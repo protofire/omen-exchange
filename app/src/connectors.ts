@@ -1,7 +1,14 @@
 import { Connectors } from 'web3-react'
 import WalletConnectApi from '@walletconnect/web3-subprovider'
+import { ConnectorsEnum } from './types'
 
-export const WalletConnect = new Connectors.WalletConnectConnector({
+const { InjectedConnector, WalletConnectConnector } = Connectors
+
+const MetaMask = new InjectedConnector({
+  supportedNetworks: [1, 4],
+})
+
+const WalletConnect = new WalletConnectConnector({
   api: WalletConnectApi,
   bridge: 'https://bridge.walletconnect.org',
   supportedNetworkURLs: {
@@ -10,3 +17,9 @@ export const WalletConnect = new Connectors.WalletConnectConnector({
   },
   defaultNetwork: 4,
 })
+
+const connector = (process.env.REACT_APP_CONNECTOR || 'MetaMask') as ConnectorsEnum
+
+const connectorToExport = connector === ConnectorsEnum.MetaMask ? { MetaMask } : { WalletConnect }
+
+export default connectorToExport

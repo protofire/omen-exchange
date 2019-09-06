@@ -1,48 +1,77 @@
 import React from 'react'
-import Web3Provider from 'web3-react'
+import Web3Provider, { useWeb3Context, Web3Consumer } from 'web3-react'
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
-import { WalletConnect } from './connectors'
-import { useWeb3Context } from 'web3-react'
+import connectors from './connectors'
 
 const ConnectWallet: React.FC = () => {
   const context = useWeb3Context()
 
-  const connect = () => {
-    context.setConnector('WalletConnect', { networkId: 4 })
+  if (context.error) {
+    console.error('Error in web3 context', context.error)
   }
 
   React.useEffect(() => {
-    if (context.active && !context.account) {
+    if (context.active && !context.account && context.connectorName === 'WalletConnect') {
       const uri = context.connector.walletConnector.uri
       WalletConnectQRCodeModal.open(uri, () => {})
 
       context.connector.walletConnector.on('connect', () => {
         WalletConnectQRCodeModal.close()
       })
+    } else {
+      try {
+        WalletConnectQRCodeModal.close()
+      } catch (err) {
+        console.error(err)
+      }
     }
   }, [context, context.active])
 
-  return <button onClick={connect}>Connect</button>
+  return (
+    <>
+      {Object.keys(connectors).map(connectorName => (
+        <button
+          key={connectorName}
+          disabled={context.connectorName === connectorName}
+          onClick={() => context.setConnector(connectorName)}
+        >
+          Connect with {connectorName}
+        </button>
+      ))}
+
+      {(context.active || (context.error && context.connectorName)) && (
+        <button onClick={() => context.unsetConnector()}>
+          {context.active ? 'Deactivate Connector' : 'Reset'}
+        </button>
+      )}
+    </>
+  )
 }
 
-const Account: React.FC = () => {
-  const context = useWeb3Context()
-
-  return <div>{context.account || 'not connected'}</div>
-}
-
-const CurrentNetwork: React.FC = () => {
-  const context = useWeb3Context()
-
-  return <div>{context.networkId}</div>
+const ConnectionStatus: React.FC = () => {
+  return (
+    <Web3Consumer>
+      {// eslint-disable-next-line
+        (context: any) => {
+        const { active, account, networkId } = context
+        return (
+          active && (
+            <React.Fragment>
+              <p>Account: {account || 'None'}</p>
+              <p>Network ID: {networkId || 'None'}</p>
+            </React.Fragment>
+          )
+        )
+      }}
+    </Web3Consumer>
+  )
 }
 
 const App: React.FC = () => {
   return (
-    <Web3Provider connectors={{ WalletConnect }} libraryName="ethers.js">
+    <Web3Provider connectors={connectors} libraryName="ethers.js">
       <ConnectWallet />
-      <Account />
-      <CurrentNetwork />
+      <ConnectionStatus />
     </Web3Provider>
   )
 }
