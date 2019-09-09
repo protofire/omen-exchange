@@ -25,15 +25,12 @@ const ConnectWallet: React.FC = () => {
   }, [context, context.active])
 
   return (
-    <>
-      <button
-        key={connectorName}
-        disabled={context.connectorName === connectorName}
-        onClick={() => context.setConnector(connectorName)}
-      >
-        Connect with {connectorName}
-      </button>
-    </>
+    <button
+      disabled={context.connectorName === connectorName}
+      onClick={() => context.setConnector(connectorName)}
+    >
+      Connect with {connectorName}
+    </button>
   )
 }
 
