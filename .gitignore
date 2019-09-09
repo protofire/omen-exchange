@@ -56,6 +56,10 @@ typings/
 
 # dotenv environment variables file
 .env
+./app/.env
 
 # next.js build output
 .next
+
+# Webstorm project configuration
+.idea
