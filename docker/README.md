@@ -16,5 +16,5 @@ docker run -it --rm gnosis-cond-ganache
 The addresses of the contracts are saved in a file inside the container. You can see them with:
 
 ```
-docker run -it --rm cat contracts_addresses.txt
+docker run -it --rm gnosis-cond-ganache cat contracts_addresses.txt
 ```
