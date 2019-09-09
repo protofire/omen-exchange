@@ -3,6 +3,9 @@ import Web3Provider, { useWeb3Context, Web3Consumer } from 'web3-react'
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
 import connectors from './connectors'
 
+const connectorName: string = process.env.REACT_APP_CONNECTOR || 'MetaMask'
+const connector = connectors[connectorName as keyof typeof connectors]
+
 const ConnectWallet: React.FC = () => {
   const context = useWeb3Context()
 
@@ -18,32 +21,18 @@ const ConnectWallet: React.FC = () => {
       context.connector.walletConnector.on('connect', () => {
         WalletConnectQRCodeModal.close()
       })
-    } else {
-      try {
-        WalletConnectQRCodeModal.close()
-      } catch (err) {
-        console.error(err)
-      }
     }
   }, [context, context.active])
 
   return (
     <>
-      {Object.keys(connectors).map(connectorName => (
-        <button
-          key={connectorName}
-          disabled={context.connectorName === connectorName}
-          onClick={() => context.setConnector(connectorName)}
-        >
-          Connect with {connectorName}
-        </button>
-      ))}
-
-      {(context.active || (context.error && context.connectorName)) && (
-        <button onClick={() => context.unsetConnector()}>
-          {context.active ? 'Deactivate Connector' : 'Reset'}
-        </button>
-      )}
+      <button
+        key={connectorName}
+        disabled={context.connectorName === connectorName}
+        onClick={() => context.setConnector(connectorName)}
+      >
+        Connect with {connectorName}
+      </button>
     </>
   )
 }
@@ -51,8 +40,7 @@ const ConnectWallet: React.FC = () => {
 const ConnectionStatus: React.FC = () => {
   return (
     <Web3Consumer>
-      {// eslint-disable-next-line
-        (context: any) => {
+      {(context: any) => {
         const { active, account, networkId } = context
         return (
           active && (
@@ -69,7 +57,7 @@ const ConnectionStatus: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <Web3Provider connectors={connectors} libraryName="ethers.js">
+    <Web3Provider connectors={{ [connectorName]: connector }} libraryName="ethers.js">
       <ConnectWallet />
       <ConnectionStatus />
     </Web3Provider>
