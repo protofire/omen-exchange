@@ -8,10 +8,10 @@ const ConnectionStatus: React.FC = () => {
         const { active, account, networkId } = context
         return (
           active && (
-            <React.Fragment>
+            <>
               <p>Account: {account || 'None'}</p>
               <p>Network ID: {networkId || 'None'}</p>
-            </React.Fragment>
+            </>
           )
         )
       }}
