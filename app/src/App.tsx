@@ -1,63 +1,30 @@
 import React from 'react'
-import Web3Provider, { useWeb3Context, Web3Consumer } from 'web3-react'
-import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
-import connectors from './connectors'
+import Web3Provider from 'web3-react'
+import { ThemeProvider } from 'styled-components'
+import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom'
 
-const connectorName: string = process.env.REACT_APP_CONNECTOR || 'MetaMask'
-const connector = connectors[connectorName as keyof typeof connectors]
+import { CONNECTOR } from './common/constants'
+import theme from './theme'
+import connectors from './util/connectors'
+import { ConnectWallet, ConnectionStatus, CreateMarket } from './components/'
 
-const ConnectWallet: React.FC = () => {
-  const context = useWeb3Context()
+const connector = connectors[CONNECTOR as keyof typeof connectors]
 
-  if (context.error) {
-    console.error('Error in web3 context', context.error)
-  }
-
-  React.useEffect(() => {
-    if (context.active && !context.account && context.connectorName === 'WalletConnect') {
-      const uri = context.connector.walletConnector.uri
-      WalletConnectQRCodeModal.open(uri, () => {})
-
-      context.connector.walletConnector.on('connect', () => {
-        WalletConnectQRCodeModal.close()
-      })
-    }
-  }, [context, context.active])
-
-  return (
-    <button
-      disabled={context.connectorName === connectorName}
-      onClick={() => context.setConnector(connectorName)}
-    >
-      Connect with {connectorName}
-    </button>
-  )
-}
-
-const ConnectionStatus: React.FC = () => {
-  return (
-    <Web3Consumer>
-      {(context: any) => {
-        const { active, account, networkId } = context
-        return (
-          active && (
-            <React.Fragment>
-              <p>Account: {account || 'None'}</p>
-              <p>Network ID: {networkId || 'None'}</p>
-            </React.Fragment>
-          )
-        )
-      }}
-    </Web3Consumer>
-  )
-}
+const RedirectToHome = () => <Redirect to="/" />
 
 const App: React.FC = () => {
   return (
-    <Web3Provider connectors={{ [connectorName]: connector }} libraryName="ethers.js">
-      <ConnectWallet />
-      <ConnectionStatus />
-    </Web3Provider>
+    <ThemeProvider theme={theme}>
+      <Web3Provider connectors={{ [CONNECTOR]: connector }} libraryName="ethers.js">
+        <Router>
+          <ConnectWallet />
+          <ConnectionStatus />
+          <Link to="/create">Create market</Link>
+          <Route path="/create" exact component={CreateMarket} />
+          <Route component={RedirectToHome} />
+        </Router>
+      </Web3Provider>
+    </ThemeProvider>
   )
 }
 
