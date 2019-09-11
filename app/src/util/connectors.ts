@@ -4,7 +4,7 @@ import WalletConnectApi from '@walletconnect/web3-subprovider'
 const { InjectedConnector, WalletConnectConnector } = Connectors
 
 const MetaMask = new InjectedConnector({
-  supportedNetworks: [1, 4],
+  supportedNetworks: [1, 4, 50],
 })
 
 const WalletConnect = new WalletConnectConnector({
@@ -13,6 +13,7 @@ const WalletConnect = new WalletConnectConnector({
   supportedNetworkURLs: {
     1: 'https://mainnet.infura.io',
     4: 'https://rinkeby.infura.io',
+    50: 'http://localhost:8545',
   },
   defaultNetwork: 4,
 })
