@@ -52,11 +52,9 @@ class MenuStep extends Component<Props, State> {
     ],
   }
 
-  public renderSteps() {
+  public render() {
     const { steps } = this.state
-    const currentStepItemSelected: StepItem | undefined = steps.find(
-      step => step.type === this.props.currentStep,
-    )
+    const currentStepItemSelected = steps.find(step => step.type === this.props.currentStep)
 
     const stepsBlocks = steps.map((stepItem, stepItemKey) => (
       <DivStyled
@@ -75,10 +73,6 @@ class MenuStep extends Component<Props, State> {
         {stepsBlocks}
       </>
     )
-  }
-
-  render() {
-    return <>{this.renderSteps()}</>
   }
 }
 
