@@ -29,6 +29,7 @@ cd ..
 
 # save contracts addresses
 echo "realitio: $(jq '.networks["50"].address' realitio/truffle/build/contracts/Realitio.json)" >> contracts_addresses.txt
+echo "realitio arbitrator: $(jq '.networks["50"].address' realitio/truffle/build/contracts/Arbitrator.json)" >> contracts_addresses.txt
 echo "mock dai: ${MOCK_DAI_ADDRESS}" >> contracts_addresses.txt
 echo "conditional tokens: $(jq '.networks["50"].address' conditional-tokens-contracts/build/contracts/ConditionalTokens.json)" >> contracts_addresses.txt
 echo "market maker factory: $(jq '.networks["50"].address' conditional-tokens-market-makers/build/contracts/LMSRMarketMakerFactory.json)" >> contracts_addresses.txt
