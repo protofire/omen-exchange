@@ -1,10 +1,8 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 
-import { StepType } from './types'
-
 interface Props {
-  currentStep: StepType
+  currentStep: number
 }
 
 interface State {
@@ -12,7 +10,6 @@ interface State {
 }
 
 interface StepItem {
-  type: StepType
   name: string
   value: number
 }
@@ -30,22 +27,18 @@ class MenuStep extends Component<Props, State> {
   public state: State = {
     steps: [
       {
-        type: StepType.ONE,
         name: 'Step One',
         value: 1,
       },
       {
-        type: StepType.TWO,
         name: 'Step Two',
         value: 2,
       },
       {
-        type: StepType.THREE,
         name: 'Step Tree',
         value: 3,
       },
       {
-        type: StepType.FOUR,
         name: 'Step Four',
         value: 4,
       },
@@ -54,7 +47,7 @@ class MenuStep extends Component<Props, State> {
 
   public render() {
     const { steps } = this.state
-    const currentStepItemSelected = steps.find(step => step.type === this.props.currentStep)
+    const currentStepItemSelected = steps.find(step => step.value === this.props.currentStep)
 
     const stepsBlocks = steps.map((step, index) => (
       <DivStyled
