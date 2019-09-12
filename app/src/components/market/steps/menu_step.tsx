@@ -56,12 +56,12 @@ class MenuStep extends Component<Props, State> {
     const { steps } = this.state
     const currentStepItemSelected = steps.find(step => step.type === this.props.currentStep)
 
-    const stepsBlocks = steps.map((stepItem, stepItemKey) => (
+    const stepsBlocks = steps.map((step, index) => (
       <DivStyled
-        active={currentStepItemSelected && stepItem.value <= currentStepItemSelected.value}
-        key={stepItemKey}
+        active={currentStepItemSelected && step.value <= currentStepItemSelected.value}
+        key={index}
       >
-        {stepItem.name}
+        {step.name}
       </DivStyled>
     ))
     const stepsBlocksPosition = `Step ${currentStepItemSelected &&
