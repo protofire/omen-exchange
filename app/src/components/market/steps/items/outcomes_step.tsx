@@ -76,7 +76,7 @@ class OutcomesStep extends Component<Props> {
     return (
       <>
         {this.state.errors.length > 0 && <p>{this.state.errors.join('. ')}</p>}
-        <label>Please add all the possible outcomes for the "{question}" question</label>
+        <label>Please add all the possible outcomes for the &quot;{question}&quot; question</label>
         <Div>
           <label>Outcome *</label>
           <Textfield
