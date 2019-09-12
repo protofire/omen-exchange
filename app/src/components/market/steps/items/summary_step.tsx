@@ -20,17 +20,11 @@ interface Props {
 }
 
 class SummaryStep extends Component<Props> {
-  constructor(props: Props) {
-    super(props)
-    this.back = this.back.bind(this)
-    this.submit = this.submit.bind(this)
-  }
-
-  public back(): void {
+  back = () => {
     this.props.back()
   }
 
-  public submit(): void {
+  submit = () => {
     this.props.submit()
   }
 

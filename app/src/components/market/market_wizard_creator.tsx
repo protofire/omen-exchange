@@ -49,14 +49,7 @@ class MarketWizardCreator extends Component<Props, State> {
     },
   }
 
-  constructor(props: Props) {
-    super(props)
-    this.next = this.next.bind(this)
-    this.back = this.back.bind(this)
-    this.submit = this.submit.bind(this)
-  }
-
-  public next(desiredStep: StepType) {
+  public next = (desiredStep: StepType): void => {
     const { currentStep, stepsMachine } = this.state
     const nextStep: StepType = stepsMachine.transitionTo(currentStep, desiredStep)
     this.setState({
@@ -64,7 +57,7 @@ class MarketWizardCreator extends Component<Props, State> {
     })
   }
 
-  public back(desiredStep: StepType) {
+  public back = (desiredStep: StepType): void => {
     const { currentStep, stepsMachine } = this.state
     const nextStep: StepType = stepsMachine.transitionFrom(currentStep, desiredStep)
     this.setState({
@@ -74,10 +67,6 @@ class MarketWizardCreator extends Component<Props, State> {
 
   public handleChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = event.target
-
-    // const state = ({
-    //   [name]: value,
-    // } as unknown) as State
 
     this.setState((prevState: State) => ({
       ...prevState,
@@ -98,13 +87,13 @@ class MarketWizardCreator extends Component<Props, State> {
     }))
   }
 
-  public submit() {
+  public submit = () => {
     const { callback } = this.props
 
     callback({ ...this.state.marketData })
   }
 
-  public currentStep() {
+  public currentStep = () => {
     const { currentStep, marketData } = this.state
 
     const {
@@ -173,7 +162,7 @@ class MarketWizardCreator extends Component<Props, State> {
     }
   }
 
-  public currentMenu() {
+  public currentMenu = () => {
     const { currentStep } = this.state
     return <MenuStep currentStep={currentStep} />
   }

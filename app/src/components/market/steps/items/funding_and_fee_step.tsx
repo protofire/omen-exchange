@@ -28,17 +28,11 @@ class FundingAndFeeStep extends Component<Props> {
     errors: [],
   }
 
-  constructor(props: Props) {
-    super(props)
-    this.back = this.back.bind(this)
-    this.validate = this.validate.bind(this)
-  }
-
-  public back(): void {
+  public back = () => {
     this.props.back()
   }
 
-  public validate(e: any): void {
+  public validate = (e: any) => {
     e.preventDefault()
 
     const { values } = this.props

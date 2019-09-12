@@ -30,12 +30,7 @@ class AskQuestionStep extends Component<Props, State> {
     errors: [],
   }
 
-  constructor(props: Props) {
-    super(props)
-    this.validate = this.validate.bind(this)
-  }
-
-  public validate(e: any): void {
+  public validate = (e: any) => {
     e.preventDefault()
 
     const { values } = this.props
