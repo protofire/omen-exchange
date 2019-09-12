@@ -44,8 +44,8 @@ class FundingAndFeeStep extends Component<Props> {
     const { values } = this.props
     const { spread, funding } = values
 
-    const errors = []
     if (!spread || !funding) {
+      const errors = []
       errors.push(`Please check the required fields`)
       this.setState({
         errors,

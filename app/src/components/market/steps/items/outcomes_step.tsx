@@ -52,8 +52,8 @@ class OutcomesStep extends Component<Props> {
       outcomeProbabilityTwo,
     } = values
 
-    const errors = []
     if (!outcomeValueOne || !outcomeValueTwo || !outcomeProbabilityOne || !outcomeProbabilityTwo) {
+      const errors = []
       errors.push(`Please check the required fields`)
       this.setState({
         errors,

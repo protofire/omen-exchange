@@ -41,8 +41,8 @@ class AskQuestionStep extends Component<Props, State> {
     const { values } = this.props
     const { question, category, resolution } = values
 
-    const errors = []
     if (!question || !category || !resolution) {
+      const errors = []
       errors.push(`Please check the required fields`)
       this.setState({
         errors,
