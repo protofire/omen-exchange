@@ -10,7 +10,7 @@ import {
   MenuStep,
 } from './steps'
 
-interface Values {
+interface MarketData {
   question: string
   category: string
   resolution: Date | null
@@ -23,29 +23,30 @@ interface Values {
 }
 
 interface Props {
-  callback: (param: Values) => void
+  callback: (param: MarketData) => void
 }
 
-interface Steps {
+interface State {
   currentStep: StepType
   stepsMachine: StepsMachine
+  marketData: MarketData
 }
-
-type State = Values & Steps
 
 class MarketWizardCreator extends Component<Props, State> {
   public state: State = {
     currentStep: StepType.ONE,
     stepsMachine: new StepsMachine(),
-    question: '',
-    category: '',
-    resolution: null,
-    spread: '',
-    funding: '',
-    outcomeValueOne: '',
-    outcomeValueTwo: '',
-    outcomeProbabilityOne: '',
-    outcomeProbabilityTwo: '',
+    marketData: {
+      question: '',
+      category: '',
+      resolution: null,
+      spread: '',
+      funding: '',
+      outcomeValueOne: '',
+      outcomeValueTwo: '',
+      outcomeProbabilityOne: '',
+      outcomeProbabilityTwo: '',
+    },
   }
 
   constructor(props: Props) {
@@ -74,49 +75,39 @@ class MarketWizardCreator extends Component<Props, State> {
   public handleChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = event.target
 
-    const state = ({
-      [name]: value,
-    } as unknown) as State
+    // const state = ({
+    //   [name]: value,
+    // } as unknown) as State
 
-    this.setState(state)
+    this.setState((prevState: State) => ({
+      ...prevState,
+      marketData: {
+        ...prevState.marketData,
+        [name]: value,
+      },
+    }))
   }
 
   public handleChangeDate = (date: Date | null) => {
-    this.setState({
-      resolution: date,
-    })
+    this.setState((prevState: State) => ({
+      ...prevState,
+      marketData: {
+        ...prevState.marketData,
+        resolution: date,
+      },
+    }))
   }
 
   public submit() {
     const { callback } = this.props
-    const {
-      question,
-      category,
-      resolution,
-      spread,
-      funding,
-      outcomeValueOne,
-      outcomeValueTwo,
-      outcomeProbabilityOne,
-      outcomeProbabilityTwo,
-    } = this.state
 
-    callback({
-      question,
-      category,
-      resolution,
-      spread,
-      funding,
-      outcomeValueOne,
-      outcomeValueTwo,
-      outcomeProbabilityOne,
-      outcomeProbabilityTwo,
-    })
+    callback({ ...this.state.marketData })
   }
 
   public currentStep() {
+    const { currentStep, marketData } = this.state
+
     const {
-      currentStep,
       question,
       category,
       resolution,
@@ -126,7 +117,7 @@ class MarketWizardCreator extends Component<Props, State> {
       outcomeValueTwo,
       outcomeProbabilityOne,
       outcomeProbabilityTwo,
-    } = this.state
+    } = marketData
 
     switch (currentStep) {
       case StepType.ONE:
@@ -167,17 +158,7 @@ class MarketWizardCreator extends Component<Props, State> {
           <SummaryStep
             back={() => this.back(StepType.THREE)}
             submit={() => this.submit()}
-            values={{
-              question,
-              category,
-              resolution,
-              spread,
-              funding,
-              outcomeValueOne,
-              outcomeValueTwo,
-              outcomeProbabilityOne,
-              outcomeProbabilityTwo,
-            }}
+            values={{ ...marketData }}
           />
         )
       default:
