@@ -23,7 +23,7 @@ const Div = styled.div`
   align-items: center;
 `
 
-class SecondStep extends Component<Props> {
+class FundingAndFeeStep extends Component<Props> {
   public state: State = {
     errors: [],
   }
@@ -76,4 +76,4 @@ class SecondStep extends Component<Props> {
   }
 }
 
-export { SecondStep }
+export { FundingAndFeeStep }

@@ -19,7 +19,7 @@ interface Props {
   }
 }
 
-class FourthStep extends Component<Props> {
+class SummaryStep extends Component<Props> {
   constructor(props: Props) {
     super(props)
     this.back = this.back.bind(this)
@@ -74,4 +74,4 @@ class FourthStep extends Component<Props> {
   }
 }
 
-export { FourthStep }
+export { SummaryStep }

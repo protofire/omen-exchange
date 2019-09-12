@@ -3,10 +3,10 @@ import React, { Component, ChangeEvent } from 'react'
 import {
   StepTypes,
   StepsMachine,
-  FirstStep,
-  SecondStep,
-  ThirdStep,
-  FourthStep,
+  AskQuestionStep,
+  FundingAndFeeStep,
+  OutcomesStep,
+  SummaryStep,
   MenuStep,
 } from './steps'
 
@@ -131,7 +131,7 @@ class MarketWizardCreator extends Component<Props, State> {
     switch (currentStep) {
       case StepTypes.ONE:
         return (
-          <FirstStep
+          <AskQuestionStep
             next={() => this.next(StepTypes.TWO)}
             values={{ question, category, resolution }}
             handleChange={this.handleChange}
@@ -140,7 +140,7 @@ class MarketWizardCreator extends Component<Props, State> {
         )
       case StepTypes.TWO:
         return (
-          <SecondStep
+          <FundingAndFeeStep
             next={() => this.next(StepTypes.THREE)}
             back={() => this.back(StepTypes.ONE)}
             values={{ spreed, funding }}
@@ -149,7 +149,7 @@ class MarketWizardCreator extends Component<Props, State> {
         )
       case StepTypes.THREE:
         return (
-          <ThirdStep
+          <OutcomesStep
             next={() => this.next(StepTypes.FOUR)}
             back={() => this.back(StepTypes.TWO)}
             values={{
@@ -164,7 +164,7 @@ class MarketWizardCreator extends Component<Props, State> {
         )
       case StepTypes.FOUR:
         return (
-          <FourthStep
+          <SummaryStep
             back={() => this.back(StepTypes.THREE)}
             submit={() => this.submit()}
             values={{
@@ -182,7 +182,7 @@ class MarketWizardCreator extends Component<Props, State> {
         )
       default:
         return (
-          <FirstStep
+          <AskQuestionStep
             next={() => this.next(StepTypes.TWO)}
             values={{ question, category, resolution }}
             handleChange={this.handleChange}
