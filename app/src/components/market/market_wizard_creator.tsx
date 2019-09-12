@@ -14,7 +14,7 @@ interface Values {
   question: string
   category: string
   resolution: Date | null
-  spreed: string
+  spread: string
   funding: string
   outcomeValueOne: string
   outcomeValueTwo: string
@@ -40,7 +40,7 @@ class MarketWizardCreator extends Component<Props, State> {
     question: '',
     category: '',
     resolution: null,
-    spreed: '',
+    spread: '',
     funding: '',
     outcomeValueOne: '',
     outcomeValueTwo: '',
@@ -93,7 +93,7 @@ class MarketWizardCreator extends Component<Props, State> {
       question,
       category,
       resolution,
-      spreed,
+      spread,
       funding,
       outcomeValueOne,
       outcomeValueTwo,
@@ -105,7 +105,7 @@ class MarketWizardCreator extends Component<Props, State> {
       question,
       category,
       resolution,
-      spreed,
+      spread,
       funding,
       outcomeValueOne,
       outcomeValueTwo,
@@ -120,7 +120,7 @@ class MarketWizardCreator extends Component<Props, State> {
       question,
       category,
       resolution,
-      spreed,
+      spread,
       funding,
       outcomeValueOne,
       outcomeValueTwo,
@@ -143,7 +143,7 @@ class MarketWizardCreator extends Component<Props, State> {
           <FundingAndFeeStep
             next={() => this.next(StepType.THREE)}
             back={() => this.back(StepType.ONE)}
-            values={{ spreed, funding }}
+            values={{ spread, funding }}
             handleChange={this.handleChange}
           />
         )
@@ -171,7 +171,7 @@ class MarketWizardCreator extends Component<Props, State> {
               question,
               category,
               resolution,
-              spreed,
+              spread,
               funding,
               outcomeValueOne,
               outcomeValueTwo,

@@ -7,7 +7,7 @@ interface Props {
   back: () => void
   next: () => void
   values: {
-    spreed: string
+    spread: string
     funding: string
   }
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
@@ -42,10 +42,10 @@ class FundingAndFeeStep extends Component<Props> {
     e.preventDefault()
 
     const { values } = this.props
-    const { spreed, funding } = values
+    const { spread, funding } = values
 
     const errors = []
-    if (!spreed || !funding) {
+    if (!spread || !funding) {
       errors.push(`Please check the required fields`)
       this.setState({
         errors,
@@ -57,13 +57,13 @@ class FundingAndFeeStep extends Component<Props> {
 
   render() {
     const { values, handleChange } = this.props
-    const { spreed, funding } = values
+    const { spread, funding } = values
     return (
       <>
         {this.state.errors.length > 0 && <p>{this.state.errors.join('. ')}</p>}
         <Div>
-          <label>Spreed/Fee *</label>
-          <Textfield type="text" name="spreed" defaultValue={spreed} onChange={handleChange} />
+          <label>Spread/Fee *</label>
+          <Textfield type="text" name="spread" defaultValue={spread} onChange={handleChange} />
         </Div>
         <Div>
           <label>Funding *</label>

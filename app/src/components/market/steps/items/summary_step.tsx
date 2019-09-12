@@ -10,7 +10,7 @@ interface Props {
     question: string
     category: string
     resolution: Date | null
-    spreed: string
+    spread: string
     funding: string
     outcomeValueOne: string
     outcomeValueTwo: string
@@ -40,7 +40,7 @@ class SummaryStep extends Component<Props> {
       question,
       category,
       resolution,
-      spreed,
+      spread,
       funding,
       outcomeValueOne,
       outcomeValueTwo,
@@ -59,7 +59,7 @@ class SummaryStep extends Component<Props> {
         <div>Question: {question}</div>
         <div>Oracle: Lorem ipsum oracle</div>
         <div>Category: {category}</div>
-        <div>Spreed/Fee: {spreed}</div>
+        <div>Spread/Fee: {spread}</div>
         <div>Funding: {funding}</div>
         <div>Resolution date: {resolutionDate}</div>
         <div>Outcomes:</div>
