@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 
-import { StepTypes } from './types'
+import { StepType } from './types'
 
 interface Props {
-  currentStep: StepTypes
+  currentStep: StepType
 }
 
 interface State {
@@ -12,7 +12,7 @@ interface State {
 }
 
 interface StepItem {
-  type: StepTypes
+  type: StepType
   name: string
   value: number
 }
@@ -30,22 +30,22 @@ class MenuStep extends Component<Props, State> {
   public state: State = {
     steps: [
       {
-        type: StepTypes.ONE,
+        type: StepType.ONE,
         name: 'Step One',
         value: 1,
       },
       {
-        type: StepTypes.TWO,
+        type: StepType.TWO,
         name: 'Step Two',
         value: 2,
       },
       {
-        type: StepTypes.THREE,
+        type: StepType.THREE,
         name: 'Step Tree',
         value: 3,
       },
       {
-        type: StepTypes.FOUR,
+        type: StepType.FOUR,
         name: 'Step Four',
         value: 4,
       },

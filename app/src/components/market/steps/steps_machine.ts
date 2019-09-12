@@ -1,4 +1,4 @@
-import { StepTypes } from './types'
+import { StepType } from './types'
 
 // Coordinate transitions
 export class StepsMachine {
@@ -6,9 +6,9 @@ export class StepsMachine {
 
   constructor() {
     this.transitions = {
-      [StepTypes.ONE]: StepTypes.TWO,
-      [StepTypes.TWO]: StepTypes.THREE,
-      [StepTypes.THREE]: StepTypes.FOUR,
+      [StepType.ONE]: StepType.TWO,
+      [StepType.TWO]: StepType.THREE,
+      [StepType.THREE]: StepType.FOUR,
     }
   }
 
@@ -26,7 +26,7 @@ export class StepsMachine {
     }
   }
 
-  checkStep(availableStep: StepTypes, nextStep: StepTypes) {
+  checkStep(availableStep: StepType, nextStep: StepType) {
     if (availableStep === nextStep) {
       return nextStep
     } else {
@@ -34,14 +34,14 @@ export class StepsMachine {
     }
   }
 
-  transitionTo(currentStep: StepTypes, nextStep: StepTypes): StepTypes {
-    const availableStep = this.transitions[currentStep] as StepTypes
+  transitionTo(currentStep: StepType, nextStep: StepType): StepType {
+    const availableStep = this.transitions[currentStep] as StepType
     return this.checkStep(availableStep, nextStep)
   }
 
-  transitionFrom(currentStep: StepTypes, nextStep: StepTypes): StepTypes {
+  transitionFrom(currentStep: StepType, nextStep: StepType): StepType {
     const reversed = this.reversed(this.transitions)
-    const availableStep = reversed[currentStep].concat() as StepTypes
+    const availableStep = reversed[currentStep].concat() as StepType
     return this.checkStep(availableStep, nextStep)
   }
 }
