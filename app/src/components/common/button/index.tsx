@@ -4,7 +4,7 @@ interface Props extends HTMLAttributes<HTMLButtonElement> {
   children: ReactNode
   type?: 'button' | 'submit' | 'reset' | undefined
   disabled?: boolean
-  onClick?: () => void
+  onClick?: (e?: any) => void
 }
 
 export const Button = (props: Props) => {

@@ -2,9 +2,10 @@ import React from 'react'
 
 interface Props {
   type: string
-  value: string
   name: string
+  value?: string
   placeholder?: string
+  defaultValue?: string
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => any
   onClick?: (event: React.MouseEvent<HTMLInputElement>) => any
   autoFocus?: boolean
