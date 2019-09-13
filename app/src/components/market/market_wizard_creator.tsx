@@ -16,6 +16,7 @@ interface MarketData {
 
 interface Props {
   callback: (param: MarketData) => void
+  status: string
 }
 
 interface State {
@@ -138,6 +139,7 @@ class MarketWizardCreator extends Component<Props, State> {
             back={() => this.back()}
             submit={() => this.submit()}
             values={{ ...marketData }}
+            status={this.props.status}
           />
         )
       default:

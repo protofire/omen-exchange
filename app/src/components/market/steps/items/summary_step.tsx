@@ -17,6 +17,7 @@ interface Props {
     outcomeProbabilityOne: string
     outcomeProbabilityTwo: string
   }
+  status: string
 }
 
 class SummaryStep extends Component<Props> {
@@ -29,7 +30,7 @@ class SummaryStep extends Component<Props> {
   }
 
   render() {
-    const { values } = this.props
+    const { values, status } = this.props
     const {
       question,
       category,
@@ -61,6 +62,7 @@ class SummaryStep extends Component<Props> {
           {outcomeValueOne} - {outcomeProbabilityOne}
           {outcomeValueTwo} - {outcomeProbabilityTwo}
         </div>
+        <div>Status: {status}</div>
         <Button onClick={this.back}>Back</Button>
         <Button onClick={this.submit}>Create Market</Button>
       </>
