@@ -41,4 +41,4 @@ class ERC20Service {
   }
 }
 
-export default ERC20Service
+export { ERC20Service }
