@@ -18,10 +18,10 @@ const Market: FC = () => {
     const provider = context.library
 
     const { question, resolution } = data
-    const openingTimestamp = (moment(resolution).unix() as unknown) as number
+    const openingDateMoment = moment(resolution)
 
     setStatus('loading')
-    await RealitioService.askQuestion(question, openingTimestamp, provider, networkId)
+    await RealitioService.askQuestion(question, openingDateMoment, provider, networkId)
     setStatus('done')
   }
 
