@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom
 import { CONNECTOR } from './common/constants'
 import theme from './theme'
 import connectors from './util/connectors'
-import { ConnectWallet, ConnectionStatus, Market } from './components/'
+import { ConnectWallet, ConnectionStatus, MarketWizardCreatorContainer } from './components/'
 
 const connector = connectors[CONNECTOR as keyof typeof connectors]
 
@@ -20,7 +20,7 @@ const App: React.FC = () => {
           <ConnectWallet />
           <ConnectionStatus />
           <Link to="/create">Create market</Link>
-          <Route path="/create" exact component={Market} />
+          <Route path="/create" exact component={MarketWizardCreatorContainer} />
           <Route component={RedirectToHome} />
         </Router>
       </Web3Provider>

@@ -5,7 +5,7 @@ import moment from 'moment'
 import { MarketWizardCreator } from './market_wizard_creator'
 import RealitioService from '../../services/realitio'
 
-const Market: FC = () => {
+const MarketWizardCreatorContainer: FC = () => {
   const context = useWeb3Context()
   const [status, setStatus] = useState('ready')
 
@@ -28,4 +28,4 @@ const Market: FC = () => {
   return <MarketWizardCreator callback={handleSubmit} status={status} />
 }
 
-export { Market }
+export { MarketWizardCreatorContainer }
