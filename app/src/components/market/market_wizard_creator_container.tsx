@@ -3,7 +3,7 @@ import { useWeb3Context } from 'web3-react'
 import moment from 'moment'
 
 import { MarketWizardCreator } from './market_wizard_creator'
-import RealitioService from '../../services/realitio'
+import { RealitioService } from '../../services'
 
 const MarketWizardCreatorContainer: FC = () => {
   const context = useWeb3Context()
