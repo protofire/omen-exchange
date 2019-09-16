@@ -72,19 +72,9 @@ class OutcomesStep extends Component<Props> {
         {this.state.errors.length > 0 && <p>{this.state.errors.join('. ')}</p>}
         <label>Please add all the possible outcomes for the &quot;{question}&quot; question</label>
         <Div>
-          <label>Outcome *</label>
-          <Textfield
-            name="outcomeValueOne"
-            type="text"
-            defaultValue={outcomeValueOne}
-            onChange={handleChange}
-          />
-          <Textfield
-            name="outcomeValueTwo"
-            type="text"
-            defaultValue={outcomeValueTwo}
-            onChange={handleChange}
-          />
+          <label>Outcome</label>
+          {outcomeValueOne}
+          {outcomeValueTwo}
         </Div>
         <Div>
           <label>Probability *</label>
