@@ -1,4 +1,5 @@
 import { ethers } from 'ethers'
+import { Moment } from 'moment'
 
 import { getContractAddress } from '../util/addresses'
 
@@ -24,7 +25,7 @@ class RealitioService {
    */
   static askQuestion = async (
     question: string,
-    openingTimestamp: number,
+    openingDateMoment: Moment,
     provider: any,
     networkId: number,
     value = '0',
@@ -41,6 +42,7 @@ class RealitioService {
       signer,
     )
 
+    const openingTimestamp = openingDateMoment.unix()
     const questionId = await realitioConstantContract.askQuestion(
       0,
       question,
