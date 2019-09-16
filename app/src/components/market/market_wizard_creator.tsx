@@ -2,7 +2,7 @@ import React, { Component, ChangeEvent } from 'react'
 
 import { AskQuestionStep, FundingAndFeeStep, OutcomesStep, SummaryStep, MenuStep } from './steps'
 
-interface MarketData {
+export interface MarketData {
   question: string
   category: string
   resolution: Date | null
@@ -24,7 +24,7 @@ interface State {
   marketData: MarketData
 }
 
-class MarketWizardCreator extends Component<Props, State> {
+export class MarketWizardCreator extends Component<Props, State> {
   public state: State = {
     currentStep: 1,
     marketData: {
@@ -168,5 +168,3 @@ class MarketWizardCreator extends Component<Props, State> {
     )
   }
 }
-
-export { MarketWizardCreator }
