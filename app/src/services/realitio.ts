@@ -1,7 +1,10 @@
 import { ethers } from 'ethers'
 import { Moment } from 'moment'
 
+import { getLogger } from '../util/logger'
 import { getContractAddress } from '../util/addresses'
+
+const logger = getLogger('Services::Realitio')
 
 const realitioAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public payable returns (bytes32)',
@@ -53,9 +56,18 @@ class RealitioService {
     )
 
     // send the transaction and wait until it's mined
-    await realitioContract.askQuestion(0, question, arbitrator, '86400', openingTimestamp, 0, {
-      value: ethers.utils.bigNumberify(value),
-    })
+    const transactionObject = await realitioContract.askQuestion(
+      0,
+      question,
+      arbitrator,
+      '86400',
+      openingTimestamp,
+      0,
+      {
+        value: ethers.utils.bigNumberify(value),
+      },
+    )
+    logger.log(`Ask question transaction hash: ${transactionObject.hash}`)
 
     return questionId
   }
