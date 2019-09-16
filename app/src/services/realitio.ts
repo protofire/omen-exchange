@@ -14,7 +14,13 @@ class RealitioService {
   /**
    * Create a question in the realit.io contract. Returns a promise that resolves when the transaction is mined.
    *
-   * @returns {Promise<string>} A promise that resolves to a string with the bytes32 corresponding to the id of the
+   * @param question - The question to ask
+   * @param openingTimestamp - The moment after which the question can be answered, specified in epoch seconds
+   * @param provider - ethers.js provider obtained from the web3 context
+   * @param networkId - the current network id
+   * @param value - The amount of value to send, specified in wei
+   *
+   * @returns A promise that resolves to a string with the bytes32 corresponding to the id of the
    * question
    */
   static askQuestion = async (
@@ -22,6 +28,7 @@ class RealitioService {
     openingDateMoment: Moment,
     provider: any,
     networkId: number,
+    value = '0',
   ): Promise<string> => {
     const signer = provider.getSigner()
 
@@ -46,10 +53,12 @@ class RealitioService {
     )
 
     // send the transaction and wait until it's mined
-    await realitioContract.askQuestion(0, question, arbitrator, '86400', openingTimestamp, 0)
+    await realitioContract.askQuestion(0, question, arbitrator, '86400', openingTimestamp, 0, {
+      value: ethers.utils.bigNumberify(value),
+    })
 
     return questionId
   }
 }
 
-export default RealitioService
+export { RealitioService }
