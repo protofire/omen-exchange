@@ -4,7 +4,7 @@ import { useWeb3Context } from 'web3-react'
 import moment from 'moment'
 
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
-import { RealitioService, ERC20Service } from '../../services'
+import { RealitioService, ERC20Service, ConditionalTokenService } from '../../services'
 import { getContractAddress } from '../../util/addresses'
 
 const MarketWizardCreatorContainer: FC = () => {
@@ -27,7 +27,15 @@ const MarketWizardCreatorContainer: FC = () => {
     const openingDateMoment = moment(resolution)
 
     setStatus('posting question to realitio')
-    await RealitioService.askQuestion(question, openingDateMoment, provider, networkId)
+    const questionId = await RealitioService.askQuestion(
+      question,
+      openingDateMoment,
+      provider,
+      networkId,
+    )
+
+    setStatus('prepare condition')
+    await ConditionalTokenService.prepareCondition(questionId, provider, networkId)
 
     // approve movement of DAI to MarketMakerFactory
     setStatus('approving DAI')
