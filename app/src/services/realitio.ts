@@ -59,4 +59,4 @@ class RealitioService {
   }
 }
 
-export default RealitioService
+export { RealitioService }
