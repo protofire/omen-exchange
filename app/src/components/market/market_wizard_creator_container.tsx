@@ -4,7 +4,12 @@ import { useWeb3Context } from 'web3-react'
 import moment from 'moment'
 
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
-import { RealitioService, ERC20Service, ConditionalTokenService } from '../../services'
+import {
+  RealitioService,
+  ERC20Service,
+  ConditionalTokenService,
+  MarketMakerService,
+} from '../../services'
 import { getContractAddress } from '../../util/addresses'
 
 const MarketWizardCreatorContainer: FC = () => {
@@ -35,7 +40,11 @@ const MarketWizardCreatorContainer: FC = () => {
     )
 
     setStatus('prepare condition')
-    await ConditionalTokenService.prepareCondition(questionId, provider, networkId)
+    const conditionId = await ConditionalTokenService.prepareCondition(
+      questionId,
+      provider,
+      networkId,
+    )
 
     // approve movement of DAI to MarketMakerFactory
     setStatus('approving DAI')
@@ -53,6 +62,9 @@ const MarketWizardCreatorContainer: FC = () => {
     if (!hasEnoughAlowance) {
       await daiService.approve(provider, marketMakerFactoryAddress, fundingWei)
     }
+
+    setStatus('create Market Maker')
+    await MarketMakerService.createMarketMaker(conditionId, fundingWei, provider, networkId)
 
     setStatus('done')
   }
