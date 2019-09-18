@@ -4,7 +4,7 @@ You need to build your app by running the following in the root of your project 
 
 You should now have an updated IPFS compatible build in the “build” folder of your React app.
 
-Now that you have our app is prepared, we can host the app on IPFS.
+Now that your app is prepared, we can host the app on IPFS.
 
 We have two options:
 #### A free service. 
