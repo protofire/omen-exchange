@@ -19,7 +19,7 @@ RUN git clone https://github.com/gnosis/conditional-tokens-contracts.git && \
 
 RUN git clone https://github.com/gnosis/conditional-tokens-market-makers.git && \
   cd conditional-tokens-market-makers && \
-  git checkout 5506d1fd182d84fc4429623dc33af58b5085be23 && \
+  git checkout 49b8fc1494a20f6233d10e534dac60ce7ccf9868 && \
   npm install
 
 # deploy contracts in ganache

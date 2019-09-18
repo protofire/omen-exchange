@@ -18,6 +18,7 @@ interface Props {
   callback: (param: MarketData) => void
   status: string
   questionId: string | null
+  marketMakerAddress: string | null
 }
 
 interface State {
@@ -87,7 +88,7 @@ export class MarketWizardCreator extends Component<Props, State> {
 
   public currentStep = () => {
     const { currentStep, marketData } = this.state
-    const { status, questionId } = this.props
+    const { marketMakerAddress, status, questionId } = this.props
 
     const {
       question,
@@ -143,6 +144,7 @@ export class MarketWizardCreator extends Component<Props, State> {
             values={{ ...marketData }}
             status={status}
             questionId={questionId}
+            marketMakerAddress={marketMakerAddress}
           />
         )
       default:

@@ -16,7 +16,7 @@ const addresses: { [networkId: number]: KnownContracts } = {
     realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
     realitioArbitrator: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
     dai: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-    marketMakerFactory: '0xBeBE9776252396cB1Da2c86Fa850A8D851A9E962',
+    marketMakerFactory: '0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E',
     conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
   },
   [networkIds.GANACHE]: {
