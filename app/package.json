@@ -54,6 +54,7 @@
       "pre-push": "yarn run lint"
     }
   },
+  "homepage": "./",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.1.0",
     "@typescript-eslint/parser": "^2.1.0",
