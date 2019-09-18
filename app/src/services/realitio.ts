@@ -34,6 +34,7 @@ class RealitioService {
     value = '0',
   ): Promise<string> => {
     const signer = provider.getSigner()
+    const signerAddress = await signer.getAddress()
 
     const realitioAddress = getContractAddress(networkId, 'realitio')
     const arbitrator = getContractAddress(networkId, 'realitioArbitrator')
@@ -53,6 +54,7 @@ class RealitioService {
       '86400',
       openingTimestamp,
       0,
+      { from: signerAddress },
     )
 
     // send the transaction and wait until it's mined
