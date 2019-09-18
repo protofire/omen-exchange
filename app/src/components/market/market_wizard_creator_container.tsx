@@ -16,6 +16,7 @@ const MarketWizardCreatorContainer: FC = () => {
   const context = useWeb3Context()
   const [status, setStatus] = useState('ready')
   const [questionId, setQuestionId] = useState<string | null>(null)
+  const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
   const handleSubmit = async (data: MarketData) => {
     if (!context.networkId || !context.library) {
@@ -66,12 +67,25 @@ const MarketWizardCreatorContainer: FC = () => {
     }
 
     setStatus('create Market Maker')
-    await MarketMakerService.createMarketMaker(conditionId, fundingWei, provider, networkId)
+    const marketMakerAddress = await MarketMakerService.createMarketMaker(
+      conditionId,
+      fundingWei,
+      provider,
+      networkId,
+    )
+    setMarketMakerAddress(marketMakerAddress)
 
     setStatus('done')
   }
 
-  return <MarketWizardCreator callback={handleSubmit} status={status} questionId={questionId} />
+  return (
+    <MarketWizardCreator
+      callback={handleSubmit}
+      status={status}
+      questionId={questionId}
+      marketMakerAddress={marketMakerAddress}
+    />
+  )
 }
 
 export { MarketWizardCreatorContainer }
