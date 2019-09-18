@@ -18,6 +18,7 @@ interface Props {
     outcomeProbabilityTwo: string
   }
   status: string
+  questionId: string | null
 }
 
 class SummaryStep extends Component<Props> {
@@ -30,7 +31,7 @@ class SummaryStep extends Component<Props> {
   }
 
   render() {
-    const { values, status } = this.props
+    const { values, status, questionId } = this.props
     const {
       question,
       category,
@@ -63,6 +64,20 @@ class SummaryStep extends Component<Props> {
           {outcomeValueTwo} - {outcomeProbabilityTwo}
         </div>
         <div>Status: {status}</div>
+        {questionId ? (
+          <div>
+            Realitio{' '}
+            <a
+              href={`https://realitio.github.io/#!/question/${questionId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              question url
+            </a>
+          </div>
+        ) : (
+          ''
+        )}
         <Button onClick={this.back}>Back</Button>
         <Button onClick={this.submit}>Create Market</Button>
       </>

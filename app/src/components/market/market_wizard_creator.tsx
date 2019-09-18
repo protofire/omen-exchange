@@ -17,6 +17,7 @@ export interface MarketData {
 interface Props {
   callback: (param: MarketData) => void
   status: string
+  questionId: string | null
 }
 
 interface State {
@@ -33,8 +34,8 @@ export class MarketWizardCreator extends Component<Props, State> {
       resolution: null,
       spread: '',
       funding: '',
-      outcomeValueOne: '',
-      outcomeValueTwo: '',
+      outcomeValueOne: 'Yes',
+      outcomeValueTwo: 'No',
       outcomeProbabilityOne: '',
       outcomeProbabilityTwo: '',
     },
@@ -86,6 +87,7 @@ export class MarketWizardCreator extends Component<Props, State> {
 
   public currentStep = () => {
     const { currentStep, marketData } = this.state
+    const { status, questionId } = this.props
 
     const {
       question,
@@ -139,7 +141,8 @@ export class MarketWizardCreator extends Component<Props, State> {
             back={() => this.back()}
             submit={() => this.submit()}
             values={{ ...marketData }}
-            status={this.props.status}
+            status={status}
+            questionId={questionId}
           />
         )
       default:

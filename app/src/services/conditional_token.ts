@@ -1,6 +1,9 @@
 import { ethers } from 'ethers'
 
+import { getLogger } from '../util/logger'
 import { getContractAddress } from '../util/addresses'
+
+const logger = getLogger('Services::Conditional-Token')
 
 const conditionTokenAbi = [
   'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
@@ -24,7 +27,12 @@ class ConditionalTokenService {
 
     const oracleAddress = getContractAddress(networkId, 'realitioArbitrator')
 
-    await conditionalTokenContract.prepareCondition(oracleAddress, questionId, outcomeSlotCount)
+    const transactionObject = await conditionalTokenContract.prepareCondition(
+      oracleAddress,
+      questionId,
+      outcomeSlotCount,
+    )
+    logger.log(`Prepare condition transaction hash: ${transactionObject.hash}`)
 
     const conditionId = ethers.utils.solidityKeccak256(
       ['address', 'bytes32', 'uint256'],
