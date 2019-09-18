@@ -1,6 +1,10 @@
 import { ethers, Wallet } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
+import { getLogger } from '../util/logger'
+
+const logger = getLogger('Services::Erc20')
+
 const erc20Abi = [
   'function allowance(address owner, address spender) external view returns (uint256)',
   'function approve(address spender, uint256 amount) external returns (bool)',
@@ -37,7 +41,8 @@ class ERC20Service {
 
     const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, provider).connect(signer)
 
-    await erc20Contract.approve(spender, amount)
+    const transactionObject = await erc20Contract.approve(spender, amount)
+    logger.log(`Approve transaccion hash: ${transactionObject.hash}`)
   }
 }
 

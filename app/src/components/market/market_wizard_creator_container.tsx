@@ -10,6 +10,7 @@ import { getContractAddress } from '../../util/addresses'
 const MarketWizardCreatorContainer: FC = () => {
   const context = useWeb3Context()
   const [status, setStatus] = useState('ready')
+  const [questionId, setQuestionId] = useState<string | null>(null)
 
   const handleSubmit = async (data: MarketData) => {
     if (!context.networkId || !context.library) {
@@ -33,6 +34,7 @@ const MarketWizardCreatorContainer: FC = () => {
       provider,
       networkId,
     )
+    setQuestionId(questionId)
 
     setStatus('prepare condition')
     await ConditionalTokenService.prepareCondition(questionId, provider, networkId)
@@ -57,7 +59,7 @@ const MarketWizardCreatorContainer: FC = () => {
     setStatus('done')
   }
 
-  return <MarketWizardCreator callback={handleSubmit} status={status} />
+  return <MarketWizardCreator callback={handleSubmit} status={status} questionId={questionId} />
 }
 
 export { MarketWizardCreatorContainer }
