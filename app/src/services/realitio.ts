@@ -47,28 +47,14 @@ class RealitioService {
     )
 
     const openingTimestamp = openingDateMoment.unix()
-    const questionId = await realitioConstantContract.askQuestion(
-      0,
-      question,
-      arbitrator,
-      '86400',
-      openingTimestamp,
-      0,
-      { from: signerAddress },
-    )
+    const args = [0, question, arbitrator, '86400', openingTimestamp, 0]
+
+    const questionId = await realitioConstantContract.askQuestion(...args, { from: signerAddress })
 
     // send the transaction and wait until it's mined
-    const transactionObject = await realitioContract.askQuestion(
-      0,
-      question,
-      arbitrator,
-      '86400',
-      openingTimestamp,
-      0,
-      {
-        value: ethers.utils.bigNumberify(value),
-      },
-    )
+    const transactionObject = await realitioContract.askQuestion(...args, {
+      value: ethers.utils.bigNumberify(value),
+    })
     logger.log(`Ask question transaction hash: ${transactionObject.hash}`)
 
     return questionId

@@ -4,13 +4,19 @@ import { useWeb3Context } from 'web3-react'
 import moment from 'moment'
 
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
-import { RealitioService, ERC20Service, ConditionalTokenService } from '../../services'
+import {
+  RealitioService,
+  ERC20Service,
+  ConditionalTokenService,
+  MarketMakerService,
+} from '../../services'
 import { getContractAddress } from '../../util/addresses'
 
 const MarketWizardCreatorContainer: FC = () => {
   const context = useWeb3Context()
   const [status, setStatus] = useState('ready')
   const [questionId, setQuestionId] = useState<string | null>(null)
+  const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
   const handleSubmit = async (data: MarketData) => {
     if (!context.networkId || !context.library) {
@@ -37,7 +43,11 @@ const MarketWizardCreatorContainer: FC = () => {
     setQuestionId(questionId)
 
     setStatus('prepare condition')
-    await ConditionalTokenService.prepareCondition(questionId, provider, networkId)
+    const conditionId = await ConditionalTokenService.prepareCondition(
+      questionId,
+      provider,
+      networkId,
+    )
 
     // approve movement of DAI to MarketMakerFactory
     setStatus('approving DAI')
@@ -56,10 +66,26 @@ const MarketWizardCreatorContainer: FC = () => {
       await daiService.approve(provider, marketMakerFactoryAddress, fundingWei)
     }
 
+    setStatus('create Market Maker')
+    const marketMakerAddress = await MarketMakerService.createMarketMaker(
+      conditionId,
+      fundingWei,
+      provider,
+      networkId,
+    )
+    setMarketMakerAddress(marketMakerAddress)
+
     setStatus('done')
   }
 
-  return <MarketWizardCreator callback={handleSubmit} status={status} questionId={questionId} />
+  return (
+    <MarketWizardCreator
+      callback={handleSubmit}
+      status={status}
+      questionId={questionId}
+      marketMakerAddress={marketMakerAddress}
+    />
+  )
 }
 
 export { MarketWizardCreatorContainer }
