@@ -19,6 +19,7 @@ interface Props {
   }
   status: string
   questionId: string | null
+  marketMakerAddress: string | null
 }
 
 class SummaryStep extends Component<Props> {
@@ -31,7 +32,7 @@ class SummaryStep extends Component<Props> {
   }
 
   render() {
-    const { values, status, questionId } = this.props
+    const { marketMakerAddress, values, status, questionId } = this.props
     const {
       question,
       category,
@@ -78,6 +79,7 @@ class SummaryStep extends Component<Props> {
         ) : (
           ''
         )}
+        {marketMakerAddress && <div>Market Maker deployed at {marketMakerAddress}</div>}
         <Button onClick={this.back}>Back</Button>
         <Button onClick={this.submit}>Create Market</Button>
       </>
