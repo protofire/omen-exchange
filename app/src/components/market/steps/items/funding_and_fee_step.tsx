@@ -27,6 +27,15 @@ const PWarn = styled.p`
   color: red;
 `
 
+const InputStyled = styled(Textfield)`
+  text-align: right;
+`
+
+const Span = styled.span`
+  margin-left: 5px;
+  width: 25px;
+`
+
 class FundingAndFeeStep extends Component<Props> {
   public state: State = {
     errors: [],
@@ -67,7 +76,13 @@ class FundingAndFeeStep extends Component<Props> {
           <div className="col">
             <label>Spread/Fee *</label>
             <Div>
-              <Textfield type="text" name="spread" defaultValue={spread} onChange={handleChange} />
+              <InputStyled
+                type="text"
+                name="spread"
+                defaultValue={spread}
+                onChange={handleChange}
+              />
+              <Span>%</Span>
             </Div>
           </div>
         </div>
@@ -75,12 +90,13 @@ class FundingAndFeeStep extends Component<Props> {
           <div className="col">
             <label>Funding *</label>
             <Div>
-              <Textfield
+              <InputStyled
                 type="text"
                 name="funding"
                 defaultValue={funding}
                 onChange={handleChange}
               />
+              <Span>DAI</Span>
             </Div>
           </div>
         </div>
