@@ -1,8 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import 'react-datepicker/dist/react-datepicker.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
+import 'wingcss'
+import 'react-datepicker/dist/react-datepicker.css'
 
 ReactDOM.render(<App />, document.getElementById('root'))
 

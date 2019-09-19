@@ -54,17 +54,40 @@ class FundingAndFeeStep extends Component<Props> {
     const { spread, funding } = values
     return (
       <>
-        {this.state.errors.length > 0 && <p>{this.state.errors.join('. ')}</p>}
-        <Div>
-          <label>Spread/Fee *</label>
-          <Textfield type="text" name="spread" defaultValue={spread} onChange={handleChange} />
-        </Div>
-        <Div>
-          <label>Funding *</label>
-          <Textfield type="text" name="funding" defaultValue={funding} onChange={handleChange} />
-        </Div>
-        <Button onClick={this.back}>Back</Button>
-        <Button onClick={this.validate}>Next</Button>
+        {this.state.errors.length > 0 && (
+          <p>
+            <i>{this.state.errors.join('. ')}</i>
+          </p>
+        )}
+        <div className="row">
+          <div className="col">
+            <label>Spread/Fee *</label>
+            <Div>
+              <Textfield type="text" name="spread" defaultValue={spread} onChange={handleChange} />
+            </Div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col">
+            <label>Funding *</label>
+            <Div>
+              <Textfield
+                type="text"
+                name="funding"
+                defaultValue={funding}
+                onChange={handleChange}
+              />
+            </Div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col left">
+            <Button onClick={this.back}>Back</Button>
+          </div>
+          <div className="col right">
+            <Button onClick={this.validate}>Next</Button>
+          </div>
+        </div>
       </>
     )
   }

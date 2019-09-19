@@ -1,5 +1,4 @@
 import React, { ChangeEvent, Component } from 'react'
-import styled from 'styled-components'
 
 import { Button, Textfield } from '../../../common/index'
 
@@ -19,12 +18,6 @@ interface Props {
 interface State {
   errors: string[]
 }
-
-const Div = styled.div`
-  height: 50px;
-  display: flex;
-  align-items: center;
-`
 
 class OutcomesStep extends Component<Props> {
   public state: State = {
@@ -69,30 +62,54 @@ class OutcomesStep extends Component<Props> {
 
     return (
       <>
-        {this.state.errors.length > 0 && <p>{this.state.errors.join('. ')}</p>}
-        <label>Please add all the possible outcomes for the &quot;{question}&quot; question</label>
-        <Div>
-          <label>Outcome</label>
-          {outcomeValueOne}
-          {outcomeValueTwo}
-        </Div>
-        <Div>
-          <label>Probability *</label>
-          <Textfield
-            name="outcomeProbabilityOne"
-            type="text"
-            defaultValue={outcomeProbabilityOne}
-            onChange={handleChange}
-          />
-          <Textfield
-            name="outcomeProbabilityTwo"
-            type="text"
-            defaultValue={outcomeProbabilityTwo}
-            onChange={handleChange}
-          />
-        </Div>
-        <Button onClick={this.back}>Back</Button>
-        <Button onClick={this.validate}>Next</Button>
+        {this.state.errors.length > 0 && (
+          <p>
+            <i>{this.state.errors.join('. ')}</i>
+          </p>
+        )}
+        <h6>Please add all the possible outcomes for the &quot;{question}&quot; question</h6>
+        <div className="row">
+          <div className="col left">
+            <label>Outcome</label>
+          </div>
+          <div className="col left">
+            <label>Probability *</label>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col left">
+            <p>{outcomeValueOne}</p>
+          </div>
+          <div className="col left">
+            <Textfield
+              name="outcomeProbabilityOne"
+              type="text"
+              defaultValue={outcomeProbabilityOne}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col left">
+            <p>{outcomeValueTwo}</p>
+          </div>
+          <div className="col left">
+            <Textfield
+              name="outcomeProbabilityTwo"
+              type="text"
+              defaultValue={outcomeProbabilityTwo}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col left">
+            <Button onClick={this.back}>Back</Button>
+          </div>
+          <div className="col right">
+            <Button onClick={this.validate}>Next</Button>
+          </div>
+        </div>
       </>
     )
   }
