@@ -1,4 +1,4 @@
-const networkIds = {
+export const networkIds = {
   RINKEBY: 4,
   GANACHE: 50,
 }
