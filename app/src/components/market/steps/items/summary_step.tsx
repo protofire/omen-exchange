@@ -82,10 +82,7 @@ class SummaryStep extends Component<Props> {
         )}
         {marketMakerAddress && <div>Market Maker deployed at {marketMakerAddress}</div>}
         <Button onClick={this.back}>Back</Button>
-        <Button
-          disabled={status !== Status.Ready && status !== Status.Done && status !== Status.Error}
-          onClick={this.submit}
-        >
+        <Button disabled={status !== Status.Ready && status !== Status.Error} onClick={this.submit}>
           Create Market
         </Button>
       </>
