@@ -24,6 +24,21 @@ const PWarn = styled.p`
   color: red;
 `
 
+const Div = styled.div`
+  height: 50px;
+  display: flex;
+  align-items: center;
+`
+
+const InputStyled = styled(Textfield)`
+  text-align: right;
+`
+
+const Span = styled.span`
+  margin-left: 5px;
+  width: 25px;
+`
+
 class OutcomesStep extends Component<Props> {
   public state: State = {
     errors: [],
@@ -85,26 +100,32 @@ class OutcomesStep extends Component<Props> {
           <div className="col left">
             <p>{outcomeValueOne}</p>
           </div>
-          <div className="col left">
-            <Textfield
-              name="outcomeProbabilityOne"
-              type="text"
-              defaultValue={outcomeProbabilityOne}
-              onChange={handleChange}
-            />
+          <div className="col">
+            <Div>
+              <InputStyled
+                name="outcomeProbabilityOne"
+                type="text"
+                defaultValue={outcomeProbabilityOne}
+                onChange={handleChange}
+              />
+              <Span>%</Span>
+            </Div>
           </div>
         </div>
         <div className="row">
           <div className="col left">
             <p>{outcomeValueTwo}</p>
           </div>
-          <div className="col left">
-            <Textfield
-              name="outcomeProbabilityTwo"
-              type="text"
-              defaultValue={outcomeProbabilityTwo}
-              onChange={handleChange}
-            />
+          <div className="col">
+            <Div>
+              <InputStyled
+                name="outcomeProbabilityTwo"
+                type="text"
+                defaultValue={outcomeProbabilityTwo}
+                onChange={handleChange}
+              />
+              <Span>%</Span>
+            </Div>
           </div>
         </div>
         <div className="row">
