@@ -14835,6 +14835,11 @@ wide-align@^1.1.0:
   dependencies:
     string-width "^1.0.2 || 2"
 
+wingcss@^1.0.0-beta:
+  version "1.0.0-beta"
+  resolved "https://registry.yarnpkg.com/wingcss/-/wingcss-1.0.0-beta.tgz#0d2ec3267e91b47c76eb3c02069765e7953ccc1d"
+  integrity sha1-DS7DJn6RtHx26zwCBpdl55U8zB0=
+
 wordwrap@~0.0.2:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/wordwrap/-/wordwrap-0.0.3.tgz#a3d5da6cd5c0bc0008d37234bbaf1bed63059107"
