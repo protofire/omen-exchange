@@ -75,6 +75,13 @@ const MarketWizardCreatorContainer: FC = () => {
     )
     setMarketMakerAddress(marketMakerAddress)
 
+    setStatus('approve dai for market maker')
+    await daiService.approveUnlimited(provider, marketMakerAddress)
+
+    setStatus('initial trade in market maker')
+    const marketMakerService = new MarketMakerService(marketMakerAddress)
+    await marketMakerService.trade(provider, ['1000000000', '0'])
+
     setStatus('done')
   }
 
