@@ -24,6 +24,9 @@ const Div = styled.div`
   display: flex;
   align-items: center;
 `
+const PWarn = styled.p`
+  color: red;
+`
 
 class AskQuestionStep extends Component<Props, State> {
   public state: State = {
@@ -53,9 +56,9 @@ class AskQuestionStep extends Component<Props, State> {
     return (
       <>
         {this.state.errors.length > 0 && (
-          <p>
+          <PWarn>
             <i>{this.state.errors.join('. ')}</i>
-          </p>
+          </PWarn>
         )}
         <div className="row">
           <div className="col">

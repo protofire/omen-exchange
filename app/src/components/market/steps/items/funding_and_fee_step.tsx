@@ -23,6 +23,10 @@ const Div = styled.div`
   align-items: center;
 `
 
+const PWarn = styled.p`
+  color: red;
+`
+
 class FundingAndFeeStep extends Component<Props> {
   public state: State = {
     errors: [],
@@ -55,9 +59,9 @@ class FundingAndFeeStep extends Component<Props> {
     return (
       <>
         {this.state.errors.length > 0 && (
-          <p>
+          <PWarn>
             <i>{this.state.errors.join('. ')}</i>
-          </p>
+          </PWarn>
         )}
         <div className="row">
           <div className="col">

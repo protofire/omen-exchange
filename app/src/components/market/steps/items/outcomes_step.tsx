@@ -1,4 +1,5 @@
 import React, { ChangeEvent, Component } from 'react'
+import styled from 'styled-components'
 
 import { Button, Textfield } from '../../../common/index'
 
@@ -18,6 +19,10 @@ interface Props {
 interface State {
   errors: string[]
 }
+
+const PWarn = styled.p`
+  color: red;
+`
 
 class OutcomesStep extends Component<Props> {
   public state: State = {
@@ -63,9 +68,9 @@ class OutcomesStep extends Component<Props> {
     return (
       <>
         {this.state.errors.length > 0 && (
-          <p>
+          <PWarn>
             <i>{this.state.errors.join('. ')}</i>
-          </p>
+          </PWarn>
         )}
         <h6>Please add all the possible outcomes for the &quot;{question}&quot; question</h6>
         <div className="row">
