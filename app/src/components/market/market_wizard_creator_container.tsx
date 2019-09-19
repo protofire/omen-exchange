@@ -12,9 +12,20 @@ import {
 } from '../../services'
 import { getContractAddress } from '../../util/addresses'
 
+export enum Status {
+  Ready = 'Ready',
+  PostingQuestion = 'Posting question to realitio',
+  PrepareCondition = 'Prepare condition',
+  ApprovingDAI = 'Approving DAI',
+  CreateMarketMaker = 'Create market maker',
+  ApproveDAIForMarketMaker = 'Approve dai for market maker',
+  InitialTradeInMarketMaker = 'initial trade in market maker',
+  Done = 'Done',
+}
+
 const MarketWizardCreatorContainer: FC = () => {
   const context = useWeb3Context()
-  const [status, setStatus] = useState('ready')
+  const [status, setStatus] = useState<Status>(Status.Ready)
   const [questionId, setQuestionId] = useState<string | null>(null)
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
@@ -33,7 +44,7 @@ const MarketWizardCreatorContainer: FC = () => {
     const { question, resolution, funding } = data
     const openingDateMoment = moment(resolution)
 
-    setStatus('posting question to realitio')
+    setStatus(Status.PostingQuestion)
     const questionId = await RealitioService.askQuestion(
       question,
       openingDateMoment,
@@ -42,7 +53,7 @@ const MarketWizardCreatorContainer: FC = () => {
     )
     setQuestionId(questionId)
 
-    setStatus('prepare condition')
+    setStatus(Status.PrepareCondition)
     const conditionId = await ConditionalTokenService.prepareCondition(
       questionId,
       provider,
@@ -50,7 +61,7 @@ const MarketWizardCreatorContainer: FC = () => {
     )
 
     // approve movement of DAI to MarketMakerFactory
-    setStatus('approving DAI')
+    setStatus(Status.ApprovingDAI)
     const fundingWei = ethers.utils.bigNumberify(funding).mul(ethers.constants.WeiPerEther)
     const daiAddress = getContractAddress(networkId, 'dai')
     const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
@@ -66,7 +77,7 @@ const MarketWizardCreatorContainer: FC = () => {
       await daiService.approve(provider, marketMakerFactoryAddress, fundingWei)
     }
 
-    setStatus('create Market Maker')
+    setStatus(Status.CreateMarketMaker)
     const marketMakerAddress = await MarketMakerService.createMarketMaker(
       conditionId,
       fundingWei,
@@ -75,14 +86,14 @@ const MarketWizardCreatorContainer: FC = () => {
     )
     setMarketMakerAddress(marketMakerAddress)
 
-    setStatus('approve dai for market maker')
+    setStatus(Status.ApproveDAIForMarketMaker)
     await daiService.approveUnlimited(provider, marketMakerAddress)
 
-    setStatus('initial trade in market maker')
+    setStatus(Status.InitialTradeInMarketMaker)
     const marketMakerService = new MarketMakerService(marketMakerAddress)
     await marketMakerService.trade(provider, ['1000000000', '0'])
 
-    setStatus('done')
+    setStatus(Status.Done)
   }
 
   return (

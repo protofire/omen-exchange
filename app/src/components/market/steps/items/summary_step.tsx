@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import moment from 'moment'
 
 import { Button } from '../../../common/index'
+import { Status } from '../../market_wizard_creator_container'
 
 interface Props {
   back: () => void
@@ -81,7 +82,9 @@ class SummaryStep extends Component<Props> {
         )}
         {marketMakerAddress && <div>Market Maker deployed at {marketMakerAddress}</div>}
         <Button onClick={this.back}>Back</Button>
-        <Button onClick={this.submit}>Create Market</Button>
+        <Button disabled={status !== Status.Ready} onClick={this.submit}>
+          Create Market
+        </Button>
       </>
     )
   }
