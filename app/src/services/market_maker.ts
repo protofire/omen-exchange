@@ -1,16 +1,37 @@
 import { ethers } from 'ethers'
+import { BigNumberish } from 'ethers/utils'
 
 import { getContractAddress } from '../util/addresses'
 import { FEE } from '../common/constants'
 
 const marketMakerAbi = [
+  'function trade(int[] outcomeTokenAmounts, int collateralLimit) public returns (int netCost)',
+]
+
+const marketMakerFactoryAbi = [
   `function createLMSRMarketMaker(address pmSystem, address collateralToken, bytes32[] conditionIds, uint64 fee, address whitelist, uint256 funding) public returns (address lmsrMarketMaker)`,
 ]
-const marketMakerCallAbi = [
+const marketMakerFactoryCallAbi = [
   `function createLMSRMarketMaker(address pmSystem, address collateralToken, bytes32[] conditionIds, uint64 fee, address whitelist, uint256 funding) public constant returns (address lmsrMarketMaker)`,
 ]
 
 class MarketMakerService {
+  address: string
+
+  constructor(address: string) {
+    this.address = address
+  }
+
+  trade = async (provider: any, outcomeTokenAmounts: BigNumberish[]) => {
+    const signer = provider.getSigner()
+
+    const marketMakerContract = new ethers.Contract(this.address, marketMakerAbi, provider).connect(
+      signer,
+    )
+
+    await marketMakerContract.trade(outcomeTokenAmounts, 0)
+  }
+
   static createMarketMaker = async (
     conditionId: string,
     fundingWei: ethers.utils.BigNumber,
@@ -24,14 +45,14 @@ class MarketMakerService {
     const conditionalTokenAddress = getContractAddress(networkId, 'conditionalTokens')
     const daiAddress = getContractAddress(networkId, 'dai')
 
-    const marketMakerConstantContract = new ethers.Contract(
+    const marketMakerFactoryConstantContract = new ethers.Contract(
       marketMakerFactoryAddress,
-      marketMakerCallAbi,
+      marketMakerFactoryCallAbi,
       provider,
     )
-    const marketMakerContract = new ethers.Contract(
+    const marketMakerFactoryContract = new ethers.Contract(
       marketMakerFactoryAddress,
-      marketMakerAbi,
+      marketMakerFactoryAbi,
       provider,
     ).connect(signer)
 
@@ -44,11 +65,14 @@ class MarketMakerService {
       fundingWei,
     ]
 
-    const marketMakerAddress = await marketMakerConstantContract.createLMSRMarketMaker(...args, {
-      from: signerAddress,
-    })
+    const marketMakerAddress = await marketMakerFactoryConstantContract.createLMSRMarketMaker(
+      ...args,
+      {
+        from: signerAddress,
+      },
+    )
 
-    await marketMakerContract.createLMSRMarketMaker(...args)
+    await marketMakerFactoryContract.createLMSRMarketMaker(...args)
 
     return marketMakerAddress
   }

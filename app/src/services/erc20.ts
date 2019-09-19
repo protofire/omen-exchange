@@ -44,6 +44,18 @@ class ERC20Service {
     const transactionObject = await erc20Contract.approve(spender, amount)
     logger.log(`Approve transaccion hash: ${transactionObject.hash}`)
   }
+
+  /**
+   * Approve `spender` to transfer an "unlimited" amount of tokens on behalf of the connected user.
+   */
+  approveUnlimited = async (provider: any, spender: string): Promise<any> => {
+    const signer: Wallet = provider.getSigner()
+
+    const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, provider).connect(signer)
+
+    const transactionObject = await erc20Contract.approve(spender, ethers.constants.MaxUint256)
+    logger.log(`Approve unlimited transaccion hash: ${transactionObject.hash}`)
+  }
 }
 
 export { ERC20Service }
