@@ -24,6 +24,9 @@ const Div = styled.div`
   display: flex;
   align-items: center;
 `
+const PWarn = styled.p`
+  color: red;
+`
 
 class AskQuestionStep extends Component<Props, State> {
   public state: State = {
@@ -52,27 +55,59 @@ class AskQuestionStep extends Component<Props, State> {
     const { question, category, resolution } = values
     return (
       <>
-        {this.state.errors.length > 0 && <p>{this.state.errors.join('. ')}</p>}
-        <Div>
-          <label>Question *</label>
-          <Textfield type="text" name="question" defaultValue={question} onChange={handleChange} />
-        </Div>
-        <Div>
-          <label>Categories *</label>
-          <Categories name="category" value={category} onChange={handleChange} />
-        </Div>
-        <Div>
-          <label>Resolution Date *</label>
-          <DatePicker name="resolution" selected={resolution} onChange={handleChangeDate} />
-        </Div>
-        <Div>
-          <label>
-            Oracle: The market is resolved using realit.io oracle using the dxDAO as final
-            arbitrator
-          </label>
-        </Div>
-
-        <Button onClick={this.validate}>Next</Button>
+        {this.state.errors.length > 0 && (
+          <PWarn>
+            <i>{this.state.errors.join('. ')}</i>
+          </PWarn>
+        )}
+        <div className="row">
+          <div className="col">
+            <label>Question *</label>
+            <Div>
+              <Textfield
+                type="text"
+                name="question"
+                defaultValue={question}
+                onChange={handleChange}
+              />
+            </Div>
+            <p>
+              <i>
+                For example: &quot;Will France win?&quot; is not an acceptable question, but
+                &quot;Will France win the 2022 FIFA World Cup&quot; is.
+              </i>
+            </p>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col">
+            <label>Categories *</label>
+            <Div>
+              <Categories name="category" value={category} onChange={handleChange} />
+            </Div>
+          </div>
+          <div className="col">
+            <label>Resolution Date *</label>
+            <Div>
+              <DatePicker name="resolution" selected={resolution} onChange={handleChangeDate} />
+            </Div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col">
+            <label>Oracle</label>
+            <p>
+              <i>
+                The market is resolved using realit.io oracle using the dxDAO as final arbitrator.
+              </i>
+            </p>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col right">
+            <Button onClick={this.validate}>Next</Button>
+          </div>
+        </div>
       </>
     )
   }

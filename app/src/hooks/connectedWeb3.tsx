@@ -41,7 +41,7 @@ export const ConnectedWeb3: React.FC<{ children: React.ReactNode }> = props => {
     checkIfReady()
   }, [context.library])
 
-  if (!context.account || !ready) {
+  if (!context.account || !ready || !context.library.network) {
     return null
   }
 

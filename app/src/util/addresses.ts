@@ -34,3 +34,10 @@ export const getContractAddress = (networkId: number, contract: keyof KnownContr
   }
   return addresses[networkId][contract]
 }
+
+export const getContractAddressName = (networkId: number) => {
+  const networkName = Object.keys(networkIds).find(key => (networkIds as any)[key] === networkId)
+  const networkNameCase =
+    networkName && networkName.substr(0, 1).toUpperCase() + networkName.substr(1).toLowerCase()
+  return networkNameCase
+}

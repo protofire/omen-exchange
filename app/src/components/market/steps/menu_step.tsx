@@ -19,8 +19,10 @@ interface DivProp {
   key?: number
 }
 
-const DivStyled = styled.div<DivProp>`
-  ${props => (props.active && props.active ? 'background-color: #d0e5e9;' : '')}
+const DivStep = styled.div<DivProp>`
+  ${props => (props.active ? 'background-color: #050300;' : 'background-color: #D8D6D3')}
+  height: 23px;
+  width: 100%;
 `
 
 class MenuStep extends Component<Props, State> {
@@ -50,20 +52,19 @@ class MenuStep extends Component<Props, State> {
     const currentStepItemSelected = steps.find(step => step.value === this.props.currentStep)
 
     const stepsBlocks = steps.map((step, index) => (
-      <DivStyled
+      <DivStep
         active={currentStepItemSelected && step.value <= currentStepItemSelected.value}
         key={index}
-      >
-        {step.name}
-      </DivStyled>
+        className="col center"
+      ></DivStep>
     ))
     const stepsBlocksPosition = `Step ${currentStepItemSelected &&
       currentStepItemSelected.value} of ${steps.length}`
 
     return (
       <>
-        {stepsBlocksPosition}
-        {stepsBlocks}
+        <div className="row right">{stepsBlocksPosition}</div>
+        <div className="row">{stepsBlocks}</div>
       </>
     )
   }

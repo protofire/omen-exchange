@@ -20,10 +20,23 @@ interface State {
   errors: string[]
 }
 
+const PWarn = styled.p`
+  color: red;
+`
+
 const Div = styled.div`
   height: 50px;
   display: flex;
   align-items: center;
+`
+
+const InputStyled = styled(Textfield)`
+  text-align: right;
+`
+
+const Span = styled.span`
+  margin-left: 5px;
+  width: 25px;
 `
 
 class OutcomesStep extends Component<Props> {
@@ -69,30 +82,60 @@ class OutcomesStep extends Component<Props> {
 
     return (
       <>
-        {this.state.errors.length > 0 && <p>{this.state.errors.join('. ')}</p>}
-        <label>Please add all the possible outcomes for the &quot;{question}&quot; question</label>
-        <Div>
-          <label>Outcome</label>
-          {outcomeValueOne}
-          {outcomeValueTwo}
-        </Div>
-        <Div>
-          <label>Probability *</label>
-          <Textfield
-            name="outcomeProbabilityOne"
-            type="text"
-            defaultValue={outcomeProbabilityOne}
-            onChange={handleChange}
-          />
-          <Textfield
-            name="outcomeProbabilityTwo"
-            type="text"
-            defaultValue={outcomeProbabilityTwo}
-            onChange={handleChange}
-          />
-        </Div>
-        <Button onClick={this.back}>Back</Button>
-        <Button onClick={this.validate}>Next</Button>
+        {this.state.errors.length > 0 && (
+          <PWarn>
+            <i>{this.state.errors.join('. ')}</i>
+          </PWarn>
+        )}
+        <h6>Please add all the possible outcomes for the &quot;{question}&quot; question</h6>
+        <div className="row">
+          <div className="col left">
+            <label>Outcome</label>
+          </div>
+          <div className="col left">
+            <label>Probability *</label>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col left">
+            <p>{outcomeValueOne}</p>
+          </div>
+          <div className="col">
+            <Div>
+              <InputStyled
+                name="outcomeProbabilityOne"
+                type="text"
+                defaultValue={outcomeProbabilityOne}
+                onChange={handleChange}
+              />
+              <Span>%</Span>
+            </Div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col left">
+            <p>{outcomeValueTwo}</p>
+          </div>
+          <div className="col">
+            <Div>
+              <InputStyled
+                name="outcomeProbabilityTwo"
+                type="text"
+                defaultValue={outcomeProbabilityTwo}
+                onChange={handleChange}
+              />
+              <Span>%</Span>
+            </Div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col left">
+            <Button onClick={this.back}>Back</Button>
+          </div>
+          <div className="col right">
+            <Button onClick={this.validate}>Next</Button>
+          </div>
+        </div>
       </>
     )
   }
