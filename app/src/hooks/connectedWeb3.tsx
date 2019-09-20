@@ -5,6 +5,7 @@ import { useWeb3Context } from 'web3-react'
 const ConnectedWeb3Context = React.createContext<{
   account: string
   library: providers.BaseProvider
+  networkId: number
 } | null>(null)
 
 /**
@@ -17,10 +18,7 @@ export const useConnectedWeb3Context = () => {
     throw new Error('Component rendered outside the provider tree')
   }
 
-  return {
-    ...context,
-    networkId: context.library.network.chainId,
-  }
+  return context
 }
 
 /**
@@ -28,24 +26,25 @@ export const useConnectedWeb3Context = () => {
  * `useConnectedWeb3Context` safely to get web3 stuff without having to null check it.
  */
 export const ConnectedWeb3: React.FC<{ children: React.ReactNode }> = props => {
-  const [ready, setReady] = useState(false)
+  const [networkId, setNetworkId] = useState<number | null>(null)
   const context = useWeb3Context()
+
   useEffect(() => {
     const checkIfReady = async () => {
-      if (context.library) {
-        await context.library.ready
-        setReady(true)
-      }
+      const network = await context.library.ready
+      setNetworkId(network.chainId)
     }
 
-    checkIfReady()
+    if (context.library) {
+      checkIfReady()
+    }
   }, [context.library])
 
-  if (!context.account || !ready || !context.library.network) {
+  if (!context.account || !networkId) {
     return null
   }
 
-  const value = { account: context.account, library: context.library }
+  const value = { account: context.account, library: context.library, networkId }
 
   return (
     <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
