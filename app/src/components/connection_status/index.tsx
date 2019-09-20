@@ -1,21 +1,15 @@
 import React from 'react'
-import { Web3Consumer } from 'web3-react'
+import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 
 const ConnectionStatus: React.FC = () => {
+  const context = useConnectedWeb3Context()
+  const { account, networkId } = context
+
   return (
-    <Web3Consumer>
-      {(context: any) => {
-        const { active, account, networkId } = context
-        return (
-          active && (
-            <>
-              <p>Account: {account || 'None'}</p>
-              <p>Network ID: {networkId || 'None'}</p>
-            </>
-          )
-        )
-      }}
-    </Web3Consumer>
+    <>
+      <p>Account: {account || 'None'}</p>
+      <p>Network ID: {networkId || 'None'}</p>
+    </>
   )
 }
 

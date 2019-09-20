@@ -4,6 +4,7 @@ import { ThemeProvider } from 'styled-components'
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom'
 
 import { CONNECTOR } from './common/constants'
+import { ConnectedWeb3 } from './hooks/connectedWeb3'
 import theme from './theme'
 import connectors from './util/connectors'
 import { ConnectWallet, ConnectionStatus, MarketWizardCreatorContainer } from './components/'
@@ -18,7 +19,9 @@ const App: React.FC = () => {
       <Web3Provider connectors={{ [CONNECTOR]: connector }} libraryName="ethers.js">
         <Router>
           <ConnectWallet />
-          <ConnectionStatus />
+          <ConnectedWeb3>
+            <ConnectionStatus />
+          </ConnectedWeb3>
           <Link to="/create">Create market</Link>
           <Route path="/create" exact component={MarketWizardCreatorContainer} />
           <Route component={RedirectToHome} />
