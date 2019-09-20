@@ -106,12 +106,14 @@ const MarketWizardCreatorContainer: FC = () => {
   }
 
   return (
-    <MarketWizardCreator
-      callback={handleSubmit}
-      status={status}
-      questionId={questionId}
-      marketMakerAddress={marketMakerAddress}
-    />
+    <>
+      <MarketWizardCreator
+        callback={handleSubmit}
+        status={status}
+        questionId={questionId}
+        marketMakerAddress={marketMakerAddress}
+      />
+    </>
   )
 }
 

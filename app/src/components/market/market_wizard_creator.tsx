@@ -166,10 +166,14 @@ export class MarketWizardCreator extends Component<Props, State> {
 
   render() {
     return (
-      <>
-        <div>{this.currentMenu()}</div>
-        <div>{this.currentStep()}</div>
-      </>
+      <div className="row">
+        <div className="col-2" />
+        <div className="col-6">
+          {this.currentMenu()}
+          {this.currentStep()}
+        </div>
+        <div className="col-2" />
+      </div>
     )
   }
 }
