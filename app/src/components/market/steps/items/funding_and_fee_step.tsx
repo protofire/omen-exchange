@@ -29,6 +29,14 @@ const PWarn = styled.p`
 
 const InputStyled = styled(Textfield)`
   text-align: right;
+  ::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  ::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
 `
 
 const Span = styled.span`
@@ -77,7 +85,7 @@ class FundingAndFeeStep extends Component<Props> {
             <label>Spread/Fee *</label>
             <Div>
               <InputStyled
-                type="text"
+                type="number"
                 name="spread"
                 defaultValue={spread}
                 onChange={handleChange}
@@ -91,7 +99,7 @@ class FundingAndFeeStep extends Component<Props> {
             <label>Funding *</label>
             <Div>
               <InputStyled
-                type="text"
+                type="number"
                 name="funding"
                 defaultValue={funding}
                 onChange={handleChange}

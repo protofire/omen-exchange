@@ -1,7 +1,7 @@
 import React, { ChangeEvent, Component } from 'react'
 import styled from 'styled-components'
 
-import { Button, Textfield } from '../../../common/index'
+import { Button, Outcomes } from '../../../common/index'
 
 interface Props {
   back: () => void
@@ -17,31 +17,16 @@ interface Props {
 }
 
 interface State {
-  errors: string[]
+  error: string | null
 }
 
 const PWarn = styled.p`
   color: red;
 `
 
-const Div = styled.div`
-  height: 50px;
-  display: flex;
-  align-items: center;
-`
-
-const InputStyled = styled(Textfield)`
-  text-align: right;
-`
-
-const Span = styled.span`
-  margin-left: 5px;
-  width: 25px;
-`
-
 class OutcomesStep extends Component<Props> {
   public state: State = {
-    errors: [],
+    error: null,
   }
 
   public back = () => {
@@ -59,13 +44,26 @@ class OutcomesStep extends Component<Props> {
       outcomeProbabilityTwo,
     } = values
 
+    let error = null
     if (!outcomeValueOne || !outcomeValueTwo || !outcomeProbabilityOne || !outcomeProbabilityTwo) {
-      const errors = []
-      errors.push(`Please check the required fields`)
-      this.setState({
-        errors,
-      })
-    } else {
+      error = `Please check the required fields`
+    }
+
+    console.log(`One ${outcomeProbabilityOne}, Two ${outcomeProbabilityTwo}`)
+    const probability = +outcomeProbabilityOne + +outcomeProbabilityTwo
+    if (probability > 100) {
+      error = `The sum of the probabilities cannot be greater than 100`
+    }
+
+    if (probability !== 100) {
+      error = `The sum of the probabilities must be 100`
+    }
+
+    this.setState({
+      error,
+    })
+
+    if (!error) {
       this.props.next()
     }
   }
@@ -80,54 +78,28 @@ class OutcomesStep extends Component<Props> {
       outcomeValueTwo,
     } = values
 
+    const outcomes = [
+      {
+        value: outcomeValueOne,
+        probability: outcomeProbabilityOne,
+        name: 'outcomeProbabilityOne',
+      },
+      {
+        value: outcomeValueTwo,
+        probability: outcomeProbabilityTwo,
+        name: 'outcomeProbabilityTwo',
+      },
+    ]
+
     return (
       <>
-        {this.state.errors.length > 0 && (
+        {this.state.error && (
           <PWarn>
-            <i>{this.state.errors.join('. ')}</i>
+            <i>{this.state.error}</i>
           </PWarn>
         )}
         <h6>Please add all the possible outcomes for the &quot;{question}&quot; question</h6>
-        <div className="row">
-          <div className="col left">
-            <label>Outcome</label>
-          </div>
-          <div className="col left">
-            <label>Probability *</label>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col left">
-            <p>{outcomeValueOne}</p>
-          </div>
-          <div className="col">
-            <Div>
-              <InputStyled
-                name="outcomeProbabilityOne"
-                type="text"
-                defaultValue={outcomeProbabilityOne}
-                onChange={handleChange}
-              />
-              <Span>%</Span>
-            </Div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col left">
-            <p>{outcomeValueTwo}</p>
-          </div>
-          <div className="col">
-            <Div>
-              <InputStyled
-                name="outcomeProbabilityTwo"
-                type="text"
-                defaultValue={outcomeProbabilityTwo}
-                onChange={handleChange}
-              />
-              <Span>%</Span>
-            </Div>
-          </div>
-        </div>
+        <Outcomes outcomes={outcomes} handleChange={handleChange} />
         <div className="row">
           <div className="col left">
             <Button onClick={this.back}>Back</Button>
