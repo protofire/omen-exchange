@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Component } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 import styled from 'styled-components'
 
 import { Button, Outcomes } from '../../../common/index'
@@ -16,101 +16,99 @@ interface Props {
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
 }
 
-interface State {
-  error: string | null
-}
-
 const PWarn = styled.p`
   color: red;
 `
 
-class OutcomesStep extends Component<Props> {
-  public state: State = {
-    error: null,
+const OutcomesStep = (props: Props) => {
+  const { outcomeProbabilityOne, outcomeProbabilityTwo } = props.values
+
+  const [probabilities, setProbabilities] = useState([
+    outcomeProbabilityOne || 50,
+    outcomeProbabilityTwo || 50,
+  ])
+  const [error, setError] = useState('')
+
+  const handleChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
+    const newProbabilities = [
+      ...probabilities.slice(0, index),
+      event.target.value,
+      ...probabilities.slice(index + 1),
+    ]
+    setProbabilities(newProbabilities)
+    props.handleChange(event)
   }
 
-  public back = () => {
-    this.props.back()
+  const back = () => {
+    props.back()
   }
 
-  public validate = (e: any) => {
+  const validate = (e: any) => {
     e.preventDefault()
 
-    const { values } = this.props
-    const {
-      outcomeValueOne,
-      outcomeValueTwo,
-      outcomeProbabilityOne,
-      outcomeProbabilityTwo,
-    } = values
+    const probabilityOne = +probabilities[0]
+    const probabilityTwo = +probabilities[1]
 
-    let error = null
-    if (!outcomeValueOne || !outcomeValueTwo || !outcomeProbabilityOne || !outcomeProbabilityTwo) {
-      error = `Please check the required fields`
+    let msgError = ''
+    if (!probabilityOne || !probabilityTwo) {
+      msgError = `Please check the required fields`
     }
 
-    console.log(`One ${outcomeProbabilityOne}, Two ${outcomeProbabilityTwo}`)
-    const probability = +outcomeProbabilityOne + +outcomeProbabilityTwo
-    if (probability > 100) {
-      error = `The sum of the probabilities cannot be greater than 100`
+    const totalProbabilities = probabilityOne + probabilityTwo
+    if (totalProbabilities === 0) {
+      msgError = `The sum of the probabilities cannot be 0`
     }
 
-    if (probability !== 100) {
-      error = `The sum of the probabilities must be 100`
+    if (totalProbabilities > 100) {
+      msgError = `The sum of the probabilities cannot be greater than 100`
     }
 
-    this.setState({
-      error,
-    })
+    if (totalProbabilities > 1 && totalProbabilities < 100) {
+      msgError = `The sum of the probabilities cannot be less than 100`
+    }
 
-    if (!error) {
-      this.props.next()
+    setError(msgError)
+
+    if (!msgError) {
+      props.next()
     }
   }
 
-  render() {
-    const { values, handleChange } = this.props
-    const {
-      question,
-      outcomeProbabilityOne,
-      outcomeProbabilityTwo,
-      outcomeValueOne,
-      outcomeValueTwo,
-    } = values
+  const { values } = props
+  const { question, outcomeValueOne, outcomeValueTwo } = values
 
-    const outcomes = [
-      {
-        value: outcomeValueOne,
-        probability: outcomeProbabilityOne,
-        name: 'outcomeProbabilityOne',
-      },
-      {
-        value: outcomeValueTwo,
-        probability: outcomeProbabilityTwo,
-        name: 'outcomeProbabilityTwo',
-      },
-    ]
+  const outcomes = [
+    {
+      value: outcomeValueOne,
+      probability: probabilities[0],
+      name: 'outcomeProbabilityOne',
+    },
+    {
+      value: outcomeValueTwo,
+      probability: probabilities[1],
+      name: 'outcomeProbabilityTwo',
+    },
+  ]
 
-    return (
-      <>
-        {this.state.error && (
-          <PWarn>
-            <i>{this.state.error}</i>
-          </PWarn>
-        )}
-        <h6>Please add all the possible outcomes for the &quot;{question}&quot; question</h6>
-        <Outcomes outcomes={outcomes} handleChange={handleChange} />
-        <div className="row">
-          <div className="col left">
-            <Button onClick={this.back}>Back</Button>
-          </div>
-          <div className="col right">
-            <Button onClick={this.validate}>Next</Button>
-          </div>
+  return (
+    <>
+      {error && (
+        <PWarn>
+          <i>{error}</i>
+        </PWarn>
+      )}
+      <h6>Please add all the possible outcomes for the &quot;{question}&quot; question</h6>
+      <Outcomes outcomes={outcomes} onChange={handleChange} />
+      <div className="row">
+        <div className="col left">
+          <Button onClick={() => back()}>Back</Button>
         </div>
-      </>
-    )
-  }
+        <div className="col right">
+          <Button onClick={(e: any) => validate(e)}>Next</Button>
+        </div>
+      </div>
+    </>
+  )
 }
 
 export { OutcomesStep }
