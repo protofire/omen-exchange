@@ -16,7 +16,6 @@
     "@walletconnect/web3-subprovider": "^1.0.0-beta.1",
     "ethers": "^4.0.36",
     "ipfs-deploy": "^7.10.5",
-    "lodash": "^4.17.15",
     "logdown": "^3.2.8",
     "moment": "^2.24.0",
     "react": "^16.9.0",
