@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 import { ConnectWallet, ConnectionStatus } from '../../../components'
+import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
 import { Logo } from '../logo'
 
 export const Header = () => (
@@ -13,11 +14,15 @@ export const Header = () => (
       <Link className="nav-item" to="/">
         Home
       </Link>
-      <Link className="nav-item" to="/create">
-        Create market
-      </Link>
+      <ConnectedWeb3>
+        <Link className="nav-item" to="/create">
+          Create market
+        </Link>
+      </ConnectedWeb3>
       <ConnectWallet className="nav-item" />
-      <ConnectionStatus className="nav-item" />
+      <ConnectedWeb3>
+        <ConnectionStatus className="nav-item" />
+      </ConnectedWeb3>
     </div>
   </div>
 )
