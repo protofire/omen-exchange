@@ -23,10 +23,7 @@ const PWarn = styled.p`
 const OutcomesStep = (props: Props) => {
   const { outcomeProbabilityOne, outcomeProbabilityTwo } = props.values
 
-  const [probabilities, setProbabilities] = useState([
-    outcomeProbabilityOne || 50,
-    outcomeProbabilityTwo || 50,
-  ])
+  const [probabilities, setProbabilities] = useState([outcomeProbabilityOne, outcomeProbabilityTwo])
   const [error, setError] = useState('')
 
   const handleChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
