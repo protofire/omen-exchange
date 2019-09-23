@@ -5,7 +5,7 @@ interface Props {
   name: string
   value?: string
   placeholder?: string
-  defaultValue?: string
+  defaultValue?: any
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => any
   onClick?: (event: React.MouseEvent<HTMLInputElement>) => any
   autoFocus?: boolean
