@@ -182,7 +182,6 @@ export class MarketWizardCreator extends Component<Props, State> {
 
   render() {
     const { status } = this.props
-    console.log(`Status ${status}`)
     return (
       <div className="row">
         <div className="col-2" />
