@@ -1,5 +1,4 @@
 import { ethers } from 'ethers'
-import LMSRMarketMaker from './abis/LMSRMarketMaker.json'
 
 enum Stage {
   Running = 0,
@@ -7,47 +6,68 @@ enum Stage {
   Closed = 2,
 }
 
+const LMSRMarketMakerAbi = [
+  'function pmSystem() external view returns (address)',
+  'function collateralToken() external view returns (address)',
+  'function stage() external view returns (uint8)',
+  'function funding() external view returns (uint256)',
+  'function atomicOutcomeSlotCount() external view returns (uint256)',
+  'function fee() external view returns (uint64)',
+  'function conditionIds(uint256) external view returns (bytes32)',
+]
+
 class FetchMarketService {
-  address: string
   contract: any
 
   constructor(address: string, provider: any) {
-    this.address = address
-    this.contract = new ethers.Contract(address, LMSRMarketMaker.abi, provider)
+    this.contract = new ethers.Contract(address, LMSRMarketMakerAbi, provider)
   }
 
   async getFunding(): Promise<any> {
-    return await this.contract.functions.funding()
+    return await this.contract.funding()
   }
 
   async getFee(): Promise<any> {
-    return await this.contract.functions.fee()
+    return await this.contract.fee()
   }
 
   async getConditionIds() {
-    return await this.contract.functions.conditionIds(0)
+    return await this.contract.conditionIds(0)
   }
 
   async getOutcomeSlots(): Promise<any> {
-    return await this.contract.functions.atomicOutcomeSlotCount()
+    return await this.contract.atomicOutcomeSlotCount()
   }
 
   async getStage(): Promise<Stage> {
-    return await this.contract.functions.stage()
+    return await this.contract.stage()
   }
 
   async getCollateralToken(): Promise<any> {
-    return await this.contract.functions.pmSystem()
+    return await this.contract.collateralToken()
+  }
+
+  async getConditionalToken(): Promise<any> {
+    return await this.contract.pmSystem()
   }
 
   async getMarket(): Promise<any> {
-    const [funding, fee, conditionId, outcomeSlots, stage, collateralToken] = await Promise.all([
+    const [
+      funding,
+      fee,
+      conditionId,
+      outcomeSlots,
+      stage,
+      collateralToken,
+      conditionalToken,
+    ] = await Promise.all([
       this.getFunding(),
       this.getFee(),
+      this.getStage(),
       this.getConditionIds(),
       this.getOutcomeSlots(),
-      this.getOutcomeSlots(),
       this.getCollateralToken(),
+      this.getConditionalToken(),
     ])
 
     return {
@@ -57,6 +77,7 @@ class FetchMarketService {
       outcomeSlots,
       stage,
       collateralToken,
+      conditionalToken,
     }
   }
 }
