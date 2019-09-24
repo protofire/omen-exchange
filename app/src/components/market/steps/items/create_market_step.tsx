@@ -23,7 +23,7 @@ interface Props {
   marketMakerAddress: string | null
 }
 
-class SummaryStep extends Component<Props> {
+class CreateMarketStep extends Component<Props> {
   back = () => {
     this.props.back()
   }
@@ -120,4 +120,4 @@ class SummaryStep extends Component<Props> {
   }
 }
 
-export { SummaryStep }
+export { CreateMarketStep }
