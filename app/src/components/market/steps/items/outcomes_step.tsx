@@ -64,6 +64,10 @@ const OutcomesStep = (props: Props) => {
       msgError = `The sum of the probabilities cannot be less than 100`
     }
 
+    if (probabilityOne < 0 || probabilityTwo < 0) {
+      msgError = `Value cannot be negative`
+    }
+
     setError(msgError)
 
     if (!msgError) {
