@@ -27,9 +27,8 @@ class FetchMarketService {
   marketMakerContract: any
   conditionalTokensContract: any
   daiTokenAddress: string
-  ownerAddress: string
 
-  constructor(marketMakerAddress: string, ownerAddress: string, networkId: number, provider: any) {
+  constructor(marketMakerAddress: string, networkId: number, provider: any) {
     const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
 
     this.marketMakerContract = new ethers.Contract(marketMakerAddress, marketMakerAbi, provider)
@@ -39,7 +38,6 @@ class FetchMarketService {
       provider,
     )
     this.daiTokenAddress = getContractAddress(networkId, 'dai')
-    this.ownerAddress = ownerAddress
   }
 
   async getFunding(): Promise<any> {
@@ -90,11 +88,11 @@ class FetchMarketService {
     return await this.conditionalTokensContract.getPositionId(this.daiTokenAddress, collectionId)
   }
 
-  async getBalanceOf(positionId: string): Promise<any> {
-    return await this.conditionalTokensContract.balanceOf(this.ownerAddress, positionId)
+  async getBalanceOf(ownerAddress: string, positionId: string): Promise<any> {
+    return await this.conditionalTokensContract.balanceOf(ownerAddress, positionId)
   }
 
-  async getBalanceInformation(): Promise<any> {
+  async getBalanceInformation(ownerAddress: string): Promise<any> {
     const conditionId = await this.getConditionIds()
     const [collectionIdForYes, collectionIdForNo] = await Promise.all([
       this.getCollectionIdForYes(conditionId),
@@ -107,8 +105,8 @@ class FetchMarketService {
     ])
 
     const [balanceOfForYes, balanceOfForNo] = await Promise.all([
-      this.getBalanceOf(positionIdForYes),
-      this.getBalanceOf(positionIdForNo),
+      this.getBalanceOf(ownerAddress, positionIdForYes),
+      this.getBalanceOf(ownerAddress, positionIdForNo),
     ])
 
     return {
