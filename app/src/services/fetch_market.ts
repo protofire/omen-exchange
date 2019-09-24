@@ -15,6 +15,7 @@ const marketMakerAbi = [
   'function atomicOutcomeSlotCount() external view returns (uint256)',
   'function fee() external view returns (uint64)',
   'function conditionIds(uint256) external view returns (bytes32)',
+  'function calcMarginalPrice(uint8 outcomeTokenIndex) view returns (uint price)',
 ]
 
 const conditionTokenAbi = [
@@ -82,6 +83,18 @@ class FetchMarketService {
       conditionId,
       2,
     )
+  }
+
+  async getActualPrice(): Promise<any> {
+    const [actualPriceForYes, actualPriceForNo] = await Promise.all([
+      this.marketMakerContract.calcMarginalPrice(0),
+      this.marketMakerContract.calcMarginalPrice(1),
+    ])
+
+    return {
+      actualPriceForYes,
+      actualPriceForNo,
+    }
   }
 
   async getPositionId(collectionId: string): Promise<any> {
