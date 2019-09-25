@@ -37,8 +37,8 @@ export class MarketWizardCreator extends Component<Props, State> {
       funding: '',
       outcomeValueOne: 'Yes',
       outcomeValueTwo: 'No',
-      outcomeProbabilityOne: '',
-      outcomeProbabilityTwo: '',
+      outcomeProbabilityOne: '50',
+      outcomeProbabilityTwo: '50',
     },
   }
 
