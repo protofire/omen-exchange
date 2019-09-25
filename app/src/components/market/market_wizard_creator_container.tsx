@@ -4,6 +4,7 @@ import { useWeb3Context } from 'web3-react'
 import moment from 'moment'
 
 import { getLogger } from '../../util/logger'
+import { computeInitialTradeOutcomeTokens } from '../../util/tools'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import {
   RealitioService,
@@ -46,7 +47,7 @@ const MarketWizardCreatorContainer: FC = () => {
       const provider = context.library
       const user = await provider.getSigner().getAddress()
 
-      const { question, resolution, funding } = data
+      const { question, resolution, funding, outcomeProbabilityOne, outcomeProbabilityTwo } = data
       const openingDateMoment = moment(resolution)
 
       setStatus(Status.PostingQuestion)
@@ -67,7 +68,7 @@ const MarketWizardCreatorContainer: FC = () => {
 
       // approve movement of DAI to MarketMakerFactory
       setStatus(Status.ApprovingDAI)
-      const fundingWei = ethers.utils.bigNumberify(funding).mul(ethers.constants.WeiPerEther)
+      const fundingInWei = ethers.utils.bigNumberify(funding).mul(ethers.constants.WeiPerEther)
       const daiAddress = getContractAddress(networkId, 'dai')
       const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
       const daiService = new ERC20Service(daiAddress)
@@ -76,16 +77,16 @@ const MarketWizardCreatorContainer: FC = () => {
         provider,
         user,
         marketMakerFactoryAddress,
-        fundingWei,
+        fundingInWei,
       )
       if (!hasEnoughAlowance) {
-        await daiService.approve(provider, marketMakerFactoryAddress, fundingWei)
+        await daiService.approve(provider, marketMakerFactoryAddress, fundingInWei)
       }
 
       setStatus(Status.CreateMarketMaker)
       const marketMakerAddress = await MarketMakerService.createMarketMaker(
         conditionId,
-        fundingWei,
+        fundingInWei,
         provider,
         networkId,
       )
@@ -96,7 +97,11 @@ const MarketWizardCreatorContainer: FC = () => {
 
       setStatus(Status.InitialTradeInMarketMaker)
       const marketMakerService = new MarketMakerService(marketMakerAddress)
-      await marketMakerService.trade(provider, ['1000000000', '0'])
+      const initialTradeOutcomeTokens = computeInitialTradeOutcomeTokens(
+        [+outcomeProbabilityOne, +outcomeProbabilityTwo],
+        fundingInWei,
+      )
+      await marketMakerService.trade(provider, initialTradeOutcomeTokens)
 
       setStatus(Status.Done)
     } catch (err) {
