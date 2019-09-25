@@ -89,7 +89,15 @@ class AskQuestionStep extends Component<Props, State> {
           <div className="col">
             <label>Resolution Date *</label>
             <Div>
-              <DatePicker name="resolution" selected={resolution} onChange={handleChangeDate} />
+              <DatePicker
+                dateFormat="Pp"
+                name="resolution"
+                selected={resolution}
+                onChange={handleChangeDate}
+                minDate={new Date()}
+                showDisabledMonthNavigation
+                showTimeInput
+              />
             </Div>
           </div>
         </div>
