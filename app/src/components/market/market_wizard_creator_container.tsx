@@ -4,6 +4,7 @@ import moment from 'moment'
 
 import { getLogger } from '../../util/logger'
 import { computeInitialTradeOutcomeTokens } from '../../util/tools'
+import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import {
   RealitioService,
@@ -16,21 +17,9 @@ import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 
 const logger = getLogger('Market::MarketWizardCreatorContainer')
 
-export enum Status {
-  Ready = 'Ready',
-  PostingQuestion = 'Posting question to realitio',
-  PrepareCondition = 'Prepare condition',
-  ApprovingDAI = 'Approving DAI',
-  CreateMarketMaker = 'Create market maker',
-  ApproveDAIForMarketMaker = 'Approve dai for market maker',
-  InitialTradeInMarketMaker = 'initial trade in market maker',
-  Done = 'Done',
-  Error = 'Error',
-}
-
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
-  const [status, setStatus] = useState<Status>(Status.Ready)
+  const [status, setStatus] = useState<StatusMarketCreation>(StatusMarketCreation.Ready)
   const [questionId, setQuestionId] = useState<string | null>(null)
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
@@ -47,7 +36,7 @@ const MarketWizardCreatorContainer: FC = () => {
       const { question, resolution, funding, outcomeProbabilityOne, outcomeProbabilityTwo } = data
       const openingDateMoment = moment(resolution)
 
-      setStatus(Status.PostingQuestion)
+      setStatus(StatusMarketCreation.PostingQuestion)
       const questionId = await RealitioService.askQuestion(
         question,
         openingDateMoment,
@@ -56,7 +45,7 @@ const MarketWizardCreatorContainer: FC = () => {
       )
       setQuestionId(questionId)
 
-      setStatus(Status.PrepareCondition)
+      setStatus(StatusMarketCreation.PrepareCondition)
       const conditionId = await ConditionalTokenService.prepareCondition(
         questionId,
         provider,
@@ -64,7 +53,7 @@ const MarketWizardCreatorContainer: FC = () => {
       )
 
       // approve movement of DAI to MarketMakerFactory
-      setStatus(Status.ApprovingDAI)
+      setStatus(StatusMarketCreation.ApprovingDAI)
       const fundingInWei = ethers.utils.bigNumberify(funding).mul(ethers.constants.WeiPerEther)
       const daiAddress = getContractAddress(networkId, 'dai')
       const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
@@ -80,7 +69,7 @@ const MarketWizardCreatorContainer: FC = () => {
         await daiService.approve(provider, marketMakerFactoryAddress, fundingInWei)
       }
 
-      setStatus(Status.CreateMarketMaker)
+      setStatus(StatusMarketCreation.CreateMarketMaker)
       const marketMakerAddress = await MarketMakerService.createMarketMaker(
         conditionId,
         fundingInWei,
@@ -89,10 +78,10 @@ const MarketWizardCreatorContainer: FC = () => {
       )
       setMarketMakerAddress(marketMakerAddress)
 
-      setStatus(Status.ApproveDAIForMarketMaker)
+      setStatus(StatusMarketCreation.ApproveDAIForMarketMaker)
       await daiService.approveUnlimited(provider, marketMakerAddress)
 
-      setStatus(Status.InitialTradeInMarketMaker)
+      setStatus(StatusMarketCreation.InitialTradeInMarketMaker)
       const marketMakerService = new MarketMakerService(marketMakerAddress)
       const initialTradeOutcomeTokens = computeInitialTradeOutcomeTokens(
         [+outcomeProbabilityOne, +outcomeProbabilityTwo],
@@ -100,9 +89,9 @@ const MarketWizardCreatorContainer: FC = () => {
       )
       await marketMakerService.trade(provider, initialTradeOutcomeTokens)
 
-      setStatus(Status.Done)
+      setStatus(StatusMarketCreation.Done)
     } catch (err) {
-      setStatus(Status.Error)
+      setStatus(StatusMarketCreation.Error)
       logger.error(err.message)
     }
   }

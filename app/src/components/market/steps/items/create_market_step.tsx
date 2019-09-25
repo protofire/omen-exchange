@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
 import { Button } from '../../../common/index'
-import { Status } from '../../market_wizard_creator_container'
+import { StatusMarketCreation } from '../../../../util/types'
 import { formatDate } from '../../../../util/tools'
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
     outcomeProbabilityOne: string
     outcomeProbabilityTwo: string
   }
-  status: string
+  status: StatusMarketCreation
   questionId: string | null
   marketMakerAddress: string | null
 }
@@ -108,7 +108,9 @@ class CreateMarketStep extends Component<Props> {
           </div>
           <div className="col right">
             <Button
-              disabled={status !== Status.Ready && status !== Status.Error}
+              disabled={
+                status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error
+              }
               onClick={this.submit}
             >
               Create Market

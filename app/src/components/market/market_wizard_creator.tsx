@@ -9,7 +9,7 @@ import {
   ResumeMarketStep,
 } from './steps'
 
-import { Status } from './market_wizard_creator_container'
+import { StatusMarketCreation } from '../../util/types'
 
 export interface MarketData {
   question: string
@@ -25,7 +25,7 @@ export interface MarketData {
 
 interface Props {
   callback: (param: MarketData) => void
-  status: string
+  status: StatusMarketCreation
   questionId: string | null
   marketMakerAddress: string | null
 }
@@ -186,12 +186,12 @@ export class MarketWizardCreator extends Component<Props, State> {
       <div className="row">
         <div className="col-2" />
         <div className="col-6">
-          {status !== Status.Done && (
+          {status !== StatusMarketCreation.Done && (
             <>
               {this.currentMenu()} {this.currentStep()}
             </>
           )}
-          {status === Status.Done && this.resumeMarketStep()}
+          {status === StatusMarketCreation.Done && this.resumeMarketStep()}
         </div>
         <div className="col-2" />
       </div>

@@ -1,11 +1,6 @@
 import { ethers } from 'ethers'
 import { getContractAddress } from '../util/addresses'
-
-enum Stage {
-  Running = 0,
-  Paused = 1,
-  Closed = 2,
-}
+import { Stage } from '../util/types'
 
 const marketMakerAbi = [
   'function pmSystem() external view returns (address)',
