@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from 'react'
-import { useWeb3Context } from 'web3-react'
 
+import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { FetchMarketService } from '../../services'
 import { getLogger } from '../../util/logger'
 
@@ -11,26 +11,24 @@ enum Status {
   Error = 'Error',
 }
 
-const logger = getLogger('Market::MarketViewContainer')
+const logger = getLogger('Market::MarketView')
 
 const MarketViewContainer: FC = (props: any) => {
-  const context = useWeb3Context()
+  const context = useConnectedWeb3Context()
 
   const [data, setData] = useState({
     marketInformation: [],
     balanceInformation: [],
     actualPrice: [],
   })
-  const [address, setAddress] = useState(props.match.params.address)
+
+  const [address] = useState(props.match.params.address)
   const [status, setStatus] = useState(Status.Ready)
 
   useEffect(() => {
     const fetchData = async () => {
       setStatus(Status.Loading)
       try {
-        if (!context.networkId || !context.library) {
-          throw new Error('Network is not available')
-        }
         const networkId = context.networkId
         const provider = context.library
         const user = await provider.getSigner().getAddress()
