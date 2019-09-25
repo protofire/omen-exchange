@@ -94,6 +94,8 @@ class AskQuestionStep extends Component<Props, State> {
                 name="resolution"
                 selected={resolution}
                 onChange={handleChangeDate}
+                minDate={new Date()}
+                showDisabledMonthNavigation
                 showTimeInput
               />
             </Div>
