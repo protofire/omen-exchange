@@ -1,8 +1,12 @@
 import React, { Component } from 'react'
-import moment from 'moment'
 
 import { Button } from '../../../common/index'
 import { Status } from '../../market_wizard_creator_container'
+
+const formatDate = (date: Date): string => {
+  const dateParts = date.toString().split(/\s+/)
+  return dateParts.slice(1, 6).join(' ')
+}
 
 interface Props {
   back: () => void
@@ -46,7 +50,7 @@ class SummaryStep extends Component<Props> {
       outcomeProbabilityTwo,
     } = values
 
-    const resolutionDate = resolution && moment(resolution).format('MM-DD-YYYY')
+    const resolutionDate = resolution && formatDate(resolution)
 
     return (
       <>
