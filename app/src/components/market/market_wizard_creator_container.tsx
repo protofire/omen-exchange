@@ -1,6 +1,5 @@
 import { ethers } from 'ethers'
 import React, { FC, useState } from 'react'
-import { useWeb3Context } from 'web3-react'
 import moment from 'moment'
 
 import { getLogger } from '../../util/logger'
@@ -13,6 +12,7 @@ import {
   MarketMakerService,
 } from '../../services'
 import { getContractAddress } from '../../util/addresses'
+import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 
 const logger = getLogger('Market::MarketWizardCreatorContainer')
 
@@ -29,16 +29,13 @@ export enum Status {
 }
 
 const MarketWizardCreatorContainer: FC = () => {
-  const context = useWeb3Context()
+  const context = useConnectedWeb3Context()
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [questionId, setQuestionId] = useState<string | null>(null)
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
   const handleSubmit = async (data: MarketData) => {
     try {
-      if (!context.networkId || !context.library) {
-        throw new Error('Network is not available')
-      }
       if (!data.resolution) {
         throw new Error('resolution time was not specified')
       }
