@@ -40,3 +40,8 @@ export const computeInitialTradeOutcomeTokens = (
 
   return buyAmounts
 }
+
+export const formatDate = (date: Date): string => {
+  const dateParts = date.toString().split(/\s+/)
+  return dateParts.slice(1, 6).join(' ')
+}

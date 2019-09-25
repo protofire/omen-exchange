@@ -2,11 +2,7 @@ import React, { Component } from 'react'
 
 import { Button } from '../../../common/index'
 import { Status } from '../../market_wizard_creator_container'
-
-const formatDate = (date: Date): string => {
-  const dateParts = date.toString().split(/\s+/)
-  return dateParts.slice(1, 6).join(' ')
-}
+import { formatDate } from '../../../../util/tools'
 
 interface Props {
   back: () => void

@@ -1,9 +1,9 @@
 import React from 'react'
-import moment from 'moment'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
 import { Link } from 'react-router-dom'
 import { LinkSpan } from '../../../common/link_span'
+import { formatDate } from '../../../../util/tools'
 
 interface Props {
   values: {
@@ -34,7 +34,7 @@ const ResumeMarketStep = (props: Props) => {
     outcomeProbabilityTwo,
   } = values
 
-  const resolutionDate = resolution && moment(resolution).format('MM-DD-YYYY')
+  const resolutionDate = resolution && formatDate(resolution)
 
   const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/view/${marketMakerAddress}`
 
