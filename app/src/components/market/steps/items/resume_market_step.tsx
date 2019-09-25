@@ -79,6 +79,8 @@ const ResumeMarketStep = (props: Props) => {
           {outcomeValueTwo} - {outcomeProbabilityTwo} %
         </i>
       </p>
+
+      <Link to={`/view/${marketMakerAddress}`}>Go to Market</Link>
     </>
   )
 }
