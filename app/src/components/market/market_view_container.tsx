@@ -31,15 +31,15 @@ const MarketViewContainer: FC = (props: any) => {
         const balance = [
           {
             outcomeName: OutcomeSlots.Yes,
-            probability: '50',
-            currentPrice: actualPrice.actualPriceForYes.toString(),
-            shares: balanceInformation.balanceOfForYes.toString(),
+            probability: actualPrice.actualPriceForYes * 100,
+            currentPrice: actualPrice.actualPriceForYes,
+            shares: balanceInformation.balanceOfForYes,
           },
           {
             outcomeName: OutcomeSlots.No,
-            probability: '50',
-            currentPrice: actualPrice.actualPriceForNo.toString(),
-            shares: balanceInformation.balanceOfForNo.toString(),
+            probability: actualPrice.actualPriceForNo * 100,
+            currentPrice: actualPrice.actualPriceForNo,
+            shares: balanceInformation.balanceOfForNo,
           },
         ]
 
@@ -54,14 +54,6 @@ const MarketViewContainer: FC = (props: any) => {
     fetchData()
   }, [address, context])
 
-  const handleBuy = (): void => {
-    alert('Buy')
-  }
-
-  const handleSell = (): void => {
-    alert('Sell')
-  }
-
   // TODO: fetch question and resolution date, and pass in props
   return (
     <MarketView
@@ -69,8 +61,6 @@ const MarketViewContainer: FC = (props: any) => {
       question={'Will be X the president of X in 2020?'}
       resolution={new Date()}
       balance={balance}
-      handleBuy={handleBuy}
-      handleSell={handleSell}
     />
   )
 }

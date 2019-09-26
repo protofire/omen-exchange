@@ -1,64 +1,83 @@
-import React from 'react'
-import styled from 'styled-components'
-import { ethers } from 'ethers'
-import { formatDate } from '../../util/tools'
+import React, { FC, useState } from 'react'
+
 import { Status, BalanceItems } from '../../util/types'
-import { Button } from '../common/button'
+import { Buy } from './profile/buy'
+import { Sell } from './profile/sell'
+import { View } from './profile/view'
+import { QuestionHeader } from './profile/question_header'
 
 interface Props {
   balance: BalanceItems[]
   question: string
   resolution: Date
   status: Status
-  handleBuy: () => any
-  handleSell: () => any
 }
 
-const DivStyled = styled.div`
-  width: 5px;
-  height: auto;
-  display: inline-block;
-`
+enum Step {
+  View = 'View',
+  Buy = 'Buy',
+  Sell = 'Sell',
+}
 
-const MarketView = (props: Props) => {
-  const { balance, question, resolution } = props
+const MarketView: FC<Props> = props => {
+  const { question, resolution, balance } = props
+  const [currentStep, setCurrentStep] = useState<Step>(Step.View)
 
-  const renderTableHeader = ['Outcome', 'Probabilities', 'Current Price', 'Shares'].map(
-    (value, index) => {
-      return <th key={index}>{value}</th>
-    },
-  )
+  const handleFinish = (): void => {
+    setCurrentStep(Step.View)
+  }
 
-  const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
-    const { outcomeName, probability, currentPrice, shares } = balanceItem
-    return (
-      <tr key={index}>
-        <td>{outcomeName}</td>
-        <td>{probability} %</td>
-        <td>{ethers.utils.formatEther(currentPrice)} DAI</td>
-        <td>{shares}</td>
-      </tr>
-    )
-  })
+  const handleBack = (): void => {
+    setCurrentStep(Step.View)
+  }
+
+  const handleBuy = (): void => {
+    setCurrentStep(Step.Buy)
+  }
+
+  const handleSell = (): void => {
+    setCurrentStep(Step.Sell)
+  }
+
+  const renderView = () => {
+    switch (currentStep) {
+      case Step.View:
+        return (
+          <>
+            <View handleBuy={() => handleBuy()} handleSell={() => handleSell()} {...props} />
+          </>
+        )
+      case Step.Buy:
+        return (
+          <>
+            <Buy
+              handleBack={() => handleBack()}
+              handleFinish={() => handleFinish()}
+              balance={balance}
+            />
+          </>
+        )
+      case Step.Sell:
+        return (
+          <>
+            <Sell handleBack={() => handleBack()} handleFinish={() => handleFinish()} />
+          </>
+        )
+      default:
+        return (
+          <>
+            <View handleBuy={() => handleBuy()} handleSell={() => handleSell()} {...props} />
+          </>
+        )
+    }
+  }
 
   return (
     <div className="row">
       <div className="col-2" />
       <div className="col-6">
-        <h4>{question}</h4>
-        <h5>Resolution date: {formatDate(resolution)}</h5>
-        <h5>Balance</h5>
-        <table>
-          <tbody>
-            <tr>{renderTableHeader}</tr>
-            {renderTableData}
-          </tbody>
-        </table>
-        <div className="row right">
-          <Button onClick={() => props.handleSell()}>Sell</Button>
-          <DivStyled />
-          <Button onClick={() => props.handleBuy()}>Buy</Button>
-        </div>
+        <QuestionHeader question={question} resolution={resolution} />
+        {renderView()}
       </div>
       <div className="col-2" />
     </div>
