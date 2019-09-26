@@ -61,6 +61,7 @@ const MarketViewContainer: FC = (props: any) => {
       question={'Will be X the president of X in 2020?'}
       resolution={new Date()}
       balance={balance}
+      marketAddress={address}
     />
   )
 }

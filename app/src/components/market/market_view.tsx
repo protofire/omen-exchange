@@ -11,6 +11,7 @@ interface Props {
   question: string
   resolution: Date
   status: Status
+  marketAddress: string
 }
 
 enum Step {
@@ -20,7 +21,7 @@ enum Step {
 }
 
 const MarketView: FC<Props> = props => {
-  const { question, resolution, balance } = props
+  const { question, resolution, balance, marketAddress } = props
   const [currentStep, setCurrentStep] = useState<Step>(Step.View)
 
   const handleFinish = (): void => {
@@ -54,6 +55,7 @@ const MarketView: FC<Props> = props => {
               handleBack={() => handleBack()}
               handleFinish={() => handleFinish()}
               balance={balance}
+              marketAddress={marketAddress}
             />
           </>
         )
