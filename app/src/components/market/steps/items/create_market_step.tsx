@@ -1,12 +1,8 @@
 import React, { Component } from 'react'
 
 import { Button } from '../../../common/index'
-import { Status } from '../../market_wizard_creator_container'
-
-const formatDate = (date: Date): string => {
-  const dateParts = date.toString().split(/\s+/)
-  return dateParts.slice(1, 6).join(' ')
-}
+import { StatusMarketCreation } from '../../../../util/types'
+import { formatDate } from '../../../../util/tools'
 
 interface Props {
   back: () => void
@@ -22,12 +18,12 @@ interface Props {
     outcomeProbabilityOne: string
     outcomeProbabilityTwo: string
   }
-  status: string
+  status: StatusMarketCreation
   questionId: string | null
   marketMakerAddress: string | null
 }
 
-class SummaryStep extends Component<Props> {
+class CreateMarketStep extends Component<Props> {
   back = () => {
     this.props.back()
   }
@@ -112,7 +108,9 @@ class SummaryStep extends Component<Props> {
           </div>
           <div className="col right">
             <Button
-              disabled={status !== Status.Ready && status !== Status.Error}
+              disabled={
+                status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error
+              }
               onClick={this.submit}
             >
               Create Market
@@ -124,4 +122,4 @@ class SummaryStep extends Component<Props> {
   }
 }
 
-export { SummaryStep }
+export { CreateMarketStep }

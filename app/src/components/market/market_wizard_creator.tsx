@@ -1,6 +1,15 @@
 import React, { Component, ChangeEvent } from 'react'
 
-import { AskQuestionStep, FundingAndFeeStep, OutcomesStep, SummaryStep, MenuStep } from './steps'
+import {
+  AskQuestionStep,
+  FundingAndFeeStep,
+  OutcomesStep,
+  CreateMarketStep,
+  MenuStep,
+  ResumeMarketStep,
+} from './steps'
+
+import { StatusMarketCreation } from '../../util/types'
 
 export interface MarketData {
   question: string
@@ -16,7 +25,7 @@ export interface MarketData {
 
 interface Props {
   callback: (param: MarketData) => void
-  status: string
+  status: StatusMarketCreation
   questionId: string | null
   marketMakerAddress: string | null
 }
@@ -138,7 +147,7 @@ export class MarketWizardCreator extends Component<Props, State> {
         )
       case 4:
         return (
-          <SummaryStep
+          <CreateMarketStep
             back={() => this.back()}
             submit={() => this.submit()}
             values={{ ...marketData }}
@@ -164,13 +173,25 @@ export class MarketWizardCreator extends Component<Props, State> {
     return <MenuStep currentStep={currentStep} />
   }
 
+  public resumeMarketStep = () => {
+    const { marketData } = this.state
+    const { marketMakerAddress } = this.props
+
+    return <ResumeMarketStep values={{ ...marketData }} marketMakerAddress={marketMakerAddress} />
+  }
+
   render() {
+    const { status } = this.props
     return (
       <div className="row">
         <div className="col-2" />
         <div className="col-6">
-          {this.currentMenu()}
-          {this.currentStep()}
+          {status !== StatusMarketCreation.Done && (
+            <>
+              {this.currentMenu()} {this.currentStep()}
+            </>
+          )}
+          {status === StatusMarketCreation.Done && this.resumeMarketStep()}
         </div>
         <div className="col-2" />
       </div>
