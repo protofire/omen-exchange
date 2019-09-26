@@ -1,7 +1,7 @@
 import React, { ChangeEvent, Component } from 'react'
 import DatePicker from 'react-datepicker'
 import styled from 'styled-components'
-
+import { CreateCard } from '../../create_card'
 import { Button, Textfield, Categories } from '../../../common/index'
 
 interface Props {
@@ -54,7 +54,7 @@ class AskQuestionStep extends Component<Props, State> {
     const { values, handleChange, handleChangeDate } = this.props
     const { question, category, resolution } = values
     return (
-      <>
+      <CreateCard>
         {this.state.errors.length > 0 && (
           <PWarn>
             <i>{this.state.errors.join('. ')}</i>
@@ -116,7 +116,7 @@ class AskQuestionStep extends Component<Props, State> {
             <Button onClick={this.validate}>Next</Button>
           </div>
         </div>
-      </>
+      </CreateCard>
     )
   }
 }

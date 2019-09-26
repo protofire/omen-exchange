@@ -2,7 +2,6 @@ import React from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 
 import { Link } from 'react-router-dom'
-import { LinkSpan } from '../../../common/link_span'
 import { formatDate } from '../../../../util/tools'
 
 interface Props {
@@ -46,7 +45,7 @@ const ResumeMarketStep = (props: Props) => {
         {marketMakerURL}
       </Link>
       <CopyToClipboard text={marketMakerURL}>
-        <LinkSpan>Copy to clipboard</LinkSpan>
+        <span>Copy to clipboard</span>
       </CopyToClipboard>
       <h5>Details</h5>
       <p>

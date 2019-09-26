@@ -115,32 +115,32 @@ export class MarketWizardCreator extends Component<Props, State> {
       case 1:
         return (
           <AskQuestionStep
-            next={() => this.next()}
-            values={{ question, category, resolution }}
             handleChange={this.handleChange}
             handleChangeDate={this.handleChangeDate}
+            next={() => this.next()}
+            values={{ question, category, resolution }}
           />
         )
       case 2:
         return (
           <FundingAndFeeStep
-            next={() => this.next()}
             back={() => this.back()}
-            values={{ spread, funding }}
             handleChange={this.handleChange}
+            next={() => this.next()}
+            values={{ spread, funding }}
           />
         )
       case 3:
         return (
           <OutcomesStep
-            next={() => this.next()}
             back={() => this.back()}
+            next={() => this.next()}
             values={{
-              question,
-              outcomeValueOne,
-              outcomeValueTwo,
               outcomeProbabilityOne,
               outcomeProbabilityTwo,
+              outcomeValueOne,
+              outcomeValueTwo,
+              question,
             }}
             handleChange={this.handleChange}
           />
@@ -149,20 +149,20 @@ export class MarketWizardCreator extends Component<Props, State> {
         return (
           <CreateMarketStep
             back={() => this.back()}
+            marketMakerAddress={marketMakerAddress}
+            questionId={questionId}
+            status={status}
             submit={() => this.submit()}
             values={{ ...marketData }}
-            status={status}
-            questionId={questionId}
-            marketMakerAddress={marketMakerAddress}
           />
         )
       default:
         return (
           <AskQuestionStep
-            next={() => this.next()}
-            values={{ question, category, resolution }}
             handleChange={this.handleChange}
             handleChangeDate={this.handleChangeDate}
+            next={() => this.next()}
+            values={{ question, category, resolution }}
           />
         )
     }
@@ -183,18 +183,14 @@ export class MarketWizardCreator extends Component<Props, State> {
   render() {
     const { status } = this.props
     return (
-      <div className="row">
-        <div className="col-2" />
-        <div className="col-6">
-          {status !== StatusMarketCreation.Done && (
-            <>
-              {this.currentMenu()} {this.currentStep()}
-            </>
-          )}
-          {status === StatusMarketCreation.Done && this.resumeMarketStep()}
-        </div>
-        <div className="col-2" />
-      </div>
+      <>
+        {status !== StatusMarketCreation.Done && (
+          <>
+            {this.currentMenu()} {this.currentStep()}
+          </>
+        )}
+        {status === StatusMarketCreation.Done && this.resumeMarketStep()}
+      </>
     )
   }
 }

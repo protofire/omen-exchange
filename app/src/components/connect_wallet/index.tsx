@@ -1,11 +1,34 @@
 import React from 'react'
 import { useWeb3Context } from 'web3-react'
+import styled from 'styled-components'
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
-
 import { CONNECTOR } from '../../common/constants'
-import { LinkSpan } from '../common/link_span'
 
-const ConnectWallet = (props: any) => {
+const Wrapper = styled.div`
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+`
+
+const Text = styled.span`
+  color: #999;
+  font-size: 14px;
+  font-weight: 400;
+
+  &:hover {
+    color: #000;
+  }
+`
+
+const Dot = styled.div`
+  background-color: #ccc;
+  border-radius: 50%;
+  height: 12px;
+  margin-right: 8px;
+  width: 12px;
+`
+
+export const ConnectWallet = (props: any) => {
   const context = useWeb3Context()
 
   if (context.error) {
@@ -26,13 +49,11 @@ const ConnectWallet = (props: any) => {
   return (
     <>
       {!context.active && (
-        <div {...props}>
-          <LinkSpan onClick={() => context.setConnector(CONNECTOR)}>
-            Connect with {CONNECTOR}
-          </LinkSpan>
-        </div>
+        <Wrapper {...props} onClick={() => context.setConnector(CONNECTOR)}>
+          <Dot />
+          <Text>Click to connect with {CONNECTOR}</Text>
+        </Wrapper>
       )}
     </>
   )
 }
-export { ConnectWallet }
