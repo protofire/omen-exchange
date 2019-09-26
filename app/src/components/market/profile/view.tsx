@@ -51,14 +51,18 @@ const View = (props: Props) => {
 
   return (
     <>
-      {userHaveShares && <h5>Balance</h5>}
-      Status: {status}
-      <table>
-        <tbody>
-          <tr>{renderTableHeader}</tr>
-          {renderTableData}
-        </tbody>
-      </table>
+      <div className="row">{userHaveShares && <h5>Balance</h5>}</div>
+      <div className="row">
+        <p>Status: {status}</p>
+      </div>
+      <div className="row">
+        <table>
+          <tbody>
+            <tr>{renderTableHeader}</tr>
+            {renderTableData}
+          </tbody>
+        </table>
+      </div>
       <div className="row right">
         {userHaveShares && <Button onClick={() => props.handleSell()}>Sell</Button>}
         <DivStyled />
