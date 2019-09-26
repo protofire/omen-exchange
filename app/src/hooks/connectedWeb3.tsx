@@ -4,7 +4,7 @@ import { useWeb3Context } from 'web3-react'
 
 const ConnectedWeb3Context = React.createContext<{
   account: string
-  library: providers.BaseProvider
+  library: providers.Web3Provider
   networkId: number
 } | null>(null)
 
