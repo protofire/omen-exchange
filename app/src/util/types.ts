@@ -14,8 +14,8 @@ export enum OutcomeSlots {
 
 export interface BalanceItems {
   outcomeName: string
-  probability: string
-  currentPrice: BigNumber
+  probability: number
+  currentPrice: string
   shares: BigNumber
 }
 
