@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Button } from '../../common'
-import { BalanceItems } from '../../../util/types'
+import { BalanceItems, OutcomeSlots } from '../../../util/types'
 
 interface Props {
   balance: BalanceItems[]
@@ -25,10 +25,12 @@ const Buy = (props: Props) => {
 
   const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
     const { outcomeName, probability, currentPrice } = balanceItem
+    const defaultChecked = outcomeName === OutcomeSlots.Yes
     return (
       <tr key={index}>
         <td>
-          <input type="radio" value={outcomeName} name="outcome" /> {outcomeName}
+          <input type="radio" value={outcomeName} defaultChecked={defaultChecked} name="outcome" />{' '}
+          {outcomeName}
         </td>
         <td>{probability} %</td>
         <td>{currentPrice} DAI</td>
