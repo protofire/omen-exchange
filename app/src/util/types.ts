@@ -1,3 +1,5 @@
+import { BigNumber } from 'ethers/utils'
+
 export enum Status {
   Ready = 'Ready',
   Loading = 'Loading',
@@ -13,8 +15,8 @@ export enum OutcomeSlots {
 export interface BalanceItems {
   outcomeName: string
   probability: string
-  currentPrice: string
-  shares: string
+  currentPrice: BigNumber
+  shares: BigNumber
 }
 
 export enum Stage {

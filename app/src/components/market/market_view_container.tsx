@@ -1,29 +1,19 @@
 import React, { FC, useState, useEffect } from 'react'
 
+import { MarketView } from './market_view'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { FetchMarketService } from '../../services'
 import { getLogger } from '../../util/logger'
-
-enum Status {
-  Ready = 'Ready',
-  Loading = 'Loading',
-  Done = 'Done',
-  Error = 'Error',
-}
+import { Status, BalanceItems, OutcomeSlots } from '../../util/types'
 
 const logger = getLogger('Market::MarketView')
 
 const MarketViewContainer: FC = (props: any) => {
   const context = useConnectedWeb3Context()
 
-  const [data, setData] = useState({
-    marketInformation: [],
-    balanceInformation: [],
-    actualPrice: [],
-  })
-
-  const [address] = useState(props.match.params.address)
-  const [status, setStatus] = useState(Status.Ready)
+  const [balance, setBalance] = useState<BalanceItems[]>([])
+  const [address] = useState<string>(props.match.params.address)
+  const [status, setStatus] = useState<Status>(Status.Ready)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,17 +24,26 @@ const MarketViewContainer: FC = (props: any) => {
         const user = await provider.getSigner().getAddress()
 
         const fetchMarketService = new FetchMarketService(address, networkId, provider)
-        const [marketInformation, balanceInformation, actualPrice] = await Promise.all([
-          fetchMarketService.getMarketInformation(),
+        const [balanceInformation, actualPrice] = await Promise.all([
           fetchMarketService.getBalanceInformation(user),
           fetchMarketService.getActualPrice(),
         ])
+        const balance = [
+          {
+            outcomeName: OutcomeSlots.Yes,
+            probability: '50',
+            currentPrice: actualPrice.actualPriceForYes.toString(),
+            shares: balanceInformation.balanceOfForYes.toString(),
+          },
+          {
+            outcomeName: OutcomeSlots.No,
+            probability: '50',
+            currentPrice: actualPrice.actualPriceForNo.toString(),
+            shares: balanceInformation.balanceOfForNo.toString(),
+          },
+        ]
 
-        setData({
-          marketInformation,
-          balanceInformation,
-          actualPrice,
-        })
+        setBalance(balance)
 
         setStatus(Status.Done)
       } catch (error) {
@@ -55,16 +54,24 @@ const MarketViewContainer: FC = (props: any) => {
     fetchData()
   }, [address, context])
 
-  return (
-    <>
-      <p>Status: {status}</p>
-      <p>Question: TODO</p>
-      <p>Resolution date: TODO</p>
+  const handleBuy = (): void => {
+    alert('Buy')
+  }
 
-      <p>{JSON.stringify(data.marketInformation)}</p>
-      <p>{JSON.stringify(data.balanceInformation)}</p>
-      <p>{JSON.stringify(data.actualPrice)}</p>
-    </>
+  const handleSell = (): void => {
+    alert('Sell')
+  }
+
+  // TODO: fetch question and resolution date, and pass in props
+  return (
+    <MarketView
+      status={status}
+      question={'Will be X the president of X in 2020?'}
+      resolution={new Date()}
+      balance={balance}
+      handleBuy={handleBuy}
+      handleSell={handleSell}
+    />
   )
 }
 
