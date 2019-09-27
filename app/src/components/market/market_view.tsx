@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react'
+import { BigNumber } from 'ethers/utils'
 
 import { Status, BalanceItems } from '../../util/types'
 import { Buy } from './profile/buy'
@@ -8,6 +9,7 @@ import { QuestionHeader } from './profile/question_header'
 
 interface Props {
   balance: BalanceItems[]
+  funding: BigNumber
   question: string
   resolution: Date
   status: Status
@@ -21,7 +23,7 @@ enum Step {
 }
 
 const MarketView: FC<Props> = props => {
-  const { question, resolution, balance, marketAddress } = props
+  const { funding, question, resolution, balance, marketAddress } = props
   const [currentStep, setCurrentStep] = useState<Step>(Step.View)
 
   const handleFinish = (): void => {
@@ -56,6 +58,7 @@ const MarketView: FC<Props> = props => {
               handleFinish={() => handleFinish()}
               balance={balance}
               marketAddress={marketAddress}
+              funding={funding}
             />
           </>
         )

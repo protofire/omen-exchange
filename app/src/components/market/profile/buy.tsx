@@ -9,9 +9,11 @@ import { ERC20Service, MarketMakerService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getContractAddress } from '../../../util/addresses'
 import { getLogger } from '../../../util/logger'
+import { computePriceAfterTrade } from '../../../util/tools'
 
 interface Props {
   balance: BalanceItems[]
+  funding: BigNumber
   marketAddress: string
   handleBack: () => void
   handleFinish: () => void
@@ -75,7 +77,7 @@ const formatBN = (bn: BigNumber): string => {
 const Buy = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { balance, marketAddress } = props
+  const { balance, marketAddress, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcome, setOutcome] = useState<OutcomeSlots>(OutcomeSlots.Yes)
@@ -87,9 +89,25 @@ const Buy = (props: Props) => {
     setOutcome(outcomeSelected)
   }
 
-  const renderTableHeader = ['Outcome', 'Probabilities', 'Current Price'].map((value, index) => {
-    return <THStyled key={index}>{value}</THStyled>
-  })
+  const renderTableHeader = ['Outcome', 'Probabilities', 'Current Price', 'Price after trade'].map(
+    (value, index) => {
+      return <THStyled key={index}>{value}</THStyled>
+    },
+  )
+
+  const [tradeYes, tradeNo] =
+    outcome === OutcomeSlots.Yes
+      ? [tradedShares, ethers.constants.Zero]
+      : [ethers.constants.Zero, tradedShares]
+  const holdingsYes = balance[0].holdings
+  const holdingsNo = balance[1].holdings
+  const pricesAfterTrade = computePriceAfterTrade(
+    tradeYes,
+    tradeNo,
+    holdingsYes,
+    holdingsNo,
+    funding,
+  )
 
   const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
     const { outcomeName, probability, currentPrice } = balanceItem
@@ -109,6 +127,7 @@ const Buy = (props: Props) => {
         </TDStyled>
         <TDStyled>{probability} %</TDStyled>
         <TDStyled>{currentPrice} DAI</TDStyled>
+        <TDStyled>{pricesAfterTrade[index].toFixed(4)} DAI</TDStyled>
       </tr>
     )
   })
