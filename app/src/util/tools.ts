@@ -77,7 +77,7 @@ export const calcNetCost = (
   tradeYes: BigNumber,
   priceNo: number,
   tradeNo: BigNumber,
-): number => {
+): BigNumber => {
   // funding * log2(oddYes * (2^(tradeYes / funding)) + oddNo * (2^(tradeNo / funding)))
   const logTerm = Math.log2(
     priceYes * Math.pow(2, divBN(tradeYes, funding)) +
