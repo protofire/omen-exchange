@@ -20,12 +20,24 @@ const DivStyled = styled.div`
   display: inline-block;
 `
 
+const TableStyled = styled.table`
+  width: 100%;
+`
+
+const THStyled = styled.th`
+  border-bottom: 1px solid #ddd;
+`
+
+const TDStyled = styled.th`
+  border-bottom: 1px solid #ddd;
+`
+
 const View = (props: Props) => {
   const { balance, status } = props
 
   const userHaveShares = balance.some((balanceItem: BalanceItems) => {
     const { shares } = balanceItem
-    return shares.isZero()
+    return !shares.isZero()
   })
 
   const headerArray = ['Outcome', 'Probabilities', 'Current Price', 'Shares']
@@ -34,34 +46,34 @@ const View = (props: Props) => {
   }
 
   const renderTableHeader = headerArray.map((value, index) => {
-    return <th key={index}>{value}</th>
+    return <THStyled key={index}>{value}</THStyled>
   })
 
   const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
     const { outcomeName, probability, currentPrice, shares } = balanceItem
     return (
       <tr key={index}>
-        <td>{outcomeName}</td>
-        <td>{probability} %</td>
-        <td>{currentPrice} DAI</td>
-        {userHaveShares && <td>{ethers.utils.formatEther(shares)}</td>}
+        <TDStyled>{outcomeName}</TDStyled>
+        <TDStyled>{probability} %</TDStyled>
+        <TDStyled>{currentPrice} DAI</TDStyled>
+        {userHaveShares && <TDStyled>{ethers.utils.formatEther(shares)}</TDStyled>}
       </tr>
     )
   })
 
   return (
     <>
-      <div className="row">{userHaveShares && <h5>Balance</h5>}</div>
+      {userHaveShares && <h5>Balance</h5>}
       <div className="row">
-        <p>Status: {status}</p>
-      </div>
-      <div className="row">
-        <table>
+        <TableStyled>
           <tbody>
             <tr>{renderTableHeader}</tr>
             {renderTableData}
           </tbody>
-        </table>
+        </TableStyled>
+      </div>
+      <div className="row">
+        <p>Status: {status}</p>
       </div>
       <div className="row right">
         {userHaveShares && <Button onClick={() => props.handleSell()}>Sell</Button>}

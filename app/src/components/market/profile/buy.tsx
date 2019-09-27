@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 
-import { Button } from '../../common'
+import { Button, Textfield } from '../../common'
 import { BalanceItems, OutcomeSlots, Status } from '../../../util/types'
 import { ERC20Service, MarketMakerService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
@@ -22,23 +22,81 @@ const DivStyled = styled.div`
   height: auto;
   display: inline-block;
 `
+
+const TableStyled = styled.table`
+  width: 100%;
+`
+
+const THStyled = styled.th`
+  border-bottom: 1px solid #ddd;
+`
+
+const TDStyled = styled.th`
+  border-bottom: 1px solid #ddd;
+`
+const Div = styled.div`
+  height: 50px;
+  display: flex;
+  align-items: center;
+`
+
+const InputStyled = styled(Textfield)`
+  text-align: right;
+  ::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  ::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+`
+
+const Span = styled.span`
+  margin-left: 5px;
+  width: 25px;
+`
+const DivLabel = styled.div`
+  height: 30px;
+  display: flex;
+  align-items: center;
+`
+
 const logger = getLogger('Market::Buy')
 
 const Buy = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const { balance, marketAddress } = props
+
+  const balanceItemDefault: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
+    return balanceItem.outcomeName === OutcomeSlots.Yes
+  })
+
+  const currentPriceDefault = balanceItemDefault && balanceItemDefault.currentPrice
+
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [amount, setAmount] = useState<number>(0)
-  const [outcome, setOutcome] = useState(OutcomeSlots.Yes)
+  const [amount, setAmount] = useState(0)
+  const [outcome, setOutcome] = useState<OutcomeSlots>(OutcomeSlots.Yes)
+  const [currentPrice, setCurrentPrice] = useState(currentPriceDefault)
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
 
   const handleChangeOutcome = async (e: any) => {
-    setOutcome(e.target.value as OutcomeSlots)
+    const outcomeSelected: OutcomeSlots = e.target.value
+    setOutcome(outcomeSelected)
+
+    const balanceItemSelected: BalanceItems | undefined = balance.find(
+      (balanceItem: BalanceItems) => {
+        return balanceItem.outcomeName === outcomeSelected
+      },
+    )
+
+    const currentPriceSelected = balanceItemSelected && balanceItemSelected.currentPrice
+    setCurrentPrice(currentPriceSelected)
   }
 
   const renderTableHeader = ['Outcome', 'Probabilities', 'Current Price'].map((value, index) => {
-    return <th key={index}>{value}</th>
+    return <THStyled key={index}>{value}</THStyled>
   })
 
   const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
@@ -47,7 +105,7 @@ const Buy = (props: Props) => {
 
     return (
       <tr key={index}>
-        <td>
+        <TDStyled>
           <input
             type="radio"
             value={outcomeName}
@@ -56,9 +114,9 @@ const Buy = (props: Props) => {
             onChange={(e: any) => handleChangeOutcome(e)}
           />{' '}
           {outcomeName}
-        </td>
-        <td>{probability} %</td>
-        <td>{currentPrice} DAI</td>
+        </TDStyled>
+        <TDStyled>{probability} %</TDStyled>
+        <TDStyled>{currentPrice} DAI</TDStyled>
       </tr>
     )
   })
@@ -73,12 +131,19 @@ const Buy = (props: Props) => {
       return balanceItem.outcomeName === outcome
     })
 
-    const divisor: number = balanceItem ? +balanceItem.currentPrice : 1
-    const amount: number = value / divisor
+    const divisor = balanceItem ? +balanceItem.currentPrice : 1
+    const amount = value / divisor
     setAmount(amount)
 
+    // Not allow decimals
+    const amountFixed = amount.toFixed(0)
+
     const marketMakerService = new MarketMakerService(marketAddress)
-    const outcomeTokenCost = await marketMakerService.calculateNetCost(provider, [amount, 0])
+
+    // Check outcome value to use
+    const outcomeValue = outcome === OutcomeSlots.Yes ? [amountFixed, 0] : [0, amountFixed]
+
+    const outcomeTokenCost = await marketMakerService.calculateNetCost(provider, outcomeValue)
     const fee: BigNumber = await marketMakerService.calculateMarketFee(provider, outcomeTokenCost)
     const cost = fee.add(outcomeTokenCost)
     setCost(cost)
@@ -109,7 +174,10 @@ const Buy = (props: Props) => {
         await daiService.approve(provider, marketMakerFactoryAddress, costInWei)
       }
 
-      await marketMakerService.trade(provider, [amount, 0])
+      // Check outcome value to use
+      const outcomeValue = outcome === OutcomeSlots.Yes ? [costInWei, 0] : [0, costInWei]
+
+      await marketMakerService.trade(provider, outcomeValue)
 
       setStatus(Status.Ready)
       props.handleFinish()
@@ -119,24 +187,44 @@ const Buy = (props: Props) => {
     }
   }
 
-  const disabled = status !== Status.Ready && status !== Status.Error
+  const disabled = (status !== Status.Ready && status !== Status.Error) || !amount
 
   return (
     <>
       <h6>Choose the shares you want to buy</h6>
-      <table>
+      <TableStyled>
         <tbody>
           <tr>{renderTableHeader}</tr>
           {renderTableData}
         </tbody>
-      </table>
-      Amount
-      <input type="number" onChange={(e: any) => handleChangeAmount(e)}></input>DAI
-      <h6>Totals</h6>
-      <p>You spend: {cost.toString()} DAI</p>
-      <p>&quot;Yes&quot; shares you get 1 shares</p>
-      <p>1 shares can be redeemed for 1 DAI in case it represents the final outcome.</p>
-      <p>Status: {status}</p>
+      </TableStyled>
+      <div className="row">
+        <div className="col">
+          <label>Amount</label>
+          <Div>
+            <InputStyled name="amount" type="number" onChange={(e: any) => handleChangeAmount(e)} />
+            <Span>DAI</Span>
+          </Div>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col">
+          <DivLabel>
+            <strong>Totals</strong>
+          </DivLabel>
+          <DivLabel>
+            <label>You spend: {cost.toString()} DAI</label>
+          </DivLabel>
+          <DivLabel>
+            <label>&quot;{outcome}&quot; shares you get X shares</label>
+          </DivLabel>
+        </div>
+      </div>
+
+      <div className="row">
+        <p>1 shares can be redeemed for 1 DAI in case it represents the final outcome.</p>
+        <p>Status: {status}</p>
+      </div>
       <div className="row right">
         <Button disabled={disabled} onClick={() => props.handleBack()}>
           Back
