@@ -5,6 +5,7 @@ import { ethers } from 'ethers'
 
 import { Button, Textfield } from '../../common'
 import { BalanceItems, OutcomeSlots, Status } from '../../../util/types'
+import { formatBN } from '../../../util/tools'
 import { ERC20Service, MarketMakerService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getContractAddress } from '../../../util/addresses'
@@ -63,14 +64,6 @@ const DivLabel = styled.div`
 `
 
 const logger = getLogger('Market::Buy')
-
-const formatBN = (bn: BigNumber): string => {
-  const integer = bn.div(ethers.constants.WeiPerEther).toString()
-  const mantissa = bn.mod(ethers.constants.WeiPerEther).toString()
-  const x = +`${integer}.${mantissa}`
-
-  return x.toFixed(2)
-}
 
 const Buy = (props: Props) => {
   const context = useConnectedWeb3Context()

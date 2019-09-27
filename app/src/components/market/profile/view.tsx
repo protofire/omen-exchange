@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
-import { ethers } from 'ethers'
 
 import { Status, BalanceItems } from '../../../util/types'
+import { formatBN } from '../../../util/tools'
 import { Button } from '../../common'
 
 interface Props {
@@ -56,7 +56,7 @@ const View = (props: Props) => {
         <TDStyled>{outcomeName}</TDStyled>
         <TDStyled>{probability} %</TDStyled>
         <TDStyled>{currentPrice} DAI</TDStyled>
-        {userHaveShares && <TDStyled>{ethers.utils.formatEther(shares)}</TDStyled>}
+        {userHaveShares && <TDStyled>{formatBN(shares)}</TDStyled>}
       </tr>
     )
   })
