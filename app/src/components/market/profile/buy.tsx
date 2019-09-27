@@ -226,9 +226,7 @@ const Buy = (props: Props) => {
         <p>Status: {status}</p>
       </div>
       <div className="row right">
-        <Button disabled={disabled} onClick={() => props.handleBack()}>
-          Back
-        </Button>
+        <Button onClick={() => props.handleBack()}>Back</Button>
         <DivStyled />
         <Button disabled={disabled} onClick={() => finish()}>
           Finish
