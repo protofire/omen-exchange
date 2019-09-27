@@ -19,8 +19,8 @@ const MarketViewContainer: FC = (props: any) => {
   const [funding, setFunding] = useState<BigNumber>(ethers.constants.Zero)
 
   useEffect(() => {
-    const fetchData = async () => {
-      setStatus(Status.Loading)
+    const fetchData = async ({ enableStatus }: any) => {
+      enableStatus && setStatus(Status.Loading)
       try {
         const networkId = context.networkId
         const provider = context.library
@@ -60,15 +60,22 @@ const MarketViewContainer: FC = (props: any) => {
         ]
 
         setBalance(balance)
-
-        setStatus(Status.Done)
         setFunding(marketFunding)
+
+        enableStatus && setStatus(Status.Done)
       } catch (error) {
         logger.error(error && error.message)
-        setStatus(Status.Error)
+        enableStatus && setStatus(Status.Error)
       }
     }
-    fetchData()
+
+    fetchData({ enableStatus: true })
+
+    const intervalId = setInterval(() => {
+      fetchData({ enableStatus: false })
+    }, 2000)
+
+    return () => clearInterval(intervalId)
   }, [address, context])
 
   // TODO: fetch question and resolution date, and pass in props
@@ -76,7 +83,7 @@ const MarketViewContainer: FC = (props: any) => {
     <MarketView
       status={status}
       question={'Will be X the president of X in 2020?'}
-      resolution={new Date()}
+      resolution={new Date(2019, 10, 30)}
       balance={balance}
       marketAddress={address}
       funding={funding}
