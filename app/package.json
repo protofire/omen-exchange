@@ -18,6 +18,7 @@
     "ipfs-deploy": "^7.10.5",
     "logdown": "^3.2.8",
     "moment": "^2.24.0",
+    "polished": "^3.4.1",
     "react": "^16.9.0",
     "react-copy-to-clipboard": "^5.0.1",
     "react-datepicker": "^2.9.6",
