@@ -28,16 +28,20 @@ const MarketViewContainer: FC = (props: any) => {
           fetchMarketService.getBalanceInformation(user),
           fetchMarketService.getActualPrice(),
         ])
+
+        const probabilityForYes = actualPrice.actualPriceForYes * 100
+        const probabilityForNo = actualPrice.actualPriceForNo * 100
+
         const balance = [
           {
             outcomeName: OutcomeSlots.Yes,
-            probability: actualPrice.actualPriceForYes * 100,
+            probability: Math.round((probabilityForYes / 100) * 100),
             currentPrice: actualPrice.actualPriceForYes,
             shares: balanceInformation.balanceOfForYes,
           },
           {
             outcomeName: OutcomeSlots.No,
-            probability: actualPrice.actualPriceForNo * 100,
+            probability: Math.round((probabilityForNo / 100) * 100),
             currentPrice: actualPrice.actualPriceForNo,
             shares: balanceInformation.balanceOfForNo,
           },
