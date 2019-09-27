@@ -64,35 +64,27 @@ const DivLabel = styled.div`
 
 const logger = getLogger('Market::Buy')
 
+const formatBN = (bn: BigNumber): string => {
+  const integer = bn.div(ethers.constants.WeiPerEther).toString()
+  const mantissa = bn.mod(ethers.constants.WeiPerEther).toString()
+  const x = +`${integer}.${mantissa}`
+
+  return x.toFixed(2)
+}
+
 const Buy = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const { balance, marketAddress } = props
 
-  const balanceItemDefault: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
-    return balanceItem.outcomeName === OutcomeSlots.Yes
-  })
-
-  const currentPriceDefault = balanceItemDefault && balanceItemDefault.currentPrice
-
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [amount, setAmount] = useState(0)
   const [outcome, setOutcome] = useState<OutcomeSlots>(OutcomeSlots.Yes)
-  const [currentPrice, setCurrentPrice] = useState(currentPriceDefault)
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
+  const [tradedShares, setTradedShares] = useState<BigNumber>(new BigNumber(0))
 
   const handleChangeOutcome = async (e: any) => {
     const outcomeSelected: OutcomeSlots = e.target.value
     setOutcome(outcomeSelected)
-
-    const balanceItemSelected: BalanceItems | undefined = balance.find(
-      (balanceItem: BalanceItems) => {
-        return balanceItem.outcomeName === outcomeSelected
-      },
-    )
-
-    const currentPriceSelected = balanceItemSelected && balanceItemSelected.currentPrice
-    setCurrentPrice(currentPriceSelected)
   }
 
   const renderTableHeader = ['Outcome', 'Probabilities', 'Current Price'].map((value, index) => {
@@ -123,7 +115,6 @@ const Buy = (props: Props) => {
 
   const handleChangeAmount = async (event: any) => {
     event.persist()
-    const provider = context.library
 
     const value = +event.target.value
 
@@ -131,22 +122,22 @@ const Buy = (props: Props) => {
       return balanceItem.outcomeName === outcome
     })
 
-    const divisor = balanceItem ? +balanceItem.currentPrice : 1
-    const amount = value / divisor
-    setAmount(amount)
+    const price = balanceItem ? +balanceItem.currentPrice : 1
+    const amount = value / price
 
     // Not allow decimals
-    const amountFixed = amount.toFixed(0)
+    const amountInWei = ethers.utils
+      .bigNumberify(Math.round(10000 * amount))
+      .mul(ethers.constants.WeiPerEther)
+      .div(10000)
 
-    const marketMakerService = new MarketMakerService(marketAddress)
+    setTradedShares(amountInWei)
 
-    // Check outcome value to use
-    const outcomeValue = outcome === OutcomeSlots.Yes ? [amountFixed, 0] : [0, amountFixed]
-
-    const outcomeTokenCost = await marketMakerService.calculateNetCost(provider, outcomeValue)
-    const fee: BigNumber = await marketMakerService.calculateMarketFee(provider, outcomeTokenCost)
-    const cost = fee.add(outcomeTokenCost)
-    setCost(cost)
+    const costWithFee = ethers.utils
+      .bigNumberify(Math.round(value * 1.01 * 10000))
+      .mul(ethers.constants.WeiPerEther)
+      .div(10000)
+    setCost(costWithFee)
   }
 
   const finish = async () => {
@@ -162,20 +153,19 @@ const Buy = (props: Props) => {
       const marketMakerService = new MarketMakerService(marketAddress)
       const daiService = new ERC20Service(daiAddress)
 
-      const costInWei = ethers.utils.bigNumberify(cost).mul(ethers.constants.WeiPerEther)
       const hasEnoughAlowance = await daiService.hasEnoughAllowance(
         provider,
         user,
         marketMakerFactoryAddress,
-        costInWei,
+        cost,
       )
 
       if (!hasEnoughAlowance) {
-        await daiService.approve(provider, marketMakerFactoryAddress, costInWei)
+        await daiService.approve(provider, marketMakerFactoryAddress, cost)
       }
 
       // Check outcome value to use
-      const outcomeValue = outcome === OutcomeSlots.Yes ? [costInWei, 0] : [0, costInWei]
+      const outcomeValue = outcome === OutcomeSlots.Yes ? [tradedShares, 0] : [0, tradedShares]
 
       await marketMakerService.trade(provider, outcomeValue)
 
@@ -187,7 +177,7 @@ const Buy = (props: Props) => {
     }
   }
 
-  const disabled = (status !== Status.Ready && status !== Status.Error) || !amount
+  const disabled = (status !== Status.Ready && status !== Status.Error) || cost.isZero()
 
   return (
     <>
@@ -213,10 +203,12 @@ const Buy = (props: Props) => {
             <strong>Totals</strong>
           </DivLabel>
           <DivLabel>
-            <label>You spend: {cost.toString()} DAI</label>
+            <label>You spend: {formatBN(cost)} DAI</label>
           </DivLabel>
           <DivLabel>
-            <label>&quot;{outcome}&quot; shares you get X shares</label>
+            <label>
+              &quot;{outcome}&quot; shares you get {formatBN(tradedShares)} shares
+            </label>
           </DivLabel>
         </div>
       </div>

@@ -14,7 +14,7 @@ const ConnectWeb3 = () => {
 
   React.useEffect(() => {
     context.setConnector(CONNECTOR)
-  }, [])
+  }, [context])
 
   return <></>
 }
