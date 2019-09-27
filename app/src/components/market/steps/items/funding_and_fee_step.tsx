@@ -1,9 +1,11 @@
 import React, { ChangeEvent, Component } from 'react'
 import styled from 'styled-components'
-import { CreateCard } from '../../create_card'
 import { Button, Textfield } from '../../../common/index'
-import { FormRow } from '../../../common/form_row'
 import { ButtonContainer } from '../../../common/button_container'
+import { CreateCard } from '../../create_card'
+import { FormRow } from '../../../common/form_row'
+import { TextfieldCustomPlaceholder } from '../../../common/textfield_custom_placeholder'
+import { ButtonLink } from '../../../common/button_link'
 
 interface Props {
   back: () => void
@@ -19,16 +21,12 @@ interface State {
   errors: string[]
 }
 
-const TextfieldStyled = styled(Textfield)`
+const ButtonLinkStyled = styled(ButtonLink)`
+  margin-right: auto;
+`
+
+const TextfieldStyledRight = styled(Textfield)`
   text-align: right;
-  ::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  ::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
 `
 
 class FundingAndFeeStep extends Component<Props> {
@@ -65,12 +63,18 @@ class FundingAndFeeStep extends Component<Props> {
       <CreateCard>
         <FormRow
           formField={
-            <TextfieldStyled
-              defaultValue={spread}
-              disabled
-              name="spread"
-              onChange={handleChange}
-              type="number"
+            <TextfieldCustomPlaceholder
+              disabled={true}
+              formField={
+                <TextfieldStyledRight
+                  defaultValue={spread}
+                  disabled
+                  name="spread"
+                  onChange={handleChange}
+                  type="number"
+                />
+              }
+              placeholderText="%"
             />
           }
           title={'Spread / Fee'}
@@ -78,18 +82,24 @@ class FundingAndFeeStep extends Component<Props> {
         />
         <FormRow
           formField={
-            <TextfieldStyled
-              defaultValue={funding}
-              name="funding"
-              onChange={handleChange}
-              type="number"
+            <TextfieldCustomPlaceholder
+              formField={
+                <Textfield
+                  defaultValue={funding}
+                  name="funding"
+                  onChange={handleChange}
+                  placeholder="Funding amount..."
+                  type="number"
+                />
+              }
+              placeholderText="DAI"
             />
           }
           title={'Funding'}
           tooltipText={'Initial funding to fund the market maker.'}
         />
         <ButtonContainer>
-          <Button onClick={this.back}>Back</Button>
+          <ButtonLinkStyled onClick={this.back}>‹ Back</ButtonLinkStyled>
           <Button disabled={!spread || !funding} onClick={this.validate}>
             Next
           </Button>

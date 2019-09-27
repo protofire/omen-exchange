@@ -17,7 +17,9 @@ interface Props {
 
 const FormInput = styled.input`
   background-color: transparent;
-  border-bottom: solid 1px #999;
+  border-bottom-color: #999;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
   border-left: none;
   border-right: none;
   border-top: none;
