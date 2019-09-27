@@ -1,4 +1,6 @@
 import { ethers } from 'ethers'
+import { BigNumber } from 'ethers/utils'
+
 import { getContractAddress } from '../util/addresses'
 import { Stage } from '../util/types'
 
@@ -81,10 +83,24 @@ class FetchMarketService {
   }
 
   async getActualPrice(): Promise<any> {
-    const [actualPriceForYes, actualPriceForNo] = await Promise.all([
+    let [actualPriceForYes, actualPriceForNo] = await Promise.all([
       this.marketMakerContract.calcMarginalPrice(0),
       this.marketMakerContract.calcMarginalPrice(1),
     ])
+
+    const two = new BigNumber(2)
+    const twoPower64 = two.pow(64)
+
+    actualPriceForYes =
+      actualPriceForYes
+        .mul(new BigNumber(10000))
+        .div(twoPower64)
+        .toNumber() / 10000
+    actualPriceForNo =
+      actualPriceForNo
+        .mul(new BigNumber(10000))
+        .div(twoPower64)
+        .toNumber() / 10000
 
     return {
       actualPriceForYes,

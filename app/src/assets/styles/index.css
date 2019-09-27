@@ -35,3 +35,7 @@
   width: 100%;
   display: flex !important;
 }
+
+button[disabled] {
+  background-color: #555;
+}
