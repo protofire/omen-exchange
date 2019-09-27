@@ -3,13 +3,10 @@ import { Link } from 'react-router-dom'
 
 import { ConnectWallet, ConnectionStatus } from '../../../components'
 import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
-import { Logo } from '../logo'
 
 export const Header = () => (
   <div className="nav horizontal-align">
-    <div className="col-3">
-      <Logo className="nav-logo" />
-    </div>
+    <div className="col-3"></div>
     <div className="col-9 right">
       <Link className="nav-item" to="/">
         Home
