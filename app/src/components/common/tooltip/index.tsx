@@ -66,7 +66,7 @@ export const Tooltip = (props: Props) => {
   return (
     <TooltipPopup
       data-class="reactTooltip"
-      data-tip={props.description}
+      data-tip={description}
       data-multiline={true}
       {...restProps}
     >

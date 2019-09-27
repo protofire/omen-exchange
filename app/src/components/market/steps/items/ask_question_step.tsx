@@ -89,11 +89,11 @@ class AskQuestionStep extends Component<Props, State> {
             />
           }
           note={[
-            <strong>For example:</strong>,
+            <strong key="1">For example:</strong>,
             ' ',
-            <i>"Will France win?"</i>,
+            <i key="2">&quot;Will France win?&quot;</i>,
             ' is not an acceptable question, but ',
-            <i>"Will France win the 2020 FIFA World Cup?"</i>,
+            <i key="3">&quot;Will France win the 2020 FIFA World Cup?&quot;</i>,
             ' is a good one.',
           ]}
           title={'Question'}
