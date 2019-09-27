@@ -6,6 +6,7 @@ import { FormRow } from '../../../common/form_row'
 import { DateField } from '../../../common/date_field'
 import { TimeField } from '../../../common/time_field'
 import { ButtonContainer } from '../../../common/button_container'
+import { Well } from '../../../common/well'
 
 interface Props {
   next: () => void
@@ -28,25 +29,9 @@ const TwoColumnsRow = styled.div`
   grid-template-columns: 1fr 1fr;
 `
 
-const OracleInfo = styled.div`
-  background-color: #f6f6f6;
-  border-radius: 3px;
-  color: #555;
-  font-size: 14px;
+const OracleInfo = styled(Well)`
   font-style: italic;
-  font-weight: normal;
-  line-height: 1.36;
-  padding: 12px 15px;
   text-align: center;
-
-  a {
-    color: #555;
-    text-decoration: underline;
-
-    &:hover {
-      text-decoration: none;
-    }
-  }
 `
 
 class AskQuestionStep extends Component<Props, State> {

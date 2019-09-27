@@ -34,7 +34,13 @@ const FormInput = styled.input`
     color: #999;
   }
 
-  &:disabled {
+  &:read-only,
+  [readonly] {
+    cursor: not-allowed;
+  }
+
+  &:disabled,
+  &[disabled] {
     cursor: not-allowed;
     opacity: 0.5;
   }

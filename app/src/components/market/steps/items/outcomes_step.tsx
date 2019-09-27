@@ -1,7 +1,10 @@
 import React, { ChangeEvent, useState } from 'react'
 import styled from 'styled-components'
-
+import { CreateCard } from '../../create_card'
 import { Button, Outcomes } from '../../../common/index'
+import { ButtonContainer } from '../../../common/button_container'
+import { ButtonLink } from '../../../common/button_link'
+import { Well } from '../../../common/well'
 
 interface Props {
   back: () => void
@@ -16,8 +19,12 @@ interface Props {
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
 }
 
-const PWarn = styled.p`
-  color: red;
+const ButtonLinkStyled = styled(ButtonLink)`
+  margin-right: auto;
+`
+
+const OutcomeInfo = styled(Well)`
+  margin-bottom: 30px;
 `
 
 const OutcomesStep = (props: Props) => {
@@ -90,25 +97,23 @@ const OutcomesStep = (props: Props) => {
       name: 'outcomeProbabilityTwo',
     },
   ]
+  const thereIsAnError: boolean = !+probabilities[0] || !+probabilities[1] || error !== ''
 
   return (
-    <>
-      {error && (
-        <PWarn>
-          <i>{error}</i>
-        </PWarn>
-      )}
-      <h6>Please add all the possible outcomes for the &quot;{question}&quot; question</h6>
+    <CreateCard>
+      {error && <i>{error}</i>}
+      <OutcomeInfo>
+        Please add all the possible outcomes for the <strong>&quot;{question}&quot;</strong>{' '}
+        question.
+      </OutcomeInfo>
       <Outcomes outcomes={outcomes} onChange={handleChange} />
-      <div className="row">
-        <div className="col left">
-          <Button onClick={() => back()}>Back</Button>
-        </div>
-        <div className="col right">
-          <Button onClick={(e: any) => validate(e)}>Next</Button>
-        </div>
-      </div>
-    </>
+      <ButtonContainer>
+        <ButtonLinkStyled onClick={() => back()}>‹ Back</ButtonLinkStyled>
+        <Button disabled={thereIsAnError || false} onClick={(e: any) => validate(e)}>
+          Next
+        </Button>
+      </ButtonContainer>
+    </CreateCard>
   )
 }
 
