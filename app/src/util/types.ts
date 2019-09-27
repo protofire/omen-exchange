@@ -13,7 +13,7 @@ export enum OutcomeSlots {
 }
 
 export interface BalanceItems {
-  outcomeName: string
+  outcomeName: OutcomeSlots
   probability: number
   currentPrice: string
   shares: BigNumber

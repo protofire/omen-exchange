@@ -29,7 +29,7 @@ const Buy = (props: Props) => {
 
   const { balance, marketAddress } = props
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [amount, setAmount] = useState(0)
+  const [amount, setAmount] = useState<number>(0)
   const [outcome, setOutcome] = useState(OutcomeSlots.Yes)
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
 
@@ -44,6 +44,7 @@ const Buy = (props: Props) => {
   const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
     const { outcomeName, probability, currentPrice } = balanceItem
     const defaultChecked = outcomeName === OutcomeSlots.Yes
+
     return (
       <tr key={index}>
         <td>
@@ -66,7 +67,14 @@ const Buy = (props: Props) => {
     event.persist()
     const provider = context.library
 
-    const amount = event.target.value
+    const value = +event.target.value
+
+    const balanceItem: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
+      return balanceItem.outcomeName === outcome
+    })
+
+    const divisor: number = balanceItem ? +balanceItem.currentPrice : 1
+    const amount: number = value / divisor
     setAmount(amount)
 
     const marketMakerService = new MarketMakerService(marketAddress)
