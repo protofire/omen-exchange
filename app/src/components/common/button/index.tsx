@@ -1,9 +1,10 @@
 import React, { ReactNode, HTMLAttributes } from 'react'
-import styled from 'styled-components'
+import styled, { withTheme } from 'styled-components'
+import { darken } from 'polished'
 
-const ButtonContainer = styled.button`
+const ButtonContainer = styled.button<{ backgroundColor: string }>`
   align-items: center;
-  background-color: ${props => props.theme.colors.primary};
+  background-color: ${props => props.backgroundColor};
   border-radius: 2px;
   border: none;
   color: #fff;
@@ -14,35 +15,45 @@ const ButtonContainer = styled.button`
   height: 38px;
   justify-content: center;
   outline: none;
-  padding: 0 25px;
+  padding: 0 35px;
   text-align: center;
   text-transform: uppercase;
-  transition: background-color 0.15s ease-out;
+  transition: background-color 0.1s ease-out;
   white-space: nowrap;
 
   &:hover {
-    /* something */
+    background-color: ${props => darken(0.15, props.backgroundColor)};
   }
 
   &[disabled] {
+    background-color: ${props => props.backgroundColor};
     cursor: not-allowed;
     opacity: 0.5;
   }
 `
 
 interface Props extends HTMLAttributes<HTMLButtonElement> {
+  backgroundColor?: string
   children: ReactNode
   disabled?: boolean
   onClick?: (e?: any) => void
   type?: 'button' | 'submit' | 'reset' | undefined
+  theme?: any
 }
 
-export const Button = (props: Props) => {
-  const { children, disabled = false, onClick, ...restProps } = props
+const ButtonComponent: React.FC<Props> = (props: Props) => {
+  const { backgroundColor, theme, children, disabled = false, onClick, ...restProps } = props
 
   return (
-    <ButtonContainer disabled={disabled} onClick={onClick} {...restProps}>
+    <ButtonContainer
+      backgroundColor={backgroundColor ? backgroundColor : theme.colors.primary}
+      disabled={disabled}
+      onClick={onClick}
+      {...restProps}
+    >
       {children}
     </ButtonContainer>
   )
 }
+
+export const Button = withTheme(ButtonComponent)

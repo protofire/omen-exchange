@@ -7,7 +7,7 @@ const TableOverflowWrapper = styled.div`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  children: any
+  children: React.ReactNode
 }
 
 export const TableOverflow: React.FC<Props> = (props: Props) => {

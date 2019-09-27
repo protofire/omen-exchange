@@ -5,6 +5,7 @@ import styled from 'styled-components'
 const CardStyled = styled(Card)`
   margin: 0 auto;
   max-width: ${props => props.theme.createSteps.maxWidth};
+  min-height: 530px;
   width: 100%;
 `
 

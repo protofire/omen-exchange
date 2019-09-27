@@ -4,7 +4,7 @@ import LogoProtofire from './img/logo.png'
 
 const FooterStyled = styled.footer`
   margin-top: auto;
-  padding-top: 30px;
+  padding-top: 50px;
 `
 
 const AFooter = styled.a`

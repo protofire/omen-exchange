@@ -1,7 +1,9 @@
 import React, { ChangeEvent, Component } from 'react'
 import styled from 'styled-components'
-
+import { CreateCard } from '../../create_card'
 import { Button, Textfield } from '../../../common/index'
+import { FormRow } from '../../../common/form_row'
+import { ButtonContainer } from '../../../common/button_container'
 
 interface Props {
   back: () => void
@@ -23,11 +25,7 @@ const Div = styled.div`
   align-items: center;
 `
 
-const PWarn = styled.p`
-  color: red;
-`
-
-const InputStyled = styled(Textfield)`
+const TextfieldStyled = styled(Textfield)`
   text-align: right;
   ::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -37,11 +35,6 @@ const InputStyled = styled(Textfield)`
     -webkit-appearance: none;
     margin: 0;
   }
-`
-
-const Span = styled.span`
-  margin-left: 5px;
-  width: 25px;
 `
 
 class FundingAndFeeStep extends Component<Props> {
@@ -73,51 +66,41 @@ class FundingAndFeeStep extends Component<Props> {
   render() {
     const { values, handleChange } = this.props
     const { spread, funding } = values
+
     return (
-      <>
-        {this.state.errors.length > 0 && (
-          <PWarn>
-            <i>{this.state.errors.join('. ')}</i>
-          </PWarn>
-        )}
-        <div className="row">
-          <div className="col">
-            <label>Spread/Fee *</label>
-            <Div>
-              <InputStyled
-                type="number"
-                name="spread"
-                defaultValue={spread}
-                onChange={handleChange}
-                disabled
-              />
-              <Span>%</Span>
-            </Div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col">
-            <label>Funding *</label>
-            <Div>
-              <InputStyled
-                type="number"
-                name="funding"
-                defaultValue={funding}
-                onChange={handleChange}
-              />
-              <Span>DAI</Span>
-            </Div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col left">
-            <Button onClick={this.back}>Back</Button>
-          </div>
-          <div className="col right">
-            <Button onClick={this.validate}>Next</Button>
-          </div>
-        </div>
-      </>
+      <CreateCard>
+        <FormRow
+          formField={
+            <TextfieldStyled
+              defaultValue={spread}
+              disabled
+              name="spread"
+              onChange={handleChange}
+              type="number"
+            />
+          }
+          title={'Spread / Fee'}
+          tooltipText={'The fee taken from every trade. Temporarily fixed at 1%.'}
+        />
+        <FormRow
+          formField={
+            <TextfieldStyled
+              defaultValue={funding}
+              name="funding"
+              onChange={handleChange}
+              type="number"
+            />
+          }
+          title={'Funding'}
+          tooltipText={'Initial funding to fund the market maker.'}
+        />
+        <ButtonContainer>
+          <Button onClick={this.back}>Back</Button>
+          <Button disabled={!spread || !funding} onClick={this.validate}>
+            Next
+          </Button>
+        </ButtonContainer>
+      </CreateCard>
     )
   }
 }
