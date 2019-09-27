@@ -19,12 +19,6 @@ interface State {
   errors: string[]
 }
 
-const Div = styled.div`
-  height: 50px;
-  display: flex;
-  align-items: center;
-`
-
 const TextfieldStyled = styled(Textfield)`
   text-align: right;
   ::-webkit-inner-spin-button {
