@@ -89,6 +89,7 @@ class FundingAndFeeStep extends Component<Props> {
                 name="spread"
                 defaultValue={spread}
                 onChange={handleChange}
+                disabled
               />
               <Span>%</Span>
             </Div>
