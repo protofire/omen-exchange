@@ -17,6 +17,7 @@ export interface BalanceItems {
   probability: number
   currentPrice: string
   shares: BigNumber
+  holdings: BigNumber
 }
 
 export enum Stage {
