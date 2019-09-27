@@ -11,6 +11,7 @@ interface Props {
   autoFocus?: boolean
   readOnly?: boolean
   focusOutline?: boolean
+  disabled?: boolean
 }
 
 export const Textfield = (props: Props) => {

@@ -42,7 +42,7 @@ export class MarketWizardCreator extends Component<Props, State> {
       question: '',
       category: '',
       resolution: null,
-      spread: '',
+      spread: '1',
       funding: '',
       outcomeValueOne: 'Yes',
       outcomeValueTwo: 'No',

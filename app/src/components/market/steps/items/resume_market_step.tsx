@@ -41,12 +41,18 @@ const ResumeMarketStep = (props: Props) => {
     <>
       <h4>Your new market has been created!</h4>
       <h5>You can access it thought this URL, don&apos;t miss it</h5>
-      <Link className="nav-item" target="_blank" to={`/view/${marketMakerAddress}`}>
-        {marketMakerURL}
-      </Link>
-      <CopyToClipboard text={marketMakerURL}>
-        <span>Copy to clipboard</span>
-      </CopyToClipboard>
+      <div className="row">
+        <div className="col">
+          <Link target="_blank" to={`/view/${marketMakerAddress}`}>
+            {marketMakerURL}
+          </Link>
+        </div>
+        <div className="col">
+          <CopyToClipboard text={marketMakerURL}>
+            <span>Copy to clipboard</span>
+          </CopyToClipboard>
+        </div>
+      </div>
       <h5>Details</h5>
       <p>
         Question: <i>{question}</i>
@@ -79,7 +85,9 @@ const ResumeMarketStep = (props: Props) => {
         </i>
       </p>
 
-      <Link to={`/view/${marketMakerAddress}`}>Go to Market</Link>
+      <div className="row center">
+        <Link to={`/view/${marketMakerAddress}`}>Go to Market</Link>
+      </div>
     </>
   )
 }
