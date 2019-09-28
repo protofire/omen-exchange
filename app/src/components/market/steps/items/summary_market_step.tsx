@@ -9,6 +9,7 @@ import { SubsectionTitle } from '../../../common/subsection_title'
 import styled from 'styled-components'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonCSS } from '../../../common/button'
+import { SectionTitle } from '../../../common/section_title'
 
 const TableStyled = styled(Table)`
   margin-bottom: 25px;
@@ -28,6 +29,8 @@ const TitleValueStyled = styled(TitleValue)`
 
 const MainButton = styled.a`
   ${ButtonCSS}
+  flex-grow: 1;
+  text-decoration: none;
 `
 
 interface Props {
@@ -45,7 +48,7 @@ interface Props {
   marketMakerAddress: string | null
 }
 
-const ResumeMarketStep = (props: Props) => {
+const SummaryMarketStep = (props: Props) => {
   const { marketMakerAddress, values } = props
   const {
     question,
@@ -64,8 +67,7 @@ const ResumeMarketStep = (props: Props) => {
 
   return (
     <>
-      <h4>Your new market has been created!</h4>
-      <h5>You can access it thought this URL, don&apos;t miss it</h5>
+      <SectionTitle title="Conditional Exchange" subTitle="Your new market has been created!" />
       <CreateCard>
         <Paragraph>
           This is the URL to access the market. <strong>Be careful and don’t lose it</strong>,
@@ -139,4 +141,4 @@ const ResumeMarketStep = (props: Props) => {
   )
 }
 
-export { ResumeMarketStep }
+export { SummaryMarketStep }

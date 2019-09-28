@@ -6,7 +6,7 @@ import {
   OutcomesStep,
   CreateMarketStep,
   MenuStep,
-  ResumeMarketStep,
+  SummaryMarketStep,
 } from './steps'
 
 import { StatusMarketCreation } from '../../util/types'
@@ -173,23 +173,25 @@ export class MarketWizardCreator extends Component<Props, State> {
     return <MenuStep currentStep={currentStep} />
   }
 
-  public resumeMarketStep = () => {
+  public SummaryMarketStep = () => {
     const { marketData } = this.state
     const { marketMakerAddress } = this.props
 
-    return <ResumeMarketStep values={{ ...marketData }} marketMakerAddress={marketMakerAddress} />
+    return <SummaryMarketStep values={{ ...marketData }} marketMakerAddress={marketMakerAddress} />
   }
 
   render() {
     const { status } = this.props
     return (
       <>
-        {status !== StatusMarketCreation.Done && (
+        {this.SummaryMarketStep()}
+        {/* {status !== StatusMarketCreation.Done && (
           <>
             {this.currentMenu()} {this.currentStep()}
           </>
         )}
-        {status === StatusMarketCreation.Done && this.resumeMarketStep()}
+         */}
+        {/* {status === StatusMarketCreation.Done && this.SummaryMarketStep()} */}
       </>
     )
   }
