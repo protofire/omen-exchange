@@ -150,9 +150,9 @@ class CreateMarketStep extends Component<Props> {
                   ]}
                 />
               ) : null}
-              {marketMakerAddress && (
+              {marketMakerAddress ? (
                 <TitleValue title={'Market Maker'} value={`Deployed at ${marketMakerAddress}`} />
-              )}
+              ) : null}
             </Grid>
           </>
         ) : null}

@@ -1,10 +1,10 @@
 import React, { ReactNode, HTMLAttributes } from 'react'
-import styled, { withTheme } from 'styled-components'
+import styled, { withTheme, css } from 'styled-components'
 import { darken } from 'polished'
 
-const ButtonContainer = styled.button<{ backgroundColor: string }>`
+export const ButtonCSS = css<{ backgroundColor?: string }>`
   align-items: center;
-  background-color: ${props => props.backgroundColor};
+  background-color: ${props => props.backgroundColor || '#00be95'};
   border-radius: 2px;
   border: none;
   color: #fff;
@@ -22,7 +22,7 @@ const ButtonContainer = styled.button<{ backgroundColor: string }>`
   white-space: nowrap;
 
   &:hover {
-    background-color: ${props => darken(0.15, props.backgroundColor)};
+    background-color: ${props => darken(0.15, props.backgroundColor || '#00be95')};
   }
 
   &[disabled] {
@@ -30,6 +30,10 @@ const ButtonContainer = styled.button<{ backgroundColor: string }>`
     cursor: not-allowed;
     opacity: 0.5;
   }
+`
+
+const ButtonContainer = styled.button<{ backgroundColor: string }>`
+  ${ButtonCSS}
 `
 
 interface Props extends HTMLAttributes<HTMLButtonElement> {
