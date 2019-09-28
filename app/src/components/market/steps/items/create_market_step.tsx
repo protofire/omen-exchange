@@ -1,8 +1,36 @@
 import React, { Component } from 'react'
-
 import { Button } from '../../../common/index'
+import { ButtonContainer } from '../../../common/button_container'
+import { ButtonLink } from '../../../common/button_link'
+import { CreateCard } from '../../create_card'
 import { StatusMarketCreation } from '../../../../util/types'
+import { Paragraph } from '../../../common/paragraph'
+import { FullLoading } from '../../../common/full_loading'
+import { Table, TD, TH, THead, TR } from '../../../common/table'
+import { TitleValue } from '../../../common/title_value'
+import { SubsectionTitle } from '../../../common/subsection_title'
 import { formatDate } from '../../../../util/tools'
+import styled from 'styled-components'
+
+const ButtonLinkStyled = styled(ButtonLink)`
+  margin-right: auto;
+`
+
+const TableStyled = styled(Table)`
+  margin-bottom: 25px;
+`
+
+const Grid = styled.div`
+  display: grid;
+  grid-column-gap: 20px;
+  grid-row-gap: 14px;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 25px;
+`
+
+const TitleValueStyled = styled(TitleValue)`
+  margin-bottom: 14px;
+`
 
 interface Props {
   back: () => void
@@ -49,75 +77,107 @@ class CreateMarketStep extends Component<Props> {
     const resolutionDate = resolution && formatDate(resolution)
 
     return (
-      <>
-        <h6>
-          Please check all the information is correct. You can go back and edit anything you need.
-          If everything is OK proceed to create the new market.
-        </h6>
-        <p>
-          Question: <i>{question}</i>
-        </p>
-        <p>
-          Oracle:{' '}
-          <i>The market is resolved using realit.io oracle using the dxDAO as final arbitrator.</i>
-        </p>
-        <p>
-          Category: <i>{category}</i>
-        </p>
-        <p>
-          Spread/Fee: <i>{spread} %</i>
-        </p>
-        <p>
-          Funding: <i>{funding} DAI</i>
-        </p>
-        <p>
-          Resolution date: <i>{resolutionDate}</i>
-        </p>
-        <p>Outcomes:</p>
-        <p>
-          <i>
-            {outcomeValueOne} - {outcomeProbabilityOne} %
-          </i>
-        </p>
-        <p>
-          <i>
-            {outcomeValueTwo} - {outcomeProbabilityTwo} %
-          </i>
-        </p>
-        <p>
-          Status: <i>{status}</i>
-        </p>
-        {questionId ? (
-          <p>
-            Realitio:{' '}
-            <a
-              href={`https://realitio.github.io/#!/question/${questionId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              question url
-            </a>
-          </p>
-        ) : (
-          ''
-        )}
-        {marketMakerAddress && <p>Market Maker deployed at {marketMakerAddress}</p>}
-        <div className="row">
-          <div className="col left">
-            <Button onClick={this.back}>Back</Button>
-          </div>
-          <div className="col right">
-            <Button
-              disabled={
-                status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error
-              }
-              onClick={this.submit}
-            >
-              Create Market
-            </Button>
-          </div>
-        </div>
-      </>
+      <CreateCard>
+        <Paragraph>
+          Please <strong>check all the information is correct</strong>. You can go back and edit
+          anything you need.
+        </Paragraph>
+        <Paragraph>
+          <strong>If everything is OK</strong> proceed to create the new market.
+        </Paragraph>
+        <SubsectionTitle>Details</SubsectionTitle>
+        <TitleValueStyled title={'Question'} value={question} />
+        <Grid>
+          <TitleValue title={'Category'} value={category} />
+          <TitleValue title={'Resolution date'} value={resolutionDate} />
+          <TitleValue
+            title={'Oracle'}
+            value={[
+              <a href="https://realit.io/" key={1} rel="noopener noreferrer" target="_blank">
+                realit.io
+              </a>,
+              ' oracle and ',
+              <a
+                href="https://dxdao.daostack.io/"
+                key={2}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                dxDAO
+              </a>,
+              ' as final arbitrator.',
+            ]}
+          />
+          <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
+          <TitleValue title={'Funding'} value={[funding, <strong key="1"> DAI</strong>]} />
+        </Grid>
+        <SubsectionTitle>Outcomes</SubsectionTitle>
+        <TableStyled
+          head={
+            <THead>
+              <TR>
+                <TH>Outcome</TH>
+                <TH textAlign="right">Probabilities</TH>
+              </TR>
+            </THead>
+          }
+        >
+          <TR>
+            <TD>{outcomeValueOne}</TD>
+            <TD textAlign="right">{outcomeProbabilityOne}%</TD>
+          </TR>
+          <TR>
+            <TD>{outcomeValueTwo}</TD>
+            <TD textAlign="right">{outcomeProbabilityTwo}%</TD>
+          </TR>
+        </TableStyled>
+        {questionId || marketMakerAddress ? (
+          <>
+            <SubsectionTitle>Created Market Information</SubsectionTitle>
+            <Grid>
+              {questionId ? (
+                <TitleValue
+                  title={'Realitio'}
+                  value={[
+                    <a
+                      href={`https://realitio.github.io/#!/question/${questionId}`}
+                      key="1"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      Question URL
+                    </a>,
+                  ]}
+                />
+              ) : null}
+              {marketMakerAddress && (
+                <TitleValue title={'Market Maker'} value={`Deployed at ${marketMakerAddress}`} />
+              )}
+            </Grid>
+          </>
+        ) : null}
+        {status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error ? (
+          <FullLoading message={`${status}...`} />
+        ) : null}
+        <ButtonContainer>
+          <ButtonLinkStyled
+            disabled={
+              status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error
+            }
+            onClick={this.back}
+          >
+            ‹ Back
+          </ButtonLinkStyled>
+          <Button
+            disabled={
+              status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error
+            }
+            onClick={this.submit}
+          >
+            Finish
+          </Button>
+        </ButtonContainer>
+      </CreateCard>
     )
   }
 }

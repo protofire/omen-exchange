@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 const FullLoadingStyled = styled.div`
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.35);
+  background-color: rgba(255, 255, 255, 0.75);
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -18,7 +18,7 @@ const FullLoadingStyled = styled.div`
 `
 
 const Message = styled.p`
-  color: #fff;
+  color: #333;
   font-size: 15px;
   font-weight: 600;
   line-height: 1.2;
@@ -26,7 +26,6 @@ const Message = styled.p`
   max-width: 100%;
   padding: 10px ${props => props.theme.paddings.mainPadding} 0;
   text-align: center;
-  text-shadow: 0 0 2px #000;
   width: 480px;
 `
 
@@ -36,7 +35,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const FullLoading: React.FC<Props> = (props: Props) => {
   const { message = 'Loading...', ...restProps } = props
-  const portal: any = document.getElementById('loadingContainer')
+  const portal: any = document.getElementById('portalContainer')
 
   return ReactDOM.createPortal(
     <FullLoadingStyled {...restProps}>
@@ -46,5 +45,3 @@ export const FullLoading: React.FC<Props> = (props: Props) => {
     portal,
   )
 }
-
-export default FullLoading
