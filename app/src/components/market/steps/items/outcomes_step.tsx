@@ -33,6 +33,14 @@ const OutcomesStep = (props: Props) => {
   const [probabilities, setProbabilities] = useState([outcomeProbabilityOne, outcomeProbabilityTwo])
   const [error, setError] = useState(false)
 
+  const validate = (newProbabilities: any) => {
+    const probabilityOne = +newProbabilities[0]
+    const probabilityTwo = +newProbabilities[1]
+    const totalProbabilities = probabilityOne + probabilityTwo
+
+    setError(!probabilityOne || !probabilityTwo || totalProbabilities !== 100)
+  }
+
   const handleChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
     const newProbabilities = [
       ...probabilities.slice(0, index),
@@ -41,19 +49,12 @@ const OutcomesStep = (props: Props) => {
     ]
     setProbabilities(newProbabilities)
     props.handleChange(event)
+
     validate(newProbabilities)
   }
 
   const back = () => {
     props.back()
-  }
-
-  const validate = (newProbabilities: any) => {
-    const probabilityOne = +newProbabilities[0]
-    const probabilityTwo = +newProbabilities[1]
-    const totalProbabilities = probabilityOne + probabilityTwo
-
-    setError(!probabilityOne || !probabilityTwo || totalProbabilities !== 100)
   }
 
   const nextSection = (e: any) => {
