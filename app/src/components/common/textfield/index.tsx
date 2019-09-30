@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLInputElement> {
   autoFocus?: boolean
   defaultValue?: any
   disabled?: boolean
   focusOutline?: boolean
+  min?: number
   name: string
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => any
   onClick?: (event: React.MouseEvent<HTMLInputElement>) => any

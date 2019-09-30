@@ -6,6 +6,14 @@ import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
 import { Well } from '../../../common/well'
 
+const ButtonLinkStyled = styled(ButtonLink)`
+  margin-right: auto;
+`
+
+const OutcomeInfo = styled(Well)`
+  margin-bottom: 30px;
+`
+
 interface Props {
   back: () => void
   next: () => void
@@ -19,19 +27,11 @@ interface Props {
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
 }
 
-const ButtonLinkStyled = styled(ButtonLink)`
-  margin-right: auto;
-`
-
-const OutcomeInfo = styled(Well)`
-  margin-bottom: 30px;
-`
-
 const OutcomesStep = (props: Props) => {
   const { outcomeProbabilityOne, outcomeProbabilityTwo } = props.values
 
   const [probabilities, setProbabilities] = useState([outcomeProbabilityOne, outcomeProbabilityTwo])
-  const [error, setError] = useState('')
+  const [error, setError] = useState(false)
 
   const handleChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
     const newProbabilities = [
@@ -41,43 +41,25 @@ const OutcomesStep = (props: Props) => {
     ]
     setProbabilities(newProbabilities)
     props.handleChange(event)
+    validate(newProbabilities)
   }
 
   const back = () => {
     props.back()
   }
 
-  const validate = (e: any) => {
+  const validate = (newProbabilities: any) => {
+    const probabilityOne = +newProbabilities[0]
+    const probabilityTwo = +newProbabilities[1]
+    const totalProbabilities = probabilityOne + probabilityTwo
+
+    setError(!probabilityOne || !probabilityTwo || totalProbabilities !== 100)
+  }
+
+  const nextSection = (e: any) => {
     e.preventDefault()
 
-    const probabilityOne = +probabilities[0]
-    const probabilityTwo = +probabilities[1]
-
-    let msgError = ''
-    if (!probabilityOne || !probabilityTwo) {
-      msgError = `Please check the required fields`
-    }
-
-    const totalProbabilities = probabilityOne + probabilityTwo
-    if (totalProbabilities === 0) {
-      msgError = `The sum of the probabilities cannot be 0`
-    }
-
-    if (totalProbabilities > 100) {
-      msgError = `The sum of the probabilities cannot be greater than 100`
-    }
-
-    if (totalProbabilities > 1 && totalProbabilities < 100) {
-      msgError = `The sum of the probabilities cannot be less than 100`
-    }
-
-    if (probabilityOne < 0 || probabilityTwo < 0) {
-      msgError = `Value cannot be negative`
-    }
-
-    setError(msgError)
-
-    if (!msgError) {
+    if (!error) {
       props.next()
     }
   }
@@ -97,11 +79,9 @@ const OutcomesStep = (props: Props) => {
       name: 'outcomeProbabilityTwo',
     },
   ]
-  const thereIsAnError: boolean = !+probabilities[0] || !+probabilities[1] || error !== ''
 
   return (
     <CreateCard>
-      {error && <i>{error}</i>}
       <OutcomeInfo>
         Please add all the possible outcomes for the <strong>&quot;{question}&quot;</strong>{' '}
         question.
@@ -109,7 +89,7 @@ const OutcomesStep = (props: Props) => {
       <Outcomes outcomes={outcomes} onChange={handleChange} />
       <ButtonContainer>
         <ButtonLinkStyled onClick={() => back()}>‹ Back</ButtonLinkStyled>
-        <Button disabled={thereIsAnError || false} onClick={(e: any) => validate(e)}>
+        <Button disabled={error} onClick={(e: any) => nextSection(e)}>
           Next
         </Button>
       </ButtonContainer>

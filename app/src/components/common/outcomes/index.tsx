@@ -6,9 +6,9 @@ import { FormLabel } from '../form_label'
 import { Tooltip } from '../tooltip'
 
 interface Outcome {
-  value: string
   name: string
   probability: string | number
+  value: string
 }
 
 interface Props {
@@ -44,6 +44,7 @@ const Outcomes = (props: Props) => {
       <TextfieldCustomPlaceholder
         formField={
           <TextFieldStyled
+            min={0}
             name={outcome.name}
             onChange={e => props.onChange(index, e)}
             type="number"
