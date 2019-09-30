@@ -1,14 +1,15 @@
 import React, { ChangeEvent, Component } from 'react'
 import styled from 'styled-components'
+import { BigNumber } from 'ethers/utils'
 
-import { Button, Textfield } from '../../../common/index'
+import { Button, BigNumberInput, Textfield } from '../../../common'
 
 interface Props {
   back: () => void
   next: () => void
   values: {
     spread: string
-    funding: string
+    funding: BigNumber
   }
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
 }
@@ -27,16 +28,12 @@ const PWarn = styled.p`
   color: red;
 `
 
-const InputStyled = styled(Textfield)`
+const InputStyled = styled<any>(Textfield)`
   text-align: right;
-  ::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  ::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
+`
+
+const InputBigNumberStyled = styled<any>(BigNumberInput)`
+  text-align: right;
 `
 
 const Span = styled.span`
@@ -59,7 +56,7 @@ class FundingAndFeeStep extends Component<Props> {
     const { values } = this.props
     const { spread, funding } = values
 
-    if (!spread || !funding) {
+    if (!spread || funding.isZero()) {
       const errors = []
       errors.push(`Please check the required fields`)
       this.setState({
@@ -73,6 +70,7 @@ class FundingAndFeeStep extends Component<Props> {
   render() {
     const { values, handleChange } = this.props
     const { spread, funding } = values
+
     return (
       <>
         {this.state.errors.length > 0 && (
@@ -99,11 +97,11 @@ class FundingAndFeeStep extends Component<Props> {
           <div className="col">
             <label>Funding *</label>
             <Div>
-              <InputStyled
-                type="number"
+              <InputBigNumberStyled
                 name="funding"
-                defaultValue={funding}
+                value={funding}
                 onChange={handleChange}
+                decimals={3}
               />
               <Span>DAI</Span>
             </Div>

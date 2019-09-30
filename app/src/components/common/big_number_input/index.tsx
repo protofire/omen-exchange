@@ -1,21 +1,28 @@
 import React from 'react'
 import styled from 'styled-components'
+import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
-import { TokenAmount } from '../../../util/token_amount'
 import { Maybe } from '../../../util/types'
 
+export interface BigNumberInputReturn {
+  name: string
+  value: BigNumber
+}
+
 interface Props {
+  decimals: number
+  name: string
   autofocus?: boolean
   className?: string
-  decimals: number
   placeholder?: string
   max?: BigNumber
   min?: BigNumber
-  onChange: (newValue: BigNumber | null) => void
+  onChange: (value: BigNumberInputReturn) => void
   step?: BigNumber
   value: Maybe<BigNumber>
   valueFixedDecimals?: number
+  disabled?: boolean
 }
 
 interface State {
@@ -36,32 +43,29 @@ export class BigNumberInput extends React.Component<Props, State> {
     placeholder: '0.00',
   }
 
+  public readonly state = {
+    currentValueStr: this.props.value
+      ? ethers.utils.formatUnits(this.props.value, this.props.decimals)
+      : '',
+  }
+
   private textInput: any
 
   public static getDerivedStateFromProps = (props: Props, state: State) => {
-    const { decimals, value, valueFixedDecimals } = props
+    const { decimals, value } = props
     const { currentValueStr } = state
 
     if (!value) {
       return {
         currentValueStr: '',
       }
-    } else if (
-      value &&
-      !TokenAmount.fromString(currentValueStr || '0', decimals).amount.eq(value)
-    ) {
+    } else if (value && !ethers.utils.parseUnits(currentValueStr || '0', decimals).eq(value)) {
       return {
-        currentValueStr: TokenAmount.format(value, decimals, valueFixedDecimals),
+        currentValueStr: ethers.utils.formatUnits(value, decimals),
       }
     } else {
       return null
     }
-  }
-
-  public readonly state = {
-    currentValueStr: this.props.value
-      ? TokenAmount.format(this.props.value, this.props.decimals, this.props.valueFixedDecimals)
-      : '',
   }
 
   public componentDidMount = () => {
@@ -72,12 +76,34 @@ export class BigNumberInput extends React.Component<Props, State> {
     }
   }
 
+  private readonly updateValue: React.ReactEventHandler<HTMLInputElement> = e => {
+    const { decimals, onChange, min, max } = this.props
+    const newValueStr = e.currentTarget.value
+
+    if (!newValueStr) {
+      onChange({ name: e.currentTarget.name, value: new BigNumber(0) })
+    } else {
+      const newValue = ethers.utils.parseUnits(newValueStr || '0', decimals)
+      const invalidValue = (min && newValue.lt(min)) || (max && newValue.gt(max))
+
+      if (invalidValue) {
+        return
+      }
+
+      onChange({ name: e.currentTarget.name, value: newValue })
+    }
+
+    this.setState({
+      currentValueStr: newValueStr,
+    })
+  }
+
   public render = () => {
     const { currentValueStr } = this.state
-    const { decimals, step, min, max, className, placeholder } = this.props
-    const stepStr = step && TokenAmount.format(step, decimals)
-    const minStr = min && TokenAmount.format(min, decimals)
-    const maxStr = max && TokenAmount.format(max, decimals)
+    const { name, decimals, step, min, max, className, placeholder, disabled = false } = this.props
+    const stepStr = step && ethers.utils.formatUnits(step, decimals)
+    const minStr = min && ethers.utils.formatUnits(min, decimals)
+    const maxStr = max && ethers.utils.formatUnits(max, decimals)
 
     return (
       <Input
@@ -88,31 +114,11 @@ export class BigNumberInput extends React.Component<Props, State> {
         ref={ref => (this.textInput = ref)}
         step={stepStr}
         type={'number'}
+        name={name}
         value={currentValueStr}
         placeholder={placeholder}
+        disabled={disabled}
       />
     )
-  }
-
-  private readonly updateValue: React.ReactEventHandler<HTMLInputElement> = e => {
-    const { decimals, onChange, min, max } = this.props
-    const newValueStr = e.currentTarget.value
-
-    if (!newValueStr) {
-      onChange(null)
-    } else {
-      const newValue = TokenAmount.fromString(newValueStr || '0', decimals).amount
-      const invalidValue = (min && newValue.lt(min)) || (max && newValue.gt(max))
-
-      if (invalidValue) {
-        return
-      }
-
-      onChange(newValue)
-    }
-
-    this.setState({
-      currentValueStr: newValueStr,
-    })
   }
 }

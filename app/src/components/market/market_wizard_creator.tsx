@@ -1,4 +1,5 @@
-import React, { Component, ChangeEvent } from 'react'
+import React, { ChangeEvent, Component } from 'react'
+import { BigNumber } from 'ethers/utils'
 
 import {
   AskQuestionStep,
@@ -10,13 +11,14 @@ import {
 } from './steps'
 
 import { StatusMarketCreation } from '../../util/types'
+import { BigNumberInputReturn } from '../common/big_number_input'
 
 export interface MarketData {
   question: string
   category: string
   resolution: Date | null
   spread: string
-  funding: string
+  funding: BigNumber
   outcomeValueOne: string
   outcomeValueTwo: string
   outcomeProbabilityOne: string
@@ -43,7 +45,7 @@ export class MarketWizardCreator extends Component<Props, State> {
       category: '',
       resolution: null,
       spread: '1',
-      funding: '',
+      funding: new BigNumber('0'),
       outcomeValueOne: 'Yes',
       outcomeValueTwo: 'No',
       outcomeProbabilityOne: '50',
@@ -67,8 +69,10 @@ export class MarketWizardCreator extends Component<Props, State> {
     })
   }
 
-  public handleChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = event.target
+  public handleChange = (
+    event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn,
+  ) => {
+    const { name, value } = 'target' in event ? event.target : event
 
     this.setState((prevState: State) => ({
       ...prevState,

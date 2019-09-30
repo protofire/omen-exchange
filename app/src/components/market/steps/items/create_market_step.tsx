@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { ethers } from 'ethers'
+import { BigNumber } from 'ethers/utils'
 
 import { Button } from '../../../common/index'
 import { StatusMarketCreation } from '../../../../util/types'
@@ -12,7 +14,7 @@ interface Props {
     category: string
     resolution: Date | null
     spread: string
-    funding: string
+    funding: BigNumber
     outcomeValueOne: string
     outcomeValueTwo: string
     outcomeProbabilityOne: string
@@ -68,7 +70,7 @@ class CreateMarketStep extends Component<Props> {
           Spread/Fee: <i>{spread} %</i>
         </p>
         <p>
-          Funding: <i>{funding} DAI</i>
+          Funding: <i>{ethers.utils.formatUnits(funding, 3)} DAI</i>
         </p>
         <p>
           Resolution date: <i>{resolutionDate}</i>

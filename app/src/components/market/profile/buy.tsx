@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 
-import { Button, Textfield } from '../../common'
+import { Button, BigNumberInput } from '../../common'
 import { BalanceItems, OutcomeSlots, Status } from '../../../util/types'
 import { formatBN } from '../../../util/tools'
 import { ERC20Service, MarketMakerService } from '../../../services'
@@ -11,6 +11,7 @@ import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getContractAddress } from '../../../util/addresses'
 import { getLogger } from '../../../util/logger'
 import { computePriceAfterTrade } from '../../../util/tools'
+import { BigNumberInputReturn } from '../../common/big_number_input'
 
 interface Props {
   balance: BalanceItems[]
@@ -43,7 +44,7 @@ const Div = styled.div`
   align-items: center;
 `
 
-const InputStyled = styled(Textfield)`
+const InputStyled = styled<any>(BigNumberInput)`
   text-align: right;
   ::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -74,24 +75,16 @@ const Buy = (props: Props) => {
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcome, setOutcome] = useState<OutcomeSlots>(OutcomeSlots.Yes)
+  const [balanceItem, setBalanceItem] = useState<BalanceItems>()
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [tradedShares, setTradedShares] = useState<BigNumber>(new BigNumber(0))
-
-  const handleChangeOutcome = async (e: any) => {
-    const outcomeSelected: OutcomeSlots = e.target.value
-    setOutcome(outcomeSelected)
-  }
-
-  const renderTableHeader = ['Outcome', 'Probabilities', 'Current Price', 'Price after trade'].map(
-    (value, index) => {
-      return <THStyled key={index}>{value}</THStyled>
-    },
-  )
+  const [value, setValue] = useState<BigNumber>(new BigNumber(0))
 
   const [tradeYes, tradeNo] =
     outcome === OutcomeSlots.Yes
       ? [tradedShares, ethers.constants.Zero]
       : [ethers.constants.Zero, tradedShares]
+
   const holdingsYes = balance[0].holdings
   const holdingsNo = balance[1].holdings
   const pricesAfterTrade = computePriceAfterTrade(
@@ -100,6 +93,19 @@ const Buy = (props: Props) => {
     holdingsYes,
     holdingsNo,
     funding,
+  )
+
+  useEffect(() => {
+    const balanceItemFound: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
+      return balanceItem.outcomeName === outcome
+    })
+    setBalanceItem(balanceItemFound)
+  }, [outcome, balance])
+
+  const renderTableHeader = ['Outcome', 'Probabilities', 'Current Price', 'Price after trade'].map(
+    (value, index) => {
+      return <THStyled key={index}>{value}</THStyled>
+    },
   )
 
   const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
@@ -114,7 +120,7 @@ const Buy = (props: Props) => {
             value={outcomeName}
             defaultChecked={defaultChecked}
             name="outcome"
-            onChange={(e: any) => handleChangeOutcome(e)}
+            onChange={(e: any) => setOutcome(e.target.value)}
           />{' '}
           {outcomeName}
         </TDStyled>
@@ -125,17 +131,14 @@ const Buy = (props: Props) => {
     )
   })
 
-  const handleChangeAmount = async (event: any) => {
-    event.persist()
+  const handleChangeAmount = async (event: BigNumberInputReturn) => {
+    const { value } = event
+    setValue(value)
 
-    const value = +event.target.value
-
-    const balanceItem: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
-      return balanceItem.outcomeName === outcome
-    })
+    const valueNumber = +ethers.utils.formatUnits(value, 3)
 
     const price = balanceItem ? +balanceItem.currentPrice : 1
-    const amount = value / price
+    const amount = valueNumber / price
 
     // Not allow decimals
     const amountInWei = ethers.utils
@@ -146,7 +149,7 @@ const Buy = (props: Props) => {
     setTradedShares(amountInWei)
 
     const costWithFee = ethers.utils
-      .bigNumberify(Math.round(value * 1.01 * 10000))
+      .bigNumberify(Math.round(valueNumber * 1.01 * 10000))
       .mul(ethers.constants.WeiPerEther)
       .div(10000)
     setCost(costWithFee)
@@ -204,7 +207,7 @@ const Buy = (props: Props) => {
         <div className="col">
           <label>Amount</label>
           <Div>
-            <InputStyled name="amount" type="number" onChange={(e: any) => handleChangeAmount(e)} />
+            <InputStyled name="amount" value={value} onChange={handleChangeAmount} decimals={3} />
             <Span>DAI</Span>
           </Div>
         </div>
