@@ -126,15 +126,13 @@ const Sell = (props: Props) => {
         <AmountWrapper
           formField={
             <TextfieldCustomPlaceholder
-              formField={
-                <Textfield min={0} name="amount" onChange={(e: any) => {}} type="number" />
-              }
+              formField={<Textfield min={0} name="amount" onChange={() => {}} type="number" />}
               placeholderText="Shares"
             />
           }
           note={[
             'You will be charged an extra 1% trade fee of ',
-            <strong key="1">{true ? '0' : 'PUT VALUE HERE DAI'}</strong>,
+            <strong key="1">{'PUT VALUE HERE DAI'}</strong>,
           ]}
           title={'Amount'}
           tooltipText={'Transaction fees.'}
