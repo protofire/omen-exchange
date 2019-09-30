@@ -173,7 +173,7 @@ export class MarketWizardCreator extends Component<Props, State> {
     return <MenuStep currentStep={currentStep} />
   }
 
-  public SummaryMarketStep = () => {
+  public summaryMarketStep = () => {
     const { marketData } = this.state
     const { marketMakerAddress } = this.props
 
@@ -184,14 +184,12 @@ export class MarketWizardCreator extends Component<Props, State> {
     const { status } = this.props
     return (
       <>
-        {this.SummaryMarketStep()}
-        {/* {status !== StatusMarketCreation.Done && (
+        {status !== StatusMarketCreation.Done && (
           <>
             {this.currentMenu()} {this.currentStep()}
           </>
         )}
-         */}
-        {/* {status === StatusMarketCreation.Done && this.SummaryMarketStep()} */}
+        {status === StatusMarketCreation.Done && this.summaryMarketStep()}
       </>
     )
   }

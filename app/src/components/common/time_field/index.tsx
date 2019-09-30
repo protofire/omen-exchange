@@ -13,7 +13,7 @@ const TimeFieldWrapper = styled.div<{ disabled?: boolean }>`
   position: relative;
 
   input {
-    padding-right: 20px;
+    padding-right: 25px;
     position: relative;
     z-index: 1;
   }

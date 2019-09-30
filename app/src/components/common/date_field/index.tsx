@@ -23,7 +23,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
   font-weight: normal;
   opacity: ${props => (props.disabled ? '0.5' : '1')};
   outline: none;
-  padding: 6px 20px 6px 4px;
+  padding: 6px 25px 6px 4px;
   position: relative;
   width: 100%;
 

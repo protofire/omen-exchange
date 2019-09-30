@@ -27,6 +27,7 @@ const SelectWrapper = styled.div<{ disabled?: boolean }>`
   padding: 6px 0 6px 4px;
   position: relative;
   width: 100%;
+  z-index: 1;
 
   > svg {
     position: absolute;

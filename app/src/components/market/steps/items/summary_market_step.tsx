@@ -1,5 +1,4 @@
 import React from 'react'
-import CopyToClipboard from 'react-copy-to-clipboard'
 import { CreateCard } from '../../create_card'
 import { formatDate } from '../../../../util/tools'
 import { Paragraph } from '../../../common/paragraph'
@@ -10,6 +9,7 @@ import styled from 'styled-components'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonCSS } from '../../../common/button'
 import { SectionTitle } from '../../../common/section_title'
+import { CopyText } from '../../../common/copy_text'
 
 const TableStyled = styled(Table)`
   margin-bottom: 25px;
@@ -77,9 +77,7 @@ const SummaryMarketStep = (props: Props) => {
           <a target="_blank" rel="noopener noreferrer" href={`/view/${marketMakerAddress}`}>
             {marketMakerURL}
           </a>
-          <CopyToClipboard text={marketMakerURL}>
-            <span>Copy to clipboard</span>
-          </CopyToClipboard>
+          <CopyText value={marketMakerURL} />
         </Paragraph>
         <SubsectionTitle>Details</SubsectionTitle>
         <TitleValueStyled title={'Question'} value={question} />
