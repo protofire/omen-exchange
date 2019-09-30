@@ -25,6 +25,12 @@ const TooltipPopup = styled.div`
     }
   }
 
+  .__react_component_tooltip.type-dark.place-top:after {
+    border-top-color: #313131;
+    border-top-width: 10px;
+    bottom: -8px;
+  }
+
   .reactTooltip {
     background-color: #313131;
     color: #fff;
@@ -32,6 +38,7 @@ const TooltipPopup = styled.div`
     line-height: 1.3;
     max-width: 180px;
     opacity: 1;
+    padding: 5px 8px;
     text-align: left;
 
     &.place-left:after {
@@ -66,8 +73,8 @@ export const Tooltip = (props: Props) => {
   return (
     <TooltipPopup
       data-class="reactTooltip"
-      data-tip={description}
       data-multiline={true}
+      data-tip={description}
       {...restProps}
     >
       <IconInfo />
