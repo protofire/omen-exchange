@@ -3,6 +3,8 @@ import { BigNumber } from 'ethers/utils'
 import { Buy } from './profile/buy'
 import { SectionTitle } from '../common/section_title'
 import { Sell } from './profile/sell'
+import { Redeem } from './profile/redeem'
+import { Withdraw } from './profile/withdraw'
 import { Status, BalanceItems } from '../../util/types'
 import { View } from './profile/view'
 import { formatDate } from '../../util/tools'
@@ -20,6 +22,8 @@ enum Step {
   View = 'View',
   Buy = 'Buy',
   Sell = 'Sell',
+  Redeem = 'Redeem',
+  Withdraw = 'Withdraw',
 }
 
 const MarketView: FC<Props> = props => {
@@ -42,12 +46,26 @@ const MarketView: FC<Props> = props => {
     setCurrentStep(Step.Sell)
   }
 
+  const handleRedeem = (): void => {
+    setCurrentStep(Step.Redeem)
+  }
+
+  const handleWithdraw = (): void => {
+    setCurrentStep(Step.Withdraw)
+  }
+
   const renderView = () => {
     switch (currentStep) {
       case Step.View:
         return (
           <>
-            <View handleBuy={() => handleBuy()} handleSell={() => handleSell()} {...props} />
+            <View
+              handleBuy={() => handleBuy()}
+              handleRedeem={() => handleRedeem()}
+              handleWithdraw={() => handleWithdraw()}
+              handleSell={() => handleSell()}
+              {...props}
+            />
           </>
         )
       case Step.Buy:
@@ -68,10 +86,28 @@ const MarketView: FC<Props> = props => {
             <Sell handleBack={() => handleBack()} handleFinish={() => handleFinish()} />
           </>
         )
+      case Step.Redeem:
+        return (
+          <>
+            <Redeem handleFinish={() => {}} />
+          </>
+        )
+      case Step.Withdraw:
+        return (
+          <>
+            <Withdraw handleFinish={() => {}} />
+          </>
+        )
       default:
         return (
           <>
-            <View handleBuy={() => handleBuy()} handleSell={() => handleSell()} {...props} />
+            <View
+              handleBuy={() => handleBuy()}
+              handleRedeem={() => handleRedeem()}
+              handleSell={() => handleSell()}
+              handleWithdraw={() => handleWithdraw()}
+              {...props}
+            />
           </>
         )
     }
