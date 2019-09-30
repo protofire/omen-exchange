@@ -2,6 +2,8 @@ import { providers } from 'ethers'
 import React, { useState, useEffect } from 'react'
 import { useWeb3Context } from 'web3-react'
 
+import { CONNECTOR } from '../common/constants'
+
 const ConnectedWeb3Context = React.createContext<{
   account: string
   library: providers.Web3Provider
@@ -19,6 +21,17 @@ export const useConnectedWeb3Context = () => {
   }
 
   return context
+}
+
+/**
+ * Use this hook to connect the wallet automatically
+ */
+export const useConnectWeb3 = () => {
+  const context = useWeb3Context()
+
+  useEffect(() => {
+    context.setConnector(CONNECTOR)
+  }, [context])
 }
 
 /**

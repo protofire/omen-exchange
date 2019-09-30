@@ -10,11 +10,15 @@ import { Status, BalanceItems, OutcomeSlots } from '../../util/types'
 
 const logger = getLogger('Market::MarketView')
 
-const MarketViewContainer: FC = (props: any) => {
+interface Props {
+  address: string
+}
+
+const MarketViewContainer: FC<Props> = props => {
   const context = useConnectedWeb3Context()
 
   const [balance, setBalance] = useState<BalanceItems[]>([])
-  const [address] = useState<string>(props.match.params.address)
+  const [address] = useState<string>(props.address)
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [funding, setFunding] = useState<BigNumber>(ethers.constants.Zero)
 
