@@ -135,7 +135,7 @@ const Buy = (props: Props) => {
     const { value } = event
     setValue(value)
 
-    const valueNumber = +ethers.utils.formatUnits(value, 3)
+    const valueNumber = +ethers.utils.formatUnits(value, 18)
 
     const price = balanceItem ? +balanceItem.currentPrice : 1
     const amount = valueNumber / price
@@ -207,7 +207,7 @@ const Buy = (props: Props) => {
         <div className="col">
           <label>Amount</label>
           <Div>
-            <InputStyled name="amount" value={value} onChange={handleChangeAmount} decimals={3} />
+            <InputStyled name="amount" value={value} onChange={handleChangeAmount} decimals={18} />
             <Span>DAI</Span>
           </Div>
         </div>

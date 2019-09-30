@@ -1,4 +1,3 @@
-import { ethers } from 'ethers'
 import React, { FC, useState } from 'react'
 import moment from 'moment'
 

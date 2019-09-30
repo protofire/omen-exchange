@@ -70,7 +70,7 @@ class CreateMarketStep extends Component<Props> {
           Spread/Fee: <i>{spread} %</i>
         </p>
         <p>
-          Funding: <i>{ethers.utils.formatUnits(funding, 3)} DAI</i>
+          Funding: <i>{ethers.utils.formatUnits(funding, 18)} DAI</i>
         </p>
         <p>
           Resolution date: <i>{resolutionDate}</i>
