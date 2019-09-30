@@ -101,7 +101,7 @@ class FundingAndFeeStep extends Component<Props> {
                 name="funding"
                 value={funding}
                 onChange={handleChange}
-                decimals={3}
+                decimals={18}
               />
               <Span>DAI</Span>
             </Div>
