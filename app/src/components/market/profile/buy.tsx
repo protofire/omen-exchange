@@ -25,16 +25,16 @@ import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeh
 interface Props {
   balance: BalanceItems[]
   funding: BigNumber
-  marketAddress: string
   handleBack: () => void
   handleFinish: () => void
+  marketAddress: string
 }
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
 
-const RadioContainer = styled.div`
+const RadioContainer = styled.label`
   align-items: center;
   display: flex;
   white-space: nowrap;
