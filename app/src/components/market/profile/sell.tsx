@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { OutcomeSlots, Status } from '../../../util/types'
+import { OutcomeSlots } from '../../../util/types'
 import { Button, Textfield } from '../../common'
 import { ButtonContainer } from '../../common/button_container'
 import { ButtonLink } from '../../common/button_link'
