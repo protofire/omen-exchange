@@ -1,11 +1,11 @@
 import React, { FC, useState } from 'react'
 import { BigNumber } from 'ethers/utils'
-
-import { Status, BalanceItems } from '../../util/types'
 import { Buy } from './profile/buy'
+import { SectionTitle } from '../common/section_title'
 import { Sell } from './profile/sell'
+import { Status, BalanceItems } from '../../util/types'
 import { View } from './profile/view'
-import { QuestionHeader } from './profile/question_header'
+import { formatDate } from '../../util/tools'
 
 interface Props {
   balance: BalanceItems[]
@@ -54,11 +54,11 @@ const MarketView: FC<Props> = props => {
         return (
           <>
             <Buy
+              balance={balance}
+              funding={funding}
               handleBack={() => handleBack()}
               handleFinish={() => handleFinish()}
-              balance={balance}
               marketAddress={marketAddress}
-              funding={funding}
             />
           </>
         )
@@ -78,14 +78,10 @@ const MarketView: FC<Props> = props => {
   }
 
   return (
-    <div className="row">
-      <div className="col-2" />
-      <div className="col-6">
-        <QuestionHeader question={question} resolution={resolution} />
-        {renderView()}
-      </div>
-      <div className="col-2" />
-    </div>
+    <>
+      <SectionTitle title={question} subTitle={`${formatDate(resolution)}`} />
+      {renderView()}
+    </>
   )
 }
 

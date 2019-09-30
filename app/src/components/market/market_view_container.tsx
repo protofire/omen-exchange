@@ -81,12 +81,12 @@ const MarketViewContainer: FC = (props: any) => {
   // TODO: fetch question and resolution date, and pass in props
   return (
     <MarketView
-      status={status}
+      balance={balance}
+      funding={funding}
+      marketAddress={address}
       question={'Will be X the president of X in 2020?'}
       resolution={new Date(2019, 10, 30)}
-      balance={balance}
-      marketAddress={address}
-      funding={funding}
+      status={status}
     />
   )
 }

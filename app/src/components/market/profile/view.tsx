@@ -1,9 +1,13 @@
 import React from 'react'
-import styled from 'styled-components'
-
+import { withTheme } from 'styled-components'
+import { ViewCard } from '../view_card'
 import { Status, BalanceItems } from '../../../util/types'
 import { formatBN } from '../../../util/tools'
 import { Button } from '../../common'
+import { FullLoading } from '../../common/full_loading'
+import { ButtonContainer } from '../../common/button_container'
+import { Table, TD, TH, THead, TR } from '../../common/table'
+import { SubsectionTitle } from '../../common/subsection_title'
 
 interface Props {
   balance: BalanceItems[]
@@ -12,76 +16,70 @@ interface Props {
   status: Status
   handleBuy: () => void
   handleSell: () => void
+  theme?: any
 }
 
-const DivStyled = styled.div`
-  width: 5px;
-  height: auto;
-  display: inline-block;
-`
+const ViewWrapper = (props: Props) => {
+  const { balance, status, theme } = props
 
-const TableStyled = styled.table`
-  width: 100%;
-`
-
-const THStyled = styled.th`
-  border-bottom: 1px solid #ddd;
-`
-
-const TDStyled = styled.th`
-  border-bottom: 1px solid #ddd;
-`
-
-const View = (props: Props) => {
-  const { balance, status } = props
-
-  const userHaveShares = balance.some((balanceItem: BalanceItems) => {
+  const userHasShares = balance.some((balanceItem: BalanceItems) => {
     const { shares } = balanceItem
     return !shares.isZero()
   })
 
   const headerArray = ['Outcome', 'Probabilities', 'Current Price', 'Shares']
-  if (!userHaveShares) {
+  const cellAlignment = ['left', 'right', 'right', 'right']
+  if (!userHasShares) {
     headerArray.pop()
   }
 
-  const renderTableHeader = headerArray.map((value, index) => {
-    return <THStyled key={index}>{value}</THStyled>
-  })
-
-  const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
-    const { outcomeName, probability, currentPrice, shares } = balanceItem
+  const renderTableHeader = (): React.ReactNode => {
     return (
-      <tr key={index}>
-        <TDStyled>{outcomeName}</TDStyled>
-        <TDStyled>{probability} %</TDStyled>
-        <TDStyled>{currentPrice} DAI</TDStyled>
-        {userHaveShares && <TDStyled>{formatBN(shares)}</TDStyled>}
-      </tr>
+      <THead>
+        <TR>
+          {headerArray.map((value, index) => {
+            return (
+              <TH key={index} textAlign={cellAlignment[index]}>
+                {value}
+              </TH>
+            )
+          })}
+        </TR>
+      </THead>
     )
-  })
+  }
+
+  const renderTableData = () => {
+    return balance.map((balanceItem: BalanceItems, index: number) => {
+      const { outcomeName, probability, currentPrice, shares } = balanceItem
+      return (
+        <TR key={index}>
+          <TD textAlign={cellAlignment[0]}>{outcomeName}</TD>
+          <TD textAlign={cellAlignment[1]}>{probability} %</TD>
+          <TD textAlign={cellAlignment[2]}>{currentPrice} DAI</TD>
+          {userHasShares && <TD textAlign={cellAlignment[3]}>{formatBN(shares)}</TD>}
+        </TR>
+      )
+    })
+  }
 
   return (
     <>
-      {userHaveShares && <h5>Balance</h5>}
-      <div className="row">
-        <TableStyled>
-          <tbody>
-            <tr>{renderTableHeader}</tr>
-            {renderTableData}
-          </tbody>
-        </TableStyled>
-      </div>
-      <div className="row">
-        <p>Status: {status}</p>
-      </div>
-      <div className="row right">
-        {userHaveShares && <Button onClick={() => props.handleSell()}>Sell</Button>}
-        <DivStyled />
-        <Button onClick={() => props.handleBuy()}>Buy</Button>
-      </div>
+      <ViewCard>
+        {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
+        <Table head={renderTableHeader()}>{renderTableData()}</Table>
+        <ButtonContainer>
+          {userHasShares && (
+            <Button backgroundColor={theme.colors.secondary} onClick={() => props.handleSell()}>
+              Sell
+            </Button>
+          )}
+          <Button onClick={() => props.handleBuy()}>Buy</Button>
+        </ButtonContainer>
+      </ViewCard>
+      {status === Status.Loading ? <FullLoading /> : null}
     </>
   )
 }
 
-export { View }
+export const View = withTheme(ViewWrapper)
