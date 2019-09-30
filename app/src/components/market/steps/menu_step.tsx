@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
+import { SectionTitle } from '../../common/section_title'
 
 interface Props {
   currentStep: number
@@ -14,15 +15,23 @@ interface StepItem {
   value: number
 }
 
-interface DivProp {
-  active?: boolean
-  key?: number
-}
-
-const DivStep = styled.div<DivProp>`
-  ${props => (props.active ? 'background-color: #050300;' : 'background-color: #D8D6D3')}
-  height: 23px;
+const Wrapper = styled.div`
+  display: flex;
+  margin: 0 auto 20px;
+  max-width: ${props => props.theme.createSteps.maxWidth};
   width: 100%;
+`
+
+const Step = styled.div<{ active?: boolean }>`
+  background-color: ${props => (props.active ? props.theme.colors.secondary : '#ddd')};
+  height: 6px;
+  margin-right: 30px;
+  width: 100%;
+  border-radius: 6px;
+
+  &:last-child {
+    margin-right: 0;
+  }
 `
 
 class MenuStep extends Component<Props, State> {
@@ -52,19 +61,16 @@ class MenuStep extends Component<Props, State> {
     const currentStepItemSelected = steps.find(step => step.value === this.props.currentStep)
 
     const stepsBlocks = steps.map((step, index) => (
-      <DivStep
+      <Step
         active={currentStepItemSelected && step.value <= currentStepItemSelected.value}
         key={index}
-        className="col center"
-      ></DivStep>
+      ></Step>
     ))
-    const stepsBlocksPosition = `Step ${currentStepItemSelected &&
-      currentStepItemSelected.value} of ${steps.length}`
 
     return (
       <>
-        <div className="row right">{stepsBlocksPosition}</div>
-        <div className="row">{stepsBlocks}</div>
+        <SectionTitle title={'Conditional Exchange'} subTitle={'Create A New Market'} />
+        <Wrapper>{stepsBlocks}</Wrapper>
       </>
     )
   }

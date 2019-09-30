@@ -1,13 +1,18 @@
 import React from 'react'
+import styled from 'styled-components'
+import { Select } from '../select'
 
 interface Props {
+  autoFocus?: boolean
+  disabled?: boolean
   name: string
-  value: string
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => any
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
-  autoFocus?: boolean
   readOnly?: boolean
+  value: string
 }
+
+const FormOption = styled.option``
 
 const options = [
   { value: 'Miscellaneous', label: 'Miscellaneous' },
@@ -18,17 +23,15 @@ export const Categories = (props: Props) => {
   const { ...restProps } = props
 
   return (
-    <select {...restProps}>
-      <option value="" disabled>
-        Select your option
-      </option>
+    <Select {...restProps}>
+      <FormOption value="">Select a category</FormOption>
       {options.map((category: any) => {
         return (
-          <option key={category.value} value={category.value}>
+          <FormOption key={category.value} value={category.value}>
             {category.label}
-          </option>
+          </FormOption>
         )
       })}
-    </select>
+    </Select>
   )
 }

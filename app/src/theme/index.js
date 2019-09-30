@@ -1,7 +1,63 @@
-// We will use this when we apply the design
 const theme = {
+  fonts: {
+    fontFamily: `'Roboto', 'Helvetica Neue', 'Arial', 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', '-apple-system', 'BlinkMacSystemFont', sans-serif`,
+    fontFamilyCode: `source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace`,
+  },
   colors: {
-    primary: '#55acee',
+    primary: '#00be95',
+    secondary: '#ff7848',
+    tertiary: '#f5f5f5',
+    textColor: '#333',
+    textColorLight: '#888',
+  },
+  cards: {
+    backgroundColor: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    boxShadow: '0 0 18px 0 rgba(0, 0, 0, 0.08)',
+    paddingHorizontal: '15px',
+    paddingVertical: '20px',
+    textColor: '#000',
+    textColorSecondary: '#333',
+    titleColor: '#000',
+  },
+  header: {
+    backgroundColor: '#fff',
+    boxShadow: 'none',
+    height: '60px',
+    color: '#666',
+  },
+  footer: {
+    color: '#303b3e',
+  },
+  themeBreakPoints: {
+    lg: '992px',
+    md: '768px',
+    sm: '480px',
+    xl: '1024px',
+    xs: '320px',
+    xxl: '1280px',
+    xxxl: '1366px',
+  },
+  borders: {
+    borderColor: '#d9d9d9',
+    commonBorderRadius: '5px',
+  },
+  margins: {
+    blockSeparation: '10px',
+  },
+  paddings: {
+    mainPadding: '15px',
+  },
+  textfield: {
+    borderColor: '#d9d9d9',
+    color: '#333',
+    fontSize: '15px',
+    fontWeight: '500',
+    placeholderColor: '#666',
+  },
+  createSteps: {
+    maxWidth: '400px'
   }
 }
 

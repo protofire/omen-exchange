@@ -1,11 +1,14 @@
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 import { Textfield } from '../index'
+import { TextfieldCustomPlaceholder } from '../textfield_custom_placeholder'
+import { FormLabel } from '../form_label'
+import { Tooltip } from '../tooltip'
 
 interface Outcome {
-  value: string
   name: string
   probability: string | number
+  value: string
 }
 
 interface Props {
@@ -13,59 +16,55 @@ interface Props {
   onChange: (index: number, event: ChangeEvent<HTMLInputElement>) => any
 }
 
-const Div = styled.div`
-  height: 50px;
-  display: flex;
+const TwoColumnsRow = styled.div`
+  column-gap: 17px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 12px;
+`
+
+const TwoColumnsRowExtraMargin = styled(TwoColumnsRow)`
+  margin-bottom: 25px;
+`
+
+const LabelWrapper = styled.div`
   align-items: center;
+  display: flex;
+  justify-content: space-between;
 `
 
-const InputStyled = styled(Textfield)`
+const TextFieldStyled = styled(Textfield)`
   text-align: right;
-  ::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  ::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-`
-
-const Span = styled.span`
-  margin-left: 5px;
-  width: 25px;
 `
 
 const Outcomes = (props: Props) => {
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
-    <div className="row" key={index}>
-      <div className="col left">
-        <p>{outcome.value}</p>
-      </div>
-      <div className="col">
-        <Div>
-          <InputStyled
+    <TwoColumnsRowExtraMargin key={index}>
+      <Textfield name={`outcome_${index}`} type="text" value={outcome.value} readOnly />
+      <TextfieldCustomPlaceholder
+        formField={
+          <TextFieldStyled
+            min={0}
             name={outcome.name}
+            onChange={e => props.onChange(index, e)}
             type="number"
             value={outcome.probability}
-            onChange={e => props.onChange(index, e)}
           />
-          <Span>%</Span>
-        </Div>
-      </div>
-    </div>
+        }
+        placeholderText="%"
+      />
+    </TwoColumnsRowExtraMargin>
   ))
 
   return (
     <>
-      <div className="row">
-        <div className="col left">
-          <label>Outcome</label>
-        </div>
-        <div className="col left">
-          <label>Probability *</label>
-        </div>
-      </div>
+      <TwoColumnsRow>
+        <FormLabel>Outcome</FormLabel>
+        <LabelWrapper>
+          <FormLabel>Probability</FormLabel>
+          <Tooltip description="The total amount of probabilites must add up to 100%" />
+        </LabelWrapper>
+      </TwoColumnsRow>
       {outcomesToRender}
     </>
   )
