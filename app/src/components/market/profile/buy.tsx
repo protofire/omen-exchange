@@ -75,7 +75,6 @@ const Buy = (props: Props) => {
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcome, setOutcome] = useState<OutcomeSlots>(OutcomeSlots.Yes)
-  const [balanceItem, setBalanceItem] = useState<BalanceItems>()
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [tradedShares, setTradedShares] = useState<BigNumber>(new BigNumber(0))
   const [value, setValue] = useState<BigNumber>(new BigNumber(0))
@@ -99,8 +98,25 @@ const Buy = (props: Props) => {
     const balanceItemFound: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
       return balanceItem.outcomeName === outcome
     })
-    setBalanceItem(balanceItemFound)
-  }, [outcome, balance])
+
+    const valueNumber = +ethers.utils.formatUnits(value, 18)
+
+    const price = balanceItemFound ? +balanceItemFound.currentPrice : 1
+    const amount = valueNumber / price
+
+    const amountInWei = ethers.utils
+      .bigNumberify(Math.round(10000 * amount))
+      .mul(ethers.constants.WeiPerEther)
+      .div(10000)
+
+    setTradedShares(amountInWei)
+
+    const costWithFee = ethers.utils
+      .bigNumberify(Math.round(valueNumber * 1.01 * 10000))
+      .mul(ethers.constants.WeiPerEther)
+      .div(10000)
+    setCost(costWithFee)
+  }, [outcome, value, balance])
 
   const renderTableHeader = ['Outcome', 'Probabilities', 'Current Price', 'Price after trade'].map(
     (value, index) => {
@@ -130,30 +146,6 @@ const Buy = (props: Props) => {
       </tr>
     )
   })
-
-  const handleChangeAmount = async (event: BigNumberInputReturn) => {
-    const { value } = event
-    setValue(value)
-
-    const valueNumber = +ethers.utils.formatUnits(value, 18)
-
-    const price = balanceItem ? +balanceItem.currentPrice : 1
-    const amount = valueNumber / price
-
-    // Not allow decimals
-    const amountInWei = ethers.utils
-      .bigNumberify(Math.round(10000 * amount))
-      .mul(ethers.constants.WeiPerEther)
-      .div(10000)
-
-    setTradedShares(amountInWei)
-
-    const costWithFee = ethers.utils
-      .bigNumberify(Math.round(valueNumber * 1.01 * 10000))
-      .mul(ethers.constants.WeiPerEther)
-      .div(10000)
-    setCost(costWithFee)
-  }
 
   const finish = async () => {
     try {
@@ -207,7 +199,12 @@ const Buy = (props: Props) => {
         <div className="col">
           <label>Amount</label>
           <Div>
-            <InputStyled name="amount" value={value} onChange={handleChangeAmount} decimals={18} />
+            <InputStyled
+              name="amount"
+              value={value}
+              onChange={(e: BigNumberInputReturn) => setValue(e.value)}
+              decimals={18}
+            />
             <Span>DAI</Span>
           </Div>
         </div>
