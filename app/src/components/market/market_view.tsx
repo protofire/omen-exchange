@@ -65,7 +65,13 @@ const MarketView: FC<Props> = props => {
       case Step.Sell:
         return (
           <>
-            <Sell handleBack={() => handleBack()} handleFinish={() => handleFinish()} />
+            <Sell
+              handleBack={() => handleBack()}
+              handleFinish={() => handleFinish()}
+              balance={balance}
+              marketAddress={marketAddress}
+              funding={funding}
+            />
           </>
         )
       default:
