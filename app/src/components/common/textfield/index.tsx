@@ -27,6 +27,7 @@ const FormInput = styled.input`
   color: #000;
   font-size: 13px;
   font-weight: normal;
+  line-height: 1.2;
   outline: none;
   padding: 6px 4px;
   width: 100%;
