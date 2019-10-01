@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="46" height="46" viewBox="0 0 46 46">
+    <defs>
+        <filter id="spinner" width="46" height="46" x="0" y="0" filterUnits="userSpaceOnUse">
+            <feOffset/>
+            <feGaussianBlur result="blur" stdDeviation="1"/>
+            <feFlood/>
+            <feComposite in2="blur" operator="in"/>
+            <feComposite in="SourceGraphic"/>
+        </filter>
+    </defs>
+    <g style="filter:url(#spinner)">
+        <path id="spinner-2" d="M28.819 2l2.362 1.364-3.128 5.416-2.362-1.364zM38 11.181l-1.361-2.362-5.419 3.128 1.364 2.362zm-4.256 10.183H40v-2.728h-6.256zm-2.524 6.689l5.419 3.128L38 28.819l-5.419-3.128zm-5.529 4.531L28.819 38l2.362-1.364-3.128-5.416zM18.636 40h2.727v-6.256h-2.727zm-9.817-3.361L11.181 38l3.128-5.419-2.362-1.361zM2 28.819l1.364 2.362 5.416-3.128-1.364-2.362zm-2-7.455h6.256v-2.728H0zm8.78-9.416L3.361 8.819 2 11.181l5.418 3.128zm.039-8.586l3.128 5.418 2.362-1.364L11.181 2zm9.817 2.895h2.727V0h-2.727z" data-name="spinner" transform="translate(3 3)" style="fill:#333"/>
+    </g>
+</svg>

@@ -1,7 +1,5 @@
 export { Button } from './button'
 export { Categories } from './categories'
 export { Textfield } from './textfield'
-export { Logo } from './logo'
-export { LinkSpan } from './link_span'
 export { Outcomes } from './outcomes'
 export { BigNumberInput } from './big_number_input'

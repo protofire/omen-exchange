@@ -1,8 +1,12 @@
 import React, { ChangeEvent, Component } from 'react'
-import DatePicker from 'react-datepicker'
 import styled from 'styled-components'
-
+import { CreateCard } from '../../create_card'
 import { Button, Textfield, Categories } from '../../../common/index'
+import { FormRow } from '../../../common/form_row'
+import { DateField } from '../../../common/date_field'
+import { TimeField } from '../../../common/time_field'
+import { ButtonContainer } from '../../../common/button_container'
+import { Well } from '../../../common/well'
 
 interface Props {
   next: () => void
@@ -19,13 +23,15 @@ interface State {
   errors: string[]
 }
 
-const Div = styled.div`
-  height: 50px;
-  display: flex;
-  align-items: center;
+const TwoColumnsRow = styled.div`
+  column-gap: 17px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 `
-const PWarn = styled.p`
-  color: red;
+
+const OracleInfo = styled(Well)`
+  font-style: italic;
+  text-align: center;
 `
 
 class AskQuestionStep extends Component<Props, State> {
@@ -45,6 +51,7 @@ class AskQuestionStep extends Component<Props, State> {
       this.setState({
         errors,
       })
+      console.log(errors)
     } else {
       this.props.next()
     }
@@ -53,70 +60,73 @@ class AskQuestionStep extends Component<Props, State> {
   render() {
     const { values, handleChange, handleChangeDate } = this.props
     const { question, category, resolution } = values
+
     return (
-      <>
-        {this.state.errors.length > 0 && (
-          <PWarn>
-            <i>{this.state.errors.join('. ')}</i>
-          </PWarn>
-        )}
-        <div className="row">
-          <div className="col">
-            <label>Question *</label>
-            <Div>
-              <Textfield
-                type="text"
-                name="question"
-                defaultValue={question}
-                onChange={handleChange}
-              />
-            </Div>
-            <p>
-              <i>
-                For example: &quot;Will France win?&quot; is not an acceptable question, but
-                &quot;Will France win the 2022 FIFA World Cup&quot; is.
-              </i>
-            </p>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col">
-            <label>Categories *</label>
-            <Div>
-              <Categories name="category" value={category} onChange={handleChange} />
-            </Div>
-          </div>
-          <div className="col">
-            <label>Resolution Date *</label>
-            <Div>
-              <DatePicker
-                dateFormat="Pp"
-                name="resolution"
-                selected={resolution}
-                onChange={handleChangeDate}
+      <CreateCard>
+        <FormRow
+          formField={
+            <Textfield
+              defaultValue={question}
+              name="question"
+              onChange={handleChange}
+              placeholder="Type in a question..."
+              type="text"
+            />
+          }
+          note={[
+            <strong key="1">For example:</strong>,
+            ' ',
+            <i key="2">&quot;Will France win?&quot;</i>,
+            ' is not an acceptable question, but ',
+            <i key="3">&quot;Will France win the 2020 FIFA World Cup?&quot;</i>,
+            ' is a good one.',
+          ]}
+          title={'Question'}
+          tooltipText={'It must be an unambiguous question.'}
+        />
+        <FormRow
+          formField={<Categories name="category" value={category} onChange={handleChange} />}
+          title={'Category'}
+          tooltipText={'You can choose among several available categories.'}
+        />
+        <FormRow
+          formField={
+            <TwoColumnsRow>
+              <DateField
                 minDate={new Date()}
-                showDisabledMonthNavigation
-                showTimeInput
+                name="resolution"
+                onChange={handleChangeDate}
+                selected={resolution}
               />
-            </Div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col">
-            <label>Oracle</label>
-            <p>
-              <i>
-                The market is resolved using realit.io oracle using the dxDAO as final arbitrator.
-              </i>
-            </p>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col right">
-            <Button onClick={this.validate}>Next</Button>
-          </div>
-        </div>
-      </>
+              <TimeField name="markettime" />
+            </TwoColumnsRow>
+          }
+          title={'Resolution Date'}
+          tooltipText={'Indicate when the market will close.'}
+        />
+        <FormRow
+          formField={
+            <OracleInfo>
+              The market will be resolved using the{' '}
+              <a href="https://realit.io/" rel="noopener noreferrer" target="_blank">
+                realit.io
+              </a>{' '}
+              oracle and using{' '}
+              <a href="https://dxdao.daostack.io/" rel="noopener noreferrer" target="_blank">
+                dxDAO
+              </a>{' '}
+              as final arbitrator.
+            </OracleInfo>
+          }
+          title={'Oracle'}
+          tooltipText={'The Oracle will resolve the market once the Resolution Date is reached.'}
+        />
+        <ButtonContainer>
+          <Button disabled={!question || !category || !resolution} onClick={this.validate}>
+            Next
+          </Button>
+        </ButtonContainer>
+      </CreateCard>
     )
   }
 }
