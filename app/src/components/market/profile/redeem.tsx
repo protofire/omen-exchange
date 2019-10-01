@@ -6,6 +6,7 @@ import { Button } from '../../common'
 import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
+import { ClosedMarket } from '../../common/closed_market'
 
 const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
   color: ${props => (props.winningOutcome ? props.theme.colors.primary : 'inherit')};
@@ -16,6 +17,24 @@ const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
 TDStyled.defaultProps = {
   winningOutcome: false,
 }
+
+const ButtonContainerStyled = styled(ButtonContainer)`
+  display: grid;
+  grid-row-gap: 10px;
+  grid-template-columns: 1fr;
+
+  > button {
+    margin-left: 0;
+  }
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: flex;
+
+    > button {
+      margin-left: 10px;
+    }
+  }
+`
 
 interface Props {
   handleFinish: () => void
@@ -84,12 +103,13 @@ export const Redeem = (props: Props) => {
 
   return (
     <>
+      <ClosedMarket date={'Nov 30 2019 00:00:00 GMT-0300'} />
       <ViewCard>
         <SubsectionTitle>Balance</SubsectionTitle>
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
-        <ButtonContainer>
+        <ButtonContainerStyled>
           <Button onClick={() => handleFinish()}>Redeem</Button>
-        </ButtonContainer>
+        </ButtonContainerStyled>
       </ViewCard>
       {/* {status === Status.Loading ? <FullLoading /> : null} */}
     </>

@@ -28,7 +28,7 @@ const theme = {
     color: '#666',
   },
   footer: {
-    color: '#303b3e',
+    color: '#000',
   },
   themeBreakPoints: {
     lg: '992px',
@@ -43,9 +43,6 @@ const theme = {
     borderColor: '#d9d9d9',
     commonBorderRadius: '5px',
   },
-  margins: {
-    blockSeparation: '10px',
-  },
   paddings: {
     mainPadding: '15px',
   },
@@ -58,6 +55,9 @@ const theme = {
   },
   createSteps: {
     maxWidth: '400px'
+  },
+  viewMarket: {
+    maxWidth: '550px'
   }
 }
 

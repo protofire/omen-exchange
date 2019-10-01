@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 const CardStyled = styled(Card)`
   margin: 0 auto;
-  max-width: 550px;
+  max-width: ${props => props.theme.viewMarket.maxWidth};
   min-height: 550px;
   width: 100%;
 `

@@ -1,5 +1,5 @@
 import React from 'react'
-import { withTheme } from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 import { ViewCard } from '../view_card'
 import { Status, BalanceItems } from '../../../util/types'
 import { formatBN } from '../../../util/tools'
@@ -20,6 +20,24 @@ interface Props {
   handleWithdraw: () => void
   theme?: any
 }
+
+const ButtonContainerStyled = styled(ButtonContainer)`
+  display: grid;
+  grid-row-gap: 10px;
+  grid-template-columns: 1fr;
+
+  > button {
+    margin-left: 0;
+  }
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: flex;
+
+    > button {
+      margin-left: 10px;
+    }
+  }
+`
 
 const ViewWrapper = (props: Props) => {
   const { balance, status, theme } = props
@@ -70,7 +88,8 @@ const ViewWrapper = (props: Props) => {
       <ViewCard>
         {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
-        <ButtonContainer>
+        <ButtonContainerStyled>
+          {/* TODO: Delete these */}
           <span onClick={() => props.handleWithdraw()}>Withdraw </span>&nbsp;
           <span onClick={() => props.handleRedeem()}>Redeem</span>
           {userHasShares && (
@@ -79,7 +98,7 @@ const ViewWrapper = (props: Props) => {
             </Button>
           )}
           <Button onClick={() => props.handleBuy()}>Buy</Button>
-        </ButtonContainer>
+        </ButtonContainerStyled>
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}
     </>

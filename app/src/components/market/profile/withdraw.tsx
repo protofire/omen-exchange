@@ -6,6 +6,8 @@ import { Button } from '../../common'
 import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
+import { TitleValue } from '../../common/title_value'
+import { ClosedMarket } from '../../common/closed_market'
 
 const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
   color: ${props => (props.winningOutcome ? props.theme.colors.primary : 'inherit')};
@@ -19,6 +21,36 @@ TDStyled.defaultProps = {
 
 const TableStyled = styled(Table)`
   margin-bottom: 30px;
+`
+
+const Grid = styled.div`
+  display: grid;
+  grid-column-gap: 20px;
+  grid-row-gap: 14px;
+  grid-template-columns: 1fr;
+  margin-bottom: 25px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+`
+
+const ButtonContainerStyled = styled(ButtonContainer)`
+  display: grid;
+  grid-row-gap: 10px;
+  grid-template-columns: 1fr;
+
+  > button {
+    margin-left: 0;
+  }
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: flex;
+
+    > button {
+      margin-left: 10px;
+    }
+  }
 `
 
 interface Props {
@@ -89,19 +121,28 @@ export const WithdrawWrapper = (props: Props) => {
 
   return (
     <>
+      <ClosedMarket date={'Nov 30 2019 00:00:00 GMT-0300'} />
       <ViewCard>
         {<SubsectionTitle>Balance</SubsectionTitle>}
         <TableStyled head={renderTableHeader()}>{renderTableData()}</TableStyled>
         <SubsectionTitle>Details</SubsectionTitle>
-        asdadsas
+        <Grid>
+          <TitleValue title="Category" value="Politics" />
+          <TitleValue title="Oracle" value="realit.io and dxDAO" />
+          <TitleValue title="Resolution Date" value="Sep 25 2019 09:00:00 GMT-0300" />
+          <TitleValue title="Fee" value="1%" />
+          <TitleValue title="Funding" value="1000 DAI" />
+        </Grid>
         <SubsectionTitle>Market Results</SubsectionTitle>
-        asddas
-        <ButtonContainer>
+        <Grid>
+          <TitleValue title="Collateral" value="10000 DAI" />
+        </Grid>
+        <ButtonContainerStyled>
           <Button onClick={() => handleFinish()}>Redeem</Button>
           <Button backgroundColor={theme.colors.secondary} onClick={() => handleFinish()}>
             Withdraw Collateral
           </Button>
-        </ButtonContainer>
+        </ButtonContainerStyled>
       </ViewCard>
       {/* {status === Status.Loading ? <FullLoading /> : null} */}
     </>
