@@ -221,7 +221,7 @@ const Buy = (props: Props) => {
           }
           note={[
             'You will be charged an extra 1% trade fee of ',
-            <strong key="1">{cost.isZero() ? '0' : 'PUT VALUE HERE DAI'}</strong>,
+            <strong key="1">{cost.isZero() ? '0' : formatBN(cost.sub(value))}</strong>,
           ]}
           title={'Amount'}
           tooltipText={'Transaction fees.'}
