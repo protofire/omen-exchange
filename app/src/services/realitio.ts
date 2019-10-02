@@ -8,6 +8,7 @@ const logger = getLogger('Services::Realitio')
 
 const realitioAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public payable returns (bytes32)',
+  'event LogNewQuestion(bytes32 indexed question_id, address indexed user, uint256 template_id, string question, bytes32 indexed content_hash, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce, uint256 created)',
 ]
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
@@ -58,6 +59,33 @@ class RealitioService {
     logger.log(`Ask question transaction hash: ${transactionObject.hash}`)
 
     return questionId
+  }
+  static getQuestion = async (
+    questionId: string,
+    provider: any,
+    networkId: number,
+  ): Promise<string> => {
+    const realitioAddress = getContractAddress(networkId, 'realitio')
+
+    const realitioContract = new ethers.Contract(realitioAddress, realitioAbi, provider)
+
+    const filter: any = realitioContract.filters.LogNewQuestion(questionId)
+
+    filter.fromBlock = '0x1'
+
+    const logs = await provider.getLogs(filter)
+
+    if (logs.length === 0) {
+      throw new Error(`No LogNewQuestion event found for questionId '${questionId}'`)
+    }
+    if (logs.length > 1) {
+      console.warn(`There should be only one LogNewQuestion event for questionId '${questionId}'`)
+    }
+
+    const iface = new ethers.utils.Interface(realitioAbi)
+    const event = iface.parseLog(logs[0])
+
+    return event.values.question
   }
 }
 
