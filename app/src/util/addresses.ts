@@ -1,4 +1,5 @@
 const networkIds = {
+  MAINNET: 1,
   RINKEBY: 4,
   GANACHE: 50,
 }
@@ -12,6 +13,13 @@ interface KnownContracts {
 }
 
 const addresses: { [networkId: number]: KnownContracts } = {
+  [networkIds.MAINNET]: {
+    realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
+    realitioArbitrator: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
+    dai: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
+    marketMakerFactory: '0x37186b5d78EbB1f37bC56e5dCa7f18aB98256C4B',
+    conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
+  },
   [networkIds.RINKEBY]: {
     realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
     realitioArbitrator: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
