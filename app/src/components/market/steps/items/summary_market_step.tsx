@@ -1,15 +1,18 @@
 import React from 'react'
+import styled from 'styled-components'
+import { BigNumber } from 'ethers/utils'
+
 import { CreateCard } from '../../create_card'
 import { formatDate } from '../../../../util/tools'
 import { Paragraph } from '../../../common/paragraph'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
-import styled from 'styled-components'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonCSS } from '../../../common/button'
 import { SectionTitle } from '../../../common/section_title'
 import { CopyText } from '../../../common/copy_text'
+import { ethers } from 'ethers'
 
 const TableStyled = styled(Table)`
   margin-bottom: 25px;
@@ -39,7 +42,7 @@ interface Props {
     category: string
     resolution: Date | null
     spread: string
-    funding: string
+    funding: BigNumber
     outcomeValueOne: string
     outcomeValueTwo: string
     outcomeProbabilityOne: string
@@ -103,7 +106,10 @@ const SummaryMarketStep = (props: Props) => {
             ]}
           />
           <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
-          <TitleValue title={'Funding'} value={[funding, <strong key="1"> DAI</strong>]} />
+          <TitleValue
+            title={'Funding'}
+            value={[ethers.utils.formatUnits(funding, 18), <strong key="1"> DAI</strong>]}
+          />
         </Grid>
         <SubsectionTitle>Outcomes</SubsectionTitle>
         <TableStyled

@@ -37,3 +37,15 @@ export enum StatusMarketCreation {
   Done = 'Done',
   Error = 'Error',
 }
+
+export interface TokenAmountInterface {
+  amount: BigNumber
+  decimals: number
+  format: (precision?: number) => string
+  interestRate?: number
+  price?: number
+  depositBalance?: TokenAmountInterface
+  walletBalance?: TokenAmountInterface
+}
+
+export type Maybe<T> = T | null

@@ -1,4 +1,3 @@
-import { ethers } from 'ethers'
 import React, { FC, useState } from 'react'
 import moment from 'moment'
 
@@ -54,7 +53,7 @@ const MarketWizardCreatorContainer: FC = () => {
 
       // approve movement of DAI to MarketMakerFactory
       setStatus(StatusMarketCreation.ApprovingDAI)
-      const fundingInWei = ethers.utils.bigNumberify(funding).mul(ethers.constants.WeiPerEther)
+
       const daiAddress = getContractAddress(networkId, 'dai')
       const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
       const daiService = new ERC20Service(daiAddress)
@@ -63,16 +62,16 @@ const MarketWizardCreatorContainer: FC = () => {
         provider,
         user,
         marketMakerFactoryAddress,
-        fundingInWei,
+        funding,
       )
       if (!hasEnoughAlowance) {
-        await daiService.approve(provider, marketMakerFactoryAddress, fundingInWei)
+        await daiService.approve(provider, marketMakerFactoryAddress, funding)
       }
 
       setStatus(StatusMarketCreation.CreateMarketMaker)
       const marketMakerAddress = await MarketMakerService.createMarketMaker(
         conditionId,
-        fundingInWei,
+        funding,
         provider,
         networkId,
       )
@@ -85,7 +84,7 @@ const MarketWizardCreatorContainer: FC = () => {
       const marketMakerService = new MarketMakerService(marketMakerAddress)
       const initialTradeOutcomeTokens = computeInitialTradeOutcomeTokens(
         [+outcomeProbabilityOne, +outcomeProbabilityTwo],
-        fundingInWei,
+        funding,
       )
       await marketMakerService.trade(provider, initialTradeOutcomeTokens)
 
