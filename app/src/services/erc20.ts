@@ -8,6 +8,7 @@ const logger = getLogger('Services::Erc20')
 const erc20Abi = [
   'function allowance(address owner, address spender) external view returns (uint256)',
   'function approve(address spender, uint256 amount) external returns (bool)',
+  'function balanceOf(address marketMaker) external view returns (uint256)',
 ]
 
 class ERC20Service {
@@ -57,7 +58,7 @@ class ERC20Service {
     logger.log(`Approve unlimited transaccion hash: ${transactionObject.hash}`)
   }
 
-  getCollateral = async (provider: any, marketMakerAddress: string): Promise<any> => {
+  getCollateral = async (marketMakerAddress: string, provider: any): Promise<any> => {
     const signer: Wallet = provider.getSigner()
 
     const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, provider).connect(signer)

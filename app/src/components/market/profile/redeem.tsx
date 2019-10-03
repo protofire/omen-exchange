@@ -41,7 +41,6 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 `
 
 interface Props {
-  handleFinish: () => void
   balance: BalanceItems[]
   marketAddress: string
   resolution: Date
@@ -52,7 +51,7 @@ const logger = getLogger('Market::Redeem')
 export const Redeem = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { handleFinish, balance, marketAddress, resolution } = props
+  const { balance, marketAddress, resolution } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
 
@@ -111,8 +110,6 @@ export const Redeem = (props: Props) => {
       await ConditionalTokenService.redeemPositions(daiAddress, conditionId, networkId, provider)
 
       setStatus(Status.Ready)
-
-      handleFinish()
     } catch (err) {
       setStatus(Status.Error)
       logger.log(`Error trying to redeem: ${err.message}`)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
@@ -12,7 +12,7 @@ import { SubsectionTitle } from '../../common/subsection_title'
 import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
 import { BalanceItems, Status } from '../../../util/types'
-import { ConditionalTokenService, FetchMarketService } from '../../../services'
+import { ConditionalTokenService, ERC20Service, FetchMarketService } from '../../../services'
 import { getContractAddress } from '../../../util/addresses'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
@@ -63,7 +63,6 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 `
 
 interface Props {
-  handleFinish: () => void
   theme?: any
   balance: BalanceItems[]
   funding: BigNumber
@@ -77,9 +76,10 @@ const logger = getLogger('Market::Withdraw')
 export const WithdrawWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { handleFinish, theme, balance, marketAddress, resolution, funding } = props
+  const { theme, balance, marketAddress, resolution, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
+  const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
   const TableHead = ['Outcome', 'Shares', 'Price', 'Payout']
   const TableCellsAlign = ['left', 'right', 'right', 'right']
@@ -123,6 +123,20 @@ export const WithdrawWrapper = (props: Props) => {
     })
   }
 
+  useEffect(() => {
+    const fetchBalance = async () => {
+      const provider = context.library
+      const networkId = context.networkId
+
+      const daiAddress = getContractAddress(networkId, 'dai')
+      const daiService = new ERC20Service(daiAddress)
+      const collateralBalance = await daiService.getCollateral(marketAddress, provider)
+      setCollateral(collateralBalance)
+    }
+
+    fetchBalance()
+  }, [collateral, context, marketAddress])
+
   const redeem = async () => {
     try {
       setStatus(Status.Loading)
@@ -137,8 +151,6 @@ export const WithdrawWrapper = (props: Props) => {
       await ConditionalTokenService.redeemPositions(daiAddress, conditionId, networkId, provider)
 
       setStatus(Status.Ready)
-
-      handleFinish()
     } catch (err) {
       setStatus(Status.Error)
       logger.log(`Error trying to redeem: ${err.message}`)
@@ -149,8 +161,6 @@ export const WithdrawWrapper = (props: Props) => {
     try {
       setStatus(Status.Loading)
       setStatus(Status.Ready)
-
-      handleFinish()
     } catch (err) {
       setStatus(Status.Error)
       logger.log(`Error trying to withdraw: ${err.message}`)
@@ -158,6 +168,7 @@ export const WithdrawWrapper = (props: Props) => {
   }
 
   const fundingFormat = ethers.utils.formatUnits(funding, 18)
+  const collateralFormat = `${ethers.utils.formatUnits(collateral, 18)} DAI`
 
   return (
     <>
@@ -175,7 +186,7 @@ export const WithdrawWrapper = (props: Props) => {
         </Grid>
         <SubsectionTitle>Market Results</SubsectionTitle>
         <Grid>
-          <TitleValue title="Collateral" value="10000 DAI" />
+          <TitleValue title="Collateral" value={collateralFormat} />
         </Grid>
         <ButtonContainerStyled>
           <Button onClick={() => redeem()}>Redeem</Button>
