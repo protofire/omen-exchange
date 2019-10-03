@@ -1,8 +1,8 @@
 import React from 'react'
 import styled, { withTheme } from 'styled-components'
+import { ethers } from 'ethers'
 import { ViewCard } from '../view_card'
 import { Status, BalanceItems } from '../../../util/types'
-import { formatBN } from '../../../util/tools'
 import { Button } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
@@ -77,7 +77,9 @@ const ViewWrapper = (props: Props) => {
           <TD textAlign={cellAlignment[0]}>{outcomeName}</TD>
           <TD textAlign={cellAlignment[1]}>{probability} %</TD>
           <TD textAlign={cellAlignment[2]}>{currentPrice} DAI</TD>
-          {userHasShares && <TD textAlign={cellAlignment[3]}>{formatBN(shares)}</TD>}
+          {userHasShares && (
+            <TD textAlign={cellAlignment[3]}>{ethers.utils.formatUnits(shares, 18)}</TD>
+          )}
         </TR>
       )
     })

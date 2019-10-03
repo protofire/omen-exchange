@@ -1,5 +1,4 @@
 import { BigNumber } from 'ethers/utils'
-import { ethers } from 'ethers'
 
 export const truncateStringInTheMiddle = (
   str: string,
@@ -112,12 +111,4 @@ export const computePriceAfterTrade = (
   const newPriceNo = calcPrice(funding, newHoldingsNo)
 
   return [newPriceYes, newPriceNo]
-}
-
-export const formatBN = (bn: BigNumber): string => {
-  const integer = bn.div(ethers.constants.WeiPerEther).toString()
-  const mantissa = bn.mod(ethers.constants.WeiPerEther).toString()
-  const x = +`${integer}.${mantissa}`
-
-  return x.toFixed(2)
 }

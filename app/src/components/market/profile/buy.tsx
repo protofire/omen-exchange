@@ -10,7 +10,6 @@ import { SubsectionTitle } from '../../common/subsection_title'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { ViewCard } from '../view_card'
 import { computePriceAfterTrade } from '../../../util/tools'
-import { formatBN } from '../../../util/tools'
 import { getContractAddress } from '../../../util/addresses'
 import { getLogger } from '../../../util/logger'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
@@ -225,7 +224,9 @@ const Buy = (props: Props) => {
           }
           note={[
             'You will be charged an extra 1% trade fee of ',
-            <strong key="1">{cost.isZero() ? '0' : formatBN(cost.sub(value))}</strong>,
+            <strong key="1">
+              {cost.isZero() ? '0' : ethers.utils.formatUnits(cost.sub(value), 18)}
+            </strong>,
           ]}
           title={'Amount'}
           tooltipText={'Transaction fees.'}
@@ -235,13 +236,13 @@ const Buy = (props: Props) => {
           <TR>
             <TD>You spend</TD>
             <TD textAlign="right">
-              {formatBN(cost)} <strong>DAI</strong>
+              {ethers.utils.formatUnits(cost, 18)} <strong>DAI</strong>
             </TD>
           </TR>
           <TR>
             <TD>&quot;{outcome}&quot; shares you get</TD>
             <TD textAlign="right">
-              {formatBN(tradedShares)} <strong>shares</strong>
+              {ethers.utils.formatUnits(tradedShares, 18)} <strong>shares</strong>
             </TD>
           </TR>
         </TableStyled>
