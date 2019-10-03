@@ -35,7 +35,7 @@ class ConditionalTokenService {
     // Use signer address only for development
     const oracleAddress =
       process.env.NODE_ENV === 'development'
-        ? signer.getAddress()
+        ? await signer.getAddress()
         : getContractAddress(networkId, 'realitioArbitrator')
 
     const transactionObject = await conditionalTokenContract.prepareCondition(
@@ -110,6 +110,7 @@ class ConditionalTokenService {
     networkId: number,
   ): Promise<boolean> => {
     const signer: Wallet = provider.getSigner()
+    const signerAddress = await signer.getAddress()
 
     const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
     const conditionalTokenContract = new ethers.Contract(
@@ -118,7 +119,7 @@ class ConditionalTokenService {
       provider,
     )
 
-    return await conditionalTokenContract.isApprovedForAll(signer.getAddress(), marketMakerAddress)
+    return await conditionalTokenContract.isApprovedForAll(signerAddress, marketMakerAddress)
   }
 
   static reportPayouts = async (
