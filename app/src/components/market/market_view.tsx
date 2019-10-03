@@ -5,7 +5,7 @@ import { SectionTitle } from '../common/section_title'
 import { Sell } from './profile/sell'
 import { Redeem } from './profile/redeem'
 import { Withdraw } from './profile/withdraw'
-import { Status, BalanceItems, StepProfile } from '../../util/types'
+import { Status, BalanceItems, StepProfile, WinnerOutcome } from '../../util/types'
 import { View } from './profile/view'
 import { formatDate } from '../../util/tools'
 
@@ -17,10 +17,19 @@ interface Props {
   status: Status
   marketAddress: string
   stepProfile: StepProfile
+  winnerOutcome: Maybe<WinnerOutcome>
 }
 
 const MarketView: FC<Props> = props => {
-  const { funding, question, resolution, balance, marketAddress, stepProfile } = props
+  const {
+    funding,
+    question,
+    resolution,
+    balance,
+    marketAddress,
+    stepProfile,
+    winnerOutcome,
+  } = props
   const [currentStep, setCurrentStep] = useState<StepProfile>(stepProfile)
 
   useEffect(() => {
@@ -102,7 +111,7 @@ const MarketView: FC<Props> = props => {
       case StepProfile.Withdraw:
         return (
           <>
-            <Withdraw handleFinish={() => {}} />
+            <Withdraw handleFinish={() => {}} winnerOutcome={winnerOutcome} />
           </>
         )
       default:

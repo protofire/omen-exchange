@@ -18,6 +18,7 @@ export interface BalanceItems {
   currentPrice: string
   shares: BigNumber
   holdings: BigNumber
+  winningOutcome: boolean
 }
 
 export enum Stage {
@@ -48,12 +49,15 @@ export interface TokenAmountInterface {
   walletBalance?: TokenAmountInterface
 }
 
-export type Maybe<T> = T | null
-
 export enum StepProfile {
   View = 'View',
   Buy = 'Buy',
   Sell = 'Sell',
   Redeem = 'Redeem',
   Withdraw = 'Withdraw',
+}
+
+export enum WinnerOutcome {
+  Yes = 'Yes',
+  No = 'No',
 }

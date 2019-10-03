@@ -21,10 +21,6 @@ const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
   opacity: ${props => (props.winningOutcome ? '1' : '0.35')};
 `
 
-TDStyled.defaultProps = {
-  winningOutcome: false,
-}
-
 const ButtonContainerStyled = styled(ButtonContainer)`
   display: grid;
   grid-row-gap: 10px;
@@ -79,13 +75,21 @@ export const Redeem = (props: Props) => {
 
   const renderTableData = () => {
     return balance.map((balanceItem: any, index: number) => {
-      const { outcomeName, currentPrice, shares } = balanceItem
+      const { outcomeName, currentPrice, shares, winningOutcome } = balanceItem
       return (
         <TR key={index}>
-          <TDStyled textAlign={TableCellsAlign[0]}>{outcomeName}</TDStyled>
-          <TDStyled textAlign={TableCellsAlign[1]}>{ethers.utils.formatUnits(shares, 18)}</TDStyled>
-          <TDStyled textAlign={TableCellsAlign[2]}>{currentPrice} DAI</TDStyled>
-          <TDStyled textAlign={TableCellsAlign[3]}>{ethers.utils.formatUnits(shares, 18)}</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[0]} winningOutcome={winningOutcome}>
+            {outcomeName}
+          </TDStyled>
+          <TDStyled textAlign={TableCellsAlign[1]} winningOutcome={winningOutcome}>
+            {ethers.utils.formatUnits(shares, 18)}
+          </TDStyled>
+          <TDStyled textAlign={TableCellsAlign[2]} winningOutcome={winningOutcome}>
+            {currentPrice} DAI
+          </TDStyled>
+          <TDStyled textAlign={TableCellsAlign[3]} winningOutcome={winningOutcome}>
+            {ethers.utils.formatUnits(shares, 18)}
+          </TDStyled>
         </TR>
       )
     })
