@@ -38,6 +38,18 @@ export enum StatusMarketCreation {
   Error = 'Error',
 }
 
+export interface TokenAmountInterface {
+  amount: BigNumber
+  decimals: number
+  format: (precision?: number) => string
+  interestRate?: number
+  price?: number
+  depositBalance?: TokenAmountInterface
+  walletBalance?: TokenAmountInterface
+}
+
+export type Maybe<T> = T | null
+
 export enum StepProfile {
   View = 'View',
   Buy = 'Buy',

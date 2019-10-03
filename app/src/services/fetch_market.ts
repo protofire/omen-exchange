@@ -47,7 +47,7 @@ class FetchMarketService {
     return await this.marketMakerContract.fee()
   }
 
-  async getConditionIds() {
+  async getConditionId() {
     return await this.marketMakerContract.conditionIds(0)
   }
 
@@ -122,7 +122,7 @@ class FetchMarketService {
   }
 
   async getBalanceInformation(ownerAddress: string): Promise<any> {
-    const conditionId = await this.getConditionIds()
+    const conditionId = await this.getConditionId()
     const [collectionIdForYes, collectionIdForNo] = await Promise.all([
       this.getCollectionIdForYes(conditionId),
       this.getCollectionIdForNo(conditionId),
@@ -156,7 +156,7 @@ class FetchMarketService {
     ] = await Promise.all([
       this.getFunding(),
       this.getFee(),
-      this.getConditionIds(),
+      this.getConditionId(),
       this.getOutcomeSlots(),
       this.getStage(),
       this.getCollateralToken(),

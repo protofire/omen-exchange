@@ -1,14 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { BalanceItems, OutcomeSlots, Status } from '../../../util/types'
 import { BigNumber } from 'ethers/utils'
-import { Button, Textfield } from '../../common'
+import { ethers } from 'ethers'
+
+import { BalanceItems, OutcomeSlots, Status } from '../../../util/types'
+import { Button, BigNumberInput } from '../../common'
 import { ERC20Service, MarketMakerService } from '../../../services'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { ViewCard } from '../view_card'
 import { computePriceAfterTrade } from '../../../util/tools'
-import { ethers } from 'ethers'
 import { formatBN } from '../../../util/tools'
 import { getContractAddress } from '../../../util/addresses'
 import { getLogger } from '../../../util/logger'
@@ -21,6 +22,7 @@ import { RadioInput } from '../../common/radio_input'
 import { FormRow } from '../../common/form_row'
 import { FormLabel } from '../../common/form_label'
 import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
+import { BigNumberInputReturn } from '../../common/big_number_input'
 
 interface Props {
   balance: BalanceItems[]
@@ -72,13 +74,10 @@ const Buy = (props: Props) => {
   const [outcome, setOutcome] = useState<OutcomeSlots>(OutcomeSlots.Yes)
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [tradedShares, setTradedShares] = useState<BigNumber>(new BigNumber(0))
+  const [value, setValue] = useState<BigNumber>(new BigNumber(0))
+
   const TableHead = ['Outcome', 'Probabilities', 'Current Price', 'Price after trade']
   const TableCellsAlign = ['left', 'right', 'right', 'right']
-
-  const handleChangeOutcome = async (e: any) => {
-    const outcomeSelected: OutcomeSlots = e.target.value
-    setOutcome(outcomeSelected)
-  }
 
   const renderTableHeader = () => {
     return (
@@ -100,6 +99,7 @@ const Buy = (props: Props) => {
     outcome === OutcomeSlots.Yes
       ? [tradedShares, ethers.constants.Zero]
       : [ethers.constants.Zero, tradedShares]
+
   const holdingsYes = balance[0].holdings
   const holdingsNo = balance[1].holdings
   const pricesAfterTrade = computePriceAfterTrade(
@@ -109,6 +109,30 @@ const Buy = (props: Props) => {
     holdingsNo,
     funding,
   )
+
+  useEffect(() => {
+    const balanceItemFound: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
+      return balanceItem.outcomeName === outcome
+    })
+
+    const valueNumber = +ethers.utils.formatUnits(value, 18)
+
+    const price = balanceItemFound ? +balanceItemFound.currentPrice : 1
+    const amount = valueNumber / price
+
+    const amountInWei = ethers.utils
+      .bigNumberify(Math.round(10000 * amount))
+      .mul(ethers.constants.WeiPerEther)
+      .div(10000)
+
+    setTradedShares(amountInWei)
+
+    const costWithFee = ethers.utils
+      .bigNumberify(Math.round(valueNumber * 1.01 * 10000))
+      .mul(ethers.constants.WeiPerEther)
+      .div(10000)
+    setCost(costWithFee)
+  }, [outcome, value, balance])
 
   const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
     const { outcomeName, probability, currentPrice } = balanceItem
@@ -120,7 +144,7 @@ const Buy = (props: Props) => {
             <RadioInputStyled
               checked={outcome === outcomeName}
               name="outcome"
-              onChange={(e: any) => handleChangeOutcome(e)}
+              onChange={(e: any) => setOutcome(e.target.value)}
               value={outcomeName}
             />
             {outcomeName}
@@ -136,33 +160,6 @@ const Buy = (props: Props) => {
       </TR>
     )
   })
-
-  const handleChangeAmount = async (event: any) => {
-    event.persist()
-
-    const value = +event.target.value
-
-    const balanceItem: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
-      return balanceItem.outcomeName === outcome
-    })
-
-    const price = balanceItem ? +balanceItem.currentPrice : 1
-    const amount = value / price
-
-    // Not allow decimals
-    const amountInWei = ethers.utils
-      .bigNumberify(Math.round(10000 * amount))
-      .mul(ethers.constants.WeiPerEther)
-      .div(10000)
-
-    setTradedShares(amountInWei)
-
-    const costWithFee = ethers.utils
-      .bigNumberify(Math.round(value * 1.01 * 10000))
-      .mul(ethers.constants.WeiPerEther)
-      .div(10000)
-    setCost(costWithFee)
-  }
 
   const finish = async () => {
     try {
@@ -185,7 +182,11 @@ const Buy = (props: Props) => {
       )
 
       if (!hasEnoughAlowance) {
-        await daiService.approve(provider, marketMakerFactoryAddress, cost)
+        // add 10% to the approved amount because there can be precision errors
+        // this can be improved if, instead of adding the 1% fee manually in the front, we use the `calcMarketFee`
+        // contract method and add it to the result of `calcNetCost` result
+        const costWithErrorMargin = cost.mul(11000).div(10000)
+        await daiService.approve(provider, marketAddress, costWithErrorMargin)
       }
 
       // Check outcome value to use
@@ -212,11 +213,11 @@ const Buy = (props: Props) => {
           formField={
             <TextfieldCustomPlaceholder
               formField={
-                <Textfield
-                  min={0}
+                <BigNumberInput
                   name="amount"
-                  onChange={(e: any) => handleChangeAmount(e)}
-                  type="number"
+                  value={value}
+                  onChange={(e: BigNumberInputReturn) => setValue(e.value)}
+                  decimals={18}
                 />
               }
               placeholderText="DAI"
@@ -224,7 +225,7 @@ const Buy = (props: Props) => {
           }
           note={[
             'You will be charged an extra 1% trade fee of ',
-            <strong key="1">{cost.isZero() ? '0' : 'PUT VALUE HERE DAI'}</strong>,
+            <strong key="1">{cost.isZero() ? '0' : formatBN(cost.sub(value))}</strong>,
           ]}
           title={'Amount'}
           tooltipText={'Transaction fees.'}

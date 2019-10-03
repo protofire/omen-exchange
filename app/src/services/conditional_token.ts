@@ -8,6 +8,7 @@ const logger = getLogger('Services::Conditional-Token')
 
 const conditionTokenAbi = [
   'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
+  'event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount)',
   'function reportPayouts(bytes32 questionId, uint[] payouts) external',
   'function payoutDenominator(bytes32) public view returns (uint)',
 ]
@@ -47,6 +48,40 @@ class ConditionalTokenService {
     )
 
     return conditionId
+  }
+
+  static getQuestionId = async (
+    conditionId: string,
+    provider: any,
+    networkId: number,
+  ): Promise<string> => {
+    const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
+
+    const conditionalTokenContract = new ethers.Contract(
+      conditionalTokensAddress,
+      conditionTokenAbi,
+      provider,
+    )
+
+    const filter: any = conditionalTokenContract.filters.ConditionPreparation(conditionId)
+
+    filter.fromBlock = '0x1'
+
+    const logs = await provider.getLogs(filter)
+
+    if (logs.length === 0) {
+      throw new Error(`No ConditionPreparation event found for conditionId '${conditionId}'`)
+    }
+    if (logs.length > 1) {
+      console.warn(
+        `There should be only one ConditionPreparation event for conditionId '${conditionId}'`,
+      )
+    }
+
+    const iface = new ethers.utils.Interface(conditionTokenAbi)
+    const event = iface.parseLog(logs[0])
+
+    return event.values.questionId
   }
 
   static reportPayouts = async (
