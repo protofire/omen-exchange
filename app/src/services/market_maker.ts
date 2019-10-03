@@ -8,6 +8,7 @@ const marketMakerAbi = [
   'function trade(int[] outcomeTokenAmounts, int collateralLimit) public returns (int netCost)',
   'function calcNetCost(int[] outcomeTokenAmounts) public view returns (int netCost)',
   'function calcMarketFee(uint outcomeTokenCost) public view returns (uint)',
+  'function withdrawFees() public onlyOwner returns (uint fees)',
 ]
 
 const marketMakerFactoryAbi = [
@@ -32,6 +33,16 @@ class MarketMakerService {
     )
 
     await marketMakerContract.trade(outcomeTokenAmounts, 0)
+  }
+
+  withdrawFees = async (provider: any) => {
+    const signer = provider.getSigner()
+
+    const marketMakerContract = new ethers.Contract(this.address, marketMakerAbi, provider).connect(
+      signer,
+    )
+
+    return await marketMakerContract.withdrawFees()
   }
 
   calculateNetCost = async (provider: any, outcomeTokenAmounts: BigNumberish[]) => {
