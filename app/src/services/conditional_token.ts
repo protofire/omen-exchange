@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { ethers, Wallet } from 'ethers'
 
 import { getLogger } from '../util/logger'
 import { getContractAddress } from '../util/addresses'
@@ -8,6 +8,7 @@ const logger = getLogger('Services::Conditional-Token')
 const conditionTokenAbi = [
   'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
   'event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount)',
+  'function setApprovalForAll(address operator, bool approved) external;',
 ]
 
 class ConditionalTokenService {
@@ -75,6 +76,23 @@ class ConditionalTokenService {
     const event = iface.parseLog(logs[0])
 
     return event.values.questionId
+  }
+
+  static setApprovalForAll = async (
+    marketMakerAddress: string,
+    provider: any,
+    networkId: number,
+  ): Promise<string> => {
+    const signer: Wallet = provider.getSigner()
+
+    const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
+    const conditionalTokenContract = new ethers.Contract(
+      conditionalTokensAddress,
+      conditionTokenAbi,
+      provider,
+    ).connect(signer)
+
+    return await conditionalTokenContract.setApprovalForAll(marketMakerAddress, true)
   }
 }
 
