@@ -6,7 +6,7 @@ import { MarketView } from './market_view'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { ConditionalTokenService, FetchMarketService, RealitioService } from '../../services'
 import { getLogger } from '../../util/logger'
-import { Status, BalanceItems, OutcomeSlots, StepProfile } from '../../util/types'
+import { Status, BalanceItems, OutcomeSlots, StepProfile, WinnerOutcome } from '../../util/types'
 
 const logger = getLogger('Market::MarketView')
 
@@ -23,6 +23,7 @@ const MarketViewContainer: FC<Props> = props => {
   const [funding, setFunding] = useState<BigNumber>(ethers.constants.Zero)
   const [question, setQuestion] = useState<string | null>(null)
   const [stepProfile, setStepProfile] = useState<StepProfile>(StepProfile.View)
+  const [winnerOutcome, setWinnerOutcome] = useState<Maybe<WinnerOutcome>>(null)
 
   useEffect(() => {
     const fetchContractData = async ({ enableStatus }: any) => {
@@ -56,6 +57,7 @@ const MarketViewContainer: FC<Props> = props => {
             currentPrice: actualPrice.actualPriceForYes,
             shares: balanceInformation.balanceOfForYes,
             holdings: marketBalanceInformation.balanceOfForYes,
+            winningOutcome: winnerOutcome === WinnerOutcome.Yes,
           },
           {
             outcomeName: OutcomeSlots.No,
@@ -63,6 +65,7 @@ const MarketViewContainer: FC<Props> = props => {
             currentPrice: actualPrice.actualPriceForNo,
             shares: balanceInformation.balanceOfForNo,
             holdings: marketBalanceInformation.balanceOfForNo,
+            winningOutcome: winnerOutcome === WinnerOutcome.No,
           },
         ]
 
@@ -83,7 +86,7 @@ const MarketViewContainer: FC<Props> = props => {
     }, 2000)
 
     return () => clearInterval(intervalId)
-  }, [address, context])
+  }, [address, context, winnerOutcome])
 
   // fetch Realitio question data
   useEffect(() => {
@@ -120,19 +123,27 @@ const MarketViewContainer: FC<Props> = props => {
         const fetchMarketService = new FetchMarketService(address, networkId, provider)
 
         const conditionId = await fetchMarketService.getConditionId()
-        const isConditionResolved: boolean = await ConditionalTokenService.isConditionResolved(
+        const isConditionResolved = await ConditionalTokenService.isConditionResolved(
           conditionId,
           networkId,
           provider,
         )
 
-        const ownerAddress: string = await fetchMarketService.getOwner()
+        const ownerAddress = await fetchMarketService.getOwner()
         const isMarketOwner = ownerAddress.toLowerCase() === userAddress.toLowerCase()
 
-        if (isConditionResolved && isMarketOwner) {
-          setStepProfile(StepProfile.Withdraw)
-        } else if (isConditionResolved) {
-          setStepProfile(StepProfile.Redeem)
+        if (isConditionResolved) {
+          const winnerOutcome = await ConditionalTokenService.getWinnerOutcome(
+            conditionId,
+            networkId,
+            provider,
+          )
+          setWinnerOutcome(winnerOutcome)
+          if (isMarketOwner) {
+            setStepProfile(StepProfile.Withdraw)
+          } else {
+            setStepProfile(StepProfile.Redeem)
+          }
         }
       } catch (error) {
         logger.error(error && error.message)
@@ -152,6 +163,7 @@ const MarketViewContainer: FC<Props> = props => {
       resolution={new Date(2019, 10, 30)}
       status={status}
       stepProfile={stepProfile}
+      winnerOutcome={winnerOutcome}
     />
   )
 }

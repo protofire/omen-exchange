@@ -8,6 +8,7 @@ import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
+import { WinnerOutcome } from '../../../util/types'
 
 const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
   color: ${props => (props.winningOutcome ? props.theme.colors.primary : 'inherit')};
@@ -56,10 +57,11 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 interface Props {
   handleFinish: () => void
   theme?: any
+  winnerOutcome: Maybe<WinnerOutcome>
 }
 
 export const WithdrawWrapper = (props: Props) => {
-  const { handleFinish, theme } = props
+  const { handleFinish, theme, winnerOutcome } = props
   const TableHead = ['Outcome', 'Shares', 'Price', 'Payout']
   const TableCellsAlign = ['left', 'right', 'right', 'right']
 
@@ -82,14 +84,14 @@ export const WithdrawWrapper = (props: Props) => {
   //TODO: Get real data
   const balance = [
     {
-      winningOutcome: true,
+      winningOutcome: winnerOutcome === WinnerOutcome.Yes,
       outcomeName: 'Yes',
       payout: '35',
       currentPrice: '75',
       shares: '50',
     },
     {
-      winningOutcome: false,
+      winningOutcome: winnerOutcome === WinnerOutcome.No,
       outcomeName: 'No',
       payout: '75',
       currentPrice: '35',
