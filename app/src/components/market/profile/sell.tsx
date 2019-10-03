@@ -1,7 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { OutcomeSlots } from '../../../util/types'
-import { Button, Textfield } from '../../common'
+import { BigNumber } from 'ethers/utils'
+import { ethers } from 'ethers'
+
+import { BalanceItems, OutcomeSlots, Status } from '../../../util/types'
+import { Button, BigNumberInput } from '../../common'
 import { ButtonContainer } from '../../common/button_container'
 import { ButtonLink } from '../../common/button_link'
 import { FormLabel } from '../../common/form_label'
@@ -11,9 +14,16 @@ import { SubsectionTitle } from '../../common/subsection_title'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
 import { ViewCard } from '../view_card'
-// import { FullLoading } from '../../common/full_loading'
+import { MarketMakerService, ConditionalTokenService } from '../../../services'
+import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { getLogger } from '../../../util/logger'
+import { BigNumberInputReturn } from '../../common/big_number_input'
+import { FullLoading } from '../../common/full_loading'
 
 interface Props {
+  balance: BalanceItems[]
+  funding: BigNumber
+  marketAddress: string
   handleBack: () => void
   handleFinish: () => void
 }
@@ -48,19 +58,47 @@ const AmountWrapper = styled(FormRow)`
 const FormLabelStyled = styled(FormLabel)`
   margin-bottom: 10px;
 `
+const logger = getLogger('Market::Sell')
 
 const Sell = (props: Props) => {
-  const [outcome, setOutcome] = useState<OutcomeSlots>(OutcomeSlots.Yes)
-  //TODO: Fix this
-  // const status = Status.Ready
+  const context = useConnectedWeb3Context()
 
   const TableHead = ['Outcome', 'Probabilities', 'Current Price', 'Shares']
   const TableCellsAlign = ['left', 'right', 'right', 'right']
 
-  const handleChangeOutcome = async (e: any) => {
-    const outcomeSelected: OutcomeSlots = e.target.value
-    setOutcome(outcomeSelected)
-  }
+  const { balance, marketAddress } = props
+
+  const [status, setStatus] = useState<Status>(Status.Ready)
+  const [balanceItem, setBalanceItem] = useState<BalanceItems>()
+  const [outcome, setOutcome] = useState<OutcomeSlots>(OutcomeSlots.Yes)
+  const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
+  const [tradedDAI, setTradedDAI] = useState<BigNumber>(new BigNumber(0))
+  const [costFee, setCostFee] = useState<BigNumber>(new BigNumber(0))
+
+  useEffect(() => {
+    const balanceItemFound: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
+      return balanceItem.outcomeName === outcome
+    })
+    setBalanceItem(balanceItemFound)
+
+    const amountSharesInUnits = +ethers.utils.formatUnits(amountShares, 18)
+    const individualPrice = balanceItemFound ? +balanceItemFound.currentPrice : 1
+    const amountToSell = individualPrice * amountSharesInUnits
+
+    const amountToSellInWei = ethers.utils
+      .bigNumberify(Math.round(amountToSell * 10000))
+      .mul(ethers.constants.WeiPerEther)
+      .div(10000)
+
+    const costFeeInWei = ethers.utils
+      .bigNumberify(Math.round(amountToSell * 0.01 * 10000))
+      .mul(ethers.constants.WeiPerEther)
+      .div(10000)
+
+    setCostFee(costFeeInWei)
+
+    setTradedDAI(amountToSellInWei.sub(costFeeInWei))
+  }, [outcome, amountShares, balance])
 
   const renderTableHeader = () => {
     return (
@@ -78,22 +116,7 @@ const Sell = (props: Props) => {
     )
   }
 
-  //TODO: Get real data
-  const balance = [
-    {
-      outcomeName: 'Yes',
-      probability: '35',
-      currentPrice: '75',
-      shares: '50',
-    },
-    {
-      outcomeName: 'No',
-      probability: '75',
-      currentPrice: '35',
-      shares: '25',
-    },
-  ]
-  const renderTableData = balance.map((balanceItem: any, index: number) => {
+  const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
     const { outcomeName, probability, currentPrice, shares } = balanceItem
 
     return (
@@ -103,7 +126,7 @@ const Sell = (props: Props) => {
             <RadioInputStyled
               checked={outcome === outcomeName}
               name="outcome"
-              onChange={(e: any) => handleChangeOutcome(e)}
+              onChange={(e: any) => setOutcome(e.target.value)}
               value={outcomeName}
             />
             {outcomeName}
@@ -113,10 +136,53 @@ const Sell = (props: Props) => {
         <TD textAlign={TableCellsAlign[2]}>
           {currentPrice} <strong>DAI</strong>
         </TD>
-        <TD textAlign={TableCellsAlign[3]}>{shares}</TD>
+        <TD textAlign={TableCellsAlign[3]}>{ethers.utils.formatUnits(shares, 18)}</TD>
       </TR>
     )
   })
+
+  const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
+  const finish = async () => {
+    try {
+      if (!haveEnoughShares) {
+        throw new Error('There are not enough shares to sell')
+      }
+
+      setStatus(Status.Loading)
+
+      const provider = context.library
+      const networkId = context.networkId
+
+      const marketMakerService = new MarketMakerService(marketAddress)
+
+      const amountSharesNegative = amountShares.mul(-1)
+      const outcomeValue =
+        outcome === OutcomeSlots.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
+
+      const isApprovedForAll = await ConditionalTokenService.isApprovedForAll(
+        marketAddress,
+        provider,
+        networkId,
+      )
+
+      if (!isApprovedForAll) {
+        await ConditionalTokenService.setApprovalForAll(marketAddress, provider, networkId)
+      }
+
+      await marketMakerService.trade(provider, outcomeValue)
+
+      setStatus(Status.Ready)
+      props.handleFinish()
+    } catch (err) {
+      setStatus(Status.Error)
+      logger.log(`Error trying to sell: ${err.message}`)
+    }
+  }
+
+  const disabled =
+    (status !== Status.Ready && status !== Status.Error) ||
+    amountShares.isZero() ||
+    !haveEnoughShares
 
   return (
     <>
@@ -126,13 +192,20 @@ const Sell = (props: Props) => {
         <AmountWrapper
           formField={
             <TextfieldCustomPlaceholder
-              formField={<Textfield min={0} name="amount" onChange={() => {}} type="number" />}
+              formField={
+                <BigNumberInput
+                  name="amount"
+                  value={amountShares}
+                  onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
+                  decimals={18}
+                />
+              }
               placeholderText="Shares"
             />
           }
           note={[
             'You will be charged an extra 1% trade fee of ',
-            <strong key="1">{'PUT VALUE HERE DAI'}</strong>,
+            <strong key="1">{ethers.utils.formatEther(costFee)}</strong>,
           ]}
           title={'Amount'}
           tooltipText={'Transaction fees.'}
@@ -142,17 +215,18 @@ const Sell = (props: Props) => {
           <TR>
             <TD>Total DAI Return</TD>
             <TD textAlign="right">
-              150,75 <strong>DAI</strong>
+              {ethers.utils.formatEther(tradedDAI)} <strong>DAI</strong>
             </TD>
           </TR>
         </TableStyled>
         <ButtonContainer>
           <ButtonLinkStyled onClick={() => props.handleBack()}>‹ Back</ButtonLinkStyled>
-          <Button onClick={() => props.handleFinish()}>Finish</Button>
+          <Button disabled={disabled} onClick={() => finish()}>
+            Finish
+          </Button>
         </ButtonContainer>
       </ViewCard>
-      {/* TODO: Fix this */}
-      {/* {status === Status.Loading ? <FullLoading /> : null} */}
+      {status === Status.Loading ? <FullLoading /> : null}
     </>
   )
 }

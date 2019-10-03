@@ -80,7 +80,13 @@ const MarketView: FC<Props> = props => {
       case StepProfile.Sell:
         return (
           <>
-            <Sell handleBack={() => handleBack()} handleFinish={() => handleFinish()} />
+            <Sell
+              handleBack={() => handleBack()}
+              handleFinish={() => handleFinish()}
+              balance={balance}
+              marketAddress={marketAddress}
+              funding={funding}
+            />
           </>
         )
       case StepProfile.Redeem:
