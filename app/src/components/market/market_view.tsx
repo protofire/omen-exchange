@@ -93,21 +93,13 @@ const MarketView: FC<Props> = props => {
       case StepProfile.Redeem:
         return (
           <>
-            <Redeem
-              handleFinish={() => handleFinish()}
-              marketAddress={marketAddress}
-              balance={balance}
-            />
+            <Redeem handleFinish={() => handleFinish()} {...props} />
           </>
         )
       case StepProfile.Withdraw:
         return (
           <>
-            <Withdraw
-              handleFinish={() => handleFinish()}
-              marketAddress={marketAddress}
-              {...props}
-            />
+            <Withdraw handleFinish={() => handleFinish()} {...props} />
           </>
         )
       default:
