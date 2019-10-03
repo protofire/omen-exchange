@@ -3,12 +3,23 @@ import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 
-import { Button, Textfield } from '../../common'
 import { BalanceItems, OutcomeSlots, Status } from '../../../util/types'
+import { Button, Textfield } from '../../common'
+import { ButtonContainer } from '../../common/button_container'
+import { ButtonLink } from '../../common/button_link'
+import { FormLabel } from '../../common/form_label'
+import { FormRow } from '../../common/form_row'
+import { RadioInput } from '../../common/radio_input'
+import { SubsectionTitle } from '../../common/subsection_title'
+import { Table, TD, TH, THead, TR } from '../../common/table'
+import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
+import { ViewCard } from '../view_card'
 import { MarketMakerService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatBN } from '../../../util/tools'
+
+// import { FullLoading } from '../../common/full_loading'
 
 interface Props {
   balance: BalanceItems[]
@@ -18,55 +29,43 @@ interface Props {
   handleFinish: () => void
 }
 
-const DivStyled = styled.div`
-  width: 5px;
-  height: auto;
-  display: inline-block;
+const ButtonLinkStyled = styled(ButtonLink)`
+  margin-right: auto;
 `
 
-const TableStyled = styled.table`
+const RadioContainer = styled.label`
+  align-items: center;
+  display: flex;
+  white-space: nowrap;
+`
+
+const RadioInputStyled = styled(RadioInput)`
+  margin-right: 6px;
+`
+
+const TableStyled = styled(Table)`
+  margin-bottom: 30px;
+`
+
+const AmountWrapper = styled(FormRow)`
+  margin-bottom: 30px;
   width: 100%;
-`
 
-const THStyled = styled.th`
-  border-bottom: 1px solid #ddd;
-`
-
-const TDStyled = styled.th`
-  border-bottom: 1px solid #ddd;
-`
-const Div = styled.div`
-  height: 50px;
-  display: flex;
-  align-items: center;
-`
-
-const InputStyled = styled(Textfield)`
-  text-align: right;
-  ::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  ::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    width: 50%;
   }
 `
 
-const Span = styled.span`
-  margin-left: 5px;
-  width: 25px;
+const FormLabelStyled = styled(FormLabel)`
+  margin-bottom: 10px;
 `
-const DivLabel = styled.div`
-  height: 30px;
-  display: flex;
-  align-items: center;
-`
-
 const logger = getLogger('Market::Sell')
 
 const Sell = (props: Props) => {
   const context = useConnectedWeb3Context()
+
+  const TableHead = ['Outcome', 'Probabilities', 'Current Price', 'Shares']
+  const TableCellsAlign = ['left', 'right', 'right', 'right']
 
   const { balance, marketAddress } = props
 
@@ -101,40 +100,52 @@ const Sell = (props: Props) => {
     setTradedDAI(amountToSellInWei.sub(costFeeInWei))
   }, [outcome, amountShares, balance])
 
-  const renderTableHeader = ['Outcome', 'Probabilities', 'Current Price', 'Shares'].map(
-    (value, index) => {
-      return <THStyled key={index}>{value}</THStyled>
-    },
-  )
+  const renderTableHeader = () => {
+    return (
+      <THead>
+        <TR>
+          {TableHead.map((value, index) => {
+            return (
+              <TH textAlign={TableCellsAlign[index]} key={index}>
+                {value}
+              </TH>
+            )
+          })}
+        </TR>
+      </THead>
+    )
+  }
 
-  const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
+  const renderTableData = balance.map((balanceItem: any, index: number) => {
     const { outcomeName, probability, currentPrice, shares } = balanceItem
-    const defaultChecked = outcomeName === OutcomeSlots.Yes
 
     return (
-      <tr key={index}>
-        <TDStyled>
-          <input
-            type="radio"
-            value={outcomeName}
-            defaultChecked={defaultChecked}
-            name="outcome"
-            onChange={(e: any) => setOutcome(e.target.value)}
-          />{' '}
-          {outcomeName}
-        </TDStyled>
-        <TDStyled>{probability} %</TDStyled>
-        <TDStyled>{currentPrice} DAI</TDStyled>
-        <TDStyled>{formatBN(shares)}</TDStyled>
-      </tr>
+      <TR key={index}>
+        <TD textAlign={TableCellsAlign[0]}>
+          <RadioContainer>
+            <RadioInputStyled
+              checked={outcome === outcomeName}
+              name="outcome"
+              onChange={(e: any) => setOutcome(e.target.value)}
+              value={outcomeName}
+            />
+            {outcomeName}
+          </RadioContainer>
+        </TD>
+        <TD textAlign={TableCellsAlign[1]}>{probability} %</TD>
+        <TD textAlign={TableCellsAlign[2]}>
+          {currentPrice} <strong>DAI</strong>
+        </TD>
+        <TD textAlign={TableCellsAlign[3]}>{formatBN(shares)}</TD>
+      </TR>
     )
   })
 
+  const haveEnoughShares =
+    balanceItem && amountShares.mul(ethers.constants.WeiPerEther).lte(balanceItem.shares)
   const finish = async () => {
     try {
-      if (
-        !(balanceItem && amountShares.mul(ethers.constants.WeiPerEther).lte(balanceItem.shares))
-      ) {
+      if (!haveEnoughShares) {
         throw new Error('There are not enough shares to sell')
       }
 
@@ -157,51 +168,55 @@ const Sell = (props: Props) => {
     }
   }
 
-  const disabled = (status !== Status.Ready && status !== Status.Error) || amountShares.isZero()
+  const disabled =
+    (status !== Status.Ready && status !== Status.Error) ||
+    amountShares.isZero() ||
+    !haveEnoughShares
 
   return (
     <>
-      <h6>Choose the shares you want to sell</h6>
-      <TableStyled>
-        <tbody>
-          <tr>{renderTableHeader}</tr>
-          {renderTableData}
-        </tbody>
-      </TableStyled>
-      <div className="row">
-        <div className="col">
-          <label>Amount</label>
-          <Div>
-            <InputStyled
-              name="amount"
-              type="number"
-              onChange={(e: any) => setAmountShares(ethers.utils.bigNumberify(e.target.value))}
+      <ViewCard>
+        <SubsectionTitle>Choose the shares you want to sell</SubsectionTitle>
+        <TableStyled head={renderTableHeader()}>{renderTableData}</TableStyled>
+        <AmountWrapper
+          formField={
+            <TextfieldCustomPlaceholder
+              formField={
+                <Textfield
+                  min={0}
+                  name="amount"
+                  onChange={(e: any) => setAmountShares(ethers.utils.bigNumberify(e.target.value))}
+                  type="number"
+                />
+              }
+              placeholderText="Shares"
             />
-            <Span>Shares</Span>
-          </Div>
-          <label>
-            You will be charged an extra 1.01% trade fee of {ethers.utils.formatEther(costFee)} DAI
-          </label>
-        </div>
-      </div>
-      <div className="row">
-        <div className="col">
-          <DivLabel>
-            <strong>Totals</strong>
-          </DivLabel>
-          <DivLabel>
-            <label>Total DAI return: {ethers.utils.formatEther(tradedDAI)} DAI</label>
-          </DivLabel>
-        </div>
-      </div>
-
-      <div className="row right">
-        <Button onClick={() => props.handleBack()}>Back</Button>
-        <DivStyled />
-        <Button disabled={disabled} onClick={() => finish()}>
-          Finish
-        </Button>
-      </div>
+          }
+          note={[
+            'You will be charged an extra 1.01% trade fee of ',
+            <strong key="1">{ethers.utils.formatEther(costFee)}</strong>,
+          ]}
+          title={'Amount'}
+          tooltipText={'Transaction fees.'}
+        />
+        <FormLabelStyled>Totals</FormLabelStyled>
+        <TableStyled>
+          <TR>
+            <TD>Total DAI Return</TD>
+            <TD textAlign="right">
+              {ethers.utils.formatEther(tradedDAI)} <strong>DAI</strong>
+            </TD>
+          </TR>
+        </TableStyled>
+        <ButtonContainer>
+          <ButtonLinkStyled onClick={() => props.handleBack()}>‹ Back</ButtonLinkStyled>
+          <Button disabled={disabled} onClick={() => finish()}>
+            Finish
+          </Button>
+        </ButtonContainer>
+      </ViewCard>
+      {/* TODO: Fix this */}
+      {/* {status === Status.Loading ? <FullLoading /> : null} */}
     </>
   )
 }

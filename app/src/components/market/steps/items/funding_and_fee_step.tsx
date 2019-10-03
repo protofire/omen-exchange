@@ -1,6 +1,8 @@
 import React, { ChangeEvent, Component } from 'react'
 import styled from 'styled-components'
-import { Button, Textfield } from '../../../common/index'
+import { BigNumber } from 'ethers/utils'
+
+import { Button, Textfield, BigNumberInput } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
 import { CreateCard } from '../../create_card'
 import { FormRow } from '../../../common/form_row'
@@ -12,7 +14,7 @@ interface Props {
   next: () => void
   values: {
     spread: string
-    funding: string
+    funding: BigNumber
   }
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
 }
@@ -25,7 +27,11 @@ const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
 
-const TextfieldStyledRight = styled(Textfield)`
+const TextfieldStyledRight = styled<any>(Textfield)`
+  text-align: right;
+`
+
+const InputBigNumberStyledRight = styled<any>(BigNumberInput)`
   text-align: right;
 `
 
@@ -44,7 +50,7 @@ class FundingAndFeeStep extends Component<Props> {
     const { values } = this.props
     const { spread, funding } = values
 
-    if (!spread || !funding) {
+    if (!spread || funding.isZero()) {
       const errors = []
       errors.push(`Please check the required fields`)
       this.setState({
@@ -84,12 +90,11 @@ class FundingAndFeeStep extends Component<Props> {
           formField={
             <TextfieldCustomPlaceholder
               formField={
-                <Textfield
-                  defaultValue={funding}
+                <InputBigNumberStyledRight
                   name="funding"
+                  value={funding}
                   onChange={handleChange}
-                  placeholder="Funding amount..."
-                  type="number"
+                  decimals={18}
                 />
               }
               placeholderText="DAI"
@@ -100,7 +105,7 @@ class FundingAndFeeStep extends Component<Props> {
         />
         <ButtonContainer>
           <ButtonLinkStyled onClick={this.back}>‹ Back</ButtonLinkStyled>
-          <Button disabled={!spread || !funding} onClick={this.validate}>
+          <Button disabled={!spread || funding.isZero()} onClick={this.validate}>
             Next
           </Button>
         </ButtonContainer>

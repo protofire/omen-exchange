@@ -1,4 +1,7 @@
 import React, { Component } from 'react'
+import { ethers } from 'ethers'
+import { BigNumber } from 'ethers/utils'
+
 import { Button } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
@@ -40,7 +43,7 @@ interface Props {
     category: string
     resolution: Date | null
     spread: string
-    funding: string
+    funding: BigNumber
     outcomeValueOne: string
     outcomeValueTwo: string
     outcomeProbabilityOne: string
@@ -109,7 +112,10 @@ class CreateMarketStep extends Component<Props> {
             ]}
           />
           <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
-          <TitleValue title={'Funding'} value={[funding, <strong key="1"> DAI</strong>]} />
+          <TitleValue
+            title={'Funding'}
+            value={[ethers.utils.formatUnits(funding, 18), <strong key="1"> DAI</strong>]}
+          />
         </Grid>
         <SubsectionTitle>Outcomes</SubsectionTitle>
         <TableStyled

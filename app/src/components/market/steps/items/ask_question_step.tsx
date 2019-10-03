@@ -4,7 +4,6 @@ import { CreateCard } from '../../create_card'
 import { Button, Textfield, Categories } from '../../../common/index'
 import { FormRow } from '../../../common/form_row'
 import { DateField } from '../../../common/date_field'
-import { TimeField } from '../../../common/time_field'
 import { ButtonContainer } from '../../../common/button_container'
 import { Well } from '../../../common/well'
 
@@ -22,12 +21,6 @@ interface Props {
 interface State {
   errors: string[]
 }
-
-const TwoColumnsRow = styled.div`
-  column-gap: 17px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-`
 
 const OracleInfo = styled(Well)`
   font-style: italic;
@@ -91,15 +84,12 @@ class AskQuestionStep extends Component<Props, State> {
         />
         <FormRow
           formField={
-            <TwoColumnsRow>
-              <DateField
-                minDate={new Date()}
-                name="resolution"
-                onChange={handleChangeDate}
-                selected={resolution}
-              />
-              <TimeField name="markettime" />
-            </TwoColumnsRow>
+            <DateField
+              minDate={new Date()}
+              name="resolution"
+              onChange={handleChangeDate}
+              selected={resolution}
+            />
           }
           title={'Resolution Date'}
           tooltipText={'Indicate when the market will close.'}

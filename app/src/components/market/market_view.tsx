@@ -1,11 +1,13 @@
 import React, { FC, useState } from 'react'
 import { BigNumber } from 'ethers/utils'
-
-import { Status, BalanceItems } from '../../util/types'
 import { Buy } from './profile/buy'
+import { SectionTitle } from '../common/section_title'
 import { Sell } from './profile/sell'
+import { Redeem } from './profile/redeem'
+import { Withdraw } from './profile/withdraw'
+import { Status, BalanceItems } from '../../util/types'
 import { View } from './profile/view'
-import { QuestionHeader } from './profile/question_header'
+import { formatDate } from '../../util/tools'
 
 interface Props {
   balance: BalanceItems[]
@@ -20,6 +22,8 @@ enum Step {
   View = 'View',
   Buy = 'Buy',
   Sell = 'Sell',
+  Redeem = 'Redeem',
+  Withdraw = 'Withdraw',
 }
 
 const MarketView: FC<Props> = props => {
@@ -42,23 +46,37 @@ const MarketView: FC<Props> = props => {
     setCurrentStep(Step.Sell)
   }
 
+  const handleRedeem = (): void => {
+    setCurrentStep(Step.Redeem)
+  }
+
+  const handleWithdraw = (): void => {
+    setCurrentStep(Step.Withdraw)
+  }
+
   const renderView = () => {
     switch (currentStep) {
       case Step.View:
         return (
           <>
-            <View handleBuy={() => handleBuy()} handleSell={() => handleSell()} {...props} />
+            <View
+              handleBuy={() => handleBuy()}
+              handleRedeem={() => handleRedeem()}
+              handleWithdraw={() => handleWithdraw()}
+              handleSell={() => handleSell()}
+              {...props}
+            />
           </>
         )
       case Step.Buy:
         return (
           <>
             <Buy
+              balance={balance}
+              funding={funding}
               handleBack={() => handleBack()}
               handleFinish={() => handleFinish()}
-              balance={balance}
               marketAddress={marketAddress}
-              funding={funding}
             />
           </>
         )
@@ -74,24 +92,38 @@ const MarketView: FC<Props> = props => {
             />
           </>
         )
+      case Step.Redeem:
+        return (
+          <>
+            <Redeem handleFinish={() => {}} />
+          </>
+        )
+      case Step.Withdraw:
+        return (
+          <>
+            <Withdraw handleFinish={() => {}} />
+          </>
+        )
       default:
         return (
           <>
-            <View handleBuy={() => handleBuy()} handleSell={() => handleSell()} {...props} />
+            <View
+              handleBuy={() => handleBuy()}
+              handleRedeem={() => handleRedeem()}
+              handleSell={() => handleSell()}
+              handleWithdraw={() => handleWithdraw()}
+              {...props}
+            />
           </>
         )
     }
   }
 
   return (
-    <div className="row">
-      <div className="col-2" />
-      <div className="col-6">
-        <QuestionHeader question={question} resolution={resolution} />
-        {renderView()}
-      </div>
-      <div className="col-2" />
-    </div>
+    <>
+      <SectionTitle title={question} subTitle={`${formatDate(resolution)}`} />
+      {renderView()}
+    </>
   )
 }
 

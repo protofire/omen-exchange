@@ -34,6 +34,7 @@ export const TH = styled.th<{ textAlign?: string }>`
   line-height: 1.2;
   padding: 14px 10px;
   text-align: ${props => props.textAlign};
+  white-space: nowrap;
 `
 
 TH.defaultProps = {

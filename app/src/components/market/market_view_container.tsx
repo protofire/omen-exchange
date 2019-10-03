@@ -4,7 +4,7 @@ import { BigNumber } from 'ethers/utils'
 
 import { MarketView } from './market_view'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { FetchMarketService } from '../../services'
+import { ConditionalTokenService, FetchMarketService, RealitioService } from '../../services'
 import { getLogger } from '../../util/logger'
 import { Status, BalanceItems, OutcomeSlots } from '../../util/types'
 
@@ -21,6 +21,7 @@ const MarketViewContainer: FC<Props> = props => {
   const [address] = useState<string>(props.address)
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [funding, setFunding] = useState<BigNumber>(ethers.constants.Zero)
+  const [question, setQuestion] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async ({ enableStatus }: any) => {
@@ -82,15 +83,40 @@ const MarketViewContainer: FC<Props> = props => {
     return () => clearInterval(intervalId)
   }, [address, context])
 
+  // fetch Realitio question data
+  useEffect(() => {
+    const fetchQuestion = async () => {
+      try {
+        const networkId = context.networkId
+        const provider = context.library
+
+        const fetchMarketService = new FetchMarketService(address, networkId, provider)
+
+        const conditionId = await fetchMarketService.getConditionId()
+        const questionId = await ConditionalTokenService.getQuestionId(
+          conditionId,
+          provider,
+          networkId,
+        )
+        const question = await RealitioService.getQuestion(questionId, provider, networkId)
+        setQuestion(question)
+      } catch (error) {
+        logger.error('There was an error fetching the question data:', error.message)
+      }
+    }
+
+    fetchQuestion()
+  }, [address, context])
+
   // TODO: fetch question and resolution date, and pass in props
   return (
     <MarketView
-      status={status}
-      question={'Will be X the president of X in 2020?'}
-      resolution={new Date(2019, 10, 30)}
       balance={balance}
-      marketAddress={address}
       funding={funding}
+      marketAddress={address}
+      question={question || ''}
+      resolution={new Date(2019, 10, 30)}
+      status={status}
     />
   )
 }
