@@ -77,7 +77,7 @@ const logger = getLogger('Market::Withdraw')
 export const WithdrawWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { handleFinish, theme, balance, marketAddress, resolution, funding, question } = props
+  const { handleFinish, theme, balance, marketAddress, resolution, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
 
@@ -102,7 +102,7 @@ export const WithdrawWrapper = (props: Props) => {
 
   const renderTableData = () => {
     return balance.map((balanceItem: any, index: number) => {
-      const { outcomeName, payout, currentPrice, shares, winningOutcome } = balanceItem
+      const { outcomeName, currentPrice, shares, winningOutcome } = balanceItem
 
       return (
         <TR key={index}>
