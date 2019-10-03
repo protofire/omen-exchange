@@ -2,7 +2,7 @@ import { ethers, Wallet } from 'ethers'
 
 import { getLogger } from '../util/logger'
 import { getContractAddress } from '../util/addresses'
-import { BigNumberish, BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 
 const logger = getLogger('Services::Conditional-Token')
 
@@ -124,18 +124,20 @@ class ConditionalTokenService {
 
   static reportPayouts = async (
     questionId: string,
-    payouts: BigNumberish[],
     networkId: number,
     provider: any,
   ): Promise<any> => {
+    const signer = provider.getSigner()
+
     const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
 
     const conditionalTokensContract = new ethers.Contract(
       conditionalTokensAddress,
       conditionTokenAbi,
       provider,
-    )
-    return await conditionalTokensContract.reportPayouts(questionId, payouts)
+    ).connect(signer)
+
+    return await conditionalTokensContract.reportPayouts(questionId, [1, 0])
   }
 
   static isConditionResolved = async (
