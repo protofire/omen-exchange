@@ -182,7 +182,11 @@ const Buy = (props: Props) => {
       )
 
       if (!hasEnoughAlowance) {
-        await daiService.approve(provider, marketMakerFactoryAddress, cost)
+        // add 10% to the approved amount because there can be precision errors
+        // this can be improved if, instead of adding the 1% fee manually in the front, we use the `calcMarketFee`
+        // contract method and add it to the result of `calcNetCost` result
+        const costWithErrorMargin = cost.mul(11000).div(10000)
+        await daiService.approve(provider, marketAddress, costWithErrorMargin)
       }
 
       // Check outcome value to use
