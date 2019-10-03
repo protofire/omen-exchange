@@ -4,9 +4,9 @@ import { BigNumber } from 'ethers/utils'
 
 import { MarketView } from './market_view'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { FetchMarketService } from '../../services'
+import { FetchMarketService, ConditionalTokenService } from '../../services'
 import { getLogger } from '../../util/logger'
-import { Status, BalanceItems, OutcomeSlots } from '../../util/types'
+import { Status, BalanceItems, OutcomeSlots, StepProfile } from '../../util/types'
 
 const logger = getLogger('Market::MarketView')
 
@@ -21,9 +21,10 @@ const MarketViewContainer: FC<Props> = props => {
   const [address] = useState<string>(props.address)
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [funding, setFunding] = useState<BigNumber>(ethers.constants.Zero)
+  const [stepProfile, setStepProfile] = useState<StepProfile>(StepProfile.View)
 
   useEffect(() => {
-    const fetchData = async ({ enableStatus }: any) => {
+    const fetchContractData = async ({ enableStatus }: any) => {
       enableStatus && setStatus(Status.Loading)
       try {
         const networkId = context.networkId
@@ -31,6 +32,7 @@ const MarketViewContainer: FC<Props> = props => {
         const user = await provider.getSigner().getAddress()
 
         const fetchMarketService = new FetchMarketService(address, networkId, provider)
+
         const [
           balanceInformation,
           marketBalanceInformation,
@@ -73,14 +75,46 @@ const MarketViewContainer: FC<Props> = props => {
       }
     }
 
-    fetchData({ enableStatus: true })
+    fetchContractData({ enableStatus: true })
 
     const intervalId = setInterval(() => {
-      fetchData({ enableStatus: false })
+      fetchContractData({ enableStatus: false })
     }, 2000)
 
     return () => clearInterval(intervalId)
   }, [address, context])
+
+  useEffect(() => {
+    const fetchContractStatus = async () => {
+      try {
+        const networkId = context.networkId
+        const provider = context.library
+        const userAddress = await provider.getSigner().getAddress()
+
+        const fetchMarketService = new FetchMarketService(address, networkId, provider)
+
+        const conditionId = await fetchMarketService.getConditionIds()
+        const isConditionResolved: boolean = await ConditionalTokenService.isConditionResolved(
+          conditionId,
+          networkId,
+          provider,
+        )
+
+        const ownerAddress: string = await fetchMarketService.getOwner()
+        const isMarketOwner = ownerAddress.toLowerCase() === userAddress.toLowerCase()
+
+        if (isConditionResolved && isMarketOwner) {
+          setStepProfile(StepProfile.Withdraw)
+        } else if (isConditionResolved) {
+          setStepProfile(StepProfile.Redeem)
+        }
+      } catch (error) {
+        logger.error(error && error.message)
+      }
+    }
+
+    fetchContractStatus()
+  }, [address, context, stepProfile])
 
   // TODO: fetch question and resolution date, and pass in props
   return (
@@ -91,6 +125,7 @@ const MarketViewContainer: FC<Props> = props => {
       question={'Will be X the president of X in 2020?'}
       resolution={new Date(2019, 10, 30)}
       status={status}
+      stepProfile={stepProfile}
     />
   )
 }

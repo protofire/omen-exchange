@@ -1,11 +1,11 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { BigNumber } from 'ethers/utils'
 import { Buy } from './profile/buy'
 import { SectionTitle } from '../common/section_title'
 import { Sell } from './profile/sell'
 import { Redeem } from './profile/redeem'
 import { Withdraw } from './profile/withdraw'
-import { Status, BalanceItems } from '../../util/types'
+import { Status, BalanceItems, StepProfile } from '../../util/types'
 import { View } from './profile/view'
 import { formatDate } from '../../util/tools'
 
@@ -16,47 +16,44 @@ interface Props {
   resolution: Date
   status: Status
   marketAddress: string
-}
-
-enum Step {
-  View = 'View',
-  Buy = 'Buy',
-  Sell = 'Sell',
-  Redeem = 'Redeem',
-  Withdraw = 'Withdraw',
+  stepProfile: StepProfile
 }
 
 const MarketView: FC<Props> = props => {
-  const { funding, question, resolution, balance, marketAddress } = props
-  const [currentStep, setCurrentStep] = useState<Step>(Step.View)
+  const { funding, question, resolution, balance, marketAddress, stepProfile } = props
+  const [currentStep, setCurrentStep] = useState<StepProfile>(stepProfile)
+
+  useEffect(() => {
+    setCurrentStep(stepProfile)
+  }, [stepProfile])
 
   const handleFinish = (): void => {
-    setCurrentStep(Step.View)
+    setCurrentStep(StepProfile.View)
   }
 
   const handleBack = (): void => {
-    setCurrentStep(Step.View)
+    setCurrentStep(StepProfile.View)
   }
 
   const handleBuy = (): void => {
-    setCurrentStep(Step.Buy)
+    setCurrentStep(StepProfile.Buy)
   }
 
   const handleSell = (): void => {
-    setCurrentStep(Step.Sell)
+    setCurrentStep(StepProfile.Sell)
   }
 
   const handleRedeem = (): void => {
-    setCurrentStep(Step.Redeem)
+    setCurrentStep(StepProfile.Redeem)
   }
 
   const handleWithdraw = (): void => {
-    setCurrentStep(Step.Withdraw)
+    setCurrentStep(StepProfile.Withdraw)
   }
 
   const renderView = () => {
     switch (currentStep) {
-      case Step.View:
+      case StepProfile.View:
         return (
           <>
             <View
@@ -68,7 +65,7 @@ const MarketView: FC<Props> = props => {
             />
           </>
         )
-      case Step.Buy:
+      case StepProfile.Buy:
         return (
           <>
             <Buy
@@ -80,19 +77,23 @@ const MarketView: FC<Props> = props => {
             />
           </>
         )
-      case Step.Sell:
+      case StepProfile.Sell:
         return (
           <>
             <Sell handleBack={() => handleBack()} handleFinish={() => handleFinish()} />
           </>
         )
-      case Step.Redeem:
+      case StepProfile.Redeem:
         return (
           <>
-            <Redeem handleFinish={() => {}} />
+            <Redeem
+              handleFinish={() => handleFinish()}
+              marketAddress={marketAddress}
+              balance={balance}
+            />
           </>
         )
-      case Step.Withdraw:
+      case StepProfile.Withdraw:
         return (
           <>
             <Withdraw handleFinish={() => {}} />

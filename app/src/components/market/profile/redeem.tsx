@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+
 import { ViewCard } from '../view_card'
 import { Button } from '../../common'
 // import { FullLoading } from '../../common/full_loading'
@@ -7,6 +8,8 @@ import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { ClosedMarket } from '../../common/closed_market'
+import { BalanceItems } from '../../../util/types'
+import { formatBN } from '../../../util/tools'
 
 const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
   color: ${props => (props.winningOutcome ? props.theme.colors.primary : 'inherit')};
@@ -38,10 +41,12 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 
 interface Props {
   handleFinish: () => void
+  balance: BalanceItems[]
+  marketAddress: string
 }
 
 export const Redeem = (props: Props) => {
-  const { handleFinish } = props
+  const { handleFinish, balance } = props
   const TableHead = ['Outcome', 'Shares', 'Price', 'Payout']
   const TableCellsAlign = ['left', 'right', 'right', 'right']
 
@@ -61,41 +66,15 @@ export const Redeem = (props: Props) => {
     )
   }
 
-  //TODO: Get real data
-  const balance = [
-    {
-      winningOutcome: true,
-      outcomeName: 'Yes',
-      payout: '35',
-      currentPrice: '75',
-      shares: '50',
-    },
-    {
-      winningOutcome: false,
-      outcomeName: 'No',
-      payout: '75',
-      currentPrice: '35',
-      shares: '25',
-    },
-  ]
-
   const renderTableData = () => {
     return balance.map((balanceItem: any, index: number) => {
-      const { outcomeName, payout, currentPrice, shares, winningOutcome } = balanceItem
+      const { outcomeName, currentPrice, shares } = balanceItem
       return (
         <TR key={index}>
-          <TDStyled winningOutcome={winningOutcome} textAlign={TableCellsAlign[0]}>
-            {outcomeName}
-          </TDStyled>
-          <TDStyled winningOutcome={winningOutcome} textAlign={TableCellsAlign[1]}>
-            {shares}
-          </TDStyled>
-          <TDStyled winningOutcome={winningOutcome} textAlign={TableCellsAlign[2]}>
-            {currentPrice} DAI
-          </TDStyled>
-          <TDStyled winningOutcome={winningOutcome} textAlign={TableCellsAlign[3]}>
-            {payout}
-          </TDStyled>
+          <TDStyled textAlign={TableCellsAlign[0]}>{outcomeName}</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[1]}>{formatBN(shares)}</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[2]}>{currentPrice} DAI</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[3]}>NONE</TDStyled>
         </TR>
       )
     })
