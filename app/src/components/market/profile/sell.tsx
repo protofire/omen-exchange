@@ -4,7 +4,7 @@ import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 
 import { BalanceItems, OutcomeSlots, Status } from '../../../util/types'
-import { Button, Textfield } from '../../common'
+import { Button, BigNumberInput } from '../../common'
 import { ButtonContainer } from '../../common/button_container'
 import { ButtonLink } from '../../common/button_link'
 import { FormLabel } from '../../common/form_label'
@@ -18,6 +18,7 @@ import { MarketMakerService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatBN } from '../../../util/tools'
+import { BigNumberInputReturn } from '../../common/big_number_input'
 
 // import { FullLoading } from '../../common/full_loading'
 
@@ -82,8 +83,9 @@ const Sell = (props: Props) => {
     })
     setBalanceItem(balanceItemFound)
 
+    const amountSharesInUnits = +ethers.utils.formatUnits(amountShares, 18)
     const individualPrice = balanceItemFound ? +balanceItemFound.currentPrice : 1
-    const amountToSell = individualPrice * amountShares.toNumber()
+    const amountToSell = individualPrice * amountSharesInUnits
 
     const amountToSellInWei = ethers.utils
       .bigNumberify(Math.round(amountToSell * 10000))
@@ -141,8 +143,7 @@ const Sell = (props: Props) => {
     )
   })
 
-  const haveEnoughShares =
-    balanceItem && amountShares.mul(ethers.constants.WeiPerEther).lte(balanceItem.shares)
+  const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
   const finish = async () => {
     try {
       if (!haveEnoughShares) {
@@ -182,11 +183,11 @@ const Sell = (props: Props) => {
           formField={
             <TextfieldCustomPlaceholder
               formField={
-                <Textfield
-                  min={0}
+                <BigNumberInput
                   name="amount"
-                  onChange={(e: any) => setAmountShares(ethers.utils.bigNumberify(e.target.value))}
-                  type="number"
+                  value={amountShares}
+                  onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
+                  decimals={18}
                 />
               }
               placeholderText="Shares"
