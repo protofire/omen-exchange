@@ -8,7 +8,8 @@ const logger = getLogger('Services::Conditional-Token')
 const conditionTokenAbi = [
   'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
   'event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount)',
-  'function setApprovalForAll(address operator, bool approved) external;',
+  'function setApprovalForAll(address operator, bool approved) external',
+  'function isApprovedForAll(address owner, address operator) external view returns (bool)',
 ]
 
 class ConditionalTokenService {
@@ -93,6 +94,23 @@ class ConditionalTokenService {
     ).connect(signer)
 
     return await conditionalTokenContract.setApprovalForAll(marketMakerAddress, true)
+  }
+
+  static isApprovedForAll = async (
+    marketMakerAddress: string,
+    provider: any,
+    networkId: number,
+  ): Promise<boolean> => {
+    const signer: Wallet = provider.getSigner()
+
+    const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
+    const conditionalTokenContract = new ethers.Contract(
+      conditionalTokensAddress,
+      conditionTokenAbi,
+      provider,
+    )
+
+    return await conditionalTokenContract.isApprovedForAll(signer.getAddress(), marketMakerAddress)
   }
 }
 

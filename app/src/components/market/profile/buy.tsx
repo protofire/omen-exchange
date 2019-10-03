@@ -223,7 +223,7 @@ const Buy = (props: Props) => {
             />
           }
           note={[
-            'You will be charged an extra 1.01% trade fee of ',
+            'You will be charged an extra 1% trade fee of ',
             <strong key="1">
               {cost.isZero() ? '0' : ethers.utils.formatUnits(cost.sub(value), 18)}
             </strong>,

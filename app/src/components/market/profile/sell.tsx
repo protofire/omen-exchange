@@ -91,7 +91,7 @@ const Sell = (props: Props) => {
       .div(10000)
 
     const costFeeInWei = ethers.utils
-      .bigNumberify(Math.round(((amountToSell * 1.01) / 100) * 10000))
+      .bigNumberify(Math.round(amountToSell * 1.01 * 10000))
       .mul(ethers.constants.WeiPerEther)
       .div(10000)
 
@@ -159,7 +159,15 @@ const Sell = (props: Props) => {
       const outcomeValue =
         outcome === OutcomeSlots.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
 
-      await ConditionalTokenService.setApprovalForAll(marketAddress, provider, networkId)
+      const isApprovedForAll = await ConditionalTokenService.isApprovedForAll(
+        marketAddress,
+        provider,
+        networkId,
+      )
+
+      if (!isApprovedForAll) {
+        await ConditionalTokenService.setApprovalForAll(marketAddress, provider, networkId)
+      }
 
       await marketMakerService.trade(provider, outcomeValue)
 
