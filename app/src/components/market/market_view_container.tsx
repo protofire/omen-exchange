@@ -142,7 +142,7 @@ const MarketViewContainer: FC<Props> = props => {
     fetchContractStatus()
   }, [address, context, stepProfile])
 
-  // TODO: fetch question and resolution date, and pass in props
+  // TODO: fetch resolution date, and add in props
   return (
     <MarketView
       balance={balance}

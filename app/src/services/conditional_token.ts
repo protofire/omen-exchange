@@ -11,6 +11,7 @@ const conditionTokenAbi = [
   'event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount)',
   'function reportPayouts(bytes32 questionId, uint[] payouts) external',
   'function payoutDenominator(bytes32) public view returns (uint)',
+  'function redeemPositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] indexSets) external',
 ]
 
 class ConditionalTokenService {
@@ -117,6 +118,30 @@ class ConditionalTokenService {
     )
 
     return !payoutDenominator.isZero()
+  }
+
+  static redeemPositions = async (
+    collateralToken: string,
+    conditionId: string,
+    networkId: number,
+    provider: any,
+  ): Promise<any> => {
+    const signer = provider.getSigner()
+
+    const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
+
+    const conditionalTokensContract = new ethers.Contract(
+      conditionalTokensAddress,
+      conditionTokenAbi,
+      provider,
+    ).connect(signer)
+
+    return await conditionalTokensContract.redeemPositions(
+      collateralToken,
+      ethers.constants.HashZero,
+      conditionId,
+      [1, 2],
+    )
   }
 }
 

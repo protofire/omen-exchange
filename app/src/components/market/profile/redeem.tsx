@@ -1,15 +1,19 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
+import { ethers } from 'ethers'
 
 import { ViewCard } from '../view_card'
 import { Button } from '../../common'
-// import { FullLoading } from '../../common/full_loading'
+import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { ClosedMarket } from '../../common/closed_market'
-import { BalanceItems } from '../../../util/types'
-import { formatBN } from '../../../util/tools'
+import { BalanceItems, Status } from '../../../util/types'
+import { ConditionalTokenService, FetchMarketService } from '../../../services'
+import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { getContractAddress } from '../../../util/addresses'
+import { getLogger } from '../../../util/logger'
 
 const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
   color: ${props => (props.winningOutcome ? props.theme.colors.primary : 'inherit')};
@@ -45,8 +49,15 @@ interface Props {
   marketAddress: string
 }
 
+const logger = getLogger('Market::Redeem')
+
 export const Redeem = (props: Props) => {
-  const { handleFinish, balance } = props
+  const context = useConnectedWeb3Context()
+
+  const { handleFinish, balance, marketAddress } = props
+
+  const [status, setStatus] = useState<Status>(Status.Ready)
+
   const TableHead = ['Outcome', 'Shares', 'Price', 'Payout']
   const TableCellsAlign = ['left', 'right', 'right', 'right']
 
@@ -72,12 +83,34 @@ export const Redeem = (props: Props) => {
       return (
         <TR key={index}>
           <TDStyled textAlign={TableCellsAlign[0]}>{outcomeName}</TDStyled>
-          <TDStyled textAlign={TableCellsAlign[1]}>{formatBN(shares)}</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[1]}>{ethers.utils.formatUnits(shares, 18)}</TDStyled>
           <TDStyled textAlign={TableCellsAlign[2]}>{currentPrice} DAI</TDStyled>
-          <TDStyled textAlign={TableCellsAlign[3]}>NONE</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[3]}>{ethers.utils.formatUnits(shares, 18)}</TDStyled>
         </TR>
       )
     })
+  }
+
+  const finish = async () => {
+    try {
+      setStatus(Status.Loading)
+      const provider = context.library
+      const networkId = context.networkId
+
+      const daiAddress = getContractAddress(networkId, 'dai')
+
+      const fetchMarketService = new FetchMarketService(marketAddress, networkId, provider)
+      const conditionId = await fetchMarketService.getConditionId()
+
+      await ConditionalTokenService.redeemPositions(daiAddress, conditionId, networkId, provider)
+
+      setStatus(Status.Ready)
+
+      handleFinish()
+    } catch (err) {
+      setStatus(Status.Error)
+      logger.log(`Error trying to redeem: ${err.message}`)
+    }
   }
 
   return (
@@ -87,10 +120,10 @@ export const Redeem = (props: Props) => {
         <SubsectionTitle>Balance</SubsectionTitle>
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>
-          <Button onClick={() => handleFinish()}>Redeem</Button>
+          <Button onClick={() => finish()}>Redeem</Button>
         </ButtonContainerStyled>
       </ViewCard>
-      {/* {status === Status.Loading ? <FullLoading /> : null} */}
+      {status === Status.Loading ? <FullLoading /> : null}
     </>
   )
 }
