@@ -56,6 +56,14 @@ class ERC20Service {
     const transactionObject = await erc20Contract.approve(spender, ethers.constants.MaxUint256)
     logger.log(`Approve unlimited transaccion hash: ${transactionObject.hash}`)
   }
+
+  getCollateral = async (provider: any, marketMakerAddress: string): Promise<any> => {
+    const signer: Wallet = provider.getSigner()
+
+    const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, provider).connect(signer)
+
+    return await erc20Contract.balanceOf(marketMakerAddress)
+  }
 }
 
 export { ERC20Service }
