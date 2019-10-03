@@ -17,7 +17,6 @@ import { ViewCard } from '../view_card'
 import { MarketMakerService, ConditionalTokenService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
-import { formatBN } from '../../../util/tools'
 import { BigNumberInputReturn } from '../../common/big_number_input'
 import { FullLoading } from '../../common/full_loading'
 
@@ -117,7 +116,7 @@ const Sell = (props: Props) => {
     )
   }
 
-  const renderTableData = balance.map((balanceItem: any, index: number) => {
+  const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
     const { outcomeName, probability, currentPrice, shares } = balanceItem
 
     return (
@@ -137,7 +136,7 @@ const Sell = (props: Props) => {
         <TD textAlign={TableCellsAlign[2]}>
           {currentPrice} <strong>DAI</strong>
         </TD>
-        <TD textAlign={TableCellsAlign[3]}>{formatBN(shares)}</TD>
+        <TD textAlign={TableCellsAlign[3]}>{ethers.utils.formatUnits(shares, 18)}</TD>
       </TR>
     )
   })
