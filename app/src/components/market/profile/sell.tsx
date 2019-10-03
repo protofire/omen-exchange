@@ -14,13 +14,12 @@ import { SubsectionTitle } from '../../common/subsection_title'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
 import { ViewCard } from '../view_card'
-import { MarketMakerService } from '../../../services'
+import { MarketMakerService, ConditionalTokenService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatBN } from '../../../util/tools'
 import { BigNumberInputReturn } from '../../common/big_number_input'
-
-// import { FullLoading } from '../../common/full_loading'
+import { FullLoading } from '../../common/full_loading'
 
 interface Props {
   balance: BalanceItems[]
@@ -153,11 +152,15 @@ const Sell = (props: Props) => {
       setStatus(Status.Loading)
 
       const provider = context.library
+      const networkId = context.networkId
+
       const marketMakerService = new MarketMakerService(marketAddress)
 
       const amountSharesNegative = amountShares.mul(-1)
       const outcomeValue =
         outcome === OutcomeSlots.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
+
+      await ConditionalTokenService.setApprovalForAll(marketAddress, provider, networkId)
 
       await marketMakerService.trade(provider, outcomeValue)
 
@@ -216,8 +219,7 @@ const Sell = (props: Props) => {
           </Button>
         </ButtonContainer>
       </ViewCard>
-      {/* TODO: Fix this */}
-      {/* {status === Status.Loading ? <FullLoading /> : null} */}
+      {status === Status.Loading ? <FullLoading /> : null}
     </>
   )
 }
