@@ -74,6 +74,7 @@ const Sell = (props: Props) => {
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [tradedDAI, setTradedDAI] = useState<BigNumber>(new BigNumber(0))
   const [costFee, setCostFee] = useState<BigNumber>(new BigNumber(0))
+  const [message, setMessage] = useState<string>('')
 
   useEffect(() => {
     const balanceItemFound: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
@@ -142,6 +143,7 @@ const Sell = (props: Props) => {
   })
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
+
   const finish = async () => {
     try {
       if (!haveEnoughShares) {
@@ -149,6 +151,7 @@ const Sell = (props: Props) => {
       }
 
       setStatus(Status.Loading)
+      setMessage(`Selling ${ethers.utils.formatUnits(amountShares, 18)} shares ...`)
 
       const provider = context.library
       const networkId = context.networkId
@@ -226,7 +229,7 @@ const Sell = (props: Props) => {
           </Button>
         </ButtonContainer>
       </ViewCard>
-      {status === Status.Loading ? <FullLoading /> : null}
+      {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>
   )
 }
