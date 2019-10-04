@@ -8,7 +8,7 @@ const marketMakerAbi = [
   'function trade(int[] outcomeTokenAmounts, int collateralLimit) public returns (int netCost)',
   'function calcNetCost(int[] outcomeTokenAmounts) public view returns (int netCost)',
   'function calcMarketFee(uint outcomeTokenCost) public view returns (uint)',
-  'function withdrawFees() public onlyOwner returns (uint fees)',
+  'function withdrawFees() public returns (uint fees)',
 ]
 
 const marketMakerFactoryAbi = [
