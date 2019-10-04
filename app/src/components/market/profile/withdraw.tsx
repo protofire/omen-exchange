@@ -12,7 +12,12 @@ import { SubsectionTitle } from '../../common/subsection_title'
 import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
 import { BalanceItems, Status } from '../../../util/types'
-import { ConditionalTokenService, ERC20Service, FetchMarketService } from '../../../services'
+import {
+  ConditionalTokenService,
+  ERC20Service,
+  FetchMarketService,
+  MarketMakerService,
+} from '../../../services'
 import { getContractAddress } from '../../../util/addresses'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
@@ -79,6 +84,7 @@ export const WithdrawWrapper = (props: Props) => {
   const { theme, balance, marketAddress, resolution, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
+  const [message, setMessage] = useState('')
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
   const TableHead = ['Outcome', 'Shares', 'Price', 'Payout']
@@ -139,7 +145,9 @@ export const WithdrawWrapper = (props: Props) => {
 
   const redeem = async () => {
     try {
+      setMessage('Redeem payout...')
       setStatus(Status.Loading)
+
       const provider = context.library
       const networkId = context.networkId
 
@@ -159,7 +167,13 @@ export const WithdrawWrapper = (props: Props) => {
 
   const withdraw = async () => {
     try {
+      setMessage('Withdraw collateral...')
       setStatus(Status.Loading)
+
+      const provider = context.library
+      const marketMakerService = new MarketMakerService(marketAddress)
+      await marketMakerService.withdrawFees(provider)
+
       setStatus(Status.Ready)
     } catch (err) {
       setStatus(Status.Error)
@@ -195,7 +209,7 @@ export const WithdrawWrapper = (props: Props) => {
           </Button>
         </ButtonContainerStyled>
       </ViewCard>
-      {status === Status.Loading ? <FullLoading /> : null}
+      {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>
   )
 }
