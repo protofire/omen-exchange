@@ -21,15 +21,7 @@ interface Props {
 }
 
 const MarketView: FC<Props> = props => {
-  const {
-    funding,
-    question,
-    resolution,
-    balance,
-    marketAddress,
-    stepProfile,
-    winnerOutcome,
-  } = props
+  const { funding, question, resolution, balance, marketAddress, stepProfile } = props
   const [currentStep, setCurrentStep] = useState<StepProfile>(stepProfile)
 
   useEffect(() => {
@@ -101,17 +93,13 @@ const MarketView: FC<Props> = props => {
       case StepProfile.Redeem:
         return (
           <>
-            <Redeem
-              handleFinish={() => handleFinish()}
-              marketAddress={marketAddress}
-              balance={balance}
-            />
+            <Redeem {...props} />
           </>
         )
       case StepProfile.Withdraw:
         return (
           <>
-            <Withdraw handleFinish={() => {}} winnerOutcome={winnerOutcome} />
+            <Withdraw {...props} />
           </>
         )
       default:

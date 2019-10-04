@@ -14,6 +14,7 @@ import { ConditionalTokenService, FetchMarketService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getContractAddress } from '../../../util/addresses'
 import { getLogger } from '../../../util/logger'
+import { formatDate } from '../../../util/tools'
 
 const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
   color: ${props => (props.winningOutcome ? props.theme.colors.primary : 'inherit')};
@@ -40,9 +41,9 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 `
 
 interface Props {
-  handleFinish: () => void
   balance: BalanceItems[]
   marketAddress: string
+  resolution: Date
 }
 
 const logger = getLogger('Market::Redeem')
@@ -50,7 +51,7 @@ const logger = getLogger('Market::Redeem')
 export const Redeem = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { handleFinish, balance, marketAddress } = props
+  const { balance, marketAddress, resolution } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
 
@@ -109,8 +110,6 @@ export const Redeem = (props: Props) => {
       await ConditionalTokenService.redeemPositions(daiAddress, conditionId, networkId, provider)
 
       setStatus(Status.Ready)
-
-      handleFinish()
     } catch (err) {
       setStatus(Status.Error)
       logger.log(`Error trying to redeem: ${err.message}`)
@@ -119,7 +118,7 @@ export const Redeem = (props: Props) => {
 
   return (
     <>
-      <ClosedMarket date={'Nov 30 2019 00:00:00 GMT-0300'} />
+      <ClosedMarket date={formatDate(resolution)} />
       <ViewCard>
         <SubsectionTitle>Balance</SubsectionTitle>
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
