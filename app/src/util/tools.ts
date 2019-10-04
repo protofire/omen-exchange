@@ -78,11 +78,15 @@ export const calcNetCost = (
   priceNo: number,
   tradeNo: BigNumber,
 ): BigNumber => {
-  // funding * log2(oddYes * (2^(tradeYes / funding)) + oddNo * (2^(tradeNo / funding)))
-  const logTerm = Math.log2(
-    priceYes * Math.pow(2, divBN(tradeYes, funding)) +
-      priceNo * Math.pow(2, divBN(tradeNo, funding)),
-  )
+  // funding * (offset + log2(oddYes * (2^(tradeYes / funding - offset)) + oddNo * (2^(tradeNo / funding) - offset))
+  const offset = Math.max(divBN(tradeYes, funding), divBN(tradeNo, funding))
+
+  const logTerm =
+    offset +
+    Math.log2(
+      priceYes * Math.pow(2, divBN(tradeYes, funding) - offset) +
+        priceNo * Math.pow(2, divBN(tradeNo, funding) - offset),
+    )
   return mulBN(funding, logTerm)
 }
 

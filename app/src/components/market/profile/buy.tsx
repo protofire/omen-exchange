@@ -120,14 +120,14 @@ const Buy = (props: Props) => {
     const amount = valueNumber / price
 
     const amountInWei = ethers.utils
-      .bigNumberify(Math.round(10000 * amount))
+      .bigNumberify('' + Math.round(10000 * amount)) // cast to string to avoid overflows
       .mul(ethers.constants.WeiPerEther)
       .div(10000)
 
     setTradedShares(amountInWei)
 
     const costWithFee = ethers.utils
-      .bigNumberify(Math.round(valueNumber * 1.01 * 10000))
+      .bigNumberify('' + Math.round(valueNumber * 1.01 * 10000)) // cast to string to avoid overflows
       .mul(ethers.constants.WeiPerEther)
       .div(10000)
     setCost(costWithFee)
