@@ -168,7 +168,6 @@ const Buy = (props: Props) => {
       const user = await provider.getSigner().getAddress()
 
       const daiAddress = getContractAddress(networkId, 'dai')
-      const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
 
       const marketMakerService = new MarketMakerService(marketAddress)
       const daiService = new ERC20Service(daiAddress)
@@ -176,7 +175,7 @@ const Buy = (props: Props) => {
       const hasEnoughAlowance = await daiService.hasEnoughAllowance(
         provider,
         user,
-        marketMakerFactoryAddress,
+        marketAddress,
         cost,
       )
 
