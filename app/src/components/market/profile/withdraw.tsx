@@ -184,6 +184,9 @@ export const WithdrawWrapper = (props: Props) => {
   const fundingFormat = ethers.utils.formatUnits(funding, 18)
   const collateralFormat = `${ethers.utils.formatUnits(collateral, 18)} DAI`
 
+  const haveShares = balance.every((balanceItem: BalanceItems) => balanceItem.shares.isZero())
+  const haveCollateral = collateral.isZero()
+
   return (
     <>
       <ClosedMarket date={formatDate(resolution)} />
@@ -203,8 +206,14 @@ export const WithdrawWrapper = (props: Props) => {
           <TitleValue title="Collateral" value={collateralFormat} />
         </Grid>
         <ButtonContainerStyled>
-          <Button onClick={() => redeem()}>Redeem</Button>
-          <Button backgroundColor={theme.colors.secondary} onClick={() => withdraw()}>
+          <Button disabled={haveShares} onClick={() => redeem()}>
+            Redeem
+          </Button>
+          <Button
+            disabled={haveCollateral}
+            backgroundColor={theme.colors.secondary}
+            onClick={() => withdraw()}
+          >
             Withdraw Collateral
           </Button>
         </ButtonContainerStyled>

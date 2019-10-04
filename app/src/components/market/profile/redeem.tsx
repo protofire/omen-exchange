@@ -116,6 +116,8 @@ export const Redeem = (props: Props) => {
     }
   }
 
+  const haveShares = balance.every((balanceItem: BalanceItems) => balanceItem.shares.isZero())
+
   return (
     <>
       <ClosedMarket date={formatDate(resolution)} />
@@ -123,7 +125,9 @@ export const Redeem = (props: Props) => {
         <SubsectionTitle>Balance</SubsectionTitle>
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>
-          <Button onClick={() => finish()}>Redeem</Button>
+          <Button disabled={haveShares} onClick={() => finish()}>
+            Redeem
+          </Button>
         </ButtonContainerStyled>
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}
