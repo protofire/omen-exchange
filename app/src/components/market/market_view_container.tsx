@@ -6,7 +6,7 @@ import { MarketView } from './market_view'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { ConditionalTokenService, FetchMarketService, RealitioService } from '../../services'
 import { getLogger } from '../../util/logger'
-import { Status, BalanceItems, OutcomeSlots } from '../../util/types'
+import { Status, BalanceItems, OutcomeSlots, StepProfile, WinnerOutcome } from '../../util/types'
 
 const logger = getLogger('Market::MarketView')
 
@@ -22,9 +22,11 @@ const MarketViewContainer: FC<Props> = props => {
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [funding, setFunding] = useState<BigNumber>(ethers.constants.Zero)
   const [question, setQuestion] = useState<string | null>(null)
+  const [stepProfile, setStepProfile] = useState<StepProfile>(StepProfile.View)
+  const [winnerOutcome, setWinnerOutcome] = useState<Maybe<WinnerOutcome>>(null)
 
   useEffect(() => {
-    const fetchData = async ({ enableStatus }: any) => {
+    const fetchContractData = async ({ enableStatus }: any) => {
       enableStatus && setStatus(Status.Loading)
       try {
         const networkId = context.networkId
@@ -32,6 +34,7 @@ const MarketViewContainer: FC<Props> = props => {
         const user = await provider.getSigner().getAddress()
 
         const fetchMarketService = new FetchMarketService(address, networkId, provider)
+
         const [
           balanceInformation,
           marketBalanceInformation,
@@ -54,6 +57,7 @@ const MarketViewContainer: FC<Props> = props => {
             currentPrice: actualPrice.actualPriceForYes,
             shares: balanceInformation.balanceOfForYes,
             holdings: marketBalanceInformation.balanceOfForYes,
+            winningOutcome: winnerOutcome === WinnerOutcome.Yes,
           },
           {
             outcomeName: OutcomeSlots.No,
@@ -61,6 +65,7 @@ const MarketViewContainer: FC<Props> = props => {
             currentPrice: actualPrice.actualPriceForNo,
             shares: balanceInformation.balanceOfForNo,
             holdings: marketBalanceInformation.balanceOfForNo,
+            winningOutcome: winnerOutcome === WinnerOutcome.No,
           },
         ]
 
@@ -74,14 +79,14 @@ const MarketViewContainer: FC<Props> = props => {
       }
     }
 
-    fetchData({ enableStatus: true })
+    fetchContractData({ enableStatus: true })
 
     const intervalId = setInterval(() => {
-      fetchData({ enableStatus: false })
+      fetchContractData({ enableStatus: false })
     }, 2000)
 
     return () => clearInterval(intervalId)
-  }, [address, context])
+  }, [address, context, winnerOutcome])
 
   // fetch Realitio question data
   useEffect(() => {
@@ -108,7 +113,47 @@ const MarketViewContainer: FC<Props> = props => {
     fetchQuestion()
   }, [address, context])
 
-  // TODO: fetch question and resolution date, and pass in props
+  useEffect(() => {
+    const fetchContractStatus = async () => {
+      try {
+        const networkId = context.networkId
+        const provider = context.library
+        const userAddress = await provider.getSigner().getAddress()
+
+        const fetchMarketService = new FetchMarketService(address, networkId, provider)
+
+        const conditionId = await fetchMarketService.getConditionId()
+        const isConditionResolved = await ConditionalTokenService.isConditionResolved(
+          conditionId,
+          networkId,
+          provider,
+        )
+
+        const ownerAddress = await fetchMarketService.getOwner()
+        const isMarketOwner = ownerAddress.toLowerCase() === userAddress.toLowerCase()
+
+        if (isConditionResolved) {
+          const winnerOutcome = await ConditionalTokenService.getWinnerOutcome(
+            conditionId,
+            networkId,
+            provider,
+          )
+          setWinnerOutcome(winnerOutcome)
+          if (isMarketOwner) {
+            setStepProfile(StepProfile.Withdraw)
+          } else {
+            setStepProfile(StepProfile.Redeem)
+          }
+        }
+      } catch (error) {
+        logger.error(error && error.message)
+      }
+    }
+
+    fetchContractStatus()
+  }, [address, context, stepProfile])
+
+  // TODO: fetch resolution date, and add in props
   return (
     <MarketView
       balance={balance}
@@ -117,6 +162,8 @@ const MarketViewContainer: FC<Props> = props => {
       question={question || ''}
       resolution={new Date(2019, 10, 30)}
       status={status}
+      stepProfile={stepProfile}
+      winnerOutcome={winnerOutcome}
     />
   )
 }

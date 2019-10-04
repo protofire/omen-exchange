@@ -2,6 +2,8 @@ import { ethers, Wallet } from 'ethers'
 
 import { getLogger } from '../util/logger'
 import { getContractAddress } from '../util/addresses'
+import { BigNumber } from 'ethers/utils'
+import { WinnerOutcome } from '../util/types'
 
 const logger = getLogger('Services::Conditional-Token')
 
@@ -10,6 +12,10 @@ const conditionTokenAbi = [
   'event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount)',
   'function setApprovalForAll(address operator, bool approved) external',
   'function isApprovedForAll(address owner, address operator) external view returns (bool)',
+  'function reportPayouts(bytes32 questionId, uint[] payouts) external',
+  'function payoutNumerators(bytes32, uint) public view returns (uint)',
+  'function payoutDenominator(bytes32) public view returns (uint)',
+  'function redeemPositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] indexSets) external',
 ]
 
 class ConditionalTokenService {
@@ -19,7 +25,7 @@ class ConditionalTokenService {
     networkId: number,
     outcomeSlotCount = 2,
   ): Promise<string> => {
-    const signer = provider.getSigner()
+    const signer: Wallet = provider.getSigner()
 
     const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
     const conditionalTokenContract = new ethers.Contract(
@@ -28,7 +34,11 @@ class ConditionalTokenService {
       provider,
     ).connect(signer)
 
-    const oracleAddress = getContractAddress(networkId, 'realitioArbitrator')
+    // Use signer address only for development
+    const oracleAddress: string =
+      process.env.NODE_ENV === 'development'
+        ? await signer.getAddress()
+        : getContractAddress(networkId, 'realitioArbitrator')
 
     const transactionObject = await conditionalTokenContract.prepareCondition(
       oracleAddress,
@@ -102,6 +112,7 @@ class ConditionalTokenService {
     networkId: number,
   ): Promise<boolean> => {
     const signer: Wallet = provider.getSigner()
+    const signerAddress = await signer.getAddress()
 
     const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
     const conditionalTokenContract = new ethers.Contract(
@@ -110,7 +121,85 @@ class ConditionalTokenService {
       provider,
     )
 
-    return await conditionalTokenContract.isApprovedForAll(signer.getAddress(), marketMakerAddress)
+    return await conditionalTokenContract.isApprovedForAll(signerAddress, marketMakerAddress)
+  }
+
+  static reportPayouts = async (
+    questionId: string,
+    networkId: number,
+    provider: any,
+  ): Promise<any> => {
+    const signer = provider.getSigner()
+
+    const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
+
+    const conditionalTokensContract = new ethers.Contract(
+      conditionalTokensAddress,
+      conditionTokenAbi,
+      provider,
+    ).connect(signer)
+
+    return await conditionalTokensContract.reportPayouts(questionId, [1, 0])
+  }
+
+  static isConditionResolved = async (
+    conditionId: string,
+    networkId: number,
+    provider: any,
+  ): Promise<boolean> => {
+    const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
+
+    const conditionalTokensContract = new ethers.Contract(
+      conditionalTokensAddress,
+      conditionTokenAbi,
+      provider,
+    )
+    const payoutDenominator: BigNumber = await conditionalTokensContract.payoutDenominator(
+      conditionId,
+    )
+
+    return !payoutDenominator.isZero()
+  }
+
+  static redeemPositions = async (
+    collateralToken: string,
+    conditionId: string,
+    networkId: number,
+    provider: any,
+  ): Promise<any> => {
+    const signer: Wallet = provider.getSigner()
+
+    const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
+
+    const conditionalTokensContract = new ethers.Contract(
+      conditionalTokensAddress,
+      conditionTokenAbi,
+      provider,
+    ).connect(signer)
+
+    return await conditionalTokensContract.redeemPositions(
+      collateralToken,
+      ethers.constants.HashZero,
+      conditionId,
+      [1, 2],
+    )
+  }
+
+  static getWinnerOutcome = async (
+    conditionId: string,
+    networkId: number,
+    provider: any,
+  ): Promise<WinnerOutcome> => {
+    const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
+
+    const conditionalTokensContract = new ethers.Contract(
+      conditionalTokensAddress,
+      conditionTokenAbi,
+      provider,
+    )
+    const yesNumerator: BigNumber = await conditionalTokensContract.payoutNumerators(conditionId, 0)
+
+    return yesNumerator.isZero() ? WinnerOutcome.No : WinnerOutcome.Yes
   }
 }
 

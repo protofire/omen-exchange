@@ -3,8 +3,6 @@ import styled from 'styled-components'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
-import { Maybe } from '../../../util/types'
-
 export interface BigNumberInputReturn {
   name: string
   value: BigNumber

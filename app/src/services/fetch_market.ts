@@ -13,6 +13,7 @@ const marketMakerAbi = [
   'function fee() external view returns (uint64)',
   'function conditionIds(uint256) external view returns (bytes32)',
   'function calcMarginalPrice(uint8 outcomeTokenIndex) view returns (uint price)',
+  'function owner() public view returns (address)',
 ]
 
 const conditionTokenAbi = [
@@ -60,6 +61,10 @@ class FetchMarketService {
 
   async getCollateralToken(): Promise<any> {
     return await this.marketMakerContract.collateralToken()
+  }
+
+  async getOwner(): Promise<string> {
+    return await this.marketMakerContract.owner()
   }
 
   async getConditionalToken(): Promise<any> {

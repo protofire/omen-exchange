@@ -91,9 +91,6 @@ const ViewWrapper = (props: Props) => {
         {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>
-          {/* TODO: Delete these */}
-          <span onClick={() => props.handleWithdraw()}>Withdraw </span>&nbsp;
-          <span onClick={() => props.handleRedeem()}>Redeem</span>
           {userHasShares && (
             <Button backgroundColor={theme.colors.secondary} onClick={() => props.handleSell()}>
               Sell
