@@ -22,7 +22,9 @@ const addresses: { [networkId: number]: KnownContracts } = {
   },
   [networkIds.RINKEBY]: {
     realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
-    realitioArbitrator: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
+    // realitioArbitrator: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
+    // using a custom address as arbitrator for testing
+    realitioArbitrator: '0xAEC3C8eD9516A206a4fD47EC77f026EDD533CF17',
     dai: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     marketMakerFactory: '0x965D4816a21CB3d482eD51F13369efa82Da5a9e2',
     conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
