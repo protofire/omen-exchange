@@ -5,19 +5,17 @@ import { getLogger } from '../../util/logger'
 import { computeInitialTradeOutcomeTokens } from '../../util/tools'
 import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
-import {
-  RealitioService,
-  ERC20Service,
-  ConditionalTokenService,
-  MarketMakerService,
-} from '../../services'
+import { ERC20Service, MarketMakerService } from '../../services'
 import { getContractAddress } from '../../util/addresses'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { useContracts } from '../../hooks/useContracts'
 
 const logger = getLogger('Market::MarketWizardCreatorContainer')
 
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
+  const { conditionalTokens, marketMakerFactory, realitio } = useContracts()
+
   const [status, setStatus] = useState<StatusMarketCreation>(StatusMarketCreation.Ready)
   const [questionId, setQuestionId] = useState<string | null>(null)
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
@@ -36,20 +34,16 @@ const MarketWizardCreatorContainer: FC = () => {
       const openingDateMoment = moment(resolution)
 
       setStatus(StatusMarketCreation.PostingQuestion)
-      const questionId = await RealitioService.askQuestion(
-        question,
-        openingDateMoment,
-        provider,
-        networkId,
-      )
+      const questionId = await realitio.askQuestion(question, openingDateMoment)
       setQuestionId(questionId)
 
       setStatus(StatusMarketCreation.PrepareCondition)
-      const conditionId = await ConditionalTokenService.prepareCondition(
-        questionId,
-        provider,
-        networkId,
-      )
+
+      const oracleAddress: string =
+        process.env.NODE_ENV === 'development'
+          ? user
+          : getContractAddress(networkId, 'realitioArbitrator')
+      const conditionId = await conditionalTokens.prepareCondition(questionId, oracleAddress)
 
       // approve movement of DAI to MarketMakerFactory
       setStatus(StatusMarketCreation.ApprovingDAI)
@@ -69,11 +63,11 @@ const MarketWizardCreatorContainer: FC = () => {
       }
 
       setStatus(StatusMarketCreation.CreateMarketMaker)
-      const marketMakerAddress = await MarketMakerService.createMarketMaker(
+      const marketMakerAddress = await marketMakerFactory.createMarketMaker(
+        conditionalTokens.address,
+        daiAddress,
         conditionId,
         funding,
-        provider,
-        networkId,
       )
       setMarketMakerAddress(marketMakerAddress)
 
@@ -83,12 +77,12 @@ const MarketWizardCreatorContainer: FC = () => {
       // Don't perform initial trade if odds are 50/50
       if (+outcomeProbabilityOne !== 50) {
         setStatus(StatusMarketCreation.InitialTradeInMarketMaker)
-        const marketMakerService = new MarketMakerService(marketMakerAddress)
+        const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
         const initialTradeOutcomeTokens = computeInitialTradeOutcomeTokens(
           [+outcomeProbabilityOne, +outcomeProbabilityTwo],
           funding,
         )
-        await marketMakerService.trade(provider, initialTradeOutcomeTokens)
+        await marketMaker.trade(initialTradeOutcomeTokens)
       }
 
       setStatus(StatusMarketCreation.Done)

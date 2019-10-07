@@ -12,7 +12,7 @@ export enum OutcomeSlots {
   No = 'No',
 }
 
-export interface BalanceItems {
+export interface BalanceItem {
   outcomeName: OutcomeSlots
   probability: number
   currentPrice: string

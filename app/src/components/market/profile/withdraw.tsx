@@ -11,17 +11,13 @@ import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
-import { BalanceItems, Status } from '../../../util/types'
-import {
-  ConditionalTokenService,
-  ERC20Service,
-  FetchMarketService,
-  MarketMakerService,
-} from '../../../services'
+import { BalanceItem, Status } from '../../../util/types'
+import { ERC20Service, MarketMakerService } from '../../../services'
 import { getContractAddress } from '../../../util/addresses'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatDate } from '../../../util/tools'
+import { useContracts } from '../../../hooks/useContracts'
 
 const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
   color: ${props => (props.winningOutcome ? props.theme.colors.primary : 'inherit')};
@@ -69,7 +65,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 
 interface Props {
   theme?: any
-  balance: BalanceItems[]
+  balance: BalanceItem[]
   funding: BigNumber
   question: string
   resolution: Date | null
@@ -80,12 +76,16 @@ const logger = getLogger('Market::Withdraw')
 
 export const WithdrawWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { conditionalTokens } = useContracts()
 
   const { theme, balance, marketAddress, resolution, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
+
+  const provider = context.library
+  const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
 
   const TableHead = ['Outcome', 'Shares', 'Payout']
   const TableCellsAlign = ['left', 'right', 'right']
@@ -107,7 +107,7 @@ export const WithdrawWrapper = (props: Props) => {
   }
 
   const renderTableData = () => {
-    return balance.map((balanceItem: BalanceItems, index: number) => {
+    return balance.map((balanceItem: BalanceItem, index: number) => {
       const { outcomeName, shares, winningOutcome } = balanceItem
 
       return (
@@ -145,15 +145,13 @@ export const WithdrawWrapper = (props: Props) => {
       setMessage('Redeem payout...')
       setStatus(Status.Loading)
 
-      const provider = context.library
       const networkId = context.networkId
 
       const daiAddress = getContractAddress(networkId, 'dai')
 
-      const fetchMarketService = new FetchMarketService(marketAddress, networkId, provider)
-      const conditionId = await fetchMarketService.getConditionId()
+      const conditionId = await marketMaker.getConditionId()
 
-      await ConditionalTokenService.redeemPositions(daiAddress, conditionId, networkId, provider)
+      await conditionalTokens.redeemPositions(daiAddress, conditionId)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -167,9 +165,7 @@ export const WithdrawWrapper = (props: Props) => {
       setMessage('Withdraw collateral...')
       setStatus(Status.Loading)
 
-      const provider = context.library
-      const marketMakerService = new MarketMakerService(marketAddress)
-      await marketMakerService.withdrawFees(provider)
+      await marketMaker.withdrawFees()
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -182,7 +178,7 @@ export const WithdrawWrapper = (props: Props) => {
   const collateralFormat = `${ethers.utils.formatUnits(collateral, 18)} DAI`
   const resolutionFormat = resolution ? formatDate(resolution) : ''
 
-  const winningOutcome = balance.find((balanceItem: BalanceItems) => balanceItem.winningOutcome)
+  const winningOutcome = balance.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
   const hasCollateral = collateral.isZero()
 
   return (

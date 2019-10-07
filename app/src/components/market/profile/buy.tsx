@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 
-import { BalanceItems, OutcomeSlots, Status } from '../../../util/types'
+import { BalanceItem, OutcomeSlots, Status } from '../../../util/types'
 import { Button, BigNumberInput } from '../../common'
 import { ERC20Service, MarketMakerService } from '../../../services'
 import { SubsectionTitle } from '../../common/subsection_title'
@@ -22,9 +22,10 @@ import { FormRow } from '../../common/form_row'
 import { FormLabel } from '../../common/form_label'
 import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
 import { BigNumberInputReturn } from '../../common/big_number_input'
+import { useContracts } from '../../../hooks/useContracts'
 
 interface Props {
-  balance: BalanceItems[]
+  balance: BalanceItem[]
   funding: BigNumber
   handleBack: () => void
   handleFinish: () => void
@@ -66,6 +67,7 @@ const logger = getLogger('Market::Buy')
 
 const Buy = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { conditionalTokens } = useContracts()
 
   const { balance, marketAddress, funding } = props
 
@@ -111,7 +113,7 @@ const Buy = (props: Props) => {
   )
 
   useEffect(() => {
-    const balanceItemFound: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
+    const balanceItemFound: BalanceItem | undefined = balance.find((balanceItem: BalanceItem) => {
       return balanceItem.outcomeName === outcome
     })
 
@@ -134,7 +136,7 @@ const Buy = (props: Props) => {
     setCost(costWithFee)
   }, [outcome, value, balance])
 
-  const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
+  const renderTableData = balance.map((balanceItem: BalanceItem, index: number) => {
     const { outcomeName, probability, currentPrice } = balanceItem
 
     return (
@@ -172,7 +174,7 @@ const Buy = (props: Props) => {
 
       const daiAddress = getContractAddress(networkId, 'dai')
 
-      const marketMakerService = new MarketMakerService(marketAddress)
+      const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
       const daiService = new ERC20Service(daiAddress)
 
       const hasEnoughAlowance = await daiService.hasEnoughAllowance(
@@ -193,7 +195,7 @@ const Buy = (props: Props) => {
       // Check outcome value to use
       const outcomeValue = outcome === OutcomeSlots.Yes ? [tradedShares, 0] : [0, tradedShares]
 
-      await marketMakerService.trade(provider, outcomeValue)
+      await marketMaker.trade(outcomeValue)
 
       setStatus(Status.Ready)
       props.handleFinish()

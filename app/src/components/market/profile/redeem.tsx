@@ -9,9 +9,10 @@ import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { ClosedMarket } from '../../common/closed_market'
-import { BalanceItems, Status } from '../../../util/types'
-import { ConditionalTokenService, FetchMarketService } from '../../../services'
+import { BalanceItem, Status } from '../../../util/types'
+import { MarketMakerService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { useContracts } from '../../../hooks/useContracts'
 import { getContractAddress } from '../../../util/addresses'
 import { getLogger } from '../../../util/logger'
 import { formatDate } from '../../../util/tools'
@@ -41,7 +42,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 `
 
 interface Props {
-  balance: BalanceItems[]
+  balance: BalanceItem[]
   marketAddress: string
   resolution: Date | null
 }
@@ -50,6 +51,7 @@ const logger = getLogger('Market::Redeem')
 
 export const Redeem = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { conditionalTokens } = useContracts()
 
   const { balance, marketAddress, resolution } = props
 
@@ -75,7 +77,7 @@ export const Redeem = (props: Props) => {
   }
 
   const renderTableData = () => {
-    return balance.map((balanceItem: BalanceItems, index: number) => {
+    return balance.map((balanceItem: BalanceItem, index: number) => {
       const { outcomeName, shares, winningOutcome } = balanceItem
       return (
         <TR key={index}>
@@ -101,10 +103,10 @@ export const Redeem = (props: Props) => {
 
       const daiAddress = getContractAddress(networkId, 'dai')
 
-      const fetchMarketService = new FetchMarketService(marketAddress, networkId, provider)
+      const fetchMarketService = new MarketMakerService(marketAddress, conditionalTokens, provider)
       const conditionId = await fetchMarketService.getConditionId()
 
-      await ConditionalTokenService.redeemPositions(daiAddress, conditionId, networkId, provider)
+      await conditionalTokens.redeemPositions(daiAddress, conditionId)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -113,7 +115,7 @@ export const Redeem = (props: Props) => {
     }
   }
 
-  const winningOutcome = balance.find((balanceItem: BalanceItems) => balanceItem.winningOutcome)
+  const winningOutcome = balance.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
 
   return (
     <>

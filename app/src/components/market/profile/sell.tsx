@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 
-import { BalanceItems, OutcomeSlots, Status } from '../../../util/types'
+import { BalanceItem, OutcomeSlots, Status } from '../../../util/types'
 import { Button, BigNumberInput } from '../../common'
 import { ButtonContainer } from '../../common/button_container'
 import { ButtonLink } from '../../common/button_link'
@@ -14,15 +14,16 @@ import { SubsectionTitle } from '../../common/subsection_title'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
 import { ViewCard } from '../view_card'
-import { MarketMakerService, ConditionalTokenService } from '../../../services'
+import { MarketMakerService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { BigNumberInputReturn } from '../../common/big_number_input'
 import { FullLoading } from '../../common/full_loading'
 import { computePriceAfterTrade } from '../../../util/tools'
+import { useContracts } from '../../../hooks/useContracts'
 
 interface Props {
-  balance: BalanceItems[]
+  balance: BalanceItem[]
   funding: BigNumber
   marketAddress: string
   handleBack: () => void
@@ -63,6 +64,7 @@ const logger = getLogger('Market::Sell')
 
 const Sell = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { conditionalTokens } = useContracts()
 
   const TableHead = ['Outcome', 'Probabilities', 'Current Price', 'Shares', 'Price after trade']
   const TableCellsAlign = ['left', 'right', 'right', 'right', 'right']
@@ -70,7 +72,7 @@ const Sell = (props: Props) => {
   const { balance, marketAddress, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [balanceItem, setBalanceItem] = useState<BalanceItems>()
+  const [balanceItem, setBalanceItem] = useState<BalanceItem>()
   const [outcome, setOutcome] = useState<OutcomeSlots>(OutcomeSlots.Yes)
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [tradedDAI, setTradedDAI] = useState<BigNumber>(new BigNumber(0))
@@ -93,7 +95,7 @@ const Sell = (props: Props) => {
   )
 
   useEffect(() => {
-    const balanceItemFound: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
+    const balanceItemFound: BalanceItem | undefined = balance.find((balanceItem: BalanceItem) => {
       return balanceItem.outcomeName === outcome
     })
     setBalanceItem(balanceItemFound)
@@ -133,7 +135,7 @@ const Sell = (props: Props) => {
     )
   }
 
-  const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
+  const renderTableData = balance.map((balanceItem: BalanceItem, index: number) => {
     const { outcomeName, probability, currentPrice, shares } = balanceItem
 
     return (
@@ -173,25 +175,20 @@ const Sell = (props: Props) => {
       setMessage(`Selling ${ethers.utils.formatUnits(amountShares, 18)} shares ...`)
 
       const provider = context.library
-      const networkId = context.networkId
 
-      const marketMakerService = new MarketMakerService(marketAddress)
+      const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
 
       const amountSharesNegative = amountShares.mul(-1)
       const outcomeValue =
         outcome === OutcomeSlots.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
 
-      const isApprovedForAll = await ConditionalTokenService.isApprovedForAll(
-        marketAddress,
-        provider,
-        networkId,
-      )
+      const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketAddress)
 
       if (!isApprovedForAll) {
-        await ConditionalTokenService.setApprovalForAll(marketAddress, provider, networkId)
+        await conditionalTokens.setApprovalForAll(marketAddress)
       }
 
-      await marketMakerService.trade(provider, outcomeValue)
+      await marketMaker.trade(outcomeValue)
 
       setStatus(Status.Ready)
       props.handleFinish()

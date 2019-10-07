@@ -5,12 +5,12 @@ import { SectionTitle } from '../common/section_title'
 import { Sell } from './profile/sell'
 import { Redeem } from './profile/redeem'
 import { Withdraw } from './profile/withdraw'
-import { Status, BalanceItems, StepProfile, WinnerOutcome } from '../../util/types'
+import { Status, BalanceItem, StepProfile, WinnerOutcome } from '../../util/types'
 import { View } from './profile/view'
 import { formatDate } from '../../util/tools'
 
 interface Props {
-  balance: BalanceItems[]
+  balance: BalanceItem[]
   funding: BigNumber
   question: string
   resolution: Maybe<Date>
