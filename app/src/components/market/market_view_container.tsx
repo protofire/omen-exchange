@@ -22,7 +22,7 @@ const MarketViewContainer: FC<Props> = props => {
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [funding, setFunding] = useState<BigNumber>(ethers.constants.Zero)
   const [question, setQuestion] = useState<string | null>(null)
-  const [resolution, setResolution] = useState<Date | null>(null)
+  const [resolution, setResolution] = useState<Maybe<Date>>(null)
   const [stepProfile, setStepProfile] = useState<StepProfile>(StepProfile.View)
   const [winnerOutcome, setWinnerOutcome] = useState<Maybe<WinnerOutcome>>(null)
 
@@ -167,7 +167,7 @@ const MarketViewContainer: FC<Props> = props => {
       funding={funding}
       marketAddress={address}
       question={question || ''}
-      resolution={resolution || new Date()}
+      resolution={resolution}
       status={status}
       stepProfile={stepProfile}
       winnerOutcome={winnerOutcome}
