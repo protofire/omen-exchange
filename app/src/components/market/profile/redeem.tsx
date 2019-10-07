@@ -75,7 +75,7 @@ export const Redeem = (props: Props) => {
   }
 
   const renderTableData = () => {
-    return balance.map((balanceItem: any, index: number) => {
+    return balance.map((balanceItem: BalanceItems, index: number) => {
       const { outcomeName, shares, winningOutcome } = balanceItem
       return (
         <TR key={index}>
@@ -113,6 +113,8 @@ export const Redeem = (props: Props) => {
     }
   }
 
+  const winningOutcome = balance.find((balanceItem: BalanceItems) => balanceItem.winningOutcome)
+
   return (
     <>
       <ClosedMarket date={resolution ? formatDate(resolution) : ''} />
@@ -120,7 +122,12 @@ export const Redeem = (props: Props) => {
         <SubsectionTitle>Balance</SubsectionTitle>
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>
-          <Button onClick={() => finish()}>Redeem</Button>
+          <Button
+            disabled={winningOutcome && winningOutcome.shares.isZero()}
+            onClick={() => finish()}
+          >
+            Redeem
+          </Button>
         </ButtonContainerStyled>
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}
