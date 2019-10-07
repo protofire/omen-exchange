@@ -72,7 +72,7 @@ interface Props {
   balance: BalanceItems[]
   funding: BigNumber
   question: string
-  resolution: Date
+  resolution: Date | null
   marketAddress: string
 }
 
@@ -183,10 +183,11 @@ export const WithdrawWrapper = (props: Props) => {
 
   const fundingFormat = ethers.utils.formatUnits(funding, 18)
   const collateralFormat = `${ethers.utils.formatUnits(collateral, 18)} DAI`
+  const resolutionFormat = resolution ? formatDate(resolution) : ''
 
   return (
     <>
-      <ClosedMarket date={formatDate(resolution)} />
+      <ClosedMarket date={resolutionFormat} />
       <ViewCard>
         {<SubsectionTitle>Balance</SubsectionTitle>}
         <TableStyled head={renderTableHeader()}>{renderTableData()}</TableStyled>
@@ -194,7 +195,7 @@ export const WithdrawWrapper = (props: Props) => {
         <Grid>
           <TitleValue title="Category" value="Politics" />
           <TitleValue title="Oracle" value="realit.io and dxDAO" />
-          <TitleValue title="Resolution Date" value={formatDate(resolution)} />
+          <TitleValue title="Resolution Date" value={resolutionFormat} />
           <TitleValue title="Fee" value="1%" />
           <TitleValue title="Funding" value={fundingFormat} />
         </Grid>
