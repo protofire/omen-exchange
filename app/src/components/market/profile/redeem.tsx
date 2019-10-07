@@ -75,7 +75,7 @@ export const Redeem = (props: Props) => {
   }
 
   const renderTableData = () => {
-    return balance.map((balanceItem: any, index: number) => {
+    return balance.map((balanceItem: BalanceItems, index: number) => {
       const { outcomeName, currentPrice, shares, winningOutcome } = balanceItem
       return (
         <TR key={index}>
@@ -116,7 +116,7 @@ export const Redeem = (props: Props) => {
     }
   }
 
-  const haveShares = balance.every((balanceItem: BalanceItems) => balanceItem.shares.isZero())
+  const winningOutcome = balance.find((balanceItem: BalanceItems) => balanceItem.winningOutcome)
 
   return (
     <>
@@ -125,7 +125,10 @@ export const Redeem = (props: Props) => {
         <SubsectionTitle>Balance</SubsectionTitle>
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>
-          <Button disabled={haveShares} onClick={() => finish()}>
+          <Button
+            disabled={winningOutcome && winningOutcome.shares.isZero()}
+            onClick={() => finish()}
+          >
             Redeem
           </Button>
         </ButtonContainerStyled>
