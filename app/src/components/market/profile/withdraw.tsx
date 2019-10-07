@@ -107,7 +107,7 @@ export const WithdrawWrapper = (props: Props) => {
   }
 
   const renderTableData = () => {
-    return balance.map((balanceItem: any, index: number) => {
+    return balance.map((balanceItem: BalanceItems, index: number) => {
       const { outcomeName, shares, winningOutcome } = balanceItem
 
       return (
@@ -181,6 +181,9 @@ export const WithdrawWrapper = (props: Props) => {
   const fundingFormat = ethers.utils.formatUnits(funding, 18)
   const collateralFormat = `${ethers.utils.formatUnits(collateral, 18)} DAI`
 
+  const winningOutcome = balance.find((balanceItem: BalanceItems) => balanceItem.winningOutcome)
+  const hasCollateral = collateral.isZero()
+
   return (
     <>
       <ClosedMarket date={formatDate(resolution)} />
@@ -200,8 +203,17 @@ export const WithdrawWrapper = (props: Props) => {
           <TitleValue title="Collateral" value={collateralFormat} />
         </Grid>
         <ButtonContainerStyled>
-          <Button onClick={() => redeem()}>Redeem</Button>
-          <Button backgroundColor={theme.colors.secondary} onClick={() => withdraw()}>
+          <Button
+            disabled={winningOutcome && winningOutcome.shares.isZero()}
+            onClick={() => redeem()}
+          >
+            Redeem
+          </Button>
+          <Button
+            disabled={hasCollateral}
+            backgroundColor={theme.colors.secondary}
+            onClick={() => withdraw()}
+          >
             Withdraw Collateral
           </Button>
         </ButtonContainerStyled>
