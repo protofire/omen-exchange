@@ -185,7 +185,7 @@ export const WithdrawWrapper = (props: Props) => {
   const collateralFormat = `${ethers.utils.formatUnits(collateral, 18)} DAI`
 
   const winningOutcome = balance.find((balanceItem: BalanceItems) => balanceItem.winningOutcome)
-  const haveCollateral = collateral.isZero()
+  const hasCollateral = collateral.isZero()
 
   return (
     <>
@@ -213,7 +213,7 @@ export const WithdrawWrapper = (props: Props) => {
             Redeem
           </Button>
           <Button
-            disabled={haveCollateral}
+            disabled={hasCollateral}
             backgroundColor={theme.colors.secondary}
             onClick={() => withdraw()}
           >
