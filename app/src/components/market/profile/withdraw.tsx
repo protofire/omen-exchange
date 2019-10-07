@@ -87,8 +87,8 @@ export const WithdrawWrapper = (props: Props) => {
   const [message, setMessage] = useState('')
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
-  const TableHead = ['Outcome', 'Shares', 'Price', 'Payout']
-  const TableCellsAlign = ['left', 'right', 'right', 'right']
+  const TableHead = ['Outcome', 'Shares', 'Payout']
+  const TableCellsAlign = ['left', 'right', 'right']
 
   const renderTableHeader = (): React.ReactNode => {
     return (
@@ -108,7 +108,7 @@ export const WithdrawWrapper = (props: Props) => {
 
   const renderTableData = () => {
     return balance.map((balanceItem: any, index: number) => {
-      const { outcomeName, currentPrice, shares, winningOutcome } = balanceItem
+      const { outcomeName, shares, winningOutcome } = balanceItem
 
       return (
         <TR key={index}>
@@ -119,9 +119,6 @@ export const WithdrawWrapper = (props: Props) => {
             {ethers.utils.formatUnits(shares, 18)}
           </TDStyled>
           <TDStyled winningOutcome={winningOutcome} textAlign={TableCellsAlign[2]}>
-            {currentPrice} DAI
-          </TDStyled>
-          <TDStyled winningOutcome={winningOutcome} textAlign={TableCellsAlign[3]}>
             {ethers.utils.formatUnits(shares, 18)}
           </TDStyled>
         </TR>
