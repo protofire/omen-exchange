@@ -19,6 +19,7 @@ import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { BigNumberInputReturn } from '../../common/big_number_input'
 import { FullLoading } from '../../common/full_loading'
+import { computePriceAfterTrade } from '../../../util/tools'
 
 interface Props {
   balance: BalanceItems[]
@@ -63,10 +64,10 @@ const logger = getLogger('Market::Sell')
 const Sell = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const TableHead = ['Outcome', 'Probabilities', 'Current Price', 'Shares']
-  const TableCellsAlign = ['left', 'right', 'right', 'right']
+  const TableHead = ['Outcome', 'Probabilities', 'Current Price', 'Shares', 'Price after trade']
+  const TableCellsAlign = ['left', 'right', 'right', 'right', 'right']
 
-  const { balance, marketAddress } = props
+  const { balance, marketAddress, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItems>()
@@ -74,6 +75,22 @@ const Sell = (props: Props) => {
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [tradedDAI, setTradedDAI] = useState<BigNumber>(new BigNumber(0))
   const [costFee, setCostFee] = useState<BigNumber>(new BigNumber(0))
+  const [message, setMessage] = useState<string>('')
+
+  const [tradeYes, tradeNo] =
+    outcome === OutcomeSlots.Yes
+      ? [amountShares.mul(-1), ethers.constants.Zero]
+      : [ethers.constants.Zero, amountShares.mul(-1)]
+
+  const holdingsYes = balance[0].holdings
+  const holdingsNo = balance[1].holdings
+  const pricesAfterTrade = computePriceAfterTrade(
+    tradeYes,
+    tradeNo,
+    holdingsYes,
+    holdingsNo,
+    funding,
+  )
 
   useEffect(() => {
     const balanceItemFound: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
@@ -137,11 +154,15 @@ const Sell = (props: Props) => {
           {currentPrice} <strong>DAI</strong>
         </TD>
         <TD textAlign={TableCellsAlign[3]}>{ethers.utils.formatUnits(shares, 18)}</TD>
+        <TD textAlign={TableCellsAlign[3]}>
+          {pricesAfterTrade[index].toFixed(4)} <strong>DAI</strong>
+        </TD>
       </TR>
     )
   })
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
+
   const finish = async () => {
     try {
       if (!haveEnoughShares) {
@@ -149,6 +170,7 @@ const Sell = (props: Props) => {
       }
 
       setStatus(Status.Loading)
+      setMessage(`Selling ${ethers.utils.formatUnits(amountShares, 18)} shares ...`)
 
       const provider = context.library
       const networkId = context.networkId
@@ -226,7 +248,7 @@ const Sell = (props: Props) => {
           </Button>
         </ButtonContainer>
       </ViewCard>
-      {status === Status.Loading ? <FullLoading /> : null}
+      {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>
   )
 }

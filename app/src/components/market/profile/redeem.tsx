@@ -55,8 +55,8 @@ export const Redeem = (props: Props) => {
 
   const [status, setStatus] = useState<Status>(Status.Ready)
 
-  const TableHead = ['Outcome', 'Shares', 'Price', 'Payout']
-  const TableCellsAlign = ['left', 'right', 'right', 'right']
+  const TableHead = ['Outcome', 'Shares', 'Payout']
+  const TableCellsAlign = ['left', 'right', 'right']
 
   const renderTableHeader = (): React.ReactNode => {
     return (
@@ -76,7 +76,7 @@ export const Redeem = (props: Props) => {
 
   const renderTableData = () => {
     return balance.map((balanceItem: BalanceItems, index: number) => {
-      const { outcomeName, currentPrice, shares, winningOutcome } = balanceItem
+      const { outcomeName, shares, winningOutcome } = balanceItem
       return (
         <TR key={index}>
           <TDStyled textAlign={TableCellsAlign[0]} winningOutcome={winningOutcome}>
@@ -86,9 +86,6 @@ export const Redeem = (props: Props) => {
             {ethers.utils.formatUnits(shares, 18)}
           </TDStyled>
           <TDStyled textAlign={TableCellsAlign[2]} winningOutcome={winningOutcome}>
-            {currentPrice} DAI
-          </TDStyled>
-          <TDStyled textAlign={TableCellsAlign[3]} winningOutcome={winningOutcome}>
             {ethers.utils.formatUnits(shares, 18)}
           </TDStyled>
         </TR>
