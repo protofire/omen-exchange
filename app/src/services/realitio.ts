@@ -3,6 +3,7 @@ import { Moment } from 'moment'
 
 import { getLogger } from '../util/logger'
 import { getContractAddress } from '../util/addresses'
+import { Question } from '../util/types'
 
 const logger = getLogger('Services::Realitio')
 
@@ -60,11 +61,12 @@ class RealitioService {
 
     return questionId
   }
+
   static getQuestion = async (
     questionId: string,
     provider: any,
     networkId: number,
-  ): Promise<string> => {
+  ): Promise<Question> => {
     const realitioAddress = getContractAddress(networkId, 'realitio')
 
     const realitioContract = new ethers.Contract(realitioAddress, realitioAbi, provider)
@@ -79,13 +81,16 @@ class RealitioService {
       throw new Error(`No LogNewQuestion event found for questionId '${questionId}'`)
     }
     if (logs.length > 1) {
-      console.warn(`There should be only one LogNewQuestion event for questionId '${questionId}'`)
+      logger.warn(`There should be only one LogNewQuestion event for questionId '${questionId}'`)
     }
 
     const iface = new ethers.utils.Interface(realitioAbi)
     const event = iface.parseLog(logs[0])
 
-    return event.values.question
+    return {
+      question: event.values.question,
+      resolution: new Date(event.values.opening_ts * 1000),
+    }
   }
 }
 
