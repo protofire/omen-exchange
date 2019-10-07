@@ -74,6 +74,7 @@ const Buy = (props: Props) => {
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [tradedShares, setTradedShares] = useState<BigNumber>(new BigNumber(0))
   const [value, setValue] = useState<BigNumber>(new BigNumber(0))
+  const [message, setMessage] = useState<string>('')
 
   const TableHead = ['Outcome', 'Probabilities', 'Current Price', 'Price after trade']
   const TableCellsAlign = ['left', 'right', 'right', 'right']
@@ -163,6 +164,8 @@ const Buy = (props: Props) => {
   const finish = async () => {
     try {
       setStatus(Status.Loading)
+      setMessage(`Buying ${ethers.utils.formatUnits(tradedShares, 18)} shares ...`)
+
       const provider = context.library
       const networkId = context.networkId
       const user = await provider.getSigner().getAddress()
@@ -256,7 +259,7 @@ const Buy = (props: Props) => {
           </Button>
         </ButtonContainer>
       </ViewCard>
-      {status === Status.Loading ? <FullLoading /> : null}
+      {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>
   )
 }
