@@ -13,7 +13,7 @@ interface Props {
   balance: BalanceItems[]
   funding: BigNumber
   question: string
-  resolution: Date
+  resolution: Maybe<Date>
   status: Status
   marketAddress: string
   stepProfile: StepProfile
@@ -119,7 +119,7 @@ const MarketView: FC<Props> = props => {
 
   return (
     <>
-      <SectionTitle title={question} subTitle={`${formatDate(resolution)}`} />
+      <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
       {renderView()}
     </>
   )

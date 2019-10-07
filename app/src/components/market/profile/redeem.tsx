@@ -43,7 +43,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 interface Props {
   balance: BalanceItems[]
   marketAddress: string
-  resolution: Date
+  resolution: Date | null
 }
 
 const logger = getLogger('Market::Redeem')
@@ -117,7 +117,7 @@ export const Redeem = (props: Props) => {
 
   return (
     <>
-      <ClosedMarket date={formatDate(resolution)} />
+      <ClosedMarket date={resolution ? formatDate(resolution) : ''} />
       <ViewCard>
         <SubsectionTitle>Balance</SubsectionTitle>
         <Table head={renderTableHeader()}>{renderTableData()}</Table>

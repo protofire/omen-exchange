@@ -12,7 +12,6 @@ import { SubsectionTitle } from '../../common/subsection_title'
 interface Props {
   balance: BalanceItems[]
   question: string
-  resolution: Date
   status: Status
   handleBuy: () => void
   handleSell: () => void

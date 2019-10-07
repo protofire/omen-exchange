@@ -61,3 +61,8 @@ export enum WinnerOutcome {
   Yes = 'Yes',
   No = 'No',
 }
+
+export interface Question {
+  question: string
+  resolution: Date
+}

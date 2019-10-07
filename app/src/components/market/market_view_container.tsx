@@ -22,6 +22,7 @@ const MarketViewContainer: FC<Props> = props => {
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [funding, setFunding] = useState<BigNumber>(ethers.constants.Zero)
   const [question, setQuestion] = useState<string | null>(null)
+  const [resolution, setResolution] = useState<Maybe<Date>>(null)
   const [stepProfile, setStepProfile] = useState<StepProfile>(StepProfile.View)
   const [winnerOutcome, setWinnerOutcome] = useState<Maybe<WinnerOutcome>>(null)
 
@@ -103,8 +104,14 @@ const MarketViewContainer: FC<Props> = props => {
           provider,
           networkId,
         )
-        const question = await RealitioService.getQuestion(questionId, provider, networkId)
+        const { question, resolution } = await RealitioService.getQuestion(
+          questionId,
+          provider,
+          networkId,
+        )
+
         setQuestion(question)
+        setResolution(resolution)
       } catch (error) {
         logger.error('There was an error fetching the question data:', error.message)
       }
@@ -160,7 +167,7 @@ const MarketViewContainer: FC<Props> = props => {
       funding={funding}
       marketAddress={address}
       question={question || ''}
-      resolution={new Date(2019, 10, 30)}
+      resolution={resolution}
       status={status}
       stepProfile={stepProfile}
       winnerOutcome={winnerOutcome}
