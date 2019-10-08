@@ -55,15 +55,16 @@ interface Props {
   question: string
   resolution: Date | null
   marketAddress: string
+  isMarketOwner: boolean
 }
 
-const logger = getLogger('Market::Withdraw')
+const logger = getLogger('Market::ClosedMarketDetail')
 
-export const WithdrawWrapper = (props: Props) => {
+export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { conditionalTokens } = useContracts(context)
 
-  const { theme, balance, marketAddress, resolution, funding } = props
+  const { theme, balance, marketAddress, resolution, funding, isMarketOwner } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
@@ -141,18 +142,22 @@ export const WithdrawWrapper = (props: Props) => {
           ]}
           withWinningOutcome={true}
         />
-        <SubsectionTitle>Details</SubsectionTitle>
-        <Grid>
-          <TitleValue title="Category" value="Politics" />
-          <TitleValue title="Oracle" value="realit.io and dxDAO" />
-          <TitleValue title="Resolution Date" value={resolutionFormat} />
-          <TitleValue title="Fee" value="1%" />
-          <TitleValue title="Funding" value={fundingFormat} />
-        </Grid>
-        <SubsectionTitle>Market Results</SubsectionTitle>
-        <Grid>
-          <TitleValue title="Collateral" value={collateralFormat} />
-        </Grid>
+        {isMarketOwner && (
+          <>
+            <SubsectionTitle>Details</SubsectionTitle>
+            <Grid>
+              <TitleValue title="Category" value="Politics" />
+              <TitleValue title="Oracle" value="realit.io and dxDAO" />
+              <TitleValue title="Resolution Date" value={resolutionFormat} />
+              <TitleValue title="Fee" value="1%" />
+              <TitleValue title="Funding" value={fundingFormat} />
+            </Grid>
+            <SubsectionTitle>Market Results</SubsectionTitle>
+            <Grid>
+              <TitleValue title="Collateral" value={collateralFormat} />
+            </Grid>
+          </>
+        )}
         <ButtonContainerStyled>
           <Button
             disabled={winningOutcome && winningOutcome.shares.isZero()}
@@ -160,13 +165,15 @@ export const WithdrawWrapper = (props: Props) => {
           >
             Redeem
           </Button>
-          <Button
-            disabled={hasCollateral}
-            backgroundColor={theme.colors.secondary}
-            onClick={() => withdraw()}
-          >
-            Withdraw Collateral
-          </Button>
+          {isMarketOwner && (
+            <Button
+              disabled={hasCollateral}
+              backgroundColor={theme.colors.secondary}
+              onClick={() => withdraw()}
+            >
+              Withdraw Collateral
+            </Button>
+          )}
         </ButtonContainerStyled>
       </ViewCard>
       {status === Status.Loading ? <FullLoading message={message} /> : null}
@@ -174,4 +181,4 @@ export const WithdrawWrapper = (props: Props) => {
   )
 }
 
-export const Withdraw = withTheme(WithdrawWrapper)
+export const ClosedMarketDetail = withTheme(ClosedMarketDetailWrapper)

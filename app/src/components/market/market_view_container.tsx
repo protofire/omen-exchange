@@ -27,6 +27,7 @@ const MarketViewContainer: FC<Props> = props => {
   const [resolution, setResolution] = useState<Maybe<Date>>(null)
   const [stepProfile, setStepProfile] = useState<StepProfile>(StepProfile.View)
   const [winnerOutcome, setWinnerOutcome] = useState<Maybe<WinnerOutcome>>(null)
+  const [isMarketOwner, setIsMarketOwner] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchContractData = async ({ enableStatus }: any) => {
@@ -125,15 +126,12 @@ const MarketViewContainer: FC<Props> = props => {
 
         const ownerAddress = await marketMaker.getOwner()
         const isMarketOwner = ownerAddress.toLowerCase() === userAddress.toLowerCase()
+        setIsMarketOwner(isMarketOwner)
 
         if (isConditionResolved) {
           const winnerOutcome = await conditionalTokens.getWinnerOutcome(conditionId)
           setWinnerOutcome(winnerOutcome)
-          if (isMarketOwner) {
-            setStepProfile(StepProfile.Withdraw)
-          } else {
-            setStepProfile(StepProfile.Redeem)
-          }
+          setStepProfile(StepProfile.CloseMarketDetail)
         }
       } catch (error) {
         logger.error(error && error.message)
@@ -153,6 +151,7 @@ const MarketViewContainer: FC<Props> = props => {
       status={status}
       stepProfile={stepProfile}
       winnerOutcome={winnerOutcome}
+      isMarketOwner={isMarketOwner}
     />
   )
 }

@@ -3,8 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import { Buy } from './profile/buy'
 import { SectionTitle } from '../common/section_title'
 import { Sell } from './profile/sell'
-import { Redeem } from './profile/redeem'
-import { Withdraw } from './profile/withdraw'
+import { ClosedMarketDetail } from './profile/closed_market_detail'
 import { Status, BalanceItem, StepProfile, WinnerOutcome } from '../../util/types'
 import { View } from './profile/view'
 import { formatDate } from '../../util/tools'
@@ -18,6 +17,7 @@ interface Props {
   marketAddress: string
   stepProfile: StepProfile
   winnerOutcome: Maybe<WinnerOutcome>
+  isMarketOwner: boolean
 }
 
 const MarketView: FC<Props> = props => {
@@ -90,16 +90,10 @@ const MarketView: FC<Props> = props => {
             />
           </>
         )
-      case StepProfile.Redeem:
+      case StepProfile.CloseMarketDetail:
         return (
           <>
-            <Redeem {...props} />
-          </>
-        )
-      case StepProfile.Withdraw:
-        return (
-          <>
-            <Withdraw {...props} />
+            <ClosedMarketDetail {...props} />
           </>
         )
       default:

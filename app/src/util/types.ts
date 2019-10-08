@@ -55,6 +55,7 @@ export enum StepProfile {
   Sell = 'Sell',
   Redeem = 'Redeem',
   Withdraw = 'Withdraw',
+  CloseMarketDetail = 'CloseMarketDetail',
 }
 
 export enum WinnerOutcome {
