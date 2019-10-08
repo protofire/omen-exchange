@@ -7,7 +7,7 @@ import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
 import { MarketMakerService } from '../../services'
 import { getLogger } from '../../util/logger'
-import { Status, BalanceItem, OutcomeSlots, StepProfile, WinnerOutcome } from '../../util/types'
+import { Status, BalanceItem, OutcomeSlot, StepProfile, WinnerOutcome } from '../../util/types'
 
 const logger = getLogger('Market::MarketView')
 
@@ -54,7 +54,7 @@ const MarketViewContainer: FC<Props> = props => {
 
         const balance = [
           {
-            outcomeName: OutcomeSlots.Yes,
+            outcomeName: OutcomeSlot.Yes,
             probability: Math.round((probabilityForYes / 100) * 100),
             currentPrice: actualPrice.actualPriceForYes,
             shares: balanceInformation.balanceOfForYes,
@@ -62,7 +62,7 @@ const MarketViewContainer: FC<Props> = props => {
             winningOutcome: winnerOutcome === WinnerOutcome.Yes,
           },
           {
-            outcomeName: OutcomeSlots.No,
+            outcomeName: OutcomeSlot.No,
             probability: Math.round((probabilityForNo / 100) * 100),
             currentPrice: actualPrice.actualPriceForNo,
             shares: balanceInformation.balanceOfForNo,
@@ -111,7 +111,8 @@ const MarketViewContainer: FC<Props> = props => {
     }
 
     fetchQuestion()
-  }, [address, context, conditionalTokens, realitio])
+    // eslint-disable-next-line
+  }, [address, context])
 
   useEffect(() => {
     const fetchContractStatus = async () => {
@@ -142,7 +143,8 @@ const MarketViewContainer: FC<Props> = props => {
     }
 
     fetchContractStatus()
-  }, [address, context, stepProfile, conditionalTokens])
+    // eslint-disable-next-line
+  }, [address, context, stepProfile])
 
   return (
     <MarketView

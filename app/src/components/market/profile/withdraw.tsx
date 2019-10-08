@@ -4,34 +4,19 @@ import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { ViewCard } from '../view_card'
-import { Button } from '../../common'
+import { Button, OutcomeTable } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
-import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
-import { BalanceItem, Status } from '../../../util/types'
+import { BalanceItem, OutcomeTableValue, Status } from '../../../util/types'
 import { ERC20Service, MarketMakerService } from '../../../services'
 import { getContractAddress } from '../../../util/addresses'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatDate } from '../../../util/tools'
 import { useContracts } from '../../../hooks/useContracts'
-
-const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
-  color: ${props => (props.winningOutcome ? props.theme.colors.primary : 'inherit')};
-  font-weight: ${props => (props.winningOutcome ? '700' : '400')};
-  opacity: ${props => (props.winningOutcome ? '1' : '0.35')};
-`
-
-TDStyled.defaultProps = {
-  winningOutcome: false,
-}
-
-const TableStyled = styled(Table)`
-  margin-bottom: 30px;
-`
 
 const Grid = styled.div`
   display: grid;
@@ -86,45 +71,6 @@ export const WithdrawWrapper = (props: Props) => {
 
   const provider = context.library
   const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
-
-  const TableHead = ['Outcome', 'Shares', 'Payout']
-  const TableCellsAlign = ['left', 'right', 'right']
-
-  const renderTableHeader = (): React.ReactNode => {
-    return (
-      <THead>
-        <TR>
-          {TableHead.map((value, index) => {
-            return (
-              <TH key={index} textAlign={TableCellsAlign[index]}>
-                {value}
-              </TH>
-            )
-          })}
-        </TR>
-      </THead>
-    )
-  }
-
-  const renderTableData = () => {
-    return balance.map((balanceItem: BalanceItem, index: number) => {
-      const { outcomeName, shares, winningOutcome } = balanceItem
-
-      return (
-        <TR key={index}>
-          <TDStyled winningOutcome={winningOutcome} textAlign={TableCellsAlign[0]}>
-            {outcomeName}
-          </TDStyled>
-          <TDStyled winningOutcome={winningOutcome} textAlign={TableCellsAlign[1]}>
-            {ethers.utils.formatUnits(shares, 18)}
-          </TDStyled>
-          <TDStyled winningOutcome={winningOutcome} textAlign={TableCellsAlign[2]}>
-            {ethers.utils.formatUnits(shares, 18)}
-          </TDStyled>
-        </TR>
-      )
-    })
-  }
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -186,7 +132,15 @@ export const WithdrawWrapper = (props: Props) => {
       <ClosedMarket date={resolutionFormat} />
       <ViewCard>
         {<SubsectionTitle>Balance</SubsectionTitle>}
-        <TableStyled head={renderTableHeader()}>{renderTableData()}</TableStyled>
+        <OutcomeTable
+          balance={balance}
+          disabledColumns={[
+            OutcomeTableValue.Probabilities,
+            OutcomeTableValue.CurrentPrice,
+            OutcomeTableValue.PriceAfterTrade,
+          ]}
+          withWinningOutcome={true}
+        />
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
           <TitleValue title="Category" value="Politics" />

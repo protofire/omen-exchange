@@ -3,15 +3,14 @@ import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 
-import { BalanceItem, OutcomeSlots, Status } from '../../../util/types'
-import { Button, BigNumberInput } from '../../common'
+import { BalanceItem, OutcomeSlot, OutcomeTableValue, Status } from '../../../util/types'
+import { Button, BigNumberInput, OutcomeTable } from '../../common'
 import { ButtonContainer } from '../../common/button_container'
 import { ButtonLink } from '../../common/button_link'
 import { FormLabel } from '../../common/form_label'
 import { FormRow } from '../../common/form_row'
-import { RadioInput } from '../../common/radio_input'
 import { SubsectionTitle } from '../../common/subsection_title'
-import { Table, TD, TH, THead, TR } from '../../common/table'
+import { Table, TD, TR } from '../../common/table'
 import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
 import { ViewCard } from '../view_card'
 import { MarketMakerService } from '../../../services'
@@ -32,16 +31,6 @@ interface Props {
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
-`
-
-const RadioContainer = styled.label`
-  align-items: center;
-  display: flex;
-  white-space: nowrap;
-`
-
-const RadioInputStyled = styled(RadioInput)`
-  margin-right: 6px;
 `
 
 const TableStyled = styled(Table)`
@@ -66,21 +55,18 @@ const Sell = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { conditionalTokens } = useContracts()
 
-  const TableHead = ['Outcome', 'Probabilities', 'Current Price', 'Shares', 'Price after trade']
-  const TableCellsAlign = ['left', 'right', 'right', 'right', 'right']
-
   const { balance, marketAddress, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
-  const [outcome, setOutcome] = useState<OutcomeSlots>(OutcomeSlots.Yes)
+  const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [tradedDAI, setTradedDAI] = useState<BigNumber>(new BigNumber(0))
   const [costFee, setCostFee] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
 
   const [tradeYes, tradeNo] =
-    outcome === OutcomeSlots.Yes
+    outcome === OutcomeSlot.Yes
       ? [amountShares.mul(-1), ethers.constants.Zero]
       : [ethers.constants.Zero, amountShares.mul(-1)]
 
@@ -119,50 +105,6 @@ const Sell = (props: Props) => {
     setTradedDAI(amountToSellInWei.sub(costFeeInWei))
   }, [outcome, amountShares, balance])
 
-  const renderTableHeader = () => {
-    return (
-      <THead>
-        <TR>
-          {TableHead.map((value, index) => {
-            return (
-              <TH textAlign={TableCellsAlign[index]} key={index}>
-                {value}
-              </TH>
-            )
-          })}
-        </TR>
-      </THead>
-    )
-  }
-
-  const renderTableData = balance.map((balanceItem: BalanceItem, index: number) => {
-    const { outcomeName, probability, currentPrice, shares } = balanceItem
-
-    return (
-      <TR key={index}>
-        <TD textAlign={TableCellsAlign[0]}>
-          <RadioContainer>
-            <RadioInputStyled
-              checked={outcome === outcomeName}
-              name="outcome"
-              onChange={(e: any) => setOutcome(e.target.value)}
-              value={outcomeName}
-            />
-            {outcomeName}
-          </RadioContainer>
-        </TD>
-        <TD textAlign={TableCellsAlign[1]}>{probability} %</TD>
-        <TD textAlign={TableCellsAlign[2]}>
-          {currentPrice} <strong>DAI</strong>
-        </TD>
-        <TD textAlign={TableCellsAlign[3]}>{ethers.utils.formatUnits(shares, 18)}</TD>
-        <TD textAlign={TableCellsAlign[3]}>
-          {pricesAfterTrade[index].toFixed(4)} <strong>DAI</strong>
-        </TD>
-      </TR>
-    )
-  })
-
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
 
   const finish = async () => {
@@ -180,7 +122,7 @@ const Sell = (props: Props) => {
 
       const amountSharesNegative = amountShares.mul(-1)
       const outcomeValue =
-        outcome === OutcomeSlots.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
+        outcome === OutcomeSlot.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
 
       const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketAddress)
 
@@ -207,7 +149,13 @@ const Sell = (props: Props) => {
     <>
       <ViewCard>
         <SubsectionTitle>Choose the shares you want to sell</SubsectionTitle>
-        <TableStyled head={renderTableHeader()}>{renderTableData}</TableStyled>
+        <OutcomeTable
+          balance={balance}
+          pricesAfterTrade={pricesAfterTrade}
+          outcomeSelected={outcome}
+          outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
+          disabledColumns={[OutcomeTableValue.Payout]}
+        />
         <AmountWrapper
           formField={
             <TextfieldCustomPlaceholder

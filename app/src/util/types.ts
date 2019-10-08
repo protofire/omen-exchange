@@ -7,13 +7,13 @@ export enum Status {
   Error = 'Error',
 }
 
-export enum OutcomeSlots {
+export enum OutcomeSlot {
   Yes = 'Yes',
   No = 'No',
 }
 
 export interface BalanceItem {
-  outcomeName: OutcomeSlots
+  outcomeName: OutcomeSlot
   probability: number
   currentPrice: string
   shares: BigNumber
@@ -65,4 +65,13 @@ export enum WinnerOutcome {
 export interface Question {
   question: string
   resolution: Date
+}
+
+export enum OutcomeTableValue {
+  Outcome = 'Outcome',
+  Probabilities = 'Probabilities',
+  CurrentPrice = 'Current Price',
+  Shares = 'Shares',
+  Payout = 'Payout',
+  PriceAfterTrade = 'Price after trade',
 }
