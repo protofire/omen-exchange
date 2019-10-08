@@ -45,11 +45,11 @@ const MarketView: FC<Props> = props => {
   }
 
   const handleRedeem = (): void => {
-    setCurrentStep(StepProfile.Redeem)
+    setCurrentStep(StepProfile.CloseMarketDetail)
   }
 
   const handleWithdraw = (): void => {
-    setCurrentStep(StepProfile.Withdraw)
+    setCurrentStep(StepProfile.CloseMarketDetail)
   }
 
   const renderView = () => {
