@@ -53,8 +53,6 @@ export enum StepProfile {
   View = 'View',
   Buy = 'Buy',
   Sell = 'Sell',
-  Redeem = 'Redeem',
-  Withdraw = 'Withdraw',
   CloseMarketDetail = 'CloseMarketDetail',
 }
 
