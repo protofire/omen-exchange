@@ -71,11 +71,11 @@ const MarketWizardCreatorContainer: FC = () => {
       )
       setMarketMakerAddress(marketMakerAddress)
 
-      setStatus(StatusMarketCreation.ApproveDAIForMarketMaker)
-      await daiService.approveUnlimited(provider, marketMakerAddress)
-
       // Don't perform initial trade if odds are 50/50
       if (+outcomeProbabilityOne !== 50) {
+        setStatus(StatusMarketCreation.ApproveDAIForMarketMaker)
+        await daiService.approveUnlimited(provider, marketMakerAddress)
+
         setStatus(StatusMarketCreation.InitialTradeInMarketMaker)
         const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
         const initialTradeOutcomeTokens = computeInitialTradeOutcomeTokens(
