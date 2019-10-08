@@ -14,7 +14,7 @@ const logger = getLogger('Market::MarketWizardCreatorContainer')
 
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens, marketMakerFactory, realitio } = useContracts()
+  const { conditionalTokens, marketMakerFactory, realitio } = useContracts(context)
 
   const [status, setStatus] = useState<StatusMarketCreation>(StatusMarketCreation.Ready)
   const [questionId, setQuestionId] = useState<string | null>(null)

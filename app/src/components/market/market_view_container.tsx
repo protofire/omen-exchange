@@ -17,7 +17,7 @@ interface Props {
 
 const MarketViewContainer: FC<Props> = props => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens, realitio } = useContracts()
+  const { conditionalTokens, realitio } = useContracts(context)
 
   const [balance, setBalance] = useState<BalanceItem[]>([])
   const [address] = useState<string>(props.address)
@@ -88,8 +88,7 @@ const MarketViewContainer: FC<Props> = props => {
     }, 2000)
 
     return () => clearInterval(intervalId)
-    // eslint-disable-next-line
-  }, [address, context, winnerOutcome])
+  }, [address, context, winnerOutcome, conditionalTokens])
 
   // fetch Realitio question data
   useEffect(() => {
@@ -111,8 +110,7 @@ const MarketViewContainer: FC<Props> = props => {
     }
 
     fetchQuestion()
-    // eslint-disable-next-line
-  }, [address, context])
+  }, [address, context, conditionalTokens, realitio])
 
   useEffect(() => {
     const fetchContractStatus = async () => {
@@ -143,8 +141,7 @@ const MarketViewContainer: FC<Props> = props => {
     }
 
     fetchContractStatus()
-    // eslint-disable-next-line
-  }, [address, context, stepProfile])
+  }, [address, context, stepProfile, conditionalTokens])
 
   return (
     <MarketView

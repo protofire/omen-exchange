@@ -61,7 +61,7 @@ const logger = getLogger('Market::Withdraw')
 
 export const WithdrawWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens } = useContracts()
+  const { conditionalTokens } = useContracts(context)
 
   const { theme, balance, marketAddress, resolution, funding } = props
 

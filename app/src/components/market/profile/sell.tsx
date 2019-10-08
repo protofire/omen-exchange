@@ -53,7 +53,7 @@ const logger = getLogger('Market::Sell')
 
 const Sell = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens } = useContracts()
+  const { conditionalTokens } = useContracts(context)
 
   const { balance, marketAddress, funding } = props
 

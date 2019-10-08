@@ -43,7 +43,7 @@ const logger = getLogger('Market::Redeem')
 
 export const Redeem = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens } = useContracts()
+  const { conditionalTokens } = useContracts(context)
 
   const { balance, marketAddress, resolution } = props
 
