@@ -67,7 +67,6 @@ const MarketWizardCreatorContainer: FC = () => {
         conditionalTokens.address,
         daiAddress,
         conditionId,
-        funding,
       )
       setMarketMakerAddress(marketMakerAddress)
 
