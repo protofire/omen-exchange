@@ -4,11 +4,13 @@ import { useWeb3Context } from 'web3-react'
 
 import { CONNECTOR } from '../common/constants'
 
-const ConnectedWeb3Context = React.createContext<{
+export interface ConnectedWeb3Context {
   account: string
   library: providers.Web3Provider
   networkId: number
-} | null>(null)
+}
+
+const ConnectedWeb3Context = React.createContext<Maybe<ConnectedWeb3Context>>(null)
 
 /**
  * This hook can only be used by components under the `ConnectedWeb3` component. Otherwise it will throw.

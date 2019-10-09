@@ -3,11 +3,11 @@ import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 
-import { BalanceItems, OutcomeSlots, Status } from '../../../util/types'
-import { Button, BigNumberInput } from '../../common'
+import { BalanceItem, OutcomeSlot, Status, OutcomeTableValue } from '../../../util/types'
+import { Button, BigNumberInput, OutcomeTable } from '../../common'
 import { ERC20Service, MarketMakerService } from '../../../services'
 import { SubsectionTitle } from '../../common/subsection_title'
-import { Table, TD, TH, THead, TR } from '../../common/table'
+import { Table, TD, TR } from '../../common/table'
 import { ViewCard } from '../view_card'
 import { computePriceAfterTrade } from '../../../util/tools'
 import { getContractAddress } from '../../../util/addresses'
@@ -17,14 +17,14 @@ import { Well } from '../../common/well'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
 import { ButtonLink } from '../../common/button_link'
-import { RadioInput } from '../../common/radio_input'
 import { FormRow } from '../../common/form_row'
 import { FormLabel } from '../../common/form_label'
 import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
 import { BigNumberInputReturn } from '../../common/big_number_input'
+import { useContracts } from '../../../hooks/useContracts'
 
 interface Props {
-  balance: BalanceItems[]
+  balance: BalanceItem[]
   funding: BigNumber
   handleBack: () => void
   handleFinish: () => void
@@ -33,16 +33,6 @@ interface Props {
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
-`
-
-const RadioContainer = styled.label`
-  align-items: center;
-  display: flex;
-  white-space: nowrap;
-`
-
-const RadioInputStyled = styled(RadioInput)`
-  margin-right: 6px;
 `
 
 const TableStyled = styled(Table)`
@@ -66,37 +56,19 @@ const logger = getLogger('Market::Buy')
 
 const Buy = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { conditionalTokens } = useContracts(context)
 
   const { balance, marketAddress, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [outcome, setOutcome] = useState<OutcomeSlots>(OutcomeSlots.Yes)
+  const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [tradedShares, setTradedShares] = useState<BigNumber>(new BigNumber(0))
   const [value, setValue] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
 
-  const TableHead = ['Outcome', 'Probabilities', 'Current Price', 'Price after trade']
-  const TableCellsAlign = ['left', 'right', 'right', 'right']
-
-  const renderTableHeader = () => {
-    return (
-      <THead>
-        <TR>
-          {TableHead.map((value, index) => {
-            return (
-              <TH textAlign={TableCellsAlign[index]} key={index}>
-                {value}
-              </TH>
-            )
-          })}
-        </TR>
-      </THead>
-    )
-  }
-
   const [tradeYes, tradeNo] =
-    outcome === OutcomeSlots.Yes
+    outcome === OutcomeSlot.Yes
       ? [tradedShares, ethers.constants.Zero]
       : [ethers.constants.Zero, tradedShares]
 
@@ -111,7 +83,7 @@ const Buy = (props: Props) => {
   )
 
   useEffect(() => {
-    const balanceItemFound: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
+    const balanceItemFound: BalanceItem | undefined = balance.find((balanceItem: BalanceItem) => {
       return balanceItem.outcomeName === outcome
     })
 
@@ -134,33 +106,6 @@ const Buy = (props: Props) => {
     setCost(costWithFee)
   }, [outcome, value, balance])
 
-  const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
-    const { outcomeName, probability, currentPrice } = balanceItem
-
-    return (
-      <TR key={index}>
-        <TD textAlign={TableCellsAlign[0]}>
-          <RadioContainer>
-            <RadioInputStyled
-              checked={outcome === outcomeName}
-              name="outcome"
-              onChange={(e: any) => setOutcome(e.target.value)}
-              value={outcomeName}
-            />
-            {outcomeName}
-          </RadioContainer>
-        </TD>
-        <TD textAlign={TableCellsAlign[1]}>{probability} %</TD>
-        <TD textAlign={TableCellsAlign[2]}>
-          {currentPrice} <strong>DAI</strong>
-        </TD>
-        <TD textAlign={TableCellsAlign[3]}>
-          {pricesAfterTrade[index].toFixed(4)} <strong>DAI</strong>
-        </TD>
-      </TR>
-    )
-  })
-
   const finish = async () => {
     try {
       setStatus(Status.Loading)
@@ -172,7 +117,7 @@ const Buy = (props: Props) => {
 
       const daiAddress = getContractAddress(networkId, 'dai')
 
-      const marketMakerService = new MarketMakerService(marketAddress)
+      const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
       const daiService = new ERC20Service(daiAddress)
 
       const hasEnoughAlowance = await daiService.hasEnoughAllowance(
@@ -191,9 +136,9 @@ const Buy = (props: Props) => {
       }
 
       // Check outcome value to use
-      const outcomeValue = outcome === OutcomeSlots.Yes ? [tradedShares, 0] : [0, tradedShares]
+      const outcomeValue = outcome === OutcomeSlot.Yes ? [tradedShares, 0] : [0, tradedShares]
 
-      await marketMakerService.trade(provider, outcomeValue)
+      await marketMaker.trade(outcomeValue)
 
       setStatus(Status.Ready)
       props.handleFinish()
@@ -209,7 +154,13 @@ const Buy = (props: Props) => {
     <>
       <ViewCard>
         <SubsectionTitle>Choose the shares you want to buy</SubsectionTitle>
-        <TableStyled head={renderTableHeader()}>{renderTableData}</TableStyled>
+        <OutcomeTable
+          balance={balance}
+          pricesAfterTrade={pricesAfterTrade}
+          outcomeSelected={outcome}
+          outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
+          disabledColumns={[OutcomeTableValue.Shares, OutcomeTableValue.Payout]}
+        />
         <AmountWrapper
           formField={
             <TextfieldCustomPlaceholder

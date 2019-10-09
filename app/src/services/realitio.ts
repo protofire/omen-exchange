@@ -1,8 +1,7 @@
-import { ethers } from 'ethers'
+import { Contract, ethers, Wallet } from 'ethers'
 import { Moment } from 'moment'
 
 import { getLogger } from '../util/logger'
-import { getContractAddress } from '../util/addresses'
 import { Question } from '../util/types'
 
 const logger = getLogger('Services::Realitio')
@@ -16,6 +15,20 @@ const realitioCallAbi = [
 ]
 
 class RealitioService {
+  contract: Contract
+  constantContract: Contract
+  signerAddress: string
+  arbitratorAddress: string
+
+  constructor(address: string, provider: any, signerAddress: string, arbitratorAddress: string) {
+    const signer: Wallet = provider.getSigner()
+
+    this.contract = new ethers.Contract(address, realitioAbi, provider).connect(signer)
+    this.constantContract = new ethers.Contract(address, realitioCallAbi, provider)
+    this.signerAddress = signerAddress
+    this.arbitratorAddress = arbitratorAddress
+  }
+
   /**
    * Create a question in the realit.io contract. Returns a promise that resolves when the transaction is mined.
    *
@@ -28,33 +41,20 @@ class RealitioService {
    * @returns A promise that resolves to a string with the bytes32 corresponding to the id of the
    * question
    */
-  static askQuestion = async (
+  askQuestion = async (
     question: string,
     openingDateMoment: Moment,
-    provider: any,
-    networkId: number,
     value = '0',
   ): Promise<string> => {
-    const signer = provider.getSigner()
-    const signerAddress = await signer.getAddress()
-
-    const realitioAddress = getContractAddress(networkId, 'realitio')
-    const arbitrator = getContractAddress(networkId, 'realitioArbitrator')
-
-    // there's no way to call a non-constant method as if it were constant, so we need to instantiate two contracts,
-    // with one having an ABI that pretends the method is constant
-    const realitioConstantContract = new ethers.Contract(realitioAddress, realitioCallAbi, provider)
-    const realitioContract = new ethers.Contract(realitioAddress, realitioAbi, provider).connect(
-      signer,
-    )
-
     const openingTimestamp = openingDateMoment.unix()
-    const args = [0, question, arbitrator, '86400', openingTimestamp, 0]
+    const args = [0, question, this.arbitratorAddress, '86400', openingTimestamp, 0]
 
-    const questionId = await realitioConstantContract.askQuestion(...args, { from: signerAddress })
+    const questionId = await this.constantContract.askQuestion(...args, {
+      from: this.signerAddress,
+    })
 
     // send the transaction and wait until it's mined
-    const transactionObject = await realitioContract.askQuestion(...args, {
+    const transactionObject = await this.contract.askQuestion(...args, {
       value: ethers.utils.bigNumberify(value),
     })
     logger.log(`Ask question transaction hash: ${transactionObject.hash}`)
@@ -62,16 +62,8 @@ class RealitioService {
     return questionId
   }
 
-  static getQuestion = async (
-    questionId: string,
-    provider: any,
-    networkId: number,
-  ): Promise<Question> => {
-    const realitioAddress = getContractAddress(networkId, 'realitio')
-
-    const realitioContract = new ethers.Contract(realitioAddress, realitioAbi, provider)
-
-    const filter: any = realitioContract.filters.LogNewQuestion(questionId)
+  getQuestion = async (questionId: string, provider: any): Promise<Question> => {
+    const filter: any = this.contract.filters.LogNewQuestion(questionId)
 
     filter.fromBlock = '0x1'
 

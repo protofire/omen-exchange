@@ -7,13 +7,13 @@ export enum Status {
   Error = 'Error',
 }
 
-export enum OutcomeSlots {
+export enum OutcomeSlot {
   Yes = 'Yes',
   No = 'No',
 }
 
-export interface BalanceItems {
-  outcomeName: OutcomeSlots
+export interface BalanceItem {
+  outcomeName: OutcomeSlot
   probability: number
   currentPrice: string
   shares: BigNumber
@@ -53,8 +53,7 @@ export enum StepProfile {
   View = 'View',
   Buy = 'Buy',
   Sell = 'Sell',
-  Redeem = 'Redeem',
-  Withdraw = 'Withdraw',
+  CloseMarketDetail = 'CloseMarketDetail',
 }
 
 export enum WinnerOutcome {
@@ -65,4 +64,13 @@ export enum WinnerOutcome {
 export interface Question {
   question: string
   resolution: Date
+}
+
+export enum OutcomeTableValue {
+  Outcome = 'Outcome',
+  Probabilities = 'Probabilities',
+  CurrentPrice = 'Current Price',
+  Shares = 'Shares',
+  Payout = 'Payout',
+  PriceAfterTrade = 'Price after trade',
 }
