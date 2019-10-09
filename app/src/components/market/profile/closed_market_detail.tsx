@@ -4,38 +4,19 @@ import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { ViewCard } from '../view_card'
-import { Button } from '../../common'
+import { Button, OutcomeTable } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
-import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
-import { BalanceItems, Status } from '../../../util/types'
-import {
-  ConditionalTokenService,
-  ERC20Service,
-  FetchMarketService,
-  MarketMakerService,
-} from '../../../services'
+import { BalanceItem, OutcomeTableValue, Status } from '../../../util/types'
+import { ERC20Service, MarketMakerService } from '../../../services'
 import { getContractAddress } from '../../../util/addresses'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatDate } from '../../../util/tools'
-
-const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
-  color: ${props => (props.winningOutcome ? props.theme.colors.primary : 'inherit')};
-  font-weight: ${props => (props.winningOutcome ? '700' : '400')};
-  opacity: ${props => (props.winningOutcome ? '1' : '0.35')};
-`
-
-TDStyled.defaultProps = {
-  winningOutcome: false,
-}
-
-const TableStyled = styled(Table)`
-  margin-bottom: 30px;
-`
+import { useContracts } from '../../../hooks/useContracts'
 
 const Grid = styled.div`
   display: grid;
@@ -69,62 +50,28 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 
 interface Props {
   theme?: any
-  balance: BalanceItems[]
+  balance: BalanceItem[]
   funding: BigNumber
   question: string
   resolution: Date | null
   marketAddress: string
+  isMarketOwner: boolean
 }
 
-const logger = getLogger('Market::Withdraw')
+const logger = getLogger('Market::ClosedMarketDetail')
 
-export const WithdrawWrapper = (props: Props) => {
+export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { conditionalTokens } = useContracts(context)
 
-  const { theme, balance, marketAddress, resolution, funding } = props
+  const { theme, balance, marketAddress, resolution, funding, isMarketOwner } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
-  const TableHead = ['Outcome', 'Shares', 'Payout']
-  const TableCellsAlign = ['left', 'right', 'right']
-
-  const renderTableHeader = (): React.ReactNode => {
-    return (
-      <THead>
-        <TR>
-          {TableHead.map((value, index) => {
-            return (
-              <TH key={index} textAlign={TableCellsAlign[index]}>
-                {value}
-              </TH>
-            )
-          })}
-        </TR>
-      </THead>
-    )
-  }
-
-  const renderTableData = () => {
-    return balance.map((balanceItem: BalanceItems, index: number) => {
-      const { outcomeName, shares, winningOutcome } = balanceItem
-
-      return (
-        <TR key={index}>
-          <TDStyled winningOutcome={winningOutcome} textAlign={TableCellsAlign[0]}>
-            {outcomeName}
-          </TDStyled>
-          <TDStyled winningOutcome={winningOutcome} textAlign={TableCellsAlign[1]}>
-            {ethers.utils.formatUnits(shares, 18)}
-          </TDStyled>
-          <TDStyled winningOutcome={winningOutcome} textAlign={TableCellsAlign[2]}>
-            {ethers.utils.formatUnits(shares, 18)}
-          </TDStyled>
-        </TR>
-      )
-    })
-  }
+  const provider = context.library
+  const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -145,15 +92,13 @@ export const WithdrawWrapper = (props: Props) => {
       setMessage('Redeem payout...')
       setStatus(Status.Loading)
 
-      const provider = context.library
       const networkId = context.networkId
 
       const daiAddress = getContractAddress(networkId, 'dai')
 
-      const fetchMarketService = new FetchMarketService(marketAddress, networkId, provider)
-      const conditionId = await fetchMarketService.getConditionId()
+      const conditionId = await marketMaker.getConditionId()
 
-      await ConditionalTokenService.redeemPositions(daiAddress, conditionId, networkId, provider)
+      await conditionalTokens.redeemPositions(daiAddress, conditionId)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -167,9 +112,7 @@ export const WithdrawWrapper = (props: Props) => {
       setMessage('Withdraw collateral...')
       setStatus(Status.Loading)
 
-      const provider = context.library
-      const marketMakerService = new MarketMakerService(marketAddress)
-      await marketMakerService.withdrawFees(provider)
+      await marketMaker.withdrawFees()
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -182,7 +125,7 @@ export const WithdrawWrapper = (props: Props) => {
   const collateralFormat = `${ethers.utils.formatUnits(collateral, 18)} DAI`
   const resolutionFormat = resolution ? formatDate(resolution) : ''
 
-  const winningOutcome = balance.find((balanceItem: BalanceItems) => balanceItem.winningOutcome)
+  const winningOutcome = balance.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
   const hasCollateral = collateral.isZero()
 
   return (
@@ -190,19 +133,31 @@ export const WithdrawWrapper = (props: Props) => {
       <ClosedMarket date={resolutionFormat} />
       <ViewCard>
         {<SubsectionTitle>Balance</SubsectionTitle>}
-        <TableStyled head={renderTableHeader()}>{renderTableData()}</TableStyled>
-        <SubsectionTitle>Details</SubsectionTitle>
-        <Grid>
-          <TitleValue title="Category" value="Politics" />
-          <TitleValue title="Oracle" value="realit.io and dxDAO" />
-          <TitleValue title="Resolution Date" value={resolutionFormat} />
-          <TitleValue title="Fee" value="1%" />
-          <TitleValue title="Funding" value={fundingFormat} />
-        </Grid>
-        <SubsectionTitle>Market Results</SubsectionTitle>
-        <Grid>
-          <TitleValue title="Collateral" value={collateralFormat} />
-        </Grid>
+        <OutcomeTable
+          balance={balance}
+          disabledColumns={[
+            OutcomeTableValue.Probabilities,
+            OutcomeTableValue.CurrentPrice,
+            OutcomeTableValue.PriceAfterTrade,
+          ]}
+          withWinningOutcome={true}
+        />
+        {isMarketOwner && (
+          <>
+            <SubsectionTitle>Details</SubsectionTitle>
+            <Grid>
+              <TitleValue title="Category" value="Politics" />
+              <TitleValue title="Oracle" value="realit.io and dxDAO" />
+              <TitleValue title="Resolution Date" value={resolutionFormat} />
+              <TitleValue title="Fee" value="1%" />
+              <TitleValue title="Funding" value={fundingFormat} />
+            </Grid>
+            <SubsectionTitle>Market Results</SubsectionTitle>
+            <Grid>
+              <TitleValue title="Collateral" value={collateralFormat} />
+            </Grid>
+          </>
+        )}
         <ButtonContainerStyled>
           <Button
             disabled={winningOutcome && winningOutcome.shares.isZero()}
@@ -210,13 +165,15 @@ export const WithdrawWrapper = (props: Props) => {
           >
             Redeem
           </Button>
-          <Button
-            disabled={hasCollateral}
-            backgroundColor={theme.colors.secondary}
-            onClick={() => withdraw()}
-          >
-            Withdraw Collateral
-          </Button>
+          {isMarketOwner && (
+            <Button
+              disabled={hasCollateral}
+              backgroundColor={theme.colors.secondary}
+              onClick={() => withdraw()}
+            >
+              Withdraw Collateral
+            </Button>
+          )}
         </ButtonContainerStyled>
       </ViewCard>
       {status === Status.Loading ? <FullLoading message={message} /> : null}
@@ -224,4 +181,4 @@ export const WithdrawWrapper = (props: Props) => {
   )
 }
 
-export const Withdraw = withTheme(WithdrawWrapper)
+export const ClosedMarketDetail = withTheme(ClosedMarketDetailWrapper)

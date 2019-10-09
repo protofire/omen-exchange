@@ -2,7 +2,7 @@ import React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { ethers } from 'ethers'
 import { ViewCard } from '../view_card'
-import { Status, BalanceItems } from '../../../util/types'
+import { Status, BalanceItem } from '../../../util/types'
 import { Button } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
@@ -10,7 +10,7 @@ import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
 
 interface Props {
-  balance: BalanceItems[]
+  balance: BalanceItem[]
   question: string
   status: Status
   handleBuy: () => void
@@ -41,7 +41,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 const ViewWrapper = (props: Props) => {
   const { balance, status, theme } = props
 
-  const userHasShares = balance.some((balanceItem: BalanceItems) => {
+  const userHasShares = balance.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
     return !shares.isZero()
   })
@@ -69,7 +69,7 @@ const ViewWrapper = (props: Props) => {
   }
 
   const renderTableData = () => {
-    return balance.map((balanceItem: BalanceItems, index: number) => {
+    return balance.map((balanceItem: BalanceItem, index: number) => {
       const { outcomeName, probability, currentPrice, shares } = balanceItem
       return (
         <TR key={index}>

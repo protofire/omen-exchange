@@ -3,26 +3,26 @@ import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 
-import { BalanceItems, OutcomeSlots, Status } from '../../../util/types'
-import { Button, BigNumberInput } from '../../common'
+import { BalanceItem, OutcomeSlot, OutcomeTableValue, Status } from '../../../util/types'
+import { Button, BigNumberInput, OutcomeTable } from '../../common'
 import { ButtonContainer } from '../../common/button_container'
 import { ButtonLink } from '../../common/button_link'
 import { FormLabel } from '../../common/form_label'
 import { FormRow } from '../../common/form_row'
-import { RadioInput } from '../../common/radio_input'
 import { SubsectionTitle } from '../../common/subsection_title'
-import { Table, TD, TH, THead, TR } from '../../common/table'
+import { Table, TD, TR } from '../../common/table'
 import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
 import { ViewCard } from '../view_card'
-import { MarketMakerService, ConditionalTokenService } from '../../../services'
+import { MarketMakerService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { BigNumberInputReturn } from '../../common/big_number_input'
 import { FullLoading } from '../../common/full_loading'
 import { computePriceAfterTrade } from '../../../util/tools'
+import { useContracts } from '../../../hooks/useContracts'
 
 interface Props {
-  balance: BalanceItems[]
+  balance: BalanceItem[]
   funding: BigNumber
   marketAddress: string
   handleBack: () => void
@@ -31,16 +31,6 @@ interface Props {
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
-`
-
-const RadioContainer = styled.label`
-  align-items: center;
-  display: flex;
-  white-space: nowrap;
-`
-
-const RadioInputStyled = styled(RadioInput)`
-  margin-right: 6px;
 `
 
 const TableStyled = styled(Table)`
@@ -63,22 +53,20 @@ const logger = getLogger('Market::Sell')
 
 const Sell = (props: Props) => {
   const context = useConnectedWeb3Context()
-
-  const TableHead = ['Outcome', 'Probabilities', 'Current Price', 'Shares', 'Price after trade']
-  const TableCellsAlign = ['left', 'right', 'right', 'right', 'right']
+  const { conditionalTokens } = useContracts(context)
 
   const { balance, marketAddress, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [balanceItem, setBalanceItem] = useState<BalanceItems>()
-  const [outcome, setOutcome] = useState<OutcomeSlots>(OutcomeSlots.Yes)
+  const [balanceItem, setBalanceItem] = useState<BalanceItem>()
+  const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [tradedDAI, setTradedDAI] = useState<BigNumber>(new BigNumber(0))
   const [costFee, setCostFee] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
 
   const [tradeYes, tradeNo] =
-    outcome === OutcomeSlots.Yes
+    outcome === OutcomeSlot.Yes
       ? [amountShares.mul(-1), ethers.constants.Zero]
       : [ethers.constants.Zero, amountShares.mul(-1)]
 
@@ -93,7 +81,7 @@ const Sell = (props: Props) => {
   )
 
   useEffect(() => {
-    const balanceItemFound: BalanceItems | undefined = balance.find((balanceItem: BalanceItems) => {
+    const balanceItemFound: BalanceItem | undefined = balance.find((balanceItem: BalanceItem) => {
       return balanceItem.outcomeName === outcome
     })
     setBalanceItem(balanceItemFound)
@@ -117,50 +105,6 @@ const Sell = (props: Props) => {
     setTradedDAI(amountToSellInWei.sub(costFeeInWei))
   }, [outcome, amountShares, balance])
 
-  const renderTableHeader = () => {
-    return (
-      <THead>
-        <TR>
-          {TableHead.map((value, index) => {
-            return (
-              <TH textAlign={TableCellsAlign[index]} key={index}>
-                {value}
-              </TH>
-            )
-          })}
-        </TR>
-      </THead>
-    )
-  }
-
-  const renderTableData = balance.map((balanceItem: BalanceItems, index: number) => {
-    const { outcomeName, probability, currentPrice, shares } = balanceItem
-
-    return (
-      <TR key={index}>
-        <TD textAlign={TableCellsAlign[0]}>
-          <RadioContainer>
-            <RadioInputStyled
-              checked={outcome === outcomeName}
-              name="outcome"
-              onChange={(e: any) => setOutcome(e.target.value)}
-              value={outcomeName}
-            />
-            {outcomeName}
-          </RadioContainer>
-        </TD>
-        <TD textAlign={TableCellsAlign[1]}>{probability} %</TD>
-        <TD textAlign={TableCellsAlign[2]}>
-          {currentPrice} <strong>DAI</strong>
-        </TD>
-        <TD textAlign={TableCellsAlign[3]}>{ethers.utils.formatUnits(shares, 18)}</TD>
-        <TD textAlign={TableCellsAlign[3]}>
-          {pricesAfterTrade[index].toFixed(4)} <strong>DAI</strong>
-        </TD>
-      </TR>
-    )
-  })
-
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
 
   const finish = async () => {
@@ -173,25 +117,20 @@ const Sell = (props: Props) => {
       setMessage(`Selling ${ethers.utils.formatUnits(amountShares, 18)} shares ...`)
 
       const provider = context.library
-      const networkId = context.networkId
 
-      const marketMakerService = new MarketMakerService(marketAddress)
+      const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
 
       const amountSharesNegative = amountShares.mul(-1)
       const outcomeValue =
-        outcome === OutcomeSlots.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
+        outcome === OutcomeSlot.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
 
-      const isApprovedForAll = await ConditionalTokenService.isApprovedForAll(
-        marketAddress,
-        provider,
-        networkId,
-      )
+      const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketAddress)
 
       if (!isApprovedForAll) {
-        await ConditionalTokenService.setApprovalForAll(marketAddress, provider, networkId)
+        await conditionalTokens.setApprovalForAll(marketAddress)
       }
 
-      await marketMakerService.trade(provider, outcomeValue)
+      await marketMaker.trade(outcomeValue)
 
       setStatus(Status.Ready)
       props.handleFinish()
@@ -210,7 +149,13 @@ const Sell = (props: Props) => {
     <>
       <ViewCard>
         <SubsectionTitle>Choose the shares you want to sell</SubsectionTitle>
-        <TableStyled head={renderTableHeader()}>{renderTableData}</TableStyled>
+        <OutcomeTable
+          balance={balance}
+          pricesAfterTrade={pricesAfterTrade}
+          outcomeSelected={outcome}
+          outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
+          disabledColumns={[OutcomeTableValue.Payout]}
+        />
         <AmountWrapper
           formField={
             <TextfieldCustomPlaceholder
