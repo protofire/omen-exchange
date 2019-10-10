@@ -3,6 +3,7 @@ import { BigNumber, BigNumberish } from 'ethers/utils'
 
 import { ConditionalTokenService } from './conditional_token'
 import { getLogger } from '../util/logger'
+import { OutcomeSlot } from '../util/types'
 
 const logger = getLogger('Services::MarketMaker')
 
@@ -13,6 +14,7 @@ const marketMakerAbi = [
   'function conditionIds(uint256) external view returns (bytes32)',
   'function addFunding(uint addedFunds, uint[] distributionHint) external',
   'function totalSupply() external view returns (uint256)',
+  'function buy(uint investmentAmount, uint outcomeIndex, uint minOutcomeTokensToBuy) external',
 ]
 
 class MarketMakerService {
@@ -102,6 +104,19 @@ class MarketMakerService {
     return {
       balanceOfForYes,
       balanceOfForNo,
+    }
+  }
+
+  buy = async (amount: BigNumber, outcome: OutcomeSlot) => {
+    const outcomeIndex = outcome == OutcomeSlot.Yes ? 0 : 1
+    try {
+      await this.contract.buy(amount, outcomeIndex, 0)
+    } catch (err) {
+      logger.error(
+        `There was an error buying '${amount.toString()}' for outcome '${outcome}'`,
+        err.message,
+      )
+      throw err
     }
   }
 }
