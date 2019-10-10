@@ -1,22 +1,21 @@
 import { Contract, ethers, Wallet } from 'ethers'
 import { BigNumber, BigNumberish } from 'ethers/utils'
 
-import { Stage } from '../util/types'
 import { ConditionalTokenService } from './conditional_token'
+import { getLogger } from '../util/logger'
+
+const logger = getLogger('Services::MarketMaker')
 
 const marketMakerAbi = [
-  'function pmSystem() external view returns (address)',
+  'function conditionalTokens() external view returns (address)',
   'function collateralToken() external view returns (address)',
-  'function stage() external view returns (uint8)',
-  'function funding() external view returns (uint256)',
-  'function atomicOutcomeSlotCount() external view returns (uint256)',
-  'function fee() external view returns (uint64)',
+  'function fee() external view returns (uint)',
   'function conditionIds(uint256) external view returns (bytes32)',
+  'function addFunding(uint addedFunds, uint[] distributionHint) external',
+  'function totalSupply() external view returns (uint256)',
   'function calcMarginalPrice(uint8 outcomeTokenIndex) view returns (uint price)',
   'function owner() public view returns (address)',
   'function trade(int[] outcomeTokenAmounts, int collateralLimit) public returns (int netCost)',
-  'function calcNetCost(int[] outcomeTokenAmounts) public view returns (int netCost)',
-  'function calcMarketFee(uint outcomeTokenCost) public view returns (uint)',
   'function withdrawFees() public returns (uint fees)',
 ]
 
@@ -31,39 +30,36 @@ class MarketMakerService {
     this.conditionalTokens = conditionalTokens
   }
 
-  async getFunding(): Promise<any> {
-    return await this.contract.funding()
+  getConditionalToken = async (): Promise<string> => {
+    return await this.contract.conditionalTokens()
   }
 
-  async getFee(): Promise<any> {
-    return await this.contract.fee()
-  }
-
-  async getConditionId() {
-    return await this.contract.conditionIds(0)
-  }
-
-  async getOutcomeSlots(): Promise<any> {
-    return await this.contract.atomicOutcomeSlotCount()
-  }
-
-  async getStage(): Promise<Stage> {
-    return await this.contract.stage()
-  }
-
-  async getCollateralToken(): Promise<string> {
+  getCollateralToken = async (): Promise<string> => {
     return await this.contract.collateralToken()
   }
 
-  async getOwner(): Promise<string> {
+  getFee = async (): Promise<any> => {
+    return await this.contract.fee()
+  }
+
+  getConditionId = async () => {
+    return await this.contract.conditionIds(0)
+  }
+
+  getOwner = async (): Promise<string> => {
     return await this.contract.owner()
   }
 
-  async getConditionalToken(): Promise<string> {
-    return await this.contract.pmSystem()
+  getTotalSupply = async (): Promise<any> => {
+    return await this.contract.totalSupply()
   }
 
-  async getActualPrice(): Promise<any> {
+  addFunding = async (amount: BigNumber) => {
+    logger.log(`Add funding to market maker ${amount}`)
+    this.contract.addFunding(amount, [])
+  }
+
+  getActualPrice = async (): Promise<any> => {
     let [actualPriceForYes, actualPriceForNo] = await Promise.all([
       this.contract.calcMarginalPrice(0),
       this.contract.calcMarginalPrice(1),
@@ -89,7 +85,7 @@ class MarketMakerService {
     }
   }
 
-  async getBalanceInformation(ownerAddress: string): Promise<any> {
+  getBalanceInformation = async (ownerAddress: string): Promise<any> => {
     const conditionId = await this.getConditionId()
     const collateralTokenAddress = await this.getCollateralToken()
 
@@ -114,50 +110,12 @@ class MarketMakerService {
     }
   }
 
-  async getMarketInformation(): Promise<any> {
-    const [
-      funding,
-      fee,
-      conditionId,
-      outcomeSlots,
-      stage,
-      collateralToken,
-      conditionalToken,
-    ] = await Promise.all([
-      this.getFunding(),
-      this.getFee(),
-      this.getConditionId(),
-      this.getOutcomeSlots(),
-      this.getStage(),
-      this.getCollateralToken(),
-      this.getConditionalToken(),
-    ])
-
-    return {
-      funding,
-      fee,
-      conditionId,
-      outcomeSlots,
-      stage,
-      collateralToken,
-      conditionalToken,
-    }
-  }
-
   trade = async (outcomeTokenAmounts: BigNumberish[]) => {
     await this.contract.trade(outcomeTokenAmounts, 0)
   }
 
   withdrawFees = async () => {
     await this.contract.withdrawFees()
-  }
-
-  calculateNetCost = async (outcomeTokenAmounts: BigNumberish[]) => {
-    return await this.contract.calcNetCost(outcomeTokenAmounts)
-  }
-
-  calculateMarketFee = async (outcomeTokenCost: BigNumberish) => {
-    return await this.contract.calcMarketFee(outcomeTokenCost)
   }
 }
 

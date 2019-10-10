@@ -34,6 +34,7 @@ export enum StatusMarketCreation {
   ApprovingDAI = 'Approving DAI',
   CreateMarketMaker = 'Create market maker',
   ApproveDAIForMarketMaker = 'Approve dai for market maker',
+  AddFunding = 'Add funding in market maker',
   InitialTradeInMarketMaker = 'initial trade in market maker',
   Done = 'Done',
   Error = 'Error',

@@ -47,7 +47,7 @@ const MarketViewContainer: FC<Props> = props => {
           marketMaker.getBalanceInformation(user),
           marketMaker.getBalanceInformation(address),
           marketMaker.getActualPrice(),
-          marketMaker.getFunding(),
+          marketMaker.getTotalSupply(),
         ])
 
         const probabilityForYes = actualPrice.actualPriceForYes * 100
