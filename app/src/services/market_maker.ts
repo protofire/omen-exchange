@@ -13,10 +13,6 @@ const marketMakerAbi = [
   'function conditionIds(uint256) external view returns (bytes32)',
   'function addFunding(uint addedFunds, uint[] distributionHint) external',
   'function totalSupply() external view returns (uint256)',
-  'function calcMarginalPrice(uint8 outcomeTokenIndex) view returns (uint price)',
-  'function owner() public view returns (address)',
-  'function trade(int[] outcomeTokenAmounts, int collateralLimit) public returns (int netCost)',
-  'function withdrawFees() public returns (uint fees)',
 ]
 
 class MarketMakerService {
@@ -46,11 +42,7 @@ class MarketMakerService {
     return await this.contract.conditionIds(0)
   }
 
-  getOwner = async (): Promise<string> => {
-    return await this.contract.owner()
-  }
-
-  getTotalSupply = async (): Promise<any> => {
+  getTotalSupply = async (): Promise<BigNumber> => {
     return await this.contract.totalSupply()
   }
 
@@ -59,33 +51,36 @@ class MarketMakerService {
     this.contract.addFunding(amount, [])
   }
 
-  getActualPrice = async (): Promise<any> => {
-    let [actualPriceForYes, actualPriceForNo] = await Promise.all([
-      this.contract.calcMarginalPrice(0),
-      this.contract.calcMarginalPrice(1),
-    ])
-
-    const two = new BigNumber(2)
-    const twoPower64 = two.pow(64)
-
-    actualPriceForYes =
-      actualPriceForYes
-        .mul(new BigNumber(10000))
-        .div(twoPower64)
-        .toNumber() / 10000
-    actualPriceForNo =
-      actualPriceForNo
-        .mul(new BigNumber(10000))
-        .div(twoPower64)
-        .toNumber() / 10000
-
+  /* TODO: TBD */
+  getActualPrice = async (): Promise<{ actualPriceForYes: number; actualPriceForNo: number }> => {
+    // let [actualPriceForYes, actualPriceForNo] = await Promise.all([
+    //   this.contract.calcMarginalPrice(0),
+    //   this.contract.calcMarginalPrice(1),
+    // ])
+    //
+    // const two = new BigNumber(2)
+    // const twoPower64 = two.pow(64)
+    //
+    // actualPriceForYes =
+    //   actualPriceForYes
+    //     .mul(new BigNumber(10000))
+    //     .div(twoPower64)
+    //     .toNumber() / 10000
+    // actualPriceForNo =
+    //   actualPriceForNo
+    //     .mul(new BigNumber(10000))
+    //     .div(twoPower64)
+    //     .toNumber() / 10000
+    //
     return {
-      actualPriceForYes,
-      actualPriceForNo,
+      actualPriceForYes: 0.5,
+      actualPriceForNo: 0.5,
     }
   }
 
-  getBalanceInformation = async (ownerAddress: string): Promise<any> => {
+  getBalanceInformation = async (
+    ownerAddress: string,
+  ): Promise<{ balanceOfForYes: BigNumber; balanceOfForNo: BigNumber }> => {
     const conditionId = await this.getConditionId()
     const collateralTokenAddress = await this.getCollateralToken()
 
@@ -108,14 +103,6 @@ class MarketMakerService {
       balanceOfForYes,
       balanceOfForNo,
     }
-  }
-
-  trade = async (outcomeTokenAmounts: BigNumberish[]) => {
-    await this.contract.trade(outcomeTokenAmounts, 0)
-  }
-
-  withdrawFees = async () => {
-    await this.contract.withdrawFees()
   }
 }
 

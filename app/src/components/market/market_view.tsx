@@ -17,7 +17,6 @@ interface Props {
   marketAddress: string
   stepProfile: StepProfile
   winnerOutcome: Maybe<WinnerOutcome>
-  isMarketOwner: boolean
 }
 
 const MarketView: FC<Props> = props => {

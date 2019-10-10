@@ -130,7 +130,9 @@ const Sell = (props: Props) => {
         await conditionalTokens.setApprovalForAll(marketAddress)
       }
 
-      await marketMaker.trade(outcomeValue)
+      // TODO: TBD
+
+      // await marketMaker.trade(outcomeValue)
 
       setStatus(Status.Ready)
       props.handleFinish()
