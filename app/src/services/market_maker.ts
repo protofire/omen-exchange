@@ -30,7 +30,7 @@ class MarketMakerService {
     this.conditionalTokens = conditionalTokens
   }
 
-  getConditionalToken = async (): Promise<string> => {
+  getConditionalTokens = async (): Promise<string> => {
     return await this.contract.conditionalTokens()
   }
 
