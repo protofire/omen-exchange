@@ -103,16 +103,18 @@ export const computePriceAfterTrade = (
   holdingsNo: BigNumber,
   funding: BigNumber,
 ): [number, number] => {
-  const priceYes = calcPrice(funding, holdingsYes)
-  const priceNo = calcPrice(funding, holdingsNo)
-
-  const netCost = calcNetCost(funding, priceYes, tradeYes, priceNo, tradeNo)
-
-  const newHoldingsYes = holdingsYes.sub(tradeYes).add(netCost)
-  const newHoldingsNo = holdingsNo.sub(tradeNo).add(netCost)
-
-  const newPriceYes = calcPrice(funding, newHoldingsYes)
-  const newPriceNo = calcPrice(funding, newHoldingsNo)
-
+  // TODO: TBD
+  // const priceYes = calcPrice(funding, holdingsYes)
+  // const priceNo = calcPrice(funding, holdingsNo)
+  //
+  // const netCost = calcNetCost(funding, priceYes, tradeYes, priceNo, tradeNo)
+  //
+  // const newHoldingsYes = holdingsYes.sub(tradeYes).add(netCost)
+  // const newHoldingsNo = holdingsNo.sub(tradeNo).add(netCost)
+  //
+  // const newPriceYes = calcPrice(funding, newHoldingsYes)
+  // const newPriceNo = calcPrice(funding, newHoldingsNo)
+  const newPriceYes = 0.5
+  const newPriceNo = 0.5
   return [newPriceYes, newPriceNo]
 }

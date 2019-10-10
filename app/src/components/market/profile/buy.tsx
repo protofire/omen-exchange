@@ -138,7 +138,8 @@ const Buy = (props: Props) => {
       // Check outcome value to use
       const outcomeValue = outcome === OutcomeSlot.Yes ? [tradedShares, 0] : [0, tradedShares]
 
-      await marketMaker.trade(outcomeValue)
+      //TODO: TBD
+      // await marketMaker.trade(outcomeValue)
 
       setStatus(Status.Ready)
       props.handleFinish()

@@ -67,23 +67,33 @@ const MarketWizardCreatorContainer: FC = () => {
         conditionalTokens.address,
         daiAddress,
         conditionId,
-        funding,
       )
       setMarketMakerAddress(marketMakerAddress)
 
-      // Don't perform initial trade if odds are 50/50
-      if (+outcomeProbabilityOne !== 50) {
-        setStatus(StatusMarketCreation.ApproveDAIForMarketMaker)
-        await daiService.approveUnlimited(provider, marketMakerAddress)
+      setStatus(StatusMarketCreation.ApproveDAIForMarketMaker)
+      await daiService.approveUnlimited(provider, marketMakerAddress)
 
-        setStatus(StatusMarketCreation.InitialTradeInMarketMaker)
-        const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
-        const initialTradeOutcomeTokens = computeInitialTradeOutcomeTokens(
-          [+outcomeProbabilityOne, +outcomeProbabilityTwo],
-          funding,
-        )
-        await marketMaker.trade(initialTradeOutcomeTokens)
-      }
+      setStatus(StatusMarketCreation.AddFunding)
+      const marketMakerService = new MarketMakerService(
+        marketMakerAddress,
+        conditionalTokens,
+        provider,
+      )
+      await marketMakerService.addFunding(funding)
+
+      // Don't perform initial trade if odds are 50/50
+      // if (+outcomeProbabilityOne !== 50) {
+      //   setStatus(StatusMarketCreation.ApproveDAIForMarketMaker)
+      //   await daiService.approveUnlimited(provider, marketMakerAddress)
+      //
+      //   setStatus(StatusMarketCreation.InitialTradeInMarketMaker)
+      //   const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+      //   const initialTradeOutcomeTokens = computeInitialTradeOutcomeTokens(
+      //     [+outcomeProbabilityOne, +outcomeProbabilityTwo],
+      //     funding,
+      //   )
+      //   await marketMaker.trade(initialTradeOutcomeTokens)
+      // }
 
       setStatus(StatusMarketCreation.Done)
     } catch (err) {

@@ -27,7 +27,6 @@ const MarketViewContainer: FC<Props> = props => {
   const [resolution, setResolution] = useState<Maybe<Date>>(null)
   const [stepProfile, setStepProfile] = useState<StepProfile>(StepProfile.View)
   const [winnerOutcome, setWinnerOutcome] = useState<Maybe<WinnerOutcome>>(null)
-  const [isMarketOwner, setIsMarketOwner] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchContractData = async ({ enableStatus }: any) => {
@@ -46,8 +45,9 @@ const MarketViewContainer: FC<Props> = props => {
         ] = await Promise.all([
           marketMaker.getBalanceInformation(user),
           marketMaker.getBalanceInformation(address),
-          marketMaker.getActualPrice(),
-          marketMaker.getFunding(),
+          // marketMaker.getActualPrice(),
+          { actualPriceForYes: 0.5, actualPriceForNo: 0.5 },
+          marketMaker.getTotalSupply(),
         ])
 
         const probabilityForYes = actualPrice.actualPriceForYes * 100
@@ -124,10 +124,6 @@ const MarketViewContainer: FC<Props> = props => {
         const conditionId = await marketMaker.getConditionId()
         const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
 
-        const ownerAddress = await marketMaker.getOwner()
-        const isMarketOwner = ownerAddress.toLowerCase() === userAddress.toLowerCase()
-        setIsMarketOwner(isMarketOwner)
-
         if (isConditionResolved) {
           const winnerOutcome = await conditionalTokens.getWinnerOutcome(conditionId)
           setWinnerOutcome(winnerOutcome)
@@ -151,7 +147,6 @@ const MarketViewContainer: FC<Props> = props => {
       status={status}
       stepProfile={stepProfile}
       winnerOutcome={winnerOutcome}
-      isMarketOwner={isMarketOwner}
     />
   )
 }
