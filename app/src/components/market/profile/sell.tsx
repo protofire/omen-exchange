@@ -88,21 +88,21 @@ const Sell = (props: Props) => {
 
     const amountSharesInUnits = +ethers.utils.formatUnits(amountShares, 18)
     const individualPrice = balanceItemFound ? +balanceItemFound.currentPrice : 1
-    const amountToSell = individualPrice * amountSharesInUnits
+    const amountSharesToSell = individualPrice * amountSharesInUnits
 
-    const amountToSellInWei = ethers.utils
-      .bigNumberify(Math.round(amountToSell * 10000))
+    const amountSharesToSellInWei = ethers.utils
+      .bigNumberify(Math.round(amountSharesToSell * 10000))
       .mul(ethers.constants.WeiPerEther)
       .div(10000)
 
     const costFeeInWei = ethers.utils
-      .bigNumberify(Math.round(amountToSell * 0.01 * 10000))
+      .bigNumberify(Math.round(amountSharesToSell * 0.01 * 10000))
       .mul(ethers.constants.WeiPerEther)
       .div(10000)
 
     setCostFee(costFeeInWei)
 
-    setTradedDAI(amountToSellInWei.sub(costFeeInWei))
+    setTradedDAI(amountSharesToSellInWei.sub(costFeeInWei))
   }, [outcome, amountShares, balance])
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
@@ -120,19 +120,12 @@ const Sell = (props: Props) => {
 
       const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
 
-      const amountSharesNegative = amountShares.mul(-1)
-      const outcomeValue =
-        outcome === OutcomeSlot.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
-
       const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketAddress)
-
       if (!isApprovedForAll) {
         await conditionalTokens.setApprovalForAll(marketAddress)
       }
 
-      // TODO: TBD
-
-      // await marketMaker.trade(outcomeValue)
+      await marketMaker.sell(amountShares, outcome)
 
       setStatus(Status.Ready)
       props.handleFinish()
