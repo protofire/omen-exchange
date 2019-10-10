@@ -15,6 +15,7 @@ const marketMakerAbi = [
   'function addFunding(uint addedFunds, uint[] distributionHint) external',
   'function totalSupply() external view returns (uint256)',
   'function buy(uint investmentAmount, uint outcomeIndex, uint minOutcomeTokensToBuy) external',
+  'function calcBuyAmount(uint investmentAmount, uint outcomeIndex) public view returns (uint)',
 ]
 
 class MarketMakerService {
@@ -110,7 +111,8 @@ class MarketMakerService {
   buy = async (amount: BigNumber, outcome: OutcomeSlot) => {
     const outcomeIndex = outcome == OutcomeSlot.Yes ? 0 : 1
     try {
-      await this.contract.buy(amount, outcomeIndex, 0)
+      const outcomeTokensToBuy = await this.contract.calcBuyAmount(amount, outcomeIndex)
+      await this.contract.buy(amount, outcomeIndex, outcomeTokensToBuy)
     } catch (err) {
       logger.error(
         `There was an error buying '${amount.toString()}' for outcome '${outcome}'`,
