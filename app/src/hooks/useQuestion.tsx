@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { MarketMakerService } from '../services'
