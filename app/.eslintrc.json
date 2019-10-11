@@ -16,7 +16,8 @@
     "prettier/prettier": "error",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "no-warning-comments": "warn"
   },
   "settings": {
     "react": {
