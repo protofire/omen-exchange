@@ -3,7 +3,7 @@ import styled, { withTheme } from 'styled-components'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
-import { ViewCard } from '../view_card'
+import { ViewCard } from '../../common/view_card'
 import { Button, OutcomeTable } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
