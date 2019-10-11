@@ -24,7 +24,7 @@ import { useContracts } from '../../../hooks/useContracts'
 interface Props {
   balance: BalanceItem[]
   funding: BigNumber
-  marketAddress: string
+  marketMakerAddress: string
   handleBack: () => void
   handleFinish: () => void
 }
@@ -55,7 +55,7 @@ const Sell = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { conditionalTokens } = useContracts(context)
 
-  const { balance, marketAddress, funding } = props
+  const { balance, marketMakerAddress, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
@@ -118,16 +118,16 @@ const Sell = (props: Props) => {
 
       const provider = context.library
 
-      const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
+      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
       const amountSharesNegative = amountShares.mul(-1)
       const outcomeValue =
         outcome === OutcomeSlot.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
 
-      const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketAddress)
+      const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketMakerAddress)
 
       if (!isApprovedForAll) {
-        await conditionalTokens.setApprovalForAll(marketAddress)
+        await conditionalTokens.setApprovalForAll(marketMakerAddress)
       }
 
       // TODO: TBD

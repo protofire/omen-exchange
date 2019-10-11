@@ -14,13 +14,13 @@ interface Props {
   question: string
   resolution: Maybe<Date>
   status: Status
-  marketAddress: string
+  marketMakerAddress: string
   stepProfile: StepProfile
   winnerOutcome: Maybe<WinnerOutcome>
 }
 
 const MarketView: FC<Props> = props => {
-  const { funding, question, resolution, balance, marketAddress, stepProfile } = props
+  const { funding, question, resolution, balance, marketMakerAddress, stepProfile } = props
   const [currentStep, setCurrentStep] = useState<StepProfile>(stepProfile)
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const MarketView: FC<Props> = props => {
               funding={funding}
               handleBack={() => handleBack()}
               handleFinish={() => handleFinish()}
-              marketAddress={marketAddress}
+              marketMakerAddress={marketMakerAddress}
             />
           </>
         )
@@ -84,7 +84,7 @@ const MarketView: FC<Props> = props => {
               handleBack={() => handleBack()}
               handleFinish={() => handleFinish()}
               balance={balance}
-              marketAddress={marketAddress}
+              marketMakerAddress={marketMakerAddress}
               funding={funding}
             />
           </>

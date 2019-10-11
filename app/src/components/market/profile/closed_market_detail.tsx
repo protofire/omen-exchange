@@ -54,7 +54,7 @@ interface Props {
   funding: BigNumber
   question: string
   resolution: Date | null
-  marketAddress: string
+  marketMakerAddress: string
 }
 
 const logger = getLogger('Market::ClosedMarketDetail')
@@ -63,14 +63,14 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { conditionalTokens } = useContracts(context)
 
-  const { theme, balance, marketAddress, resolution, funding } = props
+  const { theme, balance, marketMakerAddress, resolution, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
   const provider = context.library
-  const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
+  const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -79,12 +79,12 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
       const daiAddress = getContractAddress(networkId, 'dai')
       const daiService = new ERC20Service(daiAddress)
-      const collateralBalance = await daiService.getCollateral(marketAddress, provider)
+      const collateralBalance = await daiService.getCollateral(marketMakerAddress, provider)
       setCollateral(collateralBalance)
     }
 
     fetchBalance()
-  }, [collateral, context, marketAddress])
+  }, [collateral, context, marketMakerAddress])
 
   const redeem = async () => {
     try {

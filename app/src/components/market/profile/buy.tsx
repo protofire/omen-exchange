@@ -28,7 +28,7 @@ interface Props {
   funding: BigNumber
   handleBack: () => void
   handleFinish: () => void
-  marketAddress: string
+  marketMakerAddress: string
 }
 
 const ButtonLinkStyled = styled(ButtonLink)`
@@ -58,7 +58,7 @@ const Buy = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { conditionalTokens } = useContracts(context)
 
-  const { balance, marketAddress, funding } = props
+  const { balance, marketMakerAddress, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
@@ -117,13 +117,13 @@ const Buy = (props: Props) => {
 
       const daiAddress = getContractAddress(networkId, 'dai')
 
-      const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
+      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
       const daiService = new ERC20Service(daiAddress)
 
       const hasEnoughAlowance = await daiService.hasEnoughAllowance(
         provider,
         user,
-        marketAddress,
+        marketMakerAddress,
         cost,
       )
 
@@ -132,7 +132,7 @@ const Buy = (props: Props) => {
         // this can be improved if, instead of adding the 1% fee manually in the front, we use the `calcMarketFee`
         // contract method and add it to the result of `calcNetCost` result
         const costWithErrorMargin = cost.mul(11000).div(10000)
-        await daiService.approve(provider, marketAddress, costWithErrorMargin)
+        await daiService.approve(provider, marketMakerAddress, costWithErrorMargin)
       }
 
       // Check outcome value to use

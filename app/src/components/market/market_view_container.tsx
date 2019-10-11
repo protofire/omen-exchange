@@ -8,25 +8,27 @@ import { useContracts } from '../../hooks/useContracts'
 import { MarketMakerService } from '../../services'
 import { getLogger } from '../../util/logger'
 import { Status, BalanceItem, OutcomeSlot, StepProfile, WinnerOutcome } from '../../util/types'
+import { useQuestion } from '../../hooks/useQuestion'
 
 const logger = getLogger('Market::MarketView')
 
 interface Props {
-  address: string
+  marketMakerAddress: string
 }
 
 const MarketViewContainer: FC<Props> = props => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens, realitio } = useContracts(context)
+  const { conditionalTokens } = useContracts(context)
 
   const [balance, setBalance] = useState<BalanceItem[]>([])
-  const [address] = useState<string>(props.address)
+  const [marketMakerAddress] = useState<string>(props.marketMakerAddress)
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [funding, setFunding] = useState<BigNumber>(ethers.constants.Zero)
-  const [question, setQuestion] = useState<string | null>(null)
-  const [resolution, setResolution] = useState<Maybe<Date>>(null)
+
   const [stepProfile, setStepProfile] = useState<StepProfile>(StepProfile.View)
   const [winnerOutcome, setWinnerOutcome] = useState<Maybe<WinnerOutcome>>(null)
+
+  const { question, resolution } = useQuestion(marketMakerAddress, context)
 
   useEffect(() => {
     const fetchContractData = async ({ enableStatus }: any) => {
@@ -35,7 +37,7 @@ const MarketViewContainer: FC<Props> = props => {
         const provider = context.library
         const user = await provider.getSigner().getAddress()
 
-        const marketMaker = new MarketMakerService(address, conditionalTokens, provider)
+        const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
         const [
           balanceInformation,
@@ -44,7 +46,7 @@ const MarketViewContainer: FC<Props> = props => {
           marketFunding,
         ] = await Promise.all([
           marketMaker.getBalanceInformation(user),
-          marketMaker.getBalanceInformation(address),
+          marketMaker.getBalanceInformation(marketMakerAddress),
           // marketMaker.getActualPrice(),
           { actualPriceForYes: 0.5, actualPriceForNo: 0.5 },
           marketMaker.getTotalSupply(),
@@ -89,37 +91,14 @@ const MarketViewContainer: FC<Props> = props => {
     }, 2000)
 
     return () => clearInterval(intervalId)
-  }, [address, context, winnerOutcome, conditionalTokens])
-
-  // fetch Realitio question data
-  useEffect(() => {
-    const fetchQuestion = async () => {
-      try {
-        const provider = context.library
-
-        const marketMaker = new MarketMakerService(address, conditionalTokens, provider)
-
-        const conditionId = await marketMaker.getConditionId()
-        const questionId = await conditionalTokens.getQuestionId(conditionId, provider)
-        const { question, resolution } = await realitio.getQuestion(questionId, provider)
-
-        setQuestion(question)
-        setResolution(resolution)
-      } catch (error) {
-        logger.error('There was an error fetching the question data:', error.message)
-      }
-    }
-
-    fetchQuestion()
-  }, [address, context, conditionalTokens, realitio])
+  }, [marketMakerAddress, context, winnerOutcome, conditionalTokens])
 
   useEffect(() => {
     const fetchContractStatus = async () => {
       try {
         const provider = context.library
-        const userAddress = await provider.getSigner().getAddress()
 
-        const marketMaker = new MarketMakerService(address, conditionalTokens, provider)
+        const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
         const conditionId = await marketMaker.getConditionId()
         const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
@@ -135,13 +114,13 @@ const MarketViewContainer: FC<Props> = props => {
     }
 
     fetchContractStatus()
-  }, [address, context, stepProfile, conditionalTokens])
+  }, [marketMakerAddress, context, stepProfile, conditionalTokens])
 
   return (
     <MarketView
       balance={balance}
       funding={funding}
-      marketAddress={address}
+      marketMakerAddress={marketMakerAddress}
       question={question || ''}
       resolution={resolution}
       status={status}

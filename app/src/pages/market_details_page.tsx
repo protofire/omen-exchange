@@ -13,7 +13,7 @@ const MarketDetailsPage = (props: RouteComponentProps<RouteParams>) => {
 
   return (
     <ConnectedWeb3>
-      <MarketViewContainer address={props.match.params.address} />
+      <MarketViewContainer marketMakerAddress={props.match.params.address} />
     </ConnectedWeb3>
   )
 }
