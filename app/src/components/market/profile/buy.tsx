@@ -64,7 +64,7 @@ const Buy = (props: Props) => {
   const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [tradedShares, setTradedShares] = useState<BigNumber>(new BigNumber(0))
-  const [value, setValue] = useState<BigNumber>(new BigNumber(0))
+  const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
 
   const [tradeYes, tradeNo] =
@@ -87,24 +87,24 @@ const Buy = (props: Props) => {
       return balanceItem.outcomeName === outcome
     })
 
-    const valueNumber = +ethers.utils.formatUnits(value, 18)
+    const valueNumber = +ethers.utils.formatUnits(amount, 18)
 
     const price = balanceItemFound ? +balanceItemFound.currentPrice : 1
-    const amount = valueNumber / price
+    const sharesAmount = valueNumber / price
 
-    const amountInWei = ethers.utils
-      .bigNumberify('' + Math.round(10000 * amount)) // cast to string to avoid overflows
+    const sharesAmountInWei = ethers.utils
+      .bigNumberify('' + Math.round(10000 * sharesAmount)) // cast to string to avoid overflows
       .mul(ethers.constants.WeiPerEther)
       .div(10000)
 
-    setTradedShares(amountInWei)
+    setTradedShares(sharesAmountInWei)
 
     const costWithFee = ethers.utils
       .bigNumberify('' + Math.round(valueNumber * 1.01 * 10000)) // cast to string to avoid overflows
       .mul(ethers.constants.WeiPerEther)
       .div(10000)
     setCost(costWithFee)
-  }, [outcome, value, balance])
+  }, [outcome, amount, balance])
 
   const finish = async () => {
     try {
@@ -135,11 +135,8 @@ const Buy = (props: Props) => {
         await daiService.approve(provider, marketAddress, costWithErrorMargin)
       }
 
-      // Check outcome value to use
-      const outcomeValue = outcome === OutcomeSlot.Yes ? [tradedShares, 0] : [0, tradedShares]
-
       //TODO: TBD
-      // await marketMaker.trade(outcomeValue)
+      await marketMaker.buy(amount, outcome)
 
       setStatus(Status.Ready)
       props.handleFinish()
@@ -168,8 +165,8 @@ const Buy = (props: Props) => {
               formField={
                 <BigNumberInput
                   name="amount"
-                  value={value}
-                  onChange={(e: BigNumberInputReturn) => setValue(e.value)}
+                  value={amount}
+                  onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
                   decimals={18}
                 />
               }
@@ -179,7 +176,7 @@ const Buy = (props: Props) => {
           note={[
             'You will be charged an extra 1% trade fee of ',
             <strong key="1">
-              {cost.isZero() ? '0' : ethers.utils.formatUnits(cost.sub(value), 18)}
+              {cost.isZero() ? '0' : ethers.utils.formatUnits(cost.sub(amount), 18)}
             </strong>,
           ]}
           title={'Amount'}
