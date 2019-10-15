@@ -9,6 +9,7 @@ const logger = getLogger('Services::MarketMaker')
 
 const marketMakerAbi = [
   'function conditionalTokens() external view returns (address)',
+  'function balanceOf(address addr) external view returns (uint256)',
   'function collateralToken() external view returns (address)',
   'function fee() external view returns (uint)',
   'function conditionIds(uint256) external view returns (bytes32)',
@@ -108,8 +109,12 @@ class MarketMakerService {
     }
   }
 
+  balanceOf = async (address: string): Promise<BigNumber> => {
+    return await this.contract.balanceOf(address)
+  }
+
   buy = async (amount: BigNumber, outcome: OutcomeSlot) => {
-    const outcomeIndex = outcome == OutcomeSlot.Yes ? 0 : 1
+    const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {
       const outcomeTokensToBuy = await this.contract.calcBuyAmount(amount, outcomeIndex)
       await this.contract.buy(amount, outcomeIndex, outcomeTokensToBuy)
@@ -123,7 +128,7 @@ class MarketMakerService {
   }
 
   calcBuyAmount = async (amount: BigNumber, outcome: OutcomeSlot): Promise<BigNumber> => {
-    const outcomeIndex = outcome == OutcomeSlot.Yes ? 0 : 1
+    const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {
       return this.contract.calcBuyAmount(amount, outcomeIndex)
     } catch (err) {

@@ -17,7 +17,7 @@ const MarketViewContainer: FC<Props> = props => {
   const [stepProfile, setStepProfile] = useState<StepProfile>(StepProfile.View)
 
   const { question, resolution } = useQuestion(marketMakerAddress, context)
-  const { marketFunding, balance, winnerOutcome, status } = useMarketMakerData(
+  const { marketMakerFunding, balance, winnerOutcome, status } = useMarketMakerData(
     marketMakerAddress,
     context,
   )
@@ -29,7 +29,7 @@ const MarketViewContainer: FC<Props> = props => {
   return (
     <MarketView
       balance={balance}
-      funding={marketFunding}
+      funding={marketMakerFunding}
       marketMakerAddress={marketMakerAddress}
       question={question || ''}
       resolution={resolution}

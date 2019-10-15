@@ -77,7 +77,7 @@ const Buy = (props: Props) => {
     () => (amount: BigNumber) => {
       return marketMaker.calcBuyAmount(amount, outcome)
     },
-    [outcome],
+    [outcome, marketMaker],
   )
   const tradedShares = useAsyncDerivedValue(amount, new BigNumber(0), calcBuyAmount)
 

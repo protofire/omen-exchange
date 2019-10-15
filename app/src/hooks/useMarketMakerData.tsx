@@ -16,21 +16,25 @@ export const useMarketMakerData = (
 ): {
   totalPoolShares: BigNumber
   userPoolShares: BigNumber
-  marketFunding: BigNumber
+  userPoolSharesPercentage: number
   balance: BalanceItem[]
   winnerOutcome: Maybe<WinnerOutcome>
-  userPoolSharesPercentage: number
   status: Status
+  marketMakerFunding: BigNumber
+  marketMakerUserFunding: BigNumber
+  marketMakerFundingPercentage: number
 } => {
   const { conditionalTokens } = useContracts(context)
 
   const [totalPoolShares, setTotalPoolShares] = useState<BigNumber>(new BigNumber(0))
   const [userPoolShares, setUserPoolShares] = useState<BigNumber>(new BigNumber(0))
-  const [marketFunding, setMarketFunding] = useState<BigNumber>(new BigNumber(0))
   const [balance, setBalance] = useState<BalanceItem[]>([])
   const [winnerOutcome, setWinnerOutcome] = useState<Maybe<WinnerOutcome>>(null)
   const [userPoolSharesPercentage, setUserPoolSharesPercentage] = useState<number>(0)
   const [status, setStatus] = useState<Status>(Status.Ready)
+  const [marketMakerFunding, setMarketMakerFunding] = useState<BigNumber>(new BigNumber(0))
+  const [marketMakerUserFunding, setMarketMakerUserFunding] = useState<BigNumber>(new BigNumber(0))
+  const [marketMakerFundingPercentage, setMarketMakerFundingPercentage] = useState<number>(0)
 
   useEffect(() => {
     const fetchMarketMakerData = async ({ enableStatus }: { enableStatus: boolean }) => {
@@ -49,16 +53,21 @@ export const useMarketMakerData = (
           : null
         setWinnerOutcome(winnerOutcomeData)
 
-        const [userShares, marketMakerShares, actualPrices, marketMakerFunding] = await Promise.all(
-          [
-            marketMaker.getBalanceInformation(user),
-            marketMaker.getBalanceInformation(marketMakerAddress),
-            // TODO: calculate actual prices
-            // marketMaker.getActualPrice(),
-            { actualPriceForYes: 0.5, actualPriceForNo: 0.5 },
-            marketMaker.getTotalSupply(),
-          ],
-        )
+        const [
+          userShares,
+          marketMakerShares,
+          actualPrices,
+          marketMakerFund,
+          marketMakerUserFund,
+        ] = await Promise.all([
+          marketMaker.getBalanceInformation(user),
+          marketMaker.getBalanceInformation(marketMakerAddress),
+          // TODO: calculate actual prices
+          // marketMaker.getActualPrice(),
+          { actualPriceForYes: 0.5, actualPriceForNo: 0.5 },
+          marketMaker.getTotalSupply(),
+          marketMaker.balanceOf(user),
+        ])
 
         const probabilityForYes = actualPrices.actualPriceForYes * 100
         const probabilityForNo = actualPrices.actualPriceForNo * 100
@@ -95,11 +104,23 @@ export const useMarketMakerData = (
         const userSharesPercentage =
           totalSharesNumber > 0 ? (totalUserSharesNumber / totalSharesNumber) * 100 : 0
 
+        const marketMakerFundingNumber = +ethers.utils.formatUnits(marketMakerFund, 18)
+        const marketMakerUserFundingNumber = +ethers.utils.formatUnits(marketMakerUserFund, 18)
+        const marketMakerFundPercentage =
+          marketMakerFundingNumber > 0
+            ? (marketMakerUserFundingNumber / marketMakerFundingNumber) * 100
+            : 0
+
         setTotalPoolShares(totalShares)
         setUserPoolShares(totalUserShares)
-        setMarketFunding(marketMakerFunding)
-        setBalance(balanceShares)
         setUserPoolSharesPercentage(userSharesPercentage)
+
+        setMarketMakerFunding(marketMakerFund)
+        setMarketMakerUserFunding(marketMakerUserFund)
+        setMarketMakerFundingPercentage(marketMakerFundPercentage)
+
+        setBalance(balanceShares)
+
         enableStatus && setStatus(Status.Done)
       } catch (error) {
         logger.error('There was an error fetching the market maker data:', error.message)
@@ -114,15 +135,17 @@ export const useMarketMakerData = (
     }, 2000)
 
     return () => clearInterval(intervalId)
-  }, [marketMakerAddress, context, conditionalTokens])
+  }, [marketMakerAddress, context, conditionalTokens, winnerOutcome])
 
   return {
     totalPoolShares,
     userPoolShares,
-    marketFunding,
-    balance,
     userPoolSharesPercentage,
+    balance,
     winnerOutcome,
     status,
+    marketMakerFunding,
+    marketMakerUserFunding,
+    marketMakerFundingPercentage,
   }
 }

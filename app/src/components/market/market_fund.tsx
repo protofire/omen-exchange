@@ -1,17 +1,21 @@
-import React, { FC } from 'react'
-import styled from 'styled-components'
+import React, { FC, useState } from 'react'
+import styled, { withTheme } from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
 import { SectionTitle } from '../common/section_title'
 import { formatDate } from '../../util/tools'
 import { ViewCard } from '../common/view_card/'
 import { Table, TD, TR } from '../common/table'
-import { FormLabel } from '../common/form_label'
 import { ethers } from 'ethers'
 import { BalanceItem, OutcomeTableValue, Status, WinnerOutcome } from '../../util/types'
 import { OutcomeTable } from '../common/outcome_table'
 import { FullLoading } from '../common/full_loading'
 import { SubsectionTitle } from '../common/subsection_title'
+import { BigNumberInput, BigNumberInputReturn } from '../common/big_number_input'
+import { FormRow } from '../common/form_row'
+import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
+import { ButtonContainer } from '../common/button_container'
+import { Button } from '../common/button'
 
 interface Props {
   marketMakerAddress: string
@@ -19,22 +23,48 @@ interface Props {
   resolution: Maybe<Date>
   totalPoolShares: BigNumber
   userPoolShares: BigNumber
-  marketFunding: BigNumber
   userPoolSharesPercentage: number
+  marketMakerFunding: BigNumber
+  marketMakerUserFunding: BigNumber
+  marketMakerFundingPercentage: number
   balance: BalanceItem[]
   winnerOutcome: Maybe<WinnerOutcome>
   status: Status
+  theme?: any
 }
 
 const TableStyled = styled(Table)`
   margin-bottom: 30px;
 `
 
-const FormLabelStyled = styled(FormLabel)`
-  margin-bottom: 10px;
+const AmountWrapper = styled(FormRow)`
+  margin-bottom: 30px;
+  width: 100%;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    width: 50%;
+  }
 `
 
-const MarketFund: FC<Props> = props => {
+const ButtonContainerStyled = styled(ButtonContainer)`
+  display: grid;
+  grid-row-gap: 10px;
+  grid-template-columns: 1fr;
+
+  > button {
+    margin-left: 0;
+  }
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: flex;
+
+    > button {
+      margin-left: 10px;
+    }
+  }
+`
+
+const MarketFundWrapper: FC<Props> = props => {
   const {
     question,
     resolution,
@@ -43,7 +73,13 @@ const MarketFund: FC<Props> = props => {
     userPoolSharesPercentage,
     balance,
     status,
+    marketMakerUserFunding,
+    marketMakerFunding,
+    marketMakerFundingPercentage,
+    theme,
   } = props
+
+  const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
 
   return (
     <>
@@ -51,6 +87,21 @@ const MarketFund: FC<Props> = props => {
       <ViewCard>
         <SubsectionTitle>Totals</SubsectionTitle>
         <TableStyled>
+          <TR>
+            <TD>Total funding</TD>
+            <TD textAlign="right">
+              {marketMakerFunding ? ethers.utils.formatUnits(marketMakerFunding, 18) : '0'}{' '}
+              <strong>DAI</strong>
+            </TD>
+          </TR>
+          <TR>
+            <TD>Your funding</TD>
+            <TD textAlign="right">
+              {marketMakerUserFunding ? ethers.utils.formatUnits(marketMakerUserFunding, 18) : '0'}{' '}
+              ({marketMakerFundingPercentage ? marketMakerFundingPercentage.toFixed(2) : '0'} %){' '}
+              <strong>DAI</strong>
+            </TD>
+          </TR>
           <TR>
             <TD>Total pool shares</TD>
             <TD textAlign="right">
@@ -78,10 +129,34 @@ const MarketFund: FC<Props> = props => {
           ]}
           displayRadioSelection={false}
         />
+        <AmountWrapper
+          formField={
+            <>
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInput
+                    name="amount"
+                    value={amount}
+                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                    decimals={18}
+                  />
+                }
+                placeholderText="DAI"
+              />
+            </>
+          }
+          title={'Amount'}
+        />
+        <ButtonContainerStyled>
+          <Button onClick={() => null}>Add funding</Button>
+          <Button backgroundColor={theme.colors.secondary} onClick={() => null}>
+            Remove funding
+          </Button>
+        </ButtonContainerStyled>
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}
     </>
   )
 }
 
-export { MarketFund }
+export const MarketFund = withTheme(MarketFundWrapper)
