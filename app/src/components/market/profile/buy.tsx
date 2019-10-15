@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
@@ -13,6 +13,7 @@ import { computePriceAfterTrade } from '../../../util/tools'
 import { getContractAddress } from '../../../util/addresses'
 import { getLogger } from '../../../util/logger'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { useAsyncDerivedValue } from '../../../hooks/useAsyncDerivedValue'
 import { Well } from '../../common/well'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
@@ -63,17 +64,28 @@ const Buy = (props: Props) => {
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
-  const [tradedShares, setTradedShares] = useState<BigNumber>(new BigNumber(0))
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
+
+  const holdingsYes = balance[0].holdings
+  const holdingsNo = balance[1].holdings
+
+  const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, context.library)
+
+  // get the amount of shares that will be traded
+  const calcBuyAmount = useMemo(
+    () => (amount: BigNumber) => {
+      return marketMaker.calcBuyAmount(amount, outcome)
+    },
+    [outcome],
+  )
+  const tradedShares = useAsyncDerivedValue(amount, new BigNumber(0), calcBuyAmount)
 
   const [tradeYes, tradeNo] =
     outcome === OutcomeSlot.Yes
       ? [tradedShares, ethers.constants.Zero]
       : [ethers.constants.Zero, tradedShares]
 
-  const holdingsYes = balance[0].holdings
-  const holdingsNo = balance[1].holdings
   const pricesAfterTrade = computePriceAfterTrade(
     tradeYes,
     tradeNo,
@@ -83,21 +95,7 @@ const Buy = (props: Props) => {
   )
 
   useEffect(() => {
-    const balanceItemFound: BalanceItem | undefined = balance.find((balanceItem: BalanceItem) => {
-      return balanceItem.outcomeName === outcome
-    })
-
     const valueNumber = +ethers.utils.formatUnits(amount, 18)
-
-    const price = balanceItemFound ? +balanceItemFound.currentPrice : 1
-    const sharesAmount = valueNumber / price
-
-    const sharesAmountInWei = ethers.utils
-      .bigNumberify('' + Math.round(10000 * sharesAmount)) // cast to string to avoid overflows
-      .mul(ethers.constants.WeiPerEther)
-      .div(10000)
-
-    setTradedShares(sharesAmountInWei)
 
     const costWithFee = ethers.utils
       .bigNumberify('' + Math.round(valueNumber * 1.01 * 10000)) // cast to string to avoid overflows
@@ -117,7 +115,6 @@ const Buy = (props: Props) => {
 
       const daiAddress = getContractAddress(networkId, 'dai')
 
-      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
       const daiService = new ERC20Service(daiAddress)
 
       const hasEnoughAlowance = await daiService.hasEnoughAllowance(
