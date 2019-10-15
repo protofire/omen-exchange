@@ -20,7 +20,6 @@ const MarketFundContainer: FC<Props> = props => {
     userPoolSharesPercentage,
     balance,
     winnerOutcome,
-    status,
     marketMakerFunding,
     marketMakerUserFunding,
     marketMakerFundingPercentage,
@@ -39,7 +38,6 @@ const MarketFundContainer: FC<Props> = props => {
       marketMakerFundingPercentage={marketMakerFundingPercentage}
       balance={balance}
       winnerOutcome={winnerOutcome}
-      status={status}
     />
   )
 }

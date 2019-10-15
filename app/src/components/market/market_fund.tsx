@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
@@ -16,6 +16,10 @@ import { FormRow } from '../common/form_row'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 import { ButtonContainer } from '../common/button_container'
 import { Button } from '../common/button'
+import { getLogger } from '../../util/logger'
+import { MarketMakerService } from '../../services'
+import { useContracts } from '../../hooks/useContracts'
+import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 
 interface Props {
   marketMakerAddress: string
@@ -29,7 +33,6 @@ interface Props {
   marketMakerFundingPercentage: number
   balance: BalanceItem[]
   winnerOutcome: Maybe<WinnerOutcome>
-  status: Status
   theme?: any
 }
 
@@ -64,7 +67,9 @@ const ButtonContainerStyled = styled(ButtonContainer)`
   }
 `
 
-const MarketFundWrapper: FC<Props> = props => {
+const logger = getLogger('Market::Fund')
+
+const MarketFundWrapper = (props: Props) => {
   const {
     question,
     resolution,
@@ -72,14 +77,53 @@ const MarketFundWrapper: FC<Props> = props => {
     userPoolShares,
     userPoolSharesPercentage,
     balance,
-    status,
     marketMakerUserFunding,
     marketMakerFunding,
     marketMakerFundingPercentage,
     theme,
+    marketMakerAddress,
   } = props
 
+  const context = useConnectedWeb3Context()
+  const { conditionalTokens, dai } = useContracts(context)
+
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  const [status, setStatus] = useState<Status>(Status.Ready)
+  const [message, setMessage] = useState<string>('')
+
+  const addFunding = async () => {
+    try {
+      setStatus(Status.Loading)
+      setMessage(`Add funding amount: ${ethers.utils.formatUnits(amount, 18)} ...`)
+
+      const provider = context.library
+      await dai.approve(provider, marketMakerAddress, amount)
+
+      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+      await marketMaker.addFunding(amount)
+
+      setStatus(Status.Ready)
+    } catch (err) {
+      setStatus(Status.Error)
+      logger.log(`Error trying to add funding: ${err.message}`)
+    }
+  }
+
+  const removeFunding = async () => {
+    try {
+      setStatus(Status.Loading)
+      setMessage(`Remove funding amount: ${ethers.utils.formatUnits(amount, 18)} ...`)
+
+      const provider = context.library
+      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+      await marketMaker.removeFunding(amount)
+
+      setStatus(Status.Ready)
+    } catch (err) {
+      setStatus(Status.Error)
+      logger.log(`Error trying to remove funding: ${err.message}`)
+    }
+  }
 
   return (
     <>
@@ -91,7 +135,6 @@ const MarketFundWrapper: FC<Props> = props => {
             <TD>Total funding</TD>
             <TD textAlign="right">
               {marketMakerFunding ? ethers.utils.formatUnits(marketMakerFunding, 18) : '0'}{' '}
-              <strong>DAI</strong>
             </TD>
           </TR>
           <TR>
@@ -99,7 +142,6 @@ const MarketFundWrapper: FC<Props> = props => {
             <TD textAlign="right">
               {marketMakerUserFunding ? ethers.utils.formatUnits(marketMakerUserFunding, 18) : '0'}{' '}
               ({marketMakerFundingPercentage ? marketMakerFundingPercentage.toFixed(2) : '0'} %){' '}
-              <strong>DAI</strong>
             </TD>
           </TR>
           <TR>
@@ -141,20 +183,28 @@ const MarketFundWrapper: FC<Props> = props => {
                     decimals={18}
                   />
                 }
-                placeholderText="DAI"
+                placeholderText="shares"
               />
             </>
           }
           title={'Amount'}
         />
         <ButtonContainerStyled>
-          <Button onClick={() => null}>Add funding</Button>
-          <Button backgroundColor={theme.colors.secondary} onClick={() => null}>
+          <Button onClick={() => addFunding()}>Add funding</Button>
+          <Button
+            disabled={
+              (marketMakerUserFunding && marketMakerUserFunding.isZero()) ||
+              amount.gt(marketMakerUserFunding) ||
+              amount.isZero()
+            }
+            backgroundColor={theme.colors.secondary}
+            onClick={() => removeFunding()}
+          >
             Remove funding
           </Button>
         </ButtonContainerStyled>
       </ViewCard>
-      {status === Status.Loading ? <FullLoading /> : null}
+      {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>
   )
 }

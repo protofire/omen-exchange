@@ -14,6 +14,7 @@ const marketMakerAbi = [
   'function fee() external view returns (uint)',
   'function conditionIds(uint256) external view returns (bytes32)',
   'function addFunding(uint addedFunds, uint[] distributionHint) external',
+  'function removeFunding(uint sharesToBurn) external',
   'function totalSupply() external view returns (uint256)',
   'function buy(uint investmentAmount, uint outcomeIndex, uint minOutcomeTokensToBuy) external',
   'function calcBuyAmount(uint investmentAmount, uint outcomeIndex) public view returns (uint)',
@@ -52,7 +53,12 @@ class MarketMakerService {
 
   addFunding = async (amount: BigNumber) => {
     logger.log(`Add funding to market maker ${amount}`)
-    this.contract.addFunding(amount, [])
+    return await this.contract.addFunding(amount, [])
+  }
+
+  removeFunding = async (amount: BigNumber) => {
+    logger.log(`Remove funding to market maker ${amount}`)
+    return await this.contract.removeFunding(amount)
   }
 
   /* TODO: TBD */

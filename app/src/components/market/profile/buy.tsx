@@ -57,7 +57,7 @@ const logger = getLogger('Market::Buy')
 
 const Buy = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens } = useContracts(context)
+  const { conditionalTokens, dai } = useContracts(context)
 
   const { balance, marketMakerAddress, funding } = props
 
@@ -110,14 +110,9 @@ const Buy = (props: Props) => {
       setMessage(`Buying ${ethers.utils.formatUnits(tradedShares, 18)} shares ...`)
 
       const provider = context.library
-      const networkId = context.networkId
       const user = await provider.getSigner().getAddress()
 
-      const daiAddress = getContractAddress(networkId, 'dai')
-
-      const daiService = new ERC20Service(daiAddress)
-
-      const hasEnoughAlowance = await daiService.hasEnoughAllowance(
+      const hasEnoughAlowance = await dai.hasEnoughAllowance(
         provider,
         user,
         marketMakerAddress,
@@ -129,7 +124,7 @@ const Buy = (props: Props) => {
         // this can be improved if, instead of adding the 1% fee manually in the front, we use the `calcMarketFee`
         // contract method and add it to the result of `calcNetCost` result
         const costWithErrorMargin = cost.mul(11000).div(10000)
-        await daiService.approve(provider, marketMakerAddress, costWithErrorMargin)
+        await dai.approve(provider, marketMakerAddress, costWithErrorMargin)
       }
 
       //TODO: TBD
