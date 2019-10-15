@@ -121,6 +121,19 @@ class MarketMakerService {
       throw err
     }
   }
+
+  calcBuyAmount = async (amount: BigNumber, outcome: OutcomeSlot): Promise<BigNumber> => {
+    const outcomeIndex = outcome == OutcomeSlot.Yes ? 0 : 1
+    try {
+      return this.contract.calcBuyAmount(amount, outcomeIndex)
+    } catch (err) {
+      logger.error(
+        `There was an error computing the buy amount for amount '${amount.toString()}' and outcome '${outcome}'`,
+        err.message,
+      )
+      throw err
+    }
+  }
 }
 
 export { MarketMakerService }
