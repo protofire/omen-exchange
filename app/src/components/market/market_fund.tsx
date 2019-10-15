@@ -11,6 +11,7 @@ import { ethers } from 'ethers'
 import { BalanceItem, OutcomeTableValue, Status, WinnerOutcome } from '../../util/types'
 import { OutcomeTable } from '../common/outcome_table'
 import { FullLoading } from '../common/full_loading'
+import { SubsectionTitle } from '../common/subsection_title'
 
 interface Props {
   marketMakerAddress: string
@@ -48,7 +49,7 @@ const MarketFund: FC<Props> = props => {
     <>
       <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
       <ViewCard>
-        <FormLabelStyled>Totals</FormLabelStyled>
+        <SubsectionTitle>Totals</SubsectionTitle>
         <TableStyled>
           <TR>
             <TD>Total pool shares</TD>
@@ -66,6 +67,7 @@ const MarketFund: FC<Props> = props => {
             </TD>
           </TR>
         </TableStyled>
+        <SubsectionTitle>Balance</SubsectionTitle>
         <OutcomeTable
           balance={balance}
           disabledColumns={[
