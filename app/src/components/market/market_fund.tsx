@@ -112,11 +112,13 @@ const MarketFundWrapper = (props: Props) => {
   const removeFunding = async () => {
     try {
       setStatus(Status.Loading)
-      setMessage(`Remove funding amount: ${ethers.utils.formatUnits(amount, 18)} ...`)
+      setMessage(
+        `Remove all funding amount: ${ethers.utils.formatUnits(marketMakerUserFunding, 18)} ...`,
+      )
 
       const provider = context.library
       const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
-      await marketMaker.removeFunding(amount)
+      await marketMaker.removeFunding(marketMakerUserFunding)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -183,7 +185,7 @@ const MarketFundWrapper = (props: Props) => {
                     decimals={18}
                   />
                 }
-                placeholderText="shares"
+                placeholderText="DAI"
               />
             </>
           }
@@ -192,15 +194,11 @@ const MarketFundWrapper = (props: Props) => {
         <ButtonContainerStyled>
           <Button onClick={() => addFunding()}>Add funding</Button>
           <Button
-            disabled={
-              (marketMakerUserFunding && marketMakerUserFunding.isZero()) ||
-              amount.gt(marketMakerUserFunding) ||
-              amount.isZero()
-            }
+            disabled={marketMakerUserFunding && marketMakerUserFunding.isZero()}
             backgroundColor={theme.colors.secondary}
             onClick={() => removeFunding()}
           >
-            Remove funding
+            Remove all funding
           </Button>
         </ButtonContainerStyled>
       </ViewCard>
