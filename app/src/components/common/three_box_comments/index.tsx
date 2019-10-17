@@ -18,15 +18,13 @@ export const ThreeBoxComments = () => {
     const { account, library } = context
     logger.log(`Open three box with account ${account}`)
 
-    const box = await Box.openBox(currentUserAddress, library._web3Provider)
-    await box.openSpace(THREEBOX_SPACE_NAME)
-
-    setBox(box)
+    const newBox = await Box.openBox(account, library._web3Provider)
+    await newBox.openSpace(THREEBOX_SPACE_NAME)
     setCurrentUserAddress(account)
 
-    box.onSyncDone(() => {
+    newBox.onSyncDone(() => {
+      setBox(newBox)
       logger.log(`Three box sync with account ${account}`)
-      setBox(box)
     })
   }
 
