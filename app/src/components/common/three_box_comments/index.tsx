@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Box from '3box'
 import ThreeBoxCommentsReact from '3box-comments-react'
 import styled from 'styled-components'
@@ -115,23 +115,23 @@ export const ThreeBoxComments = () => {
   const [box, setBox] = useState<any>(null)
   const [currentUserAddress, setCurrentUserAddress] = useState<string>(context.account)
 
-  const handle3boxLogin = async () => {
-    const { account, library } = context
-    logger.log(`Open three box with account ${account}`)
+  useEffect(() => {
+    const handle3boxLogin = async () => {
+      const { account, library } = context
+      logger.log(`Open three box with account ${account}`)
 
-    const box = await Box.openBox(currentUserAddress, library._web3Provider)
-    await box.openSpace(THREEBOX_SPACE_NAME)
+      const newBox = await Box.openBox(account, library._web3Provider)
+      await newBox.openSpace(THREEBOX_SPACE_NAME)
+      setCurrentUserAddress(account)
 
-    setBox(box)
-    setCurrentUserAddress(account)
+      newBox.onSyncDone(() => {
+        setBox(newBox)
+        logger.log(`Three box sync with account ${account}`)
+      })
+    }
 
-    box.onSyncDone(() => {
-      logger.log(`Three box sync with account ${account}`)
-      setBox(box)
-    })
-  }
-
-  useMemo(() => handle3boxLogin(), [context])
+    handle3boxLogin()
+  }, [context])
 
   return (
     <ThreeBoxCustom>
