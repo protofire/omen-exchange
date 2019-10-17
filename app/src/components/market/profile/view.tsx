@@ -40,13 +40,6 @@ const ButtonContainerStyled = styled(ButtonContainer)`
   }
 `
 
-const CommentsWrapper = styled.div`
-  display: flex;
-  margin: 50px auto 0px;
-  max-width: ${props => props.theme.createSteps.maxWidth};
-  width: 100%;
-`
-
 const ViewWrapper = (props: Props) => {
   const { balance, status, theme } = props
 
@@ -106,9 +99,7 @@ const ViewWrapper = (props: Props) => {
           )}
           <Button onClick={() => props.handleBuy()}>Buy</Button>
         </ButtonContainerStyled>
-        <CommentsWrapper>
-          <ThreeBoxComments />
-        </CommentsWrapper>
+        <ThreeBoxComments />
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}
     </>
