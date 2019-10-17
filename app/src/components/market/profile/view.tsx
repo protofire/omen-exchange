@@ -1,6 +1,7 @@
 import React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { ethers } from 'ethers'
+
 import { ViewCard } from '../view_card'
 import { Status, BalanceItem } from '../../../util/types'
 import { Button } from '../../common'
@@ -8,6 +9,7 @@ import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
+import { ThreeBoxComments } from '../../common'
 
 interface Props {
   balance: BalanceItem[]
@@ -36,6 +38,13 @@ const ButtonContainerStyled = styled(ButtonContainer)`
       margin-left: 10px;
     }
   }
+`
+
+const CommentsWrapper = styled.div`
+  display: flex;
+  margin: 50px auto 0px;
+  max-width: ${props => props.theme.createSteps.maxWidth};
+  width: 100%;
 `
 
 const ViewWrapper = (props: Props) => {
@@ -97,6 +106,9 @@ const ViewWrapper = (props: Props) => {
           )}
           <Button onClick={() => props.handleBuy()}>Buy</Button>
         </ButtonContainerStyled>
+        <CommentsWrapper>
+          <ThreeBoxComments />
+        </CommentsWrapper>
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}
     </>
