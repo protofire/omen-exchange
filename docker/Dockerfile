@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y jq
 
 WORKDIR ganache
 ENV PATH="./node_modules/.bin:${PATH}"
-RUN npm install ganache-cli@6.6.0 eth-cli@1.4.0
+RUN npm install ganache-cli@6.6.0 eth-cli@2.0.0-beta-5
 
 # clone realitio and install dependencies
 RUN git clone https://github.com/realitio/realitio-contracts.git realitio && \
@@ -23,7 +23,7 @@ RUN git clone https://github.com/mariano-aguero/conditional-tokens-market-makers
   npm install
 
 # deploy contracts in ganache
-COPY prepare_db.sh Dai.bin ./
+COPY prepare_db.sh ERC20.bin ./
 RUN bash prepare_db.sh
 
 EXPOSE 8545

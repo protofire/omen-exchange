@@ -66,11 +66,11 @@ contract FixedSupplyToken {
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 
-    constructor() public {
+    constructor(string memory _symbol, uint8 _decimals) public {
         owner = msg.sender;
-        symbol = "DAI";
-        name = "Mock DAI token";
-        decimals = 18;
+        symbol = _symbol;
+        name = "Mock token";
+        decimals = _decimals;
         _totalSupply = 1000000 * 10**uint(decimals);
         balances[owner] = _totalSupply;
         emit Transfer(address(0), owner, _totalSupply);
