@@ -32,33 +32,33 @@ class MarketMakerService {
   }
 
   getConditionalTokens = async (): Promise<string> => {
-    return await this.contract.conditionalTokens()
+    return this.contract.conditionalTokens()
   }
 
   getCollateralToken = async (): Promise<string> => {
-    return await this.contract.collateralToken()
+    return this.contract.collateralToken()
   }
 
   getFee = async (): Promise<any> => {
-    return await this.contract.fee()
+    return this.contract.fee()
   }
 
   getConditionId = async () => {
-    return await this.contract.conditionIds(0)
+    return this.contract.conditionIds(0)
   }
 
   getTotalSupply = async (): Promise<BigNumber> => {
-    return await this.contract.totalSupply()
+    return this.contract.totalSupply()
   }
 
   addFunding = async (amount: BigNumber) => {
     logger.log(`Add funding to market maker ${amount}`)
-    return await this.contract.addFunding(amount, [])
+    return this.contract.addFunding(amount, [])
   }
 
   removeFunding = async (amount: BigNumber) => {
     logger.log(`Remove funding to market maker ${amount}`)
-    return await this.contract.removeFunding(amount)
+    return this.contract.removeFunding(amount)
   }
 
   /* TODO: TBD */
@@ -116,7 +116,7 @@ class MarketMakerService {
   }
 
   balanceOf = async (address: string): Promise<BigNumber> => {
-    return await this.contract.balanceOf(address)
+    return this.contract.balanceOf(address)
   }
 
   buy = async (amount: BigNumber, outcome: OutcomeSlot) => {
