@@ -94,7 +94,7 @@ const MarketFundWrapper = (props: Props) => {
   const addFunding = async () => {
     try {
       setStatus(Status.Loading)
-      setMessage(`Add funding amount: ${ethers.utils.formatUnits(amount, 18)} ...`)
+      setMessage(`Add funding amount: ${ethers.utils.formatUnits(amount, 18)} DAI ...`)
 
       const provider = context.library
       await dai.approve(provider, marketMakerAddress, amount)
