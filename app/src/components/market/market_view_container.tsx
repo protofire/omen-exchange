@@ -13,7 +13,7 @@ interface Props {
 const MarketViewContainer: FC<Props> = props => {
   const context = useConnectedWeb3Context()
 
-  const [marketMakerAddress] = useState<string>(props.marketMakerAddress)
+  const { marketMakerAddress } = props
   const [stepProfile, setStepProfile] = useState<StepProfile>(StepProfile.View)
 
   const { question, resolution } = useQuestion(marketMakerAddress, context)
