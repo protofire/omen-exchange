@@ -12,6 +12,7 @@ import { FullLoading } from '../../../common/full_loading'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
+import { knownTokens } from '../../../../util/addresses'
 import { formatDate } from '../../../../util/tools'
 import styled from 'styled-components'
 
@@ -39,6 +40,7 @@ interface Props {
   back: () => void
   submit: () => void
   values: {
+    collateralId: KnownToken
     question: string
     category: string
     resolution: Date | null
@@ -66,6 +68,7 @@ class CreateMarketStep extends Component<Props> {
   render() {
     const { marketMakerAddress, values, status, questionId } = this.props
     const {
+      collateralId,
       question,
       category,
       resolution,
@@ -76,6 +79,8 @@ class CreateMarketStep extends Component<Props> {
       outcomeProbabilityOne,
       outcomeProbabilityTwo,
     } = values
+
+    const collateral = knownTokens[collateralId]
 
     const resolutionDate = resolution && formatDate(resolution)
 
@@ -114,7 +119,10 @@ class CreateMarketStep extends Component<Props> {
           <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
           <TitleValue
             title={'Funding'}
-            value={[ethers.utils.formatUnits(funding, 18), <strong key="1"> DAI</strong>]}
+            value={[
+              ethers.utils.formatUnits(funding, collateral.decimals),
+              <strong key="1"> {collateral.symbol}</strong>,
+            ]}
           />
         </Grid>
         <SubsectionTitle>Outcomes</SubsectionTitle>

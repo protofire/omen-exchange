@@ -1,4 +1,5 @@
 import React, { ChangeEvent, Component } from 'react'
+import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import {
@@ -14,6 +15,7 @@ import { StatusMarketCreation } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
 
 export interface MarketData {
+  collateralId: KnownToken
   question: string
   category: string
   resolution: Date | null
@@ -41,6 +43,7 @@ export class MarketWizardCreator extends Component<Props, State> {
   public state: State = {
     currentStep: 1,
     marketData: {
+      collateralId: 'dai',
       question: '',
       category: '',
       resolution: null,
@@ -74,10 +77,15 @@ export class MarketWizardCreator extends Component<Props, State> {
   ) => {
     const { name, value } = 'target' in event ? event.target : event
 
+    // when the collateral changes, reset the value of funding
+    const funding: BigNumber =
+      name === 'collateralId' ? ethers.constants.Zero : this.state.marketData.funding
+
     this.setState((prevState: State) => ({
       ...prevState,
       marketData: {
         ...prevState.marketData,
+        funding,
         [name]: value,
       },
     }))
@@ -104,6 +112,7 @@ export class MarketWizardCreator extends Component<Props, State> {
     const { marketMakerAddress, status, questionId } = this.props
 
     const {
+      collateralId,
       question,
       category,
       resolution,
@@ -131,7 +140,7 @@ export class MarketWizardCreator extends Component<Props, State> {
             back={() => this.back()}
             handleChange={this.handleChange}
             next={() => this.next()}
-            values={{ spread, funding }}
+            values={{ collateralId, spread, funding }}
           />
         )
       case 3:

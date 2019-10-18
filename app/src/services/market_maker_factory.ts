@@ -24,10 +24,10 @@ class MarketMakerFactoryService {
 
   createMarketMaker = async (
     conditionalTokenAddress: string,
-    daiAddress: string,
+    collateralAddress: string,
     conditionId: string,
   ) => {
-    const args = [conditionalTokenAddress, daiAddress, [conditionId], FEE]
+    const args = [conditionalTokenAddress, collateralAddress, [conditionId], FEE]
 
     const marketMakerAddress = await this.constantContract.createFixedProductMarketMaker(...args, {
       from: this.signerAddress,

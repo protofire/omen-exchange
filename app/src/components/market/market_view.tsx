@@ -4,7 +4,7 @@ import { Buy } from './profile/buy'
 import { SectionTitle } from '../common/section_title'
 import { Sell } from './profile/sell'
 import { ClosedMarketDetail } from './profile/closed_market_detail'
-import { Status, BalanceItem, StepProfile, WinnerOutcome } from '../../util/types'
+import { Status, BalanceItem, StepProfile, WinnerOutcome, Token } from '../../util/types'
 import { View } from './profile/view'
 import { formatDate } from '../../util/tools'
 
@@ -17,10 +17,11 @@ interface Props {
   marketAddress: string
   stepProfile: StepProfile
   winnerOutcome: Maybe<WinnerOutcome>
+  collateral: Token
 }
 
 const MarketView: FC<Props> = props => {
-  const { funding, question, resolution, balance, marketAddress, stepProfile } = props
+  const { funding, question, resolution, balance, marketAddress, stepProfile, collateral } = props
   const [currentStep, setCurrentStep] = useState<StepProfile>(stepProfile)
 
   useEffect(() => {
@@ -74,6 +75,7 @@ const MarketView: FC<Props> = props => {
               handleBack={() => handleBack()}
               handleFinish={() => handleFinish()}
               marketAddress={marketAddress}
+              collateral={collateral}
             />
           </>
         )
@@ -86,6 +88,7 @@ const MarketView: FC<Props> = props => {
               balance={balance}
               marketAddress={marketAddress}
               funding={funding}
+              collateral={collateral}
             />
           </>
         )
