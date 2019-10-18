@@ -6,7 +6,7 @@ import { computeInitialTradeOutcomeTokens } from '../../util/tools'
 import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import { ERC20Service, MarketMakerService } from '../../services'
-import { getContractAddress } from '../../util/addresses'
+import { getContractAddress, getToken } from '../../util/addresses'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
 
@@ -30,8 +30,17 @@ const MarketWizardCreatorContainer: FC = () => {
       const provider = context.library
       const user = await provider.getSigner().getAddress()
 
-      const { question, resolution, funding, outcomeProbabilityOne, outcomeProbabilityTwo } = data
+      const {
+        collateralId,
+        question,
+        resolution,
+        funding,
+        outcomeProbabilityOne,
+        outcomeProbabilityTwo,
+      } = data
       const openingDateMoment = moment(resolution)
+
+      const collateralToken = getToken(networkId, collateralId)
 
       setStatus(StatusMarketCreation.PostingQuestion)
       const questionId = await realitio.askQuestion(question, openingDateMoment)
@@ -45,33 +54,32 @@ const MarketWizardCreatorContainer: FC = () => {
           : getContractAddress(networkId, 'realitioArbitrator')
       const conditionId = await conditionalTokens.prepareCondition(questionId, oracleAddress)
 
-      // approve movement of DAI to MarketMakerFactory
-      setStatus(StatusMarketCreation.ApprovingDAI)
+      // approve movement of collateral token to MarketMakerFactory
+      setStatus(StatusMarketCreation.ApprovingCollateral)
 
-      const daiAddress = getContractAddress(networkId, 'dai')
       const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
-      const daiService = new ERC20Service(daiAddress)
+      const collateralService = new ERC20Service(collateralToken.address)
 
-      const hasEnoughAlowance = await daiService.hasEnoughAllowance(
+      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
         provider,
         user,
         marketMakerFactoryAddress,
         funding,
       )
       if (!hasEnoughAlowance) {
-        await daiService.approve(provider, marketMakerFactoryAddress, funding)
+        await collateralService.approve(provider, marketMakerFactoryAddress, funding)
       }
 
       setStatus(StatusMarketCreation.CreateMarketMaker)
       const marketMakerAddress = await marketMakerFactory.createMarketMaker(
         conditionalTokens.address,
-        daiAddress,
+        collateralToken.address,
         conditionId,
       )
       setMarketMakerAddress(marketMakerAddress)
 
-      setStatus(StatusMarketCreation.ApproveDAIForMarketMaker)
-      await daiService.approveUnlimited(provider, marketMakerAddress)
+      setStatus(StatusMarketCreation.ApproveCollateralForMarketMaker)
+      await collateralService.approveUnlimited(provider, marketMakerAddress)
 
       setStatus(StatusMarketCreation.AddFunding)
       const marketMakerService = new MarketMakerService(
