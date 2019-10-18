@@ -13,7 +13,7 @@ import { SubsectionTitle } from '../../common/subsection_title'
 import { Table, TD, TR } from '../../common/table'
 import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
 import { ViewCard } from '../view_card'
-import { MarketMakerService } from '../../../services'
+// import { MarketMakerService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { BigNumberInputReturn } from '../../common/big_number_input'
@@ -116,13 +116,13 @@ const Sell = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Selling ${ethers.utils.formatUnits(amountShares, 18)} shares ...`)
 
-      const provider = context.library
+      // const provider = context.library
 
-      const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
+      // const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
 
-      const amountSharesNegative = amountShares.mul(-1)
-      const outcomeValue =
-        outcome === OutcomeSlot.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
+      // const amountSharesNegative = amountShares.mul(-1)
+      // const outcomeValue =
+      // outcome === OutcomeSlot.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
 
       const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketAddress)
 

@@ -63,7 +63,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { conditionalTokens } = useContracts(context)
 
-  const { theme, balance, marketAddress, resolution, funding } = props
+  const { balance, marketAddress, resolution, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
@@ -106,27 +106,27 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     }
   }
 
-  const withdraw = async () => {
-    try {
-      setMessage('Withdraw collateral...')
-      setStatus(Status.Loading)
+  // const withdraw = async () => {
+  //   try {
+  //     setMessage('Withdraw collateral...')
+  //     setStatus(Status.Loading)
 
-      // TODO: TBD
-      // await marketMaker.withdrawFees()
+  //     // TODO: TBD
+  //     // await marketMaker.withdrawFees()
 
-      setStatus(Status.Ready)
-    } catch (err) {
-      setStatus(Status.Error)
-      logger.log(`Error trying to withdraw: ${err.message}`)
-    }
-  }
+  //     setStatus(Status.Ready)
+  //   } catch (err) {
+  //     setStatus(Status.Error)
+  //     logger.log(`Error trying to withdraw: ${err.message}`)
+  //   }
+  // }
 
   const fundingFormat = ethers.utils.formatUnits(funding, 18)
   const collateralFormat = `${ethers.utils.formatUnits(collateral, 18)} DAI`
   const resolutionFormat = resolution ? formatDate(resolution) : ''
 
   const winningOutcome = balance.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
-  const hasCollateral = collateral.isZero()
+  // const hasCollateral = collateral.isZero()
 
   return (
     <>

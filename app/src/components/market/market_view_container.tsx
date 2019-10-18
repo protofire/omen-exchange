@@ -117,7 +117,7 @@ const MarketViewContainer: FC<Props> = props => {
     const fetchContractStatus = async () => {
       try {
         const provider = context.library
-        const userAddress = await provider.getSigner().getAddress()
+        // const userAddress = await provider.getSigner().getAddress()
 
         const marketMaker = new MarketMakerService(address, conditionalTokens, provider)
 

@@ -2,7 +2,6 @@ import React, { FC, useState } from 'react'
 import moment from 'moment'
 
 import { getLogger } from '../../util/logger'
-import { computeInitialTradeOutcomeTokens } from '../../util/tools'
 import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import { ERC20Service, MarketMakerService } from '../../services'
@@ -30,7 +29,7 @@ const MarketWizardCreatorContainer: FC = () => {
       const provider = context.library
       const user = await provider.getSigner().getAddress()
 
-      const { question, resolution, funding, outcomeProbabilityOne, outcomeProbabilityTwo } = data
+      const { question, resolution, funding } = data
       const openingDateMoment = moment(resolution)
 
       setStatus(StatusMarketCreation.PostingQuestion)

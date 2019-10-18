@@ -1,5 +1,5 @@
 import { Contract, ethers, Wallet } from 'ethers'
-import { BigNumber, BigNumberish } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 
 import { ConditionalTokenService } from './conditional_token'
 import { getLogger } from '../util/logger'
@@ -109,7 +109,7 @@ class MarketMakerService {
   }
 
   buy = async (amount: BigNumber, outcome: OutcomeSlot) => {
-    const outcomeIndex = outcome == OutcomeSlot.Yes ? 0 : 1
+    const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {
       const outcomeTokensToBuy = await this.contract.calcBuyAmount(amount, outcomeIndex)
       await this.contract.buy(amount, outcomeIndex, outcomeTokensToBuy)
@@ -123,7 +123,7 @@ class MarketMakerService {
   }
 
   calcBuyAmount = async (amount: BigNumber, outcome: OutcomeSlot): Promise<BigNumber> => {
-    const outcomeIndex = outcome == OutcomeSlot.Yes ? 0 : 1
+    const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {
       return this.contract.calcBuyAmount(amount, outcomeIndex)
     } catch (err) {

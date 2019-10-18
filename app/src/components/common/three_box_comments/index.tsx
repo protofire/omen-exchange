@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { THREEBOX_ADMIN_ADDRESS, THREEBOX_SPACE_NAME } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
+import { ButtonCSS } from '../button'
 
 const logger = getLogger('Component::ThreeBoxComments')
 
@@ -85,7 +86,6 @@ const ThreeBoxCustom = styled.div`
         }
       }
     }
-
     .context {
       height: auto;
       justify-content: flex-end;
@@ -97,6 +97,23 @@ const ThreeBoxCustom = styled.div`
         font-weight: 400;
         line-height: 1.2;
       }
+    }
+    .dialogue_button_container {
+      height: auto;
+      .dialogue_button {
+        ${ButtonCSS}
+        width: 100%;
+      }
+    }
+  }
+
+  footer {
+    margin-bottom: 0;
+    padding-top: 20px;
+    .footer_text {
+      color: #999;
+      font-size: 12px;
+      font-weight: 400;
     }
   }
 `
