@@ -3,11 +3,12 @@ import styled from 'styled-components'
 
 import { Table, TD, TH, THead, TR } from '../table/index'
 import { RadioInput } from '../radio_input/index'
-import { BalanceItem, OutcomeSlot, OutcomeTableValue } from '../../../util/types'
+import { BalanceItem, OutcomeSlot, OutcomeTableValue, Token } from '../../../util/types'
 import { ethers } from 'ethers'
 
 interface Props {
   balance: BalanceItem[]
+  collateral: Token
   pricesAfterTrade?: [number, number]
   outcomeSelected?: OutcomeSlot
   outcomeHandleChange?: (e: OutcomeSlot) => void
@@ -43,6 +44,7 @@ const RadioInputStyled = styled(RadioInput)`
 export const OutcomeTable = (props: Props) => {
   const {
     balance,
+    collateral,
     pricesAfterTrade,
     outcomeSelected,
     outcomeHandleChange,
@@ -115,34 +117,40 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[2]} winningOutcome={winningOutcome}>
-            {currentPrice} <strong>DAI</strong>
+            {currentPrice} <strong>{collateral.symbol}</strong>
           </TDStyled>
         ) : (
           <TD textAlign={TableCellsAlign[2]}>
-            {currentPrice} <strong>DAI</strong>
+            {currentPrice} <strong>{collateral.symbol}</strong>
           </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.Shares) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[3]} winningOutcome={winningOutcome}>
-            {ethers.utils.formatUnits(shares, 18)}
+            {ethers.utils.formatUnits(shares, collateral.decimals)}
           </TDStyled>
         ) : (
-          <TD textAlign={TableCellsAlign[3]}>{ethers.utils.formatUnits(shares, 18)}</TD>
+          <TD textAlign={TableCellsAlign[3]}>
+            {ethers.utils.formatUnits(shares, collateral.decimals)}
+          </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.Payout) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[4]} winningOutcome={winningOutcome}>
-            {ethers.utils.formatUnits(shares, 18)}
+            {ethers.utils.formatUnits(shares, collateral.decimals)}
           </TDStyled>
         ) : (
-          <TD textAlign={TableCellsAlign[4]}>{ethers.utils.formatUnits(shares, 18)}</TD>
+          <TD textAlign={TableCellsAlign[4]}>
+            {ethers.utils.formatUnits(shares, collateral.decimals)}
+          </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.PriceAfterTrade) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[5]} winningOutcome={winningOutcome}>
-            {pricesAfterTrade && pricesAfterTrade[index].toFixed(4)} <strong>DAI</strong>
+            {pricesAfterTrade && pricesAfterTrade[index].toFixed(4)}{' '}
+            <strong>{collateral.symbol}</strong>
           </TDStyled>
         ) : (
           <TD textAlign={TableCellsAlign[5]}>
-            {pricesAfterTrade && pricesAfterTrade[index].toFixed(4)} <strong>DAI</strong>
+            {pricesAfterTrade && pricesAfterTrade[index].toFixed(4)}{' '}
+            <strong>{collateral.symbol}</strong>
           </TD>
         )}
       </TR>

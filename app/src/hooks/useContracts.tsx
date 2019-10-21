@@ -1,12 +1,7 @@
 import { useMemo } from 'react'
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { getContractAddress } from '../util/addresses'
-import {
-  ConditionalTokenService,
-  MarketMakerFactoryService,
-  RealitioService,
-  ERC20Service,
-} from '../services'
+import { ConditionalTokenService, MarketMakerFactoryService, RealitioService } from '../services'
 
 export const useContracts = (context: ConnectedWeb3Context) => {
   const { account, library, networkId } = context
@@ -29,13 +24,9 @@ export const useContracts = (context: ConnectedWeb3Context) => {
     [realitioAddress, library, account, arbitratorAddress],
   )
 
-  const daiAddress = getContractAddress(networkId, 'dai')
-  const dai = useMemo(() => new ERC20Service(daiAddress), [])
-
   return {
     conditionalTokens,
     marketMakerFactory,
     realitio,
-    dai,
   }
 }

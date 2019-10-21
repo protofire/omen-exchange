@@ -4,9 +4,10 @@ import { ethers } from 'ethers'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { MarketMakerService } from '../services'
+import { getTokenFromAddress } from '../util/addresses'
 import { useContracts } from './useContracts'
 import { getLogger } from '../util/logger'
-import { BalanceItem, OutcomeSlot, Status, WinnerOutcome } from '../util/types'
+import { BalanceItem, OutcomeSlot, Status, WinnerOutcome, Token } from '../util/types'
 
 const logger = getLogger('Market::useMarketMakerData')
 
@@ -23,6 +24,7 @@ export const useMarketMakerData = (
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
   marketMakerFundingPercentage: number
+  collateral: Maybe<Token>
 } => {
   const { conditionalTokens } = useContracts(context)
 
@@ -35,6 +37,7 @@ export const useMarketMakerData = (
   const [marketMakerFunding, setMarketMakerFunding] = useState<BigNumber>(new BigNumber(0))
   const [marketMakerUserFunding, setMarketMakerUserFunding] = useState<BigNumber>(new BigNumber(0))
   const [marketMakerFundingPercentage, setMarketMakerFundingPercentage] = useState<number>(0)
+  const [collateral, setCollateral] = useState<Maybe<Token>>(null)
 
   useEffect(() => {
     const fetchMarketMakerData = async ({ enableStatus }: { enableStatus: boolean }) => {
@@ -59,6 +62,7 @@ export const useMarketMakerData = (
           actualPrices,
           marketMakerFund,
           marketMakerUserFund,
+          collateralAddress,
         ] = await Promise.all([
           marketMaker.getBalanceInformation(user),
           marketMaker.getBalanceInformation(marketMakerAddress),
@@ -67,7 +71,11 @@ export const useMarketMakerData = (
           { actualPriceForYes: 0.5, actualPriceForNo: 0.5 },
           marketMaker.getTotalSupply(),
           marketMaker.balanceOf(user),
+          marketMaker.getCollateralToken(),
         ])
+
+        const token = getTokenFromAddress(context.networkId, collateralAddress)
+        setCollateral(token)
 
         const probabilityForYes = actualPrices.actualPriceForYes * 100
         const probabilityForNo = actualPrices.actualPriceForNo * 100
@@ -147,5 +155,6 @@ export const useMarketMakerData = (
     marketMakerFunding,
     marketMakerUserFunding,
     marketMakerFundingPercentage,
+    collateral,
   }
 }

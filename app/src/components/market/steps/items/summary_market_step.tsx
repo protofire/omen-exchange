@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
 import { CreateCard } from '../../create_card'
+import { knownTokens } from '../../../../util/addresses'
 import { formatDate } from '../../../../util/tools'
 import { Paragraph } from '../../../common/paragraph'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
@@ -38,6 +39,7 @@ const MainButton = styled.a`
 
 interface Props {
   values: {
+    collateralId: KnownToken
     question: string
     category: string
     resolution: Date | null
@@ -54,6 +56,7 @@ interface Props {
 const SummaryMarketStep = (props: Props) => {
   const { marketMakerAddress, values } = props
   const {
+    collateralId,
     question,
     category,
     resolution,
@@ -65,6 +68,7 @@ const SummaryMarketStep = (props: Props) => {
     outcomeProbabilityTwo,
   } = values
 
+  const collateral = knownTokens[collateralId]
   const resolutionDate = resolution && formatDate(resolution)
   const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/view/${marketMakerAddress}`
 
@@ -108,7 +112,10 @@ const SummaryMarketStep = (props: Props) => {
           <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
           <TitleValue
             title={'Funding'}
-            value={[ethers.utils.formatUnits(funding, 18), <strong key="1"> DAI</strong>]}
+            value={[
+              ethers.utils.formatUnits(funding, collateral.decimals),
+              <strong key="1"> {collateral.symbol}</strong>,
+            ]}
           />
         </Grid>
         <SubsectionTitle>Outcomes</SubsectionTitle>

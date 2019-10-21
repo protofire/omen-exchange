@@ -3,14 +3,13 @@ import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 
-import { BalanceItem, OutcomeSlot, Status, OutcomeTableValue } from '../../../util/types'
+import { BalanceItem, OutcomeSlot, Status, OutcomeTableValue, Token } from '../../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../../common'
 import { ERC20Service, MarketMakerService } from '../../../services'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { Table, TD, TR } from '../../common/table'
 import { ViewCard } from '../../common/view_card'
 import { computePriceAfterTrade } from '../../../util/tools'
-import { getContractAddress } from '../../../util/addresses'
 import { getLogger } from '../../../util/logger'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { useAsyncDerivedValue } from '../../../hooks/useAsyncDerivedValue'
@@ -30,6 +29,7 @@ interface Props {
   handleBack: () => void
   handleFinish: () => void
   marketMakerAddress: string
+  collateral: Token
 }
 
 const ButtonLinkStyled = styled(ButtonLink)`
@@ -57,9 +57,9 @@ const logger = getLogger('Market::Buy')
 
 const Buy = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens, dai } = useContracts(context)
+  const { conditionalTokens } = useContracts(context)
 
-  const { balance, marketMakerAddress, funding } = props
+  const { balance, marketMakerAddress, funding, collateral } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
@@ -95,24 +95,29 @@ const Buy = (props: Props) => {
   )
 
   useEffect(() => {
-    const valueNumber = +ethers.utils.formatUnits(amount, 18)
+    const valueNumber = +ethers.utils.formatUnits(amount, collateral.decimals)
 
+    const weiPerUnit = ethers.utils.bigNumberify(10).pow(collateral.decimals)
     const costWithFee = ethers.utils
       .bigNumberify('' + Math.round(valueNumber * 1.01 * 10000)) // cast to string to avoid overflows
-      .mul(ethers.constants.WeiPerEther)
+      .mul(weiPerUnit)
       .div(10000)
     setCost(costWithFee)
-  }, [outcome, amount, balance])
+  }, [outcome, amount, balance, collateral])
 
   const finish = async () => {
     try {
       setStatus(Status.Loading)
-      setMessage(`Buying ${ethers.utils.formatUnits(tradedShares, 18)} shares ...`)
+      setMessage(`Buying ${ethers.utils.formatUnits(tradedShares, collateral.decimals)} shares ...`)
 
       const provider = context.library
       const user = await provider.getSigner().getAddress()
 
-      const hasEnoughAlowance = await dai.hasEnoughAllowance(
+      const collateralAddress = await marketMaker.getCollateralToken()
+
+      const collateralService = new ERC20Service(collateralAddress)
+
+      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
         provider,
         user,
         marketMakerAddress,
@@ -124,7 +129,7 @@ const Buy = (props: Props) => {
         // this can be improved if, instead of adding the 1% fee manually in the front, we use the `calcMarketFee`
         // contract method and add it to the result of `calcNetCost` result
         const costWithErrorMargin = cost.mul(11000).div(10000)
-        await dai.approve(provider, marketMakerAddress, costWithErrorMargin)
+        await collateralService.approve(provider, marketMakerAddress, costWithErrorMargin)
       }
 
       //TODO: TBD
@@ -146,6 +151,7 @@ const Buy = (props: Props) => {
         <SubsectionTitle>Choose the shares you want to buy</SubsectionTitle>
         <OutcomeTable
           balance={balance}
+          collateral={collateral}
           pricesAfterTrade={pricesAfterTrade}
           outcomeSelected={outcome}
           outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
@@ -159,16 +165,18 @@ const Buy = (props: Props) => {
                   name="amount"
                   value={amount}
                   onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                  decimals={18}
+                  decimals={collateral.decimals}
                 />
               }
-              placeholderText="DAI"
+              placeholderText={collateral.symbol}
             />
           }
           note={[
             'You will be charged an extra 1% trade fee of ',
             <strong key="1">
-              {cost.isZero() ? '0' : ethers.utils.formatUnits(cost.sub(amount), 18)}
+              {cost.isZero()
+                ? '0'
+                : ethers.utils.formatUnits(cost.sub(amount), collateral.decimals)}
             </strong>,
           ]}
           title={'Amount'}
@@ -179,19 +187,20 @@ const Buy = (props: Props) => {
           <TR>
             <TD>You spend</TD>
             <TD textAlign="right">
-              {ethers.utils.formatUnits(cost, 18)} <strong>DAI</strong>
+              {ethers.utils.formatUnits(cost, collateral.decimals)}{' '}
+              <strong>{collateral.symbol}</strong>
             </TD>
           </TR>
           <TR>
             <TD>&quot;{outcome}&quot; shares you get</TD>
             <TD textAlign="right">
-              {ethers.utils.formatUnits(tradedShares, 18)} <strong>shares</strong>
+              {ethers.utils.formatUnits(tradedShares, collateral.decimals)} <strong>shares</strong>
             </TD>
           </TR>
         </TableStyled>
         <Well>
-          <strong>1 shares</strong> can be redeemed for <strong>1 DAI</strong> in case it represents
-          the final outcome.
+          <strong>1 shares</strong> can be redeemed for <strong>1 {collateral.symbol}</strong> in
+          case it represents the final outcome.
         </Well>
         <ButtonContainer>
           <ButtonLinkStyled onClick={() => props.handleBack()}>‹ Back</ButtonLinkStyled>

@@ -44,7 +44,7 @@ class MarketMakerService {
   }
 
   getConditionId = async () => {
-    return this.contract.conditionIds(0)
+    return await this.contract.conditionIds(0)
   }
 
   getTotalSupply = async (): Promise<BigNumber> => {

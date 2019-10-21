@@ -7,7 +7,7 @@ import { formatDate } from '../../util/tools'
 import { ViewCard } from '../common/view_card/'
 import { Table, TD, TR } from '../common/table'
 import { ethers } from 'ethers'
-import { BalanceItem, OutcomeTableValue, Status, WinnerOutcome } from '../../util/types'
+import { BalanceItem, OutcomeTableValue, Status, Token, WinnerOutcome } from '../../util/types'
 import { OutcomeTable } from '../common/outcome_table'
 import { FullLoading } from '../common/full_loading'
 import { SubsectionTitle } from '../common/subsection_title'
@@ -17,7 +17,7 @@ import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placehold
 import { ButtonContainer } from '../common/button_container'
 import { Button } from '../common/button'
 import { getLogger } from '../../util/logger'
-import { MarketMakerService } from '../../services'
+import { ERC20Service, MarketMakerService } from '../../services'
 import { useContracts } from '../../hooks/useContracts'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 
@@ -34,6 +34,7 @@ interface Props {
   balance: BalanceItem[]
   winnerOutcome: Maybe<WinnerOutcome>
   theme?: any
+  collateral: Token
 }
 
 const TableStyled = styled(Table)`
@@ -82,10 +83,11 @@ const MarketFundWrapper = (props: Props) => {
     marketMakerFundingPercentage,
     theme,
     marketMakerAddress,
+    collateral,
   } = props
 
   const context = useConnectedWeb3Context()
-  const { conditionalTokens, dai } = useContracts(context)
+  const { conditionalTokens } = useContracts(context)
 
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -94,12 +96,21 @@ const MarketFundWrapper = (props: Props) => {
   const addFunding = async () => {
     try {
       setStatus(Status.Loading)
-      setMessage(`Add funding amount: ${ethers.utils.formatUnits(amount, 18)} DAI ...`)
+      setMessage(
+        `Add funding amount: ${ethers.utils.formatUnits(amount, collateral.decimals)} ${
+          collateral.symbol
+        } ...`,
+      )
 
       const provider = context.library
-      await dai.approve(provider, marketMakerAddress, amount)
 
       const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+
+      const collateralAddress = await marketMaker.getCollateralToken()
+      const collateralService = new ERC20Service(collateralAddress)
+
+      await collateralService.approve(provider, marketMakerAddress, amount)
+
       await marketMaker.addFunding(amount)
 
       setStatus(Status.Ready)
@@ -113,7 +124,10 @@ const MarketFundWrapper = (props: Props) => {
     try {
       setStatus(Status.Loading)
       setMessage(
-        `Remove all funding amount: ${ethers.utils.formatUnits(marketMakerUserFunding, 18)} ...`,
+        `Remove all funding amount: ${ethers.utils.formatUnits(
+          marketMakerUserFunding,
+          collateral.decimals,
+        )} ...`,
       )
 
       const provider = context.library
@@ -136,28 +150,34 @@ const MarketFundWrapper = (props: Props) => {
           <TR>
             <TD>Total funding</TD>
             <TD textAlign="right">
-              {marketMakerFunding ? ethers.utils.formatUnits(marketMakerFunding, 18) : '0'}{' '}
+              {marketMakerFunding
+                ? ethers.utils.formatUnits(marketMakerFunding, collateral.decimals)
+                : '0'}{' '}
             </TD>
           </TR>
           <TR>
             <TD>Your funding</TD>
             <TD textAlign="right">
-              {marketMakerUserFunding ? ethers.utils.formatUnits(marketMakerUserFunding, 18) : '0'}{' '}
+              {marketMakerUserFunding
+                ? ethers.utils.formatUnits(marketMakerUserFunding, collateral.decimals)
+                : '0'}{' '}
               ({marketMakerFundingPercentage ? marketMakerFundingPercentage.toFixed(2) : '0'} %){' '}
             </TD>
           </TR>
           <TR>
             <TD>Total pool shares</TD>
             <TD textAlign="right">
-              {totalPoolShares ? ethers.utils.formatUnits(totalPoolShares, 18) : '0'}{' '}
+              {totalPoolShares
+                ? ethers.utils.formatUnits(totalPoolShares, collateral.decimals)
+                : '0'}{' '}
               <strong>shares</strong>
             </TD>
           </TR>
           <TR>
             <TD>Your pool shares</TD>
             <TD textAlign="right">
-              {userPoolShares ? ethers.utils.formatUnits(userPoolShares, 18) : '0'} (
-              {userPoolSharesPercentage ? userPoolSharesPercentage.toFixed(2) : '0'} %){' '}
+              {userPoolShares ? ethers.utils.formatUnits(userPoolShares, collateral.decimals) : '0'}{' '}
+              ({userPoolSharesPercentage ? userPoolSharesPercentage.toFixed(2) : '0'} %){' '}
               <strong>shares</strong>
             </TD>
           </TR>
@@ -172,6 +192,7 @@ const MarketFundWrapper = (props: Props) => {
             OutcomeTableValue.PriceAfterTrade,
           ]}
           displayRadioSelection={false}
+          collateral={collateral}
         />
         <AmountWrapper
           formField={
@@ -182,10 +203,10 @@ const MarketFundWrapper = (props: Props) => {
                     name="amount"
                     value={amount}
                     onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                    decimals={18}
+                    decimals={collateral.decimals}
                   />
                 }
-                placeholderText="DAI"
+                placeholderText={collateral.symbol}
               />
             </>
           }

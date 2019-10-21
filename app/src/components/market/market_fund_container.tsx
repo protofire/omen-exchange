@@ -4,6 +4,7 @@ import { MarketFund } from './market_fund'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useQuestion } from '../../hooks/useQuestion'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
+import { FullLoading } from '../common/full_loading'
 
 interface Props {
   marketMakerAddress: string
@@ -23,7 +24,12 @@ const MarketFundContainer: FC<Props> = props => {
     marketMakerFunding,
     marketMakerUserFunding,
     marketMakerFundingPercentage,
+    collateral,
   } = useMarketMakerData(marketMakerAddress, context)
+
+  if (!collateral) {
+    return <FullLoading />
+  }
 
   return (
     <MarketFund
@@ -38,6 +44,7 @@ const MarketFundContainer: FC<Props> = props => {
       marketMakerFundingPercentage={marketMakerFundingPercentage}
       balance={balance}
       winnerOutcome={winnerOutcome}
+      collateral={collateral}
     />
   )
 }

@@ -62,8 +62,8 @@ class ConditionalTokenService {
     return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, 2)
   }
 
-  getPositionId = async (daiAddress: string, collectionId: string): Promise<any> => {
-    return this.contract.getPositionId(daiAddress, collectionId)
+  getPositionId = async (collateralAddress: string, collectionId: string): Promise<any> => {
+    return this.contract.getPositionId(collateralAddress, collectionId)
   }
 
   getBalanceOf = async (ownerAddress: string, positionId: string): Promise<any> => {

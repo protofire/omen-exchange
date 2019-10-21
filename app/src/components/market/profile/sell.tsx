@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 
-import { BalanceItem, OutcomeSlot, OutcomeTableValue, Status } from '../../../util/types'
+import { BalanceItem, OutcomeSlot, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../../common'
 import { ButtonContainer } from '../../common/button_container'
 import { ButtonLink } from '../../common/button_link'
@@ -27,6 +27,7 @@ interface Props {
   marketMakerAddress: string
   handleBack: () => void
   handleFinish: () => void
+  collateral: Token
 }
 
 const ButtonLinkStyled = styled(ButtonLink)`
@@ -55,13 +56,13 @@ const Sell = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { conditionalTokens } = useContracts(context)
 
-  const { balance, marketMakerAddress, funding } = props
+  const { balance, marketMakerAddress, funding, collateral } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
   const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
-  const [tradedDAI, setTradedDAI] = useState<BigNumber>(new BigNumber(0))
+  const [tradedCollateral, setTradedCollateral] = useState<BigNumber>(new BigNumber(0))
   const [costFee, setCostFee] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
 
@@ -86,24 +87,25 @@ const Sell = (props: Props) => {
     })
     setBalanceItem(balanceItemFound)
 
-    const amountSharesInUnits = +ethers.utils.formatUnits(amountShares, 18)
+    const amountSharesInUnits = +ethers.utils.formatUnits(amountShares, collateral.decimals)
     const individualPrice = balanceItemFound ? +balanceItemFound.currentPrice : 1
     const amountToSell = individualPrice * amountSharesInUnits
 
+    const weiPerUnit = ethers.utils.bigNumberify(10).pow(collateral.decimals)
     const amountToSellInWei = ethers.utils
       .bigNumberify(Math.round(amountToSell * 10000))
-      .mul(ethers.constants.WeiPerEther)
+      .mul(weiPerUnit)
       .div(10000)
 
     const costFeeInWei = ethers.utils
       .bigNumberify(Math.round(amountToSell * 0.01 * 10000))
-      .mul(ethers.constants.WeiPerEther)
+      .mul(weiPerUnit)
       .div(10000)
 
     setCostFee(costFeeInWei)
 
-    setTradedDAI(amountToSellInWei.sub(costFeeInWei))
-  }, [outcome, amountShares, balance])
+    setTradedCollateral(amountToSellInWei.sub(costFeeInWei))
+  }, [outcome, amountShares, balance, collateral])
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
 
@@ -114,7 +116,9 @@ const Sell = (props: Props) => {
       }
 
       setStatus(Status.Loading)
-      setMessage(`Selling ${ethers.utils.formatUnits(amountShares, 18)} shares ...`)
+      setMessage(
+        `Selling ${ethers.utils.formatUnits(amountShares, collateral.decimals)} shares ...`,
+      )
 
       const provider = context.library
 
@@ -153,6 +157,7 @@ const Sell = (props: Props) => {
         <SubsectionTitle>Choose the shares you want to sell</SubsectionTitle>
         <OutcomeTable
           balance={balance}
+          collateral={collateral}
           pricesAfterTrade={pricesAfterTrade}
           outcomeSelected={outcome}
           outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
@@ -166,7 +171,7 @@ const Sell = (props: Props) => {
                   name="amount"
                   value={amountShares}
                   onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
-                  decimals={18}
+                  decimals={collateral.decimals}
                 />
               }
               placeholderText="Shares"
@@ -182,9 +187,9 @@ const Sell = (props: Props) => {
         <FormLabelStyled>Totals</FormLabelStyled>
         <TableStyled>
           <TR>
-            <TD>Total DAI Return</TD>
+            <TD>Total {collateral.symbol} Return</TD>
             <TD textAlign="right">
-              {ethers.utils.formatEther(tradedDAI)} <strong>DAI</strong>
+              {ethers.utils.formatEther(tradedCollateral)} <strong>{collateral.symbol}</strong>
             </TD>
           </TR>
         </TableStyled>
