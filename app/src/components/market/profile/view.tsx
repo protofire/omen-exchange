@@ -21,6 +21,7 @@ interface Props {
   handleRedeem: () => void
   handleWithdraw: () => void
   theme?: any
+  marketAddress: string
 }
 
 const ButtonContainerStyled = styled(ButtonContainer)`
@@ -42,7 +43,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 `
 
 const ViewWrapper = (props: Props) => {
-  const { balance, collateral, status, theme } = props
+  const { balance, collateral, status, theme, marketAddress } = props
 
   const userHasShares = balance.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -104,7 +105,7 @@ const ViewWrapper = (props: Props) => {
           )}
           <Button onClick={() => props.handleBuy()}>Buy</Button>
         </ButtonContainerStyled>
-        <ThreeBoxComments />
+        <ThreeBoxComments threadName={marketAddress} />
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}
     </>
