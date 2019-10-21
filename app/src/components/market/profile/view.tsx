@@ -3,7 +3,7 @@ import styled, { withTheme } from 'styled-components'
 import { ethers } from 'ethers'
 
 import { ViewCard } from '../view_card'
-import { Status, BalanceItem } from '../../../util/types'
+import { Status, BalanceItem, Token } from '../../../util/types'
 import { Button } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
@@ -13,6 +13,7 @@ import { ThreeBoxComments } from '../../common'
 
 interface Props {
   balance: BalanceItem[]
+  collateral: Token
   question: string
   status: Status
   handleBuy: () => void
@@ -41,7 +42,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 `
 
 const ViewWrapper = (props: Props) => {
-  const { balance, status, theme } = props
+  const { balance, collateral, status, theme } = props
 
   const userHasShares = balance.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -77,9 +78,13 @@ const ViewWrapper = (props: Props) => {
         <TR key={index}>
           <TD textAlign={cellAlignment[0]}>{outcomeName}</TD>
           <TD textAlign={cellAlignment[1]}>{probability} %</TD>
-          <TD textAlign={cellAlignment[2]}>{currentPrice} DAI</TD>
+          <TD textAlign={cellAlignment[2]}>
+            {currentPrice} {collateral.symbol}
+          </TD>
           {userHasShares && (
-            <TD textAlign={cellAlignment[3]}>{ethers.utils.formatUnits(shares, 18)}</TD>
+            <TD textAlign={cellAlignment[3]}>
+              {ethers.utils.formatUnits(shares, collateral.decimals)}
+            </TD>
           )}
         </TR>
       )

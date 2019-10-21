@@ -8,11 +8,14 @@ import { CreateCard } from '../../create_card'
 import { FormRow } from '../../../common/form_row'
 import { TextfieldCustomPlaceholder } from '../../../common/textfield_custom_placeholder'
 import { ButtonLink } from '../../../common/button_link'
+import { Tokens } from '../../../common/tokens'
+import { knownTokens } from '../../../../util/addresses'
 
 interface Props {
   back: () => void
   next: () => void
   values: {
+    collateralId: KnownToken
     spread: string
     funding: BigNumber
   }
@@ -63,7 +66,9 @@ class FundingAndFeeStep extends Component<Props> {
 
   render() {
     const { values, handleChange } = this.props
-    const { spread, funding } = values
+    const { collateralId, spread, funding } = values
+
+    const collateral = knownTokens[collateralId]
 
     return (
       <CreateCard>
@@ -87,6 +92,11 @@ class FundingAndFeeStep extends Component<Props> {
           tooltipText={'The fee taken from every trade. Temporarily fixed at 1%.'}
         />
         <FormRow
+          formField={<Tokens name="collateralId" value={collateralId} onChange={handleChange} />}
+          title={'Collateral token'}
+          tooltipText={'Select the token you want to use as collateral'}
+        />
+        <FormRow
           formField={
             <TextfieldCustomPlaceholder
               formField={
@@ -94,10 +104,10 @@ class FundingAndFeeStep extends Component<Props> {
                   name="funding"
                   value={funding}
                   onChange={handleChange}
-                  decimals={18}
+                  decimals={collateral.decimals}
                 />
               }
-              placeholderText="DAI"
+              placeholderText={collateral.symbol}
             />
           }
           title={'Funding'}

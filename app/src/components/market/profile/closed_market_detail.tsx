@@ -10,9 +10,8 @@ import { ButtonContainer } from '../../common/button_container'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
-import { BalanceItem, OutcomeTableValue, Status } from '../../../util/types'
+import { BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { ERC20Service, MarketMakerService } from '../../../services'
-import { getContractAddress } from '../../../util/addresses'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatDate } from '../../../util/tools'
@@ -51,6 +50,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 interface Props {
   theme?: any
   balance: BalanceItem[]
+  collateral: Token
   funding: BigNumber
   question: string
   resolution: Date | null
@@ -63,7 +63,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { conditionalTokens } = useContracts(context)
 
-  const { balance, marketAddress, resolution, funding } = props
+  const { theme, collateral: collateralToken, balance, marketAddress, resolution, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
@@ -75,11 +75,10 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   useEffect(() => {
     const fetchBalance = async () => {
       const provider = context.library
-      const networkId = context.networkId
 
-      const daiAddress = getContractAddress(networkId, 'dai')
-      const daiService = new ERC20Service(daiAddress)
-      const collateralBalance = await daiService.getCollateral(marketAddress, provider)
+      const collateralAddress = await marketMaker.getCollateralToken()
+      const collateralService = new ERC20Service(collateralAddress)
+      const collateralBalance = await collateralService.getCollateral(marketAddress, provider)
       setCollateral(collateralBalance)
     }
 
@@ -91,13 +90,11 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       setMessage('Redeem payout...')
       setStatus(Status.Loading)
 
-      const networkId = context.networkId
-
-      const daiAddress = getContractAddress(networkId, 'dai')
+      const collateralAddress = await marketMaker.getCollateralToken()
 
       const conditionId = await marketMaker.getConditionId()
 
-      await conditionalTokens.redeemPositions(daiAddress, conditionId)
+      await conditionalTokens.redeemPositions(collateralAddress, conditionId)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -121,8 +118,10 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   //   }
   // }
 
-  const fundingFormat = ethers.utils.formatUnits(funding, 18)
-  const collateralFormat = `${ethers.utils.formatUnits(collateral, 18)} DAI`
+  const fundingFormat = ethers.utils.formatUnits(funding, collateralToken.decimals)
+  const collateralFormat = `${ethers.utils.formatUnits(collateral, collateralToken.decimals)} ${
+    collateralToken.symbol
+  }`
   const resolutionFormat = resolution ? formatDate(resolution) : ''
 
   const winningOutcome = balance.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
@@ -135,6 +134,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         {<SubsectionTitle>Balance</SubsectionTitle>}
         <OutcomeTable
           balance={balance}
+          collateral={collateralToken}
           disabledColumns={[
             OutcomeTableValue.Probabilities,
             OutcomeTableValue.CurrentPrice,
