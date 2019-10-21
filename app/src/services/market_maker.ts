@@ -1,5 +1,5 @@
 import { Contract, ethers, Wallet } from 'ethers'
-import { BigNumber, BigNumberish } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 
 import { ConditionalTokenService } from './conditional_token'
 import { getLogger } from '../util/logger'
