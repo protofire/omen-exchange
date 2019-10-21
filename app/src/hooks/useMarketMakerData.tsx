@@ -104,16 +104,19 @@ export const useMarketMakerData = (
         )
 
         const totalUserShares = userShares.balanceOfForNo.add(userShares.balanceOfForYes)
-        const totalUserSharesNumber = +ethers.utils.formatUnits(totalUserShares, 18)
+        const totalUserSharesNumber = +ethers.utils.formatUnits(totalUserShares, token.decimals)
 
         const totalShares = totalMarketMakerShares.add(totalUserShares)
-        const totalSharesNumber = +ethers.utils.formatUnits(totalShares, 18)
+        const totalSharesNumber = +ethers.utils.formatUnits(totalShares, token.decimals)
 
         const userSharesPercentage =
           totalSharesNumber > 0 ? (totalUserSharesNumber / totalSharesNumber) * 100 : 0
 
-        const marketMakerFundingNumber = +ethers.utils.formatUnits(marketMakerFund, 18)
-        const marketMakerUserFundingNumber = +ethers.utils.formatUnits(marketMakerUserFund, 18)
+        const marketMakerFundingNumber = +ethers.utils.formatUnits(marketMakerFund, token.decimals)
+        const marketMakerUserFundingNumber = +ethers.utils.formatUnits(
+          marketMakerUserFund,
+          token.decimals,
+        )
         const marketMakerFundPercentage =
           marketMakerFundingNumber > 0
             ? (marketMakerUserFundingNumber / marketMakerFundingNumber) * 100
