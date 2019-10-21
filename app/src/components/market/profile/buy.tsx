@@ -8,7 +8,7 @@ import { Button, BigNumberInput, OutcomeTable } from '../../common'
 import { ERC20Service, MarketMakerService } from '../../../services'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { Table, TD, TR } from '../../common/table'
-import { ViewCard } from '../view_card'
+import { ViewCard } from '../../common/view_card'
 import { computePriceAfterTrade } from '../../../util/tools'
 import { getLogger } from '../../../util/logger'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
@@ -28,7 +28,7 @@ interface Props {
   funding: BigNumber
   handleBack: () => void
   handleFinish: () => void
-  marketAddress: string
+  marketMakerAddress: string
   collateral: Token
 }
 
@@ -59,7 +59,7 @@ const Buy = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { conditionalTokens } = useContracts(context)
 
-  const { balance, marketAddress, funding, collateral } = props
+  const { balance, marketMakerAddress, funding, collateral } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
@@ -70,14 +70,14 @@ const Buy = (props: Props) => {
   const holdingsYes = balance[0].holdings
   const holdingsNo = balance[1].holdings
 
-  const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, context.library)
+  const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, context.library)
 
   // get the amount of shares that will be traded
   const calcBuyAmount = useMemo(
     () => (amount: BigNumber) => {
       return marketMaker.calcBuyAmount(amount, outcome)
     },
-    [outcome],
+    [outcome, marketMaker],
   )
   const tradedShares = useAsyncDerivedValue(amount, new BigNumber(0), calcBuyAmount)
 
@@ -103,7 +103,7 @@ const Buy = (props: Props) => {
       .mul(weiPerUnit)
       .div(10000)
     setCost(costWithFee)
-  }, [outcome, amount, balance])
+  }, [outcome, amount, balance, collateral])
 
   const finish = async () => {
     try {
@@ -120,7 +120,7 @@ const Buy = (props: Props) => {
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
         provider,
         user,
-        marketAddress,
+        marketMakerAddress,
         cost,
       )
 
@@ -129,7 +129,7 @@ const Buy = (props: Props) => {
         // this can be improved if, instead of adding the 1% fee manually in the front, we use the `calcMarketFee`
         // contract method and add it to the result of `calcNetCost` result
         const costWithErrorMargin = cost.mul(11000).div(10000)
-        await collateralService.approve(provider, marketAddress, costWithErrorMargin)
+        await collateralService.approve(provider, marketMakerAddress, costWithErrorMargin)
       }
 
       //TODO: TBD

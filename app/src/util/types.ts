@@ -64,7 +64,7 @@ export enum WinnerOutcome {
 
 export interface Question {
   question: string
-  resolution: Date
+  resolution: Maybe<Date>
 }
 
 export enum OutcomeTableValue {

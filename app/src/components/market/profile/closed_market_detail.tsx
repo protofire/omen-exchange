@@ -3,7 +3,7 @@ import styled, { withTheme } from 'styled-components'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
-import { ViewCard } from '../view_card'
+import { ViewCard } from '../../common/view_card'
 import { Button, OutcomeTable } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
@@ -54,7 +54,7 @@ interface Props {
   funding: BigNumber
   question: string
   resolution: Date | null
-  marketAddress: string
+  marketMakerAddress: string
 }
 
 const logger = getLogger('Market::ClosedMarketDetail')
@@ -63,14 +63,21 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { conditionalTokens } = useContracts(context)
 
-  const { theme, collateral: collateralToken, balance, marketAddress, resolution, funding } = props
+  const {
+    theme,
+    collateral: collateralToken,
+    balance,
+    marketMakerAddress,
+    resolution,
+    funding,
+  } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
   const provider = context.library
-  const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
+  const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -78,12 +85,12 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const collateralService = new ERC20Service(collateralAddress)
-      const collateralBalance = await collateralService.getCollateral(marketAddress, provider)
+      const collateralBalance = await collateralService.getCollateral(marketMakerAddress, provider)
       setCollateral(collateralBalance)
     }
 
     fetchBalance()
-  }, [collateral, context, marketAddress])
+  }, [collateral, context, marketMakerAddress])
 
   const redeem = async () => {
     try {

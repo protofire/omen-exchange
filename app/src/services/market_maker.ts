@@ -9,10 +9,12 @@ const logger = getLogger('Services::MarketMaker')
 
 const marketMakerAbi = [
   'function conditionalTokens() external view returns (address)',
+  'function balanceOf(address addr) external view returns (uint256)',
   'function collateralToken() external view returns (address)',
   'function fee() external view returns (uint)',
   'function conditionIds(uint256) external view returns (bytes32)',
   'function addFunding(uint addedFunds, uint[] distributionHint) external',
+  'function removeFunding(uint sharesToBurn) external',
   'function totalSupply() external view returns (uint256)',
   'function buy(uint investmentAmount, uint outcomeIndex, uint minOutcomeTokensToBuy) external',
   'function calcBuyAmount(uint investmentAmount, uint outcomeIndex) public view returns (uint)',
@@ -30,15 +32,15 @@ class MarketMakerService {
   }
 
   getConditionalTokens = async (): Promise<string> => {
-    return await this.contract.conditionalTokens()
+    return this.contract.conditionalTokens()
   }
 
   getCollateralToken = async (): Promise<string> => {
-    return await this.contract.collateralToken()
+    return this.contract.collateralToken()
   }
 
   getFee = async (): Promise<any> => {
-    return await this.contract.fee()
+    return this.contract.fee()
   }
 
   getConditionId = async () => {
@@ -46,12 +48,17 @@ class MarketMakerService {
   }
 
   getTotalSupply = async (): Promise<BigNumber> => {
-    return await this.contract.totalSupply()
+    return this.contract.totalSupply()
   }
 
   addFunding = async (amount: BigNumber) => {
     logger.log(`Add funding to market maker ${amount}`)
-    this.contract.addFunding(amount, [])
+    return this.contract.addFunding(amount, [])
+  }
+
+  removeFunding = async (amount: BigNumber) => {
+    logger.log(`Remove funding to market maker ${amount}`)
+    return this.contract.removeFunding(amount)
   }
 
   /* TODO: TBD */
@@ -106,6 +113,10 @@ class MarketMakerService {
       balanceOfForYes,
       balanceOfForNo,
     }
+  }
+
+  balanceOf = async (address: string): Promise<BigNumber> => {
+    return this.contract.balanceOf(address)
   }
 
   buy = async (amount: BigNumber, outcome: OutcomeSlot) => {

@@ -2,7 +2,7 @@ import React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { ethers } from 'ethers'
 
-import { ViewCard } from '../view_card'
+import { ViewCard } from '../../common/view_card'
 import { Status, BalanceItem, Token } from '../../../util/types'
 import { Button } from '../../common'
 import { FullLoading } from '../../common/full_loading'

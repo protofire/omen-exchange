@@ -14,6 +14,7 @@ interface Props {
   outcomeHandleChange?: (e: OutcomeSlot) => void
   disabledColumns?: OutcomeTableValue[]
   withWinningOutcome?: boolean
+  displayRadioSelection?: boolean
 }
 
 const TableStyled = styled(Table)`
@@ -49,6 +50,7 @@ export const OutcomeTable = (props: Props) => {
     outcomeHandleChange,
     disabledColumns = [],
     withWinningOutcome = false,
+    displayRadioSelection = true,
   } = props
 
   const TableHead: OutcomeTableValue[] = [
@@ -89,17 +91,21 @@ export const OutcomeTable = (props: Props) => {
           </TDStyled>
         ) : (
           <TD textAlign={TableCellsAlign[0]}>
-            <RadioContainer>
-              <RadioInputStyled
-                checked={outcomeSelected === outcomeName}
-                name="outcome"
-                onChange={(e: any) =>
-                  outcomeHandleChange && outcomeHandleChange(e.target.value as OutcomeSlot)
-                }
-                value={outcomeName}
-              />
-              {outcomeName}
-            </RadioContainer>
+            {displayRadioSelection ? (
+              <RadioContainer>
+                <RadioInputStyled
+                  checked={outcomeSelected === outcomeName}
+                  name="outcome"
+                  onChange={(e: any) =>
+                    outcomeHandleChange && outcomeHandleChange(e.target.value as OutcomeSlot)
+                  }
+                  value={outcomeName}
+                />
+                {outcomeName}
+              </RadioContainer>
+            ) : (
+              outcomeName
+            )}
           </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (

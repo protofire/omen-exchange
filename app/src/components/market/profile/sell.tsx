@@ -12,8 +12,8 @@ import { FormRow } from '../../common/form_row'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { Table, TD, TR } from '../../common/table'
 import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
-import { ViewCard } from '../view_card'
-// import { MarketMakerService } from '../../../services'
+import { ViewCard } from '../../common/view_card'
+import { MarketMakerService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { BigNumberInputReturn } from '../../common/big_number_input'
@@ -24,7 +24,7 @@ import { useContracts } from '../../../hooks/useContracts'
 interface Props {
   balance: BalanceItem[]
   funding: BigNumber
-  marketAddress: string
+  marketMakerAddress: string
   handleBack: () => void
   handleFinish: () => void
   collateral: Token
@@ -56,7 +56,7 @@ const Sell = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { conditionalTokens } = useContracts(context)
 
-  const { balance, marketAddress, funding, collateral } = props
+  const { balance, marketMakerAddress, funding, collateral } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
@@ -105,7 +105,7 @@ const Sell = (props: Props) => {
     setCostFee(costFeeInWei)
 
     setTradedCollateral(amountToSellInWei.sub(costFeeInWei))
-  }, [outcome, amountShares, balance])
+  }, [outcome, amountShares, balance, collateral])
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
 
@@ -120,18 +120,18 @@ const Sell = (props: Props) => {
         `Selling ${ethers.utils.formatUnits(amountShares, collateral.decimals)} shares ...`,
       )
 
-      // const provider = context.library
+      const provider = context.library
 
-      // const marketMaker = new MarketMakerService(marketAddress, conditionalTokens, provider)
+      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
-      // const amountSharesNegative = amountShares.mul(-1)
-      // const outcomeValue =
-      // outcome === OutcomeSlot.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
+      const amountSharesNegative = amountShares.mul(-1)
+      const outcomeValue =
+        outcome === OutcomeSlot.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
 
-      const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketAddress)
+      const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketMakerAddress)
 
       if (!isApprovedForAll) {
-        await conditionalTokens.setApprovalForAll(marketAddress)
+        await conditionalTokens.setApprovalForAll(marketMakerAddress)
       }
 
       // TODO: TBD
