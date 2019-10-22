@@ -126,8 +126,13 @@ const CommentsTitle = styled.h3`
   margin: 0 0 15px;
 `
 
-export const ThreeBoxComments = () => {
+interface Props {
+  threadName: string
+}
+
+export const ThreeBoxComments = (props: Props) => {
   const context: ConnectedWeb3Context = useConnectedWeb3Context()
+  const { threadName } = props
 
   const [box, setBox] = useState<any>(null)
   const [currentUserAddress, setCurrentUserAddress] = useState<string>(context.account)
@@ -159,7 +164,7 @@ export const ThreeBoxComments = () => {
         currentUserAddr={currentUserAddress}
         showCommentCount={10}
         spaceName={THREEBOX_SPACE_NAME}
-        threadName="profile"
+        threadName={threadName}
         useHovers={false}
       />
     </ThreeBoxCustom>
