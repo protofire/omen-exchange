@@ -31,9 +31,9 @@ export enum StatusMarketCreation {
   Ready = 'Ready',
   PostingQuestion = 'Posting question to realitio',
   PrepareCondition = 'Prepare condition',
-  ApprovingDAI = 'Approving DAI',
+  ApprovingCollateral = 'Approving collateral',
   CreateMarketMaker = 'Create market maker',
-  ApproveDAIForMarketMaker = 'Approve dai for market maker',
+  ApproveCollateralForMarketMaker = 'Approve collateral for market maker',
   AddFunding = 'Add funding in market maker',
   InitialTradeInMarketMaker = 'initial trade in market maker',
   Done = 'Done',
@@ -64,7 +64,7 @@ export enum WinnerOutcome {
 
 export interface Question {
   question: string
-  resolution: Date
+  resolution: Maybe<Date>
 }
 
 export enum OutcomeTableValue {
@@ -74,4 +74,10 @@ export enum OutcomeTableValue {
   Shares = 'Shares',
   Payout = 'Payout',
   PriceAfterTrade = 'Price after trade',
+}
+
+export interface Token {
+  address: string
+  decimals: number
+  symbol: string
 }

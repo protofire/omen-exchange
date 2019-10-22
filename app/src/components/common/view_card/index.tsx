@@ -1,5 +1,5 @@
 import React, { HTMLAttributes } from 'react'
-import { Card } from '../common/card'
+import { Card } from '../card/index'
 import styled from 'styled-components'
 
 const CardStyled = styled(Card)`

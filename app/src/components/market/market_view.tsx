@@ -4,7 +4,7 @@ import { Buy } from './profile/buy'
 import { SectionTitle } from '../common/section_title'
 import { Sell } from './profile/sell'
 import { ClosedMarketDetail } from './profile/closed_market_detail'
-import { Status, BalanceItem, StepProfile, WinnerOutcome } from '../../util/types'
+import { Status, BalanceItem, StepProfile, WinnerOutcome, Token } from '../../util/types'
 import { View } from './profile/view'
 import { formatDate } from '../../util/tools'
 
@@ -14,13 +14,22 @@ interface Props {
   question: string
   resolution: Maybe<Date>
   status: Status
-  marketAddress: string
+  marketMakerAddress: string
   stepProfile: StepProfile
   winnerOutcome: Maybe<WinnerOutcome>
+  collateral: Token
 }
 
 const MarketView: FC<Props> = props => {
-  const { funding, question, resolution, balance, marketAddress, stepProfile } = props
+  const {
+    funding,
+    question,
+    resolution,
+    balance,
+    marketMakerAddress,
+    stepProfile,
+    collateral,
+  } = props
   const [currentStep, setCurrentStep] = useState<StepProfile>(stepProfile)
 
   useEffect(() => {
@@ -73,7 +82,8 @@ const MarketView: FC<Props> = props => {
               funding={funding}
               handleBack={() => handleBack()}
               handleFinish={() => handleFinish()}
-              marketAddress={marketAddress}
+              marketMakerAddress={marketMakerAddress}
+              collateral={collateral}
             />
           </>
         )
@@ -84,8 +94,9 @@ const MarketView: FC<Props> = props => {
               handleBack={() => handleBack()}
               handleFinish={() => handleFinish()}
               balance={balance}
-              marketAddress={marketAddress}
+              marketMakerAddress={marketMakerAddress}
               funding={funding}
+              collateral={collateral}
             />
           </>
         )

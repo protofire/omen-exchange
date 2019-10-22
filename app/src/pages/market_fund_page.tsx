@@ -1,21 +1,21 @@
 import React from 'react'
 import { RouteComponentProps } from 'react-router'
 
-import { MarketViewContainer } from '../components'
+import { MarketFundContainer } from '../components'
 import { ConnectedWeb3, useConnectWeb3 } from '../hooks/connectedWeb3'
 
 interface RouteParams {
   address: string
 }
 
-const MarketDetailsPage = (props: RouteComponentProps<RouteParams>) => {
+const MarketFundPage = (props: RouteComponentProps<RouteParams>) => {
   useConnectWeb3()
 
   return (
     <ConnectedWeb3>
-      <MarketViewContainer marketMakerAddress={props.match.params.address} />
+      <MarketFundContainer marketMakerAddress={props.match.params.address} />
     </ConnectedWeb3>
   )
 }
 
-export { MarketDetailsPage }
+export { MarketFundPage }

@@ -55,19 +55,19 @@ class ConditionalTokenService {
   }
 
   getCollectionIdForYes = async (conditionId: string): Promise<any> => {
-    return await this.contract.getCollectionId(ethers.constants.HashZero, conditionId, 1)
+    return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, 1)
   }
 
   getCollectionIdForNo = async (conditionId: string): Promise<any> => {
-    return await this.contract.getCollectionId(ethers.constants.HashZero, conditionId, 2)
+    return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, 2)
   }
 
-  getPositionId = async (daiAddress: string, collectionId: string): Promise<any> => {
-    return await this.contract.getPositionId(daiAddress, collectionId)
+  getPositionId = async (collateralAddress: string, collectionId: string): Promise<any> => {
+    return this.contract.getPositionId(collateralAddress, collectionId)
   }
 
   getBalanceOf = async (ownerAddress: string, positionId: string): Promise<any> => {
-    return await this.contract.balanceOf(ownerAddress, positionId)
+    return this.contract.balanceOf(ownerAddress, positionId)
   }
 
   getQuestionId = async (conditionId: string, provider: any): Promise<string> => {
@@ -81,7 +81,7 @@ class ConditionalTokenService {
       throw new Error(`No ConditionPreparation event found for conditionId '${conditionId}'`)
     }
     if (logs.length > 1) {
-      console.warn(
+      logger.warn(
         `There should be only one ConditionPreparation event for conditionId '${conditionId}'`,
       )
     }
@@ -93,15 +93,15 @@ class ConditionalTokenService {
   }
 
   setApprovalForAll = async (marketMakerAddress: string): Promise<string> => {
-    return await this.contract.setApprovalForAll(marketMakerAddress, true)
+    return this.contract.setApprovalForAll(marketMakerAddress, true)
   }
 
   isApprovedForAll = async (marketMakerAddress: string): Promise<boolean> => {
-    return await this.contract.isApprovedForAll(this.signerAddress, marketMakerAddress)
+    return this.contract.isApprovedForAll(this.signerAddress, marketMakerAddress)
   }
 
   reportPayouts = async (questionId: string): Promise<any> => {
-    return await this.contract.reportPayouts(questionId, [1, 0])
+    return this.contract.reportPayouts(questionId, [1, 0])
   }
 
   isConditionResolved = async (conditionId: string): Promise<boolean> => {
@@ -111,12 +111,10 @@ class ConditionalTokenService {
   }
 
   redeemPositions = async (collateralToken: string, conditionId: string): Promise<any> => {
-    return await this.contract.redeemPositions(
-      collateralToken,
-      ethers.constants.HashZero,
-      conditionId,
-      [1, 2],
-    )
+    return this.contract.redeemPositions(collateralToken, ethers.constants.HashZero, conditionId, [
+      1,
+      2,
+    ])
   }
 
   getWinnerOutcome = async (conditionId: string): Promise<WinnerOutcome> => {

@@ -1,16 +1,19 @@
 import React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { ethers } from 'ethers'
-import { ViewCard } from '../view_card'
-import { Status, BalanceItem } from '../../../util/types'
+
+import { ViewCard } from '../../common/view_card'
+import { Status, BalanceItem, Token } from '../../../util/types'
 import { Button } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
+import { ThreeBoxComments } from '../../common'
 
 interface Props {
   balance: BalanceItem[]
+  collateral: Token
   question: string
   status: Status
   handleBuy: () => void
@@ -18,6 +21,7 @@ interface Props {
   handleRedeem: () => void
   handleWithdraw: () => void
   theme?: any
+  marketAddress: string
 }
 
 const ButtonContainerStyled = styled(ButtonContainer)`
@@ -39,7 +43,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 `
 
 const ViewWrapper = (props: Props) => {
-  const { balance, status, theme } = props
+  const { balance, collateral, status, theme, marketAddress } = props
 
   const userHasShares = balance.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -75,9 +79,13 @@ const ViewWrapper = (props: Props) => {
         <TR key={index}>
           <TD textAlign={cellAlignment[0]}>{outcomeName}</TD>
           <TD textAlign={cellAlignment[1]}>{probability} %</TD>
-          <TD textAlign={cellAlignment[2]}>{currentPrice} DAI</TD>
+          <TD textAlign={cellAlignment[2]}>
+            {currentPrice} {collateral.symbol}
+          </TD>
           {userHasShares && (
-            <TD textAlign={cellAlignment[3]}>{ethers.utils.formatUnits(shares, 18)}</TD>
+            <TD textAlign={cellAlignment[3]}>
+              {ethers.utils.formatUnits(shares, collateral.decimals)}
+            </TD>
           )}
         </TR>
       )
@@ -97,6 +105,7 @@ const ViewWrapper = (props: Props) => {
           )}
           <Button onClick={() => props.handleBuy()}>Buy</Button>
         </ButtonContainerStyled>
+        <ThreeBoxComments threadName={marketAddress} />
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}
     </>

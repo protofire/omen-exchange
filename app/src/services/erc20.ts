@@ -63,7 +63,7 @@ class ERC20Service {
 
     const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, provider).connect(signer)
 
-    return await erc20Contract.balanceOf(marketMakerAddress)
+    return erc20Contract.balanceOf(marketMakerAddress)
   }
 }
 
