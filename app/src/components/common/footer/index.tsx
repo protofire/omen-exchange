@@ -1,6 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
-import LogoProtofire from './img/logo.png'
+
+import LogoImageProtofire from './img/logo_protofire.png'
+import LogoImageGeco from './img/logo_geco.png'
 
 const FooterStyled = styled.footer`
   margin-top: auto;
@@ -9,7 +11,6 @@ const FooterStyled = styled.footer`
 
 const AFooter = styled.a`
   align-items: center;
-  cursor: pointer;
   display: flex;
   justify-content: center;
   text-decoration: none;
@@ -25,10 +26,15 @@ const AText = styled.span`
   text-align: left;
 `
 
-const Logo = styled.img`
+const LogoProtofire = styled.img`
   cursor: pointer;
   height: 22px;
   width: 90px;
+`
+
+const LogoGeco = styled.img`
+  height: 40px;
+  margin: 0 10px;
 `
 
 export const Footer: React.FC = props => {
@@ -38,7 +44,10 @@ export const Footer: React.FC = props => {
     <FooterStyled {...restProps}>
       <AFooter href="https://www.protofire.io">
         <AText>Built by</AText>
-        <Logo src={LogoProtofire} alt="Protofire" />
+        <LogoProtofire src={LogoImageProtofire} alt="Protofire" />
+      </AFooter>
+      <AFooter>
+        <LogoGeco src={LogoImageGeco} alt="Geco" />
       </AFooter>
     </FooterStyled>
   )
