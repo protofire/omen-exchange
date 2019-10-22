@@ -70,7 +70,7 @@ const SummaryMarketStep = (props: Props) => {
 
   const collateral = knownTokens[collateralId]
   const resolutionDate = resolution && formatDate(resolution)
-  const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/view/${marketMakerAddress}`
+  const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}/view`
 
   return (
     <>
@@ -81,7 +81,7 @@ const SummaryMarketStep = (props: Props) => {
           there’s currently no way to retrieve it if lost:
         </Paragraph>
         <Paragraph>
-          <a target="_blank" rel="noopener noreferrer" href={`/#/view/${marketMakerAddress}`}>
+          <a target="_blank" rel="noopener noreferrer" href={`/#/${marketMakerAddress}/view`}>
             {marketMakerURL}
           </a>
           <CopyText value={marketMakerURL} />
@@ -141,7 +141,7 @@ const SummaryMarketStep = (props: Props) => {
         <ButtonContainer>
           <MainButton
             rel="noopener noreferrer"
-            href={`/#/view/${marketMakerAddress}`}
+            href={`/#/${marketMakerAddress}/view`}
             target="_blank"
           >
             Go to Market

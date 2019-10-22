@@ -63,14 +63,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { conditionalTokens } = useContracts(context)
 
-  const {
-    theme,
-    collateral: collateralToken,
-    balance,
-    marketMakerAddress,
-    resolution,
-    funding,
-  } = props
+  const { collateral: collateralToken, balance, marketMakerAddress, resolution, funding } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
@@ -79,6 +72,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const provider = context.library
   const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
+  // TODO Is necessary to do this ?
   useEffect(() => {
     const fetchBalance = async () => {
       const provider = context.library

@@ -1,6 +1,7 @@
 import React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { ethers } from 'ethers'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { ViewCard } from '../../common/view_card'
 import { Status, BalanceItem, Token } from '../../../util/types'
@@ -11,17 +12,13 @@ import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { ThreeBoxComments } from '../../common'
 
-interface Props {
+interface Props extends RouteComponentProps<any> {
   balance: BalanceItem[]
   collateral: Token
   question: string
   status: Status
-  handleBuy: () => void
-  handleSell: () => void
-  handleRedeem: () => void
-  handleWithdraw: () => void
   theme?: any
-  marketAddress: string
+  marketMakerAddress: string
 }
 
 const ButtonContainerStyled = styled(ButtonContainer)`
@@ -43,7 +40,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 `
 
 const ViewWrapper = (props: Props) => {
-  const { balance, collateral, status, theme, marketAddress } = props
+  const { balance, collateral, status, theme, marketMakerAddress } = props
 
   const userHasShares = balance.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -99,17 +96,20 @@ const ViewWrapper = (props: Props) => {
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>
           {userHasShares && (
-            <Button backgroundColor={theme.colors.secondary} onClick={() => props.handleSell()}>
+            <Button
+              backgroundColor={theme.colors.secondary}
+              onClick={() => props.history.push(`/${marketMakerAddress}/sell`)}
+            >
               Sell
             </Button>
           )}
-          <Button onClick={() => props.handleBuy()}>Buy</Button>
+          <Button onClick={() => props.history.push(`/${marketMakerAddress}/buy`)}>Buy</Button>
         </ButtonContainerStyled>
-        <ThreeBoxComments threadName={marketAddress} />
+        <ThreeBoxComments threadName={marketMakerAddress} />
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}
     </>
   )
 }
 
-export const View = withTheme(ViewWrapper)
+export const View = withRouter(withTheme(ViewWrapper))

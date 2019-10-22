@@ -2,33 +2,25 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 
-import { BalanceItem, OutcomeSlot, OutcomeTableValue, Status, Token } from '../../../util/types'
-import { Button, BigNumberInput, OutcomeTable } from '../../common'
-import { ButtonContainer } from '../../common/button_container'
-import { ButtonLink } from '../../common/button_link'
-import { FormLabel } from '../../common/form_label'
-import { FormRow } from '../../common/form_row'
-import { SubsectionTitle } from '../../common/subsection_title'
-import { Table, TD, TR } from '../../common/table'
-import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
-import { ViewCard } from '../../common/view_card'
-import { MarketMakerService } from '../../../services'
-import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { getLogger } from '../../../util/logger'
-import { BigNumberInputReturn } from '../../common/big_number_input'
-import { FullLoading } from '../../common/full_loading'
-import { computePriceAfterTrade } from '../../../util/tools'
-import { useContracts } from '../../../hooks/useContracts'
-
-interface Props {
-  balance: BalanceItem[]
-  funding: BigNumber
-  marketMakerAddress: string
-  handleBack: () => void
-  handleFinish: () => void
-  collateral: Token
-}
+import { BalanceItem, OutcomeSlot, OutcomeTableValue, Status, Token } from '../../util/types'
+import { Button, BigNumberInput, OutcomeTable } from '../common'
+import { ButtonContainer } from '../common/button_container'
+import { ButtonLink } from '../common/button_link'
+import { FormLabel } from '../common/form_label'
+import { FormRow } from '../common/form_row'
+import { SubsectionTitle } from '../common/subsection_title'
+import { Table, TD, TR } from '../common/table'
+import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
+import { ViewCard } from '../common/view_card'
+import { ConditionalTokenService, MarketMakerService } from '../../services'
+import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { getLogger } from '../../util/logger'
+import { BigNumberInputReturn } from '../common/big_number_input'
+import { FullLoading } from '../common/full_loading'
+import { computePriceAfterTrade, formatDate } from '../../util/tools'
+import { SectionTitle } from '../common/section_title'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -52,11 +44,28 @@ const FormLabelStyled = styled(FormLabel)`
 `
 const logger = getLogger('Market::Sell')
 
-const Sell = (props: Props) => {
-  const context = useConnectedWeb3Context()
-  const { conditionalTokens } = useContracts(context)
+interface Props extends RouteComponentProps<any> {
+  marketMakerAddress: string
+  marketMakerFunding: BigNumber
+  balance: BalanceItem[]
+  collateral: Token
+  conditionalTokens: ConditionalTokenService
+  question: string
+  resolution: Maybe<Date>
+}
 
-  const { balance, marketMakerAddress, funding, collateral } = props
+const MarketSellWrapper = (props: Props) => {
+  const context = useConnectedWeb3Context()
+
+  const {
+    balance,
+    marketMakerAddress,
+    marketMakerFunding,
+    collateral,
+    conditionalTokens,
+    question,
+    resolution,
+  } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
@@ -78,7 +87,7 @@ const Sell = (props: Props) => {
     tradeNo,
     holdingsYes,
     holdingsNo,
-    funding,
+    marketMakerFunding,
   )
 
   useEffect(() => {
@@ -122,7 +131,7 @@ const Sell = (props: Props) => {
 
       const provider = context.library
 
-      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+      // const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
       const amountSharesNegative = amountShares.mul(-1)
       const outcomeValue =
@@ -139,7 +148,6 @@ const Sell = (props: Props) => {
       // await marketMaker.trade(outcomeValue)
 
       setStatus(Status.Ready)
-      props.handleFinish()
     } catch (err) {
       setStatus(Status.Error)
       logger.log(`Error trying to sell: ${err.message}`)
@@ -153,6 +161,7 @@ const Sell = (props: Props) => {
 
   return (
     <>
+      <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
       <ViewCard>
         <SubsectionTitle>Choose the shares you want to sell</SubsectionTitle>
         <OutcomeTable
@@ -194,7 +203,9 @@ const Sell = (props: Props) => {
           </TR>
         </TableStyled>
         <ButtonContainer>
-          <ButtonLinkStyled onClick={() => props.handleBack()}>‹ Back</ButtonLinkStyled>
+          <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}/view`)}>
+            ‹ Back
+          </ButtonLinkStyled>
           <Button disabled={disabled} onClick={() => finish()}>
             Finish
           </Button>
@@ -205,4 +216,4 @@ const Sell = (props: Props) => {
   )
 }
 
-export { Sell }
+export const MarketSell = withRouter(MarketSellWrapper)
