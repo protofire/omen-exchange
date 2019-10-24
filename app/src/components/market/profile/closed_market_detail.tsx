@@ -72,7 +72,6 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const provider = context.library
   const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
-  // TODO Is necessary to do this ?
   useEffect(() => {
     const fetchBalance = async () => {
       const provider = context.library
