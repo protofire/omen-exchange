@@ -12,7 +12,7 @@ import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { ThreeBoxComments } from '../../common'
 
-interface Props extends RouteComponentProps<any> {
+interface Props extends RouteComponentProps<{}> {
   balance: BalanceItem[]
   collateral: Token
   question: string
