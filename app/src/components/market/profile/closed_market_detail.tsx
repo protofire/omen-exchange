@@ -84,7 +84,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     }
 
     fetchBalance()
-  }, [collateral, context, marketMakerAddress])
+  }, [collateral, context, marketMakerAddress, marketMaker])
 
   const redeem = async () => {
     try {
