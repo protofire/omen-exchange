@@ -13,7 +13,6 @@ import {
 import { Header } from '../common/header'
 import { MainScroll } from '../common/main_scroll'
 import { MainWrapper } from '../common/main_wrapper'
-import { MarketPermission } from '../market/market_permission'
 
 const RedirectToHome = () => <Redirect to="/" />
 
@@ -25,13 +24,11 @@ export const Main: React.FC = () => {
         <MainScroll>
           <Switch>
             <Route exact path="/" component={Home} />
-            <MarketPermission>
-              <Route exact path="/create" component={CreateMarketPage} />
-              <Route exact path="/:address" component={MarketDetailsPage} />
-              <Route exact path="/:address/buy" component={MarketBuyPage} />
-              <Route exact path="/:address/sell" component={MarketSellPage} />
-              <Route exact path="/:address/fund" component={MarketFundPage} />
-            </MarketPermission>
+            <Route exact path="/create" component={CreateMarketPage} />
+            <Route exact path="/:address" component={MarketDetailsPage} />
+            <Route exact path="/:address/buy" component={MarketBuyPage} />
+            <Route exact path="/:address/sell" component={MarketSellPage} />
+            <Route exact path="/:address/fund" component={MarketFundPage} />
             <Route component={RedirectToHome} />
           </Switch>
           <Footer />
