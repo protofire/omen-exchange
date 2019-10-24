@@ -27,7 +27,7 @@ export const Main: React.FC = () => {
             <Route exact path="/" component={Home} />
             <MarketPermission>
               <Route exact path="/create" component={CreateMarketPage} />
-              <Route exact path="/:address/view" component={MarketDetailsPage} />
+              <Route exact path="/:address" component={MarketDetailsPage} />
               <Route exact path="/:address/buy" component={MarketBuyPage} />
               <Route exact path="/:address/sell" component={MarketSellPage} />
               <Route exact path="/:address/fund" component={MarketFundPage} />
