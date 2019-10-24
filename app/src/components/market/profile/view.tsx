@@ -5,12 +5,11 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { ViewCard } from '../../common/view_card'
 import { Status, BalanceItem, Token } from '../../../util/types'
-import { Button } from '../../common'
+import { ButtonAnchor, ThreeBoxComments } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
-import { ThreeBoxComments } from '../../common'
 
 interface Props extends RouteComponentProps<{}> {
   balance: BalanceItem[]
@@ -26,14 +25,14 @@ const ButtonContainerStyled = styled(ButtonContainer)`
   grid-row-gap: 10px;
   grid-template-columns: 1fr;
 
-  > button {
+  > a {
     margin-left: 0;
   }
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: flex;
 
-    > button {
+    > a {
       margin-left: 10px;
     }
   }
@@ -96,14 +95,14 @@ const ViewWrapper = (props: Props) => {
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>
           {userHasShares && (
-            <Button
+            <ButtonAnchor
               backgroundColor={theme.colors.secondary}
-              onClick={() => props.history.push(`/${marketMakerAddress}/sell`)}
+              href={`/#/${marketMakerAddress}/sell`}
             >
               Sell
-            </Button>
+            </ButtonAnchor>
           )}
-          <Button onClick={() => props.history.push(`/${marketMakerAddress}/buy`)}>Buy</Button>
+          <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
         </ButtonContainerStyled>
         <ThreeBoxComments threadName={marketMakerAddress} />
       </ViewCard>
