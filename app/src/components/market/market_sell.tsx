@@ -203,7 +203,7 @@ const MarketSellWrapper = (props: Props) => {
           </TR>
         </TableStyled>
         <ButtonContainer>
-          <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}/view`)}>
+          <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
           <Button disabled={disabled} onClick={() => finish()}>

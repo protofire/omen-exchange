@@ -212,7 +212,7 @@ const MarketBuyWrapper = (props: Props) => {
           case it represents the final outcome.
         </Well>
         <ButtonContainer>
-          <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}/view`)}>
+          <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
           <Button disabled={disabled} onClick={() => finish()}>
