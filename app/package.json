@@ -2,6 +2,10 @@
   "name": "app",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=v12.13.0",
+    "yarn": "^1.12.3"
+  },
   "dependencies": {
     "3box": "^1.12.0",
     "3box-comments-react": "^0.0.1-beta.11",
@@ -37,7 +41,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test  --passWithNoTests",
     "eject": "react-scripts eject",
     "lint": "eslint './src/**/*.{ts,tsx}'",

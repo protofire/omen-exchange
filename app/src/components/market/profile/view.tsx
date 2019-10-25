@@ -1,27 +1,23 @@
 import React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { ethers } from 'ethers'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { ViewCard } from '../../common/view_card'
 import { Status, BalanceItem, Token } from '../../../util/types'
-import { Button } from '../../common'
+import { ButtonAnchor, ThreeBoxComments } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
-import { ThreeBoxComments } from '../../common'
 
-interface Props {
+interface Props extends RouteComponentProps<{}> {
   balance: BalanceItem[]
   collateral: Token
   question: string
   status: Status
-  handleBuy: () => void
-  handleSell: () => void
-  handleRedeem: () => void
-  handleWithdraw: () => void
   theme?: any
-  marketAddress: string
+  marketMakerAddress: string
 }
 
 const ButtonContainerStyled = styled(ButtonContainer)`
@@ -29,21 +25,21 @@ const ButtonContainerStyled = styled(ButtonContainer)`
   grid-row-gap: 10px;
   grid-template-columns: 1fr;
 
-  > button {
+  > a {
     margin-left: 0;
   }
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: flex;
 
-    > button {
+    > a {
       margin-left: 10px;
     }
   }
 `
 
 const ViewWrapper = (props: Props) => {
-  const { balance, collateral, status, theme, marketAddress } = props
+  const { balance, collateral, status, theme, marketMakerAddress } = props
 
   const userHasShares = balance.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -99,17 +95,20 @@ const ViewWrapper = (props: Props) => {
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>
           {userHasShares && (
-            <Button backgroundColor={theme.colors.secondary} onClick={() => props.handleSell()}>
+            <ButtonAnchor
+              backgroundColor={theme.colors.secondary}
+              href={`/#/${marketMakerAddress}/sell`}
+            >
               Sell
-            </Button>
+            </ButtonAnchor>
           )}
-          <Button onClick={() => props.handleBuy()}>Buy</Button>
+          <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
         </ButtonContainerStyled>
-        <ThreeBoxComments threadName={marketAddress} />
+        <ThreeBoxComments threadName={marketMakerAddress} />
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}
     </>
   )
 }
 
-export const View = withTheme(ViewWrapper)
+export const View = withRouter(withTheme(ViewWrapper))

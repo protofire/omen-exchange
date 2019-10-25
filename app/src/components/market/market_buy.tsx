@@ -2,35 +2,27 @@ import React, { useMemo, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 
-import { BalanceItem, OutcomeSlot, Status, OutcomeTableValue, Token } from '../../../util/types'
-import { Button, BigNumberInput, OutcomeTable } from '../../common'
-import { ERC20Service, MarketMakerService } from '../../../services'
-import { SubsectionTitle } from '../../common/subsection_title'
-import { Table, TD, TR } from '../../common/table'
-import { ViewCard } from '../../common/view_card'
-import { computePriceAfterTrade } from '../../../util/tools'
-import { getLogger } from '../../../util/logger'
-import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { useAsyncDerivedValue } from '../../../hooks/useAsyncDerivedValue'
-import { Well } from '../../common/well'
-import { FullLoading } from '../../common/full_loading'
-import { ButtonContainer } from '../../common/button_container'
-import { ButtonLink } from '../../common/button_link'
-import { FormRow } from '../../common/form_row'
-import { FormLabel } from '../../common/form_label'
-import { TextfieldCustomPlaceholder } from '../../common/textfield_custom_placeholder'
-import { BigNumberInputReturn } from '../../common/big_number_input'
-import { useContracts } from '../../../hooks/useContracts'
-
-interface Props {
-  balance: BalanceItem[]
-  funding: BigNumber
-  handleBack: () => void
-  handleFinish: () => void
-  marketMakerAddress: string
-  collateral: Token
-}
+import { BalanceItem, OutcomeSlot, Status, OutcomeTableValue, Token } from '../../util/types'
+import { Button, BigNumberInput, OutcomeTable } from '../common'
+import { ConditionalTokenService, ERC20Service, MarketMakerService } from '../../services'
+import { SubsectionTitle } from '../common/subsection_title'
+import { Table, TD, TR } from '../common/table'
+import { ViewCard } from '../common/view_card'
+import { computePriceAfterTrade, formatDate } from '../../util/tools'
+import { getLogger } from '../../util/logger'
+import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
+import { Well } from '../common/well'
+import { FullLoading } from '../common/full_loading'
+import { ButtonContainer } from '../common/button_container'
+import { ButtonLink } from '../common/button_link'
+import { FormRow } from '../common/form_row'
+import { FormLabel } from '../common/form_label'
+import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
+import { BigNumberInputReturn } from '../common/big_number_input'
+import { SectionTitle } from '../common/section_title'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -55,11 +47,28 @@ const FormLabelStyled = styled(FormLabel)`
 
 const logger = getLogger('Market::Buy')
 
-const Buy = (props: Props) => {
-  const context = useConnectedWeb3Context()
-  const { conditionalTokens } = useContracts(context)
+interface Props extends RouteComponentProps<any> {
+  marketMakerAddress: string
+  marketMakerFunding: BigNumber
+  balance: BalanceItem[]
+  collateral: Token
+  conditionalTokens: ConditionalTokenService
+  question: string
+  resolution: Maybe<Date>
+}
 
-  const { balance, marketMakerAddress, funding, collateral } = props
+const MarketBuyWrapper = (props: Props) => {
+  const context = useConnectedWeb3Context()
+
+  const {
+    marketMakerAddress,
+    marketMakerFunding,
+    balance,
+    collateral,
+    conditionalTokens,
+    question,
+    resolution,
+  } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
@@ -91,7 +100,7 @@ const Buy = (props: Props) => {
     tradeNo,
     holdingsYes,
     holdingsNo,
-    funding,
+    marketMakerFunding,
   )
 
   useEffect(() => {
@@ -136,7 +145,6 @@ const Buy = (props: Props) => {
       await marketMaker.buy(amount, outcome)
 
       setStatus(Status.Ready)
-      props.handleFinish()
     } catch (err) {
       setStatus(Status.Error)
       logger.log(`Error trying to buy: ${err.message}`)
@@ -147,6 +155,7 @@ const Buy = (props: Props) => {
 
   return (
     <>
+      <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
       <ViewCard>
         <SubsectionTitle>Choose the shares you want to buy</SubsectionTitle>
         <OutcomeTable
@@ -203,7 +212,9 @@ const Buy = (props: Props) => {
           case it represents the final outcome.
         </Well>
         <ButtonContainer>
-          <ButtonLinkStyled onClick={() => props.handleBack()}>‹ Back</ButtonLinkStyled>
+          <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
+            ‹ Back
+          </ButtonLinkStyled>
           <Button disabled={disabled} onClick={() => finish()}>
             Finish
           </Button>
@@ -214,4 +225,4 @@ const Buy = (props: Props) => {
   )
 }
 
-export { Buy }
+export const MarketBuy = withRouter(MarketBuyWrapper)
