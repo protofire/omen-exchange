@@ -5,7 +5,8 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { ViewCard } from '../../common/view_card'
 import { Status, BalanceItem, Token } from '../../../util/types'
-import { ButtonAnchor, ThreeBoxComments } from '../../common'
+// import { ButtonAnchor, ThreeBoxComments } from '../../common'
+import { ButtonAnchor } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
@@ -104,7 +105,7 @@ const ViewWrapper = (props: Props) => {
           )}
           <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
         </ButtonContainerStyled>
-        <ThreeBoxComments threadName={marketMakerAddress} />
+        {/*<ThreeBoxComments threadName={marketMakerAddress} />*/}
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}
     </>
