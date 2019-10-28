@@ -33,7 +33,7 @@ const addresses: { [networkId: number]: KnownContracts } = {
     // realitioArbitrator: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
     // using a custom address as arbitrator for testing
     realitioArbitrator: '0xAEC3C8eD9516A206a4fD47EC77f026EDD533CF17',
-    marketMakerFactory: '0x965D4816a21CB3d482eD51F13369efa82Da5a9e2',
+    marketMakerFactory: '0xF248C1fe91eC1a5DD78bF26EB43489cDc6aAd1dD',
     conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
   },
   [networkIds.GANACHE]: {
