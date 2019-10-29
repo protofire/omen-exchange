@@ -4,6 +4,7 @@ import { BigNumber } from 'ethers/utils'
 import { ConditionalTokenService } from './conditional_token'
 import { getLogger } from '../util/logger'
 import { OutcomeSlot } from '../util/types'
+import { calcDistributionHint } from '../util/tools'
 
 const logger = getLogger('Services::MarketMaker')
 
@@ -51,9 +52,23 @@ class MarketMakerService {
     return this.contract.totalSupply()
   }
 
-  addFunding = async (amount: BigNumber) => {
+  addInitialFunding = async (amount: BigNumber, initialOddsYes: number, initialOddsNo: number) => {
     logger.log(`Add funding to market maker ${amount}`)
-    return this.contract.addFunding(amount, [])
+
+    const distributionHint = calcDistributionHint(initialOddsYes, initialOddsNo)
+
+    return this.addFunding(amount, distributionHint)
+  }
+
+  addFunding = async (amount: BigNumber, distributionHint: BigNumber[] = []) => {
+    logger.log(`Add funding to market maker ${amount}`)
+
+    try {
+      return this.contract.addFunding(amount, distributionHint)
+    } catch (err) {
+      logger.error(`There was an error adding '${amount.toString()}' of funding'`, err.message)
+      throw err
+    }
   }
 
   removeFunding = async (amount: BigNumber) => {
