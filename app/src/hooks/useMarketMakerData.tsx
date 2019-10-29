@@ -66,9 +66,7 @@ export const useMarketMakerData = (
         ] = await Promise.all([
           marketMaker.getBalanceInformation(user),
           marketMaker.getBalanceInformation(marketMakerAddress),
-          // TODO: calculate actual prices
-          // marketMaker.getActualPrice(),
-          { actualPriceForYes: 0.5, actualPriceForNo: 0.5 },
+          marketMaker.getActualPrice(),
           marketMaker.getTotalSupply(),
           marketMaker.balanceOf(user),
           marketMaker.getCollateralToken(),

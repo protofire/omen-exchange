@@ -46,7 +46,7 @@ export const formatDate = (date: Date): string => {
   return dateParts.slice(1, 6).join(' ')
 }
 
-const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
+export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
   return (
     a
       .mul(scale)
