@@ -2,7 +2,6 @@ import React, { FC, useState } from 'react'
 import moment from 'moment'
 
 import { getLogger } from '../../util/logger'
-import { computeInitialTradeOutcomeTokens } from '../../util/tools'
 import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import { ERC20Service, MarketMakerService } from '../../services'
@@ -87,21 +86,11 @@ const MarketWizardCreatorContainer: FC = () => {
         conditionalTokens,
         provider,
       )
-      await marketMakerService.addFunding(funding)
-
-      // Don't perform initial trade if odds are 50/50
-      // if (+outcomeProbabilityOne !== 50) {
-      //   setStatus(StatusMarketCreation.ApproveDAIForMarketMaker)
-      //   await daiService.approveUnlimited(provider, marketMakerAddress)
-      //
-      //   setStatus(StatusMarketCreation.InitialTradeInMarketMaker)
-      //   const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
-      //   const initialTradeOutcomeTokens = computeInitialTradeOutcomeTokens(
-      //     [+outcomeProbabilityOne, +outcomeProbabilityTwo],
-      //     funding,
-      //   )
-      //   await marketMaker.trade(initialTradeOutcomeTokens)
-      // }
+      await marketMakerService.addInitialFunding(
+        funding,
+        +outcomeProbabilityOne,
+        +outcomeProbabilityTwo,
+      )
 
       setStatus(StatusMarketCreation.Done)
     } catch (err) {
