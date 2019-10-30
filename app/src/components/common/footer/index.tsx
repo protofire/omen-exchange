@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import LogoImageProtofire from './img/logo_protofire.png'
 import LogoImageGeco from './img/logo_geco.png'
+import { GIT_COMMIT } from '../../../common/constants'
 
 const FooterStyled = styled.footer`
   margin-top: auto;
@@ -41,7 +42,7 @@ export const Footer: React.FC = props => {
   const { ...restProps } = props
 
   return (
-    <FooterStyled {...restProps}>
+    <FooterStyled title={GIT_COMMIT} {...restProps}>
       <AFooter href="https://www.protofire.io">
         <AText>Built by</AText>
         <LogoProtofire src={LogoImageProtofire} alt="Protofire" />
