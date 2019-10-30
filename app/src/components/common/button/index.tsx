@@ -2,7 +2,7 @@ import React, { ReactNode, HTMLAttributes } from 'react'
 import styled, { withTheme, css } from 'styled-components'
 import { darken } from 'polished'
 
-export const ButtonCSS = css<{ backgroundColor?: string, fontSize?: string  }>`
+export const ButtonCSS = css<{ backgroundColor?: string; fontSize?: string }>`
   align-items: center;
   background-color: ${props => props.backgroundColor || '#00be95'};
   border-radius: 2px;
@@ -32,7 +32,7 @@ export const ButtonCSS = css<{ backgroundColor?: string, fontSize?: string  }>`
   }
 `
 
-const ButtonContainer = styled.button<{ backgroundColor: string, fontSize?: string }>`
+const ButtonContainer = styled.button<{ backgroundColor: string; fontSize?: string }>`
   ${ButtonCSS}
 `
 

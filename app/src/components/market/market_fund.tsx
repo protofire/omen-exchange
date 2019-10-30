@@ -223,7 +223,9 @@ const MarketFundWrapper = (props: Props) => {
             ‹ Back
           </ButtonLinkStyled>
 
-          <Button onClick={() => addFunding()} fontSize={'18px'}>Add funding</Button>
+          <Button onClick={() => addFunding()} fontSize={'18px'}>
+            Add funding
+          </Button>
           <Button
             disabled={marketMakerUserFunding && marketMakerUserFunding.isZero()}
             backgroundColor={theme.colors.secondary}
