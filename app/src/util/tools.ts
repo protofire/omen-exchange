@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 export const truncateStringInTheMiddle = (
@@ -90,31 +91,33 @@ export const calcNetCost = (
   return mulBN(funding, logTerm)
 }
 
-/**
- * Computes the price of the outcome tokens after trading `tradeYes` and `tradeNo`, given the initial funding is
- * `funding` and holdings.
- *
- * Returns an array with the price the `yes` and the `no` outcome tokens will have after executing that trade.
- */
-export const computePriceAfterTrade = (
-  tradeYes: BigNumber,
-  tradeNo: BigNumber,
+export const computeBalanceAfterTrade = (
   holdingsYes: BigNumber,
   holdingsNo: BigNumber,
-  funding: BigNumber,
-): [number, number] => {
-  // TODO: TBD
-  // const priceYes = calcPrice(funding, holdingsYes)
-  // const priceNo = calcPrice(funding, holdingsNo)
-  //
-  // const netCost = calcNetCost(funding, priceYes, tradeYes, priceNo, tradeNo)
-  //
-  // const newHoldingsYes = holdingsYes.sub(tradeYes).add(netCost)
-  // const newHoldingsNo = holdingsNo.sub(tradeNo).add(netCost)
-  //
-  // const newPriceYes = calcPrice(funding, newHoldingsYes)
-  // const newPriceNo = calcPrice(funding, newHoldingsNo)
-  const newPriceYes = 0.5
-  const newPriceNo = 0.5
-  return [newPriceYes, newPriceNo]
+  amountCollateral: BigNumber,
+): { balanceOfForYes: BigNumber; balanceOfForNo: BigNumber } => {
+  // -sellSharesY = sharesNo - collateral - (sharesYes*sharesNo) / (sharesYes - collateral - (fee * collateral))
+  const holdingsNoSubCollateral = holdingsNo.sub(amountCollateral)
+  const holdingsYesSubCollateral = holdingsYes.sub(amountCollateral)
+
+  const dividingNo = holdingsNoSubCollateral.sub(holdingsYes.mul(holdingsNo))
+  const dividerNo = holdingsYesSubCollateral.sub(
+    ethers.utils
+      .bigNumberify('' + Math.round(1.01 * 10000))
+      .mul(amountCollateral)
+      .div(10000),
+  )
+  const balanceOfForYes = dividingNo.div(dividerNo)
+
+  // -sellSharesN = sharesYes - collateral - (sharesYes*sharesNo) / (sharesNo - collateral - (fee * collateral))
+  const dividingYes = holdingsYesSubCollateral.sub(holdingsYes.mul(holdingsNo))
+  const dividerYes = holdingsNoSubCollateral.sub(
+    ethers.utils
+      .bigNumberify('' + Math.round(1.01 * 10000))
+      .mul(amountCollateral)
+      .div(10000),
+  )
+  const balanceOfForNo = dividingYes.div(dividerYes)
+
+  return { balanceOfForYes, balanceOfForNo }
 }

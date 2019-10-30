@@ -19,7 +19,7 @@ import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getLogger } from '../../util/logger'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { FullLoading } from '../common/full_loading'
-import { computePriceAfterTrade, formatDate } from '../../util/tools'
+import { computeBalanceAfterTrade, formatDate } from '../../util/tools'
 import { SectionTitle } from '../common/section_title'
 
 const ButtonLinkStyled = styled(ButtonLink)`
@@ -57,15 +57,7 @@ interface Props extends RouteComponentProps<any> {
 const MarketSellWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const {
-    balance,
-    marketMakerAddress,
-    marketMakerFunding,
-    collateral,
-    conditionalTokens,
-    question,
-    resolution,
-  } = props
+  const { balance, marketMakerAddress, collateral, conditionalTokens, question, resolution } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
@@ -74,21 +66,26 @@ const MarketSellWrapper = (props: Props) => {
   const [tradedCollateral, setTradedCollateral] = useState<BigNumber>(new BigNumber(0))
   const [costFee, setCostFee] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
-
-  const [tradeYes, tradeNo] =
-    outcome === OutcomeSlot.Yes
-      ? [amountShares.mul(-1), ethers.constants.Zero]
-      : [ethers.constants.Zero, amountShares.mul(-1)]
+  const [priceAfterTradeForYes, setPriceAfterTradeForYes] = useState<number>(0)
+  const [priceAfterTradeForNo, setPriceAfterTradeForNo] = useState<number>(0)
 
   const holdingsYes = balance[0].holdings
   const holdingsNo = balance[1].holdings
-  const pricesAfterTrade = computePriceAfterTrade(
-    tradeYes,
-    tradeNo,
-    holdingsYes,
-    holdingsNo,
-    marketMakerFunding,
-  )
+
+  const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, context.library)
+
+  useEffect(() => {
+    const getPriceAfterTrade = async () => {
+      // TODO convert amountShares to amount in collateral
+      const balanceAfterTrade = computeBalanceAfterTrade(holdingsYes, holdingsNo, amountShares)
+      const { actualPriceForYes, actualPriceForNo } = await marketMaker.getActualPrice(
+        balanceAfterTrade,
+      )
+      setPriceAfterTradeForYes(actualPriceForYes)
+      setPriceAfterTradeForNo(actualPriceForNo)
+    }
+    getPriceAfterTrade()
+  }, [marketMaker, amountShares, holdingsYes, holdingsNo])
 
   useEffect(() => {
     const balanceItemFound: BalanceItem | undefined = balance.find((balanceItem: BalanceItem) => {
@@ -167,7 +164,7 @@ const MarketSellWrapper = (props: Props) => {
         <OutcomeTable
           balance={balance}
           collateral={collateral}
-          pricesAfterTrade={pricesAfterTrade}
+          pricesAfterTrade={[priceAfterTradeForNo, priceAfterTradeForYes]}
           outcomeSelected={outcome}
           outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
           disabledColumns={[OutcomeTableValue.Payout]}

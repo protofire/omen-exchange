@@ -10,7 +10,7 @@ import { ConditionalTokenService, ERC20Service, MarketMakerService } from '../..
 import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { ViewCard } from '../common/view_card'
-import { computePriceAfterTrade, formatDate } from '../../util/tools'
+import { computeBalanceAfterTrade, formatDate } from '../../util/tools'
 import { getLogger } from '../../util/logger'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
@@ -60,21 +60,15 @@ interface Props extends RouteComponentProps<any> {
 const MarketBuyWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const {
-    marketMakerAddress,
-    marketMakerFunding,
-    balance,
-    collateral,
-    conditionalTokens,
-    question,
-    resolution,
-  } = props
+  const { marketMakerAddress, balance, collateral, conditionalTokens, question, resolution } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
+  const [priceAfterTradeForYes, setPriceAfterTradeForYes] = useState<number>(0)
+  const [priceAfterTradeForNo, setPriceAfterTradeForNo] = useState<number>(0)
 
   const holdingsYes = balance[0].holdings
   const holdingsNo = balance[1].holdings
@@ -90,18 +84,17 @@ const MarketBuyWrapper = (props: Props) => {
   )
   const tradedShares = useAsyncDerivedValue(amount, new BigNumber(0), calcBuyAmount)
 
-  const [tradeYes, tradeNo] =
-    outcome === OutcomeSlot.Yes
-      ? [tradedShares, ethers.constants.Zero]
-      : [ethers.constants.Zero, tradedShares]
-
-  const pricesAfterTrade = computePriceAfterTrade(
-    tradeYes,
-    tradeNo,
-    holdingsYes,
-    holdingsNo,
-    marketMakerFunding,
-  )
+  useEffect(() => {
+    const getPriceAfterTrade = async () => {
+      const balanceAfterTrade = computeBalanceAfterTrade(holdingsYes, holdingsNo, amount)
+      const { actualPriceForYes, actualPriceForNo } = await marketMaker.getActualPrice(
+        balanceAfterTrade,
+      )
+      setPriceAfterTradeForYes(actualPriceForYes)
+      setPriceAfterTradeForNo(actualPriceForNo)
+    }
+    getPriceAfterTrade()
+  }, [marketMaker, amount, holdingsYes, holdingsNo])
 
   useEffect(() => {
     const valueNumber = +ethers.utils.formatUnits(amount, collateral.decimals)
@@ -141,7 +134,6 @@ const MarketBuyWrapper = (props: Props) => {
         await collateralService.approve(provider, marketMakerAddress, costWithErrorMargin)
       }
 
-      //TODO: TBD
       await marketMaker.buy(amount, outcome)
 
       setStatus(Status.Ready)
@@ -161,7 +153,7 @@ const MarketBuyWrapper = (props: Props) => {
         <OutcomeTable
           balance={balance}
           collateral={collateral}
-          pricesAfterTrade={pricesAfterTrade}
+          pricesAfterTrade={[priceAfterTradeForNo, priceAfterTradeForYes]}
           outcomeSelected={outcome}
           outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
           disabledColumns={[OutcomeTableValue.Shares, OutcomeTableValue.Payout]}
