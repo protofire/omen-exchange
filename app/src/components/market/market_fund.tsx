@@ -20,8 +20,10 @@ import { getLogger } from '../../util/logger'
 import { ERC20Service, MarketMakerService } from '../../services'
 import { useContracts } from '../../hooks/useContracts'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { ButtonLink } from '../common/button_link'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 
-interface Props {
+interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
   question: string
   resolution: Maybe<Date>
@@ -66,6 +68,10 @@ const ButtonContainerStyled = styled(ButtonContainer)`
       margin-left: 10px;
     }
   }
+`
+
+const ButtonLinkStyled = styled(ButtonLink)`
+  margin-right: auto;
 `
 
 const logger = getLogger('Market::Fund')
@@ -213,11 +219,16 @@ const MarketFundWrapper = (props: Props) => {
           title={'Amount'}
         />
         <ButtonContainerStyled>
-          <Button onClick={() => addFunding()}>Add funding</Button>
+          <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
+            ‹ Back
+          </ButtonLinkStyled>
+
+          <Button onClick={() => addFunding()} fontSize={'18px'}>Add funding</Button>
           <Button
             disabled={marketMakerUserFunding && marketMakerUserFunding.isZero()}
             backgroundColor={theme.colors.secondary}
             onClick={() => removeFunding()}
+            fontSize={'18px'}
           >
             Remove all funding
           </Button>
@@ -228,4 +239,4 @@ const MarketFundWrapper = (props: Props) => {
   )
 }
 
-export const MarketFund = withTheme(MarketFundWrapper)
+export const MarketFund = withRouter(withTheme(MarketFundWrapper))

@@ -2,7 +2,7 @@ import React, { ReactNode, HTMLAttributes } from 'react'
 import styled, { withTheme, css } from 'styled-components'
 import { darken } from 'polished'
 
-export const ButtonCSS = css<{ backgroundColor?: string }>`
+export const ButtonCSS = css<{ backgroundColor?: string, fontSize?: string  }>`
   align-items: center;
   background-color: ${props => props.backgroundColor || '#00be95'};
   border-radius: 2px;
@@ -10,7 +10,7 @@ export const ButtonCSS = css<{ backgroundColor?: string }>`
   color: #fff;
   cursor: pointer;
   display: flex;
-  font-size: 19px;
+  font-size: ${props => props.fontSize || '19px'};
   font-weight: 500;
   height: 38px;
   justify-content: center;
@@ -32,12 +32,13 @@ export const ButtonCSS = css<{ backgroundColor?: string }>`
   }
 `
 
-const ButtonContainer = styled.button<{ backgroundColor: string }>`
+const ButtonContainer = styled.button<{ backgroundColor: string, fontSize?: string }>`
   ${ButtonCSS}
 `
 
 interface Props extends HTMLAttributes<HTMLButtonElement> {
   backgroundColor?: string
+  fontSize?: string
   children: ReactNode
   disabled?: boolean
   onClick?: (e?: any) => void
