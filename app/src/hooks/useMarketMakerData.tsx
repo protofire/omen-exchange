@@ -70,7 +70,7 @@ export const useMarketMakerData = (
           marketMaker.getCollateralToken(),
         ])
 
-        const actualPrices = await marketMaker.getActualPrice(marketMakerShares)
+        const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
         const token = getTokenFromAddress(context.networkId, collateralAddress)
         setCollateral(token)

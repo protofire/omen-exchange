@@ -62,10 +62,10 @@ class MarketMakerService {
     return this.contract.removeFunding(amount)
   }
 
-  getActualPrice = async (balanceInformation: {
+  static getActualPrice = (balanceInformation: {
     balanceOfForYes: BigNumber
     balanceOfForNo: BigNumber
-  }): Promise<{ actualPriceForYes: number; actualPriceForNo: number }> => {
+  }): { actualPriceForYes: number; actualPriceForNo: number } => {
     const { balanceOfForYes, balanceOfForNo } = balanceInformation
 
     const totalBalance = balanceOfForYes.add(balanceOfForNo)
