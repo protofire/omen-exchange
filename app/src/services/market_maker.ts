@@ -62,9 +62,11 @@ class MarketMakerService {
     return this.contract.removeFunding(amount)
   }
 
-  getActualPrice = async (): Promise<{ actualPriceForYes: number; actualPriceForNo: number }> => {
-    const { address } = this.contract
-    const { balanceOfForYes, balanceOfForNo } = await this.getBalanceInformation(address)
+  getActualPrice = async (balanceInformation: {
+    balanceOfForYes: BigNumber
+    balanceOfForNo: BigNumber
+  }): Promise<{ actualPriceForYes: number; actualPriceForNo: number }> => {
+    const { balanceOfForYes, balanceOfForNo } = balanceInformation
 
     const totalBalance = balanceOfForYes.add(balanceOfForNo)
     const actualPriceForYes = divBN(balanceOfForNo, totalBalance)
