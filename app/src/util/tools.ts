@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, getAddress } from 'ethers/utils'
 
 export const truncateStringInTheMiddle = (
   str: string,
@@ -117,4 +117,13 @@ export const computePriceAfterTrade = (
   const newPriceYes = 0.5
   const newPriceNo = 0.5
   return [newPriceYes, newPriceNo]
+}
+
+export const isAddress = (address: string): boolean => {
+  try {
+    getAddress(address)
+  } catch (e) {
+    return false
+  }
+  return true
 }
