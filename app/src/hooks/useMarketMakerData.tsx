@@ -59,20 +59,18 @@ export const useMarketMakerData = (
         const [
           userShares,
           marketMakerShares,
-          actualPrices,
           marketMakerFund,
           marketMakerUserFund,
           collateralAddress,
         ] = await Promise.all([
           marketMaker.getBalanceInformation(user),
           marketMaker.getBalanceInformation(marketMakerAddress),
-          // TODO: calculate actual prices
-          // marketMaker.getActualPrice(),
-          { actualPriceForYes: 0.5, actualPriceForNo: 0.5 },
           marketMaker.getTotalSupply(),
           marketMaker.balanceOf(user),
           marketMaker.getCollateralToken(),
         ])
+
+        const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
         const token = getTokenFromAddress(context.networkId, collateralAddress)
         setCollateral(token)
