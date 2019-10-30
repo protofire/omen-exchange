@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers/utils'
+import { OutcomeSlot } from './types'
 
 export const truncateStringInTheMiddle = (
   str: string,
@@ -117,4 +118,26 @@ export const computePriceAfterTrade = (
   const newPriceYes = 0.5
   const newPriceNo = 0.5
   return [newPriceYes, newPriceNo]
+}
+
+/**
+ * Computes the balance of the outcome tokens after trading
+ */
+export const computeBalanceAfterTrade = (
+  holdingsYes: BigNumber,
+  holdingsNo: BigNumber,
+  outcome: OutcomeSlot, // Outcome selected
+  amountCollateralSpent: BigNumber, // Amount of collateral being spent
+  amountShares: BigNumber, // amount of `outcome` shares being traded
+): { balanceOfForYes: BigNumber; balanceOfForNo: BigNumber } => {
+  let balanceOfForYes = holdingsYes.add(amountCollateralSpent)
+  let balanceOfForNo = holdingsNo.add(amountCollateralSpent)
+
+  if (outcome === OutcomeSlot.Yes) {
+    balanceOfForYes = balanceOfForYes.sub(amountShares)
+  } else {
+    balanceOfForNo = balanceOfForNo.sub(amountShares)
+  }
+
+  return { balanceOfForYes, balanceOfForNo }
 }
