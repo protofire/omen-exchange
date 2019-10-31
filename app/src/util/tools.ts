@@ -115,11 +115,11 @@ export const calcDistributionHint = (
 }
 
 export const isAddress = (address: string): boolean => {
-    try {
-        getAddress(address)
-    } catch (e) {
-        logger.log(`Address '${address}' doesn't exist`)
-        return false
-    }
-    return true
+  try {
+    getAddress(address)
+  } catch (e) {
+    logger.log(`Address '${address}' doesn't exist`)
+    return false
+  }
+  return true
 }
