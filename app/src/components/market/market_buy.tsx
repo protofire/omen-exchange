@@ -10,7 +10,7 @@ import { ConditionalTokenService, ERC20Service, MarketMakerService } from '../..
 import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { ViewCard } from '../common/view_card'
-import { computeBalanceAfterTrade, computePriceAfterTrade, formatDate } from '../../util/tools'
+import { computeBalanceAfterTrade, formatDate } from '../../util/tools'
 import { getLogger } from '../../util/logger'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
@@ -60,15 +60,7 @@ interface Props extends RouteComponentProps<any> {
 const MarketBuyWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const {
-    marketMakerAddress,
-    marketMakerFunding,
-    balance,
-    collateral,
-    conditionalTokens,
-    question,
-    resolution,
-  } = props
+  const { marketMakerAddress, balance, collateral, conditionalTokens, question, resolution } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
@@ -91,18 +83,6 @@ const MarketBuyWrapper = (props: Props) => {
     [outcome, marketMaker],
   )
   const tradedShares = useAsyncDerivedValue(amount, new BigNumber(0), calcBuyAmount)
-  const [tradeYes, tradeNo] =
-    outcome === OutcomeSlot.Yes
-      ? [tradedShares, ethers.constants.Zero]
-      : [ethers.constants.Zero, tradedShares]
-
-  const pricesAfterTrade = computePriceAfterTrade(
-    tradeYes,
-    tradeNo,
-    holdingsYes,
-    holdingsNo,
-    marketMakerFunding,
-  )
 
   useEffect(() => {
     const valueNumber = +ethers.utils.formatUnits(amount, collateral.decimals)
@@ -160,7 +140,6 @@ const MarketBuyWrapper = (props: Props) => {
         await collateralService.approve(provider, marketMakerAddress, costWithErrorMargin)
       }
 
-      //TODO: TBD
       await marketMaker.buy(amount, outcome)
 
       setStatus(Status.Ready)
