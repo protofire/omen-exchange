@@ -124,9 +124,9 @@ export const computePriceAfterTrade = (
 
 export const isAddress = (address: string): boolean => {
   try {
-    logger.log(`Address '${address}' doesn't exist`)
     getAddress(address)
   } catch (e) {
+    logger.log(`Address '${address}' doesn't exist`)
     return false
   }
   return true
