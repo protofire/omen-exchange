@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=v12.13.0",
-    "yarn": "^1.12.3"
+    "node": ">=v12.13.0"
   },
   "dependencies": {
     "3box": "^1.12.0",
