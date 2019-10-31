@@ -17,6 +17,7 @@ export const ButtonCSS = css<{ backgroundColor?: string }>`
   outline: none;
   padding: 0 35px;
   text-align: center;
+  text-decoration: none;
   text-transform: uppercase;
   transition: background-color 0.1s ease-out;
   white-space: nowrap;

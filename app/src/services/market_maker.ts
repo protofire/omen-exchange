@@ -4,6 +4,7 @@ import { BigNumber } from 'ethers/utils'
 import { ConditionalTokenService } from './conditional_token'
 import { getLogger } from '../util/logger'
 import { OutcomeSlot } from '../util/types'
+import { calcDistributionHint, divBN } from '../util/tools'
 
 const logger = getLogger('Services::MarketMaker')
 
@@ -51,9 +52,23 @@ class MarketMakerService {
     return this.contract.totalSupply()
   }
 
-  addFunding = async (amount: BigNumber) => {
+  addInitialFunding = async (amount: BigNumber, initialOddsYes: number, initialOddsNo: number) => {
     logger.log(`Add funding to market maker ${amount}`)
-    return this.contract.addFunding(amount, [])
+
+    const distributionHint = calcDistributionHint(initialOddsYes, initialOddsNo)
+
+    return this.addFunding(amount, distributionHint)
+  }
+
+  addFunding = async (amount: BigNumber, distributionHint: BigNumber[] = []) => {
+    logger.log(`Add funding to market maker ${amount}`)
+
+    try {
+      return this.contract.addFunding(amount, distributionHint)
+    } catch (err) {
+      logger.error(`There was an error adding '${amount.toString()}' of funding'`, err.message)
+      throw err
+    }
   }
 
   removeFunding = async (amount: BigNumber) => {
@@ -61,30 +76,19 @@ class MarketMakerService {
     return this.contract.removeFunding(amount)
   }
 
-  /* TODO: TBD */
-  getActualPrice = async (): Promise<{ actualPriceForYes: number; actualPriceForNo: number }> => {
-    // let [actualPriceForYes, actualPriceForNo] = await Promise.all([
-    //   this.contract.calcMarginalPrice(0),
-    //   this.contract.calcMarginalPrice(1),
-    // ])
-    //
-    // const two = new BigNumber(2)
-    // const twoPower64 = two.pow(64)
-    //
-    // actualPriceForYes =
-    //   actualPriceForYes
-    //     .mul(new BigNumber(10000))
-    //     .div(twoPower64)
-    //     .toNumber() / 10000
-    // actualPriceForNo =
-    //   actualPriceForNo
-    //     .mul(new BigNumber(10000))
-    //     .div(twoPower64)
-    //     .toNumber() / 10000
-    //
+  static getActualPrice = (balanceInformation: {
+    balanceOfForYes: BigNumber
+    balanceOfForNo: BigNumber
+  }): { actualPriceForYes: number; actualPriceForNo: number } => {
+    const { balanceOfForYes, balanceOfForNo } = balanceInformation
+
+    const totalBalance = balanceOfForYes.add(balanceOfForNo)
+    const actualPriceForYes = divBN(balanceOfForNo, totalBalance)
+    const actualPriceForNo = divBN(balanceOfForYes, totalBalance)
+
     return {
-      actualPriceForYes: 0.5,
-      actualPriceForNo: 0.5,
+      actualPriceForYes,
+      actualPriceForNo,
     }
   }
 

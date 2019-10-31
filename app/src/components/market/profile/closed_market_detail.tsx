@@ -103,29 +103,12 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     }
   }
 
-  // const withdraw = async () => {
-  //   try {
-  //     setMessage('Withdraw collateral...')
-  //     setStatus(Status.Loading)
-
-  //     // TODO: TBD
-  //     // await marketMaker.withdrawFees()
-
-  //     setStatus(Status.Ready)
-  //   } catch (err) {
-  //     setStatus(Status.Error)
-  //     logger.log(`Error trying to withdraw: ${err.message}`)
-  //   }
-  // }
-
   const fundingFormat = ethers.utils.formatUnits(funding, collateralToken.decimals)
   const collateralFormat = `${ethers.utils.formatUnits(collateral, collateralToken.decimals)} ${
     collateralToken.symbol
   }`
   const resolutionFormat = resolution ? formatDate(resolution) : ''
-
   const winningOutcome = balance.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
-  // const hasCollateral = collateral.isZero()
 
   return (
     <>
@@ -163,16 +146,6 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
           >
             Redeem
           </Button>
-          {/* TODO: TBD */}
-          {/*{isMarketOwner && (*/}
-          {/*<Button*/}
-          {/*disabled={hasCollateral}*/}
-          {/*backgroundColor={theme.colors.secondary}*/}
-          {/*onClick={() => withdraw()}*/}
-          {/*>*/}
-          {/*Withdraw Collateral*/}
-          {/*</Button>*/}
-          {/*)}*/}
         </ButtonContainerStyled>
       </ViewCard>
       {status === Status.Loading ? <FullLoading message={message} /> : null}

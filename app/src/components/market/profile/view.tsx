@@ -95,6 +95,7 @@ const ViewWrapper = (props: Props) => {
         {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>
+          <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
           {userHasShares && (
             <ButtonAnchor
               backgroundColor={theme.colors.secondary}

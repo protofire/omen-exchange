@@ -1,4 +1,4 @@
-import { BigNumber, getAddress } from 'ethers/utils'
+import { BigNumber, getAddress, bigNumberify } from 'ethers/utils'
 import { getLogger } from './logger'
 
 const logger = getLogger('Tools')
@@ -18,38 +18,12 @@ export const truncateStringInTheMiddle = (
   return str
 }
 
-/**
- * Returns the amount of outcome tokens that need to be bought to set the probabilities to `targetProbabilities`,
- * assuming the current probabilities are uniform.
- *
- * @param targetProbabilities - An array of probabilities specified over 100. For example [75, 25].
- * @param funding - The initial funding of the market maker, in wei.
- */
-export const computeInitialTradeOutcomeTokens = (
-  targetProbabilities: number[],
-  funding: BigNumber,
-): BigNumber[] => {
-  const numOutcomes = targetProbabilities.length
-  const netTradeAmountForOutcomes = targetProbabilities.map(targetProbability => {
-    const logProbabilities =
-      Math.log(targetProbability / (100 / numOutcomes)) / Math.log(numOutcomes)
-    const logProbabilitiesBN = new BigNumber(Math.round(logProbabilities * 10000))
-    return funding.mul(logProbabilitiesBN).div(10000)
-  })
-
-  const cost = netTradeAmountForOutcomes.reduce((a, b) => (a.lt(b) ? a : b)).mul(-1)
-
-  const buyAmounts = netTradeAmountForOutcomes.map(x => x.add(cost))
-
-  return buyAmounts
-}
-
 export const formatDate = (date: Date): string => {
   const dateParts = date.toString().split(/\s+/)
   return dateParts.slice(1, 6).join(' ')
 }
 
-const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
+export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
   return (
     a
       .mul(scale)
@@ -122,12 +96,30 @@ export const computePriceAfterTrade = (
   return [newPriceYes, newPriceNo]
 }
 
+/**
+ * Computes the distribution hint that should be used for setting the initial odds to `initialOddsYes`
+ * and `initialOddsNo`
+ */
+export const calcDistributionHint = (
+  initialOddsYes: number,
+  initialOddsNo: number,
+): BigNumber[] => {
+  const distributionHintYes = Math.sqrt(initialOddsNo / initialOddsYes)
+  const distributionHintNo = Math.sqrt(initialOddsYes / initialOddsNo)
+
+  const distributionHint = [distributionHintYes, distributionHintNo]
+    .map(hint => Math.round(hint * 1000000))
+    .map(bigNumberify)
+
+  return distributionHint
+}
+
 export const isAddress = (address: string): boolean => {
-  try {
-    getAddress(address)
-  } catch (e) {
-    logger.log(`Address '${address}' doesn't exist`)
-    return false
-  }
-  return true
+    try {
+        getAddress(address)
+    } catch (e) {
+        logger.log(`Address '${address}' doesn't exist`)
+        return false
+    }
+    return true
 }
