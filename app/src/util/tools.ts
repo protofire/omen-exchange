@@ -1,9 +1,8 @@
 import { BigNumber, getAddress, bigNumberify } from 'ethers/utils'
 import { getLogger } from './logger'
+import { OutcomeSlot } from './types'
 
 const logger = getLogger('Tools')
-
-import { OutcomeSlot } from './types'
 
 export const truncateStringInTheMiddle = (
   str: string,
