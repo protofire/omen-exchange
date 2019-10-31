@@ -1,6 +1,12 @@
 /* eslint-env jest */
-import { ethers } from 'ethers'
-import { calcDistributionHint, calcNetCost, calcPrice, computePriceAfterTrade } from './tools'
+import { bigNumberify } from 'ethers/utils'
+import {
+  calcDistributionHint,
+  calcNetCost,
+  calcPrice,
+  calcSellAmountInCollateral,
+  divBN,
+} from './tools'
 
 describe('tools', () => {
   describe('calcPrice', () => {
@@ -8,8 +14,8 @@ describe('tools', () => {
 
     for (const [[funding, holdings], expectedResult] of testCases) {
       it(`should compute the right price for funding ${funding} and holdings ${holdings}`, () => {
-        const fundingBN = ethers.utils.bigNumberify(funding)
-        const holdingsBN = ethers.utils.bigNumberify(holdings)
+        const fundingBN = bigNumberify(funding)
+        const holdingsBN = bigNumberify(holdings)
         const result = calcPrice(fundingBN, holdingsBN)
 
         expect(result).toBeCloseTo(expectedResult)
@@ -29,9 +35,9 @@ describe('tools', () => {
 
     for (const [[funding, priceYes, tradeYes, priceNo, tradeNo], expectedResult] of testCases) {
       it(`should compute the right net cost, `, () => {
-        const fundingBN = ethers.utils.bigNumberify(funding)
-        const tradeYesBN = ethers.utils.bigNumberify(tradeYes)
-        const tradeNoBN = ethers.utils.bigNumberify(tradeNo)
+        const fundingBN = bigNumberify(funding)
+        const tradeYesBN = bigNumberify(tradeYes)
+        const tradeNoBN = bigNumberify(tradeNo)
         const result = calcNetCost(fundingBN, priceYes, tradeYesBN, priceNo, tradeNoBN).toNumber()
 
         expect(result).toBeCloseTo(expectedResult)
@@ -86,6 +92,30 @@ describe('tools', () => {
 
         expect(distributionHint[0].toNumber()).toBeCloseTo(expectedHintForYes)
         expect(distributionHint[1].toNumber()).toBeCloseTo(expectedHintForNo)
+      })
+    }
+  })
+
+  describe('calcSellAmountInCollateral', () => {
+    const testCases: any = [
+      [['502512562814070351', '2000000000000000000', '669745046301742827'], '500000000000000000'],
+      [['1502512562814070351', '673378000740715800', '365128583991411574'], '100000000000000000'],
+      [['673378000740715800', '1502512562814070351', '148526984259244846'], '100000000000000000'],
+    ]
+
+    for (const [
+      [holdingsOfSoldOutcome, holdingsOfOtherOutcome, sharesSold],
+      expected,
+    ] of testCases) {
+      it(`should compute the amount of collateral to sell`, () => {
+        const result = calcSellAmountInCollateral(
+          bigNumberify(holdingsOfSoldOutcome),
+          bigNumberify(holdingsOfOtherOutcome),
+          bigNumberify(sharesSold),
+          0.01,
+        )
+
+        expect(divBN(result, bigNumberify(expected))).toBeCloseTo(1)
       })
     }
   })

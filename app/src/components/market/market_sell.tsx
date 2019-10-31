@@ -19,7 +19,12 @@ import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getLogger } from '../../util/logger'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { FullLoading } from '../common/full_loading'
-import { computePriceAfterTrade, formatDate } from '../../util/tools'
+import {
+  computePriceAfterTrade,
+  formatDate,
+  calcSellAmountInCollateral,
+  mulBN,
+} from '../../util/tools'
 import { SectionTitle } from '../common/section_title'
 
 const ButtonLinkStyled = styled(ButtonLink)`
@@ -96,24 +101,20 @@ const MarketSellWrapper = (props: Props) => {
     })
     setBalanceItem(balanceItemFound)
 
-    const amountSharesInUnits = +ethers.utils.formatUnits(amountShares, collateral.decimals)
-    const individualPrice = balanceItemFound ? +balanceItemFound.currentPrice : 1
-    const amountToSell = individualPrice * amountSharesInUnits
+    const yesHoldings = balance[0].holdings
+    const noHoldings = balance[1].holdings
+    const [holdingsOfSoldOutcome, holdingsOfOtherOutcome] =
+      outcome === OutcomeSlot.Yes ? [yesHoldings, noHoldings] : [noHoldings, yesHoldings]
+    const amountToSell = calcSellAmountInCollateral(
+      holdingsOfSoldOutcome,
+      holdingsOfOtherOutcome,
+      amountShares,
+      0.01,
+    )
 
-    const weiPerUnit = ethers.utils.bigNumberify(10).pow(collateral.decimals)
-    const amountToSellInWei = ethers.utils
-      .bigNumberify(Math.round(amountToSell * 10000))
-      .mul(weiPerUnit)
-      .div(10000)
+    setCostFee(mulBN(amountToSell, 0.01))
 
-    const costFeeInWei = ethers.utils
-      .bigNumberify(Math.round(amountToSell * 0.01 * 10000))
-      .mul(weiPerUnit)
-      .div(10000)
-
-    setCostFee(costFeeInWei)
-
-    setTradedCollateral(amountToSellInWei.sub(costFeeInWei))
+    setTradedCollateral(amountToSell)
   }, [outcome, amountShares, balance, collateral])
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
@@ -131,21 +132,14 @@ const MarketSellWrapper = (props: Props) => {
 
       const provider = context.library
 
-      // const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
-
-      const amountSharesNegative = amountShares.mul(-1)
-      const outcomeValue =
-        outcome === OutcomeSlot.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
+      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
       const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketMakerAddress)
-
       if (!isApprovedForAll) {
         await conditionalTokens.setApprovalForAll(marketMakerAddress)
       }
 
-      // TODO: TBD
-
-      // await marketMaker.trade(outcomeValue)
+      await marketMaker.sell(tradedCollateral, outcome)
 
       setStatus(Status.Ready)
     } catch (err) {

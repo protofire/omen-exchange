@@ -1,3 +1,4 @@
+import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
 export const truncateStringInTheMiddle = (
@@ -29,7 +30,7 @@ export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
   )
 }
 
-const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
+export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
   return a.mul(Math.round(b * scale)).div(scale)
 }
 
@@ -109,4 +110,81 @@ export const calcDistributionHint = (
     .map(bigNumberify)
 
   return distributionHint
+}
+
+/**
+ * Computes the amount of collateral that needs to be sold to get `shares` amount of shares.
+ *
+ * @param holdingsOfSoldOutcome How many tokens the market maker has of the outcome that is being sold
+ * @param holdingsOfOtherOutcome How many tokens the market maker has of the outcome that is not being sold
+ * @param shares The amount of shares that need to be sold
+ * @param fee The fee of the market maker, between 0 and 1
+ */
+export const calcSellAmountInCollateral = (
+  holdingsOfSoldOutcome: BigNumber,
+  holdingsOfOtherOutcome: BigNumber,
+  shares: BigNumber,
+  fee: number,
+): BigNumber => {
+  Big.DP = 90
+
+  const x = new Big(holdingsOfOtherOutcome.toString())
+  const y = new Big(holdingsOfSoldOutcome.toString())
+  const a = new Big(shares.toString())
+  const f = new Big(fee)
+  const termInsideSqrt = a
+    .pow(2)
+    .mul(f.pow(2))
+    .add(
+      a
+        .pow(2)
+        .mul(f)
+        .mul(2),
+    )
+    .add(a.pow(2))
+    .add(
+      a
+        .mul(f.pow(2))
+        .mul(y)
+        .mul(2),
+    )
+    .minus(
+      a
+        .mul(f)
+        .mul(x)
+        .mul(2),
+    )
+    .add(
+      a
+        .mul(f)
+        .mul(y)
+        .mul(4),
+    )
+    .minus(a.mul(x).mul(2))
+    .add(a.mul(y).mul(2))
+    .add(f.pow(2).mul(y.pow(2)))
+    .add(
+      f
+        .mul(x)
+        .mul(y)
+        .mul(2),
+    )
+    .add(f.mul(y.pow(2)).mul(2))
+    .add(x.pow(2))
+    .add(x.mul(y).mul(2))
+    .add(y.pow(2))
+
+  const amountToSellBig = termInsideSqrt
+    .sqrt()
+    .mul(-1)
+    .add(a.mul(f))
+    .add(a)
+    .add(f.mul(y))
+    .add(x)
+    .add(y)
+    .div(f.add(1).mul(2))
+
+  const amountToSell = bigNumberify(amountToSellBig.toFixed(0))
+
+  return amountToSell
 }
