@@ -67,22 +67,37 @@ const MarketBuyWrapper = (props: Props) => {
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
-  const [priceAfterTradeForYes, setPriceAfterTradeForYes] = useState<number>(0)
-  const [priceAfterTradeForNo, setPriceAfterTradeForNo] = useState<number>(0)
 
   const holdingsYes = balance[0].holdings
   const holdingsNo = balance[1].holdings
 
   const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, context.library)
 
-  // get the amount of shares that will be traded
+  // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
-    () => (amount: BigNumber) => {
-      return marketMaker.calcBuyAmount(amount, outcome)
+    () => async (amount: BigNumber): Promise<[BigNumber, number, number]> => {
+      const tradedShares = await marketMaker.calcBuyAmount(amount, outcome)
+      const balanceAfterTrade = computeBalanceAfterTrade(
+        holdingsYes,
+        holdingsNo,
+        outcome,
+        amount,
+        tradedShares,
+      )
+      const { actualPriceForYes, actualPriceForNo } = MarketMakerService.getActualPrice(
+        balanceAfterTrade,
+      )
+
+      return [tradedShares, actualPriceForYes, actualPriceForNo]
     },
-    [outcome, marketMaker],
+    [amount, outcome, marketMaker, holdingsYes, holdingsNo],
   )
-  const tradedShares = useAsyncDerivedValue(amount, new BigNumber(0), calcBuyAmount)
+
+  const [tradedShares, priceAfterTradeForYes, priceAfterTradeForNo] = useAsyncDerivedValue(
+    amount,
+    [new BigNumber(0), 0, 0],
+    calcBuyAmount,
+  )
 
   useEffect(() => {
     const valueNumber = +ethers.utils.formatUnits(amount, collateral.decimals)
@@ -94,24 +109,6 @@ const MarketBuyWrapper = (props: Props) => {
       .div(10000)
     setCost(costWithFee)
   }, [outcome, amount, balance, collateral])
-
-  useEffect(() => {
-    const getPriceAfterTrade = async () => {
-      const balanceAfterTrade = computeBalanceAfterTrade(
-        holdingsYes,
-        holdingsNo,
-        outcome,
-        amount,
-        tradedShares,
-      )
-      const { actualPriceForYes, actualPriceForNo } = MarketMakerService.getActualPrice(
-        balanceAfterTrade,
-      )
-      setPriceAfterTradeForYes(actualPriceForYes)
-      setPriceAfterTradeForNo(actualPriceForNo)
-    }
-    getPriceAfterTrade()
-  }, [holdingsYes, holdingsNo, outcome, amount, tradedShares])
 
   const finish = async () => {
     try {
