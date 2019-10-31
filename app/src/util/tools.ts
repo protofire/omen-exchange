@@ -1,6 +1,8 @@
-import { BigNumber, bigNumberify } from 'ethers/utils'
-
+import { BigNumber, getAddress, bigNumberify } from 'ethers/utils'
+import { getLogger } from './logger'
 import { OutcomeSlot } from './types'
+
+const logger = getLogger('Tools')
 
 export const truncateStringInTheMiddle = (
   str: string,
@@ -133,4 +135,14 @@ export const calcDistributionHint = (
     .map(bigNumberify)
 
   return distributionHint
+}
+
+export const isAddress = (address: string): boolean => {
+  try {
+    getAddress(address)
+  } catch (e) {
+    logger.log(`Address '${address}' doesn't exist`)
+    return false
+  }
+  return true
 }
