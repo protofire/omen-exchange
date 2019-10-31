@@ -1,8 +1,7 @@
 import React from 'react'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 
 import { MarketViewContainer } from '../components'
-import { NoMatchPage } from '../components/common'
 import { ConnectedWeb3, useConnectWeb3 } from '../hooks/connectedWeb3'
 import { isAddress } from '../util/tools'
 
@@ -14,14 +13,13 @@ const MarketDetailsPage = (props: RouteComponentProps<RouteParams>) => {
   useConnectWeb3()
 
   const marketMakerAddress = props.match.params.address
+  if (!isAddress(marketMakerAddress)) {
+    return <Redirect to="/" />
+  }
 
   return (
     <ConnectedWeb3>
-      {isAddress(marketMakerAddress) ? (
-        <MarketViewContainer marketMakerAddress={marketMakerAddress} />
-      ) : (
-        <NoMatchPage />
-      )}
+      <MarketViewContainer marketMakerAddress={marketMakerAddress} />
     </ConnectedWeb3>
   )
 }

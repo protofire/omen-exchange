@@ -1,4 +1,7 @@
 import { BigNumber, getAddress } from 'ethers/utils'
+import { getLogger } from './logger'
+
+const logger = getLogger('Tools')
 
 export const truncateStringInTheMiddle = (
   str: string,
@@ -121,6 +124,7 @@ export const computePriceAfterTrade = (
 
 export const isAddress = (address: string): boolean => {
   try {
+    logger.log(`Address '${address}' doesn't exist`)
     getAddress(address)
   } catch (e) {
     return false
