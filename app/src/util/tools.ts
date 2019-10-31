@@ -1,4 +1,8 @@
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber, getAddress, bigNumberify } from 'ethers/utils'
+import { getLogger } from './logger'
+import { OutcomeSlot } from './types'
+
+const logger = getLogger('Tools')
 
 export const truncateStringInTheMiddle = (
   str: string,
@@ -94,6 +98,28 @@ export const computePriceAfterTrade = (
 }
 
 /**
+ * Computes the balance of the outcome tokens after trading
+ */
+export const computeBalanceAfterTrade = (
+  holdingsYes: BigNumber,
+  holdingsNo: BigNumber,
+  outcome: OutcomeSlot, // Outcome selected
+  amountCollateralSpent: BigNumber, // Amount of collateral being spent
+  amountShares: BigNumber, // amount of `outcome` shares being traded
+): { balanceOfForYes: BigNumber; balanceOfForNo: BigNumber } => {
+  let balanceOfForYes = holdingsYes.add(amountCollateralSpent)
+  let balanceOfForNo = holdingsNo.add(amountCollateralSpent)
+
+  if (outcome === OutcomeSlot.Yes) {
+    balanceOfForYes = balanceOfForYes.sub(amountShares)
+  } else {
+    balanceOfForNo = balanceOfForNo.sub(amountShares)
+  }
+
+  return { balanceOfForYes, balanceOfForNo }
+}
+
+/**
  * Computes the distribution hint that should be used for setting the initial odds to `initialOddsYes`
  * and `initialOddsNo`
  */
@@ -109,4 +135,14 @@ export const calcDistributionHint = (
     .map(bigNumberify)
 
   return distributionHint
+}
+
+export const isAddress = (address: string): boolean => {
+  try {
+    getAddress(address)
+  } catch (e) {
+    logger.log(`Address '${address}' doesn't exist`)
+    return false
+  }
+  return true
 }
