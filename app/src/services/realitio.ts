@@ -19,6 +19,7 @@ class RealitioService {
   constantContract: Contract
   signerAddress: string
   arbitratorAddress: string
+  provider: any
 
   constructor(address: string, provider: any, signerAddress: string, arbitratorAddress: string) {
     const signer: Wallet = provider.getSigner()
@@ -27,6 +28,7 @@ class RealitioService {
     this.constantContract = new ethers.Contract(address, realitioCallAbi, provider)
     this.signerAddress = signerAddress
     this.arbitratorAddress = arbitratorAddress
+    this.provider = provider
   }
 
   /**
@@ -58,6 +60,7 @@ class RealitioService {
       value: ethers.utils.bigNumberify(value),
     })
     logger.log(`Ask question transaction hash: ${transactionObject.hash}`)
+    await this.provider.waitForTransaction(transactionObject.hash)
 
     return questionId
   }
