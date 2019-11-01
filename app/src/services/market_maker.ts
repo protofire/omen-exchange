@@ -20,6 +20,8 @@ const marketMakerAbi = [
   'function totalSupply() external view returns (uint256)',
   'function buy(uint investmentAmount, uint outcomeIndex, uint minOutcomeTokensToBuy) external',
   'function calcBuyAmount(uint investmentAmount, uint outcomeIndex) public view returns (uint)',
+  'function sell(uint returnAmount, uint outcomeIndex, uint maxOutcomeTokensToSell) external',
+  'function calcSellAmount(uint returnAmount, uint outcomeIndex) public view returns (uint)',
   ...erc20Abi,
 ]
 
@@ -167,6 +169,20 @@ class MarketMakerService {
     } catch (err) {
       logger.error(
         `There was an error getting the balance of pool shares for '${address}''`,
+        err.message,
+      )
+      throw err
+    }
+  }
+
+  sell = async (amount: BigNumber, outcome: OutcomeSlot) => {
+    const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
+    try {
+      const outcomeTokensToSell = await this.contract.calcSellAmount(amount, outcomeIndex)
+      await this.contract.sell(amount, outcomeIndex, outcomeTokensToSell)
+    } catch (err) {
+      logger.error(
+        `There was an error selling '${amount.toString()}' for outcome '${outcome}'`,
         err.message,
       )
       throw err

@@ -14,12 +14,18 @@ import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 import { ViewCard } from '../common/view_card'
-import { ConditionalTokenService } from '../../services'
+import { ConditionalTokenService, MarketMakerService } from '../../services'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getLogger } from '../../util/logger'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { FullLoading } from '../common/full_loading'
-import { computePriceAfterTrade, formatBigNumber, formatDate } from '../../util/tools'
+import {
+  computeBalanceAfterTrade,
+  formatBigNumber,
+  formatDate,
+  calcSellAmountInCollateral,
+  mulBN,
+} from '../../util/tools'
 import { SectionTitle } from '../common/section_title'
 
 const ButtonLinkStyled = styled(ButtonLink)`
@@ -57,15 +63,7 @@ interface Props extends RouteComponentProps<any> {
 const MarketSellWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const {
-    balance,
-    marketMakerAddress,
-    marketMakerFunding,
-    collateral,
-    conditionalTokens,
-    question,
-    resolution,
-  } = props
+  const { balance, marketMakerAddress, collateral, conditionalTokens, question, resolution } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
@@ -74,21 +72,10 @@ const MarketSellWrapper = (props: Props) => {
   const [tradedCollateral, setTradedCollateral] = useState<BigNumber>(new BigNumber(0))
   const [costFee, setCostFee] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
-
-  const [tradeYes, tradeNo] =
-    outcome === OutcomeSlot.Yes
-      ? [amountShares.mul(-1), ethers.constants.Zero]
-      : [ethers.constants.Zero, amountShares.mul(-1)]
+  const [pricesAfterTrade, setPricesAfterTrade] = useState<[number, number]>([0, 0])
 
   const holdingsYes = balance[0].holdings
   const holdingsNo = balance[1].holdings
-  const pricesAfterTrade = computePriceAfterTrade(
-    tradeYes,
-    tradeNo,
-    holdingsYes,
-    holdingsNo,
-    marketMakerFunding,
-  )
 
   useEffect(() => {
     const balanceItemFound: BalanceItem | undefined = balance.find((balanceItem: BalanceItem) => {
@@ -96,25 +83,34 @@ const MarketSellWrapper = (props: Props) => {
     })
     setBalanceItem(balanceItemFound)
 
-    const amountSharesInUnits = +ethers.utils.formatUnits(amountShares, collateral.decimals)
-    const individualPrice = balanceItemFound ? +balanceItemFound.currentPrice : 1
-    const amountToSell = individualPrice * amountSharesInUnits
+    const yesHoldings = balance[0].holdings
+    const noHoldings = balance[1].holdings
+    const [holdingsOfSoldOutcome, holdingsOfOtherOutcome] =
+      outcome === OutcomeSlot.Yes ? [yesHoldings, noHoldings] : [noHoldings, yesHoldings]
+    const amountToSell = calcSellAmountInCollateral(
+      holdingsOfSoldOutcome,
+      holdingsOfOtherOutcome,
+      amountShares,
+      0.01,
+    )
 
-    const weiPerUnit = ethers.utils.bigNumberify(10).pow(collateral.decimals)
-    const amountToSellInWei = ethers.utils
-      .bigNumberify(Math.round(amountToSell * 10000))
-      .mul(weiPerUnit)
-      .div(10000)
+    const balanceAfterTrade = computeBalanceAfterTrade(
+      holdingsYes,
+      holdingsNo,
+      outcome,
+      amountToSell.mul(-1), // negate amounts because it's a sale
+      amountShares.mul(-1),
+    )
+    const { actualPriceForYes, actualPriceForNo } = MarketMakerService.getActualPrice(
+      balanceAfterTrade,
+    )
 
-    const costFeeInWei = ethers.utils
-      .bigNumberify(Math.round(amountToSell * 0.01 * 10000))
-      .mul(weiPerUnit)
-      .div(10000)
+    setPricesAfterTrade([actualPriceForYes, actualPriceForNo])
 
-    setCostFee(costFeeInWei)
+    setCostFee(mulBN(amountToSell, 0.01))
 
-    setTradedCollateral(amountToSellInWei.sub(costFeeInWei))
-  }, [outcome, amountShares, balance, collateral])
+    setTradedCollateral(amountToSell)
+  }, [outcome, amountShares, balance, collateral, holdingsYes, holdingsNo])
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
 
@@ -129,21 +125,14 @@ const MarketSellWrapper = (props: Props) => {
 
       const provider = context.library
 
-      // const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
-
-      const amountSharesNegative = amountShares.mul(-1)
-      const outcomeValue =
-        outcome === OutcomeSlot.Yes ? [amountSharesNegative, 0] : [0, amountSharesNegative]
+      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
       const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketMakerAddress)
-
       if (!isApprovedForAll) {
         await conditionalTokens.setApprovalForAll(marketMakerAddress)
       }
 
-      // TODO: TBD
-
-      // await marketMaker.trade(outcomeValue)
+      await marketMaker.sell(tradedCollateral, outcome)
 
       setStatus(Status.Ready)
     } catch (err) {

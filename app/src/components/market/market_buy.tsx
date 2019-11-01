@@ -90,7 +90,7 @@ const MarketBuyWrapper = (props: Props) => {
 
       return [tradedShares, actualPriceForYes, actualPriceForNo]
     },
-    [amount, outcome, marketMaker, holdingsYes, holdingsNo],
+    [outcome, marketMaker, holdingsYes, holdingsNo],
   )
 
   const [tradedShares, priceAfterTradeForYes, priceAfterTradeForNo] = useAsyncDerivedValue(
