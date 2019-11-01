@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { Button } from '../../../common/index'
@@ -13,7 +12,7 @@ import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
 import { knownTokens } from '../../../../util/addresses'
-import { formatDate } from '../../../../util/tools'
+import { formatBigNumber, formatDate } from '../../../../util/tools'
 import styled from 'styled-components'
 
 const ButtonLinkStyled = styled(ButtonLink)`
@@ -120,7 +119,7 @@ class CreateMarketStep extends Component<Props> {
           <TitleValue
             title={'Funding'}
             value={[
-              ethers.utils.formatUnits(funding, collateral.decimals),
+              formatBigNumber(funding, collateral.decimals),
               <strong key="1"> {collateral.symbol}</strong>,
             ]}
           />

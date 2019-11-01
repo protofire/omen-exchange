@@ -10,7 +10,7 @@ import { ConditionalTokenService, ERC20Service, MarketMakerService } from '../..
 import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { ViewCard } from '../common/view_card'
-import { computeBalanceAfterTrade, formatDate } from '../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber, formatDate } from '../../util/tools'
 import { getLogger } from '../../util/logger'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
@@ -113,7 +113,7 @@ const MarketBuyWrapper = (props: Props) => {
   const finish = async () => {
     try {
       setStatus(Status.Loading)
-      setMessage(`Buying ${ethers.utils.formatUnits(tradedShares, collateral.decimals)} shares ...`)
+      setMessage(`Buying ${formatBigNumber(tradedShares, collateral.decimals)} shares ...`)
 
       const provider = context.library
       const user = await provider.getSigner().getAddress()
@@ -178,9 +178,7 @@ const MarketBuyWrapper = (props: Props) => {
           note={[
             'You will be charged an extra 1% trade fee of ',
             <strong key="1">
-              {cost.isZero()
-                ? '0'
-                : ethers.utils.formatUnits(cost.sub(amount), collateral.decimals)}
+              {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}
             </strong>,
           ]}
           title={'Amount'}
@@ -191,14 +189,13 @@ const MarketBuyWrapper = (props: Props) => {
           <TR>
             <TD>You spend</TD>
             <TD textAlign="right">
-              {ethers.utils.formatUnits(cost, collateral.decimals)}{' '}
-              <strong>{collateral.symbol}</strong>
+              {formatBigNumber(cost, collateral.decimals)} <strong>{collateral.symbol}</strong>
             </TD>
           </TR>
           <TR>
             <TD>&quot;{outcome}&quot; shares you get</TD>
             <TD textAlign="right">
-              {ethers.utils.formatUnits(tradedShares, collateral.decimals)} <strong>shares</strong>
+              {formatBigNumber(tradedShares, collateral.decimals)} <strong>shares</strong>
             </TD>
           </TR>
         </TableStyled>

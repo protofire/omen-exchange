@@ -4,7 +4,7 @@ import { BigNumber } from 'ethers/utils'
 
 import { CreateCard } from '../../create_card'
 import { knownTokens } from '../../../../util/addresses'
-import { formatDate } from '../../../../util/tools'
+import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { Paragraph } from '../../../common/paragraph'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
@@ -13,7 +13,6 @@ import { ButtonContainer } from '../../../common/button_container'
 import { ButtonCSS } from '../../../common/button'
 import { SectionTitle } from '../../../common/section_title'
 import { CopyText } from '../../../common/copy_text'
-import { ethers } from 'ethers'
 
 const TableStyled = styled(Table)`
   margin-bottom: 25px;
@@ -113,7 +112,7 @@ const SummaryMarketStep = (props: Props) => {
           <TitleValue
             title={'Funding'}
             value={[
-              ethers.utils.formatUnits(funding, collateral.decimals),
+              formatBigNumber(funding, collateral.decimals),
               <strong key="1"> {collateral.symbol}</strong>,
             ]}
           />

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { BigNumber } from 'ethers/utils'
-import { ethers } from 'ethers'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { MarketMakerService } from '../services'
@@ -17,13 +16,11 @@ export const useMarketMakerData = (
 ): {
   totalPoolShares: BigNumber
   userPoolShares: BigNumber
-  userPoolSharesPercentage: number
   balance: BalanceItem[]
   winnerOutcome: Maybe<WinnerOutcome>
   status: Status
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
-  marketMakerFundingPercentage: number
   collateral: Maybe<Token>
 } => {
   const { conditionalTokens } = useContracts(context)
@@ -32,11 +29,9 @@ export const useMarketMakerData = (
   const [userPoolShares, setUserPoolShares] = useState<BigNumber>(new BigNumber(0))
   const [balance, setBalance] = useState<BalanceItem[]>([])
   const [winnerOutcome, setWinnerOutcome] = useState<Maybe<WinnerOutcome>>(null)
-  const [userPoolSharesPercentage, setUserPoolSharesPercentage] = useState<number>(0)
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [marketMakerFunding, setMarketMakerFunding] = useState<BigNumber>(new BigNumber(0))
   const [marketMakerUserFunding, setMarketMakerUserFunding] = useState<BigNumber>(new BigNumber(0))
-  const [marketMakerFundingPercentage, setMarketMakerFundingPercentage] = useState<number>(0)
   const [collateral, setCollateral] = useState<Maybe<Token>>(null)
 
   useEffect(() => {
@@ -97,36 +92,14 @@ export const useMarketMakerData = (
           },
         ]
 
-        const totalMarketMakerShares = marketMakerShares.balanceOfForNo.add(
-          marketMakerShares.balanceOfForYes,
-        )
+        const poolSharesTotalSupply = await marketMaker.poolSharesTotalSupply()
+        const userPoolShares = await marketMaker.poolSharesBalanceOf(user)
 
-        const totalUserShares = userShares.balanceOfForNo.add(userShares.balanceOfForYes)
-        const totalUserSharesNumber = +ethers.utils.formatUnits(totalUserShares, token.decimals)
-
-        const totalShares = totalMarketMakerShares.add(totalUserShares)
-        const totalSharesNumber = +ethers.utils.formatUnits(totalShares, token.decimals)
-
-        const userSharesPercentage =
-          totalSharesNumber > 0 ? (totalUserSharesNumber / totalSharesNumber) * 100 : 0
-
-        const marketMakerFundingNumber = +ethers.utils.formatUnits(marketMakerFund, token.decimals)
-        const marketMakerUserFundingNumber = +ethers.utils.formatUnits(
-          marketMakerUserFund,
-          token.decimals,
-        )
-        const marketMakerFundPercentage =
-          marketMakerFundingNumber > 0
-            ? (marketMakerUserFundingNumber / marketMakerFundingNumber) * 100
-            : 0
-
-        setTotalPoolShares(totalShares)
-        setUserPoolShares(totalUserShares)
-        setUserPoolSharesPercentage(userSharesPercentage)
+        setTotalPoolShares(poolSharesTotalSupply)
+        setUserPoolShares(userPoolShares)
 
         setMarketMakerFunding(marketMakerFund)
         setMarketMakerUserFunding(marketMakerUserFund)
-        setMarketMakerFundingPercentage(marketMakerFundPercentage)
 
         setBalance(balanceShares)
 
@@ -149,13 +122,11 @@ export const useMarketMakerData = (
   return {
     totalPoolShares,
     userPoolShares,
-    userPoolSharesPercentage,
     balance,
     winnerOutcome,
     status,
     marketMakerFunding,
     marketMakerUserFunding,
-    marketMakerFundingPercentage,
     collateral,
   }
 }

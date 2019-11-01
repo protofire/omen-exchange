@@ -3,8 +3,8 @@ import styled from 'styled-components'
 
 import { Table, TD, TH, THead, TR } from '../table/index'
 import { RadioInput } from '../radio_input/index'
+import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, OutcomeSlot, OutcomeTableValue, Token } from '../../../util/types'
-import { ethers } from 'ethers'
 
 interface Props {
   balance: BalanceItem[]
@@ -126,21 +126,17 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.Shares) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[3]} winningOutcome={winningOutcome}>
-            {ethers.utils.formatUnits(shares, collateral.decimals)}
+            {formatBigNumber(shares, collateral.decimals)}
           </TDStyled>
         ) : (
-          <TD textAlign={TableCellsAlign[3]}>
-            {ethers.utils.formatUnits(shares, collateral.decimals)}
-          </TD>
+          <TD textAlign={TableCellsAlign[3]}>{formatBigNumber(shares, collateral.decimals)}</TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.Payout) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[4]} winningOutcome={winningOutcome}>
-            {ethers.utils.formatUnits(shares, collateral.decimals)}
+            {formatBigNumber(shares, collateral.decimals)}
           </TDStyled>
         ) : (
-          <TD textAlign={TableCellsAlign[4]}>
-            {ethers.utils.formatUnits(shares, collateral.decimals)}
-          </TD>
+          <TD textAlign={TableCellsAlign[4]}>{formatBigNumber(shares, collateral.decimals)}</TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.PriceAfterTrade) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[5]} winningOutcome={winningOutcome}>

@@ -1,6 +1,7 @@
 import { Contract, ethers, Wallet } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
+import { erc20Abi } from './erc20'
 import { ConditionalTokenService } from './conditional_token'
 import { getLogger } from '../util/logger'
 import { OutcomeSlot } from '../util/types'
@@ -19,6 +20,7 @@ const marketMakerAbi = [
   'function totalSupply() external view returns (uint256)',
   'function buy(uint investmentAmount, uint outcomeIndex, uint minOutcomeTokensToBuy) external',
   'function calcBuyAmount(uint investmentAmount, uint outcomeIndex) public view returns (uint)',
+  ...erc20Abi,
 ]
 
 class MarketMakerService {
@@ -144,6 +146,27 @@ class MarketMakerService {
     } catch (err) {
       logger.error(
         `There was an error computing the buy amount for amount '${amount.toString()}' and outcome '${outcome}'`,
+        err.message,
+      )
+      throw err
+    }
+  }
+
+  poolSharesTotalSupply = async (): Promise<BigNumber> => {
+    try {
+      return this.contract.totalSupply()
+    } catch (err) {
+      logger.error(`There was an error getting the supply of pool shares`, err.message)
+      throw err
+    }
+  }
+
+  poolSharesBalanceOf = async (address: string): Promise<BigNumber> => {
+    try {
+      return this.contract.balanceOf(address)
+    } catch (err) {
+      logger.error(
+        `There was an error getting the balance of pool shares for '${address}''`,
         err.message,
       )
       throw err

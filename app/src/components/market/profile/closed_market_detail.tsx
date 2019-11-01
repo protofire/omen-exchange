@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
-import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { ViewCard } from '../../common/view_card'
@@ -14,7 +13,7 @@ import { BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/typ
 import { ERC20Service, MarketMakerService } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
-import { formatDate } from '../../../util/tools'
+import { formatBigNumber, formatDate } from '../../../util/tools'
 import { useContracts } from '../../../hooks/useContracts'
 
 const Grid = styled.div`
@@ -103,8 +102,8 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     }
   }
 
-  const fundingFormat = ethers.utils.formatUnits(funding, collateralToken.decimals)
-  const collateralFormat = `${ethers.utils.formatUnits(collateral, collateralToken.decimals)} ${
+  const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
+  const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${
     collateralToken.symbol
   }`
   const resolutionFormat = resolution ? formatDate(resolution) : ''

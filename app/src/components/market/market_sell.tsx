@@ -14,12 +14,12 @@ import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 import { ViewCard } from '../common/view_card'
-import { ConditionalTokenService, MarketMakerService } from '../../services'
+import { ConditionalTokenService } from '../../services'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getLogger } from '../../util/logger'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { FullLoading } from '../common/full_loading'
-import { computePriceAfterTrade, formatDate } from '../../util/tools'
+import { computePriceAfterTrade, formatBigNumber, formatDate } from '../../util/tools'
 import { SectionTitle } from '../common/section_title'
 
 const ButtonLinkStyled = styled(ButtonLink)`
@@ -125,9 +125,7 @@ const MarketSellWrapper = (props: Props) => {
       }
 
       setStatus(Status.Loading)
-      setMessage(
-        `Selling ${ethers.utils.formatUnits(amountShares, collateral.decimals)} shares ...`,
-      )
+      setMessage(`Selling ${formatBigNumber(amountShares, collateral.decimals)} shares ...`)
 
       const provider = context.library
 

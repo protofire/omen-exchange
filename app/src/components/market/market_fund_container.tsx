@@ -18,12 +18,10 @@ const MarketFundContainer: FC<Props> = props => {
   const {
     totalPoolShares,
     userPoolShares,
-    userPoolSharesPercentage,
     balance,
     winnerOutcome,
     marketMakerFunding,
     marketMakerUserFunding,
-    marketMakerFundingPercentage,
     collateral,
   } = useMarketMakerData(marketMakerAddress, context)
 
@@ -38,10 +36,8 @@ const MarketFundContainer: FC<Props> = props => {
       resolution={resolution}
       totalPoolShares={totalPoolShares}
       userPoolShares={userPoolShares}
-      userPoolSharesPercentage={userPoolSharesPercentage}
       marketMakerFunding={marketMakerFunding}
       marketMakerUserFunding={marketMakerUserFunding}
-      marketMakerFundingPercentage={marketMakerFundingPercentage}
       balance={balance}
       winnerOutcome={winnerOutcome}
       collateral={collateral}
