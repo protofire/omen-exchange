@@ -1,5 +1,6 @@
 import Big from 'big.js'
-import { BigNumber, getAddress, bigNumberify } from 'ethers/utils'
+import { BigNumber, getAddress, bigNumberify, formatUnits } from 'ethers/utils'
+
 import { getLogger } from './logger'
 import { OutcomeSlot } from './types'
 
@@ -195,3 +196,6 @@ export const isAddress = (address: string): boolean => {
   }
   return true
 }
+
+export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string =>
+  Number(formatUnits(value, decimals)).toFixed(precision)

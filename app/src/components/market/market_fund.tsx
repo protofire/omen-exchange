@@ -3,10 +3,9 @@ import styled, { withTheme } from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
 import { SectionTitle } from '../common/section_title'
-import { formatDate } from '../../util/tools'
+import { divBN, formatBigNumber, formatDate } from '../../util/tools'
 import { ViewCard } from '../common/view_card/'
 import { Table, TD, TR } from '../common/table'
-import { ethers } from 'ethers'
 import { BalanceItem, OutcomeTableValue, Status, Token, WinnerOutcome } from '../../util/types'
 import { OutcomeTable } from '../common/outcome_table'
 import { FullLoading } from '../common/full_loading'
@@ -29,10 +28,8 @@ interface Props extends RouteComponentProps<any> {
   resolution: Maybe<Date>
   totalPoolShares: BigNumber
   userPoolShares: BigNumber
-  userPoolSharesPercentage: number
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
-  marketMakerFundingPercentage: number
   balance: BalanceItem[]
   winnerOutcome: Maybe<WinnerOutcome>
   theme?: any
@@ -82,11 +79,9 @@ const MarketFundWrapper = (props: Props) => {
     resolution,
     totalPoolShares,
     userPoolShares,
-    userPoolSharesPercentage,
     balance,
     marketMakerUserFunding,
     marketMakerFunding,
-    marketMakerFundingPercentage,
     theme,
     marketMakerAddress,
     collateral,
@@ -99,11 +94,18 @@ const MarketFundWrapper = (props: Props) => {
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
 
+  const marketMakerFundingPercentage: Maybe<number> = marketMakerFunding.isZero()
+    ? null
+    : 100 * divBN(marketMakerUserFunding, marketMakerFunding)
+  const userPoolSharesPercentage: Maybe<number> = totalPoolShares.isZero()
+    ? null
+    : 100 * divBN(userPoolShares, totalPoolShares)
+
   const addFunding = async () => {
     try {
       setStatus(Status.Loading)
       setMessage(
-        `Add funding amount: ${ethers.utils.formatUnits(amount, collateral.decimals)} ${
+        `Add funding amount: ${formatBigNumber(amount, collateral.decimals)} ${
           collateral.symbol
         } ...`,
       )
@@ -130,7 +132,7 @@ const MarketFundWrapper = (props: Props) => {
     try {
       setStatus(Status.Loading)
       setMessage(
-        `Remove all funding amount: ${ethers.utils.formatUnits(
+        `Remove all funding amount: ${formatBigNumber(
           marketMakerUserFunding,
           collateral.decimals,
         )} ...`,
@@ -156,34 +158,30 @@ const MarketFundWrapper = (props: Props) => {
           <TR>
             <TD>Total funding</TD>
             <TD textAlign="right">
-              {marketMakerFunding
-                ? ethers.utils.formatUnits(marketMakerFunding, collateral.decimals)
-                : '0'}{' '}
+              {marketMakerFunding ? formatBigNumber(marketMakerFunding, collateral.decimals) : '0'}{' '}
             </TD>
           </TR>
           <TR>
             <TD>Your funding</TD>
             <TD textAlign="right">
               {marketMakerUserFunding
-                ? ethers.utils.formatUnits(marketMakerUserFunding, collateral.decimals)
+                ? formatBigNumber(marketMakerUserFunding, collateral.decimals)
                 : '0'}{' '}
-              ({marketMakerFundingPercentage ? marketMakerFundingPercentage.toFixed(2) : '0'} %){' '}
+              ({marketMakerFundingPercentage && marketMakerFundingPercentage.toFixed(2)}%){' '}
             </TD>
           </TR>
           <TR>
             <TD>Total pool shares</TD>
             <TD textAlign="right">
-              {totalPoolShares
-                ? ethers.utils.formatUnits(totalPoolShares, collateral.decimals)
-                : '0'}{' '}
+              {totalPoolShares ? formatBigNumber(totalPoolShares, collateral.decimals) : '0'}{' '}
               <strong>shares</strong>
             </TD>
           </TR>
           <TR>
             <TD>Your pool shares</TD>
             <TD textAlign="right">
-              {userPoolShares ? ethers.utils.formatUnits(userPoolShares, collateral.decimals) : '0'}{' '}
-              ({userPoolSharesPercentage ? userPoolSharesPercentage.toFixed(2) : '0'} %){' '}
+              {userPoolShares ? formatBigNumber(userPoolShares, collateral.decimals) : '0'} (
+              {userPoolSharesPercentage && userPoolSharesPercentage.toFixed(2)}%){' '}
               <strong>shares</strong>
             </TD>
           </TR>
@@ -223,7 +221,7 @@ const MarketFundWrapper = (props: Props) => {
             ‹ Back
           </ButtonLinkStyled>
 
-          <Button onClick={() => addFunding()} fontSize={'18px'}>
+          <Button onClick={() => addFunding()} fontSize={'18px'} disabled={amount.isZero()}>
             Add funding
           </Button>
           <Button

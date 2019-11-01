@@ -152,6 +152,27 @@ class MarketMakerService {
     }
   }
 
+  poolSharesTotalSupply = async (): Promise<BigNumber> => {
+    try {
+      return this.contract.totalSupply()
+    } catch (err) {
+      logger.error(`There was an error getting the supply of pool shares`, err.message)
+      throw err
+    }
+  }
+
+  poolSharesBalanceOf = async (address: string): Promise<BigNumber> => {
+    try {
+      return this.contract.balanceOf(address)
+    } catch (err) {
+      logger.error(
+        `There was an error getting the balance of pool shares for '${address}''`,
+        err.message,
+      )
+      throw err
+    }
+  }
+
   sell = async (amount: BigNumber, outcome: OutcomeSlot) => {
     const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {

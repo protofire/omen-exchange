@@ -1,11 +1,10 @@
 import React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { ethers } from 'ethers'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { ViewCard } from '../../common/view_card'
+import { formatBigNumber } from '../../../util/tools'
 import { Status, BalanceItem, Token } from '../../../util/types'
-// import { ButtonAnchor, ThreeBoxComments } from '../../common'
 import { ButtonAnchor } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
@@ -80,9 +79,7 @@ const ViewWrapper = (props: Props) => {
             {currentPrice} {collateral.symbol}
           </TD>
           {userHasShares && (
-            <TD textAlign={cellAlignment[3]}>
-              {ethers.utils.formatUnits(shares, collateral.decimals)}
-            </TD>
+            <TD textAlign={cellAlignment[3]}>{formatBigNumber(shares, collateral.decimals)}</TD>
           )}
         </TR>
       )
