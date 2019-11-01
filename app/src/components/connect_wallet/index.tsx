@@ -1,8 +1,7 @@
 import React from 'react'
 import { useWeb3Context } from 'web3-react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
-import { CONNECTOR } from '../../common/constants'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -20,12 +19,20 @@ const Text = styled.span`
   }
 `
 
-const Dot = styled.div`
-  background-color: #ccc;
-  border-radius: 50%;
-  height: 12px;
-  margin-right: 8px;
-  width: 12px;
+const Separator = css`
+  &::before {
+    background-color: ${props => props.theme.header.color};
+    content: '';
+    height: 22px;
+    margin: 0 15px;
+    width: 1px;
+  }
+`
+
+const ConnectorSeparator = styled.div`
+  align-items: center;
+  display: flex;
+  ${Separator}
 `
 
 export const ConnectWallet = (props: any) => {
@@ -49,9 +56,25 @@ export const ConnectWallet = (props: any) => {
   return (
     <>
       {!context.active && (
-        <Wrapper {...props} onClick={() => context.setConnector(CONNECTOR)}>
-          <Dot />
-          <Text>Click to connect with {CONNECTOR}</Text>
+        <Wrapper {...props}>
+          <Text
+            onClick={() => {
+              context.setConnector('MetaMask')
+              localStorage.setItem('CONNECTOR', 'MetaMask')
+            }}
+          >
+            Click to connect with Metamask
+          </Text>
+          <ConnectorSeparator>
+            <Text
+              onClick={() => {
+                context.setConnector('WalletConnect')
+                localStorage.setItem('CONNECTOR', 'WalletConnect')
+              }}
+            >
+              Click to connect with WalletConnect
+            </Text>
+          </ConnectorSeparator>
         </Wrapper>
       )}
     </>

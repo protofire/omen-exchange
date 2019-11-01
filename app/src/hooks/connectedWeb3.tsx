@@ -1,8 +1,7 @@
 import { providers } from 'ethers'
 import React, { useState, useEffect } from 'react'
 import { useWeb3Context } from 'web3-react'
-
-import { CONNECTOR } from '../common/constants'
+import connectors from '../util/connectors'
 
 export interface ConnectedWeb3Context {
   account: string
@@ -32,7 +31,10 @@ export const useConnectWeb3 = () => {
   const context = useWeb3Context()
 
   useEffect(() => {
-    context.setConnector(CONNECTOR)
+    const connector = localStorage.getItem('CONNECTOR')
+    if (connector && (connector as keyof typeof connectors)) {
+      context.setConnector(connector)
+    }
   }, [context])
 }
 
