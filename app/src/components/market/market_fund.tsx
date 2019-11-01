@@ -96,10 +96,10 @@ const MarketFundWrapper = (props: Props) => {
 
   const marketMakerFundingPercentage: Maybe<number> = marketMakerFunding.isZero()
     ? null
-    : divBN(marketMakerUserFunding, marketMakerFunding)
+    : 100 * divBN(marketMakerUserFunding, marketMakerFunding)
   const userPoolSharesPercentage: Maybe<number> = totalPoolShares.isZero()
     ? null
-    : divBN(userPoolShares, totalPoolShares)
+    : 100 * divBN(userPoolShares, totalPoolShares)
 
   const addFunding = async () => {
     try {
