@@ -20,7 +20,7 @@ import { getLogger } from '../../util/logger'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { FullLoading } from '../common/full_loading'
 import {
-  computePriceAfterTrade,
+  computeBalanceAfterTrade,
   formatDate,
   calcSellAmountInCollateral,
   mulBN,
@@ -62,15 +62,7 @@ interface Props extends RouteComponentProps<any> {
 const MarketSellWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const {
-    balance,
-    marketMakerAddress,
-    marketMakerFunding,
-    collateral,
-    conditionalTokens,
-    question,
-    resolution,
-  } = props
+  const { balance, marketMakerAddress, collateral, conditionalTokens, question, resolution } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
@@ -79,21 +71,10 @@ const MarketSellWrapper = (props: Props) => {
   const [tradedCollateral, setTradedCollateral] = useState<BigNumber>(new BigNumber(0))
   const [costFee, setCostFee] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
-
-  const [tradeYes, tradeNo] =
-    outcome === OutcomeSlot.Yes
-      ? [amountShares.mul(-1), ethers.constants.Zero]
-      : [ethers.constants.Zero, amountShares.mul(-1)]
+  const [pricesAfterTrade, setPricesAfterTrade] = useState<[number, number]>([0, 0])
 
   const holdingsYes = balance[0].holdings
   const holdingsNo = balance[1].holdings
-  const pricesAfterTrade = computePriceAfterTrade(
-    tradeYes,
-    tradeNo,
-    holdingsYes,
-    holdingsNo,
-    marketMakerFunding,
-  )
 
   useEffect(() => {
     const balanceItemFound: BalanceItem | undefined = balance.find((balanceItem: BalanceItem) => {
@@ -112,10 +93,23 @@ const MarketSellWrapper = (props: Props) => {
       0.01,
     )
 
+    const balanceAfterTrade = computeBalanceAfterTrade(
+      holdingsYes,
+      holdingsNo,
+      outcome,
+      amountToSell.mul(-1), // negate amounts because it's a sale
+      amountShares.mul(-1),
+    )
+    const { actualPriceForYes, actualPriceForNo } = MarketMakerService.getActualPrice(
+      balanceAfterTrade,
+    )
+
+    setPricesAfterTrade([actualPriceForYes, actualPriceForNo])
+
     setCostFee(mulBN(amountToSell, 0.01))
 
     setTradedCollateral(amountToSell)
-  }, [outcome, amountShares, balance, collateral])
+  }, [outcome, amountShares, balance, collateral, holdingsYes, holdingsNo])
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
 

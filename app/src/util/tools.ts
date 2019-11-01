@@ -70,35 +70,6 @@ export const calcNetCost = (
 }
 
 /**
- * Computes the price of the outcome tokens after trading `tradeYes` and `tradeNo`, given the initial funding is
- * `funding` and holdings.
- *
- * Returns an array with the price the `yes` and the `no` outcome tokens will have after executing that trade.
- */
-export const computePriceAfterTrade = (
-  tradeYes: BigNumber,
-  tradeNo: BigNumber,
-  holdingsYes: BigNumber,
-  holdingsNo: BigNumber,
-  funding: BigNumber,
-): [number, number] => {
-  // TODO: TBD
-  // const priceYes = calcPrice(funding, holdingsYes)
-  // const priceNo = calcPrice(funding, holdingsNo)
-  //
-  // const netCost = calcNetCost(funding, priceYes, tradeYes, priceNo, tradeNo)
-  //
-  // const newHoldingsYes = holdingsYes.sub(tradeYes).add(netCost)
-  // const newHoldingsNo = holdingsNo.sub(tradeNo).add(netCost)
-  //
-  // const newPriceYes = calcPrice(funding, newHoldingsYes)
-  // const newPriceNo = calcPrice(funding, newHoldingsNo)
-  const newPriceYes = 0.5
-  const newPriceNo = 0.5
-  return [newPriceYes, newPriceNo]
-}
-
-/**
  * Computes the balance of the outcome tokens after trading
  */
 export const computeBalanceAfterTrade = (

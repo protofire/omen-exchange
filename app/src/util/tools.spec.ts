@@ -45,40 +45,6 @@ describe('tools', () => {
     }
   })
 
-  describe('computePriceAfterTrade', () => {
-    // const testCases: any = [
-    //   [[100, 50, 0, 100, 100], [0.58579, 0.41421]],
-    //   [[100, 0, 50, 100, 100], [0.41421, 0.58579]],
-    //   [[100, 50, 0, 77, 127], [0.6666, 0.3333]],
-    //   [[100, 0, 50, 77, 127], [0.5, 0.5]],
-    //   [[100, -50, 0, 100, 100], [0.41421, 0.58579]],
-    //   [[100, 50, 50, 100, 100], [0.5, 0.5]],
-    // ]
-    //
-    // for (const [
-    //   [funding, tradeYes, tradeNo, holdingsYes, holdingsNo],
-    //   [expectedPriceYes, expectedPriceNo],
-    // ] of testCases) {
-    //   it(`should compute the right net cost, `, () => {
-    //     const fundingBN = ethers.utils.bigNumberify(funding)
-    //     const tradeYesBN = ethers.utils.bigNumberify(tradeYes)
-    //     const tradeNoBN = ethers.utils.bigNumberify(tradeNo)
-    //     const holdingsYesBN = ethers.utils.bigNumberify(holdingsYes)
-    //     const holdingsNoBN = ethers.utils.bigNumberify(holdingsNo)
-    //     const [newPriceYes, newPriceNo] = computePriceAfterTrade(
-    //       tradeYesBN,
-    //       tradeNoBN,
-    //       holdingsYesBN,
-    //       holdingsNoBN,
-    //       fundingBN,
-    //     )
-    //
-    //     expect(newPriceYes).toBeCloseTo(expectedPriceYes)
-    //     expect(newPriceNo).toBeCloseTo(expectedPriceNo)
-    //   })
-    // }
-  })
-
   describe('calcDistributionHint', () => {
     const testCases: any = [
       [[50, 50], [1000000, 1000000]],
