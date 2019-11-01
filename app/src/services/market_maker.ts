@@ -1,7 +1,6 @@
 import { Contract, ethers, Wallet } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
-import { erc20Abi } from './erc20'
 import { ConditionalTokenService } from './conditional_token'
 import { getLogger } from '../util/logger'
 import { OutcomeSlot } from '../util/types'
@@ -22,7 +21,6 @@ const marketMakerAbi = [
   'function calcBuyAmount(uint investmentAmount, uint outcomeIndex) public view returns (uint)',
   'function sell(uint returnAmount, uint outcomeIndex, uint maxOutcomeTokensToSell) external',
   'function calcSellAmount(uint returnAmount, uint outcomeIndex) public view returns (uint)',
-  ...erc20Abi,
 ]
 
 class MarketMakerService {
