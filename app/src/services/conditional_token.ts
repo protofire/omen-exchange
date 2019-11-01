@@ -24,6 +24,7 @@ class ConditionalTokenService {
   contract: Contract
   address: string
   signerAddress: string
+  provider: any
 
   constructor(address: string, provider: any, signerAddress: string) {
     const signer: Wallet = provider.getSigner()
@@ -32,6 +33,7 @@ class ConditionalTokenService {
 
     this.address = address
     this.signerAddress = signerAddress
+    this.provider = provider
   }
 
   prepareCondition = async (
@@ -45,6 +47,7 @@ class ConditionalTokenService {
       outcomeSlotCount,
     )
     logger.log(`Prepare condition transaction hash: ${transactionObject.hash}`)
+    await this.provider.waitForTransaction(transactionObject.hash)
 
     const conditionId = ethers.utils.solidityKeccak256(
       ['address', 'bytes32', 'uint256'],
