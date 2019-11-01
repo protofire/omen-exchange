@@ -13,6 +13,7 @@ class MarketMakerFactoryService {
   contract: Contract
   constantContract: Contract
   signerAddress: string
+  provider: any
 
   constructor(address: string, provider: any, signerAddress: string) {
     const signer: Wallet = provider.getSigner()
@@ -20,6 +21,7 @@ class MarketMakerFactoryService {
     this.contract = new ethers.Contract(address, marketMakerFactoryAbi, provider).connect(signer)
     this.constantContract = new ethers.Contract(address, marketMakerFactoryCallAbi, provider)
     this.signerAddress = signerAddress
+    this.provider = provider
   }
 
   createMarketMaker = async (
@@ -33,7 +35,8 @@ class MarketMakerFactoryService {
       from: this.signerAddress,
     })
 
-    await this.contract.createFixedProductMarketMaker(...args)
+    const transactionObject = await this.contract.createFixedProductMarketMaker(...args)
+    await this.provider.waitForTransaction(transactionObject.hash)
 
     return marketMakerAddress
   }

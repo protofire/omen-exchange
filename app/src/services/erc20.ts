@@ -44,6 +44,7 @@ class ERC20Service {
 
     const transactionObject = await erc20Contract.approve(spender, amount)
     logger.log(`Approve transaccion hash: ${transactionObject.hash}`)
+    await provider.waitForTransaction(transactionObject.hash)
   }
 
   /**
@@ -56,6 +57,7 @@ class ERC20Service {
 
     const transactionObject = await erc20Contract.approve(spender, ethers.constants.MaxUint256)
     logger.log(`Approve unlimited transaccion hash: ${transactionObject.hash}`)
+    await provider.waitForTransaction(transactionObject.hash)
   }
 
   getCollateral = async (marketMakerAddress: string, provider: any): Promise<any> => {
