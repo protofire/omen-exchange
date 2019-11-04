@@ -1,20 +1,26 @@
-import React, { FC, useState } from 'react'
+import React from 'react'
 
 import { MarketFund } from './market_fund'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useQuestion } from '../../hooks/useQuestion'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
 import { FullLoading } from '../common/full_loading'
+import { MarketNotFound } from '../common/market_not_found'
+import { useCheckContractExist } from '../../hooks/useCheckContractExist'
 
 interface Props {
   marketMakerAddress: string
 }
 
-const MarketFundContainer: FC<Props> = props => {
+const MarketFundContainer = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const [marketMakerAddress] = useState<string>(props.marketMakerAddress)
+
+  const { marketMakerAddress } = props
+
+  const { contractExist } = useCheckContractExist(marketMakerAddress, context)
 
   const { question, resolution } = useQuestion(marketMakerAddress, context)
+
   const {
     totalPoolShares,
     userPoolShares,
@@ -24,6 +30,10 @@ const MarketFundContainer: FC<Props> = props => {
     marketMakerUserFunding,
     collateral,
   } = useMarketMakerData(marketMakerAddress, context)
+
+  if (!contractExist) {
+    return <MarketNotFound />
+  }
 
   if (!collateral) {
     return <FullLoading />
