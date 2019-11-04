@@ -17,16 +17,16 @@ const FooterCss = css`
   text-decoration: none;
 `
 
-const AFooterGeco = styled.a`
+const FooterGeco = styled.a`
   ${FooterCss}
 `
 
-const AFooterProtofire = styled.a`
+const FooterProtofire = styled.a`
   ${FooterCss}
   margin-top: 10px
 `
 
-const AText = styled.span`
+const Text = styled.span`
   color: ${props => props.theme.footer.color};
   cursor: pointer;
   font-size: 10px;
@@ -52,13 +52,13 @@ export const Footer: React.FC = props => {
 
   return (
     <FooterStyled title={GIT_COMMIT} {...restProps}>
-      <AFooterGeco>
+      <FooterGeco>
         <LogoGeco src={LogoImageGeco} alt="Geco" />
-      </AFooterGeco>
-      <AFooterProtofire href="https://www.protofire.io">
-        <AText>Built by</AText>
+      </FooterGeco>
+      <FooterProtofire href="https://www.protofire.io">
+        <Text>Built by</Text>
         <LogoProtofire src={LogoImageProtofire} alt="Protofire" />
-      </AFooterProtofire>
+      </FooterProtofire>
     </FooterStyled>
   )
 }
