@@ -2,6 +2,7 @@ import React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
+import { ThreeBoxComments } from '../../common/three_box_comments'
 import { ViewCard } from '../../common/view_card'
 import { formatBigNumber } from '../../../util/tools'
 import { Status, BalanceItem, Token } from '../../../util/types'
@@ -103,7 +104,7 @@ const ViewWrapper = (props: Props) => {
           )}
           <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
         </ButtonContainerStyled>
-        {/*<ThreeBoxComments threadName={marketMakerAddress} />*/}
+        <ThreeBoxComments threadName={marketMakerAddress} />
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}
     </>
