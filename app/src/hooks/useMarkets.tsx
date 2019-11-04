@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
 import { getLogger } from '../util/logger'
-import { Market, MarketAndQuestion, Status } from '../util/types'
+import { Market, MarketAndQuestion, MarketStatus, Status } from '../util/types'
 
 const logger = getLogger('Market::useMarkets')
 
@@ -26,12 +26,17 @@ export const useMarkets = (
 
         const getQuestionData = async (market: Market) => {
           const { conditionId } = market
+          // Get question data
           const questionId = await conditionalTokens.getQuestionId(conditionId, provider)
           const { question, resolution } = await realitio.getQuestion(questionId, provider)
+          // Know if a market is open or resolved
+          const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
+          const marketStatus = isConditionResolved ? MarketStatus.Resolved : MarketStatus.Open
           return {
             ...market,
             question,
             resolution,
+            marketStatus,
           }
         }
 

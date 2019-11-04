@@ -89,7 +89,16 @@ export interface Market {
   conditionId: string
 }
 
-export type MarketAndQuestion = Market & Question
+export enum MarketStatus {
+  Open = 'Open',
+  Resolved = 'Resolved',
+}
+
+export interface MarketValueStatus {
+  marketStatus: MarketStatus
+}
+
+export type MarketAndQuestion = Market & MarketValueStatus & Question
 
 export interface Log {
   topics: Array<string>
