@@ -81,3 +81,17 @@ export interface Token {
   decimals: number
   symbol: string
 }
+
+export interface Market {
+  marketMakerAddress: string
+  ownerAddress: string
+  collateralTokenAddress: string
+  conditionId: string
+}
+
+export type MarketAndQuestion = Market & Question
+
+export interface Log {
+  topics: Array<string>
+  data: string
+}
