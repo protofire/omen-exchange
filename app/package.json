@@ -41,7 +41,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "node --max-old-space-size=4000 node_modules/react-scripts/scripts/build.js",
+    "build": "sed -i '207s/isEnvProduction/false/' node_modules/react-scripts/config/webpack.config.js && node --max-old-space-size=4000 node_modules/react-scripts/scripts/build.js",
     "test": "react-scripts test  --passWithNoTests",
     "eject": "react-scripts eject",
     "lint": "eslint './src/**/*.{ts,tsx}'",
