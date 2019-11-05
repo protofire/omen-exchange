@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import LogoImageProtofire from './img/logo_protofire.png'
 import LogoImageGeco from './img/logo_geco.png'
@@ -10,14 +10,23 @@ const FooterStyled = styled.footer`
   padding-top: 50px;
 `
 
-const AFooter = styled.a`
+const FooterCss = css`
   align-items: center;
   display: flex;
   justify-content: center;
   text-decoration: none;
 `
 
-const AText = styled.span`
+const FooterGeco = styled.a`
+  ${FooterCss}
+`
+
+const FooterProtofire = styled.a`
+  ${FooterCss}
+  margin-top: 10px
+`
+
+const Text = styled.span`
   color: ${props => props.theme.footer.color};
   cursor: pointer;
   font-size: 10px;
@@ -34,7 +43,7 @@ const LogoProtofire = styled.img`
 `
 
 const LogoGeco = styled.img`
-  height: 40px;
+  height: 60px;
   margin: 0 10px;
 `
 
@@ -43,13 +52,13 @@ export const Footer: React.FC = props => {
 
   return (
     <FooterStyled title={GIT_COMMIT} {...restProps}>
-      <AFooter href="https://www.protofire.io">
-        <AText>Built by</AText>
-        <LogoProtofire src={LogoImageProtofire} alt="Protofire" />
-      </AFooter>
-      <AFooter>
+      <FooterGeco>
         <LogoGeco src={LogoImageGeco} alt="Geco" />
-      </AFooter>
+      </FooterGeco>
+      <FooterProtofire href="https://www.protofire.io">
+        <Text>Built by</Text>
+        <LogoProtofire src={LogoImageProtofire} alt="Protofire" />
+      </FooterProtofire>
     </FooterStyled>
   )
 }
