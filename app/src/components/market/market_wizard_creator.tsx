@@ -187,10 +187,9 @@ export class MarketWizardCreator extends Component<Props, State> {
   }
 
   public summaryMarketStep = () => {
-    const { marketData } = this.state
     const { marketMakerAddress } = this.props
 
-    return <SummaryMarketStep values={{ ...marketData }} marketMakerAddress={marketMakerAddress} />
+    return marketMakerAddress ? <SummaryMarketStep marketMakerAddress={marketMakerAddress} /> : ''
   }
 
   render() {

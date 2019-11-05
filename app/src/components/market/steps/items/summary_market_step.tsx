@@ -1,9 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import { BigNumber } from 'ethers/utils'
 
 import { CreateCard } from '../../create_card'
-import { knownTokens } from '../../../../util/addresses'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { Paragraph } from '../../../common/paragraph'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
@@ -13,6 +11,11 @@ import { ButtonContainer } from '../../../common/button_container'
 import { ButtonCSS } from '../../../common/button'
 import { SectionTitle } from '../../../common/section_title'
 import { CopyText } from '../../../common/copy_text'
+import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { useMarketMakerData } from '../../../../hooks/useMarketMakerData'
+import { useQuestion } from '../../../../hooks/useQuestion'
+import { FullLoading } from '../../../common/full_loading'
+import { BalanceItem } from '../../../../util/types'
 
 const TableStyled = styled(Table)`
   margin-bottom: 25px;
@@ -37,39 +40,26 @@ const MainButton = styled.a`
 `
 
 interface Props {
-  values: {
-    collateralId: KnownToken
-    question: string
-    category: string
-    resolution: Date | null
-    spread: string
-    funding: BigNumber
-    outcomeValueOne: string
-    outcomeValueTwo: string
-    outcomeProbabilityOne: string
-    outcomeProbabilityTwo: string
-  }
-  marketMakerAddress: string | null
+  marketMakerAddress: string
 }
 
 const SummaryMarketStep = (props: Props) => {
-  const { marketMakerAddress, values } = props
-  const {
-    collateralId,
-    question,
-    category,
-    resolution,
-    spread,
-    funding,
-    outcomeValueOne,
-    outcomeValueTwo,
-    outcomeProbabilityOne,
-    outcomeProbabilityTwo,
-  } = values
+  const context = useConnectedWeb3Context()
 
-  const collateral = knownTokens[collateralId]
+  const { marketMakerAddress } = props
+
+  const { question, resolution } = useQuestion(marketMakerAddress, context)
+  const { marketMakerFunding, balance, collateral } = useMarketMakerData(
+    marketMakerAddress,
+    context,
+  )
+
   const resolutionDate = resolution && formatDate(resolution)
   const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`
+
+  if (!collateral) {
+    return <FullLoading />
+  }
 
   return (
     <>
@@ -88,7 +78,7 @@ const SummaryMarketStep = (props: Props) => {
         <SubsectionTitle>Details</SubsectionTitle>
         <TitleValueStyled title={'Question'} value={question} />
         <Grid>
-          <TitleValue title={'Category'} value={category} />
+          <TitleValue title={'Category'} value={'TODO: Add category'} />
           <TitleValue title={'Resolution date'} value={resolutionDate} />
           <TitleValue
             title={'Oracle'}
@@ -108,11 +98,11 @@ const SummaryMarketStep = (props: Props) => {
               ' as final arbitrator.',
             ]}
           />
-          <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
+          <TitleValue title={'Spread / Fee'} value={`1%`} />
           <TitleValue
             title={'Funding'}
             value={[
-              formatBigNumber(funding, collateral.decimals),
+              formatBigNumber(marketMakerFunding, collateral.decimals),
               <strong key="1"> {collateral.symbol}</strong>,
             ]}
           />
@@ -128,14 +118,14 @@ const SummaryMarketStep = (props: Props) => {
             </THead>
           }
         >
-          <TR>
-            <TD>{outcomeValueOne}</TD>
-            <TD textAlign="right">{outcomeProbabilityOne}%</TD>
-          </TR>
-          <TR>
-            <TD>{outcomeValueTwo}</TD>
-            <TD textAlign="right">{outcomeProbabilityTwo}%</TD>
-          </TR>
+          {balance.map((item: BalanceItem, index: number) => {
+            return (
+              <TR key={index}>
+                <TD>{item.outcomeName}</TD>
+                <TD textAlign="right">{item.probability}%</TD>
+              </TR>
+            )
+          })}
         </TableStyled>
         <ButtonContainer>
           <MainButton rel="noopener noreferrer" href={`/#/${marketMakerAddress}`} target="_blank">
