@@ -6,8 +6,6 @@ import { FullLoading } from '../common/full_loading'
 import { useContracts } from '../../hooks/useContracts'
 import { MarketBuy } from './market_buy'
 import { useQuestion } from '../../hooks/useQuestion'
-import { useCheckContractExists } from '../../hooks/useCheckContractExists'
-import { MarketNotFound } from '../common/market_not_found'
 
 interface Props {
   marketMakerAddress: string
@@ -17,21 +15,13 @@ const MarketBuyContainer = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const { marketMakerAddress } = props
-
-  const contractExists = useCheckContractExists(marketMakerAddress, context)
-
   const { question, resolution } = useQuestion(marketMakerAddress, context)
-
   const { balance, marketMakerFunding, collateral } = useMarketMakerData(
     marketMakerAddress,
     context,
   )
 
   const { conditionalTokens } = useContracts(context)
-
-  if (!contractExists) {
-    return <MarketNotFound />
-  }
 
   if (!collateral || balance.length === 0) {
     return <FullLoading />
