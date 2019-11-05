@@ -27,8 +27,8 @@ export const useMarkets = (
         const getQuestionData = async (market: Market) => {
           const { conditionId } = market
           // Get question data
-          const questionId = await conditionalTokens.getQuestionId(conditionId, provider)
-          const { question, resolution } = await realitio.getQuestion(questionId, provider)
+          const questionId = await conditionalTokens.getQuestionId(conditionId)
+          const { question, resolution } = await realitio.getQuestion(questionId)
           // Know if a market is open or resolved
           const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
           const marketStatus = isConditionResolved ? MarketStatus.Resolved : MarketStatus.Open

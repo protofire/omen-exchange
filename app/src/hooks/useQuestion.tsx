@@ -25,8 +25,8 @@ export const useQuestion = (
         const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
         const conditionId = await marketMaker.getConditionId()
-        const questionId = await conditionalTokens.getQuestionId(conditionId, provider)
-        const { question, resolution } = await realitio.getQuestion(questionId, provider)
+        const questionId = await conditionalTokens.getQuestionId(conditionId)
+        const { question, resolution } = await realitio.getQuestion(questionId)
 
         setQuestion(question)
         setResolution(resolution)

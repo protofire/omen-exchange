@@ -73,12 +73,12 @@ class ConditionalTokenService {
     return this.contract.balanceOf(ownerAddress, positionId)
   }
 
-  getQuestionId = async (conditionId: string, provider: any): Promise<string> => {
+  getQuestionId = async (conditionId: string): Promise<string> => {
     const filter: any = this.contract.filters.ConditionPreparation(conditionId)
 
     filter.fromBlock = '0x1'
 
-    const logs = await provider.getLogs(filter)
+    const logs = await this.provider.getLogs(filter)
 
     if (logs.length === 0) {
       throw new Error(`No ConditionPreparation event found for conditionId '${conditionId}'`)
