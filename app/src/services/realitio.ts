@@ -87,9 +87,8 @@ class RealitioService {
     const iface = new ethers.utils.Interface(realitioAbi)
     const event = iface.parseLog(logs[0])
 
-    const templateId = event.values.template_id.toString()
     const question: QuestionLog = RealitioQuestionLib.populatedJSONForTemplate(
-      RealitioTemplateConfig.content[templateId],
+      RealitioTemplateConfig.content[0],
       event.values.question,
     )
 
