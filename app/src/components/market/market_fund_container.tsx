@@ -6,7 +6,7 @@ import { useQuestion } from '../../hooks/useQuestion'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
 import { FullLoading } from '../common/full_loading'
 import { MarketNotFound } from '../common/market_not_found'
-import { useCheckContractExist } from '../../hooks/useCheckContractExist'
+import { useCheckContractExists } from '../../hooks/useCheckContractExists'
 
 interface Props {
   marketMakerAddress: string
@@ -17,7 +17,7 @@ const MarketFundContainer = (props: Props) => {
 
   const { marketMakerAddress } = props
 
-  const { contractExist } = useCheckContractExist(marketMakerAddress, context)
+  const contractExists = useCheckContractExists(marketMakerAddress, context)
 
   const { question, resolution } = useQuestion(marketMakerAddress, context)
 
@@ -31,7 +31,7 @@ const MarketFundContainer = (props: Props) => {
     collateral,
   } = useMarketMakerData(marketMakerAddress, context)
 
-  if (!contractExist) {
+  if (!contractExists) {
     return <MarketNotFound />
   }
 

@@ -5,7 +5,7 @@ import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { FullLoading } from '../common/full_loading'
 import { useQuestion } from '../../hooks/useQuestion'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
-import { useCheckContractExist } from '../../hooks/useCheckContractExist'
+import { useCheckContractExists } from '../../hooks/useCheckContractExists'
 import { MarketNotFound } from '../common/market_not_found'
 
 interface Props {
@@ -17,7 +17,7 @@ const MarketViewContainer = (props: Props) => {
 
   const { marketMakerAddress } = props
 
-  const { contractExist } = useCheckContractExist(marketMakerAddress, context)
+  const contractExists = useCheckContractExists(marketMakerAddress, context)
 
   const { question, resolution } = useQuestion(marketMakerAddress, context)
 
@@ -26,7 +26,7 @@ const MarketViewContainer = (props: Props) => {
     context,
   )
 
-  if (!contractExist) {
+  if (!contractExists) {
     return <MarketNotFound />
   }
 

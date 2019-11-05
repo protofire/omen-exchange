@@ -6,7 +6,7 @@ import { FullLoading } from '../common/full_loading'
 import { useContracts } from '../../hooks/useContracts'
 import { MarketBuy } from './market_buy'
 import { useQuestion } from '../../hooks/useQuestion'
-import { useCheckContractExist } from '../../hooks/useCheckContractExist'
+import { useCheckContractExists } from '../../hooks/useCheckContractExists'
 import { MarketNotFound } from '../common/market_not_found'
 
 interface Props {
@@ -18,7 +18,7 @@ const MarketBuyContainer = (props: Props) => {
 
   const { marketMakerAddress } = props
 
-  const { contractExist } = useCheckContractExist(marketMakerAddress, context)
+  const contractExists = useCheckContractExists(marketMakerAddress, context)
 
   const { question, resolution } = useQuestion(marketMakerAddress, context)
 
@@ -29,7 +29,7 @@ const MarketBuyContainer = (props: Props) => {
 
   const { conditionalTokens } = useContracts(context)
 
-  if (!contractExist) {
+  if (!contractExists) {
     return <MarketNotFound />
   }
 
