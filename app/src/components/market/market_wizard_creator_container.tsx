@@ -36,13 +36,14 @@ const MarketWizardCreatorContainer: FC = () => {
         funding,
         outcomeProbabilityOne,
         outcomeProbabilityTwo,
+        category,
       } = data
       const openingDateMoment = moment(resolution)
 
       const collateralToken = getToken(networkId, collateralId)
 
       setStatus(StatusMarketCreation.PostingQuestion)
-      const questionId = await realitio.askQuestion(question, openingDateMoment)
+      const questionId = await realitio.askQuestion(question, category, openingDateMoment)
       setQuestionId(questionId)
 
       setStatus(StatusMarketCreation.PrepareCondition)

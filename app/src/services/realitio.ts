@@ -1,8 +1,10 @@
 import { Contract, ethers, Wallet } from 'ethers'
 import { Moment } from 'moment'
+import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
+import RealitioTemplateConfig from '@realitio/realitio-contracts/config/templates.json'
 
 import { getLogger } from '../util/logger'
-import { Question } from '../util/types'
+import { Question, QuestionLog } from '../util/types'
 
 const logger = getLogger('Services::Realitio')
 
@@ -45,11 +47,14 @@ class RealitioService {
    */
   askQuestion = async (
     question: string,
+    category: string,
     openingDateMoment: Moment,
     value = '0',
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
-    const args = [0, question, this.arbitratorAddress, '86400', openingTimestamp, 0]
+    const questionText = RealitioQuestionLib.encodeText('bool', question, [1, 0], category)
+
+    const args = [0, questionText, this.arbitratorAddress, '86400', openingTimestamp, 0]
 
     const questionId = await this.constantContract.askQuestion(...args, {
       from: this.signerAddress,
@@ -82,8 +87,15 @@ class RealitioService {
     const iface = new ethers.utils.Interface(realitioAbi)
     const event = iface.parseLog(logs[0])
 
+    const templateId = event.values.template_id.toString()
+    const question: QuestionLog = RealitioQuestionLib.populatedJSONForTemplate(
+      RealitioTemplateConfig.content[templateId],
+      event.values.question,
+    )
+
     return {
-      question: event.values.question,
+      question: question.title,
+      category: question.category,
       resolution: new Date(event.values.opening_ts * 1000),
     }
   }
