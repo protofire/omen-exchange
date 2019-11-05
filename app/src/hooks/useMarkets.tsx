@@ -40,7 +40,7 @@ export const useMarkets = (
           }
         }
 
-        const { markets } = await marketMakerFactory.getMarkets(provider)
+        const markets = await marketMakerFactory.getMarkets(provider)
         const marketsWithRealitioData = await Promise.all(
           markets.map((market: Market) => getQuestionData(market)),
         )
