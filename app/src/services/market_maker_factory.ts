@@ -44,7 +44,7 @@ class MarketMakerFactoryService {
     return marketMakerAddress
   }
 
-  getMarkets = async (provider: any): Promise<{ markets: Market[] }> => {
+  getMarkets = async (provider: any): Promise<Market[]> => {
     const filter: any = this.contract.filters.FixedProductMarketMakerCreation()
 
     const logs = await provider.getLogs({
@@ -54,7 +54,7 @@ class MarketMakerFactoryService {
     })
 
     if (logs.length === 0) {
-      throw new Error(`No FixedProductMarketMakerCreation events found`)
+      return []
     }
 
     const interfaceMarketMakerFactory = new ethers.utils.Interface(marketMakerFactoryAbi)
@@ -71,9 +71,7 @@ class MarketMakerFactoryService {
       },
     )
 
-    return {
-      markets,
-    }
+    return markets
   }
 }
 
