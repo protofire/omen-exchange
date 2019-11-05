@@ -48,7 +48,7 @@ const SummaryMarketStep = (props: Props) => {
 
   const { marketMakerAddress } = props
 
-  const { question, resolution } = useQuestion(marketMakerAddress, context)
+  const { question, resolution, category } = useQuestion(marketMakerAddress, context)
   const { marketMakerFunding, balance, collateral } = useMarketMakerData(
     marketMakerAddress,
     context,
@@ -78,7 +78,7 @@ const SummaryMarketStep = (props: Props) => {
         <SubsectionTitle>Details</SubsectionTitle>
         <TitleValueStyled title={'Question'} value={question} />
         <Grid>
-          <TitleValue title={'Category'} value={'TODO: Add category'} />
+          <TitleValue title={'Category'} value={category} />
           <TitleValue title={'Resolution date'} value={resolutionDate} />
           <TitleValue
             title={'Oracle'}
