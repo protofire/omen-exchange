@@ -11,6 +11,7 @@ interface KnownContracts {
   realitioArbitrator: string
   marketMakerFactory: string
   conditionalTokens: string
+  oracle: string
 }
 
 interface KnownTokenData {
@@ -27,6 +28,7 @@ const addresses: { [networkId: number]: KnownContracts } = {
     realitioArbitrator: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
     marketMakerFactory: '0x4967C09AB3cDed1b4E21739f74b036eADA243C8A',
     conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
+    oracle: '0x0000000000000000000000000000000000000000',
   },
   [networkIds.RINKEBY]: {
     realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
@@ -35,12 +37,14 @@ const addresses: { [networkId: number]: KnownContracts } = {
     realitioArbitrator: '0xAEC3C8eD9516A206a4fD47EC77f026EDD533CF17',
     marketMakerFactory: '0xF248C1fe91eC1a5DD78bF26EB43489cDc6aAd1dD',
     conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
+    oracle: '0x0000000000000000000000000000000000000000',
   },
   [networkIds.GANACHE]: {
     realitio: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
     realitioArbitrator: '0x254dffcd3277c0b1660f6d42efbb754edababc2b',
     marketMakerFactory: '0x21a59654176f2689d12E828B77a783072CD26680',
-    conditionalTokens: '0x0290FB167208Af455bB137780163b7B7a9a10C16',
+    conditionalTokens: '0xb09bCc172050fBd4562da8b229Cf3E45Dc3045A6',
+    oracle: '0x7C728214be9A0049e6a86f2137ec61030D0AA964',
   },
 }
 
