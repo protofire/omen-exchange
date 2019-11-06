@@ -1,6 +1,7 @@
 import { Contract, ethers, Wallet } from 'ethers'
 import { Moment } from 'moment'
 
+import { REALITIO_TIMEOUT } from '../common/constants'
 import { getLogger } from '../util/logger'
 import { Question } from '../util/types'
 
@@ -49,7 +50,7 @@ class RealitioService {
     value = '0',
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
-    const args = [0, question, this.arbitratorAddress, '86400', openingTimestamp, 0]
+    const args = [0, question, this.arbitratorAddress, REALITIO_TIMEOUT, openingTimestamp, 0]
 
     const questionId = await this.constantContract.askQuestion(...args, {
       from: this.signerAddress,
