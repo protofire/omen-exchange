@@ -5,20 +5,24 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { ThreeBoxComments } from '../../common/three_box_comments'
 import { ViewCard } from '../../common/view_card'
 import { formatBigNumber } from '../../../util/tools'
-import { Status, BalanceItem, Token } from '../../../util/types'
+import { Status, BalanceItem, Token, Arbitrator } from '../../../util/types'
 import { ButtonAnchor } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
+import { BigNumber } from 'ethers/utils'
+import { TitleValue } from '../../common/title_value'
 
 interface Props extends RouteComponentProps<{}> {
   balance: BalanceItem[]
   collateral: Token
+  arbitrator: Arbitrator
   question: string
   status: Status
   theme?: any
   marketMakerAddress: string
+  funding: BigNumber
 }
 
 const ButtonContainerStyled = styled(ButtonContainer)`
@@ -38,9 +42,16 @@ const ButtonContainerStyled = styled(ButtonContainer)`
     }
   }
 `
+const Grid = styled.div`
+  display: grid;
+  grid-column-gap: 20px;
+  grid-row-gap: 14px;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 25px;
+`
 
 const ViewWrapper = (props: Props) => {
-  const { balance, collateral, status, theme, marketMakerAddress } = props
+  const { balance, collateral, status, theme, marketMakerAddress, arbitrator } = props
 
   const userHasShares = balance.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -87,9 +98,30 @@ const ViewWrapper = (props: Props) => {
     })
   }
 
+  const details = () => {
+    return (
+      <>
+        <SubsectionTitle>Details</SubsectionTitle>
+        <Grid>
+          <TitleValue title={'Category'} value={'TODO: Add category'} />
+          <TitleValue
+            title={'Oracle'}
+            value={[
+              <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
+                {arbitrator.name}
+              </a>,
+              ' oracle as final arbitrator.',
+            ]}
+          />
+        </Grid>
+      </>
+    )
+  }
+
   return (
     <>
       <ViewCard>
+        {details()}
         {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>

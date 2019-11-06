@@ -42,16 +42,14 @@ const MarketWizardCreatorContainer: FC = () => {
 
       const collateralToken = getToken(networkId, collateralId)
       const arbitrator = getArbitrator(networkId, arbitratorId)
-      const oracleAddress: string =
-        process.env.NODE_ENV === 'development' ? user : arbitrator.address
 
       setStatus(StatusMarketCreation.PostingQuestion)
-      const questionId = await realitio.askQuestion(question, oracleAddress, openingDateMoment)
+      const questionId = await realitio.askQuestion(question, arbitrator.address, openingDateMoment)
       setQuestionId(questionId)
 
       setStatus(StatusMarketCreation.PrepareCondition)
 
-      const conditionId = await conditionalTokens.prepareCondition(questionId, oracleAddress)
+      const conditionId = await conditionalTokens.prepareCondition(questionId, arbitrator.address)
 
       // approve movement of collateral token to MarketMakerFactory
       setStatus(StatusMarketCreation.ApprovingCollateral)
