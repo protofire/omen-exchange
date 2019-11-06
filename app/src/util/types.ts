@@ -81,3 +81,9 @@ export interface Token {
   decimals: number
   symbol: string
 }
+
+export interface Arbitrator {
+  address: string
+  name: string
+  url: string
+}

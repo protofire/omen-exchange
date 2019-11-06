@@ -18,16 +18,14 @@ class RealitioService {
   contract: Contract
   constantContract: Contract
   signerAddress: string
-  arbitratorAddress: string
   provider: any
 
-  constructor(address: string, provider: any, signerAddress: string, arbitratorAddress: string) {
+  constructor(address: string, provider: any, signerAddress: string) {
     const signer: Wallet = provider.getSigner()
 
     this.contract = new ethers.Contract(address, realitioAbi, provider).connect(signer)
     this.constantContract = new ethers.Contract(address, realitioCallAbi, provider)
     this.signerAddress = signerAddress
-    this.arbitratorAddress = arbitratorAddress
     this.provider = provider
   }
 
@@ -45,11 +43,12 @@ class RealitioService {
    */
   askQuestion = async (
     question: string,
+    arbitratorAddress: string,
     openingDateMoment: Moment,
     value = '0',
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
-    const args = [0, question, this.arbitratorAddress, '86400', openingTimestamp, 0]
+    const args = [0, question, arbitratorAddress, '86400', openingTimestamp, 0]
 
     const questionId = await this.constantContract.askQuestion(...args, {
       from: this.signerAddress,

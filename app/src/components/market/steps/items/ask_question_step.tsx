@@ -1,11 +1,14 @@
 import React, { ChangeEvent, Component } from 'react'
 import styled from 'styled-components'
+
 import { CreateCard } from '../../create_card'
 import { Button, Textfield, Categories } from '../../../common/index'
 import { FormRow } from '../../../common/form_row'
 import { DateField } from '../../../common/date_field'
 import { ButtonContainer } from '../../../common/button_container'
 import { Well } from '../../../common/well'
+import { Arbitrators } from '../../../common/arbitrators'
+import { knownArbitrators } from '../../../../util/addresses'
 
 interface Props {
   next: () => void
@@ -13,6 +16,7 @@ interface Props {
     question: string
     category: string
     resolution: Date | null
+    arbitratorId: KnownArbitrator
   }
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
   handleChangeDate: (date: Date | null) => any
@@ -52,7 +56,9 @@ class AskQuestionStep extends Component<Props, State> {
 
   render() {
     const { values, handleChange, handleChangeDate } = this.props
-    const { question, category, resolution } = values
+    const { question, category, resolution, arbitratorId } = values
+
+    const arbitrator = knownArbitrators[arbitratorId]
 
     return (
       <CreateCard>
@@ -96,20 +102,21 @@ class AskQuestionStep extends Component<Props, State> {
         />
         <FormRow
           formField={
-            <OracleInfo>
-              The market will be resolved using the{' '}
-              <a href="https://realit.io/" rel="noopener noreferrer" target="_blank">
-                realit.io
-              </a>{' '}
-              oracle and using{' '}
-              <a href="https://dxdao.daostack.io/" rel="noopener noreferrer" target="_blank">
-                dxDAO
-              </a>{' '}
-              as final arbitrator.
-            </OracleInfo>
+            <>
+              <Arbitrators name="arbitratorId" value={arbitratorId} onChange={handleChange} />
+              <OracleInfo>
+                The market will be resolved using{' '}
+                <a href={arbitrator.url} rel="noopener noreferrer" target="_blank">
+                  {arbitrator.name}
+                </a>{' '}
+                as final arbitrator.
+              </OracleInfo>
+            </>
           }
           title={'Oracle'}
-          tooltipText={'The Oracle will resolve the market once the Resolution Date is reached.'}
+          tooltipText={
+            'You can choose among several available Oracles. The Oracle will resolve the market once the Resolution Date is reached.'
+          }
         />
         <ButtonContainer>
           <Button disabled={!question || !category || !resolution} onClick={this.validate}>

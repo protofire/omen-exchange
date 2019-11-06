@@ -11,7 +11,7 @@ import { FullLoading } from '../../../common/full_loading'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
-import { knownTokens } from '../../../../util/addresses'
+import { knownArbitrators, knownTokens } from '../../../../util/addresses'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import styled from 'styled-components'
 
@@ -43,6 +43,7 @@ interface Props {
     question: string
     category: string
     resolution: Date | null
+    arbitratorId: KnownArbitrator
     spread: string
     funding: BigNumber
     outcomeValueOne: string
@@ -70,6 +71,7 @@ class CreateMarketStep extends Component<Props> {
       collateralId,
       question,
       category,
+      arbitratorId,
       resolution,
       spread,
       funding,
@@ -80,6 +82,8 @@ class CreateMarketStep extends Component<Props> {
     } = values
 
     const collateral = knownTokens[collateralId]
+
+    const arbitrator = knownArbitrators[arbitratorId]
 
     const resolutionDate = resolution && formatDate(resolution)
 
@@ -100,19 +104,10 @@ class CreateMarketStep extends Component<Props> {
           <TitleValue
             title={'Oracle'}
             value={[
-              <a href="https://realit.io/" key={1} rel="noopener noreferrer" target="_blank">
-                realit.io
+              <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
+                {arbitrator.name}
               </a>,
-              ' oracle and ',
-              <a
-                href="https://dxdao.daostack.io/"
-                key={2}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                dxDAO
-              </a>,
-              ' as final arbitrator.',
+              ' oracle as final arbitrator.',
             ]}
           />
           <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
