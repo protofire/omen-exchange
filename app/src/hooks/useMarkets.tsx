@@ -4,11 +4,12 @@ import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
 import { getLogger } from '../util/logger'
 import { Market, MarketAndQuestion, MarketStatus, Status } from '../util/types'
+import { DisconnectedWeb3Context } from './disconnectedWeb3'
 
 const logger = getLogger('Market::useMarkets')
 
 export const useMarkets = (
-  context: ConnectedWeb3Context,
+  context: ConnectedWeb3Context | DisconnectedWeb3Context,
 ): {
   markets: MarketAndQuestion[]
   status: Status

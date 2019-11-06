@@ -3,6 +3,7 @@ import { LogDescription } from 'ethers/utils/interface'
 
 import { Market, Log } from '../util/types'
 import { FEE } from '../common/constants'
+import { getLogger } from '../util/logger'
 
 const marketMakerFactoryAbi = [
   `function createFixedProductMarketMaker(address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint64 fee) public returns (address)`,
@@ -12,6 +13,8 @@ const marketMakerFactoryCallAbi = [
   `function createFixedProductMarketMaker(address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint64 fee) public constant returns (address)`,
 ]
 
+const logger = getLogger('Services::MarketMakerFactory')
+
 class MarketMakerFactoryService {
   contract: Contract
   constantContract: Contract
@@ -19,9 +22,15 @@ class MarketMakerFactoryService {
   provider: any
 
   constructor(address: string, provider: any, signerAddress: string) {
-    const signer: Wallet = provider.getSigner()
+    try {
+      const signer: Wallet = provider.getSigner()
 
-    this.contract = new ethers.Contract(address, marketMakerFactoryAbi, provider).connect(signer)
+      this.contract = new ethers.Contract(address, marketMakerFactoryAbi, provider).connect(signer)
+    } catch (err) {
+      logger.log(`There was an error creating the contract`, err.message)
+      this.contract = new ethers.Contract(address, marketMakerFactoryAbi, provider)
+    }
+
     this.constantContract = new ethers.Contract(address, marketMakerFactoryCallAbi, provider)
     this.signerAddress = signerAddress
     this.provider = provider

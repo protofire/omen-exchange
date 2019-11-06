@@ -22,9 +22,15 @@ class RealitioService {
   provider: any
 
   constructor(address: string, provider: any, signerAddress: string, arbitratorAddress: string) {
-    const signer: Wallet = provider.getSigner()
+    try {
+      const signer: Wallet = provider.getSigner()
 
-    this.contract = new ethers.Contract(address, realitioAbi, provider).connect(signer)
+      this.contract = new ethers.Contract(address, realitioAbi, provider).connect(signer)
+    } catch (err) {
+      logger.log(`There was an error creating the contract`, err.message)
+      this.contract = new ethers.Contract(address, realitioAbi, provider)
+    }
+
     this.constantContract = new ethers.Contract(address, realitioCallAbi, provider)
     this.signerAddress = signerAddress
     this.arbitratorAddress = arbitratorAddress
