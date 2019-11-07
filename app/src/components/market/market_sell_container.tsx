@@ -11,7 +11,7 @@ interface Props {
   marketMakerAddress: string
 }
 
-const MarketSellContainer = (props: Props) => {
+const MarketSellContainer: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const { marketMakerAddress } = props
