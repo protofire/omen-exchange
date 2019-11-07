@@ -1,6 +1,6 @@
 import React, { ChangeEvent, Component } from 'react'
 import styled from 'styled-components'
-import { CreateCard } from '../../create_card'
+import { CreateCard } from '../../../common/create_card'
 import { Button, Textfield, Categories } from '../../../common/index'
 import { FormRow } from '../../../common/form_row'
 import { DateField } from '../../../common/date_field'

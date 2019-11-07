@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useState } from 'react'
 import styled from 'styled-components'
-import { CreateCard } from '../../create_card'
+import { CreateCard } from '../../../common/create_card'
 import { Button, Outcomes } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'

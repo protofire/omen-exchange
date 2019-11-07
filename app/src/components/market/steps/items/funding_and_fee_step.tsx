@@ -4,7 +4,7 @@ import { BigNumber } from 'ethers/utils'
 
 import { Button, Textfield, BigNumberInput } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
-import { CreateCard } from '../../create_card'
+import { CreateCard } from '../../../common/create_card'
 import { FormRow } from '../../../common/form_row'
 import { TextfieldCustomPlaceholder } from '../../../common/textfield_custom_placeholder'
 import { ButtonLink } from '../../../common/button_link'

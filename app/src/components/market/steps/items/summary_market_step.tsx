@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { CreateCard } from '../../create_card'
+import { CreateCard } from '../../../common/create_card'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { Paragraph } from '../../../common/paragraph'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
