@@ -52,7 +52,7 @@ class RealitioService {
     value = '0',
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
-    const questionText = RealitioQuestionLib.encodeText('bool', question, [1, 0], category)
+    const questionText = RealitioQuestionLib.encodeText('bool', question, null, category)
 
     const args = [0, questionText, this.arbitratorAddress, '86400', openingTimestamp, 0]
 
