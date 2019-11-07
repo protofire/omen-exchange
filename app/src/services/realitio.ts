@@ -1,7 +1,7 @@
 import { Contract, ethers, Wallet } from 'ethers'
 import { Moment } from 'moment'
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
-import RealitioTemplateConfig from '@realitio/realitio-contracts/config/templates.json'
+import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 
 import { getLogger } from '../util/logger'
 import { Question, QuestionLog } from '../util/types'
@@ -88,7 +88,7 @@ class RealitioService {
     const event = iface.parseLog(logs[0])
 
     const question: QuestionLog = RealitioQuestionLib.populatedJSONForTemplate(
-      RealitioTemplateConfig.content[0],
+      RealitioTemplateLib.defaultTemplateForType('bool'),
       event.values.question,
     )
 
