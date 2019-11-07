@@ -84,7 +84,7 @@ class RealitioService {
     return {
       question: event.values.question,
       resolution: new Date(event.values.opening_ts * 1000),
-      arbitratorAddress: event.values.arbitratorAddress,
+      arbitratorAddress: event.values.arbitrator,
     }
   }
 }

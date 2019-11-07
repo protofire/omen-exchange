@@ -16,7 +16,7 @@ export const useQuestion = (
 
   const [question, setQuestion] = useState<string>('')
   const [resolution, setResolution] = useState<Maybe<Date>>(null)
-  const [arbitrator, setArbitrator] = useState<string>('')
+  const [arbitratorAddress, setArbitratorAddress] = useState<string>('')
 
   useEffect(() => {
     const fetchQuestion = async () => {
@@ -34,7 +34,7 @@ export const useQuestion = (
 
         setQuestion(question)
         setResolution(resolution)
-        setArbitrator(arbitratorAddress)
+        setArbitratorAddress(arbitratorAddress)
       } catch (error) {
         logger.error('There was an error fetching the question data:', error.message)
       }
@@ -43,5 +43,5 @@ export const useQuestion = (
     fetchQuestion()
   }, [marketMakerAddress, context, conditionalTokens, realitio])
 
-  return { question, resolution, arbitratorAddress: arbitrator }
+  return { question, resolution, arbitratorAddress }
 }
