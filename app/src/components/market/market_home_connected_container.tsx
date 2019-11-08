@@ -4,7 +4,7 @@ import { MarketHome } from './market_home'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useMarkets } from '../../hooks/useMarkets'
 
-const MarketHomeConnectedContainer = () => {
+const MarketHomeConnectedContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
 
   const { markets, status } = useMarkets(context)

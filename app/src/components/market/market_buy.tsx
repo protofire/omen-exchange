@@ -57,7 +57,7 @@ interface Props extends RouteComponentProps<any> {
   resolution: Maybe<Date>
 }
 
-const MarketBuyWrapper = (props: Props) => {
+const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const { marketMakerAddress, balance, collateral, conditionalTokens, question, resolution } = props

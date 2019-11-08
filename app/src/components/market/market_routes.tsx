@@ -18,7 +18,7 @@ interface Props {
   marketMakerAddress: string
 }
 
-const MarketValidateContractAddress = (props: Props) => {
+const MarketValidateContractAddress: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const { marketMakerAddress } = props
