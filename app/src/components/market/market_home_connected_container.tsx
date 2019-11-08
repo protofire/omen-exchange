@@ -9,7 +9,7 @@ const MarketHomeConnectedContainer: React.FC = () => {
 
   const { markets, status } = useMarkets(context)
 
-  return <MarketHome markets={markets} status={status} />
+  return <MarketHome markets={markets} status={status} context={context} />
 }
 
 export { MarketHomeConnectedContainer }
