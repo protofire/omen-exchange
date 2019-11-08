@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React from 'react'
 
 import { MarketFund } from './market_fund'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
@@ -10,10 +10,10 @@ interface Props {
   marketMakerAddress: string
 }
 
-const MarketFundContainer: FC<Props> = props => {
+const MarketFundContainer: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const [marketMakerAddress] = useState<string>(props.marketMakerAddress)
 
+  const { marketMakerAddress } = props
   const { question, resolution } = useQuestion(marketMakerAddress, context)
   const {
     totalPoolShares,
