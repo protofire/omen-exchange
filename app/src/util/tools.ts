@@ -199,3 +199,8 @@ export const isAddress = (address: string): boolean => {
 
 export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string =>
   Number(formatUnits(value, decimals)).toFixed(precision)
+
+export const isContract = async (provider: any, address: string): Promise<boolean> => {
+  const code = await provider.getCode(address)
+  return code && code !== '0x'
+}

@@ -2,16 +2,11 @@ import * as React from 'react'
 import { HashRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 
 import { Footer } from '../common/footer'
-import {
-  CreateMarketPage,
-  MarketDetailsPage,
-  MarketFundPage,
-  MarketBuyPage,
-  MarketSellPage,
-} from '../../pages'
+import { CreateMarketPage } from '../../pages'
 import { Header } from '../common/header'
 import { MainScroll } from '../common/main_scroll'
 import { MainWrapper } from '../common/main_wrapper'
+import { MarketRoutes } from '../market/market_routes'
 import { MarketHomePage } from '../../pages/market_home_page'
 
 const RedirectToHome = () => <Redirect to="/" />
@@ -25,10 +20,7 @@ export const Main: React.FC = () => {
           <Switch>
             <Route exact path="/" component={MarketHomePage} />
             <Route exact path="/create" component={CreateMarketPage} />
-            <Route exact path="/:address" component={MarketDetailsPage} />
-            <Route exact path="/:address/buy" component={MarketBuyPage} />
-            <Route exact path="/:address/sell" component={MarketSellPage} />
-            <Route exact path="/:address/fund" component={MarketFundPage} />
+            <Route path="/:address" component={MarketRoutes} />
             <Route component={RedirectToHome} />
           </Switch>
           <Footer />
