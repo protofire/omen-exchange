@@ -3,7 +3,6 @@ import { ethers } from 'ethers'
 import { INFURA_PROJECT_ID } from '../common/constants'
 
 export interface DisconnectedWeb3Context {
-  account: string
   library: any
   networkId: number
 }
@@ -22,12 +21,11 @@ export const useDisconnectedWeb3Context = () => {
 
 export const DisconnectedWeb3: React.FC<{ children: React.ReactNode }> = props => {
   const network = process.env.NODE_ENV === 'development' ? 'rinkeby' : 'homestead'
-  const account = ''
 
   const provider = new ethers.providers.InfuraProvider(network, INFURA_PROJECT_ID)
   const networkId = process.env.NODE_ENV === 'development' ? 4 : 1
 
-  const value = { account, library: provider, networkId }
+  const value = { library: provider, networkId }
 
   return (
     <DisconnectedWeb3Context.Provider value={value}>
