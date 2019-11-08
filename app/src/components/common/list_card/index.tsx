@@ -15,5 +15,9 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const ListCard: React.FC<Props> = (props: Props) => {
   const { children, ...restProps } = props
-  return <CardStyled {...restProps}>{children}</CardStyled>
+  return (
+    <CardStyled noPadding={true} {...restProps}>
+      {children}
+    </CardStyled>
+  )
 }

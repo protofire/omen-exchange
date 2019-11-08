@@ -4,6 +4,7 @@ const theme = {
     fontFamilyCode: `source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace`,
   },
   colors: {
+    activeListItemBackground: '#fafafa',
     primary: '#00be95',
     secondary: '#ff7848',
     tertiary: '#f5f5f5',
