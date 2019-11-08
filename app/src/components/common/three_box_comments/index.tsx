@@ -100,6 +100,7 @@ const ThreeBoxCustom = styled.div`
     }
     .dialogue_button_container {
       height: auto;
+
       .dialogue_button {
         ${ButtonCSS}
         width: 100%;
@@ -110,6 +111,7 @@ const ThreeBoxCustom = styled.div`
   footer {
     margin-bottom: 0;
     padding-top: 20px;
+
     .footer_text {
       color: #999;
       font-size: 12px;

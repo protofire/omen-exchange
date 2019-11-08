@@ -41,7 +41,7 @@ const theme = {
     xxxl: '1366px',
   },
   borders: {
-    borderColor: '#d9d9d9',
+    borderColor: '#d5d5d5',
     commonBorderRadius: '5px',
   },
   paddings: {
@@ -59,7 +59,18 @@ const theme = {
   },
   viewMarket: {
     maxWidth: '550px'
-  }
+  },
+  list: {
+    maxWidth: '620px'
+  },
+  dropdown: {
+    backgroundColor: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    boxShadow: '0 0 12px 0 rgba(0, 0, 0, 0.12)',
+    textColor: '#000',
+    lightTextColor: '#666',
+  },
 }
 
 export default theme

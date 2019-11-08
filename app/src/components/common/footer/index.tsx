@@ -6,7 +6,7 @@ import LogoImageGeco from './img/logo_geco.png'
 import { GIT_COMMIT } from '../../../common/constants'
 
 const FooterStyled = styled.footer`
-  margin-top: auto;
+  margin: auto 0 0 0;
   padding-top: 50px;
 `
 
@@ -18,12 +18,12 @@ const FooterCss = css`
 `
 
 const FooterGeco = styled.a`
-  ${FooterCss}
+  display: block;
+  margin: 0 20px 0 0;
 `
 
 const FooterProtofire = styled.a`
   ${FooterCss}
-  margin-top: 10px
 `
 
 const Text = styled.span`
@@ -43,8 +43,8 @@ const LogoProtofire = styled.img`
 `
 
 const LogoGeco = styled.img`
-  height: 60px;
-  margin: 0 10px;
+  display: block;
+  height: 45px;
 `
 
 export const Footer: React.FC = props => {
