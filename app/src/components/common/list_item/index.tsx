@@ -4,8 +4,9 @@ import { MarketAndQuestion, MarketStatus } from '../../../util/types'
 import { formatDate } from '../../../util/tools'
 import { CalendarIcon } from '../calendar_icon'
 import { ChevronRightIcon } from '../chevron_right_icon'
+import { NavLink } from 'react-router-dom'
 
-const ListItemWrapper = styled.div`
+const ListItemWrapper = styled(NavLink)`
   align-items: center;
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
   cursor: pointer;
@@ -116,9 +117,10 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const ListItem: React.FC<Props> = (props: Props) => {
-  const { data, ...restProps } = props
+  const { data } = props
+  console.log(data)
   return (
-    <ListItemWrapper {...restProps}>
+    <ListItemWrapper to={`${data.marketMakerAddress}`}>
       <Contents>
         <Title>{data.question}</Title>
         <Info>
