@@ -27,12 +27,10 @@ class ConditionalTokenService {
   provider: any
 
   constructor(address: string, provider: any, signerAddress: string) {
-    try {
+    if (signerAddress) {
       const signer: Wallet = provider.getSigner()
-
       this.contract = new ethers.Contract(address, conditionalTokensAbi, provider).connect(signer)
-    } catch (err) {
-      logger.log(`There was an error creating the contract`, err.message)
+    } else {
       this.contract = new ethers.Contract(address, conditionalTokensAbi, provider)
     }
     this.address = address

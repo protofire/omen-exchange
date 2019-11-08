@@ -28,7 +28,7 @@ const MarketHomePage = (props: any) => {
   const { active } = useWeb3Context()
   const connector = localStorage.getItem('CONNECTOR')
 
-  return active || (connector && (connector as keyof typeof connectors)) ? (
+  return active || (connector && connector in connectors) ? (
     <MarketHomeConnectedWrapper {...props} />
   ) : (
     <MarketHomeDisconnectedWrapper {...props} />

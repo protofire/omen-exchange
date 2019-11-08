@@ -10,11 +10,10 @@ interface Props {
   marketMakerAddress: string
 }
 
-const MarketViewContainer = (props: Props) => {
+const MarketViewContainer: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const { marketMakerAddress } = props
-
   const { question, resolution } = useQuestion(marketMakerAddress, context)
   const { marketMakerFunding, balance, winnerOutcome, status, collateral } = useMarketMakerData(
     marketMakerAddress,
