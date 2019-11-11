@@ -29,7 +29,9 @@ export const useMarkets = (
           const { conditionId } = market
           // Get question data
           const questionId = await conditionalTokens.getQuestionId(conditionId)
-          const { question, resolution, arbitratorAddress } = await realitio.getQuestion(questionId)
+          const { question, resolution, arbitratorAddress, category } = await realitio.getQuestion(
+            questionId,
+          )
           // Know if a market is open or resolved
           const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
           const marketStatus = isConditionResolved ? MarketStatus.Resolved : MarketStatus.Open
@@ -37,6 +39,7 @@ export const useMarkets = (
             ...market,
             question,
             resolution,
+            category,
             arbitratorAddress,
             marketStatus,
           }
