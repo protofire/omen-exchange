@@ -3,17 +3,14 @@ import { BigNumber } from 'ethers/utils'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { MarketMakerService } from '../services'
-import { getTokenFromAddress } from '../util/addresses'
+import { getArbitratorFromAddress, getTokenFromAddress } from '../util/addresses'
 import { useContracts } from './useContracts'
 import { getLogger } from '../util/logger'
-import { BalanceItem, OutcomeSlot, Status, WinnerOutcome, Token } from '../util/types'
+import { BalanceItem, OutcomeSlot, Status, WinnerOutcome, Token, Arbitrator } from '../util/types'
 
 const logger = getLogger('Market::useMarketMakerData')
 
-export const useMarketMakerData = (
-  marketMakerAddress: string,
-  context: ConnectedWeb3Context,
-): {
+interface MarketMakerData {
   totalPoolShares: BigNumber
   userPoolShares: BigNumber
   balance: BalanceItem[]
@@ -22,8 +19,17 @@ export const useMarketMakerData = (
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
   collateral: Maybe<Token>
-} => {
-  const { conditionalTokens } = useContracts(context)
+  question: string
+  category: string
+  resolution: Maybe<Date>
+  arbitrator: Maybe<Arbitrator>
+}
+
+export const useMarketMakerData = (
+  marketMakerAddress: string,
+  context: ConnectedWeb3Context,
+): MarketMakerData => {
+  const { conditionalTokens, realitio } = useContracts(context)
 
   const [totalPoolShares, setTotalPoolShares] = useState<BigNumber>(new BigNumber(0))
   const [userPoolShares, setUserPoolShares] = useState<BigNumber>(new BigNumber(0))
@@ -33,6 +39,10 @@ export const useMarketMakerData = (
   const [marketMakerFunding, setMarketMakerFunding] = useState<BigNumber>(new BigNumber(0))
   const [marketMakerUserFunding, setMarketMakerUserFunding] = useState<BigNumber>(new BigNumber(0))
   const [collateral, setCollateral] = useState<Maybe<Token>>(null)
+  const [question, setQuestion] = useState<string>('')
+  const [category, setCategory] = useState<string>('')
+  const [resolution, setResolution] = useState<Maybe<Date>>(null)
+  const [arbitrator, setArbitrator] = useState<Maybe<Arbitrator>>(null)
 
   useEffect(() => {
     const fetchMarketMakerData = async ({ enableStatus }: { enableStatus: boolean }) => {
@@ -45,6 +55,18 @@ export const useMarketMakerData = (
 
         const conditionId = await marketMaker.getConditionId()
         const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
+
+        const questionId = await conditionalTokens.getQuestionId(conditionId, provider)
+        const { question, resolution, arbitratorAddress, category } = await realitio.getQuestion(
+          questionId,
+          provider,
+        )
+
+        const arbitratorObject = getArbitratorFromAddress(context.networkId, arbitratorAddress)
+        setArbitrator(arbitratorObject)
+        setQuestion(question)
+        setResolution(resolution)
+        setCategory(category)
 
         const winnerOutcomeData = isConditionResolved
           ? await conditionalTokens.getWinnerOutcome(conditionId)
@@ -117,7 +139,7 @@ export const useMarketMakerData = (
     }, 2000)
 
     return () => clearInterval(intervalId)
-  }, [marketMakerAddress, context, conditionalTokens, winnerOutcome])
+  }, [marketMakerAddress, context, conditionalTokens, winnerOutcome, realitio])
 
   return {
     totalPoolShares,
@@ -128,5 +150,9 @@ export const useMarketMakerData = (
     marketMakerFunding,
     marketMakerUserFunding,
     collateral,
+    question,
+    resolution,
+    arbitrator,
+    category,
   }
 }

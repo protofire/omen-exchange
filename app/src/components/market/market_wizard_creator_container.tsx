@@ -5,7 +5,7 @@ import { getLogger } from '../../util/logger'
 import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import { ERC20Service, MarketMakerService } from '../../services'
-import { getContractAddress, getToken } from '../../util/addresses'
+import { getArbitrator, getContractAddress, getToken } from '../../util/addresses'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
 
@@ -31,18 +31,26 @@ const MarketWizardCreatorContainer: FC = () => {
 
       const {
         collateralId,
+        arbitratorId,
         question,
         resolution,
         funding,
         outcomeProbabilityOne,
         outcomeProbabilityTwo,
+        category,
       } = data
       const openingDateMoment = moment(resolution)
 
       const collateralToken = getToken(networkId, collateralId)
+      const arbitrator = getArbitrator(networkId, arbitratorId)
 
       setStatus(StatusMarketCreation.PostingQuestion)
-      const questionId = await realitio.askQuestion(question, openingDateMoment)
+      const questionId = await realitio.askQuestion(
+        question,
+        category,
+        arbitrator.address,
+        openingDateMoment,
+      )
       setQuestionId(questionId)
 
       setStatus(StatusMarketCreation.PrepareCondition)
