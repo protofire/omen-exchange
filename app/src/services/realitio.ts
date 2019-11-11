@@ -21,12 +21,12 @@ class RealitioService {
   provider: any
 
   constructor(address: string, provider: any, signerAddress: string) {
-    if( signerAddress ) {
-        const signer: Wallet = provider.getSigner()
+    if (signerAddress) {
+      const signer: Wallet = provider.getSigner()
 
-        this.contract = new ethers.Contract(address, realitioAbi, provider).connect(signer)
+      this.contract = new ethers.Contract(address, realitioAbi, provider).connect(signer)
     } else {
-        this.contract = new ethers.Contract(address, realitioAbi, provider)
+      this.contract = new ethers.Contract(address, realitioAbi, provider)
     }
 
     this.constantContract = new ethers.Contract(address, realitioCallAbi, provider)

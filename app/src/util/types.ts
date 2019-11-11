@@ -112,7 +112,7 @@ export enum MarketFilters {
 }
 
 export interface Arbitrator {
-    address: string
-    name: string
-    url: string
+  address: string
+  name: string
+  url: string
 }
