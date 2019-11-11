@@ -65,6 +65,7 @@ export enum WinnerOutcome {
 export interface Question {
   question: string
   resolution: Maybe<Date>
+  arbitratorAddress: string
 }
 
 export enum OutcomeTableValue {
@@ -108,4 +109,10 @@ export interface Log {
 export enum MarketFilters {
   AllMarkets = 'All Markets',
   MyMarkets = 'My Markets',
+}
+
+export interface Arbitrator {
+    address: string
+    name: string
+    url: string
 }

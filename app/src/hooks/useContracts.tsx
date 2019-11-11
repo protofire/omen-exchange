@@ -21,11 +21,11 @@ export const useContracts = (context: ConnectedWeb3Context | DisconnectedWeb3Con
   )
 
   const realitioAddress = getContractAddress(networkId, 'realitio')
-  const arbitratorAddress = getContractAddress(networkId, 'realitioArbitrator')
-  const realitio = useMemo(
-    () => new RealitioService(realitioAddress, library, account, arbitratorAddress),
-    [realitioAddress, library, account, arbitratorAddress],
-  )
+  const realitio = useMemo(() => new RealitioService(realitioAddress, library, account), [
+    realitioAddress,
+    library,
+    account,
+  ])
 
   return {
     conditionalTokens,

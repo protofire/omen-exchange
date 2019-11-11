@@ -18,22 +18,19 @@ class RealitioService {
   contract: Contract
   constantContract: Contract
   signerAddress: string
-  arbitratorAddress: string
   provider: any
 
-  constructor(address: string, provider: any, signerAddress: string, arbitratorAddress: string) {
-    try {
-      const signer: Wallet = provider.getSigner()
+  constructor(address: string, provider: any, signerAddress: string) {
+    if( signerAddress ) {
+        const signer: Wallet = provider.getSigner()
 
-      this.contract = new ethers.Contract(address, realitioAbi, provider).connect(signer)
-    } catch (err) {
-      logger.log(`There was an error creating the contract`, err.message)
-      this.contract = new ethers.Contract(address, realitioAbi, provider)
+        this.contract = new ethers.Contract(address, realitioAbi, provider).connect(signer)
+    } else {
+        this.contract = new ethers.Contract(address, realitioAbi, provider)
     }
 
     this.constantContract = new ethers.Contract(address, realitioCallAbi, provider)
     this.signerAddress = signerAddress
-    this.arbitratorAddress = arbitratorAddress
     this.provider = provider
   }
 
@@ -51,11 +48,12 @@ class RealitioService {
    */
   askQuestion = async (
     question: string,
+    arbitratorAddress: string,
     openingDateMoment: Moment,
     value = '0',
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
-    const args = [0, question, this.arbitratorAddress, '86400', openingTimestamp, 0]
+    const args = [0, question, arbitratorAddress, '86400', openingTimestamp, 0]
 
     const questionId = await this.constantContract.askQuestion(...args, {
       from: this.signerAddress,
@@ -91,6 +89,7 @@ class RealitioService {
     return {
       question: event.values.question,
       resolution: new Date(event.values.opening_ts * 1000),
+      arbitratorAddress: event.values.arbitrator,
     }
   }
 }

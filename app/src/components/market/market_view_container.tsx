@@ -3,7 +3,6 @@ import React from 'react'
 import { MarketView } from './market_view'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { FullLoading } from '../common/full_loading'
-import { useQuestion } from '../../hooks/useQuestion'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
 
 interface Props {
@@ -14,13 +13,19 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const { marketMakerAddress } = props
-  const { question, resolution } = useQuestion(marketMakerAddress, context)
-  const { marketMakerFunding, balance, winnerOutcome, status, collateral } = useMarketMakerData(
-    marketMakerAddress,
-    context,
-  )
 
-  if (!collateral) {
+  const {
+    marketMakerFunding,
+    balance,
+    winnerOutcome,
+    status,
+    collateral,
+    question,
+    resolution,
+    arbitrator,
+  } = useMarketMakerData(marketMakerAddress, context)
+
+  if (!collateral || !arbitrator) {
     return <FullLoading />
   }
 
@@ -29,11 +34,12 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
       balance={balance}
       funding={marketMakerFunding}
       marketMakerAddress={marketMakerAddress}
-      question={question || ''}
-      resolution={resolution}
       status={status}
       winnerOutcome={winnerOutcome}
       collateral={collateral}
+      question={question || ''}
+      resolution={resolution}
+      arbitrator={arbitrator}
     />
   )
 }
