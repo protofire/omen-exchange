@@ -77,9 +77,11 @@ class RealitioService {
   getQuestion = async (questionId: string): Promise<Question> => {
     const filter: any = this.contract.filters.LogNewQuestion(questionId)
 
-    filter.fromBlock = '0x1'
-
-    const logs = await this.provider.getLogs(filter)
+    const logs = await this.provider.getLogs({
+      fromBlock: 1,
+      toBlock: 'latest',
+      ...filter,
+    })
 
     if (logs.length === 0) {
       throw new Error(`No LogNewQuestion event found for questionId '${questionId}'`)

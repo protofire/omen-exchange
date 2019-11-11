@@ -67,6 +67,7 @@ class MarketMakerFactoryService {
       (log: Log): Market => {
         const parsedLog: LogDescription = interfaceMarketMakerFactory.parseLog(log)
         const { fixedProductMarketMaker, creator, collateralToken, conditionIds } = parsedLog.values
+
         return {
           marketMakerAddress: fixedProductMarketMaker,
           ownerAddress: creator,
