@@ -16,9 +16,19 @@ import { useMarketMakerData } from '../../../../hooks/useMarketMakerData'
 import { useQuestion } from '../../../../hooks/useQuestion'
 import { FullLoading } from '../../../common/full_loading'
 import { BalanceItem } from '../../../../util/types'
+import { NavLink } from 'react-router-dom'
 
 const TableStyled = styled(Table)`
   margin-bottom: 25px;
+`
+
+const NavLinkStyled = styled(NavLink)`
+  color: ${props => props.theme.colors.textColor};
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
 `
 
 const Grid = styled.div`
@@ -65,9 +75,10 @@ const SummaryMarketStep = (props: Props) => {
     <>
       <SectionTitle title="Conditional Exchange" subTitle="Your new market has been created!" />
       <CreateCard>
+        <SubsectionTitle>Market&apos;s URL</SubsectionTitle>
         <Paragraph>
-          This is the URL to access the market. <strong>Be careful and don’t lose it</strong>,
-          there’s currently no way to retrieve it if lost:
+          You can access your markets from the <NavLinkStyled to="/">Markets</NavLinkStyled>{' '}
+          section.
         </Paragraph>
         <Paragraph>
           <a target="_blank" rel="noopener noreferrer" href={`/#/${marketMakerAddress}`}>
