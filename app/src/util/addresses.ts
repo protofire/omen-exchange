@@ -126,6 +126,7 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     addresses: {
       [networkIds.MAINNET]: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       [networkIds.RINKEBY]: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
+      [networkIds.GANACHE]: '0x0000000000000000000000000000000000c1e305',
     },
   },
   realitio: {
@@ -134,6 +135,7 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     addresses: {
       [networkIds.MAINNET]: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
       [networkIds.RINKEBY]: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
+      [networkIds.GANACHE]: '0x000000000000000000000000000000003ea11710',
     },
   },
 }
