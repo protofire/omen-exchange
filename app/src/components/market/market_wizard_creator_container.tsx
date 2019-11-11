@@ -5,7 +5,7 @@ import { getLogger } from '../../util/logger'
 import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import { ERC20Service, MarketMakerService } from '../../services'
-import { getContractAddress, getToken } from '../../util/addresses'
+import { getArbitrator, getContractAddress, getToken } from '../../util/addresses'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
 
@@ -31,6 +31,7 @@ const MarketWizardCreatorContainer: FC = () => {
 
       const {
         collateralId,
+        arbitratorId,
         question,
         resolution,
         funding,
@@ -41,18 +42,15 @@ const MarketWizardCreatorContainer: FC = () => {
       const openingDateMoment = moment(resolution)
 
       const collateralToken = getToken(networkId, collateralId)
+      const arbitrator = getArbitrator(networkId, arbitratorId)
 
       setStatus(StatusMarketCreation.PostingQuestion)
-      const questionId = await realitio.askQuestion(question, category, openingDateMoment)
+      const questionId = await realitio.askQuestion(question, category, arbitrator.address, openingDateMoment)
       setQuestionId(questionId)
 
       setStatus(StatusMarketCreation.PrepareCondition)
 
-      const oracleAddress: string =
-        process.env.NODE_ENV === 'development'
-          ? user
-          : getContractAddress(networkId, 'realitioArbitrator')
-      const conditionId = await conditionalTokens.prepareCondition(questionId, oracleAddress)
+      const conditionId = await conditionalTokens.prepareCondition(questionId, arbitrator.address)
 
       // approve movement of collateral token to MarketMakerFactory
       setStatus(StatusMarketCreation.ApprovingCollateral)

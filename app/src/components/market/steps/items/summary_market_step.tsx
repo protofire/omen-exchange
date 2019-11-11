@@ -49,7 +49,7 @@ const SummaryMarketStep = (props: Props) => {
   const { marketMakerAddress } = props
 
   const { question, resolution, category } = useQuestion(marketMakerAddress, context)
-  const { marketMakerFunding, balance, collateral } = useMarketMakerData(
+  const { marketMakerFunding, balance, collateral, arbitrator } = useMarketMakerData(
     marketMakerAddress,
     context,
   )
@@ -57,7 +57,7 @@ const SummaryMarketStep = (props: Props) => {
   const resolutionDate = resolution && formatDate(resolution)
   const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`
 
-  if (!collateral) {
+  if (!collateral || !arbitrator) {
     return <FullLoading />
   }
 
@@ -83,19 +83,10 @@ const SummaryMarketStep = (props: Props) => {
           <TitleValue
             title={'Oracle'}
             value={[
-              <a href="https://realit.io/" key={1} rel="noopener noreferrer" target="_blank">
-                realit.io
+              <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
+                {arbitrator.name}
               </a>,
-              ' oracle and ',
-              <a
-                href="https://dxdao.daostack.io/"
-                key={2}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                dxDAO
-              </a>,
-              ' as final arbitrator.',
+              ' oracle as final arbitrator.',
             ]}
           />
           <TitleValue title={'Spread / Fee'} value={`1%`} />
