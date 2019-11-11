@@ -165,7 +165,7 @@ export const ThreeBoxComments = (props: Props) => {
         showCommentCount={10}
         spaceName={THREEBOX_SPACE_NAME}
         threadName={threadName}
-        useHovers={false}
+        useHovers={true}
       />
     </ThreeBoxCustom>
   )
