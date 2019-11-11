@@ -18,7 +18,7 @@ interface Props {
   collateral: Token
 }
 
-const MarketView = (props: Props) => {
+const MarketView: React.FC<Props> = (props: Props) => {
   const { question, resolution, winnerOutcome } = props
 
   const renderView = () => {

@@ -73,7 +73,7 @@ const ButtonLinkStyled = styled(ButtonLink)`
 
 const logger = getLogger('Market::Fund')
 
-const MarketFundWrapper = (props: Props) => {
+const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   const {
     question,
     resolution,

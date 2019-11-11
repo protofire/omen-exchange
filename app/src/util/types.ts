@@ -104,3 +104,8 @@ export interface Log {
   topics: Array<string>
   data: string
 }
+
+export enum MarketFilters {
+  AllMarkets = 'All Markets',
+  MyMarkets = 'My Markets',
+}
