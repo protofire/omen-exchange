@@ -19,6 +19,7 @@ export interface MarketData {
   question: string
   category: string
   resolution: Date | null
+  arbitratorId: KnownArbitrator
   spread: string
   funding: BigNumber
   outcomeValueOne: string
@@ -47,6 +48,7 @@ export class MarketWizardCreator extends Component<Props, State> {
       question: '',
       category: '',
       resolution: null,
+      arbitratorId: 'realitio',
       spread: '1',
       funding: new BigNumber('0'),
       outcomeValueOne: 'Yes',
@@ -116,6 +118,7 @@ export class MarketWizardCreator extends Component<Props, State> {
       question,
       category,
       resolution,
+      arbitratorId,
       spread,
       funding,
       outcomeValueOne,
@@ -131,7 +134,7 @@ export class MarketWizardCreator extends Component<Props, State> {
             handleChange={this.handleChange}
             handleChangeDate={this.handleChangeDate}
             next={() => this.next()}
-            values={{ question, category, resolution }}
+            values={{ question, category, resolution, arbitratorId }}
           />
         )
       case 2:
@@ -175,7 +178,7 @@ export class MarketWizardCreator extends Component<Props, State> {
             handleChange={this.handleChange}
             handleChangeDate={this.handleChangeDate}
             next={() => this.next()}
-            values={{ question, category, resolution }}
+            values={{ question, category, resolution, arbitratorId }}
           />
         )
     }

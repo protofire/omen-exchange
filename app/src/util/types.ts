@@ -65,6 +65,7 @@ export enum WinnerOutcome {
 export interface Question {
   question: string
   resolution: Maybe<Date>
+  arbitratorAddress: string
 }
 
 export enum OutcomeTableValue {
@@ -80,4 +81,10 @@ export interface Token {
   address: string
   decimals: number
   symbol: string
+}
+
+export interface Arbitrator {
+  address: string
+  name: string
+  url: string
 }
