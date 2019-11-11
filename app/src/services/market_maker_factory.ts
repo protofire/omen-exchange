@@ -53,9 +53,9 @@ class MarketMakerFactoryService {
     const filter: any = this.contract.filters.FixedProductMarketMakerCreation()
 
     const logs = await provider.getLogs({
+      ...filter,
       fromBlock: 1,
       toBlock: 'latest',
-      ...filter,
     })
 
     if (logs.length === 0) {

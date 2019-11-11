@@ -79,9 +79,9 @@ class ConditionalTokenService {
     const filter: any = this.contract.filters.ConditionPreparation(conditionId)
 
     const logs = await this.provider.getLogs({
+      ...filter,
       fromBlock: 1,
       toBlock: 'latest',
-      ...filter,
     })
 
     if (logs.length === 0) {
