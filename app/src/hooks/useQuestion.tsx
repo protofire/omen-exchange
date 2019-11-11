@@ -28,7 +28,9 @@ export const useQuestion = (
 
         const conditionId = await marketMaker.getConditionId()
         const questionId = await conditionalTokens.getQuestionId(conditionId)
-        const { question, resolution, category, arbitratorAddress } = await realitio.getQuestion(questionId)
+        const { question, resolution, category, arbitratorAddress } = await realitio.getQuestion(
+          questionId,
+        )
 
         setQuestion(question)
         setResolution(resolution)

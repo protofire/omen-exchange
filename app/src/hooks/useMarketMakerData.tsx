@@ -57,7 +57,9 @@ export const useMarketMakerData = (
         const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
 
         const questionId = await conditionalTokens.getQuestionId(conditionId)
-        const { question, resolution, arbitratorAddress, category } = await realitio.getQuestion(questionId)
+        const { question, resolution, arbitratorAddress, category } = await realitio.getQuestion(
+          questionId,
+        )
 
         const arbitratorObject = getArbitratorFromAddress(context.networkId, arbitratorAddress)
         setArbitrator(arbitratorObject)
