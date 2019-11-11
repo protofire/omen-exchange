@@ -25,16 +25,12 @@ interface Props {
 export const MarketHome: React.FC<Props> = (props: Props) => {
   const { status, markets, context } = props
   const options = [MarketFilters.AllMarkets, MarketFilters.MyMarkets]
-  const defaultOption = options[0]
 
   const [marketsFiltered, setMarketsFiltered] = useState<MarketAndQuestion[]>([])
+  const [currentFilter, setCurrentFilter] = useState<MarketFilters>(MarketFilters.AllMarkets)
 
   useEffect(() => {
-    setMarketsFiltered(markets)
-  }, [markets])
-
-  const filterMarkets = (event: { name: string; value: string }) => {
-    if (event.value === MarketFilters.MyMarkets) {
+    if (currentFilter === MarketFilters.MyMarkets) {
       setMarketsFiltered(
         markets.filter(
           (market: MarketAndQuestion) =>
@@ -45,13 +41,17 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     } else {
       setMarketsFiltered(markets)
     }
-  }
+  }, [currentFilter, context, markets])
 
   return (
     <>
       <SectionTitle title={'MARKETS'} />
       {'account' in context && (
-        <FilterStyled defaultOption={defaultOption} options={options} onChange={filterMarkets} />
+        <FilterStyled
+          defaultOption={currentFilter}
+          options={options}
+          onChange={(event: { value: MarketFilters }) => setCurrentFilter(event.value)}
+        />
       )}
       <ListCard>
         {marketsFiltered.map((item: MarketAndQuestion, index: number) => {
