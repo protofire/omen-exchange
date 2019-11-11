@@ -75,7 +75,7 @@ const SummaryMarketStep = (props: Props) => {
     <>
       <SectionTitle title="Conditional Exchange" subTitle="Your new market has been created!" />
       <CreateCard>
-        <SubsectionTitle>Market's URL</SubsectionTitle>
+        <SubsectionTitle>Market&apos;s URL</SubsectionTitle>
         <Paragraph>
           You can access your markets from the <NavLinkStyled to="/">Markets</NavLinkStyled>{' '}
           section.
