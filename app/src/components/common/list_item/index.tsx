@@ -118,7 +118,6 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const ListItem: React.FC<Props> = (props: Props) => {
   const { data } = props
-  console.log(data)
   return (
     <ListItemWrapper to={`${data.marketMakerAddress}`}>
       <Contents>
