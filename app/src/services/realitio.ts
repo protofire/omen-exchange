@@ -3,6 +3,7 @@ import { Moment } from 'moment'
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 
+import { REALITIO_TIMEOUT } from '../common/constants'
 import { getLogger } from '../util/logger'
 import { Question, QuestionLog } from '../util/types'
 
@@ -52,7 +53,7 @@ class RealitioService {
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
     const questionText = RealitioQuestionLib.encodeText('bool', question, null, category)
-    const args = [0, questionText, arbitratorAddress, '86400', openingTimestamp, 0]
+    const args = [0, questionText, arbitratorAddress, REALITIO_TIMEOUT, openingTimestamp, 0]
 
     const questionId = await this.constantContract.askQuestion(...args, {
       from: this.signerAddress,

@@ -55,7 +55,8 @@ const MarketWizardCreatorContainer: FC = () => {
 
       setStatus(StatusMarketCreation.PrepareCondition)
 
-      const conditionId = await conditionalTokens.prepareCondition(questionId, arbitrator.address)
+      const oracleAddress = getContractAddress(networkId, 'oracle')
+      const conditionId = await conditionalTokens.prepareCondition(questionId, oracleAddress)
 
       // approve movement of collateral token to MarketMakerFactory
       setStatus(StatusMarketCreation.ApprovingCollateral)
