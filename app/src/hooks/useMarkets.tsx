@@ -25,7 +25,7 @@ export const useMarkets = (
         setStatus(Status.Loading)
         const provider = context.library
 
-        const getQuestionData = async (market: Market) => {
+        const getQuestionData = async (market: Market): Promise<MarketAndQuestion> => {
           const { conditionId } = market
           // Get question data
           const questionId = await conditionalTokens.getQuestionId(conditionId)
@@ -50,7 +50,16 @@ export const useMarkets = (
           markets.map((market: Market) => getQuestionData(market)),
         )
 
-        setMarkets(marketsWithRealitioData)
+        const marketsOrdered = marketsWithRealitioData.sort(
+          (marketA: MarketAndQuestion, marketB: MarketAndQuestion) => {
+            if (marketA.resolution && marketB.resolution) {
+              return marketB.resolution.getTime() - marketA.resolution.getTime()
+            }
+            return 0
+          },
+        )
+
+        setMarkets(marketsOrdered)
         setStatus(Status.Done)
       } catch (error) {
         logger.error('There was an error fetching the markets data:', error.message)
