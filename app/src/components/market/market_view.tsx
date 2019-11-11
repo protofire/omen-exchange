@@ -15,6 +15,7 @@ interface Props {
   winnerOutcome: Maybe<WinnerOutcome>
   collateral: Token
   question: string
+  category: string
   resolution: Maybe<Date>
   arbitrator: Arbitrator
 }

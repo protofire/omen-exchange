@@ -66,6 +66,7 @@ export interface Question {
   question: string
   resolution: Maybe<Date>
   arbitratorAddress: string
+  category: string
 }
 
 export enum OutcomeTableValue {
@@ -81,6 +82,13 @@ export interface Token {
   address: string
   decimals: number
   symbol: string
+}
+
+export interface QuestionLog {
+  category: string
+  lang: string
+  title: string
+  type: string
 }
 
 export interface Arbitrator {

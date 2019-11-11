@@ -23,6 +23,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
     question,
     resolution,
     arbitrator,
+    category,
   } = useMarketMakerData(marketMakerAddress, context)
 
   if (!collateral || !arbitrator) {
@@ -38,6 +39,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
       winnerOutcome={winnerOutcome}
       collateral={collateral}
       question={question || ''}
+      category={category || ''}
       resolution={resolution}
       arbitrator={arbitrator}
     />

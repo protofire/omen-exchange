@@ -19,6 +19,7 @@ interface Props extends RouteComponentProps<{}> {
   collateral: Token
   arbitrator: Arbitrator
   question: string
+  category: string
   status: Status
   theme?: any
   marketMakerAddress: string
@@ -51,7 +52,7 @@ const Grid = styled.div`
 `
 
 const ViewWrapper = (props: Props) => {
-  const { balance, collateral, status, theme, marketMakerAddress, arbitrator } = props
+  const { balance, collateral, status, theme, marketMakerAddress, arbitrator, category } = props
 
   const userHasShares = balance.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -103,7 +104,7 @@ const ViewWrapper = (props: Props) => {
       <>
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
-          <TitleValue title={'Category'} value={'TODO: Add category'} />
+          <TitleValue title={'Category'} value={category} />
           <TitleValue
             title={'Oracle'}
             value={[
