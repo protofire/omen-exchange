@@ -30,11 +30,9 @@ const addresses: { [networkId: number]: KnownContracts } = {
   },
   [networkIds.RINKEBY]: {
     realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
-    // realitioArbitrator: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
-    // using a custom address as arbitratorId for testing
     marketMakerFactory: '0xF248C1fe91eC1a5DD78bF26EB43489cDc6aAd1dD',
     conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
-    oracle: '0xAFfcEa835Bc0Dc6557Cae804B7ea859F53062Da7',
+    oracle: '0xa5C8Cea58D79dd3094281eac1048a937beF6C84C',
   },
   [networkIds.GANACHE]: {
     realitio: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
