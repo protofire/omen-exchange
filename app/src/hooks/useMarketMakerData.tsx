@@ -20,6 +20,7 @@ interface MarketMakerData {
   marketMakerUserFunding: BigNumber
   collateral: Maybe<Token>
   question: string
+  category: string
   resolution: Maybe<Date>
   arbitrator: Maybe<Arbitrator>
 }
@@ -39,6 +40,7 @@ export const useMarketMakerData = (
   const [marketMakerUserFunding, setMarketMakerUserFunding] = useState<BigNumber>(new BigNumber(0))
   const [collateral, setCollateral] = useState<Maybe<Token>>(null)
   const [question, setQuestion] = useState<string>('')
+  const [category, setCategory] = useState<string>('')
   const [resolution, setResolution] = useState<Maybe<Date>>(null)
   const [arbitrator, setArbitrator] = useState<Maybe<Arbitrator>>(null)
 
@@ -55,7 +57,7 @@ export const useMarketMakerData = (
         const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
 
         const questionId = await conditionalTokens.getQuestionId(conditionId, provider)
-        const { question, resolution, arbitratorAddress } = await realitio.getQuestion(
+        const { question, resolution, arbitratorAddress, category } = await realitio.getQuestion(
           questionId,
           provider,
         )
@@ -64,6 +66,7 @@ export const useMarketMakerData = (
         setArbitrator(arbitratorObject)
         setQuestion(question)
         setResolution(resolution)
+        setCategory(category)
 
         const winnerOutcomeData = isConditionResolved
           ? await conditionalTokens.getWinnerOutcome(conditionId)
@@ -150,5 +153,6 @@ export const useMarketMakerData = (
     question,
     resolution,
     arbitrator,
+    category,
   }
 }
