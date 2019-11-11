@@ -45,7 +45,12 @@ const MarketWizardCreatorContainer: FC = () => {
       const arbitrator = getArbitrator(networkId, arbitratorId)
 
       setStatus(StatusMarketCreation.PostingQuestion)
-      const questionId = await realitio.askQuestion(question, category, arbitrator.address, openingDateMoment)
+      const questionId = await realitio.askQuestion(
+        question,
+        category,
+        arbitrator.address,
+        openingDateMoment,
+      )
       setQuestionId(questionId)
 
       setStatus(StatusMarketCreation.PrepareCondition)

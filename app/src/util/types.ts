@@ -85,10 +85,10 @@ export interface Token {
 }
 
 export interface QuestionLog {
-    category: string
-    lang: string
-    title: string
-    type: string
+  category: string
+  lang: string
+  title: string
+  type: string
 }
 
 export interface Arbitrator {
