@@ -92,7 +92,7 @@ const SummaryMarketStep = (props: Props) => {
           <TitleValue title={'Category'} value={category} />
           <TitleValue title={'Resolution date'} value={resolutionDate} />
           <TitleValue
-            title={'Oracle'}
+            title={'Arbitrator'}
             value={[
               <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
                 {arbitrator.name}
