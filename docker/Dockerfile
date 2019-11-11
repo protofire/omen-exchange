@@ -22,6 +22,11 @@ RUN git clone https://github.com/mariano-aguero/conditional-tokens-market-makers
   git checkout a9f7b1b96ea082581dbd50e03f4299f0d6a05695 && \
   npm install
 
+RUN git clone https://github.com/fvictorio/realitio-gnosis-proxy && \
+  cd realitio-gnosis-proxy && \
+  git checkout 4e7631b156ccdd972c8715802fa23b85b1c0ef4a && \
+  yarn
+
 # deploy contracts in ganache
 COPY prepare_db.sh ERC20.bin ./
 RUN bash prepare_db.sh

@@ -66,6 +66,7 @@ export interface Question {
   question: string
   resolution: Maybe<Date>
   arbitratorAddress: string
+  category: string
 }
 
 export enum OutcomeTableValue {
@@ -83,32 +84,40 @@ export interface Token {
   symbol: string
 }
 
+export interface QuestionLog {
+  category: string
+  lang: string
+  title: string
+  type: string
+}
+
+
 export interface Market {
-  marketMakerAddress: string
-  ownerAddress: string
-  collateralTokenAddress: string
-  conditionId: string
+    marketMakerAddress: string
+    ownerAddress: string
+    collateralTokenAddress: string
+    conditionId: string
 }
 
 export enum MarketStatus {
-  Open = 'Open',
-  Resolved = 'Resolved',
+    Open = 'Open',
+    Resolved = 'Resolved',
 }
 
 export interface MarketValueStatus {
-  marketStatus: MarketStatus
+    marketStatus: MarketStatus
 }
 
 export type MarketAndQuestion = Market & MarketValueStatus & Question
 
 export interface Log {
-  topics: Array<string>
-  data: string
+    topics: Array<string>
+    data: string
 }
 
 export enum MarketFilters {
-  AllMarkets = 'All Markets',
-  MyMarkets = 'My Markets',
+    AllMarkets = 'All Markets',
+    MyMarkets = 'My Markets',
 }
 
 export interface Arbitrator {

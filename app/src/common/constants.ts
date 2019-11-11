@@ -8,4 +8,5 @@ export const THREEBOX_SPACE_NAME: string =
   process.env.REACT_APP_THREEBOX_SPACE_NAME || 'conditional_exchange'
 export const GIT_COMMIT: string = process.env.COMMIT_REF || ''
 export const INFURA_PROJECT_ID: string =
-  process.env.REACT_APP_INFURA_PROJECT_ID || '7e977d73f2f143ce84ea5ff54f1601fd'
+    process.env.REACT_APP_INFURA_PROJECT_ID || '7e977d73f2f143ce84ea5ff54f1601fd'
+export const REALITIO_TIMEOUT = process.env.REACT_APP_REALITIO_TIMEOUT || '86400'

@@ -30,6 +30,16 @@ const OracleInfo = styled(Well)`
   text-align: center;
 `
 
+const FormRowResolutionDate = styled(FormRow)`
+  position: relative;
+  z-index: 15;
+`
+
+const FormRowOracle = styled(FormRow)`
+  position: relative;
+  z-index: 5;
+`
+
 class AskQuestionStep extends Component<Props, State> {
   public state: State = {
     errors: [],
@@ -87,7 +97,7 @@ class AskQuestionStep extends Component<Props, State> {
           title={'Category'}
           tooltipText={'You can choose among several available categories.'}
         />
-        <FormRow
+        <FormRowResolutionDate
           formField={
             <DateField
               minDate={new Date()}
@@ -99,24 +109,22 @@ class AskQuestionStep extends Component<Props, State> {
           title={'Resolution Date'}
           tooltipText={'Indicate when the market will close.'}
         />
-        <FormRow
+        <FormRowOracle
           formField={
-            <>
-              <Arbitrators name="arbitratorId" value={arbitratorId} onChange={handleChange} />
-              <OracleInfo>
-                The market will be resolved using{' '}
-                <a href={arbitrator.url} rel="noopener noreferrer" target="_blank">
-                  {arbitrator.name}
-                </a>{' '}
-                as final arbitrator.
-              </OracleInfo>
-            </>
+            <Arbitrators name="arbitratorId" value={arbitratorId} onChange={handleChange} />
           }
           title={'Oracle'}
           tooltipText={
             'You can choose among several available Oracles. The Oracle will resolve the market once the Resolution Date is reached.'
           }
         />
+        <OracleInfo>
+          The market will be resolved using{' '}
+          <a href={arbitrator.url} rel="noopener noreferrer" target="_blank">
+            {arbitrator.name}
+          </a>{' '}
+          as final arbitrator.
+        </OracleInfo>
         <ButtonContainer>
           <Button disabled={!question || !category || !resolution} onClick={this.validate}>
             Next
