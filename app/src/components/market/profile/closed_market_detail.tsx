@@ -128,7 +128,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
           <TitleValue title="Category" value="Politics" />
-          <TitleValue title="Oracle" value="realit.io and dxDAO" />
+          <TitleValue title="Arbitrator" value="realit.io and dxDAO" />
           <TitleValue title="Resolution Date" value={resolutionFormat} />
           <TitleValue title="Fee" value="1%" />
           <TitleValue title="Funding" value={fundingFormat} />

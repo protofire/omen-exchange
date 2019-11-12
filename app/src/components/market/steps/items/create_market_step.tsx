@@ -4,7 +4,7 @@ import { BigNumber } from 'ethers/utils'
 import { Button } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
-import { CreateCard } from '../../create_card'
+import { CreateCard } from '../../../common/create_card'
 import { StatusMarketCreation } from '../../../../util/types'
 import { Paragraph } from '../../../common/paragraph'
 import { FullLoading } from '../../../common/full_loading'
@@ -102,7 +102,7 @@ class CreateMarketStep extends Component<Props> {
           <TitleValue title={'Category'} value={category} />
           <TitleValue title={'Resolution date'} value={resolutionDate} />
           <TitleValue
-            title={'Oracle'}
+            title={'Arbitrator'}
             value={[
               <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
                 {arbitrator.name}

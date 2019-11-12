@@ -1,7 +1,6 @@
 import React, { ChangeEvent, Component } from 'react'
 import styled from 'styled-components'
-
-import { CreateCard } from '../../create_card'
+import { CreateCard } from '../../../common/create_card'
 import { Button, Textfield, Categories } from '../../../common/index'
 import { FormRow } from '../../../common/form_row'
 import { DateField } from '../../../common/date_field'
@@ -114,9 +113,9 @@ class AskQuestionStep extends Component<Props, State> {
           formField={
             <Arbitrators name="arbitratorId" value={arbitratorId} onChange={handleChange} />
           }
-          title={'Oracle'}
+          title={'Arbitrator'}
           tooltipText={
-            'You can choose among several available Oracles. The Oracle will resolve the market once the Resolution Date is reached.'
+            'You can choose among several available Arbitrators. The Arbitrator will resolve the market once the Resolution Date is reached.'
           }
         />
         <OracleInfo>

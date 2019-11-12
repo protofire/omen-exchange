@@ -24,9 +24,14 @@ class RealitioService {
   provider: any
 
   constructor(address: string, provider: any, signerAddress: string) {
-    const signer: Wallet = provider.getSigner()
+    if (signerAddress) {
+      const signer: Wallet = provider.getSigner()
 
-    this.contract = new ethers.Contract(address, realitioAbi, provider).connect(signer)
+      this.contract = new ethers.Contract(address, realitioAbi, provider).connect(signer)
+    } else {
+      this.contract = new ethers.Contract(address, realitioAbi, provider)
+    }
+
     this.constantContract = new ethers.Contract(address, realitioCallAbi, provider)
     this.signerAddress = signerAddress
     this.provider = provider
@@ -69,12 +74,14 @@ class RealitioService {
     return questionId
   }
 
-  getQuestion = async (questionId: string, provider: any): Promise<Question> => {
+  getQuestion = async (questionId: string): Promise<Question> => {
     const filter: any = this.contract.filters.LogNewQuestion(questionId)
 
-    filter.fromBlock = '0x1'
-
-    const logs = await provider.getLogs(filter)
+    const logs = await this.provider.getLogs({
+      ...filter,
+      fromBlock: 1,
+      toBlock: 'latest',
+    })
 
     if (logs.length === 0) {
       throw new Error(`No LogNewQuestion event found for questionId '${questionId}'`)

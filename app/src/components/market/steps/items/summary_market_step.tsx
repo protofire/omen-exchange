@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { CreateCard } from '../../create_card'
+import { CreateCard } from '../../../common/create_card'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { Paragraph } from '../../../common/paragraph'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
@@ -16,9 +16,19 @@ import { useMarketMakerData } from '../../../../hooks/useMarketMakerData'
 import { useQuestion } from '../../../../hooks/useQuestion'
 import { FullLoading } from '../../../common/full_loading'
 import { BalanceItem } from '../../../../util/types'
+import { NavLink } from 'react-router-dom'
 
 const TableStyled = styled(Table)`
   margin-bottom: 25px;
+`
+
+const NavLinkStyled = styled(NavLink)`
+  color: ${props => props.theme.colors.textColor};
+  text-decoration: underline;
+
+  &:hover {
+    text-decoration: none;
+  }
 `
 
 const Grid = styled.div`
@@ -65,9 +75,10 @@ const SummaryMarketStep = (props: Props) => {
     <>
       <SectionTitle title="Conditional Exchange" subTitle="Your new market has been created!" />
       <CreateCard>
+        <SubsectionTitle>Market&apos;s URL</SubsectionTitle>
         <Paragraph>
-          This is the URL to access the market. <strong>Be careful and don’t lose it</strong>,
-          there’s currently no way to retrieve it if lost:
+          You can access your markets from the <NavLinkStyled to="/">Markets</NavLinkStyled>{' '}
+          section.
         </Paragraph>
         <Paragraph>
           <a target="_blank" rel="noopener noreferrer" href={`/#/${marketMakerAddress}`}>
@@ -81,7 +92,7 @@ const SummaryMarketStep = (props: Props) => {
           <TitleValue title={'Category'} value={category} />
           <TitleValue title={'Resolution date'} value={resolutionDate} />
           <TitleValue
-            title={'Oracle'}
+            title={'Arbitrator'}
             value={[
               <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
                 {arbitrator.name}

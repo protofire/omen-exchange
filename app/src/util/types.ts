@@ -91,6 +91,34 @@ export interface QuestionLog {
   type: string
 }
 
+export interface Market {
+  marketMakerAddress: string
+  ownerAddress: string
+  collateralTokenAddress: string
+  conditionId: string
+}
+
+export enum MarketStatus {
+  Open = 'Open',
+  Resolved = 'Resolved',
+}
+
+export interface MarketValueStatus {
+  marketStatus: MarketStatus
+}
+
+export type MarketAndQuestion = Market & MarketValueStatus & Question
+
+export interface Log {
+  topics: Array<string>
+  data: string
+}
+
+export enum MarketFilters {
+  AllMarkets = 'All Markets',
+  MyMarkets = 'My Markets',
+}
+
 export interface Arbitrator {
   address: string
   name: string

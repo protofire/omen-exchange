@@ -31,6 +31,7 @@
     "react-copy-to-clipboard": "^5.0.1",
     "react-datepicker": "^2.9.6",
     "react-dom": "^16.9.0",
+    "react-dropdown": "^1.6.4",
     "react-router": "5.0.1",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.1.2",

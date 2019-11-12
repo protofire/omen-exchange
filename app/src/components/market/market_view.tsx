@@ -20,7 +20,7 @@ interface Props {
   arbitrator: Arbitrator
 }
 
-const MarketView = (props: Props) => {
+const MarketView: React.FC<Props> = (props: Props) => {
   const { question, resolution, winnerOutcome } = props
 
   const renderView = () => {

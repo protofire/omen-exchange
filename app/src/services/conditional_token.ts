@@ -27,10 +27,12 @@ class ConditionalTokenService {
   provider: any
 
   constructor(address: string, provider: any, signerAddress: string) {
-    const signer: Wallet = provider.getSigner()
-
-    this.contract = new ethers.Contract(address, conditionalTokensAbi, provider).connect(signer)
-
+    if (signerAddress) {
+      const signer: Wallet = provider.getSigner()
+      this.contract = new ethers.Contract(address, conditionalTokensAbi, provider).connect(signer)
+    } else {
+      this.contract = new ethers.Contract(address, conditionalTokensAbi, provider)
+    }
     this.address = address
     this.signerAddress = signerAddress
     this.provider = provider
@@ -73,12 +75,14 @@ class ConditionalTokenService {
     return this.contract.balanceOf(ownerAddress, positionId)
   }
 
-  getQuestionId = async (conditionId: string, provider: any): Promise<string> => {
+  getQuestionId = async (conditionId: string): Promise<string> => {
     const filter: any = this.contract.filters.ConditionPreparation(conditionId)
 
-    filter.fromBlock = '0x1'
-
-    const logs = await provider.getLogs(filter)
+    const logs = await this.provider.getLogs({
+      ...filter,
+      fromBlock: 1,
+      toBlock: 'latest',
+    })
 
     if (logs.length === 0) {
       throw new Error(`No ConditionPreparation event found for conditionId '${conditionId}'`)
