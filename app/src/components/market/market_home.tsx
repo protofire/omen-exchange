@@ -50,7 +50,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <FilterStyled
           defaultOption={currentFilter}
           options={options}
-          onChange={(event: { value: MarketFilters }) => setCurrentFilter(value)}
+          onChange={({ value }: { value: MarketFilters }) => setCurrentFilter(value)}
         />
       )}
       <ListCard>
