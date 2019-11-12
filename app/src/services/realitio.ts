@@ -98,9 +98,8 @@ class RealitioService {
       event.values.question,
     )
 
-    const category =
-      questionLog.category && questionLog.category === 'undefined' ? '' : questionLog.category
-    const question = questionLog.title && questionLog.title === 'undefined' ? '' : questionLog.title
+    const category = questionLog.category === 'undefined' ? '' : questionLog.category
+    const question = questionLog.title === 'undefined' ? '' : questionLog.title
 
     return {
       question,
