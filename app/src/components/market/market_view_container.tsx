@@ -26,7 +26,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
     category,
   } = useMarketMakerData(marketMakerAddress, context)
 
-  if (!collateral || !arbitrator) {
+  if (!collateral) {
     return <FullLoading />
   }
 
