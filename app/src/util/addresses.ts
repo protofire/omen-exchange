@@ -157,7 +157,7 @@ export const getArbitrator = (networkId: number, arbitratorId: KnownArbitrator):
   }
 }
 
-export const getArbitratorFromAddress = (networkId: number, address: string): Arbitrator => {
+export const getArbitratorFromAddress = (networkId: number, address: string): Maybe<Arbitrator> => {
   for (const arbitrator of Object.values(knownArbitrators)) {
     const arbitratorAddress = arbitrator.addresses[networkId]
 
@@ -175,5 +175,5 @@ export const getArbitratorFromAddress = (networkId: number, address: string): Ar
     }
   }
 
-  throw new Error(`Couldn't find arbitrator with address '${address}' in network '${networkId}'`)
+  return null
 }

@@ -17,7 +17,7 @@ interface Props {
   question: string
   category: string
   resolution: Maybe<Date>
-  arbitrator: Arbitrator
+  arbitrator: Maybe<Arbitrator>
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {

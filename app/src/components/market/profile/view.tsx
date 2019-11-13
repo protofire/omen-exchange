@@ -17,7 +17,7 @@ import { TitleValue } from '../../common/title_value'
 interface Props extends RouteComponentProps<{}> {
   balance: BalanceItem[]
   collateral: Token
-  arbitrator: Arbitrator
+  arbitrator: Maybe<Arbitrator>
   question: string
   category: string
   status: Status
@@ -104,25 +104,29 @@ const ViewWrapper = (props: Props) => {
       <>
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
-          <TitleValue title={'Category'} value={category} />
-          <TitleValue
-            title={'Arbitrator'}
-            value={[
-              <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
-                {arbitrator.name}
-              </a>,
-              ' oracle as final arbitrator.',
-            ]}
-          />
+          {category && <TitleValue title={'Category'} value={category} />}
+          {arbitrator && (
+            <TitleValue
+              title={'Arbitrator'}
+              value={[
+                <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
+                  {arbitrator.name}
+                </a>,
+                ' oracle as final arbitrator.',
+              ]}
+            />
+          )}
         </Grid>
       </>
     )
   }
 
+  const marketHasDetails = category || arbitrator
+
   return (
     <>
       <ViewCard>
-        {details()}
+        {marketHasDetails && details()}
         {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>
