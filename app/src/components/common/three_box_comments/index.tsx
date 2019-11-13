@@ -140,21 +140,27 @@ export const ThreeBoxComments = (props: Props) => {
   const [currentUserAddress, setCurrentUserAddress] = useState<string>(context.account)
 
   useEffect(() => {
+    let isSubscribed = true
+
     const handle3boxLogin = async () => {
       const { account, library } = context
       logger.log(`Open three box with account ${account}`)
 
       const newBox = await Box.openBox(account, library._web3Provider)
       await newBox.openSpace(THREEBOX_SPACE_NAME)
-      setCurrentUserAddress(account)
+      if (isSubscribed) setCurrentUserAddress(account)
 
       newBox.onSyncDone(() => {
-        setBox(newBox)
+        if (isSubscribed) setBox(newBox)
         logger.log(`Three box sync with account ${account}`)
       })
     }
 
     handle3boxLogin()
+
+    return () => {
+      isSubscribed = false
+    }
   }, [context])
 
   return (

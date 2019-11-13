@@ -20,6 +20,7 @@ export const useQuestion = (
   const [category, setCategory] = useState<string>('')
 
   useEffect(() => {
+    let isSubscribed = true
     const fetchQuestion = async () => {
       try {
         const provider = context.library
@@ -32,16 +33,21 @@ export const useQuestion = (
           questionId,
         )
 
-        setQuestion(question)
-        setResolution(resolution)
-        setArbitratorAddress(arbitratorAddress)
-        setCategory(category)
+        if (isSubscribed) {
+          setQuestion(question)
+          setResolution(resolution)
+          setArbitratorAddress(arbitratorAddress)
+          setCategory(category)
+        }
       } catch (error) {
         logger.error('There was an error fetching the question data:', error.message)
       }
     }
 
     fetchQuestion()
+    return () => {
+      isSubscribed = false
+    }
   }, [marketMakerAddress, context, conditionalTokens, realitio])
 
   return { question, resolution, category, arbitratorAddress }

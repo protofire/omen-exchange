@@ -45,6 +45,7 @@ export const useMarketMakerData = (
   const [arbitrator, setArbitrator] = useState<Maybe<Arbitrator>>(null)
 
   useEffect(() => {
+    let isSubscribed = true
     const fetchMarketMakerData = async ({ enableStatus }: { enableStatus: boolean }) => {
       try {
         enableStatus && setStatus(Status.Loading)
@@ -62,15 +63,10 @@ export const useMarketMakerData = (
         )
 
         const arbitratorObject = getArbitratorFromAddress(context.networkId, arbitratorAddress)
-        setArbitrator(arbitratorObject)
-        setQuestion(question)
-        setResolution(resolution)
-        setCategory(category)
 
         const winnerOutcomeData = isConditionResolved
           ? await conditionalTokens.getWinnerOutcome(conditionId)
           : null
-        setWinnerOutcome(winnerOutcomeData)
 
         const [
           userShares,
@@ -89,7 +85,6 @@ export const useMarketMakerData = (
         const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
         const token = getTokenFromAddress(context.networkId, collateralAddress)
-        setCollateral(token)
 
         const probabilityForYes = actualPrices.actualPriceForYes * 100
         const probabilityForNo = actualPrices.actualPriceForNo * 100
@@ -116,13 +111,19 @@ export const useMarketMakerData = (
         const poolSharesTotalSupply = await marketMaker.poolSharesTotalSupply()
         const userPoolShares = await marketMaker.poolSharesBalanceOf(user)
 
-        setTotalPoolShares(poolSharesTotalSupply)
-        setUserPoolShares(userPoolShares)
-
-        setMarketMakerFunding(marketMakerFund)
-        setMarketMakerUserFunding(marketMakerUserFund)
-
-        setBalance(balanceShares)
+        if (isSubscribed) {
+          setArbitrator(arbitratorObject)
+          setQuestion(question)
+          setResolution(resolution)
+          setCategory(category)
+          setWinnerOutcome(winnerOutcomeData)
+          setCollateral(token)
+          setTotalPoolShares(poolSharesTotalSupply)
+          setUserPoolShares(userPoolShares)
+          setMarketMakerFunding(marketMakerFund)
+          setMarketMakerUserFunding(marketMakerUserFund)
+          setBalance(balanceShares)
+        }
 
         enableStatus && setStatus(Status.Done)
       } catch (error) {
@@ -137,7 +138,10 @@ export const useMarketMakerData = (
       fetchMarketMakerData({ enableStatus: false })
     }, 2000)
 
-    return () => clearInterval(intervalId)
+    return () => {
+      clearInterval(intervalId)
+      isSubscribed = false
+    }
   }, [marketMakerAddress, context, conditionalTokens, winnerOutcome, realitio])
 
   return {
