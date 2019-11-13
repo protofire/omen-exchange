@@ -20,6 +20,8 @@ export const useMarkets = (
   const [markets, setMarkets] = useState<MarketAndQuestion[]>([])
 
   useEffect(() => {
+    let isSubscribed = true
+
     const fetchMarkets = async () => {
       try {
         setStatus(Status.Loading)
@@ -59,7 +61,8 @@ export const useMarkets = (
           },
         )
 
-        setMarkets(marketsOrdered)
+        if (isSubscribed) setMarkets(marketsOrdered)
+
         setStatus(Status.Done)
       } catch (error) {
         logger.error('There was an error fetching the markets data:', error.message)
@@ -68,6 +71,9 @@ export const useMarkets = (
     }
 
     fetchMarkets()
+    return () => {
+      isSubscribed = false
+    }
   }, [context, marketMakerFactory, conditionalTokens, realitio])
 
   return {

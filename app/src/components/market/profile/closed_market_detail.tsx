@@ -72,16 +72,22 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
   useEffect(() => {
+    let isSubscribed = true
+
     const fetchBalance = async () => {
       const provider = context.library
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const collateralService = new ERC20Service(collateralAddress)
       const collateralBalance = await collateralService.getCollateral(marketMakerAddress, provider)
-      setCollateral(collateralBalance)
+      if (isSubscribed) setCollateral(collateralBalance)
     }
 
     fetchBalance()
+
+    return () => {
+      isSubscribed = false
+    }
   }, [collateral, context, marketMakerAddress, marketMaker])
 
   const redeem = async () => {
