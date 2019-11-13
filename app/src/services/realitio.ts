@@ -93,14 +93,17 @@ class RealitioService {
     const iface = new ethers.utils.Interface(realitioAbi)
     const event = iface.parseLog(logs[0])
 
-    const question: QuestionLog = RealitioQuestionLib.populatedJSONForTemplate(
+    const questionLog: QuestionLog = RealitioQuestionLib.populatedJSONForTemplate(
       RealitioTemplateLib.defaultTemplateForType('bool'),
       event.values.question,
     )
 
+    const category = questionLog.category === 'undefined' ? '' : questionLog.category
+    const question = questionLog.title === 'undefined' ? '' : questionLog.title
+
     return {
-      question: question.title,
-      category: question.category,
+      question,
+      category,
       resolution: new Date(event.values.opening_ts * 1000),
       arbitratorAddress: event.values.arbitrator,
     }
