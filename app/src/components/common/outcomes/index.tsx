@@ -62,7 +62,10 @@ const Outcomes = (props: Props) => {
         <FormLabel>Outcome</FormLabel>
         <LabelWrapper>
           <FormLabel>Probability</FormLabel>
-          <Tooltip description="The total amount of probabilites must add up to 100%" />
+          <Tooltip
+            id="probability"
+            description="If an event has already a probability different than 50-50 you can adjust it here. It is important that the probabilities add up to 100%"
+          />
         </LabelWrapper>
       </TwoColumnsRow>
       {outcomesToRender}

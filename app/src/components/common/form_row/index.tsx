@@ -22,17 +22,19 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   formField: any
   note?: any
   title?: string
-  tooltipText?: string
+  tooltip?: {
+    id: string
+    description: string
+  }
 }
 
 export const FormRow = (props: Props) => {
-  const { formField, title, tooltipText, note, ...restProps } = props
-
+  const { formField, title, note, tooltip, ...restProps } = props
   return (
     <FormRowWrapper {...restProps}>
       <TitleWrapper>
         {title ? <FormLabel>{title}</FormLabel> : null}
-        {tooltipText ? <TooltipStyled description={tooltipText} /> : null}
+        {tooltip ? <TooltipStyled description={tooltip.description} id={tooltip.id} /> : null}
       </TitleWrapper>
       {formField}
       {note ? <FormRowNote>{note}</FormRowNote> : null}

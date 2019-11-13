@@ -41,6 +41,14 @@ const TooltipPopup = styled.div`
     padding: 5px 8px;
     text-align: left;
 
+    > a {
+      color: #fff;
+      text-decoration: underline;
+    }
+    > a:hover {
+      color: #00f;
+    }
+
     &.place-left:after {
       border-left-color: #000;
     }
@@ -64,21 +72,24 @@ const TooltipPopup = styled.div`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
+  id: string
   description: string
 }
 
 export const Tooltip = (props: Props) => {
-  const { description, ...restProps } = props
+  const { id, description, ...restProps } = props
 
   return (
     <TooltipPopup
       data-class="reactTooltip"
       data-multiline={true}
       data-tip={description}
+      data-html={true}
+      data-for={id}
       {...restProps}
     >
       <IconInfo />
-      <ReactTooltip />
+      <ReactTooltip id={id} clickable={true} effect="solid" delayHide={500} />
     </TooltipPopup>
   )
 }
