@@ -47,13 +47,19 @@ export const ConnectedWeb3: React.FC<{ children: React.ReactNode }> = props => {
   const context = useWeb3Context()
 
   useEffect(() => {
+    let isSubscribed = true
+
     const checkIfReady = async () => {
       const network = await context.library.ready
-      setNetworkId(network.chainId)
+      if (isSubscribed) setNetworkId(network.chainId)
     }
 
     if (context.library) {
       checkIfReady()
+    }
+
+    return () => {
+      isSubscribed = false
     }
   }, [context.library])
 

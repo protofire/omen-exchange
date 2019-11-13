@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useWeb3Context } from 'web3-react'
 import styled, { css } from 'styled-components'
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
@@ -42,7 +42,7 @@ export const ConnectWallet = (props: any) => {
     console.error('Error in web3 context', context.error)
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (context.active && !context.account && context.connectorName === 'WalletConnect') {
       const uri = context.connector.walletConnector.uri
       WalletConnectQRCodeModal.open(uri, () => {})

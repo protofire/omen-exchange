@@ -9,12 +9,16 @@ export const useCheckContractExists = (
   const [contractExists, setContractExists] = useState<boolean>(true)
 
   useEffect(() => {
+    let isSubscribed = true
     const provider = context.library
     const fetchIsContract = async () => {
-      setContractExists(await isContract(provider, marketMakerAddress))
+      if (isSubscribed) setContractExists(await isContract(provider, marketMakerAddress))
     }
 
     fetchIsContract()
+    return () => {
+      isSubscribed = false
+    }
   }, [context, marketMakerAddress])
 
   return contractExists
