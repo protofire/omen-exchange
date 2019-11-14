@@ -5,11 +5,11 @@ import { Market, Log } from '../util/types'
 import { FEE } from '../common/constants'
 
 const marketMakerFactoryAbi = [
-  `function createFixedProductMarketMaker(address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint64 fee) public returns (address)`,
-  `event FixedProductMarketMakerCreation(address indexed creator, address fixedProductMarketMaker, address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint64 fee)`,
+  `function createFixedProductMarketMaker(address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint fee) public returns (address)`,
+  `event FixedProductMarketMakerCreation(address indexed creator, address fixedProductMarketMaker, address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint fee)`,
 ]
 const marketMakerFactoryCallAbi = [
-  `function createFixedProductMarketMaker(address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint64 fee) public constant returns (address)`,
+  `function createFixedProductMarketMaker(address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint fee) public constant returns (address)`,
 ]
 
 class MarketMakerFactoryService {
