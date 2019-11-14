@@ -8,6 +8,7 @@ import { ButtonContainer } from '../../../common/button_container'
 import { Well } from '../../../common/well'
 import { Arbitrators } from '../../../common/arbitrators'
 import { knownArbitrators } from '../../../../util/addresses'
+import { getLogger } from '../../../../util/logger'
 
 interface Props {
   next: () => void
@@ -40,6 +41,8 @@ const FormRowOracle = styled(FormRow)`
   z-index: 5;
 `
 
+const logger = getLogger('Market::AskQuestionStep')
+
 class AskQuestionStep extends Component<Props, State> {
   public state: State = {
     errors: [],
@@ -57,7 +60,7 @@ class AskQuestionStep extends Component<Props, State> {
       this.setState({
         errors,
       })
-      console.log(errors)
+      logger.error(errors)
     } else {
       this.props.next()
     }
@@ -90,12 +93,18 @@ class AskQuestionStep extends Component<Props, State> {
             ' is a good one.',
           ]}
           title={'Question'}
-          tooltipText={'It must be an unambiguous question.'}
+          tooltip={{
+            id: `question`,
+            description: `Ensure that your market is phrased in a way that it can be unambiguous, resolvable, contains all the necessary parameters and is clearly understandable. As a guide you could use the <a target="_blank" href="https://augur.guide/2-market-creators/checksheet.html">check sheet</a> prepared by Augur for creating markets.`,
+          }}
         />
         <FormRow
           formField={<Categories name="category" value={category} onChange={handleChange} />}
           title={'Category'}
-          tooltipText={'You can choose among several available categories.'}
+          tooltip={{
+            id: `category`,
+            description: `You can choose among several categories. Your selection will classify the subject/topic of your market.`,
+          }}
         />
         <FormRowResolutionDate
           formField={
@@ -107,16 +116,21 @@ class AskQuestionStep extends Component<Props, State> {
             />
           }
           title={'Resolution Date'}
-          tooltipText={'Indicate when the market will close.'}
+          tooltip={{
+            id: `resolution`,
+            description: `Precisely indicate when the market is resolved. The time is displayed in ISO 8601 format.`,
+          }}
         />
         <FormRowOracle
           formField={
             <Arbitrators name="arbitratorId" value={arbitratorId} onChange={handleChange} />
           }
           title={'Arbitrator'}
-          tooltipText={
-            'You can choose among several available Arbitrators. The Arbitrator will resolve the market once the Resolution Date is reached.'
-          }
+          tooltip={{
+            id: `arbitrator`,
+            description: `If you want to learn how <a target="_blank" href="https://realit.io">realit.io</a> and <a target="_blank" href="https://kleros.io">Kleros</a> work, please visit their websites.
+`,
+          }}
         />
         <OracleInfo>
           The market will be resolved using{' '}
