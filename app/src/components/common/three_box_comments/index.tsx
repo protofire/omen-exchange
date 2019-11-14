@@ -147,7 +147,11 @@ export const ThreeBoxComments = (props: Props) => {
       logger.log(`Open three box with account ${account}`)
 
       const newBox = await Box.openBox(account, library._web3Provider)
-      await newBox.openSpace(THREEBOX_SPACE_NAME)
+
+      const spaceData = await Box.getSpace(account, THREEBOX_SPACE_NAME)
+      if (Object.keys(spaceData).length === 0) {
+        await newBox.openSpace(THREEBOX_SPACE_NAME)
+      }
       if (isSubscribed) setCurrentUserAddress(account)
 
       newBox.onSyncDone(() => {
