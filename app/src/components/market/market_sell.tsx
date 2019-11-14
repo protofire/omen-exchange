@@ -178,7 +178,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             <strong key="1">{ethers.utils.formatEther(costFee)}</strong>,
           ]}
           title={'Amount'}
-          tooltipText={'Transaction fees.'}
+          tooltip={{ id: 'amount', description: 'Amount of shares to sell.' }}
         />
         <FormLabelStyled>Totals</FormLabelStyled>
         <TableStyled>

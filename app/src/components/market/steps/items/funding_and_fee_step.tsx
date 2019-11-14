@@ -89,12 +89,18 @@ class FundingAndFeeStep extends Component<Props> {
             />
           }
           title={'Spread / Fee'}
-          tooltipText={'The fee taken from every trade. Temporarily fixed at 1%.'}
+          tooltip={{
+            id: `spreadFee`,
+            description: `The fee taken from every trade. Temporarily fixed at 1%.`,
+          }}
         />
         <FormRow
           formField={<Tokens name="collateralId" value={collateralId} onChange={handleChange} />}
           title={'Collateral token'}
-          tooltipText={'Select the token you want to use as collateral'}
+          tooltip={{
+            id: `collateralToken`,
+            description: `Select the token you want to use as collateral.`,
+          }}
         />
         <FormRow
           formField={
@@ -111,7 +117,10 @@ class FundingAndFeeStep extends Component<Props> {
             />
           }
           title={'Funding'}
-          tooltipText={'Initial funding to fund the market maker.'}
+          tooltip={{
+            id: `funding`,
+            description: `Initial funding to fund the market maker.`,
+          }}
         />
         <ButtonContainer>
           <ButtonLinkStyled onClick={this.back}>‹ Back</ButtonLinkStyled>

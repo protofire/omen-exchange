@@ -182,7 +182,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             </strong>,
           ]}
           title={'Amount'}
-          tooltipText={'Transaction fees.'}
+          tooltip={{ id: 'amount', description: 'Shares to buy with this amount of collateral.' }}
         />
         <FormLabelStyled>Totals</FormLabelStyled>
         <TableStyled>
