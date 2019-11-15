@@ -68,9 +68,11 @@ class MarketMakerService {
     logger.log(`Add funding to market maker ${amount}`)
 
     try {
-      const transactionObject = await this.contract.addFunding(amount, distributionHint, {
+      const overrides = {
+        gasLimit: 750000,
         value: '0x0',
-      })
+      }
+      const transactionObject = await this.contract.addFunding(amount, distributionHint, overrides)
       await this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
       logger.error(`There was an error adding '${amount.toString()}' of funding'`, err.message)
