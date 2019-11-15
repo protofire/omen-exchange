@@ -24,13 +24,13 @@ interface KnownTokenData {
 const addresses: { [networkId: number]: KnownContracts } = {
   [networkIds.MAINNET]: {
     realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
-    marketMakerFactory: '0x4967C09AB3cDed1b4E21739f74b036eADA243C8A',
+    marketMakerFactory: '0x2E8C4eC3fE9E3FC78FAE42af9c93A4DC88c38cb7',
     conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
     oracle: '0x0000000000000000000000000000000000000000',
   },
   [networkIds.RINKEBY]: {
     realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
-    marketMakerFactory: '0xF248C1fe91eC1a5DD78bF26EB43489cDc6aAd1dD',
+    marketMakerFactory: '0xD0B953db85fb6f0C6A437b18140Ba857cb67768a',
     conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
     oracle: '0xa5C8Cea58D79dd3094281eac1048a937beF6C84C',
   },
