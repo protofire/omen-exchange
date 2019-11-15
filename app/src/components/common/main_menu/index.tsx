@@ -26,7 +26,7 @@ export const MainMenu: React.FC = props => {
 
   return (
     <MainMenuWrapper {...restProps}>
-      <Item activeClassName="active" to="/home">
+      <Item activeClassName="active" to="/">
         Markets Overview
       </Item>
       <ConnectedWeb3>
