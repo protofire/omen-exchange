@@ -26,12 +26,14 @@ const marketMakerAbi = [
 class MarketMakerService {
   contract: Contract
   conditionalTokens: ConditionalTokenService
+  provider: any
 
   constructor(address: string, conditionalTokens: ConditionalTokenService, provider: any) {
     const signer: Wallet = provider.getSigner()
 
     this.contract = new ethers.Contract(address, marketMakerAbi, provider).connect(signer)
     this.conditionalTokens = conditionalTokens
+    this.provider = provider
   }
 
   getConditionalTokens = async (): Promise<string> => {
@@ -66,7 +68,10 @@ class MarketMakerService {
     logger.log(`Add funding to market maker ${amount}`)
 
     try {
-      return this.contract.addFunding(amount, distributionHint)
+      const transactionObject = await this.contract.addFunding(amount, distributionHint, {
+        value: '0x0',
+      })
+      await this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
       logger.error(`There was an error adding '${amount.toString()}' of funding'`, err.message)
       throw err
@@ -75,7 +80,9 @@ class MarketMakerService {
 
   removeFunding = async (amount: BigNumber) => {
     logger.log(`Remove funding to market maker ${amount}`)
-    return this.contract.removeFunding(amount)
+    return this.contract.removeFunding(amount, {
+      value: '0x0',
+    })
   }
 
   static getActualPrice = (balanceInformation: {
@@ -85,8 +92,12 @@ class MarketMakerService {
     const { balanceOfForYes, balanceOfForNo } = balanceInformation
 
     const totalBalance = balanceOfForYes.add(balanceOfForNo)
-    const actualPriceForYes = divBN(balanceOfForNo, totalBalance)
-    const actualPriceForNo = divBN(balanceOfForYes, totalBalance)
+    const actualPriceForYes = !totalBalance.isZero()
+      ? divBN(balanceOfForNo, totalBalance)
+      : balanceOfForNo.toNumber()
+    const actualPriceForNo = !totalBalance.isZero()
+      ? divBN(balanceOfForYes, totalBalance)
+      : balanceOfForYes.toNumber()
 
     return {
       actualPriceForYes,
@@ -128,8 +139,12 @@ class MarketMakerService {
   buy = async (amount: BigNumber, outcome: OutcomeSlot) => {
     const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {
-      const outcomeTokensToBuy = await this.contract.calcBuyAmount(amount, outcomeIndex)
-      await this.contract.buy(amount, outcomeIndex, outcomeTokensToBuy)
+      const outcomeTokensToBuy = await this.contract.calcBuyAmount(amount, outcomeIndex, {
+        value: '0x0',
+      })
+      await this.contract.buy(amount, outcomeIndex, outcomeTokensToBuy, {
+        value: '0x0',
+      })
     } catch (err) {
       logger.error(
         `There was an error buying '${amount.toString()}' for outcome '${outcome}'`,
@@ -142,7 +157,9 @@ class MarketMakerService {
   calcBuyAmount = async (amount: BigNumber, outcome: OutcomeSlot): Promise<BigNumber> => {
     const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {
-      return this.contract.calcBuyAmount(amount, outcomeIndex)
+      return this.contract.calcBuyAmount(amount, outcomeIndex, {
+        value: '0x0',
+      })
     } catch (err) {
       logger.error(
         `There was an error computing the buy amount for amount '${amount.toString()}' and outcome '${outcome}'`,
@@ -177,7 +194,9 @@ class MarketMakerService {
     const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {
       const outcomeTokensToSell = await this.contract.calcSellAmount(amount, outcomeIndex)
-      await this.contract.sell(amount, outcomeIndex, outcomeTokensToSell)
+      await this.contract.sell(amount, outcomeIndex, outcomeTokensToSell, {
+        value: '0x0',
+      })
     } catch (err) {
       logger.error(
         `There was an error selling '${amount.toString()}' for outcome '${outcome}'`,
