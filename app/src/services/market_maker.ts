@@ -141,12 +141,11 @@ class MarketMakerService {
   buy = async (amount: BigNumber, outcome: OutcomeSlot) => {
     const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {
-      const outcomeTokensToBuy = await this.contract.calcBuyAmount(amount, outcomeIndex, {
+      const outcomeTokensToBuy = await this.contract.calcBuyAmount(amount, outcomeIndex)
+      const transactionObject = await this.contract.buy(amount, outcomeIndex, outcomeTokensToBuy, {
         value: '0x0',
       })
-      await this.contract.buy(amount, outcomeIndex, outcomeTokensToBuy, {
-        value: '0x0',
-      })
+      await this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
       logger.error(
         `There was an error buying '${amount.toString()}' for outcome '${outcome}'`,
@@ -159,9 +158,7 @@ class MarketMakerService {
   calcBuyAmount = async (amount: BigNumber, outcome: OutcomeSlot): Promise<BigNumber> => {
     const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {
-      return this.contract.calcBuyAmount(amount, outcomeIndex, {
-        value: '0x0',
-      })
+      return this.contract.calcBuyAmount(amount, outcomeIndex)
     } catch (err) {
       logger.error(
         `There was an error computing the buy amount for amount '${amount.toString()}' and outcome '${outcome}'`,
@@ -196,9 +193,18 @@ class MarketMakerService {
     const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {
       const outcomeTokensToSell = await this.contract.calcSellAmount(amount, outcomeIndex)
-      await this.contract.sell(amount, outcomeIndex, outcomeTokensToSell, {
+
+      const overrides = {
+        gasLimit: 750000,
         value: '0x0',
-      })
+      }
+      const transactionObject = await this.contract.sell(
+        amount,
+        outcomeIndex,
+        outcomeTokensToSell,
+        overrides,
+      )
+      await this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
       logger.error(
         `There was an error selling '${amount.toString()}' for outcome '${outcome}'`,
