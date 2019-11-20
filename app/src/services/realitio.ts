@@ -54,7 +54,6 @@ class RealitioService {
     category: string,
     arbitratorAddress: string,
     openingDateMoment: Moment,
-    value = '0',
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
     const questionText = RealitioQuestionLib.encodeText('bool', question, null, category)
