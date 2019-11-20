@@ -48,7 +48,7 @@ const FundingAndFeeStep = (props: Props) => {
 
   const nextSection = (e: any) => {
     e.preventDefault()
-    if (error) {
+    if (!error) {
       props.next()
     }
   }
