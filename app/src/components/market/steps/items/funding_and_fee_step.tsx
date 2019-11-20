@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Component } from 'react'
+import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
@@ -22,10 +22,6 @@ interface Props {
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
 }
 
-interface State {
-  errors: string[]
-}
-
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
@@ -38,99 +34,90 @@ const InputBigNumberStyledRight = styled<any>(BigNumberInput)`
   text-align: right;
 `
 
-class FundingAndFeeStep extends Component<Props> {
-  public state: State = {
-    errors: [],
+const FundingAndFeeStep = (props: Props) => {
+  const { values } = props
+  const { funding, spread, collateralId } = values
+  const error = !spread || funding.isZero()
+
+  const back = () => {
+    props.back()
   }
 
-  public back = () => {
-    this.props.back()
-  }
-
-  public validate = (e: any) => {
+  const nextSection = (e: any) => {
     e.preventDefault()
-
-    const { values } = this.props
-    const { spread, funding } = values
-
-    if (!spread || funding.isZero()) {
-      const errors = []
-      errors.push(`Please check the required fields`)
-      this.setState({
-        errors,
-      })
-    } else {
-      this.props.next()
+    if (error) {
+      props.next()
     }
   }
 
-  render() {
-    const { values, handleChange } = this.props
-    const { collateralId, spread, funding } = values
+  const collateral = knownTokens[collateralId]
 
-    const collateral = knownTokens[collateralId]
-
-    return (
-      <CreateCard>
-        <FormRow
-          formField={
-            <TextfieldCustomPlaceholder
-              disabled={true}
-              formField={
-                <TextfieldStyledRight
-                  defaultValue={spread}
-                  disabled
-                  name="spread"
-                  onChange={handleChange}
-                  type="number"
-                />
-              }
-              placeholderText="%"
-            />
-          }
-          title={'Spread / Fee'}
-          tooltip={{
-            id: `spreadFee`,
-            description: `The fee taken from every trade. Temporarily fixed at 1%.`,
-          }}
-        />
-        <FormRow
-          formField={<Tokens name="collateralId" value={collateralId} onChange={handleChange} />}
-          title={'Collateral token'}
-          tooltip={{
-            id: `collateralToken`,
-            description: `Select the token you want to use as collateral.`,
-          }}
-        />
-        <FormRow
-          formField={
-            <TextfieldCustomPlaceholder
-              formField={
-                <InputBigNumberStyledRight
-                  name="funding"
-                  value={funding}
-                  onChange={handleChange}
-                  decimals={collateral.decimals}
-                />
-              }
-              placeholderText={collateral.symbol}
-            />
-          }
-          title={'Funding'}
-          tooltip={{
-            id: `funding`,
-            description: `Initial funding to fund the market maker.`,
-          }}
-        />
-        <ButtonContainer>
-          <ButtonLinkStyled onClick={this.back}>‹ Back</ButtonLinkStyled>
-          <Button disabled={!spread || funding.isZero()} onClick={this.validate}>
-            Next
-          </Button>
-        </ButtonContainer>
-      </CreateCard>
-    )
-  }
+  return (
+    <CreateCard>
+      <FormRow
+        formField={
+          <TextfieldCustomPlaceholder
+            disabled={true}
+            formField={
+              <TextfieldStyledRight
+                defaultValue={spread}
+                disabled
+                name="spread"
+                onChange={(e: any) => props.handleChange(e)}
+                type="number"
+              />
+            }
+            placeholderText="%"
+          />
+        }
+        title={'Spread / Fee'}
+        tooltip={{
+          id: `spreadFee`,
+          description: `The fee taken from every trade. Temporarily fixed at 1%.`,
+        }}
+      />
+      <FormRow
+        formField={
+          <Tokens
+            name="collateralId"
+            value={collateralId}
+            onChange={(e: any) => props.handleChange(e)}
+          />
+        }
+        title={'Collateral token'}
+        tooltip={{
+          id: `collateralToken`,
+          description: `Select the token you want to use as collateral.`,
+        }}
+      />
+      <FormRow
+        formField={
+          <TextfieldCustomPlaceholder
+            formField={
+              <InputBigNumberStyledRight
+                name="funding"
+                value={funding}
+                onChange={(e: any) => props.handleChange(e)}
+                decimals={collateral.decimals}
+              />
+            }
+            placeholderText={collateral.symbol}
+          />
+        }
+        title={'Funding'}
+        tooltip={{
+          id: `funding`,
+          description: `Initial funding to fund the market maker.`,
+        }}
+      />
+      <ButtonContainer>
+        <ButtonLinkStyled onClick={() => back()}>‹ Back</ButtonLinkStyled>
+        <Button disabled={error} onClick={(e: any) => nextSection(e)}>
+          Next
+        </Button>
+      </ButtonContainer>
+    </CreateCard>
+  )
 }
 
 export { FundingAndFeeStep }
