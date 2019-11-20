@@ -10,6 +10,7 @@ import { TextfieldCustomPlaceholder } from '../../../common/textfield_custom_pla
 import { ButtonLink } from '../../../common/button_link'
 import { Tokens } from '../../../common/tokens'
 import { knownTokens } from '../../../../util/addresses'
+import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 
 interface Props {
   back: () => void
@@ -35,6 +36,8 @@ const InputBigNumberStyledRight = styled<any>(BigNumberInput)`
 `
 
 const FundingAndFeeStep = (props: Props) => {
+  const context = useConnectedWeb3Context()
+
   const { values } = props
   const { funding, spread, collateralId } = values
   const error = !spread || funding.isZero()
@@ -79,6 +82,7 @@ const FundingAndFeeStep = (props: Props) => {
       <FormRow
         formField={
           <Tokens
+            networkId={context.networkId}
             name="collateralId"
             value={collateralId}
             onChange={(e: any) => props.handleChange(e)}
