@@ -1,19 +1,18 @@
-import React, { ChangeEvent } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { Textfield } from '../index'
 import { TextfieldCustomPlaceholder } from '../textfield_custom_placeholder'
 import { FormLabel } from '../form_label'
 import { Tooltip } from '../tooltip'
 
-interface Outcome {
+export interface Outcome {
   name: string
-  probability: string | number
-  value: string
+  probability: number
 }
 
 interface Props {
   outcomes: Outcome[]
-  onChange: (index: number, event: ChangeEvent<HTMLInputElement>) => any
+  onChange: (newOutcomes: Outcome[]) => any
 }
 
 const TwoColumnsRow = styled.div`
@@ -38,15 +37,49 @@ const TextFieldStyled = styled(Textfield)`
 `
 
 const Outcomes = (props: Props) => {
+  const { outcomes } = props
+
+  const updateOutcomeProbability = (index: number, newProbability: number) => {
+    if (newProbability < 0 || newProbability > 100) {
+      return
+    }
+
+    // for binary markets, change the probability of the other outcome so that they add to 100
+    if (outcomes.length === 2) {
+      const otherProbability = 100 - newProbability
+
+      const newOutcomes = [
+        {
+          ...outcomes[0],
+          probability: index === 0 ? newProbability : otherProbability,
+        },
+        {
+          ...outcomes[1],
+          probability: index === 0 ? otherProbability : newProbability,
+        },
+      ]
+
+      props.onChange(newOutcomes)
+    } else {
+      const newOutcome = {
+        ...outcomes[index],
+        probability: newProbability,
+      }
+
+      const newOutcomes = [...outcomes.slice(0, index), newOutcome, ...outcomes.slice(index + 1)]
+      props.onChange(newOutcomes)
+    }
+  }
+
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
     <TwoColumnsRowExtraMargin key={index}>
-      <Textfield name={`outcome_${index}`} type="text" value={outcome.value} readOnly />
+      <Textfield name={`outcome_${index}`} type="text" value={outcome.name} readOnly />
       <TextfieldCustomPlaceholder
         formField={
           <TextFieldStyled
+            data-testid={`outcome_${index}`}
             min={0}
-            name={outcome.name}
-            onChange={e => props.onChange(index, e)}
+            onChange={e => updateOutcomeProbability(index, +e.currentTarget.value)}
             type="number"
             value={outcome.probability}
           />

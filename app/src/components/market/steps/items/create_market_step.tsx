@@ -11,6 +11,7 @@ import { FullLoading } from '../../../common/full_loading'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
+import { Outcome } from '../../../common/outcomes'
 import { knownArbitrators, knownTokens } from '../../../../util/addresses'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import styled from 'styled-components'
@@ -46,10 +47,7 @@ interface Props {
     arbitratorId: KnownArbitrator
     spread: string
     funding: BigNumber
-    outcomeValueOne: string
-    outcomeValueTwo: string
-    outcomeProbabilityOne: string
-    outcomeProbabilityTwo: string
+    outcomes: Outcome[]
   }
   status: StatusMarketCreation
   questionId: string | null
@@ -75,10 +73,7 @@ class CreateMarketStep extends Component<Props> {
       resolution,
       spread,
       funding,
-      outcomeValueOne,
-      outcomeValueTwo,
-      outcomeProbabilityOne,
-      outcomeProbabilityTwo,
+      outcomes,
     } = values
 
     const collateral = knownTokens[collateralId]
@@ -131,12 +126,12 @@ class CreateMarketStep extends Component<Props> {
           }
         >
           <TR>
-            <TD>{outcomeValueOne}</TD>
-            <TD textAlign="right">{outcomeProbabilityOne}%</TD>
+            <TD>{outcomes[0].name}</TD>
+            <TD textAlign="right">{outcomes[0].probability}%</TD>
           </TR>
           <TR>
-            <TD>{outcomeValueTwo}</TD>
-            <TD textAlign="right">{outcomeProbabilityTwo}%</TD>
+            <TD>{outcomes[1].name}</TD>
+            <TD textAlign="right">{outcomes[1].probability}%</TD>
           </TR>
         </TableStyled>
         {questionId || marketMakerAddress ? (
