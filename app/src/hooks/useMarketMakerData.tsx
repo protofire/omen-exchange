@@ -20,6 +20,7 @@ interface MarketMakerData {
   marketMakerUserFunding: BigNumber
   collateral: Maybe<Token>
   question: string
+  questionId: string
   category: string
   resolution: Maybe<Date>
   arbitrator: Maybe<Arbitrator>
@@ -40,6 +41,7 @@ export const useMarketMakerData = (
   const [marketMakerUserFunding, setMarketMakerUserFunding] = useState<BigNumber>(new BigNumber(0))
   const [collateral, setCollateral] = useState<Maybe<Token>>(null)
   const [question, setQuestion] = useState<string>('')
+  const [questionId, setQuestionId] = useState<string>('')
   const [category, setCategory] = useState<string>('')
   const [resolution, setResolution] = useState<Maybe<Date>>(null)
   const [arbitrator, setArbitrator] = useState<Maybe<Arbitrator>>(null)
@@ -114,6 +116,7 @@ export const useMarketMakerData = (
         if (isSubscribed) {
           setArbitrator(arbitratorObject)
           setQuestion(question)
+          setQuestionId(questionId)
           setResolution(resolution)
           setCategory(category)
           setWinnerOutcome(winnerOutcomeData)
@@ -154,6 +157,7 @@ export const useMarketMakerData = (
     marketMakerUserFunding,
     collateral,
     question,
+    questionId,
     resolution,
     arbitrator,
     category,

@@ -21,6 +21,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
     status,
     collateral,
     question,
+    questionId,
     resolution,
     arbitrator,
     category,
@@ -39,6 +40,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
       winnerOutcome={winnerOutcome}
       collateral={collateral}
       question={question || ''}
+      questionId={questionId || ''}
       category={category || ''}
       resolution={resolution}
       arbitrator={arbitrator}
