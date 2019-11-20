@@ -94,12 +94,8 @@ class MarketMakerService {
     const { balanceOfForYes, balanceOfForNo } = balanceInformation
 
     const totalBalance = balanceOfForYes.add(balanceOfForNo)
-    const actualPriceForYes = !totalBalance.isZero()
-      ? divBN(balanceOfForNo, totalBalance)
-      : balanceOfForNo.toNumber()
-    const actualPriceForNo = !totalBalance.isZero()
-      ? divBN(balanceOfForYes, totalBalance)
-      : balanceOfForYes.toNumber()
+    const actualPriceForYes = !totalBalance.isZero() ? divBN(balanceOfForNo, totalBalance) : 0
+    const actualPriceForNo = !totalBalance.isZero() ? divBN(balanceOfForYes, totalBalance) : 0
 
     return {
       actualPriceForYes,
