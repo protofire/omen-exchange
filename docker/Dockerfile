@@ -17,9 +17,9 @@ RUN git clone https://github.com/gnosis/conditional-tokens-contracts.git && \
   git checkout 7ad77eb4cba295b12de4d9f5977d641eeb2044ae && \
   npm install
 
-RUN git clone https://github.com/mariano-aguero/conditional-tokens-market-makers.git && \
+RUN git clone https://github.com/gnosis/conditional-tokens-market-makers.git && \
   cd conditional-tokens-market-makers && \
-  git checkout a9f7b1b96ea082581dbd50e03f4299f0d6a05695 && \
+  git checkout a5da76724a2263c5512b336448db1166cdb705d1 && \
   npm install
 
 RUN git clone https://github.com/fvictorio/realitio-gnosis-proxy && \
