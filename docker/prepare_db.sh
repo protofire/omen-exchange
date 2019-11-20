@@ -9,8 +9,11 @@ PID=$!
 export REALITIO_ADDRESS=$(jq -r '.networks["50"].address' realitio/truffle/build/contracts/Realitio.json)
 
 # deploy mock tokens
+MOCK_SAI_ADDRESS=$(eth contract:deploy --pk '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d' --abi 'constructor(string,uint8)' --args '["SAI", 18]' ERC20.bin | jq -r .address)
 MOCK_DAI_ADDRESS=$(eth contract:deploy --pk '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d' --abi 'constructor(string,uint8)' --args '["DAI", 18]' ERC20.bin | jq -r .address)
 MOCK_USDC_ADDRESS=$(eth contract:deploy --pk '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d' --abi 'constructor(string,uint8)' --args '["USDC", 6]' ERC20.bin | jq -r .address)
+MOCK_OWL_ADDRESS=$(eth contract:deploy --pk '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d' --abi 'constructor(string,uint8)' --args '["OWL", 18]' ERC20.bin | jq -r .address)
+MOCK_WETH_ADDRESS=$(eth contract:deploy --pk '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d' --abi 'constructor(string,uint8)' --args '["WETH", 18]' ERC20.bin | jq -r .address)
 
 # deploy conditional tokens contracts
 (cd conditional-tokens-contracts && npm run migrate -- --network local)
@@ -41,8 +44,11 @@ cd ..
 # save contracts addresses
 echo "realitio: ${REALITIO_ADDRESS}" >> contracts_addresses.txt
 echo "realitio arbitrator: $(jq -r '.networks["50"].address' realitio/truffle/build/contracts/Arbitrator.json)" >> contracts_addresses.txt
+echo "mock sai: ${MOCK_SAI_ADDRESS}" >> contracts_addresses.txt
 echo "mock dai: ${MOCK_DAI_ADDRESS}" >> contracts_addresses.txt
 echo "mock usdc: ${MOCK_USDC_ADDRESS}" >> contracts_addresses.txt
+echo "mock owl: ${MOCK_OWL_ADDRESS}" >> contracts_addresses.txt
+echo "mock weth: ${MOCK_WETH_ADDRESS}" >> contracts_addresses.txt
 echo "conditional tokens: ${CONDITIONAL_TOKENS_ADDRESS}" >> contracts_addresses.txt
 echo "market maker factory: $(jq -r '.networks["50"].address' conditional-tokens-market-makers/build/contracts/FixedProductMarketMakerFactory.json)" >> contracts_addresses.txt
 echo "realitio proxy: ${REALITIO_PROXY_ADDRESS}" >> contracts_addresses.txt

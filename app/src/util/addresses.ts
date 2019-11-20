@@ -43,13 +43,31 @@ const addresses: { [networkId: number]: KnownContracts } = {
 }
 
 export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
-  dai: {
-    symbol: 'DAI',
+  sai: {
+    symbol: 'SAI',
     decimals: 18,
     addresses: {
       [networkIds.MAINNET]: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
       [networkIds.RINKEBY]: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       [networkIds.GANACHE]: '0xD833215cBcc3f914bD1C9ece3EE7BF8B14f841bb',
+    },
+  },
+  dai: {
+    symbol: 'DAI',
+    decimals: 6,
+    addresses: {
+      [networkIds.MAINNET]: '0x6b175474e89094c44da98b954eedeac495271d0f',
+      [networkIds.RINKEBY]: '0xb307901ac0a807402a99879a491836697fec5e62',
+      [networkIds.GANACHE]: '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
+    },
+  },
+  weth: {
+    symbol: 'WETH',
+    decimals: 18,
+    addresses: {
+      [networkIds.MAINNET]: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+      [networkIds.RINKEBY]: '0xc778417e063141139fce010982780140aa0cd5ab',
+      [networkIds.GANACHE]: '0x0290FB167208Af455bB137780163b7B7a9a10C16',
     },
   },
   usdc: {
@@ -58,7 +76,16 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     addresses: {
       [networkIds.MAINNET]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
       [networkIds.RINKEBY]: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
-      [networkIds.GANACHE]: '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
+      [networkIds.GANACHE]: '0xe982E462b094850F12AF94d21D470e21bE9D0E9C',
+    },
+  },
+  owl: {
+    symbol: 'OWL',
+    decimals: 18,
+    addresses: {
+      [networkIds.MAINNET]: '0x1a5f9352af8af974bfc03399e3767df6370d82e4',
+      [networkIds.RINKEBY]: '0x9187a7788410f54a630407fa994c1555722f9abc',
+      [networkIds.GANACHE]: '0x59d3631c86BbE35EF041872d502F218A39FBa150',
     },
   },
 }
