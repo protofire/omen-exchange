@@ -19,6 +19,7 @@ interface KnownTokenData {
   addresses: {
     [networkId: number]: string
   }
+  order: number
 }
 
 const addresses: { [networkId: number]: KnownContracts } = {
@@ -51,6 +52,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
       [networkIds.RINKEBY]: '0x7a978b38d5af06ff929ca06647e025b759479318',
       [networkIds.GANACHE]: '0xD833215cBcc3f914bD1C9ece3EE7BF8B14f841bb',
     },
+    order: 2,
   },
   dai: {
     symbol: 'DAI',
@@ -60,6 +62,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
       [networkIds.RINKEBY]: '0xb307901ac0a807402a99879a491836697fec5e62',
       [networkIds.GANACHE]: '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
     },
+    order: 1,
   },
   weth: {
     symbol: 'WETH',
@@ -69,6 +72,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
       [networkIds.RINKEBY]: '0xc778417e063141139fce010982780140aa0cd5ab',
       [networkIds.GANACHE]: '0x0290FB167208Af455bB137780163b7B7a9a10C16',
     },
+    order: 3,
   },
   usdc: {
     symbol: 'USDC',
@@ -78,6 +82,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
       [networkIds.RINKEBY]: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
       [networkIds.GANACHE]: '0xe982E462b094850F12AF94d21D470e21bE9D0E9C',
     },
+    order: 4,
   },
   owl: {
     symbol: 'OWL',
@@ -87,6 +92,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
       [networkIds.RINKEBY]: '0x9187a7788410f54a630407fa994c1555722f9abc',
       [networkIds.GANACHE]: '0x59d3631c86BbE35EF041872d502F218A39FBa150',
     },
+    order: 5,
   },
 }
 
