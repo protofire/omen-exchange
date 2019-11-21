@@ -42,7 +42,9 @@ class ERC20Service {
 
     const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, provider).connect(signer)
 
-    const transactionObject = await erc20Contract.approve(spender, amount)
+    const transactionObject = await erc20Contract.approve(spender, amount, {
+      value: '0x0',
+    })
     logger.log(`Approve transaccion hash: ${transactionObject.hash}`)
     await provider.waitForTransaction(transactionObject.hash)
   }
@@ -55,7 +57,9 @@ class ERC20Service {
 
     const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, provider).connect(signer)
 
-    const transactionObject = await erc20Contract.approve(spender, ethers.constants.MaxUint256)
+    const transactionObject = await erc20Contract.approve(spender, ethers.constants.MaxUint256, {
+      value: '0x0',
+    })
     logger.log(`Approve unlimited transaccion hash: ${transactionObject.hash}`)
     await provider.waitForTransaction(transactionObject.hash)
   }
