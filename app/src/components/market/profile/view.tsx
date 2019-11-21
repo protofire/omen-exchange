@@ -24,6 +24,8 @@ interface Props extends RouteComponentProps<{}> {
   theme?: any
   marketMakerAddress: string
   funding: BigNumber
+  isQuestionFinalized: boolean
+  onResolveCondition: () => Promise<void>
 }
 
 const ButtonContainerStyled = styled(ButtonContainer)`
@@ -52,7 +54,17 @@ const Grid = styled.div`
 `
 
 const ViewWrapper = (props: Props) => {
-  const { balance, collateral, status, theme, marketMakerAddress, arbitrator, category } = props
+  const {
+    balance,
+    collateral,
+    status,
+    theme,
+    marketMakerAddress,
+    arbitrator,
+    category,
+    isQuestionFinalized,
+    onResolveCondition,
+  } = props
 
   const userHasShares = balance.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -128,6 +140,7 @@ const ViewWrapper = (props: Props) => {
       <ViewCard>
         {marketHasDetails && details()}
         {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
+        {isQuestionFinalized && <button onClick={onResolveCondition}>FINALIZED!!!</button>}
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>
           <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>

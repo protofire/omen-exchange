@@ -19,10 +19,12 @@ interface MarketMakerData {
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
   collateral: Maybe<Token>
+  questionId: string
   question: string
   category: string
   resolution: Maybe<Date>
   arbitrator: Maybe<Arbitrator>
+  isQuestionFinalized: boolean
 }
 
 export const useMarketMakerData = (
@@ -42,10 +44,12 @@ export const useMarketMakerData = (
       marketMakerFunding: new BigNumber(0),
       marketMakerUserFunding: new BigNumber(0),
       collateral: null,
+      questionId: '',
       question: '',
       category: '',
       resolution: null,
       arbitrator: null,
+      isQuestionFinalized: false,
     }),
     [],
   )
@@ -77,12 +81,14 @@ export const useMarketMakerData = (
       marketMakerFunding,
       marketMakerUserFunding,
       collateralAddress,
+      isQuestionFinalized,
     ] = await Promise.all([
       marketMaker.getBalanceInformation(user),
       marketMaker.getBalanceInformation(marketMakerAddress),
       marketMaker.getTotalSupply(),
       marketMaker.balanceOf(user),
       marketMaker.getCollateralToken(),
+      realitio.isFinalized(questionId),
     ])
 
     const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
@@ -122,12 +128,14 @@ export const useMarketMakerData = (
       balance,
       arbitrator,
       winnerOutcome,
+      questionId,
       question,
       resolution,
       category,
       collateral,
       marketMakerFunding,
       marketMakerUserFunding,
+      isQuestionFinalized,
     }
   }, [conditionalTokens, context.library, context.networkId, marketMakerAddress, realitio])
 
