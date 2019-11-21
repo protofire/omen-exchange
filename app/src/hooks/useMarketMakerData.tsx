@@ -142,7 +142,7 @@ export const useMarketMakerData = (
   const marketMakerData = usePolling<MarketMakerData>({
     fetchFunc,
     initialState: initialMarketMakerData,
-    delay: 2000,
+    delay: 5000,
     onError: useCallback(error => {
       logger.error('There was an error fetching the market maker data:', error.message)
       setStatus(Status.Error)
