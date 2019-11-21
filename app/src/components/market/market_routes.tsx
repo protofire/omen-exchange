@@ -7,6 +7,9 @@ import { ConnectedWeb3, useConnectedWeb3Context, useConnectWeb3 } from '../../ho
 import { useCheckContractExists } from '../../hooks/useCheckContractExists'
 import { MarketNotFound } from '../common/market_not_found'
 import { getLogger } from '../../util/logger'
+import { useWeb3Context } from 'web3-react/dist'
+import connectors from '../../util/connectors'
+import { Message } from '../common/message'
 
 const logger = getLogger('Market::Routes')
 
@@ -39,7 +42,7 @@ const MarketValidateContractAddress: React.FC<Props> = (props: Props) => {
   )
 }
 
-const MarketRoutes = (props: RouteComponentProps<RouteParams>) => {
+const MarketRoutesConnectedWrapper = (props: any) => {
   useConnectWeb3()
 
   const marketMakerAddress = props.match.params.address
@@ -52,6 +55,27 @@ const MarketRoutes = (props: RouteComponentProps<RouteParams>) => {
     <ConnectedWeb3>
       <MarketValidateContractAddress marketMakerAddress={marketMakerAddress} />
     </ConnectedWeb3>
+  )
+}
+
+const MarketRoutesDisconnectedWrapper = () => {
+  return (
+    <Message
+      type="warning"
+      delayed={3000}
+      message="Please connect to your wallet to open the market details..."
+    />
+  )
+}
+
+const MarketRoutes = (props: RouteComponentProps<RouteParams>) => {
+  const { active } = useWeb3Context()
+  const connector = localStorage.getItem('CONNECTOR')
+
+  return active || (connector && connector in connectors) ? (
+    <MarketRoutesConnectedWrapper {...props} />
+  ) : (
+    <MarketRoutesDisconnectedWrapper />
   )
 }
 
