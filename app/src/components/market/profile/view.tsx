@@ -129,16 +129,15 @@ const ViewWrapper = (props: Props) => {
           {questionId && (
             <TitleValue
               title={'Realitio'}
-              value={[
+              value={
                 <a
                   href={`https://realitio.github.io/#!/question/${questionId}`}
-                  key={1}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
                   Question URL
-                </a>,
-              ]}
+                </a>
+              }
             />
           )}
         </Grid>
