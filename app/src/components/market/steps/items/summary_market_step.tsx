@@ -59,10 +59,8 @@ const SummaryMarketStep = (props: Props) => {
   const { marketMakerAddress } = props
 
   const { question, resolution, category } = useQuestion(marketMakerAddress, context)
-  const { marketMakerFunding, balance, collateral, arbitrator } = useMarketMakerData(
-    marketMakerAddress,
-    context,
-  )
+  const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
+  const { marketMakerFunding, balance, collateral, arbitrator } = marketMakerData
 
   const resolutionDate = resolution && formatDate(resolution)
   const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`

@@ -14,17 +14,18 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
 
   const { marketMakerAddress } = props
 
+  const { marketMakerData, status } = useMarketMakerData(marketMakerAddress, context)
+
   const {
     marketMakerFunding,
     balance,
     winnerOutcome,
-    status,
     collateral,
     question,
     resolution,
     arbitrator,
     category,
-  } = useMarketMakerData(marketMakerAddress, context)
+  } = marketMakerData
 
   if (!collateral) {
     return <FullLoading />
