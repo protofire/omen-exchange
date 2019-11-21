@@ -135,6 +135,7 @@ export class MarketWizardCreator extends Component<Props, State> {
       arbitratorId,
       spread,
       funding,
+      outcomes,
     } = marketData
 
     switch (currentStep) {
@@ -162,7 +163,7 @@ export class MarketWizardCreator extends Component<Props, State> {
             back={() => this.back()}
             next={() => this.next()}
             values={{
-              outcomes: marketData.outcomes,
+              outcomes,
               question,
             }}
             handleOutcomesChange={this.handleOutcomesChange}
