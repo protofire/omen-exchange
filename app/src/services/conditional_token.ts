@@ -47,6 +47,9 @@ class ConditionalTokenService {
       oracleAddress,
       questionId,
       outcomeSlotCount,
+      {
+        value: '0x0',
+      },
     )
     logger.log(`Prepare condition transaction hash: ${transactionObject.hash}`)
     await this.provider.waitForTransaction(transactionObject.hash)
