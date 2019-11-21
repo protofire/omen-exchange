@@ -43,12 +43,12 @@ const addresses: { [networkId: number]: KnownContracts } = {
 }
 
 export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
-  sai: {
-    symbol: 'SAI',
-    decimals: 18,
+  cdai: {
+    symbol: 'CDAI',
+    decimals: 8,
     addresses: {
-      [networkIds.MAINNET]: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
-      [networkIds.RINKEBY]: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      [networkIds.MAINNET]: '0xa4c993e32876795abf80842adb0a241bb0eecd47',
+      [networkIds.RINKEBY]: '0x7a978b38d5af06ff929ca06647e025b759479318',
       [networkIds.GANACHE]: '0xD833215cBcc3f914bD1C9ece3EE7BF8B14f841bb',
     },
   },

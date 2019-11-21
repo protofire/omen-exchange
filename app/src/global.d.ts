@@ -6,6 +6,6 @@ declare module '@realitio/realitio-lib/formatters/template'
 
 declare type Maybe<T> = T | null
 
-declare type KnownToken = 'sai' | 'usdc' | 'dai' | 'weth' | 'owl'
+declare type KnownToken = 'cdai' | 'usdc' | 'dai' | 'weth' | 'owl'
 
 declare type KnownArbitrator = 'kleros' | 'realitio'

@@ -9,7 +9,7 @@ PID=$!
 export REALITIO_ADDRESS=$(jq -r '.networks["50"].address' realitio/truffle/build/contracts/Realitio.json)
 
 # deploy mock tokens
-MOCK_SAI_ADDRESS=$(eth contract:deploy --pk '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d' --abi 'constructor(string,uint8)' --args '["SAI", 18]' ERC20.bin | jq -r .address)
+MOCK_CDAI_ADDRESS=$(eth contract:deploy --pk '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d' --abi 'constructor(string,uint8)' --args '["CDAI", 8]' ERC20.bin | jq -r .address)
 MOCK_DAI_ADDRESS=$(eth contract:deploy --pk '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d' --abi 'constructor(string,uint8)' --args '["DAI", 18]' ERC20.bin | jq -r .address)
 MOCK_USDC_ADDRESS=$(eth contract:deploy --pk '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d' --abi 'constructor(string,uint8)' --args '["USDC", 6]' ERC20.bin | jq -r .address)
 MOCK_OWL_ADDRESS=$(eth contract:deploy --pk '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d' --abi 'constructor(string,uint8)' --args '["OWL", 18]' ERC20.bin | jq -r .address)
@@ -44,7 +44,7 @@ cd ..
 # save contracts addresses
 echo "realitio: ${REALITIO_ADDRESS}" >> contracts_addresses.txt
 echo "realitio arbitrator: $(jq -r '.networks["50"].address' realitio/truffle/build/contracts/Arbitrator.json)" >> contracts_addresses.txt
-echo "mock sai: ${MOCK_SAI_ADDRESS}" >> contracts_addresses.txt
+echo "mock cdai: ${MOCK_CDAI_ADDRESS}" >> contracts_addresses.txt
 echo "mock dai: ${MOCK_DAI_ADDRESS}" >> contracts_addresses.txt
 echo "mock usdc: ${MOCK_USDC_ADDRESS}" >> contracts_addresses.txt
 echo "mock owl: ${MOCK_OWL_ADDRESS}" >> contracts_addresses.txt
