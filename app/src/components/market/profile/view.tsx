@@ -6,7 +6,7 @@ import { ThreeBoxComments } from '../../common/three_box_comments'
 import { ViewCard } from '../../common/view_card'
 import { formatBigNumber } from '../../../util/tools'
 import { Status, BalanceItem, Token, Arbitrator } from '../../../util/types'
-import { ButtonAnchor } from '../../common'
+import { Button, ButtonAnchor } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
@@ -38,7 +38,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
   }
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: flex;
+    grid-template-columns: 1fr 1fr 1fr;
 
     > a {
       margin-left: 10px;
@@ -140,7 +140,6 @@ const ViewWrapper = (props: Props) => {
       <ViewCard>
         {marketHasDetails && details()}
         {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
-        {isQuestionFinalized && <button onClick={onResolveCondition}>FINALIZED!!!</button>}
         <Table head={renderTableHeader()}>{renderTableData()}</Table>
         <ButtonContainerStyled>
           <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
@@ -153,6 +152,7 @@ const ViewWrapper = (props: Props) => {
             </ButtonAnchor>
           )}
           <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
+          {isQuestionFinalized && <Button onClick={onResolveCondition}>Resolve condition</Button>}
         </ButtonContainerStyled>
         <ThreeBoxComments threadName={marketMakerAddress} />
       </ViewCard>

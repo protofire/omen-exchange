@@ -9,10 +9,12 @@ const Wrapper = styled.div`
   padding-top: 30px;
 
   > button {
-    margin-left: 10px;
+    @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+      margin-left: 10px;
 
-    &:first-child {
-      margin-left: 0;
+      &:first-child {
+        margin-left: 0;
+      }
     }
   }
 `
