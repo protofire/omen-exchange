@@ -1,4 +1,4 @@
-// Taken from https://github.com/faizrr/use-api-polling/blob/master/package.json and modified
+// Taken from https://github.com/faizrr/use-api-polling and modified
 
 import { useCallback, useState, useEffect, useRef } from 'react'
 
