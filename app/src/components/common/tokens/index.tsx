@@ -11,17 +11,22 @@ interface Props {
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
   readOnly?: boolean
   value: string
+  networkId: number
 }
 
 const FormOption = styled.option``
 
-const tokens = Object.entries(knownTokens).map(([id, knownToken]) => ({
-  label: knownToken.symbol,
-  value: id,
-}))
-
 export const Tokens = (props: Props) => {
-  const { ...restProps } = props
+  const { networkId, ...restProps } = props
+
+  const tokens = Object.entries(knownTokens)
+    .filter(([, knownToken]) => {
+      return knownToken.addresses[networkId]
+    })
+    .map(([id, knownToken]) => ({
+      label: knownToken.symbol,
+      value: id,
+    }))
 
   return (
     <Select {...restProps}>
