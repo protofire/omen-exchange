@@ -69,7 +69,6 @@ class MarketMakerService {
 
     try {
       const overrides = {
-        gasLimit: 750000,
         value: '0x0',
       }
       const transactionObject = await this.contract.addFunding(amount, distributionHint, overrides)
@@ -191,7 +190,6 @@ class MarketMakerService {
       const outcomeTokensToSell = await this.contract.calcSellAmount(amount, outcomeIndex)
 
       const overrides = {
-        gasLimit: 750000,
         value: '0x0',
       }
       const transactionObject = await this.contract.sell(
