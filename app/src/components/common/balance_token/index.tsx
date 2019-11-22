@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import styled from 'styled-components'
 
 import { getToken } from '../../../util/addresses'
 import { ButtonLink } from '../button_link'
@@ -14,6 +15,18 @@ interface Props {
   onClickMax: (collateral: Token, collateralBalance: BigNumber) => void
 }
 
+const Wrapper = styled.span`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  padding-bottom: 5px;
+`
+
+const BalanceTitle = styled.span`
+  margin-right: 10px;
+  margin-top: 3px;
+`
+
 export const BalanceToken = (props: Props) => {
   const context = useConnectedWeb3Context()
 
@@ -23,26 +36,31 @@ export const BalanceToken = (props: Props) => {
   const collateral = getToken(networkId, collateralId)
 
   const calculateBalanceAmount = useMemo(
-    () => async (): Promise<BigNumber> => {
+    () => async (): Promise<[BigNumber, string, string]> => {
       const collateralService = new ERC20Service(collateral.address)
 
-      return collateralService.getCollateral(account, library)
+      const collateralBalance = await collateralService.getCollateral(account, library)
+      return [
+        collateralBalance,
+        formatBigNumber(collateralBalance, collateral.decimals),
+        collateral.symbol,
+      ]
     },
     [account, library, collateral],
   )
 
-  const collateralBalance = useAsyncDerivedValue(
-    new BigNumber(0),
-    new BigNumber(0),
+  const [collateralBalance, calculateBalanceAmountValue, collateralSymbol] = useAsyncDerivedValue(
+    '',
+    [new BigNumber(0), '', ''],
     calculateBalanceAmount,
   )
 
-  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals)
-
   return (
-    <>
-      Balance {collateralBalanceFormatted} {collateral.symbol}{' '}
+    <Wrapper>
+      <BalanceTitle>
+        Balance {calculateBalanceAmountValue} {collateralSymbol}.
+      </BalanceTitle>
       <ButtonLink onClick={() => onClickMax(collateral, collateralBalance)}>Max</ButtonLink>
-    </>
+    </Wrapper>
   )
 }

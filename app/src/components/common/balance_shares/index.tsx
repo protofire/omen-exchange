@@ -1,48 +1,42 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 
-import { getToken } from '../../../util/addresses'
 import { ButtonLink } from '../button_link'
-import { BigNumber } from 'ethers/utils'
-import { useAsyncDerivedValue } from '../../../hooks/useAsyncDerivedValue'
 import { formatBigNumber } from '../../../util/tools'
-import { ERC20Service } from '../../../services'
-import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { Token } from '../../../util/types'
+import { BalanceItem, Token } from '../../../util/types'
+import styled from 'styled-components'
 
 interface Props {
-  collateralId: KnownToken
-  onClickMax: (collateral: Token, collateralBalance: BigNumber) => void
+  balanceItem?: BalanceItem
+  collateral: Token
+  onClickMax: (balanceItem?: BalanceItem) => void
 }
 
-export const BalanceToken = (props: Props) => {
-  const context = useConnectedWeb3Context()
+const Wrapper = styled.span`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  padding-bottom: 5px;
+`
 
-  const { networkId, account, library } = context
-  const { collateralId, onClickMax } = props
+const BalanceTitle = styled.span`
+  margin-right: 10px;
+  margin-top: 3px;
+`
 
-  const collateral = getToken(networkId, collateralId)
-
-  const calculateBalanceAmount = useMemo(
-    () => async (): Promise<BigNumber> => {
-      const collateralService = new ERC20Service(collateral.address)
-
-      return collateralService.getCollateral(account, library)
-    },
-    [account, library, collateral],
-  )
-
-  const collateralBalance = useAsyncDerivedValue(
-    new BigNumber(0),
-    new BigNumber(0),
-    calculateBalanceAmount,
-  )
-
-  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals)
+export const BalanceShares = (props: Props) => {
+  const { balanceItem, collateral, onClickMax } = props
+  const sharesBalanceFormatted = balanceItem
+    ? formatBigNumber(balanceItem.shares, collateral.decimals)
+    : ''
 
   return (
     <>
-      Balance {collateralBalanceFormatted} {collateral.symbol}{' '}
-      <ButtonLink onClick={() => onClickMax(collateral, collateralBalance)}>Max</ButtonLink>
+      {sharesBalanceFormatted && (
+        <Wrapper>
+          <BalanceTitle>Balance {sharesBalanceFormatted}.</BalanceTitle>
+          <ButtonLink onClick={() => onClickMax(balanceItem)}>Max</ButtonLink>
+        </Wrapper>
+      )}
     </>
   )
 }

@@ -154,9 +154,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <React.Fragment key="1">
         <BalanceToken
           collateralId={collateral.symbol.toLowerCase() as KnownToken}
-          onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
+          onClickMax={(collateral: Token, collateralBalance: BigNumber) =>
             setAmount(collateralBalance)
-          }}
+          }
         />
       </React.Fragment>
     )
@@ -165,7 +165,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const noteBuy = () => {
     return (
       <React.Fragment key="2">
-        You will be charged an extra 1% trade fee of{' '}
+        You will be charged an extra 1% trade fee of &nbsp;
         <strong>
           {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}
         </strong>
