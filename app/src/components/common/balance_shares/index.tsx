@@ -1,9 +1,9 @@
 import React from 'react'
+import styled from 'styled-components'
 
 import { ButtonLink } from '../button_link'
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, Token } from '../../../util/types'
-import styled from 'styled-components'
 
 interface Props {
   balanceItem?: BalanceItem
