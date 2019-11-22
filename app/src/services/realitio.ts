@@ -55,7 +55,6 @@ class RealitioService {
     category: string,
     arbitratorAddress: string,
     openingDateMoment: Moment,
-    value = '0',
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
     const questionText = RealitioQuestionLib.encodeText('bool', question, null, category)
@@ -67,7 +66,7 @@ class RealitioService {
 
     // send the transaction and wait until it's mined
     const transactionObject = await this.contract.askQuestion(...args, {
-      value: ethers.utils.bigNumberify(value),
+      value: '0x0',
     })
     logger.log(`Ask question transaction hash: ${transactionObject.hash}`)
     await this.provider.waitForTransaction(transactionObject.hash)
