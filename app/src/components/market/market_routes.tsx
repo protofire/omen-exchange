@@ -26,7 +26,8 @@ const MarketValidateContractAddress: React.FC<Props> = (props: Props) => {
 
   const { marketMakerAddress } = props
 
-  const { fee } = useMarketMakerData(marketMakerAddress, context)
+  const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
+  const { fee } = marketMakerData
   const contractExists = useCheckContractExists(marketMakerAddress, context)
 
   if (fee === null) {
