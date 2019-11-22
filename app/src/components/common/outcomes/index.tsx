@@ -38,7 +38,7 @@ const TextFieldStyled = styled(Textfield)`
 `
 
 const Outcomes = (props: Props) => {
-  const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
+  const outcomesToRender = props.outcomes.map((outcome, index) => (
     <TwoColumnsRowExtraMargin key={index}>
       <Textfield name={`outcome_${index}`} type="text" value={outcome.value} readOnly />
       <TextfieldCustomPlaceholder

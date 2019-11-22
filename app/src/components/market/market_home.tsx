@@ -33,7 +33,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     if (currentFilter === MarketFilters.MyMarkets) {
       setMarketsFiltered(
         markets.filter(
-          (market: MarketWithExtraData) =>
+          market =>
             'account' in context &&
             market.ownerAddress.toLowerCase() === context.account.toLowerCase(),
         ),
@@ -54,7 +54,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         />
       )}
       <ListCard>
-        {marketsFiltered.map((item: MarketWithExtraData, index: number) => {
+        {marketsFiltered.map((item, index) => {
           return <ListItem key={index} data={item}></ListItem>
         })}
       </ListCard>
