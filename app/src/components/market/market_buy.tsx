@@ -154,9 +154,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <React.Fragment key="1">
         <BalanceToken
           collateralId={collateral.symbol.toLowerCase() as KnownToken}
-          onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
+          onClickMax={(collateral: Token, collateralBalance: BigNumber) =>
             setAmount(collateralBalance)
-          }}
+          }
         />
       </React.Fragment>
     )

@@ -27,6 +27,7 @@ import {
   mulBN,
 } from '../../util/tools'
 import { SectionTitle } from '../common/section_title'
+import { BalanceShares } from '../common/balance_shares'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -146,6 +147,29 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     amountShares.isZero() ||
     !haveEnoughShares
 
+  const noteBalanceShares = () => {
+    return (
+      <React.Fragment key="1">
+        <BalanceShares
+          balanceItem={balanceItem}
+          collateral={collateral}
+          onClickMax={(balanceItemSet?: BalanceItem) => {
+            if (balanceItemSet) setAmountShares(balanceItemSet.shares)
+          }}
+        />
+      </React.Fragment>
+    )
+  }
+
+  const noteSell = () => {
+    return (
+      <React.Fragment key="2">
+        You will be charged an extra 1% trade fee of{' '}
+        <strong key="1">{ethers.utils.formatEther(costFee)}</strong>
+      </React.Fragment>
+    )
+  }
+
   return (
     <>
       <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
@@ -173,10 +197,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               placeholderText="Shares"
             />
           }
-          note={[
-            'You will be charged an extra 1% trade fee of ',
-            <strong key="1">{ethers.utils.formatEther(costFee)}</strong>,
-          ]}
+          note={[noteBalanceShares(), noteSell()]}
           title={'Amount'}
           tooltip={{ id: 'amount', description: 'Amount of shares to sell.' }}
         />
