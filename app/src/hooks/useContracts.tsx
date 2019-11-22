@@ -1,7 +1,12 @@
 import { useMemo } from 'react'
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { getContractAddress } from '../util/addresses'
-import { ConditionalTokenService, MarketMakerFactoryService, RealitioService } from '../services'
+import {
+  ConditionalTokenService,
+  MarketMakerFactoryService,
+  OracleService,
+  RealitioService,
+} from '../services'
 import { DisconnectedWeb3Context } from './disconnectedWeb3'
 
 export const useContracts = (context: ConnectedWeb3Context | DisconnectedWeb3Context) => {
@@ -27,9 +32,13 @@ export const useContracts = (context: ConnectedWeb3Context | DisconnectedWeb3Con
     account,
   ])
 
+  const oracleAddress = getContractAddress(networkId, 'oracle')
+  const oracle = useMemo(() => new OracleService(oracleAddress, library), [oracleAddress, library])
+
   return {
     conditionalTokens,
     marketMakerFactory,
     realitio,
+    oracle,
   }
 }
