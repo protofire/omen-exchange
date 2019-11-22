@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers/utils'
 export enum Status {
   Ready = 'Ready',
   Loading = 'Loading',
+  Refreshing = 'Refreshing',
   Done = 'Done',
   Error = 'Error',
 }

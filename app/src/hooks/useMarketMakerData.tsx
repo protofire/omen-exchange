@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { BigNumber } from 'ethers/utils'
 
+import { usePolling } from './usePolling'
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { MarketMakerService } from '../services'
 import { getArbitratorFromAddress, getTokenFromAddress } from '../util/addresses'
@@ -15,153 +16,144 @@ interface MarketMakerData {
   userPoolShares: BigNumber
   balance: BalanceItem[]
   winnerOutcome: Maybe<WinnerOutcome>
-  status: Status
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
   collateral: Maybe<Token>
+  questionId: string
   question: string
   category: string
   resolution: Maybe<Date>
   arbitrator: Maybe<Arbitrator>
   fee: Maybe<BigNumber>
+  isQuestionFinalized: boolean
 }
 
 export const useMarketMakerData = (
   marketMakerAddress: string,
   context: ConnectedWeb3Context,
-): MarketMakerData => {
+): { marketMakerData: MarketMakerData; status: Status } => {
   const { conditionalTokens, realitio } = useContracts(context)
 
-  const [totalPoolShares, setTotalPoolShares] = useState<BigNumber>(new BigNumber(0))
-  const [userPoolShares, setUserPoolShares] = useState<BigNumber>(new BigNumber(0))
-  const [balance, setBalance] = useState<BalanceItem[]>([])
-  const [winnerOutcome, setWinnerOutcome] = useState<Maybe<WinnerOutcome>>(null)
-  const [status, setStatus] = useState<Status>(Status.Ready)
-  const [marketMakerFunding, setMarketMakerFunding] = useState<BigNumber>(new BigNumber(0))
-  const [marketMakerUserFunding, setMarketMakerUserFunding] = useState<BigNumber>(new BigNumber(0))
-  const [collateral, setCollateral] = useState<Maybe<Token>>(null)
-  const [question, setQuestion] = useState<string>('')
-  const [category, setCategory] = useState<string>('')
-  const [resolution, setResolution] = useState<Maybe<Date>>(null)
-  const [arbitrator, setArbitrator] = useState<Maybe<Arbitrator>>(null)
-  const [fee, setFee] = useState<Maybe<BigNumber>>(null)
+  const [status, setStatus] = useState(Status.Ready)
 
-  useEffect(() => {
-    let isSubscribed = true
-    const fetchMarketMakerData = async ({ enableStatus }: { enableStatus: boolean }) => {
-      try {
-        enableStatus && setStatus(Status.Loading)
-        const provider = context.library
-        const user = await provider.getSigner().getAddress()
+  const initialMarketMakerData = useMemo(
+    () => ({
+      totalPoolShares: new BigNumber(0),
+      userPoolShares: new BigNumber(0),
+      balance: [],
+      winnerOutcome: null,
+      marketMakerFunding: new BigNumber(0),
+      marketMakerUserFunding: new BigNumber(0),
+      collateral: null,
+      questionId: '',
+      question: '',
+      category: '',
+      resolution: null,
+      arbitrator: null,
+      isQuestionFinalized: false,
+      fee: null,
+    }),
+    [],
+  )
 
-        const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+  const fetchFunc = useCallback(async () => {
+    setStatus(status => (status === Status.Ready ? Status.Loading : Status.Refreshing))
+    const provider = context.library
+    const user = await provider.getSigner().getAddress()
 
-        const conditionId = await marketMaker.getConditionId()
-        const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
+    const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
 
-        const questionId = await conditionalTokens.getQuestionId(conditionId)
-        const { question, resolution, arbitratorAddress, category } = await realitio.getQuestion(
-          questionId,
-        )
+    const conditionId = await marketMaker.getConditionId()
+    const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
 
-        const arbitratorObject = getArbitratorFromAddress(context.networkId, arbitratorAddress)
+    const questionId = await conditionalTokens.getQuestionId(conditionId)
+    const { question, resolution, arbitratorAddress, category } = await realitio.getQuestion(
+      questionId,
+    )
 
-        const winnerOutcomeData = isConditionResolved
-          ? await conditionalTokens.getWinnerOutcome(conditionId)
-          : null
+    const arbitrator = getArbitratorFromAddress(context.networkId, arbitratorAddress)
 
-        const [
-          userShares,
-          marketMakerShares,
-          marketMakerFund,
-          marketMakerUserFund,
-          collateralAddress,
-          fee,
-        ] = await Promise.all([
-          marketMaker.getBalanceInformation(user),
-          marketMaker.getBalanceInformation(marketMakerAddress),
-          marketMaker.getTotalSupply(),
-          marketMaker.balanceOf(user),
-          marketMaker.getCollateralToken(),
-          marketMaker.getFee(),
-        ])
+    const winnerOutcome = isConditionResolved
+      ? await conditionalTokens.getWinnerOutcome(conditionId)
+      : null
 
-        const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
+    const [
+      userShares,
+      marketMakerShares,
+      marketMakerFunding,
+      marketMakerUserFunding,
+      collateralAddress,
+      totalPoolShares,
+      userPoolShares,
+      fee,
+      isQuestionFinalized,
+    ] = await Promise.all([
+      marketMaker.getBalanceInformation(user),
+      marketMaker.getBalanceInformation(marketMakerAddress),
+      marketMaker.getTotalSupply(),
+      marketMaker.balanceOf(user),
+      marketMaker.getCollateralToken(),
+      marketMaker.poolSharesTotalSupply(),
+      marketMaker.poolSharesBalanceOf(user),
+      marketMaker.getFee(),
+      realitio.isFinalized(questionId),
+    ])
 
-        const token = getTokenFromAddress(context.networkId, collateralAddress)
+    const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
-        const probabilityForYes = actualPrices.actualPriceForYes * 100
-        const probabilityForNo = actualPrices.actualPriceForNo * 100
+    const collateral = getTokenFromAddress(context.networkId, collateralAddress)
 
-        const balanceShares = [
-          {
-            outcomeName: OutcomeSlot.Yes,
-            probability: Math.round((probabilityForYes / 100) * 100),
-            currentPrice: actualPrices.actualPriceForYes,
-            shares: userShares.balanceOfForYes,
-            holdings: marketMakerShares.balanceOfForYes,
-            winningOutcome: winnerOutcome === WinnerOutcome.Yes,
-          },
-          {
-            outcomeName: OutcomeSlot.No,
-            probability: Math.round((probabilityForNo / 100) * 100),
-            currentPrice: actualPrices.actualPriceForNo,
-            shares: userShares.balanceOfForNo,
-            holdings: marketMakerShares.balanceOfForNo,
-            winningOutcome: winnerOutcome === WinnerOutcome.No,
-          },
-        ]
+    const probabilityForYes = actualPrices.actualPriceForYes * 100
+    const probabilityForNo = actualPrices.actualPriceForNo * 100
 
-        const poolSharesTotalSupply = await marketMaker.poolSharesTotalSupply()
-        const userPoolShares = await marketMaker.poolSharesBalanceOf(user)
+    const balance = [
+      {
+        outcomeName: OutcomeSlot.Yes,
+        probability: Math.round((probabilityForYes / 100) * 100),
+        currentPrice: actualPrices.actualPriceForYes,
+        shares: userShares.balanceOfForYes,
+        holdings: marketMakerShares.balanceOfForYes,
+        winningOutcome: winnerOutcome === WinnerOutcome.Yes,
+      },
+      {
+        outcomeName: OutcomeSlot.No,
+        probability: Math.round((probabilityForNo / 100) * 100),
+        currentPrice: actualPrices.actualPriceForNo,
+        shares: userShares.balanceOfForNo,
+        holdings: marketMakerShares.balanceOfForNo,
+        winningOutcome: winnerOutcome === WinnerOutcome.No,
+      },
+    ]
 
-        if (isSubscribed) {
-          setArbitrator(arbitratorObject)
-          setQuestion(question)
-          setResolution(resolution)
-          setCategory(category)
-          setWinnerOutcome(winnerOutcomeData)
-          setCollateral(token)
-          setTotalPoolShares(poolSharesTotalSupply)
-          setUserPoolShares(userPoolShares)
-          setMarketMakerFunding(marketMakerFund)
-          setMarketMakerUserFunding(marketMakerUserFund)
-          setBalance(balanceShares)
-          setFee(fee)
-        }
+    setStatus(Status.Done)
 
-        enableStatus && setStatus(Status.Done)
-      } catch (error) {
-        logger.error('There was an error fetching the market maker data:', error.message)
-        enableStatus && setStatus(Status.Error)
-      }
+    return {
+      totalPoolShares,
+      userPoolShares,
+      balance,
+      arbitrator,
+      winnerOutcome,
+      questionId,
+      question,
+      resolution,
+      category,
+      collateral,
+      marketMakerFunding,
+      marketMakerUserFunding,
+      isQuestionFinalized,
+      fee,
     }
+  }, [conditionalTokens, context.library, context.networkId, marketMakerAddress, realitio])
 
-    fetchMarketMakerData({ enableStatus: true })
+  const marketMakerData = usePolling<MarketMakerData>({
+    fetchFunc,
+    initialState: initialMarketMakerData,
+    delay: 5000,
+    onError: useCallback(error => {
+      logger.error('There was an error fetching the market maker data:', error.message)
+      setStatus(Status.Error)
+    }, []),
+  })
 
-    const intervalId = setInterval(() => {
-      fetchMarketMakerData({ enableStatus: false })
-    }, 2000)
-
-    return () => {
-      clearInterval(intervalId)
-      isSubscribed = false
-    }
-  }, [marketMakerAddress, context, conditionalTokens, winnerOutcome, realitio])
-
-  return {
-    totalPoolShares,
-    userPoolShares,
-    balance,
-    winnerOutcome,
-    status,
-    marketMakerFunding,
-    marketMakerUserFunding,
-    collateral,
-    question,
-    resolution,
-    arbitrator,
-    category,
-    fee,
-  }
+  return { marketMakerData, status }
 }
