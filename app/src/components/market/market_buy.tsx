@@ -161,6 +161,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       </React.Fragment>
     )
   }
+
   const noteBuy = () => {
     return (
       <React.Fragment key="2">
@@ -171,6 +172,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       </React.Fragment>
     )
   }
+
   return (
     <>
       <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
