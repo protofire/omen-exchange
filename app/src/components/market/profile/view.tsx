@@ -6,7 +6,7 @@ import { ThreeBoxComments } from '../../common/three_box_comments'
 import { ViewCard } from '../../common/view_card'
 import { formatBigNumber } from '../../../util/tools'
 import { Status, BalanceItem, Token, Arbitrator } from '../../../util/types'
-import { ButtonAnchor } from '../../common'
+import { Button, ButtonAnchor } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
@@ -25,6 +25,8 @@ interface Props extends RouteComponentProps<{}> {
   theme?: any
   marketMakerAddress: string
   funding: BigNumber
+  isQuestionFinalized: boolean
+  onResolveCondition: () => Promise<void>
 }
 
 const ButtonContainerStyled = styled(ButtonContainer)`
@@ -37,7 +39,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
   }
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: flex;
+    grid-template-columns: 1fr 1fr 1fr;
 
     > a {
       margin-left: 10px;
@@ -62,6 +64,8 @@ const ViewWrapper = (props: Props) => {
     marketMakerAddress,
     arbitrator,
     category,
+    isQuestionFinalized,
+    onResolveCondition,
   } = props
 
   const userHasShares = balance.some((balanceItem: BalanceItem) => {
@@ -164,6 +168,7 @@ const ViewWrapper = (props: Props) => {
             </ButtonAnchor>
           )}
           <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
+          {isQuestionFinalized && <Button onClick={onResolveCondition}>Resolve condition</Button>}
         </ButtonContainerStyled>
         <ThreeBoxComments threadName={marketMakerAddress} />
       </ViewCard>

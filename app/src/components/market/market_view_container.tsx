@@ -2,6 +2,7 @@ import React from 'react'
 
 import { MarketView } from './market_view'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { useContracts } from '../../hooks/useContracts'
 import { FullLoading } from '../common/full_loading'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
 
@@ -12,20 +13,28 @@ interface Props {
 const MarketViewContainer: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
+  const { oracle } = useContracts(context)
+
   const { marketMakerAddress } = props
+
+  const { marketMakerData, status } = useMarketMakerData(marketMakerAddress, context)
 
   const {
     marketMakerFunding,
     balance,
     winnerOutcome,
-    status,
     collateral,
     question,
     questionId,
     resolution,
     arbitrator,
     category,
-  } = useMarketMakerData(marketMakerAddress, context)
+    isQuestionFinalized,
+  } = marketMakerData
+
+  const resolveCondition = async () => {
+    return oracle.resolveCondition(questionId)
+  }
 
   if (!collateral) {
     return <FullLoading />
@@ -44,6 +53,8 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
       category={category || ''}
       resolution={resolution}
       arbitrator={arbitrator}
+      isQuestionFinalized={isQuestionFinalized}
+      onResolveCondition={resolveCondition}
     />
   )
 }

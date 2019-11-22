@@ -43,7 +43,9 @@ class MarketMakerFactoryService {
       from: this.signerAddress,
     })
 
-    const transactionObject = await this.contract.createFixedProductMarketMaker(...args)
+    const transactionObject = await this.contract.createFixedProductMarketMaker(...args, {
+      value: '0x0',
+    })
     await this.provider.waitForTransaction(transactionObject.hash)
 
     return marketMakerAddress

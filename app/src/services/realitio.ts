@@ -12,6 +12,7 @@ const logger = getLogger('Services::Realitio')
 const realitioAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public payable returns (bytes32)',
   'event LogNewQuestion(bytes32 indexed question_id, address indexed user, uint256 template_id, string question, bytes32 indexed content_hash, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce, uint256 created)',
+  'function isFinalized(bytes32 question_id) view public returns (bool)',
 ]
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
@@ -54,7 +55,6 @@ class RealitioService {
     category: string,
     arbitratorAddress: string,
     openingDateMoment: Moment,
-    value = '0',
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
     const questionText = RealitioQuestionLib.encodeText('bool', question, null, category)
@@ -66,7 +66,7 @@ class RealitioService {
 
     // send the transaction and wait until it's mined
     const transactionObject = await this.contract.askQuestion(...args, {
-      value: ethers.utils.bigNumberify(value),
+      value: '0x0',
     })
     logger.log(`Ask question transaction hash: ${transactionObject.hash}`)
     await this.provider.waitForTransaction(transactionObject.hash)
@@ -106,6 +106,19 @@ class RealitioService {
       category,
       resolution: new Date(event.values.opening_ts * 1000),
       arbitratorAddress: event.values.arbitrator,
+    }
+  }
+
+  isFinalized = async (questionId: string): Promise<boolean> => {
+    try {
+      const isFinalized = await this.contract.isFinalized(questionId)
+      return isFinalized
+    } catch (err) {
+      logger.error(
+        `There was an error querying if the question with id '${questionId}' is finalized`,
+        err.message,
+      )
+      throw err
     }
   }
 }

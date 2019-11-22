@@ -19,6 +19,8 @@ interface Props {
   category: string
   resolution: Maybe<Date>
   arbitrator: Maybe<Arbitrator>
+  isQuestionFinalized: boolean
+  onResolveCondition: () => Promise<void>
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {
