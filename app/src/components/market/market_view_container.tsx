@@ -25,11 +25,11 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
     winnerOutcome,
     collateral,
     question,
+    questionId,
     resolution,
     arbitrator,
     category,
     isQuestionFinalized,
-    questionId,
   } = marketMakerData
 
   const resolveCondition = async () => {
@@ -49,6 +49,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
       winnerOutcome={winnerOutcome}
       collateral={collateral}
       question={question || ''}
+      questionId={questionId || ''}
       category={category || ''}
       resolution={resolution}
       arbitrator={arbitrator}
