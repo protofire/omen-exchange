@@ -6,7 +6,7 @@ import { ThreeBoxComments } from '../../common/three_box_comments'
 import { ViewCard } from '../../common/view_card'
 import { formatBigNumber } from '../../../util/tools'
 import { Status, BalanceItem, Token, Arbitrator } from '../../../util/types'
-import { ButtonAnchor } from '../../common'
+import { Button, ButtonAnchor } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
 import { Table, TD, TH, THead, TR } from '../../common/table'
@@ -19,11 +19,14 @@ interface Props extends RouteComponentProps<{}> {
   collateral: Token
   arbitrator: Maybe<Arbitrator>
   question: string
+  questionId: string
   category: string
   status: Status
   theme?: any
   marketMakerAddress: string
   funding: BigNumber
+  isQuestionFinalized: boolean
+  onResolveCondition: () => Promise<void>
 }
 
 const ButtonContainerStyled = styled(ButtonContainer)`
@@ -36,7 +39,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
   }
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: flex;
+    grid-template-columns: 1fr 1fr 1fr;
 
     > a {
       margin-left: 10px;
@@ -52,7 +55,18 @@ const Grid = styled.div`
 `
 
 const ViewWrapper = (props: Props) => {
-  const { balance, collateral, status, theme, marketMakerAddress, arbitrator, category } = props
+  const {
+    balance,
+    collateral,
+    status,
+    questionId,
+    theme,
+    marketMakerAddress,
+    arbitrator,
+    category,
+    isQuestionFinalized,
+    onResolveCondition,
+  } = props
 
   const userHasShares = balance.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -116,6 +130,20 @@ const ViewWrapper = (props: Props) => {
               ]}
             />
           )}
+          {questionId && (
+            <TitleValue
+              title={'Realitio'}
+              value={
+                <a
+                  href={`https://realitio.github.io/#!/question/${questionId}`}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  Question URL
+                </a>
+              }
+            />
+          )}
         </Grid>
       </>
     )
@@ -140,6 +168,7 @@ const ViewWrapper = (props: Props) => {
             </ButtonAnchor>
           )}
           <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
+          {isQuestionFinalized && <Button onClick={onResolveCondition}>Resolve condition</Button>}
         </ButtonContainerStyled>
         <ThreeBoxComments threadName={marketMakerAddress} />
       </ViewCard>

@@ -184,7 +184,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           pricesAfterTrade={[priceAfterTradeForYes, priceAfterTradeForNo]}
           outcomeSelected={outcome}
           outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
-          disabledColumns={[OutcomeTableValue.Shares, OutcomeTableValue.Payout]}
+          disabledColumns={[OutcomeTableValue.Payout]}
         />
         <AmountWrapper
           formField={

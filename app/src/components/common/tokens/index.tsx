@@ -23,6 +23,7 @@ export const Tokens = (props: Props) => {
     .filter(([, knownToken]) => {
       return knownToken.addresses[networkId]
     })
+    .sort(([, knownTokenA], [, knownTokenB]) => (knownTokenA.order > knownTokenB.order ? 1 : -1))
     .map(([id, knownToken]) => ({
       label: knownToken.symbol,
       value: id,

@@ -15,6 +15,7 @@ const MarketFundContainer: React.FC<Props> = (props: Props) => {
 
   const { marketMakerAddress } = props
   const { question, resolution } = useQuestion(marketMakerAddress, context)
+  const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
   const {
     totalPoolShares,
     userPoolShares,
@@ -23,7 +24,7 @@ const MarketFundContainer: React.FC<Props> = (props: Props) => {
     marketMakerFunding,
     marketMakerUserFunding,
     collateral,
-  } = useMarketMakerData(marketMakerAddress, context)
+  } = marketMakerData
 
   if (!collateral) {
     return <FullLoading />

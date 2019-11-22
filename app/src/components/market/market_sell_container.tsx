@@ -16,10 +16,8 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
 
   const { marketMakerAddress } = props
   const { question, resolution } = useQuestion(marketMakerAddress, context)
-  const { balance, marketMakerFunding, collateral } = useMarketMakerData(
-    marketMakerAddress,
-    context,
-  )
+  const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
+  const { balance, marketMakerFunding, collateral } = marketMakerData
 
   const { conditionalTokens } = useContracts(context)
 
