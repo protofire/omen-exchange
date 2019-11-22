@@ -23,6 +23,7 @@ interface MarketMakerData {
   category: string
   resolution: Maybe<Date>
   arbitrator: Maybe<Arbitrator>
+  fee: Maybe<BigNumber>
 }
 
 export const useMarketMakerData = (
@@ -43,6 +44,7 @@ export const useMarketMakerData = (
   const [category, setCategory] = useState<string>('')
   const [resolution, setResolution] = useState<Maybe<Date>>(null)
   const [arbitrator, setArbitrator] = useState<Maybe<Arbitrator>>(null)
+  const [fee, setFee] = useState<Maybe<BigNumber>>(null)
 
   useEffect(() => {
     let isSubscribed = true
@@ -74,12 +76,14 @@ export const useMarketMakerData = (
           marketMakerFund,
           marketMakerUserFund,
           collateralAddress,
+          fee,
         ] = await Promise.all([
           marketMaker.getBalanceInformation(user),
           marketMaker.getBalanceInformation(marketMakerAddress),
           marketMaker.getTotalSupply(),
           marketMaker.balanceOf(user),
           marketMaker.getCollateralToken(),
+          marketMaker.getFee(),
         ])
 
         const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
@@ -123,6 +127,7 @@ export const useMarketMakerData = (
           setMarketMakerFunding(marketMakerFund)
           setMarketMakerUserFunding(marketMakerUserFund)
           setBalance(balanceShares)
+          setFee(fee)
         }
 
         enableStatus && setStatus(Status.Done)
@@ -157,5 +162,6 @@ export const useMarketMakerData = (
     resolution,
     arbitrator,
     category,
+    fee,
   }
 }

@@ -44,7 +44,7 @@ class MarketMakerService {
     return this.contract.collateralToken()
   }
 
-  getFee = async (): Promise<any> => {
+  getFee = async (): Promise<BigNumber> => {
     return this.contract.fee()
   }
 
