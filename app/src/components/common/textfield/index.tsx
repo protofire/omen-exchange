@@ -7,7 +7,7 @@ interface Props extends HTMLAttributes<HTMLInputElement> {
   disabled?: boolean
   focusOutline?: boolean
   min?: number
-  name: string
+  name?: string
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => any
   onClick?: (event: React.MouseEvent<HTMLInputElement>) => any
   placeholder?: string

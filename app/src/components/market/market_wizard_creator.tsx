@@ -13,6 +13,7 @@ import {
 
 import { StatusMarketCreation } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
+import { Outcome } from '../common/outcomes'
 
 export interface MarketData {
   collateralId: KnownToken
@@ -22,10 +23,7 @@ export interface MarketData {
   arbitratorId: KnownArbitrator
   spread: string
   funding: BigNumber
-  outcomeValueOne: string
-  outcomeValueTwo: string
-  outcomeProbabilityOne: string
-  outcomeProbabilityTwo: string
+  outcomes: Outcome[]
 }
 
 interface Props {
@@ -51,10 +49,16 @@ export class MarketWizardCreator extends Component<Props, State> {
       arbitratorId: 'realitio',
       spread: '1',
       funding: new BigNumber('0'),
-      outcomeValueOne: 'Yes',
-      outcomeValueTwo: 'No',
-      outcomeProbabilityOne: '50',
-      outcomeProbabilityTwo: '50',
+      outcomes: [
+        {
+          name: 'Yes',
+          probability: 50,
+        },
+        {
+          name: 'No',
+          probability: 50,
+        },
+      ],
     },
   }
 
@@ -93,6 +97,16 @@ export class MarketWizardCreator extends Component<Props, State> {
     }))
   }
 
+  public handleOutcomesChange = (outcomes: Outcome[]) => {
+    this.setState((prevState: State) => ({
+      ...prevState,
+      marketData: {
+        ...prevState.marketData,
+        outcomes,
+      },
+    }))
+  }
+
   public handleChangeDate = (date: Date | null) => {
     this.setState((prevState: State) => ({
       ...prevState,
@@ -121,10 +135,7 @@ export class MarketWizardCreator extends Component<Props, State> {
       arbitratorId,
       spread,
       funding,
-      outcomeValueOne,
-      outcomeValueTwo,
-      outcomeProbabilityOne,
-      outcomeProbabilityTwo,
+      outcomes,
     } = marketData
 
     switch (currentStep) {
@@ -152,13 +163,10 @@ export class MarketWizardCreator extends Component<Props, State> {
             back={() => this.back()}
             next={() => this.next()}
             values={{
-              outcomeProbabilityOne,
-              outcomeProbabilityTwo,
-              outcomeValueOne,
-              outcomeValueTwo,
+              outcomes,
               question,
             }}
-            handleChange={this.handleChange}
+            handleOutcomesChange={this.handleOutcomesChange}
           />
         )
       case 4:

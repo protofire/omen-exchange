@@ -29,16 +29,7 @@ const MarketWizardCreatorContainer: FC = () => {
       const provider = context.library
       const user = await provider.getSigner().getAddress()
 
-      const {
-        collateralId,
-        arbitratorId,
-        question,
-        resolution,
-        funding,
-        outcomeProbabilityOne,
-        outcomeProbabilityTwo,
-        category,
-      } = data
+      const { collateralId, arbitratorId, question, resolution, funding, outcomes, category } = data
       const openingDateMoment = moment(resolution)
 
       const collateralToken = getToken(networkId, collateralId)
@@ -93,8 +84,8 @@ const MarketWizardCreatorContainer: FC = () => {
       )
       await marketMakerService.addInitialFunding(
         funding,
-        +outcomeProbabilityOne,
-        +outcomeProbabilityTwo,
+        +outcomes[0].probability,
+        +outcomes[1].probability,
       )
 
       setStatus(StatusMarketCreation.Done)
