@@ -68,7 +68,7 @@ export const OutcomeTable = (props: Props) => {
     return (
       <THead>
         <TR>
-          {TableHead.map((value: OutcomeTableValue, index: number) => {
+          {TableHead.map((value, index) => {
             return !disabledColumns.includes(value) ? (
               <TH textAlign={TableCellsAlign[index]} key={index}>
                 {value}
@@ -80,7 +80,7 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
-  const renderTableData = balance.map((balanceItem: BalanceItem, index: number) => {
+  const renderTableData = balance.map((balanceItem, index) => {
     const { outcomeName, probability, currentPrice, shares, winningOutcome } = balanceItem
 
     return (

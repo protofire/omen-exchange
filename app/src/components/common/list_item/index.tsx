@@ -1,6 +1,6 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
-import { MarketAndQuestion, MarketStatus } from '../../../util/types'
+import { MarketWithExtraData, MarketStatus } from '../../../util/types'
 import { formatDate } from '../../../util/tools'
 import { CalendarIcon } from '../calendar_icon'
 import { ChevronRightIcon } from '../chevron_right_icon'
@@ -113,13 +113,13 @@ const Chevron = styled(ChevronRightIcon)`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  data: MarketAndQuestion
+  data: MarketWithExtraData
 }
 
 export const ListItem: React.FC<Props> = (props: Props) => {
   const { data } = props
   return (
-    <ListItemWrapper to={`${data.marketMakerAddress}`}>
+    <ListItemWrapper to={`${data.address}`}>
       <Contents>
         <Title>{data.question}</Title>
         <Info>
@@ -129,8 +129,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
             <ResolutionText>{data.resolution ? formatDate(data.resolution) : ''}</ResolutionText>
           </ResolutionDate>
           <Separator>-</Separator>
-          <Status resolved={data.marketStatus === MarketStatus.Resolved ? true : false}>
-            {data.marketStatus}
+          <Status resolved={data.status === MarketStatus.Resolved ? true : false}>
+            {data.status}
           </Status>
         </Info>
       </Contents>

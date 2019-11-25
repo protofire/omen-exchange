@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
+import { FEE } from '../common/constants'
+import { MarketMakerService } from '../services/market_maker'
 import { getLogger } from '../util/logger'
-import { Market, MarketAndQuestion, MarketStatus, Status } from '../util/types'
+import { Market, MarketWithExtraData, MarketStatus, Status } from '../util/types'
 import { DisconnectedWeb3Context } from './disconnectedWeb3'
 
 const logger = getLogger('Market::useMarkets')
@@ -11,13 +13,13 @@ const logger = getLogger('Market::useMarkets')
 export const useMarkets = (
   context: ConnectedWeb3Context | DisconnectedWeb3Context,
 ): {
-  markets: MarketAndQuestion[]
+  markets: MarketWithExtraData[]
   status: Status
 } => {
   const { marketMakerFactory, conditionalTokens, realitio } = useContracts(context)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [markets, setMarkets] = useState<MarketAndQuestion[]>([])
+  const [markets, setMarkets] = useState<MarketWithExtraData[]>([])
 
   useEffect(() => {
     let isSubscribed = true
@@ -27,7 +29,7 @@ export const useMarkets = (
         setStatus(Status.Loading)
         const provider = context.library
 
-        const getQuestionData = async (market: Market): Promise<MarketAndQuestion> => {
+        const getExtraData = async (market: Market): Promise<MarketWithExtraData> => {
           const { conditionId } = market
           // Get question data
           const questionId = await conditionalTokens.getQuestionId(conditionId)
@@ -37,23 +39,33 @@ export const useMarkets = (
           // Know if a market is open or resolved
           const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
           const marketStatus = isConditionResolved ? MarketStatus.Resolved : MarketStatus.Open
+
+          const marketMakerService = new MarketMakerService(
+            market.address,
+            conditionalTokens,
+            provider,
+          )
+
+          const fee = await marketMakerService.getFee()
+
           return {
             ...market,
             question,
             resolution,
             category,
             arbitratorAddress,
-            marketStatus,
+            status: marketStatus,
+            fee,
           }
         }
 
         const markets = await marketMakerFactory.getMarkets(provider)
-        const marketsWithRealitioData = await Promise.all(
-          markets.map((market: Market) => getQuestionData(market)),
-        )
+        const marketsWithExtraData = await Promise.all(markets.map(getExtraData))
 
-        const marketsOrdered = marketsWithRealitioData.sort(
-          (marketA: MarketAndQuestion, marketB: MarketAndQuestion) => {
+        const validMarkets = marketsWithExtraData.filter(market => market.fee.eq(FEE))
+
+        const marketsOrdered = validMarkets.sort(
+          (marketA: MarketWithExtraData, marketB: MarketWithExtraData) => {
             if (marketA.resolution && marketB.resolution) {
               return marketB.resolution.getTime() - marketA.resolution.getTime()
             }

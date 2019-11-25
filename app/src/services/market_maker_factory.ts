@@ -71,7 +71,7 @@ class MarketMakerFactoryService {
         const { fixedProductMarketMaker, creator, collateralToken, conditionIds } = parsedLog.values
 
         return {
-          marketMakerAddress: fixedProductMarketMaker,
+          address: fixedProductMarketMaker,
           ownerAddress: creator,
           conditionId: conditionIds[0],
           collateralTokenAddress: collateralToken,
