@@ -19,8 +19,8 @@ interface MarketMakerData {
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
   collateral: Maybe<Token>
-  questionId: string
   question: string
+  questionId: string
   category: string
   resolution: Maybe<Date>
   arbitrator: Maybe<Arbitrator>
@@ -128,8 +128,8 @@ export const useMarketMakerData = (
       balance,
       arbitrator,
       winnerOutcome,
-      questionId,
       question,
+      questionId,
       resolution,
       category,
       collateral,

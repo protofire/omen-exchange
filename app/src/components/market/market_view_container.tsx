@@ -21,10 +21,10 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
     balance,
     collateral,
     question,
+    questionId,
     resolution,
     arbitrator,
     category,
-    questionId,
     isConditionResolved,
     isQuestionFinalized,
   } = marketMakerData

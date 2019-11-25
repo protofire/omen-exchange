@@ -19,6 +19,7 @@ interface Props extends RouteComponentProps<{}> {
   collateral: Token
   arbitrator: Maybe<Arbitrator>
   question: string
+  questionId: string
   category: string
   status: Status
   theme?: any
@@ -52,7 +53,16 @@ const Grid = styled.div`
 `
 
 const ViewWrapper = (props: Props) => {
-  const { balance, collateral, status, theme, marketMakerAddress, arbitrator, category } = props
+  const {
+    balance,
+    collateral,
+    status,
+    questionId,
+    theme,
+    marketMakerAddress,
+    arbitrator,
+    category,
+  } = props
 
   const userHasShares = balance.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -114,6 +124,20 @@ const ViewWrapper = (props: Props) => {
                 </a>,
                 ' oracle as final arbitrator.',
               ]}
+            />
+          )}
+          {questionId && (
+            <TitleValue
+              title={'Realitio'}
+              value={
+                <a
+                  href={`https://realitio.github.io/#!/question/${questionId}`}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  Question URL
+                </a>
+              }
             />
           )}
         </Grid>
