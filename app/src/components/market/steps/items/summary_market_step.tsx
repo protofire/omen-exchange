@@ -15,7 +15,6 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { useMarketMakerData } from '../../../../hooks/useMarketMakerData'
 import { useQuestion } from '../../../../hooks/useQuestion'
 import { FullLoading } from '../../../common/full_loading'
-import { BalanceItem } from '../../../../util/types'
 import { NavLink } from 'react-router-dom'
 
 const TableStyled = styled(Table)`
@@ -118,7 +117,7 @@ const SummaryMarketStep = (props: Props) => {
             </THead>
           }
         >
-          {balance.map((item: BalanceItem, index: number) => {
+          {balance.map((item, index) => {
             return (
               <TR key={index}>
                 <TD>{item.outcomeName}</TD>

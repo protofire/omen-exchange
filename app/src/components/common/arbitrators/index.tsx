@@ -26,7 +26,7 @@ export const Arbitrators = (props: Props) => {
 
   return (
     <Select {...restProps}>
-      {arbitrators.map((arbitrator: any) => {
+      {arbitrators.map(arbitrator => {
         return (
           <FormOption key={arbitrator.value} value={arbitrator.value}>
             {arbitrator.label}
