@@ -19,9 +19,8 @@ class MarketMakerFactoryService {
   provider: any
 
   constructor(address: string, provider: any, signerAddress: string) {
-    if (signerAddress) {
+    if (Object.prototype.hasOwnProperty.call(provider, 'getSigner')) {
       const signer: Wallet = provider.getSigner()
-
       this.contract = new ethers.Contract(address, marketMakerFactoryAbi, provider).connect(signer)
     } else {
       this.contract = new ethers.Contract(address, marketMakerFactoryAbi, provider)

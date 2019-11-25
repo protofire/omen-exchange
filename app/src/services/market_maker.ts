@@ -29,9 +29,12 @@ class MarketMakerService {
   provider: any
 
   constructor(address: string, conditionalTokens: ConditionalTokenService, provider: any) {
-    const signer: Wallet = provider.getSigner()
-
-    this.contract = new ethers.Contract(address, marketMakerAbi, provider).connect(signer)
+    if (Object.prototype.hasOwnProperty.call(provider, 'getSigner')) {
+      const signer: Wallet = provider.getSigner()
+      this.contract = new ethers.Contract(address, marketMakerAbi, provider).connect(signer)
+    } else {
+      this.contract = new ethers.Contract(address, marketMakerAbi, provider)
+    }
     this.conditionalTokens = conditionalTokens
     this.provider = provider
   }

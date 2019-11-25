@@ -27,7 +27,7 @@ class ConditionalTokenService {
   provider: any
 
   constructor(address: string, provider: any, signerAddress: string) {
-    if (signerAddress) {
+    if (Object.prototype.hasOwnProperty.call(provider, 'getSigner')) {
       const signer: Wallet = provider.getSigner()
       this.contract = new ethers.Contract(address, conditionalTokensAbi, provider).connect(signer)
     } else {

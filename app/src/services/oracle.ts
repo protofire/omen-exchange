@@ -10,11 +10,11 @@ export class OracleService {
   contract: Contract
 
   constructor(address: string, provider: any) {
-    if (typeof provider['getSigner'] === 'function') {
-      this.contract = new ethers.Contract(address, oracleAbi, provider)
-    } else {
+    if (Object.prototype.hasOwnProperty.call(provider, 'getSigner')) {
       const signer: Wallet = provider.getSigner()
       this.contract = new ethers.Contract(address, oracleAbi, provider).connect(signer)
+    } else {
+      this.contract = new ethers.Contract(address, oracleAbi, provider)
     }
   }
 
