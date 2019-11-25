@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 
 import { MarketBuyPage, MarketDetailsPage, MarketFundPage, MarketSellPage } from '../../pages'
@@ -59,12 +59,19 @@ const MarketRoutesConnectedWrapper = (props: RouteComponentProps<RouteParams>) =
 }
 
 const MarketRoutesDisconnectedWrapper = () => {
+  const [displayMessage, setDisplayMessage] = useState(true)
+
   return (
-    <Message
-      type="warning"
-      delay={3000}
-      message="Please connect to your wallet to open the market details..."
-    />
+    <>
+      {displayMessage && (
+        <Message
+          type="warning"
+          delay={3000}
+          message="Please connect to your wallet to open the market details..."
+          onClick={() => setDisplayMessage(false)}
+        />
+      )}
+    </>
   )
 }
 

@@ -39,6 +39,7 @@ const MessageWrapperCss = css`
   left: 50%;
   transform: translate(-50%, 0);
   top: 79px;
+  cursor: pointer;
   z-index: 12345;
 `
 
@@ -92,10 +93,11 @@ interface Props {
   delay?: number
   message: string
   type: MessageType
+  onClick: () => void
 }
 
 export const Message: React.FC<Props> = (props: Props): ReactPortal => {
-  const { message, type, delay = 1000 } = props
+  const { message, type, delay = 1000, onClick } = props
   const portal: any = document.getElementById('portalContainer')
 
   const [showNotification, setShowNotification] = useState(false)
@@ -106,14 +108,14 @@ export const Message: React.FC<Props> = (props: Props): ReactPortal => {
     switch (type) {
       case 'info':
         return (
-          <InfoMessageWrapper>
+          <InfoMessageWrapper onClick={() => onClick()}>
             <InfoIcon />
             <MessageBlockInfo>{message}</MessageBlockInfo>
           </InfoMessageWrapper>
         )
       case 'warning':
         return (
-          <WarningMessageWrapper>
+          <WarningMessageWrapper onClick={() => onClick()}>
             <WarningIcon />
             <MessageBlockWarning>{message}</MessageBlockWarning>
           </WarningMessageWrapper>
@@ -121,7 +123,7 @@ export const Message: React.FC<Props> = (props: Props): ReactPortal => {
       case 'ok':
         return (
           <OkMessageWrapper>
-            <MessageBlockOk>{message}</MessageBlockOk>
+            <MessageBlockOk onClick={() => onClick()}>{message}</MessageBlockOk>
           </OkMessageWrapper>
         )
     }
