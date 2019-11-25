@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 
-import { MarketAndQuestion, MarketFilters, Status } from '../../util/types'
+import { MarketWithExtraData, MarketFilters, Status } from '../../util/types'
 import { FullLoading } from '../common/full_loading'
 import { ListCard } from '../common/list_card'
 import { ListItem } from '../common/list_item'
@@ -17,7 +17,7 @@ const FilterStyled = styled(Filter)`
 `
 
 interface Props {
-  markets: MarketAndQuestion[]
+  markets: MarketWithExtraData[]
   status: Status
   context: ConnectedWeb3Context | DisconnectedWeb3Context
 }
@@ -26,14 +26,14 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const { status, markets, context } = props
   const options = [MarketFilters.AllMarkets, MarketFilters.MyMarkets]
 
-  const [marketsFiltered, setMarketsFiltered] = useState<MarketAndQuestion[]>([])
+  const [marketsFiltered, setMarketsFiltered] = useState<MarketWithExtraData[]>([])
   const [currentFilter, setCurrentFilter] = useState<MarketFilters>(MarketFilters.AllMarkets)
 
   useEffect(() => {
     if (currentFilter === MarketFilters.MyMarkets) {
       setMarketsFiltered(
         markets.filter(
-          (market: MarketAndQuestion) =>
+          market =>
             'account' in context &&
             market.ownerAddress.toLowerCase() === context.account.toLowerCase(),
         ),
@@ -54,7 +54,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         />
       )}
       <ListCard>
-        {marketsFiltered.map((item: MarketAndQuestion, index: number) => {
+        {marketsFiltered.map((item, index) => {
           return <ListItem key={index} data={item}></ListItem>
         })}
       </ListCard>
