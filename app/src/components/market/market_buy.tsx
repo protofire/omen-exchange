@@ -149,29 +149,20 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const disabled = (status !== Status.Ready && status !== Status.Error) || cost.isZero()
 
-  const noteBalanceCollateral = () => {
-    return (
-      <React.Fragment key="1">
-        <BalanceToken
-          collateralId={collateral.symbol.toLowerCase() as KnownToken}
-          onClickMax={(collateral: Token, collateralBalance: BigNumber) =>
-            setAmount(collateralBalance)
-          }
-        />
-      </React.Fragment>
-    )
-  }
-
-  const noteBuy = () => {
-    return (
-      <React.Fragment key="2">
-        You will be charged an extra 1% trade fee of &nbsp;
-        <strong>
-          {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}
-        </strong>
-      </React.Fragment>
-    )
-  }
+  const noteAmount = (
+    <>
+      <BalanceToken
+        collateralId={collateral.symbol.toLowerCase() as KnownToken}
+        onClickMax={(collateral: Token, collateralBalance: BigNumber) =>
+          setAmount(collateralBalance)
+        }
+      />
+      You will be charged an extra 1% trade fee of &nbsp;
+      <strong>
+        {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}
+      </strong>
+    </>
+  )
 
   return (
     <>
@@ -200,7 +191,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               placeholderText={collateral.symbol}
             />
           }
-          note={[noteBalanceCollateral(), noteBuy()]}
+          note={noteAmount}
           title={'Amount'}
           tooltip={{ id: 'amount', description: 'Shares to buy with this amount of collateral.' }}
         />
