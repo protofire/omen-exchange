@@ -89,18 +89,18 @@ const MessageBlockOk = styled.p`
 type MessageType = 'info' | 'warning' | 'ok'
 
 interface Props {
-  delayed?: number
+  delay?: number
   message: string
   type: MessageType
 }
 
 export const Message: React.FC<Props> = (props: Props): ReactPortal => {
-  const { message, type, delayed = 1000 } = props
+  const { message, type, delay = 1000 } = props
   const portal: any = document.getElementById('portalContainer')
 
   const [showNotification, setShowNotification] = useState(false)
 
-  setTimeout(() => setShowNotification(true), delayed)
+  setTimeout(() => setShowNotification(true), delay)
 
   const Message = () => {
     switch (type) {

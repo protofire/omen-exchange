@@ -42,7 +42,7 @@ const MarketValidateContractAddress: React.FC<Props> = (props: Props) => {
   )
 }
 
-const MarketRoutesConnectedWrapper = (props: any) => {
+const MarketRoutesConnectedWrapper = (props: RouteComponentProps<RouteParams>) => {
   useConnectWeb3()
 
   const marketMakerAddress = props.match.params.address
@@ -62,7 +62,7 @@ const MarketRoutesDisconnectedWrapper = () => {
   return (
     <Message
       type="warning"
-      delayed={3000}
+      delay={3000}
       message="Please connect to your wallet to open the market details..."
     />
   )
@@ -72,7 +72,7 @@ const MarketRoutes = (props: RouteComponentProps<RouteParams>) => {
   const { active } = useWeb3Context()
   const connector = localStorage.getItem('CONNECTOR')
 
-  return active || (connector && connector in connectors) ? (
+  return active && (connector && connector in connectors) ? (
     <MarketRoutesConnectedWrapper {...props} />
   ) : (
     <MarketRoutesDisconnectedWrapper />
