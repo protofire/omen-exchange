@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
-import { MarketWithExtraData, MarketFilters, Status } from '../../util/types'
+import { MarketWithExtraData, MarketFilters } from '../../util/types'
+import { RemoteData } from '../../util/remote_data'
 import { FullLoading } from '../common/full_loading'
 import { ListCard } from '../common/list_card'
 import { ListItem } from '../common/list_item'
@@ -17,31 +18,15 @@ const FilterStyled = styled(Filter)`
 `
 
 interface Props {
-  markets: MarketWithExtraData[]
-  status: Status
+  markets: RemoteData<MarketWithExtraData[]>
   context: ConnectedWeb3Context | DisconnectedWeb3Context
+  currentFilter: MarketFilters
+  onFilterChange: (filter: MarketFilters) => void
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { status, markets, context } = props
-  const options = [MarketFilters.AllMarkets, MarketFilters.MyMarkets]
-
-  const [marketsFiltered, setMarketsFiltered] = useState<MarketWithExtraData[]>([])
-  const [currentFilter, setCurrentFilter] = useState<MarketFilters>(MarketFilters.AllMarkets)
-
-  useEffect(() => {
-    if (currentFilter === MarketFilters.MyMarkets) {
-      setMarketsFiltered(
-        markets.filter(
-          market =>
-            'account' in context &&
-            market.ownerAddress.toLowerCase() === context.account.toLowerCase(),
-        ),
-      )
-    } else {
-      setMarketsFiltered(markets)
-    }
-  }, [currentFilter, context, markets])
+  const { markets, context, currentFilter, onFilterChange } = props
+  const options = [MarketFilters.AllMarkets, MarketFilters.MyMarkets, MarketFilters.FundedMarkets]
 
   return (
     <>
@@ -50,15 +35,17 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <FilterStyled
           defaultOption={currentFilter}
           options={options}
-          onChange={({ value }: { value: MarketFilters }) => setCurrentFilter(value)}
+          onChange={({ value }: { value: MarketFilters }) => onFilterChange(value)}
         />
       )}
       <ListCard>
-        {marketsFiltered.map((item, index) => {
-          return <ListItem key={index} data={item}></ListItem>
-        })}
+        {RemoteData.is.success(markets)
+          ? markets.data.map((item, index) => {
+              return <ListItem key={index} data={item}></ListItem>
+            })
+          : null}
       </ListCard>
-      {status === Status.Loading ? <FullLoading message="Loading markets..." /> : null}
+      {RemoteData.is.loading(markets) ? <FullLoading message="Loading markets..." /> : null}
     </>
   )
 }
