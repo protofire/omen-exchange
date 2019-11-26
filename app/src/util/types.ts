@@ -88,7 +88,7 @@ export interface QuestionLog {
 }
 
 export interface Market {
-  marketMakerAddress: string
+  address: string
   ownerAddress: string
   collateralTokenAddress: string
   conditionId: string
@@ -99,11 +99,11 @@ export enum MarketStatus {
   Resolved = 'Resolved',
 }
 
-export interface MarketValueStatus {
-  marketStatus: MarketStatus
-}
-
-export type MarketAndQuestion = Market & MarketValueStatus & Question
+export type MarketWithExtraData = Market &
+  Question & {
+    status: MarketStatus
+    fee: BigNumber
+  }
 
 export interface Log {
   topics: Array<string>

@@ -92,7 +92,7 @@ const ViewWrapper = (props: Props) => {
   }
 
   const renderTableData = () => {
-    return balance.map((balanceItem: BalanceItem, index: number) => {
+    return balance.map((balanceItem, index) => {
       const { outcomeName, probability, currentPrice, shares } = balanceItem
       return (
         <TR key={index}>

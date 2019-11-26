@@ -25,7 +25,7 @@ export const Categories = (props: Props) => {
   return (
     <Select {...restProps}>
       <FormOption value="">Select a category</FormOption>
-      {options.map((category: any) => {
+      {options.map(category => {
         return (
           <FormOption key={category.value} value={category.value}>
             {category.label}
