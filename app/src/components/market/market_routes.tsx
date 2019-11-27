@@ -13,6 +13,7 @@ import { getLogger } from '../../util/logger'
 import { useWeb3Context } from 'web3-react/dist'
 import connectors from '../../util/connectors'
 import { Message } from '../common/message'
+import { MarketNotFound } from '../common/market_not_found'
 
 const logger = getLogger('Market::Routes')
 
@@ -29,9 +30,15 @@ const MarketValidateContractAddress: React.FC<Props> = (props: Props) => {
 
   const { marketMakerAddress } = props
 
-  const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
-  const { fee } = marketMakerData
   const contractExists = useCheckContractExists(marketMakerAddress, context)
+  const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
+
+  if (!contractExists) {
+    logger.log(`Market address not found`)
+    return <MarketNotFound />
+  }
+
+  const { fee } = marketMakerData
 
   if (fee === null) {
     return <FullLoading />
@@ -39,11 +46,6 @@ const MarketValidateContractAddress: React.FC<Props> = (props: Props) => {
   if (!fee.eq(FEE)) {
     logger.log(`Market was not created with this app (different fee)`)
     return <SectionTitle title={'Invalid market'} />
-  }
-
-  if (!contractExists) {
-    logger.log(`Market address not found`)
-    return <SectionTitle title={'Market not found'} />
   }
 
   return (
