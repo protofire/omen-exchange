@@ -34,14 +34,12 @@ export const ButtonConnectWallet = (props: Props) => {
   const buttonMessage = props.modalState ? 'CONNECTING...' : 'CONNECT TO A WALLET'
 
   return (
-    <>
-      <ButtonConnectWalletStyled
-        onClick={() => {
-          props.onClick()
-        }}
-      >
-        <ButtonTitle>{buttonMessage}</ButtonTitle>
-      </ButtonConnectWalletStyled>
-    </>
+    <ButtonConnectWalletStyled
+      onClick={() => {
+        props.onClick()
+      }}
+    >
+      <ButtonTitle>{buttonMessage}</ButtonTitle>
+    </ButtonConnectWalletStyled>
   )
 }
