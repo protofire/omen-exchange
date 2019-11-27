@@ -70,6 +70,7 @@ class MarketMakerService {
     try {
       const overrides = {
         value: '0x0',
+        gasLimit: 750000,
       }
       const transactionObject = await this.contract.addFunding(amount, distributionHint, overrides)
       await this.provider.waitForTransaction(transactionObject.hash)

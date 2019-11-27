@@ -21,6 +21,7 @@ import { useContracts } from '../../hooks/useContracts'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { ButtonLink } from '../common/button_link'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { BalanceToken } from '../common/balance_token'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -214,6 +215,14 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
             </>
           }
           title={'Amount'}
+          note={
+            <BalanceToken
+              collateralId={collateral.symbol.toLowerCase() as KnownToken}
+              onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
+                setAmount(collateralBalance)
+              }}
+            />
+          }
         />
         <ButtonContainerStyled>
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
