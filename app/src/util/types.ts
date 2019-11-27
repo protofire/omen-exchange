@@ -58,11 +58,6 @@ export enum StepProfile {
   CloseMarketDetail = 'CloseMarketDetail',
 }
 
-export enum WinnerOutcome {
-  Yes = 'Yes',
-  No = 'No',
-}
-
 export interface Question {
   question: string
   resolution: Maybe<Date>
