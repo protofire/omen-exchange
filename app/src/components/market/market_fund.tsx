@@ -6,7 +6,7 @@ import { SectionTitle } from '../common/section_title'
 import { divBN, formatBigNumber, formatDate } from '../../util/tools'
 import { ViewCard } from '../common/view_card/'
 import { Table, TD, TR } from '../common/table'
-import { BalanceItem, OutcomeTableValue, Status, Token, WinnerOutcome } from '../../util/types'
+import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { OutcomeTable } from '../common/outcome_table'
 import { FullLoading } from '../common/full_loading'
 import { SubsectionTitle } from '../common/subsection_title'
@@ -21,6 +21,7 @@ import { useContracts } from '../../hooks/useContracts'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { ButtonLink } from '../common/button_link'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { BalanceToken } from '../common/balance_token'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -31,7 +32,6 @@ interface Props extends RouteComponentProps<any> {
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
   balance: BalanceItem[]
-  winnerOutcome: Maybe<WinnerOutcome>
   theme?: any
   collateral: Token
 }
@@ -215,6 +215,14 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
             </>
           }
           title={'Amount'}
+          note={
+            <BalanceToken
+              collateralId={collateral.symbol.toLowerCase() as KnownToken}
+              onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
+                setAmount(collateralBalance)
+              }}
+            />
+          }
         />
         <ButtonContainerStyled>
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>

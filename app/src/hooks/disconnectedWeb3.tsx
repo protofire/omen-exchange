@@ -7,7 +7,7 @@ export interface DisconnectedWeb3Context {
   networkId: number
 }
 
-const DisconnectedWeb3Context = React.createContext<Maybe<DisconnectedWeb3Context>>(null)
+export const DisconnectedWeb3Context = React.createContext<Maybe<DisconnectedWeb3Context>>(null)
 
 export const useDisconnectedWeb3Context = () => {
   const context = React.useContext(DisconnectedWeb3Context)

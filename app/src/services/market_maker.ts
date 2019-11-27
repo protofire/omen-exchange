@@ -28,10 +28,20 @@ class MarketMakerService {
   conditionalTokens: ConditionalTokenService
   provider: any
 
-  constructor(address: string, conditionalTokens: ConditionalTokenService, provider: any) {
-    const signer: Wallet = provider.getSigner()
+  constructor(
+    address: string,
+    conditionalTokens: ConditionalTokenService,
+    provider: any,
+    signerAddress?: string,
+  ) {
+    if (signerAddress) {
+      const signer: Wallet = provider.getSigner()
 
-    this.contract = new ethers.Contract(address, marketMakerAbi, provider).connect(signer)
+      this.contract = new ethers.Contract(address, marketMakerAbi, provider).connect(signer)
+    } else {
+      this.contract = new ethers.Contract(address, marketMakerAbi, provider)
+    }
+
     this.conditionalTokens = conditionalTokens
     this.provider = provider
   }
@@ -70,6 +80,7 @@ class MarketMakerService {
     try {
       const overrides = {
         value: '0x0',
+        gasLimit: 750000,
       }
       const transactionObject = await this.contract.addFunding(amount, distributionHint, overrides)
       await this.provider.waitForTransaction(transactionObject.hash)
