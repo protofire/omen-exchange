@@ -113,6 +113,7 @@ export interface Log {
 export enum MarketFilters {
   AllMarkets = 'All Markets',
   MyMarkets = 'My Markets',
+  FundedMarkets = "Markets I've funded",
 }
 
 export interface Arbitrator {
