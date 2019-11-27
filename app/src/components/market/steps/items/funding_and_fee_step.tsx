@@ -9,8 +9,11 @@ import { FormRow } from '../../../common/form_row'
 import { TextfieldCustomPlaceholder } from '../../../common/textfield_custom_placeholder'
 import { ButtonLink } from '../../../common/button_link'
 import { Tokens } from '../../../common/tokens'
-import { knownTokens } from '../../../../util/addresses'
+import { getToken } from '../../../../util/addresses'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { BalanceToken } from '../../../common/balance_token'
+import { Token } from '../../../../util/types'
+import { BigNumberInputReturn } from '../../../common/big_number_input'
 
 interface Props {
   back: () => void
@@ -20,7 +23,9 @@ interface Props {
     spread: string
     funding: BigNumber
   }
-  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
+  handleChange: (
+    event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn,
+  ) => any
 }
 
 const ButtonLinkStyled = styled(ButtonLink)`
@@ -53,7 +58,7 @@ const FundingAndFeeStep = (props: Props) => {
     }
   }
 
-  const collateral = knownTokens[collateralId]
+  const collateral = getToken(context.networkId, collateralId)
 
   return (
     <CreateCard>
@@ -113,6 +118,14 @@ const FundingAndFeeStep = (props: Props) => {
           id: `funding`,
           description: `Initial funding to fund the market maker.`,
         }}
+        note={
+          <BalanceToken
+            collateralId={collateralId}
+            onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
+              props.handleChange({ name: 'funding', value: collateralBalance })
+            }}
+          />
+        }
       />
       <ButtonContainer>
         <ButtonLinkStyled onClick={() => back()}>‹ Back</ButtonLinkStyled>
