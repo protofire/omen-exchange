@@ -37,9 +37,9 @@ const addresses: { [networkId: number]: KnownContracts } = {
   },
   [networkIds.GANACHE]: {
     realitio: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
-    marketMakerFactory: '0x21a59654176f2689d12E828B77a783072CD26680',
-    conditionalTokens: '0xb09bCc172050fBd4562da8b229Cf3E45Dc3045A6',
-    oracle: '0x7C728214be9A0049e6a86f2137ec61030D0AA964',
+    marketMakerFactory: '0xaD888d0Ade988EbEe74B8D4F39BF29a8d0fe8A8D',
+    conditionalTokens: '0x21a59654176f2689d12E828B77a783072CD26680',
+    oracle: '0xFF6049B87215476aBf744eaA3a476cBAd46fB1cA',
   },
 }
 

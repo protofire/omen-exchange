@@ -58,11 +58,6 @@ export enum StepProfile {
   CloseMarketDetail = 'CloseMarketDetail',
 }
 
-export enum WinnerOutcome {
-  Yes = 'Yes',
-  No = 'No',
-}
-
 export interface Question {
   question: string
   resolution: Maybe<Date>
@@ -118,6 +113,7 @@ export interface Log {
 export enum MarketFilters {
   AllMarkets = 'All Markets',
   MyMarkets = 'My Markets',
+  FundedMarkets = "Markets I've funded",
 }
 
 export interface Arbitrator {
