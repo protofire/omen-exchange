@@ -4,6 +4,11 @@ import { LogDescription } from 'ethers/utils/interface'
 import { Market, Log } from '../util/types'
 import { FEE } from '../common/constants'
 
+interface GetMarketsOptions {
+  from: number
+  to: number
+}
+
 const marketMakerFactoryAbi = [
   `function createFixedProductMarketMaker(address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint fee) public returns (address)`,
   `event FixedProductMarketMakerCreation(address indexed creator, address fixedProductMarketMaker, address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint fee)`,
@@ -51,13 +56,14 @@ class MarketMakerFactoryService {
     return marketMakerAddress
   }
 
-  getMarkets = async (provider: any): Promise<Market[]> => {
+  getMarkets = async (provider: any, { from, to }: GetMarketsOptions): Promise<Market[]> => {
+    console.log(`fetching from ${from} to ${to}`)
     const filter: any = this.contract.filters.FixedProductMarketMakerCreation()
 
     const logs = await provider.getLogs({
       ...filter,
-      fromBlock: 1,
-      toBlock: 'latest',
+      fromBlock: from,
+      toBlock: to,
     })
 
     if (logs.length === 0) {
