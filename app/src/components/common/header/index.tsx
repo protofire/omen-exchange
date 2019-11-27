@@ -4,7 +4,8 @@ import { MainMenu } from '../main_menu'
 import { MobileMenu } from '../mobile_menu'
 import styled from 'styled-components'
 import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
-import { ConnectWallet } from '../../connect_wallet'
+import { ButtonConnectWallet } from '../button_connect_wallet'
+import { ModalConnectWallet } from '../modal_connect_wallet'
 
 const HeaderWrapper = styled.div`
   background: ${props => props.theme.header.backgroundColor};
@@ -39,10 +40,6 @@ const NetworkStyled = styled(Network)`
   margin: 0 0 0 auto;
 `
 
-const ConnectWalletStyled = styled(ConnectWallet)`
-  margin: 0 0 0 auto;
-`
-
 const MobileMenuStyled = styled(MobileMenu)`
   display: inherit;
 
@@ -62,6 +59,7 @@ const MainMenuStyled = styled(MainMenu)`
 export const Header: React.FC = props => {
   const { ...restProps } = props
   const [isMenuOpen, setMenuState] = useState(false)
+  const [isModalOpen, setModalState] = useState(false)
   const toggleMenu = () => setMenuState(!isMenuOpen)
 
   return (
@@ -72,7 +70,13 @@ export const Header: React.FC = props => {
         <ConnectedWeb3>
           <NetworkStyled />
         </ConnectedWeb3>
-        <ConnectWalletStyled />
+        <ButtonConnectWallet
+          onClick={() => {
+            setModalState(true)
+          }}
+          modalState={isModalOpen}
+        />
+        {isModalOpen && <ModalConnectWallet onClose={() => setModalState(false)} />}
       </HeaderInner>
     </HeaderWrapper>
   )
