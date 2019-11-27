@@ -7,7 +7,7 @@ import { MarketMakerService } from '../services'
 import { getArbitratorFromAddress, getTokenFromAddress } from '../util/addresses'
 import { useContracts } from './useContracts'
 import { getLogger } from '../util/logger'
-import { BalanceItem, OutcomeSlot, Status, WinnerOutcome, Token, Arbitrator } from '../util/types'
+import { BalanceItem, OutcomeSlot, Status, Token, Arbitrator } from '../util/types'
 
 const logger = getLogger('Market::useMarketMakerData')
 
@@ -15,7 +15,7 @@ interface MarketMakerData {
   totalPoolShares: BigNumber
   userPoolShares: BigNumber
   balance: BalanceItem[]
-  winnerOutcome: Maybe<WinnerOutcome>
+  winnerOutcome: Maybe<number>
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
   collateral: Maybe<Token>
@@ -24,6 +24,7 @@ interface MarketMakerData {
   category: string
   resolution: Maybe<Date>
   arbitrator: Maybe<Arbitrator>
+  isConditionResolved: boolean
   fee: Maybe<BigNumber>
   isQuestionFinalized: boolean
 }
@@ -51,6 +52,7 @@ export const useMarketMakerData = (
       resolution: null,
       arbitrator: null,
       isQuestionFinalized: false,
+      isConditionResolved: false,
       fee: null,
     }),
     [],
@@ -72,10 +74,6 @@ export const useMarketMakerData = (
     )
 
     const arbitrator = getArbitratorFromAddress(context.networkId, arbitratorAddress)
-
-    const winnerOutcome = isConditionResolved
-      ? await conditionalTokens.getWinnerOutcome(conditionId)
-      : null
 
     const [
       userShares,
@@ -99,6 +97,8 @@ export const useMarketMakerData = (
       realitio.isFinalized(questionId),
     ])
 
+    const winnerOutcome = isQuestionFinalized ? await realitio.getWinnerOutcome(questionId) : null
+
     const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
     const collateral = getTokenFromAddress(context.networkId, collateralAddress)
@@ -113,7 +113,7 @@ export const useMarketMakerData = (
         currentPrice: actualPrices.actualPriceForYes,
         shares: userShares.balanceOfForYes,
         holdings: marketMakerShares.balanceOfForYes,
-        winningOutcome: winnerOutcome === WinnerOutcome.Yes,
+        winningOutcome: winnerOutcome === 1,
       },
       {
         outcomeName: OutcomeSlot.No,
@@ -121,7 +121,7 @@ export const useMarketMakerData = (
         currentPrice: actualPrices.actualPriceForNo,
         shares: userShares.balanceOfForNo,
         holdings: marketMakerShares.balanceOfForNo,
-        winningOutcome: winnerOutcome === WinnerOutcome.No,
+        winningOutcome: winnerOutcome === 0,
       },
     ]
 
@@ -141,6 +141,7 @@ export const useMarketMakerData = (
       marketMakerFunding,
       marketMakerUserFunding,
       isQuestionFinalized,
+      isConditionResolved,
       fee,
     }
   }, [conditionalTokens, context.library, context.networkId, marketMakerAddress, realitio])

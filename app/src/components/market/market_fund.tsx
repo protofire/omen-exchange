@@ -6,7 +6,7 @@ import { SectionTitle } from '../common/section_title'
 import { divBN, formatBigNumber, formatDate } from '../../util/tools'
 import { ViewCard } from '../common/view_card/'
 import { Table, TD, TR } from '../common/table'
-import { BalanceItem, OutcomeTableValue, Status, Token, WinnerOutcome } from '../../util/types'
+import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { OutcomeTable } from '../common/outcome_table'
 import { FullLoading } from '../common/full_loading'
 import { SubsectionTitle } from '../common/subsection_title'
@@ -32,7 +32,6 @@ interface Props extends RouteComponentProps<any> {
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
   balance: BalanceItem[]
-  winnerOutcome: Maybe<WinnerOutcome>
   theme?: any
   collateral: Token
 }
