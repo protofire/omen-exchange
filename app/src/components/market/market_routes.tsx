@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 
 import { MarketBuyPage, MarketDetailsPage, MarketFundPage, MarketSellPage } from '../../pages'
@@ -10,6 +10,9 @@ import { SectionTitle } from '../common/section_title'
 import { FullLoading } from '../common/full_loading'
 import { FEE } from '../../common/constants'
 import { getLogger } from '../../util/logger'
+import { useWeb3Context } from 'web3-react/dist'
+import connectors from '../../util/connectors'
+import { Message } from '../common/message'
 import { MarketNotFound } from '../common/market_not_found'
 
 const logger = getLogger('Market::Routes')
@@ -55,7 +58,7 @@ const MarketValidateContractAddress: React.FC<Props> = (props: Props) => {
   )
 }
 
-const MarketRoutes = (props: RouteComponentProps<RouteParams>) => {
+const MarketRoutesConnectedWrapper = (props: RouteComponentProps<RouteParams>) => {
   useConnectWeb3()
 
   const marketMakerAddress = props.match.params.address
@@ -68,6 +71,34 @@ const MarketRoutes = (props: RouteComponentProps<RouteParams>) => {
     <ConnectedWeb3>
       <MarketValidateContractAddress marketMakerAddress={marketMakerAddress} />
     </ConnectedWeb3>
+  )
+}
+
+const MarketRoutesDisconnectedWrapper = () => {
+  const [displayMessage, setDisplayMessage] = useState(true)
+
+  return (
+    <>
+      {displayMessage && (
+        <Message
+          type="warning"
+          delay={3000}
+          message="Please connect to your wallet to open the market details..."
+          onClick={() => setDisplayMessage(false)}
+        />
+      )}
+    </>
+  )
+}
+
+const MarketRoutes = (props: RouteComponentProps<RouteParams>) => {
+  const { active } = useWeb3Context()
+  const connector = localStorage.getItem('CONNECTOR')
+
+  return active && (connector && connector in connectors) ? (
+    <MarketRoutesConnectedWrapper {...props} />
+  ) : (
+    <MarketRoutesDisconnectedWrapper />
   )
 }
 
