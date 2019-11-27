@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
 import { ButtonConnectWallet } from '../button_connect_wallet'
 import { ModalConnectWallet } from '../modal_connect_wallet'
+import { useWeb3Context } from 'web3-react/dist'
 
 const HeaderWrapper = styled.div`
   background: ${props => props.theme.header.backgroundColor};
@@ -57,6 +58,8 @@ const MainMenuStyled = styled(MainMenu)`
 `
 
 export const Header: React.FC = props => {
+  const context = useWeb3Context()
+
   const { ...restProps } = props
   const [isMenuOpen, setMenuState] = useState(false)
   const [isModalOpen, setModalState] = useState(false)
@@ -70,12 +73,14 @@ export const Header: React.FC = props => {
         <ConnectedWeb3>
           <NetworkStyled />
         </ConnectedWeb3>
-        <ButtonConnectWallet
-          onClick={() => {
-            setModalState(true)
-          }}
-          modalState={isModalOpen}
-        />
+        {!context.active && (
+          <ButtonConnectWallet
+            onClick={() => {
+              setModalState(true)
+            }}
+            modalState={isModalOpen}
+          />
+        )}
         {isModalOpen && <ModalConnectWallet onClose={() => setModalState(false)} />}
       </HeaderInner>
     </HeaderWrapper>

@@ -1,5 +1,4 @@
 import React from 'react'
-import { useWeb3Context } from 'web3-react'
 import styled from 'styled-components'
 
 const ButtonConnectWalletStyled = styled.div`
@@ -32,25 +31,17 @@ interface Props {
 }
 
 export const ButtonConnectWallet = (props: Props) => {
-  const context = useWeb3Context()
-
-  if (context.error) {
-    console.error('Error in web3 context', context.error)
-  }
-
   const buttonMessage = props.modalState ? 'CONNECTING...' : 'CONNECT TO A WALLET'
 
   return (
     <>
-      {!context.active && (
-        <ButtonConnectWalletStyled
-          onClick={() => {
-            props.onClick()
-          }}
-        >
-          <ButtonTitle>{buttonMessage}</ButtonTitle>
-        </ButtonConnectWalletStyled>
-      )}
+      <ButtonConnectWalletStyled
+        onClick={() => {
+          props.onClick()
+        }}
+      >
+        <ButtonTitle>{buttonMessage}</ButtonTitle>
+      </ButtonConnectWalletStyled>
     </>
   )
 }

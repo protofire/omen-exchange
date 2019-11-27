@@ -164,7 +164,7 @@ export const ModalConnectWallet = (props: Props) => {
     console.error('Error in web3 context', context.error)
   }
 
-  const [walletSelected, setWalletSelected] = useState('MetaMask')
+  const [walletSelected, setWalletSelected] = useState(Wallet.MetaMask)
 
   const ItemWalletConnect = () => (
     <>
@@ -199,7 +199,7 @@ export const ModalConnectWallet = (props: Props) => {
   }
 
   useEffect(() => {
-    if (context.active && !context.account && context.connectorName === 'WalletConnect') {
+    if (context.active && !context.account && context.connectorName === Wallet.WalletConnect) {
       const uri = context.connector.walletConnector.uri
       WalletConnectQRCodeModal.open(uri, () => {
         // Callback passed to the onClose click of the QRCode modal
@@ -212,7 +212,7 @@ export const ModalConnectWallet = (props: Props) => {
         WalletConnectQRCodeModal.close()
       })
     }
-  }, [context, walletSelected])
+  }, [context])
 
   const onConnect = () => {
     context.setConnector(walletSelected)
