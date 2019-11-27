@@ -41,10 +41,12 @@ export const useMarkets = (
           const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
           const marketStatus = isConditionResolved ? MarketStatus.Resolved : MarketStatus.Open
 
+          const account = 'account' in context ? context.account : ''
           const marketMakerService = new MarketMakerService(
             market.address,
             conditionalTokens,
             provider,
+            account,
           )
 
           const fee = await marketMakerService.getFee()

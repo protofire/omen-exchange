@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 
 import { MarketHome } from './market_home'
-import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { useConnectedOrDisconnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useMarkets } from '../../hooks/useMarkets'
 import { MarketFilters } from '../../util/types'
 
 const MarketHomeContainer: React.FC = () => {
-  const context = useConnectedWeb3Context()
+  const context = useConnectedOrDisconnectedWeb3Context()
 
   const [filter, setFilter] = useState<MarketFilters>(MarketFilters.AllMarkets)
 
