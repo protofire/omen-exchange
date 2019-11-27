@@ -121,3 +121,8 @@ export interface Arbitrator {
   name: string
   url: string
 }
+
+export enum Wallet {
+  MetaMask = 'MetaMask',
+  WalletConnect = 'WalletConnect',
+}
