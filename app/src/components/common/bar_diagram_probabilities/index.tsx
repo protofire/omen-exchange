@@ -75,35 +75,6 @@ const LabelOutcome = styled.div`
   font-weight: 700;
 `
 
-const Icon = styled.div<StyleProps>`
-  color: ${props =>
-    props.isGreaterThanFifty ? props.theme.colors.primary : props.theme.colors.secondary};
-  display: inline-block;
-  height: 0px;
-  line-height: 0px;
-  position: relative;
-  text-align: center;
-  text-size-adjust: 100%;
-  width: 24px;
-  font-weight: 700;
-  font-style: italic;
-  &::after {
-    background-color: ${props =>
-      props.isGreaterThanFifty ? props.theme.colors.primary : props.theme.colors.secondary};
-    border-bottom-left-radius: 100%;
-    border-bottom-right-radius: 100%;
-    border-top-left-radius: 100%;
-    border-top-right-radius: 100%;
-    content: '';
-    display: block;
-    height: 12px;
-    left: 6px;
-    margin-top: -11px;
-    position: absolute;
-    width: 12px;
-  }
-`
-
 const OutcomeName = styled.span`
   color: #00193c;
   line-height: 0px;
