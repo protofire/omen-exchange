@@ -26,7 +26,7 @@ export async function callInChunks<T>(
   options: {
     chunkSize: number
     delay?: number
-    callUntil?: (result: T[]) => boolean
+    callUntil?: (result: T[]) => Promise<boolean>
   },
 ): Promise<[T[], [number, number]]> {
   const [start, end] = range
@@ -47,7 +47,7 @@ export async function callInChunks<T>(
       break
     }
 
-    if (options.callUntil && options.callUntil(result)) {
+    if (options.callUntil && (await options.callUntil(result))) {
       break
     }
 

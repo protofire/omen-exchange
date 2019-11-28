@@ -22,13 +22,12 @@ interface Props {
   moreMarkets: boolean
   context: ConnectedWeb3Context | DisconnectedWeb3Context
   currentFilter: MarketFilters
-  count: number
   onFilterChange: (filter: MarketFilters) => void
   onShowMore: () => void
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { markets, moreMarkets, context, currentFilter, count, onFilterChange, onShowMore } = props
+  const { markets, moreMarkets, context, currentFilter, onFilterChange, onShowMore } = props
   const options = [MarketFilters.AllMarkets, MarketFilters.MyMarkets, MarketFilters.FundedMarkets]
 
   return (
@@ -42,8 +41,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         />
       )}
       <ListCard>
-        {RemoteData.hasData(markets)
-          ? markets.data.slice(0, count).map(item => {
+        {RemoteData.is.success(markets)
+          ? markets.data.map(item => {
               return <ListItem key={item.conditionId} data={item}></ListItem>
             })
           : null}

@@ -60,7 +60,7 @@ const logger = getLogger('Market::ClosedMarketDetail')
 
 export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens } = useContracts(context)
+  const { conditionalTokens, realitio } = useContracts(context)
 
   const { collateral: collateralToken, balance, marketMakerAddress, resolution, funding } = props
 
@@ -69,7 +69,12 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
   const provider = context.library
-  const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+  const marketMaker = new MarketMakerService(
+    marketMakerAddress,
+    conditionalTokens,
+    realitio,
+    provider,
+  )
 
   useEffect(() => {
     let isSubscribed = true

@@ -80,6 +80,7 @@ const MarketWizardCreatorContainer: FC = () => {
       const marketMakerService = new MarketMakerService(
         marketMakerAddress,
         conditionalTokens,
+        realitio,
         provider,
       )
       await marketMakerService.addInitialFunding(

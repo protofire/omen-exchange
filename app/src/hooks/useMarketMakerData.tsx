@@ -61,7 +61,12 @@ export const useMarketMakerData = (
     const provider = context.library
     const user = await provider.getSigner().getAddress()
 
-    const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+    const marketMaker = new MarketMakerService(
+      marketMakerAddress,
+      conditionalTokens,
+      realitio,
+      provider,
+    )
 
     const conditionId = await marketMaker.getConditionId()
     const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)

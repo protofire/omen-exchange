@@ -6,7 +6,12 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { BalanceItem, OutcomeSlot, Status, OutcomeTableValue, Token } from '../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../common'
-import { ConditionalTokenService, ERC20Service, MarketMakerService } from '../../services'
+import {
+  ConditionalTokenService,
+  ERC20Service,
+  MarketMakerService,
+  RealitioService,
+} from '../../services'
 import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { ViewCard } from '../common/view_card'
@@ -53,6 +58,7 @@ interface Props extends RouteComponentProps<any> {
   balance: BalanceItem[]
   collateral: Token
   conditionalTokens: ConditionalTokenService
+  realitio: RealitioService
   question: string
   resolution: Maybe<Date>
 }
@@ -60,7 +66,15 @@ interface Props extends RouteComponentProps<any> {
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { marketMakerAddress, balance, collateral, conditionalTokens, question, resolution } = props
+  const {
+    marketMakerAddress,
+    balance,
+    collateral,
+    conditionalTokens,
+    realitio,
+    question,
+    resolution,
+  } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
@@ -71,7 +85,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const holdingsYes = balance[0].holdings
   const holdingsNo = balance[1].holdings
 
-  const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, context.library)
+  const marketMaker = new MarketMakerService(
+    marketMakerAddress,
+    conditionalTokens,
+    realitio,
+    context.library,
+  )
 
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(

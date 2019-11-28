@@ -16,15 +16,18 @@ const MarketHomeContainer: React.FC = () => {
   const { markets, moreMarkets } = useMarkets(context, filter, count)
 
   const showMore = () => setCount(count => count + PAGE_SIZE)
+  const onFilterChange = (filter: MarketFilters) => {
+    setCount(PAGE_SIZE)
+    setFilter(filter)
+  }
 
   return (
     <MarketHome
       markets={markets}
       moreMarkets={moreMarkets}
-      count={count}
       context={context}
       currentFilter={filter}
-      onFilterChange={setFilter}
+      onFilterChange={onFilterChange}
       onShowMore={showMore}
     />
   )
