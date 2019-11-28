@@ -1,4 +1,4 @@
-import { useDebugValue, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
@@ -79,19 +79,13 @@ export const useMarkets = (
 ): {
   markets: RemoteData<MarketWithExtraData[]>
   moreMarkets: boolean
-  fetching: boolean
 } => {
   const { marketMakerFactory, conditionalTokens, realitio } = useContracts(context)
 
   const [markets, setMarkets] = useState<RemoteData<MarketWithExtraData[]>>(RemoteData.loading())
   const [latestCheckedBlock, setLatestCheckedBlock] = useState<Maybe<number>>(null)
-  const [fetching, setFetching] = useState(false)
   const [moreMarkets, setMoreMarkets] = useState(true)
   const [needFetchMore, setNeedFetchMore] = useState(true)
-
-  useDebugValue(`Markets length: ${RemoteData.is.success(markets) && markets.data.length}`)
-  useDebugValue(`expectedMarketsCount: ${expectedMarketsCount}`)
-  useDebugValue(`needFetchMore: ${needFetchMore}`)
 
   useEffect(() => {
     setMoreMarkets(!latestCheckedBlock || latestCheckedBlock >= EARLIEST_BLOCK_EVENTS)
@@ -122,7 +116,9 @@ export const useMarkets = (
 
     const run = async (range: [number, number]) => {
       try {
-        setFetching(true)
+        setMarkets(markets =>
+          RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading(),
+        )
         const result = await fetchMarkets(
           'account' in context ? context.account : null,
           filter,
@@ -137,16 +133,14 @@ export const useMarkets = (
           setNeedFetchMore(false)
           setLatestCheckedBlock(result.usedRange[0] - 1)
           setMarkets(currentMarkets =>
-            RemoteData.is.success(currentMarkets)
+            RemoteData.hasData(currentMarkets)
               ? RemoteData.success(currentMarkets.data.concat(result.markets))
               : RemoteData.success(result.markets),
           )
-          setFetching(false)
         }
       } catch (e) {
         if (!didCancel) {
           setMarkets(RemoteData.failure(e))
-          setFetching(false)
         }
       }
     }
@@ -171,7 +165,6 @@ export const useMarkets = (
 
   return {
     markets,
-    fetching,
     moreMarkets,
   }
 }
