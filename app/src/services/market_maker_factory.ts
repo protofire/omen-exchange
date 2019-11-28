@@ -1,7 +1,11 @@
 import { Contract, ethers, Wallet } from 'ethers'
 import { LogDescription } from 'ethers/utils/interface'
 
-import { Market, Log } from '../util/types'
+import { ConditionalTokenService } from './conditional_token'
+import { MarketMakerService } from './market_maker'
+import { RealitioService } from './realitio'
+
+import { Market, MarketWithExtraData, Log } from '../util/types'
 import { FEE } from '../common/constants'
 
 interface GetMarketsOptions {
@@ -56,11 +60,11 @@ class MarketMakerFactoryService {
     return marketMakerAddress
   }
 
-  getMarkets = async (provider: any, { from, to }: GetMarketsOptions): Promise<Market[]> => {
+  getMarkets = async ({ from, to }: GetMarketsOptions): Promise<Market[]> => {
     console.log(`fetching from ${from} to ${to}`)
     const filter: any = this.contract.filters.FixedProductMarketMakerCreation()
 
-    const logs = await provider.getLogs({
+    const logs = await this.provider.getLogs({
       ...filter,
       fromBlock: from,
       toBlock: to,
@@ -86,6 +90,33 @@ class MarketMakerFactoryService {
     )
 
     return markets
+  }
+
+  getMarketsWithExtraData = async (
+    { from, to }: GetMarketsOptions,
+    conditionalTokens: ConditionalTokenService,
+    realitio: RealitioService,
+  ): Promise<MarketWithExtraData[]> => {
+    const markets = await this.getMarkets({ from, to })
+
+    const marketsWithExtraData = await Promise.all(
+      markets.map(market => {
+        const marketMaker = this.buildMarketMaker(market.address, conditionalTokens, realitio)
+        return marketMaker.getExtraData(market)
+      }),
+    )
+
+    const validMarkets = marketsWithExtraData.filter(market => market.fee.eq(FEE))
+
+    return validMarkets
+  }
+
+  buildMarketMaker = (
+    address: string,
+    conditionalTokens: ConditionalTokenService,
+    realitio: RealitioService,
+  ): MarketMakerService => {
+    return new MarketMakerService(address, conditionalTokens, realitio, this.provider)
   }
 }
 

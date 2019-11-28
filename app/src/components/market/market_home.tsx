@@ -19,6 +19,8 @@ const FilterStyled = styled(Filter)`
 
 interface Props {
   markets: RemoteData<MarketWithExtraData[]>
+  count: number
+  fetching: boolean
   moreMarkets: boolean
   context: ConnectedWeb3Context | DisconnectedWeb3Context
   currentFilter: MarketFilters
@@ -27,7 +29,7 @@ interface Props {
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { markets, moreMarkets, context, currentFilter, onFilterChange, onShowMore } = props
+  const { markets, context, currentFilter, onFilterChange } = props
   const options = [MarketFilters.AllMarkets, MarketFilters.MyMarkets, MarketFilters.FundedMarkets]
 
   return (
@@ -42,13 +44,13 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       )}
       <ListCard>
         {RemoteData.is.success(markets)
-          ? markets.data.map(item => {
+          ? markets.data.slice(0, props.count).map(item => {
               return <ListItem key={item.conditionId} data={item}></ListItem>
             })
           : null}
       </ListCard>
-      {moreMarkets && (
-        <button disabled={!RemoteData.is.success(markets)} onClick={onShowMore}>
+      {props.moreMarkets && (
+        <button disabled={props.fetching} onClick={props.onShowMore}>
           Show more
         </button>
       )}

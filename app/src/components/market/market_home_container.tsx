@@ -13,7 +13,7 @@ const MarketHomeContainer: React.FC = () => {
   const [filter, setFilter] = useState<MarketFilters>(MarketFilters.AllMarkets)
   const [count, setCount] = useState(PAGE_SIZE)
 
-  const { markets, moreMarkets } = useMarkets(context, filter, count)
+  const { markets, fetching, moreMarkets } = useMarkets(context, filter, count)
 
   const showMore = () => setCount(count => count + PAGE_SIZE)
   const onFilterChange = (filter: MarketFilters) => {
@@ -24,6 +24,8 @@ const MarketHomeContainer: React.FC = () => {
   return (
     <MarketHome
       markets={markets}
+      count={count}
+      fetching={fetching}
       moreMarkets={moreMarkets}
       context={context}
       currentFilter={filter}
