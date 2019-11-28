@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { MarketWithExtraData, MarketFilters } from '../../util/types'
 import { RemoteData } from '../../util/remote_data'
+import { Button } from '../common/button'
 import { FullLoading } from '../common/full_loading'
 import { ListCard } from '../common/list_card'
 import { ListItem } from '../common/list_item'
@@ -47,12 +48,12 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               return <ListItem key={item.conditionId} data={item}></ListItem>
             })
           : null}
+        {props.moreMarkets && (
+          <Button disabled={RemoteData.is.reloading(markets)} onClick={props.onShowMore}>
+            Show more
+          </Button>
+        )}
       </ListCard>
-      {props.moreMarkets && (
-        <button disabled={RemoteData.is.reloading(markets)} onClick={props.onShowMore}>
-          Show more
-        </button>
-      )}
       {RemoteData.is.loading(markets) ? <FullLoading message="Loading markets..." /> : null}
     </>
   )
