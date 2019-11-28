@@ -5,6 +5,7 @@ import { Table, TD, TH, THead, TR } from '../table/index'
 import { RadioInput } from '../radio_input/index'
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, OutcomeSlot, OutcomeTableValue, Token } from '../../../util/types'
+import { BarDiagram } from '../bar_diagram_probabilities'
 
 interface Props {
   balance: BalanceItem[]
@@ -54,7 +55,6 @@ export const OutcomeTable = (props: Props) => {
   } = props
 
   const TableHead: OutcomeTableValue[] = [
-    OutcomeTableValue.Outcome,
     OutcomeTableValue.Probabilities,
     OutcomeTableValue.CurrentPrice,
     OutcomeTableValue.Shares,
@@ -62,12 +62,13 @@ export const OutcomeTable = (props: Props) => {
     OutcomeTableValue.PriceAfterTrade,
   ]
 
-  const TableCellsAlign = ['left', 'right', 'right', 'right', 'right', 'right']
+  const TableCellsAlign = ['left', 'right', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
     return (
       <THead>
         <TR>
+          {displayRadioSelection && <TH />}
           {TableHead.map((value, index) => {
             return !disabledColumns.includes(value) ? (
               <TH textAlign={TableCellsAlign[index]} key={index}>
@@ -85,35 +86,28 @@ export const OutcomeTable = (props: Props) => {
 
     return (
       <TR key={index}>
-        {disabledColumns.includes(OutcomeTableValue.Outcome) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[0]} winningOutcome={winningOutcome}>
-            {outcomeName}
-          </TDStyled>
-        ) : (
+        {!displayRadioSelection || withWinningOutcome ? null : (
           <TD textAlign={TableCellsAlign[0]}>
-            {displayRadioSelection ? (
-              <RadioContainer>
-                <RadioInputStyled
-                  checked={outcomeSelected === outcomeName}
-                  name="outcome"
-                  onChange={(e: any) =>
-                    outcomeHandleChange && outcomeHandleChange(e.target.value as OutcomeSlot)
-                  }
-                  value={outcomeName}
-                />
-                {outcomeName}
-              </RadioContainer>
-            ) : (
-              outcomeName
-            )}
+            <RadioContainer>
+              <RadioInputStyled
+                checked={outcomeSelected === outcomeName}
+                name="outcome"
+                onChange={(e: any) =>
+                  outcomeHandleChange && outcomeHandleChange(e.target.value as OutcomeSlot)
+                }
+                value={outcomeName}
+              />
+            </RadioContainer>
           </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]} winningOutcome={winningOutcome}>
-            {probability} %
+            <BarDiagram outcomeName={outcomeName} probability={probability} />
           </TDStyled>
         ) : (
-          <TD textAlign={TableCellsAlign[1]}>{probability} %</TD>
+          <TD textAlign={TableCellsAlign[1]}>
+            <BarDiagram outcomeName={outcomeName} probability={probability} />
+          </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[2]} winningOutcome={winningOutcome}>
