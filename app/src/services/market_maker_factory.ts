@@ -24,10 +24,10 @@ const marketMakerFactoryCallAbi = [
 class MarketMakerFactoryService {
   contract: Contract
   constantContract: Contract
-  signerAddress: string
+  signerAddress: Maybe<string>
   provider: any
 
-  constructor(address: string, provider: any, signerAddress: string) {
+  constructor(address: string, provider: any, signerAddress: Maybe<string>) {
     if (signerAddress) {
       const signer: Wallet = provider.getSigner()
 

@@ -10,7 +10,6 @@ import { ListItem } from '../common/list_item'
 import { SectionTitle } from '../common/section_title'
 import { Filter } from '../common/filter'
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { DisconnectedWeb3Context } from '../../hooks/disconnectedWeb3'
 
 const FilterStyled = styled(Filter)`
   margin: -30px auto 10px;
@@ -22,7 +21,7 @@ interface Props {
   markets: RemoteData<MarketWithExtraData[]>
   count: number
   moreMarkets: boolean
-  context: ConnectedWeb3Context | DisconnectedWeb3Context
+  context: ConnectedWeb3Context
   currentFilter: MarketFilters
   onFilterChange: (filter: MarketFilters) => void
   onShowMore: () => void
@@ -35,7 +34,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   return (
     <>
       <SectionTitle title={'MARKETS'} />
-      {'account' in context && (
+      {context.account && (
         <FilterStyled
           defaultOption={currentFilter}
           options={options}

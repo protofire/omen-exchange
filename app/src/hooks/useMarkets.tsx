@@ -5,7 +5,6 @@ import { useContracts, Contracts } from './useContracts'
 import { MarketWithExtraData, MarketFilters } from '../util/types'
 import { callInChunks } from '../util/call_in_chunks'
 import { RemoteData } from '../util/remote_data'
-import { DisconnectedWeb3Context } from './disconnectedWeb3'
 
 const EARLIEST_BLOCK_EVENTS = 4986777
 
@@ -72,7 +71,7 @@ const fetchMarkets = async (
 }
 
 export const useMarkets = (
-  context: ConnectedWeb3Context | DisconnectedWeb3Context,
+  context: ConnectedWeb3Context,
   filter: MarketFilters,
   expectedMarketsCount: number,
 ): {
@@ -119,7 +118,7 @@ export const useMarkets = (
           RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading(),
         )
         const result = await fetchMarkets(
-          'account' in context ? context.account : null,
+          context.account,
           filter,
           range,
           expectedMarketsCount,
