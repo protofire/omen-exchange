@@ -3,21 +3,21 @@ import { useEffect, useState } from 'react'
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts, Contracts } from './useContracts'
 import { MarketWithExtraData, MarketFilters } from '../util/types'
-import { callInChunks } from '../util/call_in_chunks'
+import { callInChunks, Range } from '../util/call_in_chunks'
 import { RemoteData } from '../util/remote_data'
 
-const EARLIEST_BLOCK_EVENTS = 4986777
+const EARLIEST_BLOCK_TO_CHECK = 4986777
 
 const fetchMarkets = async (
   account: Maybe<string>,
   filter: MarketFilters,
-  range: [number, number],
+  range: Range,
   expectedMarketsCount: number,
   contracts: Contracts,
-): Promise<{ markets: MarketWithExtraData[]; usedRange: [number, number] }> => {
-  const { conditionalTokens, marketMakerFactory, realitio } = contracts
+): Promise<{ markets: MarketWithExtraData[]; usedRange: Range }> => {
+  const { conditionalTokens, marketMakerFactory, realitio, buildMarketMaker } = contracts
 
-  const fetchAndFilter = async (subrange: [number, number]): Promise<MarketWithExtraData[]> => {
+  const fetchAndFilter = async (subrange: Range): Promise<MarketWithExtraData[]> => {
     const validMarkets = await marketMakerFactory.getMarketsWithExtraData(
       {
         from: subrange[0],
@@ -34,11 +34,7 @@ const fetchMarkets = async (
       } else if (filter === MarketFilters.FundedMarkets) {
         filteredMarkets = []
         for (const market of validMarkets) {
-          const marketMakerService = marketMakerFactory.buildMarketMaker(
-            market.address,
-            conditionalTokens,
-            realitio,
-          )
+          const marketMakerService = buildMarketMaker(market.address)
           const poolShares = await marketMakerService.poolSharesBalanceOf(account)
           if (poolShares.gt(0)) {
             filteredMarkets.push(market)
@@ -51,9 +47,7 @@ const fetchMarkets = async (
   }
 
   const [marketsPage, usedRange] = await callInChunks(fetchAndFilter, range, {
-    callUntil: async result => {
-      return result.length >= expectedMarketsCount
-    },
+    callUntil: result => result.length >= expectedMarketsCount,
     chunkSize: 20000,
     delay: 100,
   })
@@ -81,14 +75,15 @@ export const useMarkets = (
   const contracts = useContracts(context)
 
   const [markets, setMarkets] = useState<RemoteData<MarketWithExtraData[]>>(RemoteData.loading())
-  const [latestCheckedBlock, setLatestCheckedBlock] = useState<Maybe<number>>(null)
+  const [latestBlockToCheck, setLatestBlockTocheck] = useState<Maybe<number>>(null)
   const [moreMarkets, setMoreMarkets] = useState(true)
   const [needFetchMore, setNeedFetchMore] = useState(true)
 
   useEffect(() => {
-    setMoreMarkets(latestCheckedBlock === null || latestCheckedBlock > EARLIEST_BLOCK_EVENTS)
-  }, [latestCheckedBlock])
+    setMoreMarkets(latestBlockToCheck === null || latestBlockToCheck > EARLIEST_BLOCK_TO_CHECK)
+  }, [latestBlockToCheck])
 
+  // Set `needFetchMore` to true when it makes sense to fetch more markets
   useEffect(() => {
     if (
       RemoteData.is.success(markets) &&
@@ -99,20 +94,22 @@ export const useMarkets = (
     }
   }, [markets, moreMarkets, expectedMarketsCount])
 
+  // restart values when the filter changes
   useEffect(() => {
     const run = async () => {
       const blockNumber = await context.library.getBlockNumber()
       setMarkets(RemoteData.notAsked())
-      setLatestCheckedBlock(blockNumber)
+      setLatestBlockTocheck(blockNumber)
       setNeedFetchMore(true)
     }
     run()
   }, [context, filter])
 
+  // fetch markets
   useEffect(() => {
     let didCancel = false
 
-    const run = async (range: [number, number]) => {
+    const run = async (range: Range) => {
       try {
         setMarkets(markets =>
           RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading(),
@@ -127,7 +124,7 @@ export const useMarkets = (
 
         if (!didCancel) {
           setNeedFetchMore(false)
-          setLatestCheckedBlock(result.usedRange[0] - 1)
+          setLatestBlockTocheck(result.usedRange[0] - 1)
           setMarkets(currentMarkets =>
             RemoteData.hasData(currentMarkets)
               ? RemoteData.success(currentMarkets.data.concat(result.markets))
@@ -141,14 +138,14 @@ export const useMarkets = (
       }
     }
 
-    if (latestCheckedBlock && needFetchMore) {
-      run([EARLIEST_BLOCK_EVENTS, latestCheckedBlock])
+    if (latestBlockToCheck && needFetchMore) {
+      run([EARLIEST_BLOCK_TO_CHECK, latestBlockToCheck])
     }
 
     return () => {
       didCancel = true
     }
-  }, [context, filter, latestCheckedBlock, expectedMarketsCount, needFetchMore, contracts])
+  }, [context, filter, latestBlockToCheck, expectedMarketsCount, needFetchMore, contracts])
 
   return {
     markets,

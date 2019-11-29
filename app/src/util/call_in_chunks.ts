@@ -1,5 +1,7 @@
 import { delay } from './tools'
 
+export type Range = [number, number]
+
 /**
  * Calls function `f` repeatedly over the given `range`, dividing this range by `chunkSize`
  *
@@ -21,14 +23,14 @@ import { delay } from './tools'
  * was specified).
  */
 export async function callInChunks<T>(
-  f: (subrange: [number, number]) => Promise<T[]>,
-  range: [number, number],
+  f: (subrange: Range) => Promise<T[]>,
+  range: Range,
   options: {
     chunkSize: number
     delay?: number
-    callUntil?: (result: T[]) => Promise<boolean>
+    callUntil?: (result: T[]) => boolean
   },
-): Promise<[T[], [number, number]]> {
+): Promise<[T[], Range]> {
   const [start, end] = range
   let result: T[] = []
 
@@ -47,7 +49,7 @@ export async function callInChunks<T>(
       break
     }
 
-    if (options.callUntil && (await options.callUntil(result))) {
+    if (options.callUntil && options.callUntil(result)) {
       break
     }
 

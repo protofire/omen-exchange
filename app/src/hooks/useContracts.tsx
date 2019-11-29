@@ -3,17 +3,11 @@ import { ConnectedWeb3Context } from './connectedWeb3'
 import { getContractAddress } from '../util/addresses'
 import {
   ConditionalTokenService,
+  MarketMakerService,
   MarketMakerFactoryService,
   OracleService,
   RealitioService,
 } from '../services'
-
-export interface Contracts {
-  conditionalTokens: ConditionalTokenService
-  marketMakerFactory: MarketMakerFactoryService
-  realitio: RealitioService
-  oracle: OracleService
-}
 
 export const useContracts = (context: ConnectedWeb3Context) => {
   const { library, networkId } = context
@@ -41,13 +35,22 @@ export const useContracts = (context: ConnectedWeb3Context) => {
   const oracleAddress = getContractAddress(networkId, 'oracle')
   const oracle = useMemo(() => new OracleService(oracleAddress, library), [oracleAddress, library])
 
+  const buildMarketMaker = useMemo(
+    () => (address: string) =>
+      new MarketMakerService(address, conditionalTokens, realitio, library),
+    [conditionalTokens, realitio, library],
+  )
+
   return useMemo(
     () => ({
       conditionalTokens,
       marketMakerFactory,
       realitio,
       oracle,
+      buildMarketMaker,
     }),
-    [conditionalTokens, marketMakerFactory, realitio, oracle],
+    [conditionalTokens, marketMakerFactory, realitio, oracle, buildMarketMaker],
   )
 }
+
+export type Contracts = ReturnType<typeof useContracts>

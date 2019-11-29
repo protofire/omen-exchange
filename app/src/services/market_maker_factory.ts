@@ -101,7 +101,12 @@ class MarketMakerFactoryService {
 
     const marketsWithExtraData = await Promise.all(
       markets.map(market => {
-        const marketMaker = this.buildMarketMaker(market.address, conditionalTokens, realitio)
+        const marketMaker = new MarketMakerService(
+          market.address,
+          conditionalTokens,
+          realitio,
+          this.provider,
+        )
         return marketMaker.getExtraData(market)
       }),
     )
@@ -109,14 +114,6 @@ class MarketMakerFactoryService {
     const validMarkets = marketsWithExtraData.filter(market => market.fee.eq(FEE))
 
     return validMarkets
-  }
-
-  buildMarketMaker = (
-    address: string,
-    conditionalTokens: ConditionalTokenService,
-    realitio: RealitioService,
-  ): MarketMakerService => {
-    return new MarketMakerService(address, conditionalTokens, realitio, this.provider)
   }
 }
 

@@ -135,7 +135,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       const provider = context.library
 
-      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, realitio, provider)
+      const marketMaker = new MarketMakerService(
+        marketMakerAddress,
+        conditionalTokens,
+        realitio,
+        provider,
+      )
 
       const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketMakerAddress)
       if (!isApprovedForAll) {
