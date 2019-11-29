@@ -1,7 +1,12 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-interface StyleProps {
+interface ProbabilityProps {
+  isWinning: boolean
+  theme?: any
+}
+
+interface BarProps {
   isWinning: boolean
   percentage: number
   theme?: any
@@ -20,7 +25,7 @@ const OutcomeBar = styled.div`
   text-size-adjust: 100%;
 `
 
-const Probability = styled.div<StyleProps>`
+const Probability = styled.div<ProbabilityProps>`
   border-color: ${props =>
     props.isWinning ? props.theme.colors.primarySoft : props.theme.colors.secondarySoft};
   border-bottom-style: solid;
@@ -38,7 +43,7 @@ const Probability = styled.div<StyleProps>`
   text-align: center;
 `
 
-const Bar = styled.div<StyleProps>`
+const Bar = styled.div<BarProps>`
   background-color: ${props =>
     props.isWinning ? props.theme.colors.primarySoft : props.theme.colors.secondarySoft};
   color: #00193c;
