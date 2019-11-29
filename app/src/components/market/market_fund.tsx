@@ -190,7 +190,6 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         <OutcomeTable
           balance={balance}
           disabledColumns={[
-            OutcomeTableValue.Probabilities,
             OutcomeTableValue.CurrentPrice,
             OutcomeTableValue.Payout,
             OutcomeTableValue.PriceAfterTrade,

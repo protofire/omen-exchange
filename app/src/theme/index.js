@@ -6,7 +6,9 @@ const theme = {
   colors: {
     activeListItemBackground: '#fafafa',
     primary: '#00be95',
+    primarySoft:'#A3F7E5',
     secondary: '#ff7848',
+    secondarySoft:'#FFB59B',
     tertiary: '#f5f5f5',
     textColor: '#333',
     textColorLight: '#888',

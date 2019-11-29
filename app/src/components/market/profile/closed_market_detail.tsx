@@ -140,11 +140,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <OutcomeTable
           balance={balance}
           collateral={collateralToken}
-          disabledColumns={[
-            OutcomeTableValue.Probabilities,
-            OutcomeTableValue.CurrentPrice,
-            OutcomeTableValue.PriceAfterTrade,
-          ]}
+          disabledColumns={[OutcomeTableValue.CurrentPrice, OutcomeTableValue.PriceAfterTrade]}
           withWinningOutcome={true}
         />
 
