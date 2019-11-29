@@ -70,7 +70,7 @@ export const ConnectedWeb3: React.FC<Props> = props => {
     return () => {
       isSubscribed = false
     }
-  }, [context.library, props.infura])
+  }, [context, props.infura])
 
   if (!networkId) {
     return null
