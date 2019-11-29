@@ -1,4 +1,4 @@
-import React, { useState, HTMLAttributes, useEffect } from 'react'
+import React, { useState, HTMLAttributes, useEffect, useCallback } from 'react'
 import { useWeb3Context } from 'web3-react'
 import styled, { css } from 'styled-components'
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
@@ -9,6 +9,9 @@ import { Wallet } from '../../../util/types'
 import CloseSVG from './img/close.svg'
 import WalletConnectSVG from './img/wallet_connect.svg'
 import MetaMaskSVG from './img/metamask.svg'
+import { getLogger } from '../../../util/logger'
+
+const logger = getLogger('ModalConnectWallet::Index')
 
 const Wrapper = styled.div`
   align-items: center;
@@ -161,7 +164,7 @@ export const ModalConnectWallet = (props: Props) => {
   const context = useWeb3Context()
 
   if (context.error) {
-    console.error('Error in web3 context', context.error)
+    logger.error('Error in web3 context', context.error)
   }
 
   const [walletSelected, setWalletSelected] = useState(Wallet.MetaMask)
@@ -194,9 +197,9 @@ export const ModalConnectWallet = (props: Props) => {
     </>
   )
 
-  const onClickCloseButton = () => {
+  const onClickCloseButton = useCallback(() => {
     props.onClose()
-  }
+  }, [props])
 
   useEffect(() => {
     if (context.active && !context.account && context.connectorName === Wallet.WalletConnect) {
@@ -212,7 +215,7 @@ export const ModalConnectWallet = (props: Props) => {
         WalletConnectQRCodeModal.close()
       })
     }
-  }, [context])
+  }, [context, onClickCloseButton])
 
   const onConnect = () => {
     context.setConnector(walletSelected)
