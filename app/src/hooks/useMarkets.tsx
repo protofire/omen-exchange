@@ -1,24 +1,23 @@
 import { useEffect, useState } from 'react'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
-import { useContracts } from './useContracts'
-import { ConditionalTokenService, MarketMakerFactoryService, RealitioService } from '../services'
+import { useContracts, Contracts } from './useContracts'
 import { MarketWithExtraData, MarketFilters } from '../util/types'
 import { callInChunks } from '../util/call_in_chunks'
 import { RemoteData } from '../util/remote_data'
 import { DisconnectedWeb3Context } from './disconnectedWeb3'
 
-const EARLIEST_BLOCK_EVENTS = 5279938
+const EARLIEST_BLOCK_EVENTS = 4986777
 
 const fetchMarkets = async (
   account: Maybe<string>,
   filter: MarketFilters,
   range: [number, number],
   expectedMarketsCount: number,
-  marketMakerFactory: MarketMakerFactoryService,
-  conditionalTokens: ConditionalTokenService,
-  realitio: RealitioService,
+  contracts: Contracts,
 ): Promise<{ markets: MarketWithExtraData[]; usedRange: [number, number] }> => {
+  const { conditionalTokens, marketMakerFactory, realitio } = contracts
+
   const fetchAndFilter = async (subrange: [number, number]): Promise<MarketWithExtraData[]> => {
     const validMarkets = await marketMakerFactory.getMarketsWithExtraData(
       {
@@ -80,7 +79,7 @@ export const useMarkets = (
   markets: RemoteData<MarketWithExtraData[]>
   moreMarkets: boolean
 } => {
-  const { marketMakerFactory, conditionalTokens, realitio } = useContracts(context)
+  const contracts = useContracts(context)
 
   const [markets, setMarkets] = useState<RemoteData<MarketWithExtraData[]>>(RemoteData.loading())
   const [latestCheckedBlock, setLatestCheckedBlock] = useState<Maybe<number>>(null)
@@ -88,7 +87,7 @@ export const useMarkets = (
   const [needFetchMore, setNeedFetchMore] = useState(true)
 
   useEffect(() => {
-    setMoreMarkets(!latestCheckedBlock || latestCheckedBlock >= EARLIEST_BLOCK_EVENTS)
+    setMoreMarkets(latestCheckedBlock === null || latestCheckedBlock > EARLIEST_BLOCK_EVENTS)
   }, [latestCheckedBlock])
 
   useEffect(() => {
@@ -124,9 +123,7 @@ export const useMarkets = (
           filter,
           range,
           expectedMarketsCount,
-          marketMakerFactory,
-          conditionalTokens,
-          realitio,
+          contracts,
         )
 
         if (!didCancel) {
@@ -152,16 +149,7 @@ export const useMarkets = (
     return () => {
       didCancel = true
     }
-  }, [
-    context,
-    filter,
-    latestCheckedBlock,
-    expectedMarketsCount,
-    needFetchMore,
-    conditionalTokens,
-    realitio,
-    marketMakerFactory,
-  ])
+  }, [context, filter, latestCheckedBlock, expectedMarketsCount, needFetchMore, contracts])
 
   return {
     markets,

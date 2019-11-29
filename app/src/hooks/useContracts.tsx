@@ -9,7 +9,16 @@ import {
 } from '../services'
 import { DisconnectedWeb3Context } from './disconnectedWeb3'
 
-export const useContracts = (context: ConnectedWeb3Context | DisconnectedWeb3Context) => {
+export interface Contracts {
+  conditionalTokens: ConditionalTokenService
+  marketMakerFactory: MarketMakerFactoryService
+  realitio: RealitioService
+  oracle: OracleService
+}
+
+export const useContracts = (
+  context: ConnectedWeb3Context | DisconnectedWeb3Context,
+): Contracts => {
   const { library, networkId } = context
   const account = 'account' in context ? context.account : ''
 
@@ -35,10 +44,13 @@ export const useContracts = (context: ConnectedWeb3Context | DisconnectedWeb3Con
   const oracleAddress = getContractAddress(networkId, 'oracle')
   const oracle = useMemo(() => new OracleService(oracleAddress, library), [oracleAddress, library])
 
-  return {
-    conditionalTokens,
-    marketMakerFactory,
-    realitio,
-    oracle,
-  }
+  return useMemo(
+    () => ({
+      conditionalTokens,
+      marketMakerFactory,
+      realitio,
+      oracle,
+    }),
+    [conditionalTokens, marketMakerFactory, realitio, oracle],
+  )
 }
