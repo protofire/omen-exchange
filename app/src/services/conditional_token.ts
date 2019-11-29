@@ -22,10 +22,10 @@ const conditionalTokensAbi = [
 class ConditionalTokenService {
   contract: Contract
   address: string
-  signerAddress: string
+  signerAddress: Maybe<string>
   provider: any
 
-  constructor(address: string, provider: any, signerAddress: string) {
+  constructor(address: string, provider: any, signerAddress: Maybe<string>) {
     if (signerAddress) {
       const signer: Wallet = provider.getSigner()
       this.contract = new ethers.Contract(address, conditionalTokensAbi, provider).connect(signer)

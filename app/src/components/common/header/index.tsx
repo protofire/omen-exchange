@@ -73,7 +73,7 @@ export const Header: React.FC = props => {
         <ConnectedWeb3>
           <NetworkStyled />
         </ConnectedWeb3>
-        {!context.active && (
+        {!context.account && (
           <ButtonConnectWallet
             onClick={() => {
               setModalState(true)

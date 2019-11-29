@@ -7,11 +7,10 @@ import {
   OracleService,
   RealitioService,
 } from '../services'
-import { DisconnectedWeb3Context } from './disconnectedWeb3'
 
-export const useContracts = (context: ConnectedWeb3Context | DisconnectedWeb3Context) => {
+export const useContracts = (context: ConnectedWeb3Context) => {
   const { library, networkId } = context
-  const account = 'account' in context ? context.account : ''
+  const account = context.account
 
   const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
   const conditionalTokens = useMemo(
