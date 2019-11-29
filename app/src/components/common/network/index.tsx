@@ -58,6 +58,9 @@ export const Network: React.FC = props => {
   const networkName = getContractAddressName(networkId)
   const { ...restProps } = props
 
+  if (!account) {
+    return null
+  }
   return (
     <NetworkWrapper {...restProps}>
       <IconStyled src={Icon} alt="" />
