@@ -52,17 +52,27 @@ interface Props {
   collateral: Token
   funding: BigNumber
   question: string
+  questionId: string
   resolution: Date | null
   marketMakerAddress: string
+  isConditionResolved: boolean
 }
 
 const logger = getLogger('Market::ClosedMarketDetail')
 
 export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens, realitio } = useContracts(context)
+  const { conditionalTokens, oracle, realitio } = useContracts(context)
 
-  const { collateral: collateralToken, balance, marketMakerAddress, resolution, funding } = props
+  const {
+    collateral: collateralToken,
+    balance,
+    marketMakerAddress,
+    resolution,
+    funding,
+    isConditionResolved,
+    questionId,
+  } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
@@ -75,6 +85,10 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     realitio,
     provider,
   )
+
+  const resolveCondition = () => {
+    return oracle.resolveCondition(questionId)
+  }
 
   useEffect(() => {
     let isSubscribed = true
@@ -97,11 +111,14 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
   const redeem = async () => {
     try {
+      if (!isConditionResolved) {
+        setMessage('Resolving condition...')
+        await resolveCondition()
+      }
       setMessage('Redeem payout...')
       setStatus(Status.Loading)
 
       const collateralAddress = await marketMaker.getCollateralToken()
-
       const conditionId = await marketMaker.getConditionId()
 
       await conditionalTokens.redeemPositions(collateralAddress, conditionId)
@@ -156,6 +173,9 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
           >
             Redeem
           </Button>
+          {!isConditionResolved && !winningOutcome ? (
+            <Button onClick={resolveCondition}>Resolve Condition</Button>
+          ) : null}
         </ButtonContainerStyled>
       </ViewCard>
       {status === Status.Loading ? <FullLoading message={message} /> : null}

@@ -2,7 +2,6 @@ import { ethers, Wallet, Contract } from 'ethers'
 
 import { getLogger } from '../util/logger'
 import { BigNumber } from 'ethers/utils'
-import { WinnerOutcome } from '../util/types'
 
 const logger = getLogger('Services::Conditional-Token')
 
@@ -125,12 +124,6 @@ class ConditionalTokenService {
       1,
       2,
     ])
-  }
-
-  getWinnerOutcome = async (conditionId: string): Promise<WinnerOutcome> => {
-    const yesNumerator: BigNumber = await this.contract.payoutNumerators(conditionId, 0)
-
-    return yesNumerator.isZero() ? WinnerOutcome.No : WinnerOutcome.Yes
   }
 }
 

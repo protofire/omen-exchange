@@ -1,4 +1,5 @@
 import { Contract, ethers, Wallet } from 'ethers'
+import { bigNumberify } from 'ethers/utils'
 import { Moment } from 'moment'
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
@@ -13,6 +14,7 @@ const realitioAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public payable returns (bytes32)',
   'event LogNewQuestion(bytes32 indexed question_id, address indexed user, uint256 template_id, string question, bytes32 indexed content_hash, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce, uint256 created)',
   'function isFinalized(bytes32 question_id) view public returns (bool)',
+  'function resultFor(bytes32 question_id) external view returns (bytes32)',
 ]
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
@@ -116,6 +118,20 @@ class RealitioService {
     } catch (err) {
       logger.error(
         `There was an error querying if the question with id '${questionId}' is finalized`,
+        err.message,
+      )
+      throw err
+    }
+  }
+
+  getWinnerOutcome = async (questionId: string): Promise<number> => {
+    try {
+      const result: string = await this.contract.resultFor(questionId)
+      const resultBN = bigNumberify(result)
+      return resultBN.isZero() ? 0 : 1
+    } catch (err) {
+      logger.error(
+        `There was an error querying the result for question with id '${questionId}'`,
         err.message,
       )
       throw err

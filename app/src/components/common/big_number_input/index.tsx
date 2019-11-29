@@ -25,6 +25,7 @@ interface Props {
 
 interface State {
   currentValueStr: string
+  currentDecimalsStr: number
 }
 
 const Input = styled.input`
@@ -49,19 +50,23 @@ export class BigNumberInput extends React.Component<Props, State> {
     currentValueStr: this.props.value
       ? ethers.utils.formatUnits(this.props.value, this.props.decimals)
       : '',
+    currentDecimalsStr: this.props.decimals,
   }
 
   private textInput: any
 
   public static getDerivedStateFromProps = (props: Props, state: State) => {
     const { decimals, value } = props
-    const { currentValueStr } = state
+    const { currentValueStr, currentDecimalsStr } = state
 
     if (!value) {
       return {
         currentValueStr: '',
       }
-    } else if (value && !ethers.utils.parseUnits(currentValueStr || '0', decimals).eq(value)) {
+    } else if (
+      value &&
+      !ethers.utils.parseUnits(currentValueStr || '0', currentDecimalsStr).eq(value)
+    ) {
       return {
         currentValueStr: ethers.utils.formatUnits(value, decimals),
       }
@@ -97,6 +102,7 @@ export class BigNumberInput extends React.Component<Props, State> {
 
     this.setState({
       currentValueStr: newValueStr,
+      currentDecimalsStr: decimals,
     })
   }
 

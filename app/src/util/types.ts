@@ -58,11 +58,6 @@ export enum StepProfile {
   CloseMarketDetail = 'CloseMarketDetail',
 }
 
-export enum WinnerOutcome {
-  Yes = 'Yes',
-  No = 'No',
-}
-
 export interface Question {
   question: string
   resolution: Maybe<Date>
@@ -125,4 +120,9 @@ export interface Arbitrator {
   address: string
   name: string
   url: string
+}
+
+export enum Wallet {
+  MetaMask = 'MetaMask',
+  WalletConnect = 'WalletConnect',
 }

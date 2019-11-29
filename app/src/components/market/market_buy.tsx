@@ -28,6 +28,7 @@ import { FormLabel } from '../common/form_label'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { SectionTitle } from '../common/section_title'
+import { BalanceToken } from '../common/balance_token'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -167,6 +168,21 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const disabled = (status !== Status.Ready && status !== Status.Error) || cost.isZero()
 
+  const noteAmount = (
+    <>
+      <BalanceToken
+        collateralId={collateral.symbol.toLowerCase() as KnownToken}
+        onClickMax={(collateral: Token, collateralBalance: BigNumber) =>
+          setAmount(collateralBalance)
+        }
+      />
+      You will be charged an extra 1% trade fee of &nbsp;
+      <strong>
+        {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}
+      </strong>
+    </>
+  )
+
   return (
     <>
       <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
@@ -194,12 +210,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               placeholderText={collateral.symbol}
             />
           }
-          note={[
-            'You will be charged an extra 1% trade fee of ',
-            <strong key="1">
-              {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}
-            </strong>,
-          ]}
+          note={noteAmount}
           title={'Amount'}
           tooltip={{ id: 'amount', description: 'Shares to buy with this amount of collateral.' }}
         />

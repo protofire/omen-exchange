@@ -2,6 +2,7 @@ import { providers } from 'ethers'
 import React, { useState, useEffect } from 'react'
 import { useWeb3Context } from 'web3-react'
 import connectors from '../util/connectors'
+import { DisconnectedWeb3Context } from './disconnectedWeb3'
 
 export interface ConnectedWeb3Context {
   account: string
@@ -22,6 +23,22 @@ export const useConnectedWeb3Context = () => {
   }
 
   return context
+}
+
+// TEMPORARY SOLUTION, this should disappear SOON
+export const useConnectedOrDisconnectedWeb3Context = () => {
+  const connectedContext = React.useContext(ConnectedWeb3Context)
+  const disconnectedContext = React.useContext(DisconnectedWeb3Context)
+
+  if (connectedContext) {
+    return connectedContext
+  }
+
+  if (disconnectedContext) {
+    return disconnectedContext
+  }
+
+  throw new Error('Component rendered outside the provider tree')
 }
 
 /**
