@@ -83,6 +83,7 @@ export const OutcomeTable = (props: Props) => {
 
   const renderTableData = balance.map((balanceItem, index) => {
     const { outcomeName, probability, currentPrice, shares, winningOutcome } = balanceItem
+    const isWinning = probability > 50
 
     return (
       <TR key={index}>
@@ -102,11 +103,11 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]} winningOutcome={winningOutcome}>
-            <BarDiagram outcomeName={outcomeName} probability={probability} />
+            <BarDiagram outcomeName={outcomeName} isWinning={isWinning} probability={probability} />
           </TDStyled>
         ) : (
           <TD textAlign={TableCellsAlign[1]}>
-            <BarDiagram outcomeName={outcomeName} probability={probability} />
+            <BarDiagram outcomeName={outcomeName} isWinning={isWinning} probability={probability} />
           </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (

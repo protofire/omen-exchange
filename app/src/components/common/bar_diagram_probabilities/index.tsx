@@ -2,7 +2,7 @@ import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
 interface StyleProps {
-  isGreaterThanFifty?: boolean
+  isWinning?: boolean
   percentage?: number
   theme?: any
 }
@@ -22,7 +22,7 @@ const OutcomeBar = styled.div`
 
 const Probability = styled.div<StyleProps>`
   border-color: ${props =>
-    props.isGreaterThanFifty ? props.theme.colors.primarySoft : props.theme.colors.secondarySoft};
+    props.isWinning ? props.theme.colors.primarySoft : props.theme.colors.secondarySoft};
   border-bottom-style: solid;
   border-bottom-width: 2px;
   display: block;
@@ -40,7 +40,7 @@ const Probability = styled.div<StyleProps>`
 
 const Bar = styled.div<StyleProps>`
   background-color: ${props =>
-    props.isGreaterThanFifty ? props.theme.colors.primarySoft : props.theme.colors.secondarySoft};
+    props.isWinning ? props.theme.colors.primarySoft : props.theme.colors.secondarySoft};
   color: #00193c;
   display: block;
   height: 32px;
@@ -87,20 +87,19 @@ const OutcomeName = styled.span`
 interface Props extends HTMLAttributes<HTMLButtonElement> {
   outcomeName: string
   probability: number
+  isWinning: boolean
 }
 
 export const BarDiagram: React.FC<Props> = (props: Props) => {
-  const { outcomeName, probability } = props
-
-  const isGreaterThanFifty = probability > 50
+  const { outcomeName, probability, isWinning } = props
 
   return (
     <OutcomeBar>
-      <Probability isGreaterThanFifty={isGreaterThanFifty}>
+      <Probability isWinning={isWinning}>
         <LabelOutcome>
           <OutcomeName>{outcomeName}</OutcomeName>
         </LabelOutcome>
-        <Bar isGreaterThanFifty={isGreaterThanFifty} barPercentage={probability} />
+        <Bar isWinning={isWinning} barPercentage={probability} />
         <LabelAmount>{probability}%</LabelAmount>
       </Probability>
     </OutcomeBar>
