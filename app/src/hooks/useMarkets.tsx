@@ -7,12 +7,11 @@ import { MarketMakerService } from '../services/market_maker'
 import { getLogger } from '../util/logger'
 import { Market, MarketWithExtraData, MarketFilters, MarketStatus } from '../util/types'
 import { RemoteData } from '../util/remote_data'
-import { DisconnectedWeb3Context } from './disconnectedWeb3'
 
 const logger = getLogger('Market::useMarkets')
 
 export const useMarkets = (
-  context: ConnectedWeb3Context | DisconnectedWeb3Context,
+  context: ConnectedWeb3Context,
   filter: MarketFilters,
 ): {
   markets: RemoteData<MarketWithExtraData[]>
@@ -41,12 +40,10 @@ export const useMarkets = (
           const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
           const marketStatus = isConditionResolved ? MarketStatus.Resolved : MarketStatus.Open
 
-          const account = 'account' in context ? context.account : ''
           const marketMakerService = new MarketMakerService(
             market.address,
             conditionalTokens,
             provider,
-            account,
           )
 
           const fee = await marketMakerService.getFee()
@@ -68,7 +65,7 @@ export const useMarkets = (
         const validMarkets = marketsWithExtraData.filter(market => market.fee.eq(FEE))
 
         let filteredMarkets = validMarkets
-        if ('account' in context) {
+        if (context.account) {
           if (filter === MarketFilters.MyMarkets) {
             filteredMarkets = validMarkets.filter(market => market.ownerAddress === context.account)
           } else if (filter === MarketFilters.FundedMarkets) {

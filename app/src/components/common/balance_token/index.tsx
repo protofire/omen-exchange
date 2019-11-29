@@ -39,7 +39,8 @@ export const BalanceToken = (props: Props) => {
     () => async (): Promise<[BigNumber, string, string]> => {
       const collateralService = new ERC20Service(collateral.address)
 
-      const collateralBalance = await collateralService.getCollateral(account, library)
+      // TODO: fix with useConnectedWallet context
+      const collateralBalance = await collateralService.getCollateral(account || '', library)
       return [
         collateralBalance,
         formatBigNumber(collateralBalance, collateral.decimals),

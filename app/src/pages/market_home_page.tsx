@@ -3,7 +3,6 @@ import { useWeb3Context } from 'web3-react'
 
 import { MarketHomeContainer } from '../components'
 import { ConnectedWeb3, useConnectWeb3 } from '../hooks/connectedWeb3'
-import { DisconnectedWeb3 } from '../hooks/disconnectedWeb3'
 import connectors from '../util/connectors'
 
 const MarketHomeConnectedWrapper = (props: any) => {
@@ -18,9 +17,9 @@ const MarketHomeConnectedWrapper = (props: any) => {
 
 const MarketHomeDisconnectedWrapper = (props: any) => {
   return (
-    <DisconnectedWeb3>
+    <ConnectedWeb3 infura={true}>
       <MarketHomeContainer {...props} />
-    </DisconnectedWeb3>
+    </ConnectedWeb3>
   )
 }
 

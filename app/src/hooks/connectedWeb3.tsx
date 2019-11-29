@@ -2,10 +2,9 @@ import { providers } from 'ethers'
 import React, { useState, useEffect } from 'react'
 import { useWeb3Context } from 'web3-react'
 import connectors from '../util/connectors'
-import { DisconnectedWeb3Context } from './disconnectedWeb3'
 
 export interface ConnectedWeb3Context {
-  account: string
+  account: Maybe<string>
   library: providers.Web3Provider
   networkId: number
 }
@@ -25,22 +24,6 @@ export const useConnectedWeb3Context = () => {
   return context
 }
 
-// TEMPORARY SOLUTION, this should disappear SOON
-export const useConnectedOrDisconnectedWeb3Context = () => {
-  const connectedContext = React.useContext(ConnectedWeb3Context)
-  const disconnectedContext = React.useContext(DisconnectedWeb3Context)
-
-  if (connectedContext) {
-    return connectedContext
-  }
-
-  if (disconnectedContext) {
-    return disconnectedContext
-  }
-
-  throw new Error('Component rendered outside the provider tree')
-}
-
 /**
  * Use this hook to connect the wallet automatically
  */
@@ -55,11 +38,16 @@ export const useConnectWeb3 = () => {
   }, [context])
 }
 
+interface Props {
+  children: React.ReactNode
+  infura?: boolean
+}
+
 /**
  * Component used to render components that depend on Web3 being available. These components can then
  * `useConnectedWeb3Context` safely to get web3 stuff without having to null check it.
  */
-export const ConnectedWeb3: React.FC<{ children: React.ReactNode }> = props => {
+export const ConnectedWeb3: React.FC<Props> = props => {
   const [networkId, setNetworkId] = useState<number | null>(null)
   const context = useWeb3Context()
 
@@ -71,6 +59,10 @@ export const ConnectedWeb3: React.FC<{ children: React.ReactNode }> = props => {
       if (isSubscribed) setNetworkId(network.chainId)
     }
 
+    if (props.infura) {
+      context.setConnector('Infura')
+    }
+
     if (context.library) {
       checkIfReady()
     }
@@ -78,13 +70,13 @@ export const ConnectedWeb3: React.FC<{ children: React.ReactNode }> = props => {
     return () => {
       isSubscribed = false
     }
-  }, [context.library])
+  }, [context.library, props.infura])
 
-  if (!context.account || !networkId) {
+  if (!networkId) {
     return null
   }
 
-  const value = { account: context.account, library: context.library, networkId }
+  const value = { account: context.account || null, library: context.library, networkId }
 
   return (
     <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
