@@ -14,7 +14,7 @@ const FullLoadingStyled = styled.div`
   position: fixed;
   top: 0;
   width: 100vw;
-  z-index: 12345;
+  z-index: 100;
 `
 
 const Message = styled.p`
