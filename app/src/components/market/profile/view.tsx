@@ -4,12 +4,10 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { ThreeBoxComments } from '../../common/three_box_comments'
 import { ViewCard } from '../../common/view_card'
-import { formatBigNumber } from '../../../util/tools'
-import { Status, BalanceItem, Token, Arbitrator } from '../../../util/types'
-import { ButtonAnchor } from '../../common'
+import { Status, BalanceItem, Token, Arbitrator, OutcomeTableValue } from '../../../util/types'
+import { ButtonAnchor, OutcomeTable } from '../../common'
 import { FullLoading } from '../../common/full_loading'
 import { ButtonContainer } from '../../common/button_container'
-import { Table, TD, TH, THead, TR } from '../../common/table'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { BigNumber } from 'ethers/utils'
 import { TitleValue } from '../../common/title_value'
@@ -69,44 +67,19 @@ const ViewWrapper = (props: Props) => {
     return !shares.isZero()
   })
 
-  const headerArray = ['Outcome', 'Probabilities', 'Current Price', 'Shares']
-  const cellAlignment = ['left', 'right', 'right', 'right']
-  if (!userHasShares) {
-    headerArray.pop()
-  }
-
-  const renderTableHeader = (): React.ReactNode => {
-    return (
-      <THead>
-        <TR>
-          {headerArray.map((value, index) => {
-            return (
-              <TH key={index} textAlign={cellAlignment[index]}>
-                {value}
-              </TH>
-            )
-          })}
-        </TR>
-      </THead>
-    )
-  }
-
   const renderTableData = () => {
-    return balance.map((balanceItem, index) => {
-      const { outcomeName, probability, currentPrice, shares } = balanceItem
-      return (
-        <TR key={index}>
-          <TD textAlign={cellAlignment[0]}>{outcomeName}</TD>
-          <TD textAlign={cellAlignment[1]}>{probability} %</TD>
-          <TD textAlign={cellAlignment[2]}>
-            {currentPrice} {collateral.symbol}
-          </TD>
-          {userHasShares && (
-            <TD textAlign={cellAlignment[3]}>{formatBigNumber(shares, collateral.decimals)}</TD>
-          )}
-        </TR>
-      )
-    })
+    const disabledColumns = [OutcomeTableValue.Payout, OutcomeTableValue.PriceAfterTrade]
+    if (!userHasShares) {
+      disabledColumns.push(OutcomeTableValue.Shares)
+    }
+    return (
+      <OutcomeTable
+        balance={balance}
+        collateral={collateral}
+        displayRadioSelection={false}
+        disabledColumns={disabledColumns}
+      />
+    )
   }
 
   const details = () => {
@@ -152,7 +125,7 @@ const ViewWrapper = (props: Props) => {
       <ViewCard>
         {marketHasDetails && details()}
         {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
-        <Table head={renderTableHeader()}>{renderTableData()}</Table>
+        {renderTableData()}
         <ButtonContainerStyled>
           <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
           {userHasShares && (
