@@ -221,7 +221,7 @@ export const ModalConnectWallet = (props: Props) => {
 
   return (
     <>
-      {!context.active && (
+      {!context.account && (
         <Wrapper>
           <Card>
             <CloseIcon onClick={onClickCloseButton} />

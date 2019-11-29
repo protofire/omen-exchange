@@ -137,13 +137,17 @@ export const ThreeBoxComments = (props: Props) => {
   const { threadName } = props
 
   const [box, setBox] = useState<any>(null)
-  const [currentUserAddress, setCurrentUserAddress] = useState<string>(context.account)
+  // TODO: fix with useConnectedWeb3Wallet context
+  const [currentUserAddress, setCurrentUserAddress] = useState<string>(context.account || '')
 
   useEffect(() => {
     let isSubscribed = true
 
     const handle3boxLogin = async () => {
-      const { account, library } = context
+      const { library } = context
+      // TODO: fix with useConnectedWeb3Wallet context
+      const account = context.account || ''
+
       logger.log(`Open three box with account ${account}`)
 
       const newBox = await Box.openBox(account, library._web3Provider)
