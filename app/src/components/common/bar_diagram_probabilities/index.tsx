@@ -2,8 +2,8 @@ import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
 interface StyleProps {
-  isWinning?: boolean
-  percentage?: number
+  isWinning: boolean
+  percentage: number
   theme?: any
 }
 
@@ -49,7 +49,7 @@ const Bar = styled.div<StyleProps>`
   padding-right: 2px;
   padding-top: 4px;
   text-align: center;
-  width: ${props => props.percentage || '50'}%;
+  width: ${props => props.percentage}%;
 `
 
 const LabelAmount = styled.div`
@@ -99,7 +99,7 @@ export const BarDiagram: React.FC<Props> = (props: Props) => {
         <LabelOutcome>
           <OutcomeName>{outcomeName}</OutcomeName>
         </LabelOutcome>
-        <Bar isWinning={isWinning} barPercentage={probability} />
+        <Bar isWinning={isWinning} percentage={probability} />
         <LabelAmount>{probability}%</LabelAmount>
       </Probability>
     </OutcomeBar>
