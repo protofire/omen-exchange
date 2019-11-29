@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 interface StyleProps {
   isGreaterThanFifty?: boolean
-  barPercentage?: number
+  percentage?: number
   theme?: any
 }
 
@@ -49,7 +49,7 @@ const Bar = styled.div<StyleProps>`
   padding-right: 2px;
   padding-top: 4px;
   text-align: center;
-  width: ${props => props.barPercentage || '50'}%;
+  width: ${props => props.percentage || '50'}%;
 `
 
 const LabelAmount = styled.div`
