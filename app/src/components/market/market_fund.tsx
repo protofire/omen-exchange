@@ -117,6 +117,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         conditionalTokens,
         realitio,
         provider,
+        context.account,
       )
 
       const collateralAddress = await marketMaker.getCollateralToken()
@@ -149,6 +150,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         conditionalTokens,
         realitio,
         provider,
+        context.account,
       )
       await marketMaker.removeFunding(marketMakerUserFunding)
 

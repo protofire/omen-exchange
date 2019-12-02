@@ -140,6 +140,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         conditionalTokens,
         realitio,
         provider,
+        context.account,
       )
 
       const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketMakerAddress)

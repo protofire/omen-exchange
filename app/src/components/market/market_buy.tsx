@@ -91,6 +91,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     conditionalTokens,
     realitio,
     context.library,
+    context.account,
   )
 
   // get the amount of shares that will be traded and the estimated prices after trade

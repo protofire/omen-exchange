@@ -109,12 +109,6 @@ export interface Log {
   data: string
 }
 
-export enum MarketFilters {
-  AllMarkets = 'All Markets',
-  MyMarkets = 'My Markets',
-  FundedMarkets = "Markets I've funded",
-}
-
 export interface Arbitrator {
   address: string
   name: string

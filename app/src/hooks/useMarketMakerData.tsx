@@ -33,7 +33,7 @@ export const useMarketMakerData = (
   marketMakerAddress: string,
   context: ConnectedWeb3Context,
 ): { marketMakerData: MarketMakerData; status: Status } => {
-  const { conditionalTokens, realitio } = useContracts(context)
+  const { conditionalTokens, realitio, buildMarketMaker } = useContracts(context)
 
   const [status, setStatus] = useState(Status.Ready)
 
@@ -63,12 +63,7 @@ export const useMarketMakerData = (
     const provider = context.library
     const user = await provider.getSigner().getAddress()
 
-    const marketMaker = new MarketMakerService(
-      marketMakerAddress,
-      conditionalTokens,
-      realitio,
-      provider,
-    )
+    const marketMaker = buildMarketMaker(marketMakerAddress)
 
     const conditionId = await marketMaker.getConditionId()
     const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
@@ -149,7 +144,14 @@ export const useMarketMakerData = (
       isConditionResolved,
       fee,
     }
-  }, [conditionalTokens, context.library, context.networkId, marketMakerAddress, realitio])
+  }, [
+    conditionalTokens,
+    context.library,
+    context.networkId,
+    marketMakerAddress,
+    realitio,
+    buildMarketMaker,
+  ])
 
   const marketMakerData = usePolling<MarketMakerData>({
     fetchFunc,

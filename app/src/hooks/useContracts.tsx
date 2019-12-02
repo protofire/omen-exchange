@@ -37,8 +37,8 @@ export const useContracts = (context: ConnectedWeb3Context) => {
 
   const buildMarketMaker = useMemo(
     () => (address: string) =>
-      new MarketMakerService(address, conditionalTokens, realitio, library),
-    [conditionalTokens, realitio, library],
+      new MarketMakerService(address, conditionalTokens, realitio, library, account),
+    [conditionalTokens, realitio, library, account],
   )
 
   return useMemo(
