@@ -28,7 +28,7 @@ interface Props {
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { markets, context, currentFilter, onFilterChange } = props
+  const { count, markets, context, currentFilter, onFilterChange, onShowMore } = props
   const options = [MarketFilters.AllMarkets, MarketFilters.MyMarkets, MarketFilters.FundedMarkets]
 
   return (
@@ -43,12 +43,12 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       )}
       <ListCard>
         {RemoteData.hasData(markets)
-          ? markets.data.slice(0, props.count).map(item => {
+          ? markets.data.slice(0, count).map(item => {
               return <ListItem key={item.conditionId} data={item}></ListItem>
             })
           : null}
         {props.moreMarkets && (
-          <Button disabled={RemoteData.is.reloading(markets)} onClick={props.onShowMore}>
+          <Button disabled={RemoteData.is.reloading(markets)} onClick={onShowMore}>
             Show more
           </Button>
         )}

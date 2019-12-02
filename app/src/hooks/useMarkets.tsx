@@ -2,11 +2,10 @@ import { useEffect, useState } from 'react'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts, Contracts } from './useContracts'
+import { EARLIEST_BLOCK_TO_CHECK, FETCH_EVENTS_CHUNK_SIZE } from '../common/constants'
 import { MarketWithExtraData, MarketFilters } from '../util/types'
 import { callInChunks, Range } from '../util/call_in_chunks'
 import { RemoteData } from '../util/remote_data'
-
-const EARLIEST_BLOCK_TO_CHECK = 4986777
 
 const fetchMarkets = async (
   account: Maybe<string>,
@@ -48,7 +47,7 @@ const fetchMarkets = async (
 
   const [marketsPage, usedRange] = await callInChunks(fetchAndFilter, range, {
     callUntil: result => result.length >= expectedMarketsCount,
-    chunkSize: 20000,
+    chunkSize: FETCH_EVENTS_CHUNK_SIZE,
     delay: 100,
   })
 

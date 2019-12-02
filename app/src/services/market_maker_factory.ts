@@ -5,8 +5,11 @@ import { ConditionalTokenService } from './conditional_token'
 import { MarketMakerService } from './market_maker'
 import { RealitioService } from './realitio'
 
+import { getLogger } from '../util/logger'
 import { Market, MarketWithExtraData, Log } from '../util/types'
 import { FEE } from '../common/constants'
+
+const logger = getLogger('Services::MarketMakerFactory')
 
 interface GetMarketsOptions {
   from: number
@@ -61,7 +64,7 @@ class MarketMakerFactoryService {
   }
 
   getMarkets = async ({ from, to }: GetMarketsOptions): Promise<Market[]> => {
-    console.log(`fetching from ${from} to ${to}`)
+    logger.debug(`Fetching markets from '${from}' to '${to}'`)
     const filter: any = this.contract.filters.FixedProductMarketMakerCreation()
 
     const logs = await this.provider.getLogs({
