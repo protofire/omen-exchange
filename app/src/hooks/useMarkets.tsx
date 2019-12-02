@@ -27,9 +27,11 @@ const fetchMarkets = async (
       realitio,
     )
 
-    let filteredMarkets = validMarkets
+    let filteredMarkets: MarketWithExtraData[] = []
     if (account) {
-      if (MarketFilter.is.myMarkets(filter)) {
+      if (MarketFilter.is.allMarkets(filter)) {
+        filteredMarkets = validMarkets
+      } else if (MarketFilter.is.myMarkets(filter)) {
         filteredMarkets = validMarkets.filter(market => market.ownerAddress === filter.account)
       } else if (MarketFilter.is.fundedMarkets(filter)) {
         filteredMarkets = []
@@ -40,6 +42,21 @@ const fetchMarkets = async (
             filteredMarkets.push(market)
           }
         }
+      } else if (MarketFilter.is.investedMarkets(filter)) {
+        filteredMarkets = []
+        for (const market of validMarkets) {
+          const marketMakerService = buildMarketMaker(market.address)
+          const {
+            balanceOfForYes,
+            balanceOfForNo,
+          } = await marketMakerService.getBalanceInformation(filter.account)
+          if (balanceOfForYes.gt(0) || balanceOfForNo.gt(0)) {
+            filteredMarkets.push(market)
+          }
+        }
+      } else {
+        const exhaustiveCheck: never = filter
+        return exhaustiveCheck
       }
     }
 

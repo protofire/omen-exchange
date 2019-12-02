@@ -48,7 +48,7 @@ export const MarketFilter = {
   investedMarkets: (account: string): InvestedMarkets => ({
     _type: Types.investedMarkets,
     account,
-    label: "Markets I've invested",
+    label: "Markets I've invested in",
   }),
   is: {
     allMarkets: isAllMarkets,
