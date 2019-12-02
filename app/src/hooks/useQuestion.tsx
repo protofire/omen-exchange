@@ -25,7 +25,12 @@ export const useQuestion = (
       try {
         const provider = context.library
 
-        const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+        const marketMaker = new MarketMakerService(
+          marketMakerAddress,
+          conditionalTokens,
+          realitio,
+          provider,
+        )
 
         const conditionId = await marketMaker.getConditionId()
         const questionId = await conditionalTokens.getQuestionId(conditionId)
