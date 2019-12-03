@@ -33,7 +33,11 @@ export const useContracts = (context: ConnectedWeb3Context) => {
   ])
 
   const oracleAddress = getContractAddress(networkId, 'oracle')
-  const oracle = useMemo(() => new OracleService(oracleAddress, library), [oracleAddress, library])
+  const oracle = useMemo(() => new OracleService(oracleAddress, library, account), [
+    oracleAddress,
+    library,
+    account,
+  ])
 
   const buildMarketMaker = useMemo(
     () => (address: string) =>
