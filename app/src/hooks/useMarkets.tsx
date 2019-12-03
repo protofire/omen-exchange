@@ -46,12 +46,39 @@ const fetchMarkets = async (
         filteredMarkets = []
         for (const market of validMarkets) {
           const marketMakerService = buildMarketMaker(market.address)
-          const {
-            balanceOfForYes,
-            balanceOfForNo,
-          } = await marketMakerService.getBalanceInformation(filter.account)
-          if (balanceOfForYes.gt(0) || balanceOfForNo.gt(0)) {
-            filteredMarkets.push(market)
+          const questionId = await conditionalTokens.getQuestionId(market.conditionId)
+          const isFinalized = await realitio.isFinalized(questionId)
+
+          if (!isFinalized) {
+            const {
+              balanceOfForYes,
+              balanceOfForNo,
+            } = await marketMakerService.getBalanceInformation(filter.account)
+            if (balanceOfForYes.gt(0) || balanceOfForNo.gt(0)) {
+              filteredMarkets.push(market)
+            }
+          }
+        }
+      } else if (MarketFilter.is.winningResultMarkets(filter)) {
+        filteredMarkets = []
+        for (const market of validMarkets) {
+          const marketMakerService = buildMarketMaker(market.address)
+          const questionId = await conditionalTokens.getQuestionId(market.conditionId)
+          const isFinalized = await realitio.isFinalized(questionId)
+
+          if (isFinalized) {
+            const winnerOutcome = await realitio.getWinnerOutcome(questionId)
+            const {
+              balanceOfForYes,
+              balanceOfForNo,
+            } = await marketMakerService.getBalanceInformation(filter.account)
+
+            const hasWinningOutcomes =
+              (winnerOutcome === 0 && balanceOfForNo.gt(0)) ||
+              (winnerOutcome === 1 && balanceOfForYes.gt(0))
+            if (hasWinningOutcomes) {
+              filteredMarkets.push(market)
+            }
           }
         }
       } else {
