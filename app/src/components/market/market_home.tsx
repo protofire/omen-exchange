@@ -31,6 +31,13 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const { count, markets, context, currentFilter, onFilterChange, onShowMore } = props
   const options = [MarketFilters.AllMarkets, MarketFilters.MyMarkets, MarketFilters.FundedMarkets]
 
+  const showMoreButton =
+    props.moreMarkets && !RemoteData.is.loading(markets) ? (
+      <Button disabled={RemoteData.is.reloading(markets)} onClick={onShowMore}>
+        {RemoteData.is.reloading(markets) ? 'Loading...' : 'Show more'}
+      </Button>
+    ) : null
+
   return (
     <>
       <SectionTitle title={'MARKETS'} />
@@ -47,11 +54,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               return <ListItem key={item.conditionId} data={item}></ListItem>
             })
           : null}
-        {props.moreMarkets && (
-          <Button disabled={RemoteData.is.reloading(markets)} onClick={onShowMore}>
-            Show more
-          </Button>
-        )}
+        {showMoreButton}
       </ListCard>
       {RemoteData.is.loading(markets) ? <FullLoading message="Loading markets..." /> : null}
     </>
