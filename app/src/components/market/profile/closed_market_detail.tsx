@@ -157,13 +157,10 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         </Grid>
 
         <ButtonContainerStyled>
-          <Button
-            disabled={winningOutcome && winningOutcome.shares.isZero()}
-            onClick={() => redeem()}
-          >
-            Redeem
-          </Button>
-          {!isConditionResolved && !winningOutcome ? (
+          {winningOutcome && !winningOutcome.shares.isZero() && (
+            <Button onClick={() => redeem()}>Redeem</Button>
+          )}
+          {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() ? (
             <Button onClick={resolveCondition}>Resolve Condition</Button>
           ) : null}
         </ButtonContainerStyled>
