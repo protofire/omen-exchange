@@ -3,19 +3,64 @@ import { useEffect, useState } from 'react'
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts, Contracts } from './useContracts'
 import { EARLIEST_BLOCK_TO_CHECK, FETCH_EVENTS_CHUNK_SIZE } from '../common/constants'
+import { asyncFilter } from '../util/async_filter'
 import { MarketWithExtraData } from '../util/types'
 import { MarketFilter } from '../util/market_filter'
 import { callInChunks, Range } from '../util/call_in_chunks'
 import { RemoteData } from '../util/remote_data'
 
+const buildFilterFn = (filter: MarketFilter, contracts: Contracts) => async (
+  market: MarketWithExtraData,
+): Promise<boolean> => {
+  const { buildMarketMaker, conditionalTokens, realitio } = contracts
+
+  if (MarketFilter.is.allMarkets(filter)) {
+    return true
+  } else if (MarketFilter.is.myMarkets(filter)) {
+    return market.ownerAddress === filter.account
+  } else if (MarketFilter.is.fundedMarkets(filter)) {
+    const marketMakerService = buildMarketMaker(market.address)
+    const poolShares = await marketMakerService.poolSharesBalanceOf(filter.account)
+
+    return poolShares.gt(0)
+  } else if (
+    MarketFilter.is.investedMarkets(filter) ||
+    MarketFilter.is.winningResultMarkets(filter)
+  ) {
+    const marketMakerService = buildMarketMaker(market.address)
+    const questionId = await conditionalTokens.getQuestionId(market.conditionId)
+    const isFinalized = await realitio.isFinalized(questionId)
+
+    const { balanceOfForYes, balanceOfForNo } = await marketMakerService.getBalanceInformation(
+      filter.account,
+    )
+
+    if (MarketFilter.is.investedMarkets(filter) && !isFinalized) {
+      return balanceOfForYes.gt(0) || balanceOfForNo.gt(0)
+    }
+    if (MarketFilter.is.winningResultMarkets(filter) && isFinalized) {
+      const winnerOutcome = await realitio.getWinnerOutcome(questionId)
+
+      const hasWinningOutcomes =
+        (winnerOutcome === 0 && balanceOfForNo.gt(0)) ||
+        (winnerOutcome === 1 && balanceOfForYes.gt(0))
+      return hasWinningOutcomes
+    }
+
+    return false
+  } else {
+    const exhaustiveCheck: never = filter
+    return exhaustiveCheck
+  }
+}
+
 const fetchMarkets = async (
-  account: Maybe<string>,
   filter: MarketFilter,
   range: Range,
   expectedMarketsCount: number,
   contracts: Contracts,
 ): Promise<{ markets: MarketWithExtraData[]; usedRange: Range }> => {
-  const { conditionalTokens, marketMakerFactory, realitio, buildMarketMaker } = contracts
+  const { conditionalTokens, marketMakerFactory, realitio } = contracts
 
   const fetchAndFilter = async (subrange: Range): Promise<MarketWithExtraData[]> => {
     const validMarkets = await marketMakerFactory.getMarketsWithExtraData(
@@ -27,65 +72,8 @@ const fetchMarkets = async (
       realitio,
     )
 
-    let filteredMarkets: MarketWithExtraData[] = []
-    if (account) {
-      if (MarketFilter.is.allMarkets(filter)) {
-        filteredMarkets = validMarkets
-      } else if (MarketFilter.is.myMarkets(filter)) {
-        filteredMarkets = validMarkets.filter(market => market.ownerAddress === filter.account)
-      } else if (MarketFilter.is.fundedMarkets(filter)) {
-        filteredMarkets = []
-        for (const market of validMarkets) {
-          const marketMakerService = buildMarketMaker(market.address)
-          const poolShares = await marketMakerService.poolSharesBalanceOf(filter.account)
-          if (poolShares.gt(0)) {
-            filteredMarkets.push(market)
-          }
-        }
-      } else if (MarketFilter.is.investedMarkets(filter)) {
-        filteredMarkets = []
-        for (const market of validMarkets) {
-          const marketMakerService = buildMarketMaker(market.address)
-          const questionId = await conditionalTokens.getQuestionId(market.conditionId)
-          const isFinalized = await realitio.isFinalized(questionId)
-
-          if (!isFinalized) {
-            const {
-              balanceOfForYes,
-              balanceOfForNo,
-            } = await marketMakerService.getBalanceInformation(filter.account)
-            if (balanceOfForYes.gt(0) || balanceOfForNo.gt(0)) {
-              filteredMarkets.push(market)
-            }
-          }
-        }
-      } else if (MarketFilter.is.winningResultMarkets(filter)) {
-        filteredMarkets = []
-        for (const market of validMarkets) {
-          const marketMakerService = buildMarketMaker(market.address)
-          const questionId = await conditionalTokens.getQuestionId(market.conditionId)
-          const isFinalized = await realitio.isFinalized(questionId)
-
-          if (isFinalized) {
-            const winnerOutcome = await realitio.getWinnerOutcome(questionId)
-            const {
-              balanceOfForYes,
-              balanceOfForNo,
-            } = await marketMakerService.getBalanceInformation(filter.account)
-
-            const hasWinningOutcomes =
-              (winnerOutcome === 0 && balanceOfForNo.gt(0)) ||
-              (winnerOutcome === 1 && balanceOfForYes.gt(0))
-            if (hasWinningOutcomes) {
-              filteredMarkets.push(market)
-            }
-          }
-        }
-      } else {
-        const exhaustiveCheck: never = filter
-        return exhaustiveCheck
-      }
-    }
+    const filterFn = buildFilterFn(filter, contracts)
+    const filteredMarkets = await asyncFilter(validMarkets, filterFn)
 
     return filteredMarkets
   }
@@ -158,13 +146,7 @@ export const useMarkets = (
         setMarkets(markets =>
           RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading(),
         )
-        const result = await fetchMarkets(
-          context.account,
-          filter,
-          range,
-          expectedMarketsCount,
-          contracts,
-        )
+        const result = await fetchMarkets(filter, range, expectedMarketsCount, contracts)
 
         if (!didCancel) {
           setNeedFetchMore(false)
