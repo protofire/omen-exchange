@@ -91,6 +91,7 @@ export const OutcomeTable = (props: Props) => {
           <TD textAlign={TableCellsAlign[0]}>
             <RadioContainer>
               <RadioInputStyled
+                data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
                 checked={outcomeSelected === outcomeName}
                 name="outcome"
                 onChange={(e: any) =>

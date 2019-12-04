@@ -1,0 +1,1532 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should accept a selected outcome 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-bdVaJa cDoURO"
+  >
+    <table
+      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+    >
+      <thead
+        class="sc-htpNat KtFsv"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <th
+            class="sc-ifAKCX ceeJPY"
+          />
+          <th
+            class="sc-ifAKCX ceeJPY"
+          >
+            Outcome probabilities
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Current Price
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Shares
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Payout
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Price after trade
+          </th>
+        </tr>
+      </thead>
+      <tbody
+        class="sc-bZQynM bOrPFB"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+            <label
+              class="sc-jzJRlG gOFPzm"
+            >
+              <div
+                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                data-testid="outcome_table_radio_Yes"
+              >
+                <svg
+                  height="18"
+                  viewBox="0 0 18 18"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    fill="#fff"
+                    stroke="#ccc"
+                  >
+                    <circle
+                      cx="9"
+                      cy="9"
+                      r="9"
+                      stroke="none"
+                    />
+                    <circle
+                      cx="9"
+                      cy="9"
+                      fill="none"
+                      r="8.5"
+                    />
+                  </g>
+                  <circle
+                    cx="6"
+                    cy="6"
+                    fill="#20e0b4"
+                    id="fill"
+                    r="6"
+                    transform="translate(3 3)"
+                  />
+                </svg>
+                <input
+                  checked=""
+                  name="outcome"
+                  type="radio"
+                  value="Yes"
+                />
+              </div>
+            </label>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    Yes
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+             
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+            <label
+              class="sc-jzJRlG gOFPzm"
+            >
+              <div
+                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                data-testid="outcome_table_radio_No"
+              >
+                <svg
+                  height="18"
+                  viewBox="0 0 18 18"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    fill="#fff"
+                    id="radio_off"
+                    stroke="#ccc"
+                  >
+                    <circle
+                      cx="9"
+                      cy="9"
+                      r="9"
+                      stroke="none"
+                    />
+                    <circle
+                      cx="9"
+                      cy="9"
+                      fill="none"
+                      r="8.5"
+                    />
+                  </g>
+                </svg>
+                <input
+                  name="outcome"
+                  type="radio"
+                  value="No"
+                />
+              </div>
+            </label>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    No
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+             
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`should hide radio selections 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-bdVaJa cDoURO"
+  >
+    <table
+      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+    >
+      <thead
+        class="sc-htpNat KtFsv"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <th
+            class="sc-ifAKCX ceeJPY"
+          >
+            Outcome probabilities
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Current Price
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Shares
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Payout
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Price after trade
+          </th>
+        </tr>
+      </thead>
+      <tbody
+        class="sc-bZQynM bOrPFB"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje cxvido"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    Yes
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+             
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje cxvido"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    No
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+             
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`should show no as winning token 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-bdVaJa cDoURO"
+  >
+    <table
+      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+    >
+      <thead
+        class="sc-htpNat KtFsv"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <th
+            class="sc-ifAKCX ceeJPY"
+          />
+          <th
+            class="sc-ifAKCX ceeJPY"
+          >
+            Outcome probabilities
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Current Price
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Shares
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Payout
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Price after trade
+          </th>
+        </tr>
+      </thead>
+      <tbody
+        class="sc-bZQynM bOrPFB"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    Yes
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX hZeboP"
+          >
+             
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    No
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX hZeboP"
+          >
+             
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`should show prices after trade 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-bdVaJa cDoURO"
+  >
+    <table
+      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+    >
+      <thead
+        class="sc-htpNat KtFsv"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <th
+            class="sc-ifAKCX ceeJPY"
+          />
+          <th
+            class="sc-ifAKCX ceeJPY"
+          >
+            Outcome probabilities
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Current Price
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Shares
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Payout
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Price after trade
+          </th>
+        </tr>
+      </thead>
+      <tbody
+        class="sc-bZQynM bOrPFB"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+            <label
+              class="sc-jzJRlG gOFPzm"
+            >
+              <div
+                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                data-testid="outcome_table_radio_Yes"
+              >
+                <svg
+                  height="18"
+                  viewBox="0 0 18 18"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    fill="#fff"
+                    id="radio_off"
+                    stroke="#ccc"
+                  >
+                    <circle
+                      cx="9"
+                      cy="9"
+                      r="9"
+                      stroke="none"
+                    />
+                    <circle
+                      cx="9"
+                      cy="9"
+                      fill="none"
+                      r="8.5"
+                    />
+                  </g>
+                </svg>
+                <input
+                  name="outcome"
+                  type="radio"
+                  value="Yes"
+                />
+              </div>
+            </label>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    Yes
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+            0.7500 
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+            <label
+              class="sc-jzJRlG gOFPzm"
+            >
+              <div
+                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                data-testid="outcome_table_radio_No"
+              >
+                <svg
+                  height="18"
+                  viewBox="0 0 18 18"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    fill="#fff"
+                    id="radio_off"
+                    stroke="#ccc"
+                  >
+                    <circle
+                      cx="9"
+                      cy="9"
+                      r="9"
+                      stroke="none"
+                    />
+                    <circle
+                      cx="9"
+                      cy="9"
+                      fill="none"
+                      r="8.5"
+                    />
+                  </g>
+                </svg>
+                <input
+                  name="outcome"
+                  type="radio"
+                  value="No"
+                />
+              </div>
+            </label>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    No
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+            0.2500 
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`should show yes as winning token 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-bdVaJa cDoURO"
+  >
+    <table
+      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+    >
+      <thead
+        class="sc-htpNat KtFsv"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <th
+            class="sc-ifAKCX ceeJPY"
+          />
+          <th
+            class="sc-ifAKCX ceeJPY"
+          >
+            Outcome probabilities
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Current Price
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Shares
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Payout
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Price after trade
+          </th>
+        </tr>
+      </thead>
+      <tbody
+        class="sc-bZQynM bOrPFB"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    Yes
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX hZeboP"
+          >
+             
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    No
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX eoXJYw"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje sc-fjdhpX hZeboP"
+          >
+             
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`should work with disabled columns 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-bdVaJa cDoURO"
+  >
+    <table
+      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+    >
+      <thead
+        class="sc-htpNat KtFsv"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <th
+            class="sc-ifAKCX ceeJPY"
+          />
+          <th
+            class="sc-ifAKCX ceeJPY"
+          >
+            Outcome probabilities
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Current Price
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Shares
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Price after trade
+          </th>
+        </tr>
+      </thead>
+      <tbody
+        class="sc-bZQynM bOrPFB"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+            <label
+              class="sc-jzJRlG gOFPzm"
+            >
+              <div
+                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                data-testid="outcome_table_radio_Yes"
+              >
+                <svg
+                  height="18"
+                  viewBox="0 0 18 18"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    fill="#fff"
+                    id="radio_off"
+                    stroke="#ccc"
+                  >
+                    <circle
+                      cx="9"
+                      cy="9"
+                      r="9"
+                      stroke="none"
+                    />
+                    <circle
+                      cx="9"
+                      cy="9"
+                      fill="none"
+                      r="8.5"
+                    />
+                  </g>
+                </svg>
+                <input
+                  name="outcome"
+                  type="radio"
+                  value="Yes"
+                />
+              </div>
+            </label>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    Yes
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+             
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+            <label
+              class="sc-jzJRlG gOFPzm"
+            >
+              <div
+                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                data-testid="outcome_table_radio_No"
+              >
+                <svg
+                  height="18"
+                  viewBox="0 0 18 18"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    fill="#fff"
+                    id="radio_off"
+                    stroke="#ccc"
+                  >
+                    <circle
+                      cx="9"
+                      cy="9"
+                      r="9"
+                      stroke="none"
+                    />
+                    <circle
+                      cx="9"
+                      cy="9"
+                      fill="none"
+                      r="8.5"
+                    />
+                  </g>
+                </svg>
+                <input
+                  name="outcome"
+                  type="radio"
+                  value="No"
+                />
+              </div>
+            </label>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    No
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+             
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`should work with minimal props 1`] = `
+<DocumentFragment>
+  <div
+    class="sc-bdVaJa cDoURO"
+  >
+    <table
+      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+    >
+      <thead
+        class="sc-htpNat KtFsv"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <th
+            class="sc-ifAKCX ceeJPY"
+          />
+          <th
+            class="sc-ifAKCX ceeJPY"
+          >
+            Outcome probabilities
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Current Price
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Shares
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Payout
+          </th>
+          <th
+            class="sc-ifAKCX bourab"
+          >
+            Price after trade
+          </th>
+        </tr>
+      </thead>
+      <tbody
+        class="sc-bZQynM bOrPFB"
+      >
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+            <label
+              class="sc-jzJRlG gOFPzm"
+            >
+              <div
+                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                data-testid="outcome_table_radio_Yes"
+              >
+                <svg
+                  height="18"
+                  viewBox="0 0 18 18"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    fill="#fff"
+                    id="radio_off"
+                    stroke="#ccc"
+                  >
+                    <circle
+                      cx="9"
+                      cy="9"
+                      r="9"
+                      stroke="none"
+                    />
+                    <circle
+                      cx="9"
+                      cy="9"
+                      fill="none"
+                      r="8.5"
+                    />
+                  </g>
+                </svg>
+                <input
+                  name="outcome"
+                  type="radio"
+                  value="Yes"
+                />
+              </div>
+            </label>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    Yes
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+             
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+        <tr
+          class="sc-bxivhb gowuVX"
+        >
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+            <label
+              class="sc-jzJRlG gOFPzm"
+            >
+              <div
+                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                data-testid="outcome_table_radio_No"
+              >
+                <svg
+                  height="18"
+                  viewBox="0 0 18 18"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g
+                    fill="#fff"
+                    id="radio_off"
+                    stroke="#ccc"
+                  >
+                    <circle
+                      cx="9"
+                      cy="9"
+                      r="9"
+                      stroke="none"
+                    />
+                    <circle
+                      cx="9"
+                      cy="9"
+                      fill="none"
+                      r="8.5"
+                    />
+                  </g>
+                </svg>
+                <input
+                  name="outcome"
+                  type="radio"
+                  value="No"
+                />
+              </div>
+            </label>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            <div
+              class="sc-htoDjs bCdOla"
+            >
+              <div
+                class="sc-dnqmqq BIXUB"
+              >
+                <div
+                  class="sc-gqjmRU buRbgl"
+                >
+                  <span
+                    class="sc-VigVT fWbcJs"
+                  >
+                    No
+                  </span>
+                </div>
+                <div
+                  class="sc-iwsKbI cdXeOC"
+                />
+                <div
+                  class="sc-gZMcBi kiRsF"
+                >
+                  50%
+                </div>
+              </div>
+            </div>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.5 
+            <strong>
+              DAI
+            </strong>
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje cxvido"
+          >
+            0.00
+          </td>
+          <td
+            class="sc-EHOje jDXqLu"
+          >
+             
+            <strong>
+              DAI
+            </strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</DocumentFragment>
+`;
