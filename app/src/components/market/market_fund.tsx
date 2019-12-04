@@ -88,7 +88,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   } = props
 
   const context = useConnectedWeb3Context()
-  const { conditionalTokens } = useContracts(context)
+  const { conditionalTokens, realitio } = useContracts(context)
 
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -112,7 +112,12 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
 
       const provider = context.library
 
-      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+      const marketMaker = new MarketMakerService(
+        marketMakerAddress,
+        conditionalTokens,
+        realitio,
+        provider,
+      )
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const collateralService = new ERC20Service(collateralAddress)
@@ -139,7 +144,12 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
       )
 
       const provider = context.library
-      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+      const marketMaker = new MarketMakerService(
+        marketMakerAddress,
+        conditionalTokens,
+        realitio,
+        provider,
+      )
       await marketMaker.removeFunding(marketMakerUserFunding)
 
       setStatus(Status.Ready)

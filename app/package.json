@@ -36,6 +36,7 @@
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.1.2",
     "react-tooltip": "^3.11.1",
+    "react-waypoint": "^9.0.2",
     "sanitize.css": "^11.0.0",
     "styled-components": "^4.3.2",
     "typescript": "3.6.2",

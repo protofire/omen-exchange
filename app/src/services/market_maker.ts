@@ -2,8 +2,9 @@ import { Contract, ethers, Wallet } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { ConditionalTokenService } from './conditional_token'
+import { RealitioService } from './realitio'
 import { getLogger } from '../util/logger'
-import { OutcomeSlot } from '../util/types'
+import { Market, MarketStatus, MarketWithExtraData, OutcomeSlot } from '../util/types'
 import { calcDistributionHint, divBN } from '../util/tools'
 
 const logger = getLogger('Services::MarketMaker')
@@ -26,11 +27,13 @@ const marketMakerAbi = [
 class MarketMakerService {
   contract: Contract
   conditionalTokens: ConditionalTokenService
+  realitio: RealitioService
   provider: any
 
   constructor(
     address: string,
     conditionalTokens: ConditionalTokenService,
+    realitio: RealitioService,
     provider: any,
     signerAddress?: string,
   ) {
@@ -43,6 +46,7 @@ class MarketMakerService {
     }
 
     this.conditionalTokens = conditionalTokens
+    this.realitio = realitio
     this.provider = provider
   }
 
@@ -216,6 +220,30 @@ class MarketMakerService {
         err.message,
       )
       throw err
+    }
+  }
+
+  getExtraData = async (market: Market): Promise<MarketWithExtraData> => {
+    const { conditionId } = market
+    // Get question data
+    const questionId = await this.conditionalTokens.getQuestionId(conditionId)
+    const { question, resolution, arbitratorAddress, category } = await this.realitio.getQuestion(
+      questionId,
+    )
+    // Know if a market is open or resolved
+    const isConditionResolved = await this.conditionalTokens.isConditionResolved(conditionId)
+    const marketStatus = isConditionResolved ? MarketStatus.Resolved : MarketStatus.Open
+
+    const fee = await this.getFee()
+
+    return {
+      ...market,
+      question,
+      resolution,
+      category,
+      arbitratorAddress,
+      status: marketStatus,
+      fee,
     }
   }
 }
