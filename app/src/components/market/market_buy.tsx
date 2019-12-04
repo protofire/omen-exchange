@@ -72,11 +72,17 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const holdingsYes = balance[0].holdings
   const holdingsNo = balance[1].holdings
 
-  const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, context.library)
-
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number, number]> => {
+      const provider = context.library
+      const user = await provider.getSigner().getAddress()
+      const marketMaker = new MarketMakerService(
+        marketMakerAddress,
+        conditionalTokens,
+        provider,
+        user,
+      )
       const tradedShares = await marketMaker.calcBuyAmount(amount, outcome)
       const balanceAfterTrade = computeBalanceAfterTrade(
         holdingsYes,
@@ -91,7 +97,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       return [tradedShares, actualPriceForYes, actualPriceForNo]
     },
-    [outcome, marketMaker, holdingsYes, holdingsNo],
+    [conditionalTokens, context.library, marketMakerAddress, outcome, holdingsYes, holdingsNo],
   )
 
   const [tradedShares, priceAfterTradeForYes, priceAfterTradeForNo] = useAsyncDerivedValue(
@@ -119,6 +125,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const provider = context.library
       const user = await provider.getSigner().getAddress()
 
+      const marketMaker = new MarketMakerService(
+        marketMakerAddress,
+        conditionalTokens,
+        provider,
+        user,
+      )
       const collateralAddress = await marketMaker.getCollateralToken()
 
       const collateralService = new ERC20Service(provider, collateralAddress)

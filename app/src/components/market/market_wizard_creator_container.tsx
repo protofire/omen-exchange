@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react'
 import moment from 'moment'
 
 import { getLogger } from '../../util/logger'
-import { StatusMarketCreation } from '../../util/types'
+import { StatusMarketCreation, Token } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import { ERC20Service, MarketMakerService } from '../../services'
 import { getArbitrator, getContractAddress, getToken } from '../../util/addresses'
@@ -32,7 +32,16 @@ const MarketWizardCreatorContainer: FC = () => {
       const { collateralId, arbitratorId, question, resolution, funding, outcomes, category } = data
       const openingDateMoment = moment(resolution)
 
-      const collateralToken = getToken(networkId, collateralId)
+      const erc20Service = new ERC20Service(provider, collateralId)
+      const isValidErc20 = await erc20Service.isValidErc20()
+
+      let collateralToken: Maybe<Token> = null
+      if (isValidErc20) {
+        collateralToken = await erc20Service.getProfileSummary()
+      } else {
+        collateralToken = getToken(context.networkId, collateralId as KnownToken)
+      }
+
       const arbitrator = getArbitrator(networkId, arbitratorId)
 
       setStatus(StatusMarketCreation.PostingQuestion)
@@ -80,6 +89,7 @@ const MarketWizardCreatorContainer: FC = () => {
         marketMakerAddress,
         conditionalTokens,
         provider,
+        user,
       )
       await marketMakerService.addInitialFunding(
         funding,

@@ -111,8 +111,13 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
       )
 
       const provider = context.library
-
-      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+      const user = await provider.getSigner().getAddress()
+      const marketMaker = new MarketMakerService(
+        marketMakerAddress,
+        conditionalTokens,
+        provider,
+        user,
+      )
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const collateralService = new ERC20Service(provider, collateralAddress)
@@ -139,7 +144,13 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
       )
 
       const provider = context.library
-      const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+      const user = await provider.getSigner().getAddress()
+      const marketMaker = new MarketMakerService(
+        marketMakerAddress,
+        conditionalTokens,
+        provider,
+        user,
+      )
       await marketMaker.removeFunding(marketMakerUserFunding)
 
       setStatus(Status.Ready)
