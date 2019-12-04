@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { Select } from '../select'
 import { knownTokens } from '../../../util/addresses'
+import { Collateral, Token } from '../../../util/types'
 
 interface Props {
   autoFocus?: boolean
@@ -10,14 +11,15 @@ interface Props {
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => any
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
   readOnly?: boolean
-  value: string
+  value: Token | Collateral
+  customValues: Collateral[]
   networkId: number
 }
 
 const FormOption = styled.option``
 
 export const Tokens = (props: Props) => {
-  const { networkId, ...restProps } = props
+  const { networkId, value, customValues, ...restProps } = props
 
   const tokens = Object.entries(knownTokens)
     .filter(([, knownToken]) => {
@@ -29,8 +31,24 @@ export const Tokens = (props: Props) => {
       value: id,
     }))
 
+  const isTokenInKnowTokens = tokens.find(token => token.label === value.symbol)
+  // Add custom values previously added
+  for (const collateral of customValues) {
+    const isTokenInKnowTokens = tokens.find(
+      token => token.label.toLowerCase() === collateral.symbol.toLowerCase(),
+    )
+    if (!isTokenInKnowTokens) {
+      tokens.push({
+        label: collateral.symbol,
+        value: collateral.address,
+      })
+    }
+  }
+
+  const selectedValue = { value: isTokenInKnowTokens ? value.symbol.toLowerCase() : value.address }
+
   return (
-    <Select {...restProps}>
+    <Select {...restProps} {...selectedValue}>
       {tokens.map(token => {
         return (
           <FormOption key={token.value} value={token.value}>

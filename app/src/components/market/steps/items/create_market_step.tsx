@@ -1,20 +1,22 @@
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BigNumber } from 'ethers/utils'
+import styled from 'styled-components'
 
 import { Button } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
 import { CreateCard } from '../../../common/create_card'
-import { StatusMarketCreation } from '../../../../util/types'
+import { StatusMarketCreation, Token } from '../../../../util/types'
 import { Paragraph } from '../../../common/paragraph'
 import { FullLoading } from '../../../common/full_loading'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
 import { Outcome } from '../../../common/outcomes'
-import { knownArbitrators, knownTokens } from '../../../../util/addresses'
+import { getToken, knownArbitrators } from '../../../../util/addresses'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
-import styled from 'styled-components'
+import { ERC20Service } from '../../../../services'
+import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -40,7 +42,7 @@ interface Props {
   back: () => void
   submit: () => void
   values: {
-    collateralId: KnownToken
+    collateralId: KnownToken | string
     question: string
     category: string
     resolution: Date | null
@@ -54,58 +56,86 @@ interface Props {
   marketMakerAddress: string | null
 }
 
-class CreateMarketStep extends Component<Props> {
-  back = () => {
-    this.props.back()
+const CreateMarketStep = (props: Props) => {
+  const context = useConnectedWeb3Context()
+
+  const { marketMakerAddress, values, status, questionId } = props
+  const {
+    collateralId,
+    question,
+    category,
+    arbitratorId,
+    resolution,
+    spread,
+    funding,
+    outcomes,
+  } = values
+
+  const back = () => {
+    props.back()
   }
 
-  submit = () => {
-    this.props.submit()
+  const submit = () => {
+    props.submit()
   }
 
-  render() {
-    const { marketMakerAddress, values, status, questionId } = this.props
-    const {
-      collateralId,
-      question,
-      category,
-      arbitratorId,
-      resolution,
-      spread,
-      funding,
-      outcomes,
-    } = values
+  const [collateral, setCollateral] = useState<Maybe<Token>>(null)
 
-    const collateral = knownTokens[collateralId]
+  useEffect(() => {
+    let isSubscribed = true
 
-    const arbitrator = knownArbitrators[arbitratorId]
+    const fetchIsValidErc20 = async () => {
+      let collateralData: Token
+      const erc20Service = new ERC20Service(context.library, collateralId)
+      const isValidErc20 = await erc20Service.isValidErc20()
+      if (isValidErc20) {
+        const data = await erc20Service.getProfileSummary()
+        collateralData = {
+          ...data,
+        } as Token
+      } else {
+        collateralData = getToken(context.networkId, collateralId as KnownToken)
+      }
 
-    const resolutionDate = resolution && formatDate(resolution)
+      if (isSubscribed) setCollateral(collateralData)
+    }
 
-    return (
-      <CreateCard>
-        <Paragraph>
-          Please <strong>check all the information is correct</strong>. You can go back and edit
-          anything you need.
-        </Paragraph>
-        <Paragraph>
-          <strong>If everything is OK</strong> proceed to create the new market.
-        </Paragraph>
-        <SubsectionTitle>Details</SubsectionTitle>
-        <TitleValueStyled title={'Question'} value={question} />
-        <Grid>
-          <TitleValue title={'Category'} value={category} />
-          <TitleValue title={'Resolution date'} value={resolutionDate} />
-          <TitleValue
-            title={'Arbitrator'}
-            value={[
-              <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
-                {arbitrator.name}
-              </a>,
-              ' oracle as final arbitrator.',
-            ]}
-          />
-          <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
+    fetchIsValidErc20()
+
+    return () => {
+      isSubscribed = false
+    }
+  }, [context, collateralId])
+
+  const arbitrator = knownArbitrators[arbitratorId]
+
+  const resolutionDate = resolution && formatDate(resolution)
+
+  return (
+    <CreateCard>
+      <Paragraph>
+        Please <strong>check all the information is correct</strong>. You can go back and edit
+        anything you need.
+      </Paragraph>
+      <Paragraph>
+        <strong>If everything is OK</strong> proceed to create the new market.
+      </Paragraph>
+      <SubsectionTitle>Details</SubsectionTitle>
+      <TitleValueStyled title={'Question'} value={question} />
+      <Grid>
+        <TitleValue title={'Category'} value={category} />
+        <TitleValue title={'Resolution date'} value={resolutionDate} />
+        <TitleValue
+          title={'Arbitrator'}
+          value={[
+            <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
+              {arbitrator.name}
+            </a>,
+            ' oracle as final arbitrator.',
+          ]}
+        />
+        <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
+        {collateral && (
           <TitleValue
             title={'Funding'}
             value={[
@@ -113,76 +143,72 @@ class CreateMarketStep extends Component<Props> {
               <strong key="1"> {collateral.symbol}</strong>,
             ]}
           />
-        </Grid>
-        <SubsectionTitle>Outcomes</SubsectionTitle>
-        <TableStyled
-          head={
-            <THead>
-              <TR>
-                <TH>Outcome</TH>
-                <TH textAlign="right">Probabilities</TH>
-              </TR>
-            </THead>
-          }
+        )}
+      </Grid>
+      <SubsectionTitle>Outcomes</SubsectionTitle>
+      <TableStyled
+        head={
+          <THead>
+            <TR>
+              <TH>Outcome</TH>
+              <TH textAlign="right">Probabilities</TH>
+            </TR>
+          </THead>
+        }
+      >
+        <TR>
+          <TD>{outcomes[0].name}</TD>
+          <TD textAlign="right">{outcomes[0].probability}%</TD>
+        </TR>
+        <TR>
+          <TD>{outcomes[1].name}</TD>
+          <TD textAlign="right">{outcomes[1].probability}%</TD>
+        </TR>
+      </TableStyled>
+      {questionId || marketMakerAddress ? (
+        <>
+          <SubsectionTitle>Created Market Information</SubsectionTitle>
+          <Grid>
+            {questionId ? (
+              <TitleValue
+                title={'Realitio'}
+                value={[
+                  <a
+                    href={`https://realitio.github.io/#!/question/${questionId}`}
+                    key="1"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Question URL
+                  </a>,
+                ]}
+              />
+            ) : null}
+            {marketMakerAddress ? (
+              <TitleValue title={'Market Maker'} value={`Deployed at ${marketMakerAddress}`} />
+            ) : null}
+          </Grid>
+        </>
+      ) : null}
+      {status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error ? (
+        <FullLoading message={`${status}...`} />
+      ) : null}
+      <ButtonContainer>
+        <ButtonLinkStyled
+          disabled={status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error}
+          onClick={back}
         >
-          <TR>
-            <TD>{outcomes[0].name}</TD>
-            <TD textAlign="right">{outcomes[0].probability}%</TD>
-          </TR>
-          <TR>
-            <TD>{outcomes[1].name}</TD>
-            <TD textAlign="right">{outcomes[1].probability}%</TD>
-          </TR>
-        </TableStyled>
-        {questionId || marketMakerAddress ? (
-          <>
-            <SubsectionTitle>Created Market Information</SubsectionTitle>
-            <Grid>
-              {questionId ? (
-                <TitleValue
-                  title={'Realitio'}
-                  value={[
-                    <a
-                      href={`https://realitio.github.io/#!/question/${questionId}`}
-                      key="1"
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
-                      Question URL
-                    </a>,
-                  ]}
-                />
-              ) : null}
-              {marketMakerAddress ? (
-                <TitleValue title={'Market Maker'} value={`Deployed at ${marketMakerAddress}`} />
-              ) : null}
-            </Grid>
-          </>
-        ) : null}
-        {status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error ? (
-          <FullLoading message={`${status}...`} />
-        ) : null}
-        <ButtonContainer>
-          <ButtonLinkStyled
-            disabled={
-              status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error
-            }
-            onClick={this.back}
-          >
-            ‹ Back
-          </ButtonLinkStyled>
-          <Button
-            disabled={
-              status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error
-            }
-            onClick={this.submit}
-          >
-            Finish
-          </Button>
-        </ButtonContainer>
-      </CreateCard>
-    )
-  }
+          ‹ Back
+        </ButtonLinkStyled>
+        <Button
+          disabled={status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error}
+          onClick={submit}
+        >
+          Finish
+        </Button>
+      </ButtonContainer>
+    </CreateCard>
+  )
 }
 
 export { CreateMarketStep }

@@ -11,12 +11,13 @@ import {
   SummaryMarketStep,
 } from './steps'
 
-import { StatusMarketCreation } from '../../util/types'
+import { Collateral, CollateralCustomEvent, StatusMarketCreation } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { Outcome } from '../common/outcomes'
 
 export interface MarketData {
   collateralId: KnownToken
+  collateralsCustom: Collateral[]
   question: string
   category: string
   resolution: Date | null
@@ -43,6 +44,7 @@ export class MarketWizardCreator extends Component<Props, State> {
     currentStep: 1,
     marketData: {
       collateralId: 'dai',
+      collateralsCustom: [],
       question: '',
       category: '',
       resolution: null,
@@ -78,8 +80,22 @@ export class MarketWizardCreator extends Component<Props, State> {
     })
   }
 
+  public addCollateralCustom = (collateral: Collateral): void => {
+    this.setState((prevState: State) => ({
+      ...prevState,
+      marketData: {
+        ...prevState.marketData,
+        collateralsCustom: [...prevState.marketData.collateralsCustom, collateral],
+      },
+    }))
+  }
+
   public handleChange = (
-    event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn,
+    event:
+      | ChangeEvent<HTMLInputElement>
+      | ChangeEvent<HTMLSelectElement>
+      | BigNumberInputReturn
+      | CollateralCustomEvent,
   ) => {
     const { name, value } = 'target' in event ? event.target : event
 
@@ -129,6 +145,7 @@ export class MarketWizardCreator extends Component<Props, State> {
 
     const {
       collateralId,
+      collateralsCustom,
       question,
       category,
       resolution,
@@ -153,8 +170,9 @@ export class MarketWizardCreator extends Component<Props, State> {
           <FundingAndFeeStep
             back={() => this.back()}
             handleChange={this.handleChange}
+            addCollateralCustom={this.addCollateralCustom}
             next={() => this.next()}
-            values={{ collateralId, spread, funding }}
+            values={{ collateralId, collateralsCustom, spread, funding }}
           />
         )
       case 3:

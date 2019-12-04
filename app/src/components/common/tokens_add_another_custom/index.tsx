@@ -10,6 +10,8 @@ interface Props {
   name: string
   onChange: (event: any) => any
   value: Token | Collateral
+  customValues: Collateral[]
+  addCustomValue: (collateral: Collateral) => void
   networkId: number
 }
 
@@ -28,10 +30,9 @@ const ButtonStyled = styled(Button)`
 `
 
 export const TokensAddAnotherCustom = (props: Props) => {
-  const { networkId, name, value, onChange } = props
+  const { networkId, name, value, customValues, addCustomValue, onChange } = props
 
   const [isModalCollateralOpen, setModalCollateralState] = useState(false)
-  const [collateralCustom, setCollateralCustom] = useState<Maybe<Collateral>>(null)
 
   return (
     <>
@@ -41,7 +42,7 @@ export const TokensAddAnotherCustom = (props: Props) => {
             networkId={networkId}
             name={name}
             value={value}
-            collateralCustom={collateralCustom}
+            customValues={customValues}
             onChange={(e: any) => onChange(e)}
           />
         </TokenWrapper>
@@ -51,7 +52,7 @@ export const TokensAddAnotherCustom = (props: Props) => {
         <ModalCollateral
           onClose={() => setModalCollateralState(false)}
           onSave={(collateral: Collateral) => {
-            setCollateralCustom(collateral)
+            addCustomValue(collateral)
             onChange({ name: 'collateralId', value: collateral.address })
           }}
         />
