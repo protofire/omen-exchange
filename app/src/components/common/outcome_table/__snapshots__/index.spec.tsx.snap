@@ -484,7 +484,7 @@ exports[`should show no as winning token 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-fjdhpX eQeePs"
           >
             <div
               class="sc-htoDjs bCdOla"
@@ -498,7 +498,7 @@ exports[`should show no as winning token 1`] = `
                   <span
                     class="sc-VigVT fWbcJs"
                   >
-                    Yes
+                    No
                   </span>
                 </div>
                 <div
@@ -513,7 +513,7 @@ exports[`should show no as winning token 1`] = `
             </div>
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-fjdhpX eQeePs"
           >
             0.5 
             <strong>
@@ -521,17 +521,17 @@ exports[`should show no as winning token 1`] = `
             </strong>
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-fjdhpX eQeePs"
           >
             0.00
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-fjdhpX eQeePs"
           >
             0.00
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX hZeboP"
+            class="sc-EHOje sc-fjdhpX RJGzz"
           >
              
             <strong>
@@ -557,7 +557,7 @@ exports[`should show no as winning token 1`] = `
                   <span
                     class="sc-VigVT fWbcJs"
                   >
-                    No
+                    Yes
                   </span>
                 </div>
                 <div
@@ -912,7 +912,7 @@ exports[`should show yes as winning token 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-fjdhpX eQeePs"
           >
             <div
               class="sc-htoDjs bCdOla"
@@ -941,7 +941,7 @@ exports[`should show yes as winning token 1`] = `
             </div>
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-fjdhpX eQeePs"
           >
             0.5 
             <strong>
@@ -949,17 +949,17 @@ exports[`should show yes as winning token 1`] = `
             </strong>
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-fjdhpX eQeePs"
           >
             0.00
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-fjdhpX eQeePs"
           >
             0.00
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX hZeboP"
+            class="sc-EHOje sc-fjdhpX RJGzz"
           >
              
             <strong>

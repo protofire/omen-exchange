@@ -6,29 +6,29 @@ import React from 'react'
 import { ThemeProvider } from 'styled-components'
 
 import theme from '../../../theme'
-import { BalanceItem, OutcomeSlot, OutcomeTableValue, Token } from '../../../util/types'
+import { BalanceItem, OutcomeSlot, OutcomeTableValue } from '../../../util/types'
 
 import { OutcomeTable } from './index'
 
 const getBalances = (yes: Partial<BalanceItem> = {}, no: Partial<BalanceItem> = {}) => {
   return [
     {
-      ...yes,
       outcomeName: OutcomeSlot.Yes,
       probability: 50,
       currentPrice: 0.5,
       shares: new BigNumber(0),
       holdings: new BigNumber(0),
       winningOutcome: false,
+      ...yes,
     },
     {
-      ...no,
       outcomeName: OutcomeSlot.No,
       probability: 50,
       currentPrice: 0.5,
       shares: new BigNumber(0),
       holdings: new BigNumber(0),
       winningOutcome: false,
+      ...no,
     },
   ]
 }
