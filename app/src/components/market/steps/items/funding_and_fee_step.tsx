@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
@@ -8,13 +8,12 @@ import { CreateCard } from '../../../common/create_card'
 import { FormRow } from '../../../common/form_row'
 import { TextfieldCustomPlaceholder } from '../../../common/textfield_custom_placeholder'
 import { ButtonLink } from '../../../common/button_link'
-import { getToken } from '../../../../util/addresses'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { BalanceToken } from '../../../common/balance_token'
 import { Collateral, CollateralCustomEvent, Token } from '../../../../util/types'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
 import { TokensAddAnotherCustom } from '../../../common/tokens_add_another_custom'
-import { ERC20Service } from '../../../../services'
+import { useCollateral } from '../../../../hooks/useCollateral'
 
 interface Props {
   back: () => void
@@ -65,33 +64,7 @@ const FundingAndFeeStep = (props: Props) => {
     }
   }
 
-  const [collateral, setCollateral] = useState<Maybe<Token>>(null)
-
-  useEffect(() => {
-    let isSubscribed = true
-
-    const fetchIsValidErc20 = async () => {
-      let collateralData: Token
-      const erc20Service = new ERC20Service(context.library, collateralId)
-      const isValidErc20 = await erc20Service.isValidErc20()
-      if (isValidErc20) {
-        const data = await erc20Service.getProfileSummary()
-        collateralData = {
-          ...data,
-        } as Token
-      } else {
-        collateralData = getToken(context.networkId, collateralId as KnownToken)
-      }
-
-      if (isSubscribed) setCollateral(collateralData)
-    }
-
-    fetchIsValidErc20()
-
-    return () => {
-      isSubscribed = false
-    }
-  }, [context, collateralId])
+  const collateral = useCollateral(collateralId, context)
 
   return (
     <CreateCard>
@@ -121,7 +94,7 @@ const FundingAndFeeStep = (props: Props) => {
         <FormRow
           formField={
             <TokensAddAnotherCustom
-              networkId={context.networkId}
+              context={context}
               name="collateralId"
               value={collateral}
               customValues={collateralsCustom}

@@ -5,6 +5,7 @@ import { Tokens } from '../tokens'
 import { Button } from '../button'
 import { ModalCollateral } from './modal_collateral'
 import { Collateral, Token } from '../../../util/types'
+import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 
 interface Props {
   name: string
@@ -12,7 +13,7 @@ interface Props {
   value: Token | Collateral
   customValues: Collateral[]
   addCustomValue: (collateral: Collateral) => void
-  networkId: number
+  context: ConnectedWeb3Context
 }
 
 const Wrapper = styled.div``
@@ -30,7 +31,7 @@ const ButtonStyled = styled(Button)`
 `
 
 export const TokensAddAnotherCustom = (props: Props) => {
-  const { networkId, name, value, customValues, addCustomValue, onChange } = props
+  const { context, name, value, customValues, addCustomValue, onChange } = props
 
   const [isModalCollateralOpen, setModalCollateralState] = useState(false)
 
@@ -39,7 +40,7 @@ export const TokensAddAnotherCustom = (props: Props) => {
       <Wrapper>
         <TokenWrapper>
           <Tokens
-            networkId={networkId}
+            networkId={context.networkId}
             name={name}
             value={value}
             customValues={customValues}
@@ -50,6 +51,7 @@ export const TokensAddAnotherCustom = (props: Props) => {
       </Wrapper>
       {isModalCollateralOpen && (
         <ModalCollateral
+          context={context}
           onClose={() => setModalCollateralState(false)}
           onSave={(collateral: Collateral) => {
             addCustomValue(collateral)

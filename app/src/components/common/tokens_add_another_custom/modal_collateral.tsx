@@ -1,8 +1,6 @@
-import React, { useState, HTMLAttributes, useEffect, ChangeEvent } from 'react'
-import { useWeb3Context } from 'web3-react'
+import React, { useState, HTMLAttributes, ChangeEvent } from 'react'
 import styled, { withTheme } from 'styled-components'
 
-import { getLogger } from '../../../util/logger'
 import ReactDOM from 'react-dom'
 import { FormRow } from '../form_row'
 import { Card } from '../card'
@@ -11,10 +9,9 @@ import { SubsectionTitle } from '../subsection_title'
 import { TitleValue } from '../title_value'
 import { ButtonContainer } from '../button_container'
 import { Button } from '../button'
-import { ERC20Service } from '../../../services'
 import { Collateral } from '../../../util/types'
-
-const logger = getLogger('ModalConnectWallet::Index')
+import { useCollateral } from '../../../hooks/useCollateral'
+import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -52,47 +49,18 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   theme?: any
   onClose: () => void
   onSave: (collateral: Collateral) => void
+  context: ConnectedWeb3Context
 }
 
 const ModalCollateralWrapper = (props: Props) => {
-  const context = useWeb3Context()
-
-  if (context.error) {
-    logger.error('Error in web3 context', context.error)
-  }
-
-  const { theme, onClose, onSave } = props
+  const { theme, onClose, onSave, context } = props
 
   const [collateralAddress, setCollateralAddress] = useState<string>('')
-  const [collateral, setCollateral] = useState<Maybe<Collateral>>(null)
-  const [collateralError, setCollateralError] = useState<boolean>(false)
 
-  useEffect(() => {
-    let isSubscribed = true
+  const collateralData = useCollateral(collateralAddress, context)
+  const collateralError = !collateralData
 
-    const fetchIsValidErc20 = async () => {
-      const erc20Service = new ERC20Service(context.library, collateralAddress)
-      const isValidErc20 = await erc20Service.isValidErc20()
-      if (isSubscribed) {
-        setCollateralError(!isValidErc20)
-        setCollateral(null)
-      }
-
-      if (isSubscribed && isValidErc20) {
-        const data = await erc20Service.getProfileSummary()
-        setCollateral({
-          address: collateralAddress,
-          ...data,
-        } as Collateral)
-      }
-    }
-
-    fetchIsValidErc20()
-
-    return () => {
-      isSubscribed = false
-    }
-  }, [context, collateralAddress])
+  const collateral = { address: collateralAddress, ...collateralData } as Collateral
 
   const onClickCloseButton = () => {
     onClose()

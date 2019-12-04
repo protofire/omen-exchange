@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { BigNumber } from 'ethers/utils'
 import styled from 'styled-components'
 
@@ -6,17 +6,17 @@ import { Button } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
 import { CreateCard } from '../../../common/create_card'
-import { StatusMarketCreation, Token } from '../../../../util/types'
+import { StatusMarketCreation } from '../../../../util/types'
 import { Paragraph } from '../../../common/paragraph'
 import { FullLoading } from '../../../common/full_loading'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
 import { Outcome } from '../../../common/outcomes'
-import { getToken, knownArbitrators } from '../../../../util/addresses'
+import { knownArbitrators } from '../../../../util/addresses'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
-import { ERC20Service } from '../../../../services'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { useCollateral } from '../../../../hooks/useCollateral'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -79,33 +79,7 @@ const CreateMarketStep = (props: Props) => {
     props.submit()
   }
 
-  const [collateral, setCollateral] = useState<Maybe<Token>>(null)
-
-  useEffect(() => {
-    let isSubscribed = true
-
-    const fetchIsValidErc20 = async () => {
-      let collateralData: Token
-      const erc20Service = new ERC20Service(context.library, collateralId)
-      const isValidErc20 = await erc20Service.isValidErc20()
-      if (isValidErc20) {
-        const data = await erc20Service.getProfileSummary()
-        collateralData = {
-          ...data,
-        } as Token
-      } else {
-        collateralData = getToken(context.networkId, collateralId as KnownToken)
-      }
-
-      if (isSubscribed) setCollateral(collateralData)
-    }
-
-    fetchIsValidErc20()
-
-    return () => {
-      isSubscribed = false
-    }
-  }, [context, collateralId])
+  const collateral = useCollateral(collateralId, context)
 
   const arbitrator = knownArbitrators[arbitratorId]
 
