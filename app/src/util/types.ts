@@ -125,3 +125,15 @@ export enum Wallet {
   MetaMask = 'MetaMask',
   WalletConnect = 'WalletConnect',
 }
+
+export interface Collateral {
+  address: string
+  name: string
+  symbol: string
+  decimals: number
+}
+
+export interface CollateralCustomEvent {
+  name: string
+  value: string
+}
