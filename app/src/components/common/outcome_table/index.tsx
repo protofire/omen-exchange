@@ -104,11 +104,23 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]} winningOutcome={winningOutcome}>
-            <BarDiagram outcomeName={outcomeName} isWinning={isWinning} probability={probability} />
+            <BarDiagram
+              outcomeName={outcomeName}
+              isWinning={isWinning}
+              probability={probability}
+              withWinningOutcome={withWinningOutcome}
+              winningOutcome={winningOutcome}
+            />
           </TDStyled>
         ) : (
           <TD textAlign={TableCellsAlign[1]}>
-            <BarDiagram outcomeName={outcomeName} isWinning={isWinning} probability={probability} />
+            <BarDiagram
+              outcomeName={outcomeName}
+              isWinning={isWinning}
+              probability={probability}
+              withWinningOutcome={withWinningOutcome}
+              winningOutcome={winningOutcome}
+            />
           </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
