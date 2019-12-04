@@ -121,10 +121,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       const collateralAddress = await marketMaker.getCollateralToken()
 
-      const collateralService = new ERC20Service(collateralAddress)
+      const collateralService = new ERC20Service(provider, collateralAddress)
 
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
-        provider,
         user,
         marketMakerAddress,
         cost,
@@ -135,7 +134,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         // this can be improved if, instead of adding the 1% fee manually in the front, we use the `calcMarketFee`
         // contract method and add it to the result of `calcNetCost` result
         const costWithErrorMargin = cost.mul(11000).div(10000)
-        await collateralService.approve(provider, marketMakerAddress, costWithErrorMargin)
+        await collateralService.approve(marketMakerAddress, costWithErrorMargin)
       }
 
       await marketMaker.buy(amount, outcome)
@@ -152,7 +151,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const noteAmount = (
     <>
       <BalanceToken
-        collateralId={collateral.symbol.toLowerCase() as KnownToken}
+        collateral={collateral}
         onClickMax={(collateral: Token, collateralBalance: BigNumber) =>
           setAmount(collateralBalance)
         }

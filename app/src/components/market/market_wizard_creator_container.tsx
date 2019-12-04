@@ -53,16 +53,15 @@ const MarketWizardCreatorContainer: FC = () => {
       setStatus(StatusMarketCreation.ApprovingCollateral)
 
       const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
-      const collateralService = new ERC20Service(collateralToken.address)
+      const collateralService = new ERC20Service(provider, collateralToken.address)
 
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
-        provider,
         user,
         marketMakerFactoryAddress,
         funding,
       )
       if (!hasEnoughAlowance) {
-        await collateralService.approve(provider, marketMakerFactoryAddress, funding)
+        await collateralService.approve(marketMakerFactoryAddress, funding)
       }
 
       setStatus(StatusMarketCreation.CreateMarketMaker)
@@ -74,7 +73,7 @@ const MarketWizardCreatorContainer: FC = () => {
       setMarketMakerAddress(marketMakerAddress)
 
       setStatus(StatusMarketCreation.ApproveCollateralForMarketMaker)
-      await collateralService.approveUnlimited(provider, marketMakerAddress)
+      await collateralService.approveUnlimited(marketMakerAddress)
 
       setStatus(StatusMarketCreation.AddFunding)
       const marketMakerService = new MarketMakerService(
