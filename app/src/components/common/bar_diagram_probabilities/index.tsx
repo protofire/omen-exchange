@@ -1,6 +1,8 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
+import WinningOutcomeBadge from './img/badge.svg'
+
 interface ProbabilityProps {
   isWinning: boolean
   theme?: any
@@ -89,17 +91,29 @@ const OutcomeName = styled.span`
   font-size: 13px;
 `
 
+const Badge = styled.div`
+  text-align: left
+  min-width: 20px;
+`
+
 interface Props extends HTMLAttributes<HTMLButtonElement> {
   outcomeName: string
   probability: number
   isWinning: boolean
+  withWinningOutcome: boolean
+  winningOutcome: boolean
 }
 
 export const BarDiagram: React.FC<Props> = (props: Props) => {
-  const { outcomeName, probability, isWinning } = props
+  const { outcomeName, probability, isWinning, winningOutcome, withWinningOutcome } = props
 
   return (
     <OutcomeBar>
+      {withWinningOutcome && (
+        <Badge>
+          {winningOutcome ? <img src={WinningOutcomeBadge} alt="Winning outcome" /> : null}
+        </Badge>
+      )}
       <Probability isWinning={isWinning}>
         <LabelOutcome>
           <OutcomeName>{outcomeName}</OutcomeName>
