@@ -95,7 +95,7 @@ const MarketRoutes = (props: RouteComponentProps<RouteParams>) => {
   const { active } = useWeb3Context()
   const connector = localStorage.getItem('CONNECTOR')
 
-  return active && (connector && connector in connectors) ? (
+  return active || (connector && connector in connectors) ? (
     <MarketRoutesConnectedWrapper {...props} />
   ) : (
     <MarketRoutesDisconnectedWrapper />
