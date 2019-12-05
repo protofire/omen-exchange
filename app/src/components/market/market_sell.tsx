@@ -14,7 +14,7 @@ import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 import { ViewCard } from '../common/view_card'
-import { ConditionalTokenService, MarketMakerService } from '../../services'
+import { ConditionalTokenService, MarketMakerService, RealitioService } from '../../services'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getLogger } from '../../util/logger'
 import { BigNumberInputReturn } from '../common/big_number_input'
@@ -57,6 +57,7 @@ interface Props extends RouteComponentProps<any> {
   balance: BalanceItem[]
   collateral: Token
   conditionalTokens: ConditionalTokenService
+  realitio: RealitioService
   question: string
   resolution: Maybe<Date>
 }
@@ -64,7 +65,15 @@ interface Props extends RouteComponentProps<any> {
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { balance, marketMakerAddress, collateral, conditionalTokens, question, resolution } = props
+  const {
+    balance,
+    marketMakerAddress,
+    collateral,
+    conditionalTokens,
+    question,
+    resolution,
+    realitio,
+  } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
@@ -129,6 +138,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       const marketMaker = new MarketMakerService(
         marketMakerAddress,
         conditionalTokens,
+        realitio,
         provider,
         user,
       )

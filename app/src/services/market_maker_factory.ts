@@ -1,8 +1,20 @@
 import { Contract, ethers, Wallet } from 'ethers'
 import { LogDescription } from 'ethers/utils/interface'
 
-import { Market, Log } from '../util/types'
+import { ConditionalTokenService } from './conditional_token'
+import { MarketMakerService } from './market_maker'
+import { RealitioService } from './realitio'
+
+import { getLogger } from '../util/logger'
+import { Market, MarketWithExtraData, Log } from '../util/types'
 import { FEE } from '../common/constants'
+
+const logger = getLogger('Services::MarketMakerFactory')
+
+interface GetMarketsOptions {
+  from: number
+  to: number
+}
 
 const marketMakerFactoryAbi = [
   `function createFixedProductMarketMaker(address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint fee) public returns (address)`,
@@ -51,13 +63,14 @@ class MarketMakerFactoryService {
     return marketMakerAddress
   }
 
-  getMarkets = async (provider: any): Promise<Market[]> => {
+  getMarkets = async ({ from, to }: GetMarketsOptions): Promise<Market[]> => {
+    logger.debug(`Fetching markets from '${from}' to '${to}'`)
     const filter: any = this.contract.filters.FixedProductMarketMakerCreation()
 
-    const logs = await provider.getLogs({
+    const logs = await this.provider.getLogs({
       ...filter,
-      fromBlock: 1,
-      toBlock: 'latest',
+      fromBlock: from,
+      toBlock: to,
     })
 
     if (logs.length === 0) {
@@ -80,6 +93,30 @@ class MarketMakerFactoryService {
     )
 
     return markets
+  }
+
+  getMarketsWithExtraData = async (
+    { from, to }: GetMarketsOptions,
+    conditionalTokens: ConditionalTokenService,
+    realitio: RealitioService,
+  ): Promise<MarketWithExtraData[]> => {
+    const markets = await this.getMarkets({ from, to })
+
+    const marketsWithExtraData = await Promise.all(
+      markets.map(market => {
+        const marketMaker = new MarketMakerService(
+          market.address,
+          conditionalTokens,
+          realitio,
+          this.provider,
+        )
+        return marketMaker.getExtraData(market)
+      }),
+    )
+
+    const validMarkets = marketsWithExtraData.filter(market => market.fee.eq(FEE))
+
+    return validMarkets
   }
 }
 

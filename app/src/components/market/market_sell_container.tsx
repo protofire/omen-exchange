@@ -19,7 +19,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
   const { balance, marketMakerFunding, collateral } = marketMakerData
 
-  const { conditionalTokens } = useContracts(context)
+  const { conditionalTokens, realitio } = useContracts(context)
 
   if (!collateral || balance.length === 0) {
     return <FullLoading />
@@ -32,6 +32,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
       balance={balance}
       collateral={collateral}
       conditionalTokens={conditionalTokens}
+      realitio={realitio}
       question={question}
       resolution={resolution}
     />

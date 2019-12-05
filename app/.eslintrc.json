@@ -17,6 +17,7 @@
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "react/prop-types": "off",
+    "no-console": "warn",
     "no-warning-comments": "warn",
     "import/no-extraneous-dependencies": ["error", {"optionalDependencies": false, "peerDependencies": false}]
   },

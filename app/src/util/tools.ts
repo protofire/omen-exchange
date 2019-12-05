@@ -204,3 +204,5 @@ export const isContract = async (provider: any, address: string): Promise<boolea
   const code = await provider.getCode(address)
   return code && code !== '0x'
 }
+
+export const delay = (timeout: number) => new Promise(res => setTimeout(res, timeout))

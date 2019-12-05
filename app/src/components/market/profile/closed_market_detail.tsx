@@ -62,7 +62,7 @@ const logger = getLogger('Market::ClosedMarketDetail')
 
 export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens, oracle } = useContracts(context)
+  const { conditionalTokens, oracle, realitio } = useContracts(context)
 
   const {
     collateral: collateralToken,
@@ -79,7 +79,12 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
   const provider = context.library
-  const marketMaker = new MarketMakerService(marketMakerAddress, conditionalTokens, provider)
+  const marketMaker = new MarketMakerService(
+    marketMakerAddress,
+    conditionalTokens,
+    realitio,
+    provider,
+  )
 
   const resolveCondition = () => {
     return oracle.resolveCondition(questionId)
