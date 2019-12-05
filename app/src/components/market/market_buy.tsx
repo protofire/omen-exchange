@@ -112,7 +112,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       return [tradedShares, actualPriceForYes, actualPriceForNo]
     },
-    [conditionalTokens, context.library, marketMakerAddress, outcome, holdingsYes, holdingsNo],
+    [
+      conditionalTokens,
+      context.library,
+      realitio,
+      marketMakerAddress,
+      outcome,
+      holdingsYes,
+      holdingsNo,
+    ],
   )
 
   const [tradedShares, priceAfterTradeForYes, priceAfterTradeForNo] = useAsyncDerivedValue(
