@@ -11,7 +11,7 @@ import { ButtonLink } from '../../../common/button_link'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { BalanceToken } from '../../../common/balance_token'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
-import { TokensAddAnotherCustom } from '../../../common/tokens_add_another_custom'
+import { CustomizableTokensSelect } from '../../../common/customizable_tokens_select'
 
 interface Props {
   back: () => void
@@ -85,7 +85,7 @@ const FundingAndFeeStep = (props: Props) => {
       />
       <FormRow
         formField={
-          <TokensAddAnotherCustom
+          <CustomizableTokensSelect
             context={context}
             name="collateralId"
             value={collateral}

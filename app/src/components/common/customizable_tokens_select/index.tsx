@@ -30,7 +30,7 @@ const ButtonStyled = styled(Button)`
   margin-left: 10px;
 `
 
-export const TokensAddAnotherCustom = (props: Props) => {
+export const CustomizableTokensSelect = (props: Props) => {
   const { context, name, value, customValues, onCollateralChange, addCustomValue } = props
 
   const [isModalCollateralOpen, setModalCollateralState] = useState(false)
