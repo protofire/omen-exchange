@@ -141,6 +141,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
           collateral={collateralToken}
           disabledColumns={[OutcomeTableValue.CurrentPrice, OutcomeTableValue.PriceAfterTrade]}
           withWinningOutcome={true}
+          displayRadioSelection={false}
         />
 
         <SubsectionTitle>Details</SubsectionTitle>
