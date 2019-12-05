@@ -94,6 +94,15 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     },
     order: 5,
   },
+  chai: {
+    symbol: 'CHAI',
+    decimals: 18,
+    addresses: {
+      [networkIds.MAINNET]: '0x06AF07097C9Eeb7fD685c692751D5C66dB49c215',
+      [networkIds.GANACHE]: '0x9b1f7F645351AF3631a656421eD2e40f2802E6c0',
+    },
+    order: 6,
+  },
 }
 
 export const getContractAddress = (networkId: number, contract: keyof KnownContracts) => {
