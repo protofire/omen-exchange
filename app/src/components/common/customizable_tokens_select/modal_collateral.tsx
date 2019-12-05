@@ -58,7 +58,6 @@ const ModalCollateralWrapper = (props: Props) => {
   const [collateralAddress, setCollateralAddress] = useState<string>('')
 
   const collateralData = useCollateral(collateralAddress, context)
-  const collateralError = !collateralData
 
   const collateral: Maybe<Token> = collateralData
     ? { address: collateralAddress, ...collateralData }
@@ -109,7 +108,7 @@ const ModalCollateralWrapper = (props: Props) => {
         />
         {tokenDetails()}
         <ButtonContainer>
-          <ButtonStyled disabled={collateralError} onClick={onClickSaveButton}>
+          <ButtonStyled disabled={!collateralData} onClick={onClickSaveButton}>
             Save
           </ButtonStyled>
           <Button backgroundColor={theme.colors.secondary} onClick={onClickCloseButton}>
