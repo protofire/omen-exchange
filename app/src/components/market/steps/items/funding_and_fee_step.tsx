@@ -8,21 +8,23 @@ import { CreateCard } from '../../../common/create_card'
 import { FormRow } from '../../../common/form_row'
 import { TextfieldCustomPlaceholder } from '../../../common/textfield_custom_placeholder'
 import { ButtonLink } from '../../../common/button_link'
-import { Tokens } from '../../../common/tokens'
-import { getToken } from '../../../../util/addresses'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { BalanceToken } from '../../../common/balance_token'
-import { Token } from '../../../../util/types'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
+import { CustomizableTokensSelect } from '../../../common/customizable_tokens_select'
+import { Token } from '../../../../util/types'
 
 interface Props {
   back: () => void
   next: () => void
   values: {
-    collateralId: KnownToken
+    collateral: Token
+    collateralsCustom: Token[]
     spread: string
     funding: BigNumber
   }
+  handleCollateralChange: (collateral: Token) => void
+  addCollateralCustom: (collateral: Token) => void
   handleChange: (
     event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn,
   ) => any
@@ -43,8 +45,8 @@ const InputBigNumberStyledRight = styled<any>(BigNumberInput)`
 const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { values } = props
-  const { funding, spread, collateralId } = values
+  const { values, addCollateralCustom, handleCollateralChange } = props
+  const { funding, spread, collateral, collateralsCustom } = values
   const error = !spread || funding.isZero()
 
   const back = () => {
@@ -57,8 +59,6 @@ const FundingAndFeeStep = (props: Props) => {
       props.next()
     }
   }
-
-  const collateral = getToken(context.networkId, collateralId)
 
   return (
     <CreateCard>
@@ -86,11 +86,13 @@ const FundingAndFeeStep = (props: Props) => {
       />
       <FormRow
         formField={
-          <Tokens
-            networkId={context.networkId}
+          <CustomizableTokensSelect
+            context={context}
             name="collateralId"
-            value={collateralId}
-            onChange={(e: any) => props.handleChange(e)}
+            value={collateral}
+            customValues={collateralsCustom}
+            addCustomValue={addCollateralCustom}
+            onCollateralChange={handleCollateralChange}
           />
         }
         title={'Collateral token'}
@@ -120,7 +122,7 @@ const FundingAndFeeStep = (props: Props) => {
         }}
         note={
           <BalanceToken
-            collateralId={collateralId}
+            collateral={collateral}
             onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
               props.handleChange({ name: 'funding', value: collateralBalance })
             }}

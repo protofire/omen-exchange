@@ -111,19 +111,19 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
       )
 
       const provider = context.library
-
+      const user = await provider.getSigner().getAddress()
       const marketMaker = new MarketMakerService(
         marketMakerAddress,
         conditionalTokens,
         realitio,
         provider,
-        context.account,
+        user,
       )
 
       const collateralAddress = await marketMaker.getCollateralToken()
-      const collateralService = new ERC20Service(collateralAddress)
+      const collateralService = new ERC20Service(provider, collateralAddress)
 
-      await collateralService.approve(provider, marketMakerAddress, amount)
+      await collateralService.approve(marketMakerAddress, amount)
 
       await marketMaker.addFunding(amount)
 
@@ -145,12 +145,13 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
       )
 
       const provider = context.library
+      const user = await provider.getSigner().getAddress()
       const marketMaker = new MarketMakerService(
         marketMakerAddress,
         conditionalTokens,
         realitio,
         provider,
-        context.account,
+        user,
       )
       await marketMaker.removeFunding(marketMakerUserFunding)
 
@@ -228,7 +229,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
           title={'Amount'}
           note={
             <BalanceToken
-              collateralId={collateral.symbol.toLowerCase() as KnownToken}
+              collateral={collateral}
               onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
                 setAmount(collateralBalance)
               }}

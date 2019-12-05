@@ -10,6 +10,7 @@ interface Props {
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => any
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
   readOnly?: boolean
+  value: string
 }
 
 const SelectWrapper = styled.div<{ disabled?: boolean }>`

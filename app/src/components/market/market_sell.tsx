@@ -134,13 +134,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setMessage(`Selling ${formatBigNumber(amountShares, collateral.decimals)} shares ...`)
 
       const provider = context.library
-
+      const user = await provider.getSigner().getAddress()
       const marketMaker = new MarketMakerService(
         marketMakerAddress,
         conditionalTokens,
         realitio,
         provider,
-        context.account,
+        user,
       )
 
       const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketMakerAddress)
