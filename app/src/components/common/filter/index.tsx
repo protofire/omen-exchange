@@ -1,7 +1,9 @@
-import React, { HTMLAttributes } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import Dropdown from 'react-dropdown'
 import 'react-dropdown/style.css'
+
+import { MarketFilter } from '../../../util/market_filter'
 
 const FilterWrapper = styled.div`
   display: flex;
@@ -81,19 +83,28 @@ const FilterWrapper = styled.div`
   }
 `
 
-interface Props extends HTMLAttributes<HTMLDivElement> {
-  options: any
+interface Props {
+  options: MarketFilter[]
   defaultOption?: any
-  onChange?: any
+  onFilterChange: (filter: MarketFilter) => void
 }
 
 export const Filter: React.FC<Props> = (props: Props) => {
-  const { options, defaultOption, onChange, ...restProps } = props
+  const { options, defaultOption, onFilterChange, ...restProps } = props
+
+  const onChange = (selectedOption: { value: string }) => {
+    for (const option of options) {
+      if (option.label === selectedOption.value) {
+        onFilterChange(option)
+        return
+      }
+    }
+  }
 
   return (
     <FilterWrapper {...restProps}>
       <Dropdown
-        options={options}
+        options={options.map(option => option.label)}
         onChange={onChange}
         value={defaultOption}
         placeholder="Select an option"

@@ -1,7 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { MarketWithExtraData, MarketFilters } from '../../util/types'
+import { MarketWithExtraData } from '../../util/types'
+import { MarketFilter } from '../../util/market_filter'
 import { RemoteData } from '../../util/remote_data'
 import { Button } from '../common/button'
 import { FullLoading } from '../common/full_loading'
@@ -22,14 +23,13 @@ interface Props {
   count: number
   moreMarkets: boolean
   context: ConnectedWeb3Context
-  currentFilter: MarketFilters
-  onFilterChange: (filter: MarketFilters) => void
+  currentFilter: MarketFilter
+  onFilterChange: (filter: MarketFilter) => void
   onShowMore: () => void
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
   const { count, markets, context, currentFilter, onFilterChange, onShowMore } = props
-  const options = [MarketFilters.AllMarkets, MarketFilters.MyMarkets, MarketFilters.FundedMarkets]
 
   const showMoreButton =
     props.moreMarkets && !RemoteData.is.loading(markets) ? (
@@ -44,8 +44,14 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       {context.account && (
         <FilterStyled
           defaultOption={currentFilter}
-          options={options}
-          onChange={({ value }: { value: MarketFilters }) => onFilterChange(value)}
+          options={[
+            MarketFilter.allMarkets(),
+            MarketFilter.myMarkets(context.account),
+            MarketFilter.fundedMarkets(context.account),
+            MarketFilter.investedMarkets(context.account),
+            MarketFilter.winningResultMarkets(context.account),
+          ]}
+          onFilterChange={onFilterChange}
         />
       )}
       <ListCard>

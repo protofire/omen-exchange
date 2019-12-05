@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
-import { MarketMakerService } from '../services'
 import { useContracts } from './useContracts'
 import { getLogger } from '../util/logger'
 import { Question } from '../util/types'
@@ -12,7 +11,7 @@ export const useQuestion = (
   marketMakerAddress: string,
   context: ConnectedWeb3Context,
 ): Question => {
-  const { conditionalTokens, realitio } = useContracts(context)
+  const { conditionalTokens, realitio, buildMarketMaker } = useContracts(context)
 
   const [question, setQuestion] = useState<string>('')
   const [resolution, setResolution] = useState<Maybe<Date>>(null)
@@ -23,14 +22,7 @@ export const useQuestion = (
     let isSubscribed = true
     const fetchQuestion = async () => {
       try {
-        const provider = context.library
-
-        const marketMaker = new MarketMakerService(
-          marketMakerAddress,
-          conditionalTokens,
-          realitio,
-          provider,
-        )
+        const marketMaker = buildMarketMaker(marketMakerAddress)
 
         const conditionId = await marketMaker.getConditionId()
         const questionId = await conditionalTokens.getQuestionId(conditionId)
@@ -53,7 +45,7 @@ export const useQuestion = (
     return () => {
       isSubscribed = false
     }
-  }, [marketMakerAddress, context, conditionalTokens, realitio])
+  }, [marketMakerAddress, context, conditionalTokens, realitio, buildMarketMaker])
 
   return { question, resolution, category, arbitratorAddress }
 }

@@ -10,7 +10,7 @@ import { SubsectionTitle } from '../../common/subsection_title'
 import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
-import { ERC20Service, MarketMakerService } from '../../../services'
+import { ERC20Service } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
@@ -62,7 +62,7 @@ const logger = getLogger('Market::ClosedMarketDetail')
 
 export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens, oracle, realitio } = useContracts(context)
+  const { conditionalTokens, oracle, buildMarketMaker } = useContracts(context)
 
   const {
     collateral: collateralToken,
@@ -78,13 +78,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const [message, setMessage] = useState('')
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
-  const provider = context.library
-  const marketMaker = new MarketMakerService(
-    marketMakerAddress,
-    conditionalTokens,
-    realitio,
-    provider,
-  )
+  const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const resolveCondition = () => {
     return oracle.resolveCondition(questionId)
@@ -164,13 +158,10 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         </Grid>
 
         <ButtonContainerStyled>
-          <Button
-            disabled={winningOutcome && winningOutcome.shares.isZero()}
-            onClick={() => redeem()}
-          >
-            Redeem
-          </Button>
-          {!isConditionResolved && !winningOutcome ? (
+          {winningOutcome && !winningOutcome.shares.isZero() && (
+            <Button onClick={() => redeem()}>Redeem</Button>
+          )}
+          {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() ? (
             <Button onClick={resolveCondition}>Resolve Condition</Button>
           ) : null}
         </ButtonContainerStyled>
