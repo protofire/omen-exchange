@@ -23,15 +23,20 @@ interface Props {
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {
-  const { question, resolution, isQuestionFinalized } = props
+  const { balance, question, resolution, isQuestionFinalized } = props
 
   const renderView = () => {
     return isQuestionFinalized ? <ClosedMarketDetail {...props} /> : <View {...props} />
   }
 
+  const winningOutcome = balance[0].winningOutcome ? balance[0].outcomeName : balance[1].outcomeName
+
+  const formattedResolution = resolution ? formatDate(resolution) : ''
+  const subtitle = isQuestionFinalized ? `Final Outcome: ${winningOutcome}` : formattedResolution
+
   return (
     <>
-      <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
+      <SectionTitle title={question} subTitle={subtitle} />
       {renderView()}
     </>
   )
