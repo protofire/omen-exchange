@@ -97,8 +97,8 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       const provider = context.library
 
       const collateralAddress = await marketMaker.getCollateralToken()
-      const collateralService = new ERC20Service(collateralAddress)
-      const collateralBalance = await collateralService.getCollateral(marketMakerAddress, provider)
+      const collateralService = new ERC20Service(provider, collateralAddress)
+      const collateralBalance = await collateralService.getCollateral(marketMakerAddress)
       if (isSubscribed) setCollateral(collateralBalance)
     }
 

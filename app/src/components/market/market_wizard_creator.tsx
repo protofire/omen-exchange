@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Component } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
@@ -11,12 +11,15 @@ import {
   SummaryMarketStep,
 } from './steps'
 
-import { StatusMarketCreation } from '../../util/types'
+import { Token, StatusMarketCreation } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { Outcome } from '../common/outcomes'
+import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { getDefaultToken } from '../../util/addresses'
 
 export interface MarketData {
-  collateralId: KnownToken
+  collateral: Token
+  collateralsCustom: Token[]
   question: string
   category: string
   resolution: Date | null
@@ -38,97 +41,102 @@ interface State {
   marketData: MarketData
 }
 
-export class MarketWizardCreator extends Component<Props, State> {
-  public state: State = {
-    currentStep: 1,
-    marketData: {
-      collateralId: 'dai',
-      question: '',
-      category: '',
-      resolution: null,
-      arbitratorId: 'realitio',
-      spread: '1',
-      funding: new BigNumber('0'),
-      outcomes: [
-        {
-          name: 'Yes',
-          probability: 50,
-        },
-        {
-          name: 'No',
-          probability: 50,
-        },
-      ],
-    },
+export const MarketWizardCreator = (props: Props) => {
+  const context = useConnectedWeb3Context()
+
+  const { callback, status, questionId, marketMakerAddress } = props
+
+  const defaultCollateral = getDefaultToken(context.networkId)
+
+  const marketDataDefault: MarketData = {
+    collateral: defaultCollateral,
+    collateralsCustom: [],
+    question: '',
+    category: '',
+    resolution: null,
+    arbitratorId: 'realitio',
+    spread: '1',
+    funding: new BigNumber('0'),
+    outcomes: [
+      {
+        name: 'Yes',
+        probability: 50,
+      },
+      {
+        name: 'No',
+        probability: 50,
+      },
+    ],
   }
 
-  public next = (): void => {
-    let { currentStep } = this.state
-    currentStep = currentStep >= 3 ? 4 : currentStep + 1
-    this.setState({
-      currentStep,
-    })
+  const [currentStep, setCurrentStep] = useState(1)
+  const [marketData, setMarketdata] = useState<MarketData>(marketDataDefault)
+
+  const next = (): void => {
+    const actualCurrentStep = currentStep >= 3 ? 4 : currentStep + 1
+    setCurrentStep(actualCurrentStep)
   }
 
-  public back = (): void => {
-    let { currentStep } = this.state
-    currentStep = currentStep <= 1 ? 1 : currentStep - 1
-    this.setState({
-      currentStep,
-    })
+  const back = (): void => {
+    const actualCurrentStep = currentStep <= 1 ? 1 : currentStep - 1
+    setCurrentStep(actualCurrentStep)
   }
 
-  public handleChange = (
+  const addCollateralCustom = (collateral: Token): void => {
+    const collateralsCustom = marketData.collateralsCustom
+    collateralsCustom.push(collateral)
+    const newMarketData = {
+      ...marketData,
+      collateralsCustom,
+    }
+    setMarketdata(newMarketData)
+  }
+
+  const handleChange = (
     event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn,
   ) => {
     const { name, value } = 'target' in event ? event.target : event
 
-    // when the collateral changes, reset the value of funding
-    const funding: BigNumber =
-      name === 'collateralId' ? ethers.constants.Zero : this.state.marketData.funding
-
-    this.setState((prevState: State) => ({
-      ...prevState,
-      marketData: {
-        ...prevState.marketData,
-        funding,
-        [name]: value,
-      },
-    }))
+    const newMarketData = {
+      ...marketData,
+      [name]: value,
+    }
+    setMarketdata(newMarketData)
   }
 
-  public handleOutcomesChange = (outcomes: Outcome[]) => {
-    this.setState((prevState: State) => ({
-      ...prevState,
-      marketData: {
-        ...prevState.marketData,
-        outcomes,
-      },
-    }))
+  const handleCollateralChange = (collateral: Token) => {
+    const newMarketData = {
+      ...marketData,
+      funding: ethers.constants.Zero, // when the collateral changes, reset the value of funding
+      collateral,
+    }
+    setMarketdata(newMarketData)
   }
 
-  public handleChangeDate = (date: Date | null) => {
-    this.setState((prevState: State) => ({
-      ...prevState,
-      marketData: {
-        ...prevState.marketData,
-        resolution: date,
-      },
-    }))
+  const handleOutcomesChange = (outcomes: Outcome[]) => {
+    const newMarketData = {
+      ...marketData,
+      outcomes,
+    }
+    setMarketdata(newMarketData)
   }
 
-  public submit = () => {
-    const { callback } = this.props
-
-    callback({ ...this.state.marketData })
+  const handleChangeDate = (date: Date | null) => {
+    const newMarketData = {
+      ...marketData,
+      resolution: date,
+    }
+    setMarketdata(newMarketData)
   }
 
-  public currentStep = () => {
-    const { currentStep, marketData } = this.state
-    const { marketMakerAddress, status, questionId } = this.props
+  const submit = () => {
+    callback(marketData as MarketData)
+  }
 
+  const currentStepFn = () => {
     const {
-      collateralId,
+      collateral,
+      collateralsCustom,
       question,
       category,
       resolution,
@@ -142,78 +150,74 @@ export class MarketWizardCreator extends Component<Props, State> {
       case 1:
         return (
           <AskQuestionStep
-            handleChange={this.handleChange}
-            handleChangeDate={this.handleChangeDate}
-            next={() => this.next()}
+            handleChange={handleChange}
+            handleChangeDate={handleChangeDate}
+            next={() => next()}
             values={{ question, category, resolution, arbitratorId }}
           />
         )
       case 2:
         return (
           <FundingAndFeeStep
-            back={() => this.back()}
-            handleChange={this.handleChange}
-            next={() => this.next()}
-            values={{ collateralId, spread, funding }}
+            back={() => back()}
+            handleChange={handleChange}
+            handleCollateralChange={handleCollateralChange}
+            addCollateralCustom={addCollateralCustom}
+            next={() => next()}
+            values={{ collateral, collateralsCustom, spread, funding }}
           />
         )
       case 3:
         return (
           <OutcomesStep
-            back={() => this.back()}
-            next={() => this.next()}
+            back={() => back()}
+            next={() => next()}
             values={{
               outcomes,
               question,
             }}
-            handleOutcomesChange={this.handleOutcomesChange}
+            handleOutcomesChange={handleOutcomesChange}
           />
         )
       case 4:
         return (
           <CreateMarketStep
-            back={() => this.back()}
+            back={() => back()}
             marketMakerAddress={marketMakerAddress}
             questionId={questionId}
             status={status}
-            submit={() => this.submit()}
-            values={{ ...marketData }}
+            submit={() => submit()}
+            values={marketData}
           />
         )
       default:
         return (
           <AskQuestionStep
-            handleChange={this.handleChange}
-            handleChangeDate={this.handleChangeDate}
-            next={() => this.next()}
+            handleChange={handleChange}
+            handleChangeDate={handleChangeDate}
+            next={() => next()}
             values={{ question, category, resolution, arbitratorId }}
           />
         )
     }
   }
 
-  public currentMenu = () => {
-    const { currentStep } = this.state
+  const currentMenu = () => {
     return <MenuStep currentStep={currentStep} />
   }
 
-  public summaryMarketStep = () => {
-    const { marketMakerAddress } = this.props
-
+  const summaryMarketStep = () => {
     return marketMakerAddress ? <SummaryMarketStep marketMakerAddress={marketMakerAddress} /> : ''
   }
 
-  render() {
-    const { status } = this.props
-    return (
-      <>
-        {status !== StatusMarketCreation.Done && (
-          <>
-            {this.currentMenu()} {this.currentStep()}
-          </>
-        )}
-        {status === StatusMarketCreation.Done && this.summaryMarketStep()}
-      </>
-    )
-  }
+  return (
+    <>
+      {status !== StatusMarketCreation.Done && (
+        <>
+          {currentMenu()} {currentStepFn()}
+        </>
+      )}
+      {status === StatusMarketCreation.Done && summaryMarketStep()}
+    </>
+  )
 }

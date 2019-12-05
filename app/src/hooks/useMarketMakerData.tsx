@@ -3,8 +3,8 @@ import { BigNumber } from 'ethers/utils'
 
 import { usePolling } from './usePolling'
 import { ConnectedWeb3Context } from './connectedWeb3'
-import { MarketMakerService } from '../services'
-import { getArbitratorFromAddress, getTokenFromAddress } from '../util/addresses'
+import { ERC20Service, MarketMakerService } from '../services'
+import { getArbitratorFromAddress } from '../util/addresses'
 import { useContracts } from './useContracts'
 import { getLogger } from '../util/logger'
 import { BalanceItem, OutcomeSlot, Status, Token, Arbitrator } from '../util/types'
@@ -106,7 +106,8 @@ export const useMarketMakerData = (
 
     const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
-    const collateral = getTokenFromAddress(context.networkId, collateralAddress)
+    const erc20Service = new ERC20Service(provider, collateralAddress)
+    const collateral = await erc20Service.getProfileSummary()
 
     const probabilityForYes = actualPrices.actualPriceForYes * 100
     const probabilityForNo = actualPrices.actualPriceForNo * 100

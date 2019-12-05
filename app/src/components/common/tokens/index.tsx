@@ -1,40 +1,47 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Select } from '../select'
-import { knownTokens } from '../../../util/addresses'
+import { getTokensByNetwork } from '../../../util/addresses'
+import { Token } from '../../../util/types'
 
 interface Props {
   autoFocus?: boolean
   disabled?: boolean
   name: string
-  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => any
+  onTokenChange: (token: Token) => any
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
   readOnly?: boolean
-  value: string
+  value: Token
+  customValues: Token[]
   networkId: number
 }
 
 const FormOption = styled.option``
 
 export const Tokens = (props: Props) => {
-  const { networkId, ...restProps } = props
+  const { networkId, value, customValues, onTokenChange, ...restProps } = props
 
-  const tokens = Object.entries(knownTokens)
-    .filter(([, knownToken]) => {
-      return knownToken.addresses[networkId]
-    })
-    .sort(([, knownTokenA], [, knownTokenB]) => (knownTokenA.order > knownTokenB.order ? 1 : -1))
-    .map(([id, knownToken]) => ({
-      label: knownToken.symbol,
-      value: id,
-    }))
+  const knownTokens = getTokensByNetwork(networkId)
+  const tokens = knownTokens.concat(customValues)
+  const options = tokens.map(token => ({
+    label: token.symbol,
+    value: token.address,
+  }))
+
+  const onChange = (address: string) => {
+    for (const token of tokens) {
+      if (token.address === address) {
+        onTokenChange(token)
+      }
+    }
+  }
 
   return (
-    <Select {...restProps}>
-      {tokens.map(token => {
+    <Select {...restProps} value={value.address} onChange={e => onChange(e.target.value)}>
+      {options.map(option => {
         return (
-          <FormOption key={token.value} value={token.value}>
-            {token.label}
+          <FormOption key={option.value} value={option.value}>
+            {option.label}
           </FormOption>
         )
       })}

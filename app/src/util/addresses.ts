@@ -56,7 +56,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
   dai: {
     symbol: 'DAI',
-    decimals: 6,
+    decimals: 18,
     addresses: {
       [networkIds.MAINNET]: '0x6b175474e89094c44da98b954eedeac495271d0f',
       [networkIds.RINKEBY]: '0xb307901ac0a807402a99879a491836697fec5e62',
@@ -105,6 +105,11 @@ export const getContractAddress = (networkId: number, contract: keyof KnownContr
 
 export const getToken = (networkId: number, tokenId: KnownToken): Token => {
   const token = knownTokens[tokenId]
+
+  if (!token) {
+    throw new Error(`Unsupported token id: '${tokenId}'`)
+  }
+
   const address = token.addresses[networkId]
 
   if (!address) {
@@ -144,6 +149,23 @@ export const getContractAddressName = (networkId: number) => {
   const networkNameCase =
     networkName && networkName.substr(0, 1).toUpperCase() + networkName.substr(1).toLowerCase()
   return networkNameCase
+}
+
+export const getDefaultToken = (networkId: number) => {
+  return getToken(networkId, 'dai')
+}
+
+export const getTokensByNetwork = (networkId: number): Token[] => {
+  return Object.values(knownTokens)
+    .filter(token => !!token.addresses[networkId])
+    .sort((a, b) => (a.order > b.order ? 1 : -1))
+    .map(token => {
+      return {
+        symbol: token.symbol,
+        decimals: token.decimals,
+        address: token.addresses[networkId],
+      }
+    })
 }
 
 interface KnownArbitratorData {
