@@ -81,16 +81,17 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
-  const renderTableData = balance.map((balanceItem, index) => {
+  const renderTableRow = (balanceItem: BalanceItem, priceAfterTrade?: number) => {
     const { outcomeName, probability, currentPrice, shares, winningOutcome } = balanceItem
     const isWinning = probability > 50
 
     return (
-      <TR key={index}>
+      <TR key={outcomeName}>
         {!displayRadioSelection || withWinningOutcome ? null : (
           <TD textAlign={TableCellsAlign[0]}>
             <RadioContainer>
               <RadioInputStyled
+                data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
                 checked={outcomeSelected === outcomeName}
                 name="outcome"
                 onChange={(e: any) =>
@@ -103,11 +104,23 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]} winningOutcome={winningOutcome}>
-            <BarDiagram outcomeName={outcomeName} isWinning={isWinning} probability={probability} />
+            <BarDiagram
+              outcomeName={outcomeName}
+              isWinning={isWinning}
+              probability={probability}
+              withWinningOutcome={withWinningOutcome}
+              winningOutcome={winningOutcome}
+            />
           </TDStyled>
         ) : (
           <TD textAlign={TableCellsAlign[1]}>
-            <BarDiagram outcomeName={outcomeName} isWinning={isWinning} probability={probability} />
+            <BarDiagram
+              outcomeName={outcomeName}
+              isWinning={isWinning}
+              probability={probability}
+              withWinningOutcome={withWinningOutcome}
+              winningOutcome={winningOutcome}
+            />
           </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
@@ -135,18 +148,26 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.PriceAfterTrade) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[5]} winningOutcome={winningOutcome}>
-            {pricesAfterTrade && pricesAfterTrade[index].toFixed(4)}{' '}
-            <strong>{collateral.symbol}</strong>
+            {priceAfterTrade && priceAfterTrade.toFixed(4)} <strong>{collateral.symbol}</strong>
           </TDStyled>
         ) : (
           <TD textAlign={TableCellsAlign[5]}>
-            {pricesAfterTrade && pricesAfterTrade[index].toFixed(4)}{' '}
-            <strong>{collateral.symbol}</strong>
+            {priceAfterTrade && priceAfterTrade.toFixed(4)} <strong>{collateral.symbol}</strong>
           </TD>
         )}
       </TR>
     )
-  })
+  }
 
-  return <TableStyled head={renderTableHeader()}>{renderTableData}</TableStyled>
+  const yesRow = renderTableRow(balance[0], pricesAfterTrade && pricesAfterTrade[0])
+  const noRow = renderTableRow(balance[1], pricesAfterTrade && pricesAfterTrade[1])
+
+  let rows = [yesRow, noRow]
+  if (withWinningOutcome) {
+    if (balance[1].winningOutcome) {
+      rows = [noRow, yesRow]
+    }
+  }
+
+  return <TableStyled head={renderTableHeader()}>{rows}</TableStyled>
 }
