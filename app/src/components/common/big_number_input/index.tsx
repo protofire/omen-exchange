@@ -23,11 +23,6 @@ interface Props {
   disabled?: boolean
 }
 
-interface State {
-  currentValueStr: string
-  currentDecimalsStr: number
-}
-
 const Input = styled.input`
   ::-webkit-inner-spin-button,
   ::-webkit-outer-spin-button {

@@ -12,6 +12,7 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { BalanceToken } from '../../../common/balance_token'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
 import { CustomizableTokensSelect } from '../../../common/customizable_tokens_select'
+import { Token } from '../../../../util/types'
 
 interface Props {
   back: () => void
