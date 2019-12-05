@@ -10,7 +10,7 @@ import { TextfieldCustomPlaceholder } from '../../../common/textfield_custom_pla
 import { ButtonLink } from '../../../common/button_link'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { BalanceToken } from '../../../common/balance_token'
-import { Collateral, CollateralCustomEvent, Token } from '../../../../util/types'
+import { CollateralCustomEvent, Token } from '../../../../util/types'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
 import { TokensAddAnotherCustom } from '../../../common/tokens_add_another_custom'
 import { useCollateral } from '../../../../hooks/useCollateral'
@@ -20,11 +20,11 @@ interface Props {
   next: () => void
   values: {
     collateralId: KnownToken | string
-    collateralsCustom: Collateral[]
+    collateralsCustom: Token[]
     spread: string
     funding: BigNumber
   }
-  addCollateralCustom: (collateral: Collateral) => void
+  addCollateralCustom: (collateral: Token) => void
   handleChange: (
     event:
       | ChangeEvent<HTMLInputElement>

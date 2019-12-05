@@ -11,13 +11,13 @@ import {
   SummaryMarketStep,
 } from './steps'
 
-import { Collateral, CollateralCustomEvent, StatusMarketCreation } from '../../util/types'
+import { Token, CollateralCustomEvent, StatusMarketCreation } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { Outcome } from '../common/outcomes'
 
 export interface MarketData {
   collateralId: KnownToken
-  collateralsCustom: Collateral[]
+  collateralsCustom: Token[]
   question: string
   category: string
   resolution: Date | null
@@ -76,7 +76,7 @@ export const MarketWizardCreator = (props: Props) => {
     setCurrentStep(actualCurrentStep)
   }
 
-  const addCollateralCustom = (collateral: Collateral): void => {
+  const addCollateralCustom = (collateral: Token): void => {
     const collateralsCustom = marketData.collateralsCustom
     collateralsCustom.push(collateral)
     const newMarketData = {

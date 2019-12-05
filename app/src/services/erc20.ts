@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
 import { isAddress, isContract } from '../util/tools'
-import { Collateral } from '../util/types'
+import { Token } from '../util/types'
 
 const logger = getLogger('Services::Erc20')
 
@@ -96,32 +96,26 @@ class ERC20Service {
 
       const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, this.provider)
 
-      const [decimals, name, symbol] = await Promise.all([
+      const [decimals, symbol] = await Promise.all([
         erc20Contract.decimals(),
-        erc20Contract.name(),
         erc20Contract.symbol(),
       ])
 
-      return !!(decimals && name && symbol)
+      return !!(decimals && symbol)
     } catch (err) {
       logger.error(err.message)
       return false
     }
   }
 
-  getProfileSummary = async (): Promise<Collateral> => {
+  getProfileSummary = async (): Promise<Token> => {
     const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, this.provider)
 
-    const [decimals, name, symbol] = await Promise.all([
-      erc20Contract.decimals(),
-      erc20Contract.name(),
-      erc20Contract.symbol(),
-    ])
+    const [decimals, symbol] = await Promise.all([erc20Contract.decimals(), erc20Contract.symbol()])
 
     return {
       address: this.tokenAddress,
       decimals,
-      name,
       symbol,
     }
   }

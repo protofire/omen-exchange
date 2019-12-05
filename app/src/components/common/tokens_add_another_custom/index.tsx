@@ -4,15 +4,15 @@ import styled from 'styled-components'
 import { Tokens } from '../tokens'
 import { Button } from '../button'
 import { ModalCollateral } from './modal_collateral'
-import { Collateral, Token } from '../../../util/types'
+import { Token } from '../../../util/types'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 
 interface Props {
   name: string
   onChange: (event: any) => any
-  value: Token | Collateral
-  customValues: Collateral[]
-  addCustomValue: (collateral: Collateral) => void
+  value: Token
+  customValues: Token[]
+  addCustomValue: (collateral: Token) => void
   context: ConnectedWeb3Context
 }
 
@@ -53,7 +53,7 @@ export const TokensAddAnotherCustom = (props: Props) => {
         <ModalCollateral
           context={context}
           onClose={() => setModalCollateralState(false)}
-          onSave={(collateral: Collateral) => {
+          onSave={(collateral: Token) => {
             addCustomValue(collateral)
             onChange({ name: 'collateralId', value: collateral.address })
           }}

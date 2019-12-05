@@ -9,7 +9,7 @@ import { SubsectionTitle } from '../subsection_title'
 import { TitleValue } from '../title_value'
 import { ButtonContainer } from '../button_container'
 import { Button } from '../button'
-import { Collateral } from '../../../util/types'
+import { Token } from '../../../util/types'
 import { useCollateral } from '../../../hooks/useCollateral'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 
@@ -48,7 +48,7 @@ const ButtonStyled = styled(Button)`
 interface Props extends HTMLAttributes<HTMLDivElement> {
   theme?: any
   onClose: () => void
-  onSave: (collateral: Collateral) => void
+  onSave: (collateral: Token) => void
   context: ConnectedWeb3Context
 }
 
@@ -60,7 +60,9 @@ const ModalCollateralWrapper = (props: Props) => {
   const collateralData = useCollateral(collateralAddress, context)
   const collateralError = !collateralData
 
-  const collateral = { address: collateralAddress, ...collateralData } as Collateral
+  const collateral: Maybe<Token> = collateralData
+    ? { address: collateralAddress, ...collateralData }
+    : null
 
   const onClickCloseButton = () => {
     onClose()
@@ -80,7 +82,6 @@ const ModalCollateralWrapper = (props: Props) => {
       <>
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
-          <TitleValue title={'Name:'} value={collateral && collateral.name} />
           <TitleValue title={'Symbol:'} value={collateral && collateral.symbol} />
           <TitleValue title={'Decimals:'} value={collateral && collateral.decimals} />
         </Grid>

@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { Select } from '../select'
 import { knownTokens } from '../../../util/addresses'
-import { Collateral, Token } from '../../../util/types'
+import { Token } from '../../../util/types'
 
 interface Props {
   autoFocus?: boolean
@@ -11,8 +11,8 @@ interface Props {
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => any
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
   readOnly?: boolean
-  value: Token | Collateral
-  customValues: Collateral[]
+  value: Token
+  customValues: Token[]
   networkId: number
 }
 
