@@ -11,12 +11,14 @@ import {
   SummaryMarketStep,
 } from './steps'
 
-import { Token, CollateralCustomEvent, StatusMarketCreation } from '../../util/types'
+import { Token, StatusMarketCreation } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { Outcome } from '../common/outcomes'
+import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { getDefaultToken } from '../../util/addresses'
 
 export interface MarketData {
-  collateralId: KnownToken
+  collateral: Token
   collateralsCustom: Token[]
   question: string
   category: string
@@ -40,10 +42,14 @@ interface State {
 }
 
 export const MarketWizardCreator = (props: Props) => {
+  const context = useConnectedWeb3Context()
+
   const { callback, status, questionId, marketMakerAddress } = props
 
+  const defaultCollateral = getDefaultToken(context.networkId)
+
   const marketDataDefault: MarketData = {
-    collateralId: 'dai',
+    collateral: defaultCollateral,
     collateralsCustom: [],
     question: '',
     category: '',
@@ -87,21 +93,22 @@ export const MarketWizardCreator = (props: Props) => {
   }
 
   const handleChange = (
-    event:
-      | ChangeEvent<HTMLInputElement>
-      | ChangeEvent<HTMLSelectElement>
-      | BigNumberInputReturn
-      | CollateralCustomEvent,
+    event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn,
   ) => {
     const { name, value } = 'target' in event ? event.target : event
 
-    // when the collateral changes, reset the value of funding
-    const funding: BigNumber = name === 'collateralId' ? ethers.constants.Zero : marketData.funding
-
     const newMarketData = {
       ...marketData,
-      funding,
       [name]: value,
+    }
+    setMarketdata(newMarketData)
+  }
+
+  const handleCollateralChange = (collateral: Token) => {
+    const newMarketData = {
+      ...marketData,
+      funding: ethers.constants.Zero, // when the collateral changes, reset the value of funding
+      collateral,
     }
     setMarketdata(newMarketData)
   }
@@ -128,7 +135,7 @@ export const MarketWizardCreator = (props: Props) => {
 
   const currentStepFn = () => {
     const {
-      collateralId,
+      collateral,
       collateralsCustom,
       question,
       category,
@@ -154,9 +161,10 @@ export const MarketWizardCreator = (props: Props) => {
           <FundingAndFeeStep
             back={() => back()}
             handleChange={handleChange}
+            handleCollateralChange={handleCollateralChange}
             addCollateralCustom={addCollateralCustom}
             next={() => next()}
-            values={{ collateralId, collateralsCustom, spread, funding }}
+            values={{ collateral, collateralsCustom, spread, funding }}
           />
         )
       case 3:

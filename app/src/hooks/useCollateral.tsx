@@ -1,15 +1,23 @@
 import { useEffect, useState } from 'react'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
-import { getToken } from '../util/addresses'
+import { getTokenFromAddress } from '../util/addresses'
 import { ERC20Service } from '../services'
 import { Token } from '../util/types'
-import { getLogger } from '../util/logger'
 
-const logger = getLogger('Hooks::useCollateral')
+const getTokenFromAddressIfExists = (
+  networkId: number,
+  collateralAddress: string,
+): Maybe<Token> => {
+  try {
+    return getTokenFromAddress(networkId, collateralAddress)
+  } catch (err) {
+    return null
+  }
+}
 
 export const useCollateral = (
-  collateralId: KnownToken | string,
+  collateralAddress: string,
   context: ConnectedWeb3Context,
 ): Maybe<Token> => {
   const [collateral, setCollateral] = useState<Maybe<Token>>(null)
@@ -18,20 +26,14 @@ export const useCollateral = (
     let isSubscribed = true
 
     const fetchIsValidErc20 = async () => {
-      let collateralData: Maybe<Token> = null
-      const erc20Service = new ERC20Service(context.library, collateralId)
-      const isValidErc20 = await erc20Service.isValidErc20()
+      let collateralData = getTokenFromAddressIfExists(context.networkId, collateralAddress)
 
-      if (isValidErc20) {
-        const data = await erc20Service.getProfileSummary()
-        collateralData = {
-          ...data,
-        } as Token
-      } else {
-        try {
-          collateralData = getToken(context.networkId, collateralId as KnownToken)
-        } catch (err) {
-          logger.error(err.message)
+      // If the address doesn't belong to a knowToken, we fetch its metadata
+      if (!collateralData) {
+        const erc20Service = new ERC20Service(context.library, collateralAddress)
+        const isValidErc20 = await erc20Service.isValidErc20()
+        if (isValidErc20) {
+          collateralData = await erc20Service.getProfileSummary()
         }
       }
 
@@ -43,7 +45,7 @@ export const useCollateral = (
     return () => {
       isSubscribed = false
     }
-  }, [context, collateralId])
+  }, [context, collateralAddress])
 
   return collateral
 }

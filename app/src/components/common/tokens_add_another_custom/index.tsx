@@ -9,7 +9,7 @@ import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 
 interface Props {
   name: string
-  onChange: (event: any) => any
+  onCollateralChange: (token: Token) => void
   value: Token
   customValues: Token[]
   addCustomValue: (collateral: Token) => void
@@ -31,7 +31,7 @@ const ButtonStyled = styled(Button)`
 `
 
 export const TokensAddAnotherCustom = (props: Props) => {
-  const { context, name, value, customValues, addCustomValue, onChange } = props
+  const { context, name, value, customValues, onCollateralChange, addCustomValue } = props
 
   const [isModalCollateralOpen, setModalCollateralState] = useState(false)
 
@@ -44,7 +44,7 @@ export const TokensAddAnotherCustom = (props: Props) => {
             name={name}
             value={value}
             customValues={customValues}
-            onChange={(e: any) => onChange(e)}
+            onTokenChange={onCollateralChange}
           />
         </TokenWrapper>
         <ButtonStyled onClick={() => setModalCollateralState(true)}>+</ButtonStyled>
@@ -55,7 +55,7 @@ export const TokensAddAnotherCustom = (props: Props) => {
           onClose={() => setModalCollateralState(false)}
           onSave={(collateral: Token) => {
             addCustomValue(collateral)
-            onChange({ name: 'collateralId', value: collateral.address })
+            onCollateralChange(collateral)
           }}
         />
       )}

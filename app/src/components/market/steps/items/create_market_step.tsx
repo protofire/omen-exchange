@@ -6,7 +6,7 @@ import { Button } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
 import { CreateCard } from '../../../common/create_card'
-import { StatusMarketCreation } from '../../../../util/types'
+import { StatusMarketCreation, Token } from '../../../../util/types'
 import { Paragraph } from '../../../common/paragraph'
 import { FullLoading } from '../../../common/full_loading'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
@@ -15,8 +15,6 @@ import { SubsectionTitle } from '../../../common/subsection_title'
 import { Outcome } from '../../../common/outcomes'
 import { knownArbitrators } from '../../../../util/addresses'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { useCollateral } from '../../../../hooks/useCollateral'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -42,7 +40,7 @@ interface Props {
   back: () => void
   submit: () => void
   values: {
-    collateralId: KnownToken | string
+    collateral: Token
     question: string
     category: string
     resolution: Date | null
@@ -57,11 +55,9 @@ interface Props {
 }
 
 const CreateMarketStep = (props: Props) => {
-  const context = useConnectedWeb3Context()
-
   const { marketMakerAddress, values, status, questionId } = props
   const {
-    collateralId,
+    collateral,
     question,
     category,
     arbitratorId,
@@ -78,8 +74,6 @@ const CreateMarketStep = (props: Props) => {
   const submit = () => {
     props.submit()
   }
-
-  const collateral = useCollateral(collateralId, context)
 
   const arbitrator = knownArbitrators[arbitratorId]
 

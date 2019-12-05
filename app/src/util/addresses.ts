@@ -151,6 +151,23 @@ export const getContractAddressName = (networkId: number) => {
   return networkNameCase
 }
 
+export const getDefaultToken = (networkId: number) => {
+  return getToken(networkId, 'dai')
+}
+
+export const getTokensByNetwork = (networkId: number): Token[] => {
+  return Object.values(knownTokens)
+    .filter(token => !!token.addresses[networkId])
+    .sort((a, b) => (a.order > b.order ? 1 : -1))
+    .map(token => {
+      return {
+        symbol: token.symbol,
+        decimals: token.decimals,
+        address: token.addresses[networkId],
+      }
+    })
+}
+
 interface KnownArbitratorData {
   name: string
   url: string

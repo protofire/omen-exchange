@@ -2,10 +2,10 @@ import React, { FC, useState } from 'react'
 import moment from 'moment'
 
 import { getLogger } from '../../util/logger'
-import { StatusMarketCreation, Token } from '../../util/types'
+import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import { ERC20Service, MarketMakerService } from '../../services'
-import { getArbitrator, getContractAddress, getToken } from '../../util/addresses'
+import { getArbitrator, getContractAddress } from '../../util/addresses'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
 
@@ -29,18 +29,8 @@ const MarketWizardCreatorContainer: FC = () => {
       const provider = context.library
       const user = await provider.getSigner().getAddress()
 
-      const { collateralId, arbitratorId, question, resolution, funding, outcomes, category } = data
+      const { collateral, arbitratorId, question, resolution, funding, outcomes, category } = data
       const openingDateMoment = moment(resolution)
-
-      const erc20Service = new ERC20Service(provider, collateralId)
-      const isValidErc20 = await erc20Service.isValidErc20()
-
-      let collateralToken: Maybe<Token> = null
-      if (isValidErc20) {
-        collateralToken = await erc20Service.getProfileSummary()
-      } else {
-        collateralToken = getToken(context.networkId, collateralId as KnownToken)
-      }
 
       const arbitrator = getArbitrator(networkId, arbitratorId)
 
@@ -62,7 +52,7 @@ const MarketWizardCreatorContainer: FC = () => {
       setStatus(StatusMarketCreation.ApprovingCollateral)
 
       const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
-      const collateralService = new ERC20Service(provider, collateralToken.address)
+      const collateralService = new ERC20Service(provider, collateral.address)
 
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
         user,
@@ -76,7 +66,7 @@ const MarketWizardCreatorContainer: FC = () => {
       setStatus(StatusMarketCreation.CreateMarketMaker)
       const marketMakerAddress = await marketMakerFactory.createMarketMaker(
         conditionalTokens.address,
-        collateralToken.address,
+        collateral.address,
         conditionId,
       )
       setMarketMakerAddress(marketMakerAddress)
