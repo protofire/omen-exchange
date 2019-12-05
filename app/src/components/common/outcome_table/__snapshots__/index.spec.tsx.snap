@@ -6,7 +6,7 @@ exports[`should accept a selected outcome 1`] = `
     class="sc-bdVaJa cDoURO"
   >
     <table
-      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -54,10 +54,10 @@ exports[`should accept a selected outcome 1`] = `
             class="sc-EHOje jDXqLu"
           >
             <label
-              class="sc-jzJRlG gOFPzm"
+              class="sc-cSHVUG kELJFl"
             >
               <div
-                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_Yes"
               >
                 <svg
@@ -164,10 +164,10 @@ exports[`should accept a selected outcome 1`] = `
             class="sc-EHOje jDXqLu"
           >
             <label
-              class="sc-jzJRlG gOFPzm"
+              class="sc-cSHVUG kELJFl"
             >
               <div
-                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_No"
               >
                 <svg
@@ -271,7 +271,7 @@ exports[`should hide radio selections 1`] = `
     class="sc-bdVaJa cDoURO"
   >
     <table
-      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -439,7 +439,7 @@ exports[`should show no as winning token 1`] = `
     class="sc-bdVaJa cDoURO"
   >
     <table
-      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -484,11 +484,19 @@ exports[`should show no as winning token 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <td
-            class="sc-EHOje sc-fjdhpX eQeePs"
+            class="sc-EHOje sc-jzJRlG kyBZSR"
           >
             <div
               class="sc-htoDjs bCdOla"
             >
+              <div
+                class="sc-jTzLTM jprmas"
+              >
+                <img
+                  alt="Winning outcome"
+                  src="badge.svg"
+                />
+              </div>
               <div
                 class="sc-dnqmqq BIXUB"
               >
@@ -513,7 +521,7 @@ exports[`should show no as winning token 1`] = `
             </div>
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eQeePs"
+            class="sc-EHOje sc-jzJRlG kyBZSR"
           >
             0.5 
             <strong>
@@ -521,17 +529,17 @@ exports[`should show no as winning token 1`] = `
             </strong>
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eQeePs"
+            class="sc-EHOje sc-jzJRlG kyBZSR"
           >
             0.00
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eQeePs"
+            class="sc-EHOje sc-jzJRlG kyBZSR"
           >
             0.00
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX RJGzz"
+            class="sc-EHOje sc-jzJRlG kvRrbA"
           >
              
             <strong>
@@ -543,11 +551,14 @@ exports[`should show no as winning token 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-jzJRlG dnMenI"
           >
             <div
               class="sc-htoDjs bCdOla"
             >
+              <div
+                class="sc-jTzLTM jprmas"
+              />
               <div
                 class="sc-dnqmqq BIXUB"
               >
@@ -572,7 +583,7 @@ exports[`should show no as winning token 1`] = `
             </div>
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-jzJRlG dnMenI"
           >
             0.5 
             <strong>
@@ -580,17 +591,17 @@ exports[`should show no as winning token 1`] = `
             </strong>
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-jzJRlG dnMenI"
           >
             0.00
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-jzJRlG dnMenI"
           >
             0.00
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX hZeboP"
+            class="sc-EHOje sc-jzJRlG ezannz"
           >
              
             <strong>
@@ -610,7 +621,7 @@ exports[`should show prices after trade 1`] = `
     class="sc-bdVaJa cDoURO"
   >
     <table
-      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -658,10 +669,10 @@ exports[`should show prices after trade 1`] = `
             class="sc-EHOje jDXqLu"
           >
             <label
-              class="sc-jzJRlG gOFPzm"
+              class="sc-cSHVUG kELJFl"
             >
               <div
-                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_Yes"
               >
                 <svg
@@ -760,10 +771,10 @@ exports[`should show prices after trade 1`] = `
             class="sc-EHOje jDXqLu"
           >
             <label
-              class="sc-jzJRlG gOFPzm"
+              class="sc-cSHVUG kELJFl"
             >
               <div
-                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_No"
               >
                 <svg
@@ -867,7 +878,7 @@ exports[`should show yes as winning token 1`] = `
     class="sc-bdVaJa cDoURO"
   >
     <table
-      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -912,11 +923,19 @@ exports[`should show yes as winning token 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <td
-            class="sc-EHOje sc-fjdhpX eQeePs"
+            class="sc-EHOje sc-jzJRlG kyBZSR"
           >
             <div
               class="sc-htoDjs bCdOla"
             >
+              <div
+                class="sc-jTzLTM jprmas"
+              >
+                <img
+                  alt="Winning outcome"
+                  src="badge.svg"
+                />
+              </div>
               <div
                 class="sc-dnqmqq BIXUB"
               >
@@ -941,7 +960,7 @@ exports[`should show yes as winning token 1`] = `
             </div>
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eQeePs"
+            class="sc-EHOje sc-jzJRlG kyBZSR"
           >
             0.5 
             <strong>
@@ -949,17 +968,17 @@ exports[`should show yes as winning token 1`] = `
             </strong>
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eQeePs"
+            class="sc-EHOje sc-jzJRlG kyBZSR"
           >
             0.00
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eQeePs"
+            class="sc-EHOje sc-jzJRlG kyBZSR"
           >
             0.00
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX RJGzz"
+            class="sc-EHOje sc-jzJRlG kvRrbA"
           >
              
             <strong>
@@ -971,11 +990,14 @@ exports[`should show yes as winning token 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-jzJRlG dnMenI"
           >
             <div
               class="sc-htoDjs bCdOla"
             >
+              <div
+                class="sc-jTzLTM jprmas"
+              />
               <div
                 class="sc-dnqmqq BIXUB"
               >
@@ -1000,7 +1022,7 @@ exports[`should show yes as winning token 1`] = `
             </div>
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-jzJRlG dnMenI"
           >
             0.5 
             <strong>
@@ -1008,17 +1030,17 @@ exports[`should show yes as winning token 1`] = `
             </strong>
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-jzJRlG dnMenI"
           >
             0.00
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX eoXJYw"
+            class="sc-EHOje sc-jzJRlG dnMenI"
           >
             0.00
           </td>
           <td
-            class="sc-EHOje sc-fjdhpX hZeboP"
+            class="sc-EHOje sc-jzJRlG ezannz"
           >
              
             <strong>
@@ -1038,7 +1060,7 @@ exports[`should work with disabled columns 1`] = `
     class="sc-bdVaJa cDoURO"
   >
     <table
-      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -1081,10 +1103,10 @@ exports[`should work with disabled columns 1`] = `
             class="sc-EHOje jDXqLu"
           >
             <label
-              class="sc-jzJRlG gOFPzm"
+              class="sc-cSHVUG kELJFl"
             >
               <div
-                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_Yes"
               >
                 <svg
@@ -1178,10 +1200,10 @@ exports[`should work with disabled columns 1`] = `
             class="sc-EHOje jDXqLu"
           >
             <label
-              class="sc-jzJRlG gOFPzm"
+              class="sc-cSHVUG kELJFl"
             >
               <div
-                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_No"
               >
                 <svg
@@ -1280,7 +1302,7 @@ exports[`should work with minimal props 1`] = `
     class="sc-bdVaJa cDoURO"
   >
     <table
-      class="sc-jTzLTM hfbIJR sc-bwzfXH jwzwsZ"
+      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -1328,10 +1350,10 @@ exports[`should work with minimal props 1`] = `
             class="sc-EHOje jDXqLu"
           >
             <label
-              class="sc-jzJRlG gOFPzm"
+              class="sc-cSHVUG kELJFl"
             >
               <div
-                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_Yes"
               >
                 <svg
@@ -1430,10 +1452,10 @@ exports[`should work with minimal props 1`] = `
             class="sc-EHOje jDXqLu"
           >
             <label
-              class="sc-jzJRlG gOFPzm"
+              class="sc-cSHVUG kELJFl"
             >
               <div
-                class="sc-cSHVUG bBExWh sc-gzVnrw WkcJn"
+                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_No"
               >
                 <svg
