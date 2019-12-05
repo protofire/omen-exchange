@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ChangeEvent, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
@@ -23,11 +23,6 @@ interface Props {
   disabled?: boolean
 }
 
-interface State {
-  currentValueStr: string
-  currentDecimalsStr: number
-}
-
 const Input = styled.input`
   ::-webkit-inner-spin-button,
   ::-webkit-outer-spin-button {
@@ -41,92 +36,59 @@ const Input = styled.input`
   }
 `
 
-export class BigNumberInput extends React.Component<Props, State> {
-  public static defaultProps = {
-    placeholder: '0.00',
-  }
+export const BigNumberInput = (props: Props) => {
+  const {
+    placeholder = '0.00',
+    autofocus = false,
+    value,
+    decimals,
+    name,
+    step,
+    min,
+    max,
+    className,
+    disabled = false,
+    onChange,
+  } = props
 
-  public readonly state = {
-    currentValueStr: this.props.value
-      ? ethers.utils.formatUnits(this.props.value, this.props.decimals)
-      : '',
-    currentDecimalsStr: this.props.decimals,
-  }
+  const currentValue = value && decimals ? ethers.utils.formatUnits(value, decimals) : ''
 
-  private textInput: any
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  public static getDerivedStateFromProps = (props: Props, state: State) => {
-    const { decimals, value } = props
-    const { currentValueStr, currentDecimalsStr } = state
+  useEffect(() => {
+    if (autofocus && inputRef && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [autofocus])
+
+  const updateValue = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
 
     if (!value) {
-      return {
-        currentValueStr: '',
-      }
-    } else if (
-      value &&
-      !ethers.utils.parseUnits(currentValueStr || '0', currentDecimalsStr).eq(value)
-    ) {
-      return {
-        currentValueStr: ethers.utils.formatUnits(value, decimals),
-      }
+      onChange({ name, value: new BigNumber(0) })
     } else {
-      return null
+      const newValue = ethers.utils.parseUnits(value, decimals)
+      onChange({ name, value: newValue })
     }
   }
 
-  public componentDidMount = () => {
-    const { autofocus } = this.props
+  const currentStep = step && ethers.utils.formatUnits(step, decimals)
+  const currentMin = min && ethers.utils.formatUnits(min, decimals)
+  const currentMax = max && ethers.utils.formatUnits(max, decimals)
 
-    if (autofocus) {
-      this.textInput.focus()
-    }
-  }
-
-  private readonly updateValue: React.ReactEventHandler<HTMLInputElement> = e => {
-    const { decimals, onChange, min, max } = this.props
-    const newValueStr = e.currentTarget.value
-
-    if (!newValueStr) {
-      onChange({ name: e.currentTarget.name, value: new BigNumber(0) })
-    } else {
-      const newValue = ethers.utils.parseUnits(newValueStr || '0', decimals)
-      const invalidValue = (min && newValue.lt(min)) || (max && newValue.gt(max))
-
-      if (invalidValue) {
-        return
-      }
-
-      onChange({ name: e.currentTarget.name, value: newValue })
-    }
-
-    this.setState({
-      currentValueStr: newValueStr,
-      currentDecimalsStr: decimals,
-    })
-  }
-
-  public render = () => {
-    const { currentValueStr } = this.state
-    const { name, decimals, step, min, max, className, placeholder, disabled = false } = this.props
-    const stepStr = step && ethers.utils.formatUnits(step, decimals)
-    const minStr = min && ethers.utils.formatUnits(min, decimals)
-    const maxStr = max && ethers.utils.formatUnits(max, decimals)
-
-    return (
-      <Input
-        className={className}
-        max={maxStr}
-        min={minStr}
-        onChange={this.updateValue}
-        ref={ref => (this.textInput = ref)}
-        step={stepStr}
-        type={'number'}
-        name={name}
-        value={currentValueStr}
-        placeholder={placeholder}
-        disabled={disabled}
-      />
-    )
-  }
+  return (
+    <Input
+      className={className}
+      max={currentMax}
+      min={currentMin}
+      onChange={updateValue}
+      ref={inputRef}
+      step={currentStep}
+      type={'number'}
+      name={name}
+      value={currentValue}
+      placeholder={placeholder}
+      disabled={disabled}
+    />
+  )
 }

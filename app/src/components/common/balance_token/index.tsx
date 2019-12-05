@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 
-import { getToken } from '../../../util/addresses'
 import { ButtonLink } from '../button_link'
 import { BigNumber } from 'ethers/utils'
 import { useAsyncDerivedValue } from '../../../hooks/useAsyncDerivedValue'
@@ -11,7 +10,7 @@ import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { Token } from '../../../util/types'
 
 interface Props {
-  collateralId: KnownToken
+  collateral: Token
   onClickMax: (collateral: Token, collateralBalance: BigNumber) => void
 }
 
@@ -30,17 +29,15 @@ const BalanceTitle = styled.span`
 export const BalanceToken = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { networkId, account, library } = context
-  const { collateralId, onClickMax } = props
-
-  const collateral = getToken(networkId, collateralId)
+  const { account, library } = context
+  const { collateral, onClickMax } = props
 
   const calculateBalanceAmount = useMemo(
     () => async (): Promise<[BigNumber, string, string]> => {
-      const collateralService = new ERC20Service(collateral.address)
+      const collateralService = new ERC20Service(library, collateral.address)
 
       // TODO: fix with useConnectedWallet context
-      const collateralBalance = await collateralService.getCollateral(account || '', library)
+      const collateralBalance = await collateralService.getCollateral(account || '')
       return [
         collateralBalance,
         formatBigNumber(collateralBalance, collateral.decimals),

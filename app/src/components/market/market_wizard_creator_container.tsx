@@ -5,7 +5,7 @@ import { getLogger } from '../../util/logger'
 import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import { ERC20Service, MarketMakerService } from '../../services'
-import { getArbitrator, getContractAddress, getToken } from '../../util/addresses'
+import { getArbitrator, getContractAddress } from '../../util/addresses'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
 
@@ -29,10 +29,9 @@ const MarketWizardCreatorContainer: FC = () => {
       const provider = context.library
       const user = await provider.getSigner().getAddress()
 
-      const { collateralId, arbitratorId, question, resolution, funding, outcomes, category } = data
+      const { collateral, arbitratorId, question, resolution, funding, outcomes, category } = data
       const openingDateMoment = moment(resolution)
 
-      const collateralToken = getToken(networkId, collateralId)
       const arbitrator = getArbitrator(networkId, arbitratorId)
 
       setStatus(StatusMarketCreation.PostingQuestion)
@@ -53,28 +52,27 @@ const MarketWizardCreatorContainer: FC = () => {
       setStatus(StatusMarketCreation.ApprovingCollateral)
 
       const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
-      const collateralService = new ERC20Service(collateralToken.address)
+      const collateralService = new ERC20Service(provider, collateral.address)
 
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
-        provider,
         user,
         marketMakerFactoryAddress,
         funding,
       )
       if (!hasEnoughAlowance) {
-        await collateralService.approve(provider, marketMakerFactoryAddress, funding)
+        await collateralService.approve(marketMakerFactoryAddress, funding)
       }
 
       setStatus(StatusMarketCreation.CreateMarketMaker)
       const marketMakerAddress = await marketMakerFactory.createMarketMaker(
         conditionalTokens.address,
-        collateralToken.address,
+        collateral.address,
         conditionId,
       )
       setMarketMakerAddress(marketMakerAddress)
 
       setStatus(StatusMarketCreation.ApproveCollateralForMarketMaker)
-      await collateralService.approveUnlimited(provider, marketMakerAddress)
+      await collateralService.approveUnlimited(marketMakerAddress)
 
       setStatus(StatusMarketCreation.AddFunding)
       const marketMakerService = new MarketMakerService(
@@ -82,6 +80,7 @@ const MarketWizardCreatorContainer: FC = () => {
         conditionalTokens,
         realitio,
         provider,
+        user,
       )
       await marketMakerService.addInitialFunding(
         funding,
