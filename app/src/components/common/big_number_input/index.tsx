@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useRef } from 'react'
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
@@ -51,9 +51,17 @@ export const BigNumberInput = (props: Props) => {
     onChange,
   } = props
 
-  const currentValue = value && decimals ? ethers.utils.formatUnits(value, decimals) : ''
+  const [currentValue, setCurrentValue] = useState('')
 
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!value) {
+      setCurrentValue('')
+    } else if (value && !ethers.utils.parseUnits(currentValue || '0', decimals).eq(value)) {
+      setCurrentValue(ethers.utils.formatUnits(value, decimals))
+    }
+  }, [value, decimals, currentValue])
 
   useEffect(() => {
     if (autofocus && inputRef && inputRef.current) {
@@ -62,14 +70,22 @@ export const BigNumberInput = (props: Props) => {
   }, [autofocus])
 
   const updateValue = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
+    const { name, value } = event.currentTarget
 
     if (!value) {
       onChange({ name, value: new BigNumber(0) })
     } else {
       const newValue = ethers.utils.parseUnits(value, decimals)
+      const invalidValue = (min && newValue.lt(min)) || (max && newValue.gt(max))
+
+      if (invalidValue) {
+        return
+      }
+
       onChange({ name, value: newValue })
     }
+
+    setCurrentValue(value)
   }
 
   const currentStep = step && ethers.utils.formatUnits(step, decimals)
