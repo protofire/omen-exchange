@@ -176,7 +176,11 @@ export const ModalConnectWallet = (props: Props) => {
   const onClickWallet = (wallet: Wallet) => setWalletSelected(wallet)
 
   const ItemWalletConnect = () => (
-    <ItemWalletWrapper onClick={() => { onClickWallet(Wallet.WalletConnect)}}>
+    <ItemWalletWrapper
+      onClick={() => {
+        onClickWallet(Wallet.WalletConnect)
+      }}
+    >
       <ItemIconWalletConnect />
       <ItemTitleWalletConnect>WalletConnect</ItemTitleWalletConnect>
       <ItemDescription>Open protocol for connecting wallets to Dapps.</ItemDescription>
@@ -190,7 +194,11 @@ export const ModalConnectWallet = (props: Props) => {
   )
 
   const ItemMetamaskConnect = () => (
-    <ItemWalletWrapper onClick={() => { onClickWallet(Wallet.MetaMask)}}>
+    <ItemWalletWrapper
+      onClick={() => {
+        onClickWallet(Wallet.MetaMask)
+      }}
+    >
       <ItemIconMetaMask />
       <ItemTitleMetaMask>MetaMask</ItemTitleMetaMask>
       <ItemDescription>Use this popular browser extension wallet.</ItemDescription>
