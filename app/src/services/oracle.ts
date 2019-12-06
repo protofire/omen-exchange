@@ -9,12 +9,12 @@ const oracleAbi = ['function resolveCondition(bytes32 questionId) public']
 export class OracleService {
   contract: Contract
 
-  constructor(address: string, provider: any) {
-    if (typeof provider['getSigner'] === 'function') {
-      this.contract = new ethers.Contract(address, oracleAbi, provider)
-    } else {
+  constructor(address: string, provider: any, signerAddress: Maybe<string>) {
+    if (signerAddress) {
       const signer: Wallet = provider.getSigner()
       this.contract = new ethers.Contract(address, oracleAbi, provider).connect(signer)
+    } else {
+      this.contract = new ethers.Contract(address, oracleAbi, provider)
     }
   }
 

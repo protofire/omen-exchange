@@ -4,7 +4,7 @@ import moment from 'moment'
 import { getLogger } from '../../util/logger'
 import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
-import { ERC20Service, MarketMakerService } from '../../services'
+import { ERC20Service } from '../../services'
 import { getArbitrator, getContractAddress } from '../../util/addresses'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
@@ -13,7 +13,9 @@ const logger = getLogger('Market::MarketWizardCreatorContainer')
 
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
-  const { conditionalTokens, marketMakerFactory, realitio } = useContracts(context)
+  const { conditionalTokens, marketMakerFactory, realitio, buildMarketMaker } = useContracts(
+    context,
+  )
 
   const [status, setStatus] = useState<StatusMarketCreation>(StatusMarketCreation.Ready)
   const [questionId, setQuestionId] = useState<string | null>(null)
@@ -75,13 +77,7 @@ const MarketWizardCreatorContainer: FC = () => {
       await collateralService.approveUnlimited(marketMakerAddress)
 
       setStatus(StatusMarketCreation.AddFunding)
-      const marketMakerService = new MarketMakerService(
-        marketMakerAddress,
-        conditionalTokens,
-        realitio,
-        provider,
-        user,
-      )
+      const marketMakerService = buildMarketMaker(marketMakerAddress)
       await marketMakerService.addInitialFunding(
         funding,
         +outcomes[0].probability,
