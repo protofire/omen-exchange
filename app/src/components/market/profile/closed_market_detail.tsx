@@ -9,7 +9,7 @@ import { ButtonContainer } from '../../common/button_container'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
-import { BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
+import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { ERC20Service } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
@@ -56,6 +56,7 @@ interface Props {
   resolution: Date | null
   marketMakerAddress: string
   isConditionResolved: boolean
+  arbitrator: Maybe<Arbitrator>
 }
 
 const logger = getLogger('Market::ClosedMarketDetail')
@@ -72,6 +73,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     funding,
     isConditionResolved,
     questionId,
+    arbitrator,
   } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -147,7 +149,17 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
           <TitleValue title="Category" value="Politics" />
-          <TitleValue title="Arbitrator" value="realit.io and dxDAO" />
+          {arbitrator && (
+            <TitleValue
+              title={'Arbitrator'}
+              value={[
+                <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
+                  {arbitrator.name}
+                </a>,
+                ' oracle as final arbitrator.',
+              ]}
+            />
+          )}
           <TitleValue title="Resolution Date" value={resolutionFormat} />
           <TitleValue title="Fee" value="1%" />
           <TitleValue title="Funding" value={fundingFormat} />
