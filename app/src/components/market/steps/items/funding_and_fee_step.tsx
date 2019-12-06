@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent, useMemo } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
@@ -13,6 +13,8 @@ import { BalanceToken } from '../../../common/balance_token'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
 import { CustomizableTokensSelect } from '../../../common/customizable_tokens_select'
 import { Token } from '../../../../util/types'
+import { ERC20Service } from '../../../../services'
+import { useAsyncDerivedValue } from '../../../../hooks/useAsyncDerivedValue'
 
 interface Props {
   back: () => void
@@ -45,9 +47,21 @@ const InputBigNumberStyledRight = styled<any>(BigNumberInput)`
 const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { values, addCollateralCustom, handleCollateralChange } = props
+  const { values, addCollateralCustom, handleChange, handleCollateralChange } = props
   const { funding, spread, collateral, collateralsCustom } = values
-  const error = !spread || funding.isZero()
+
+  const calculateCollateralBalance = useMemo(
+    () => async (): Promise<BigNumber> => {
+      const collateralService = new ERC20Service(context.library, collateral.address)
+      const collateralBalance = await collateralService.getCollateral(context.account || '')
+      return collateralBalance
+    },
+    [context, collateral],
+  )
+
+  const collateralBalance = useAsyncDerivedValue('', new BigNumber(0), calculateCollateralBalance)
+
+  const error = !spread || funding.isZero() || funding.gt(collateralBalance)
 
   const back = () => {
     props.back()
@@ -71,7 +85,7 @@ const FundingAndFeeStep = (props: Props) => {
                 defaultValue={spread}
                 disabled
                 name="spread"
-                onChange={(e: any) => props.handleChange(e)}
+                onChange={handleChange}
                 type="number"
               />
             }
@@ -108,7 +122,7 @@ const FundingAndFeeStep = (props: Props) => {
               <InputBigNumberStyledRight
                 name="funding"
                 value={funding}
-                onChange={(e: any) => props.handleChange(e)}
+                onChange={handleChange}
                 decimals={collateral.decimals}
               />
             }
@@ -124,7 +138,7 @@ const FundingAndFeeStep = (props: Props) => {
           <BalanceToken
             collateral={collateral}
             onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
-              props.handleChange({ name: 'funding', value: collateralBalance })
+              handleChange({ name: 'funding', value: collateralBalance })
             }}
           />
         }
