@@ -109,6 +109,7 @@ class MarketMakerFactoryService {
           conditionalTokens,
           realitio,
           this.provider,
+          this.signerAddress,
         )
         return marketMaker.getExtraData(market)
       }),

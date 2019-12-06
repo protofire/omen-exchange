@@ -3,18 +3,64 @@ import { useEffect, useState } from 'react'
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts, Contracts } from './useContracts'
 import { EARLIEST_BLOCK_TO_CHECK, FETCH_EVENTS_CHUNK_SIZE } from '../common/constants'
-import { MarketWithExtraData, MarketFilters } from '../util/types'
+import { asyncFilter } from '../util/async_filter'
+import { MarketWithExtraData } from '../util/types'
+import { MarketFilter } from '../util/market_filter'
 import { callInChunks, Range } from '../util/call_in_chunks'
 import { RemoteData } from '../util/remote_data'
 
+const buildFilterFn = (filter: MarketFilter, contracts: Contracts) => async (
+  market: MarketWithExtraData,
+): Promise<boolean> => {
+  const { buildMarketMaker, conditionalTokens, realitio } = contracts
+
+  if (MarketFilter.is.allMarkets(filter)) {
+    return true
+  } else if (MarketFilter.is.myMarkets(filter)) {
+    return market.ownerAddress === filter.account
+  } else if (MarketFilter.is.fundedMarkets(filter)) {
+    const marketMakerService = buildMarketMaker(market.address)
+    const poolShares = await marketMakerService.poolSharesBalanceOf(filter.account)
+
+    return poolShares.gt(0)
+  } else if (
+    MarketFilter.is.investedMarkets(filter) ||
+    MarketFilter.is.winningResultMarkets(filter)
+  ) {
+    const marketMakerService = buildMarketMaker(market.address)
+    const questionId = await conditionalTokens.getQuestionId(market.conditionId)
+    const isFinalized = await realitio.isFinalized(questionId)
+
+    const { balanceOfForYes, balanceOfForNo } = await marketMakerService.getBalanceInformation(
+      filter.account,
+    )
+
+    if (MarketFilter.is.investedMarkets(filter) && !isFinalized) {
+      return balanceOfForYes.gt(0) || balanceOfForNo.gt(0)
+    }
+    if (MarketFilter.is.winningResultMarkets(filter) && isFinalized) {
+      const winnerOutcome = await realitio.getWinnerOutcome(questionId)
+
+      const hasWinningOutcomes =
+        (winnerOutcome === 0 && balanceOfForNo.gt(0)) ||
+        (winnerOutcome === 1 && balanceOfForYes.gt(0))
+      return hasWinningOutcomes
+    }
+
+    return false
+  } else {
+    const exhaustiveCheck: never = filter
+    return exhaustiveCheck
+  }
+}
+
 const fetchMarkets = async (
-  account: Maybe<string>,
-  filter: MarketFilters,
+  filter: MarketFilter,
   range: Range,
   expectedMarketsCount: number,
   contracts: Contracts,
 ): Promise<{ markets: MarketWithExtraData[]; usedRange: Range }> => {
-  const { conditionalTokens, marketMakerFactory, realitio, buildMarketMaker } = contracts
+  const { conditionalTokens, marketMakerFactory, realitio } = contracts
 
   const fetchAndFilter = async (subrange: Range): Promise<MarketWithExtraData[]> => {
     const validMarkets = await marketMakerFactory.getMarketsWithExtraData(
@@ -26,21 +72,8 @@ const fetchMarkets = async (
       realitio,
     )
 
-    let filteredMarkets = validMarkets
-    if (account) {
-      if (filter === MarketFilters.MyMarkets) {
-        filteredMarkets = validMarkets.filter(market => market.ownerAddress === account)
-      } else if (filter === MarketFilters.FundedMarkets) {
-        filteredMarkets = []
-        for (const market of validMarkets) {
-          const marketMakerService = buildMarketMaker(market.address)
-          const poolShares = await marketMakerService.poolSharesBalanceOf(account)
-          if (poolShares.gt(0)) {
-            filteredMarkets.push(market)
-          }
-        }
-      }
-    }
+    const filterFn = buildFilterFn(filter, contracts)
+    const filteredMarkets = await asyncFilter(validMarkets, filterFn)
 
     return filteredMarkets
   }
@@ -65,7 +98,7 @@ const fetchMarkets = async (
 
 export const useMarkets = (
   context: ConnectedWeb3Context,
-  filter: MarketFilters,
+  filter: MarketFilter,
   expectedMarketsCount: number,
 ): {
   markets: RemoteData<MarketWithExtraData[]>
@@ -113,13 +146,7 @@ export const useMarkets = (
         setMarkets(markets =>
           RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading(),
         )
-        const result = await fetchMarkets(
-          context.account,
-          filter,
-          range,
-          expectedMarketsCount,
-          contracts,
-        )
+        const result = await fetchMarkets(filter, range, expectedMarketsCount, contracts)
 
         if (!didCancel) {
           setNeedFetchMore(false)

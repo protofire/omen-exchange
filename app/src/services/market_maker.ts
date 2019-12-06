@@ -35,7 +35,7 @@ class MarketMakerService {
     conditionalTokens: ConditionalTokenService,
     realitio: RealitioService,
     provider: any,
-    signerAddress?: string,
+    signerAddress: Maybe<string>,
   ) {
     if (signerAddress) {
       const signer: Wallet = provider.getSigner()

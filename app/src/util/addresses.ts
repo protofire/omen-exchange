@@ -46,7 +46,7 @@ const addresses: { [networkId: number]: KnownContracts } = {
 export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   cdai: {
     symbol: 'CDAI',
-    decimals: 8,
+    decimals: 18,
     addresses: {
       [networkIds.MAINNET]: '0xa4c993e32876795abf80842adb0a241bb0eecd47',
       [networkIds.RINKEBY]: '0x7a978b38d5af06ff929ca06647e025b759479318',
@@ -59,7 +59,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     decimals: 18,
     addresses: {
       [networkIds.MAINNET]: '0x6b175474e89094c44da98b954eedeac495271d0f',
-      [networkIds.RINKEBY]: '0xb307901ac0a807402a99879a491836697fec5e62',
+      [networkIds.RINKEBY]: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       [networkIds.GANACHE]: '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7',
     },
     order: 1,
