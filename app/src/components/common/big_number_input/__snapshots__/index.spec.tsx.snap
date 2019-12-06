@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should work with minimal props 1`] = `
+<DocumentFragment>
+  <input
+    class="sc-bdVaJa fyiQAW"
+    data-testid="test"
+    name="test"
+    placeholder="0.00"
+    type="number"
+    value="1.23"
+  />
+</DocumentFragment>
+`;

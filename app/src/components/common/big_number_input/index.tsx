@@ -94,6 +94,7 @@ export const BigNumberInput = (props: Props) => {
 
   return (
     <Input
+      data-testid={name}
       className={className}
       max={currentMax}
       min={currentMin}
