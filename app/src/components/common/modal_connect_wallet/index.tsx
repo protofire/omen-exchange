@@ -155,6 +155,10 @@ const RadioInputStyled = styled(RadioInput)`
   left: 20px;
 `
 
+const ItemWalletWrapper = styled.div`
+  cursor: pointer;
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   theme?: any
   onClose: () => void
@@ -169,8 +173,10 @@ export const ModalConnectWallet = (props: Props) => {
 
   const [walletSelected, setWalletSelected] = useState(Wallet.MetaMask)
 
+  const onClickWallet = (wallet: Wallet) => setWalletSelected(wallet)
+
   const ItemWalletConnect = () => (
-    <>
+    <ItemWalletWrapper onClick={() => { onClickWallet(Wallet.WalletConnect)}}>
       <ItemIconWalletConnect />
       <ItemTitleWalletConnect>WalletConnect</ItemTitleWalletConnect>
       <ItemDescription>Open protocol for connecting wallets to Dapps.</ItemDescription>
@@ -180,11 +186,11 @@ export const ModalConnectWallet = (props: Props) => {
         value={Wallet.WalletConnect}
         onChange={(e: any) => setWalletSelected(e.target.value as Wallet)}
       />
-    </>
+    </ItemWalletWrapper>
   )
 
   const ItemMetamaskConnect = () => (
-    <>
+    <ItemWalletWrapper onClick={() => { onClickWallet(Wallet.MetaMask)}}>
       <ItemIconMetaMask />
       <ItemTitleMetaMask>MetaMask</ItemTitleMetaMask>
       <ItemDescription>Use this popular browser extension wallet.</ItemDescription>
@@ -194,7 +200,7 @@ export const ModalConnectWallet = (props: Props) => {
         value={Wallet.MetaMask}
         onChange={(e: any) => setWalletSelected(e.target.value as Wallet)}
       />
-    </>
+    </ItemWalletWrapper>
   )
 
   const onClickCloseButton = useCallback(() => {
