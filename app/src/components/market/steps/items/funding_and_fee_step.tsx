@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useMemo } from 'react'
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
@@ -44,8 +44,16 @@ const InputBigNumberStyledRight = styled<any>(BigNumberInput)`
   text-align: right;
 `
 
+const ErrorStyled = styled.span`
+  margin-top: 0px;
+  color: red;
+  font-weight: 500;
+`
+
 const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
+
+  const [fundingMessageError, setFundingMessageError] = useState('')
 
   const { values, addCollateralCustom, handleChange, handleCollateralChange } = props
   const { funding, spread, collateral, collateralsCustom } = values
@@ -61,7 +69,15 @@ const FundingAndFeeStep = (props: Props) => {
 
   const collateralBalance = useAsyncDerivedValue('', new BigNumber(0), calculateCollateralBalance)
 
-  const error = !spread || funding.isZero() || funding.gt(collateralBalance)
+  const isFundingGreaterThanBalance = funding.gt(collateralBalance)
+  const error = !spread || funding.isZero() || isFundingGreaterThanBalance
+
+  useEffect(() => {
+    const messageError = isFundingGreaterThanBalance
+      ? `You don't have enough collateral in your balance.`
+      : ''
+    setFundingMessageError(messageError)
+  }, [isFundingGreaterThanBalance])
 
   const back = () => {
     props.back()
@@ -135,12 +151,15 @@ const FundingAndFeeStep = (props: Props) => {
           description: `Initial funding to fund the market maker.`,
         }}
         note={
-          <BalanceToken
-            collateral={collateral}
-            onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
-              handleChange({ name: 'funding', value: collateralBalance })
-            }}
-          />
+          <>
+            <BalanceToken
+              collateral={collateral}
+              onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
+                handleChange({ name: 'funding', value: collateralBalance })
+              }}
+            />
+            <ErrorStyled>{fundingMessageError}</ErrorStyled>
+          </>
         }
       />
       <ButtonContainer>
