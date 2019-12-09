@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
@@ -22,6 +22,7 @@ import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { ButtonLink } from '../common/button_link'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { BalanceToken } from '../common/balance_token'
+import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -71,6 +72,12 @@ const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
 
+const ErrorStyled = styled.span`
+  margin-top: 0px;
+  color: red;
+  font-weight: 500;
+`
+
 const logger = getLogger('Market::Fund')
 
 const MarketFundWrapper: React.FC<Props> = (props: Props) => {
@@ -93,6 +100,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
+  const [fundingMessageError, setFundingMessageError] = useState('')
 
   const marketMakerFundingPercentage: Maybe<number> = marketMakerFunding.isZero()
     ? null
@@ -162,6 +170,32 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const calculateCollateralBalance = useMemo(
+    () => async (): Promise<BigNumber> => {
+      const collateralService = new ERC20Service(context.library, collateral.address)
+      const collateralBalance = await collateralService.getCollateral(context.account || '')
+      return collateralBalance
+    },
+    [context, collateral],
+  )
+
+  const collateralBalance = useAsyncDerivedValue('', new BigNumber(0), calculateCollateralBalance)
+
+  const isFundingGreaterThanBalance = amount.gt(collateralBalance)
+  const error = amount.isZero() || isFundingGreaterThanBalance
+
+  useEffect(() => {
+    let isSubscribed = true
+
+    const messageError = isFundingGreaterThanBalance
+      ? `You don't have enough collateral in your balance.`
+      : ''
+    if (isSubscribed) setFundingMessageError(messageError)
+    return () => {
+      isSubscribed = false
+    }
+  }, [isFundingGreaterThanBalance])
+
   return (
     <>
       <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
@@ -228,12 +262,15 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
           }
           title={'Amount'}
           note={
-            <BalanceToken
-              collateral={collateral}
-              onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
-                setAmount(collateralBalance)
-              }}
-            />
+            <>
+              <BalanceToken
+                collateral={collateral}
+                onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
+                  setAmount(collateralBalance)
+                }}
+              />
+              <ErrorStyled>{fundingMessageError}</ErrorStyled>
+            </>
           }
         />
         <ButtonContainerStyled>
@@ -241,7 +278,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
             ‹ Back
           </ButtonLinkStyled>
 
-          <Button onClick={() => addFunding()} fontSize={'18px'} disabled={amount.isZero()}>
+          <Button onClick={() => addFunding()} fontSize={'18px'} disabled={error}>
             Add funding
           </Button>
           <Button
