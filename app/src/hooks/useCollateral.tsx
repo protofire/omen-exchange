@@ -19,33 +19,35 @@ const getTokenFromAddressIfExists = (
 export const useCollateral = (
   collateralAddress: string,
   context: ConnectedWeb3Context,
-): { collateral: Maybe<Token>; messageError: string } => {
+): { collateral: Maybe<Token>; errorMessage: Maybe<string> } => {
   const [collateral, setCollateral] = useState<Maybe<Token>>(null)
-  const [messageError, setMessageError] = useState<string>('')
+  const [errorMessage, setErrorMessage] = useState<Maybe<string>>(null)
 
   useEffect(() => {
     let isSubscribed = true
 
     const fetchIsValidErc20 = async () => {
-      let collateralData = null
-      let messageErrorData = ''
-      if (collateralAddress) {
-        collateralData = getTokenFromAddressIfExists(context.networkId, collateralAddress)
+      if (!collateralAddress) {
+        return
+      }
 
-        // If the address doesn't belong to a knowToken, we fetch its metadata
-        if (!collateralData) {
-          const erc20Service = new ERC20Service(context.library, collateralAddress)
-          const isValidErc20 = await erc20Service.isValidErc20()
-          if (isValidErc20) {
-            collateralData = await erc20Service.getProfileSummary()
-          } else {
-            messageErrorData = `The address is not a valid Erc20 token.`
-          }
+      let newCollateral = getTokenFromAddressIfExists(context.networkId, collateralAddress)
+      let newErrorMessage: Maybe<string> = null
+
+      // If the address doesn't belong to a knowToken, we fetch its metadata
+      if (!newCollateral) {
+        const erc20Service = new ERC20Service(context.library, collateralAddress)
+        const isValidErc20 = await erc20Service.isValidErc20()
+        if (isValidErc20) {
+          newCollateral = await erc20Service.getProfileSummary()
+        } else {
+          newErrorMessage = `The address is not a valid Erc20 token.`
         }
       }
+
       if (isSubscribed) {
-        setCollateral(collateralData)
-        setMessageError(messageErrorData)
+        setCollateral(newCollateral)
+        setErrorMessage(newErrorMessage)
       }
     }
 
@@ -58,6 +60,6 @@ export const useCollateral = (
 
   return {
     collateral,
-    messageError: messageError,
+    errorMessage,
   }
 }
