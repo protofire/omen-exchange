@@ -3,7 +3,6 @@ import React from 'react'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
 import { FullLoading } from '../common/full_loading'
-import { useContracts } from '../../hooks/useContracts'
 import { MarketSell } from './market_sell'
 import { useQuestion } from '../../hooks/useQuestion'
 
@@ -17,9 +16,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
   const { marketMakerAddress } = props
   const { question, resolution } = useQuestion(marketMakerAddress, context)
   const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
-  const { balance, marketMakerFunding, collateral } = marketMakerData
-
-  const { conditionalTokens, realitio } = useContracts(context)
+  const { balance, collateral } = marketMakerData
 
   if (!collateral || balance.length === 0) {
     return <FullLoading />
@@ -28,11 +25,8 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
   return (
     <MarketSell
       marketMakerAddress={marketMakerAddress}
-      marketMakerFunding={marketMakerFunding}
       balance={balance}
       collateral={collateral}
-      conditionalTokens={conditionalTokens}
-      realitio={realitio}
       question={question}
       resolution={resolution}
     />
