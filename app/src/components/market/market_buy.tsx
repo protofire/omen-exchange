@@ -6,12 +6,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { BalanceItem, OutcomeSlot, Status, OutcomeTableValue, Token } from '../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../common'
-import {
-  ConditionalTokenService,
-  ERC20Service,
-  MarketMakerService,
-  RealitioService,
-} from '../../services'
+import { ERC20Service, MarketMakerService } from '../../services'
 import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { ViewCard } from '../common/view_card'
@@ -29,6 +24,7 @@ import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placehold
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { SectionTitle } from '../common/section_title'
 import { BalanceToken } from '../common/balance_token'
+import { useContracts } from '../../hooks/useContracts'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -55,27 +51,18 @@ const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
-  marketMakerFunding: BigNumber
   balance: BalanceItem[]
   collateral: Token
-  conditionalTokens: ConditionalTokenService
-  realitio: RealitioService
   question: string
   resolution: Maybe<Date>
 }
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { buildMarketMaker } = useContracts(context)
 
-  const {
-    marketMakerAddress,
-    balance,
-    collateral,
-    conditionalTokens,
-    realitio,
-    question,
-    resolution,
-  } = props
+  const { marketMakerAddress, balance, collateral, question, resolution } = props
+  const marketMakerService = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
@@ -89,16 +76,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number, number]> => {
-      const provider = context.library
-      const user = await provider.getSigner().getAddress()
-      const marketMaker = new MarketMakerService(
-        marketMakerAddress,
-        conditionalTokens,
-        realitio,
-        provider,
-        user,
-      )
-      const tradedShares = await marketMaker.calcBuyAmount(amount, outcome)
+      const tradedShares = await marketMakerService.calcBuyAmount(amount, outcome)
       const balanceAfterTrade = computeBalanceAfterTrade(
         holdingsYes,
         holdingsNo,
@@ -112,15 +90,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       return [tradedShares, actualPriceForYes, actualPriceForNo]
     },
-    [
-      conditionalTokens,
-      context.library,
-      realitio,
-      marketMakerAddress,
-      outcome,
-      holdingsYes,
-      holdingsNo,
-    ],
+    [marketMakerService, outcome, holdingsYes, holdingsNo],
   )
 
   const [tradedShares, priceAfterTradeForYes, priceAfterTradeForNo] = useAsyncDerivedValue(
@@ -148,14 +118,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const provider = context.library
       const user = await provider.getSigner().getAddress()
 
-      const marketMaker = new MarketMakerService(
-        marketMakerAddress,
-        conditionalTokens,
-        realitio,
-        provider,
-        user,
-      )
-      const collateralAddress = await marketMaker.getCollateralToken()
+      const collateralAddress = await marketMakerService.getCollateralToken()
 
       const collateralService = new ERC20Service(provider, collateralAddress)
 
@@ -173,7 +136,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         await collateralService.approve(marketMakerAddress, costWithErrorMargin)
       }
 
-      await marketMaker.buy(amount, outcome)
+      await marketMakerService.buy(amount, outcome)
 
       setStatus(Status.Ready)
     } catch (err) {

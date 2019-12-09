@@ -13,7 +13,7 @@ import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 import { ViewCard } from '../common/view_card'
-import { ConditionalTokenService, MarketMakerService, RealitioService } from '../../services'
+import { MarketMakerService } from '../../services'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getLogger } from '../../util/logger'
 import { BigNumberInputReturn } from '../common/big_number_input'
@@ -27,6 +27,7 @@ import {
 } from '../../util/tools'
 import { SectionTitle } from '../common/section_title'
 import { BalanceShares } from '../common/balance_shares'
+import { useContracts } from '../../hooks/useContracts'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -52,27 +53,19 @@ const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
-  marketMakerFunding: BigNumber
   balance: BalanceItem[]
   collateral: Token
-  conditionalTokens: ConditionalTokenService
-  realitio: RealitioService
   question: string
   resolution: Maybe<Date>
 }
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { buildMarketMaker, conditionalTokens } = useContracts(context)
 
-  const {
-    balance,
-    marketMakerAddress,
-    collateral,
-    conditionalTokens,
-    question,
-    resolution,
-    realitio,
-  } = props
+  const { balance, marketMakerAddress, collateral, question, resolution } = props
+
+  const marketMakerService = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
@@ -132,22 +125,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Selling ${formatBigNumber(amountShares, collateral.decimals)} shares ...`)
 
-      const provider = context.library
-      const user = await provider.getSigner().getAddress()
-      const marketMaker = new MarketMakerService(
-        marketMakerAddress,
-        conditionalTokens,
-        realitio,
-        provider,
-        user,
-      )
-
       const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketMakerAddress)
       if (!isApprovedForAll) {
         await conditionalTokens.setApprovalForAll(marketMakerAddress)
       }
 
-      await marketMaker.sell(tradedCollateral, outcome)
+      await marketMakerService.sell(tradedCollateral, outcome)
 
       setStatus(Status.Ready)
     } catch (err) {
