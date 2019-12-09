@@ -18,6 +18,10 @@ const FilterStyled = styled(Filter)`
   width: 100%;
 `
 
+const NoMarketsAvailable = styled(SectionTitle)`
+  margin-top: 150px;
+`
+
 interface Props {
   markets: RemoteData<MarketWithExtraData[]>
   count: number
@@ -55,11 +59,14 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         />
       )}
       <ListCard>
-        {RemoteData.hasData(markets)
-          ? markets.data.slice(0, count).map(item => {
-              return <ListItem key={item.conditionId} data={item}></ListItem>
-            })
-          : null}
+        {RemoteData.hasData(markets) &&
+          RemoteData.getDataOr(markets, []).length > 0 &&
+          markets.data.slice(0, count).map(item => {
+            return <ListItem key={item.conditionId} data={item}></ListItem>
+          })}
+        {RemoteData.is.success(markets) && RemoteData.getDataOr(markets, []).length === 0 && (
+          <NoMarketsAvailable title={'No markets available'} />
+        )}
         {showMoreButton}
       </ListCard>
       {RemoteData.is.loading(markets) ? <FullLoading message="Loading markets..." /> : null}
