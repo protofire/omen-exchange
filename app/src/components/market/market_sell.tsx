@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
-import { ethers } from 'ethers'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { BalanceItem, OutcomeSlot, OutcomeTableValue, Status, Token } from '../../util/types'
@@ -162,9 +161,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     amountShares.isZero() ||
     !haveEnoughShares
 
-  const noteBalanceShares = () => {
+  const note = () => {
     return (
-      <React.Fragment key="1">
+      <>
         <BalanceShares
           balanceItem={balanceItem}
           collateral={collateral}
@@ -172,16 +171,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             if (balanceItemSet) setAmountShares(balanceItemSet.shares)
           }}
         />
-      </React.Fragment>
-    )
-  }
-
-  const noteSell = () => {
-    return (
-      <React.Fragment key="2">
         You will be charged an extra 1% trade fee of &nbsp;
-        <strong>{ethers.utils.formatEther(costFee)}</strong>
-      </React.Fragment>
+        <strong>{formatBigNumber(costFee, collateral.decimals, 10)}</strong>
+      </>
     )
   }
 
@@ -212,7 +204,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               placeholderText="Shares"
             />
           }
-          note={[noteBalanceShares(), noteSell()]}
+          note={note()}
           title={'Amount'}
           tooltip={{ id: 'amount', description: 'Amount of shares to sell.' }}
         />
@@ -221,7 +213,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           <TR>
             <TD>Total {collateral.symbol} Return</TD>
             <TD textAlign="right">
-              {ethers.utils.formatEther(tradedCollateral)} <strong>{collateral.symbol}</strong>
+              {formatBigNumber(tradedCollateral, collateral.decimals)}{' '}
+              <strong>{collateral.symbol}</strong>
             </TD>
           </TR>
         </TableStyled>
