@@ -45,6 +45,12 @@ const ButtonStyled = styled(Button)`
   margin-right: auto;
 `
 
+const ErrorStyled = styled.span`
+  margin-top: 0px;
+  color: red;
+  font-weight: 500;
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   theme?: any
   onClose: () => void
@@ -57,10 +63,10 @@ const ModalCollateralWrapper = (props: Props) => {
 
   const [collateralAddress, setCollateralAddress] = useState<string>('')
 
-  const collateralData = useCollateral(collateralAddress, context)
+  const { collateral, messageError } = useCollateral(collateralAddress, context)
 
-  const collateral: Maybe<Token> = collateralData
-    ? { address: collateralAddress, ...collateralData }
+  const collateralWithAddress: Maybe<Token> = collateral
+    ? { address: collateralAddress, ...collateral }
     : null
 
   const onClickCloseButton = () => {
@@ -68,8 +74,8 @@ const ModalCollateralWrapper = (props: Props) => {
   }
 
   const onClickSaveButton = () => {
-    if (collateral) {
-      onSave(collateral)
+    if (collateralWithAddress) {
+      onSave(collateralWithAddress)
       onClose()
     }
   }
@@ -81,8 +87,14 @@ const ModalCollateralWrapper = (props: Props) => {
       <>
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
-          <TitleValue title={'Symbol:'} value={collateral && collateral.symbol} />
-          <TitleValue title={'Decimals:'} value={collateral && collateral.decimals} />
+          <TitleValue
+            title={'Symbol:'}
+            value={collateralWithAddress && collateralWithAddress.symbol}
+          />
+          <TitleValue
+            title={'Decimals:'}
+            value={collateralWithAddress && collateralWithAddress.decimals}
+          />
         </Grid>
       </>
     )
@@ -105,10 +117,11 @@ const ModalCollateralWrapper = (props: Props) => {
             />
           }
           title={'Collateral token address'}
+          note={<ErrorStyled>{messageError}</ErrorStyled>}
         />
         {tokenDetails()}
         <ButtonContainer>
-          <ButtonStyled disabled={!collateralData} onClick={onClickSaveButton}>
+          <ButtonStyled disabled={!collateralWithAddress} onClick={onClickSaveButton}>
             Save
           </ButtonStyled>
           <Button backgroundColor={theme.colors.secondary} onClick={onClickCloseButton}>
