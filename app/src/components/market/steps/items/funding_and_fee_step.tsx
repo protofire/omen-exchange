@@ -73,10 +73,16 @@ const FundingAndFeeStep = (props: Props) => {
   const error = !spread || funding.isZero() || isFundingGreaterThanBalance
 
   useEffect(() => {
+    let isSubscribed = true
+
     const messageError = isFundingGreaterThanBalance
       ? `You don't have enough collateral in your balance.`
       : ''
-    setFundingMessageError(messageError)
+    if (isSubscribed) setFundingMessageError(messageError)
+
+    return () => {
+      isSubscribed = false
+    }
   }, [isFundingGreaterThanBalance])
 
   const back = () => {
