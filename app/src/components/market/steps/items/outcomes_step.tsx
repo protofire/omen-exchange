@@ -29,6 +29,7 @@ const OutcomesStep = (props: Props) => {
   const { handleOutcomesChange, values } = props
   const { question, outcomes } = values
 
+  // TODO: validate if the outcomes are more than 2, the sum of all outcome must be 100%
   return (
     <CreateCard>
       <OutcomeInfo>

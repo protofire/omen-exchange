@@ -58,13 +58,22 @@ export const MarketWizardCreator = (props: Props) => {
     spread: '1',
     funding: new BigNumber('0'),
     outcomes: [
+      // TODO: change this to two options when we add in the outcome step the possibility to  add more outcomes manually
       {
         name: 'Yes',
-        probability: 50,
+        probability: 25,
       },
       {
-        name: 'No',
-        probability: 50,
+        name: 'Could be',
+        probability: 25,
+      },
+      {
+        name: 'Maybe',
+        probability: 25,
+      },
+      {
+        name: 'Please no',
+        probability: 25,
       },
     ],
   }
