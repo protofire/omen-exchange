@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
+import React, { ChangeEvent, useMemo } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
@@ -53,8 +53,6 @@ const ErrorStyled = styled.span`
 const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const [fundingMessageError, setFundingMessageError] = useState('')
-
   const { values, addCollateralCustom, handleChange, handleCollateralChange } = props
   const { funding, spread, collateral, collateralsCustom } = values
 
@@ -72,18 +70,9 @@ const FundingAndFeeStep = (props: Props) => {
   const isFundingGreaterThanBalance = funding.gt(collateralBalance)
   const error = !spread || funding.isZero() || isFundingGreaterThanBalance
 
-  useEffect(() => {
-    let isSubscribed = true
-
-    const messageError = isFundingGreaterThanBalance
-      ? `You don't have enough collateral in your balance.`
-      : ''
-    if (isSubscribed) setFundingMessageError(messageError)
-
-    return () => {
-      isSubscribed = false
-    }
-  }, [isFundingGreaterThanBalance])
+  const fundingMessageError = isFundingGreaterThanBalance
+    ? `You don't have enough collateral in your balance.`
+    : ''
 
   const back = () => {
     props.back()
