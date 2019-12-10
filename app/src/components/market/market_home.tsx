@@ -64,7 +64,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           markets.data.slice(0, count).map(item => {
             return <ListItem key={item.conditionId} data={item}></ListItem>
           })}
-        {RemoteData.is.success(markets) && RemoteData.getDataOr(markets, []).length === 0 && (
+        {RemoteData.is.success(markets) && markets.data.length === 0 && (
           <NoMarketsAvailable title={'No markets available'} />
         )}
         {showMoreButton}
