@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
@@ -102,7 +102,6 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
-  const [fundingMessageError, setFundingMessageError] = useState('')
 
   const marketMakerFundingPercentage: Maybe<number> = marketMakerFunding.isZero()
     ? null
@@ -167,17 +166,9 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   const isFundingGreaterThanBalance = amount.gt(collateralBalance)
   const error = amount.isZero() || isFundingGreaterThanBalance
 
-  useEffect(() => {
-    let isSubscribed = true
-
-    const messageError = isFundingGreaterThanBalance
-      ? `You don't have enough collateral in your balance.`
-      : ''
-    if (isSubscribed) setFundingMessageError(messageError)
-    return () => {
-      isSubscribed = false
-    }
-  }, [isFundingGreaterThanBalance])
+  const fundingMessageError = isFundingGreaterThanBalance
+    ? `You don't have enough collateral in your balance.`
+    : ''
 
   return (
     <>
