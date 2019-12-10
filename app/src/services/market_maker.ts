@@ -226,9 +226,13 @@ class MarketMakerService {
     const { conditionId } = market
     // Get question data
     const questionId = await this.conditionalTokens.getQuestionId(conditionId)
-    const { question, resolution, arbitratorAddress, category } = await this.realitio.getQuestion(
-      questionId,
-    )
+    const {
+      question,
+      resolution,
+      arbitratorAddress,
+      category,
+      outcomes,
+    } = await this.realitio.getQuestion(questionId)
     // Know if a market is open or resolved
     const isConditionResolved = await this.conditionalTokens.isConditionResolved(conditionId)
     const marketStatus = isConditionResolved ? MarketStatus.Resolved : MarketStatus.Open
@@ -237,6 +241,7 @@ class MarketMakerService {
 
     return {
       ...market,
+      outcomes,
       question,
       resolution,
       category,
