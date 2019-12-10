@@ -13,8 +13,10 @@ import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
 import { Outcome } from '../../../common/outcomes'
-import { knownArbitrators } from '../../../../util/addresses'
+import { getArbitrator } from '../../../../util/addresses'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
+import { DisplayArbitrator } from '../../../common/display_arbitrator'
+import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -55,6 +57,8 @@ interface Props {
 }
 
 const CreateMarketStep = (props: Props) => {
+  const context = useConnectedWeb3Context()
+
   const { marketMakerAddress, values, status, questionId } = props
   const {
     collateral,
@@ -75,7 +79,7 @@ const CreateMarketStep = (props: Props) => {
     props.submit()
   }
 
-  const arbitrator = knownArbitrators[arbitratorId]
+  const arbitrator = getArbitrator(context.networkId, arbitratorId)
 
   const resolutionDate = resolution && formatDate(resolution)
 
@@ -93,15 +97,7 @@ const CreateMarketStep = (props: Props) => {
       <Grid>
         <TitleValue title={'Category'} value={category} />
         <TitleValue title={'Resolution date'} value={resolutionDate} />
-        <TitleValue
-          title={'Arbitrator'}
-          value={[
-            <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
-              {arbitrator.name}
-            </a>,
-            ' oracle as final arbitrator.',
-          ]}
-        />
+        <TitleValue title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
         <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
         {collateral && (
           <TitleValue

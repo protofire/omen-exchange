@@ -15,6 +15,7 @@ import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
 import { useContracts } from '../../../hooks/useContracts'
+import { DisplayArbitrator } from '../../common/display_arbitrator'
 
 const Grid = styled.div`
   display: grid;
@@ -149,17 +150,10 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
           <TitleValue title="Category" value="Politics" />
-          {arbitrator && (
-            <TitleValue
-              title={'Arbitrator'}
-              value={[
-                <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
-                  {arbitrator.name}
-                </a>,
-                ' oracle as final arbitrator.',
-              ]}
-            />
-          )}
+          <TitleValue
+            title={'Arbitrator'}
+            value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />}
+          />
           <TitleValue title="Resolution Date" value={resolutionFormat} />
           <TitleValue title="Fee" value="1%" />
           <TitleValue title="Funding" value={fundingFormat} />
