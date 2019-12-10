@@ -107,6 +107,7 @@ export const useMarketMakerData = (
     const probabilityForYes = actualPrices.actualPriceForYes * 100
     const probabilityForNo = actualPrices.actualPriceForNo * 100
 
+    // TODO: refactor this with multiple outcomes
     const balance = [
       {
         outcomeName: OutcomeSlot.Yes,
