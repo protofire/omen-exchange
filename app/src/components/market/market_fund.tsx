@@ -16,7 +16,7 @@ import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placehold
 import { ButtonContainer } from '../common/button_container'
 import { Button } from '../common/button'
 import { getLogger } from '../../util/logger'
-import { ERC20Service, MarketMakerService } from '../../services'
+import { ERC20Service } from '../../services'
 import { useContracts } from '../../hooks/useContracts'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { ButtonLink } from '../common/button_link'
@@ -95,7 +95,9 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   } = props
 
   const context = useConnectedWeb3Context()
-  const { conditionalTokens, realitio } = useContracts(context)
+  const { buildMarketMaker } = useContracts(context)
+  const provider = context.library
+  const marketMakerService = buildMarketMaker(marketMakerAddress)
 
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -118,22 +120,12 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         } ...`,
       )
 
-      const provider = context.library
-      const user = await provider.getSigner().getAddress()
-      const marketMaker = new MarketMakerService(
-        marketMakerAddress,
-        conditionalTokens,
-        realitio,
-        provider,
-        user,
-      )
-
-      const collateralAddress = await marketMaker.getCollateralToken()
+      const collateralAddress = await marketMakerService.getCollateralToken()
       const collateralService = new ERC20Service(provider, collateralAddress)
 
       await collateralService.approve(marketMakerAddress, amount)
 
-      await marketMaker.addFunding(amount)
+      await marketMakerService.addFunding(amount)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -152,16 +144,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         )} ...`,
       )
 
-      const provider = context.library
-      const user = await provider.getSigner().getAddress()
-      const marketMaker = new MarketMakerService(
-        marketMakerAddress,
-        conditionalTokens,
-        realitio,
-        provider,
-        user,
-      )
-      await marketMaker.removeFunding(marketMakerUserFunding)
+      await marketMakerService.removeFunding(marketMakerUserFunding)
 
       setStatus(Status.Ready)
     } catch (err) {

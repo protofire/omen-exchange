@@ -63,7 +63,7 @@ const ModalCollateralWrapper = (props: Props) => {
 
   const [collateralAddress, setCollateralAddress] = useState<string>('')
 
-  const { collateral, messageError } = useCollateral(collateralAddress, context)
+  const { collateral, errorMessage } = useCollateral(collateralAddress, context)
 
   const collateralWithAddress: Maybe<Token> = collateral
     ? { address: collateralAddress, ...collateral }
@@ -117,7 +117,7 @@ const ModalCollateralWrapper = (props: Props) => {
             />
           }
           title={'Collateral token address'}
-          note={<ErrorStyled>{messageError}</ErrorStyled>}
+          note={<ErrorStyled>{errorMessage || ''}</ErrorStyled>}
         />
         {tokenDetails()}
         <ButtonContainer>
