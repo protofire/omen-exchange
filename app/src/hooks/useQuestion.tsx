@@ -17,6 +17,7 @@ export const useQuestion = (
   const [resolution, setResolution] = useState<Maybe<Date>>(null)
   const [arbitratorAddress, setArbitratorAddress] = useState<string>('')
   const [category, setCategory] = useState<string>('')
+  const [outcomes, setOutcomes] = useState<string[]>([])
 
   useEffect(() => {
     let isSubscribed = true
@@ -26,15 +27,20 @@ export const useQuestion = (
 
         const conditionId = await marketMaker.getConditionId()
         const questionId = await conditionalTokens.getQuestionId(conditionId)
-        const { question, resolution, category, arbitratorAddress } = await realitio.getQuestion(
-          questionId,
-        )
+        const {
+          question,
+          resolution,
+          category,
+          arbitratorAddress,
+          outcomes,
+        } = await realitio.getQuestion(questionId)
 
         if (isSubscribed) {
           setQuestion(question)
           setResolution(resolution)
           setArbitratorAddress(arbitratorAddress)
           setCategory(category)
+          setOutcomes(outcomes)
         }
       } catch (error) {
         logger.error('There was an error fetching the question data:', error.message)
@@ -47,5 +53,5 @@ export const useQuestion = (
     }
   }, [marketMakerAddress, context, conditionalTokens, realitio, buildMarketMaker])
 
-  return { question, resolution, category, arbitratorAddress }
+  return { question, resolution, category, arbitratorAddress, outcomes }
 }
