@@ -119,11 +119,14 @@ class ConditionalTokenService {
     return !payoutDenominator.isZero()
   }
 
-  redeemPositions = async (collateralToken: string, conditionId: string): Promise<any> => {
-    return this.contract.redeemPositions(collateralToken, ethers.constants.HashZero, conditionId, [
-      1,
-      2,
-    ])
+  redeemPositions = async (collateralToken: string, conditionId: string) => {
+    const transactionObject = await this.contract.redeemPositions(
+      collateralToken,
+      ethers.constants.HashZero,
+      conditionId,
+      [1, 2],
+    )
+    await this.provider.waitForTransaction(transactionObject.hash)
   }
 }
 

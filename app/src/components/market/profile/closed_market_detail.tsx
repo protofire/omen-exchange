@@ -9,12 +9,13 @@ import { ButtonContainer } from '../../common/button_container'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
-import { BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
+import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { ERC20Service } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
 import { useContracts } from '../../../hooks/useContracts'
+import { DisplayArbitrator } from '../../common/display_arbitrator'
 
 const Grid = styled.div`
   display: grid;
@@ -56,6 +57,7 @@ interface Props {
   resolution: Date | null
   marketMakerAddress: string
   isConditionResolved: boolean
+  arbitrator: Maybe<Arbitrator>
 }
 
 const logger = getLogger('Market::ClosedMarketDetail')
@@ -72,6 +74,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     funding,
     isConditionResolved,
     questionId,
+    arbitrator,
   } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -147,7 +150,10 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
           <TitleValue title="Category" value="Politics" />
-          <TitleValue title="Arbitrator" value="realit.io and dxDAO" />
+          <TitleValue
+            title={'Arbitrator'}
+            value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />}
+          />
           <TitleValue title="Resolution Date" value={resolutionFormat} />
           <TitleValue title="Fee" value="1%" />
           <TitleValue title="Funding" value={fundingFormat} />

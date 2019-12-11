@@ -16,6 +16,7 @@ import { useMarketMakerData } from '../../../../hooks/useMarketMakerData'
 import { useQuestion } from '../../../../hooks/useQuestion'
 import { FullLoading } from '../../../common/full_loading'
 import { NavLink } from 'react-router-dom'
+import { DisplayArbitrator } from '../../../common/display_arbitrator'
 
 const TableStyled = styled(Table)`
   margin-bottom: 25px;
@@ -88,15 +89,7 @@ const SummaryMarketStep = (props: Props) => {
         <Grid>
           <TitleValue title={'Category'} value={category} />
           <TitleValue title={'Resolution date'} value={resolutionDate} />
-          <TitleValue
-            title={'Arbitrator'}
-            value={[
-              <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
-                {arbitrator.name}
-              </a>,
-              ' oracle as final arbitrator.',
-            ]}
-          />
+          <TitleValue title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
           <TitleValue title={'Spread / Fee'} value={`1%`} />
           <TitleValue
             title={'Funding'}
