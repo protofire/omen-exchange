@@ -5,18 +5,6 @@ import { TextfieldCustomPlaceholder } from '../textfield_custom_placeholder'
 import { FormLabel } from '../form_label'
 import { Tooltip } from '../tooltip'
 
-export interface Outcome {
-  name: string
-  probability: number
-}
-
-interface Props {
-  outcomes: Outcome[]
-  onChange: (newOutcomes: Outcome[]) => any
-  messageEmptyNamesError: string
-  messageProbabilitiesError: string
-}
-
 const TwoColumnsRow = styled.div`
   column-gap: 17px;
   display: grid;
@@ -48,8 +36,19 @@ const ErrorStyled = styled.p`
   text-align: left;
 `
 
+export interface Outcome {
+  name: string
+  probability: number
+}
+
+interface Props {
+  outcomes: Outcome[]
+  onChange: (newOutcomes: Outcome[]) => any
+  errorMessages: string[]
+}
+
 const Outcomes = (props: Props) => {
-  const { outcomes, messageEmptyNamesError, messageProbabilitiesError } = props
+  const { outcomes, errorMessages } = props
 
   const updateOutcomeProbability = (index: number, newProbability: number) => {
     if (newProbability < 0 || newProbability > 100) {
@@ -96,8 +95,9 @@ const Outcomes = (props: Props) => {
   const messageErrorToRender = () => {
     return (
       <>
-        <ErrorStyled>{messageProbabilitiesError}</ErrorStyled>
-        <ErrorStyled>{messageEmptyNamesError}</ErrorStyled>
+        {errorMessages.map((errorMessage, index) => (
+          <ErrorStyled key={index}>{errorMessage}</ErrorStyled>
+        ))}
       </>
     )
   }

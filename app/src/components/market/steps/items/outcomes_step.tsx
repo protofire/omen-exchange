@@ -80,8 +80,7 @@ const OutcomesStep = (props: Props) => {
       <Outcomes
         outcomes={outcomes}
         onChange={handleOutcomesChange}
-        messageEmptyNamesError={messageOutcomeEmptyNamesError}
-        messageProbabilitiesError={messageOutcomeProbabilitiesError}
+        errorMessages={[messageOutcomeEmptyNamesError, messageOutcomeProbabilitiesError]}
       />
       <ButtonContainerStyled>
         <ButtonLinkStyled onClick={props.back}>‹ Back</ButtonLinkStyled>
