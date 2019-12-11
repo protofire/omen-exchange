@@ -11,6 +11,7 @@ import { ButtonContainer } from '../../common/button_container'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { BigNumber } from 'ethers/utils'
 import { TitleValue } from '../../common/title_value'
+import { DisplayArbitrator } from '../../common/display_arbitrator'
 
 interface Props extends RouteComponentProps<{}> {
   balance: BalanceItem[]
@@ -88,17 +89,10 @@ const ViewWrapper = (props: Props) => {
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
           {category && <TitleValue title={'Category'} value={category} />}
-          {arbitrator && (
-            <TitleValue
-              title={'Arbitrator'}
-              value={[
-                <a href={arbitrator.url} key={1} rel="noopener noreferrer" target="_blank">
-                  {arbitrator.name}
-                </a>,
-                ' oracle as final arbitrator.',
-              ]}
-            />
-          )}
+          <TitleValue
+            title={'Arbitrator'}
+            value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />}
+          />
           {questionId && (
             <TitleValue
               title={'Realitio'}

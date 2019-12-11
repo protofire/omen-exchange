@@ -44,6 +44,12 @@ const InputBigNumberStyledRight = styled<any>(BigNumberInput)`
   text-align: right;
 `
 
+const ErrorStyled = styled.span`
+  margin-top: 0px;
+  color: red;
+  font-weight: 500;
+`
+
 const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
 
@@ -61,7 +67,12 @@ const FundingAndFeeStep = (props: Props) => {
 
   const collateralBalance = useAsyncDerivedValue('', new BigNumber(0), calculateCollateralBalance)
 
-  const error = !spread || funding.isZero() || funding.gt(collateralBalance)
+  const isFundingGreaterThanBalance = funding.gt(collateralBalance)
+  const error = !spread || funding.isZero() || isFundingGreaterThanBalance
+
+  const fundingMessageError = isFundingGreaterThanBalance
+    ? `You don't have enough collateral in your balance.`
+    : ''
 
   const back = () => {
     props.back()
@@ -135,12 +146,15 @@ const FundingAndFeeStep = (props: Props) => {
           description: `Initial funding to fund the market maker.`,
         }}
         note={
-          <BalanceToken
-            collateral={collateral}
-            onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
-              handleChange({ name: 'funding', value: collateralBalance })
-            }}
-          />
+          <>
+            <BalanceToken
+              collateral={collateral}
+              onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
+                handleChange({ name: 'funding', value: collateralBalance })
+              }}
+            />
+            <ErrorStyled>{fundingMessageError}</ErrorStyled>
+          </>
         }
       />
       <ButtonContainer>

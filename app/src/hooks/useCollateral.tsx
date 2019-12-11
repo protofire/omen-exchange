@@ -19,25 +19,36 @@ const getTokenFromAddressIfExists = (
 export const useCollateral = (
   collateralAddress: string,
   context: ConnectedWeb3Context,
-): Maybe<Token> => {
+): { collateral: Maybe<Token>; errorMessage: Maybe<string> } => {
   const [collateral, setCollateral] = useState<Maybe<Token>>(null)
+  const [errorMessage, setErrorMessage] = useState<Maybe<string>>(null)
 
   useEffect(() => {
     let isSubscribed = true
 
     const fetchIsValidErc20 = async () => {
-      let collateralData = getTokenFromAddressIfExists(context.networkId, collateralAddress)
+      if (!collateralAddress) {
+        return
+      }
+
+      let newCollateral = getTokenFromAddressIfExists(context.networkId, collateralAddress)
+      let newErrorMessage: Maybe<string> = null
 
       // If the address doesn't belong to a knowToken, we fetch its metadata
-      if (!collateralData) {
+      if (!newCollateral) {
         const erc20Service = new ERC20Service(context.library, collateralAddress)
         const isValidErc20 = await erc20Service.isValidErc20()
         if (isValidErc20) {
-          collateralData = await erc20Service.getProfileSummary()
+          newCollateral = await erc20Service.getProfileSummary()
+        } else {
+          newErrorMessage = `The address is not a valid Erc20 token.`
         }
       }
 
-      if (isSubscribed) setCollateral(collateralData)
+      if (isSubscribed) {
+        setCollateral(newCollateral)
+        setErrorMessage(newErrorMessage)
+      }
     }
 
     fetchIsValidErc20()
@@ -47,5 +58,8 @@ export const useCollateral = (
     }
   }, [context, collateralAddress])
 
-  return collateral
+  return {
+    collateral,
+    errorMessage,
+  }
 }
