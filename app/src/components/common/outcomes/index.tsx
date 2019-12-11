@@ -13,6 +13,8 @@ export interface Outcome {
 interface Props {
   outcomes: Outcome[]
   onChange: (newOutcomes: Outcome[]) => any
+  messageEmptyNamesError: string
+  messageProbabilitiesError: string
 }
 
 const TwoColumnsRow = styled.div`
@@ -36,8 +38,18 @@ const TextFieldStyled = styled(Textfield)`
   text-align: right;
 `
 
+const ErrorStyled = styled.p`
+  color: red;
+  font-weight: 500;
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 1.45;
+  margin: 0 0 15px 0;
+  text-align: left;
+`
+
 const Outcomes = (props: Props) => {
-  const { outcomes } = props
+  const { outcomes, messageEmptyNamesError, messageProbabilitiesError } = props
 
   const updateOutcomeProbability = (index: number, newProbability: number) => {
     if (newProbability < 0 || newProbability > 100) {
@@ -71,9 +83,33 @@ const Outcomes = (props: Props) => {
     }
   }
 
+  const updateOutcomeName = (index: number, newName: string) => {
+    const newOutcome = {
+      ...outcomes[index],
+      name: newName,
+    }
+
+    const newOutcomes = [...outcomes.slice(0, index), newOutcome, ...outcomes.slice(index + 1)]
+    props.onChange(newOutcomes)
+  }
+
+  const messageErrorToRender = () => {
+    return (
+      <>
+        <ErrorStyled>{messageProbabilitiesError}</ErrorStyled>
+        <ErrorStyled>{messageEmptyNamesError}</ErrorStyled>
+      </>
+    )
+  }
+
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
     <TwoColumnsRowExtraMargin key={index}>
-      <Textfield name={`outcome_${index}`} type="text" value={outcome.name} readOnly />
+      <Textfield
+        name={`outcome_${index}`}
+        type="text"
+        value={outcome.name}
+        onChange={e => updateOutcomeName(index, e.currentTarget.value)}
+      />
       <TextfieldCustomPlaceholder
         formField={
           <TextFieldStyled
@@ -102,6 +138,7 @@ const Outcomes = (props: Props) => {
         </LabelWrapper>
       </TwoColumnsRow>
       {outcomesToRender}
+      {messageErrorToRender()}
     </>
   )
 }
