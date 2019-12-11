@@ -124,9 +124,9 @@ const CreateMarketStep = (props: Props) => {
           </THead>
         }
       >
-        {outcomes.map((outcome, key) => {
+        {outcomes.map((outcome, index) => {
           return (
-            <TR key={key}>
+            <TR key={index}>
               <TD>{outcome.name}</TD>
               <TD textAlign="right">{outcome.probability}%</TD>
             </TR>
