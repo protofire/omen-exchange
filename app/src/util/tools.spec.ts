@@ -10,15 +10,23 @@ import {
 
 describe('tools', () => {
   describe('calcPrice', () => {
-    const testCases: any = [[[100, 100], 0.5], [[100, 32], 0.8], [[100, 230], 0.2]]
+    const testCases = [
+      [[100, 100], [0.5, 0.5]],
+      [[150, 50], [0.25, 0.75]],
+      [[50, 150], [0.75, 0.25]],
+      [[100, 100, 100], [0.3333, 0.3333, 0.3333]],
+      [[200, 100, 100], [0.2, 0.4, 0.4]],
+      [[100, 200, 100], [0.4, 0.2, 0.4]],
+      [[100, 100, 200], [0.4, 0.4, 0.2]],
+      [[100, 200, 300], [0.5454, 0.2727, 0.1818]],
+    ]
 
-    for (const [[funding, holdings], expectedResult] of testCases) {
-      it(`should compute the right price for funding ${funding} and holdings ${holdings}`, () => {
-        const fundingBN = bigNumberify(funding)
-        const holdingsBN = bigNumberify(holdings)
-        const result = calcPrice(fundingBN, holdingsBN)
+    for (const [holdings, expectedResult] of testCases) {
+      it(`should compute the right price`, () => {
+        const holdingsBN = holdings.map(bigNumberify)
+        const prices = calcPrice(holdingsBN)
 
-        expect(result).toBeCloseTo(expectedResult)
+        prices.forEach((price, index) => expect(price).toBeCloseTo(expectedResult[index]))
       })
     }
   })
