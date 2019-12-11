@@ -54,7 +54,7 @@ const OutcomesStep = (props: Props) => {
     ? 'The names of the outcomes should not be empty.'
     : ''
 
-  const totalOutcomeProbabilities = outcomes.reduce((prev, cur) => prev + cur.probability, 0)
+  const totalOutcomeProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
   const messageOutcomeProbabilitiesError =
     totalOutcomeProbabilities !== 100 ? 'The sum of all probabilities must be equal to 100%.' : ''
 
