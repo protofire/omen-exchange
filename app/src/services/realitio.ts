@@ -110,16 +110,14 @@ class RealitioService {
     const iface = new ethers.utils.Interface(realitioAbi)
     const event = iface.parseLog(logs[0])
 
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    const { question, template_id, opening_ts, arbitrator } = event.values
+    const { question, template_id: templateId, opening_ts: openingTs, arbitrator } = event.values
 
     const templates = ['bool', 'uint', 'single-select', 'multiple-select', 'datetime']
 
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    const templateId = templates[(template_id as BigNumber).toNumber()]
+    const templateType = templates[(templateId as BigNumber).toNumber()]
 
     const questionLog: QuestionLog = RealitioQuestionLib.populatedJSONForTemplate(
-      RealitioTemplateLib.defaultTemplateForType(templateId),
+      RealitioTemplateLib.defaultTemplateForType(templateType),
       question,
     )
 
@@ -128,7 +126,7 @@ class RealitioService {
     return {
       question: title === 'undefined' ? '' : title,
       category: category === 'undefined' ? '' : category,
-      resolution: new Date(opening_ts * 1000), // eslint-disable-line @typescript-eslint/camelcase
+      resolution: new Date(openingTs * 1000),
       arbitratorAddress: arbitrator,
       outcomes: outcomes,
     }

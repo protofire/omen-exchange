@@ -19,6 +19,7 @@
     "react/prop-types": "off",
     "no-console": "warn",
     "no-warning-comments": "warn",
+    "camelcase": "off",
     "import/no-extraneous-dependencies": ["error", {"optionalDependencies": false, "peerDependencies": false}]
   },
   "settings": {
