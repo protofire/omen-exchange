@@ -44,11 +44,11 @@ export interface Outcome {
 interface Props {
   outcomes: Outcome[]
   onChange: (newOutcomes: Outcome[]) => any
-  errorMessages: string[]
+  errorMessages?: string[]
 }
 
 const Outcomes = (props: Props) => {
-  const { outcomes, errorMessages } = props
+  const { outcomes, errorMessages = [] } = props
 
   const updateOutcomeProbability = (index: number, newProbability: number) => {
     if (newProbability < 0 || newProbability > 100) {
@@ -96,7 +96,9 @@ const Outcomes = (props: Props) => {
     return (
       <>
         {errorMessages.map((errorMessage, index) => (
-          <ErrorStyled key={index}>{errorMessage}</ErrorStyled>
+          <ErrorStyled data-testid={`outcome_error_message_${index}`} key={index}>
+            {errorMessage}
+          </ErrorStyled>
         ))}
       </>
     )
