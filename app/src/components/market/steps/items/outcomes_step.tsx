@@ -48,16 +48,17 @@ const OutcomesStep = (props: Props) => {
   const { handleOutcomesChange, values } = props
   const { question, outcomes } = values
 
-  const outcomesWithEmptyNamesCount = outcomes.filter(outcome => !outcome.name).length
+  const someEmptyName = outcomes.some(outcome => !outcome.name)
 
-  const messageOutcomeEmptyNamesError =
-    outcomesWithEmptyNamesCount > 0 ? 'The names of the outcomes should not be empty.' : ''
+  const messageOutcomeEmptyNamesError = someEmptyName
+    ? 'The names of the outcomes should not be empty.'
+    : ''
 
   const totalOutcomeProbabilities = outcomes.reduce((prev, cur) => prev + cur.probability, 0)
   const messageOutcomeProbabilitiesError =
     totalOutcomeProbabilities !== 100 ? 'The sum of all probabilities must be equal to 100%.' : ''
 
-  const error = totalOutcomeProbabilities !== 100 || outcomesWithEmptyNamesCount > 0
+  const error = totalOutcomeProbabilities !== 100 || someEmptyName
 
   const isAddNewOutcomeButtonDisabled = outcomes.length >= MAX_OUTCOME_ALLOWED
 
