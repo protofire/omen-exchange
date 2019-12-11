@@ -40,11 +40,16 @@ export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
 }
 
 /**
- * Computes the price of some outcome tokens, given the initial funding and the current holdings.
+ * Computes the price of each outcome token given their holdings. Returns an array of numbers in the range [0, 1]
  */
-export const calcPrice = (funding: BigNumber, holdings: BigNumber) => {
-  // 2^(-holding / funding)
-  return Math.pow(2, -divBN(holdings, funding))
+export const calcPrice = (holdingsBN: BigNumber[]): number[] => {
+  const holdings = holdingsBN.map(h => new Big(h.toString()))
+  const product = holdings.reduce((a, b) => a.mul(b))
+  const denominator = holdings.map(h => product.div(h)).reduce((a, b) => a.add(b))
+
+  const prices = holdings.map(holding => product.div(holding).div(denominator))
+
+  return prices.map(price => +price.valueOf())
 }
 
 /**
