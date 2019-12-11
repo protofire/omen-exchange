@@ -4,7 +4,7 @@ import { Moment } from 'moment'
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 
-import { REALITIO_TIMEOUT } from '../common/constants'
+import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from '../common/constants'
 import { getLogger } from '../util/logger'
 import { OutcomeSlot, Question, QuestionLog } from '../util/types'
 import { Outcome } from '../components/common/outcomes'
@@ -68,7 +68,14 @@ class RealitioService {
       outcomeNames,
       category,
     )
-    const args = [2, questionText, arbitratorAddress, REALITIO_TIMEOUT, openingTimestamp, 0]
+    const args = [
+      SINGLE_SELECT_TEMPLATE_ID,
+      questionText,
+      arbitratorAddress,
+      REALITIO_TIMEOUT,
+      openingTimestamp,
+      0,
+    ]
 
     const questionId = await this.constantContract.askQuestion(...args, {
       from: this.signerAddress,
