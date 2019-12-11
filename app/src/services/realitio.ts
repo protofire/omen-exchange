@@ -116,8 +116,9 @@ class RealitioService {
 
     const templateType = templates[(templateId as BigNumber).toNumber()]
 
+    const template = RealitioTemplateLib.defaultTemplateForType(templateType)
     const questionLog: QuestionLog = RealitioQuestionLib.populatedJSONForTemplate(
-      RealitioTemplateLib.defaultTemplateForType(templateType),
+      template,
       question,
     )
 
