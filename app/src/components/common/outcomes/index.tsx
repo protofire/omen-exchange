@@ -48,7 +48,7 @@ interface Props {
 }
 
 const Outcomes = (props: Props) => {
-  const { outcomes, errorMessages = [] } = props
+  const { outcomes, errorMessages } = props
 
   const updateOutcomeProbability = (index: number, newProbability: number) => {
     if (newProbability < 0 || newProbability > 100) {
@@ -93,6 +93,10 @@ const Outcomes = (props: Props) => {
   }
 
   const messageErrorToRender = () => {
+    if (!errorMessages) {
+      return
+    }
+
     return (
       <>
         {errorMessages.map((errorMessage, index) => (

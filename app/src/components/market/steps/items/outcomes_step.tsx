@@ -48,15 +48,17 @@ const OutcomesStep = (props: Props) => {
   const { handleOutcomesChange, values } = props
   const { question, outcomes } = values
 
-  const someEmptyName = outcomes.some(outcome => !outcome.name)
+  const errorMessages = []
 
-  const messageOutcomeEmptyNamesError = someEmptyName
-    ? 'The names of the outcomes should not be empty.'
-    : ''
+  const someEmptyName = outcomes.some(outcome => !outcome.name)
+  if (someEmptyName) {
+    errorMessages.push('The names of the outcomes should not be empty.')
+  }
 
   const totalOutcomeProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
-  const messageOutcomeProbabilitiesError =
-    totalOutcomeProbabilities !== 100 ? 'The sum of all probabilities must be equal to 100%.' : ''
+  if (totalOutcomeProbabilities !== 100) {
+    errorMessages.push('The sum of all probabilities must be equal to 100%.')
+  }
 
   const error = totalOutcomeProbabilities !== 100 || someEmptyName
 
@@ -77,11 +79,7 @@ const OutcomesStep = (props: Props) => {
         Please add all the possible outcomes for the <strong>&quot;{question}&quot;</strong>{' '}
         question.
       </OutcomeInfo>
-      <Outcomes
-        outcomes={outcomes}
-        onChange={handleOutcomesChange}
-        errorMessages={[messageOutcomeEmptyNamesError, messageOutcomeProbabilitiesError]}
-      />
+      <Outcomes outcomes={outcomes} onChange={handleOutcomesChange} errorMessages={errorMessages} />
       <ButtonContainerStyled>
         <ButtonLinkStyled onClick={props.back}>‹ Back</ButtonLinkStyled>
         <Button disabled={isAddNewOutcomeButtonDisabled} fontSize={'17px'} onClick={addNewOutcome}>
