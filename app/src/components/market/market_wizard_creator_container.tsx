@@ -39,6 +39,7 @@ const MarketWizardCreatorContainer: FC = () => {
       setStatus(StatusMarketCreation.PostingQuestion)
       const questionId = await realitio.askQuestion(
         question,
+        outcomes,
         category,
         arbitrator.address,
         openingDateMoment,
@@ -78,6 +79,7 @@ const MarketWizardCreatorContainer: FC = () => {
 
       setStatus(StatusMarketCreation.AddFunding)
       const marketMakerService = buildMarketMaker(marketMakerAddress)
+      // TODO: pass all outcomes
       await marketMakerService.addInitialFunding(
         funding,
         +outcomes[0].probability,
