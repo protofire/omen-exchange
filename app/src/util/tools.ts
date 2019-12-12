@@ -98,19 +98,16 @@ export const computeBalanceAfterTrade = (
 }
 
 /**
- * Computes the distribution hint that should be used for setting the initial odds to `initialOddsYes`
- * and `initialOddsNo`
+ * Computes the distribution hint that should be used for setting the initial odds to `initialOdds`
  */
-export const calcDistributionHint = (
-  initialOddsYes: number,
-  initialOddsNo: number,
-): BigNumber[] => {
-  const distributionHintYes = Math.sqrt(initialOddsNo / initialOddsYes)
-  const distributionHintNo = Math.sqrt(initialOddsYes / initialOddsNo)
+export const calcDistributionHint = (initialOdds: number[]): BigNumber[] => {
+  const initialOddsBig = initialOdds.map(x => new Big(x))
+  const product = initialOddsBig.reduce((a, b) => a.mul(b))
 
-  const distributionHint = [distributionHintYes, distributionHintNo]
-    .map(hint => Math.round(hint * 1000000))
-    .map(bigNumberify)
+  const distributionHint = initialOddsBig
+    .map(o => product.div(o))
+    .map(x => x.mul(1000000).round())
+    .map(x => bigNumberify(x.toString()))
 
   return distributionHint
 }

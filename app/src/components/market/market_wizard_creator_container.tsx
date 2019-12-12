@@ -79,12 +79,7 @@ const MarketWizardCreatorContainer: FC = () => {
 
       setStatus(StatusMarketCreation.AddFunding)
       const marketMakerService = buildMarketMaker(marketMakerAddress)
-      // TODO: pass all outcomes
-      await marketMakerService.addInitialFunding(
-        funding,
-        +outcomes[0].probability,
-        +outcomes[1].probability,
-      )
+      await marketMakerService.addInitialFunding(funding, outcomes.map(o => o.probability))
 
       setStatus(StatusMarketCreation.Done)
     } catch (err) {
