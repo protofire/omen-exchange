@@ -70,10 +70,10 @@ class MarketMakerService {
     return this.contract.totalSupply()
   }
 
-  addInitialFunding = async (amount: BigNumber, initialOddsYes: number, initialOddsNo: number) => {
+  addInitialFunding = async (amount: BigNumber, initialOdds: number[]) => {
     logger.log(`Add funding to market maker ${amount}`)
 
-    const distributionHint = calcDistributionHint(initialOddsYes, initialOddsNo)
+    const distributionHint = calcDistributionHint(initialOdds)
 
     return this.addFunding(amount, distributionHint)
   }
