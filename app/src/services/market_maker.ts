@@ -78,13 +78,6 @@ class MarketMakerService {
     return this.addFunding(amount, distributionHint)
   }
 
-  // TODO: TEMPORARY, We need to remove this later
-  addInitialFundingWithMultipleOutcomes = async (amount: BigNumber) => {
-    logger.log(`Add funding to market maker ${amount}`)
-
-    return this.addFunding(amount)
-  }
-
   addFunding = async (amount: BigNumber, distributionHint: BigNumber[] = []) => {
     logger.log(`Add funding to market maker ${amount}`)
 
