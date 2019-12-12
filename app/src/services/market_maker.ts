@@ -5,7 +5,7 @@ import { ConditionalTokenService } from './conditional_token'
 import { RealitioService } from './realitio'
 import { getLogger } from '../util/logger'
 import { Market, MarketStatus, MarketWithExtraData, OutcomeSlot } from '../util/types'
-import { calcDistributionHint, divBN } from '../util/tools'
+import { calcDistributionHint, divBN, calcPrice } from '../util/tools'
 
 const logger = getLogger('Services::MarketMaker')
 
@@ -78,12 +78,20 @@ class MarketMakerService {
     return this.addFunding(amount, distributionHint)
   }
 
+  // TODO: TEMPORARY, We need to remove this later
+  addInitialFundingWithMultipleOutcomes = async (amount: BigNumber) => {
+    logger.log(`Add funding to market maker ${amount}`)
+
+    return this.addFunding(amount)
+  }
+
   addFunding = async (amount: BigNumber, distributionHint: BigNumber[] = []) => {
     logger.log(`Add funding to market maker ${amount}`)
 
     try {
       const overrides = {
         value: '0x0',
+        gasLimit: 750000,
       }
       const transactionObject = await this.contract.addFunding(amount, distributionHint, overrides)
       await this.provider.waitForTransaction(transactionObject.hash)
@@ -141,6 +149,42 @@ class MarketMakerService {
       balanceOfForYes,
       balanceOfForNo,
     }
+  }
+
+  static getActualPriceWithHoldings = (holdings: BigNumber[]): number[] => {
+    return calcPrice(holdings)
+  }
+
+  getBalanceInformationWithMultipleOutcomes = async (
+    ownerAddress: string,
+    outcomeQuantity: number,
+  ): Promise<BigNumber[]> => {
+    const conditionId = await this.getConditionId()
+    const collateralTokenAddress = await this.getCollateralToken()
+
+    const balances = []
+    logger.log(`Outcomes quantity ${outcomeQuantity}`)
+    for (let i = 0; i < outcomeQuantity; i++) {
+      const collectionId = await this.conditionalTokens.getCollectionIdForOutcome(
+        conditionId,
+        1 << i,
+      )
+      logger.log(
+        `Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
+      )
+      const positionIdForCollectionId = await this.conditionalTokens.getPositionId(
+        collateralTokenAddress,
+        collectionId,
+      )
+      const balance = await this.conditionalTokens.getBalanceOf(
+        ownerAddress,
+        positionIdForCollectionId,
+      )
+      logger.log(`Balance ${balance.toString()}`)
+      balances.push(balance)
+    }
+
+    return balances
   }
 
   balanceOf = async (address: string): Promise<BigNumber> => {

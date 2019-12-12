@@ -7,7 +7,7 @@ import { ERC20Service, MarketMakerService } from '../services'
 import { getArbitratorFromAddress } from '../util/addresses'
 import { useContracts } from './useContracts'
 import { getLogger } from '../util/logger'
-import { BalanceItem, OutcomeSlot, Status, Token, Arbitrator } from '../util/types'
+import { BalanceItem, Status, Token, Arbitrator } from '../util/types'
 
 const logger = getLogger('Market::useMarketMakerData')
 
@@ -69,9 +69,13 @@ export const useMarketMakerData = (
     const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
 
     const questionId = await conditionalTokens.getQuestionId(conditionId)
-    const { question, resolution, arbitratorAddress, category } = await realitio.getQuestion(
-      questionId,
-    )
+    const {
+      question,
+      resolution,
+      arbitratorAddress,
+      category,
+      outcomes,
+    } = await realitio.getQuestion(questionId)
 
     const arbitrator = getArbitratorFromAddress(context.networkId, arbitratorAddress)
 
@@ -86,8 +90,8 @@ export const useMarketMakerData = (
       fee,
       isQuestionFinalized,
     ] = await Promise.all([
-      marketMaker.getBalanceInformation(user),
-      marketMaker.getBalanceInformation(marketMakerAddress),
+      marketMaker.getBalanceInformationWithMultipleOutcomes(user, outcomes.length),
+      marketMaker.getBalanceInformationWithMultipleOutcomes(marketMakerAddress, outcomes.length),
       marketMaker.getTotalSupply(),
       marketMaker.balanceOf(user),
       marketMaker.getCollateralToken(),
@@ -99,33 +103,29 @@ export const useMarketMakerData = (
 
     const winnerOutcome = isQuestionFinalized ? await realitio.getWinnerOutcome(questionId) : null
 
-    const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
+    const actualPrices = MarketMakerService.getActualPriceWithHoldings(marketMakerShares)
 
     const erc20Service = new ERC20Service(provider, collateralAddress)
     const collateral = await erc20Service.getProfileSummary()
 
-    const probabilityForYes = actualPrices.actualPriceForYes * 100
-    const probabilityForNo = actualPrices.actualPriceForNo * 100
-
-    // TODO: refactor this with multiple outcomes
-    const balance = [
-      {
-        outcomeName: OutcomeSlot.Yes,
-        probability: Math.round((probabilityForYes / 100) * 100),
-        currentPrice: actualPrices.actualPriceForYes,
-        shares: userShares.balanceOfForYes,
-        holdings: marketMakerShares.balanceOfForYes,
-        winningOutcome: winnerOutcome === 1,
-      },
-      {
-        outcomeName: OutcomeSlot.No,
-        probability: Math.round((probabilityForNo / 100) * 100),
-        currentPrice: actualPrices.actualPriceForNo,
-        shares: userShares.balanceOfForNo,
-        holdings: marketMakerShares.balanceOfForNo,
-        winningOutcome: winnerOutcome === 0,
-      },
-    ]
+    const balance: BalanceItem[] = []
+    for (let i = 0; i < outcomes.length; i++) {
+      const outcomeName = outcomes[i]
+      const probabilityForPrice = actualPrices[i] * 100
+      const probability = Math.round((probabilityForPrice / 100) * 100)
+      const currentPrice = actualPrices[i]
+      const shares = userShares[i]
+      const holdings = marketMakerShares[i]
+      const balanceItem = {
+        outcomeName,
+        probability,
+        currentPrice,
+        shares,
+        holdings,
+        winningOutcome: false, // TODO: fix this, how to know the winningOutcome with multiple outcomes ?
+      }
+      balance.push(balanceItem)
+    }
 
     setStatus(Status.Done)
 

@@ -45,7 +45,7 @@ class ConditionalTokenService {
     const transactionObject = await this.contract.prepareCondition(
       oracleAddress,
       questionId,
-      outcomeSlotCount,
+      new BigNumber(outcomeSlotCount),
       {
         value: '0x0',
       },
@@ -59,6 +59,10 @@ class ConditionalTokenService {
     )
 
     return conditionId
+  }
+
+  getCollectionIdForOutcome = async (conditionId: string, outcomeIndex: number): Promise<any> => {
+    return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, outcomeIndex)
   }
 
   getCollectionIdForYes = async (conditionId: string): Promise<any> => {
