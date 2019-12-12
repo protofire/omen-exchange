@@ -84,6 +84,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         amount,
         tradedShares,
       )
+      // TODO: refactor this with multiple outcomes
       const { actualPriceForYes, actualPriceForNo } = MarketMakerService.getActualPrice(
         balanceAfterTrade,
       )

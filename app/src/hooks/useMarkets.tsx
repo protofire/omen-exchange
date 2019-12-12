@@ -31,6 +31,7 @@ const buildFilterFn = (filter: MarketFilter, contracts: Contracts) => async (
     const questionId = await conditionalTokens.getQuestionId(market.conditionId)
     const isFinalized = await realitio.isFinalized(questionId)
 
+    // TODO, refactor this with multiple outcomes
     const { balanceOfForYes, balanceOfForNo } = await marketMakerService.getBalanceInformation(
       filter.account,
     )

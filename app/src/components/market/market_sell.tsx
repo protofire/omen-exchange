@@ -103,6 +103,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       amountToSell.mul(-1), // negate amounts because it's a sale
       amountShares.mul(-1),
     )
+    // TODO: refactor this with multiple outcomes
     const { actualPriceForYes, actualPriceForNo } = MarketMakerService.getActualPrice(
       balanceAfterTrade,
     )
