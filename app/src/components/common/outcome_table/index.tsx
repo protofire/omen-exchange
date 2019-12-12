@@ -159,15 +159,12 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
-  const yesRow = renderTableRow(balance[0], pricesAfterTrade && pricesAfterTrade[0])
-  const noRow = renderTableRow(balance[1], pricesAfterTrade && pricesAfterTrade[1])
+  const renderTable = () =>
+    balance
+      .sort((a, b) => (a.winningOutcome === b.winningOutcome ? 0 : a.winningOutcome ? -1 : 1))
+      .map((balanceItem: BalanceItem, index) =>
+        renderTableRow(balanceItem, pricesAfterTrade && pricesAfterTrade[index]),
+      )
 
-  let rows = [yesRow, noRow]
-  if (withWinningOutcome) {
-    if (balance[1].winningOutcome) {
-      rows = [noRow, yesRow]
-    }
-  }
-
-  return <TableStyled head={renderTableHeader()}>{rows}</TableStyled>
+  return <TableStyled head={renderTableHeader()}>{renderTable()}</TableStyled>
 }
