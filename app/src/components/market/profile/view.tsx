@@ -14,7 +14,7 @@ import { TitleValue } from '../../common/title_value'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
 
 interface Props extends RouteComponentProps<{}> {
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   collateral: Token
   arbitrator: Maybe<Arbitrator>
   question: string
@@ -53,7 +53,7 @@ const Grid = styled.div`
 
 const ViewWrapper = (props: Props) => {
   const {
-    balance,
+    balances,
     collateral,
     status,
     questionId,
@@ -63,7 +63,7 @@ const ViewWrapper = (props: Props) => {
     category,
   } = props
 
-  const userHasShares = balance.some((balanceItem: BalanceItem) => {
+  const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
     return !shares.isZero()
   })
@@ -75,7 +75,7 @@ const ViewWrapper = (props: Props) => {
     }
     return (
       <OutcomeTable
-        balance={balance}
+        balances={balances}
         collateral={collateral}
         displayRadioSelection={false}
         disabledColumns={disabledColumns}

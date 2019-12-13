@@ -76,7 +76,7 @@ export const calcNetCost = (
 }
 
 /**
- * Computes the balance of the outcome tokens after trading
+ * Computes the balances of the outcome tokens after trading
  */
 export const computeBalanceAfterTrade = (
   holdingsYes: BigNumber,

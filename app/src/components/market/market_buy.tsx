@@ -51,7 +51,7 @@ const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   collateral: Token
   question: string
   resolution: Maybe<Date>
@@ -61,7 +61,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { buildMarketMaker } = useContracts(context)
 
-  const { marketMakerAddress, balance, collateral, question, resolution } = props
+  const { marketMakerAddress, balances, collateral, question, resolution } = props
   const marketMakerService = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -71,8 +71,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
 
   // TODO: refactor this
-  const holdingsYes = balance[0].holdings
-  const holdingsNo = balance[1].holdings
+  const holdingsYes = balances[0].holdings
+  const holdingsNo = balances[1].holdings
 
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
@@ -110,7 +110,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       .mul(weiPerUnit)
       .div(10000)
     setCost(costWithFee)
-  }, [outcome, amount, balance, collateral])
+  }, [outcome, amount, balances, collateral])
 
   const finish = async () => {
     try {
@@ -170,7 +170,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <ViewCard>
         <SubsectionTitle>Choose the shares you want to buy</SubsectionTitle>
         <OutcomeTable
-          balance={balance}
+          balances={balances}
           collateral={collateral}
           pricesAfterTrade={[priceAfterTradeForYes, priceAfterTradeForNo]}
           outcomeSelected={outcome}

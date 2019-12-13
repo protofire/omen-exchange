@@ -14,7 +14,7 @@ const logger = getLogger('Market::useMarketMakerData')
 interface MarketMakerData {
   totalPoolShares: BigNumber
   userPoolShares: BigNumber
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   winnerOutcome: Maybe<number>
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
@@ -41,7 +41,7 @@ export const useMarketMakerData = (
     () => ({
       totalPoolShares: new BigNumber(0),
       userPoolShares: new BigNumber(0),
-      balance: [],
+      balances: [],
       winnerOutcome: null,
       marketMakerFunding: new BigNumber(0),
       marketMakerUserFunding: new BigNumber(0),
@@ -108,7 +108,7 @@ export const useMarketMakerData = (
     const erc20Service = new ERC20Service(provider, collateralAddress)
     const collateral = await erc20Service.getProfileSummary()
 
-    const balance: BalanceItem[] = []
+    const balances: BalanceItem[] = []
     for (let i = 0; i < outcomes.length; i++) {
       const outcomeName = outcomes[i]
       const probabilityForPrice = actualPrices[i] * 100
@@ -124,7 +124,7 @@ export const useMarketMakerData = (
         holdings,
         winningOutcome: false, // TODO: fix this, how to know the winningOutcome with multiple outcomes ?
       }
-      balance.push(balanceItem)
+      balances.push(balanceItem)
     }
 
     setStatus(Status.Done)
@@ -132,7 +132,7 @@ export const useMarketMakerData = (
     return {
       totalPoolShares,
       userPoolShares,
-      balance,
+      balances,
       arbitrator,
       winnerOutcome,
       question,
