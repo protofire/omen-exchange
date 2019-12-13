@@ -118,39 +118,7 @@ class MarketMakerService {
     }
   }
 
-  // TODO: delete the function we don't need anymore, check getBalanceInformationWithMultipleOutcomes
   getBalanceInformation = async (
-    ownerAddress: string,
-  ): Promise<{ balanceOfForYes: BigNumber; balanceOfForNo: BigNumber }> => {
-    const conditionId = await this.getConditionId()
-    const collateralTokenAddress = await this.getCollateralToken()
-
-    const [collectionIdForYes, collectionIdForNo] = await Promise.all([
-      this.conditionalTokens.getCollectionIdForYes(conditionId),
-      this.conditionalTokens.getCollectionIdForNo(conditionId),
-    ])
-
-    const [positionIdForYes, positionIdForNo] = await Promise.all([
-      this.conditionalTokens.getPositionId(collateralTokenAddress, collectionIdForYes),
-      this.conditionalTokens.getPositionId(collateralTokenAddress, collectionIdForNo),
-    ])
-
-    const [balanceOfForYes, balanceOfForNo] = await Promise.all([
-      this.conditionalTokens.getBalanceOf(ownerAddress, positionIdForYes),
-      this.conditionalTokens.getBalanceOf(ownerAddress, positionIdForNo),
-    ])
-
-    return {
-      balanceOfForYes,
-      balanceOfForNo,
-    }
-  }
-
-  static getActualPriceWithHoldings = (holdings: BigNumber[]): number[] => {
-    return calcPrice(holdings)
-  }
-
-  getBalanceInformationWithMultipleOutcomes = async (
     ownerAddress: string,
     outcomeQuantity: number,
   ): Promise<BigNumber[]> => {
@@ -180,6 +148,10 @@ class MarketMakerService {
     }
 
     return balances
+  }
+
+  static getActualPriceWithHoldings = (holdings: BigNumber[]): number[] => {
+    return calcPrice(holdings)
   }
 
   balanceOf = async (address: string): Promise<BigNumber> => {

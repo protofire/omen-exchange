@@ -23,6 +23,7 @@ export class OracleService {
    */
   resolveCondition = async (questionId: string): Promise<void> => {
     try {
+      // TODO: this is not working anymore
       await this.contract.resolveCondition(questionId)
     } catch (err) {
       logger.error(

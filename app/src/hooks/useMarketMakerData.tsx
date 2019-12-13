@@ -90,8 +90,8 @@ export const useMarketMakerData = (
       fee,
       isQuestionFinalized,
     ] = await Promise.all([
-      marketMaker.getBalanceInformationWithMultipleOutcomes(user, outcomes.length),
-      marketMaker.getBalanceInformationWithMultipleOutcomes(marketMakerAddress, outcomes.length),
+      marketMaker.getBalanceInformation(user, outcomes.length),
+      marketMaker.getBalanceInformation(marketMakerAddress, outcomes.length),
       marketMaker.getTotalSupply(),
       marketMaker.balanceOf(user),
       marketMaker.getCollateralToken(),
@@ -122,7 +122,7 @@ export const useMarketMakerData = (
         currentPrice,
         shares,
         holdings,
-        winningOutcome: false, // TODO: fix this, how to know the winningOutcome with multiple outcomes ?
+        winningOutcome: winnerOutcome === index,
       }
     })
 

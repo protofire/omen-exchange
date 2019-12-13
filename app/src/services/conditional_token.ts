@@ -65,16 +65,6 @@ class ConditionalTokenService {
     return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, outcomeIndex)
   }
 
-  // TODO: remove this when is no more needed
-  getCollectionIdForYes = async (conditionId: string): Promise<any> => {
-    return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, 1)
-  }
-
-  // TODO: remove this when is no more needed
-  getCollectionIdForNo = async (conditionId: string): Promise<any> => {
-    return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, 2)
-  }
-
   getPositionId = async (collateralAddress: string, collectionId: string): Promise<any> => {
     return this.contract.getPositionId(collateralAddress, collectionId)
   }
