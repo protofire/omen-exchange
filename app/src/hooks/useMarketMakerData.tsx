@@ -108,15 +108,15 @@ export const useMarketMakerData = (
     const erc20Service = new ERC20Service(provider, collateralAddress)
     const collateral = await erc20Service.getProfileSummary()
 
-    const balances: BalanceItem[] = []
-    for (let i = 0; i < outcomes.length; i++) {
-      const outcomeName = outcomes[i]
-      const probabilityForPrice = actualPrices[i] * 100
+    const balances: BalanceItem[] = outcomes.map((outcome: string, index: number) => {
+      const outcomeName = outcome
+      const probabilityForPrice = actualPrices[index] * 100
       const probability = Math.round((probabilityForPrice / 100) * 100)
-      const currentPrice = actualPrices[i]
-      const shares = userShares[i]
-      const holdings = marketMakerShares[i]
-      const balanceItem = {
+      const currentPrice = actualPrices[index]
+      const shares = userShares[index]
+      const holdings = marketMakerShares[index]
+
+      return {
         outcomeName,
         probability,
         currentPrice,
@@ -124,8 +124,7 @@ export const useMarketMakerData = (
         holdings,
         winningOutcome: false, // TODO: fix this, how to know the winningOutcome with multiple outcomes ?
       }
-      balances.push(balanceItem)
-    }
+    })
 
     setStatus(Status.Done)
 
