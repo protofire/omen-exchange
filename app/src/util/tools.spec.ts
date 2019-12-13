@@ -7,6 +7,7 @@ import {
   calcPrice,
   calcSellAmountInCollateral,
   divBN,
+  getIndexSets,
 } from './tools'
 
 describe('tools', () => {
@@ -109,6 +110,18 @@ describe('tools', () => {
         )
 
         expect(divBN(result, bigNumberify(expected))).toBeCloseTo(1)
+      })
+    }
+  })
+
+  describe('getIndexSets', () => {
+    const testCases: any = [[3, [1, 2, 4]], [4, [1, 2, 4, 8]], [5, [1, 2, 4, 8, 16]]]
+
+    for (const [outcomesCount, expected] of testCases) {
+      it(`should get the correct indexSet`, () => {
+        const result = getIndexSets(outcomesCount)
+
+        expect(result).toStrictEqual(expected)
       })
     }
   })
