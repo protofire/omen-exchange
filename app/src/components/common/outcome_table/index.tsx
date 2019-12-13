@@ -161,7 +161,7 @@ export const OutcomeTable = (props: Props) => {
 
   const renderTable = () =>
     balance
-      .sort((a, b) => (a.winningOutcome === b.winningOutcome ? 0 : a.winningOutcome ? -1 : 1))
+      .sort((a, b) => (a.winningOutcome === b.winningOutcome ? 0 : a.winningOutcome ? -1 : 1)) // Put winning outcome first
       .map((balanceItem: BalanceItem, index) =>
         renderTableRow(balanceItem, pricesAfterTrade && pricesAfterTrade[index]),
       )
