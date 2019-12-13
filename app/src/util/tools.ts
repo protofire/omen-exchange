@@ -210,6 +210,6 @@ export const isContract = async (provider: any, address: string): Promise<boolea
 export const delay = (timeout: number) => new Promise(res => setTimeout(res, timeout))
 
 export const getIndexSets = (outcomesCount: number) => {
-  const range = length => [...Array(length)].map((x, i) => i)
+  const range = (length: number) => [...Array(length)].map((x, i) => i)
   return range(outcomesCount).map(x => 1 << x)
 }

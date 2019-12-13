@@ -118,7 +118,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
 
-      await conditionalTokens.redeemPositions(collateralAddress, conditionId)
+      await conditionalTokens.redeemPositions(collateralAddress, conditionId, balances.length)
 
       setStatus(Status.Ready)
     } catch (err) {
