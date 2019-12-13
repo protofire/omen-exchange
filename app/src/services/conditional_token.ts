@@ -10,7 +10,6 @@ const conditionalTokensAbi = [
   'event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount)',
   'function setApprovalForAll(address operator, bool approved) external',
   'function isApprovedForAll(address owner, address operator) external view returns (bool)',
-  'function reportPayouts(bytes32 questionId, uint[] payouts) external',
   'function payoutNumerators(bytes32, uint) public view returns (uint)',
   'function payoutDenominator(bytes32) public view returns (uint)',
   'function redeemPositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] indexSets) external',
@@ -113,11 +112,6 @@ class ConditionalTokenService {
 
   isApprovedForAll = async (marketMakerAddress: string): Promise<boolean> => {
     return this.contract.isApprovedForAll(this.signerAddress, marketMakerAddress)
-  }
-
-  reportPayouts = async (questionId: string): Promise<any> => {
-    // TODO: analize if we need to refactor this
-    return this.contract.reportPayouts(questionId, [1, 0])
   }
 
   isConditionResolved = async (conditionId: string): Promise<boolean> => {
