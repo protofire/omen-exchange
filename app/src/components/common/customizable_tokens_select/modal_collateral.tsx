@@ -46,9 +46,9 @@ const ButtonStyled = styled(Button)`
 `
 
 const ErrorStyled = styled.span`
-  margin-top: 0px;
   color: red;
   font-weight: 500;
+  margin-top: 0px;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
