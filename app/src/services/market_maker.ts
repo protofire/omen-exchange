@@ -158,13 +158,13 @@ class MarketMakerService {
     const collateralTokenAddress = await this.getCollateralToken()
 
     const balances = []
-    logger.log(`Outcomes quantity ${outcomeQuantity}`)
+    logger.debug(`Outcomes quantity ${outcomeQuantity}`)
     for (let i = 0; i < outcomeQuantity; i++) {
       const collectionId = await this.conditionalTokens.getCollectionIdForOutcome(
         conditionId,
         1 << i,
       )
-      logger.log(
+      logger.debug(
         `Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
       )
       const positionIdForCollectionId = await this.conditionalTokens.getPositionId(
@@ -175,7 +175,7 @@ class MarketMakerService {
         ownerAddress,
         positionIdForCollectionId,
       )
-      logger.log(`Balance ${balance.toString()}`)
+      logger.debug(`Balance ${balance.toString()}`)
       balances.push(balance)
     }
 
