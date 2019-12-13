@@ -150,6 +150,7 @@ class RealitioService {
     try {
       const result: string = await this.contract.resultFor(questionId)
       const resultBN = bigNumberify(result)
+      // TODO: refactor this
       return resultBN.isZero() ? 0 : 1
     } catch (err) {
       logger.error(

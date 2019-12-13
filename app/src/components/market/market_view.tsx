@@ -29,6 +29,7 @@ const MarketView: React.FC<Props> = (props: Props) => {
     return isQuestionFinalized ? <ClosedMarketDetail {...props} /> : <View {...props} />
   }
 
+  // TODO: refactor this, check for the winning outcome
   const winningOutcome = balance[0].winningOutcome ? balance[0].outcomeName : balance[1].outcomeName
 
   const formattedResolution = resolution ? formatDate(resolution) : ''

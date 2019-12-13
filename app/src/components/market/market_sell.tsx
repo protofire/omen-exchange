@@ -76,6 +76,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [pricesAfterTrade, setPricesAfterTrade] = useState<[number, number]>([0, 0])
 
+  // TODO: refactor this
   const holdingsYes = balance[0].holdings
   const holdingsNo = balance[1].holdings
 
@@ -85,6 +86,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     })
     setBalanceItem(balanceItemFound)
 
+    // TODO: refactor this
     const yesHoldings = balance[0].holdings
     const noHoldings = balance[1].holdings
     const [holdingsOfSoldOutcome, holdingsOfOtherOutcome] =

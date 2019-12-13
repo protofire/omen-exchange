@@ -65,10 +65,12 @@ class ConditionalTokenService {
     return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, outcomeIndex)
   }
 
+  // TODO: remove this when is no more needed
   getCollectionIdForYes = async (conditionId: string): Promise<any> => {
     return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, 1)
   }
 
+  // TODO: remove this when is no more needed
   getCollectionIdForNo = async (conditionId: string): Promise<any> => {
     return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, 2)
   }
@@ -114,6 +116,7 @@ class ConditionalTokenService {
   }
 
   reportPayouts = async (questionId: string): Promise<any> => {
+    // TODO: analize if we need to refactor this
     return this.contract.reportPayouts(questionId, [1, 0])
   }
 
@@ -128,7 +131,7 @@ class ConditionalTokenService {
       collateralToken,
       ethers.constants.HashZero,
       conditionId,
-      [1, 2],
+      [1, 2], // TODO: analize if we need to refactor this
     )
     await this.provider.waitForTransaction(transactionObject.hash)
   }

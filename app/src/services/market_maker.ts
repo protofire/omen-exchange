@@ -101,6 +101,7 @@ class MarketMakerService {
     })
   }
 
+  // TODO: delete the function we don't need anymore, check getActualPriceWithHoldings
   static getActualPrice = (balanceInformation: {
     balanceOfForYes: BigNumber
     balanceOfForNo: BigNumber
@@ -117,6 +118,7 @@ class MarketMakerService {
     }
   }
 
+  // TODO: delete the function we don't need anymore, check getBalanceInformationWithMultipleOutcomes
   getBalanceInformation = async (
     ownerAddress: string,
   ): Promise<{ balanceOfForYes: BigNumber; balanceOfForNo: BigNumber }> => {
@@ -202,6 +204,7 @@ class MarketMakerService {
   }
 
   calcBuyAmount = async (amount: BigNumber, outcome: OutcomeSlot): Promise<BigNumber> => {
+    // TODO: refactor this
     const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {
       return this.contract.calcBuyAmount(amount, outcomeIndex)
@@ -236,6 +239,7 @@ class MarketMakerService {
   }
 
   sell = async (amount: BigNumber, outcome: OutcomeSlot) => {
+    // TODO: refactor this
     const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
     try {
       const outcomeTokensToSell = await this.contract.calcSellAmount(amount, outcomeIndex)

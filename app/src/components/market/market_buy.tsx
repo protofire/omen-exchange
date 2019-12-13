@@ -70,6 +70,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
 
+  // TODO: refactor this
   const holdingsYes = balance[0].holdings
   const holdingsNo = balance[1].holdings
 
