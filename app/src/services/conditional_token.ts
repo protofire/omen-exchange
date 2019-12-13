@@ -1,7 +1,8 @@
 import { ethers, Wallet, Contract } from 'ethers'
+import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
-import { BigNumber } from 'ethers/utils'
+import { getIndexSets } from '../util/tools'
 
 const logger = getLogger('Services::Conditional-Token')
 
@@ -120,13 +121,16 @@ class ConditionalTokenService {
     return !payoutDenominator.isZero()
   }
 
-  redeemPositions = async (collateralToken: string, conditionId: string) => {
+  redeemPositions = async (collateralToken: string, conditionId: string, outcomesCount: number) => {
+    const indexSets = getIndexSets(outcomesCount)
+
     const transactionObject = await this.contract.redeemPositions(
       collateralToken,
       ethers.constants.HashZero,
       conditionId,
-      [1, 2], // TODO: analize if we need to refactor this
+      indexSets,
     )
+
     await this.provider.waitForTransaction(transactionObject.hash)
   }
 }
