@@ -53,7 +53,7 @@ const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   collateral: Token
   question: string
   resolution: Maybe<Date>
@@ -63,7 +63,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
 
-  const { balance, marketMakerAddress, collateral, question, resolution } = props
+  const { balances, marketMakerAddress, collateral, question, resolution } = props
 
   const marketMakerService = buildMarketMaker(marketMakerAddress)
 
@@ -76,17 +76,19 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [pricesAfterTrade, setPricesAfterTrade] = useState<[number, number]>([0, 0])
 
-  const holdingsYes = balance[0].holdings
-  const holdingsNo = balance[1].holdings
+  // TODO: refactor this
+  const holdingsYes = balances[0].holdings
+  const holdingsNo = balances[1].holdings
 
   useEffect(() => {
-    const balanceItemFound: BalanceItem | undefined = balance.find((balanceItem: BalanceItem) => {
+    const balanceItemFound: BalanceItem | undefined = balances.find((balanceItem: BalanceItem) => {
       return balanceItem.outcomeName === outcome
     })
     setBalanceItem(balanceItemFound)
 
-    const yesHoldings = balance[0].holdings
-    const noHoldings = balance[1].holdings
+    // TODO: refactor this
+    const yesHoldings = balances[0].holdings
+    const noHoldings = balances[1].holdings
     const [holdingsOfSoldOutcome, holdingsOfOtherOutcome] =
       outcome === OutcomeSlot.Yes ? [yesHoldings, noHoldings] : [noHoldings, yesHoldings]
     const amountToSell = calcSellAmountInCollateral(
@@ -103,6 +105,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       amountToSell.mul(-1), // negate amounts because it's a sale
       amountShares.mul(-1),
     )
+    // TODO: refactor this with multiple outcomes
     const { actualPriceForYes, actualPriceForNo } = MarketMakerService.getActualPrice(
       balanceAfterTrade,
     )
@@ -112,7 +115,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     setCostFee(mulBN(amountToSell, 0.01))
 
     setTradedCollateral(amountToSell)
-  }, [outcome, amountShares, balance, collateral, holdingsYes, holdingsNo])
+  }, [outcome, amountShares, balances, collateral, holdingsYes, holdingsNo])
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
 
@@ -166,7 +169,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       <ViewCard>
         <SubsectionTitle>Choose the shares you want to sell</SubsectionTitle>
         <OutcomeTable
-          balance={balance}
+          balances={balances}
           collateral={collateral}
           pricesAfterTrade={pricesAfterTrade}
           outcomeSelected={outcome}

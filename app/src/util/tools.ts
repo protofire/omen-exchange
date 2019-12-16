@@ -76,7 +76,7 @@ export const calcNetCost = (
 }
 
 /**
- * Computes the balance of the outcome tokens after trading
+ * Computes the balances of the outcome tokens after trading
  */
 export const computeBalanceAfterTrade = (
   holdingsYes: BigNumber,
@@ -208,3 +208,8 @@ export const isContract = async (provider: any, address: string): Promise<boolea
 }
 
 export const delay = (timeout: number) => new Promise(res => setTimeout(res, timeout))
+
+export const getIndexSets = (outcomesCount: number) => {
+  const range = (length: number) => [...Array(length)].map((x, i) => i)
+  return range(outcomesCount).map(x => 1 << x)
+}

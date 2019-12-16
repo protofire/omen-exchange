@@ -8,7 +8,7 @@ import { BalanceItem, OutcomeSlot, OutcomeTableValue, Token } from '../../../uti
 import { BarDiagram } from '../bar_diagram_probabilities'
 
 interface Props {
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   collateral: Token
   pricesAfterTrade?: [number, number]
   outcomeSelected?: OutcomeSlot
@@ -44,7 +44,7 @@ const RadioInputStyled = styled(RadioInput)`
 
 export const OutcomeTable = (props: Props) => {
   const {
-    balance,
+    balances,
     collateral,
     pricesAfterTrade,
     outcomeSelected,
@@ -159,15 +159,12 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
-  const yesRow = renderTableRow(balance[0], pricesAfterTrade && pricesAfterTrade[0])
-  const noRow = renderTableRow(balance[1], pricesAfterTrade && pricesAfterTrade[1])
+  const renderTable = () =>
+    balances
+      .sort((a, b) => (a.winningOutcome === b.winningOutcome ? 0 : a.winningOutcome ? -1 : 1)) // Put winning outcome first
+      .map((balanceItem: BalanceItem, index) =>
+        renderTableRow(balanceItem, pricesAfterTrade && pricesAfterTrade[index]),
+      )
 
-  let rows = [yesRow, noRow]
-  if (withWinningOutcome) {
-    if (balance[1].winningOutcome) {
-      rows = [noRow, yesRow]
-    }
-  }
-
-  return <TableStyled head={renderTableHeader()}>{rows}</TableStyled>
+  return <TableStyled head={renderTableHeader()}>{renderTable()}</TableStyled>
 }

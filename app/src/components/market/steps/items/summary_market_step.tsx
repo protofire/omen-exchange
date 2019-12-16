@@ -58,9 +58,9 @@ const SummaryMarketStep = (props: Props) => {
 
   const { marketMakerAddress } = props
 
-  const { question, resolution, category, outcomes } = useQuestion(marketMakerAddress, context)
+  const { question, resolution, category } = useQuestion(marketMakerAddress, context)
   const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
-  const { marketMakerFunding, collateral, arbitrator } = marketMakerData
+  const { marketMakerFunding, collateral, arbitrator, balances } = marketMakerData
 
   const resolutionDate = resolution && formatDate(resolution)
   const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`
@@ -110,13 +110,11 @@ const SummaryMarketStep = (props: Props) => {
             </THead>
           }
         >
-          {outcomes.map((item, index) => {
+          {balances.map((item, index) => {
             return (
               <TR key={index}>
-                <TD>{item}</TD>
-                {/*// TODO: add probability*/}
-                <TD textAlign="right">0%</TD>
-                {/*<TD textAlign="right">{item.probability}%</TD>*/}
+                <TD>{item.outcomeName}</TD>
+                <TD textAlign="right">{item.probability}%</TD>
               </TR>
             )
           })}

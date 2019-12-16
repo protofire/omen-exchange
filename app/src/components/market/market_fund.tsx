@@ -32,7 +32,7 @@ interface Props extends RouteComponentProps<any> {
   userPoolShares: BigNumber
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   theme?: any
   collateral: Token
 }
@@ -86,7 +86,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
     resolution,
     totalPoolShares,
     userPoolShares,
-    balance,
+    balances,
     marketMakerUserFunding,
     marketMakerFunding,
     theme,
@@ -209,7 +209,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         </TableStyled>
         <SubsectionTitle>Balance</SubsectionTitle>
         <OutcomeTable
-          balance={balance}
+          balances={balances}
           disabledColumns={[
             OutcomeTableValue.CurrentPrice,
             OutcomeTableValue.Payout,

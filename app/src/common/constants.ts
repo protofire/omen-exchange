@@ -19,6 +19,6 @@ export const FETCH_EVENTS_CHUNK_SIZE = parseInt(
   process.env.REACT_APP_FETCH_EVENTS_CHUNK_SIZE || '500000',
   10,
 )
-export const MAX_OUTCOME_ALLOWED = parseInt(process.env.REACT_APP_MAX_OUTCOME_ALLOWED || '8', 10)
+export const MAX_OUTCOME_ALLOWED = parseInt(process.env.REACT_APP_MAX_OUTCOME_ALLOWED || '4', 10)
 
 export const SINGLE_SELECT_TEMPLATE_ID = 2
