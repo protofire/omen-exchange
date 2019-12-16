@@ -8,6 +8,7 @@ import { MarketWithExtraData } from '../util/types'
 import { MarketFilter } from '../util/market_filter'
 import { callInChunks, Range } from '../util/call_in_chunks'
 import { RemoteData } from '../util/remote_data'
+import { BigNumber } from 'ethers/utils'
 
 const buildFilterFn = (filter: MarketFilter, contracts: Contracts) => async (
   market: MarketWithExtraData,
@@ -29,22 +30,21 @@ const buildFilterFn = (filter: MarketFilter, contracts: Contracts) => async (
   ) {
     const marketMakerService = buildMarketMaker(market.address)
     const questionId = await conditionalTokens.getQuestionId(market.conditionId)
+    const { outcomes } = await realitio.getQuestion(questionId)
     const isFinalized = await realitio.isFinalized(questionId)
 
-    const { balanceOfForYes, balanceOfForNo } = await marketMakerService.getBalanceInformation(
-      filter.account,
-    )
+    const balances = await marketMakerService.getBalanceInformation(filter.account, outcomes.length)
 
     if (MarketFilter.is.investedMarkets(filter) && !isFinalized) {
-      return balanceOfForYes.gt(0) || balanceOfForNo.gt(0)
+      const balancesGreaterThanZero = balances.filter((balanceBN: BigNumber) => balanceBN.gt(0))
+      return balancesGreaterThanZero.length > 0
     }
     if (MarketFilter.is.winningResultMarkets(filter) && isFinalized) {
       const winnerOutcome = await realitio.getWinnerOutcome(questionId)
-
-      const hasWinningOutcomes =
-        (winnerOutcome === 0 && balanceOfForNo.gt(0)) ||
-        (winnerOutcome === 1 && balanceOfForYes.gt(0))
-      return hasWinningOutcomes
+      const winningOutcomes = balances.filter(
+        (balanceBN: BigNumber, index: number) => winnerOutcome === index && balanceBN.gt(0),
+      )
+      return winningOutcomes.length > 0
     }
 
     return false

@@ -49,7 +49,7 @@ const ButtonContainerStyled = styled(ButtonContainer)`
 
 interface Props {
   theme?: any
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   collateral: Token
   funding: BigNumber
   question: string
@@ -68,7 +68,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
   const {
     collateral: collateralToken,
-    balance,
+    balances,
     marketMakerAddress,
     resolution,
     funding,
@@ -118,7 +118,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
 
-      await conditionalTokens.redeemPositions(collateralAddress, conditionId)
+      await conditionalTokens.redeemPositions(collateralAddress, conditionId, balances.length)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -132,7 +132,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     collateralToken.symbol
   }`
   const resolutionFormat = resolution ? formatDate(resolution) : ''
-  const winningOutcome = balance.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
+  const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
 
   return (
     <>
@@ -140,7 +140,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       <ViewCard>
         {<SubsectionTitle>Balance</SubsectionTitle>}
         <OutcomeTable
-          balance={balance}
+          balances={balances}
           collateral={collateralToken}
           disabledColumns={[OutcomeTableValue.CurrentPrice, OutcomeTableValue.PriceAfterTrade]}
           withWinningOutcome={true}

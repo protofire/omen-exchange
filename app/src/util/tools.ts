@@ -40,11 +40,16 @@ export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
 }
 
 /**
- * Computes the price of some outcome tokens, given the initial funding and the current holdings.
+ * Computes the price of each outcome token given their holdings. Returns an array of numbers in the range [0, 1]
  */
-export const calcPrice = (funding: BigNumber, holdings: BigNumber) => {
-  // 2^(-holding / funding)
-  return Math.pow(2, -divBN(holdings, funding))
+export const calcPrice = (holdingsBN: BigNumber[]): number[] => {
+  const holdings = holdingsBN.map(h => new Big(h.toString()))
+  const product = holdings.reduce((a, b) => a.mul(b))
+  const denominator = holdings.map(h => product.div(h)).reduce((a, b) => a.add(b))
+
+  const prices = holdings.map(holding => product.div(holding).div(denominator))
+
+  return prices.map(price => +price.valueOf())
 }
 
 /**
@@ -71,7 +76,7 @@ export const calcNetCost = (
 }
 
 /**
- * Computes the balance of the outcome tokens after trading
+ * Computes the balances of the outcome tokens after trading
  */
 export const computeBalanceAfterTrade = (
   holdingsYes: BigNumber,
@@ -93,19 +98,16 @@ export const computeBalanceAfterTrade = (
 }
 
 /**
- * Computes the distribution hint that should be used for setting the initial odds to `initialOddsYes`
- * and `initialOddsNo`
+ * Computes the distribution hint that should be used for setting the initial odds to `initialOdds`
  */
-export const calcDistributionHint = (
-  initialOddsYes: number,
-  initialOddsNo: number,
-): BigNumber[] => {
-  const distributionHintYes = Math.sqrt(initialOddsNo / initialOddsYes)
-  const distributionHintNo = Math.sqrt(initialOddsYes / initialOddsNo)
+export const calcDistributionHint = (initialOdds: number[]): BigNumber[] => {
+  const initialOddsBig = initialOdds.map(x => new Big(x))
+  const product = initialOddsBig.reduce((a, b) => a.mul(b))
 
-  const distributionHint = [distributionHintYes, distributionHintNo]
-    .map(hint => Math.round(hint * 1000000))
-    .map(bigNumberify)
+  const distributionHint = initialOddsBig
+    .map(o => product.div(o))
+    .map(x => x.mul(1000000).round())
+    .map(x => bigNumberify(x.toString()))
 
   return distributionHint
 }
@@ -206,3 +208,8 @@ export const isContract = async (provider: any, address: string): Promise<boolea
 }
 
 export const delay = (timeout: number) => new Promise(res => setTimeout(res, timeout))
+
+export const getIndexSets = (outcomesCount: number) => {
+  const range = (length: number) => [...Array(length)].map((x, i) => i)
+  return range(outcomesCount).map(x => 1 << x)
+}

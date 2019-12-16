@@ -1,7 +1,8 @@
 import { ethers, Wallet, Contract } from 'ethers'
+import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
-import { BigNumber } from 'ethers/utils'
+import { getIndexSets } from '../util/tools'
 
 const logger = getLogger('Services::Conditional-Token')
 
@@ -10,7 +11,6 @@ const conditionalTokensAbi = [
   'event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount)',
   'function setApprovalForAll(address operator, bool approved) external',
   'function isApprovedForAll(address owner, address operator) external view returns (bool)',
-  'function reportPayouts(bytes32 questionId, uint[] payouts) external',
   'function payoutNumerators(bytes32, uint) public view returns (uint)',
   'function payoutDenominator(bytes32) public view returns (uint)',
   'function redeemPositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] indexSets) external',
@@ -45,7 +45,7 @@ class ConditionalTokenService {
     const transactionObject = await this.contract.prepareCondition(
       oracleAddress,
       questionId,
-      outcomeSlotCount,
+      new BigNumber(outcomeSlotCount),
       {
         value: '0x0',
       },
@@ -61,12 +61,8 @@ class ConditionalTokenService {
     return conditionId
   }
 
-  getCollectionIdForYes = async (conditionId: string): Promise<any> => {
-    return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, 1)
-  }
-
-  getCollectionIdForNo = async (conditionId: string): Promise<any> => {
-    return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, 2)
+  getCollectionIdForOutcome = async (conditionId: string, outcomeIndex: number): Promise<any> => {
+    return this.contract.getCollectionId(ethers.constants.HashZero, conditionId, outcomeIndex)
   }
 
   getPositionId = async (collateralAddress: string, collectionId: string): Promise<any> => {
@@ -109,23 +105,22 @@ class ConditionalTokenService {
     return this.contract.isApprovedForAll(this.signerAddress, marketMakerAddress)
   }
 
-  reportPayouts = async (questionId: string): Promise<any> => {
-    return this.contract.reportPayouts(questionId, [1, 0])
-  }
-
   isConditionResolved = async (conditionId: string): Promise<boolean> => {
     const payoutDenominator: BigNumber = await this.contract.payoutDenominator(conditionId)
 
     return !payoutDenominator.isZero()
   }
 
-  redeemPositions = async (collateralToken: string, conditionId: string) => {
+  redeemPositions = async (collateralToken: string, conditionId: string, outcomesCount: number) => {
+    const indexSets = getIndexSets(outcomesCount)
+
     const transactionObject = await this.contract.redeemPositions(
       collateralToken,
       ethers.constants.HashZero,
       conditionId,
-      [1, 2],
+      indexSets,
     )
+
     await this.provider.waitForTransaction(transactionObject.hash)
   }
 }

@@ -33,13 +33,13 @@ const addresses: { [networkId: number]: KnownContracts } = {
     realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
     marketMakerFactory: '0xD0B953db85fb6f0C6A437b18140Ba857cb67768a',
     conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
-    oracle: '0xa5C8Cea58D79dd3094281eac1048a937beF6C84C',
+    oracle: '0x5A90132C104CA33652Ee71E2E645D5A4d8E5d7D6',
   },
   [networkIds.GANACHE]: {
     realitio: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
-    marketMakerFactory: '0xaD888d0Ade988EbEe74B8D4F39BF29a8d0fe8A8D',
-    conditionalTokens: '0x21a59654176f2689d12E828B77a783072CD26680',
-    oracle: '0xFF6049B87215476aBf744eaA3a476cBAd46fB1cA',
+    marketMakerFactory: '0x7C728214be9A0049e6a86f2137ec61030D0AA964',
+    conditionalTokens: '0xD86C8F0327494034F60e25074420BcCF560D5610',
+    oracle: '0xA586074FA4Fe3E546A132a16238abe37951D41fE',
   },
 }
 

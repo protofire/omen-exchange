@@ -120,14 +120,14 @@ const CreateMarketStep = (props: Props) => {
           </THead>
         }
       >
-        <TR>
-          <TD>{outcomes[0].name}</TD>
-          <TD textAlign="right">{outcomes[0].probability}%</TD>
-        </TR>
-        <TR>
-          <TD>{outcomes[1].name}</TD>
-          <TD textAlign="right">{outcomes[1].probability}%</TD>
-        </TR>
+        {outcomes.map((outcome, index) => {
+          return (
+            <TR key={index}>
+              <TD>{outcome.name}</TD>
+              <TD textAlign="right">{outcome.probability}%</TD>
+            </TR>
+          )
+        })}
       </TableStyled>
       {questionId || marketMakerAddress ? (
         <>

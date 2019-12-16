@@ -14,7 +14,7 @@ export enum OutcomeSlot {
 }
 
 export interface BalanceItem {
-  outcomeName: OutcomeSlot
+  outcomeName: string
   probability: number
   currentPrice: number
   shares: BigNumber
@@ -63,6 +63,7 @@ export interface Question {
   resolution: Maybe<Date>
   arbitratorAddress: string
   category: string
+  outcomes: string[]
 }
 
 export enum OutcomeTableValue {
@@ -84,6 +85,7 @@ export interface QuestionLog {
   lang: string
   title: string
   type: string
+  outcomes?: string[]
 }
 
 export interface Market {

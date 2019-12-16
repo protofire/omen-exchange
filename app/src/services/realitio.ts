@@ -1,12 +1,13 @@
 import { Contract, ethers, Wallet } from 'ethers'
-import { bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import { Moment } from 'moment'
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 
-import { REALITIO_TIMEOUT } from '../common/constants'
+import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from '../common/constants'
 import { getLogger } from '../util/logger'
-import { Question, QuestionLog } from '../util/types'
+import { OutcomeSlot, Question, QuestionLog } from '../util/types'
+import { Outcome } from '../components/common/outcomes'
 
 const logger = getLogger('Services::Realitio')
 
@@ -54,13 +55,27 @@ class RealitioService {
    */
   askQuestion = async (
     question: string,
+    outcomes: Outcome[],
     category: string,
     arbitratorAddress: string,
     openingDateMoment: Moment,
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
-    const questionText = RealitioQuestionLib.encodeText('bool', question, null, category)
-    const args = [0, questionText, arbitratorAddress, REALITIO_TIMEOUT, openingTimestamp, 0]
+    const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
+    const questionText = RealitioQuestionLib.encodeText(
+      'single-select',
+      question,
+      outcomeNames,
+      category,
+    )
+    const args = [
+      SINGLE_SELECT_TEMPLATE_ID,
+      questionText,
+      arbitratorAddress,
+      REALITIO_TIMEOUT,
+      openingTimestamp,
+      0,
+    ]
 
     const questionId = await this.constantContract.askQuestion(...args, {
       from: this.signerAddress,
@@ -95,19 +110,26 @@ class RealitioService {
     const iface = new ethers.utils.Interface(realitioAbi)
     const event = iface.parseLog(logs[0])
 
+    const { question, template_id: templateId, opening_ts: openingTs, arbitrator } = event.values
+
+    const templates = ['bool', 'uint', 'single-select', 'multiple-select', 'datetime']
+
+    const templateType = templates[(templateId as BigNumber).toNumber()]
+
+    const template = RealitioTemplateLib.defaultTemplateForType(templateType)
     const questionLog: QuestionLog = RealitioQuestionLib.populatedJSONForTemplate(
-      RealitioTemplateLib.defaultTemplateForType('bool'),
-      event.values.question,
+      template,
+      question,
     )
 
-    const category = questionLog.category === 'undefined' ? '' : questionLog.category
-    const question = questionLog.title === 'undefined' ? '' : questionLog.title
+    const { category, title, outcomes = [OutcomeSlot.Yes, OutcomeSlot.No] } = questionLog
 
     return {
-      question,
-      category,
-      resolution: new Date(event.values.opening_ts * 1000),
-      arbitratorAddress: event.values.arbitrator,
+      question: title === 'undefined' ? '' : title,
+      category: category === 'undefined' ? '' : category,
+      resolution: new Date(openingTs * 1000),
+      arbitratorAddress: arbitrator,
+      outcomes: outcomes,
     }
   }
 
@@ -128,7 +150,7 @@ class RealitioService {
     try {
       const result: string = await this.contract.resultFor(questionId)
       const resultBN = bigNumberify(result)
-      return resultBN.isZero() ? 0 : 1
+      return +resultBN.toString()
     } catch (err) {
       logger.error(
         `There was an error querying the result for question with id '${questionId}'`,
