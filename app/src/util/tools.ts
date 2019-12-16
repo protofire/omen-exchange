@@ -2,7 +2,6 @@ import Big from 'big.js'
 import { BigNumber, getAddress, bigNumberify, formatUnits } from 'ethers/utils'
 
 import { getLogger } from './logger'
-import { OutcomeSlot } from './types'
 
 const logger = getLogger('Tools')
 
@@ -79,22 +78,14 @@ export const calcNetCost = (
  * Computes the balances of the outcome tokens after trading
  */
 export const computeBalanceAfterTrade = (
-  holdingsYes: BigNumber,
-  holdingsNo: BigNumber,
-  outcome: OutcomeSlot, // Outcome selected
+  holdings: BigNumber[],
+  outcomeIndex: number, // Outcome selected
   amountCollateralSpent: BigNumber, // Amount of collateral being spent
   amountShares: BigNumber, // amount of `outcome` shares being traded
-): { balanceOfForYes: BigNumber; balanceOfForNo: BigNumber } => {
-  let balanceOfForYes = holdingsYes.add(amountCollateralSpent)
-  let balanceOfForNo = holdingsNo.add(amountCollateralSpent)
+): BigNumber[] => {
+  // TODO: refactor this, calculate balance after trade
 
-  if (outcome === OutcomeSlot.Yes) {
-    balanceOfForYes = balanceOfForYes.sub(amountShares)
-  } else {
-    balanceOfForNo = balanceOfForNo.sub(amountShares)
-  }
-
-  return { balanceOfForYes, balanceOfForNo }
+  return []
 }
 
 /**

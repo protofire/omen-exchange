@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
-import { BalanceItem, OutcomeSlot, OutcomeTableValue, Status, Token } from '../../util/types'
+import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../common'
 import { ButtonContainer } from '../common/button_container'
 import { ButtonLink } from '../common/button_link'
@@ -13,18 +13,11 @@ import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 import { ViewCard } from '../common/view_card'
-import { MarketMakerService } from '../../services'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getLogger } from '../../util/logger'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { FullLoading } from '../common/full_loading'
-import {
-  computeBalanceAfterTrade,
-  formatBigNumber,
-  formatDate,
-  calcSellAmountInCollateral,
-  mulBN,
-} from '../../util/tools'
+import { formatBigNumber, formatDate, calcSellAmountInCollateral, mulBN } from '../../util/tools'
 import { SectionTitle } from '../common/section_title'
 import { BalanceShares } from '../common/balance_shares'
 import { useContracts } from '../../hooks/useContracts'
@@ -69,28 +62,23 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
-  const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
+  const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [tradedCollateral, setTradedCollateral] = useState<BigNumber>(new BigNumber(0))
   const [costFee, setCostFee] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
-  const [pricesAfterTrade, setPricesAfterTrade] = useState<[number, number]>([0, 0])
-
-  // TODO: refactor this
-  const holdingsYes = balances[0].holdings
-  const holdingsNo = balances[1].holdings
+  const [pricesAfterTrade, setPricesAfterTrade] = useState<number[]>([])
 
   useEffect(() => {
-    const balanceItemFound: BalanceItem | undefined = balances.find((balanceItem: BalanceItem) => {
-      return balanceItem.outcomeName === outcome
-    })
-    setBalanceItem(balanceItemFound)
+    setBalanceItem(balances[outcomeIndex])
 
     // TODO: refactor this
-    const yesHoldings = balances[0].holdings
-    const noHoldings = balances[1].holdings
-    const [holdingsOfSoldOutcome, holdingsOfOtherOutcome] =
-      outcome === OutcomeSlot.Yes ? [yesHoldings, noHoldings] : [noHoldings, yesHoldings]
+    const holdingsOfSoldOutcome = balances[outcomeIndex].holdings
+    const holdingsOfOtherOutcome = balances
+      .filter((item, index) => {
+        return index !== outcomeIndex
+      })
+      .reduce((a, b) => a.add(b.holdings), new BigNumber(0))
     const amountToSell = calcSellAmountInCollateral(
       holdingsOfSoldOutcome,
       holdingsOfOtherOutcome,
@@ -98,24 +86,26 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       0.01,
     )
 
-    const balanceAfterTrade = computeBalanceAfterTrade(
-      holdingsYes,
-      holdingsNo,
-      outcome,
-      amountToSell.mul(-1), // negate amounts because it's a sale
-      amountShares.mul(-1),
-    )
-    // TODO: refactor this with multiple outcomes
-    const { actualPriceForYes, actualPriceForNo } = MarketMakerService.getActualPrice(
-      balanceAfterTrade,
-    )
+    // TODO: refactor this
+    // const balanceAfterTrade = computeBalanceAfterTrade(
+    //   [],
+    //   outcomeIndex,
+    //   amountToSell.mul(-1), // negate amounts because it's a sale
+    //   amountShares.mul(-1),
+    // )
 
-    setPricesAfterTrade([actualPriceForYes, actualPriceForNo])
+    // TODO: refactor this with multiple outcomes
+    // const pricesAfterTrade = MarketMakerService.getActualPrice(
+    //   balanceAfterTrade,
+    // )
+    const pricesAfterTrade = [] as number[]
+
+    setPricesAfterTrade(pricesAfterTrade)
 
     setCostFee(mulBN(amountToSell, 0.01))
 
     setTradedCollateral(amountToSell)
-  }, [outcome, amountShares, balances, collateral, holdingsYes, holdingsNo])
+  }, [outcomeIndex, amountShares, balances, collateral])
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
 
@@ -133,7 +123,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         await conditionalTokens.setApprovalForAll(marketMakerAddress)
       }
 
-      await marketMakerService.sell(tradedCollateral, outcome)
+      await marketMakerService.sell(tradedCollateral, outcomeIndex)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -172,8 +162,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           balances={balances}
           collateral={collateral}
           pricesAfterTrade={pricesAfterTrade}
-          outcomeSelected={outcome}
-          outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
+          outcomeSelected={outcomeIndex}
+          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           disabledColumns={[OutcomeTableValue.Payout]}
         />
         <AmountWrapper
