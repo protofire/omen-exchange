@@ -5,7 +5,6 @@ import { getLogger } from '../util/logger'
 const logger = getLogger('Services::Oracle')
 
 const oracleAbi = [
-  'function resolveCondition(bytes32 questionId) public',
   'function resolveSingleSelectCondition(bytes32 questionId, uint256 numOutcomes) public',
 ]
 
