@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { THREEBOX_ADMIN_ADDRESS, THREEBOX_SPACE_NAME } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
-import { ButtonCSS } from '../button'
+import { ButtonCSS } from '../../../common/styling_types'
 
 const logger = getLogger('Component::ThreeBoxComments')
 

@@ -25,6 +25,7 @@ import { BigNumberInputReturn } from '../common/big_number_input'
 import { SectionTitle } from '../common/section_title'
 import { BalanceToken } from '../common/balance_token'
 import { useContracts } from '../../hooks/useContracts'
+import { ButtonType } from '../../common/styling_types'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -216,8 +217,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
-          <Button disabled={disabled} onClick={() => finish()}>
-            Finish
+          <Button buttonType={ButtonType.primary} disabled={disabled} onClick={() => finish()}>
+            Buy
           </Button>
         </ButtonContainer>
       </ViewCard>

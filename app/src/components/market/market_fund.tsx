@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import styled, { withTheme } from 'styled-components'
+import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
 import { SectionTitle } from '../common/section_title'
@@ -23,6 +23,7 @@ import { ButtonLink } from '../common/button_link'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { BalanceToken } from '../common/balance_token'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
+import { ButtonType } from '../../common/styling_types'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -50,24 +51,6 @@ const AmountWrapper = styled(FormRow)`
   }
 `
 
-const ButtonContainerStyled = styled(ButtonContainer)`
-  display: grid;
-  grid-row-gap: 10px;
-  grid-template-columns: 1fr;
-
-  > button {
-    margin-left: 0;
-  }
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: flex;
-
-    > button {
-      margin-left: 10px;
-    }
-  }
-`
-
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
@@ -82,16 +65,15 @@ const logger = getLogger('Market::Fund')
 
 const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   const {
+    balance,
+    collateral,
+    marketMakerAddress,
+    marketMakerFunding,
+    marketMakerUserFunding,
     question,
     resolution,
     totalPoolShares,
     userPoolShares,
-    balance,
-    marketMakerUserFunding,
-    marketMakerFunding,
-    theme,
-    marketMakerAddress,
-    collateral,
   } = props
 
   const context = useConnectedWeb3Context()
@@ -247,27 +229,25 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
             </>
           }
         />
-        <ButtonContainerStyled>
+        <ButtonContainer>
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
-
-          <Button onClick={() => addFunding()} fontSize={'18px'} disabled={error}>
-            Add funding
-          </Button>
           <Button
             disabled={marketMakerUserFunding && marketMakerUserFunding.isZero()}
-            backgroundColor={theme.colors.secondary}
+            buttonType={ButtonType.secondary}
             onClick={() => removeFunding()}
-            fontSize={'18px'}
           >
-            Remove all funding
+            Remove funding
           </Button>
-        </ButtonContainerStyled>
+          <Button buttonType={ButtonType.primary} onClick={() => addFunding()} disabled={error}>
+            Add funding
+          </Button>
+        </ButtonContainer>
       </ViewCard>
       {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>
   )
 }
 
-export const MarketFund = withRouter(withTheme(MarketFundWrapper))
+export const MarketFund = withRouter(MarketFundWrapper)

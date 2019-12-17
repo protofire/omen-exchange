@@ -8,18 +8,18 @@ import { View } from './profile/view'
 import { formatDate } from '../../util/tools'
 
 interface Props {
+  arbitrator: Maybe<Arbitrator>
   balance: BalanceItem[]
-  funding: BigNumber
-  status: Status
-  marketMakerAddress: string
+  category: string
   collateral: Token
+  funding: BigNumber
+  isConditionResolved: boolean
+  isQuestionFinalized: boolean
+  marketMakerAddress: string
   question: string
   questionId: string
-  category: string
   resolution: Maybe<Date>
-  arbitrator: Maybe<Arbitrator>
-  isQuestionFinalized: boolean
-  isConditionResolved: boolean
+  status: Status
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {

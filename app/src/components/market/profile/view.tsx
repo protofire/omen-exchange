@@ -1,7 +1,6 @@
 import React from 'react'
 import styled, { withTheme } from 'styled-components'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-
 import { ThreeBoxComments } from '../../common/three_box_comments'
 import { ViewCard } from '../../common/view_card'
 import { Status, BalanceItem, Token, Arbitrator, OutcomeTableValue } from '../../../util/types'
@@ -14,35 +13,18 @@ import { TitleValue } from '../../common/title_value'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
 
 interface Props extends RouteComponentProps<{}> {
-  balance: BalanceItem[]
-  collateral: Token
   arbitrator: Maybe<Arbitrator>
+  balance: BalanceItem[]
+  category: string
+  collateral: Token
+  funding: BigNumber
+  marketMakerAddress: string
   question: string
   questionId: string
-  category: string
   status: Status
   theme?: any
-  marketMakerAddress: string
-  funding: BigNumber
 }
 
-const ButtonContainerStyled = styled(ButtonContainer)`
-  display: grid;
-  grid-row-gap: 10px;
-  grid-template-columns: 1fr;
-
-  > a {
-    margin-left: 0;
-  }
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    grid-template-columns: 1fr 1fr 1fr;
-
-    > a {
-      margin-left: 10px;
-    }
-  }
-`
 const Grid = styled.div`
   display: grid;
   grid-column-gap: 20px;
@@ -53,14 +35,13 @@ const Grid = styled.div`
 
 const ViewWrapper = (props: Props) => {
   const {
-    balance,
-    collateral,
-    status,
-    questionId,
-    theme,
-    marketMakerAddress,
     arbitrator,
+    balance,
     category,
+    collateral,
+    marketMakerAddress,
+    questionId,
+    status,
   } = props
 
   const userHasShares = balance.some((balanceItem: BalanceItem) => {
@@ -120,18 +101,13 @@ const ViewWrapper = (props: Props) => {
         {marketHasDetails && details()}
         {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
         {renderTableData()}
-        <ButtonContainerStyled>
+        <ButtonContainer>
           <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
           {userHasShares && (
-            <ButtonAnchor
-              backgroundColor={theme.colors.secondary}
-              href={`/#/${marketMakerAddress}/sell`}
-            >
-              Sell
-            </ButtonAnchor>
+            <ButtonAnchor href={`/#/${marketMakerAddress}/sell`}>Sell</ButtonAnchor>
           )}
           <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
-        </ButtonContainerStyled>
+        </ButtonContainer>
         <ThreeBoxComments threadName={marketMakerAddress} />
       </ViewCard>
       {status === Status.Loading ? <FullLoading /> : null}

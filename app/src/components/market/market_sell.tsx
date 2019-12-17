@@ -28,6 +28,7 @@ import {
 import { SectionTitle } from '../common/section_title'
 import { BalanceShares } from '../common/balance_shares'
 import { useContracts } from '../../hooks/useContracts'
+import { ButtonType } from '../../common/styling_types'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -205,8 +206,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
-          <Button disabled={disabled} onClick={() => finish()}>
-            Finish
+          <Button buttonType={ButtonType.primary} disabled={disabled} onClick={() => finish()}>
+            Sell
           </Button>
         </ButtonContainer>
       </ViewCard>
