@@ -5,10 +5,9 @@ const theme = {
   },
   colors: {
     activeListItemBackground: '#fafafa',
+    darkGray: '#acacac',
     primary: '#00be95',
-    primarySoft:'#A3F7E5',
     secondary: '#ff7848',
-    secondarySoft:'#FFB59B',
     tertiary: '#f5f5f5',
     textColor: '#333',
     textColorLight: '#888',
@@ -57,13 +56,13 @@ const theme = {
     placeholderColor: '#666',
   },
   createSteps: {
-    maxWidth: '400px'
+    maxWidth: '400px',
   },
   viewMarket: {
-    maxWidth: '550px'
+    maxWidth: '550px',
   },
   list: {
-    maxWidth: '620px'
+    maxWidth: '620px',
   },
   dropdown: {
     backgroundColor: '#fff',
