@@ -103,7 +103,7 @@ export const useMarketMakerData = (
 
     const winnerOutcome = isQuestionFinalized ? await realitio.getWinnerOutcome(questionId) : null
 
-    const actualPrices = MarketMakerService.getActualPriceWithHoldings(marketMakerShares)
+    const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
     const erc20Service = new ERC20Service(provider, collateralAddress)
     const collateral = await erc20Service.getProfileSummary()

@@ -108,7 +108,7 @@ test('should accept a selected outcome', () => {
   const balances = getBalances()
 
   const { asFragment } = renderTable(
-    <OutcomeTable balances={balances} collateral={dai} outcomeSelected={OutcomeSlot.Yes} />,
+    <OutcomeTable balances={balances} collateral={dai} outcomeSelected={0} />,
   )
 
   expect(asFragment()).toMatchSnapshot()
@@ -134,7 +134,7 @@ test('should accept a selected outcome', () => {
   }
 
   fireEvent.click(radioForNo)
-  expect(onOutcomeChange).toHaveBeenCalledWith(OutcomeSlot.No)
+  expect(onOutcomeChange).toHaveBeenCalledWith(1)
   fireEvent.click(radioForYes)
-  expect(onOutcomeChange).toHaveBeenCalledWith(OutcomeSlot.Yes)
+  expect(onOutcomeChange).toHaveBeenCalledWith(0)
 })
