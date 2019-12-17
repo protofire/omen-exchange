@@ -84,7 +84,8 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const resolveCondition = () => {
-    return oracle.resolveCondition(questionId)
+    // Balances length is the number of outcomes
+    return oracle.resolveCondition(questionId, balances.length)
   }
 
   useEffect(() => {
