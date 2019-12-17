@@ -89,7 +89,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const [tradedShares, pricesAfterTrade] = useAsyncDerivedValue(
     amount,
-    [new BigNumber(0), []],
+    [new BigNumber(0), balances.map(() => 0)],
     calcBuyAmount,
   )
 
