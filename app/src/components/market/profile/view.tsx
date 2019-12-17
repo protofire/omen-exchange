@@ -1,6 +1,7 @@
 import React from 'react'
-import styled, { withTheme } from 'styled-components'
+import styled from 'styled-components'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
+
 import { ThreeBoxComments } from '../../common/three_box_comments'
 import { ViewCard } from '../../common/view_card'
 import { Status, BalanceItem, Token, Arbitrator, OutcomeTableValue } from '../../../util/types'
@@ -13,16 +14,15 @@ import { TitleValue } from '../../common/title_value'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
 
 interface Props extends RouteComponentProps<{}> {
-  arbitrator: Maybe<Arbitrator>
-  balance: BalanceItem[]
-  category: string
+  balances: BalanceItem[]
   collateral: Token
-  funding: BigNumber
-  marketMakerAddress: string
+  arbitrator: Maybe<Arbitrator>
   question: string
   questionId: string
+  category: string
   status: Status
-  theme?: any
+  marketMakerAddress: string
+  funding: BigNumber
 }
 
 const Grid = styled.div`
@@ -35,16 +35,16 @@ const Grid = styled.div`
 
 const ViewWrapper = (props: Props) => {
   const {
-    arbitrator,
-    balance,
-    category,
+    balances,
     collateral,
-    marketMakerAddress,
-    questionId,
     status,
+    questionId,
+    marketMakerAddress,
+    arbitrator,
+    category,
   } = props
 
-  const userHasShares = balance.some((balanceItem: BalanceItem) => {
+  const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
     return !shares.isZero()
   })
@@ -56,7 +56,7 @@ const ViewWrapper = (props: Props) => {
     }
     return (
       <OutcomeTable
-        balance={balance}
+        balances={balances}
         collateral={collateral}
         displayRadioSelection={false}
         disabledColumns={disabledColumns}
@@ -115,4 +115,4 @@ const ViewWrapper = (props: Props) => {
   )
 }
 
-export const View = withRouter(withTheme(ViewWrapper))
+export const View = withRouter(ViewWrapper)

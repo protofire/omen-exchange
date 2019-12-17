@@ -6,6 +6,7 @@ import { Outcomes, Outcome } from '../../../common/outcomes'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
 import { Well } from '../../../common/well'
+import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -13,6 +14,24 @@ const ButtonLinkStyled = styled(ButtonLink)`
 
 const OutcomeInfo = styled(Well)`
   margin-bottom: 30px;
+`
+
+const ButtonContainerStyled = styled(ButtonContainer)`
+  display: grid;
+  grid-row-gap: 10px;
+  grid-template-columns: 1fr;
+
+  > button {
+    margin-left: 0;
+  }
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: flex;
+
+    > button {
+      margin-left: 10px;
+    }
+  }
 `
 
 interface Props {
@@ -29,17 +48,47 @@ const OutcomesStep = (props: Props) => {
   const { handleOutcomesChange, values } = props
   const { question, outcomes } = values
 
+  const errorMessages = []
+
+  const someEmptyName = outcomes.some(outcome => !outcome.name)
+  if (someEmptyName) {
+    errorMessages.push('The names of the outcomes should not be empty.')
+  }
+
+  const totalOutcomeProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
+  if (totalOutcomeProbabilities !== 100) {
+    errorMessages.push('The sum of all probabilities must be equal to 100%.')
+  }
+
+  const error = totalOutcomeProbabilities !== 100 || someEmptyName
+
+  const isAddNewOutcomeButtonDisabled = outcomes.length >= MAX_OUTCOME_ALLOWED
+
+  const addNewOutcome = () => {
+    const newOutcome = {
+      name: '',
+      probability: 0,
+    }
+    outcomes.push(newOutcome)
+    handleOutcomesChange(outcomes)
+  }
+
   return (
     <CreateCard>
       <OutcomeInfo>
         Please add all the possible outcomes for the <strong>&quot;{question}&quot;</strong>{' '}
         question.
       </OutcomeInfo>
-      <Outcomes outcomes={outcomes} onChange={handleOutcomesChange} />
-      <ButtonContainer>
+      <Outcomes outcomes={outcomes} onChange={handleOutcomesChange} errorMessages={errorMessages} />
+      <ButtonContainerStyled>
         <ButtonLinkStyled onClick={props.back}>‹ Back</ButtonLinkStyled>
-        <Button onClick={props.next}>Next</Button>
-      </ButtonContainer>
+        <Button disabled={isAddNewOutcomeButtonDisabled} onClick={addNewOutcome}>
+          Add outcome
+        </Button>
+        <Button disabled={error} onClick={props.next}>
+          Next
+        </Button>
+      </ButtonContainerStyled>
     </CreateCard>
   )
 }

@@ -1325,6 +1325,13 @@
   dependencies:
     prop-types "^15.5.10"
 
+"@fvictorio/newton-raphson-method@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@fvictorio/newton-raphson-method/-/newton-raphson-method-1.0.5.tgz#e2dd2f3b00277c575a4430c7bbbd5d160a87af7c"
+  integrity sha512-01tOywjS038lwx/kPL91uflpU/tfRhR2hkf8zHNiqfxy7tUX6oKVXjo2lvEwelrtzvCYaSy4Yl5qkKpwjmfzSw==
+  dependencies:
+    big.js "^5.2.2"
+
 "@hapi/accept@3.x.x":
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/@hapi/accept/-/accept-3.2.3.tgz#6947259928ed28df2736c7daffbfc739b72adfcc"

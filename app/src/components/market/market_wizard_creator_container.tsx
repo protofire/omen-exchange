@@ -39,6 +39,7 @@ const MarketWizardCreatorContainer: FC = () => {
       setStatus(StatusMarketCreation.PostingQuestion)
       const questionId = await realitio.askQuestion(
         question,
+        outcomes,
         category,
         arbitrator.address,
         openingDateMoment,
@@ -48,7 +49,11 @@ const MarketWizardCreatorContainer: FC = () => {
       setStatus(StatusMarketCreation.PrepareCondition)
 
       const oracleAddress = getContractAddress(networkId, 'oracle')
-      const conditionId = await conditionalTokens.prepareCondition(questionId, oracleAddress)
+      const conditionId = await conditionalTokens.prepareCondition(
+        questionId,
+        oracleAddress,
+        outcomes.length,
+      )
 
       // approve movement of collateral token to MarketMakerFactory
       setStatus(StatusMarketCreation.ApprovingCollateral)
@@ -78,11 +83,7 @@ const MarketWizardCreatorContainer: FC = () => {
 
       setStatus(StatusMarketCreation.AddFunding)
       const marketMakerService = buildMarketMaker(marketMakerAddress)
-      await marketMakerService.addInitialFunding(
-        funding,
-        +outcomes[0].probability,
-        +outcomes[1].probability,
-      )
+      await marketMakerService.addInitialFunding(funding, outcomes.map(o => o.probability))
 
       setStatus(StatusMarketCreation.Done)
     } catch (err) {

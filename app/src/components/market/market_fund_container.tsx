@@ -19,7 +19,7 @@ const MarketFundContainer: React.FC<Props> = (props: Props) => {
   const {
     totalPoolShares,
     userPoolShares,
-    balance,
+    balances,
     marketMakerFunding,
     marketMakerUserFunding,
     collateral,
@@ -38,7 +38,7 @@ const MarketFundContainer: React.FC<Props> = (props: Props) => {
       userPoolShares={userPoolShares}
       marketMakerFunding={marketMakerFunding}
       marketMakerUserFunding={marketMakerUserFunding}
-      balance={balance}
+      balances={balances}
       collateral={collateral}
     />
   )

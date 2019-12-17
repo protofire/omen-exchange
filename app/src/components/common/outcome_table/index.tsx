@@ -4,15 +4,15 @@ import styled from 'styled-components'
 import { Table, TD, TH, THead, TR } from '../table/index'
 import { RadioInput } from '../radio_input/index'
 import { formatBigNumber } from '../../../util/tools'
-import { BalanceItem, OutcomeSlot, OutcomeTableValue, Token } from '../../../util/types'
+import { BalanceItem, OutcomeTableValue, Token } from '../../../util/types'
 import { BarDiagram } from '../bar_diagram_probabilities'
 
 interface Props {
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   collateral: Token
-  pricesAfterTrade?: [number, number]
-  outcomeSelected?: OutcomeSlot
-  outcomeHandleChange?: (e: OutcomeSlot) => void
+  pricesAfterTrade?: number[]
+  outcomeSelected?: number
+  outcomeHandleChange?: (e: number) => void
   disabledColumns?: OutcomeTableValue[]
   withWinningOutcome?: boolean
   displayRadioSelection?: boolean
@@ -44,7 +44,7 @@ const RadioInputStyled = styled(RadioInput)`
 
 export const OutcomeTable = (props: Props) => {
   const {
-    balance,
+    balances,
     collateral,
     pricesAfterTrade,
     outcomeSelected,
@@ -81,7 +81,11 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
-  const renderTableRow = (balanceItem: BalanceItem, priceAfterTrade?: number) => {
+  const renderTableRow = (
+    balanceItem: BalanceItem,
+    outcomeIndex: number,
+    priceAfterTrade?: number,
+  ) => {
     const { outcomeName, probability, currentPrice, shares, winningOutcome } = balanceItem
     const isWinning = probability > 50
 
@@ -92,12 +96,10 @@ export const OutcomeTable = (props: Props) => {
             <RadioContainer>
               <RadioInputStyled
                 data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
-                checked={outcomeSelected === outcomeName}
+                checked={outcomeSelected === outcomeIndex}
                 name="outcome"
-                onChange={(e: any) =>
-                  outcomeHandleChange && outcomeHandleChange(e.target.value as OutcomeSlot)
-                }
-                value={outcomeName}
+                onChange={(e: any) => outcomeHandleChange && outcomeHandleChange(+e.target.value)}
+                value={outcomeIndex}
               />
             </RadioContainer>
           </TD>
@@ -159,15 +161,12 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
-  const yesRow = renderTableRow(balance[0], pricesAfterTrade && pricesAfterTrade[0])
-  const noRow = renderTableRow(balance[1], pricesAfterTrade && pricesAfterTrade[1])
+  const renderTable = () =>
+    balances
+      .sort((a, b) => (a.winningOutcome === b.winningOutcome ? 0 : a.winningOutcome ? -1 : 1)) // Put winning outcome first
+      .map((balanceItem: BalanceItem, index) =>
+        renderTableRow(balanceItem, index, pricesAfterTrade && pricesAfterTrade[index]),
+      )
 
-  let rows = [yesRow, noRow]
-  if (withWinningOutcome) {
-    if (balance[1].winningOutcome) {
-      rows = [noRow, yesRow]
-    }
-  }
-
-  return <TableStyled head={renderTableHeader()}>{rows}</TableStyled>
+  return <TableStyled head={renderTableHeader()}>{renderTable()}</TableStyled>
 }

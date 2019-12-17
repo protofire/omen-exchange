@@ -8,31 +8,33 @@ import { View } from './profile/view'
 import { formatDate } from '../../util/tools'
 
 interface Props {
-  arbitrator: Maybe<Arbitrator>
-  balance: BalanceItem[]
-  category: string
-  collateral: Token
+  balances: BalanceItem[]
   funding: BigNumber
-  isConditionResolved: boolean
-  isQuestionFinalized: boolean
+  status: Status
   marketMakerAddress: string
+  collateral: Token
   question: string
   questionId: string
+  category: string
   resolution: Maybe<Date>
-  status: Status
+  arbitrator: Maybe<Arbitrator>
+  isQuestionFinalized: boolean
+  isConditionResolved: boolean
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {
-  const { balance, question, resolution, isQuestionFinalized } = props
+  const { balances, question, resolution, isQuestionFinalized } = props
 
   const renderView = () => {
     return isQuestionFinalized ? <ClosedMarketDetail {...props} /> : <View {...props} />
   }
 
-  const winningOutcome = balance[0].winningOutcome ? balance[0].outcomeName : balance[1].outcomeName
+  const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
 
   const formattedResolution = resolution ? formatDate(resolution) : ''
-  const subtitle = isQuestionFinalized ? `Final Outcome: ${winningOutcome}` : formattedResolution
+  const subtitle = isQuestionFinalized
+    ? `Final Outcome: ${winningOutcome && winningOutcome.outcomeName}`
+    : formattedResolution
 
   return (
     <>

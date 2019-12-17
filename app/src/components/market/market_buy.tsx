@@ -4,7 +4,7 @@ import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
-import { BalanceItem, OutcomeSlot, Status, OutcomeTableValue, Token } from '../../util/types'
+import { BalanceItem, Status, OutcomeTableValue, Token } from '../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../common'
 import { ERC20Service, MarketMakerService } from '../../services'
 import { SubsectionTitle } from '../common/subsection_title'
@@ -52,7 +52,7 @@ const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   collateral: Token
   question: string
   resolution: Maybe<Date>
@@ -62,41 +62,35 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { buildMarketMaker } = useContracts(context)
 
-  const { marketMakerAddress, balance, collateral, question, resolution } = props
+  const { marketMakerAddress, balances, collateral, question, resolution } = props
   const marketMakerService = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
+  const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
 
-  const holdingsYes = balance[0].holdings
-  const holdingsNo = balance[1].holdings
-
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
-    () => async (amount: BigNumber): Promise<[BigNumber, number, number]> => {
-      const tradedShares = await marketMakerService.calcBuyAmount(amount, outcome)
+    () => async (amount: BigNumber): Promise<[BigNumber, number[]]> => {
+      const tradedShares = await marketMakerService.calcBuyAmount(amount, outcomeIndex)
       const balanceAfterTrade = computeBalanceAfterTrade(
-        holdingsYes,
-        holdingsNo,
-        outcome,
+        balances.map(b => b.holdings),
+        outcomeIndex,
         amount,
         tradedShares,
       )
-      const { actualPriceForYes, actualPriceForNo } = MarketMakerService.getActualPrice(
-        balanceAfterTrade,
-      )
+      const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
-      return [tradedShares, actualPriceForYes, actualPriceForNo]
+      return [tradedShares, pricesAfterTrade]
     },
-    [marketMakerService, outcome, holdingsYes, holdingsNo],
+    [balances, marketMakerService, outcomeIndex],
   )
 
-  const [tradedShares, priceAfterTradeForYes, priceAfterTradeForNo] = useAsyncDerivedValue(
+  const [tradedShares, pricesAfterTrade] = useAsyncDerivedValue(
     amount,
-    [new BigNumber(0), 0, 0],
+    [new BigNumber(0), balances.map(() => 0)],
     calcBuyAmount,
   )
 
@@ -109,7 +103,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       .mul(weiPerUnit)
       .div(10000)
     setCost(costWithFee)
-  }, [outcome, amount, balance, collateral])
+  }, [amount, collateral])
 
   const finish = async () => {
     try {
@@ -137,7 +131,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         await collateralService.approve(marketMakerAddress, costWithErrorMargin)
       }
 
-      await marketMakerService.buy(amount, outcome)
+      await marketMakerService.buy(amount, outcomeIndex)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -169,11 +163,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <ViewCard>
         <SubsectionTitle>Choose the shares you want to buy</SubsectionTitle>
         <OutcomeTable
-          balance={balance}
+          balances={balances}
           collateral={collateral}
-          pricesAfterTrade={[priceAfterTradeForYes, priceAfterTradeForNo]}
-          outcomeSelected={outcome}
-          outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
+          pricesAfterTrade={pricesAfterTrade}
+          outcomeSelected={outcomeIndex}
+          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           disabledColumns={[OutcomeTableValue.Payout]}
         />
         <AmountWrapper
@@ -203,7 +197,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             </TD>
           </TR>
           <TR>
-            <TD>&quot;{outcome}&quot; shares you get</TD>
+            <TD>&quot;{balances[outcomeIndex].outcomeName}&quot; shares you get</TD>
             <TD textAlign="right">
               {formatBigNumber(tradedShares, collateral.decimals)} <strong>shares</strong>
             </TD>

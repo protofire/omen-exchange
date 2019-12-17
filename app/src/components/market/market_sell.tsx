@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
-import { BalanceItem, OutcomeSlot, OutcomeTableValue, Status, Token } from '../../util/types'
+import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../common'
 import { ButtonContainer } from '../common/button_container'
 import { ButtonLink } from '../common/button_link'
@@ -54,7 +54,7 @@ const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   collateral: Token
   question: string
   resolution: Maybe<Date>
@@ -64,56 +64,57 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
 
-  const { balance, marketMakerAddress, collateral, question, resolution } = props
+  const { balances, marketMakerAddress, collateral, question, resolution } = props
 
   const marketMakerService = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
-  const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
+  const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
-  const [tradedCollateral, setTradedCollateral] = useState<BigNumber>(new BigNumber(0))
-  const [costFee, setCostFee] = useState<BigNumber>(new BigNumber(0))
+  const [tradedCollateral, setTradedCollateral] = useState<Maybe<BigNumber>>(null)
+  const [costFee, setCostFee] = useState<Maybe<BigNumber>>(null)
   const [message, setMessage] = useState<string>('')
-  const [pricesAfterTrade, setPricesAfterTrade] = useState<[number, number]>([0, 0])
-
-  const holdingsYes = balance[0].holdings
-  const holdingsNo = balance[1].holdings
+  const [pricesAfterTrade, setPricesAfterTrade] = useState<Maybe<number[]>>(null)
 
   useEffect(() => {
-    const balanceItemFound: BalanceItem | undefined = balance.find((balanceItem: BalanceItem) => {
-      return balanceItem.outcomeName === outcome
-    })
-    setBalanceItem(balanceItemFound)
+    setBalanceItem(balances[outcomeIndex])
 
-    const yesHoldings = balance[0].holdings
-    const noHoldings = balance[1].holdings
-    const [holdingsOfSoldOutcome, holdingsOfOtherOutcome] =
-      outcome === OutcomeSlot.Yes ? [yesHoldings, noHoldings] : [noHoldings, yesHoldings]
+    const holdings = balances.map(balance => balance.holdings)
+    const holdingsOfSoldOutcome = holdings[outcomeIndex]
+    const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
+      return index !== outcomeIndex
+    })
     const amountToSell = calcSellAmountInCollateral(
-      holdingsOfSoldOutcome,
-      holdingsOfOtherOutcome,
       amountShares,
+      holdingsOfSoldOutcome,
+      holdingsOfOtherOutcomes,
       0.01,
     )
 
+    if (!amountToSell) {
+      setPricesAfterTrade(null)
+      setCostFee(null)
+      setTradedCollateral(null)
+      logger.warn(
+        `Could not compute amount of collateral to sell for '${amountShares.toString()}' and '${holdingsOfSoldOutcome.toString()}'`,
+      )
+      return
+    }
+
     const balanceAfterTrade = computeBalanceAfterTrade(
-      holdingsYes,
-      holdingsNo,
-      outcome,
+      holdings,
+      outcomeIndex,
       amountToSell.mul(-1), // negate amounts because it's a sale
       amountShares.mul(-1),
     )
-    const { actualPriceForYes, actualPriceForNo } = MarketMakerService.getActualPrice(
-      balanceAfterTrade,
-    )
 
-    setPricesAfterTrade([actualPriceForYes, actualPriceForNo])
+    const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
+    setPricesAfterTrade(pricesAfterTrade)
     setCostFee(mulBN(amountToSell, 0.01))
-
     setTradedCollateral(amountToSell)
-  }, [outcome, amountShares, balance, collateral, holdingsYes, holdingsNo])
+  }, [outcomeIndex, amountShares, balances, collateral])
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
 
@@ -121,6 +122,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     try {
       if (!haveEnoughShares) {
         throw new Error('There are not enough shares to sell')
+      }
+      if (!tradedCollateral) {
+        return
       }
 
       setStatus(Status.Loading)
@@ -131,7 +135,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         await conditionalTokens.setApprovalForAll(marketMakerAddress)
       }
 
-      await marketMakerService.sell(tradedCollateral, outcome)
+      await marketMakerService.sell(tradedCollateral, outcomeIndex)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -156,7 +160,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           }}
         />
         You will be charged an extra 1% trade fee of &nbsp;
-        <strong>{formatBigNumber(costFee, collateral.decimals, 10)}</strong>
+        <strong>{costFee ? formatBigNumber(costFee, collateral.decimals, 10) : '-'}</strong>
       </>
     )
   }
@@ -167,11 +171,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       <ViewCard>
         <SubsectionTitle>Choose the shares you want to sell</SubsectionTitle>
         <OutcomeTable
-          balance={balance}
+          balances={balances}
           collateral={collateral}
-          pricesAfterTrade={pricesAfterTrade}
-          outcomeSelected={outcome}
-          outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
+          pricesAfterTrade={pricesAfterTrade || undefined /* hack to cast Maybe<A> to A? */}
+          outcomeSelected={outcomeIndex}
+          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           disabledColumns={[OutcomeTableValue.Payout]}
         />
         <AmountWrapper
@@ -197,7 +201,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           <TR>
             <TD>Total {collateral.symbol} Return</TD>
             <TD textAlign="right">
-              {formatBigNumber(tradedCollateral, collateral.decimals)}{' '}
+              {tradedCollateral ? formatBigNumber(tradedCollateral, collateral.decimals) : '-'}{' '}
               <strong>{collateral.symbol}</strong>
             </TD>
           </TR>

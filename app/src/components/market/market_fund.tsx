@@ -33,7 +33,7 @@ interface Props extends RouteComponentProps<any> {
   userPoolShares: BigNumber
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   theme?: any
   collateral: Token
 }
@@ -51,6 +51,24 @@ const AmountWrapper = styled(FormRow)`
   }
 `
 
+const ButtonContainerStyled = styled(ButtonContainer)`
+  display: grid;
+  grid-row-gap: 10px;
+  grid-template-columns: 1fr;
+
+  > button {
+    margin-left: 0;
+  }
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: flex;
+
+    > button {
+      margin-left: 10px;
+    }
+  }
+`
+
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
@@ -65,15 +83,15 @@ const logger = getLogger('Market::Fund')
 
 const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   const {
-    balance,
-    collateral,
-    marketMakerAddress,
-    marketMakerFunding,
-    marketMakerUserFunding,
     question,
     resolution,
     totalPoolShares,
     userPoolShares,
+    balances,
+    marketMakerUserFunding,
+    marketMakerFunding,
+    marketMakerAddress,
+    collateral,
   } = props
 
   const context = useConnectedWeb3Context()
@@ -191,7 +209,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         </TableStyled>
         <SubsectionTitle>Balance</SubsectionTitle>
         <OutcomeTable
-          balance={balance}
+          balances={balances}
           disabledColumns={[
             OutcomeTableValue.CurrentPrice,
             OutcomeTableValue.Payout,
@@ -229,13 +247,13 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
             </>
           }
         />
-        <ButtonContainer>
+        <ButtonContainerStyled>
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
           <Button
-            disabled={marketMakerUserFunding && marketMakerUserFunding.isZero()}
             buttonType={ButtonType.secondary}
+            disabled={marketMakerUserFunding && marketMakerUserFunding.isZero()}
             onClick={() => removeFunding()}
           >
             Remove funding
@@ -243,7 +261,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
           <Button buttonType={ButtonType.primary} onClick={() => addFunding()} disabled={error}>
             Add funding
           </Button>
-        </ButtonContainer>
+        </ButtonContainerStyled>
       </ViewCard>
       {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>

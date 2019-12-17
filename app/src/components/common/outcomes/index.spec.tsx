@@ -121,3 +121,51 @@ test('should not modify the probabilities of the other inputs if there are more 
     { name: 'blue', probability: 34 },
   ])
 })
+
+test('should change the probability of the third input', () => {
+  const onChangeFn = jest.fn()
+
+  const { getByTestId } = render(
+    <Outcomes
+      outcomes={[
+        { name: 'red', probability: 30 },
+        { name: 'green', probability: 33 },
+        { name: 'blue', probability: 34 },
+      ]}
+      onChange={onChangeFn}
+    />,
+  )
+
+  const thirdInput = getByTestId('outcome_2')
+
+  fireEvent.change(thirdInput, { target: { value: '20' } })
+
+  expect(onChangeFn).toHaveBeenCalledWith([
+    { name: 'red', probability: 30 },
+    { name: 'green', probability: 33 },
+    { name: 'blue', probability: 20 },
+  ])
+})
+
+test('should pass some message errors', () => {
+  const onChangeFn = jest.fn()
+
+  const { getByTestId } = render(
+    <Outcomes
+      outcomes={[
+        { name: 'red', probability: 25 },
+        { name: 'green', probability: 25 },
+        { name: 'blue', probability: 25 },
+        { name: 'black', probability: 25 },
+      ]}
+      onChange={onChangeFn}
+      errorMessages={['Error message one', 'Error message two']}
+    />,
+  )
+
+  const firstErrorMessage = getByTestId('outcome_error_message_0')
+  const secondErrorMessage = getByTestId('outcome_error_message_1')
+
+  expect(firstErrorMessage.textContent).toEqual('Error message one')
+  expect(secondErrorMessage.textContent).toEqual('Error message two')
+})
