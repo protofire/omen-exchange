@@ -1,5 +1,4 @@
 import React from 'react'
-import styled from 'styled-components'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { ThreeBoxComments } from '../../common/three_box_comments'
@@ -12,6 +11,7 @@ import { SubsectionTitle } from '../../common/subsection_title'
 import { BigNumber } from 'ethers/utils'
 import { TitleValue } from '../../common/title_value'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
+import { GridThreeColumns } from '../../common/grid_three_columns'
 
 interface Props extends RouteComponentProps<{}> {
   balances: BalanceItem[]
@@ -24,14 +24,6 @@ interface Props extends RouteComponentProps<{}> {
   marketMakerAddress: string
   funding: BigNumber
 }
-
-const Grid = styled.div`
-  display: grid;
-  grid-column-gap: 20px;
-  grid-row-gap: 14px;
-  grid-template-columns: 1fr 1fr;
-  margin-bottom: 25px;
-`
 
 const ViewWrapper = (props: Props) => {
   const {
@@ -68,7 +60,7 @@ const ViewWrapper = (props: Props) => {
     return (
       <>
         <SubsectionTitle>Details</SubsectionTitle>
-        <Grid>
+        <GridThreeColumns>
           {category && <TitleValue title={'Category'} value={category} />}
           <TitleValue
             title={'Arbitrator'}
@@ -88,7 +80,7 @@ const ViewWrapper = (props: Props) => {
               }
             />
           )}
-        </Grid>
+        </GridThreeColumns>
       </>
     )
   }
@@ -98,9 +90,9 @@ const ViewWrapper = (props: Props) => {
   return (
     <>
       <ViewCard>
-        {marketHasDetails && details()}
         {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
         {renderTableData()}
+        {marketHasDetails && details()}
         <ButtonContainer>
           <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
           {userHasShares && (
@@ -108,8 +100,8 @@ const ViewWrapper = (props: Props) => {
           )}
           <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
         </ButtonContainer>
-        <ThreeBoxComments threadName={marketMakerAddress} />
       </ViewCard>
+      <ThreeBoxComments threadName={marketMakerAddress} />
       {status === Status.Loading ? <FullLoading /> : null}
     </>
   )
