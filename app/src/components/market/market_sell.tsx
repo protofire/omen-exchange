@@ -71,10 +71,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [balanceItem, setBalanceItem] = useState<BalanceItem>()
   const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
-  const [tradedCollateral, setTradedCollateral] = useState<BigNumber>(new BigNumber(0))
-  const [costFee, setCostFee] = useState<BigNumber>(new BigNumber(0))
+  const [tradedCollateral, setTradedCollateral] = useState<Maybe<BigNumber>>(null)
+  const [costFee, setCostFee] = useState<Maybe<BigNumber>>(null)
   const [message, setMessage] = useState<string>('')
-  const [pricesAfterTrade, setPricesAfterTrade] = useState<[number, number]>([0, 0])
+  const [pricesAfterTrade, setPricesAfterTrade] = useState<Maybe<[number, number]>>(null)
 
   // TODO: refactor this
   const holdingsYes = balances[0].holdings
@@ -92,11 +92,21 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     const [holdingsOfSoldOutcome, holdingsOfOtherOutcome] =
       outcome === OutcomeSlot.Yes ? [yesHoldings, noHoldings] : [noHoldings, yesHoldings]
     const amountToSell = calcSellAmountInCollateral(
-      holdingsOfSoldOutcome,
-      holdingsOfOtherOutcome,
       amountShares,
+      holdingsOfSoldOutcome,
+      [holdingsOfOtherOutcome],
       0.01,
     )
+
+    if (!amountToSell) {
+      setPricesAfterTrade(null)
+      setCostFee(null)
+      setTradedCollateral(null)
+      logger.warn(
+        `Could not compute amount of collateral to sell for '${amountShares.toString()}', '${holdingsOfSoldOutcome.toString()}' and '${holdingsOfOtherOutcome.toString()}'`,
+      )
+      return
+    }
 
     const balanceAfterTrade = computeBalanceAfterTrade(
       holdingsYes,
@@ -111,9 +121,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     )
 
     setPricesAfterTrade([actualPriceForYes, actualPriceForNo])
-
     setCostFee(mulBN(amountToSell, 0.01))
-
     setTradedCollateral(amountToSell)
   }, [outcome, amountShares, balances, collateral, holdingsYes, holdingsNo])
 
@@ -123,6 +131,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     try {
       if (!haveEnoughShares) {
         throw new Error('There are not enough shares to sell')
+      }
+      if (!tradedCollateral) {
+        return
       }
 
       setStatus(Status.Loading)
@@ -158,7 +169,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           }}
         />
         You will be charged an extra 1% trade fee of &nbsp;
-        <strong>{formatBigNumber(costFee, collateral.decimals, 10)}</strong>
+        <strong>{costFee ? formatBigNumber(costFee, collateral.decimals, 10) : '-'}</strong>
       </>
     )
   }
@@ -171,7 +182,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          pricesAfterTrade={pricesAfterTrade}
+          pricesAfterTrade={pricesAfterTrade || undefined /* hack to cast Maybe<A> to A? */}
           outcomeSelected={outcome}
           outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
           disabledColumns={[OutcomeTableValue.Payout]}
@@ -199,7 +210,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           <TR>
             <TD>Total {collateral.symbol} Return</TD>
             <TD textAlign="right">
-              {formatBigNumber(tradedCollateral, collateral.decimals)}{' '}
+              {tradedCollateral ? formatBigNumber(tradedCollateral, collateral.decimals) : '-'}{' '}
               <strong>{collateral.symbol}</strong>
             </TD>
           </TR>

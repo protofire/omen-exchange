@@ -1,6 +1,6 @@
 /* eslint-env jest */
 import Big from 'big.js'
-import { bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import {
   calcDistributionHint,
   calcNetCost,
@@ -92,24 +92,31 @@ describe('tools', () => {
 
   describe('calcSellAmountInCollateral', () => {
     const testCases: any = [
-      [['502512562814070351', '2000000000000000000', '669745046301742827'], '500000000000000000'],
-      [['1502512562814070351', '673378000740715800', '365128583991411574'], '100000000000000000'],
-      [['673378000740715800', '1502512562814070351', '148526984259244846'], '100000000000000000'],
+      [['669745046301742827', '502512562814070351', ['2000000000000000000']], '500000000000000000'],
+      [['365128583991411574', '1502512562814070351', ['673378000740715800']], '100000000000000000'],
+      [['148526984259244846', '673378000740715800', ['1502512562814070351']], '100000000000000000'],
+      [
+        [
+          '169611024591650211',
+          '299279122636316870',
+          ['1500000000000000000', '1500000000000000000', '1500000000000000000'],
+        ],
+        '100000000000000000',
+      ],
     ]
 
-    for (const [
-      [holdingsOfSoldOutcome, holdingsOfOtherOutcome, sharesSold],
-      expected,
-    ] of testCases) {
+    for (const [[sharesToSell, holdings, otherHoldings], expected] of testCases) {
       it(`should compute the amount of collateral to sell`, () => {
         const result = calcSellAmountInCollateral(
-          bigNumberify(holdingsOfSoldOutcome),
-          bigNumberify(holdingsOfOtherOutcome),
-          bigNumberify(sharesSold),
+          bigNumberify(sharesToSell),
+          bigNumberify(holdings),
+          otherHoldings.map(bigNumberify),
           0.01,
         )
 
-        expect(divBN(result, bigNumberify(expected))).toBeCloseTo(1)
+        expect(result).not.toBe(null)
+
+        expect(divBN(result as BigNumber, bigNumberify(expected))).toBeCloseTo(1)
       })
     }
   })

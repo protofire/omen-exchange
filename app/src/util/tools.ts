@@ -1,3 +1,4 @@
+import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import Big from 'big.js'
 import { BigNumber, getAddress, bigNumberify, formatUnits } from 'ethers/utils'
 
@@ -113,80 +114,45 @@ export const calcDistributionHint = (initialOdds: number[]): BigNumber[] => {
 }
 
 /**
- * Computes the amount of collateral that needs to be sold to get `shares` amount of shares.
+ * Computes the amount of collateral that needs to be sold to get `shares` amount of shares. Returns null if the amount
+ * couldn't be computed.
  *
- * @param holdingsOfSoldOutcome How many tokens the market maker has of the outcome that is being sold
- * @param holdingsOfOtherOutcome How many tokens the market maker has of the outcome that is not being sold
- * @param shares The amount of shares that need to be sold
+ * @param sharesToSell The amount of shares that need to be sold
+ * @param holdings How many tokens the market maker has of the outcome that is being sold
+ * @param otherHoldings How many tokens the market maker has of the outcomes that are not being sold
  * @param fee The fee of the market maker, between 0 and 1
  */
 export const calcSellAmountInCollateral = (
-  holdingsOfSoldOutcome: BigNumber,
-  holdingsOfOtherOutcome: BigNumber,
-  shares: BigNumber,
+  sharesToSell: BigNumber,
+  holdings: BigNumber,
+  otherHoldings: BigNumber[],
   fee: number,
-): BigNumber => {
+): Maybe<BigNumber> => {
   Big.DP = 90
 
-  const x = new Big(holdingsOfOtherOutcome.toString())
-  const y = new Big(holdingsOfSoldOutcome.toString())
-  const a = new Big(shares.toString())
-  const f = new Big(fee)
-  const termInsideSqrt = a
-    .pow(2)
-    .mul(f.pow(2))
-    .add(
-      a
-        .pow(2)
-        .mul(f)
-        .mul(2),
-    )
-    .add(a.pow(2))
-    .add(
-      a
-        .mul(f.pow(2))
-        .mul(y)
-        .mul(2),
-    )
-    .minus(
-      a
-        .mul(f)
-        .mul(x)
-        .mul(2),
-    )
-    .add(
-      a
-        .mul(f)
-        .mul(y)
-        .mul(4),
-    )
-    .minus(a.mul(x).mul(2))
-    .add(a.mul(y).mul(2))
-    .add(f.pow(2).mul(y.pow(2)))
-    .add(
-      f
-        .mul(x)
-        .mul(y)
-        .mul(2),
-    )
-    .add(f.mul(y.pow(2)).mul(2))
-    .add(x.pow(2))
-    .add(x.mul(y).mul(2))
-    .add(y.pow(2))
+  const sharesToSellBig = new Big(sharesToSell.toString())
+  const holdingsBig = new Big(holdings.toString())
+  const otherHoldingsBig = otherHoldings.map(x => new Big(x.toString()))
 
-  const amountToSellBig = termInsideSqrt
-    .sqrt()
-    .mul(-1)
-    .add(a.mul(f))
-    .add(a)
-    .add(f.mul(y))
-    .add(x)
-    .add(y)
-    .div(f.add(1).mul(2))
+  const f = (r: Big) => {
+    const numerator = otherHoldingsBig.reduce((a, b) => a.mul(b), holdingsBig)
+    const denominator = otherHoldingsBig
+      .map(h => h.minus(r).minus(r.mul(fee)))
+      .reduce((a, b) => a.mul(b))
+    return holdingsBig
+      .minus(r)
+      .plus(sharesToSellBig)
+      .minus(numerator.div(denominator))
+  }
 
-  const amountToSell = bigNumberify(amountToSellBig.toFixed(0))
+  const r = newtonRaphson(f, 0)
 
-  return amountToSell
+  if (r) {
+    const amountToSell = bigNumberify(r.toFixed(0))
+    return amountToSell
+  }
+
+  return null
 }
 
 export const isAddress = (address: string): boolean => {
