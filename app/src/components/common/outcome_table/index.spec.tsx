@@ -134,7 +134,7 @@ test('should accept a selected outcome', () => {
   }
 
   fireEvent.click(radioForNo)
-  expect(onOutcomeChange).toHaveBeenCalledWith(OutcomeSlot.No)
+  expect(onOutcomeChange).toHaveBeenCalledWith(1)
   fireEvent.click(radioForYes)
-  expect(onOutcomeChange).toHaveBeenCalledWith(OutcomeSlot.Yes)
+  expect(onOutcomeChange).toHaveBeenCalledWith(0)
 })
