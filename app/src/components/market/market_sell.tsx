@@ -28,7 +28,7 @@ import {
 import { SectionTitle } from '../common/section_title'
 import { BalanceShares } from '../common/balance_shares'
 import { useContracts } from '../../hooks/useContracts'
-import { ButtonType } from '../../common/styling_types'
+import { ButtonType } from '../../common/button_styling_types'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;

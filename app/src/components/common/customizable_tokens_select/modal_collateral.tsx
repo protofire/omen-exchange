@@ -11,7 +11,7 @@ import { Button } from '../button'
 import { Token } from '../../../util/types'
 import { useCollateral } from '../../../hooks/useCollateral'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { ButtonType } from '../../../common/styling_types'
+import { ButtonType } from '../../../common/button_styling_types'
 
 const Wrapper = styled.div`
   align-items: center;

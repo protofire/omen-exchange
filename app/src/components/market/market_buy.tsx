@@ -25,7 +25,7 @@ import { BigNumberInputReturn } from '../common/big_number_input'
 import { SectionTitle } from '../common/section_title'
 import { BalanceToken } from '../common/balance_token'
 import { useContracts } from '../../hooks/useContracts'
-import { ButtonType } from '../../common/styling_types'
+import { ButtonType } from '../../common/button_styling_types'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;

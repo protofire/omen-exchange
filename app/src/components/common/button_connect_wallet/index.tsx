@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Button } from '../button'
-import { ButtonType } from '../../../common/styling_types'
+import { ButtonType } from '../../../common/button_styling_types'
 
 const ButtonStyled = styled(Button)`
   font-size: 13px;

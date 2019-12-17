@@ -17,7 +17,7 @@ import { getArbitrator } from '../../../../util/addresses'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { ButtonType } from '../../../../common/styling_types'
+import { ButtonType } from '../../../../common/button_styling_types'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;

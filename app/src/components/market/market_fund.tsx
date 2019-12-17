@@ -23,7 +23,7 @@ import { ButtonLink } from '../common/button_link'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { BalanceToken } from '../common/balance_token'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
-import { ButtonType } from '../../common/styling_types'
+import { ButtonType } from '../../common/button_styling_types'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
