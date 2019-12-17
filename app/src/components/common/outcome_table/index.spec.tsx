@@ -108,7 +108,7 @@ test('should accept a selected outcome', () => {
   const balances = getBalances()
 
   const { asFragment } = renderTable(
-    <OutcomeTable balances={balances} collateral={dai} outcomeSelected={OutcomeSlot.Yes} />,
+    <OutcomeTable balances={balances} collateral={dai} outcomeSelected={0} />,
   )
 
   expect(asFragment()).toMatchSnapshot()
