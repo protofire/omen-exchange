@@ -68,6 +68,7 @@ exports[`should accept a selected outcome 1`] = `
                 >
                   <g
                     fill="#fff"
+                    id="radio_off"
                     stroke="#ccc"
                   >
                     <circle
@@ -83,20 +84,11 @@ exports[`should accept a selected outcome 1`] = `
                       r="8.5"
                     />
                   </g>
-                  <circle
-                    cx="6"
-                    cy="6"
-                    fill="#20e0b4"
-                    id="fill"
-                    r="6"
-                    transform="translate(3 3)"
-                  />
                 </svg>
                 <input
-                  checked=""
                   name="outcome"
                   type="radio"
-                  value="Yes"
+                  value="0"
                 />
               </div>
             </label>
@@ -204,7 +196,7 @@ exports[`should accept a selected outcome 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="No"
+                  value="1"
                 />
               </div>
             </label>
@@ -740,7 +732,7 @@ exports[`should show prices after trade 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="Yes"
+                  value="0"
                 />
               </div>
             </label>
@@ -848,7 +840,7 @@ exports[`should show prices after trade 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="No"
+                  value="1"
                 />
               </div>
             </label>
@@ -1199,7 +1191,7 @@ exports[`should work with disabled columns 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="Yes"
+                  value="0"
                 />
               </div>
             </label>
@@ -1302,7 +1294,7 @@ exports[`should work with disabled columns 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="No"
+                  value="1"
                 />
               </div>
             </label>
@@ -1458,7 +1450,7 @@ exports[`should work with minimal props 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="Yes"
+                  value="0"
                 />
               </div>
             </label>
@@ -1566,7 +1558,7 @@ exports[`should work with minimal props 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="No"
+                  value="1"
                 />
               </div>
             </label>

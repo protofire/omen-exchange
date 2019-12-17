@@ -4,8 +4,8 @@ import { BigNumber } from 'ethers/utils'
 import { ConditionalTokenService } from './conditional_token'
 import { RealitioService } from './realitio'
 import { getLogger } from '../util/logger'
-import { Market, MarketStatus, MarketWithExtraData, OutcomeSlot } from '../util/types'
-import { calcDistributionHint, divBN, calcPrice } from '../util/tools'
+import { Market, MarketStatus, MarketWithExtraData } from '../util/types'
+import { calcDistributionHint, calcPrice } from '../util/tools'
 
 const logger = getLogger('Services::MarketMaker')
 
@@ -101,21 +101,8 @@ class MarketMakerService {
     })
   }
 
-  // TODO: delete the function we don't need anymore, check getActualPriceWithHoldings
-  static getActualPrice = (balanceInformation: {
-    balanceOfForYes: BigNumber
-    balanceOfForNo: BigNumber
-  }): { actualPriceForYes: number; actualPriceForNo: number } => {
-    const { balanceOfForYes, balanceOfForNo } = balanceInformation
-
-    const totalBalance = balanceOfForYes.add(balanceOfForNo)
-    const actualPriceForYes = !totalBalance.isZero() ? divBN(balanceOfForNo, totalBalance) : 0
-    const actualPriceForNo = !totalBalance.isZero() ? divBN(balanceOfForYes, totalBalance) : 0
-
-    return {
-      actualPriceForYes,
-      actualPriceForNo,
-    }
+  static getActualPrice = (holdings: BigNumber[]): number[] => {
+    return calcPrice(holdings)
   }
 
   getBalanceInformation = async (
@@ -150,16 +137,11 @@ class MarketMakerService {
     return balances
   }
 
-  static getActualPriceWithHoldings = (holdings: BigNumber[]): number[] => {
-    return calcPrice(holdings)
-  }
-
   balanceOf = async (address: string): Promise<BigNumber> => {
     return this.contract.balanceOf(address)
   }
 
-  buy = async (amount: BigNumber, outcome: OutcomeSlot) => {
-    const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
+  buy = async (amount: BigNumber, outcomeIndex: number) => {
     try {
       const outcomeTokensToBuy = await this.contract.calcBuyAmount(amount, outcomeIndex)
       const transactionObject = await this.contract.buy(amount, outcomeIndex, outcomeTokensToBuy, {
@@ -168,21 +150,19 @@ class MarketMakerService {
       await this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
       logger.error(
-        `There was an error buying '${amount.toString()}' for outcome '${outcome}'`,
+        `There was an error buying '${amount.toString()}' for outcome '${outcomeIndex}'`,
         err.message,
       )
       throw err
     }
   }
 
-  calcBuyAmount = async (amount: BigNumber, outcome: OutcomeSlot): Promise<BigNumber> => {
-    // TODO: refactor this
-    const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
+  calcBuyAmount = async (amount: BigNumber, outcomeIndex: number): Promise<BigNumber> => {
     try {
       return this.contract.calcBuyAmount(amount, outcomeIndex)
     } catch (err) {
       logger.error(
-        `There was an error computing the buy amount for amount '${amount.toString()}' and outcome '${outcome}'`,
+        `There was an error computing the buy amount for amount '${amount.toString()}' and outcome index '${outcomeIndex}'`,
         err.message,
       )
       throw err
@@ -210,15 +190,13 @@ class MarketMakerService {
     }
   }
 
-  sell = async (amount: BigNumber, outcome: OutcomeSlot) => {
-    // TODO: refactor this
-    const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
+  sell = async (amount: BigNumber, outcomeIndex: number) => {
     try {
       const outcomeTokensToSell = await this.contract.calcSellAmount(amount, outcomeIndex)
-
       const overrides = {
         value: '0x0',
       }
+
       const transactionObject = await this.contract.sell(
         amount,
         outcomeIndex,
@@ -228,7 +206,7 @@ class MarketMakerService {
       await this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
       logger.error(
-        `There was an error selling '${amount.toString()}' for outcome '${outcome}'`,
+        `There was an error selling '${amount.toString()}' for outcome index '${outcomeIndex}'`,
         err.message,
       )
       throw err
