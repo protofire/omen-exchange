@@ -6,11 +6,11 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { BalanceItem, Status, OutcomeTableValue, Token } from '../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../common'
-import { ERC20Service } from '../../services'
+import { ERC20Service, MarketMakerService } from '../../services'
 import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { ViewCard } from '../common/view_card'
-import { formatBigNumber, formatDate } from '../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber, formatDate } from '../../util/tools'
 import { getLogger } from '../../util/logger'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
@@ -74,16 +74,17 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[]]> => {
       const tradedShares = await marketMakerService.calcBuyAmount(amount, outcomeIndex)
-      // TODO: refactor this: calculate compute balance after trade
-      // const balanceAfterTrade = [] as BigNumber[]
-      // const pricesAfterTrade = MarketMakerService.getActualPrice(
-      //     balanceAfterTrade
-      // )
-      const pricesAfterTrade = [] as number[]
+      const balanceAfterTrade = computeBalanceAfterTrade(
+        balances.map(b => b.holdings),
+        outcomeIndex,
+        amount,
+        tradedShares,
+      )
+      const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
       return [tradedShares, pricesAfterTrade]
     },
-    [marketMakerService, outcomeIndex],
+    [balances, marketMakerService, outcomeIndex],
   )
 
   const [tradedShares, pricesAfterTrade] = useAsyncDerivedValue(

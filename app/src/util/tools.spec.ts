@@ -6,6 +6,7 @@ import {
   calcNetCost,
   calcPrice,
   calcSellAmountInCollateral,
+  computeBalanceAfterTrade,
   divBN,
   getIndexSets,
 } from './tools'
@@ -124,5 +125,49 @@ describe('tools', () => {
         expect(result).toStrictEqual(expected)
       })
     }
+  })
+
+  describe('computeBalanceAfterTrade', () => {
+    const testCases: [[number[], number, number, number], number[]][] = [
+      [[[100, 100], 0, 50, 100], [50, 150]],
+      [[[100, 100], 1, 50, 100], [150, 50]],
+      [[[100, 100, 100], 2, 50, 100], [150, 150, 50]],
+    ]
+
+    for (const [[holdings, outcomeIndex, collateral, shares], expected] of testCases) {
+      it(`should compute the right balance after trade`, () => {
+        const holdingsBN = holdings.map(bigNumberify)
+
+        const result = computeBalanceAfterTrade(
+          holdingsBN,
+          outcomeIndex,
+          bigNumberify(collateral),
+          bigNumberify(shares),
+        )
+
+        result.forEach((x, i) => expect(x.toNumber()).toBeCloseTo(expected[i]))
+      })
+    }
+
+    it('should throw if index is negative', () => {
+      const holdings = [100, 100, 100].map(bigNumberify)
+      expect(() =>
+        computeBalanceAfterTrade(holdings, -1, bigNumberify(50), bigNumberify(100)),
+      ).toThrow()
+    })
+
+    it("should throw if index is equal to array's length", () => {
+      const holdings = [100, 100, 100].map(bigNumberify)
+      expect(() =>
+        computeBalanceAfterTrade(holdings, 3, bigNumberify(50), bigNumberify(100)),
+      ).toThrow()
+    })
+
+    it("should throw if index is bigger than array's length", () => {
+      const holdings = [100, 100, 100].map(bigNumberify)
+      expect(() =>
+        computeBalanceAfterTrade(holdings, 10, bigNumberify(50), bigNumberify(100)),
+      ).toThrow()
+    })
   })
 })

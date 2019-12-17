@@ -83,9 +83,15 @@ export const computeBalanceAfterTrade = (
   amountCollateralSpent: BigNumber, // Amount of collateral being spent
   amountShares: BigNumber, // amount of `outcome` shares being traded
 ): BigNumber[] => {
-  // TODO: refactor this, calculate balance after trade
+  if (outcomeIndex < 0 || outcomeIndex >= holdings.length) {
+    throw new Error(
+      `Outcome index '${outcomeIndex}' must be between 0 and '${holdings.length}' - 1`,
+    )
+  }
 
-  return []
+  return holdings.map((h, i) => {
+    return h.add(amountCollateralSpent).sub(i === outcomeIndex ? amountShares : bigNumberify(0))
+  })
 }
 
 /**
