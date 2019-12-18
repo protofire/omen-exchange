@@ -55,12 +55,17 @@ const OutcomesStep = (props: Props) => {
     errorMessages.push('The names of the outcomes should not be empty.')
   }
 
+  const someEmptyProbability = outcomes.some(outcome => outcome.probability === 0)
+  if (someEmptyProbability) {
+    errorMessages.push('The probabilities of the outcomes should not be zero.')
+  }
+
   const totalOutcomeProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
   if (totalOutcomeProbabilities !== 100) {
     errorMessages.push('The sum of all probabilities must be equal to 100%.')
   }
 
-  const error = totalOutcomeProbabilities !== 100 || someEmptyName
+  const error = totalOutcomeProbabilities !== 100 || someEmptyName || someEmptyProbability
 
   const isAddNewOutcomeButtonDisabled = outcomes.length >= MAX_OUTCOME_ALLOWED
 
