@@ -62,6 +62,12 @@ export const OutcomeTable = (props: Props) => {
     OutcomeTableValue.PriceAfterTrade,
   ]
 
+  const outcomeMaxProbability = balances.reduce(
+    (max, balance, index, balances) =>
+      balance.probability > balances[max].probability ? index : max,
+    0,
+  )
+
   const TableCellsAlign = ['left', 'right', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
@@ -87,7 +93,9 @@ export const OutcomeTable = (props: Props) => {
     priceAfterTrade?: number,
   ) => {
     const { outcomeName, probability, currentPrice, shares, winningOutcome } = balanceItem
-    const isWinning = probability > 50
+    const isWinning = outcomeIndex === outcomeMaxProbability
+
+    const currentPriceFormatted = Number(currentPrice).toFixed(4)
 
     return (
       <TR key={outcomeName}>
@@ -127,11 +135,11 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[2]} winningOutcome={winningOutcome}>
-            {currentPrice} <strong>{collateral.symbol}</strong>
+            {currentPriceFormatted} <strong>{collateral.symbol}</strong>
           </TDStyled>
         ) : (
           <TD textAlign={TableCellsAlign[2]}>
-            {currentPrice} <strong>{collateral.symbol}</strong>
+            {currentPriceFormatted} <strong>{collateral.symbol}</strong>
           </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.Shares) ? null : withWinningOutcome ? (
