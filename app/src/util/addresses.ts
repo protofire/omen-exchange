@@ -1,6 +1,6 @@
 import { Token, Arbitrator } from './types'
 
-const networkIds = {
+export const networkIds = {
   MAINNET: 1,
   RINKEBY: 4,
   GANACHE: 50,

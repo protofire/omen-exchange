@@ -8,6 +8,7 @@ import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from '../common/constants
 import { getLogger } from '../util/logger'
 import { OutcomeSlot, Question, QuestionLog } from '../util/types'
 import { Outcome } from '../components/common/outcomes'
+import { networkIds } from '../util/addresses'
 
 const logger = getLogger('Services::Realitio')
 
@@ -20,6 +21,12 @@ const realitioAbi = [
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
 ]
+
+const timeoutQuestionResolution: { [networkId: number]: number } = {
+  [networkIds.MAINNET]: 86400,
+  [networkIds.RINKEBY]: 10,
+  [networkIds.GANACHE]: 10,
+}
 
 class RealitioService {
   contract: Contract
@@ -45,10 +52,11 @@ class RealitioService {
    * Create a question in the realit.io contract. Returns a promise that resolves when the transaction is mined.
    *
    * @param question - The question to ask
+   * @param outcomes - The outcomes to use with the question
+   * @param category - The category of the question
+   * @param arbitratorAddress - The address of the arbitrator to use with the question
    * @param openingTimestamp - The moment after which the question can be answered, specified in epoch seconds
-   * @param provider - ethers.js provider obtained from the web3 context
    * @param networkId - the current network id
-   * @param value - The amount of value to send, specified in wei
    *
    * @returns A promise that resolves to a string with the bytes32 corresponding to the id of the
    * question
@@ -59,6 +67,7 @@ class RealitioService {
     category: string,
     arbitratorAddress: string,
     openingDateMoment: Moment,
+    networkId: number,
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
@@ -68,11 +77,14 @@ class RealitioService {
       outcomeNames,
       category,
     )
+
+    const timeoutResolution = REALITIO_TIMEOUT || timeoutQuestionResolution[networkId]
+
     const args = [
       SINGLE_SELECT_TEMPLATE_ID,
       questionText,
       arbitratorAddress,
-      REALITIO_TIMEOUT,
+      timeoutResolution,
       openingTimestamp,
       0,
     ]

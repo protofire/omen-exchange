@@ -43,6 +43,7 @@ const MarketWizardCreatorContainer: FC = () => {
         category,
         arbitrator.address,
         openingDateMoment,
+        networkId,
       )
       setQuestionId(questionId)
 
