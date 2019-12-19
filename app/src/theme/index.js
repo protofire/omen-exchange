@@ -72,6 +72,36 @@ const theme = {
     textColor: '#000',
     lightTextColor: '#666',
   },
+  modalStyle: {
+    content: {
+      backgroundColor: '#fff',
+      borderColor: 'transparent',
+      borderRadius: '5px',
+      bottom: 'auto',
+      boxShadow: '0 0 18px 0 rgba(0, 0, 0, 0.08)',
+      display: 'flex',
+      flexDirection: 'column',
+      flexGrow: '0',
+      height: 'fit-content',
+      left: 'auto',
+      margin: 'auto 0',
+      overflow: 'hidden',
+      padding: '15px 20px',
+      position: 'relative',
+      right: 'auto',
+      top: 'auto',
+      width: '350px',
+    },
+    overlay: {
+      alignItems: 'unset',
+      backgroundColor: 'rgba(255, 255, 255, 0.75)',
+      display: 'flex',
+      justifyContent: 'center',
+      overflow: 'auto',
+      padding: '10px',
+      zIndex: '12345',
+    },
+  },
 }
 
 export default theme
