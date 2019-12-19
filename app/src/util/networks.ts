@@ -1,4 +1,5 @@
 import { INFURA_PROJECT_ID } from '../common/constants'
+import { entries, isNotNull } from '../util/type-utils'
 
 import { Token, Arbitrator } from './types'
 
@@ -70,7 +71,7 @@ const networks: { [K in NetworkId]: Network } = {
 }
 
 export const supportedNetworkIds = (Object.keys(networks) as unknown) as NetworkId[]
-export const supportedNetworkURLs = Object.entries(networks).reduce<{
+export const supportedNetworkURLs = entries(networks).reduce<{
   [networkId: number]: string
 }>(
   (acc, [networkId, network]) => ({
@@ -222,11 +223,6 @@ export const getDefaultToken = (networkId: number) => {
 export const getTokensByNetwork = (networkId: number): Token[] => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
-  }
-
-  // needed to tell the compiler that tokens without address in this network are filtered out
-  const isNotNull = <T>(x: T | null): x is T => {
-    return x !== null
   }
 
   return Object.values(knownTokens)
