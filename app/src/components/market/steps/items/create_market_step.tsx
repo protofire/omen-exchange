@@ -23,10 +23,6 @@ const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
 
-const TableStyled = styled(Table)`
-  margin-bottom: 25px;
-`
-
 const Grid = styled.div`
   display: grid;
   grid-column-gap: 20px;
@@ -111,7 +107,7 @@ const CreateMarketStep = (props: Props) => {
         )}
       </Grid>
       <SubsectionTitle>Outcomes</SubsectionTitle>
-      <TableStyled
+      <Table
         head={
           <THead>
             <TR>
@@ -130,7 +126,7 @@ const CreateMarketStep = (props: Props) => {
             </TR>
           )
         })}
-      </TableStyled>
+      </Table>
       {questionId || marketMakerAddress ? (
         <>
           <SubsectionTitle>Created Market Information</SubsectionTitle>
