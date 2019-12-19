@@ -11,6 +11,7 @@ const theme = {
     tertiary: '#f5f5f5',
     textColor: '#333',
     textColorLight: '#888',
+    error: '#fa0000',
   },
   cards: {
     backgroundColor: '#fff',

@@ -49,16 +49,15 @@ export const CustomizableTokensSelect = (props: Props) => {
         </TokenWrapper>
         <ButtonStyled onClick={() => setModalCollateralState(true)}>+</ButtonStyled>
       </Wrapper>
-      {isModalCollateralOpen && (
-        <ModalCollateral
-          context={context}
-          onClose={() => setModalCollateralState(false)}
-          onSave={(collateral: Token) => {
-            addCustomValue(collateral)
-            onCollateralChange(collateral)
-          }}
-        />
-      )}
+      <ModalCollateral
+        context={context}
+        isOpen={isModalCollateralOpen}
+        onClose={() => setModalCollateralState(false)}
+        onSave={(collateral: Token) => {
+          addCustomValue(collateral)
+          onCollateralChange(collateral)
+        }}
+      />
     </>
   )
 }

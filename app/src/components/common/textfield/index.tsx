@@ -5,6 +5,7 @@ interface Props extends HTMLAttributes<HTMLInputElement> {
   autoFocus?: boolean
   defaultValue?: any
   disabled?: boolean
+  hasError?: boolean
   focusOutline?: boolean
   min?: number
   name?: string
@@ -16,7 +17,7 @@ interface Props extends HTMLAttributes<HTMLInputElement> {
   value?: any
 }
 
-const FormInput = styled.input`
+const FormInput = styled.input<{ hasError?: boolean }>`
   background-color: transparent;
   border-bottom-color: #999;
   border-bottom-style: solid;
@@ -24,7 +25,7 @@ const FormInput = styled.input`
   border-left: none;
   border-right: none;
   border-top: none;
-  color: #000;
+  color: ${props => (props.hasError ? props.theme.colors.error : '#000')};
   font-size: 13px;
   font-weight: normal;
   line-height: 1.2;
