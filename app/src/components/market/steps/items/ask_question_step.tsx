@@ -7,7 +7,7 @@ import { DateField } from '../../../common/date_field'
 import { ButtonContainer } from '../../../common/button_container'
 import { Well } from '../../../common/well'
 import { Arbitrators } from '../../../common/arbitrators'
-import { knownArbitrators } from '../../../../util/addresses'
+import { knownArbitrators } from '../../../../util/networks'
 
 interface Props {
   next: () => void

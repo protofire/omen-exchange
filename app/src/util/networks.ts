@@ -1,45 +1,65 @@
 import { Token, Arbitrator } from './types'
 
+export type NetworkId = 1 | 4 | 50
+
 export const networkIds = {
   MAINNET: 1,
   RINKEBY: 4,
   GANACHE: 50,
+} as const
+
+interface Network {
+  label: string
+  realitioTimeout: number
+  contracts: {
+    realitio: string
+    marketMakerFactory: string
+    conditionalTokens: string
+    oracle: string
+  }
 }
 
-interface KnownContracts {
-  realitio: string
-  marketMakerFactory: string
-  conditionalTokens: string
-  oracle: string
-}
+type KnownContracts = keyof Network['contracts']
 
 interface KnownTokenData {
   symbol: string
   decimals: number
   addresses: {
-    [networkId: number]: string
+    [K in NetworkId]?: string
   }
   order: number
 }
 
-const addresses: { [networkId: number]: KnownContracts } = {
+const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
-    realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
-    marketMakerFactory: '0x2E8C4eC3fE9E3FC78FAE42af9c93A4DC88c38cb7',
-    conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
-    oracle: '0xf3582e5D53D330266E0923e736Aa5b907726272c',
+    label: 'Mainnet',
+    realitioTimeout: 86400,
+    contracts: {
+      realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
+      marketMakerFactory: '0x2E8C4eC3fE9E3FC78FAE42af9c93A4DC88c38cb7',
+      conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
+      oracle: '0xf3582e5D53D330266E0923e736Aa5b907726272c',
+    },
   },
   [networkIds.RINKEBY]: {
-    realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
-    marketMakerFactory: '0xD0B953db85fb6f0C6A437b18140Ba857cb67768a',
-    conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
-    oracle: '0x5A90132C104CA33652Ee71E2E645D5A4d8E5d7D6',
+    label: 'Rinkeby',
+    realitioTimeout: 10,
+    contracts: {
+      realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
+      marketMakerFactory: '0xD0B953db85fb6f0C6A437b18140Ba857cb67768a',
+      conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
+      oracle: '0x5A90132C104CA33652Ee71E2E645D5A4d8E5d7D6',
+    },
   },
   [networkIds.GANACHE]: {
-    realitio: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
-    marketMakerFactory: '0x7C728214be9A0049e6a86f2137ec61030D0AA964',
-    conditionalTokens: '0xD86C8F0327494034F60e25074420BcCF560D5610',
-    oracle: '0xA586074FA4Fe3E546A132a16238abe37951D41fE',
+    label: 'Ganache',
+    realitioTimeout: 10,
+    contracts: {
+      realitio: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
+      marketMakerFactory: '0x7C728214be9A0049e6a86f2137ec61030D0AA964',
+      conditionalTokens: '0xD86C8F0327494034F60e25074420BcCF560D5610',
+      oracle: '0xA586074FA4Fe3E546A132a16238abe37951D41fE',
+    },
   },
 }
 
@@ -105,16 +125,23 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
 }
 
-export const getContractAddress = (networkId: number, contract: keyof KnownContracts) => {
-  if (!addresses[networkId]) {
+const validNetworkId = (networkId: number): networkId is NetworkId => {
+  return networks[networkId as NetworkId] !== undefined
+}
+
+export const getContractAddress = (networkId: number, contract: KnownContracts) => {
+  if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
-  return addresses[networkId][contract]
+  return networks[networkId].contracts[contract]
 }
 
 export const getToken = (networkId: number, tokenId: KnownToken): Token => {
-  const token = knownTokens[tokenId]
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
 
+  const token = knownTokens[tokenId]
   if (!token) {
     throw new Error(`Unsupported token id: '${tokenId}'`)
   }
@@ -133,6 +160,10 @@ export const getToken = (networkId: number, tokenId: KnownToken): Token => {
 }
 
 export const getTokenFromAddress = (networkId: number, address: string): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
   for (const token of Object.values(knownTokens)) {
     const tokenAddress = token.addresses[networkId]
 
@@ -161,20 +192,37 @@ export const getContractAddressName = (networkId: number) => {
 }
 
 export const getDefaultToken = (networkId: number) => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
   return getToken(networkId, 'dai')
 }
 
 export const getTokensByNetwork = (networkId: number): Token[] => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  // needed to tell the compiler that tokens without address in this network are filtered out
+  const isNotNull = <T>(x: T | null): x is T => {
+    return x !== null
+  }
+
   return Object.values(knownTokens)
-    .filter(token => !!token.addresses[networkId])
     .sort((a, b) => (a.order > b.order ? 1 : -1))
     .map(token => {
-      return {
-        symbol: token.symbol,
-        decimals: token.decimals,
-        address: token.addresses[networkId],
+      const address = token.addresses[networkId]
+      if (address) {
+        return {
+          symbol: token.symbol,
+          decimals: token.decimals,
+          address,
+        }
       }
+      return null
     })
+    .filter(isNotNull)
 }
 
 interface KnownArbitratorData {
@@ -240,4 +288,12 @@ export const getArbitratorFromAddress = (networkId: number, address: string): Ma
   }
 
   return null
+}
+
+export const getRealitioTimeout = (networkId: number): number => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  return networks[networkId].realitioTimeout
 }

@@ -8,7 +8,7 @@ import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from '../common/constants
 import { getLogger } from '../util/logger'
 import { OutcomeSlot, Question, QuestionLog } from '../util/types'
 import { Outcome } from '../components/common/outcomes'
-import { networkIds } from '../util/addresses'
+import { getRealitioTimeout } from '../util/networks'
 
 const logger = getLogger('Services::Realitio')
 
@@ -21,12 +21,6 @@ const realitioAbi = [
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
 ]
-
-const timeoutQuestionResolution: { [networkId: number]: number } = {
-  [networkIds.MAINNET]: 86400,
-  [networkIds.RINKEBY]: 10,
-  [networkIds.GANACHE]: 10,
-}
 
 class RealitioService {
   contract: Contract
@@ -78,7 +72,7 @@ class RealitioService {
       category,
     )
 
-    const timeoutResolution = REALITIO_TIMEOUT || timeoutQuestionResolution[networkId]
+    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
 
     const args = [
       SINGLE_SELECT_TEMPLATE_ID,

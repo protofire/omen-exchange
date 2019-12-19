@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Select } from '../select'
-import { knownArbitrators } from '../../../util/addresses'
+import { knownArbitrators } from '../../../util/networks'
 
 interface Props {
   autoFocus?: boolean
