@@ -107,6 +107,7 @@ const SummaryMarketStep = (props: Props) => {
               </TR>
             </THead>
           }
+          maxHeight="130px"
         >
           {balances.map((item, index) => {
             return (

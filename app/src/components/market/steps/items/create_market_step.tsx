@@ -120,6 +120,7 @@ const CreateMarketStep = (props: Props) => {
             </TR>
           </THead>
         }
+        maxHeight="130px"
       >
         {outcomes.map((outcome, index) => {
           return (
