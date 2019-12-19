@@ -53,6 +53,11 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
 export const DateField = (props: Props) => {
   const { onChange, selected, minDate, name, disabled, ...restProps } = props
 
+  const today = new Date()
+  const offset = (-1 * today.getTimezoneOffset()) / 60
+  const offsetName = 'UTC' + (offset >= 0 ? '+' + offset : offset)
+  const timeInputLabel = `Time (${offsetName})`
+
   return (
     <DateFieldWrapper {...restProps} disabled={disabled}>
       <DatePicker
@@ -64,6 +69,7 @@ export const DateField = (props: Props) => {
         placeholderText="Pick a date..."
         selected={selected}
         showDisabledMonthNavigation
+        timeInputLabel={timeInputLabel}
         showTimeInput
       />
       <IconCalendar />
