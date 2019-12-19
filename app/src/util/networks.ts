@@ -1,3 +1,5 @@
+import { INFURA_PROJECT_ID } from '../common/constants'
+
 import { Token, Arbitrator } from './types'
 
 export type NetworkId = 1 | 4 | 50
@@ -10,6 +12,7 @@ export const networkIds = {
 
 interface Network {
   label: string
+  url: string
   realitioTimeout: number
   contracts: {
     realitio: string
@@ -33,6 +36,7 @@ interface KnownTokenData {
 const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     label: 'Mainnet',
+    url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
     realitioTimeout: 86400,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
@@ -43,6 +47,7 @@ const networks: { [K in NetworkId]: Network } = {
   },
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
+    url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
     realitioTimeout: 10,
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
@@ -53,6 +58,7 @@ const networks: { [K in NetworkId]: Network } = {
   },
   [networkIds.GANACHE]: {
     label: 'Ganache',
+    url: `http://localhost:8545`,
     realitioTimeout: 10,
     contracts: {
       realitio: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
@@ -62,6 +68,20 @@ const networks: { [K in NetworkId]: Network } = {
     },
   },
 }
+
+export const supportedNetworkIds = (Object.keys(networks) as unknown) as NetworkId[]
+export const supportedNetworkURLs = Object.entries(networks).reduce<{
+  [networkId: number]: string
+}>(
+  (acc, [networkId, network]) => ({
+    ...acc,
+    [networkId]: network.url,
+  }),
+  {},
+)
+
+export const infuraNetworkURL =
+  process.env.NODE_ENV === 'development' ? networks[4].url : networks[1].url
 
 export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   cdai: {
