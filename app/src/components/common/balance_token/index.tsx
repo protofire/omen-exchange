@@ -15,6 +15,7 @@ interface Props {
 }
 
 const Wrapper = styled.div`
+  align-items: center;
   display: flex;
   justify-content: space-between;
   margin: 0 0 5px 0;
