@@ -83,9 +83,19 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
-  const resolveCondition = () => {
-    // Balances length is the number of outcomes
-    return oracle.resolveCondition(questionId, balances.length)
+  const resolveCondition = async () => {
+    try {
+      setStatus(Status.Loading)
+      setMessage('Resolve condition...')
+
+      // Balances length is the number of outcomes
+      await oracle.resolveCondition(questionId, balances.length)
+
+      setStatus(Status.Ready)
+    } catch (err) {
+      setStatus(Status.Error)
+      logger.log(`Error trying to resolve condition: ${err.message}`)
+    }
   }
 
   useEffect(() => {
@@ -109,13 +119,14 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
   const redeem = async () => {
     try {
+      setStatus(Status.Loading)
       if (!isConditionResolved) {
         setMessage('Resolving condition...')
-        await resolveCondition()
+        // Balances length is the number of outcomes
+        await oracle.resolveCondition(questionId, balances.length)
       }
-      setMessage('Redeem payout...')
-      setStatus(Status.Loading)
 
+      setMessage('Redeem payout...')
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
 
@@ -124,7 +135,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       setStatus(Status.Ready)
     } catch (err) {
       setStatus(Status.Error)
-      logger.log(`Error trying to redeem: ${err.message}`)
+      logger.log(`Error trying to resolve condition or redeem: ${err.message}`)
     }
   }
 
