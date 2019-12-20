@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { ConnectedWeb3Context } from './connectedWeb3'
-import { getContractAddress } from '../util/addresses'
+import { getContractAddress } from '../util/networks'
 import {
   ConditionalTokenService,
   MarketMakerService,

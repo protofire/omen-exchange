@@ -15,7 +15,7 @@ import { Token, StatusMarketCreation } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { Outcome } from '../common/outcomes'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { getDefaultToken } from '../../util/addresses'
+import { getDefaultToken } from '../../util/networks'
 
 export interface MarketData {
   collateral: Token

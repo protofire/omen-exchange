@@ -13,17 +13,14 @@ import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
 import { Outcome } from '../../../common/outcomes'
-import { getArbitrator } from '../../../../util/addresses'
+import { getArbitrator } from '../../../../util/networks'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { ButtonType } from '../../../../common/button_styling_types'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
-`
-
-const TableStyled = styled(Table)`
-  margin-bottom: 25px;
 `
 
 const Grid = styled.div`
@@ -110,7 +107,7 @@ const CreateMarketStep = (props: Props) => {
         )}
       </Grid>
       <SubsectionTitle>Outcomes</SubsectionTitle>
-      <TableStyled
+      <Table
         head={
           <THead>
             <TR>
@@ -119,6 +116,7 @@ const CreateMarketStep = (props: Props) => {
             </TR>
           </THead>
         }
+        maxHeight="130px"
       >
         {outcomes.map((outcome, index) => {
           return (
@@ -128,7 +126,7 @@ const CreateMarketStep = (props: Props) => {
             </TR>
           )
         })}
-      </TableStyled>
+      </Table>
       {questionId || marketMakerAddress ? (
         <>
           <SubsectionTitle>Created Market Information</SubsectionTitle>
@@ -165,10 +163,11 @@ const CreateMarketStep = (props: Props) => {
           ‹ Back
         </ButtonLinkStyled>
         <Button
+          buttonType={ButtonType.primary}
           disabled={status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error}
           onClick={submit}
         >
-          Finish
+          Create
         </Button>
       </ButtonContainer>
     </CreateCard>

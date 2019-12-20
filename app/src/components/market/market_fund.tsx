@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import styled, { withTheme } from 'styled-components'
+import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
 import { SectionTitle } from '../common/section_title'
@@ -23,6 +23,7 @@ import { ButtonLink } from '../common/button_link'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { BalanceToken } from '../common/balance_token'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
+import { ButtonType } from '../../common/button_styling_types'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -89,7 +90,6 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
     balances,
     marketMakerUserFunding,
     marketMakerFunding,
-    theme,
     marketMakerAddress,
     collateral,
   } = props
@@ -251,17 +251,15 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
-
-          <Button onClick={() => addFunding()} fontSize={'18px'} disabled={error}>
-            Add funding
-          </Button>
           <Button
+            buttonType={ButtonType.secondary}
             disabled={marketMakerUserFunding && marketMakerUserFunding.isZero()}
-            backgroundColor={theme.colors.secondary}
             onClick={() => removeFunding()}
-            fontSize={'18px'}
           >
-            Remove all funding
+            Remove funding
+          </Button>
+          <Button buttonType={ButtonType.primary} onClick={() => addFunding()} disabled={error}>
+            Add funding
           </Button>
         </ButtonContainerStyled>
       </ViewCard>
@@ -270,4 +268,4 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   )
 }
 
-export const MarketFund = withRouter(withTheme(MarketFundWrapper))
+export const MarketFund = withRouter(MarketFundWrapper)

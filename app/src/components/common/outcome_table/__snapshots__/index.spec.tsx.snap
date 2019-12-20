@@ -3,10 +3,10 @@
 exports[`should accept a selected outcome 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-bdVaJa jFUYii"
   >
     <table
-      class="sc-cSHVUG cUnUqJ sc-bwzfXH jwzwsZ"
+      class="sc-cSHVUG cUnUqJ sc-bwzfXH gHdRWs"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -15,30 +15,30 @@ exports[`should accept a selected outcome 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           />
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           >
             Outcome probabilities
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Current Price
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Shares
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Payout
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Price after trade
           </th>
@@ -139,7 +139,7 @@ exports[`should accept a selected outcome 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -247,7 +247,7 @@ exports[`should accept a selected outcome 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -280,10 +280,10 @@ exports[`should accept a selected outcome 1`] = `
 exports[`should hide radio selections 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-bdVaJa jFUYii"
   >
     <table
-      class="sc-cSHVUG cUnUqJ sc-bwzfXH jwzwsZ"
+      class="sc-cSHVUG cUnUqJ sc-bwzfXH gHdRWs"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -292,27 +292,27 @@ exports[`should hide radio selections 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           >
             Outcome probabilities
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Current Price
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Shares
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Payout
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Price after trade
           </th>
@@ -362,7 +362,7 @@ exports[`should hide radio selections 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -427,7 +427,7 @@ exports[`should hide radio selections 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -460,10 +460,10 @@ exports[`should hide radio selections 1`] = `
 exports[`should show no as winning token 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-bdVaJa jFUYii"
   >
     <table
-      class="sc-cSHVUG cUnUqJ sc-bwzfXH jwzwsZ"
+      class="sc-cSHVUG cUnUqJ sc-bwzfXH gHdRWs"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -472,30 +472,30 @@ exports[`should show no as winning token 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           />
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           >
             Outcome probabilities
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Current Price
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Shares
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Payout
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Price after trade
           </th>
@@ -554,7 +554,7 @@ exports[`should show no as winning token 1`] = `
           <td
             class="sc-EHOje sc-kAzzGY foKdFt"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -622,7 +622,7 @@ exports[`should show no as winning token 1`] = `
           <td
             class="sc-EHOje sc-kAzzGY CGYbl"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -655,10 +655,10 @@ exports[`should show no as winning token 1`] = `
 exports[`should show prices after trade 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-bdVaJa jFUYii"
   >
     <table
-      class="sc-cSHVUG cUnUqJ sc-bwzfXH jwzwsZ"
+      class="sc-cSHVUG cUnUqJ sc-bwzfXH gHdRWs"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -667,30 +667,30 @@ exports[`should show prices after trade 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           />
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           >
             Outcome probabilities
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Current Price
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Shares
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Payout
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Price after trade
           </th>
@@ -783,7 +783,7 @@ exports[`should show prices after trade 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -891,7 +891,7 @@ exports[`should show prices after trade 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -924,10 +924,10 @@ exports[`should show prices after trade 1`] = `
 exports[`should show yes as winning token 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-bdVaJa jFUYii"
   >
     <table
-      class="sc-cSHVUG cUnUqJ sc-bwzfXH jwzwsZ"
+      class="sc-cSHVUG cUnUqJ sc-bwzfXH gHdRWs"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -936,30 +936,30 @@ exports[`should show yes as winning token 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           />
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           >
             Outcome probabilities
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Current Price
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Shares
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Payout
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Price after trade
           </th>
@@ -1018,7 +1018,7 @@ exports[`should show yes as winning token 1`] = `
           <td
             class="sc-EHOje sc-kAzzGY foKdFt"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -1086,7 +1086,7 @@ exports[`should show yes as winning token 1`] = `
           <td
             class="sc-EHOje sc-kAzzGY CGYbl"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -1119,10 +1119,10 @@ exports[`should show yes as winning token 1`] = `
 exports[`should work with disabled columns 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-bdVaJa jFUYii"
   >
     <table
-      class="sc-cSHVUG cUnUqJ sc-bwzfXH jwzwsZ"
+      class="sc-cSHVUG cUnUqJ sc-bwzfXH gHdRWs"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -1131,25 +1131,25 @@ exports[`should work with disabled columns 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           />
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           >
             Outcome probabilities
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Current Price
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Shares
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Price after trade
           </th>
@@ -1242,7 +1242,7 @@ exports[`should work with disabled columns 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -1345,7 +1345,7 @@ exports[`should work with disabled columns 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -1373,10 +1373,10 @@ exports[`should work with disabled columns 1`] = `
 exports[`should work with minimal props 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-bdVaJa jFUYii"
   >
     <table
-      class="sc-cSHVUG cUnUqJ sc-bwzfXH jwzwsZ"
+      class="sc-cSHVUG cUnUqJ sc-bwzfXH gHdRWs"
     >
       <thead
         class="sc-htpNat KtFsv"
@@ -1385,30 +1385,30 @@ exports[`should work with minimal props 1`] = `
           class="sc-bxivhb gowuVX"
         >
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           />
           <th
-            class="sc-ifAKCX ceeJPY"
+            class="sc-ifAKCX giynAj"
           >
             Outcome probabilities
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Current Price
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Shares
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Payout
           </th>
           <th
-            class="sc-ifAKCX bourab"
+            class="sc-ifAKCX ipPSVf"
           >
             Price after trade
           </th>
@@ -1501,7 +1501,7 @@ exports[`should work with minimal props 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -1609,7 +1609,7 @@ exports[`should work with minimal props 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>

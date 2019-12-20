@@ -5,14 +5,25 @@ import styled from 'styled-components'
 import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { THREEBOX_ADMIN_ADDRESS, THREEBOX_SPACE_NAME } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
-import { ButtonCSS } from '../button'
+import { ButtonCSS } from '../../../common/button_styling_types'
 
 const logger = getLogger('Component::ThreeBoxComments')
 
+const MAIN_AVATAR_DIMENSIONS = '40px'
+const COMMENT_AVATAR_DIMENSIONS = '32px'
+
+const CommentsTitle = styled.h3`
+  color: #000;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0 0 20px;
+`
+
 const ThreeBoxCustom = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
-  margin: 40px 0 0 0;
-  padding: 20px 0 0;
+  margin: 30px auto;
+  max-width: ${props => props.theme.viewMarket.maxWidth};
+  width: 100%;
 
   > .threebox-comments-react {
     max-width: 100%;
@@ -21,12 +32,12 @@ const ThreeBoxCustom = styled.div`
     /* Main comment area */
     .input {
       img {
-        height: 40px;
-        max-height: 40px;
-        max-width: 40px;
-        min-height: 40px;
-        min-width: 40px;
-        width: 40px;
+        height: ${MAIN_AVATAR_DIMENSIONS};
+        max-height: ${MAIN_AVATAR_DIMENSIONS};
+        max-width: ${MAIN_AVATAR_DIMENSIONS};
+        min-height: ${MAIN_AVATAR_DIMENSIONS};
+        min-width: ${MAIN_AVATAR_DIMENSIONS};
+        width: ${MAIN_AVATAR_DIMENSIONS};
       }
 
       .input_form {
@@ -40,64 +51,106 @@ const ThreeBoxCustom = styled.div`
       }
 
       .input_commentAs {
-        color: #999;
+        color: ${props => props.theme.colors.textColorLight};
         left: auto;
+        margin: 0;
         right: 0;
+        top: -40px;
+      }
+
+      .sc-user-input--picker-wrapper {
+        max-height: 100%;
+        min-height: 44px;
+        min-width: 44px;
       }
     }
 
     /* Comments list */
     .dialogue {
+      .dialogue_grid {
+        display: block;
+        margin-bottom: 0;
+        row-gap: 30px;
+      }
+
       /* Comment */
       .comment {
-        img {
-          height: 30px;
-          max-height: 30px;
-          max-width: 30px;
-          min-height: 30px;
-          min-width: 30px;
-          width: 30px;
+        border-bottom: 1px solid ${props => props.theme.borders.borderColor};
+        padding: 15px 8px;
+
+        &:first-child {
+          border-top: 1px solid ${props => props.theme.borders.borderColor};
         }
+
+        img {
+          height: ${COMMENT_AVATAR_DIMENSIONS};
+          max-height: ${COMMENT_AVATAR_DIMENSIONS};
+          max-width: ${COMMENT_AVATAR_DIMENSIONS};
+          min-height: ${COMMENT_AVATAR_DIMENSIONS};
+          min-width: ${COMMENT_AVATAR_DIMENSIONS};
+          width: ${COMMENT_AVATAR_DIMENSIONS};
+        }
+
         .comment_content_context_main_user_info {
           margin-bottom: 0;
         }
+
         .comment_content_context_main_user_info_username {
           color: #000;
-          font-size: 15px;
-          font-weight: 500;
+          font-size: 16px;
+          font-weight: 400;
           line-height: 1.2;
         }
+
+        .comment_content_context_main_user_info_address {
+          color: ${props => props.theme.colors.textColorLight};
+          font-size: 13px;
+          font-weight: normal;
+          line-height: 1.2;
+
+          &::before {
+            content: '(';
+          }
+
+          &::after {
+            content: ')';
+          }
+        }
+
         .comment_content_context {
           margin: 0;
         }
+
         .comment_content_context_time {
-          color: #999;
+          color: ${props => props.theme.colors.textColorLight};
           font-size: 11px;
-          line-height: 1.2;
-          margin-bottom: 5px;
+          font-weight: normal;
+          line-height: 1.36;
         }
+
         .comment_content_text {
-          color: #333;
+          color: #000;
           font-size: 13px;
           font-weight: normal;
-          line-height: 1.45;
-          margin: 0;
-          text-align: left;
+          line-height: 1.33;
+          margin: 2px 0 0 0;
         }
       }
     }
+
     .context {
       height: auto;
       justify-content: flex-end;
-      margin: 0;
+      margin: 0 0 15px;
 
       .context_text {
-        color: #999;
+        color: ${props => props.theme.colors.textColorLight};
         font-size: 12px;
         font-weight: 400;
         line-height: 1.2;
       }
     }
+
     .dialogue_button_container {
       height: auto;
 
@@ -113,19 +166,11 @@ const ThreeBoxCustom = styled.div`
     padding-top: 20px;
 
     .footer_text {
-      color: #999;
+      color: ${props => props.theme.colors.textColorLight};
       font-size: 12px;
       font-weight: 400;
     }
   }
-`
-
-const CommentsTitle = styled.h3`
-  color: #000;
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 1.2;
-  margin: 0 0 15px;
 `
 
 interface Props {
