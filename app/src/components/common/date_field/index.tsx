@@ -46,6 +46,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
 
     &::placeholder {
       color: ${props => props.theme.colors.textColorLight};
+      font-size: 13px;
     }
   }
 `
