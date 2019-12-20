@@ -15,6 +15,7 @@ import { CustomizableTokensSelect } from '../../../common/customizable_tokens_se
 import { Token } from '../../../../util/types'
 import { ERC20Service } from '../../../../services'
 import { useAsyncDerivedValue } from '../../../../hooks/useAsyncDerivedValue'
+import { FormError } from '../../../common/form_error'
 
 interface Props {
   back: () => void
@@ -42,12 +43,6 @@ const TextfieldStyledRight = styled<any>(Textfield)`
 
 const InputBigNumberStyledRight = styled<any>(BigNumberInput)`
   text-align: right;
-`
-
-const ErrorStyled = styled.span`
-  margin-top: 0px;
-  color: red;
-  font-weight: 500;
 `
 
 const FundingAndFeeStep = (props: Props) => {
@@ -131,10 +126,10 @@ const FundingAndFeeStep = (props: Props) => {
           <TextfieldCustomPlaceholder
             formField={
               <InputBigNumberStyledRight
-                name="funding"
-                value={funding}
-                onChange={handleChange}
                 decimals={collateral.decimals}
+                name="funding"
+                onChange={handleChange}
+                value={funding}
               />
             }
             placeholderText={collateral.symbol}
@@ -153,7 +148,7 @@ const FundingAndFeeStep = (props: Props) => {
                 handleChange({ name: 'funding', value: collateralBalance })
               }}
             />
-            <ErrorStyled>{fundingMessageError}</ErrorStyled>
+            <FormError>{fundingMessageError}</FormError>
           </>
         }
       />
