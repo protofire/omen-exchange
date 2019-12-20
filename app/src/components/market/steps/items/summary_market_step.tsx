@@ -18,10 +18,6 @@ import { NavLink } from 'react-router-dom'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
 import { ButtonAnchor } from '../../../common/button_anchor'
 
-const TableStyled = styled(Table)`
-  margin-bottom: 25px;
-`
-
 const NavLinkStyled = styled(NavLink)`
   color: ${props => props.theme.colors.textColor};
   text-decoration: underline;
@@ -98,7 +94,7 @@ const SummaryMarketStep = (props: Props) => {
           />
         </Grid>
         <SubsectionTitle>Outcomes</SubsectionTitle>
-        <TableStyled
+        <Table
           head={
             <THead>
               <TR>
@@ -107,6 +103,7 @@ const SummaryMarketStep = (props: Props) => {
               </TR>
             </THead>
           }
+          maxHeight="130px"
         >
           {balances.map((item, index) => {
             return (
@@ -116,7 +113,7 @@ const SummaryMarketStep = (props: Props) => {
               </TR>
             )
           })}
-        </TableStyled>
+        </Table>
         <ButtonContainer>
           <Button rel="noopener noreferrer" href={`/#/${marketMakerAddress}`} target="_blank">
             View Market
