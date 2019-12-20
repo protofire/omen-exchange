@@ -83,7 +83,7 @@ export const ModalCollateral = (props: Props) => {
             name="collateralAddress"
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               const { value } = event.target
-              setCollateralAddress(value)
+              setCollateralAddress(value.trim())
             }}
             placeholder="Type in a collateral address..."
             type="text"
