@@ -8,7 +8,6 @@ import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
 import { ButtonContainer } from '../../../common/button_container'
-import { ButtonCSS } from '../../../common/button'
 import { SectionTitle } from '../../../common/section_title'
 import { CopyText } from '../../../common/copy_text'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
@@ -17,6 +16,7 @@ import { useQuestion } from '../../../../hooks/useQuestion'
 import { FullLoading } from '../../../common/full_loading'
 import { NavLink } from 'react-router-dom'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
+import { ButtonAnchor } from '../../../common/button_anchor'
 
 const TableStyled = styled(Table)`
   margin-bottom: 25px;
@@ -43,10 +43,8 @@ const TitleValueStyled = styled(TitleValue)`
   margin-bottom: 14px;
 `
 
-const MainButton = styled.a`
-  ${ButtonCSS}
+const Button = styled(ButtonAnchor)`
   flex-grow: 1;
-  text-decoration: none;
 `
 
 interface Props {
@@ -120,9 +118,9 @@ const SummaryMarketStep = (props: Props) => {
           })}
         </TableStyled>
         <ButtonContainer>
-          <MainButton rel="noopener noreferrer" href={`/#/${marketMakerAddress}`} target="_blank">
-            Go to Market
-          </MainButton>
+          <Button rel="noopener noreferrer" href={`/#/${marketMakerAddress}`} target="_blank">
+            View Market
+          </Button>
         </ButtonContainer>
       </CreateCard>
     </>

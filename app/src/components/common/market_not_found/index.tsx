@@ -19,8 +19,8 @@ const WrappedText = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #555555;
-  margin-top: 20px
-  margin-bottom: 10px
+  margin-top: 20px;
+  margin-bottom: 10px;
 `
 
 const ButtonContainerStyled = styled(ButtonContainer)`

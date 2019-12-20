@@ -82,7 +82,7 @@ const OutcomesStep = (props: Props) => {
       <Outcomes outcomes={outcomes} onChange={handleOutcomesChange} errorMessages={errorMessages} />
       <ButtonContainerStyled>
         <ButtonLinkStyled onClick={props.back}>‹ Back</ButtonLinkStyled>
-        <Button disabled={isAddNewOutcomeButtonDisabled} fontSize={'17px'} onClick={addNewOutcome}>
+        <Button disabled={isAddNewOutcomeButtonDisabled} onClick={addNewOutcome}>
           Add outcome
         </Button>
         <Button disabled={error} onClick={props.next}>
