@@ -1,6 +1,6 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
-import { useWeb3Context } from 'web3-react/dist'
+import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 
 const Separator = css`
   &::before {
@@ -47,18 +47,18 @@ interface Props {
 }
 
 export const ButtonDisconnectWallet = (props: Props) => {
-  const context = useWeb3Context()
-  const { account } = context
+  const context = useConnectedWeb3Context()
+  const { account, rawWeb3Context } = context
 
   if (!account) {
     return null
   }
 
   const logout = () => {
-    if (context.active || (context.error && context.connectorName)) {
+    if (rawWeb3Context.active || (rawWeb3Context.error && rawWeb3Context.connectorName)) {
       props.callback()
       localStorage.removeItem('CONNECTOR')
-      context.unsetConnector()
+      rawWeb3Context.unsetConnector()
     }
   }
 
