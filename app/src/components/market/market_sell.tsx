@@ -50,6 +50,11 @@ const AmountWrapper = styled(FormRow)`
 const FormLabelStyled = styled(FormLabel)`
   margin-bottom: 10px;
 `
+
+const BigNumberInputTextRight = styled<any>(BigNumberInput)`
+  text-align: right;
+`
+
 const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
@@ -182,7 +187,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           formField={
             <TextfieldCustomPlaceholder
               formField={
-                <BigNumberInput
+                <BigNumberInputTextRight
                   decimals={collateral.decimals}
                   name="amount"
                   onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}

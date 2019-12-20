@@ -20,6 +20,7 @@ const FieldWrapper = styled.div<{ disabled?: boolean }>`
     border: none;
     color: #000;
     flex-grow: 1;
+    font-family: ${props => props.theme.fonts.fontFamily};
     font-size: 13px;
     font-weight: normal;
     margin: 0 5px 0 0;
@@ -27,6 +28,8 @@ const FieldWrapper = styled.div<{ disabled?: boolean }>`
 
     &::placeholder {
       color: ${props => props.theme.colors.textColorLight};
+      font-family: ${props => props.theme.fonts.fontFamily};
+      font-size: 13px;
     }
 
     &:disabled {

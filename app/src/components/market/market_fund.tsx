@@ -74,6 +74,10 @@ const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
 
+const BigNumberInputTextRight = styled<any>(BigNumberInput)`
+  text-align: right;
+`
+
 const logger = getLogger('Market::Fund')
 
 const MarketFundWrapper: React.FC<Props> = (props: Props) => {
@@ -218,7 +222,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
             <>
               <TextfieldCustomPlaceholder
                 formField={
-                  <BigNumberInput
+                  <BigNumberInputTextRight
                     decimals={collateral.decimals}
                     name="amount"
                     onChange={(e: BigNumberInputReturn) => setAmount(e.value)}

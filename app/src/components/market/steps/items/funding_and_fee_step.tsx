@@ -41,7 +41,7 @@ const TextfieldStyledRight = styled<any>(Textfield)`
   text-align: right;
 `
 
-const InputBigNumberStyledRight = styled<any>(BigNumberInput)`
+const BigNumberInputTextRight = styled<any>(BigNumberInput)`
   text-align: right;
 `
 
@@ -125,7 +125,7 @@ const FundingAndFeeStep = (props: Props) => {
         formField={
           <TextfieldCustomPlaceholder
             formField={
-              <InputBigNumberStyledRight
+              <BigNumberInputTextRight
                 decimals={collateral.decimals}
                 name="funding"
                 onChange={handleChange}

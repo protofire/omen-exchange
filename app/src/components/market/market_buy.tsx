@@ -48,6 +48,10 @@ const FormLabelStyled = styled(FormLabel)`
   margin-bottom: 10px;
 `
 
+const BigNumberInputTextRight = styled<any>(BigNumberInput)`
+  text-align: right;
+`
+
 const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
@@ -174,7 +178,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           formField={
             <TextfieldCustomPlaceholder
               formField={
-                <BigNumberInput
+                <BigNumberInputTextRight
                   name="amount"
                   value={amount}
                   onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
