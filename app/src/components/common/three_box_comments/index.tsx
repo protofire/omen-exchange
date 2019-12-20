@@ -41,7 +41,7 @@ const ThreeBoxCustom = styled.div`
       }
 
       .input_form {
-        color: #000;
+        color: ${props => props.theme.colors.textColor};
         font-size: 13px;
         font-weight: normal;
         height: 54px;

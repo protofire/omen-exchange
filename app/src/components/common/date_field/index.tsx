@@ -17,7 +17,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
   border-radius: 0;
   border-right: none;
   border-top: none;
-  color: #000;
+  color: ${props => props.theme.colors.textColor};
   cursor: ${props => (props.disabled ? 'not-allowed' : 'default')};
   font-size: 13px;
   font-weight: normal;
@@ -38,7 +38,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
   > div > div > input {
     background-color: transparent;
     border: none;
-    color: #000;
+    color: ${props => props.theme.colors.textColor};
     font-size: 13px;
     outline: none;
     padding: 0;

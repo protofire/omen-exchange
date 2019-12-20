@@ -18,7 +18,7 @@ const FieldWrapper = styled.div<{ disabled?: boolean }>`
 
   > input {
     border: none;
-    color: #000;
+    color: ${props => props.theme.colors.textColor};
     flex-grow: 1;
     font-family: ${props => props.theme.fonts.fontFamily};
     font-size: 13px;
