@@ -45,29 +45,29 @@ export const ModalCollateral = (props: Props) => {
   const [collateralAddress, setCollateralAddress] = useState<string>('')
   const { collateral, errorMessage } = useCollateral(collateralAddress, context)
 
-  const collateralWithAddress: Maybe<Token> = collateral
+  const validCollateralAddress: Maybe<Token> = collateral
     ? { address: collateralAddress, ...collateral }
     : null
 
   const onClickSaveButton = () => {
-    if (collateralWithAddress) {
-      onSave(collateralWithAddress)
+    if (validCollateralAddress) {
+      onSave(validCollateralAddress)
       onClose()
     }
   }
 
   const tokenDetails = () => {
-    return collateralWithAddress ? (
+    return validCollateralAddress ? (
       <>
         <SubsectionTitleStyled>Details</SubsectionTitleStyled>
         <Grid>
           <TitleValueStyled
             title={'Symbol:'}
-            value={collateralWithAddress && collateralWithAddress.symbol}
+            value={validCollateralAddress && validCollateralAddress.symbol}
           />
           <TitleValueStyled
             title={'Decimals:'}
-            value={collateralWithAddress && collateralWithAddress.decimals}
+            value={validCollateralAddress && validCollateralAddress.decimals}
           />
         </Grid>
       </>
@@ -80,12 +80,13 @@ export const ModalCollateral = (props: Props) => {
         formField={
           <Textfield
             hasError={errorMessage ? true : false}
+            hasSuccess={validCollateralAddress ? true : false}
             name="collateralAddress"
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               const { value } = event.target
               setCollateralAddress(value.trim())
             }}
-            placeholder="Type in a collateral address..."
+            placeholder="0xac5d29e67a53ee4903d59a4c929b718e1d575eee"
             type="text"
           />
         }
@@ -96,7 +97,7 @@ export const ModalCollateral = (props: Props) => {
       {tokenDetails()}
       <ButtonStyled
         buttonType={ButtonType.primary}
-        disabled={!collateralWithAddress}
+        disabled={!validCollateralAddress}
         onClick={onClickSaveButton}
       >
         Add
