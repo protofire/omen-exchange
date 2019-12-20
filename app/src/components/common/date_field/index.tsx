@@ -1,7 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { IconCalendar } from './img/IconCalendar'
 import DatePicker from 'react-datepicker'
+import moment from 'moment'
+
+import { IconCalendar } from './img/IconCalendar'
 
 interface Props {
   disabled?: boolean
@@ -52,11 +54,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
 
 export const DateField = (props: Props) => {
   const { onChange, selected, minDate, name, disabled, ...restProps } = props
-
-  const today = new Date()
-  const offset = (-1 * today.getTimezoneOffset()) / 60
-  const offsetName = 'UTC' + (offset >= 0 ? '+' + offset : offset)
-  const timeInputLabel = `Time (${offsetName})`
+  const timeInputLabel = `Time (UTC ${moment().format('Z')})`
 
   return (
     <DateFieldWrapper {...restProps} disabled={disabled}>
