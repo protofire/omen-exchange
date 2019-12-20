@@ -54,7 +54,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
 
 export const DateField = (props: Props) => {
   const { onChange, selected, minDate, name, disabled, ...restProps } = props
-  const timeInputLabel = `Time (UTC ${moment().format('Z')})`
+  const timeInputLabel = `Time (UTC${moment().format('Z')})`
 
   return (
     <DateFieldWrapper {...restProps} disabled={disabled}>
