@@ -26,7 +26,7 @@ const FieldWrapper = styled.div<{ disabled?: boolean }>`
     padding: 0;
 
     &::placeholder {
-      color: #999;
+      color: ${props => props.theme.colors.textColorLight};
     }
 
     &:disabled {
@@ -48,7 +48,7 @@ FieldWrapper.defaultProps = {
 }
 
 const Placeholder = styled.span`
-  color: #999;
+  color: ${props => props.theme.colors.textColorLight};
   flex-shrink: 0;
   font-size: 13px;
   font-weight: normal;

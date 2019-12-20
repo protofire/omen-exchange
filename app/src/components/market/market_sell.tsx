@@ -173,20 +173,20 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          pricesAfterTrade={pricesAfterTrade || undefined /* hack to cast Maybe<A> to A? */}
-          outcomeSelected={outcomeIndex}
-          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           disabledColumns={[OutcomeTableValue.Payout]}
+          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
+          outcomeSelected={outcomeIndex}
+          pricesAfterTrade={pricesAfterTrade || undefined /* hack to cast Maybe<A> to A? */}
         />
         <AmountWrapper
           formField={
             <TextfieldCustomPlaceholder
               formField={
                 <BigNumberInput
-                  name="amount"
-                  value={amountShares}
-                  onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
                   decimals={collateral.decimals}
+                  name="amount"
+                  onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
+                  value={amountShares}
                 />
               }
               placeholderText="Shares"

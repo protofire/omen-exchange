@@ -38,7 +38,7 @@ const FormInput = styled.input<{ hasError?: boolean; hasSuccess?: boolean }>`
   width: 100%;
 
   &::placeholder {
-    color: #999;
+    color: ${props => props.theme.colors.textColorLight};
   }
 
   &:read-only,
