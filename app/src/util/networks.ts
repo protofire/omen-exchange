@@ -70,7 +70,8 @@ const networks: { [K in NetworkId]: Network } = {
   },
 }
 
-export const supportedNetworkIds = (Object.keys(networks) as unknown) as NetworkId[]
+export const supportedNetworkIds = Object.keys(networks).map(Number) as NetworkId[]
+
 export const supportedNetworkURLs = entries(networks).reduce<{
   [networkId: number]: string
 }>(
