@@ -68,6 +68,8 @@ export const OutcomeTable = (props: Props) => {
     0,
   )
 
+  const equalProbabilities = balances.every(b => b.probability === balances[0].probability)
+
   const TableCellsAlign = ['left', 'right', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
@@ -93,7 +95,7 @@ export const OutcomeTable = (props: Props) => {
     priceAfterTrade?: number,
   ) => {
     const { outcomeName, probability, currentPrice, shares, winningOutcome } = balanceItem
-    const isWinning = outcomeIndex === outcomeMaxProbability
+    const isWinning = !equalProbabilities && outcomeIndex === outcomeMaxProbability
 
     const currentPriceFormatted = Number(currentPrice).toFixed(4)
 
