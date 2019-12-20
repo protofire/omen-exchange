@@ -1,27 +1,23 @@
 import { Connectors } from 'web3-react'
 import WalletConnectApi from '@walletconnect/web3-subprovider'
-import { INFURA_PROJECT_ID } from '../common/constants'
+
+import { infuraNetworkURL, supportedNetworkIds, supportedNetworkURLs } from '../util/networks'
 
 const { InjectedConnector, WalletConnectConnector, NetworkOnlyConnector } = Connectors
 
 const MetaMask = new InjectedConnector({
-  supportedNetworks: [1, 4, 50],
+  supportedNetworks: supportedNetworkIds,
 })
 
 const WalletConnect = new WalletConnectConnector({
   api: WalletConnectApi,
   bridge: 'https://bridge.walletconnect.org',
-  supportedNetworkURLs: {
-    1: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
-    4: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
-    50: `http://localhost:8545`,
-  },
+  supportedNetworkURLs,
   defaultNetwork: 4,
 })
 
-const infuraNetwork = process.env.NODE_ENV === 'development' ? 'rinkeby' : 'mainnet'
 const Infura = new NetworkOnlyConnector({
-  providerURL: `https://${infuraNetwork}.infura.io/v3/${INFURA_PROJECT_ID}`,
+  providerURL: infuraNetworkURL,
 })
 
 export default {
