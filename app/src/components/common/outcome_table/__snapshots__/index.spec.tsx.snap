@@ -128,8 +128,8 @@ exports[`should accept a selected outcome 1`] = `
                   class="sc-fjdhpX iZcRRn"
                 >
                   <div
-                    class="sc-jzJRlG czlRwm"
-                    color="#00be95"
+                    class="sc-jzJRlG ckyZEE"
+                    color="#acacac"
                     width="50"
                   />
                 </div>
@@ -351,8 +351,8 @@ exports[`should hide radio selections 1`] = `
                   class="sc-fjdhpX iZcRRn"
                 >
                   <div
-                    class="sc-jzJRlG czlRwm"
-                    color="#00be95"
+                    class="sc-jzJRlG ckyZEE"
+                    color="#acacac"
                     width="50"
                   />
                 </div>
@@ -543,8 +543,8 @@ exports[`should show no as winning token 1`] = `
                   class="sc-fjdhpX iZcRRn"
                 >
                   <div
-                    class="sc-jzJRlG czlRwm"
-                    color="#00be95"
+                    class="sc-jzJRlG ckyZEE"
+                    color="#acacac"
                     width="50"
                   />
                 </div>
@@ -772,8 +772,8 @@ exports[`should show prices after trade 1`] = `
                   class="sc-fjdhpX iZcRRn"
                 >
                   <div
-                    class="sc-jzJRlG czlRwm"
-                    color="#00be95"
+                    class="sc-jzJRlG ckyZEE"
+                    color="#acacac"
                     width="50"
                   />
                 </div>
@@ -1007,8 +1007,8 @@ exports[`should show yes as winning token 1`] = `
                   class="sc-fjdhpX iZcRRn"
                 >
                   <div
-                    class="sc-jzJRlG czlRwm"
-                    color="#00be95"
+                    class="sc-jzJRlG ckyZEE"
+                    color="#acacac"
                     width="50"
                   />
                 </div>
@@ -1231,8 +1231,8 @@ exports[`should work with disabled columns 1`] = `
                   class="sc-fjdhpX iZcRRn"
                 >
                   <div
-                    class="sc-jzJRlG czlRwm"
-                    color="#00be95"
+                    class="sc-jzJRlG ckyZEE"
+                    color="#acacac"
                     width="50"
                   />
                 </div>
@@ -1490,8 +1490,8 @@ exports[`should work with minimal props 1`] = `
                   class="sc-fjdhpX iZcRRn"
                 >
                   <div
-                    class="sc-jzJRlG czlRwm"
-                    color="#00be95"
+                    class="sc-jzJRlG ckyZEE"
+                    color="#acacac"
                     width="50"
                   />
                 </div>

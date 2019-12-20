@@ -196,7 +196,7 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     },
   },
   realitio: {
-    name: 'realit.io',
+    name: 'Realitio Team',
     url: 'https://realit.io/',
     addresses: {
       [networkIds.MAINNET]: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
