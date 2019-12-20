@@ -8,13 +8,13 @@ const Wrapper = styled.div`
   margin-top: auto;
   padding-top: 30px;
 
-  > button {
-    @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-      margin-left: 10px;
+  > * {
+    margin-bottom: 0;
+    margin-left: 10px;
+    width: auto;
 
-      &:first-child {
-        margin-left: 0;
-      }
+    &:first-child {
+      margin-left: 0;
     }
   }
 `

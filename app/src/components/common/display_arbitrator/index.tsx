@@ -11,10 +11,15 @@ export const DisplayArbitrator: React.FC<Props> = (props: Props) => {
 
   return (
     <>
+      The market will be resolved using{' '}
+      <a href="https://realit.io/" rel="noopener noreferrer" target="_blank">
+        Realitio
+      </a>{' '}
+      and{' '}
       <a href={arbitrator.url} rel="noopener noreferrer" target="_blank">
         {arbitrator.name}
       </a>{' '}
-      oracle as final arbitrator.
+      as final arbitrator.
     </>
   )
 }

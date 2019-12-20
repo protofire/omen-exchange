@@ -139,7 +139,7 @@ exports[`should accept a selected outcome 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -247,7 +247,7 @@ exports[`should accept a selected outcome 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -362,7 +362,7 @@ exports[`should hide radio selections 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -427,7 +427,7 @@ exports[`should hide radio selections 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -554,7 +554,7 @@ exports[`should show no as winning token 1`] = `
           <td
             class="sc-EHOje sc-kAzzGY foKdFt"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -622,7 +622,7 @@ exports[`should show no as winning token 1`] = `
           <td
             class="sc-EHOje sc-kAzzGY CGYbl"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -783,7 +783,7 @@ exports[`should show prices after trade 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -891,7 +891,7 @@ exports[`should show prices after trade 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -1018,7 +1018,7 @@ exports[`should show yes as winning token 1`] = `
           <td
             class="sc-EHOje sc-kAzzGY foKdFt"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -1086,7 +1086,7 @@ exports[`should show yes as winning token 1`] = `
           <td
             class="sc-EHOje sc-kAzzGY CGYbl"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -1242,7 +1242,7 @@ exports[`should work with disabled columns 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -1345,7 +1345,7 @@ exports[`should work with disabled columns 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -1501,7 +1501,7 @@ exports[`should work with minimal props 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>
@@ -1609,7 +1609,7 @@ exports[`should work with minimal props 1`] = `
           <td
             class="sc-EHOje cxvido"
           >
-            0.5 
+            0.5000 
             <strong>
               DAI
             </strong>

@@ -51,6 +51,15 @@ const AskQuestionStep = (props: Props) => {
     }
   }
 
+  const questionNote = () => {
+    return (
+      <>
+        <strong>For example:</strong> <i>&quot;Will France win?&quot;</i> is not an acceptable
+        question, but <i>&quot;Will France win the 2020 FIFA World Cup?&quot;</i> is a good one.
+      </>
+    )
+  }
+
   return (
     <CreateCard>
       <FormRow
@@ -63,14 +72,7 @@ const AskQuestionStep = (props: Props) => {
             type="text"
           />
         }
-        note={[
-          <strong key="1">For example:</strong>,
-          ' ',
-          <i key="2">&quot;Will France win?&quot;</i>,
-          ' is not an acceptable question, but ',
-          <i key="3">&quot;Will France win the 2020 FIFA World Cup?&quot;</i>,
-          ' is a good one.',
-        ]}
+        note={questionNote()}
         title={'Question'}
         tooltip={{
           id: `question`,
@@ -111,7 +113,12 @@ const AskQuestionStep = (props: Props) => {
       />
       <OracleInfo>
         The market will be resolved using{' '}
+        <a href="https://realit.io/" rel="noopener noreferrer" target="_blank">
+          Realitio
+        </a>{' '}
+        and{' '}
         <a href={arbitrator.url} rel="noopener noreferrer" target="_blank">
+          {' '}
           {arbitrator.name}
         </a>{' '}
         as final arbitrator.

@@ -1,6 +1,5 @@
 import React, { useState, HTMLAttributes, ChangeEvent } from 'react'
-import styled, { withTheme } from 'styled-components'
-
+import styled from 'styled-components'
 import ReactDOM from 'react-dom'
 import { FormRow } from '../form_row'
 import { Card } from '../card'
@@ -12,6 +11,7 @@ import { Button } from '../button'
 import { Token } from '../../../util/types'
 import { useCollateral } from '../../../hooks/useCollateral'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { ButtonType } from '../../../common/button_styling_types'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -52,14 +52,13 @@ const ErrorStyled = styled.span`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  theme?: any
   onClose: () => void
   onSave: (collateral: Token) => void
   context: ConnectedWeb3Context
 }
 
 const ModalCollateralWrapper = (props: Props) => {
-  const { theme, onClose, onSave, context } = props
+  const { onClose, onSave, context } = props
 
   const [collateralAddress, setCollateralAddress] = useState<string>('')
 
@@ -124,7 +123,7 @@ const ModalCollateralWrapper = (props: Props) => {
           <ButtonStyled disabled={!collateralWithAddress} onClick={onClickSaveButton}>
             Save
           </ButtonStyled>
-          <Button backgroundColor={theme.colors.secondary} onClick={onClickCloseButton}>
+          <Button buttonType={ButtonType.secondary} onClick={onClickCloseButton}>
             Close
           </Button>
         </ButtonContainer>
@@ -135,4 +134,4 @@ const ModalCollateralWrapper = (props: Props) => {
   return ReactDOM.createPortal(messageToRender, portal)
 }
 
-export const ModalCollateral = withTheme(ModalCollateralWrapper)
+export const ModalCollateral = ModalCollateralWrapper
