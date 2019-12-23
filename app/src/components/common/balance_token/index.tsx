@@ -8,6 +8,7 @@ import { ERC20Service } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { Token } from '../../../util/types'
 import { FormRowNote } from '../form_row_note'
+import { FormRowLink } from '../form_row_link'
 
 interface Props {
   collateral: Token
@@ -27,20 +28,6 @@ const Wrapper = styled.div`
 
 const Note = styled(FormRowNote)`
   margin: 0 15px 0 0;
-`
-
-const Link = styled.span`
-  color: ${props => props.theme.colors.primary};
-  cursor: pointer;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1.2;
-  text-align: right;
-  text-decoration: underline;
-
-  &:hover {
-    text-decoration: none;
-  }
 `
 
 export const BalanceToken = (props: Props) => {
@@ -78,7 +65,9 @@ export const BalanceToken = (props: Props) => {
           {calculateBalanceAmountValue} {collateralSymbol}
         </strong>
       </Note>
-      <Link onClick={() => onClickMax(collateral, collateralBalance)}>Add all funds</Link>
+      <FormRowLink onClick={() => onClickMax(collateral, collateralBalance)}>
+        Add all funds
+      </FormRowLink>
     </Wrapper>
   )
 }

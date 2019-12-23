@@ -107,12 +107,12 @@ const FundingAndFeeStep = (props: Props) => {
       <FormRow
         formField={
           <CustomizableTokensSelect
-            context={context}
-            name="collateralId"
-            value={collateral}
-            customValues={collateralsCustom}
             addCustomValue={addCollateralCustom}
+            context={context}
+            customValues={collateralsCustom}
+            name="collateralId"
             onCollateralChange={handleCollateralChange}
+            value={collateral}
           />
         }
         title={'Collateral token'}
