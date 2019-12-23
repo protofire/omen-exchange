@@ -165,7 +165,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
             <ResolutionText>{resolution ? formatDate(resolution) : ''}</ResolutionText>
           </ResolutionDate>
           <Separator>-</Separator>
-          <Status resolved={status === MarketStatus.Resolved ? true : false}>{status}</Status>
+          <Status resolved={status === MarketStatus.Resolved}>{status}</Status>
         </Info>
       </Contents>
       <Chevron />
