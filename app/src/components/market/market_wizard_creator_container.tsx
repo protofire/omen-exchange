@@ -5,7 +5,7 @@ import { getLogger } from '../../util/logger'
 import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import { ERC20Service } from '../../services'
-import { getArbitrator, getContractAddress } from '../../util/addresses'
+import { getArbitrator, getContractAddress } from '../../util/networks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
 
@@ -43,6 +43,7 @@ const MarketWizardCreatorContainer: FC = () => {
         category,
         arbitrator.address,
         openingDateMoment,
+        networkId,
       )
       setQuestionId(questionId)
 
