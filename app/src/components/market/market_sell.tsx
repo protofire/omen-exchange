@@ -19,16 +19,18 @@ import { getLogger } from '../../util/logger'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { FullLoading } from '../common/full_loading'
 import {
+  calcSellAmountInCollateral,
   computeBalanceAfterTrade,
   formatBigNumber,
   formatDate,
-  calcSellAmountInCollateral,
   mulBN,
 } from '../../util/tools'
 import { SectionTitle } from '../common/section_title'
 import { BalanceShares } from '../common/balance_shares'
 import { useContracts } from '../../hooks/useContracts'
 import { ButtonType } from '../../common/button_styling_types'
+import { Well } from '../common/well'
+import { Paragraph } from '../common/paragraph'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -50,6 +52,11 @@ const AmountWrapper = styled(FormRow)`
 const FormLabelStyled = styled(FormLabel)`
   margin-bottom: 10px;
 `
+
+const BigNumberInputTextRight = styled<any>(BigNumberInput)`
+  text-align: right;
+`
+
 const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
@@ -159,8 +166,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             if (balanceItemSet) setAmountShares(balanceItemSet.shares)
           }}
         />
-        You will be charged an extra 1% trade fee of &nbsp;
-        <strong>{costFee ? formatBigNumber(costFee, collateral.decimals, 10) : '-'}</strong>
       </>
     )
   }
@@ -173,20 +178,20 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          pricesAfterTrade={pricesAfterTrade || undefined /* hack to cast Maybe<A> to A? */}
-          outcomeSelected={outcomeIndex}
-          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           disabledColumns={[OutcomeTableValue.Payout]}
+          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
+          outcomeSelected={outcomeIndex}
+          pricesAfterTrade={pricesAfterTrade || undefined /* hack to cast Maybe<A> to A? */}
         />
         <AmountWrapper
           formField={
             <TextfieldCustomPlaceholder
               formField={
-                <BigNumberInput
-                  name="amount"
-                  value={amountShares}
-                  onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
+                <BigNumberInputTextRight
                   decimals={collateral.decimals}
+                  name="amount"
+                  onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
+                  value={amountShares}
                 />
               }
               placeholderText="Shares"
@@ -206,6 +211,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             </TD>
           </TR>
         </TableStyled>
+        <Well>
+          <Paragraph>
+            • You will be charged an extra 1% trade fee of &nbsp;
+            <strong>{costFee ? formatBigNumber(costFee, collateral.decimals, 10) : '-'}</strong>
+          </Paragraph>
+        </Well>
         <ButtonContainer>
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back

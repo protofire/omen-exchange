@@ -4,6 +4,7 @@ import { Textfield } from '../index'
 import { TextfieldCustomPlaceholder } from '../textfield_custom_placeholder'
 import { FormLabel } from '../form_label'
 import { Tooltip } from '../tooltip'
+import { FormError } from '../form_error'
 
 const TwoColumnsRow = styled.div`
   column-gap: 17px;
@@ -26,14 +27,8 @@ const TextFieldStyled = styled(Textfield)`
   text-align: right;
 `
 
-const ErrorStyled = styled.p`
-  color: red;
-  font-weight: 500;
-  font-size: 12px;
-  font-weight: normal;
-  line-height: 1.45;
-  margin: 0 0 15px 0;
-  text-align: left;
+const ErrorStyled = styled(FormError)`
+  margin: 0 0 10px 0;
 `
 
 export interface Outcome {

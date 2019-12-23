@@ -28,19 +28,14 @@ const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
   opacity: ${props => (props.winningOutcome ? '1' : '0.35')};
 `
 
+const TDNoHorizontalPadding = styled(TD)`
+  padding-left: 0;
+  padding-right: 0;
+`
+
 TDStyled.defaultProps = {
   winningOutcome: false,
 }
-
-const RadioContainer = styled.label`
-  align-items: center;
-  display: flex;
-  white-space: nowrap;
-`
-
-const RadioInputStyled = styled(RadioInput)`
-  margin-right: 6px;
-`
 
 export const OutcomeTable = (props: Props) => {
   const {
@@ -70,16 +65,19 @@ export const OutcomeTable = (props: Props) => {
 
   const equalProbabilities = balances.every(b => b.probability === balances[0].probability)
 
-  const TableCellsAlign = ['left', 'right', 'right', 'right', 'right']
+  const TableCellsAlign = ['left', 'right', 'right', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
     return (
       <THead>
         <TR>
-          {displayRadioSelection && <TH />}
           {TableHead.map((value, index) => {
             return !disabledColumns.includes(value) ? (
-              <TH textAlign={TableCellsAlign[index]} key={index}>
+              <TH
+                colSpan={index === 0 && displayRadioSelection ? 2 : 1}
+                textAlign={TableCellsAlign[index]}
+                key={index}
+              >
                 {value}
               </TH>
             ) : null
@@ -102,17 +100,15 @@ export const OutcomeTable = (props: Props) => {
     return (
       <TR key={outcomeName}>
         {!displayRadioSelection || withWinningOutcome ? null : (
-          <TD textAlign={TableCellsAlign[0]}>
-            <RadioContainer>
-              <RadioInputStyled
-                data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
-                checked={outcomeSelected === outcomeIndex}
-                name="outcome"
-                onChange={(e: any) => outcomeHandleChange && outcomeHandleChange(+e.target.value)}
-                value={outcomeIndex}
-              />
-            </RadioContainer>
-          </TD>
+          <TDNoHorizontalPadding textAlign={TableCellsAlign[0]}>
+            <RadioInput
+              checked={outcomeSelected === outcomeIndex}
+              data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
+              name="outcome"
+              onChange={(e: any) => outcomeHandleChange && outcomeHandleChange(+e.target.value)}
+              value={outcomeIndex}
+            />
+          </TDNoHorizontalPadding>
         )}
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]} winningOutcome={winningOutcome}>

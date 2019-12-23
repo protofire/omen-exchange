@@ -15,6 +15,7 @@ import { getLogger } from '../../util/logger'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
 import { Well } from '../common/well'
+import { Paragraph } from '../common/paragraph'
 import { FullLoading } from '../common/full_loading'
 import { ButtonContainer } from '../common/button_container'
 import { ButtonLink } from '../common/button_link'
@@ -46,6 +47,10 @@ const AmountWrapper = styled(FormRow)`
 
 const FormLabelStyled = styled(FormLabel)`
   margin-bottom: 10px;
+`
+
+const BigNumberInputTextRight = styled<any>(BigNumberInput)`
+  text-align: right;
 `
 
 const logger = getLogger('Market::Buy')
@@ -150,10 +155,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           setAmount(collateralBalance)
         }
       />
-      You will be charged an extra 1% trade fee of &nbsp;
-      <strong>
-        {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}
-      </strong>
     </>
   )
 
@@ -174,7 +175,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           formField={
             <TextfieldCustomPlaceholder
               formField={
-                <BigNumberInput
+                <BigNumberInputTextRight
                   name="amount"
                   value={amount}
                   onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
@@ -204,8 +205,17 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           </TR>
         </TableStyled>
         <Well>
-          <strong>1 shares</strong> can be redeemed for <strong>1 {collateral.symbol}</strong> in
-          case it represents the final outcome.
+          <Paragraph>
+            • <strong>1 shares</strong> can be redeemed for <strong>1 {collateral.symbol}</strong>{' '}
+            in case it represents the final outcome.
+          </Paragraph>
+          <Paragraph>
+            • You will be charged an extra 1% trade fee of &nbsp;
+            <strong>
+              {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}{' '}
+              {collateral.symbol}
+            </strong>
+          </Paragraph>
         </Well>
         <ButtonContainer>
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>

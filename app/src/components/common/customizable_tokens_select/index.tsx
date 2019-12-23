@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { Tokens } from '../tokens'
-import { Button } from '../button'
 import { ModalCollateral } from './modal_collateral'
 import { Token } from '../../../util/types'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { FormRowLink } from '../form_row_link'
 
 interface Props {
   name: string
@@ -16,18 +16,10 @@ interface Props {
   context: ConnectedWeb3Context
 }
 
-const Wrapper = styled.div``
-const TokenWrapper = styled.div`
-  display: inline-block;
-  width: 90%;
-`
-
-const ButtonStyled = styled(Button)`
-  display: inline-flex;
-  padding: 0 13px;
-  width: 25px;
-  height: 25px;
-  margin-left: 10px;
+const Link = styled(FormRowLink)`
+  display: block;
+  margin-top: 5px;
+  margin-left: auto;
 `
 
 export const CustomizableTokensSelect = (props: Props) => {
@@ -37,18 +29,14 @@ export const CustomizableTokensSelect = (props: Props) => {
 
   return (
     <>
-      <Wrapper>
-        <TokenWrapper>
-          <Tokens
-            networkId={context.networkId}
-            name={name}
-            value={value}
-            customValues={customValues}
-            onTokenChange={onCollateralChange}
-          />
-        </TokenWrapper>
-        <ButtonStyled onClick={() => setModalCollateralState(true)}>+</ButtonStyled>
-      </Wrapper>
+      <Tokens
+        customValues={customValues}
+        name={name}
+        networkId={context.networkId}
+        onTokenChange={onCollateralChange}
+        value={value}
+      />
+      <Link onClick={() => setModalCollateralState(true)}>Add collateral</Link>
       <ModalCollateral
         context={context}
         isOpen={isModalCollateralOpen}
