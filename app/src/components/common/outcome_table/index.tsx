@@ -18,7 +18,7 @@ interface Props {
   displayRadioSelection?: boolean
 }
 
-const TableStyled = styled(Table)`
+const TableWrapper = styled.div`
   margin-bottom: 30px;
 `
 
@@ -174,5 +174,11 @@ export const OutcomeTable = (props: Props) => {
         renderTableRow(balanceItem, index, pricesAfterTrade && pricesAfterTrade[index]),
       )
 
-  return <TableStyled head={renderTableHeader()}>{renderTable()}</TableStyled>
+  return (
+    <TableWrapper>
+      <Table maxHeight="266px" head={renderTableHeader()}>
+        {renderTable()}
+      </Table>
+    </TableWrapper>
+  )
 }

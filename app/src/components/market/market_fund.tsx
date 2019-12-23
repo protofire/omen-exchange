@@ -25,6 +25,7 @@ import { BalanceToken } from '../common/balance_token'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
 import { ButtonType } from '../../common/button_styling_types'
 import { FormError } from '../common/form_error'
+import { FormLabel } from '../common/form_label'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -52,30 +53,20 @@ const AmountWrapper = styled(FormRow)`
   }
 `
 
-const ButtonContainerStyled = styled(ButtonContainer)`
-  display: grid;
-  grid-row-gap: 10px;
-  grid-template-columns: 1fr;
-
-  > button {
-    margin-left: 0;
-  }
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: flex;
-
-    > button {
-      margin-left: 10px;
-    }
-  }
-`
-
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
 
 const BigNumberInputTextRight = styled<any>(BigNumberInput)`
   text-align: right;
+`
+
+const FormLabelStyled = styled(FormLabel)`
+  margin-bottom: 10px;
+`
+
+const SubsectionTitleStyled = styled(SubsectionTitle)`
+  margin-bottom: 0;
 `
 
 const logger = getLogger('Market::Fund')
@@ -173,7 +164,48 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
       <ViewCard>
-        <SubsectionTitle>Totals</SubsectionTitle>
+        <SubsectionTitleStyled>Fund this market</SubsectionTitleStyled>
+        <OutcomeTable
+          balances={balances}
+          disabledColumns={[
+            OutcomeTableValue.CurrentPrice,
+            OutcomeTableValue.Payout,
+            OutcomeTableValue.PriceAfterTrade,
+          ]}
+          displayRadioSelection={false}
+          collateral={collateral}
+        />
+        <AmountWrapper
+          formField={
+            <>
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInputTextRight
+                    decimals={collateral.decimals}
+                    name="amount"
+                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                    value={amount}
+                  />
+                }
+                placeholderText={collateral.symbol}
+              />
+            </>
+          }
+          title={'Amount'}
+          tooltip={{ id: 'amount', description: 'Funds you will add to this market.' }}
+          note={
+            <>
+              <BalanceToken
+                collateral={collateral}
+                onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
+                  setAmount(collateralBalance)
+                }}
+              />
+              <FormError>{fundingMessageError}</FormError>
+            </>
+          }
+        />
+        <FormLabelStyled>Totals</FormLabelStyled>
         <TableStyled>
           <TR>
             <TD>Total funding</TD>
@@ -206,47 +238,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
             </TD>
           </TR>
         </TableStyled>
-        <SubsectionTitle>Balance</SubsectionTitle>
-        <OutcomeTable
-          balances={balances}
-          disabledColumns={[
-            OutcomeTableValue.CurrentPrice,
-            OutcomeTableValue.Payout,
-            OutcomeTableValue.PriceAfterTrade,
-          ]}
-          displayRadioSelection={false}
-          collateral={collateral}
-        />
-        <AmountWrapper
-          formField={
-            <>
-              <TextfieldCustomPlaceholder
-                formField={
-                  <BigNumberInputTextRight
-                    decimals={collateral.decimals}
-                    name="amount"
-                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                    value={amount}
-                  />
-                }
-                placeholderText={collateral.symbol}
-              />
-            </>
-          }
-          title={'Amount'}
-          note={
-            <>
-              <BalanceToken
-                collateral={collateral}
-                onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
-                  setAmount(collateralBalance)
-                }}
-              />
-              <FormError>{fundingMessageError}</FormError>
-            </>
-          }
-        />
-        <ButtonContainerStyled>
+        <ButtonContainer>
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
@@ -255,12 +247,12 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
             disabled={marketMakerUserFunding && marketMakerUserFunding.isZero()}
             onClick={() => removeFunding()}
           >
-            Remove funding
+            Remove funds
           </Button>
           <Button buttonType={ButtonType.primary} onClick={() => addFunding()} disabled={error}>
-            Add funding
+            Fund
           </Button>
-        </ButtonContainerStyled>
+        </ButtonContainer>
       </ViewCard>
       {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>
