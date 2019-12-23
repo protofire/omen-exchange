@@ -29,6 +29,7 @@ import { SectionTitle } from '../common/section_title'
 import { BalanceShares } from '../common/balance_shares'
 import { useContracts } from '../../hooks/useContracts'
 import { ButtonType } from '../../common/button_styling_types'
+import { MARKET_FEE } from '../../common/constants'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -85,11 +86,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
       return index !== outcomeIndex
     })
+
     const amountToSell = calcSellAmountInCollateral(
       amountShares,
       holdingsOfSoldOutcome,
       holdingsOfOtherOutcomes,
-      0.01,
+      MARKET_FEE / Math.pow(10, 2),
     )
 
     if (!amountToSell) {
@@ -112,7 +114,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
     setPricesAfterTrade(pricesAfterTrade)
-    setCostFee(mulBN(amountToSell, 0.01))
+    setCostFee(mulBN(amountToSell, MARKET_FEE / Math.pow(10, 2)))
     setTradedCollateral(amountToSell)
   }, [outcomeIndex, amountShares, balances, collateral])
 
@@ -159,7 +161,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             if (balanceItemSet) setAmountShares(balanceItemSet.shares)
           }}
         />
-        You will be charged an extra 1% trade fee of &nbsp;
+        You will be charged an extra {MARKET_FEE}% trade fee of &nbsp;
         <strong>{costFee ? formatBigNumber(costFee, collateral.decimals, 10) : '-'}</strong>
       </>
     )

@@ -15,6 +15,7 @@ import { CustomizableTokensSelect } from '../../../common/customizable_tokens_se
 import { Token } from '../../../../util/types'
 import { ERC20Service } from '../../../../services'
 import { useAsyncDerivedValue } from '../../../../hooks/useAsyncDerivedValue'
+import { MARKET_FEE } from '../../../../common/constants'
 
 interface Props {
   back: () => void
@@ -22,7 +23,7 @@ interface Props {
   values: {
     collateral: Token
     collateralsCustom: Token[]
-    spread: string
+    spread: number
     funding: BigNumber
   }
   handleCollateralChange: (collateral: Token) => void
@@ -106,7 +107,7 @@ const FundingAndFeeStep = (props: Props) => {
         title={'Spread / Fee'}
         tooltip={{
           id: `spreadFee`,
-          description: `The fee taken from every trade. Temporarily fixed at 1%.`,
+          description: `The fee taken from every trade. Temporarily fixed at ${MARKET_FEE}%.`,
         }}
       />
       <FormRow
