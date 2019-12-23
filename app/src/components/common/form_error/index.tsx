@@ -1,7 +1,7 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-const FormErrorWrapper = styled.p`
+const FormErrorWrapper = styled.div`
   color: ${props => props.theme.colors.error};
   font-size: 13px;
   font-weight: 700;

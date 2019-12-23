@@ -7,6 +7,8 @@ import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
 import { Well } from '../../../common/well'
 import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
+import { Textfield } from '../../../common/textfield'
+import { ButtonAdd } from '../../../common/button_add'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -17,21 +19,14 @@ const OutcomeInfo = styled(Well)`
 `
 
 const ButtonContainerStyled = styled(ButtonContainer)`
+  padding-top: 10px;
+`
+
+const NewOutcome = styled(Well)`
+  column-gap: 15px;
   display: grid;
-  grid-row-gap: 10px;
-  grid-template-columns: 1fr;
-
-  > button {
-    margin-left: 0;
-  }
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: flex;
-
-    > button {
-      margin-left: 10px;
-    }
-  }
+  grid-template-columns: 1fr 26px;
+  margin-top: auto;
 `
 
 interface Props {
@@ -85,11 +80,12 @@ const OutcomesStep = (props: Props) => {
         question.
       </OutcomeInfo>
       <Outcomes outcomes={outcomes} onChange={handleOutcomesChange} errorMessages={errorMessages} />
+      <NewOutcome>
+        <Textfield type="text" placeholder="Add new outcome" />
+        <ButtonAdd disabled={isAddNewOutcomeButtonDisabled} onClick={addNewOutcome} />
+      </NewOutcome>
       <ButtonContainerStyled>
         <ButtonLinkStyled onClick={props.back}>‹ Back</ButtonLinkStyled>
-        <Button disabled={isAddNewOutcomeButtonDisabled} onClick={addNewOutcome}>
-          Add outcome
-        </Button>
         <Button disabled={error} onClick={props.next}>
           Next
         </Button>

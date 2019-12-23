@@ -1,7 +1,7 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-const FormRowNoteWrapper = styled.p`
+const FormRowNoteWrapper = styled.div`
   color: #666;
   font-size: 11px;
   font-weight: normal;
