@@ -15,6 +15,7 @@ const ButtonContainer = styled(Button)`
   background-repeat: no-repeat;
   border: none;
   height: 25px;
+  padding: 0;
   width: 26px;
 
   &:hover {
