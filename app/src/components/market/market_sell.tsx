@@ -29,7 +29,7 @@ import { SectionTitle } from '../common/section_title'
 import { BalanceShares } from '../common/balance_shares'
 import { useContracts } from '../../hooks/useContracts'
 import { ButtonType } from '../../common/button_styling_types'
-import { MARKET_FEE } from '../../common/constants'
+import { MARKET_FEE_WITH_TWO_DECIMALS, MARKET_FEE } from '../../common/constants'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -91,7 +91,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       amountShares,
       holdingsOfSoldOutcome,
       holdingsOfOtherOutcomes,
-      MARKET_FEE / Math.pow(10, 2),
+      +MARKET_FEE_WITH_TWO_DECIMALS,
     )
 
     if (!amountToSell) {
@@ -114,7 +114,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
     setPricesAfterTrade(pricesAfterTrade)
-    setCostFee(mulBN(amountToSell, MARKET_FEE / Math.pow(10, 2)))
+    setCostFee(mulBN(amountToSell, +MARKET_FEE_WITH_TWO_DECIMALS))
     setTradedCollateral(amountToSell)
   }, [outcomeIndex, amountShares, balances, collateral])
 
