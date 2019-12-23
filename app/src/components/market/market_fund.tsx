@@ -95,8 +95,9 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   } = props
 
   const context = useConnectedWeb3Context()
+  const { library: provider, account, rawWeb3Context } = context
+
   const { buildMarketMaker } = useContracts(context)
-  const provider = context.library
   const marketMakerService = buildMarketMaker(marketMakerAddress)
 
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
@@ -120,7 +121,11 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
       )
 
       const collateralAddress = await marketMakerService.getCollateralToken()
-      const collateralService = new ERC20Service(provider, collateralAddress)
+      const collateralService = new ERC20Service(
+        provider,
+        rawWeb3Context.connectorName,
+        collateralAddress,
+      )
 
       await collateralService.approve(marketMakerAddress, amount)
 
@@ -154,11 +159,15 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
 
   const calculateCollateralBalance = useMemo(
     () => async (): Promise<BigNumber> => {
-      const collateralService = new ERC20Service(context.library, collateral.address)
-      const collateralBalance = await collateralService.getCollateral(context.account || '')
+      const collateralService = new ERC20Service(
+        provider,
+        rawWeb3Context.connectorName,
+        collateral.address,
+      )
+      const collateralBalance = await collateralService.getCollateral(account || '')
       return collateralBalance
     },
-    [context, collateral],
+    [provider, rawWeb3Context, account, collateral],
   )
 
   const collateralBalance = useAsyncDerivedValue('', new BigNumber(0), calculateCollateralBalance)

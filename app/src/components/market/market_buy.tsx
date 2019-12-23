@@ -60,6 +60,8 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { library: provider, rawWeb3Context } = context
+
   const { buildMarketMaker } = useContracts(context)
 
   const { marketMakerAddress, balances, collateral, question, resolution } = props
@@ -110,12 +112,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Buying ${formatBigNumber(tradedShares, collateral.decimals)} shares ...`)
 
-      const provider = context.library
       const user = await provider.getSigner().getAddress()
 
       const collateralAddress = await marketMakerService.getCollateralToken()
 
-      const collateralService = new ERC20Service(provider, collateralAddress)
+      const collateralService = new ERC20Service(
+        provider,
+        rawWeb3Context.connectorName,
+        collateralAddress,
+      )
 
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
         user,

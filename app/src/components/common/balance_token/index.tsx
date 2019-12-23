@@ -29,12 +29,16 @@ const BalanceTitle = styled.span`
 export const BalanceToken = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { account, library } = context
+  const { account, library: provider, rawWeb3Context } = context
   const { collateral, onClickMax } = props
 
   const calculateBalanceAmount = useMemo(
     () => async (): Promise<[BigNumber, string, string]> => {
-      const collateralService = new ERC20Service(library, collateral.address)
+      const collateralService = new ERC20Service(
+        provider,
+        rawWeb3Context.connectorName,
+        collateral.address,
+      )
 
       // TODO: fix with useConnectedWallet context
       const collateralBalance = await collateralService.getCollateral(account || '')
@@ -44,7 +48,7 @@ export const BalanceToken = (props: Props) => {
         collateral.symbol,
       ]
     },
-    [account, library, collateral],
+    [account, provider, rawWeb3Context, collateral],
   )
 
   const [collateralBalance, calculateBalanceAmountValue, collateralSymbol] = useAsyncDerivedValue(

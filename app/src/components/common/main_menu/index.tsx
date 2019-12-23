@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { NavLink } from 'react-router-dom'
-import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
 import { MainMenuItem } from '../main_menu_item'
 
 const MainMenuWrapper = styled.div`
@@ -29,11 +28,9 @@ export const MainMenu: React.FC = props => {
       <Item activeClassName="active" to="/">
         Markets Overview
       </Item>
-      <ConnectedWeb3>
-        <Item activeClassName="active" to="/create">
-          Create market
-        </Item>
-      </ConnectedWeb3>
+      <Item activeClassName="active" to="/create">
+        Create market
+      </Item>
     </MainMenuWrapper>
   )
 }
