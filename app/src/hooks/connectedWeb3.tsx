@@ -7,6 +7,7 @@ export interface ConnectedWeb3Context {
   account: Maybe<string>
   library: providers.Web3Provider
   networkId: number
+  rawWeb3Context: any
 }
 
 const ConnectedWeb3Context = React.createContext<Maybe<ConnectedWeb3Context>>(null)
@@ -76,7 +77,12 @@ export const ConnectedWeb3: React.FC<Props> = props => {
     return null
   }
 
-  const value = { account: context.account || null, library: context.library, networkId }
+  const value = {
+    account: context.account || null,
+    library: context.library,
+    networkId,
+    rawWeb3Context: context,
+  }
 
   return (
     <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
