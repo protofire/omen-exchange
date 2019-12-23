@@ -1,137 +1,107 @@
 import React, { useState, HTMLAttributes, ChangeEvent } from 'react'
 import styled from 'styled-components'
-import ReactDOM from 'react-dom'
-import { FormRow } from '../form_row'
-import { Card } from '../card'
 import { Textfield } from '../textfield'
 import { SubsectionTitle } from '../subsection_title'
 import { TitleValue } from '../title_value'
-import { ButtonContainer } from '../button_container'
 import { Button } from '../button'
 import { Token } from '../../../util/types'
 import { useCollateral } from '../../../hooks/useCollateral'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { ButtonType } from '../../../common/button_styling_types'
-
-const Wrapper = styled.div`
-  align-items: center;
-  background-color: rgb(255, 255, 255, 0.75);
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  justify-content: center;
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 100vw;
-  z-index: 3000;
-`
-
-const CollateralAddressWrapper = styled(FormRow)`
-  margin-top: 30px;
-  margin-bottom: 30px;
-  width: 100%;
-`
+import ModalWrapper from '../modal_wrapper'
+import { FormRow } from '../form_row'
 
 const Grid = styled.div`
+  column-gap: 20px;
   display: grid;
-  grid-column-gap: 20px;
-  grid-row-gap: 14px;
   grid-template-columns: 1fr 1fr;
-  margin-bottom: 25px;
 `
 
 const ButtonStyled = styled(Button)`
-  margin-right: auto;
+  margin-top: 80px;
 `
 
-const ErrorStyled = styled.span`
-  color: red;
-  font-weight: 500;
-  margin-top: 0px;
+const SubsectionTitleStyled = styled(SubsectionTitle)`
+  font-size: 15px;
+`
+
+const TitleValueStyled = styled(TitleValue)`
+  display: flex;
+
+  > p {
+    margin-left: 5px;
+  }
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
+  context: ConnectedWeb3Context
+  isOpen: boolean
   onClose: () => void
   onSave: (collateral: Token) => void
-  context: ConnectedWeb3Context
 }
 
-const ModalCollateralWrapper = (props: Props) => {
-  const { onClose, onSave, context } = props
-
+export const ModalCollateral = (props: Props) => {
+  const { onClose, onSave, context, isOpen } = props
   const [collateralAddress, setCollateralAddress] = useState<string>('')
-
   const { collateral, errorMessage } = useCollateral(collateralAddress, context)
 
-  const collateralWithAddress: Maybe<Token> = collateral
+  const validCollateralAddress: Maybe<Token> = collateral
     ? { address: collateralAddress, ...collateral }
     : null
 
-  const onClickCloseButton = () => {
-    onClose()
-  }
-
   const onClickSaveButton = () => {
-    if (collateralWithAddress) {
-      onSave(collateralWithAddress)
+    if (validCollateralAddress) {
+      onSave(validCollateralAddress)
       onClose()
     }
   }
 
-  const portal: any = document.getElementById('portalContainer')
-
   const tokenDetails = () => {
-    return (
+    return validCollateralAddress ? (
       <>
-        <SubsectionTitle>Details</SubsectionTitle>
+        <SubsectionTitleStyled>Details</SubsectionTitleStyled>
         <Grid>
-          <TitleValue
+          <TitleValueStyled
             title={'Symbol:'}
-            value={collateralWithAddress && collateralWithAddress.symbol}
+            value={validCollateralAddress && validCollateralAddress.symbol}
           />
-          <TitleValue
+          <TitleValueStyled
             title={'Decimals:'}
-            value={collateralWithAddress && collateralWithAddress.decimals}
+            value={validCollateralAddress && validCollateralAddress.decimals}
           />
         </Grid>
       </>
-    )
+    ) : null
   }
 
-  const messageToRender = (
-    <Wrapper>
-      <Card>
-        <SubsectionTitle>Add a valid collateral token address</SubsectionTitle>
-        <CollateralAddressWrapper
-          formField={
-            <Textfield
-              name="collateralAddress"
-              onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                const { value } = event.target
-                setCollateralAddress(value)
-              }}
-              placeholder="Type in a collateral address..."
-              type="text"
-            />
-          }
-          title={'Collateral token address'}
-          note={<ErrorStyled>{errorMessage || ''}</ErrorStyled>}
-        />
-        {tokenDetails()}
-        <ButtonContainer>
-          <ButtonStyled disabled={!collateralWithAddress} onClick={onClickSaveButton}>
-            Save
-          </ButtonStyled>
-          <Button buttonType={ButtonType.secondary} onClick={onClickCloseButton}>
-            Close
-          </Button>
-        </ButtonContainer>
-      </Card>
-    </Wrapper>
+  return (
+    <ModalWrapper isOpen={isOpen} onRequestClose={onClose} title={`Add Collateral`}>
+      <FormRow
+        formField={
+          <Textfield
+            hasError={errorMessage ? true : false}
+            hasSuccess={validCollateralAddress ? true : false}
+            name="collateralAddress"
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              const { value } = event.target
+              setCollateralAddress(value.trim())
+            }}
+            placeholder="0xac5d29e67a53ee4903d59a4c929b718e1d575eee"
+            type="text"
+          />
+        }
+        error={errorMessage || ''}
+        title={'Collateral Token Address'}
+        tooltip={{ id: 'ERC20', description: 'Enter a valid ERC20 address.' }}
+      />
+      {tokenDetails()}
+      <ButtonStyled
+        buttonType={ButtonType.primary}
+        disabled={!validCollateralAddress}
+        onClick={onClickSaveButton}
+      >
+        Add
+      </ButtonStyled>
+    </ModalWrapper>
   )
-
-  return ReactDOM.createPortal(messageToRender, portal)
 }
-
-export const ModalCollateral = ModalCollateralWrapper

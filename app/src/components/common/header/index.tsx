@@ -81,7 +81,7 @@ export const Header: React.FC = props => {
             modalState={isModalOpen}
           />
         )}
-        {isModalOpen && <ModalConnectWallet onClose={() => setModalState(false)} />}
+        <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
       </HeaderInner>
     </HeaderWrapper>
   )

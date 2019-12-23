@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { FormLabel } from '../form_label'
 import { Tooltip } from '../tooltip'
 import { FormRowNote } from '../form_row_note'
+import { FormError } from '../form_error'
 
 const FormRowWrapper = styled.div`
   margin-bottom: 25px;
@@ -19,6 +20,7 @@ const TitleWrapper = styled.div`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
+  error?: any
   formField: any
   note?: any
   title?: string
@@ -29,7 +31,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const FormRow = (props: Props) => {
-  const { formField, title, note, tooltip, ...restProps } = props
+  const { error, formField, title, note, tooltip, ...restProps } = props
   return (
     <FormRowWrapper {...restProps}>
       <TitleWrapper>
@@ -38,6 +40,7 @@ export const FormRow = (props: Props) => {
       </TitleWrapper>
       {formField}
       {note ? <FormRowNote>{note}</FormRowNote> : null}
+      {error ? <FormError>{error}</FormError> : null}
     </FormRowWrapper>
   )
 }
