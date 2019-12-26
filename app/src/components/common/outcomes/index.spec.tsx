@@ -2,18 +2,23 @@
 import '@testing-library/jest-dom/extend-expect'
 import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
+import { ThemeProvider } from 'styled-components'
+import theme from '../../../theme'
 
 import { Outcomes } from './index'
 
-test('should change the probability of the first input', () => {
-  const onChangeFn = jest.fn()
-
-  const { getByTestId } = render(
-    <Outcomes
-      outcomes={[{ name: 'yes', probability: 50 }, { name: 'no', probability: 50 }]}
-      onChange={onChangeFn}
-    />,
+const onChangeFn = jest.fn()
+const renderOutcomes = (props: any) =>
+  render(
+    <ThemeProvider theme={theme}>
+      <Outcomes onChange={onChangeFn} {...props} />
+    </ThemeProvider>,
   )
+
+test('should change the probability of the first input', () => {
+  const { getByTestId } = renderOutcomes({
+    outcomes: [{ name: 'yes', probability: 50 }, { name: 'no', probability: 50 }],
+  })
 
   const firstInput = getByTestId('outcome_0')
 
@@ -32,14 +37,9 @@ test('should change the probability of the first input', () => {
 })
 
 test('should not change the outcomes if the probability is negative', () => {
-  const onChangeFn = jest.fn()
-
-  const { getByTestId } = render(
-    <Outcomes
-      outcomes={[{ name: 'yes', probability: 40 }, { name: 'no', probability: 60 }]}
-      onChange={onChangeFn}
-    />,
-  )
+  const { getByTestId } = renderOutcomes({
+    outcomes: [{ name: 'yes', probability: 40 }, { name: 'no', probability: 60 }],
+  })
 
   const firstInput: any = getByTestId('outcome_0')
   const secondInput: any = getByTestId('outcome_1')
@@ -52,14 +52,9 @@ test('should not change the outcomes if the probability is negative', () => {
 })
 
 test('should not change the outcomes if the probability is greater than 100', () => {
-  const onChangeFn = jest.fn()
-
-  const { getByTestId } = render(
-    <Outcomes
-      outcomes={[{ name: 'yes', probability: 40 }, { name: 'no', probability: 60 }]}
-      onChange={onChangeFn}
-    />,
-  )
+  const { getByTestId } = renderOutcomes({
+    outcomes: [{ name: 'yes', probability: 40 }, { name: 'no', probability: 60 }],
+  })
 
   const firstInput: any = getByTestId('outcome_0')
   const secondInput: any = getByTestId('outcome_1')
@@ -72,14 +67,9 @@ test('should not change the outcomes if the probability is greater than 100', ()
 })
 
 test('should change the probability of the second input', () => {
-  const onChangeFn = jest.fn()
-
-  const { getByTestId } = render(
-    <Outcomes
-      outcomes={[{ name: 'yes', probability: 50 }, { name: 'no', probability: 50 }]}
-      onChange={onChangeFn}
-    />,
-  )
+  const { getByTestId } = renderOutcomes({
+    outcomes: [{ name: 'yes', probability: 50 }, { name: 'no', probability: 50 }],
+  })
 
   const firstInput = getByTestId('outcome_1')
 
@@ -98,18 +88,13 @@ test('should change the probability of the second input', () => {
 })
 
 test('should not modify the probabilities of the other inputs if there are more than two outcomes', () => {
-  const onChangeFn = jest.fn()
-
-  const { getByTestId } = render(
-    <Outcomes
-      outcomes={[
-        { name: 'red', probability: 33 },
-        { name: 'green', probability: 33 },
-        { name: 'blue', probability: 34 },
-      ]}
-      onChange={onChangeFn}
-    />,
-  )
+  const { getByTestId } = renderOutcomes({
+    outcomes: [
+      { name: 'red', probability: 33 },
+      { name: 'green', probability: 33 },
+      { name: 'blue', probability: 34 },
+    ],
+  })
 
   const firstInput = getByTestId('outcome_0')
 
@@ -123,18 +108,13 @@ test('should not modify the probabilities of the other inputs if there are more 
 })
 
 test('should change the probability of the third input', () => {
-  const onChangeFn = jest.fn()
-
-  const { getByTestId } = render(
-    <Outcomes
-      outcomes={[
-        { name: 'red', probability: 30 },
-        { name: 'green', probability: 33 },
-        { name: 'blue', probability: 34 },
-      ]}
-      onChange={onChangeFn}
-    />,
-  )
+  const { getByTestId } = renderOutcomes({
+    outcomes: [
+      { name: 'red', probability: 30 },
+      { name: 'green', probability: 33 },
+      { name: 'blue', probability: 34 },
+    ],
+  })
 
   const thirdInput = getByTestId('outcome_2')
 
@@ -148,20 +128,15 @@ test('should change the probability of the third input', () => {
 })
 
 test('should pass some message errors', () => {
-  const onChangeFn = jest.fn()
-
-  const { getByTestId } = render(
-    <Outcomes
-      outcomes={[
-        { name: 'red', probability: 25 },
-        { name: 'green', probability: 25 },
-        { name: 'blue', probability: 25 },
-        { name: 'black', probability: 25 },
-      ]}
-      onChange={onChangeFn}
-      errorMessages={['Error message one', 'Error message two']}
-    />,
-  )
+  const { getByTestId } = renderOutcomes({
+    outcomes: [
+      { name: 'red', probability: 25 },
+      { name: 'green', probability: 25 },
+      { name: 'blue', probability: 25 },
+      { name: 'black', probability: 25 },
+    ],
+    errorMessages: ['Error message one', 'Error message two'],
+  })
 
   const firstErrorMessage = getByTestId('outcome_error_message_0')
   const secondErrorMessage = getByTestId('outcome_error_message_1')
