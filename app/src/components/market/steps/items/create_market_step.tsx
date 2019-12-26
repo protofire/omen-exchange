@@ -6,7 +6,7 @@ import { Button } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
 import { CreateCard } from '../../../common/create_card'
-import { StatusMarketCreation, Token } from '../../../../util/types'
+import { Token } from '../../../../util/types'
 import { Paragraph } from '../../../common/paragraph'
 import { FullLoading } from '../../../common/full_loading'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
@@ -18,6 +18,10 @@ import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ButtonType } from '../../../../common/button_styling_types'
+import {
+  MarketCreationStatusType,
+  MarketCreationStatusData,
+} from '../../../../util/market_creation_status_data'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -48,7 +52,7 @@ interface Props {
     funding: BigNumber
     outcomes: Outcome[]
   }
-  status: StatusMarketCreation
+  marketCreationStatus: MarketCreationStatusType
   questionId: string | null
   marketMakerAddress: string | null
 }
@@ -56,7 +60,7 @@ interface Props {
 const CreateMarketStep = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { marketMakerAddress, values, status, questionId } = props
+  const { marketMakerAddress, values, marketCreationStatus, questionId } = props
   const {
     collateral,
     question,
@@ -152,19 +156,26 @@ const CreateMarketStep = (props: Props) => {
           </Grid>
         </>
       ) : null}
-      {status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error ? (
-        <FullLoading message={`${status}...`} />
+      {!MarketCreationStatusData.is.ready(marketCreationStatus) &&
+      !MarketCreationStatusData.is.error(marketCreationStatus) ? (
+        <FullLoading message={`${marketCreationStatus._type}...`} />
       ) : null}
       <ButtonContainer>
         <ButtonLinkStyled
-          disabled={status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error}
+          disabled={
+            !MarketCreationStatusData.is.ready(marketCreationStatus) &&
+            !MarketCreationStatusData.is.error(marketCreationStatus)
+          }
           onClick={back}
         >
           ‹ Back
         </ButtonLinkStyled>
         <Button
           buttonType={ButtonType.primary}
-          disabled={status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error}
+          disabled={
+            !MarketCreationStatusData.is.ready(marketCreationStatus) &&
+            !MarketCreationStatusData.is.error(marketCreationStatus)
+          }
           onClick={submit}
         >
           Create

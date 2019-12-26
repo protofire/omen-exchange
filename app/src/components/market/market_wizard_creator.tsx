@@ -11,12 +11,16 @@ import {
   SummaryMarketStep,
 } from './steps'
 
-import { Token, StatusMarketCreation } from '../../util/types'
+import { Token } from '../../util/types'
 import { MARKET_FEE } from '../../common/constants'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { Outcome } from '../common/outcomes'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getDefaultToken } from '../../util/networks'
+import {
+  MarketCreationStatusType,
+  MarketCreationStatusData,
+} from '../../util/market_creation_status_data'
 
 export interface MarketData {
   collateral: Token
@@ -32,7 +36,7 @@ export interface MarketData {
 
 interface Props {
   callback: (param: MarketData) => void
-  status: StatusMarketCreation
+  marketCreationStatus: MarketCreationStatusType
   questionId: string | null
   marketMakerAddress: string | null
 }
@@ -45,7 +49,7 @@ interface State {
 export const MarketWizardCreator = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { callback, status, questionId, marketMakerAddress } = props
+  const { callback, marketCreationStatus, questionId, marketMakerAddress } = props
 
   const defaultCollateral = getDefaultToken(context.networkId)
 
@@ -186,7 +190,7 @@ export const MarketWizardCreator = (props: Props) => {
             back={() => back()}
             marketMakerAddress={marketMakerAddress}
             questionId={questionId}
-            status={status}
+            marketCreationStatus={marketCreationStatus}
             submit={() => submit()}
             values={marketData}
           />
@@ -213,12 +217,12 @@ export const MarketWizardCreator = (props: Props) => {
 
   return (
     <>
-      {status !== StatusMarketCreation.Done && (
+      {MarketCreationStatusData.is.done(marketCreationStatus) && (
         <>
           {currentMenu()} {currentStepFn()}
         </>
       )}
-      {status === StatusMarketCreation.Done && summaryMarketStep()}
+      {MarketCreationStatusData.is.done(marketCreationStatus) && summaryMarketStep()}
     </>
   )
 }

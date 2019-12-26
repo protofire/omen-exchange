@@ -2,13 +2,16 @@ import React, { FC, useState } from 'react'
 import moment from 'moment'
 
 import { getLogger } from '../../util/logger'
-import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import { ERC20Service } from '../../services'
 import { getArbitrator, getContractAddress } from '../../util/networks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
 import { ModalConnectWallet } from '../common/modal_connect_wallet'
+import {
+  MarketCreationStatusData,
+  MarketCreationStatusType,
+} from '../../util/market_creation_status_data'
 
 const logger = getLogger('Market::MarketWizardCreatorContainer')
 
@@ -21,7 +24,9 @@ const MarketWizardCreatorContainer: FC = () => {
     context,
   )
 
-  const [status, setStatus] = useState<StatusMarketCreation>(StatusMarketCreation.Ready)
+  const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatusType>(
+    MarketCreationStatusData.ready(),
+  )
   const [questionId, setQuestionId] = useState<string | null>(null)
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
@@ -50,7 +55,7 @@ const MarketWizardCreatorContainer: FC = () => {
 
         const arbitrator = getArbitrator(networkId, arbitratorId)
 
-        setStatus(StatusMarketCreation.PostingQuestion)
+        setMarketCreationStatus(MarketCreationStatusData.postingQuestion())
         const questionId = await realitio.askQuestion(
           question,
           outcomes,
@@ -61,7 +66,7 @@ const MarketWizardCreatorContainer: FC = () => {
         )
         setQuestionId(questionId)
 
-        setStatus(StatusMarketCreation.PrepareCondition)
+        setMarketCreationStatus(MarketCreationStatusData.prepareCondition())
 
         const oracleAddress = getContractAddress(networkId, 'oracle')
         const conditionId = await conditionalTokens.prepareCondition(
@@ -71,7 +76,7 @@ const MarketWizardCreatorContainer: FC = () => {
         )
 
         // approve movement of collateral token to MarketMakerFactory
-        setStatus(StatusMarketCreation.ApprovingCollateral)
+        setMarketCreationStatus(MarketCreationStatusData.approvingCollateral())
 
         const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
 
@@ -85,7 +90,7 @@ const MarketWizardCreatorContainer: FC = () => {
           await collateralService.approve(marketMakerFactoryAddress, funding)
         }
 
-        setStatus(StatusMarketCreation.CreateMarketMaker)
+        setMarketCreationStatus(MarketCreationStatusData.createMarketMaker())
         const marketMakerAddress = await marketMakerFactory.createMarketMaker(
           conditionalTokens.address,
           collateral.address,
@@ -93,17 +98,17 @@ const MarketWizardCreatorContainer: FC = () => {
         )
         setMarketMakerAddress(marketMakerAddress)
 
-        setStatus(StatusMarketCreation.ApproveCollateralForMarketMaker)
+        setMarketCreationStatus(MarketCreationStatusData.approveCollateralForMarketMaker())
         await collateralService.approveUnlimited(marketMakerAddress)
 
-        setStatus(StatusMarketCreation.AddFunding)
+        setMarketCreationStatus(MarketCreationStatusData.addFunding())
         const marketMakerService = buildMarketMaker(marketMakerAddress)
         await marketMakerService.addInitialFunding(funding, outcomes.map(o => o.probability))
 
-        setStatus(StatusMarketCreation.Done)
+        setMarketCreationStatus(MarketCreationStatusData.done())
       }
     } catch (err) {
-      setStatus(StatusMarketCreation.Error)
+      setMarketCreationStatus(MarketCreationStatusData.error(err))
       logger.error(err.message)
     }
   }
@@ -114,7 +119,7 @@ const MarketWizardCreatorContainer: FC = () => {
         callback={handleSubmit}
         marketMakerAddress={marketMakerAddress}
         questionId={questionId}
-        status={status}
+        marketCreationStatus={marketCreationStatus}
       />
       <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
     </>
