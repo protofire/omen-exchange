@@ -44,7 +44,7 @@ interface Props {
     category: string
     resolution: Date | null
     arbitratorId: KnownArbitrator
-    spread: string
+    spread: number
     funding: BigNumber
     outcomes: Outcome[]
   }

@@ -12,6 +12,7 @@ import {
 } from './steps'
 
 import { Token, StatusMarketCreation } from '../../util/types'
+import { MARKET_FEE } from '../../common/constants'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { Outcome } from '../common/outcomes'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
@@ -24,7 +25,7 @@ export interface MarketData {
   category: string
   resolution: Date | null
   arbitratorId: KnownArbitrator
-  spread: string
+  spread: number
   funding: BigNumber
   outcomes: Outcome[]
 }
@@ -55,7 +56,7 @@ export const MarketWizardCreator = (props: Props) => {
     category: '',
     resolution: null,
     arbitratorId: 'realitio',
-    spread: '1',
+    spread: MARKET_FEE,
     funding: new BigNumber('0'),
     outcomes: [
       {

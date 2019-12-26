@@ -27,6 +27,7 @@ import { SectionTitle } from '../common/section_title'
 import { BalanceToken } from '../common/balance_token'
 import { useContracts } from '../../hooks/useContracts'
 import { ButtonType } from '../../common/button_styling_types'
+import { MARKET_FEE } from '../../common/constants'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -103,8 +104,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     const valueNumber = +ethers.utils.formatUnits(amount, collateral.decimals)
 
     const weiPerUnit = ethers.utils.bigNumberify(10).pow(collateral.decimals)
+    const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
     const costWithFee = ethers.utils
-      .bigNumberify('' + Math.round(valueNumber * 1.01 * 10000)) // cast to string to avoid overflows
+      .bigNumberify('' + Math.round(valueNumber * (1 + marketFeeWithTwoDecimals) * 10000)) // cast to string to avoid overflows
       .mul(weiPerUnit)
       .div(10000)
     setCost(costWithFee)
@@ -210,7 +212,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             in case it represents the final outcome.
           </Paragraph>
           <Paragraph>
-            • You will be charged an extra 1% trade fee of &nbsp;
+            • You will be charged an extra {MARKET_FEE}% trade fee of &nbsp;
             <strong>
               {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}{' '}
               {collateral.symbol}
