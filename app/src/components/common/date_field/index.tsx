@@ -3,7 +3,8 @@ import styled from 'styled-components'
 import DatePicker from 'react-datepicker'
 import moment from 'moment'
 
-import { IconCalendar } from './img/IconCalendar'
+import IconCalendar from './img/icon.svg'
+import { TextfieldCSS } from '../textfield'
 
 interface Props {
   disabled?: boolean
@@ -14,41 +15,30 @@ interface Props {
 }
 
 const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
-  border-bottom: solid 1px #999;
-  border-left: none;
-  border-radius: 0;
-  border-right: none;
-  border-top: none;
-  color: ${props => props.theme.colors.textColor};
-  cursor: ${props => (props.disabled ? 'not-allowed' : 'default')};
-  font-size: 13px;
-  font-weight: normal;
-  opacity: ${props => (props.disabled ? '0.5' : '1')};
-  outline: none;
-  padding: 6px 25px 6px 4px;
-  position: relative;
+  border: none;
+  padding: 0;
   width: 100%;
 
-  > svg {
-    position: absolute;
-    right: 4px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 5;
-  }
-
-  > div > div > input {
-    background-color: transparent;
-    border: none;
-    color: ${props => props.theme.colors.textColor};
-    font-size: 13px;
-    outline: none;
-    padding: 0;
+  .react-datepicker-wrapper {
     width: 100%;
 
-    &::placeholder {
-      color: ${props => props.theme.colors.textColorLight};
-      font-size: 13px;
+    .react-datepicker__input-container {
+      width: 100%;
+
+      input {
+        ${TextfieldCSS}
+        background-image: url(${IconCalendar});
+        background-position: calc(100% - 4px) 50%;
+        background-repeat: no-repeat;
+        cursor: ${props => (props.disabled ? 'not-allowed' : 'default')};
+        opacity: ${props => (props.disabled ? '0.5' : '1')};
+        padding: ${props =>
+          props.theme.textfield.paddingVertical +
+          ' 25px ' +
+          props.theme.textfield.paddingVertical +
+          ' ' +
+          props.theme.textfield.paddingHorizontal};
+      }
     }
   }
 `
@@ -71,7 +61,6 @@ export const DateField = (props: Props) => {
         timeInputLabel={timeInputLabel}
         showTimeInput
       />
-      <IconCalendar />
     </DateFieldWrapper>
   )
 }
