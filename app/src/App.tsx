@@ -30,7 +30,6 @@ const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
   }
 
   ${WalletConnectStylesOverride}
-  ${DatepickerStylesOverride}
 
 `
 
