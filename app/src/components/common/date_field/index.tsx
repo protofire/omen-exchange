@@ -30,7 +30,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
         background-image: url(${IconCalendar});
         background-position: calc(100% - 4px) 50%;
         background-repeat: no-repeat;
-        cursor: ${props => (props.disabled ? 'not-allowed' : 'default')};
+        cursor: ${props => (props.disabled ? 'not-allowed' : 'text')};
         opacity: ${props => (props.disabled ? '0.5' : '1')};
         padding: ${props =>
           props.theme.textfield.paddingVertical +
