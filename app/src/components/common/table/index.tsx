@@ -12,6 +12,7 @@ const TableWrapper = styled.table<{ stickyHeader?: boolean }>`
     background-color: #fff;
     position: ${props => (props.stickyHeader ? 'sticky' : 'relative')};
     top: 0;
+    z-index: 12;
 
     &::before {
       background-color: ${props => props.theme.borders.borderColor};

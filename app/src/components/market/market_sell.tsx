@@ -54,6 +54,10 @@ const FormLabelStyled = styled(FormLabel)`
   margin-bottom: 10px;
 `
 
+const SubsectionTitleStyled = styled(SubsectionTitle)`
+  margin-bottom: 0;
+`
+
 const BigNumberInputTextRight = styled<any>(BigNumberInput)`
   text-align: right;
 `
@@ -178,7 +182,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
       <ViewCard>
-        <SubsectionTitle>Choose the shares you want to sell</SubsectionTitle>
+        <SubsectionTitleStyled>Choose the shares you want to sell</SubsectionTitleStyled>
         <OutcomeTable
           balances={balances}
           collateral={collateral}

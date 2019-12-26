@@ -1,4 +1,5 @@
 import React from 'react'
+import styled from 'styled-components'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { ThreeBoxComments } from '../../common/three_box_comments'
@@ -12,6 +13,10 @@ import { BigNumber } from 'ethers/utils'
 import { TitleValue } from '../../common/title_value'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
 import { GridThreeColumns } from '../../common/grid_three_columns'
+
+const SubsectionTitleStyled = styled(SubsectionTitle)`
+  margin-bottom: 0;
+`
 
 interface Props extends RouteComponentProps<{}> {
   balances: BalanceItem[]
@@ -90,7 +95,7 @@ const ViewWrapper = (props: Props) => {
   return (
     <>
       <ViewCard>
-        {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
+        <SubsectionTitleStyled>Outcomes</SubsectionTitleStyled>
         {renderTableData()}
         {marketHasDetails && details()}
         <ButtonContainer>
