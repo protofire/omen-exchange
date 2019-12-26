@@ -1,17 +1,19 @@
 const theme = {
   fonts: {
+    defaultSize: '14px',
     fontFamily: `'Roboto', 'Helvetica Neue', 'Arial', 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', '-apple-system', 'BlinkMacSystemFont', sans-serif`,
     fontFamilyCode: `source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace`,
   },
   colors: {
     activeListItemBackground: '#fafafa',
     darkGray: '#acacac',
+    error: '#fa0000',
+    mainBodyBackground: '#fafafa',
     primary: '#00be95',
     secondary: '#ff7848',
     tertiary: '#f5f5f5',
     textColor: '#333',
     textColorLight: '#888',
-    error: '#fa0000',
   },
   cards: {
     backgroundColor: '#fff',
@@ -70,8 +72,8 @@ const theme = {
     border: 'none',
     borderRadius: '5px',
     boxShadow: '0 0 12px 0 rgba(0, 0, 0, 0.12)',
-    textColor: '#000',
     lightTextColor: '#666',
+    textColor: '#000',
   },
   modalStyle: {
     content: {
