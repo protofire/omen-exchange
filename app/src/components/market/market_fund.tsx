@@ -24,6 +24,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { BalanceToken } from '../common/balance_token'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
 import { ButtonType } from '../../common/button_styling_types'
+import { FormError } from '../common/form_error'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -73,10 +74,8 @@ const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
 
-const ErrorStyled = styled.span`
-  margin-top: 0px;
-  color: red;
-  font-weight: 500;
+const BigNumberInputTextRight = styled<any>(BigNumberInput)`
+  text-align: right;
 `
 
 const logger = getLogger('Market::Fund')
@@ -223,11 +222,11 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
             <>
               <TextfieldCustomPlaceholder
                 formField={
-                  <BigNumberInput
-                    name="amount"
-                    value={amount}
-                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                  <BigNumberInputTextRight
                     decimals={collateral.decimals}
+                    name="amount"
+                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                    value={amount}
                   />
                 }
                 placeholderText={collateral.symbol}
@@ -243,7 +242,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
                   setAmount(collateralBalance)
                 }}
               />
-              <ErrorStyled>{fundingMessageError}</ErrorStyled>
+              <FormError>{fundingMessageError}</FormError>
             </>
           }
         />

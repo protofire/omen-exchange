@@ -15,6 +15,7 @@ import { CustomizableTokensSelect } from '../../../common/customizable_tokens_se
 import { Token } from '../../../../util/types'
 import { ERC20Service } from '../../../../services'
 import { useAsyncDerivedValue } from '../../../../hooks/useAsyncDerivedValue'
+import { FormError } from '../../../common/form_error'
 import { MARKET_FEE } from '../../../../common/constants'
 
 interface Props {
@@ -41,14 +42,8 @@ const TextfieldStyledRight = styled<any>(Textfield)`
   text-align: right;
 `
 
-const InputBigNumberStyledRight = styled<any>(BigNumberInput)`
+const BigNumberInputTextRight = styled<any>(BigNumberInput)`
   text-align: right;
-`
-
-const ErrorStyled = styled.span`
-  margin-top: 0px;
-  color: red;
-  font-weight: 500;
 `
 
 const FundingAndFeeStep = (props: Props) => {
@@ -113,12 +108,12 @@ const FundingAndFeeStep = (props: Props) => {
       <FormRow
         formField={
           <CustomizableTokensSelect
-            context={context}
-            name="collateralId"
-            value={collateral}
-            customValues={collateralsCustom}
             addCustomValue={addCollateralCustom}
+            context={context}
+            customValues={collateralsCustom}
+            name="collateralId"
             onCollateralChange={handleCollateralChange}
+            value={collateral}
           />
         }
         title={'Collateral token'}
@@ -131,11 +126,11 @@ const FundingAndFeeStep = (props: Props) => {
         formField={
           <TextfieldCustomPlaceholder
             formField={
-              <InputBigNumberStyledRight
-                name="funding"
-                value={funding}
-                onChange={handleChange}
+              <BigNumberInputTextRight
                 decimals={collateral.decimals}
+                name="funding"
+                onChange={handleChange}
+                value={funding}
               />
             }
             placeholderText={collateral.symbol}
@@ -154,7 +149,7 @@ const FundingAndFeeStep = (props: Props) => {
                 handleChange({ name: 'funding', value: collateralBalance })
               }}
             />
-            <ErrorStyled>{fundingMessageError}</ErrorStyled>
+            <FormError>{fundingMessageError}</FormError>
           </>
         }
       />

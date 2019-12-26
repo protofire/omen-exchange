@@ -19,7 +19,7 @@ const SelectWrapper = styled.div<{ disabled?: boolean }>`
   border-radius: 0;
   border-right: none;
   border-top: none;
-  color: #000;
+  color: ${props => props.theme.colors.textColor};
   cursor: ${props => (props.disabled ? 'not-allowed' : 'default')};
   font-size: 13px;
   font-weight: normal;
@@ -49,7 +49,7 @@ const FormSelect = styled.select`
   appearance: none;
   background-color: transparent;
   border: none;
-  color: #000;
+  color: ${props => props.theme.colors.textColor};
   font-size: 13px;
   font-weight: normal;
   outline: none;
