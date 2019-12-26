@@ -17,7 +17,7 @@ const logger = getLogger('Market::MarketWizardCreatorContainer')
 
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
-  const { library: provider, networkId, rawWeb3Context } = context
+  const { library: provider, networkId, account } = context
 
   const [isModalOpen, setModalState] = useState(false)
   const { conditionalTokens, marketMakerFactory, realitio, buildMarketMaker } = useContracts(
@@ -32,7 +32,7 @@ const MarketWizardCreatorContainer: FC = () => {
 
   const handleSubmit = async (data: MarketData) => {
     try {
-      if (!context.account) {
+      if (!account) {
         setModalState(true)
       } else {
         if (!data.resolution) {
@@ -42,11 +42,7 @@ const MarketWizardCreatorContainer: FC = () => {
         const { collateral, arbitratorId, question, resolution, funding, outcomes, category } = data
         const openingDateMoment = moment(resolution)
 
-        const collateralService = new ERC20Service(
-          provider,
-          rawWeb3Context.connectorName,
-          collateral.address,
-        )
+        const collateralService = new ERC20Service(provider, account, collateral.address)
 
         const hasEnoughBalanceToFund = await collateralService.hasEnoughBalanceToFund(user, funding)
         if (!hasEnoughBalanceToFund) {

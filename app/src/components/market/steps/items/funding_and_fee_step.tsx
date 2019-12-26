@@ -48,28 +48,25 @@ const BigNumberInputTextRight = styled<any>(BigNumberInput)`
 
 const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { library: provider, account, rawWeb3Context } = context
+  const { library: provider, account } = context
 
   const { values, addCollateralCustom, handleChange, handleCollateralChange } = props
   const { funding, spread, collateral, collateralsCustom } = values
 
   const calculateCollateralBalance = useMemo(
     () => async (): Promise<BigNumber> => {
-      const collateralService = new ERC20Service(
-        provider,
-        rawWeb3Context.connectorName,
-        collateral.address,
-      )
-      const collateralBalance = await collateralService.getCollateral(account || '')
+      const collateralService = new ERC20Service(provider, account, collateral.address)
+      const collateralBalance = account
+        ? await collateralService.getCollateral(account)
+        : new BigNumber(0)
       return collateralBalance
     },
-    [provider, rawWeb3Context, account, collateral],
+    [provider, account, collateral],
   )
 
   const collateralBalance = useAsyncDerivedValue('', new BigNumber(0), calculateCollateralBalance)
 
-  const isFundingGreaterThanBalance =
-    rawWeb3Context.connectorName !== 'Infura' ? funding.gt(collateralBalance) : false
+  const isFundingGreaterThanBalance = account ? funding.gt(collateralBalance) : false
   const error = !spread || funding.isZero() || isFundingGreaterThanBalance
 
   const fundingMessageError = isFundingGreaterThanBalance

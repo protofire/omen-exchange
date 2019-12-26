@@ -20,13 +20,11 @@ class ERC20Service {
   tokenAddress: string
   provider: any
   contract: Contract
-  connectorName: string
 
-  constructor(provider: any, connectorName: string, tokenAddress: string) {
+  constructor(provider: any, signerAddress: Maybe<string>, tokenAddress: string) {
     this.tokenAddress = tokenAddress
     this.provider = provider
-    this.connectorName = connectorName
-    if (connectorName === 'Infura') {
+    if (signerAddress) {
       this.contract = new ethers.Contract(tokenAddress, erc20Abi, provider)
     } else {
       const signer: Wallet = provider.getSigner()
@@ -70,9 +68,7 @@ class ERC20Service {
   }
 
   getCollateral = async (marketMakerAddress: string): Promise<any> => {
-    return this.connectorName === 'Infura'
-      ? new BigNumber(0)
-      : this.contract.balanceOf(marketMakerAddress)
+    return this.contract.balanceOf(marketMakerAddress)
   }
 
   hasEnoughBalanceToFund = async (owner: string, amount: BigNumber): Promise<boolean> => {

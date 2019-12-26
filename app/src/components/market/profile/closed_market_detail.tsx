@@ -65,7 +65,7 @@ const logger = getLogger('Market::ClosedMarketDetail')
 
 export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { library: provider, rawWeb3Context } = context
+  const { library: provider, account } = context
   const { conditionalTokens, oracle, buildMarketMaker } = useContracts(context)
 
   const {
@@ -105,11 +105,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
     const fetchBalance = async () => {
       const collateralAddress = await marketMaker.getCollateralToken()
-      const collateralService = new ERC20Service(
-        provider,
-        rawWeb3Context.connectorName,
-        collateralAddress,
-      )
+      const collateralService = new ERC20Service(provider, account, collateralAddress)
       const collateralBalance = await collateralService.getCollateral(marketMakerAddress)
       if (isSubscribed) setCollateral(collateralBalance)
     }
@@ -119,7 +115,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     return () => {
       isSubscribed = false
     }
-  }, [collateral, provider, rawWeb3Context, marketMakerAddress, marketMaker])
+  }, [collateral, provider, account, marketMakerAddress, marketMaker])
 
   const redeem = async () => {
     try {

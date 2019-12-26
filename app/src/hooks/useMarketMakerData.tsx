@@ -34,7 +34,7 @@ export const useMarketMakerData = (
   context: ConnectedWeb3Context,
 ): { marketMakerData: MarketMakerData; status: Status } => {
   const { conditionalTokens, realitio, buildMarketMaker } = useContracts(context)
-  const { library: provider, networkId, rawWeb3Context } = context
+  const { library: provider, networkId, account } = context
 
   const [status, setStatus] = useState(Status.Ready)
 
@@ -105,7 +105,7 @@ export const useMarketMakerData = (
 
     const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
-    const erc20Service = new ERC20Service(provider, rawWeb3Context.connectorName, collateralAddress)
+    const erc20Service = new ERC20Service(provider, account, collateralAddress)
     const collateral = await erc20Service.getProfileSummary()
 
     const balances: BalanceItem[] = outcomes.map((outcome: string, index: number) => {
@@ -149,7 +149,7 @@ export const useMarketMakerData = (
     conditionalTokens,
     provider,
     networkId,
-    rawWeb3Context,
+    account,
     marketMakerAddress,
     realitio,
     buildMarketMaker,

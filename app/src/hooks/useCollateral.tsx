@@ -20,7 +20,7 @@ export const useCollateral = (
   collateralAddress: string,
   context: ConnectedWeb3Context,
 ): { collateral: Maybe<Token>; errorMessage: Maybe<string> } => {
-  const { library: provider, networkId, rawWeb3Context } = context
+  const { library: provider, networkId, account } = context
 
   const [collateral, setCollateral] = useState<Maybe<Token>>(null)
   const [errorMessage, setErrorMessage] = useState<Maybe<string>>(null)
@@ -38,11 +38,7 @@ export const useCollateral = (
 
       // If the address doesn't belong to a knowToken, we fetch its metadata
       if (!newCollateral) {
-        const erc20Service = new ERC20Service(
-          provider,
-          rawWeb3Context.connectorName,
-          collateralAddress,
-        )
+        const erc20Service = new ERC20Service(provider, account, collateralAddress)
         const isValidErc20 = await erc20Service.isValidErc20()
         if (isValidErc20) {
           newCollateral = await erc20Service.getProfileSummary()
@@ -62,7 +58,7 @@ export const useCollateral = (
     return () => {
       isSubscribed = false
     }
-  }, [provider, rawWeb3Context, networkId, collateralAddress])
+  }, [provider, account, networkId, collateralAddress])
 
   return {
     collateral,
