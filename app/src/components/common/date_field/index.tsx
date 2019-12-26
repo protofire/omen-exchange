@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import DatePicker from 'react-datepicker'
 import moment from 'moment'
+import ReactDOM from 'react-dom'
 
 import IconCalendar from './img/icon.svg'
 import { TextfieldCSS } from '../textfield'
@@ -12,6 +13,10 @@ interface Props {
   name: string
   onChange: any
   selected?: any
+}
+
+interface CalendarPortalProps {
+  children: React.ReactNode
 }
 
 const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
@@ -43,6 +48,28 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
   }
 `
 
+const CalendarPortalWrapper = styled.div`
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 5;
+`
+
+/**
+ * Had to do this to show the calendar outside of its wrapper and to avoid
+ * z-index problems. It simply shows the calendar in a portal.
+ */
+const CalendarPortal = (props: CalendarPortalProps) => {
+  const { children } = props
+
+  return ReactDOM.createPortal(
+    children ? <CalendarPortalWrapper>{children}</CalendarPortalWrapper> : null,
+    document.querySelector('#portalContainer') as HTMLDivElement,
+  )
+}
+
 export const DateField = (props: Props) => {
   const { onChange, selected, minDate, name, disabled, ...restProps } = props
   const timeInputLabel = `Time (UTC${moment().format('Z')})`
@@ -56,10 +83,11 @@ export const DateField = (props: Props) => {
         name={name}
         onChange={onChange}
         placeholderText="Pick a date..."
+        popperContainer={CalendarPortal}
         selected={selected}
         showDisabledMonthNavigation
-        timeInputLabel={timeInputLabel}
         showTimeInput
+        timeInputLabel={timeInputLabel}
       />
     </DateFieldWrapper>
   )

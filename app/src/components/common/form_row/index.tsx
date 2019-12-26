@@ -7,6 +7,8 @@ import { FormError } from '../form_error'
 
 const FormRowWrapper = styled.div`
   margin-bottom: 25px;
+  position: relative;
+  z-index: 1;
 `
 
 const TooltipStyled = styled(Tooltip)`
