@@ -1,5 +1,3 @@
-import { ethers } from 'ethers'
-
 export const LOGGER_ID: string = process.env.REACT_APP_LOGGER_ID || 'gnosis-conditional-exchange'
 export const THREEBOX_ADMIN_ADDRESS: string =
   process.env.REACT_APP_THREEBOX_ADMIN_ADDRESS || '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
@@ -22,8 +20,4 @@ export const MAX_OUTCOME_ALLOWED = parseInt(process.env.REACT_APP_MAX_OUTCOME_AL
 
 export const SINGLE_SELECT_TEMPLATE_ID = 2
 
-export const MARKET_FEE = parseInt(process.env.REACT_APP_MARKET_FEE || '4', 10)
-
-export const MARKET_FEE_WITH_TWO_DECIMALS = MARKET_FEE / Math.pow(10, 2)
-
-export const FEE = ethers.utils.parseEther('' + MARKET_FEE_WITH_TWO_DECIMALS) // MARKET_FEE%
+export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')

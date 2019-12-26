@@ -29,7 +29,7 @@ import { SectionTitle } from '../common/section_title'
 import { BalanceShares } from '../common/balance_shares'
 import { useContracts } from '../../hooks/useContracts'
 import { ButtonType } from '../../common/button_styling_types'
-import { MARKET_FEE_WITH_TWO_DECIMALS, MARKET_FEE } from '../../common/constants'
+import { MARKET_FEE } from '../../common/constants'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -78,6 +78,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [pricesAfterTrade, setPricesAfterTrade] = useState<Maybe<number[]>>(null)
 
+  const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
+
   useEffect(() => {
     setBalanceItem(balances[outcomeIndex])
 
@@ -91,7 +93,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       amountShares,
       holdingsOfSoldOutcome,
       holdingsOfOtherOutcomes,
-      +MARKET_FEE_WITH_TWO_DECIMALS,
+      marketFeeWithTwoDecimals,
     )
 
     if (!amountToSell) {
@@ -114,9 +116,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
     setPricesAfterTrade(pricesAfterTrade)
-    setCostFee(mulBN(amountToSell, +MARKET_FEE_WITH_TWO_DECIMALS))
+    setCostFee(mulBN(amountToSell, marketFeeWithTwoDecimals))
     setTradedCollateral(amountToSell)
-  }, [outcomeIndex, amountShares, balances, collateral])
+  }, [outcomeIndex, amountShares, balances, collateral, marketFeeWithTwoDecimals])
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
 

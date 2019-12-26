@@ -26,7 +26,7 @@ import { SectionTitle } from '../common/section_title'
 import { BalanceToken } from '../common/balance_token'
 import { useContracts } from '../../hooks/useContracts'
 import { ButtonType } from '../../common/button_styling_types'
-import { MARKET_FEE_WITH_TWO_DECIMALS, MARKET_FEE } from '../../common/constants'
+import { MARKET_FEE } from '../../common/constants'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -99,8 +99,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     const valueNumber = +ethers.utils.formatUnits(amount, collateral.decimals)
 
     const weiPerUnit = ethers.utils.bigNumberify(10).pow(collateral.decimals)
+    const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
     const costWithFee = ethers.utils
-      .bigNumberify('' + Math.round(valueNumber * (1 + MARKET_FEE_WITH_TWO_DECIMALS) * 10000)) // cast to string to avoid overflows
+      .bigNumberify('' + Math.round(valueNumber * (1 + marketFeeWithTwoDecimals) * 10000)) // cast to string to avoid overflows
       .mul(weiPerUnit)
       .div(10000)
     setCost(costWithFee)
