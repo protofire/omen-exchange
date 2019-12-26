@@ -44,11 +44,6 @@ const MarketWizardCreatorContainer: FC = () => {
 
         const collateralService = new ERC20Service(provider, account, collateral.address)
 
-        const hasEnoughBalanceToFund = await collateralService.hasEnoughBalanceToFund(user, funding)
-        if (!hasEnoughBalanceToFund) {
-          throw new Error('there are not enough collateral balance for funding')
-        }
-
         const arbitrator = getArbitrator(networkId, arbitratorId)
 
         setMarketCreationStatus(MarketCreationStatusData.postingQuestion())
