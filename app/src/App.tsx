@@ -7,7 +7,6 @@ import theme from './theme'
 import connectors from './util/connectors'
 import { Main } from './components'
 import { WalletConnectStylesOverride } from './common/wallet_connect_styles_override'
-import { DatepickerStylesOverride } from './common/datepicker_styles_override'
 
 type ThemeType = typeof theme
 
