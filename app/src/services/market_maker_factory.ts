@@ -7,7 +7,7 @@ import { RealitioService } from './realitio'
 
 import { getLogger } from '../util/logger'
 import { Market, MarketWithExtraData, Log } from '../util/types'
-import { FEE } from '../common/constants'
+import { MARKET_FEE } from '../common/constants'
 
 const logger = getLogger('Services::MarketMakerFactory')
 
@@ -49,7 +49,9 @@ class MarketMakerFactoryService {
     collateralAddress: string,
     conditionId: string,
   ) => {
-    const args = [conditionalTokenAddress, collateralAddress, [conditionId], FEE]
+    const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
+
+    const args = [conditionalTokenAddress, collateralAddress, [conditionId], feeBN]
 
     const marketMakerAddress = await this.constantContract.createFixedProductMarketMaker(...args, {
       from: this.signerAddress,
@@ -115,7 +117,9 @@ class MarketMakerFactoryService {
       }),
     )
 
-    const validMarkets = marketsWithExtraData.filter(market => market.fee.eq(FEE))
+    const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
+
+    const validMarkets = marketsWithExtraData.filter(market => market.fee.eq(feeBN))
 
     return validMarkets
   }

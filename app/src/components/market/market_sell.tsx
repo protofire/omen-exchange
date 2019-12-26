@@ -31,6 +31,7 @@ import { useContracts } from '../../hooks/useContracts'
 import { ButtonType } from '../../common/button_styling_types'
 import { Well } from '../common/well'
 import { Paragraph } from '../common/paragraph'
+import { MARKET_FEE } from '../../common/constants'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -88,6 +89,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [pricesAfterTrade, setPricesAfterTrade] = useState<Maybe<number[]>>(null)
 
+  const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
+
   useEffect(() => {
     setBalanceItem(balances[outcomeIndex])
 
@@ -96,11 +99,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
       return index !== outcomeIndex
     })
+
     const amountToSell = calcSellAmountInCollateral(
       amountShares,
       holdingsOfSoldOutcome,
       holdingsOfOtherOutcomes,
-      0.01,
+      marketFeeWithTwoDecimals,
     )
 
     if (!amountToSell) {
@@ -123,9 +127,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
     setPricesAfterTrade(pricesAfterTrade)
-    setCostFee(mulBN(amountToSell, 0.01))
+    setCostFee(mulBN(amountToSell, marketFeeWithTwoDecimals))
     setTradedCollateral(amountToSell)
-  }, [outcomeIndex, amountShares, balances, collateral])
+  }, [outcomeIndex, amountShares, balances, collateral, marketFeeWithTwoDecimals])
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
 
@@ -217,7 +221,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         </TableStyled>
         <Well>
           <Paragraph>
-            • You will be charged an extra 1% trade fee of &nbsp;
+            • You will be charged an extra {MARKET_FEE}% trade fee of &nbsp;
             <strong>{costFee ? formatBigNumber(costFee, collateral.decimals, 10) : '-'}</strong>
           </Paragraph>
         </Well>
