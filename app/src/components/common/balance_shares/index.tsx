@@ -1,9 +1,10 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ButtonLink } from '../button_link'
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, Token } from '../../../util/types'
+import { FormRowNote } from '../form_row_note'
+import { FormRowLink } from '../form_row_link'
 
 interface Props {
   balanceItem?: BalanceItem
@@ -11,16 +12,19 @@ interface Props {
   onClickMax: (balanceItem?: BalanceItem) => void
 }
 
-const Wrapper = styled.span`
+const Wrapper = styled.div`
+  align-items: center;
   display: flex;
-  flex-direction: row;
-  width: 100%;
-  padding-bottom: 5px;
+  justify-content: space-between;
+  margin: 0 0 5px 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `
 
-const BalanceTitle = styled.span`
-  margin-right: 10px;
-  margin-top: 3px;
+const Note = styled(FormRowNote)`
+  margin: 0 15px 0 0;
 `
 
 export const BalanceShares = (props: Props) => {
@@ -33,8 +37,10 @@ export const BalanceShares = (props: Props) => {
     <>
       {sharesBalanceFormatted && (
         <Wrapper>
-          <BalanceTitle>Balance {sharesBalanceFormatted}.</BalanceTitle>
-          <ButtonLink onClick={() => onClickMax(balanceItem)}>Max</ButtonLink>
+          <Note>
+            Balance <strong>{sharesBalanceFormatted}</strong>
+          </Note>
+          <FormRowLink onClick={() => onClickMax(balanceItem)}>Add all funds</FormRowLink>
         </Wrapper>
       )}
     </>
