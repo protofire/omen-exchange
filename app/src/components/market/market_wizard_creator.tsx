@@ -217,7 +217,7 @@ export const MarketWizardCreator = (props: Props) => {
 
   return (
     <>
-      {MarketCreationStatusData.is.done(marketCreationStatus) && (
+      {!MarketCreationStatusData.is.done(marketCreationStatus) && (
         <>
           {currentMenu()} {currentStepFn()}
         </>
