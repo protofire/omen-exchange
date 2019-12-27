@@ -105,6 +105,8 @@ const CreateMarketStep = (props: Props) => {
 
   const resolutionDate = resolution && formatDate(resolution)
 
+  const buttonText = account ? 'Create' : 'Connect Wallet'
+
   return (
     <CreateCard>
       <Paragraph>
@@ -199,7 +201,7 @@ const CreateMarketStep = (props: Props) => {
           }
           onClick={submit}
         >
-          Create
+          {buttonText}
         </Button>
       </ButtonContainer>
     </CreateCard>
