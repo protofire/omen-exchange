@@ -22,6 +22,10 @@ import {
   MarketCreationStatusType,
   MarketCreationStatusData,
 } from '../../../../util/market_creation_status_data'
+import { getLogger } from '../../../../util/logger'
+import { ERC20Service } from '../../../../services'
+
+const logger = getLogger('MarketCreationItems::CreateMarketStep')
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -59,6 +63,7 @@ interface Props {
 
 const CreateMarketStep = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { library: provider, account, networkId } = context
 
   const { marketMakerAddress, values, marketCreationStatus, questionId } = props
   const {
@@ -76,11 +81,27 @@ const CreateMarketStep = (props: Props) => {
     props.back()
   }
 
-  const submit = () => {
-    props.submit()
+  const submit = async () => {
+    try {
+      if (account) {
+        const collateralService = new ERC20Service(provider, account, collateral.address)
+
+        const hasEnoughBalanceToFund = await collateralService.hasEnoughBalanceToFund(
+          account,
+          funding,
+        )
+        if (!hasEnoughBalanceToFund) {
+          throw new Error('there are not enough collateral balance for funding')
+        }
+      }
+
+      props.submit()
+    } catch (err) {
+      logger.error(err)
+    }
   }
 
-  const arbitrator = getArbitrator(context.networkId, arbitratorId)
+  const arbitrator = getArbitrator(networkId, arbitratorId)
 
   const resolutionDate = resolution && formatDate(resolution)
 
