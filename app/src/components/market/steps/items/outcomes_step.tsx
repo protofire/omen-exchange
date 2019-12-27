@@ -62,7 +62,12 @@ const OutcomesStep = (props: Props) => {
     errorMessages.push('The sum of all probabilities must be equal to 100%.')
   }
 
-  const error = totalProbabilities !== 100 || someEmptyName || someEmptyProbability
+  if (outcomes.length < 2) {
+    errorMessages.push('The quantity of outcomes should be equal or greater than 2.')
+  }
+
+  const error =
+    totalProbabilities !== 100 || someEmptyName || someEmptyProbability || outcomes.length < 2
 
   const isAddNewOutcomeButtonDisabled = outcomes.length >= MAX_OUTCOME_ALLOWED
 

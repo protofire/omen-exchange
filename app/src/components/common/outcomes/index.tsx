@@ -173,7 +173,8 @@ const Outcomes = (props: Props) => {
   }
 
   const removeOutcome = (index: number) => {
-    console.log(index)
+    outcomes.splice(index, 1)
+    props.onChange(outcomes)
   }
 
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
