@@ -38,11 +38,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
         cursor: ${props => (props.disabled ? 'not-allowed' : 'text')};
         opacity: ${props => (props.disabled ? '0.5' : '1')};
         padding: ${props =>
-          props.theme.textfield.paddingVertical +
-          ' 25px ' +
-          props.theme.textfield.paddingVertical +
-          ' ' +
-          props.theme.textfield.paddingHorizontal};
+          `${props.theme.textfield.paddingVertical} 25px ${props.theme.textfield.paddingVertical} ${props.theme.textfield.paddingHorizontal};`}
       }
     }
   }
