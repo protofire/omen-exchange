@@ -43,7 +43,7 @@ interface Error {
   readonly error: Error
 }
 
-export type MarketCreationStatusType =
+export type MarketCreationStatus =
   | Ready
   | PostingQuestion
   | PrepareCondition
@@ -55,27 +55,27 @@ export type MarketCreationStatusType =
   | Done
   | Error
 
-const isReady = (mcsd: MarketCreationStatusType): mcsd is Ready => mcsd._type === Types.Ready
-const isPostingQuestion = (mcsd: MarketCreationStatusType): mcsd is PostingQuestion =>
+const isReady = (mcsd: MarketCreationStatus): mcsd is Ready => mcsd._type === Types.Ready
+const isPostingQuestion = (mcsd: MarketCreationStatus): mcsd is PostingQuestion =>
   mcsd._type === Types.PostingQuestion
-const isPrepareCondition = (mcsd: MarketCreationStatusType): mcsd is PrepareCondition =>
+const isPrepareCondition = (mcsd: MarketCreationStatus): mcsd is PrepareCondition =>
   mcsd._type === Types.PrepareCondition
-const isApprovingCollateral = (mcsd: MarketCreationStatusType): mcsd is ApprovingCollateral =>
+const isApprovingCollateral = (mcsd: MarketCreationStatus): mcsd is ApprovingCollateral =>
   mcsd._type === Types.ApprovingCollateral
-const isCreateMarketMaker = (mcsd: MarketCreationStatusType): mcsd is CreateMarketMaker =>
+const isCreateMarketMaker = (mcsd: MarketCreationStatus): mcsd is CreateMarketMaker =>
   mcsd._type === Types.CreateMarketMaker
 const isApproveCollateralForMarketMaker = (
-  mcsd: MarketCreationStatusType,
+  mcsd: MarketCreationStatus,
 ): mcsd is ApproveCollateralForMarketMaker => mcsd._type === Types.ApproveCollateralForMarketMaker
-const isAddFunding = (mcsd: MarketCreationStatusType): mcsd is AddFunding =>
+const isAddFunding = (mcsd: MarketCreationStatus): mcsd is AddFunding =>
   mcsd._type === Types.AddFunding
 const isInitialTradeInMarketMaker = (
-  mcsd: MarketCreationStatusType,
+  mcsd: MarketCreationStatus,
 ): mcsd is InitialTradeInMarketMaker => mcsd._type === Types.InitialTradeInMarketMaker
-const isDone = (mcsd: MarketCreationStatusType): mcsd is Done => mcsd._type === Types.Done
-const isError = (mcsd: MarketCreationStatusType): mcsd is Error => mcsd._type === Types.Error
+const isDone = (mcsd: MarketCreationStatus): mcsd is Done => mcsd._type === Types.Done
+const isError = (mcsd: MarketCreationStatus): mcsd is Error => mcsd._type === Types.Error
 
-export const MarketCreationStatusData = {
+export const MarketCreationStatus = {
   ready: (): Ready => ({ _type: Types.Ready }),
   postingQuestion: (): PostingQuestion => ({ _type: Types.PostingQuestion }),
   prepareCondition: (): PrepareCondition => ({ _type: Types.PrepareCondition }),

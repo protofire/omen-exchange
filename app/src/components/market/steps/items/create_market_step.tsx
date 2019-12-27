@@ -18,10 +18,7 @@ import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ButtonType } from '../../../../common/button_styling_types'
-import {
-  MarketCreationStatusType,
-  MarketCreationStatusData,
-} from '../../../../util/market_creation_status_data'
+import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { getLogger } from '../../../../util/logger'
 import { ERC20Service } from '../../../../services'
 
@@ -56,7 +53,7 @@ interface Props {
     funding: BigNumber
     outcomes: Outcome[]
   }
-  marketCreationStatus: MarketCreationStatusType
+  marketCreationStatus: MarketCreationStatus
   questionId: string | null
   marketMakerAddress: string | null
 }
@@ -179,15 +176,15 @@ const CreateMarketStep = (props: Props) => {
           </Grid>
         </>
       ) : null}
-      {!MarketCreationStatusData.is.ready(marketCreationStatus) &&
-      !MarketCreationStatusData.is.error(marketCreationStatus) ? (
+      {!MarketCreationStatus.is.ready(marketCreationStatus) &&
+      !MarketCreationStatus.is.error(marketCreationStatus) ? (
         <FullLoading message={`${marketCreationStatus._type}...`} />
       ) : null}
       <ButtonContainer>
         <ButtonLinkStyled
           disabled={
-            !MarketCreationStatusData.is.ready(marketCreationStatus) &&
-            !MarketCreationStatusData.is.error(marketCreationStatus)
+            !MarketCreationStatus.is.ready(marketCreationStatus) &&
+            !MarketCreationStatus.is.error(marketCreationStatus)
           }
           onClick={back}
         >
@@ -196,8 +193,8 @@ const CreateMarketStep = (props: Props) => {
         <Button
           buttonType={ButtonType.primary}
           disabled={
-            !MarketCreationStatusData.is.ready(marketCreationStatus) &&
-            !MarketCreationStatusData.is.error(marketCreationStatus)
+            !MarketCreationStatus.is.ready(marketCreationStatus) &&
+            !MarketCreationStatus.is.error(marketCreationStatus)
           }
           onClick={submit}
         >

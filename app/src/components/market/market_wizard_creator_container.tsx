@@ -8,10 +8,7 @@ import { getArbitrator, getContractAddress } from '../../util/networks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
 import { ModalConnectWallet } from '../common/modal_connect_wallet'
-import {
-  MarketCreationStatusData,
-  MarketCreationStatusType,
-} from '../../util/market_creation_status_data'
+import { MarketCreationStatus } from '../../util/market_creation_status_data'
 
 const logger = getLogger('Market::MarketWizardCreatorContainer')
 
@@ -24,8 +21,8 @@ const MarketWizardCreatorContainer: FC = () => {
     context,
   )
 
-  const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatusType>(
-    MarketCreationStatusData.ready(),
+  const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(
+    MarketCreationStatus.ready(),
   )
   const [questionId, setQuestionId] = useState<string | null>(null)
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
@@ -46,7 +43,7 @@ const MarketWizardCreatorContainer: FC = () => {
 
         const arbitrator = getArbitrator(networkId, arbitratorId)
 
-        setMarketCreationStatus(MarketCreationStatusData.postingQuestion())
+        setMarketCreationStatus(MarketCreationStatus.postingQuestion())
         const questionId = await realitio.askQuestion(
           question,
           outcomes,
@@ -57,7 +54,7 @@ const MarketWizardCreatorContainer: FC = () => {
         )
         setQuestionId(questionId)
 
-        setMarketCreationStatus(MarketCreationStatusData.prepareCondition())
+        setMarketCreationStatus(MarketCreationStatus.prepareCondition())
 
         const oracleAddress = getContractAddress(networkId, 'oracle')
         const conditionId = await conditionalTokens.prepareCondition(
@@ -67,7 +64,7 @@ const MarketWizardCreatorContainer: FC = () => {
         )
 
         // approve movement of collateral token to MarketMakerFactory
-        setMarketCreationStatus(MarketCreationStatusData.approvingCollateral())
+        setMarketCreationStatus(MarketCreationStatus.approvingCollateral())
 
         const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
 
@@ -81,7 +78,7 @@ const MarketWizardCreatorContainer: FC = () => {
           await collateralService.approve(marketMakerFactoryAddress, funding)
         }
 
-        setMarketCreationStatus(MarketCreationStatusData.createMarketMaker())
+        setMarketCreationStatus(MarketCreationStatus.createMarketMaker())
         const marketMakerAddress = await marketMakerFactory.createMarketMaker(
           conditionalTokens.address,
           collateral.address,
@@ -89,17 +86,17 @@ const MarketWizardCreatorContainer: FC = () => {
         )
         setMarketMakerAddress(marketMakerAddress)
 
-        setMarketCreationStatus(MarketCreationStatusData.approveCollateralForMarketMaker())
+        setMarketCreationStatus(MarketCreationStatus.approveCollateralForMarketMaker())
         await collateralService.approveUnlimited(marketMakerAddress)
 
-        setMarketCreationStatus(MarketCreationStatusData.addFunding())
+        setMarketCreationStatus(MarketCreationStatus.addFunding())
         const marketMakerService = buildMarketMaker(marketMakerAddress)
         await marketMakerService.addInitialFunding(funding, outcomes.map(o => o.probability))
 
-        setMarketCreationStatus(MarketCreationStatusData.done())
+        setMarketCreationStatus(MarketCreationStatus.done())
       }
     } catch (err) {
-      setMarketCreationStatus(MarketCreationStatusData.error(err))
+      setMarketCreationStatus(MarketCreationStatus.error(err))
       logger.error(err.message)
     }
   }

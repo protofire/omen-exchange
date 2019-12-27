@@ -17,10 +17,7 @@ import { BigNumberInputReturn } from '../common/big_number_input'
 import { Outcome } from '../common/outcomes'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getDefaultToken } from '../../util/networks'
-import {
-  MarketCreationStatusType,
-  MarketCreationStatusData,
-} from '../../util/market_creation_status_data'
+import { MarketCreationStatus } from '../../util/market_creation_status_data'
 
 export interface MarketData {
   collateral: Token
@@ -36,7 +33,7 @@ export interface MarketData {
 
 interface Props {
   callback: (param: MarketData) => void
-  marketCreationStatus: MarketCreationStatusType
+  marketCreationStatus: MarketCreationStatus
   questionId: string | null
   marketMakerAddress: string | null
 }
@@ -217,12 +214,12 @@ export const MarketWizardCreator = (props: Props) => {
 
   return (
     <>
-      {!MarketCreationStatusData.is.done(marketCreationStatus) && (
+      {!MarketCreationStatus.is.done(marketCreationStatus) && (
         <>
           {currentMenu()} {currentStepFn()}
         </>
       )}
-      {MarketCreationStatusData.is.done(marketCreationStatus) && summaryMarketStep()}
+      {MarketCreationStatus.is.done(marketCreationStatus) && summaryMarketStep()}
     </>
   )
 }
