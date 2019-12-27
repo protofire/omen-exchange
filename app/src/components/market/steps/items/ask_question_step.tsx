@@ -26,16 +26,6 @@ const OracleInfo = styled(Well)`
   text-align: center;
 `
 
-const FormRowResolutionDate = styled(FormRow)`
-  position: relative;
-  z-index: 15;
-`
-
-const FormRowOracle = styled(FormRow)`
-  position: relative;
-  z-index: 5;
-`
-
 const AskQuestionStep = (props: Props) => {
   const { values, handleChange, handleChangeDate, next } = props
   const { question, category, resolution, arbitratorId } = values
@@ -87,7 +77,7 @@ const AskQuestionStep = (props: Props) => {
           description: `You can choose among several categories. Your selection will classify the subject/topic of your market.`,
         }}
       />
-      <FormRowResolutionDate
+      <FormRow
         formField={
           <DateField
             minDate={new Date()}
@@ -102,7 +92,7 @@ const AskQuestionStep = (props: Props) => {
           description: `Precisely indicate when the market is resolved. The time is displayed in ISO 8601 format.`,
         }}
       />
-      <FormRowOracle
+      <FormRow
         formField={<Arbitrators name="arbitratorId" value={arbitratorId} onChange={handleChange} />}
         title={'Arbitrator'}
         tooltip={{
@@ -114,7 +104,7 @@ const AskQuestionStep = (props: Props) => {
       <OracleInfo>
         The market will be resolved using{' '}
         <a href="https://realit.io/" rel="noopener noreferrer" target="_blank">
-          Realitio
+          Realit.io
         </a>{' '}
         and{' '}
         <a href={arbitrator.url} rel="noopener noreferrer" target="_blank">
