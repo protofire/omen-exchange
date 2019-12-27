@@ -140,7 +140,6 @@ export const ModalConnectWallet = (props: Props) => {
       WalletConnectQRCodeModal.open(uri, () => {
         // Callback passed to the onClose click of the QRCode modal
         onClickCloseButton()
-        WalletConnectQRCodeModal.close()
         localStorage.removeItem('CONNECTOR')
         context.unsetConnector()
       })
