@@ -25,10 +25,10 @@ class ERC20Service {
     this.tokenAddress = tokenAddress
     this.provider = provider
     if (signerAddress) {
-      this.contract = new ethers.Contract(tokenAddress, erc20Abi, provider)
-    } else {
       const signer: Wallet = provider.getSigner()
       this.contract = new ethers.Contract(tokenAddress, erc20Abi, provider).connect(signer)
+    } else {
+      this.contract = new ethers.Contract(tokenAddress, erc20Abi, provider)
     }
   }
 
