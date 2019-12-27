@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { CreateCard } from '../../../common/create_card'
 import { Button } from '../../../common/index'
@@ -43,6 +43,8 @@ const OutcomesStep = (props: Props) => {
   const { handleOutcomesChange, values } = props
   const { question, outcomes } = values
 
+  const [newOutcomeName, setNewOutcomeName] = useState('')
+
   const errorMessages = []
 
   const someEmptyName = outcomes.some(outcome => !outcome.name)
@@ -66,7 +68,7 @@ const OutcomesStep = (props: Props) => {
 
   const addNewOutcome = () => {
     const newOutcome = {
-      name: '',
+      name: newOutcomeName.trim(),
       probability: 0,
     }
     outcomes.push(newOutcome)
@@ -86,7 +88,12 @@ const OutcomesStep = (props: Props) => {
         errorMessages={errorMessages}
       />
       <NewOutcome>
-        <Textfield type="text" placeholder="Add new outcome" />
+        <Textfield
+          type="text"
+          placeholder="Add new outcome"
+          value={newOutcomeName}
+          onChange={e => setNewOutcomeName(e.target.value)}
+        />
         <ButtonAdd disabled={isAddNewOutcomeButtonDisabled} onClick={addNewOutcome} />
       </NewOutcome>
       <ButtonContainerStyled>
