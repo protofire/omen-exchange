@@ -17,6 +17,7 @@ import { FullLoading } from '../../../common/full_loading'
 import { NavLink } from 'react-router-dom'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
 import { ButtonAnchor } from '../../../common/button_anchor'
+import { MARKET_FEE } from '../../../../common/constants'
 
 const NavLinkStyled = styled(NavLink)`
   color: ${props => props.theme.colors.textColor};
@@ -84,7 +85,7 @@ const SummaryMarketStep = (props: Props) => {
           <TitleValue title={'Category'} value={category} />
           <TitleValue title={'Resolution date'} value={resolutionDate} />
           <TitleValue title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
-          <TitleValue title={'Spread / Fee'} value={`1%`} />
+          <TitleValue title={'Spread / Fee'} value={`${MARKET_FEE}%`} />
           <TitleValue
             title={'Funding'}
             value={[

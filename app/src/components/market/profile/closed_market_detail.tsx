@@ -16,6 +16,7 @@ import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
 import { useContracts } from '../../../hooks/useContracts'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
+import { MARKET_FEE } from '../../../common/constants'
 
 const Grid = styled.div`
   display: grid;
@@ -149,7 +150,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
             value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />}
           />
           <TitleValue title="Resolution Date" value={resolutionFormat} />
-          <TitleValue title="Fee" value="1%" />
+          <TitleValue title="Fee" value={`${MARKET_FEE}%`} />
           <TitleValue title="Funding" value={fundingFormat} />
         </Grid>
         <SubsectionTitle>Market Results</SubsectionTitle>

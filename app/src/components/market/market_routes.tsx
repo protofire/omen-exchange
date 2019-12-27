@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
+import { ethers } from 'ethers'
 
 import { MarketBuyPage, MarketDetailsPage, MarketFundPage, MarketSellPage } from '../../pages'
 import { isAddress } from '../../util/tools'
@@ -8,7 +9,7 @@ import { useCheckContractExists } from '../../hooks/useCheckContractExists'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
 import { SectionTitle } from '../common/section_title'
 import { FullLoading } from '../common/full_loading'
-import { FEE } from '../../common/constants'
+import { MARKET_FEE } from '../../common/constants'
 import { getLogger } from '../../util/logger'
 import { useWeb3Context } from 'web3-react/dist'
 import connectors from '../../util/connectors'
@@ -43,7 +44,9 @@ const MarketValidateContractAddress: React.FC<Props> = (props: Props) => {
   if (fee === null) {
     return <FullLoading />
   }
-  if (!fee.eq(FEE)) {
+
+  const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
+  if (!fee.eq(feeBN)) {
     logger.log(`Market was not created with this app (different fee)`)
     return <SectionTitle title={'Invalid market'} />
   }
