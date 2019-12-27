@@ -55,12 +55,12 @@ const OutcomesStep = (props: Props) => {
     errorMessages.push('The probabilities of the outcomes should not be zero.')
   }
 
-  const totalOutcomeProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
-  if (totalOutcomeProbabilities !== 100) {
+  const totalProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
+  if (totalProbabilities !== 100) {
     errorMessages.push('The sum of all probabilities must be equal to 100%.')
   }
 
-  const error = totalOutcomeProbabilities !== 100 || someEmptyName || someEmptyProbability
+  const error = totalProbabilities !== 100 || someEmptyName || someEmptyProbability
 
   const isAddNewOutcomeButtonDisabled = outcomes.length >= MAX_OUTCOME_ALLOWED
 
@@ -79,7 +79,12 @@ const OutcomesStep = (props: Props) => {
         Please add all the possible outcomes for the <strong>&quot;{question}&quot;</strong>{' '}
         question.
       </OutcomeInfo>
-      <Outcomes outcomes={outcomes} onChange={handleOutcomesChange} errorMessages={errorMessages} />
+      <Outcomes
+        outcomes={outcomes}
+        totalProbabilities={totalProbabilities}
+        onChange={handleOutcomesChange}
+        errorMessages={errorMessages}
+      />
       <NewOutcome>
         <Textfield type="text" placeholder="Add new outcome" />
         <ButtonAdd disabled={isAddNewOutcomeButtonDisabled} onClick={addNewOutcome} />

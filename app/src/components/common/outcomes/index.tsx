@@ -108,10 +108,11 @@ interface Props {
   outcomes: Outcome[]
   onChange: (newOutcomes: Outcome[]) => any
   errorMessages?: string[]
+  totalProbabilities: number
 }
 
 const Outcomes = (props: Props) => {
-  const { outcomes, errorMessages } = props
+  const { outcomes, totalProbabilities, errorMessages } = props
 
   const updateOutcomeProbability = (index: number, newProbability: number) => {
     if (newProbability < 0 || newProbability > 100) {
@@ -175,10 +176,6 @@ const Outcomes = (props: Props) => {
     console.log(index)
   }
 
-  const getTotalProbabilities = (): number => {
-    return 101
-  }
-
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
     <OutcomeItem key={index}>
       <Textfield
@@ -227,10 +224,7 @@ const Outcomes = (props: Props) => {
           <strong>Total:</strong> {outcomes.length} outcomes
         </TotalTitle>
         <TotalValue>
-          <TotalValueColor error={getTotalProbabilities() > 100}>
-            {getTotalProbabilities()}
-          </TotalValueColor>
-          %
+          <TotalValueColor error={totalProbabilities > 100}>{totalProbabilities}</TotalValueColor>%
         </TotalValue>
       </TotalWrapper>
     </OutcomesWrapper>
