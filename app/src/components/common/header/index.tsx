@@ -8,6 +8,8 @@ import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
 import { ButtonConnectWallet } from '../button_connect_wallet'
 import { ModalConnectWallet } from '../modal_connect_wallet'
 import { useWeb3Context } from 'web3-react/dist'
+import { withRouter } from 'react-router'
+import { RouteComponentProps } from 'react-router-dom'
 
 const HeaderWrapper = styled.div`
   background: ${props => props.theme.header.backgroundColor};
@@ -62,7 +64,7 @@ const MainMenuStyled = styled(MainMenu)`
   }
 `
 
-export const Header: React.FC = props => {
+const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   const context = useWeb3Context()
 
   const { ...restProps } = props
@@ -73,8 +75,8 @@ export const Header: React.FC = props => {
   return (
     <HeaderWrapper {...restProps}>
       <HeaderInner>
-        <MainMenuStyled />
-        <MobileMenuStyled toggleMenu={toggleMenu} isMenuOpen={isMenuOpen} />
+        <MainMenuStyled {...restProps} />
+        <MobileMenuStyled toggleMenu={toggleMenu} isMenuOpen={isMenuOpen} {...restProps} />
         <ConnectedWeb3>
           <NetworkStyled />
           <LogoutStyled
@@ -96,3 +98,5 @@ export const Header: React.FC = props => {
     </HeaderWrapper>
   )
 }
+
+export const Header = withRouter(HeaderContainer)
