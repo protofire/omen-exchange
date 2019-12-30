@@ -28,19 +28,6 @@ export enum Stage {
   Closed = 2,
 }
 
-export enum StatusMarketCreation {
-  Ready = 'Ready',
-  PostingQuestion = 'Posting question to realitio',
-  PrepareCondition = 'Prepare condition',
-  ApprovingCollateral = 'Approving collateral',
-  CreateMarketMaker = 'Create market maker',
-  ApproveCollateralForMarketMaker = 'Approve collateral for market maker',
-  AddFunding = 'Add funding in market maker',
-  InitialTradeInMarketMaker = 'initial trade in market maker',
-  Done = 'Done',
-  Error = 'Error',
-}
-
 export interface TokenAmountInterface {
   amount: BigNumber
   decimals: number
@@ -120,9 +107,4 @@ export interface Arbitrator {
 export enum Wallet {
   MetaMask = 'MetaMask',
   WalletConnect = 'WalletConnect',
-}
-
-export interface CollateralCustomEvent {
-  name: string
-  value: string
 }
