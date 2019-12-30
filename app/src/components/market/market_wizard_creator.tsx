@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
@@ -16,7 +16,7 @@ import { MARKET_FEE } from '../../common/constants'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { Outcome } from '../common/outcomes'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { getDefaultToken } from '../../util/networks'
+import { getDefaultToken, getToken } from '../../util/networks'
 import { MarketCreationStatus } from '../../util/market_creation_status_data'
 
 export interface MarketData {
@@ -45,10 +45,11 @@ interface State {
 
 export const MarketWizardCreator = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { networkId } = context
 
   const { callback, marketCreationStatus, questionId, marketMakerAddress } = props
 
-  const defaultCollateral = getDefaultToken(context.networkId)
+  const defaultCollateral = getDefaultToken(networkId)
 
   const marketDataDefault: MarketData = {
     collateral: defaultCollateral,
@@ -73,6 +74,31 @@ export const MarketWizardCreator = (props: Props) => {
 
   const [currentStep, setCurrentStep] = useState(1)
   const [marketData, setMarketdata] = useState<MarketData>(marketDataDefault)
+
+  useEffect(() => {
+    let isSubscribed = true
+
+    const fetchNewCollateral = async () => {
+      const collateral = getToken(
+        networkId,
+        marketData.collateral.symbol.toLowerCase() as KnownToken,
+      )
+      const newMarketData = {
+        ...marketData,
+        collateral: collateral,
+      }
+
+      if (isSubscribed) {
+        setMarketdata(newMarketData)
+      }
+    }
+
+    fetchNewCollateral()
+
+    return () => {
+      isSubscribed = false
+    }
+  }, [networkId])
 
   const next = (): void => {
     const actualCurrentStep = currentStep >= 3 ? 4 : currentStep + 1
