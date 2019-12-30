@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
@@ -32,6 +32,7 @@ import { ButtonType } from '../../common/button_styling_types'
 import { Well } from '../common/well'
 import { Paragraph } from '../common/paragraph'
 import { MARKET_FEE } from '../../common/constants'
+import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -81,55 +82,55 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const marketMakerService = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [balanceItem, setBalanceItem] = useState<BalanceItem>()
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
+  const [balanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
-  const [tradedCollateral, setTradedCollateral] = useState<Maybe<BigNumber>>(null)
-  const [costFee, setCostFee] = useState<Maybe<BigNumber>>(null)
   const [message, setMessage] = useState<string>('')
-  const [pricesAfterTrade, setPricesAfterTrade] = useState<Maybe<number[]>>(null)
 
   const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
 
-  useEffect(() => {
-    setBalanceItem(balances[outcomeIndex])
+  const calcSellAmount = useMemo(
+    () => async (): Promise<[Maybe<number[]>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
+      const holdings = balances.map(balance => balance.holdings)
+      const holdingsOfSoldOutcome = holdings[outcomeIndex]
+      const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
+        return index !== outcomeIndex
+      })
 
-    const holdings = balances.map(balance => balance.holdings)
-    const holdingsOfSoldOutcome = holdings[outcomeIndex]
-    const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
-      return index !== outcomeIndex
-    })
-
-    const amountToSell = calcSellAmountInCollateral(
-      amountShares,
-      holdingsOfSoldOutcome,
-      holdingsOfOtherOutcomes,
-      marketFeeWithTwoDecimals,
-    )
-
-    if (!amountToSell) {
-      setPricesAfterTrade(null)
-      setCostFee(null)
-      setTradedCollateral(null)
-      logger.warn(
-        `Could not compute amount of collateral to sell for '${amountShares.toString()}' and '${holdingsOfSoldOutcome.toString()}'`,
+      const amountToSell = calcSellAmountInCollateral(
+        amountShares,
+        holdingsOfSoldOutcome,
+        holdingsOfOtherOutcomes,
+        marketFeeWithTwoDecimals,
       )
-      return
-    }
 
-    const balanceAfterTrade = computeBalanceAfterTrade(
-      holdings,
-      outcomeIndex,
-      amountToSell.mul(-1), // negate amounts because it's a sale
-      amountShares.mul(-1),
-    )
+      if (!amountToSell) {
+        logger.warn(
+          `Could not compute amount of collateral to sell for '${amountShares.toString()}' and '${holdingsOfSoldOutcome.toString()}'`,
+        )
+        return [null, null, null]
+      }
 
-    const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
+      const balanceAfterTrade = computeBalanceAfterTrade(
+        holdings,
+        outcomeIndex,
+        amountToSell.mul(-1), // negate amounts because it's a sale
+        amountShares.mul(-1),
+      )
 
-    setPricesAfterTrade(pricesAfterTrade)
-    setCostFee(mulBN(amountToSell, marketFeeWithTwoDecimals))
-    setTradedCollateral(amountToSell)
-  }, [outcomeIndex, amountShares, balances, collateral, marketFeeWithTwoDecimals])
+      const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
+      const costFee = mulBN(amountToSell, marketFeeWithTwoDecimals)
+
+      return [pricesAfterTrade, costFee, amountToSell]
+    },
+    [outcomeIndex, balances, amountShares, marketFeeWithTwoDecimals],
+  )
+
+  const [pricesAfterTrade, costFee, tradedCollateral] = useAsyncDerivedValue(
+    '',
+    [null, null, null],
+    calcSellAmount,
+  )
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
 
