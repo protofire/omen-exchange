@@ -6,7 +6,7 @@ import { Button } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
 import { CreateCard } from '../../../common/create_card'
-import { StatusMarketCreation, Token } from '../../../../util/types'
+import { Token } from '../../../../util/types'
 import { Paragraph } from '../../../common/paragraph'
 import { FullLoading } from '../../../common/full_loading'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
@@ -18,6 +18,11 @@ import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ButtonType } from '../../../../common/button_styling_types'
+import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
+import { getLogger } from '../../../../util/logger'
+import { ERC20Service } from '../../../../services'
+
+const logger = getLogger('MarketCreationItems::CreateMarketStep')
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -48,15 +53,16 @@ interface Props {
     funding: BigNumber
     outcomes: Outcome[]
   }
-  status: StatusMarketCreation
+  marketCreationStatus: MarketCreationStatus
   questionId: string | null
   marketMakerAddress: string | null
 }
 
 const CreateMarketStep = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { library: provider, account, networkId } = context
 
-  const { marketMakerAddress, values, status, questionId } = props
+  const { marketMakerAddress, values, marketCreationStatus, questionId } = props
   const {
     collateral,
     question,
@@ -72,13 +78,31 @@ const CreateMarketStep = (props: Props) => {
     props.back()
   }
 
-  const submit = () => {
-    props.submit()
+  const submit = async () => {
+    try {
+      if (account) {
+        const collateralService = new ERC20Service(provider, account, collateral.address)
+
+        const hasEnoughBalanceToFund = await collateralService.hasEnoughBalanceToFund(
+          account,
+          funding,
+        )
+        if (!hasEnoughBalanceToFund) {
+          throw new Error('there are not enough collateral balance for funding')
+        }
+      }
+
+      props.submit()
+    } catch (err) {
+      logger.error(err)
+    }
   }
 
-  const arbitrator = getArbitrator(context.networkId, arbitratorId)
+  const arbitrator = getArbitrator(networkId, arbitratorId)
 
   const resolutionDate = resolution && formatDate(resolution)
+
+  const buttonText = account ? 'Create' : 'Connect Wallet'
 
   return (
     <CreateCard>
@@ -152,22 +176,29 @@ const CreateMarketStep = (props: Props) => {
           </Grid>
         </>
       ) : null}
-      {status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error ? (
-        <FullLoading message={`${status}...`} />
+      {!MarketCreationStatus.is.ready(marketCreationStatus) &&
+      !MarketCreationStatus.is.error(marketCreationStatus) ? (
+        <FullLoading message={`${marketCreationStatus._type}...`} />
       ) : null}
       <ButtonContainer>
         <ButtonLinkStyled
-          disabled={status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error}
+          disabled={
+            !MarketCreationStatus.is.ready(marketCreationStatus) &&
+            !MarketCreationStatus.is.error(marketCreationStatus)
+          }
           onClick={back}
         >
           ‹ Back
         </ButtonLinkStyled>
         <Button
           buttonType={ButtonType.primary}
-          disabled={status !== StatusMarketCreation.Ready && status !== StatusMarketCreation.Error}
+          disabled={
+            !MarketCreationStatus.is.ready(marketCreationStatus) &&
+            !MarketCreationStatus.is.error(marketCreationStatus)
+          }
           onClick={submit}
         >
-          Create
+          {buttonText}
         </Button>
       </ButtonContainer>
     </CreateCard>

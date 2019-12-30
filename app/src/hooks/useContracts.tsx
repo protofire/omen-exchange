@@ -10,8 +10,7 @@ import {
 } from '../services'
 
 export const useContracts = (context: ConnectedWeb3Context) => {
-  const { library, networkId } = context
-  const account = context.account
+  const { library, networkId, account } = context
 
   const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
   const conditionalTokens = useMemo(
