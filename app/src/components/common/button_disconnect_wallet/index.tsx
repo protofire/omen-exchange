@@ -8,7 +8,6 @@ const ButtonStyled = styled(Button)`
   font-size: 13px;
   height: 28px;
   margin-left: 11px;
-
 `
 interface Props {
   callback: () => void
@@ -31,10 +30,7 @@ export const ButtonDisconnectWallet = (props: Props) => {
   }
 
   return (
-    <ButtonStyled
-      buttonType={ButtonType.secondary}
-      onClick={logout}
-    >
+    <ButtonStyled buttonType={ButtonType.secondary} onClick={logout}>
       DISCONNECT
     </ButtonStyled>
   )
