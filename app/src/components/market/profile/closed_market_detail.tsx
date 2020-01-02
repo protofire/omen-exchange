@@ -30,24 +30,6 @@ const Grid = styled.div`
   }
 `
 
-const ButtonContainerStyled = styled(ButtonContainer)`
-  display: grid;
-  grid-row-gap: 10px;
-  grid-template-columns: 1fr;
-
-  > button {
-    margin-left: 0;
-  }
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: flex;
-
-    > button {
-      margin-left: 10px;
-    }
-  }
-`
-
 interface Props {
   theme?: any
   balances: BalanceItem[]
@@ -174,15 +156,14 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <Grid>
           <TitleValue title="Collateral" value={collateralFormat} />
         </Grid>
-
-        <ButtonContainerStyled>
+        <ButtonContainer>
           {winningOutcome && !winningOutcome.shares.isZero() && (
             <Button onClick={() => redeem()}>Redeem</Button>
           )}
           {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() ? (
             <Button onClick={resolveCondition}>Resolve Condition</Button>
           ) : null}
-        </ButtonContainerStyled>
+        </ButtonContainer>
       </ViewCard>
       {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>

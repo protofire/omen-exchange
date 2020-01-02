@@ -14,9 +14,8 @@ export interface ButtonProps {
 
 export interface ButtonComponentProps {
   buttonType?: ButtonType
-  children: ReactNode
+  children?: ReactNode
   onClick?: (e?: any) => void
-  type?: 'button' | 'submit' | 'reset' | undefined
 }
 
 const DisabledCSS = css`
