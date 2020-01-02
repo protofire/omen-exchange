@@ -69,7 +69,7 @@ const OutcomesStep = (props: Props) => {
   const error =
     totalProbabilities !== 100 || someEmptyName || someEmptyProbability || outcomes.length < 2
 
-  const isAddNewOutcomeButtonDisabled = outcomes.length >= MAX_OUTCOME_ALLOWED
+  const isAddNewOutcomeButtonDisabled = outcomes.length >= MAX_OUTCOME_ALLOWED || !newOutcomeName
 
   const addNewOutcome = () => {
     const newOutcome = {
