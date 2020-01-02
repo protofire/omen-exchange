@@ -63,7 +63,7 @@ const OutcomesStep = (props: Props) => {
   }
 
   if (outcomes.length < 2) {
-    errorMessages.push('The quantity of outcomes should be equal or greater than 2.')
+    errorMessages.push('Please enter at least 2 outcomes')
   }
 
   const error =
