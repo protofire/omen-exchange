@@ -90,7 +90,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
 
   const calcSellAmount = useMemo(
-    () => async (): Promise<[Maybe<number[]>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
+    () => async (
+      amountShares: BigNumber,
+    ): Promise<[Maybe<number[]>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
       const holdings = balances.map(balance => balance.holdings)
       const holdingsOfSoldOutcome = holdings[outcomeIndex]
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
@@ -123,11 +125,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       return [pricesAfterTrade, costFee, amountToSell]
     },
-    [outcomeIndex, balances, amountShares, marketFeeWithTwoDecimals],
+    [outcomeIndex, balances, marketFeeWithTwoDecimals],
   )
 
   const [pricesAfterTrade, costFee, tradedCollateral] = useAsyncDerivedValue(
-    '',
+    amountShares,
     [null, null, null],
     calcSellAmount,
   )
