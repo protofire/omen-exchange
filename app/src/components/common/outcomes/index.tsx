@@ -225,7 +225,8 @@ const Outcomes = (props: Props) => {
           <strong>Total:</strong> {outcomes.length} outcomes
         </TotalTitle>
         <TotalValue>
-          <TotalValueColor error={totalProbabilities > 100}>{totalProbabilities}</TotalValueColor>%
+          <TotalValueColor error={totalProbabilities !== 100}>{totalProbabilities}</TotalValueColor>
+          %
         </TotalValue>
       </TotalWrapper>
     </OutcomesWrapper>
