@@ -128,6 +128,8 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const resolutionFormat = resolution ? formatDate(resolution) : ''
   const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
 
+  const probabilities = balances.map(balance => Math.round((balance.probability / 100) * 100))
+
   return (
     <>
       <ClosedMarket date={resolutionFormat} />
@@ -136,9 +138,10 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <OutcomeTable
           balances={balances}
           collateral={collateralToken}
-          disabledColumns={[OutcomeTableValue.CurrentPrice, OutcomeTableValue.PriceAfterTrade]}
+          disabledColumns={[OutcomeTableValue.CurrentPrice]}
           withWinningOutcome={true}
           displayRadioSelection={false}
+          probabilities={probabilities}
         />
 
         <SubsectionTitle>Details</SubsectionTitle>

@@ -163,6 +163,8 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
     ? `You don't have enough collateral in your balance.`
     : ''
 
+  const probabilities = balances.map(balance => Math.round((balance.probability / 100) * 100))
+
   return (
     <>
       <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
@@ -170,13 +172,10 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         <SubsectionTitleStyled>Fund this market</SubsectionTitleStyled>
         <OutcomeTable
           balances={balances}
-          disabledColumns={[
-            OutcomeTableValue.CurrentPrice,
-            OutcomeTableValue.Payout,
-            OutcomeTableValue.PriceAfterTrade,
-          ]}
+          disabledColumns={[OutcomeTableValue.CurrentPrice, OutcomeTableValue.Payout]}
           displayRadioSelection={false}
           collateral={collateral}
+          probabilities={probabilities}
         />
         <AmountWrapper
           formField={

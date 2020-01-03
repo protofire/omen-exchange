@@ -41,12 +41,6 @@ exports[`should accept a selected outcome 1`] = `
             >
               Payout
             </th>
-            <th
-              class="sc-ifAKCX ipPSVf"
-              colspan="1"
-            >
-              Price after trade
-            </th>
           </tr>
         </thead>
         <tbody
@@ -129,7 +123,7 @@ exports[`should accept a selected outcome 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG dxyKLL"
                       color="#acacac"
                       width="50"
                     />
@@ -154,14 +148,6 @@ exports[`should accept a selected outcome 1`] = `
               class="sc-EHOje cxvido"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje cxvido"
-            >
-               
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
           <tr
@@ -233,7 +219,7 @@ exports[`should accept a selected outcome 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG dxyKLL"
                       color="#acacac"
                       width="50"
                     />
@@ -258,14 +244,6 @@ exports[`should accept a selected outcome 1`] = `
               class="sc-EHOje cxvido"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje cxvido"
-            >
-               
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
         </tbody>
@@ -316,12 +294,6 @@ exports[`should hide radio selections 1`] = `
             >
               Payout
             </th>
-            <th
-              class="sc-ifAKCX ipPSVf"
-              colspan="1"
-            >
-              Price after trade
-            </th>
           </tr>
         </thead>
         <tbody
@@ -357,7 +329,7 @@ exports[`should hide radio selections 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG dxyKLL"
                       color="#acacac"
                       width="50"
                     />
@@ -382,14 +354,6 @@ exports[`should hide radio selections 1`] = `
               class="sc-EHOje cxvido"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje cxvido"
-            >
-               
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
           <tr
@@ -422,7 +386,7 @@ exports[`should hide radio selections 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG dxyKLL"
                       color="#acacac"
                       width="50"
                     />
@@ -447,14 +411,6 @@ exports[`should hide radio selections 1`] = `
               class="sc-EHOje cxvido"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje cxvido"
-            >
-               
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
         </tbody>
@@ -505,12 +461,6 @@ exports[`should show no as winning token 1`] = `
             >
               Payout
             </th>
-            <th
-              class="sc-ifAKCX ipPSVf"
-              colspan="1"
-            >
-              Price after trade
-            </th>
           </tr>
         </thead>
         <tbody
@@ -555,7 +505,7 @@ exports[`should show no as winning token 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG dxyKLL"
                       color="#acacac"
                       width="50"
                     />
@@ -580,14 +530,6 @@ exports[`should show no as winning token 1`] = `
               class="sc-EHOje sc-kAzzGY foKdFt"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje sc-kAzzGY foKdFt"
-            >
-               
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
           <tr
@@ -623,7 +565,7 @@ exports[`should show no as winning token 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG dxyKLL"
                       color="#acacac"
                       width="50"
                     />
@@ -649,14 +591,6 @@ exports[`should show no as winning token 1`] = `
             >
               0.00
             </td>
-            <td
-              class="sc-EHOje sc-kAzzGY CGYbl"
-            >
-               
-              <strong>
-                DAI
-              </strong>
-            </td>
           </tr>
         </tbody>
       </table>
@@ -665,7 +599,7 @@ exports[`should show no as winning token 1`] = `
 </DocumentFragment>
 `;
 
-exports[`should show prices after trade 1`] = `
+exports[`should show probabilities 1`] = `
 <DocumentFragment>
   <div
     class="sc-cSHVUG cUnUqJ"
@@ -705,12 +639,6 @@ exports[`should show prices after trade 1`] = `
               colspan="1"
             >
               Payout
-            </th>
-            <th
-              class="sc-ifAKCX ipPSVf"
-              colspan="1"
-            >
-              Price after trade
             </th>
           </tr>
         </thead>
@@ -779,16 +707,16 @@ exports[`should show prices after trade 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      0.75%
                     </p>
                   </div>
                   <div
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
-                      color="#acacac"
-                      width="50"
+                      class="sc-jzJRlG ihXpTy"
+                      color="#00be95"
+                      width="0.75"
                     />
                   </div>
                 </div>
@@ -811,14 +739,6 @@ exports[`should show prices after trade 1`] = `
               class="sc-EHOje cxvido"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje cxvido"
-            >
-              0.7500 
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
           <tr
@@ -883,16 +803,16 @@ exports[`should show prices after trade 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      0.25%
                     </p>
                   </div>
                   <div
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG hupGLW"
                       color="#acacac"
-                      width="50"
+                      width="0.25"
                     />
                   </div>
                 </div>
@@ -915,14 +835,6 @@ exports[`should show prices after trade 1`] = `
               class="sc-EHOje cxvido"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje cxvido"
-            >
-              0.2500 
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
         </tbody>
@@ -973,12 +885,6 @@ exports[`should show yes as winning token 1`] = `
             >
               Payout
             </th>
-            <th
-              class="sc-ifAKCX ipPSVf"
-              colspan="1"
-            >
-              Price after trade
-            </th>
           </tr>
         </thead>
         <tbody
@@ -1023,7 +929,7 @@ exports[`should show yes as winning token 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG dxyKLL"
                       color="#acacac"
                       width="50"
                     />
@@ -1048,14 +954,6 @@ exports[`should show yes as winning token 1`] = `
               class="sc-EHOje sc-kAzzGY foKdFt"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje sc-kAzzGY foKdFt"
-            >
-               
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
           <tr
@@ -1091,7 +989,7 @@ exports[`should show yes as winning token 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG dxyKLL"
                       color="#acacac"
                       width="50"
                     />
@@ -1116,14 +1014,6 @@ exports[`should show yes as winning token 1`] = `
               class="sc-EHOje sc-kAzzGY CGYbl"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje sc-kAzzGY CGYbl"
-            >
-               
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
         </tbody>
@@ -1167,12 +1057,6 @@ exports[`should work with disabled columns 1`] = `
               colspan="1"
             >
               Shares
-            </th>
-            <th
-              class="sc-ifAKCX ipPSVf"
-              colspan="1"
-            >
-              Price after trade
             </th>
           </tr>
         </thead>
@@ -1248,7 +1132,7 @@ exports[`should work with disabled columns 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG dxyKLL"
                       color="#acacac"
                       width="50"
                     />
@@ -1268,14 +1152,6 @@ exports[`should work with disabled columns 1`] = `
               class="sc-EHOje cxvido"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje cxvido"
-            >
-               
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
           <tr
@@ -1347,7 +1223,7 @@ exports[`should work with disabled columns 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG dxyKLL"
                       color="#acacac"
                       width="50"
                     />
@@ -1367,14 +1243,6 @@ exports[`should work with disabled columns 1`] = `
               class="sc-EHOje cxvido"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje cxvido"
-            >
-               
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
         </tbody>
@@ -1425,12 +1293,6 @@ exports[`should work with minimal props 1`] = `
             >
               Payout
             </th>
-            <th
-              class="sc-ifAKCX ipPSVf"
-              colspan="1"
-            >
-              Price after trade
-            </th>
           </tr>
         </thead>
         <tbody
@@ -1505,7 +1367,7 @@ exports[`should work with minimal props 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG dxyKLL"
                       color="#acacac"
                       width="50"
                     />
@@ -1530,14 +1392,6 @@ exports[`should work with minimal props 1`] = `
               class="sc-EHOje cxvido"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje cxvido"
-            >
-               
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
           <tr
@@ -1609,7 +1463,7 @@ exports[`should work with minimal props 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG ckyZEE"
+                      class="sc-jzJRlG dxyKLL"
                       color="#acacac"
                       width="50"
                     />
@@ -1634,14 +1488,6 @@ exports[`should work with minimal props 1`] = `
               class="sc-EHOje cxvido"
             >
               0.00
-            </td>
-            <td
-              class="sc-EHOje cxvido"
-            >
-               
-              <strong>
-                DAI
-              </strong>
             </td>
           </tr>
         </tbody>

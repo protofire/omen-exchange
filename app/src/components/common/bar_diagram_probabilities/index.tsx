@@ -68,6 +68,7 @@ const Progress = styled.div<ProgressBarProps>`
   border-radius: 3px;
   height: 100%;
   width: ${props => props.width}%;
+  transition: width 1s;
 `
 
 interface Props extends HTMLAttributes<HTMLButtonElement> {
