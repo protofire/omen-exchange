@@ -100,7 +100,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       })
 
       const amountToSell = calcSellAmountInCollateral(
-        amountShares,
+        amountShares.mul(99999).div(100000),
         holdingsOfSoldOutcome,
         holdingsOfOtherOutcomes,
         marketFeeWithTwoDecimals,
