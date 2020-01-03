@@ -25,7 +25,7 @@ const buildFilterFn = (filter: MarketFilter, contracts: Contracts) => async (
 
     return poolShares.gt(0)
   } else if (
-    MarketFilter.is.investedMarkets(filter) ||
+    MarketFilter.is.predictedOnMarkets(filter) ||
     MarketFilter.is.winningResultMarkets(filter)
   ) {
     const marketMakerService = buildMarketMaker(market.address)
@@ -35,7 +35,7 @@ const buildFilterFn = (filter: MarketFilter, contracts: Contracts) => async (
 
     const balances = await marketMakerService.getBalanceInformation(filter.account, outcomes.length)
 
-    if (MarketFilter.is.investedMarkets(filter) && !isFinalized) {
+    if (MarketFilter.is.predictedOnMarkets(filter) && !isFinalized) {
       const balancesGreaterThanZero = balances.filter((balanceBN: BigNumber) => balanceBN.gt(0))
       return balancesGreaterThanZero.length > 0
     }
