@@ -1,5 +1,5 @@
 import React from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import { Button } from '../button'
 import { ButtonType } from '../../../common/button_styling_types'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
