@@ -4,17 +4,17 @@ import { BigNumber } from 'ethers/utils'
 import { usePolling } from './usePolling'
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { ERC20Service, MarketMakerService } from '../services'
-import { getArbitratorFromAddress } from '../util/addresses'
+import { getArbitratorFromAddress } from '../util/networks'
 import { useContracts } from './useContracts'
 import { getLogger } from '../util/logger'
-import { BalanceItem, OutcomeSlot, Status, Token, Arbitrator } from '../util/types'
+import { BalanceItem, Status, Token, Arbitrator } from '../util/types'
 
 const logger = getLogger('Market::useMarketMakerData')
 
 interface MarketMakerData {
   totalPoolShares: BigNumber
   userPoolShares: BigNumber
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   winnerOutcome: Maybe<number>
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
@@ -34,6 +34,7 @@ export const useMarketMakerData = (
   context: ConnectedWeb3Context,
 ): { marketMakerData: MarketMakerData; status: Status } => {
   const { conditionalTokens, realitio, buildMarketMaker } = useContracts(context)
+  const { library: provider, networkId, account } = context
 
   const [status, setStatus] = useState(Status.Ready)
 
@@ -41,7 +42,7 @@ export const useMarketMakerData = (
     () => ({
       totalPoolShares: new BigNumber(0),
       userPoolShares: new BigNumber(0),
-      balance: [],
+      balances: [],
       winnerOutcome: null,
       marketMakerFunding: new BigNumber(0),
       marketMakerUserFunding: new BigNumber(0),
@@ -60,7 +61,6 @@ export const useMarketMakerData = (
 
   const fetchFunc = useCallback(async () => {
     setStatus(status => (status === Status.Ready ? Status.Loading : Status.Refreshing))
-    const provider = context.library
     const user = await provider.getSigner().getAddress()
 
     const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -69,11 +69,15 @@ export const useMarketMakerData = (
     const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
 
     const questionId = await conditionalTokens.getQuestionId(conditionId)
-    const { question, resolution, arbitratorAddress, category } = await realitio.getQuestion(
-      questionId,
-    )
+    const {
+      question,
+      resolution,
+      arbitratorAddress,
+      category,
+      outcomes,
+    } = await realitio.getQuestion(questionId)
 
-    const arbitrator = getArbitratorFromAddress(context.networkId, arbitratorAddress)
+    const arbitrator = getArbitratorFromAddress(networkId, arbitratorAddress)
 
     const [
       userShares,
@@ -86,8 +90,8 @@ export const useMarketMakerData = (
       fee,
       isQuestionFinalized,
     ] = await Promise.all([
-      marketMaker.getBalanceInformation(user),
-      marketMaker.getBalanceInformation(marketMakerAddress),
+      marketMaker.getBalanceInformation(user, outcomes.length),
+      marketMaker.getBalanceInformation(marketMakerAddress, outcomes.length),
       marketMaker.getTotalSupply(),
       marketMaker.balanceOf(user),
       marketMaker.getCollateralToken(),
@@ -101,37 +105,33 @@ export const useMarketMakerData = (
 
     const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
-    const erc20Service = new ERC20Service(provider, collateralAddress)
+    const erc20Service = new ERC20Service(provider, account, collateralAddress)
     const collateral = await erc20Service.getProfileSummary()
 
-    const probabilityForYes = actualPrices.actualPriceForYes * 100
-    const probabilityForNo = actualPrices.actualPriceForNo * 100
+    const balances: BalanceItem[] = outcomes.map((outcome: string, index: number) => {
+      const outcomeName = outcome
+      const probabilityForPrice = actualPrices[index] * 100
+      const probability = Math.round((probabilityForPrice / 100) * 100)
+      const currentPrice = actualPrices[index]
+      const shares = userShares[index]
+      const holdings = marketMakerShares[index]
 
-    const balance = [
-      {
-        outcomeName: OutcomeSlot.Yes,
-        probability: Math.round((probabilityForYes / 100) * 100),
-        currentPrice: actualPrices.actualPriceForYes,
-        shares: userShares.balanceOfForYes,
-        holdings: marketMakerShares.balanceOfForYes,
-        winningOutcome: winnerOutcome === 1,
-      },
-      {
-        outcomeName: OutcomeSlot.No,
-        probability: Math.round((probabilityForNo / 100) * 100),
-        currentPrice: actualPrices.actualPriceForNo,
-        shares: userShares.balanceOfForNo,
-        holdings: marketMakerShares.balanceOfForNo,
-        winningOutcome: winnerOutcome === 0,
-      },
-    ]
+      return {
+        outcomeName,
+        probability,
+        currentPrice,
+        shares,
+        holdings,
+        winningOutcome: winnerOutcome === index,
+      }
+    })
 
     setStatus(Status.Done)
 
     return {
       totalPoolShares,
       userPoolShares,
-      balance,
+      balances,
       arbitrator,
       winnerOutcome,
       question,
@@ -147,8 +147,9 @@ export const useMarketMakerData = (
     }
   }, [
     conditionalTokens,
-    context.library,
-    context.networkId,
+    provider,
+    networkId,
+    account,
     marketMakerAddress,
     realitio,
     buildMarketMaker,

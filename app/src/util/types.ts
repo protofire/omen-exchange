@@ -14,7 +14,7 @@ export enum OutcomeSlot {
 }
 
 export interface BalanceItem {
-  outcomeName: OutcomeSlot
+  outcomeName: string
   probability: number
   currentPrice: number
   shares: BigNumber
@@ -26,19 +26,6 @@ export enum Stage {
   Running = 0,
   Paused = 1,
   Closed = 2,
-}
-
-export enum StatusMarketCreation {
-  Ready = 'Ready',
-  PostingQuestion = 'Posting question to realitio',
-  PrepareCondition = 'Prepare condition',
-  ApprovingCollateral = 'Approving collateral',
-  CreateMarketMaker = 'Create market maker',
-  ApproveCollateralForMarketMaker = 'Approve collateral for market maker',
-  AddFunding = 'Add funding in market maker',
-  InitialTradeInMarketMaker = 'initial trade in market maker',
-  Done = 'Done',
-  Error = 'Error',
 }
 
 export interface TokenAmountInterface {
@@ -63,6 +50,7 @@ export interface Question {
   resolution: Maybe<Date>
   arbitratorAddress: string
   category: string
+  outcomes: string[]
 }
 
 export enum OutcomeTableValue {
@@ -84,6 +72,7 @@ export interface QuestionLog {
   lang: string
   title: string
   type: string
+  outcomes?: string[]
 }
 
 export interface Market {
@@ -95,7 +84,7 @@ export interface Market {
 
 export enum MarketStatus {
   Open = 'Open',
-  Resolved = 'Resolved',
+  Closed = 'Closed',
 }
 
 export type MarketWithExtraData = Market &
@@ -118,9 +107,4 @@ export interface Arbitrator {
 export enum Wallet {
   MetaMask = 'MetaMask',
   WalletConnect = 'WalletConnect',
-}
-
-export interface CollateralCustomEvent {
-  name: string
-  value: string
 }

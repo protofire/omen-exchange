@@ -8,7 +8,6 @@ import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
 import { ButtonContainer } from '../../../common/button_container'
-import { ButtonCSS } from '../../../common/button'
 import { SectionTitle } from '../../../common/section_title'
 import { CopyText } from '../../../common/copy_text'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
@@ -17,10 +16,8 @@ import { useQuestion } from '../../../../hooks/useQuestion'
 import { FullLoading } from '../../../common/full_loading'
 import { NavLink } from 'react-router-dom'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
-
-const TableStyled = styled(Table)`
-  margin-bottom: 25px;
-`
+import { ButtonAnchor } from '../../../common/button_anchor'
+import { MARKET_FEE } from '../../../../common/constants'
 
 const NavLinkStyled = styled(NavLink)`
   color: ${props => props.theme.colors.textColor};
@@ -43,10 +40,8 @@ const TitleValueStyled = styled(TitleValue)`
   margin-bottom: 14px;
 `
 
-const MainButton = styled.a`
-  ${ButtonCSS}
+const Button = styled(ButtonAnchor)`
   flex-grow: 1;
-  text-decoration: none;
 `
 
 interface Props {
@@ -60,7 +55,7 @@ const SummaryMarketStep = (props: Props) => {
 
   const { question, resolution, category } = useQuestion(marketMakerAddress, context)
   const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
-  const { marketMakerFunding, balance, collateral, arbitrator } = marketMakerData
+  const { marketMakerFunding, collateral, arbitrator, balances } = marketMakerData
 
   const resolutionDate = resolution && formatDate(resolution)
   const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`
@@ -90,7 +85,7 @@ const SummaryMarketStep = (props: Props) => {
           <TitleValue title={'Category'} value={category} />
           <TitleValue title={'Resolution date'} value={resolutionDate} />
           <TitleValue title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
-          <TitleValue title={'Spread / Fee'} value={`1%`} />
+          <TitleValue title={'Spread / Fee'} value={`${MARKET_FEE}%`} />
           <TitleValue
             title={'Funding'}
             value={[
@@ -100,7 +95,7 @@ const SummaryMarketStep = (props: Props) => {
           />
         </Grid>
         <SubsectionTitle>Outcomes</SubsectionTitle>
-        <TableStyled
+        <Table
           head={
             <THead>
               <TR>
@@ -109,8 +104,9 @@ const SummaryMarketStep = (props: Props) => {
               </TR>
             </THead>
           }
+          maxHeight="130px"
         >
-          {balance.map((item, index) => {
+          {balances.map((item, index) => {
             return (
               <TR key={index}>
                 <TD>{item.outcomeName}</TD>
@@ -118,11 +114,11 @@ const SummaryMarketStep = (props: Props) => {
               </TR>
             )
           })}
-        </TableStyled>
+        </Table>
         <ButtonContainer>
-          <MainButton rel="noopener noreferrer" href={`/#/${marketMakerAddress}`} target="_blank">
-            Go to Market
-          </MainButton>
+          <Button rel="noopener noreferrer" href={`/#/${marketMakerAddress}`} target="_blank">
+            View Market
+          </Button>
         </ButtonContainer>
       </CreateCard>
     </>

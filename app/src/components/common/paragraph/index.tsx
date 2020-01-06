@@ -2,12 +2,16 @@ import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
 const ParagraphWrapper = styled.div`
+  color: #555;
   font-size: 14px;
   font-weight: normal;
   line-height: 1.36;
   margin: 0 0 20px;
   text-align: left;
-  color: #555;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 
   a {
     color: #555;

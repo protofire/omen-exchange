@@ -52,7 +52,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             MarketFilter.allMarkets(),
             MarketFilter.myMarkets(context.account),
             MarketFilter.fundedMarkets(context.account),
-            MarketFilter.investedMarkets(context.account),
+            MarketFilter.predictedOnMarkets(context.account),
             MarketFilter.winningResultMarkets(context.account),
           ]}
           onFilterChange={onFilterChange}
@@ -62,7 +62,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         {RemoteData.hasData(markets) &&
           markets.data.length > 0 &&
           markets.data.slice(0, count).map(item => {
-            return <ListItem key={item.conditionId} data={item}></ListItem>
+            return <ListItem key={`${item.address}_${item.conditionId}`} data={item}></ListItem>
           })}
         {RemoteData.is.success(markets) && markets.data.length === 0 && (
           <NoMarketsAvailable title={'No markets available'} />

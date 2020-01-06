@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components'
 import Icon from './img/icon.svg'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { truncateStringInTheMiddle } from '../../../util/tools'
-import { getContractAddressName } from '../../../util/addresses'
+import { getContractAddressName } from '../../../util/networks'
 
 const NetworkWrapper = styled.div`
   align-items: center;

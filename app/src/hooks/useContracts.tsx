@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { ConnectedWeb3Context } from './connectedWeb3'
-import { getContractAddress } from '../util/addresses'
+import { getContractAddress } from '../util/networks'
 import {
   ConditionalTokenService,
   MarketMakerService,
@@ -10,8 +10,7 @@ import {
 } from '../services'
 
 export const useContracts = (context: ConnectedWeb3Context) => {
-  const { library, networkId } = context
-  const account = context.account
+  const { library, networkId, account } = context
 
   const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
   const conditionalTokens = useMemo(

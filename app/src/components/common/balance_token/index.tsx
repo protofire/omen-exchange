@@ -1,50 +1,56 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 
-import { ButtonLink } from '../button_link'
 import { BigNumber } from 'ethers/utils'
 import { useAsyncDerivedValue } from '../../../hooks/useAsyncDerivedValue'
 import { formatBigNumber } from '../../../util/tools'
 import { ERC20Service } from '../../../services'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { Token } from '../../../util/types'
+import { FormRowNote } from '../form_row_note'
+import { FormRowLink } from '../form_row_link'
 
 interface Props {
   collateral: Token
   onClickMax: (collateral: Token, collateralBalance: BigNumber) => void
 }
 
-const Wrapper = styled.span`
+const Wrapper = styled.div`
+  align-items: center;
   display: flex;
-  flex-direction: row;
-  width: 100%;
-  padding-bottom: 5px;
+  justify-content: space-between;
+  margin: 0 0 5px 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `
 
-const BalanceTitle = styled.span`
-  margin-right: 10px;
-  margin-top: 3px;
+const Note = styled(FormRowNote)`
+  margin: 0 15px 0 0;
 `
 
 export const BalanceToken = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { account, library } = context
+  const { account, library: provider } = context
   const { collateral, onClickMax } = props
 
   const calculateBalanceAmount = useMemo(
     () => async (): Promise<[BigNumber, string, string]> => {
-      const collateralService = new ERC20Service(library, collateral.address)
+      const collateralService = new ERC20Service(provider, account, collateral.address)
 
       // TODO: fix with useConnectedWallet context
-      const collateralBalance = await collateralService.getCollateral(account || '')
+      const collateralBalance = account
+        ? await collateralService.getCollateral(account)
+        : new BigNumber(0)
       return [
         collateralBalance,
         formatBigNumber(collateralBalance, collateral.decimals),
         collateral.symbol,
       ]
     },
-    [account, library, collateral],
+    [account, provider, collateral],
   )
 
   const [collateralBalance, calculateBalanceAmountValue, collateralSymbol] = useAsyncDerivedValue(
@@ -55,10 +61,15 @@ export const BalanceToken = (props: Props) => {
 
   return (
     <Wrapper>
-      <BalanceTitle>
-        Balance {calculateBalanceAmountValue} {collateralSymbol}.
-      </BalanceTitle>
-      <ButtonLink onClick={() => onClickMax(collateral, collateralBalance)}>Max</ButtonLink>
+      <Note>
+        Balance{' '}
+        <strong>
+          {calculateBalanceAmountValue} {collateralSymbol}
+        </strong>
+      </Note>
+      <FormRowLink onClick={() => onClickMax(collateral, collateralBalance)}>
+        Add all funds
+      </FormRowLink>
     </Wrapper>
   )
 }

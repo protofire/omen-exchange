@@ -3,61 +3,63 @@
 exports[`should accept a selected outcome 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-cSHVUG cUnUqJ"
   >
-    <table
-      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
+    <div
+      class="sc-bdVaJa ietEQA"
     >
-      <thead
-        class="sc-htpNat KtFsv"
+      <table
+        class="sc-bwzfXH ivNcPN"
       >
-        <tr
-          class="sc-bxivhb gowuVX"
+        <thead
+          class="sc-htpNat KtFsv"
         >
-          <th
-            class="sc-ifAKCX ceeJPY"
-          />
-          <th
-            class="sc-ifAKCX ceeJPY"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            Outcome probabilities
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Current Price
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Shares
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Payout
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Price after trade
-          </th>
-        </tr>
-      </thead>
-      <tbody
-        class="sc-bZQynM bOrPFB"
-      >
-        <tr
-          class="sc-bxivhb gowuVX"
+            <th
+              class="sc-ifAKCX giynAj"
+              colspan="2"
+            >
+              Outcome probabilities
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Current Price
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Shares
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Payout
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Price after trade
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          class="sc-bZQynM bOrPFB"
         >
-          <td
-            class="sc-EHOje jDXqLu"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            <label
-              class="sc-cSHVUG kELJFl"
+            <td
+              class="sc-EHOje sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
+                class="sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_Yes"
               >
                 <svg
@@ -96,78 +98,80 @@ exports[`should accept a selected outcome 1`] = `
                   checked=""
                   name="outcome"
                   type="radio"
-                  value="Yes"
+                  value="0"
                 />
               </div>
-            </label>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            <div
-              class="sc-htoDjs bCdOla"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
             >
               <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
+                  class="sc-gZMcBi cwfHym"
                 >
-                  <span
-                    class="sc-VigVT fWbcJs"
+                  <div
+                    class="sc-gqjmRU kpOMxt"
                   >
-                    Yes
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
-                />
-                <div
-                  class="sc-gZMcBi kiRsF"
-                >
-                  50%
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      Yes
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+               
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-             
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-        <tr
-          class="sc-bxivhb gowuVX"
-        >
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-            <label
-              class="sc-cSHVUG kELJFl"
+            <td
+              class="sc-EHOje sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
+                class="sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_No"
               >
                 <svg
@@ -198,69 +202,75 @@ exports[`should accept a selected outcome 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="No"
+                  value="1"
                 />
               </div>
-            </label>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            <div
-              class="sc-htoDjs bCdOla"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
             >
               <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
+                  class="sc-gZMcBi cwfHym"
                 >
-                  <span
-                    class="sc-VigVT fWbcJs"
+                  <div
+                    class="sc-gqjmRU kpOMxt"
                   >
-                    No
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
-                />
-                <div
-                  class="sc-gZMcBi kiRsF"
-                >
-                  50%
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      No
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-             
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+               
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </DocumentFragment>
 `;
@@ -268,167 +278,188 @@ exports[`should accept a selected outcome 1`] = `
 exports[`should hide radio selections 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-cSHVUG cUnUqJ"
   >
-    <table
-      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
+    <div
+      class="sc-bdVaJa ietEQA"
     >
-      <thead
-        class="sc-htpNat KtFsv"
+      <table
+        class="sc-bwzfXH ivNcPN"
       >
-        <tr
-          class="sc-bxivhb gowuVX"
+        <thead
+          class="sc-htpNat KtFsv"
         >
-          <th
-            class="sc-ifAKCX ceeJPY"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            Outcome probabilities
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Current Price
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Shares
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Payout
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Price after trade
-          </th>
-        </tr>
-      </thead>
-      <tbody
-        class="sc-bZQynM bOrPFB"
-      >
-        <tr
-          class="sc-bxivhb gowuVX"
+            <th
+              class="sc-ifAKCX giynAj"
+              colspan="1"
+            >
+              Outcome probabilities
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Current Price
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Shares
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Payout
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Price after trade
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          class="sc-bZQynM bOrPFB"
         >
-          <td
-            class="sc-EHOje cxvido"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            <div
-              class="sc-htoDjs bCdOla"
+            <td
+              class="sc-EHOje cxvido"
             >
               <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
+                  class="sc-gZMcBi cwfHym"
                 >
-                  <span
-                    class="sc-VigVT fWbcJs"
+                  <div
+                    class="sc-gqjmRU kpOMxt"
                   >
-                    Yes
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
-                />
-                <div
-                  class="sc-gZMcBi kiRsF"
-                >
-                  50%
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      Yes
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+               
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-             
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-        <tr
-          class="sc-bxivhb gowuVX"
-        >
-          <td
-            class="sc-EHOje cxvido"
-          >
-            <div
-              class="sc-htoDjs bCdOla"
+            <td
+              class="sc-EHOje cxvido"
             >
               <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
+                  class="sc-gZMcBi cwfHym"
                 >
-                  <span
-                    class="sc-VigVT fWbcJs"
+                  <div
+                    class="sc-gqjmRU kpOMxt"
                   >
-                    No
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
-                />
-                <div
-                  class="sc-gZMcBi kiRsF"
-                >
-                  50%
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      No
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-             
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+               
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </DocumentFragment>
 `;
@@ -436,181 +467,200 @@ exports[`should hide radio selections 1`] = `
 exports[`should show no as winning token 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-cSHVUG cUnUqJ"
   >
-    <table
-      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
+    <div
+      class="sc-bdVaJa ietEQA"
     >
-      <thead
-        class="sc-htpNat KtFsv"
+      <table
+        class="sc-bwzfXH ivNcPN"
       >
-        <tr
-          class="sc-bxivhb gowuVX"
+        <thead
+          class="sc-htpNat KtFsv"
         >
-          <th
-            class="sc-ifAKCX ceeJPY"
-          />
-          <th
-            class="sc-ifAKCX ceeJPY"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            Outcome probabilities
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Current Price
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Shares
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Payout
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Price after trade
-          </th>
-        </tr>
-      </thead>
-      <tbody
-        class="sc-bZQynM bOrPFB"
-      >
-        <tr
-          class="sc-bxivhb gowuVX"
+            <th
+              class="sc-ifAKCX giynAj"
+              colspan="2"
+            >
+              Outcome probabilities
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Current Price
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Shares
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Payout
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Price after trade
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          class="sc-bZQynM bOrPFB"
         >
-          <td
-            class="sc-EHOje sc-jzJRlG kyBZSR"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            <div
-              class="sc-htoDjs bCdOla"
+            <td
+              class="sc-EHOje sc-kAzzGY foKdFt"
             >
               <div
-                class="sc-jTzLTM jprmas"
-              >
-                <img
-                  alt="Winning outcome"
-                  src="badge.svg"
-                />
-              </div>
-              <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
+                  class="sc-dnqmqq fBoLxT"
                 >
-                  <span
-                    class="sc-VigVT fWbcJs"
+                  <img
+                    alt="Winning Outcome"
+                    class="sc-iwsKbI jiPRqw"
+                    src="badge.svg"
+                  />
+                </div>
+                <div
+                  class="sc-gZMcBi cwfHym"
+                >
+                  <div
+                    class="sc-gqjmRU kpOMxt"
                   >
-                    No
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
-                />
-                <div
-                  class="sc-gZMcBi kiRsF"
-                >
-                  50%
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      No
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG kyBZSR"
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY foKdFt"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY foKdFt"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY foKdFt"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY foKdFt"
+            >
+               
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG kyBZSR"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG kyBZSR"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG kvRrbA"
-          >
-             
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-        <tr
-          class="sc-bxivhb gowuVX"
-        >
-          <td
-            class="sc-EHOje sc-jzJRlG dnMenI"
-          >
-            <div
-              class="sc-htoDjs bCdOla"
+            <td
+              class="sc-EHOje sc-kAzzGY CGYbl"
             >
               <div
-                class="sc-jTzLTM jprmas"
-              />
-              <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
-                >
-                  <span
-                    class="sc-VigVT fWbcJs"
-                  >
-                    Yes
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
+                  class="sc-dnqmqq fBoLxT"
                 />
                 <div
-                  class="sc-gZMcBi kiRsF"
+                  class="sc-gZMcBi cwfHym"
                 >
-                  50%
+                  <div
+                    class="sc-gqjmRU kpOMxt"
+                  >
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      Yes
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG dnMenI"
-          >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG dnMenI"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG dnMenI"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG ezannz"
-          >
-             
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY CGYbl"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY CGYbl"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY CGYbl"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY CGYbl"
+            >
+               
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </DocumentFragment>
 `;
@@ -618,61 +668,63 @@ exports[`should show no as winning token 1`] = `
 exports[`should show prices after trade 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-cSHVUG cUnUqJ"
   >
-    <table
-      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
+    <div
+      class="sc-bdVaJa ietEQA"
     >
-      <thead
-        class="sc-htpNat KtFsv"
+      <table
+        class="sc-bwzfXH ivNcPN"
       >
-        <tr
-          class="sc-bxivhb gowuVX"
+        <thead
+          class="sc-htpNat KtFsv"
         >
-          <th
-            class="sc-ifAKCX ceeJPY"
-          />
-          <th
-            class="sc-ifAKCX ceeJPY"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            Outcome probabilities
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Current Price
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Shares
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Payout
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Price after trade
-          </th>
-        </tr>
-      </thead>
-      <tbody
-        class="sc-bZQynM bOrPFB"
-      >
-        <tr
-          class="sc-bxivhb gowuVX"
+            <th
+              class="sc-ifAKCX giynAj"
+              colspan="2"
+            >
+              Outcome probabilities
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Current Price
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Shares
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Payout
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Price after trade
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          class="sc-bZQynM bOrPFB"
         >
-          <td
-            class="sc-EHOje jDXqLu"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            <label
-              class="sc-cSHVUG kELJFl"
+            <td
+              class="sc-EHOje sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
+                class="sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_Yes"
               >
                 <svg
@@ -703,78 +755,80 @@ exports[`should show prices after trade 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="Yes"
+                  value="0"
                 />
               </div>
-            </label>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            <div
-              class="sc-htoDjs bCdOla"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
             >
               <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
+                  class="sc-gZMcBi cwfHym"
                 >
-                  <span
-                    class="sc-VigVT fWbcJs"
+                  <div
+                    class="sc-gqjmRU kpOMxt"
                   >
-                    Yes
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
-                />
-                <div
-                  class="sc-gZMcBi kiRsF"
-                >
-                  50%
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      Yes
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.7500 
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-            0.7500 
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-        <tr
-          class="sc-bxivhb gowuVX"
-        >
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-            <label
-              class="sc-cSHVUG kELJFl"
+            <td
+              class="sc-EHOje sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
+                class="sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_No"
               >
                 <svg
@@ -805,69 +859,75 @@ exports[`should show prices after trade 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="No"
+                  value="1"
                 />
               </div>
-            </label>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            <div
-              class="sc-htoDjs bCdOla"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
             >
               <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
+                  class="sc-gZMcBi cwfHym"
                 >
-                  <span
-                    class="sc-VigVT fWbcJs"
+                  <div
+                    class="sc-gqjmRU kpOMxt"
                   >
-                    No
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
-                />
-                <div
-                  class="sc-gZMcBi kiRsF"
-                >
-                  50%
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      No
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-            0.2500 
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.2500 
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </DocumentFragment>
 `;
@@ -875,181 +935,200 @@ exports[`should show prices after trade 1`] = `
 exports[`should show yes as winning token 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-cSHVUG cUnUqJ"
   >
-    <table
-      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
+    <div
+      class="sc-bdVaJa ietEQA"
     >
-      <thead
-        class="sc-htpNat KtFsv"
+      <table
+        class="sc-bwzfXH ivNcPN"
       >
-        <tr
-          class="sc-bxivhb gowuVX"
+        <thead
+          class="sc-htpNat KtFsv"
         >
-          <th
-            class="sc-ifAKCX ceeJPY"
-          />
-          <th
-            class="sc-ifAKCX ceeJPY"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            Outcome probabilities
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Current Price
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Shares
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Payout
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Price after trade
-          </th>
-        </tr>
-      </thead>
-      <tbody
-        class="sc-bZQynM bOrPFB"
-      >
-        <tr
-          class="sc-bxivhb gowuVX"
+            <th
+              class="sc-ifAKCX giynAj"
+              colspan="2"
+            >
+              Outcome probabilities
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Current Price
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Shares
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Payout
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Price after trade
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          class="sc-bZQynM bOrPFB"
         >
-          <td
-            class="sc-EHOje sc-jzJRlG kyBZSR"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            <div
-              class="sc-htoDjs bCdOla"
+            <td
+              class="sc-EHOje sc-kAzzGY foKdFt"
             >
               <div
-                class="sc-jTzLTM jprmas"
-              >
-                <img
-                  alt="Winning outcome"
-                  src="badge.svg"
-                />
-              </div>
-              <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
+                  class="sc-dnqmqq fBoLxT"
                 >
-                  <span
-                    class="sc-VigVT fWbcJs"
+                  <img
+                    alt="Winning Outcome"
+                    class="sc-iwsKbI jiPRqw"
+                    src="badge.svg"
+                  />
+                </div>
+                <div
+                  class="sc-gZMcBi cwfHym"
+                >
+                  <div
+                    class="sc-gqjmRU kpOMxt"
                   >
-                    Yes
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
-                />
-                <div
-                  class="sc-gZMcBi kiRsF"
-                >
-                  50%
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      Yes
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG kyBZSR"
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY foKdFt"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY foKdFt"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY foKdFt"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY foKdFt"
+            >
+               
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG kyBZSR"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG kyBZSR"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG kvRrbA"
-          >
-             
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-        <tr
-          class="sc-bxivhb gowuVX"
-        >
-          <td
-            class="sc-EHOje sc-jzJRlG dnMenI"
-          >
-            <div
-              class="sc-htoDjs bCdOla"
+            <td
+              class="sc-EHOje sc-kAzzGY CGYbl"
             >
               <div
-                class="sc-jTzLTM jprmas"
-              />
-              <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
-                >
-                  <span
-                    class="sc-VigVT fWbcJs"
-                  >
-                    No
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
+                  class="sc-dnqmqq fBoLxT"
                 />
                 <div
-                  class="sc-gZMcBi kiRsF"
+                  class="sc-gZMcBi cwfHym"
                 >
-                  50%
+                  <div
+                    class="sc-gqjmRU kpOMxt"
+                  >
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      No
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG dnMenI"
-          >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG dnMenI"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG dnMenI"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje sc-jzJRlG ezannz"
-          >
-             
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY CGYbl"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY CGYbl"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY CGYbl"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje sc-kAzzGY CGYbl"
+            >
+               
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </DocumentFragment>
 `;
@@ -1057,56 +1136,57 @@ exports[`should show yes as winning token 1`] = `
 exports[`should work with disabled columns 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-cSHVUG cUnUqJ"
   >
-    <table
-      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
+    <div
+      class="sc-bdVaJa ietEQA"
     >
-      <thead
-        class="sc-htpNat KtFsv"
+      <table
+        class="sc-bwzfXH ivNcPN"
       >
-        <tr
-          class="sc-bxivhb gowuVX"
+        <thead
+          class="sc-htpNat KtFsv"
         >
-          <th
-            class="sc-ifAKCX ceeJPY"
-          />
-          <th
-            class="sc-ifAKCX ceeJPY"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            Outcome probabilities
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Current Price
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Shares
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Price after trade
-          </th>
-        </tr>
-      </thead>
-      <tbody
-        class="sc-bZQynM bOrPFB"
-      >
-        <tr
-          class="sc-bxivhb gowuVX"
+            <th
+              class="sc-ifAKCX giynAj"
+              colspan="2"
+            >
+              Outcome probabilities
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Current Price
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Shares
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Price after trade
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          class="sc-bZQynM bOrPFB"
         >
-          <td
-            class="sc-EHOje jDXqLu"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            <label
-              class="sc-cSHVUG kELJFl"
+            <td
+              class="sc-EHOje sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
+                class="sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_Yes"
               >
                 <svg
@@ -1137,73 +1217,75 @@ exports[`should work with disabled columns 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="Yes"
+                  value="0"
                 />
               </div>
-            </label>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            <div
-              class="sc-htoDjs bCdOla"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
             >
               <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
+                  class="sc-gZMcBi cwfHym"
                 >
-                  <span
-                    class="sc-VigVT fWbcJs"
+                  <div
+                    class="sc-gqjmRU kpOMxt"
                   >
-                    Yes
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
-                />
-                <div
-                  class="sc-gZMcBi kiRsF"
-                >
-                  50%
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      Yes
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+               
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-             
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-        <tr
-          class="sc-bxivhb gowuVX"
-        >
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-            <label
-              class="sc-cSHVUG kELJFl"
+            <td
+              class="sc-EHOje sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
+                class="sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_No"
               >
                 <svg
@@ -1234,64 +1316,70 @@ exports[`should work with disabled columns 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="No"
+                  value="1"
                 />
               </div>
-            </label>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            <div
-              class="sc-htoDjs bCdOla"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
             >
               <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
+                  class="sc-gZMcBi cwfHym"
                 >
-                  <span
-                    class="sc-VigVT fWbcJs"
+                  <div
+                    class="sc-gqjmRU kpOMxt"
                   >
-                    No
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
-                />
-                <div
-                  class="sc-gZMcBi kiRsF"
-                >
-                  50%
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      No
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-             
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+               
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </DocumentFragment>
 `;
@@ -1299,61 +1387,63 @@ exports[`should work with disabled columns 1`] = `
 exports[`should work with minimal props 1`] = `
 <DocumentFragment>
   <div
-    class="sc-bdVaJa cDoURO"
+    class="sc-cSHVUG cUnUqJ"
   >
-    <table
-      class="sc-fjdhpX kYdDSV sc-bwzfXH jwzwsZ"
+    <div
+      class="sc-bdVaJa ietEQA"
     >
-      <thead
-        class="sc-htpNat KtFsv"
+      <table
+        class="sc-bwzfXH ivNcPN"
       >
-        <tr
-          class="sc-bxivhb gowuVX"
+        <thead
+          class="sc-htpNat KtFsv"
         >
-          <th
-            class="sc-ifAKCX ceeJPY"
-          />
-          <th
-            class="sc-ifAKCX ceeJPY"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            Outcome probabilities
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Current Price
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Shares
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Payout
-          </th>
-          <th
-            class="sc-ifAKCX bourab"
-          >
-            Price after trade
-          </th>
-        </tr>
-      </thead>
-      <tbody
-        class="sc-bZQynM bOrPFB"
-      >
-        <tr
-          class="sc-bxivhb gowuVX"
+            <th
+              class="sc-ifAKCX giynAj"
+              colspan="2"
+            >
+              Outcome probabilities
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Current Price
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Shares
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Payout
+            </th>
+            <th
+              class="sc-ifAKCX ipPSVf"
+              colspan="1"
+            >
+              Price after trade
+            </th>
+          </tr>
+        </thead>
+        <tbody
+          class="sc-bZQynM bOrPFB"
         >
-          <td
-            class="sc-EHOje jDXqLu"
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            <label
-              class="sc-cSHVUG kELJFl"
+            <td
+              class="sc-EHOje sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
+                class="sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_Yes"
               >
                 <svg
@@ -1384,78 +1474,80 @@ exports[`should work with minimal props 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="Yes"
+                  value="0"
                 />
               </div>
-            </label>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            <div
-              class="sc-htoDjs bCdOla"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
             >
               <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
+                  class="sc-gZMcBi cwfHym"
                 >
-                  <span
-                    class="sc-VigVT fWbcJs"
+                  <div
+                    class="sc-gqjmRU kpOMxt"
                   >
-                    Yes
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
-                />
-                <div
-                  class="sc-gZMcBi kiRsF"
-                >
-                  50%
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      Yes
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+               
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+          <tr
+            class="sc-bxivhb gowuVX"
           >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-             
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-        <tr
-          class="sc-bxivhb gowuVX"
-        >
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-            <label
-              class="sc-cSHVUG kELJFl"
+            <td
+              class="sc-EHOje sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-kAzzGY cixBdn sc-gzVnrw WkcJn"
+                class="sc-gzVnrw WkcJn"
                 data-testid="outcome_table_radio_No"
               >
                 <svg
@@ -1486,69 +1578,75 @@ exports[`should work with minimal props 1`] = `
                 <input
                   name="outcome"
                   type="radio"
-                  value="No"
+                  value="1"
                 />
               </div>
-            </label>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            <div
-              class="sc-htoDjs bCdOla"
+            </td>
+            <td
+              class="sc-EHOje cxvido"
             >
               <div
-                class="sc-dnqmqq BIXUB"
+                class="sc-htoDjs fOXRuD"
               >
                 <div
-                  class="sc-gqjmRU buRbgl"
+                  class="sc-gZMcBi cwfHym"
                 >
-                  <span
-                    class="sc-VigVT fWbcJs"
+                  <div
+                    class="sc-gqjmRU kpOMxt"
                   >
-                    No
-                  </span>
-                </div>
-                <div
-                  class="sc-iwsKbI cdXeOC"
-                />
-                <div
-                  class="sc-gZMcBi kiRsF"
-                >
-                  50%
+                    <h2
+                      class="sc-VigVT eyMLak"
+                    >
+                      No
+                    </h2>
+                    <p
+                      class="sc-jTzLTM hqAejy"
+                    >
+                      50%
+                    </p>
+                  </div>
+                  <div
+                    class="sc-fjdhpX iZcRRn"
+                  >
+                    <div
+                      class="sc-jzJRlG ckyZEE"
+                      color="#acacac"
+                      width="50"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.5 
-            <strong>
-              DAI
-            </strong>
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje cxvido"
-          >
-            0.00
-          </td>
-          <td
-            class="sc-EHOje jDXqLu"
-          >
-             
-            <strong>
-              DAI
-            </strong>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.5000 
+              <strong>
+                DAI
+              </strong>
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+              0.00
+            </td>
+            <td
+              class="sc-EHOje cxvido"
+            >
+               
+              <strong>
+                DAI
+              </strong>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </DocumentFragment>
 `;

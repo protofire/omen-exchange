@@ -1,7 +1,7 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-const SubsectionTitleWrapper = styled.div`
+const SubsectionTitleWrapper = styled.h2`
   color: #000;
   font-size: 18px;
   font-weight: 500;

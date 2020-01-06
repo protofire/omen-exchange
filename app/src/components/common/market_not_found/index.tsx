@@ -19,26 +19,8 @@ const WrappedText = styled.div`
   letter-spacing: normal;
   text-align: left;
   color: #555555;
-  margin-top: 20px
-  margin-bottom: 10px
-`
-
-const ButtonContainerStyled = styled(ButtonContainer)`
-  display: grid;
-  grid-row-gap: 10px;
-  grid-template-columns: 1fr;
-
-  > button {
-    margin-left: 0;
-  }
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: flex;
-
-    > button {
-      margin-left: 10px;
-    }
-  }
+  margin-top: 20px;
+  margin-bottom: 10px;
 `
 
 const ButtonLinkStyled = styled(ButtonLink)`
@@ -57,9 +39,9 @@ const MarketNotFoundWrapper = (props: Props) => {
         <SubsectionTitle>Market Not Found</SubsectionTitle>
         <WrappedText>We couldn`&apos;t find the market with the provided address.</WrappedText>
         <WrappedText>Please check the URL and address and come back again.</WrappedText>
-        <ButtonContainerStyled>
+        <ButtonContainer>
           <ButtonLinkStyled onClick={() => props.history.push(`/`)}>‹ Home</ButtonLinkStyled>
-        </ButtonContainerStyled>
+        </ButtonContainer>
       </ViewCard>
     </>
   )

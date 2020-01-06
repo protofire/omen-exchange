@@ -4,8 +4,8 @@ import { BigNumber } from 'ethers/utils'
 import { ConditionalTokenService } from './conditional_token'
 import { RealitioService } from './realitio'
 import { getLogger } from '../util/logger'
-import { Market, MarketStatus, MarketWithExtraData, OutcomeSlot } from '../util/types'
-import { calcDistributionHint, divBN } from '../util/tools'
+import { Market, MarketStatus, MarketWithExtraData } from '../util/types'
+import { calcDistributionHint, calcPrice } from '../util/tools'
 
 const logger = getLogger('Services::MarketMaker')
 
@@ -70,10 +70,10 @@ class MarketMakerService {
     return this.contract.totalSupply()
   }
 
-  addInitialFunding = async (amount: BigNumber, initialOddsYes: number, initialOddsNo: number) => {
+  addInitialFunding = async (amount: BigNumber, initialOdds: number[]) => {
     logger.log(`Add funding to market maker ${amount}`)
 
-    const distributionHint = calcDistributionHint(initialOddsYes, initialOddsNo)
+    const distributionHint = calcDistributionHint(initialOdds)
 
     return this.addFunding(amount, distributionHint)
   }
@@ -84,6 +84,7 @@ class MarketMakerService {
     try {
       const overrides = {
         value: '0x0',
+        gasLimit: 750000,
       }
       const transactionObject = await this.contract.addFunding(amount, distributionHint, overrides)
       await this.provider.waitForTransaction(transactionObject.hash)
@@ -100,55 +101,47 @@ class MarketMakerService {
     })
   }
 
-  static getActualPrice = (balanceInformation: {
-    balanceOfForYes: BigNumber
-    balanceOfForNo: BigNumber
-  }): { actualPriceForYes: number; actualPriceForNo: number } => {
-    const { balanceOfForYes, balanceOfForNo } = balanceInformation
-
-    const totalBalance = balanceOfForYes.add(balanceOfForNo)
-    const actualPriceForYes = !totalBalance.isZero() ? divBN(balanceOfForNo, totalBalance) : 0
-    const actualPriceForNo = !totalBalance.isZero() ? divBN(balanceOfForYes, totalBalance) : 0
-
-    return {
-      actualPriceForYes,
-      actualPriceForNo,
-    }
+  static getActualPrice = (holdings: BigNumber[]): number[] => {
+    return calcPrice(holdings)
   }
 
   getBalanceInformation = async (
     ownerAddress: string,
-  ): Promise<{ balanceOfForYes: BigNumber; balanceOfForNo: BigNumber }> => {
+    outcomeQuantity: number,
+  ): Promise<BigNumber[]> => {
     const conditionId = await this.getConditionId()
     const collateralTokenAddress = await this.getCollateralToken()
 
-    const [collectionIdForYes, collectionIdForNo] = await Promise.all([
-      this.conditionalTokens.getCollectionIdForYes(conditionId),
-      this.conditionalTokens.getCollectionIdForNo(conditionId),
-    ])
-
-    const [positionIdForYes, positionIdForNo] = await Promise.all([
-      this.conditionalTokens.getPositionId(collateralTokenAddress, collectionIdForYes),
-      this.conditionalTokens.getPositionId(collateralTokenAddress, collectionIdForNo),
-    ])
-
-    const [balanceOfForYes, balanceOfForNo] = await Promise.all([
-      this.conditionalTokens.getBalanceOf(ownerAddress, positionIdForYes),
-      this.conditionalTokens.getBalanceOf(ownerAddress, positionIdForNo),
-    ])
-
-    return {
-      balanceOfForYes,
-      balanceOfForNo,
+    const balances = []
+    logger.debug(`Outcomes quantity ${outcomeQuantity}`)
+    for (let i = 0; i < outcomeQuantity; i++) {
+      const collectionId = await this.conditionalTokens.getCollectionIdForOutcome(
+        conditionId,
+        1 << i,
+      )
+      logger.debug(
+        `Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
+      )
+      const positionIdForCollectionId = await this.conditionalTokens.getPositionId(
+        collateralTokenAddress,
+        collectionId,
+      )
+      const balance = await this.conditionalTokens.getBalanceOf(
+        ownerAddress,
+        positionIdForCollectionId,
+      )
+      logger.debug(`Balance ${balance.toString()}`)
+      balances.push(balance)
     }
+
+    return balances
   }
 
   balanceOf = async (address: string): Promise<BigNumber> => {
     return this.contract.balanceOf(address)
   }
 
-  buy = async (amount: BigNumber, outcome: OutcomeSlot) => {
-    const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
+  buy = async (amount: BigNumber, outcomeIndex: number) => {
     try {
       const outcomeTokensToBuy = await this.contract.calcBuyAmount(amount, outcomeIndex)
       const transactionObject = await this.contract.buy(amount, outcomeIndex, outcomeTokensToBuy, {
@@ -157,20 +150,19 @@ class MarketMakerService {
       await this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
       logger.error(
-        `There was an error buying '${amount.toString()}' for outcome '${outcome}'`,
+        `There was an error buying '${amount.toString()}' for outcome '${outcomeIndex}'`,
         err.message,
       )
       throw err
     }
   }
 
-  calcBuyAmount = async (amount: BigNumber, outcome: OutcomeSlot): Promise<BigNumber> => {
-    const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
+  calcBuyAmount = async (amount: BigNumber, outcomeIndex: number): Promise<BigNumber> => {
     try {
       return this.contract.calcBuyAmount(amount, outcomeIndex)
     } catch (err) {
       logger.error(
-        `There was an error computing the buy amount for amount '${amount.toString()}' and outcome '${outcome}'`,
+        `There was an error computing the buy amount for amount '${amount.toString()}' and outcome index '${outcomeIndex}'`,
         err.message,
       )
       throw err
@@ -198,14 +190,13 @@ class MarketMakerService {
     }
   }
 
-  sell = async (amount: BigNumber, outcome: OutcomeSlot) => {
-    const outcomeIndex = outcome === OutcomeSlot.Yes ? 0 : 1
+  sell = async (amount: BigNumber, outcomeIndex: number) => {
     try {
       const outcomeTokensToSell = await this.contract.calcSellAmount(amount, outcomeIndex)
-
       const overrides = {
         value: '0x0',
       }
+
       const transactionObject = await this.contract.sell(
         amount,
         outcomeIndex,
@@ -215,7 +206,7 @@ class MarketMakerService {
       await this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
       logger.error(
-        `There was an error selling '${amount.toString()}' for outcome '${outcome}'`,
+        `There was an error selling '${amount.toString()}' for outcome index '${outcomeIndex}'`,
         err.message,
       )
       throw err
@@ -226,17 +217,22 @@ class MarketMakerService {
     const { conditionId } = market
     // Get question data
     const questionId = await this.conditionalTokens.getQuestionId(conditionId)
-    const { question, resolution, arbitratorAddress, category } = await this.realitio.getQuestion(
-      questionId,
-    )
-    // Know if a market is open or resolved
-    const isConditionResolved = await this.conditionalTokens.isConditionResolved(conditionId)
-    const marketStatus = isConditionResolved ? MarketStatus.Resolved : MarketStatus.Open
+    const {
+      question,
+      resolution,
+      arbitratorAddress,
+      category,
+      outcomes,
+    } = await this.realitio.getQuestion(questionId)
+    // Know if a market is open or closed
+    const isQuestionFinalized = await this.realitio.isFinalized(questionId)
+    const marketStatus = isQuestionFinalized ? MarketStatus.Closed : MarketStatus.Open
 
     const fee = await this.getFee()
 
     return {
       ...market,
+      outcomes,
       question,
       resolution,
       category,

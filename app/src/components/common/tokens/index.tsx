@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Select } from '../select'
-import { getTokensByNetwork } from '../../../util/addresses'
+import { getTokensByNetwork } from '../../../util/networks'
 import { Token } from '../../../util/types'
 
 interface Props {
