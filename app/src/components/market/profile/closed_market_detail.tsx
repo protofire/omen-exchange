@@ -156,14 +156,16 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <Grid>
           <TitleValue title="Collateral" value={collateralFormat} />
         </Grid>
-        <ButtonContainer>
-          {winningOutcome && !winningOutcome.shares.isZero() && (
-            <Button onClick={() => redeem()}>Redeem</Button>
-          )}
-          {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() ? (
-            <Button onClick={resolveCondition}>Resolve Condition</Button>
-          ) : null}
-        </ButtonContainer>
+        {account && (
+          <ButtonContainer>
+            {winningOutcome && !winningOutcome.shares.isZero() && (
+              <Button onClick={() => redeem()}>Redeem</Button>
+            )}
+            {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() ? (
+              <Button onClick={resolveCondition}>Resolve Condition</Button>
+            ) : null}
+          </ButtonContainer>
+        )}
       </ViewCard>
       {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>

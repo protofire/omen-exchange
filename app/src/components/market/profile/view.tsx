@@ -19,6 +19,7 @@ const SubsectionTitleStyled = styled(SubsectionTitle)`
 `
 
 interface Props extends RouteComponentProps<{}> {
+  account: Maybe<string>
   balances: BalanceItem[]
   collateral: Token
   arbitrator: Maybe<Arbitrator>
@@ -32,6 +33,7 @@ interface Props extends RouteComponentProps<{}> {
 
 const ViewWrapper = (props: Props) => {
   const {
+    account,
     balances,
     collateral,
     status,
@@ -98,15 +100,17 @@ const ViewWrapper = (props: Props) => {
         <SubsectionTitleStyled>Outcomes</SubsectionTitleStyled>
         {renderTableData()}
         {marketHasDetails && details()}
-        <ButtonContainer>
-          <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
-          {userHasShares && (
-            <ButtonAnchor href={`/#/${marketMakerAddress}/sell`}>Sell</ButtonAnchor>
-          )}
-          <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
-        </ButtonContainer>
+        {account && (
+          <ButtonContainer>
+            <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
+            {userHasShares && (
+              <ButtonAnchor href={`/#/${marketMakerAddress}/sell`}>Sell</ButtonAnchor>
+            )}
+            <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
+          </ButtonContainer>
+        )}
       </ViewCard>
-      <ThreeBoxComments threadName={marketMakerAddress} />
+      {account && <ThreeBoxComments threadName={marketMakerAddress} />}
       {status === Status.Loading ? <FullLoading /> : null}
     </>
   )

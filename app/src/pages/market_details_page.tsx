@@ -2,6 +2,7 @@ import React from 'react'
 import { RouteComponentProps } from 'react-router'
 
 import { MarketViewContainer } from '../components'
+import { MarketConnectionPage } from '../hooks/marketConnection'
 
 interface RouteParams {
   address: string
@@ -10,7 +11,11 @@ interface RouteParams {
 const MarketDetailsPage = (props: RouteComponentProps<RouteParams>) => {
   const marketMakerAddress = props.match.params.address
 
-  return <MarketViewContainer marketMakerAddress={marketMakerAddress} />
+  return (
+    <MarketConnectionPage>
+      <MarketViewContainer marketMakerAddress={marketMakerAddress} />
+    </MarketConnectionPage>
+  )
 }
 
 export { MarketDetailsPage }
