@@ -4,21 +4,21 @@ import styled from 'styled-components'
 import { Table, TD, TH, THead, TR } from '../table/index'
 import { RadioInput } from '../radio_input/index'
 import { formatBigNumber } from '../../../util/tools'
-import { BalanceItem, OutcomeSlot, OutcomeTableValue, Token } from '../../../util/types'
+import { BalanceItem, OutcomeTableValue, Token } from '../../../util/types'
 import { BarDiagram } from '../bar_diagram_probabilities'
 
 interface Props {
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   collateral: Token
-  pricesAfterTrade?: [number, number]
-  outcomeSelected?: OutcomeSlot
-  outcomeHandleChange?: (e: OutcomeSlot) => void
+  pricesAfterTrade?: number[]
+  outcomeSelected?: number
+  outcomeHandleChange?: (e: number) => void
   disabledColumns?: OutcomeTableValue[]
   withWinningOutcome?: boolean
   displayRadioSelection?: boolean
 }
 
-const TableStyled = styled(Table)`
+const TableWrapper = styled.div`
   margin-bottom: 30px;
 `
 
@@ -28,23 +28,18 @@ const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
   opacity: ${props => (props.winningOutcome ? '1' : '0.35')};
 `
 
+const TDNoHorizontalPadding = styled(TD)`
+  padding-left: 0;
+  padding-right: 0;
+`
+
 TDStyled.defaultProps = {
   winningOutcome: false,
 }
 
-const RadioContainer = styled.label`
-  align-items: center;
-  display: flex;
-  white-space: nowrap;
-`
-
-const RadioInputStyled = styled(RadioInput)`
-  margin-right: 6px;
-`
-
 export const OutcomeTable = (props: Props) => {
   const {
-    balance,
+    balances,
     collateral,
     pricesAfterTrade,
     outcomeSelected,
@@ -62,16 +57,27 @@ export const OutcomeTable = (props: Props) => {
     OutcomeTableValue.PriceAfterTrade,
   ]
 
-  const TableCellsAlign = ['left', 'right', 'right', 'right', 'right']
+  const outcomeMaxProbability = balances.reduce(
+    (max, balance, index, balances) =>
+      balance.probability > balances[max].probability ? index : max,
+    0,
+  )
+
+  const equalProbabilities = balances.every(b => b.probability === balances[0].probability)
+
+  const TableCellsAlign = ['left', 'right', 'right', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
     return (
       <THead>
         <TR>
-          {displayRadioSelection && <TH />}
           {TableHead.map((value, index) => {
             return !disabledColumns.includes(value) ? (
-              <TH textAlign={TableCellsAlign[index]} key={index}>
+              <TH
+                colSpan={index === 0 && displayRadioSelection ? 2 : 1}
+                textAlign={TableCellsAlign[index]}
+                key={index}
+              >
                 {value}
               </TH>
             ) : null
@@ -81,26 +87,28 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
-  const renderTableRow = (balanceItem: BalanceItem, priceAfterTrade?: number) => {
+  const renderTableRow = (
+    balanceItem: BalanceItem,
+    outcomeIndex: number,
+    priceAfterTrade?: number,
+  ) => {
     const { outcomeName, probability, currentPrice, shares, winningOutcome } = balanceItem
-    const isWinning = probability > 50
+    const isWinning = !equalProbabilities && outcomeIndex === outcomeMaxProbability
+
+    const currentPriceFormatted = Number(currentPrice).toFixed(4)
 
     return (
       <TR key={outcomeName}>
         {!displayRadioSelection || withWinningOutcome ? null : (
-          <TD textAlign={TableCellsAlign[0]}>
-            <RadioContainer>
-              <RadioInputStyled
-                data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
-                checked={outcomeSelected === outcomeName}
-                name="outcome"
-                onChange={(e: any) =>
-                  outcomeHandleChange && outcomeHandleChange(e.target.value as OutcomeSlot)
-                }
-                value={outcomeName}
-              />
-            </RadioContainer>
-          </TD>
+          <TDNoHorizontalPadding textAlign={TableCellsAlign[0]}>
+            <RadioInput
+              checked={outcomeSelected === outcomeIndex}
+              data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
+              name="outcome"
+              onChange={(e: any) => outcomeHandleChange && outcomeHandleChange(+e.target.value)}
+              value={outcomeIndex}
+            />
+          </TDNoHorizontalPadding>
         )}
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]} winningOutcome={winningOutcome}>
@@ -125,11 +133,11 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[2]} winningOutcome={winningOutcome}>
-            {currentPrice} <strong>{collateral.symbol}</strong>
+            {currentPriceFormatted} <strong>{collateral.symbol}</strong>
           </TDStyled>
         ) : (
           <TD textAlign={TableCellsAlign[2]}>
-            {currentPrice} <strong>{collateral.symbol}</strong>
+            {currentPriceFormatted} <strong>{collateral.symbol}</strong>
           </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.Shares) ? null : withWinningOutcome ? (
@@ -159,15 +167,18 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
-  const yesRow = renderTableRow(balance[0], pricesAfterTrade && pricesAfterTrade[0])
-  const noRow = renderTableRow(balance[1], pricesAfterTrade && pricesAfterTrade[1])
+  const renderTable = () =>
+    balances
+      .sort((a, b) => (a.winningOutcome === b.winningOutcome ? 0 : a.winningOutcome ? -1 : 1)) // Put winning outcome first
+      .map((balanceItem: BalanceItem, index) =>
+        renderTableRow(balanceItem, index, pricesAfterTrade && pricesAfterTrade[index]),
+      )
 
-  let rows = [yesRow, noRow]
-  if (withWinningOutcome) {
-    if (balance[1].winningOutcome) {
-      rows = [noRow, yesRow]
-    }
-  }
-
-  return <TableStyled head={renderTableHeader()}>{rows}</TableStyled>
+  return (
+    <TableWrapper>
+      <Table maxHeight="266px" head={renderTableHeader()}>
+        {renderTable()}
+      </Table>
+    </TableWrapper>
+  )
 }

@@ -16,16 +16,16 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
   const { marketMakerAddress } = props
   const { question, resolution } = useQuestion(marketMakerAddress, context)
   const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
-  const { balance, collateral } = marketMakerData
+  const { balances, collateral } = marketMakerData
 
-  if (!collateral || balance.length === 0) {
+  if (!collateral || balances.length === 0) {
     return <FullLoading />
   }
 
   return (
     <MarketBuy
       marketMakerAddress={marketMakerAddress}
-      balance={balance}
+      balances={balances}
       collateral={collateral}
       question={question}
       resolution={resolution}

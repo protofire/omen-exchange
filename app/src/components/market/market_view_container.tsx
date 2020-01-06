@@ -18,7 +18,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
 
   const {
     marketMakerFunding,
-    balance,
+    balances,
     collateral,
     question,
     questionId,
@@ -35,7 +35,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
 
   return (
     <MarketView
-      balance={balance}
+      balances={balances}
       funding={marketMakerFunding}
       marketMakerAddress={marketMakerAddress}
       status={status}

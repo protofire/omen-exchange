@@ -24,7 +24,7 @@ RUN git clone https://github.com/gnosis/conditional-tokens-market-makers.git && 
 
 RUN git clone https://github.com/fvictorio/realitio-gnosis-proxy && \
   cd realitio-gnosis-proxy && \
-  git checkout 4e7631b156ccdd972c8715802fa23b85b1c0ef4a && \
+  git checkout 040dce3e9c0c8edbb36767e7b029bbe6ccf1af4a && \
   yarn
 
 # deploy contracts in ganache

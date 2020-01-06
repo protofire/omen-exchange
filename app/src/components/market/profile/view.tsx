@@ -1,5 +1,5 @@
 import React from 'react'
-import styled, { withTheme } from 'styled-components'
+import styled from 'styled-components'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { ThreeBoxComments } from '../../common/three_box_comments'
@@ -12,58 +12,36 @@ import { SubsectionTitle } from '../../common/subsection_title'
 import { BigNumber } from 'ethers/utils'
 import { TitleValue } from '../../common/title_value'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
+import { GridThreeColumns } from '../../common/grid_three_columns'
+
+const SubsectionTitleStyled = styled(SubsectionTitle)`
+  margin-bottom: 0;
+`
 
 interface Props extends RouteComponentProps<{}> {
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   collateral: Token
   arbitrator: Maybe<Arbitrator>
   question: string
   questionId: string
   category: string
   status: Status
-  theme?: any
   marketMakerAddress: string
   funding: BigNumber
 }
 
-const ButtonContainerStyled = styled(ButtonContainer)`
-  display: grid;
-  grid-row-gap: 10px;
-  grid-template-columns: 1fr;
-
-  > a {
-    margin-left: 0;
-  }
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    grid-template-columns: 1fr 1fr 1fr;
-
-    > a {
-      margin-left: 10px;
-    }
-  }
-`
-const Grid = styled.div`
-  display: grid;
-  grid-column-gap: 20px;
-  grid-row-gap: 14px;
-  grid-template-columns: 1fr 1fr;
-  margin-bottom: 25px;
-`
-
 const ViewWrapper = (props: Props) => {
   const {
-    balance,
+    balances,
     collateral,
     status,
     questionId,
-    theme,
     marketMakerAddress,
     arbitrator,
     category,
   } = props
 
-  const userHasShares = balance.some((balanceItem: BalanceItem) => {
+  const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
     return !shares.isZero()
   })
@@ -75,7 +53,7 @@ const ViewWrapper = (props: Props) => {
     }
     return (
       <OutcomeTable
-        balance={balance}
+        balances={balances}
         collateral={collateral}
         displayRadioSelection={false}
         disabledColumns={disabledColumns}
@@ -87,7 +65,7 @@ const ViewWrapper = (props: Props) => {
     return (
       <>
         <SubsectionTitle>Details</SubsectionTitle>
-        <Grid>
+        <GridThreeColumns>
           {category && <TitleValue title={'Category'} value={category} />}
           <TitleValue
             title={'Arbitrator'}
@@ -107,7 +85,7 @@ const ViewWrapper = (props: Props) => {
               }
             />
           )}
-        </Grid>
+        </GridThreeColumns>
       </>
     )
   }
@@ -117,26 +95,21 @@ const ViewWrapper = (props: Props) => {
   return (
     <>
       <ViewCard>
-        {marketHasDetails && details()}
-        {userHasShares && <SubsectionTitle>Balance</SubsectionTitle>}
+        <SubsectionTitleStyled>Outcomes</SubsectionTitleStyled>
         {renderTableData()}
-        <ButtonContainerStyled>
+        {marketHasDetails && details()}
+        <ButtonContainer>
           <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
           {userHasShares && (
-            <ButtonAnchor
-              backgroundColor={theme.colors.secondary}
-              href={`/#/${marketMakerAddress}/sell`}
-            >
-              Sell
-            </ButtonAnchor>
+            <ButtonAnchor href={`/#/${marketMakerAddress}/sell`}>Sell</ButtonAnchor>
           )}
           <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
-        </ButtonContainerStyled>
-        <ThreeBoxComments threadName={marketMakerAddress} />
+        </ButtonContainer>
       </ViewCard>
+      <ThreeBoxComments threadName={marketMakerAddress} />
       {status === Status.Loading ? <FullLoading /> : null}
     </>
   )
 }
 
-export const View = withRouter(withTheme(ViewWrapper))
+export const View = withRouter(ViewWrapper)

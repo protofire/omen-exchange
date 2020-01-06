@@ -2,6 +2,7 @@ import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 import MenuIcon from './img/menu.svg'
 import { MainMenu } from '../main_menu'
+import { RouteComponentProps } from 'react-router-dom'
 
 const MobileMenuWrapper = styled.div`
   display: flex;
@@ -37,7 +38,7 @@ const MobileMenuOpacityContainer = styled.div`
   z-index: 12345;
 `
 
-interface Props extends HTMLAttributes<HTMLDivElement> {
+interface Props extends HTMLAttributes<HTMLDivElement>, RouteComponentProps {
   isMenuOpen: boolean
   toggleMenu: any
 }
@@ -50,7 +51,7 @@ export const MobileMenu: React.FC<Props> = (props: Props) => {
       <MobileMenuButton onClick={toggleMenu} />
       {isMenuOpen ? (
         <MobileMenuOpacityContainer onClick={toggleMenu}>
-          <MainMenu />
+          <MainMenu {...restProps} />
         </MobileMenuOpacityContainer>
       ) : null}
     </MobileMenuWrapper>

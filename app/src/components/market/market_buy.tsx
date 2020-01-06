@@ -4,7 +4,7 @@ import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
-import { BalanceItem, OutcomeSlot, Status, OutcomeTableValue, Token } from '../../util/types'
+import { BalanceItem, Status, OutcomeTableValue, Token } from '../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../common'
 import { ERC20Service, MarketMakerService } from '../../services'
 import { SubsectionTitle } from '../common/subsection_title'
@@ -15,6 +15,7 @@ import { getLogger } from '../../util/logger'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
 import { Well } from '../common/well'
+import { Paragraph } from '../common/paragraph'
 import { FullLoading } from '../common/full_loading'
 import { ButtonContainer } from '../common/button_container'
 import { ButtonLink } from '../common/button_link'
@@ -25,6 +26,8 @@ import { BigNumberInputReturn } from '../common/big_number_input'
 import { SectionTitle } from '../common/section_title'
 import { BalanceToken } from '../common/balance_token'
 import { useContracts } from '../../hooks/useContracts'
+import { ButtonType } from '../../common/button_styling_types'
+import { MARKET_FEE } from '../../common/constants'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -47,11 +50,19 @@ const FormLabelStyled = styled(FormLabel)`
   margin-bottom: 10px;
 `
 
+const SubsectionTitleStyled = styled(SubsectionTitle)`
+  margin-bottom: 0;
+`
+
+const BigNumberInputTextRight = styled<any>(BigNumberInput)`
+  text-align: right;
+`
+
 const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   collateral: Token
   question: string
   resolution: Maybe<Date>
@@ -59,43 +70,39 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { library: provider } = context
+
   const { buildMarketMaker } = useContracts(context)
 
-  const { marketMakerAddress, balance, collateral, question, resolution } = props
+  const { marketMakerAddress, balances, collateral, question, resolution } = props
   const marketMakerService = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [outcome, setOutcome] = useState<OutcomeSlot>(OutcomeSlot.Yes)
+  const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
 
-  const holdingsYes = balance[0].holdings
-  const holdingsNo = balance[1].holdings
-
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
-    () => async (amount: BigNumber): Promise<[BigNumber, number, number]> => {
-      const tradedShares = await marketMakerService.calcBuyAmount(amount, outcome)
+    () => async (amount: BigNumber): Promise<[BigNumber, number[]]> => {
+      const tradedShares = await marketMakerService.calcBuyAmount(amount, outcomeIndex)
       const balanceAfterTrade = computeBalanceAfterTrade(
-        holdingsYes,
-        holdingsNo,
-        outcome,
+        balances.map(b => b.holdings),
+        outcomeIndex,
         amount,
         tradedShares,
       )
-      const { actualPriceForYes, actualPriceForNo } = MarketMakerService.getActualPrice(
-        balanceAfterTrade,
-      )
+      const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
-      return [tradedShares, actualPriceForYes, actualPriceForNo]
+      return [tradedShares, pricesAfterTrade]
     },
-    [marketMakerService, outcome, holdingsYes, holdingsNo],
+    [balances, marketMakerService, outcomeIndex],
   )
 
-  const [tradedShares, priceAfterTradeForYes, priceAfterTradeForNo] = useAsyncDerivedValue(
+  const [tradedShares, pricesAfterTrade] = useAsyncDerivedValue(
     amount,
-    [new BigNumber(0), 0, 0],
+    [new BigNumber(0), balances.map(() => 0)],
     calcBuyAmount,
   )
 
@@ -103,24 +110,24 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     const valueNumber = +ethers.utils.formatUnits(amount, collateral.decimals)
 
     const weiPerUnit = ethers.utils.bigNumberify(10).pow(collateral.decimals)
+    const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
     const costWithFee = ethers.utils
-      .bigNumberify('' + Math.round(valueNumber * 1.01 * 10000)) // cast to string to avoid overflows
+      .bigNumberify('' + Math.round(valueNumber * (1 + marketFeeWithTwoDecimals) * 10000)) // cast to string to avoid overflows
       .mul(weiPerUnit)
       .div(10000)
     setCost(costWithFee)
-  }, [outcome, amount, balance, collateral])
+  }, [amount, collateral])
 
   const finish = async () => {
     try {
       setStatus(Status.Loading)
       setMessage(`Buying ${formatBigNumber(tradedShares, collateral.decimals)} shares ...`)
 
-      const provider = context.library
       const user = await provider.getSigner().getAddress()
 
       const collateralAddress = await marketMakerService.getCollateralToken()
 
-      const collateralService = new ERC20Service(provider, collateralAddress)
+      const collateralService = new ERC20Service(provider, user, collateralAddress)
 
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
         user,
@@ -136,7 +143,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         await collateralService.approve(marketMakerAddress, costWithErrorMargin)
       }
 
-      await marketMakerService.buy(amount, outcome)
+      await marketMakerService.buy(amount, outcomeIndex)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -155,10 +162,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           setAmount(collateralBalance)
         }
       />
-      You will be charged an extra 1% trade fee of &nbsp;
-      <strong>
-        {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}
-      </strong>
     </>
   )
 
@@ -166,20 +169,20 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
       <ViewCard>
-        <SubsectionTitle>Choose the shares you want to buy</SubsectionTitle>
+        <SubsectionTitleStyled>Choose the shares you want to buy</SubsectionTitleStyled>
         <OutcomeTable
-          balance={balance}
+          balances={balances}
           collateral={collateral}
-          pricesAfterTrade={[priceAfterTradeForYes, priceAfterTradeForNo]}
-          outcomeSelected={outcome}
-          outcomeHandleChange={(value: OutcomeSlot) => setOutcome(value)}
+          pricesAfterTrade={pricesAfterTrade}
+          outcomeSelected={outcomeIndex}
+          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           disabledColumns={[OutcomeTableValue.Payout]}
         />
         <AmountWrapper
           formField={
             <TextfieldCustomPlaceholder
               formField={
-                <BigNumberInput
+                <BigNumberInputTextRight
                   name="amount"
                   value={amount}
                   onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
@@ -202,22 +205,31 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             </TD>
           </TR>
           <TR>
-            <TD>&quot;{outcome}&quot; shares you get</TD>
+            <TD>&quot;{balances[outcomeIndex].outcomeName}&quot; shares you get</TD>
             <TD textAlign="right">
               {formatBigNumber(tradedShares, collateral.decimals)} <strong>shares</strong>
             </TD>
           </TR>
         </TableStyled>
         <Well>
-          <strong>1 shares</strong> can be redeemed for <strong>1 {collateral.symbol}</strong> in
-          case it represents the final outcome.
+          <Paragraph>
+            • <strong>1 shares</strong> can be redeemed for <strong>1 {collateral.symbol}</strong>{' '}
+            in case it represents the final outcome.
+          </Paragraph>
+          <Paragraph>
+            • You will be charged an extra {MARKET_FEE}% trade fee of &nbsp;
+            <strong>
+              {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}{' '}
+              {collateral.symbol}
+            </strong>
+          </Paragraph>
         </Well>
         <ButtonContainer>
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
-          <Button disabled={disabled} onClick={() => finish()}>
-            Finish
+          <Button buttonType={ButtonType.primary} disabled={disabled} onClick={() => finish()}>
+            Buy
           </Button>
         </ButtonContainer>
       </ViewCard>

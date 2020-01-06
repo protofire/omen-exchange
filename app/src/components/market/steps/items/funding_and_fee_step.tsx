@@ -15,6 +15,8 @@ import { CustomizableTokensSelect } from '../../../common/customizable_tokens_se
 import { Token } from '../../../../util/types'
 import { ERC20Service } from '../../../../services'
 import { useAsyncDerivedValue } from '../../../../hooks/useAsyncDerivedValue'
+import { FormError } from '../../../common/form_error'
+import { MARKET_FEE } from '../../../../common/constants'
 
 interface Props {
   back: () => void
@@ -22,7 +24,7 @@ interface Props {
   values: {
     collateral: Token
     collateralsCustom: Token[]
-    spread: string
+    spread: number
     funding: BigNumber
   }
   handleCollateralChange: (collateral: Token) => void
@@ -40,34 +42,31 @@ const TextfieldStyledRight = styled<any>(Textfield)`
   text-align: right;
 `
 
-const InputBigNumberStyledRight = styled<any>(BigNumberInput)`
+const BigNumberInputTextRight = styled<any>(BigNumberInput)`
   text-align: right;
-`
-
-const ErrorStyled = styled.span`
-  margin-top: 0px;
-  color: red;
-  font-weight: 500;
 `
 
 const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { library: provider, account } = context
 
   const { values, addCollateralCustom, handleChange, handleCollateralChange } = props
   const { funding, spread, collateral, collateralsCustom } = values
 
   const calculateCollateralBalance = useMemo(
     () => async (): Promise<BigNumber> => {
-      const collateralService = new ERC20Service(context.library, collateral.address)
-      const collateralBalance = await collateralService.getCollateral(context.account || '')
+      const collateralService = new ERC20Service(provider, account, collateral.address)
+      const collateralBalance = account
+        ? await collateralService.getCollateral(account)
+        : new BigNumber(0)
       return collateralBalance
     },
-    [context, collateral],
+    [provider, account, collateral],
   )
 
   const collateralBalance = useAsyncDerivedValue('', new BigNumber(0), calculateCollateralBalance)
 
-  const isFundingGreaterThanBalance = funding.gt(collateralBalance)
+  const isFundingGreaterThanBalance = account ? funding.gt(collateralBalance) : false
   const error = !spread || funding.isZero() || isFundingGreaterThanBalance
 
   const fundingMessageError = isFundingGreaterThanBalance
@@ -106,18 +105,18 @@ const FundingAndFeeStep = (props: Props) => {
         title={'Spread / Fee'}
         tooltip={{
           id: `spreadFee`,
-          description: `The fee taken from every trade. Temporarily fixed at 1%.`,
+          description: `The fee taken from every trade. Temporarily fixed at ${MARKET_FEE}%.`,
         }}
       />
       <FormRow
         formField={
           <CustomizableTokensSelect
-            context={context}
-            name="collateralId"
-            value={collateral}
-            customValues={collateralsCustom}
             addCustomValue={addCollateralCustom}
+            context={context}
+            customValues={collateralsCustom}
+            name="collateralId"
             onCollateralChange={handleCollateralChange}
+            value={collateral}
           />
         }
         title={'Collateral token'}
@@ -130,11 +129,11 @@ const FundingAndFeeStep = (props: Props) => {
         formField={
           <TextfieldCustomPlaceholder
             formField={
-              <InputBigNumberStyledRight
-                name="funding"
-                value={funding}
-                onChange={handleChange}
+              <BigNumberInputTextRight
                 decimals={collateral.decimals}
+                name="funding"
+                onChange={handleChange}
+                value={funding}
               />
             }
             placeholderText={collateral.symbol}
@@ -153,7 +152,7 @@ const FundingAndFeeStep = (props: Props) => {
                 handleChange({ name: 'funding', value: collateralBalance })
               }}
             />
-            <ErrorStyled>{fundingMessageError}</ErrorStyled>
+            <FormError>{fundingMessageError}</FormError>
           </>
         }
       />

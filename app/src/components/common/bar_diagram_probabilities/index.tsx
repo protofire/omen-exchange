@@ -1,126 +1,106 @@
 import React, { HTMLAttributes } from 'react'
-import styled from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 
 import WinningOutcomeBadge from './img/badge.svg'
+import theme from '../../../theme'
 
-interface ProbabilityProps {
-  isWinning: boolean
-  theme?: any
+interface ProgressBarProps {
+  color?: string
+  width: number
 }
 
-interface BarProps {
-  isWinning: boolean
-  percentage: number
-  theme?: any
-}
-
-const OutcomeBar = styled.div`
-  align-items: center;
-  border-sizing: border-box;
-  border-collapse: collapse;
-  color: #00193c;
+const BarDiagramWrapper = styled.div`
   display: flex;
-  font-size: 13;
-  height: 38px;
-  line-height: 21px;
-  min-width: 200px;
-  text-size-adjust: 100%;
+  min-width: 100px;
 `
 
-const Probability = styled.div<ProbabilityProps>`
-  border-color: ${props =>
-    props.isWinning ? props.theme.colors.primarySoft : props.theme.colors.secondarySoft};
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
+const BadgeWrapper = styled.div`
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-start;
+  width: 26px;
+`
+
+const BadgeImg = styled.img`
   display: block;
-  flex-basis: 0%;
+`
+
+const Outcome = styled.div`
   flex-grow: 1;
-  flex-shrink: 1;
-  height: 34px;
-  margin-bottom: 2px;
-  margin-left: 0px;
-  margin-right: 0px;
-  margin-top: 2px;
-  position: relative;
-  text-align: center;
 `
 
-const Bar = styled.div<BarProps>`
-  background-color: ${props =>
-    props.isWinning ? props.theme.colors.primarySoft : props.theme.colors.secondarySoft};
-  color: #00193c;
-  display: block;
-  height: 32px;
-  padding-bottom: 4px;
-  padding-left: 2px;
-  padding-right: 2px;
-  padding-top: 4px;
-  text-align: center;
-  width: ${props => props.percentage}%;
+const OutcomeText = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 3px;
 `
 
-const LabelAmount = styled.div`
-  color: #526877;
-  display: block;
-  font-size: 13px;
+const OutcomeName = styled.h2`
+  color: #000;
+  flex-grow: 1;
+  font-size: 12px;
   font-weight: 400;
-  line-height: 0px;
-  position: absolute;
-  right: 10px;
-  text-align: center;
-  top: 16px;
+  line-height: 1.2;
+  margin: 0 15px 0 0;
+  text-align: left;
 `
 
-const LabelOutcome = styled.div`
-  color: #00193c;
-  display: block;
-  left: 10px;
-  line-height: 0px;
-  position: absolute;
-  text-align: center;
-  top: 16px;
-  font-weight: 700;
+const OutcomeValue = styled.p`
+  color: #272727;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  text-align: right;
 `
 
-const OutcomeName = styled.span`
-  color: #00193c;
-  line-height: 0px;
-  text-align: center;
-  text-size-adjust: 100%;
-  font-weight: 700;
-  font-size: 13px;
+const ProgressBar = styled.div`
+  background-color: #f5f5f5;
+  border-radius: 3px;
+  height: 10px;
+  overflow: hidden;
 `
 
-const Badge = styled.div`
-  text-align: left
-  min-width: 20px;
+const Progress = styled.div<ProgressBarProps>`
+  background-color: ${props => props.color};
+  border-radius: 3px;
+  height: 100%;
+  width: ${props => props.width}%;
 `
 
 interface Props extends HTMLAttributes<HTMLButtonElement> {
+  isWinning: boolean
   outcomeName: string
   probability: number
-  isWinning: boolean
-  withWinningOutcome: boolean
+  theme?: any
   winningOutcome: boolean
+  withWinningOutcome: boolean
 }
 
-export const BarDiagram: React.FC<Props> = (props: Props) => {
+const BarDiagramComponent: React.FC<Props> = (props: Props) => {
   const { outcomeName, probability, isWinning, winningOutcome, withWinningOutcome } = props
+  const progressColor = isWinning ? theme.colors.primary : theme.colors.darkGray
 
   return (
-    <OutcomeBar>
+    <BarDiagramWrapper>
       {withWinningOutcome && (
-        <Badge>
-          {winningOutcome ? <img src={WinningOutcomeBadge} alt="Winning outcome" /> : null}
-        </Badge>
+        <BadgeWrapper>
+          {winningOutcome ? <BadgeImg src={WinningOutcomeBadge} alt="Winning Outcome" /> : null}
+        </BadgeWrapper>
       )}
-      <Probability isWinning={isWinning}>
-        <LabelOutcome>
+      <Outcome>
+        <OutcomeText>
           <OutcomeName>{outcomeName}</OutcomeName>
-        </LabelOutcome>
-        <Bar isWinning={isWinning} percentage={probability} />
-        <LabelAmount>{probability}%</LabelAmount>
-      </Probability>
-    </OutcomeBar>
+          <OutcomeValue>{probability}%</OutcomeValue>
+        </OutcomeText>
+        <ProgressBar>
+          <Progress color={progressColor} width={probability} />
+        </ProgressBar>
+      </Outcome>
+    </BarDiagramWrapper>
   )
 }
+
+export const BarDiagram = withTheme(BarDiagramComponent)

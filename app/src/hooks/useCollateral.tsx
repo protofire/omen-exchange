@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
-import { getTokenFromAddress } from '../util/addresses'
+import { getTokenFromAddress } from '../util/networks'
 import { ERC20Service } from '../services'
 import { Token } from '../util/types'
 
@@ -20,6 +20,8 @@ export const useCollateral = (
   collateralAddress: string,
   context: ConnectedWeb3Context,
 ): { collateral: Maybe<Token>; errorMessage: Maybe<string> } => {
+  const { library: provider, networkId, account } = context
+
   const [collateral, setCollateral] = useState<Maybe<Token>>(null)
   const [errorMessage, setErrorMessage] = useState<Maybe<string>>(null)
 
@@ -31,12 +33,12 @@ export const useCollateral = (
         return
       }
 
-      let newCollateral = getTokenFromAddressIfExists(context.networkId, collateralAddress)
+      let newCollateral = getTokenFromAddressIfExists(networkId, collateralAddress)
       let newErrorMessage: Maybe<string> = null
 
       // If the address doesn't belong to a knowToken, we fetch its metadata
       if (!newCollateral) {
-        const erc20Service = new ERC20Service(context.library, collateralAddress)
+        const erc20Service = new ERC20Service(provider, account, collateralAddress)
         const isValidErc20 = await erc20Service.isValidErc20()
         if (isValidErc20) {
           newCollateral = await erc20Service.getProfileSummary()
@@ -56,7 +58,7 @@ export const useCollateral = (
     return () => {
       isSubscribed = false
     }
-  }, [context, collateralAddress])
+  }, [provider, account, networkId, collateralAddress])
 
   return {
     collateral,

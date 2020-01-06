@@ -1,8 +1,8 @@
+import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import Big from 'big.js'
 import { BigNumber, getAddress, bigNumberify, formatUnits } from 'ethers/utils'
 
 import { getLogger } from './logger'
-import { OutcomeSlot } from './types'
 
 const logger = getLogger('Tools')
 
@@ -40,11 +40,16 @@ export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
 }
 
 /**
- * Computes the price of some outcome tokens, given the initial funding and the current holdings.
+ * Computes the price of each outcome token given their holdings. Returns an array of numbers in the range [0, 1]
  */
-export const calcPrice = (funding: BigNumber, holdings: BigNumber) => {
-  // 2^(-holding / funding)
-  return Math.pow(2, -divBN(holdings, funding))
+export const calcPrice = (holdingsBN: BigNumber[]): number[] => {
+  const holdings = holdingsBN.map(h => new Big(h.toString()))
+  const product = holdings.reduce((a, b) => a.mul(b))
+  const denominator = holdings.map(h => product.div(h)).reduce((a, b) => a.add(b))
+
+  const prices = holdings.map(holding => product.div(holding).div(denominator))
+
+  return prices.map(price => +price.valueOf())
 }
 
 /**
@@ -71,120 +76,80 @@ export const calcNetCost = (
 }
 
 /**
- * Computes the balance of the outcome tokens after trading
+ * Computes the balances of the outcome tokens after trading
  */
 export const computeBalanceAfterTrade = (
-  holdingsYes: BigNumber,
-  holdingsNo: BigNumber,
-  outcome: OutcomeSlot, // Outcome selected
+  holdings: BigNumber[],
+  outcomeIndex: number, // Outcome selected
   amountCollateralSpent: BigNumber, // Amount of collateral being spent
   amountShares: BigNumber, // amount of `outcome` shares being traded
-): { balanceOfForYes: BigNumber; balanceOfForNo: BigNumber } => {
-  let balanceOfForYes = holdingsYes.add(amountCollateralSpent)
-  let balanceOfForNo = holdingsNo.add(amountCollateralSpent)
-
-  if (outcome === OutcomeSlot.Yes) {
-    balanceOfForYes = balanceOfForYes.sub(amountShares)
-  } else {
-    balanceOfForNo = balanceOfForNo.sub(amountShares)
+): BigNumber[] => {
+  if (outcomeIndex < 0 || outcomeIndex >= holdings.length) {
+    throw new Error(
+      `Outcome index '${outcomeIndex}' must be between 0 and '${holdings.length}' - 1`,
+    )
   }
 
-  return { balanceOfForYes, balanceOfForNo }
+  return holdings.map((h, i) => {
+    return h.add(amountCollateralSpent).sub(i === outcomeIndex ? amountShares : bigNumberify(0))
+  })
 }
 
 /**
- * Computes the distribution hint that should be used for setting the initial odds to `initialOddsYes`
- * and `initialOddsNo`
+ * Computes the distribution hint that should be used for setting the initial odds to `initialOdds`
  */
-export const calcDistributionHint = (
-  initialOddsYes: number,
-  initialOddsNo: number,
-): BigNumber[] => {
-  const distributionHintYes = Math.sqrt(initialOddsNo / initialOddsYes)
-  const distributionHintNo = Math.sqrt(initialOddsYes / initialOddsNo)
+export const calcDistributionHint = (initialOdds: number[]): BigNumber[] => {
+  const initialOddsBig = initialOdds.map(x => new Big(x))
+  const product = initialOddsBig.reduce((a, b) => a.mul(b))
 
-  const distributionHint = [distributionHintYes, distributionHintNo]
-    .map(hint => Math.round(hint * 1000000))
-    .map(bigNumberify)
+  const distributionHint = initialOddsBig
+    .map(o => product.div(o))
+    .map(x => x.mul(1000000).round())
+    .map(x => bigNumberify(x.toString()))
 
   return distributionHint
 }
 
 /**
- * Computes the amount of collateral that needs to be sold to get `shares` amount of shares.
+ * Computes the amount of collateral that needs to be sold to get `shares` amount of shares. Returns null if the amount
+ * couldn't be computed.
  *
- * @param holdingsOfSoldOutcome How many tokens the market maker has of the outcome that is being sold
- * @param holdingsOfOtherOutcome How many tokens the market maker has of the outcome that is not being sold
- * @param shares The amount of shares that need to be sold
+ * @param sharesToSell The amount of shares that need to be sold
+ * @param holdings How many tokens the market maker has of the outcome that is being sold
+ * @param otherHoldings How many tokens the market maker has of the outcomes that are not being sold
  * @param fee The fee of the market maker, between 0 and 1
  */
 export const calcSellAmountInCollateral = (
-  holdingsOfSoldOutcome: BigNumber,
-  holdingsOfOtherOutcome: BigNumber,
-  shares: BigNumber,
+  sharesToSell: BigNumber,
+  holdings: BigNumber,
+  otherHoldings: BigNumber[],
   fee: number,
-): BigNumber => {
+): Maybe<BigNumber> => {
   Big.DP = 90
 
-  const x = new Big(holdingsOfOtherOutcome.toString())
-  const y = new Big(holdingsOfSoldOutcome.toString())
-  const a = new Big(shares.toString())
-  const f = new Big(fee)
-  const termInsideSqrt = a
-    .pow(2)
-    .mul(f.pow(2))
-    .add(
-      a
-        .pow(2)
-        .mul(f)
-        .mul(2),
-    )
-    .add(a.pow(2))
-    .add(
-      a
-        .mul(f.pow(2))
-        .mul(y)
-        .mul(2),
-    )
-    .minus(
-      a
-        .mul(f)
-        .mul(x)
-        .mul(2),
-    )
-    .add(
-      a
-        .mul(f)
-        .mul(y)
-        .mul(4),
-    )
-    .minus(a.mul(x).mul(2))
-    .add(a.mul(y).mul(2))
-    .add(f.pow(2).mul(y.pow(2)))
-    .add(
-      f
-        .mul(x)
-        .mul(y)
-        .mul(2),
-    )
-    .add(f.mul(y.pow(2)).mul(2))
-    .add(x.pow(2))
-    .add(x.mul(y).mul(2))
-    .add(y.pow(2))
+  const sharesToSellBig = new Big(sharesToSell.toString())
+  const holdingsBig = new Big(holdings.toString())
+  const otherHoldingsBig = otherHoldings.map(x => new Big(x.toString()))
 
-  const amountToSellBig = termInsideSqrt
-    .sqrt()
-    .mul(-1)
-    .add(a.mul(f))
-    .add(a)
-    .add(f.mul(y))
-    .add(x)
-    .add(y)
-    .div(f.add(1).mul(2))
+  const f = (r: Big) => {
+    const numerator = otherHoldingsBig.reduce((a, b) => a.mul(b), holdingsBig)
+    const denominator = otherHoldingsBig
+      .map(h => h.minus(r).minus(r.mul(fee)))
+      .reduce((a, b) => a.mul(b))
+    return holdingsBig
+      .minus(r)
+      .plus(sharesToSellBig)
+      .minus(numerator.div(denominator))
+  }
 
-  const amountToSell = bigNumberify(amountToSellBig.toFixed(0))
+  const r = newtonRaphson(f, 0)
 
-  return amountToSell
+  if (r) {
+    const amountToSell = bigNumberify(r.toFixed(0))
+    return amountToSell
+  }
+
+  return null
 }
 
 export const isAddress = (address: string): boolean => {
@@ -206,3 +171,8 @@ export const isContract = async (provider: any, address: string): Promise<boolea
 }
 
 export const delay = (timeout: number) => new Promise(res => setTimeout(res, timeout))
+
+export const getIndexSets = (outcomesCount: number) => {
+  const range = (length: number) => [...Array(length)].map((x, i) => i)
+  return range(outcomesCount).map(x => 1 << x)
+}

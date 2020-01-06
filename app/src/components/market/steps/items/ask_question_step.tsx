@@ -7,7 +7,7 @@ import { DateField } from '../../../common/date_field'
 import { ButtonContainer } from '../../../common/button_container'
 import { Well } from '../../../common/well'
 import { Arbitrators } from '../../../common/arbitrators'
-import { knownArbitrators } from '../../../../util/addresses'
+import { knownArbitrators } from '../../../../util/networks'
 
 interface Props {
   next: () => void
@@ -26,16 +26,6 @@ const OracleInfo = styled(Well)`
   text-align: center;
 `
 
-const FormRowResolutionDate = styled(FormRow)`
-  position: relative;
-  z-index: 15;
-`
-
-const FormRowOracle = styled(FormRow)`
-  position: relative;
-  z-index: 5;
-`
-
 const AskQuestionStep = (props: Props) => {
   const { values, handleChange, handleChangeDate, next } = props
   const { question, category, resolution, arbitratorId } = values
@@ -51,6 +41,15 @@ const AskQuestionStep = (props: Props) => {
     }
   }
 
+  const questionNote = () => {
+    return (
+      <>
+        <strong>For example:</strong> <i>&quot;Will France win?&quot;</i> is not an acceptable
+        question, but <i>&quot;Will France win the 2020 FIFA World Cup?&quot;</i> is a good one.
+      </>
+    )
+  }
+
   return (
     <CreateCard>
       <FormRow
@@ -63,14 +62,7 @@ const AskQuestionStep = (props: Props) => {
             type="text"
           />
         }
-        note={[
-          <strong key="1">For example:</strong>,
-          ' ',
-          <i key="2">&quot;Will France win?&quot;</i>,
-          ' is not an acceptable question, but ',
-          <i key="3">&quot;Will France win the 2020 FIFA World Cup?&quot;</i>,
-          ' is a good one.',
-        ]}
+        note={questionNote()}
         title={'Question'}
         tooltip={{
           id: `question`,
@@ -85,7 +77,7 @@ const AskQuestionStep = (props: Props) => {
           description: `You can choose among several categories. Your selection will classify the subject/topic of your market.`,
         }}
       />
-      <FormRowResolutionDate
+      <FormRow
         formField={
           <DateField
             minDate={new Date()}
@@ -100,7 +92,7 @@ const AskQuestionStep = (props: Props) => {
           description: `Precisely indicate when the market is resolved. The time is displayed in ISO 8601 format.`,
         }}
       />
-      <FormRowOracle
+      <FormRow
         formField={<Arbitrators name="arbitratorId" value={arbitratorId} onChange={handleChange} />}
         title={'Arbitrator'}
         tooltip={{
@@ -111,7 +103,12 @@ const AskQuestionStep = (props: Props) => {
       />
       <OracleInfo>
         The market will be resolved using{' '}
+        <a href="https://realit.io/" rel="noopener noreferrer" target="_blank">
+          Realit.io
+        </a>{' '}
+        and{' '}
         <a href={arbitrator.url} rel="noopener noreferrer" target="_blank">
+          {' '}
           {arbitrator.name}
         </a>{' '}
         as final arbitrator.

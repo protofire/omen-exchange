@@ -16,6 +16,7 @@ import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
 import { useContracts } from '../../../hooks/useContracts'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
+import { MARKET_FEE } from '../../../common/constants'
 
 const Grid = styled.div`
   display: grid;
@@ -29,27 +30,9 @@ const Grid = styled.div`
   }
 `
 
-const ButtonContainerStyled = styled(ButtonContainer)`
-  display: grid;
-  grid-row-gap: 10px;
-  grid-template-columns: 1fr;
-
-  > button {
-    margin-left: 0;
-  }
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: flex;
-
-    > button {
-      margin-left: 10px;
-    }
-  }
-`
-
 interface Props {
   theme?: any
-  balance: BalanceItem[]
+  balances: BalanceItem[]
   collateral: Token
   funding: BigNumber
   question: string
@@ -64,11 +47,12 @@ const logger = getLogger('Market::ClosedMarketDetail')
 
 export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { library: provider, account } = context
   const { conditionalTokens, oracle, buildMarketMaker } = useContracts(context)
 
   const {
     collateral: collateralToken,
-    balance,
+    balances,
     marketMakerAddress,
     resolution,
     funding,
@@ -83,18 +67,27 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
-  const resolveCondition = () => {
-    return oracle.resolveCondition(questionId)
+  const resolveCondition = async () => {
+    try {
+      setStatus(Status.Loading)
+      setMessage('Resolve condition...')
+
+      // Balances length is the number of outcomes
+      await oracle.resolveCondition(questionId, balances.length)
+
+      setStatus(Status.Ready)
+    } catch (err) {
+      setStatus(Status.Error)
+      logger.log(`Error trying to resolve condition: ${err.message}`)
+    }
   }
 
   useEffect(() => {
     let isSubscribed = true
 
     const fetchBalance = async () => {
-      const provider = context.library
-
       const collateralAddress = await marketMaker.getCollateralToken()
-      const collateralService = new ERC20Service(provider, collateralAddress)
+      const collateralService = new ERC20Service(provider, account, collateralAddress)
       const collateralBalance = await collateralService.getCollateral(marketMakerAddress)
       if (isSubscribed) setCollateral(collateralBalance)
     }
@@ -104,26 +97,27 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     return () => {
       isSubscribed = false
     }
-  }, [collateral, context, marketMakerAddress, marketMaker])
+  }, [collateral, provider, account, marketMakerAddress, marketMaker])
 
   const redeem = async () => {
     try {
+      setStatus(Status.Loading)
       if (!isConditionResolved) {
         setMessage('Resolving condition...')
-        await resolveCondition()
+        // Balances length is the number of outcomes
+        await oracle.resolveCondition(questionId, balances.length)
       }
-      setMessage('Redeem payout...')
-      setStatus(Status.Loading)
 
+      setMessage('Redeem payout...')
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
 
-      await conditionalTokens.redeemPositions(collateralAddress, conditionId)
+      await conditionalTokens.redeemPositions(collateralAddress, conditionId, balances.length)
 
       setStatus(Status.Ready)
     } catch (err) {
       setStatus(Status.Error)
-      logger.log(`Error trying to redeem: ${err.message}`)
+      logger.log(`Error trying to resolve condition or redeem: ${err.message}`)
     }
   }
 
@@ -132,7 +126,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     collateralToken.symbol
   }`
   const resolutionFormat = resolution ? formatDate(resolution) : ''
-  const winningOutcome = balance.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
+  const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
 
   return (
     <>
@@ -140,7 +134,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       <ViewCard>
         {<SubsectionTitle>Balance</SubsectionTitle>}
         <OutcomeTable
-          balance={balance}
+          balances={balances}
           collateral={collateralToken}
           disabledColumns={[OutcomeTableValue.CurrentPrice, OutcomeTableValue.PriceAfterTrade]}
           withWinningOutcome={true}
@@ -155,22 +149,21 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
             value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />}
           />
           <TitleValue title="Resolution Date" value={resolutionFormat} />
-          <TitleValue title="Fee" value="1%" />
+          <TitleValue title="Fee" value={`${MARKET_FEE}%`} />
           <TitleValue title="Funding" value={fundingFormat} />
         </Grid>
         <SubsectionTitle>Market Results</SubsectionTitle>
         <Grid>
           <TitleValue title="Collateral" value={collateralFormat} />
         </Grid>
-
-        <ButtonContainerStyled>
+        <ButtonContainer>
           {winningOutcome && !winningOutcome.shares.isZero() && (
             <Button onClick={() => redeem()}>Redeem</Button>
           )}
           {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() ? (
             <Button onClick={resolveCondition}>Resolve Condition</Button>
           ) : null}
-        </ButtonContainerStyled>
+        </ButtonContainer>
       </ViewCard>
       {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>

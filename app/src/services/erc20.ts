@@ -1,4 +1,4 @@
-import { ethers, Wallet } from 'ethers'
+import { Contract, ethers, Wallet } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
@@ -19,10 +19,17 @@ const erc20Abi = [
 class ERC20Service {
   tokenAddress: string
   provider: any
+  contract: Contract
 
-  constructor(provider: any, tokenAddress: string) {
+  constructor(provider: any, signerAddress: Maybe<string>, tokenAddress: string) {
     this.tokenAddress = tokenAddress
     this.provider = provider
+    if (signerAddress) {
+      const signer: Wallet = provider.getSigner()
+      this.contract = new ethers.Contract(tokenAddress, erc20Abi, provider).connect(signer)
+    } else {
+      this.contract = new ethers.Contract(tokenAddress, erc20Abi, provider)
+    }
   }
 
   /**
@@ -33,9 +40,7 @@ class ERC20Service {
     spender: string,
     neededAmount: BigNumber,
   ): Promise<boolean> => {
-    const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, this.provider)
-
-    const allowance: BigNumber = await erc20Contract.allowance(owner, spender)
+    const allowance: BigNumber = await this.contract.allowance(owner, spender)
 
     return allowance.gte(neededAmount)
   }
@@ -44,13 +49,7 @@ class ERC20Service {
    * Approve `spender` to transfer `amount` tokens on behalf of the connected user.
    */
   approve = async (spender: string, amount: BigNumber): Promise<any> => {
-    const signer: Wallet = this.provider.getSigner()
-
-    const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, this.provider).connect(
-      signer,
-    )
-
-    const transactionObject = await erc20Contract.approve(spender, amount, {
+    const transactionObject = await this.contract.approve(spender, amount, {
       value: '0x0',
     })
     logger.log(`Approve transaccion hash: ${transactionObject.hash}`)
@@ -61,13 +60,7 @@ class ERC20Service {
    * Approve `spender` to transfer an "unlimited" amount of tokens on behalf of the connected user.
    */
   approveUnlimited = async (spender: string): Promise<any> => {
-    const signer: Wallet = this.provider.getSigner()
-
-    const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, this.provider).connect(
-      signer,
-    )
-
-    const transactionObject = await erc20Contract.approve(spender, ethers.constants.MaxUint256, {
+    const transactionObject = await this.contract.approve(spender, ethers.constants.MaxUint256, {
       value: '0x0',
     })
     logger.log(`Approve unlimited transaccion hash: ${transactionObject.hash}`)
@@ -75,13 +68,13 @@ class ERC20Service {
   }
 
   getCollateral = async (marketMakerAddress: string): Promise<any> => {
-    const signer: Wallet = this.provider.getSigner()
+    return this.contract.balanceOf(marketMakerAddress)
+  }
 
-    const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, this.provider).connect(
-      signer,
-    )
+  hasEnoughBalanceToFund = async (owner: string, amount: BigNumber): Promise<boolean> => {
+    const balance: BigNumber = await this.contract.balanceOf(owner)
 
-    return erc20Contract.balanceOf(marketMakerAddress)
+    return balance.gte(amount)
   }
 
   isValidErc20 = async (): Promise<boolean> => {
@@ -94,11 +87,9 @@ class ERC20Service {
         throw new Error('Is not a valid contract')
       }
 
-      const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, this.provider)
-
       const [decimals, symbol] = await Promise.all([
-        erc20Contract.decimals(),
-        erc20Contract.symbol(),
+        this.contract.decimals(),
+        this.contract.symbol(),
       ])
 
       return !!(decimals && symbol)
@@ -109,9 +100,7 @@ class ERC20Service {
   }
 
   getProfileSummary = async (): Promise<Token> => {
-    const erc20Contract = new ethers.Contract(this.tokenAddress, erc20Abi, this.provider)
-
-    const [decimals, symbol] = await Promise.all([erc20Contract.decimals(), erc20Contract.symbol()])
+    const [decimals, symbol] = await Promise.all([this.contract.decimals(), this.contract.symbol()])
 
     return {
       address: this.tokenAddress,

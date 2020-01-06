@@ -2,91 +2,101 @@ import React, { FC, useState } from 'react'
 import moment from 'moment'
 
 import { getLogger } from '../../util/logger'
-import { StatusMarketCreation } from '../../util/types'
 import { MarketWizardCreator, MarketData } from './market_wizard_creator'
 import { ERC20Service } from '../../services'
-import { getArbitrator, getContractAddress } from '../../util/addresses'
+import { getArbitrator, getContractAddress } from '../../util/networks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
+import { ModalConnectWallet } from '../common/modal_connect_wallet'
+import { MarketCreationStatus } from '../../util/market_creation_status_data'
 
 const logger = getLogger('Market::MarketWizardCreatorContainer')
 
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
+  const { library: provider, networkId, account } = context
+
+  const [isModalOpen, setModalState] = useState(false)
   const { conditionalTokens, marketMakerFactory, realitio, buildMarketMaker } = useContracts(
     context,
   )
 
-  const [status, setStatus] = useState<StatusMarketCreation>(StatusMarketCreation.Ready)
+  const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(
+    MarketCreationStatus.ready(),
+  )
   const [questionId, setQuestionId] = useState<string | null>(null)
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
   const handleSubmit = async (data: MarketData) => {
     try {
-      if (!data.resolution) {
-        throw new Error('resolution time was not specified')
+      if (!account) {
+        setModalState(true)
+      } else {
+        if (!data.resolution) {
+          throw new Error('resolution time was not specified')
+        }
+        const user = await provider.getSigner().getAddress()
+        const { collateral, arbitratorId, question, resolution, funding, outcomes, category } = data
+        const openingDateMoment = moment(resolution)
+
+        const collateralService = new ERC20Service(provider, account, collateral.address)
+
+        const arbitrator = getArbitrator(networkId, arbitratorId)
+
+        setMarketCreationStatus(MarketCreationStatus.postingQuestion())
+        const questionId = await realitio.askQuestion(
+          question,
+          outcomes,
+          category,
+          arbitrator.address,
+          openingDateMoment,
+          networkId,
+        )
+        setQuestionId(questionId)
+
+        setMarketCreationStatus(MarketCreationStatus.prepareCondition())
+
+        const oracleAddress = getContractAddress(networkId, 'oracle')
+        const conditionId = await conditionalTokens.prepareCondition(
+          questionId,
+          oracleAddress,
+          outcomes.length,
+        )
+
+        // approve movement of collateral token to MarketMakerFactory
+        setMarketCreationStatus(MarketCreationStatus.approvingCollateral())
+
+        const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
+
+        const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
+          user,
+          marketMakerFactoryAddress,
+          funding,
+        )
+
+        if (!hasEnoughAlowance) {
+          await collateralService.approve(marketMakerFactoryAddress, funding)
+        }
+
+        setMarketCreationStatus(MarketCreationStatus.createMarketMaker())
+        const marketMakerAddress = await marketMakerFactory.createMarketMaker(
+          conditionalTokens.address,
+          collateral.address,
+          conditionId,
+        )
+        setMarketMakerAddress(marketMakerAddress)
+
+        setMarketCreationStatus(MarketCreationStatus.approveCollateralForMarketMaker())
+        await collateralService.approveUnlimited(marketMakerAddress)
+
+        setMarketCreationStatus(MarketCreationStatus.addFunding())
+        const marketMakerService = buildMarketMaker(marketMakerAddress)
+        await marketMakerService.addInitialFunding(funding, outcomes.map(o => o.probability))
+
+        setMarketCreationStatus(MarketCreationStatus.done())
       }
-
-      const networkId = context.networkId
-      const provider = context.library
-      const user = await provider.getSigner().getAddress()
-
-      const { collateral, arbitratorId, question, resolution, funding, outcomes, category } = data
-      const openingDateMoment = moment(resolution)
-
-      const arbitrator = getArbitrator(networkId, arbitratorId)
-
-      setStatus(StatusMarketCreation.PostingQuestion)
-      const questionId = await realitio.askQuestion(
-        question,
-        category,
-        arbitrator.address,
-        openingDateMoment,
-      )
-      setQuestionId(questionId)
-
-      setStatus(StatusMarketCreation.PrepareCondition)
-
-      const oracleAddress = getContractAddress(networkId, 'oracle')
-      const conditionId = await conditionalTokens.prepareCondition(questionId, oracleAddress)
-
-      // approve movement of collateral token to MarketMakerFactory
-      setStatus(StatusMarketCreation.ApprovingCollateral)
-
-      const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
-      const collateralService = new ERC20Service(provider, collateral.address)
-
-      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
-        user,
-        marketMakerFactoryAddress,
-        funding,
-      )
-      if (!hasEnoughAlowance) {
-        await collateralService.approve(marketMakerFactoryAddress, funding)
-      }
-
-      setStatus(StatusMarketCreation.CreateMarketMaker)
-      const marketMakerAddress = await marketMakerFactory.createMarketMaker(
-        conditionalTokens.address,
-        collateral.address,
-        conditionId,
-      )
-      setMarketMakerAddress(marketMakerAddress)
-
-      setStatus(StatusMarketCreation.ApproveCollateralForMarketMaker)
-      await collateralService.approveUnlimited(marketMakerAddress)
-
-      setStatus(StatusMarketCreation.AddFunding)
-      const marketMakerService = buildMarketMaker(marketMakerAddress)
-      await marketMakerService.addInitialFunding(
-        funding,
-        +outcomes[0].probability,
-        +outcomes[1].probability,
-      )
-
-      setStatus(StatusMarketCreation.Done)
     } catch (err) {
-      setStatus(StatusMarketCreation.Error)
+      setMarketCreationStatus(MarketCreationStatus.error(err))
       logger.error(err.message)
     }
   }
@@ -97,8 +107,9 @@ const MarketWizardCreatorContainer: FC = () => {
         callback={handleSubmit}
         marketMakerAddress={marketMakerAddress}
         questionId={questionId}
-        status={status}
+        marketCreationStatus={marketCreationStatus}
       />
+      <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
     </>
   )
 }

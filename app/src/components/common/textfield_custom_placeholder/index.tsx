@@ -18,15 +18,18 @@ const FieldWrapper = styled.div<{ disabled?: boolean }>`
 
   > input {
     border: none;
-    color: #000;
+    color: ${props => props.theme.colors.textColor};
     flex-grow: 1;
+    font-family: ${props => props.theme.fonts.fontFamily};
     font-size: 13px;
     font-weight: normal;
     margin: 0 5px 0 0;
     padding: 0;
 
     &::placeholder {
-      color: #999;
+      color: ${props => props.theme.colors.textColorLight};
+      font-family: ${props => props.theme.fonts.fontFamily};
+      font-size: 13px;
     }
 
     &:disabled {
@@ -48,7 +51,7 @@ FieldWrapper.defaultProps = {
 }
 
 const Placeholder = styled.span`
-  color: #999;
+  color: ${props => props.theme.colors.textColorLight};
   flex-shrink: 0;
   font-size: 13px;
   font-weight: normal;

@@ -1,14 +1,16 @@
 const theme = {
   fonts: {
+    defaultSize: '14px',
     fontFamily: `'Roboto', 'Helvetica Neue', 'Arial', 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', '-apple-system', 'BlinkMacSystemFont', sans-serif`,
     fontFamilyCode: `source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace`,
   },
   colors: {
     activeListItemBackground: '#fafafa',
+    darkGray: '#acacac',
+    error: '#fa0000',
+    mainBodyBackground: '#fafafa',
     primary: '#00be95',
-    primarySoft:'#A3F7E5',
     secondary: '#ff7848',
-    secondarySoft:'#FFB59B',
     tertiary: '#f5f5f5',
     textColor: '#333',
     textColorLight: '#888',
@@ -50,28 +52,65 @@ const theme = {
     mainPadding: '15px',
   },
   textfield: {
-    borderColor: '#d9d9d9',
+    backgroundColor: 'transparent',
+    borderColor: '#999',
+    borderRadius: '0',
+    borderStyle: 'solid',
+    borderWidth: '1px',
     color: '#333',
-    fontSize: '15px',
-    fontWeight: '500',
-    placeholderColor: '#666',
+    fontSize: '13px',
+    fontWeight: '400',
+    outline: 'none',
+    paddingHorizontal: '4px',
+    paddingVertical: '6px',
+    placeholderColor: '#999',
   },
   createSteps: {
-    maxWidth: '400px'
+    maxWidth: '400px',
   },
   viewMarket: {
-    maxWidth: '550px'
+    maxWidth: '550px',
   },
   list: {
-    maxWidth: '620px'
+    maxWidth: '620px',
   },
   dropdown: {
     backgroundColor: '#fff',
     border: 'none',
     borderRadius: '5px',
     boxShadow: '0 0 12px 0 rgba(0, 0, 0, 0.12)',
-    textColor: '#000',
     lightTextColor: '#666',
+    textColor: '#000',
+  },
+  modalStyle: {
+    content: {
+      backgroundColor: '#fff',
+      borderColor: 'transparent',
+      borderRadius: '5px',
+      bottom: 'auto',
+      boxShadow: '0 0 18px 0 rgba(0, 0, 0, 0.08)',
+      display: 'flex',
+      flexDirection: 'column',
+      flexGrow: '0',
+      height: 'fit-content',
+      left: 'auto',
+      margin: 'auto 0',
+      overflow: 'hidden',
+      padding: '15px 20px',
+      position: 'relative',
+      right: 'auto',
+      top: 'auto',
+      width: '350px',
+    },
+    overlay: {
+      alignItems: 'unset',
+      backgroundColor: 'rgba(255, 255, 255, 0.75)',
+      display: 'flex',
+      justifyContent: 'center',
+      overflow: 'auto',
+      padding: '10px',
+      zIndex: '12345',
+    },
   },
 }
 
