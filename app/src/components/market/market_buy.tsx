@@ -95,10 +95,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
-      const probabilities = pricesAfterTrade.map(priceAfterTrade => {
-        const probabilityForPrice = priceAfterTrade * 100
-        return Math.round(probabilityForPrice)
-      })
+      const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
 
       return [tradedShares, probabilities]
     },

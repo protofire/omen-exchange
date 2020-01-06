@@ -123,10 +123,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
       const costFee = mulBN(amountToSell, marketFeeWithTwoDecimals)
 
-      const probabilities = pricesAfterTrade.map(priceAfterTrade => {
-        const probabilityForPrice = priceAfterTrade * 100
-        return Math.round(probabilityForPrice)
-      })
+      const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
 
       return [probabilities, costFee, amountToSell]
     },

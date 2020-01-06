@@ -128,7 +128,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const resolutionFormat = resolution ? formatDate(resolution) : ''
   const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
 
-  const probabilities = balances.map(balance => Math.round(balance.probability))
+  const probabilities = balances.map(balance => balance.probability)
 
   return (
     <>

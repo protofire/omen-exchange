@@ -163,7 +163,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
     ? `You don't have enough collateral in your balance.`
     : ''
 
-  const probabilities = balances.map(balance => Math.round(balance.probability))
+  const probabilities = balances.map(balance => balance.probability)
 
   return (
     <>
