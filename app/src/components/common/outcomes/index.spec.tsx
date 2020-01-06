@@ -18,7 +18,10 @@ test('should change the probability of the first input', () => {
   const onChangeFn = jest.fn()
 
   const { getByTestId } = renderOutcomes({
-    outcomes: [{ name: 'yes', probability: 50 }, { name: 'no', probability: 50 }],
+    outcomes: [
+      { name: 'yes', probability: 50 },
+      { name: 'no', probability: 50 },
+    ],
     onChange: onChangeFn,
   })
 
@@ -42,7 +45,10 @@ test('should not change the outcomes if the probability is negative', () => {
   const onChangeFn = jest.fn()
 
   const { getByTestId } = renderOutcomes({
-    outcomes: [{ name: 'yes', probability: 40 }, { name: 'no', probability: 60 }],
+    outcomes: [
+      { name: 'yes', probability: 40 },
+      { name: 'no', probability: 60 },
+    ],
     onChange: onChangeFn,
   })
 
@@ -60,7 +66,10 @@ test('should not change the outcomes if the probability is greater than 100', ()
   const onChangeFn = jest.fn()
 
   const { getByTestId } = renderOutcomes({
-    outcomes: [{ name: 'yes', probability: 40 }, { name: 'no', probability: 60 }],
+    outcomes: [
+      { name: 'yes', probability: 40 },
+      { name: 'no', probability: 60 },
+    ],
     onChange: onChangeFn,
   })
 
@@ -78,7 +87,10 @@ test('should change the probability of the second input', () => {
   const onChangeFn = jest.fn()
 
   const { getByTestId } = renderOutcomes({
-    outcomes: [{ name: 'yes', probability: 50 }, { name: 'no', probability: 50 }],
+    outcomes: [
+      { name: 'yes', probability: 50 },
+      { name: 'no', probability: 50 },
+    ],
     onChange: onChangeFn,
   })
 

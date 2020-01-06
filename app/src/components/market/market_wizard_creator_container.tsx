@@ -91,7 +91,10 @@ const MarketWizardCreatorContainer: FC = () => {
 
         setMarketCreationStatus(MarketCreationStatus.addFunding())
         const marketMakerService = buildMarketMaker(marketMakerAddress)
-        await marketMakerService.addInitialFunding(funding, outcomes.map(o => o.probability))
+        await marketMakerService.addInitialFunding(
+          funding,
+          outcomes.map(o => o.probability),
+        )
 
         setMarketCreationStatus(MarketCreationStatus.done())
       }
