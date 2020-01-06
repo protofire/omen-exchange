@@ -61,7 +61,6 @@ export const useMarketMakerData = (
 
   const fetchFunc = useCallback(async () => {
     setStatus(status => (status === Status.Ready ? Status.Loading : Status.Refreshing))
-    const user = account || ''
 
     const marketMaker = buildMarketMaker(marketMakerAddress)
 
@@ -90,15 +89,15 @@ export const useMarketMakerData = (
       fee,
       isQuestionFinalized,
     ] = await Promise.all([
-      user
-        ? marketMaker.getBalanceInformation(user, outcomes.length)
+      account
+        ? marketMaker.getBalanceInformation(account, outcomes.length)
         : outcomes.map(() => new BigNumber(0)),
       marketMaker.getBalanceInformation(marketMakerAddress, outcomes.length),
       marketMaker.getTotalSupply(),
-      user ? marketMaker.balanceOf(user) : new BigNumber(0),
+      account ? marketMaker.balanceOf(account) : new BigNumber(0),
       marketMaker.getCollateralToken(),
       marketMaker.poolSharesTotalSupply(),
-      user ? marketMaker.poolSharesBalanceOf(user) : new BigNumber(0),
+      account ? marketMaker.poolSharesBalanceOf(account) : new BigNumber(0),
       marketMaker.getFee(),
       realitio.isFinalized(questionId),
     ])
