@@ -46,7 +46,7 @@ const ViewWrapper = (props: Props) => {
     return !shares.isZero()
   })
 
-  const probabilities = balances.map(balance => Math.round((balance.probability / 100) * 100))
+  const probabilities = balances.map(balance => Math.round(balance.probability))
 
   const renderTableData = () => {
     const disabledColumns = [OutcomeTableValue.Payout]
