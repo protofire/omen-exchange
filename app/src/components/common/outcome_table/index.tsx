@@ -111,7 +111,7 @@ export const OutcomeTable = (props: Props) => {
             <BarDiagram
               outcomeName={outcomeName}
               isWinning={isWinning}
-              probability={probability}
+              probability={+probability.toFixed(2)}
               withWinningOutcome={withWinningOutcome}
               winningOutcome={winningOutcome}
             />
@@ -121,7 +121,7 @@ export const OutcomeTable = (props: Props) => {
             <BarDiagram
               outcomeName={outcomeName}
               isWinning={isWinning}
-              probability={probability}
+              probability={+probability.toFixed(2)}
               withWinningOutcome={withWinningOutcome}
               winningOutcome={winningOutcome}
             />
