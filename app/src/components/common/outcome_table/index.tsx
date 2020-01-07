@@ -16,6 +16,7 @@ interface Props {
   disabledColumns?: OutcomeTableValue[]
   withWinningOutcome?: boolean
   displayRadioSelection?: boolean
+  displayWinningOutcomeColor?: boolean
 }
 
 const TableWrapper = styled.div`
@@ -47,6 +48,7 @@ export const OutcomeTable = (props: Props) => {
     disabledColumns = [],
     withWinningOutcome = false,
     displayRadioSelection = true,
+    displayWinningOutcomeColor = true,
   } = props
 
   const TableHead: OutcomeTableValue[] = [
@@ -118,6 +120,7 @@ export const OutcomeTable = (props: Props) => {
               probability={probability}
               withWinningOutcome={withWinningOutcome}
               winningOutcome={winningOutcome}
+              displayWinningColor={displayWinningOutcomeColor}
             />
           </TDStyled>
         ) : (
@@ -128,6 +131,7 @@ export const OutcomeTable = (props: Props) => {
               probability={probability}
               withWinningOutcome={withWinningOutcome}
               winningOutcome={winningOutcome}
+              displayWinningColor={displayWinningOutcomeColor}
             />
           </TD>
         )}

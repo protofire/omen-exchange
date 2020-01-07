@@ -77,11 +77,20 @@ interface Props extends HTMLAttributes<HTMLButtonElement> {
   theme?: any
   winningOutcome: boolean
   withWinningOutcome: boolean
+  displayWinningColor?: boolean
 }
 
 const BarDiagramComponent: React.FC<Props> = (props: Props) => {
-  const { outcomeName, probability, isWinning, winningOutcome, withWinningOutcome } = props
-  const progressColor = isWinning ? theme.colors.primary : theme.colors.darkGray
+  const {
+    outcomeName,
+    probability,
+    isWinning,
+    winningOutcome,
+    withWinningOutcome,
+    displayWinningColor = true,
+  } = props
+  const progressColor =
+    isWinning && displayWinningColor ? theme.colors.primary : theme.colors.darkGray
 
   return (
     <BarDiagramWrapper>

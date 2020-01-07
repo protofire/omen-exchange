@@ -57,6 +57,7 @@ const ViewWrapper = (props: Props) => {
         collateral={collateral}
         displayRadioSelection={false}
         disabledColumns={disabledColumns}
+        displayWinningOutcomeColor={false}
       />
     )
   }
