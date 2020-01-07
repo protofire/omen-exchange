@@ -128,6 +128,11 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const resolutionFormat = resolution ? formatDate(resolution) : ''
   const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
 
+  const disabledColumns = [OutcomeTableValue.CurrentPrice, OutcomeTableValue.PriceAfterTrade]
+  if (!account) {
+    disabledColumns.push(OutcomeTableValue.Shares)
+  }
+
   return (
     <>
       <ClosedMarket date={resolutionFormat} />
@@ -136,7 +141,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <OutcomeTable
           balances={balances}
           collateral={collateralToken}
-          disabledColumns={[OutcomeTableValue.CurrentPrice, OutcomeTableValue.PriceAfterTrade]}
+          disabledColumns={disabledColumns}
           withWinningOutcome={true}
           displayRadioSelection={false}
         />
