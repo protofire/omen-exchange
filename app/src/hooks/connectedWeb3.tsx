@@ -1,5 +1,5 @@
 import { providers } from 'ethers'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, HTMLAttributes, ReactNode } from 'react'
 import { useWeb3Context } from 'web3-react'
 import connectors from '../util/connectors'
 
@@ -78,4 +78,10 @@ export const ConnectedWeb3: React.FC<Props> = props => {
   return (
     <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
   )
+}
+
+export const WhenConnected: React.FC<Props> = props => {
+  const { account } = useConnectedWeb3Context()
+
+  return <>{account && props.children}</>
 }
