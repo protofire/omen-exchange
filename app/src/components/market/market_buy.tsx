@@ -28,6 +28,7 @@ import { BalanceToken } from '../common/balance_token'
 import { useContracts } from '../../hooks/useContracts'
 import { ButtonType } from '../../common/button_styling_types'
 import { MARKET_FEE } from '../../common/constants'
+import { FormError } from '../common/form_error'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -152,7 +153,29 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const disabled = (status !== Status.Ready && status !== Status.Error) || cost.isZero()
+  const calculateCollateralBalance = useMemo(
+    () => async (): Promise<BigNumber> => {
+      const user = await provider.getSigner().getAddress()
+      const collateralService = new ERC20Service(provider, user, collateral.address)
+      const collateralBalance = await collateralService.getCollateral(user)
+      return collateralBalance
+    },
+    [provider, collateral],
+  )
+
+  const collateralBalance = useAsyncDerivedValue('', new BigNumber(0), calculateCollateralBalance)
+
+  const isBuyAmountGreaterThanBalance = amount.gt(collateralBalance)
+
+  const buyMessageError = isBuyAmountGreaterThanBalance
+    ? `You don't have enough collateral in your balance.`
+    : ''
+
+  const error =
+    (status !== Status.Ready && status !== Status.Error) ||
+    cost.isZero() ||
+    isBuyAmountGreaterThanBalance ||
+    amount.isZero()
 
   const noteAmount = (
     <>
@@ -162,6 +185,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           setAmount(collateralBalance)
         }
       />
+      <FormError>{buyMessageError}</FormError>
     </>
   )
 
@@ -228,7 +252,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
-          <Button buttonType={ButtonType.primary} disabled={disabled} onClick={() => finish()}>
+          <Button buttonType={ButtonType.primary} disabled={error} onClick={() => finish()}>
             Buy
           </Button>
         </ButtonContainer>
