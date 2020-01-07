@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 import { ethers } from 'ethers'
 
@@ -11,8 +11,8 @@ import { SectionTitle } from '../common/section_title'
 import { FullLoading } from '../common/full_loading'
 import { MARKET_FEE } from '../../common/constants'
 import { getLogger } from '../../util/logger'
-import { Message } from '../common/message'
 import { MarketNotFound } from '../common/market_not_found'
+import { MessageWarning } from '../common/message_warning'
 
 const logger = getLogger('Market::Routes')
 
@@ -65,27 +65,6 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
         </>
       )}
     </Switch>
-  )
-}
-
-interface MessageWarningProps {
-  message: string
-}
-
-const MessageWarning = (props: MessageWarningProps) => {
-  const [displayMessage, setDisplayMessage] = useState(true)
-  const { message } = props
-  return (
-    <>
-      {displayMessage && (
-        <Message
-          type="warning"
-          delay={3000}
-          message={message}
-          onClick={() => setDisplayMessage(false)}
-        />
-      )}
-    </>
   )
 }
 
