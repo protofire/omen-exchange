@@ -84,7 +84,7 @@ export interface Market {
 
 export enum MarketStatus {
   Open = 'Open',
-  Resolved = 'Resolved',
+  Closed = 'Closed',
 }
 
 export type MarketWithExtraData = Market &
