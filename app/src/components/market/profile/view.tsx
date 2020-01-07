@@ -13,6 +13,7 @@ import { BigNumber } from 'ethers/utils'
 import { TitleValue } from '../../common/title_value'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
 import { GridThreeColumns } from '../../common/grid_three_columns'
+import { WhenConnected } from '../../../hooks/connectedWeb3'
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
   margin-bottom: 0;
@@ -100,7 +101,7 @@ const ViewWrapper = (props: Props) => {
         <SubsectionTitleStyled>Outcomes</SubsectionTitleStyled>
         {renderTableData()}
         {marketHasDetails && details()}
-        {account && (
+        <WhenConnected>
           <ButtonContainer>
             <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
             {userHasShares && (
@@ -108,9 +109,11 @@ const ViewWrapper = (props: Props) => {
             )}
             <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
           </ButtonContainer>
-        )}
+        </WhenConnected>
       </ViewCard>
-      {account && <ThreeBoxComments threadName={marketMakerAddress} />}
+      <WhenConnected>
+        <ThreeBoxComments threadName={marketMakerAddress} />
+      </WhenConnected>
       {status === Status.Loading ? <FullLoading /> : null}
     </>
   )
