@@ -25,23 +25,8 @@ export const useConnectedWeb3Context = () => {
   return context
 }
 
-/**
- * Use this hook to connect the wallet automatically
- */
-export const useConnectWeb3 = () => {
-  const context = useWeb3Context()
-
-  useEffect(() => {
-    const connector = localStorage.getItem('CONNECTOR')
-    if (connector && (connector as keyof typeof connectors)) {
-      context.setConnector(connector)
-    }
-  }, [context])
-}
-
 interface Props {
   children: React.ReactNode
-  infura?: boolean
 }
 
 /**
@@ -51,35 +36,41 @@ interface Props {
 export const ConnectedWeb3: React.FC<Props> = props => {
   const [networkId, setNetworkId] = useState<number | null>(null)
   const context = useWeb3Context()
+  const { active, library, account } = context
 
   useEffect(() => {
     let isSubscribed = true
+    const connector = localStorage.getItem('CONNECTOR')
 
-    const checkIfReady = async () => {
-      const network = await context.library.ready
-      if (isSubscribed) setNetworkId(network.chainId)
-    }
-
-    if (props.infura) {
+    if (active) {
+      if (connector && connector in connectors) {
+        context.setConnector(connector)
+      }
+    } else {
       context.setConnector('Infura')
     }
 
-    if (context.library) {
+    const checkIfReady = async () => {
+      const network = await library.ready
+      if (isSubscribed) setNetworkId(network.chainId)
+    }
+
+    if (library) {
       checkIfReady()
     }
 
     return () => {
       isSubscribed = false
     }
-  }, [context, props.infura])
+  }, [context, library, active])
 
   if (!networkId) {
     return null
   }
 
   const value = {
-    account: context.account || null,
-    library: context.library,
+    account: account || null,
+    library,
     networkId,
     rawWeb3Context: context,
   }

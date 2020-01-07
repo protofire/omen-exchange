@@ -11,7 +11,6 @@ import { SectionTitle } from '../common/section_title'
 import { FullLoading } from '../common/full_loading'
 import { MARKET_FEE } from '../../common/constants'
 import { getLogger } from '../../util/logger'
-import { MarketConnectionPage } from '../../hooks/marketConnection'
 import { Message } from '../common/message'
 import { MarketNotFound } from '../common/market_not_found'
 
@@ -40,7 +39,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
   }
 
   // Validate Markets with wrong FEE
-  const { fee } = marketMakerData
+  const { fee, isQuestionFinalized } = marketMakerData
   if (fee === null) {
     return <FullLoading />
   }
@@ -55,7 +54,9 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
     <Switch>
       <Route exact path="/:address" component={MarketDetailsPage} />
       {!account ? (
-        <MessageNeedConnection />
+        <MessageWarning message="Please connect to your wallet to open the market..." />
+      ) : isQuestionFinalized ? (
+        <MessageWarning message="Market closed, question finalized..." />
       ) : (
         <>
           <Route exact path="/:address/buy" component={MarketBuyPage} />
@@ -67,16 +68,20 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
   )
 }
 
-const MessageNeedConnection = () => {
-  const [displayMessage, setDisplayMessage] = useState(true)
+interface MessageWarningProps {
+  message: string
+}
 
+const MessageWarning = (props: MessageWarningProps) => {
+  const [displayMessage, setDisplayMessage] = useState(true)
+  const { message } = props
   return (
     <>
       {displayMessage && (
         <Message
           type="warning"
           delay={3000}
-          message="Please connect to your wallet to open the market..."
+          message={message}
           onClick={() => setDisplayMessage(false)}
         />
       )}
@@ -91,11 +96,7 @@ const MarketRoutes = (props: RouteComponentProps<RouteParams>) => {
     return <Redirect to="/" />
   }
 
-  return (
-    <MarketConnectionPage>
-      <MarketValidation marketMakerAddress={marketMakerAddress} />
-    </MarketConnectionPage>
-  )
+  return <MarketValidation marketMakerAddress={marketMakerAddress} />
 }
 
 export { MarketRoutes }
