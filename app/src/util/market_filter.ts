@@ -2,7 +2,7 @@ enum Types {
   allMarkets = '__mf_all_markets__',
   myMarkets = '__mf_my_markets__',
   fundedMarkets = '__mf_funded_markets__',
-  investedMarkets = '__mf_invested_markets__',
+  predictedOnMarkets = '__mf_predicted_on_markets__',
   winningResultMarkets = '__mf_winning_result_markets__',
 }
 
@@ -20,8 +20,8 @@ interface FundedMarkets {
   readonly account: string
   readonly label: string
 }
-interface InvestedMarkets {
-  readonly _type: Types.investedMarkets
+interface PredictedOnMarkets {
+  readonly _type: Types.predictedOnMarkets
   readonly account: string
   readonly label: string
 }
@@ -35,14 +35,14 @@ export type MarketFilter =
   | AllMarkets
   | MyMarkets
   | FundedMarkets
-  | InvestedMarkets
+  | PredictedOnMarkets
   | WinningResultMarkets
 
 const isAllMarkets = (mf: MarketFilter): mf is AllMarkets => mf._type === Types.allMarkets
 const isMyMarkets = (mf: MarketFilter): mf is MyMarkets => mf._type === Types.myMarkets
 const isFundedMarkets = (mf: MarketFilter): mf is FundedMarkets => mf._type === Types.fundedMarkets
-const isInvestedMarkets = (mf: MarketFilter): mf is InvestedMarkets =>
-  mf._type === Types.investedMarkets
+const isPredictedOnMarkets = (mf: MarketFilter): mf is PredictedOnMarkets =>
+  mf._type === Types.predictedOnMarkets
 const isWinningResultMarkets = (mf: MarketFilter): mf is WinningResultMarkets =>
   mf._type === Types.winningResultMarkets
 
@@ -58,10 +58,10 @@ export const MarketFilter = {
     account,
     label: "Markets I've funded",
   }),
-  investedMarkets: (account: string): InvestedMarkets => ({
-    _type: Types.investedMarkets,
+  predictedOnMarkets: (account: string): PredictedOnMarkets => ({
+    _type: Types.predictedOnMarkets,
     account,
-    label: "Markets I've invested in",
+    label: 'Markets I predicted on',
   }),
   winningResultMarkets: (account: string): WinningResultMarkets => ({
     _type: Types.winningResultMarkets,
@@ -72,7 +72,7 @@ export const MarketFilter = {
     allMarkets: isAllMarkets,
     myMarkets: isMyMarkets,
     fundedMarkets: isFundedMarkets,
-    investedMarkets: isInvestedMarkets,
+    predictedOnMarkets: isPredictedOnMarkets,
     winningResultMarkets: isWinningResultMarkets,
   },
 }

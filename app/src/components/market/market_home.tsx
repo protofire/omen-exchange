@@ -52,7 +52,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             MarketFilter.allMarkets(),
             MarketFilter.myMarkets(context.account),
             MarketFilter.fundedMarkets(context.account),
-            MarketFilter.investedMarkets(context.account),
+            MarketFilter.predictedOnMarkets(context.account),
             MarketFilter.winningResultMarkets(context.account),
           ]}
           onFilterChange={onFilterChange}
