@@ -109,10 +109,11 @@ interface Props {
   onChange: (newOutcomes: Outcome[]) => any
   errorMessages?: string[]
   totalProbabilities: number
+  disabled: boolean
 }
 
 const Outcomes = (props: Props) => {
-  const { outcomes, totalProbabilities, errorMessages } = props
+  const { outcomes, totalProbabilities, disabled = false, errorMessages } = props
 
   const updateOutcomeProbability = (index: number, newProbability: number) => {
     if (newProbability < 0 || newProbability > 100) {
@@ -184,6 +185,7 @@ const Outcomes = (props: Props) => {
         type="text"
         value={outcome.name}
         onChange={e => updateOutcomeName(index, e.currentTarget.value)}
+        disabled={disabled}
       />
       <TextfieldCustomPlaceholder
         formField={
@@ -198,6 +200,7 @@ const Outcomes = (props: Props) => {
         placeholderText="%"
       />
       <ButtonRemove
+        disabled={disabled}
         onClick={() => {
           removeOutcome(index)
         }}

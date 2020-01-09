@@ -11,36 +11,19 @@ import {
   SummaryMarketStep,
 } from './steps'
 
-import { Token } from '../../util/types'
+import { MarketData, Question, Token } from '../../util/types'
 import { MARKET_FEE } from '../../common/constants'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { Outcome } from '../common/outcomes'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { getDefaultToken, getToken } from '../../util/networks'
+import { getDefaultToken, getKnowArbitratorFromAddress, getToken } from '../../util/networks'
 import { MarketCreationStatus } from '../../util/market_creation_status_data'
-
-export interface MarketData {
-  collateral: Token
-  collateralsCustom: Token[]
-  question: string
-  category: string
-  resolution: Date | null
-  arbitratorId: KnownArbitrator
-  spread: number
-  funding: BigNumber
-  outcomes: Outcome[]
-}
 
 interface Props {
   callback: (param: MarketData) => void
   marketCreationStatus: MarketCreationStatus
   questionId: string | null
   marketMakerAddress: string | null
-}
-
-interface State {
-  currentStep: number
-  marketData: MarketData
 }
 
 export const MarketWizardCreator = (props: Props) => {
@@ -70,6 +53,7 @@ export const MarketWizardCreator = (props: Props) => {
         probability: 50,
       },
     ],
+    questionIsFromRealitio: false,
   }
 
   const [currentStep, setCurrentStep] = useState(1)
@@ -141,6 +125,57 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
+  const handleChangeQuestion = (questionObj: Question) => {
+    const { question, resolution, arbitratorAddress, category, outcomes } = questionObj
+
+    const outcomesFromQuestion = outcomes.map(outcomeName => {
+      return {
+        name: outcomeName,
+        probability: outcomes.length > 0 ? 100 / outcomes.length : 100,
+      }
+    })
+
+    const newMarketData = {
+      ...marketData,
+      question,
+      category,
+      resolution,
+      outcomes: outcomesFromQuestion,
+      questionIsFromRealitio: true,
+    }
+
+    const arbitratorId = getKnowArbitratorFromAddress(context.networkId, arbitratorAddress)
+
+    if (arbitratorId) {
+      newMarketData['arbitratorId'] = arbitratorId
+    }
+
+    setMarketdata(newMarketData)
+  }
+
+  const handleClearQuestion = () => {
+    const newMarketData = {
+      ...marketData,
+      question: '',
+      category: '',
+      resolution: null,
+      arbitratorId: 'realitio' as KnownArbitrator,
+      outcomes: [
+        {
+          name: 'Yes',
+          probability: 50,
+        },
+        {
+          name: 'No',
+          probability: 50,
+        },
+      ],
+      questionIsFromRealitio: false,
+    }
+
+    setMarketdata(newMarketData)
+  }
+
   const handleOutcomesChange = (outcomes: Outcome[]) => {
     const newMarketData = {
       ...marketData,
@@ -172,6 +207,7 @@ export const MarketWizardCreator = (props: Props) => {
       spread,
       funding,
       outcomes,
+      questionIsFromRealitio,
     } = marketData
 
     switch (currentStep) {
@@ -180,8 +216,10 @@ export const MarketWizardCreator = (props: Props) => {
           <AskQuestionStep
             handleChange={handleChange}
             handleChangeDate={handleChangeDate}
+            handleChangeQuestion={handleChangeQuestion}
+            handleClearQuestion={handleClearQuestion}
             next={() => next()}
-            values={{ question, category, resolution, arbitratorId }}
+            values={{ question, category, resolution, arbitratorId, questionIsFromRealitio }}
           />
         )
       case 2:
@@ -203,6 +241,7 @@ export const MarketWizardCreator = (props: Props) => {
             values={{
               outcomes,
               question,
+              questionIsFromRealitio,
             }}
             handleOutcomesChange={handleOutcomesChange}
           />
@@ -223,8 +262,10 @@ export const MarketWizardCreator = (props: Props) => {
           <AskQuestionStep
             handleChange={handleChange}
             handleChangeDate={handleChangeDate}
+            handleChangeQuestion={handleChangeQuestion}
+            handleClearQuestion={handleClearQuestion}
             next={() => next()}
-            values={{ question, category, resolution, arbitratorId }}
+            values={{ question, category, resolution, arbitratorId, questionIsFromRealitio }}
           />
         )
     }

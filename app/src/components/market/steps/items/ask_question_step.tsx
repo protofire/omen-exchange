@@ -1,13 +1,17 @@
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
+
 import { CreateCard } from '../../../common/create_card'
-import { Button, Textfield, Categories } from '../../../common/index'
+import { Button, Categories } from '../../../common/index'
 import { FormRow } from '../../../common/form_row'
 import { DateField } from '../../../common/date_field'
 import { ButtonContainer } from '../../../common/button_container'
 import { Well } from '../../../common/well'
 import { Arbitrators } from '../../../common/arbitrators'
 import { knownArbitrators } from '../../../../util/networks'
+import { QuestionInput } from '../../../common/question_input'
+import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { Question } from '../../../../util/types'
 
 interface Props {
   next: () => void
@@ -16,9 +20,12 @@ interface Props {
     category: string
     resolution: Date | null
     arbitratorId: KnownArbitrator
+    questionIsFromRealitio: boolean
   }
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
   handleChangeDate: (date: Date | null) => any
+  handleChangeQuestion: (question: Question) => any
+  handleClearQuestion: () => any
 }
 
 const OracleInfo = styled(Well)`
@@ -27,8 +34,17 @@ const OracleInfo = styled(Well)`
 `
 
 const AskQuestionStep = (props: Props) => {
-  const { values, handleChange, handleChangeDate, next } = props
-  const { question, category, resolution, arbitratorId } = values
+  const context = useConnectedWeb3Context()
+
+  const {
+    values,
+    handleChange,
+    handleClearQuestion,
+    handleChangeQuestion,
+    handleChangeDate,
+    next,
+  } = props
+  const { question, category, resolution, arbitratorId, questionIsFromRealitio } = values
   const arbitrator = knownArbitrators[arbitratorId]
 
   const error = !question || !category || !resolution
@@ -54,12 +70,15 @@ const AskQuestionStep = (props: Props) => {
     <CreateCard>
       <FormRow
         formField={
-          <Textfield
+          <QuestionInput
             defaultValue={question}
             name="question"
             onChange={handleChange}
+            onChangeFromRealitio={handleChangeQuestion}
+            onClearQuestionFromRealitio={handleClearQuestion}
             placeholder="Type in a question..."
-            type="text"
+            context={context}
+            disabled={questionIsFromRealitio}
           />
         }
         note={questionNote()}
@@ -70,7 +89,14 @@ const AskQuestionStep = (props: Props) => {
         }}
       />
       <FormRow
-        formField={<Categories name="category" value={category} onChange={handleChange} />}
+        formField={
+          <Categories
+            name="category"
+            disabled={questionIsFromRealitio}
+            value={category}
+            onChange={handleChange}
+          />
+        }
         title={'Category'}
         tooltip={{
           id: `category`,
@@ -80,6 +106,7 @@ const AskQuestionStep = (props: Props) => {
       <FormRow
         formField={
           <DateField
+            disabled={questionIsFromRealitio}
             minDate={new Date()}
             name="resolution"
             onChange={handleChangeDate}
@@ -93,7 +120,14 @@ const AskQuestionStep = (props: Props) => {
         }}
       />
       <FormRow
-        formField={<Arbitrators name="arbitratorId" value={arbitratorId} onChange={handleChange} />}
+        formField={
+          <Arbitrators
+            disabled={questionIsFromRealitio}
+            name="arbitratorId"
+            value={arbitratorId}
+            onChange={handleChange}
+          />
+        }
         title={'Arbitrator'}
         tooltip={{
           id: `arbitrator`,
