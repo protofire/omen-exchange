@@ -94,7 +94,7 @@ const BarDiagramComponent: React.FC<Props> = (props: Props) => {
       <Outcome>
         <OutcomeText>
           <OutcomeName>{outcomeName}</OutcomeName>
-          <OutcomeValue>{probability}%</OutcomeValue>
+          <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
         </OutcomeText>
         <ProgressBar>
           <Progress color={progressColor} width={probability} />
