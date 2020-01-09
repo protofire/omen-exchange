@@ -11,7 +11,7 @@ import { ButtonType } from '../../../common/button_styling_types'
 import ModalWrapper from '../modal_wrapper'
 import { FormRow } from '../form_row'
 import { useContracts } from '../../../hooks/useContracts'
-import { formatDate } from '../../../util/tools'
+import { formatDate, truncateStringInTheMiddle } from '../../../util/tools'
 import { getArbitratorFromAddress } from '../../../util/networks'
 import { useAsyncDerivedValue } from '../../../hooks/useAsyncDerivedValue'
 import { Spinner } from '../spinner'
@@ -107,15 +107,22 @@ export const ModalQuestion = (props: Props) => {
             {question && <TitleValueStyled title={'Question:'} value={question.question} />}
             {question && <TitleValueStyled title={'Category:'} value={question.category} />}
             {question && question.resolution && (
-              <TitleValueStyled
-                title={'Resolution Date:'}
-                value={formatDate(question.resolution)}
-              />
+              <TitleValueStyled title={'Resolution:'} value={formatDate(question.resolution)} />
             )}
             {question && (
-              <TitleValueStyled title={'Arbitrator Address:'} value={question.arbitratorAddress} />
+              <TitleValueStyled
+                title={'Arbitrator:'}
+                value={
+                  <span
+                    title={`Name: ${arbitrator && arbitrator.name} - Address: ${
+                      question.arbitratorAddress
+                    }`}
+                  >
+                    {truncateStringInTheMiddle(question.arbitratorAddress)}
+                  </span>
+                }
+              />
             )}
-            {arbitrator && <TitleValueStyled title={'Arbitrator Name:'} value={arbitrator.name} />}
           </GridOneColumn>
         </>
       )
