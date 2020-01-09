@@ -155,6 +155,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       await marketMakerService.sell(tradedCollateral, outcomeIndex)
 
+      setAmountShares(new BigNumber(0))
       setStatus(Status.Ready)
     } catch (err) {
       setStatus(Status.Error)
