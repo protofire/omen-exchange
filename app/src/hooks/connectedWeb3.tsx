@@ -1,5 +1,5 @@
 import { providers } from 'ethers'
-import React, { useState, useEffect, HTMLAttributes, ReactNode } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useWeb3Context } from 'web3-react'
 import connectors from '../util/connectors'
 

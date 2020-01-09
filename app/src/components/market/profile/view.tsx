@@ -34,7 +34,6 @@ interface Props extends RouteComponentProps<{}> {
 
 const ViewWrapper = (props: Props) => {
   const {
-    account,
     balances,
     collateral,
     status,
