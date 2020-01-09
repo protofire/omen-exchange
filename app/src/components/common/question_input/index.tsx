@@ -6,6 +6,7 @@ import { Arbitrator, Question } from '../../../util/types'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { FormRowLink } from '../form_row_link'
 import { Textfield } from '../textfield'
+import { FormRowNote } from '../form_row_note'
 
 interface Props {
   defaultValue: string
@@ -20,10 +21,22 @@ interface Props {
   addCategoryCustomValue: (category: string) => void
 }
 
+const Wrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 5px 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`
+
+const Note = styled(FormRowNote)`
+  margin: 5px 0 0 0;
+  width: 80%;
+`
 const Link = styled(FormRowLink)`
-  display: block;
-  margin-top: 5px;
-  margin-left: auto;
+  margin: 5px 0 0 0;
 `
 
 export const QuestionInput = (props: Props) => {
@@ -52,18 +65,24 @@ export const QuestionInput = (props: Props) => {
         disabled={disabled}
         type="text"
       />
-      {!disabled && <Link onClick={() => setModalQuestionState(true)}>Add question</Link>}
-      {disabled && <Link onClick={onClearQuestionFromRealitio}>Clear question</Link>}
-      <ModalQuestion
-        context={context}
-        isOpen={isModalQuestionOpen}
-        onClose={() => setModalQuestionState(false)}
-        onSave={(question: Question, arbitrator: Arbitrator) => {
-          addArbitratorCustomValue(arbitrator)
-          addCategoryCustomValue(question.category)
-          onChangeFromRealitio(question, arbitrator)
-        }}
-      />
+      <Wrapper>
+        <Note>
+          <strong>For example:</strong> <i>&quot;Will France win?&quot;</i> is not an acceptable
+          question, but <i>&quot;Will France win the 2020 FIFA World Cup?&quot;</i> is a good one.
+        </Note>
+        {!disabled && <Link onClick={() => setModalQuestionState(true)}>Add question</Link>}
+        {disabled && <Link onClick={onClearQuestionFromRealitio}>Clear question</Link>}
+        <ModalQuestion
+          context={context}
+          isOpen={isModalQuestionOpen}
+          onClose={() => setModalQuestionState(false)}
+          onSave={(question: Question, arbitrator: Arbitrator) => {
+            addArbitratorCustomValue(arbitrator)
+            addCategoryCustomValue(question.category)
+            onChangeFromRealitio(question, arbitrator)
+          }}
+        />
+      </Wrapper>
     </>
   )
 }

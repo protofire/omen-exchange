@@ -71,15 +71,6 @@ const AskQuestionStep = (props: Props) => {
     }
   }
 
-  const questionNote = () => {
-    return (
-      <>
-        <strong>For example:</strong> <i>&quot;Will France win?&quot;</i> is not an acceptable
-        question, but <i>&quot;Will France win the 2020 FIFA World Cup?&quot;</i> is a good one.
-      </>
-    )
-  }
-
   return (
     <CreateCard>
       <FormRow
@@ -97,7 +88,6 @@ const AskQuestionStep = (props: Props) => {
             disabled={questionIsFromRealitio}
           />
         }
-        note={questionNote()}
         title={'Question'}
         tooltip={{
           id: `question`,
