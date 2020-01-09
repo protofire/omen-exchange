@@ -39,6 +39,7 @@ export const MarketWizardCreator = (props: Props) => {
     collateral: defaultCollateral,
     collateralsCustom: [],
     arbitratorsCustom: [],
+    categoriesCustom: [],
     question: '',
     category: '',
     resolution: null,
@@ -116,6 +117,16 @@ export const MarketWizardCreator = (props: Props) => {
     const newMarketData = {
       ...marketData,
       arbitratorsCustom,
+    }
+    setMarketdata(newMarketData)
+  }
+
+  const addCategoryCustom = (category: string): void => {
+    const categoriesCustom = marketData.categoriesCustom
+    categoriesCustom.push(category)
+    const newMarketData = {
+      ...marketData,
+      categoriesCustom,
     }
     setMarketdata(newMarketData)
   }
@@ -221,6 +232,7 @@ export const MarketWizardCreator = (props: Props) => {
       collateralsCustom,
       question,
       category,
+      categoriesCustom,
       resolution,
       arbitrator,
       arbitratorsCustom,
@@ -240,10 +252,12 @@ export const MarketWizardCreator = (props: Props) => {
             handleChangeQuestion={handleChangeQuestion}
             handleClearQuestion={handleClearQuestion}
             addArbitratorCustom={addArbitratorCustom}
+            addCategoryCustom={addCategoryCustom}
             next={() => next()}
             values={{
               question,
               category,
+              categoriesCustom,
               resolution,
               arbitrator,
               arbitratorsCustom,
@@ -295,10 +309,12 @@ export const MarketWizardCreator = (props: Props) => {
             handleChangeQuestion={handleChangeQuestion}
             handleClearQuestion={handleClearQuestion}
             addArbitratorCustom={addArbitratorCustom}
+            addCategoryCustom={addCategoryCustom}
             next={() => next()}
             values={{
               question,
               category,
+              categoriesCustom,
               resolution,
               arbitrator,
               arbitratorsCustom,

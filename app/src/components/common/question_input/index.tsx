@@ -17,6 +17,7 @@ interface Props {
   context: ConnectedWeb3Context
   disabled: boolean
   addArbitratorCustomValue: (arbitrator: Arbitrator) => void
+  addCategoryCustomValue: (category: string) => void
 }
 
 const Link = styled(FormRowLink)`
@@ -36,6 +37,7 @@ export const QuestionInput = (props: Props) => {
     context,
     disabled,
     addArbitratorCustomValue,
+    addCategoryCustomValue,
   } = props
 
   const [isModalQuestionOpen, setModalQuestionState] = useState(false)
@@ -58,6 +60,7 @@ export const QuestionInput = (props: Props) => {
         onClose={() => setModalQuestionState(false)}
         onSave={(question: Question, arbitrator: Arbitrator) => {
           addArbitratorCustomValue(arbitrator)
+          addCategoryCustomValue(question.category)
           onChangeFromRealitio(question, arbitrator)
         }}
       />

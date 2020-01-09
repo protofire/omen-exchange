@@ -23,9 +23,10 @@ export const Arbitrators = (props: Props) => {
   const { networkId, value, customValues, onChangeArbitrator, ...restProps } = props
 
   const arbitrators = getArbitratorsByNetwork(networkId)
-  const allArbitrators = arbitrators
-    .concat(customValues)
-    .filter((obj, key, array) => array.map(obj2 => obj.id !== obj2.id))
+  const allArbitrators = arbitrators.map(arbitrator => ({
+    ...customValues.find(customArbitrator => customArbitrator.id === arbitrator.id),
+    ...arbitrator,
+  }))
   const options = allArbitrators.map(arbitrator => ({
     label: arbitrator.name,
     value: arbitrator.id,

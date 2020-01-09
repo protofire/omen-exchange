@@ -115,6 +115,7 @@ export interface MarketData {
   collateral: Token
   collateralsCustom: Token[]
   arbitratorsCustom: Arbitrator[]
+  categoriesCustom: string[]
   question: string
   category: string
   resolution: Date | null

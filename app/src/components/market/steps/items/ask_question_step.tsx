@@ -17,10 +17,11 @@ interface Props {
   values: {
     question: string
     category: string
+    categoriesCustom: string[]
     resolution: Date | null
     arbitrator: Arbitrator
-    questionIsFromRealitio: boolean
     arbitratorsCustom: Arbitrator[]
+    questionIsFromRealitio: boolean
   }
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
   handleChangeDate: (date: Date | null) => any
@@ -28,6 +29,7 @@ interface Props {
   handleChangeArbitrator: (arbitrator: Arbitrator) => any
   handleClearQuestion: () => any
   addArbitratorCustom: (arbitrator: Arbitrator) => void
+  addCategoryCustom: (category: string) => void
 }
 
 const OracleInfo = styled(Well)`
@@ -46,11 +48,13 @@ const AskQuestionStep = (props: Props) => {
     handleChangeArbitrator,
     handleChangeDate,
     addArbitratorCustom,
+    addCategoryCustom,
     next,
   } = props
   const {
     question,
     category,
+    categoriesCustom,
     resolution,
     arbitrator,
     arbitratorsCustom,
@@ -87,6 +91,7 @@ const AskQuestionStep = (props: Props) => {
             onChangeFromRealitio={handleChangeQuestion}
             onClearQuestionFromRealitio={handleClearQuestion}
             addArbitratorCustomValue={addArbitratorCustom}
+            addCategoryCustomValue={addCategoryCustom}
             placeholder="Type in a question..."
             context={context}
             disabled={questionIsFromRealitio}
@@ -106,6 +111,7 @@ const AskQuestionStep = (props: Props) => {
             disabled={questionIsFromRealitio}
             value={category}
             onChange={handleChange}
+            customValues={categoriesCustom}
           />
         }
         title={'Category'}
