@@ -4,7 +4,7 @@ import moment from 'moment'
 import { getLogger } from '../../util/logger'
 import { MarketWizardCreator } from './market_wizard_creator'
 import { ERC20Service } from '../../services'
-import { getArbitrator, getContractAddress } from '../../util/networks'
+import { getContractAddress } from '../../util/networks'
 import { MarketData } from '../../util/types'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
@@ -37,12 +37,10 @@ const MarketWizardCreatorContainer: FC = () => {
           throw new Error('resolution time was not specified')
         }
         const user = await provider.getSigner().getAddress()
-        const { collateral, arbitratorId, question, resolution, funding, outcomes, category } = data
+        const { collateral, arbitrator, question, resolution, funding, outcomes, category } = data
         const openingDateMoment = moment(resolution)
 
         const collateralService = new ERC20Service(provider, account, collateral.address)
-
-        const arbitrator = getArbitrator(networkId, arbitratorId)
 
         setMarketCreationStatus(MarketCreationStatus.postingQuestion())
         const questionId = await realitio.askQuestion(

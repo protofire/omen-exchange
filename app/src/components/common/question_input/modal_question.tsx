@@ -1,4 +1,4 @@
-import React, { useState, HTMLAttributes, ChangeEvent, useEffect, useMemo } from 'react'
+import React, { useState, HTMLAttributes, ChangeEvent, useMemo } from 'react'
 import styled from 'styled-components'
 
 import { Textfield } from '../textfield'
@@ -48,7 +48,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   context: ConnectedWeb3Context
   isOpen: boolean
   onClose: () => void
-  onSave: (question: Question) => void
+  onSave: (question: Question, arbitrator: Arbitrator) => void
 }
 
 export const ModalQuestion = (props: Props) => {
@@ -58,8 +58,6 @@ export const ModalQuestion = (props: Props) => {
 
   const [questionId, setQuestionId] = useState<string>('')
   const [isSpinnerOn, setSpinnerOn] = useState<boolean>(false)
-
-  // TODO: is is an unkwnon, how to manage the address, validate the contract ?
 
   const fetchQuestion = useMemo(
     () => async (): Promise<[Maybe<Question>, Maybe<Arbitrator>, Maybe<string>]> => {
@@ -91,7 +89,7 @@ export const ModalQuestion = (props: Props) => {
 
   const onClickSaveButton = () => {
     if (validQuestion) {
-      if (question) onSave(question)
+      if (question && arbitrator) onSave(question, arbitrator)
       onClose()
     }
   }

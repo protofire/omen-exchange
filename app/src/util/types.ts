@@ -100,6 +100,7 @@ export interface Log {
 }
 
 export interface Arbitrator {
+  id: KnownArbitrator
   address: string
   name: string
   url: string
@@ -113,10 +114,11 @@ export enum Wallet {
 export interface MarketData {
   collateral: Token
   collateralsCustom: Token[]
+  arbitratorsCustom: Arbitrator[]
   question: string
   category: string
   resolution: Date | null
-  arbitratorId: KnownArbitrator
+  arbitrator: Arbitrator
   spread: number
   funding: BigNumber
   outcomes: Outcome[]

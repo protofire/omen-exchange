@@ -2,34 +2,53 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Select } from '../select'
-import { knownArbitrators } from '../../../util/networks'
+import { getArbitratorsByNetwork } from '../../../util/networks'
+import { Arbitrator } from '../../../util/types'
 
 interface Props {
   autoFocus?: boolean
   disabled?: boolean
   name: string
-  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => any
+  onChangeArbitrator: (arbitrator: Arbitrator) => any
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
   readOnly?: boolean
-  value: string
+  value: Arbitrator
+  customValues: Arbitrator[]
+  networkId: number
 }
 
 const FormOption = styled.option``
 
-const arbitrators = Object.entries(knownArbitrators).map(([id, knownArbitrator]) => ({
-  label: knownArbitrator.name,
-  value: id,
-}))
-
 export const Arbitrators = (props: Props) => {
-  const { ...restProps } = props
+  const { networkId, value, customValues, onChangeArbitrator, ...restProps } = props
+
+  const arbitrators = getArbitratorsByNetwork(networkId)
+  const allArbitrators = arbitrators
+    .concat(customValues)
+    .filter((obj, key, array) => array.map(obj2 => obj.id !== obj2.id))
+  const options = allArbitrators.map(arbitrator => ({
+    label: arbitrator.name,
+    value: arbitrator.id,
+  }))
+
+  const onChange = (id: KnownArbitrator) => {
+    for (const arbitrator of allArbitrators) {
+      if (arbitrator.id === id) {
+        onChangeArbitrator(arbitrator)
+      }
+    }
+  }
 
   return (
-    <Select {...restProps}>
-      {arbitrators.map(arbitrator => {
+    <Select
+      {...restProps}
+      value={value.id}
+      onChange={e => onChange(e.target.value as KnownArbitrator)}
+    >
+      {options.map(option => {
         return (
-          <FormOption key={arbitrator.value} value={arbitrator.value}>
-            {arbitrator.label}
+          <FormOption key={option.value} value={option.value}>
+            {option.label}
           </FormOption>
         )
       })}

@@ -285,14 +285,24 @@ export const getArbitrator = (networkId: number, arbitratorId: KnownArbitrator):
   }
 
   return {
+    id: arbitratorId,
     address,
     name: arbitrator.name,
     url: arbitrator.url,
   }
 }
 
+export const getDefaultArbitrator = (networkId: number) => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  return getArbitrator(networkId, 'realitio')
+}
+
 export const getArbitratorFromAddress = (networkId: number, address: string): Maybe<Arbitrator> => {
-  for (const arbitrator of Object.values(knownArbitrators)) {
+  for (const key in knownArbitrators) {
+    const arbitrator = knownArbitrators[key as KnownArbitrator]
     const arbitratorAddress = arbitrator.addresses[networkId]
 
     // arbitratorId might not be supported in the current network
@@ -302,6 +312,7 @@ export const getArbitratorFromAddress = (networkId: number, address: string): Ma
 
     if (arbitratorAddress.toLowerCase() === address.toLowerCase()) {
       return {
+        id: key as KnownArbitrator,
         address: arbitratorAddress,
         name: arbitrator.name,
         url: arbitrator.url,
@@ -309,7 +320,12 @@ export const getArbitratorFromAddress = (networkId: number, address: string): Ma
     }
   }
 
-  return null
+  return {
+    id: 'unknow' as KnownArbitrator,
+    address: address,
+    name: 'Unknow',
+    url: '',
+  }
 }
 
 export const getKnowArbitratorFromAddress = (
@@ -337,4 +353,27 @@ export const getRealitioTimeout = (networkId: number): number => {
   }
 
   return networks[networkId].realitioTimeout
+}
+
+export const getArbitratorsByNetwork = (networkId: number): Arbitrator[] => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  return Object.values(knownArbitrators)
+    .map(arbitrator => {
+      const address = arbitrator.addresses[networkId]
+      if (address) {
+        const { name, url } = arbitrator
+        const id = getKnowArbitratorFromAddress(networkId, address)
+        return {
+          id,
+          name,
+          url,
+          address,
+        }
+      }
+      return null
+    })
+    .filter(isNotNull)
 }

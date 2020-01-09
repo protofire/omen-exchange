@@ -8,10 +8,9 @@ import { DateField } from '../../../common/date_field'
 import { ButtonContainer } from '../../../common/button_container'
 import { Well } from '../../../common/well'
 import { Arbitrators } from '../../../common/arbitrators'
-import { knownArbitrators } from '../../../../util/networks'
 import { QuestionInput } from '../../../common/question_input'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { Question } from '../../../../util/types'
+import { Arbitrator, Question } from '../../../../util/types'
 
 interface Props {
   next: () => void
@@ -19,13 +18,16 @@ interface Props {
     question: string
     category: string
     resolution: Date | null
-    arbitratorId: KnownArbitrator
+    arbitrator: Arbitrator
     questionIsFromRealitio: boolean
+    arbitratorsCustom: Arbitrator[]
   }
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
   handleChangeDate: (date: Date | null) => any
-  handleChangeQuestion: (question: Question) => any
+  handleChangeQuestion: (question: Question, arbitrator: Arbitrator) => any
+  handleChangeArbitrator: (arbitrator: Arbitrator) => any
   handleClearQuestion: () => any
+  addArbitratorCustom: (arbitrator: Arbitrator) => void
 }
 
 const OracleInfo = styled(Well)`
@@ -41,11 +43,19 @@ const AskQuestionStep = (props: Props) => {
     handleChange,
     handleClearQuestion,
     handleChangeQuestion,
+    handleChangeArbitrator,
     handleChangeDate,
+    addArbitratorCustom,
     next,
   } = props
-  const { question, category, resolution, arbitratorId, questionIsFromRealitio } = values
-  const arbitrator = knownArbitrators[arbitratorId]
+  const {
+    question,
+    category,
+    resolution,
+    arbitrator,
+    arbitratorsCustom,
+    questionIsFromRealitio,
+  } = values
 
   const error = !question || !category || !resolution
 
@@ -76,6 +86,7 @@ const AskQuestionStep = (props: Props) => {
             onChange={handleChange}
             onChangeFromRealitio={handleChangeQuestion}
             onClearQuestionFromRealitio={handleClearQuestion}
+            addArbitratorCustomValue={addArbitratorCustom}
             placeholder="Type in a question..."
             context={context}
             disabled={questionIsFromRealitio}
@@ -123,9 +134,11 @@ const AskQuestionStep = (props: Props) => {
         formField={
           <Arbitrators
             disabled={questionIsFromRealitio}
-            name="arbitratorId"
-            value={arbitratorId}
-            onChange={handleChange}
+            name="arbitrator"
+            value={arbitrator}
+            onChangeArbitrator={handleChangeArbitrator}
+            customValues={arbitratorsCustom}
+            networkId={context.networkId}
           />
         }
         title={'Arbitrator'}

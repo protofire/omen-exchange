@@ -27,7 +27,7 @@ interface Props {
     spread: number
     funding: BigNumber
   }
-  handleCollateralChange: (collateral: Token) => void
+  handleChangeCollateral: (collateral: Token) => void
   addCollateralCustom: (collateral: Token) => void
   handleChange: (
     event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn,
@@ -50,7 +50,7 @@ const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { library: provider, account } = context
 
-  const { values, addCollateralCustom, handleChange, handleCollateralChange } = props
+  const { values, addCollateralCustom, handleChange, handleChangeCollateral } = props
   const { funding, spread, collateral, collateralsCustom } = values
 
   const calculateCollateralBalance = useMemo(
@@ -115,7 +115,7 @@ const FundingAndFeeStep = (props: Props) => {
             context={context}
             customValues={collateralsCustom}
             name="collateralId"
-            onCollateralChange={handleCollateralChange}
+            onCollateralChange={handleChangeCollateral}
             value={collateral}
           />
         }
