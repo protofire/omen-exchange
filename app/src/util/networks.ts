@@ -269,6 +269,11 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
       [networkIds.GANACHE]: '0x000000000000000000000000000000003ea11710',
     },
   },
+  unknow: {
+    name: 'Unknow',
+    url: '',
+    addresses: {},
+  },
 }
 
 export const getArbitrator = (networkId: number, arbitratorId: KnownArbitrator): Arbitrator => {
@@ -305,6 +310,25 @@ export const getArbitratorFromAddress = (networkId: number, address: string): Ma
   }
 
   return null
+}
+
+export const getKnowArbitratorFromAddress = (
+  networkId: number,
+  address: string,
+): KnownArbitrator => {
+  for (const key in knownArbitrators) {
+    const arbitratorAddress = knownArbitrators[key as KnownArbitrator].addresses[networkId]
+
+    if (!arbitratorAddress) {
+      continue
+    }
+
+    if (arbitratorAddress.toLowerCase() === address.toLowerCase()) {
+      return key as KnownArbitrator
+    }
+  }
+
+  return 'unknow' as KnownArbitrator
 }
 
 export const getRealitioTimeout = (networkId: number): number => {
