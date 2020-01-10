@@ -77,7 +77,7 @@ const AskQuestionStep = (props: Props) => {
       <FormRow
         formField={
           <QuestionInput
-            defaultValue={question}
+            value={question}
             name="question"
             onChange={handleChange}
             onChangeQuestion={handleChangeQuestion}

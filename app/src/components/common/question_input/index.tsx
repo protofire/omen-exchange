@@ -9,7 +9,7 @@ import { Textfield } from '../textfield'
 import { FormRowNote } from '../form_row_note'
 
 interface Props {
-  defaultValue: string
+  value: string
   name: string
   onChange: (event: ChangeEvent<HTMLInputElement>) => any
   onChangeQuestion: (question: Question, arbitrator: Arbitrator) => any
@@ -41,7 +41,7 @@ const Link = styled(FormRowLink)`
 
 export const QuestionInput = (props: Props) => {
   const {
-    defaultValue,
+    value,
     name = 'question',
     onChange,
     onChangeQuestion,
@@ -58,7 +58,7 @@ export const QuestionInput = (props: Props) => {
   return (
     <>
       <Textfield
-        defaultValue={defaultValue}
+        value={value}
         name={name}
         onChange={onChange}
         placeholder={placeholder}
