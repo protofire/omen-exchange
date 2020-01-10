@@ -110,8 +110,7 @@ export const useMarketMakerData = (
 
     const balances: BalanceItem[] = outcomes.map((outcome: string, index: number) => {
       const outcomeName = outcome
-      const probabilityForPrice = actualPrices[index] * 100
-      const probability = Math.round((probabilityForPrice / 100) * 100)
+      const probability = actualPrices[index] * 100
       const currentPrice = actualPrices[index]
       const shares = userShares[index]
       const holdings = marketMakerShares[index]

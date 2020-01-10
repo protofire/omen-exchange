@@ -10,7 +10,7 @@ import { BarDiagram } from '../bar_diagram_probabilities'
 interface Props {
   balances: BalanceItem[]
   collateral: Token
-  pricesAfterTrade?: number[]
+  probabilities: number[]
   outcomeSelected?: number
   outcomeHandleChange?: (e: number) => void
   disabledColumns?: OutcomeTableValue[]
@@ -41,7 +41,7 @@ export const OutcomeTable = (props: Props) => {
   const {
     balances,
     collateral,
-    pricesAfterTrade,
+    probabilities,
     outcomeSelected,
     outcomeHandleChange,
     disabledColumns = [],
@@ -54,16 +54,14 @@ export const OutcomeTable = (props: Props) => {
     OutcomeTableValue.CurrentPrice,
     OutcomeTableValue.Shares,
     OutcomeTableValue.Payout,
-    OutcomeTableValue.PriceAfterTrade,
   ]
 
-  const outcomeMaxProbability = balances.reduce(
-    (max, balance, index, balances) =>
-      balance.probability > balances[max].probability ? index : max,
+  const outcomeMaxProbability = probabilities.reduce(
+    (max, balance, index, balances) => (balance > balances[max] ? index : max),
     0,
   )
 
-  const equalProbabilities = balances.every(b => b.probability === balances[0].probability)
+  const equalProbabilities = probabilities.every(b => b === probabilities[0])
 
   const TableCellsAlign = ['left', 'right', 'right', 'right', 'right', 'right']
 
@@ -87,15 +85,13 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
-  const renderTableRow = (
-    balanceItem: BalanceItem,
-    outcomeIndex: number,
-    priceAfterTrade?: number,
-  ) => {
-    const { outcomeName, probability, currentPrice, shares, winningOutcome } = balanceItem
+  const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
+    const { outcomeName, currentPrice, shares, winningOutcome } = balanceItem
     const isWinning = !equalProbabilities && outcomeIndex === outcomeMaxProbability
 
     const currentPriceFormatted = Number(currentPrice).toFixed(4)
+
+    const probability = probabilities[outcomeIndex]
 
     return (
       <TR key={outcomeName}>
@@ -154,15 +150,6 @@ export const OutcomeTable = (props: Props) => {
         ) : (
           <TD textAlign={TableCellsAlign[4]}>{formatBigNumber(shares, collateral.decimals)}</TD>
         )}
-        {disabledColumns.includes(OutcomeTableValue.PriceAfterTrade) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[5]} winningOutcome={winningOutcome}>
-            {priceAfterTrade && priceAfterTrade.toFixed(4)} <strong>{collateral.symbol}</strong>
-          </TDStyled>
-        ) : (
-          <TD textAlign={TableCellsAlign[5]}>
-            {priceAfterTrade && priceAfterTrade.toFixed(4)} <strong>{collateral.symbol}</strong>
-          </TD>
-        )}
       </TR>
     )
   }
@@ -170,9 +157,7 @@ export const OutcomeTable = (props: Props) => {
   const renderTable = () =>
     balances
       .sort((a, b) => (a.winningOutcome === b.winningOutcome ? 0 : a.winningOutcome ? -1 : 1)) // Put winning outcome first
-      .map((balanceItem: BalanceItem, index) =>
-        renderTableRow(balanceItem, index, pricesAfterTrade && pricesAfterTrade[index]),
-      )
+      .map((balanceItem: BalanceItem, index) => renderTableRow(balanceItem, index))
 
   return (
     <TableWrapper>
