@@ -122,5 +122,5 @@ export interface MarketData {
   spread: number
   funding: BigNumber
   outcomes: Outcome[]
-  questionIsFromRealitio: boolean
+  loadedQuestion: boolean
 }

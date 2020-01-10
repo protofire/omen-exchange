@@ -56,7 +56,7 @@ export const MarketWizardCreator = (props: Props) => {
         probability: 50,
       },
     ],
-    questionIsFromRealitio: false,
+    loadedQuestion: false,
   }
 
   const [currentStep, setCurrentStep] = useState(1)
@@ -177,7 +177,7 @@ export const MarketWizardCreator = (props: Props) => {
       category,
       resolution,
       outcomes: outcomesFromQuestion,
-      questionIsFromRealitio: true,
+      loadedQuestion: true,
     }
 
     setMarketdata(newMarketData)
@@ -200,7 +200,7 @@ export const MarketWizardCreator = (props: Props) => {
           probability: 50,
         },
       ],
-      questionIsFromRealitio: false,
+      loadedQuestion: false,
     }
 
     setMarketdata(newMarketData)
@@ -239,7 +239,7 @@ export const MarketWizardCreator = (props: Props) => {
       spread,
       funding,
       outcomes,
-      questionIsFromRealitio,
+      loadedQuestion,
     } = marketData
 
     switch (currentStep) {
@@ -261,7 +261,7 @@ export const MarketWizardCreator = (props: Props) => {
               resolution,
               arbitrator,
               arbitratorsCustom,
-              questionIsFromRealitio,
+              loadedQuestion: loadedQuestion,
             }}
           />
         )
@@ -284,7 +284,7 @@ export const MarketWizardCreator = (props: Props) => {
             values={{
               outcomes,
               question,
-              questionIsFromRealitio,
+              loadedQuestion: loadedQuestion,
             }}
             handleOutcomesChange={handleOutcomesChange}
           />
@@ -318,7 +318,7 @@ export const MarketWizardCreator = (props: Props) => {
               resolution,
               arbitrator,
               arbitratorsCustom,
-              questionIsFromRealitio,
+              loadedQuestion: loadedQuestion,
             }}
           />
         )
