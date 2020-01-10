@@ -5,7 +5,6 @@ import { formatDate } from '../../../util/tools'
 import { CalendarIcon } from '../calendar_icon'
 import { ChevronRightIcon } from '../chevron_right_icon'
 import { NavLink } from 'react-router-dom'
-import { useWeb3Context } from 'web3-react/dist'
 
 const ListItemCss = css`
   align-items: center;
@@ -26,10 +25,6 @@ const ListItemCss = css`
 
 const ListItemWrapperWithLink = styled(NavLink)`
   cursor: pointer;
-  ${ListItemCss}
-`
-
-const ListItemWrapperWithoutLink = styled.div`
   ${ListItemCss}
 `
 
@@ -130,32 +125,22 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 interface ListItemWrapperProps {
-  account?: Maybe<string>
   address: string
   children: React.ReactNode
 }
 
 const ListItemWrapper: React.FC<ListItemWrapperProps> = (props: ListItemWrapperProps) => {
-  const { account, address, children } = props
+  const { address, children } = props
 
-  return (
-    <>
-      {account ? (
-        <ListItemWrapperWithLink to={address}>{children}</ListItemWrapperWithLink>
-      ) : (
-        <ListItemWrapperWithoutLink>{children}</ListItemWrapperWithoutLink>
-      )}
-    </>
-  )
+  return <ListItemWrapperWithLink to={address}>{children}</ListItemWrapperWithLink>
 }
 
 export const ListItem: React.FC<Props> = (props: Props) => {
-  const { account } = useWeb3Context()
   const { data } = props
   const { address, question, resolution, status } = data
 
   return (
-    <ListItemWrapper account={account} address={address}>
+    <ListItemWrapper address={address}>
       <Contents>
         <Title>{question}</Title>
         <Info>

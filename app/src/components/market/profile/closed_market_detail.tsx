@@ -11,7 +11,7 @@ import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { ERC20Service } from '../../../services'
-import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { useConnectedWeb3Context, WhenConnected } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
 import { useContracts } from '../../../hooks/useContracts'
@@ -130,6 +130,11 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
   const probabilities = balances.map(balance => balance.probability)
 
+  const disabledColumns = [OutcomeTableValue.CurrentPrice]
+  if (!account) {
+    disabledColumns.push(OutcomeTableValue.Shares)
+  }
+
   return (
     <>
       <ClosedMarket date={resolutionFormat} />
@@ -138,7 +143,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <OutcomeTable
           balances={balances}
           collateral={collateralToken}
-          disabledColumns={[OutcomeTableValue.CurrentPrice]}
+          disabledColumns={disabledColumns}
           withWinningOutcome={true}
           displayRadioSelection={false}
           probabilities={probabilities}
@@ -159,14 +164,16 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <Grid>
           <TitleValue title="Collateral" value={collateralFormat} />
         </Grid>
-        <ButtonContainer>
-          {winningOutcome && !winningOutcome.shares.isZero() && (
-            <Button onClick={() => redeem()}>Redeem</Button>
-          )}
-          {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() ? (
-            <Button onClick={resolveCondition}>Resolve Condition</Button>
-          ) : null}
-        </ButtonContainer>
+        <WhenConnected>
+          <ButtonContainer>
+            {winningOutcome && !winningOutcome.shares.isZero() && (
+              <Button onClick={() => redeem()}>Redeem</Button>
+            )}
+            {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() && (
+              <Button onClick={resolveCondition}>Resolve Condition</Button>
+            )}
+          </ButtonContainer>
+        </WhenConnected>
       </ViewCard>
       {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>

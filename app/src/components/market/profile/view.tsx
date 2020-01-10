@@ -13,12 +13,14 @@ import { BigNumber } from 'ethers/utils'
 import { TitleValue } from '../../common/title_value'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
 import { GridThreeColumns } from '../../common/grid_three_columns'
+import { WhenConnected } from '../../../hooks/connectedWeb3'
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
   margin-bottom: 0;
 `
 
 interface Props extends RouteComponentProps<{}> {
+  account: Maybe<string>
   balances: BalanceItem[]
   collateral: Token
   arbitrator: Maybe<Arbitrator>
@@ -101,15 +103,19 @@ const ViewWrapper = (props: Props) => {
         <SubsectionTitleStyled>Outcomes</SubsectionTitleStyled>
         {renderTableData()}
         {marketHasDetails && details()}
-        <ButtonContainer>
-          <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
-          {userHasShares && (
-            <ButtonAnchor href={`/#/${marketMakerAddress}/sell`}>Sell</ButtonAnchor>
-          )}
-          <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
-        </ButtonContainer>
+        <WhenConnected>
+          <ButtonContainer>
+            <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
+            {userHasShares && (
+              <ButtonAnchor href={`/#/${marketMakerAddress}/sell`}>Sell</ButtonAnchor>
+            )}
+            <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
+          </ButtonContainer>
+        </WhenConnected>
       </ViewCard>
-      <ThreeBoxComments threadName={marketMakerAddress} />
+      <WhenConnected>
+        <ThreeBoxComments threadName={marketMakerAddress} />
+      </WhenConnected>
       {status === Status.Loading ? <FullLoading /> : null}
     </>
   )

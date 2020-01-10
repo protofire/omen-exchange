@@ -8,6 +8,7 @@ import { View } from './profile/view'
 import { formatDate } from '../../util/tools'
 
 interface Props {
+  account: Maybe<string>
   balances: BalanceItem[]
   funding: BigNumber
   status: Status
