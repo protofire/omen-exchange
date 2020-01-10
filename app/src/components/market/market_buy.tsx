@@ -147,6 +147,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       await marketMakerService.buy(amount, outcomeIndex)
 
+      setAmount(new BigNumber(0))
       setStatus(Status.Ready)
     } catch (err) {
       setStatus(Status.Error)
