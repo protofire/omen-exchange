@@ -146,12 +146,14 @@ const FundingAndFeeStep = (props: Props) => {
         }}
         note={
           <>
-            <BalanceToken
-              collateral={collateral}
-              onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
-                handleChange({ name: 'funding', value: collateralBalance })
-              }}
-            />
+            {account && (
+              <BalanceToken
+                collateral={collateral}
+                onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
+                  handleChange({ name: 'funding', value: collateralBalance })
+                }}
+              />
+            )}
             <FormError>{fundingMessageError}</FormError>
           </>
         }
