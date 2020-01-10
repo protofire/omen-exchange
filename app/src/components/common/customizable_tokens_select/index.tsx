@@ -36,7 +36,7 @@ export const CustomizableTokensSelect = (props: Props) => {
         onTokenChange={onCollateralChange}
         value={value}
       />
-      <Link onClick={() => setModalCollateralState(true)}>Add token</Link>
+      <Link onClick={() => setModalCollateralState(true)}>Add custom token</Link>
       <ModalCollateral
         context={context}
         isOpen={isModalCollateralOpen}
