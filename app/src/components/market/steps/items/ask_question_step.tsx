@@ -80,7 +80,7 @@ const AskQuestionStep = (props: Props) => {
             defaultValue={question}
             name="question"
             onChange={handleChange}
-            onChangeFromRealitio={handleChangeQuestion}
+            onChangeQuestion={handleChangeQuestion}
             onClearQuestionFromRealitio={handleClearQuestion}
             addArbitratorCustomValue={addArbitratorCustom}
             addCategoryCustomValue={addCategoryCustom}

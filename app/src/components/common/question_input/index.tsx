@@ -12,7 +12,7 @@ interface Props {
   defaultValue: string
   name: string
   onChange: (event: ChangeEvent<HTMLInputElement>) => any
-  onChangeFromRealitio: (question: Question, arbitrator: Arbitrator) => any
+  onChangeQuestion: (question: Question, arbitrator: Arbitrator) => any
   onClearQuestionFromRealitio: () => void
   placeholder: string
   context: ConnectedWeb3Context
@@ -44,7 +44,7 @@ export const QuestionInput = (props: Props) => {
     defaultValue,
     name = 'question',
     onChange,
-    onChangeFromRealitio,
+    onChangeQuestion,
     onClearQuestionFromRealitio,
     placeholder = 'Type in a question...',
     context,
@@ -79,7 +79,7 @@ export const QuestionInput = (props: Props) => {
           onSave={(question: Question, arbitrator: Arbitrator) => {
             addArbitratorCustomValue(arbitrator)
             addCategoryCustomValue(question.category)
-            onChangeFromRealitio(question, arbitrator)
+            onChangeQuestion(question, arbitrator)
           }}
         />
       </Wrapper>
