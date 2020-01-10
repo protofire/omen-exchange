@@ -68,6 +68,7 @@ const Progress = styled.div<ProgressBarProps>`
   border-radius: 3px;
   height: 100%;
   width: ${props => props.width}%;
+  transition: width 1s;
 `
 
 interface Props extends HTMLAttributes<HTMLButtonElement> {
@@ -93,7 +94,7 @@ const BarDiagramComponent: React.FC<Props> = (props: Props) => {
       <Outcome>
         <OutcomeText>
           <OutcomeName>{outcomeName}</OutcomeName>
-          <OutcomeValue>{probability}%</OutcomeValue>
+          <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
         </OutcomeText>
         <ProgressBar>
           <Progress color={progressColor} width={probability} />

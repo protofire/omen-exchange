@@ -33,6 +33,8 @@ const getBalances = (yes: Partial<BalanceItem> = {}, no: Partial<BalanceItem> = 
   ]
 }
 
+const probabilities = [50, 50]
+
 const renderTable = (component: any) =>
   render(<ThemeProvider theme={theme}>{component}</ThemeProvider>)
 
@@ -45,7 +47,9 @@ const dai = {
 test('should work with minimal props', () => {
   const balances = getBalances()
 
-  const { asFragment } = renderTable(<OutcomeTable balances={balances} collateral={dai} />)
+  const { asFragment } = renderTable(
+    <OutcomeTable probabilities={probabilities} balances={balances} collateral={dai} />,
+  )
 
   expect(asFragment()).toMatchSnapshot()
 })
@@ -54,7 +58,12 @@ test('should hide radio selections', () => {
   const balances = getBalances()
 
   const { asFragment } = renderTable(
-    <OutcomeTable balances={balances} collateral={dai} displayRadioSelection={false} />,
+    <OutcomeTable
+      probabilities={probabilities}
+      balances={balances}
+      collateral={dai}
+      displayRadioSelection={false}
+    />,
   )
 
   expect(asFragment()).toMatchSnapshot()
@@ -65,6 +74,7 @@ test('should work with disabled columns', () => {
 
   const { asFragment } = renderTable(
     <OutcomeTable
+      probabilities={probabilities}
       balances={balances}
       collateral={dai}
       disabledColumns={[OutcomeTableValue.Payout]}
@@ -78,7 +88,12 @@ test('should show yes as winning token', () => {
   const balances = getBalances({ winningOutcome: true })
 
   const { asFragment } = renderTable(
-    <OutcomeTable balances={balances} collateral={dai} withWinningOutcome={true} />,
+    <OutcomeTable
+      probabilities={probabilities}
+      balances={balances}
+      collateral={dai}
+      withWinningOutcome={true}
+    />,
   )
 
   expect(asFragment()).toMatchSnapshot()
@@ -88,17 +103,22 @@ test('should show no as winning token', () => {
   const balances = getBalances({}, { winningOutcome: true })
 
   const { asFragment } = renderTable(
-    <OutcomeTable balances={balances} collateral={dai} withWinningOutcome={true} />,
+    <OutcomeTable
+      probabilities={probabilities}
+      balances={balances}
+      collateral={dai}
+      withWinningOutcome={true}
+    />,
   )
 
   expect(asFragment()).toMatchSnapshot()
 })
 
-test('should show prices after trade', () => {
+test('should show probabilities', () => {
   const balances = getBalances()
 
   const { asFragment } = renderTable(
-    <OutcomeTable balances={balances} collateral={dai} pricesAfterTrade={[0.75, 0.25]} />,
+    <OutcomeTable balances={balances} collateral={dai} probabilities={[0.75, 0.25]} />,
   )
 
   expect(asFragment()).toMatchSnapshot()
@@ -108,7 +128,12 @@ test('should accept a selected outcome', () => {
   const balances = getBalances()
 
   const { asFragment } = renderTable(
-    <OutcomeTable balances={balances} collateral={dai} outcomeSelected={0} />,
+    <OutcomeTable
+      probabilities={probabilities}
+      balances={balances}
+      collateral={dai}
+      outcomeSelected={0}
+    />,
   )
 
   expect(asFragment()).toMatchSnapshot()
@@ -120,7 +145,12 @@ test('should accept a selected outcome', () => {
   const onOutcomeChange = jest.fn()
 
   const { getByTestId } = renderTable(
-    <OutcomeTable balances={balances} collateral={dai} outcomeHandleChange={onOutcomeChange} />,
+    <OutcomeTable
+      probabilities={probabilities}
+      balances={balances}
+      collateral={dai}
+      outcomeHandleChange={onOutcomeChange}
+    />,
   )
 
   const radioForYesComponent = getByTestId('outcome_table_radio_Yes')

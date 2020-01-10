@@ -59,7 +59,6 @@ export enum OutcomeTableValue {
   CurrentPrice = 'Current Price',
   Shares = 'Shares',
   Payout = 'Payout',
-  PriceAfterTrade = 'Price after trade',
 }
 
 export interface Token {

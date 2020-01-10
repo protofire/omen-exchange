@@ -95,12 +95,14 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
-      return [tradedShares, pricesAfterTrade]
+      const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
+
+      return [tradedShares, probabilities]
     },
     [balances, marketMakerService, outcomeIndex],
   )
 
-  const [tradedShares, pricesAfterTrade] = useAsyncDerivedValue(
+  const [tradedShares, probabilities] = useAsyncDerivedValue(
     amount,
     [new BigNumber(0), balances.map(() => 0)],
     calcBuyAmount,
@@ -145,6 +147,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       await marketMakerService.buy(amount, outcomeIndex)
 
+      setAmount(new BigNumber(0))
       setStatus(Status.Ready)
     } catch (err) {
       setStatus(Status.Error)
@@ -173,7 +176,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          pricesAfterTrade={pricesAfterTrade}
+          probabilities={probabilities}
           outcomeSelected={outcomeIndex}
           outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           disabledColumns={[OutcomeTableValue.Payout]}

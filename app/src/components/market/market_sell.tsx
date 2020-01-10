@@ -92,7 +92,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
-    ): Promise<[Maybe<number[]>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
+    ): Promise<[number[], Maybe<BigNumber>, Maybe<BigNumber>]> => {
       const holdings = balances.map(balance => balance.holdings)
       const holdingsOfSoldOutcome = holdings[outcomeIndex]
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
@@ -110,7 +110,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         logger.warn(
           `Could not compute amount of collateral to sell for '${amountShares.toString()}' and '${holdingsOfSoldOutcome.toString()}'`,
         )
-        return [null, null, null]
+        return [[], null, null]
       }
 
       const balanceAfterTrade = computeBalanceAfterTrade(
@@ -123,14 +123,16 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
       const costFee = mulBN(amountToSell, marketFeeWithTwoDecimals)
 
-      return [pricesAfterTrade, costFee, amountToSell]
+      const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
+
+      return [probabilities, costFee, amountToSell]
     },
     [outcomeIndex, balances, marketFeeWithTwoDecimals],
   )
 
-  const [pricesAfterTrade, costFee, tradedCollateral] = useAsyncDerivedValue(
+  const [probabilities, costFee, tradedCollateral] = useAsyncDerivedValue(
     amountShares,
-    [null, null, null],
+    [balances.map(() => 0), null, null],
     calcSellAmount,
   )
 
@@ -155,6 +157,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       await marketMakerService.sell(tradedCollateral, outcomeIndex)
 
+      setAmountShares(new BigNumber(0))
       setStatus(Status.Ready)
     } catch (err) {
       setStatus(Status.Error)
@@ -192,7 +195,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           disabledColumns={[OutcomeTableValue.Payout]}
           outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           outcomeSelected={outcomeIndex}
-          pricesAfterTrade={pricesAfterTrade || undefined /* hack to cast Maybe<A> to A? */}
+          probabilities={probabilities}
         />
         <AmountWrapper
           formField={
