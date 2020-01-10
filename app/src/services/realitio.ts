@@ -131,6 +131,7 @@ class RealitioService {
     const { category, title, outcomes = [OutcomeSlot.Yes, OutcomeSlot.No] } = questionLog
 
     return {
+      questionId,
       question: title === 'undefined' ? '' : title,
       category: category === 'undefined' ? '' : category,
       resolution: new Date(openingTs * 1000),

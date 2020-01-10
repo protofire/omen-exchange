@@ -13,6 +13,7 @@ export const useQuestion = (
 ): Question => {
   const { conditionalTokens, realitio, buildMarketMaker } = useContracts(context)
 
+  const [questionId, setQuestionId] = useState<string>('')
   const [question, setQuestion] = useState<string>('')
   const [resolution, setResolution] = useState<Maybe<Date>>(null)
   const [arbitratorAddress, setArbitratorAddress] = useState<string>('')
@@ -36,6 +37,7 @@ export const useQuestion = (
         } = await realitio.getQuestion(questionId)
 
         if (isSubscribed) {
+          setQuestionId(questionId)
           setQuestion(question)
           setResolution(resolution)
           setArbitratorAddress(arbitratorAddress)
@@ -53,5 +55,5 @@ export const useQuestion = (
     }
   }, [marketMakerAddress, context, conditionalTokens, realitio, buildMarketMaker])
 
-  return { question, resolution, category, arbitratorAddress, outcomes }
+  return { questionId, question, resolution, category, arbitratorAddress, outcomes }
 }

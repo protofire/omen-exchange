@@ -56,7 +56,7 @@ export const MarketWizardCreator = (props: Props) => {
         probability: 50,
       },
     ],
-    loadedQuestion: false,
+    loadedQuestion: '',
   }
 
   const [currentStep, setCurrentStep] = useState(1)
@@ -161,7 +161,7 @@ export const MarketWizardCreator = (props: Props) => {
   }
 
   const handleQuestionChange = (questionObj: Question, arbitrator: Arbitrator) => {
-    const { question, resolution, category, outcomes } = questionObj
+    const { questionId, question, resolution, category, outcomes } = questionObj
 
     const outcomesFromQuestion = outcomes.map(outcomeName => {
       return {
@@ -177,7 +177,7 @@ export const MarketWizardCreator = (props: Props) => {
       category,
       resolution,
       outcomes: outcomesFromQuestion,
-      loadedQuestion: true,
+      loadedQuestion: questionId,
     }
 
     setMarketdata(newMarketData)
@@ -200,7 +200,7 @@ export const MarketWizardCreator = (props: Props) => {
           probability: 50,
         },
       ],
-      loadedQuestion: false,
+      loadedQuestion: '',
     }
 
     setMarketdata(newMarketData)
@@ -261,7 +261,7 @@ export const MarketWizardCreator = (props: Props) => {
               resolution,
               arbitrator,
               arbitratorsCustom,
-              loadedQuestion: loadedQuestion,
+              loadedQuestion,
             }}
           />
         )
@@ -284,7 +284,7 @@ export const MarketWizardCreator = (props: Props) => {
             values={{
               outcomes,
               question,
-              loadedQuestion: loadedQuestion,
+              loadedQuestion,
             }}
             handleOutcomesChange={handleOutcomesChange}
           />
@@ -318,7 +318,7 @@ export const MarketWizardCreator = (props: Props) => {
               resolution,
               arbitrator,
               arbitratorsCustom,
-              loadedQuestion: loadedQuestion,
+              loadedQuestion,
             }}
           />
         )

@@ -47,6 +47,7 @@ export enum StepProfile {
 }
 
 export interface Question {
+  questionId: string
   question: string
   resolution: Maybe<Date>
   arbitratorAddress: string
@@ -122,5 +123,5 @@ export interface MarketData {
   spread: number
   funding: BigNumber
   outcomes: Outcome[]
-  loadedQuestion: boolean
+  loadedQuestion: string
 }

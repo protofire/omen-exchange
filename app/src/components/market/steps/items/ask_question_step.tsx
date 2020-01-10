@@ -22,7 +22,7 @@ interface Props {
     resolution: Date | null
     arbitrator: Arbitrator
     arbitratorsCustom: Arbitrator[]
-    loadedQuestion: boolean
+    loadedQuestion: string
   }
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
   handleDateChange: (date: Date | null) => any
@@ -86,7 +86,7 @@ const AskQuestionStep = (props: Props) => {
             addCategoryCustomValue={addCategoryCustom}
             placeholder="Type in a question..."
             context={context}
-            disabled={loadedQuestion}
+            disabled={!!loadedQuestion}
           />
         }
         title={'Question'}
@@ -99,7 +99,7 @@ const AskQuestionStep = (props: Props) => {
         formField={
           <Categories
             name="category"
-            disabled={loadedQuestion}
+            disabled={!!loadedQuestion}
             value={category}
             onChange={handleChange}
             customValues={categoriesCustom}
@@ -114,7 +114,7 @@ const AskQuestionStep = (props: Props) => {
       <FormRow
         formField={
           <DateField
-            disabled={loadedQuestion}
+            disabled={!!loadedQuestion}
             minDate={new Date()}
             name="resolution"
             onChange={handleDateChange}
@@ -130,7 +130,7 @@ const AskQuestionStep = (props: Props) => {
       <FormRow
         formField={
           <Arbitrators
-            disabled={loadedQuestion}
+            disabled={!!loadedQuestion}
             name="arbitrator"
             value={arbitrator}
             onChangeArbitrator={handleArbitratorChange}

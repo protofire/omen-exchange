@@ -37,20 +37,31 @@ const MarketWizardCreatorContainer: FC = () => {
           throw new Error('resolution time was not specified')
         }
         const user = await provider.getSigner().getAddress()
-        const { collateral, arbitrator, question, resolution, funding, outcomes, category } = data
+        const {
+          collateral,
+          arbitrator,
+          question,
+          resolution,
+          funding,
+          outcomes,
+          category,
+          loadedQuestion,
+        } = data
         const openingDateMoment = moment(resolution)
 
         const collateralService = new ERC20Service(provider, account, collateral.address)
 
         setMarketCreationStatus(MarketCreationStatus.postingQuestion())
-        const questionId = await realitio.askQuestion(
-          question,
-          outcomes,
-          category,
-          arbitrator.address,
-          openingDateMoment,
-          networkId,
-        )
+        const questionId = !loadedQuestion
+          ? await realitio.askQuestion(
+              question,
+              outcomes,
+              category,
+              arbitrator.address,
+              openingDateMoment,
+              networkId,
+            )
+          : loadedQuestion
         setQuestionId(questionId)
 
         setMarketCreationStatus(MarketCreationStatus.prepareCondition())
