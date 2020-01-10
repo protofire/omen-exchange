@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import unionBy from 'lodash.unionby'
 
 import { Select } from '../select'
 import { getArbitratorsByNetwork } from '../../../util/networks'
@@ -23,11 +24,9 @@ export const Arbitrators = (props: Props) => {
   const { networkId, value, customValues, onChangeArbitrator, ...restProps } = props
 
   const arbitrators = getArbitratorsByNetwork(networkId)
-  const allArbitrators = arbitrators.map(arbitrator => ({
-    ...customValues.find(customArbitrator => customArbitrator.id === arbitrator.id),
-    ...arbitrator,
-  }))
-  const options = allArbitrators.map(arbitrator => ({
+  const allArbitrators = unionBy(arbitrators, customValues, 'id')
+
+  const options = allArbitrators.map((arbitrator: Arbitrator) => ({
     label: arbitrator.name,
     value: arbitrator.id,
   }))
