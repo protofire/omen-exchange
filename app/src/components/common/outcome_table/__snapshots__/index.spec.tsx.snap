@@ -116,7 +116,7 @@ exports[`should accept a selected outcome 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      50.00%
                     </p>
                   </div>
                   <div
@@ -212,7 +212,7 @@ exports[`should accept a selected outcome 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      50.00%
                     </p>
                   </div>
                   <div
@@ -322,7 +322,7 @@ exports[`should hide radio selections 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      50.00%
                     </p>
                   </div>
                   <div
@@ -379,7 +379,7 @@ exports[`should hide radio selections 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      50.00%
                     </p>
                   </div>
                   <div
@@ -498,7 +498,7 @@ exports[`should show no as winning token 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      50.00%
                     </p>
                   </div>
                   <div
@@ -558,7 +558,7 @@ exports[`should show no as winning token 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      50.00%
                     </p>
                   </div>
                   <div
@@ -922,7 +922,7 @@ exports[`should show yes as winning token 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      50.00%
                     </p>
                   </div>
                   <div
@@ -982,7 +982,7 @@ exports[`should show yes as winning token 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      50.00%
                     </p>
                   </div>
                   <div
@@ -1125,7 +1125,7 @@ exports[`should work with disabled columns 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      50.00%
                     </p>
                   </div>
                   <div
@@ -1216,7 +1216,7 @@ exports[`should work with disabled columns 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      50.00%
                     </p>
                   </div>
                   <div
@@ -1360,7 +1360,7 @@ exports[`should work with minimal props 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      50.00%
                     </p>
                   </div>
                   <div
@@ -1456,7 +1456,7 @@ exports[`should work with minimal props 1`] = `
                     <p
                       class="sc-jTzLTM hqAejy"
                     >
-                      50%
+                      50.00%
                     </p>
                   </div>
                   <div
