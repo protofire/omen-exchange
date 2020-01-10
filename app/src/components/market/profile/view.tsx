@@ -62,7 +62,6 @@ const ViewWrapper = (props: Props) => {
         displayRadioSelection={false}
         disabledColumns={disabledColumns}
         probabilities={probabilities}
-        displayWinningOutcomeColor={false}
       />
     )
   }
