@@ -113,7 +113,7 @@ interface Props {
 }
 
 const Outcomes = (props: Props) => {
-  const { outcomes, totalProbabilities, disabled = false, errorMessages } = props
+  const { outcomes, totalProbabilities, disabled, errorMessages } = props
 
   const updateOutcomeProbability = (index: number, newProbability: number) => {
     if (newProbability < 0 || newProbability > 100) {
