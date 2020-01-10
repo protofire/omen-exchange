@@ -48,8 +48,10 @@ const ViewWrapper = (props: Props) => {
     return !shares.isZero()
   })
 
+  const probabilities = balances.map(balance => balance.probability)
+
   const renderTableData = () => {
-    const disabledColumns = [OutcomeTableValue.Payout, OutcomeTableValue.PriceAfterTrade]
+    const disabledColumns = [OutcomeTableValue.Payout]
     if (!userHasShares) {
       disabledColumns.push(OutcomeTableValue.Shares)
     }
@@ -59,6 +61,7 @@ const ViewWrapper = (props: Props) => {
         collateral={collateral}
         displayRadioSelection={false}
         disabledColumns={disabledColumns}
+        probabilities={probabilities}
       />
     )
   }
