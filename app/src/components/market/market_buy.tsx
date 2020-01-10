@@ -29,6 +29,7 @@ import { useContracts } from '../../hooks/useContracts'
 import { ButtonType } from '../../common/button_styling_types'
 import { MARKET_FEE } from '../../common/constants'
 import { FormError } from '../common/form_error'
+import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -121,6 +122,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setCost(costWithFee)
   }, [amount, collateral])
 
+  const collateralBalance = useCollateralBalance(collateral, context)
+
   const finish = async () => {
     try {
       setStatus(Status.Loading)
@@ -156,18 +159,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const calculateCollateralBalance = useMemo(
-    () => async (): Promise<BigNumber> => {
-      const user = await provider.getSigner().getAddress()
-      const collateralService = new ERC20Service(provider, user, collateral.address)
-      const collateralBalance = await collateralService.getCollateral(user)
-      return collateralBalance
-    },
-    [provider, collateral],
-  )
-
-  const collateralBalance = useAsyncDerivedValue('', new BigNumber(0), calculateCollateralBalance)
-
   const isBuyAmountGreaterThanBalance = amount.gt(collateralBalance)
 
   const buyMessageError = isBuyAmountGreaterThanBalance
@@ -184,9 +175,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     <>
       <BalanceToken
         collateral={collateral}
-        onClickMax={(collateral: Token, collateralBalance: BigNumber) =>
-          setAmount(collateralBalance)
-        }
+        collateralBalance={collateralBalance}
+        onClickAddMaxCollateral={() => setAmount(collateralBalance)}
       />
       <FormError>{buyMessageError}</FormError>
     </>
