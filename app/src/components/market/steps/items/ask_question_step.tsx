@@ -11,6 +11,7 @@ import { Arbitrators } from '../../../common/arbitrators'
 import { QuestionInput } from '../../../common/question_input'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
+import { DisplayArbitrator } from '../../../common/display_arbitrator'
 
 interface Props {
   next: () => void
@@ -145,16 +146,7 @@ const AskQuestionStep = (props: Props) => {
         }}
       />
       <OracleInfo>
-        The market will be resolved using{' '}
-        <a href="https://realit.io/" rel="noopener noreferrer" target="_blank">
-          Realit.io
-        </a>{' '}
-        and{' '}
-        <a href={arbitrator.url} rel="noopener noreferrer" target="_blank">
-          {' '}
-          {arbitrator.name}
-        </a>{' '}
-        as final arbitrator.
+        <DisplayArbitrator arbitrator={arbitrator} />
       </OracleInfo>
       <ButtonContainer>
         <Button disabled={error} onClick={validate}>
