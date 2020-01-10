@@ -35,6 +35,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
 
   return (
     <MarketView
+      account={context.account}
       balances={balances}
       funding={marketMakerFunding}
       marketMakerAddress={marketMakerAddress}
