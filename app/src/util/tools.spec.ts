@@ -9,6 +9,7 @@ import {
   computeBalanceAfterTrade,
   divBN,
   getIndexSets,
+  truncateStringInTheMiddle as truncate,
 } from './tools'
 
 describe('tools', () => {
@@ -175,6 +176,20 @@ describe('tools', () => {
       expect(() =>
         computeBalanceAfterTrade(holdings, 10, bigNumberify(50), bigNumberify(100)),
       ).toThrow()
+    })
+  })
+
+  describe('truncateStringInTheMiddle', () => {
+    it('should not change string with truncate positions great or equal than string length', () => {
+      expect(truncate('foobar', 4, 2)).toBe('foobar')
+      expect(truncate('foobar', 6, 6)).toBe('foobar')
+      expect(truncate('foo')).toBe('foo')
+    })
+
+    it('should truncate string with three dots in the middle', () => {
+      expect(truncate('foobarbaz', 3, 2)).toBe('foo...az')
+      expect(truncate('foobarbaz', 1, 1)).toBe('f...z')
+      expect(truncate('foobarbazbazbarfoo')).toBe('foobarba...azbarfoo')
     })
   })
 })
