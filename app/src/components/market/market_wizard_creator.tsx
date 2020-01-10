@@ -143,7 +143,7 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const handleChangeCollateral = (collateral: Token) => {
+  const handleCollateralChange = (collateral: Token) => {
     const newMarketData = {
       ...marketData,
       funding: ethers.constants.Zero, // when the collateral changes, reset the value of funding
@@ -152,7 +152,7 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const handleChangeArbitrator = (arbitrator: Arbitrator) => {
+  const handleArbitratorChange = (arbitrator: Arbitrator) => {
     const newMarketData = {
       ...marketData,
       arbitrator,
@@ -160,7 +160,7 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const handleChangeQuestion = (questionObj: Question, arbitrator: Arbitrator) => {
+  const handleQuestionChange = (questionObj: Question, arbitrator: Arbitrator) => {
     const { question, resolution, category, outcomes } = questionObj
 
     const outcomesFromQuestion = outcomes.map(outcomeName => {
@@ -214,7 +214,7 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const handleChangeDate = (date: Date | null) => {
+  const handleDateChange = (date: Date | null) => {
     const newMarketData = {
       ...marketData,
       resolution: date,
@@ -247,9 +247,9 @@ export const MarketWizardCreator = (props: Props) => {
         return (
           <AskQuestionStep
             handleChange={handleChange}
-            handleChangeDate={handleChangeDate}
-            handleChangeArbitrator={handleChangeArbitrator}
-            handleChangeQuestion={handleChangeQuestion}
+            handleDateChange={handleDateChange}
+            handleArbitratorChange={handleArbitratorChange}
+            handleQuestionChange={handleQuestionChange}
             handleClearQuestion={handleClearQuestion}
             addArbitratorCustom={addArbitratorCustom}
             addCategoryCustom={addCategoryCustom}
@@ -270,7 +270,7 @@ export const MarketWizardCreator = (props: Props) => {
           <FundingAndFeeStep
             back={() => back()}
             handleChange={handleChange}
-            handleChangeCollateral={handleChangeCollateral}
+            handleCollateralChange={handleCollateralChange}
             addCollateralCustom={addCollateralCustom}
             next={() => next()}
             values={{ collateral, collateralsCustom, spread, funding }}
@@ -304,9 +304,9 @@ export const MarketWizardCreator = (props: Props) => {
         return (
           <AskQuestionStep
             handleChange={handleChange}
-            handleChangeDate={handleChangeDate}
-            handleChangeArbitrator={handleChangeArbitrator}
-            handleChangeQuestion={handleChangeQuestion}
+            handleDateChange={handleDateChange}
+            handleArbitratorChange={handleArbitratorChange}
+            handleQuestionChange={handleQuestionChange}
             handleClearQuestion={handleClearQuestion}
             addArbitratorCustom={addArbitratorCustom}
             addCategoryCustom={addCategoryCustom}

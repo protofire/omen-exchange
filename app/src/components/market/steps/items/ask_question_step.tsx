@@ -25,9 +25,9 @@ interface Props {
     loadedQuestion: boolean
   }
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
-  handleChangeDate: (date: Date | null) => any
-  handleChangeQuestion: (question: Question, arbitrator: Arbitrator) => any
-  handleChangeArbitrator: (arbitrator: Arbitrator) => any
+  handleDateChange: (date: Date | null) => any
+  handleQuestionChange: (question: Question, arbitrator: Arbitrator) => any
+  handleArbitratorChange: (arbitrator: Arbitrator) => any
   handleClearQuestion: () => any
   addArbitratorCustom: (arbitrator: Arbitrator) => void
   addCategoryCustom: (category: string) => void
@@ -45,9 +45,9 @@ const AskQuestionStep = (props: Props) => {
     values,
     handleChange,
     handleClearQuestion,
-    handleChangeQuestion,
-    handleChangeArbitrator,
-    handleChangeDate,
+    handleQuestionChange,
+    handleArbitratorChange,
+    handleDateChange,
     addArbitratorCustom,
     addCategoryCustom,
     next,
@@ -80,8 +80,8 @@ const AskQuestionStep = (props: Props) => {
             value={question}
             name="question"
             onChange={handleChange}
-            onChangeQuestion={handleChangeQuestion}
-            onClearQuestionFromRealitio={handleClearQuestion}
+            onChangeQuestion={handleQuestionChange}
+            onClearQuestion={handleClearQuestion}
             addArbitratorCustomValue={addArbitratorCustom}
             addCategoryCustomValue={addCategoryCustom}
             placeholder="Type in a question..."
@@ -117,7 +117,7 @@ const AskQuestionStep = (props: Props) => {
             disabled={loadedQuestion}
             minDate={new Date()}
             name="resolution"
-            onChange={handleChangeDate}
+            onChange={handleDateChange}
             selected={resolution}
           />
         }
@@ -133,7 +133,7 @@ const AskQuestionStep = (props: Props) => {
             disabled={loadedQuestion}
             name="arbitrator"
             value={arbitrator}
-            onChangeArbitrator={handleChangeArbitrator}
+            onChangeArbitrator={handleArbitratorChange}
             customValues={arbitratorsCustom}
             networkId={context.networkId}
           />

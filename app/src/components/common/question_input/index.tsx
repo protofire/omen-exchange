@@ -13,7 +13,7 @@ interface Props {
   name: string
   onChange: (event: ChangeEvent<HTMLInputElement>) => any
   onChangeQuestion: (question: Question, arbitrator: Arbitrator) => any
-  onClearQuestionFromRealitio: () => void
+  onClearQuestion: () => void
   placeholder: string
   context: ConnectedWeb3Context
   disabled: boolean
@@ -45,7 +45,7 @@ export const QuestionInput = (props: Props) => {
     name = 'question',
     onChange,
     onChangeQuestion,
-    onClearQuestionFromRealitio,
+    onClearQuestion,
     placeholder = 'Type in a question...',
     context,
     disabled,
@@ -71,7 +71,7 @@ export const QuestionInput = (props: Props) => {
           question, but <i>&quot;Will France win the 2020 FIFA World Cup?&quot;</i> is a good one.
         </Note>
         {!disabled && <Link onClick={() => setModalQuestionState(true)}>Add question</Link>}
-        {disabled && <Link onClick={onClearQuestionFromRealitio}>Clear question</Link>}
+        {disabled && <Link onClick={onClearQuestion}>Clear question</Link>}
         <ModalQuestion
           context={context}
           isOpen={isModalQuestionOpen}
