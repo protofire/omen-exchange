@@ -28,6 +28,8 @@ import { BalanceToken } from '../common/balance_token'
 import { useContracts } from '../../hooks/useContracts'
 import { ButtonType } from '../../common/button_styling_types'
 import { MARKET_FEE } from '../../common/constants'
+import { FormError } from '../common/form_error'
+import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -95,12 +97,14 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
-      return [tradedShares, pricesAfterTrade]
+      const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
+
+      return [tradedShares, probabilities]
     },
     [balances, marketMakerService, outcomeIndex],
   )
 
-  const [tradedShares, pricesAfterTrade] = useAsyncDerivedValue(
+  const [tradedShares, probabilities] = useAsyncDerivedValue(
     amount,
     [new BigNumber(0), balances.map(() => 0)],
     calcBuyAmount,
@@ -117,6 +121,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       .div(10000)
     setCost(costWithFee)
   }, [amount, collateral])
+
+  const collateralBalance = useCollateralBalance(collateral, context)
 
   const finish = async () => {
     try {
@@ -145,6 +151,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       await marketMakerService.buy(amount, outcomeIndex)
 
+      setAmount(new BigNumber(0))
       setStatus(Status.Ready)
     } catch (err) {
       setStatus(Status.Error)
@@ -152,16 +159,26 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const disabled = (status !== Status.Ready && status !== Status.Error) || cost.isZero()
+  const isBuyAmountGreaterThanBalance = amount.gt(collateralBalance)
+
+  const buyMessageError = isBuyAmountGreaterThanBalance
+    ? `You don't have enough collateral in your balance.`
+    : ''
+
+  const error =
+    (status !== Status.Ready && status !== Status.Error) ||
+    cost.isZero() ||
+    isBuyAmountGreaterThanBalance ||
+    amount.isZero()
 
   const noteAmount = (
     <>
       <BalanceToken
         collateral={collateral}
-        onClickMax={(collateral: Token, collateralBalance: BigNumber) =>
-          setAmount(collateralBalance)
-        }
+        collateralBalance={collateralBalance}
+        onClickAddMaxCollateral={() => setAmount(collateralBalance)}
       />
+      <FormError>{buyMessageError}</FormError>
     </>
   )
 
@@ -173,7 +190,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          pricesAfterTrade={pricesAfterTrade}
+          probabilities={probabilities}
           outcomeSelected={outcomeIndex}
           outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           disabledColumns={[OutcomeTableValue.Payout]}
@@ -228,7 +245,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
-          <Button buttonType={ButtonType.primary} disabled={disabled} onClick={() => finish()}>
+          <Button buttonType={ButtonType.primary} disabled={error} onClick={() => finish()}>
             Buy
           </Button>
         </ButtonContainer>

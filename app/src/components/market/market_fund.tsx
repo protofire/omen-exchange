@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
@@ -22,10 +22,10 @@ import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { ButtonLink } from '../common/button_link'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import { BalanceToken } from '../common/balance_token'
-import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
 import { ButtonType } from '../../common/button_styling_types'
 import { FormError } from '../common/form_error'
 import { FormLabel } from '../common/form_label'
+import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -143,18 +143,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const calculateCollateralBalance = useMemo(
-    () => async (): Promise<BigNumber> => {
-      const collateralService = new ERC20Service(provider, account, collateral.address)
-      const collateralBalance = account
-        ? await collateralService.getCollateral(account)
-        : new BigNumber(0)
-      return collateralBalance
-    },
-    [provider, account, collateral],
-  )
-
-  const collateralBalance = useAsyncDerivedValue('', new BigNumber(0), calculateCollateralBalance)
+  const collateralBalance = useCollateralBalance(collateral, context)
 
   const isFundingGreaterThanBalance = amount.gt(collateralBalance)
   const error = amount.isZero() || isFundingGreaterThanBalance
@@ -163,6 +152,8 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
     ? `You don't have enough collateral in your balance.`
     : ''
 
+  const probabilities = balances.map(balance => balance.probability)
+
   return (
     <>
       <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
@@ -170,13 +161,10 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         <SubsectionTitleStyled>Fund this market</SubsectionTitleStyled>
         <OutcomeTable
           balances={balances}
-          disabledColumns={[
-            OutcomeTableValue.CurrentPrice,
-            OutcomeTableValue.Payout,
-            OutcomeTableValue.PriceAfterTrade,
-          ]}
+          disabledColumns={[OutcomeTableValue.CurrentPrice, OutcomeTableValue.Payout]}
           displayRadioSelection={false}
           collateral={collateral}
+          probabilities={probabilities}
         />
         <AmountWrapper
           formField={
@@ -200,9 +188,8 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
             <>
               <BalanceToken
                 collateral={collateral}
-                onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
-                  setAmount(collateralBalance)
-                }}
+                collateralBalance={collateralBalance}
+                onClickAddMaxCollateral={() => setAmount(collateralBalance)}
               />
               <FormError>{fundingMessageError}</FormError>
             </>

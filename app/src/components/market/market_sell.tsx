@@ -33,6 +33,7 @@ import { Well } from '../common/well'
 import { Paragraph } from '../common/paragraph'
 import { MARKET_FEE } from '../../common/constants'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
+import { FormError } from '../common/form_error'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -83,7 +84,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
-  const [balanceItem] = useState<BalanceItem>(balances[outcomeIndex])
+  const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
 
@@ -92,7 +93,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
-    ): Promise<[Maybe<number[]>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
+    ): Promise<[number[], Maybe<BigNumber>, Maybe<BigNumber>]> => {
       const holdings = balances.map(balance => balance.holdings)
       const holdingsOfSoldOutcome = holdings[outcomeIndex]
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
@@ -110,7 +111,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         logger.warn(
           `Could not compute amount of collateral to sell for '${amountShares.toString()}' and '${holdingsOfSoldOutcome.toString()}'`,
         )
-        return [null, null, null]
+        return [[], null, null]
       }
 
       const balanceAfterTrade = computeBalanceAfterTrade(
@@ -123,14 +124,16 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
       const costFee = mulBN(amountToSell, marketFeeWithTwoDecimals)
 
-      return [pricesAfterTrade, costFee, amountToSell]
+      const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
+
+      return [probabilities, costFee, amountToSell]
     },
     [outcomeIndex, balances, marketFeeWithTwoDecimals],
   )
 
-  const [pricesAfterTrade, costFee, tradedCollateral] = useAsyncDerivedValue(
+  const [probabilities, costFee, tradedCollateral] = useAsyncDerivedValue(
     amountShares,
-    [null, null, null],
+    [balances.map(() => 0), null, null],
     calcSellAmount,
   )
 
@@ -155,6 +158,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       await marketMakerService.sell(tradedCollateral, outcomeIndex)
 
+      setAmountShares(new BigNumber(0))
       setStatus(Status.Ready)
     } catch (err) {
       setStatus(Status.Error)
@@ -162,10 +166,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const disabled =
+  const error =
     (status !== Status.Ready && status !== Status.Error) ||
     amountShares.isZero() ||
     !haveEnoughShares
+
+  const sharesMessageError = !haveEnoughShares
+    ? `You don't have enough shares in your balance.`
+    : ''
 
   const note = () => {
     return (
@@ -177,6 +185,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             if (balanceItemSet) setAmountShares(balanceItemSet.shares)
           }}
         />
+        <FormError>{sharesMessageError}</FormError>
       </>
     )
   }
@@ -190,9 +199,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           balances={balances}
           collateral={collateral}
           disabledColumns={[OutcomeTableValue.Payout]}
-          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
+          outcomeHandleChange={(value: number) => {
+            setOutcomeIndex(value)
+            setBalanceItem(balances[value])
+          }}
           outcomeSelected={outcomeIndex}
-          pricesAfterTrade={pricesAfterTrade || undefined /* hack to cast Maybe<A> to A? */}
+          probabilities={probabilities}
         />
         <AmountWrapper
           formField={
@@ -232,7 +244,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
-          <Button buttonType={ButtonType.primary} disabled={disabled} onClick={() => finish()}>
+          <Button buttonType={ButtonType.primary} disabled={error} onClick={() => finish()}>
             Sell
           </Button>
         </ButtonContainer>

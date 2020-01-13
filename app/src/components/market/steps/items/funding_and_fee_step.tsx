@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useMemo } from 'react'
+import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 
@@ -13,10 +13,9 @@ import { BalanceToken } from '../../../common/balance_token'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
 import { CustomizableTokensSelect } from '../../../common/customizable_tokens_select'
 import { Token } from '../../../../util/types'
-import { ERC20Service } from '../../../../services'
-import { useAsyncDerivedValue } from '../../../../hooks/useAsyncDerivedValue'
 import { FormError } from '../../../common/form_error'
 import { MARKET_FEE } from '../../../../common/constants'
+import { useCollateralBalance } from '../../../../hooks/useCollateralBalance'
 
 interface Props {
   back: () => void
@@ -48,23 +47,12 @@ const BigNumberInputTextRight = styled<any>(BigNumberInput)`
 
 const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { library: provider, account } = context
+  const { account } = context
 
   const { values, addCollateralCustom, handleChange, handleCollateralChange } = props
   const { funding, spread, collateral, collateralsCustom } = values
 
-  const calculateCollateralBalance = useMemo(
-    () => async (): Promise<BigNumber> => {
-      const collateralService = new ERC20Service(provider, account, collateral.address)
-      const collateralBalance = account
-        ? await collateralService.getCollateral(account)
-        : new BigNumber(0)
-      return collateralBalance
-    },
-    [provider, account, collateral],
-  )
-
-  const collateralBalance = useAsyncDerivedValue('', new BigNumber(0), calculateCollateralBalance)
+  const collateralBalance = useCollateralBalance(collateral, context)
 
   const isFundingGreaterThanBalance = account ? funding.gt(collateralBalance) : false
   const error = !spread || funding.isZero() || isFundingGreaterThanBalance
@@ -146,12 +134,15 @@ const FundingAndFeeStep = (props: Props) => {
         }}
         note={
           <>
-            <BalanceToken
-              collateral={collateral}
-              onClickMax={(collateral: Token, collateralBalance: BigNumber) => {
-                handleChange({ name: 'funding', value: collateralBalance })
-              }}
-            />
+            {account && (
+              <BalanceToken
+                collateral={collateral}
+                collateralBalance={collateralBalance}
+                onClickAddMaxCollateral={() =>
+                  handleChange({ name: 'funding', value: collateralBalance })
+                }
+              />
+            )}
             <FormError>{fundingMessageError}</FormError>
           </>
         }
