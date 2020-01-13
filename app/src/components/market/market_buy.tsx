@@ -26,6 +26,8 @@ import { BalanceToken } from '../common/balance_token'
 import { useContracts } from '../../hooks/useContracts'
 import { ButtonType } from '../../common/button_styling_types'
 import { MARKET_FEE } from '../../common/constants'
+import { FormError } from '../common/form_error'
+import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -118,6 +120,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setCost(costWithFee)
   }, [amount, collateral])
 
+  const collateralBalance = useCollateralBalance(collateral, context)
+
   const finish = async () => {
     try {
       setStatus(Status.Loading)
@@ -153,16 +157,26 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const disabled = (status !== Status.Ready && status !== Status.Error) || cost.isZero()
+  const isBuyAmountGreaterThanBalance = amount.gt(collateralBalance)
+
+  const buyMessageError = isBuyAmountGreaterThanBalance
+    ? `You don't have enough collateral in your balance.`
+    : ''
+
+  const error =
+    (status !== Status.Ready && status !== Status.Error) ||
+    cost.isZero() ||
+    isBuyAmountGreaterThanBalance ||
+    amount.isZero()
 
   const noteAmount = (
     <>
       <BalanceToken
         collateral={collateral}
-        onClickMax={(collateral: Token, collateralBalance: BigNumber) =>
-          setAmount(collateralBalance)
-        }
+        collateralBalance={collateralBalance}
+        onClickAddMaxCollateral={() => setAmount(collateralBalance)}
       />
+      <FormError>{buyMessageError}</FormError>
     </>
   )
 
@@ -225,7 +239,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
           </ButtonLinkStyled>
-          <Button buttonType={ButtonType.primary} disabled={disabled} onClick={() => finish()}>
+          <Button buttonType={ButtonType.primary} disabled={error} onClick={() => finish()}>
             Buy
           </Button>
         </ButtonContainer>

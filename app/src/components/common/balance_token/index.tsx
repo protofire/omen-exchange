@@ -1,18 +1,16 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
 import { BigNumber } from 'ethers/utils'
-import { useAsyncDerivedValue } from '../../../hooks/useAsyncDerivedValue'
-import { formatBigNumber } from '../../../util/tools'
-import { ERC20Service } from '../../../services'
-import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { Token } from '../../../util/types'
 import { FormRowNote } from '../form_row_note'
 import { FormRowLink } from '../form_row_link'
+import { formatBigNumber } from '../../../util/tools'
 
 interface Props {
   collateral: Token
-  onClickMax: (collateral: Token, collateralBalance: BigNumber) => void
+  collateralBalance: BigNumber
+  onClickAddMaxCollateral: () => any
 }
 
 const Wrapper = styled.div`
@@ -31,45 +29,17 @@ const Note = styled(FormRowNote)`
 `
 
 export const BalanceToken = (props: Props) => {
-  const context = useConnectedWeb3Context()
-
-  const { account, library: provider } = context
-  const { collateral, onClickMax } = props
-
-  const calculateBalanceAmount = useMemo(
-    () => async (): Promise<[BigNumber, string, string]> => {
-      const collateralService = new ERC20Service(provider, account, collateral.address)
-
-      // TODO: fix with useConnectedWallet context
-      const collateralBalance = account
-        ? await collateralService.getCollateral(account)
-        : new BigNumber(0)
-      return [
-        collateralBalance,
-        formatBigNumber(collateralBalance, collateral.decimals),
-        collateral.symbol,
-      ]
-    },
-    [account, provider, collateral],
-  )
-
-  const [collateralBalance, calculateBalanceAmountValue, collateralSymbol] = useAsyncDerivedValue(
-    '',
-    [new BigNumber(0), '', ''],
-    calculateBalanceAmount,
-  )
+  const { collateral, collateralBalance, onClickAddMaxCollateral } = props
 
   return (
     <Wrapper>
       <Note>
         Current Balance{' '}
         <strong>
-          {calculateBalanceAmountValue} {collateralSymbol}
+          {formatBigNumber(collateralBalance, collateral.decimals)} {collateral.symbol}
         </strong>
       </Note>
-      <FormRowLink onClick={() => onClickMax(collateral, collateralBalance)}>
-        Add all funds
-      </FormRowLink>
+      <FormRowLink onClick={onClickAddMaxCollateral}>Add all funds</FormRowLink>
     </Wrapper>
   )
 }
