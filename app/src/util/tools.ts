@@ -8,11 +8,11 @@ const logger = getLogger('Tools')
 
 export const truncateStringInTheMiddle = (
   str: string,
-  strLength = 41,
-  strPositionStart = 8,
-  strPositionEnd = 8,
+  strPositionStart: number,
+  strPositionEnd: number,
 ) => {
-  if (str.length > strLength) {
+  const minTruncatedLength = strPositionStart + strPositionEnd
+  if (minTruncatedLength < str.length) {
     return `${str.substr(0, strPositionStart)}...${str.substr(
       str.length - strPositionEnd,
       str.length,
