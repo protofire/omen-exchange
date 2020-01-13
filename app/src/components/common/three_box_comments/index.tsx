@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Box from '3box'
 import ThreeBoxCommentsReact from '3box-comments-react'
 import styled from 'styled-components'
 import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { THREEBOX_ADMIN_ADDRESS, THREEBOX_SPACE_NAME } from '../../../common/constants'
-import { getLogger } from '../../../util/logger'
 import { ButtonCSS } from '../../../common/button_styling_types'
-
-const logger = getLogger('Component::ThreeBoxComments')
 
 const MAIN_AVATAR_DIMENSIONS = '40px'
 const COMMENT_AVATAR_DIMENSIONS = '32px'
@@ -179,53 +176,29 @@ interface Props {
 
 export const ThreeBoxComments = (props: Props) => {
   const context: ConnectedWeb3Context = useConnectedWeb3Context()
+  const { library } = context
   const { threadName } = props
 
   const [box, setBox] = useState<any>(null)
   // TODO: fix with useConnectedWeb3Wallet context
-  const [currentUserAddress, setCurrentUserAddress] = useState<string>(context.account || '')
+  const [currentUserAddress] = useState<string>(context.account || '')
 
-  useEffect(() => {
-    let isSubscribed = true
-
-    const handle3boxLogin = async () => {
-      const { library } = context
-      // TODO: fix with useConnectedWeb3Wallet context
-      const account = context.account || ''
-
-      logger.log(`Open three box with account ${account}`)
-
-      const newBox = await Box.openBox(account, library._web3Provider)
-
-      const spaceData = await Box.getSpace(account, THREEBOX_SPACE_NAME)
-      if (Object.keys(spaceData).length === 0) {
-        await newBox.openSpace(THREEBOX_SPACE_NAME)
-      }
-      if (isSubscribed) setCurrentUserAddress(account)
-
-      newBox.onSyncDone(() => {
-        if (isSubscribed) setBox(newBox)
-        logger.log(`Three box sync with account ${account}`)
-      })
-    }
-
-    handle3boxLogin()
-
-    return () => {
-      isSubscribed = false
-    }
-  }, [context])
+  const handleLogin = async () => {
+    const box = await Box.openBox(currentUserAddress, library._web3Provider, {})
+    box.onSyncDone(() => setBox(box))
+  }
 
   return (
     <ThreeBoxCustom>
       <CommentsTitle>Comments</CommentsTitle>
       <ThreeBoxCommentsReact
-        adminEthAddr={THREEBOX_ADMIN_ADDRESS}
+        spaceName={THREEBOX_SPACE_NAME}
         box={box}
         currentUserAddr={currentUserAddress}
-        showCommentCount={10}
-        spaceName={THREEBOX_SPACE_NAME}
         threadName={threadName}
+        adminEthAddr={THREEBOX_ADMIN_ADDRESS}
+        loginFunction={handleLogin}
+        showCommentCount={10}
         useHovers={true}
       />
     </ThreeBoxCustom>
