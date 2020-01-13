@@ -179,12 +179,13 @@ export const ThreeBoxComments = (props: Props) => {
   const { library } = context
   const { threadName } = props
 
+  const [box, setBox] = useState<any>(null)
   // TODO: fix with useConnectedWeb3Wallet context
   const [currentUserAddress] = useState<string>(context.account || '')
 
   const handleLogin = async () => {
     const box = await Box.openBox(currentUserAddress, library._web3Provider, {})
-    return box
+    box.onSyncDone(() => setBox(box))
   }
 
   return (
@@ -192,6 +193,7 @@ export const ThreeBoxComments = (props: Props) => {
       <CommentsTitle>Comments</CommentsTitle>
       <ThreeBoxCommentsReact
         spaceName={THREEBOX_SPACE_NAME}
+        box={box}
         currentUserAddr={currentUserAddress}
         threadName={threadName}
         adminEthAddr={THREEBOX_ADMIN_ADDRESS}
