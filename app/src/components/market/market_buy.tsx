@@ -14,8 +14,6 @@ import { computeBalanceAfterTrade, formatBigNumber, formatDate } from '../../uti
 import { getLogger } from '../../util/logger'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
-import { Well } from '../common/well'
-import { Paragraph } from '../common/paragraph'
 import { FullLoading } from '../common/full_loading'
 import { ButtonContainer } from '../common/button_container'
 import { ButtonLink } from '../common/button_link'
@@ -168,6 +166,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     </>
   )
 
+  const amountFee = cost.sub(amount)
+
   return (
     <>
       <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
@@ -196,37 +196,31 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             />
           }
           note={noteAmount}
-          title={'Amount'}
+          title={'Total cost'}
           tooltip={{ id: 'amount', description: 'Shares to buy with this amount of collateral.' }}
         />
-        <FormLabelStyled>Totals</FormLabelStyled>
+        <FormLabelStyled>Transaction details</FormLabelStyled>
         <TableStyled>
           <TR>
-            <TD>You spend</TD>
+            <TD>Trading Fee</TD>
             <TD textAlign="right">
-              {formatBigNumber(cost, collateral.decimals)} <strong>{collateral.symbol}</strong>
+              {formatBigNumber(amountFee, collateral.decimals)} <strong>{collateral.symbol}</strong>
             </TD>
           </TR>
           <TR>
-            <TD>&quot;{balances[outcomeIndex].outcomeName}&quot; shares you get</TD>
+            <TD>Base Cost</TD>
+            <TD textAlign="right">
+              {formatBigNumber(amount.sub(amountFee), collateral.decimals)}{' '}
+              <strong>{collateral.symbol}</strong>
+            </TD>
+          </TR>
+          <TR>
+            <TD>You will receive</TD>
             <TD textAlign="right">
               {formatBigNumber(tradedShares, collateral.decimals)} <strong>shares</strong>
             </TD>
           </TR>
         </TableStyled>
-        <Well>
-          <Paragraph>
-            • <strong>1 shares</strong> can be redeemed for <strong>1 {collateral.symbol}</strong>{' '}
-            in case it represents the final outcome.
-          </Paragraph>
-          <Paragraph>
-            • You will be charged an extra {MARKET_FEE}% trade fee of &nbsp;
-            <strong>
-              {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}{' '}
-              {collateral.symbol}
-            </strong>
-          </Paragraph>
-        </Well>
         <ButtonContainer>
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back

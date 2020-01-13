@@ -62,7 +62,7 @@ export const BalanceToken = (props: Props) => {
   return (
     <Wrapper>
       <Note>
-        Balance{' '}
+        Current Balance{' '}
         <strong>
           {calculateBalanceAmountValue} {collateralSymbol}
         </strong>
