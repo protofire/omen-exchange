@@ -84,7 +84,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
-  const [balanceItem] = useState<BalanceItem>(balances[outcomeIndex])
+  const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
 
@@ -199,7 +199,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           balances={balances}
           collateral={collateral}
           disabledColumns={[OutcomeTableValue.Payout]}
-          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
+          outcomeHandleChange={(value: number) => {
+            setOutcomeIndex(value)
+            setBalanceItem(balances[value])
+          }}
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
         />
