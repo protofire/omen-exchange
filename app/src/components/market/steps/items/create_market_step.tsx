@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { Button } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
+import { Well } from '../../../common/well'
 import { CreateCard } from '../../../common/create_card'
 import { Token } from '../../../../util/types'
 import { Paragraph } from '../../../common/paragraph'
@@ -23,6 +24,10 @@ import { getLogger } from '../../../../util/logger'
 import { ERC20Service } from '../../../../services'
 
 const logger = getLogger('MarketCreationItems::CreateMarketStep')
+
+const OutcomeInfo = styled(Well)`
+  margin-bottom: 30px;
+`
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -106,13 +111,16 @@ const CreateMarketStep = (props: Props) => {
 
   return (
     <CreateCard>
-      <Paragraph>
-        Please <strong>check all the information is correct</strong>. You can go back and edit
-        anything you need.
-      </Paragraph>
-      <Paragraph>
-        <strong>If everything is OK</strong> proceed to create the new market.
-      </Paragraph>
+      <OutcomeInfo>
+        <Paragraph>
+          Please <strong>check all the information is correct</strong>. You can go back and edit
+          anything you need.
+        </Paragraph>
+        <Paragraph>
+          <strong>If everything is OK</strong> proceed to create the new market.
+        </Paragraph>
+      </OutcomeInfo>
+
       <SubsectionTitle>Details</SubsectionTitle>
       <TitleValueStyled title={'Question'} value={question} />
       <Grid>

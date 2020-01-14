@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { CreateCard } from '../../../common/create_card'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
+import { Well } from '../../../common/well'
 import { Paragraph } from '../../../common/paragraph'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
@@ -26,6 +27,9 @@ const NavLinkStyled = styled(NavLink)`
   &:hover {
     text-decoration: none;
   }
+`
+const OutcomeInfo = styled(Well)`
+  margin-bottom: 30px;
 `
 
 const Grid = styled.div`
@@ -69,16 +73,18 @@ const SummaryMarketStep = (props: Props) => {
       <SectionTitle title="Conditional Exchange" subTitle="Your new market has been created!" />
       <CreateCard>
         <SubsectionTitle>Market&apos;s URL</SubsectionTitle>
-        <Paragraph>
-          You can access your markets from the <NavLinkStyled to="/">Markets</NavLinkStyled>{' '}
-          section.
-        </Paragraph>
-        <Paragraph>
-          <a target="_blank" rel="noopener noreferrer" href={`/#/${marketMakerAddress}`}>
-            {marketMakerURL}
-          </a>
-          <CopyText value={marketMakerURL} />
-        </Paragraph>
+        <OutcomeInfo>
+          <Paragraph>
+            You can access your markets from the <NavLinkStyled to="/">Markets</NavLinkStyled>{' '}
+            section.
+          </Paragraph>
+          <Paragraph>
+            <a target="_blank" rel="noopener noreferrer" href={`/#/${marketMakerAddress}`}>
+              {marketMakerURL}
+            </a>
+            <CopyText value={marketMakerURL} />
+          </Paragraph>
+        </OutcomeInfo>
         <SubsectionTitle>Details</SubsectionTitle>
         <TitleValueStyled title={'Question'} value={question} />
         <Grid>
