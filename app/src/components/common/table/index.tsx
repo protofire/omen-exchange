@@ -56,8 +56,8 @@ TH.defaultProps = {
   textAlign: 'left',
 }
 
-export const TD = styled.td<{ textAlign?: string }>`
-  border-bottom: solid 1px #d5d5d5;
+export const TD = styled.td<{ textAlign?: string; withBorder?: boolean }>`
+  border-bottom: ${props => (props.withBorder ? 'solid 1px #d5d5d5' : 'none')};
   border-left: none;
   border-right: none;
   border-top: none;
@@ -71,6 +71,7 @@ export const TD = styled.td<{ textAlign?: string }>`
 
 TD.defaultProps = {
   textAlign: 'left',
+  withBorder: true,
 }
 
 export const TBody = styled.tbody``

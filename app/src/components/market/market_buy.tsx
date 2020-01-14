@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
@@ -14,8 +14,6 @@ import { computeBalanceAfterTrade, formatBigNumber, formatDate } from '../../uti
 import { getLogger } from '../../util/logger'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
-import { Well } from '../common/well'
-import { Paragraph } from '../common/paragraph'
 import { FullLoading } from '../common/full_loading'
 import { ButtonContainer } from '../common/button_container'
 import { ButtonLink } from '../common/button_link'
@@ -58,6 +56,31 @@ const SubsectionTitleStyled = styled(SubsectionTitle)`
 
 const BigNumberInputTextRight = styled<any>(BigNumberInput)`
   text-align: right;
+`
+
+const TextLight = styled.span`
+  color: ${props => props.theme.colors.textColorLight};
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: normal;
+  line-height: 1.4;
+  text-align: right;
+`
+
+const CssText = css`
+  font-family: Roboto;
+  font-size: 13px;
+  color: ${props => props.theme.colors.textColor};
+`
+
+const TextBold = styled.span`
+  ${CssText}
+  font-weight: bold;
+`
+
+const TextNormal = styled.span`
+  ${CssText}
+  font-weight: normal;
 `
 
 const logger = getLogger('Market::Buy')
@@ -182,6 +205,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     </>
   )
 
+  const amountFee = cost.sub(amount)
+
   return (
     <>
       <SectionTitle title={question} subTitle={resolution ? formatDate(resolution) : ''} />
@@ -210,37 +235,41 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             />
           }
           note={noteAmount}
-          title={'Amount'}
+          title={'Total cost'}
           tooltip={{ id: 'amount', description: 'Shares to buy with this amount of collateral.' }}
         />
-        <FormLabelStyled>Totals</FormLabelStyled>
+        <FormLabelStyled>Transaction details</FormLabelStyled>
         <TableStyled>
           <TR>
-            <TD>You spend</TD>
+            <TD>
+              <TextLight>Trading Fee</TextLight>
+            </TD>
             <TD textAlign="right">
-              {formatBigNumber(cost, collateral.decimals)} <strong>{collateral.symbol}</strong>
+              <TextNormal>{formatBigNumber(amountFee.mul(-1), collateral.decimals)}</TextNormal>{' '}
+              <TextLight>{collateral.symbol}</TextLight>
             </TD>
           </TR>
           <TR>
-            <TD>&quot;{balances[outcomeIndex].outcomeName}&quot; shares you get</TD>
+            <TD>
+              <TextLight>Base Cost</TextLight>
+            </TD>
             <TD textAlign="right">
-              {formatBigNumber(tradedShares, collateral.decimals)} <strong>shares</strong>
+              <TextNormal>{formatBigNumber(amount.sub(amountFee), collateral.decimals)}</TextNormal>{' '}
+              <TextLight>{collateral.symbol}</TextLight>
+            </TD>
+          </TR>
+          <TR>
+            <TD withBorder={false}>
+              <TextLight>You will receive</TextLight>
+            </TD>
+            <TD textAlign="right" withBorder={false}>
+              <TextBold>{formatBigNumber(tradedShares, collateral.decimals)} </TextBold>{' '}
+              <TextLight>
+                <strong>Shares</strong>
+              </TextLight>
             </TD>
           </TR>
         </TableStyled>
-        <Well>
-          <Paragraph>
-            • <strong>1 shares</strong> can be redeemed for <strong>1 {collateral.symbol}</strong>{' '}
-            in case it represents the final outcome.
-          </Paragraph>
-          <Paragraph>
-            • You will be charged an extra {MARKET_FEE}% trade fee of &nbsp;
-            <strong>
-              {cost.isZero() ? '0' : formatBigNumber(cost.sub(amount), collateral.decimals)}{' '}
-              {collateral.symbol}
-            </strong>
-          </Paragraph>
-        </Well>
         <ButtonContainer>
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>
             ‹ Back
