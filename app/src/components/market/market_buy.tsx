@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { BigNumber } from 'ethers/utils'
 import { ethers } from 'ethers'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
@@ -58,13 +58,29 @@ const BigNumberInputTextRight = styled<any>(BigNumberInput)`
   text-align: right;
 `
 
-const CollateralSymbol = styled.span`
+const TextLight = styled.span`
   color: ${props => props.theme.colors.textColorLight};
   flex-shrink: 0;
   font-size: 13px;
   font-weight: normal;
   line-height: 1.4;
   text-align: right;
+`
+
+const CssText = css`
+  font-family: Roboto;
+  font-size: 13px;
+  color: ${props => props.theme.colors.textColor};
+`
+
+const TextBold = styled.span`
+  ${CssText}
+  font-weight: bold;
+`
+
+const TextNormal = styled.span`
+  ${CssText}
+  font-weight: normal;
 `
 
 const logger = getLogger('Market::Buy')
@@ -225,23 +241,32 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <FormLabelStyled>Transaction details</FormLabelStyled>
         <TableStyled>
           <TR>
-            <TD>Trading Fee</TD>
+            <TD>
+              <TextLight>Trading Fee</TextLight>
+            </TD>
             <TD textAlign="right">
-              {formatBigNumber(amountFee.mul(-1), collateral.decimals)}{' '}
-              <CollateralSymbol>{collateral.symbol}</CollateralSymbol>
+              <TextNormal>{formatBigNumber(amountFee.mul(-1), collateral.decimals)}</TextNormal>{' '}
+              <TextLight>{collateral.symbol}</TextLight>
             </TD>
           </TR>
           <TR>
-            <TD>Base Cost</TD>
+            <TD>
+              <TextLight>Base Cost</TextLight>
+            </TD>
             <TD textAlign="right">
-              {formatBigNumber(amount.sub(amountFee), collateral.decimals)}{' '}
-              <CollateralSymbol>{collateral.symbol}</CollateralSymbol>
+              <TextNormal>{formatBigNumber(amount.sub(amountFee), collateral.decimals)}</TextNormal>{' '}
+              <TextLight>{collateral.symbol}</TextLight>
             </TD>
           </TR>
           <TR>
-            <TD withBorder={false}>You will receive</TD>
+            <TD withBorder={false}>
+              <TextLight>You will receive</TextLight>
+            </TD>
             <TD textAlign="right" withBorder={false}>
-              {formatBigNumber(tradedShares, collateral.decimals)} <strong>Shares</strong>
+              <TextBold>{formatBigNumber(tradedShares, collateral.decimals)} </TextBold>{' '}
+              <TextLight>
+                <strong>Shares</strong>
+              </TextLight>
             </TD>
           </TR>
         </TableStyled>
