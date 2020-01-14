@@ -68,7 +68,7 @@ export const Network: React.FC = props => {
       <ConnectionStatusWrapper>
         <ConnectionStatusDot />
         <ConnectionStatusText>
-          {truncateStringInTheMiddle(account) || 'No account connected'}
+          {truncateStringInTheMiddle(account, 6, 4) || 'No account connected'}
         </ConnectionStatusText>
       </ConnectionStatusWrapper>
     </NetworkWrapper>
