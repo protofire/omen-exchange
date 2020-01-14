@@ -63,9 +63,9 @@ const networks: { [K in NetworkId]: Network } = {
     realitioTimeout: 10,
     contracts: {
       realitio: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
-      marketMakerFactory: '0x7C728214be9A0049e6a86f2137ec61030D0AA964',
+      marketMakerFactory: '0x5017A545b09ab9a30499DE7F431DF0855bCb7275',
       conditionalTokens: '0xD86C8F0327494034F60e25074420BcCF560D5610',
-      oracle: '0xA586074FA4Fe3E546A132a16238abe37951D41fE',
+      oracle: '0x2D8BE6BF0baA74e0A907016679CaE9190e80dD0A',
     },
   },
 }
