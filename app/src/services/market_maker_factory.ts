@@ -1,4 +1,4 @@
-import { Contract, ethers, Wallet } from 'ethers'
+import { Contract, ethers, Wallet, utils } from 'ethers'
 import { LogDescription } from 'ethers/utils/interface'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -17,11 +17,29 @@ interface GetMarketsOptions {
 }
 
 const marketMakerFactoryAbi = [
-  `function createFixedProductMarketMaker(address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint fee) public returns (address)`,
+  `function create2FixedProductMarketMaker(
+     uint saltNonce,
+     address conditionalTokens,
+     address collateralToken,
+     bytes32[] conditionIds,
+     uint fee,
+     uint initialFunds,
+     uint[] distributionHint
+  ) public returns (address)`,
+  'function implementationMaster() public constant returns (address)',
   `event FixedProductMarketMakerCreation(address indexed creator, address fixedProductMarketMaker, address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint fee)`,
 ]
+
 const marketMakerFactoryCallAbi = [
-  `function createFixedProductMarketMaker(address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint fee) public constant returns (address)`,
+  `function create2FixedProductMarketMaker(
+     uint saltNonce,
+     address conditionalTokens,
+     address collateralToken,
+     bytes32[] conditionIds,
+     uint fee,
+     uint initialFunds,
+     uint[] distributionHint
+  ) public constant returns (address)`,
 ]
 
 class MarketMakerFactoryService {
@@ -44,20 +62,73 @@ class MarketMakerFactoryService {
     this.provider = provider
   }
 
-  createMarketMaker = async (
+  predictMarketMakerAddress = async (
+    saltNonce: number,
     conditionalTokenAddress: string,
     collateralAddress: string,
     conditionId: string,
-  ) => {
+  ): Promise<string> => {
+    if (!this.signerAddress) {
+      throw new Error('Wallet needs to be connected to use this method')
+    }
+
+    const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
+    const cloneFactoryInterface = new utils.Interface([
+      'function cloneConstructor(bytes consData) external',
+    ])
+    const cloneConstructorEncodedCall = cloneFactoryInterface.functions.cloneConstructor.encode([
+      utils.defaultAbiCoder.encode(
+        ['address', 'address', 'bytes32[]', 'uint'],
+        [conditionalTokenAddress, collateralAddress, [conditionId], feeBN],
+      ),
+    ])
+
+    const implementationMaster = await this.contract.implementationMaster()
+
+    return `0x${utils
+      .solidityKeccak256(
+        ['bytes', 'address', 'bytes32', 'bytes32'],
+        [
+          '0xff',
+          this.contract.address,
+          utils.keccak256(
+            utils.defaultAbiCoder.encode(['address', 'uint'], [this.signerAddress, saltNonce]),
+          ),
+          utils.keccak256(
+            `0x3d3d606380380380913d393d73${this.contract.address.slice(
+              2,
+            )}5af4602a57600080fd5b602d8060366000396000f3363d3d373d3d3d363d73${implementationMaster.slice(
+              2,
+            )}5af43d82803e903d91602b57fd5bf3${cloneConstructorEncodedCall.replace(/^0x/, '')}`,
+          ),
+        ],
+      )
+      .slice(-40)}`
+  }
+
+  createMarketMaker = async (
+    saltNonce: number,
+    conditionalTokenAddress: string,
+    collateralAddress: string,
+    conditionId: string,
+  ): Promise<string> => {
     const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
 
-    const args = [conditionalTokenAddress, collateralAddress, [conditionId], feeBN]
+    const args = [
+      saltNonce,
+      conditionalTokenAddress,
+      collateralAddress,
+      [conditionId],
+      feeBN,
+      0,
+      [],
+    ]
 
-    const marketMakerAddress = await this.constantContract.createFixedProductMarketMaker(...args, {
+    const marketMakerAddress = await this.constantContract.create2FixedProductMarketMaker(...args, {
       from: this.signerAddress,
     })
 
-    const transactionObject = await this.contract.createFixedProductMarketMaker(...args, {
+    const transactionObject = await this.contract.create2FixedProductMarketMaker(...args, {
       value: '0x0',
     })
     await this.provider.waitForTransaction(transactionObject.hash)
