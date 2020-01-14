@@ -58,6 +58,15 @@ const BigNumberInputTextRight = styled<any>(BigNumberInput)`
   text-align: right;
 `
 
+const CollateralSymbol = styled.span`
+  color: ${props => props.theme.colors.textColorLight};
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: normal;
+  line-height: 1.4;
+  text-align: right;
+`
+
 const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
@@ -218,19 +227,20 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           <TR>
             <TD>Trading Fee</TD>
             <TD textAlign="right">
-              {formatBigNumber(amountFee, collateral.decimals)} <strong>{collateral.symbol}</strong>
+              {formatBigNumber(amountFee.mul(-1), collateral.decimals)}{' '}
+              <CollateralSymbol>{collateral.symbol}</CollateralSymbol>
             </TD>
           </TR>
           <TR>
             <TD>Base Cost</TD>
             <TD textAlign="right">
               {formatBigNumber(amount.sub(amountFee), collateral.decimals)}{' '}
-              <strong>{collateral.symbol}</strong>
+              <CollateralSymbol>{collateral.symbol}</CollateralSymbol>
             </TD>
           </TR>
           <TR>
-            <TD>You will receive</TD>
-            <TD textAlign="right">
+            <TD withBorder={false}>You will receive</TD>
+            <TD textAlign="right" withBorder={false}>
               {formatBigNumber(tradedShares, collateral.decimals)} <strong>shares</strong>
             </TD>
           </TR>
