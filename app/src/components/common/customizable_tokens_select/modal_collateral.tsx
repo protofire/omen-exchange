@@ -87,7 +87,7 @@ export const ModalCollateral = (props: Props) => {
   }
 
   return (
-    <ModalWrapper isOpen={isOpen} onRequestClose={onClose} title={`Add Collateral`}>
+    <ModalWrapper isOpen={isOpen} onRequestClose={onClose} title={`Add custom token`}>
       <FormRow
         formField={
           <Textfield
