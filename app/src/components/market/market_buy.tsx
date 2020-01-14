@@ -241,7 +241,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           <TR>
             <TD withBorder={false}>You will receive</TD>
             <TD textAlign="right" withBorder={false}>
-              {formatBigNumber(tradedShares, collateral.decimals)} <strong>shares</strong>
+              {formatBigNumber(tradedShares, collateral.decimals)} <strong>Shares</strong>
             </TD>
           </TR>
         </TableStyled>
