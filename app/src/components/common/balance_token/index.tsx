@@ -34,7 +34,7 @@ export const BalanceToken = (props: Props) => {
   return (
     <Wrapper>
       <Note>
-        Balance{' '}
+        Current Balance{' '}
         <strong>
           {formatBigNumber(collateralBalance, collateral.decimals)} {collateral.symbol}
         </strong>
