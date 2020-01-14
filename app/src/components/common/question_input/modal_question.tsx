@@ -118,7 +118,7 @@ export const ModalQuestion = (props: Props) => {
                       question.arbitratorAddress
                     }`}
                   >
-                    {truncateStringInTheMiddle(question.arbitratorAddress)}
+                    {truncateStringInTheMiddle(question.arbitratorAddress, 6, 4)}
                   </span>
                 }
               />
