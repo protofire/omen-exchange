@@ -161,11 +161,12 @@ const ThreeBoxCustom = styled.div`
   footer {
     margin-bottom: 0;
     padding-top: 20px;
-
     .footer_text {
       color: ${props => props.theme.colors.textColorLight};
       font-size: 12px;
       font-weight: 400;
+      display: inline-block;
+      text-align: center;
     }
   }
 `
