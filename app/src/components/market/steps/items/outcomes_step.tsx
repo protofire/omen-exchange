@@ -69,7 +69,7 @@ const OutcomesStep = (props: Props) => {
   const error =
     totalProbabilities !== 100 || someEmptyName || someEmptyProbability || outcomes.length < 2
 
-  const isAddNewOutcomeButtonDisabled = outcomes.length >= MAX_OUTCOME_ALLOWED || !newOutcomeName
+  const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED
 
   const addNewOutcome = () => {
     const newOutcome = {
@@ -93,15 +93,18 @@ const OutcomesStep = (props: Props) => {
         onChange={handleOutcomesChange}
         errorMessages={errorMessages}
       />
-      <NewOutcome>
-        <Textfield
-          type="text"
-          placeholder="Add new outcome"
-          value={newOutcomeName}
-          onChange={e => setNewOutcomeName(e.target.value)}
-        />
-        <ButtonAdd disabled={isAddNewOutcomeButtonDisabled} onClick={addNewOutcome} />
-      </NewOutcome>
+      {canAddOutcome && (
+        <NewOutcome>
+          <Textfield
+            type="text"
+            placeholder="Add new outcome"
+            value={newOutcomeName}
+            onChange={e => setNewOutcomeName(e.target.value)}
+          />
+          <ButtonAdd disabled={!newOutcomeName} onClick={addNewOutcome} />
+        </NewOutcome>
+      )}
+
       <ButtonContainerStyled>
         <ButtonLinkStyled onClick={props.back}>‹ Back</ButtonLinkStyled>
         <Button disabled={error} onClick={props.next}>
