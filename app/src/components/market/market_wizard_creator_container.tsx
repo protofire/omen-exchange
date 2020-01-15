@@ -86,6 +86,7 @@ const MarketWizardCreatorContainer: FC = () => {
           collateral.address,
           conditionId,
         )
+        logger.log(`Predicted market address: ${predictedMarketMakerAddress}`)
         const marketMakerAddress = await marketMakerFactory.createMarketMaker(
           saltNonce,
           conditionalTokens.address,
