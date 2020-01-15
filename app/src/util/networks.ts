@@ -41,7 +41,7 @@ const networks: { [K in NetworkId]: Network } = {
     realitioTimeout: 86400,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
-      marketMakerFactory: '0x2E8C4eC3fE9E3FC78FAE42af9c93A4DC88c38cb7',
+      marketMakerFactory: '0x17227353c2782A361ec65DCe27d05830Df41D3D3',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
       oracle: '0xf3582e5D53D330266E0923e736Aa5b907726272c',
     },
@@ -52,7 +52,7 @@ const networks: { [K in NetworkId]: Network } = {
     realitioTimeout: 10,
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
-      marketMakerFactory: '0xD0B953db85fb6f0C6A437b18140Ba857cb67768a',
+      marketMakerFactory: '0x578138c6211913c3fb23bfb8a7c9d220882d1a50',
       conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
       oracle: '0x5A90132C104CA33652Ee71E2E645D5A4d8E5d7D6',
     },
@@ -63,9 +63,9 @@ const networks: { [K in NetworkId]: Network } = {
     realitioTimeout: 10,
     contracts: {
       realitio: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
-      marketMakerFactory: '0x7C728214be9A0049e6a86f2137ec61030D0AA964',
+      marketMakerFactory: '0x5017A545b09ab9a30499DE7F431DF0855bCb7275',
       conditionalTokens: '0xD86C8F0327494034F60e25074420BcCF560D5610',
-      oracle: '0xA586074FA4Fe3E546A132a16238abe37951D41fE',
+      oracle: '0x2D8BE6BF0baA74e0A907016679CaE9190e80dD0A',
     },
   },
 }
