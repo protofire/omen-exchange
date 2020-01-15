@@ -79,11 +79,25 @@ const MarketWizardCreatorContainer: FC = () => {
         }
 
         setMarketCreationStatus(MarketCreationStatus.createMarketMaker())
-        const marketMakerAddress = await marketMakerFactory.createMarketMaker(
+        const saltNonce = Math.round(Math.random() * 1000000)
+        const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
+          saltNonce,
           conditionalTokens.address,
           collateral.address,
           conditionId,
         )
+        logger.log(`Predicted market address: ${predictedMarketMakerAddress}`)
+        const marketMakerAddress = await marketMakerFactory.createMarketMaker(
+          saltNonce,
+          conditionalTokens.address,
+          collateral.address,
+          conditionId,
+        )
+        if (predictedMarketMakerAddress.toLowerCase() !== marketMakerAddress.toLowerCase()) {
+          throw new Error(
+            `Predicted market maker address is different from actual market maker address: predicted '${predictedMarketMakerAddress}', got '${marketMakerAddress}'`,
+          )
+        }
         setMarketMakerAddress(marketMakerAddress)
 
         setMarketCreationStatus(MarketCreationStatus.approveCollateralForMarketMaker())

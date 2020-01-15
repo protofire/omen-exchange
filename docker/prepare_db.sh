@@ -21,18 +21,7 @@ MOCK_CHAI_ADDRESS=$(eth contract:deploy --pk '0x4f3edf983ac636a65a842ce7c78d9aa7
 
 # deploy conditional tokens market maker contracts
 cd conditional-tokens-market-makers
-cat << EOF > truffle-local.js
-module.exports = {
-  networks: {
-    local: {
-      host: "localhost",
-      port: 8545,
-      network_id: "*"
-    }
-  }
-}
-EOF
-npm run migrate -- --network local
+npm run migrate -- --network develop
 export CONDITIONAL_TOKENS_ADDRESS=$(jq -r '.networks["50"].address' build/contracts/ConditionalTokens.json)
 cd ..
 
@@ -52,7 +41,7 @@ echo "mock owl: ${MOCK_OWL_ADDRESS}" >> contracts_addresses.txt
 echo "mock weth: ${MOCK_WETH_ADDRESS}" >> contracts_addresses.txt
 echo "mock chai: ${MOCK_CHAI_ADDRESS}" >> contracts_addresses.txt
 echo "conditional tokens: ${CONDITIONAL_TOKENS_ADDRESS}" >> contracts_addresses.txt
-echo "market maker factory: $(jq -r '.networks["50"].address' conditional-tokens-market-makers/build/contracts/FixedProductMarketMakerFactory.json)" >> contracts_addresses.txt
+echo "market maker factory: $(jq -r '.networks["50"].address' conditional-tokens-market-makers/build/contracts/FPMMDeterministicFactory.json)" >> contracts_addresses.txt
 echo "realitio proxy: ${REALITIO_PROXY_ADDRESS}" >> contracts_addresses.txt
 
 # stop ganache
