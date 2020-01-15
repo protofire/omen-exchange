@@ -35,14 +35,14 @@ interface Props {
   values: {
     question: string
     outcomes: Outcome[]
-    loadedQuestion: string
+    loadedQuestionId: Maybe<string>
   }
   handleOutcomesChange: (newOutcomes: Outcome[]) => any
 }
 
 const OutcomesStep = (props: Props) => {
   const { handleOutcomesChange, values } = props
-  const { question, outcomes, loadedQuestion } = values
+  const { question, outcomes, loadedQuestionId } = values
 
   const [newOutcomeName, setNewOutcomeName] = useState('')
 
@@ -92,18 +92,18 @@ const OutcomesStep = (props: Props) => {
         totalProbabilities={totalProbabilities}
         onChange={handleOutcomesChange}
         errorMessages={errorMessages}
-        disabled={!!loadedQuestion}
+        disabled={!!loadedQuestionId}
       />
       <NewOutcome>
         <Textfield
-          disabled={!!loadedQuestion}
+          disabled={!!loadedQuestionId}
           type="text"
           placeholder="Add new outcome"
           value={newOutcomeName}
           onChange={e => setNewOutcomeName(e.target.value)}
         />
         <ButtonAdd
-          disabled={isAddNewOutcomeButtonDisabled || !!loadedQuestion}
+          disabled={isAddNewOutcomeButtonDisabled || !!loadedQuestionId}
           onClick={addNewOutcome}
         />
       </NewOutcome>

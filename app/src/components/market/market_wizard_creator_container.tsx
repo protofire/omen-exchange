@@ -45,14 +45,14 @@ const MarketWizardCreatorContainer: FC = () => {
           funding,
           outcomes,
           category,
-          loadedQuestion,
+          loadedQuestionId,
         } = data
         const openingDateMoment = moment(resolution)
 
         const collateralService = new ERC20Service(provider, account, collateral.address)
 
         setMarketCreationStatus(MarketCreationStatus.postingQuestion())
-        const questionId = !loadedQuestion
+        const questionId = !loadedQuestionId
           ? await realitio.askQuestion(
               question,
               outcomes,
@@ -61,7 +61,7 @@ const MarketWizardCreatorContainer: FC = () => {
               openingDateMoment,
               networkId,
             )
-          : loadedQuestion
+          : loadedQuestionId
         setQuestionId(questionId)
 
         setMarketCreationStatus(MarketCreationStatus.prepareCondition())

@@ -123,5 +123,5 @@ export interface MarketData {
   spread: number
   funding: BigNumber
   outcomes: Outcome[]
-  loadedQuestion: string
+  loadedQuestionId: Maybe<string>
 }
