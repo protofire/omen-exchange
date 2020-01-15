@@ -78,6 +78,7 @@ const OutcomesStep = (props: Props) => {
     }
     outcomes.push(newOutcome)
     handleOutcomesChange(outcomes)
+    setNewOutcomeName('')
   }
 
   return (
