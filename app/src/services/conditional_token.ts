@@ -1,4 +1,4 @@
-import { ethers, Wallet, Contract } from 'ethers'
+import { ethers, Wallet, Contract, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
@@ -122,6 +122,33 @@ class ConditionalTokenService {
     )
 
     await this.provider.waitForTransaction(transactionObject.hash)
+  }
+
+  static encodeSafeTransferFrom = (
+    addressFrom: string,
+    addressTo: string,
+    positionId: BigNumber,
+    outcomeTokensToTransfer: BigNumber,
+  ): any => {
+    const safeTransferFromInterface = new utils.Interface([
+      'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data) external',
+    ])
+
+    return safeTransferFromInterface.functions.safeTransferFrom.encode([
+      addressFrom,
+      addressTo,
+      positionId,
+      outcomeTokensToTransfer,
+      '0x',
+    ])
+  }
+
+  static encodeSetApprovalForAll = (address: string, approved: boolean): any => {
+    const setApprovalForAllInterface = new utils.Interface([
+      'function setApprovalForAll(address operator, bool approved) external',
+    ])
+
+    return setApprovalForAllInterface.functions.setApprovalForAll.encode([address, approved])
   }
 }
 

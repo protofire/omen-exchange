@@ -1,4 +1,4 @@
-import { Contract, ethers, Wallet } from 'ethers'
+import { Contract, ethers, utils, Wallet } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
@@ -41,7 +41,7 @@ class ERC20Service {
     neededAmount: BigNumber,
   ): Promise<boolean> => {
     const allowance: BigNumber = await this.contract.allowance(owner, spender)
-
+    logger.log(`Allowance ${allowance.toString()}`)
     return allowance.gte(neededAmount)
   }
 
@@ -54,6 +54,7 @@ class ERC20Service {
     })
     logger.log(`Approve transaccion hash: ${transactionObject.hash}`)
     await this.provider.waitForTransaction(transactionObject.hash)
+    return transactionObject
   }
 
   /**
@@ -107,6 +108,30 @@ class ERC20Service {
       decimals,
       symbol,
     }
+  }
+
+  static encodeTransferFrom = (from: string, to: string, amount: BigNumber): any => {
+    const transferFromInterface = new utils.Interface([
+      'function transferFrom(address sender, address recipient, uint256 amount) public returns (bool)',
+    ])
+
+    return transferFromInterface.functions.transferFrom.encode([from, to, amount])
+  }
+
+  static encodeApprove = (spenderAccount: string, amount: BigNumber): any => {
+    const approveInterface = new utils.Interface([
+      'function approve(address spender, uint256 amount) external returns (bool)',
+    ])
+
+    return approveInterface.functions.approve.encode([spenderAccount, amount])
+  }
+
+  static encodeApproveUnlimited = (spenderAccount: string): any => {
+    const approveInterface = new utils.Interface([
+      'function approve(address spender, uint256 amount) external returns (bool)',
+    ])
+
+    return approveInterface.functions.approve.encode([spenderAccount, ethers.constants.MaxUint256])
   }
 }
 
