@@ -1,24 +1,36 @@
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
+
 import { CreateCard } from '../../../common/create_card'
-import { Button, Textfield, Categories } from '../../../common/index'
+import { Button, Categories } from '../../../common/index'
 import { FormRow } from '../../../common/form_row'
 import { DateField } from '../../../common/date_field'
 import { ButtonContainer } from '../../../common/button_container'
 import { Well } from '../../../common/well'
 import { Arbitrators } from '../../../common/arbitrators'
-import { knownArbitrators } from '../../../../util/networks'
+import { QuestionInput } from '../../../common/question_input'
+import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { Arbitrator, Question } from '../../../../util/types'
+import { DisplayArbitrator } from '../../../common/display_arbitrator'
 
 interface Props {
   next: () => void
   values: {
     question: string
     category: string
+    categoriesCustom: string[]
     resolution: Date | null
-    arbitratorId: KnownArbitrator
+    arbitrator: Arbitrator
+    arbitratorsCustom: Arbitrator[]
+    loadedQuestionId: Maybe<string>
   }
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
-  handleChangeDate: (date: Date | null) => any
+  handleDateChange: (date: Date | null) => any
+  handleQuestionChange: (question: Question, arbitrator: Arbitrator) => any
+  handleArbitratorChange: (arbitrator: Arbitrator) => any
+  handleClearQuestion: () => any
+  addArbitratorCustom: (arbitrator: Arbitrator) => void
+  addCategoryCustom: (category: string) => void
 }
 
 const OracleInfo = styled(Well)`
@@ -27,9 +39,28 @@ const OracleInfo = styled(Well)`
 `
 
 const AskQuestionStep = (props: Props) => {
-  const { values, handleChange, handleChangeDate, next } = props
-  const { question, category, resolution, arbitratorId } = values
-  const arbitrator = knownArbitrators[arbitratorId]
+  const context = useConnectedWeb3Context()
+
+  const {
+    values,
+    handleChange,
+    handleClearQuestion,
+    handleQuestionChange,
+    handleArbitratorChange,
+    handleDateChange,
+    addArbitratorCustom,
+    addCategoryCustom,
+    next,
+  } = props
+  const {
+    question,
+    category,
+    categoriesCustom,
+    resolution,
+    arbitrator,
+    arbitratorsCustom,
+    loadedQuestionId,
+  } = values
 
   const error = !question || !category || !resolution
 
@@ -41,28 +72,23 @@ const AskQuestionStep = (props: Props) => {
     }
   }
 
-  const questionNote = () => {
-    return (
-      <>
-        <strong>For example:</strong> <i>&quot;Will France win?&quot;</i> is not an acceptable
-        question, but <i>&quot;Will France win the 2020 FIFA World Cup?&quot;</i> is a good one.
-      </>
-    )
-  }
-
   return (
     <CreateCard>
       <FormRow
         formField={
-          <Textfield
-            defaultValue={question}
+          <QuestionInput
+            value={question}
             name="question"
             onChange={handleChange}
+            onChangeQuestion={handleQuestionChange}
+            onClearQuestion={handleClearQuestion}
+            addArbitratorCustomValue={addArbitratorCustom}
+            addCategoryCustomValue={addCategoryCustom}
             placeholder="Type in a question..."
-            type="text"
+            context={context}
+            disabled={!!loadedQuestionId}
           />
         }
-        note={questionNote()}
         title={'Question'}
         tooltip={{
           id: `question`,
@@ -70,7 +96,15 @@ const AskQuestionStep = (props: Props) => {
         }}
       />
       <FormRow
-        formField={<Categories name="category" value={category} onChange={handleChange} />}
+        formField={
+          <Categories
+            name="category"
+            disabled={!!loadedQuestionId}
+            value={category}
+            onChange={handleChange}
+            customValues={categoriesCustom}
+          />
+        }
         title={'Category'}
         tooltip={{
           id: `category`,
@@ -80,9 +114,10 @@ const AskQuestionStep = (props: Props) => {
       <FormRow
         formField={
           <DateField
+            disabled={!!loadedQuestionId}
             minDate={new Date()}
             name="resolution"
-            onChange={handleChangeDate}
+            onChange={handleDateChange}
             selected={resolution}
           />
         }
@@ -93,7 +128,16 @@ const AskQuestionStep = (props: Props) => {
         }}
       />
       <FormRow
-        formField={<Arbitrators name="arbitratorId" value={arbitratorId} onChange={handleChange} />}
+        formField={
+          <Arbitrators
+            disabled={!!loadedQuestionId}
+            name="arbitrator"
+            value={arbitrator}
+            onChangeArbitrator={handleArbitratorChange}
+            customValues={arbitratorsCustom}
+            networkId={context.networkId}
+          />
+        }
         title={'Arbitrator'}
         tooltip={{
           id: `arbitrator`,
@@ -102,16 +146,7 @@ const AskQuestionStep = (props: Props) => {
         }}
       />
       <OracleInfo>
-        The market will be resolved using{' '}
-        <a href="https://realit.io/" rel="noopener noreferrer" target="_blank">
-          Realit.io
-        </a>{' '}
-        and{' '}
-        <a href={arbitrator.url} rel="noopener noreferrer" target="_blank">
-          {' '}
-          {arbitrator.name}
-        </a>{' '}
-        as final arbitrator.
+        <DisplayArbitrator arbitrator={arbitrator} />
       </OracleInfo>
       <ButtonContainer>
         <Button disabled={error} onClick={validate}>

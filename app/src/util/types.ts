@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers/utils'
+import { Outcome } from '../components/common/outcomes'
 
 export enum Status {
   Ready = 'Ready',
@@ -46,6 +47,7 @@ export enum StepProfile {
 }
 
 export interface Question {
+  questionId: string
   question: string
   resolution: Maybe<Date>
   arbitratorAddress: string
@@ -98,6 +100,7 @@ export interface Log {
 }
 
 export interface Arbitrator {
+  id: KnownArbitrator
   address: string
   name: string
   url: string
@@ -106,4 +109,19 @@ export interface Arbitrator {
 export enum Wallet {
   MetaMask = 'MetaMask',
   WalletConnect = 'WalletConnect',
+}
+
+export interface MarketData {
+  collateral: Token
+  collateralsCustom: Token[]
+  arbitratorsCustom: Arbitrator[]
+  categoriesCustom: string[]
+  question: string
+  category: string
+  resolution: Date | null
+  arbitrator: Arbitrator
+  spread: number
+  funding: BigNumber
+  outcomes: Outcome[]
+  loadedQuestionId: Maybe<string>
 }

@@ -233,6 +233,7 @@ class MarketMakerService {
 
     return {
       ...market,
+      questionId,
       outcomes,
       question,
       resolution,
