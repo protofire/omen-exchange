@@ -19,11 +19,12 @@ const getTokenFromAddressIfExists = (
 export const useCollateral = (
   collateralAddress: string,
   context: ConnectedWeb3Context,
-): { collateral: Maybe<Token>; errorMessage: Maybe<string> } => {
+): { collateral: Maybe<Token>; errorMessage: Maybe<string>; isSpinnerOn: boolean } => {
   const { library: provider, networkId, account } = context
 
   const [collateral, setCollateral] = useState<Maybe<Token>>(null)
   const [errorMessage, setErrorMessage] = useState<Maybe<string>>(null)
+  const [isSpinnerOn, setSpinnerOn] = useState<boolean>(false)
 
   useEffect(() => {
     let isSubscribed = true
@@ -33,6 +34,7 @@ export const useCollateral = (
         return
       }
 
+      if (isSubscribed) setSpinnerOn(true)
       let newCollateral = getTokenFromAddressIfExists(networkId, collateralAddress)
       let newErrorMessage: Maybe<string> = null
 
@@ -49,6 +51,7 @@ export const useCollateral = (
 
       if (isSubscribed) {
         setCollateral(newCollateral)
+        setSpinnerOn(false)
         setErrorMessage(newErrorMessage)
       }
     }
@@ -63,5 +66,6 @@ export const useCollateral = (
   return {
     collateral,
     errorMessage,
+    isSpinnerOn,
   }
 }

@@ -9,4 +9,4 @@ declare type Maybe<T> = T | null
 
 declare type KnownToken = 'cdai' | 'usdc' | 'dai' | 'weth' | 'owl' | 'chai'
 
-declare type KnownArbitrator = 'kleros' | 'realitio'
+declare type KnownArbitrator = 'kleros' | 'realitio' | 'unknown'

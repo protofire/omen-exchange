@@ -43,7 +43,7 @@ const networks: { [K in NetworkId]: Network } = {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
       marketMakerFactory: '0x17227353c2782A361ec65DCe27d05830Df41D3D3',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
-      oracle: '0xf3582e5D53D330266E0923e736Aa5b907726272c',
+      oracle: '0x7B46FEcfBA4eB9D14970bc248dA15a3Fb4457A27',
     },
   },
   [networkIds.RINKEBY]: {
@@ -269,6 +269,11 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
       [networkIds.GANACHE]: '0x000000000000000000000000000000003ea11710',
     },
   },
+  unknown: {
+    name: 'Unknown',
+    url: '',
+    addresses: {},
+  },
 }
 
 export const getArbitrator = (networkId: number, arbitratorId: KnownArbitrator): Arbitrator => {
@@ -280,14 +285,24 @@ export const getArbitrator = (networkId: number, arbitratorId: KnownArbitrator):
   }
 
   return {
+    id: arbitratorId,
     address,
     name: arbitrator.name,
     url: arbitrator.url,
   }
 }
 
+export const getDefaultArbitrator = (networkId: number) => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  return getArbitrator(networkId, 'realitio')
+}
+
 export const getArbitratorFromAddress = (networkId: number, address: string): Maybe<Arbitrator> => {
-  for (const arbitrator of Object.values(knownArbitrators)) {
+  for (const key in knownArbitrators) {
+    const arbitrator = knownArbitrators[key as KnownArbitrator]
     const arbitratorAddress = arbitrator.addresses[networkId]
 
     // arbitratorId might not be supported in the current network
@@ -297,6 +312,7 @@ export const getArbitratorFromAddress = (networkId: number, address: string): Ma
 
     if (arbitratorAddress.toLowerCase() === address.toLowerCase()) {
       return {
+        id: key as KnownArbitrator,
         address: arbitratorAddress,
         name: arbitrator.name,
         url: arbitrator.url,
@@ -304,7 +320,31 @@ export const getArbitratorFromAddress = (networkId: number, address: string): Ma
     }
   }
 
-  return null
+  return {
+    id: 'unknown' as KnownArbitrator,
+    address: address,
+    name: 'Unknown',
+    url: '',
+  }
+}
+
+export const getKnowArbitratorFromAddress = (
+  networkId: number,
+  address: string,
+): KnownArbitrator => {
+  for (const key in knownArbitrators) {
+    const arbitratorAddress = knownArbitrators[key as KnownArbitrator].addresses[networkId]
+
+    if (!arbitratorAddress) {
+      continue
+    }
+
+    if (arbitratorAddress.toLowerCase() === address.toLowerCase()) {
+      return key as KnownArbitrator
+    }
+  }
+
+  return 'unknown' as KnownArbitrator
 }
 
 export const getRealitioTimeout = (networkId: number): number => {
@@ -313,4 +353,27 @@ export const getRealitioTimeout = (networkId: number): number => {
   }
 
   return networks[networkId].realitioTimeout
+}
+
+export const getArbitratorsByNetwork = (networkId: number): Arbitrator[] => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  return Object.values(knownArbitrators)
+    .map(arbitrator => {
+      const address = arbitrator.addresses[networkId]
+      if (address) {
+        const { name, url } = arbitrator
+        const id = getKnowArbitratorFromAddress(networkId, address)
+        return {
+          id,
+          name,
+          url,
+          address,
+        }
+      }
+      return null
+    })
+    .filter(isNotNull)
 }

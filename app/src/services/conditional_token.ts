@@ -48,6 +48,7 @@ class ConditionalTokenService {
       new BigNumber(outcomeSlotCount),
       {
         value: '0x0',
+        gasLimit: 750000,
       },
     )
     logger.log(`Prepare condition transaction hash: ${transactionObject.hash}`)
