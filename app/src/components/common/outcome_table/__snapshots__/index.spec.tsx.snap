@@ -505,8 +505,8 @@ exports[`should show no as winning token 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG dxyKLL"
-                      color="#acacac"
+                      class="sc-jzJRlG ljbcag"
+                      color="#00be95"
                       width="50"
                     />
                   </div>
@@ -929,8 +929,8 @@ exports[`should show yes as winning token 1`] = `
                     class="sc-fjdhpX iZcRRn"
                   >
                     <div
-                      class="sc-jzJRlG dxyKLL"
-                      color="#acacac"
+                      class="sc-jzJRlG ljbcag"
+                      color="#00be95"
                       width="50"
                     />
                   </div>
