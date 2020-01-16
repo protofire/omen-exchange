@@ -16,9 +16,13 @@ export const DisplayArbitrator: React.FC<Props> = (props: Props) => {
         Realitio
       </a>{' '}
       and{' '}
-      <a href={arbitrator.url} rel="noopener noreferrer" target="_blank">
-        {arbitrator.name}
-      </a>{' '}
+      {arbitrator.url ? (
+        <a href={arbitrator.url} rel="noopener noreferrer" target="_blank">
+          {arbitrator.name}
+        </a>
+      ) : (
+        arbitrator.name
+      )}{' '}
       as final arbitrator.
     </>
   )

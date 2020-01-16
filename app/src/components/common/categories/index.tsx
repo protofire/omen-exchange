@@ -10,25 +10,28 @@ interface Props {
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
   readOnly?: boolean
   value: string
+  customValues: string[]
 }
 
 const FormOption = styled.option``
 
-const options = [
-  { value: 'Miscellaneous', label: 'Miscellaneous' },
-  { value: 'Politics', label: 'Politics' },
-]
-
 export const Categories = (props: Props) => {
-  const { ...restProps } = props
+  const { customValues, ...restProps } = props
+
+  const categories = ['Miscellaneous', 'Politics']
+  const allCategories = categories.concat(customValues.filter(item => categories.indexOf(item) < 0))
+  const options = allCategories.map(category => ({
+    label: category,
+    value: category,
+  }))
 
   return (
     <Select {...restProps}>
       <FormOption value="">Select a category</FormOption>
-      {options.map(category => {
+      {options.map(option => {
         return (
-          <FormOption key={category.value} value={category.value}>
-            {category.label}
+          <FormOption key={option.value} value={option.value}>
+            {option.label}
           </FormOption>
         )
       })}

@@ -6,14 +6,13 @@ import { Button } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
 import { CreateCard } from '../../../common/create_card'
-import { Token } from '../../../../util/types'
+import { Arbitrator, Token } from '../../../../util/types'
 import { Paragraph } from '../../../common/paragraph'
 import { FullLoading } from '../../../common/full_loading'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
 import { Outcome } from '../../../common/outcomes'
-import { getArbitrator } from '../../../../util/networks'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
@@ -48,7 +47,7 @@ interface Props {
     question: string
     category: string
     resolution: Date | null
-    arbitratorId: KnownArbitrator
+    arbitrator: Arbitrator
     spread: number
     funding: BigNumber
     outcomes: Outcome[]
@@ -60,14 +59,14 @@ interface Props {
 
 const CreateMarketStep = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { library: provider, account, networkId } = context
+  const { library: provider, account } = context
 
   const { marketMakerAddress, values, marketCreationStatus, questionId } = props
   const {
     collateral,
     question,
     category,
-    arbitratorId,
+    arbitrator,
     resolution,
     spread,
     funding,
@@ -97,8 +96,6 @@ const CreateMarketStep = (props: Props) => {
       logger.error(err)
     }
   }
-
-  const arbitrator = getArbitrator(networkId, arbitratorId)
 
   const resolutionDate = resolution && formatDate(resolution)
 

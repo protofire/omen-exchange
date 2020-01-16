@@ -10,6 +10,7 @@ import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { ButtonType } from '../../../common/button_styling_types'
 import ModalWrapper from '../modal_wrapper'
 import { FormRow } from '../form_row'
+import { Spinner } from '../spinner'
 
 const Grid = styled.div`
   column-gap: 20px;
@@ -33,6 +34,11 @@ const TitleValueStyled = styled(TitleValue)`
   }
 `
 
+const SpinnerStyled = styled(Spinner)`
+  margin-left: 136px;
+  margin-top: 50px;
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   context: ConnectedWeb3Context
   isOpen: boolean
@@ -43,7 +49,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const ModalCollateral = (props: Props) => {
   const { onClose, onSave, context, isOpen } = props
   const [collateralAddress, setCollateralAddress] = useState<string>('')
-  const { collateral, errorMessage } = useCollateral(collateralAddress, context)
+  const { collateral, errorMessage, isSpinnerOn } = useCollateral(collateralAddress, context)
 
   const validCollateralAddress: Maybe<Token> = collateral
     ? { address: collateralAddress, ...collateral }
@@ -56,22 +62,28 @@ export const ModalCollateral = (props: Props) => {
     }
   }
 
+  const spinner = () => {
+    return isSpinnerOn && <SpinnerStyled height={'25px'} width={'25px'} />
+  }
+
   const tokenDetails = () => {
-    return validCollateralAddress ? (
-      <>
-        <SubsectionTitleStyled>Details</SubsectionTitleStyled>
-        <Grid>
-          <TitleValueStyled
-            title={'Symbol:'}
-            value={validCollateralAddress && validCollateralAddress.symbol}
-          />
-          <TitleValueStyled
-            title={'Decimals:'}
-            value={validCollateralAddress && validCollateralAddress.decimals}
-          />
-        </Grid>
-      </>
-    ) : null
+    return (
+      validCollateralAddress && (
+        <>
+          <SubsectionTitleStyled>Details</SubsectionTitleStyled>
+          <Grid>
+            <TitleValueStyled
+              title={'Symbol:'}
+              value={validCollateralAddress && validCollateralAddress.symbol}
+            />
+            <TitleValueStyled
+              title={'Decimals:'}
+              value={validCollateralAddress && validCollateralAddress.decimals}
+            />
+          </Grid>
+        </>
+      )
+    )
   }
 
   return (
@@ -95,6 +107,7 @@ export const ModalCollateral = (props: Props) => {
         tooltip={{ id: 'ERC20', description: 'Enter a valid ERC20 address.' }}
       />
       {tokenDetails()}
+      {spinner()}
       <ButtonStyled
         buttonType={ButtonType.primary}
         disabled={!validCollateralAddress}
