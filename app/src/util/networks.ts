@@ -43,7 +43,7 @@ const networks: { [K in NetworkId]: Network } = {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
       marketMakerFactory: '0x17227353c2782A361ec65DCe27d05830Df41D3D3',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
-      oracle: '0xf3582e5D53D330266E0923e736Aa5b907726272c',
+      oracle: '0x7B46FEcfBA4eB9D14970bc248dA15a3Fb4457A27',
     },
   },
   [networkIds.RINKEBY]: {
