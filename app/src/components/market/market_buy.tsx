@@ -6,7 +6,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { BalanceItem, Status, OutcomeTableValue, Token } from '../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../common'
-import { ERC20Service, MarketMakerService } from '../../services'
+import { MarketMakerService } from '../../services'
 import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { ViewCard } from '../common/view_card'
@@ -28,6 +28,7 @@ import { ButtonType } from '../../common/button_styling_types'
 import { MARKET_FEE } from '../../common/constants'
 import { FormError } from '../common/form_error'
 import { useCollateralBalance } from '../../hooks/useCollateralBalance'
+import { CPKService } from '../../services/cpk'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -97,10 +98,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { library: provider } = context
 
-  const { buildMarketMaker } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens } = useContracts(context)
 
   const { marketMakerAddress, balances, collateral, question, resolution } = props
-  const marketMakerService = buildMarketMaker(marketMakerAddress)
+  const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
@@ -111,7 +112,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[]]> => {
-      const tradedShares = await marketMakerService.calcBuyAmount(amount, outcomeIndex)
+      const tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
       const balanceAfterTrade = computeBalanceAfterTrade(
         balances.map(b => b.holdings),
         outcomeIndex,
@@ -124,7 +125,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       return [tradedShares, probabilities]
     },
-    [balances, marketMakerService, outcomeIndex],
+    [balances, marketMaker, outcomeIndex],
   )
 
   const [tradedShares, probabilities] = useAsyncDerivedValue(
@@ -152,27 +153,19 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Buying ${formatBigNumber(tradedShares, collateral.decimals)} shares ...`)
 
-      const user = await provider.getSigner().getAddress()
+      // add 10% to the approved amount because there can be precision errors
+      // this can be improved if, instead of adding the 1% fee manually in the front, we use the `calcMarketFee`
+      // contract method and add it to the result of `calcNetCost` result
+      const costWithErrorMargin = cost.mul(11000).div(10000)
 
-      const collateralAddress = await marketMakerService.getCollateralToken()
-
-      const collateralService = new ERC20Service(provider, user, collateralAddress)
-
-      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
-        user,
-        marketMakerAddress,
-        cost,
-      )
-
-      if (!hasEnoughAlowance) {
-        // add 10% to the approved amount because there can be precision errors
-        // this can be improved if, instead of adding the 1% fee manually in the front, we use the `calcMarketFee`
-        // contract method and add it to the result of `calcNetCost` result
-        const costWithErrorMargin = cost.mul(11000).div(10000)
-        await collateralService.approve(marketMakerAddress, costWithErrorMargin)
-      }
-
-      await marketMakerService.buy(amount, outcomeIndex)
+      await CPKService.buy({
+        provider,
+        cost: costWithErrorMargin,
+        amount,
+        outcomeIndex,
+        marketMaker,
+        conditionalTokens,
+      })
 
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
