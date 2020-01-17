@@ -158,7 +158,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       // contract method and add it to the result of `calcNetCost` result
       const costWithErrorMargin = cost.mul(11000).div(10000)
 
-      await CPKService.buy({
+      await CPKService.buyOutcomes({
         provider,
         cost: costWithErrorMargin,
         amount,

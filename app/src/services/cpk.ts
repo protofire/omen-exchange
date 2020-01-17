@@ -7,7 +7,7 @@ import { BigNumber } from 'ethers/utils'
 
 const logger = getLogger('Services::CPKService')
 
-interface CPKBuyParams {
+interface CPKBuyOutcomesParams {
   provider: any
   cost: BigNumber
   amount: BigNumber
@@ -17,14 +17,14 @@ interface CPKBuyParams {
 }
 
 class CPKService {
-  static buy = async ({
+  static buyOutcomes = async ({
     provider,
     cost,
     amount,
     outcomeIndex,
     marketMaker,
     conditionalTokens,
-  }: CPKBuyParams) => {
+  }: CPKBuyOutcomesParams) => {
     try {
       const signer: Wallet = provider.getSigner()
       const account = await signer.getAddress()
