@@ -52,8 +52,7 @@ class ERC20Service {
       value: '0x0',
     })
     logger.log(`Approve transaccion hash: ${transactionObject.hash}`)
-    await this.provider.waitForTransaction(transactionObject.hash)
-    return transactionObject
+    return this.provider.waitForTransaction(transactionObject.hash)
   }
 
   /**
@@ -64,7 +63,7 @@ class ERC20Service {
       value: '0x0',
     })
     logger.log(`Approve unlimited transaccion hash: ${transactionObject.hash}`)
-    await this.provider.waitForTransaction(transactionObject.hash)
+    return this.provider.waitForTransaction(transactionObject.hash)
   }
 
   getCollateral = async (marketMakerAddress: string): Promise<any> => {
