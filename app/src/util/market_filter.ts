@@ -1,6 +1,5 @@
 enum Types {
   allMarkets = '__mf_all_markets__',
-  myMarkets = '__mf_my_markets__',
   fundedMarkets = '__mf_funded_markets__',
   predictedOnMarkets = '__mf_predicted_on_markets__',
   winningResultMarkets = '__mf_winning_result_markets__',
@@ -8,11 +7,6 @@ enum Types {
 
 interface AllMarkets {
   readonly _type: Types.allMarkets
-  readonly label: string
-}
-interface MyMarkets {
-  readonly _type: Types.myMarkets
-  readonly account: string
   readonly label: string
 }
 interface FundedMarkets {
@@ -31,15 +25,9 @@ interface WinningResultMarkets {
   readonly label: string
 }
 
-export type MarketFilter =
-  | AllMarkets
-  | MyMarkets
-  | FundedMarkets
-  | PredictedOnMarkets
-  | WinningResultMarkets
+export type MarketFilter = AllMarkets | FundedMarkets | PredictedOnMarkets | WinningResultMarkets
 
 const isAllMarkets = (mf: MarketFilter): mf is AllMarkets => mf._type === Types.allMarkets
-const isMyMarkets = (mf: MarketFilter): mf is MyMarkets => mf._type === Types.myMarkets
 const isFundedMarkets = (mf: MarketFilter): mf is FundedMarkets => mf._type === Types.fundedMarkets
 const isPredictedOnMarkets = (mf: MarketFilter): mf is PredictedOnMarkets =>
   mf._type === Types.predictedOnMarkets
@@ -48,11 +36,6 @@ const isWinningResultMarkets = (mf: MarketFilter): mf is WinningResultMarkets =>
 
 export const MarketFilter = {
   allMarkets: (): AllMarkets => ({ _type: Types.allMarkets, label: 'All Markets' }),
-  myMarkets: (account: string): MyMarkets => ({
-    _type: Types.myMarkets,
-    account,
-    label: 'My Markets',
-  }),
   fundedMarkets: (account: string): FundedMarkets => ({
     _type: Types.fundedMarkets,
     account,
@@ -70,7 +53,6 @@ export const MarketFilter = {
   }),
   is: {
     allMarkets: isAllMarkets,
-    myMarkets: isMyMarkets,
     fundedMarkets: isFundedMarkets,
     predictedOnMarkets: isPredictedOnMarkets,
     winningResultMarkets: isWinningResultMarkets,
