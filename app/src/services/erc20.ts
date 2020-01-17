@@ -41,7 +41,6 @@ class ERC20Service {
     neededAmount: BigNumber,
   ): Promise<boolean> => {
     const allowance: BigNumber = await this.contract.allowance(owner, spender)
-    logger.log(`Allowance ${allowance.toString()}`)
     return allowance.gte(neededAmount)
   }
 
