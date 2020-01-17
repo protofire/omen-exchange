@@ -115,7 +115,7 @@ class CPKService {
       logger.log(`Transaction hash: ${txObject.hash}`)
       await provider.waitForTransaction(txObject.hash)
     } catch (err) {
-      logger.error(`There was an error buying '${amount.toString()}' of shares'`, err.message)
+      logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
       throw err
     }
   }
