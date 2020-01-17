@@ -17,8 +17,6 @@ const buildFilterFn = (filter: MarketFilter, contracts: Contracts) => async (
 
   if (MarketFilter.is.allMarkets(filter)) {
     return true
-  } else if (MarketFilter.is.myMarkets(filter)) {
-    return market.ownerAddress === filter.account
   } else if (MarketFilter.is.fundedMarkets(filter)) {
     const marketMakerService = buildMarketMaker(market.address)
     const poolShares = await marketMakerService.poolSharesBalanceOf(filter.account)
