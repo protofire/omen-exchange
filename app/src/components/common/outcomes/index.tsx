@@ -204,6 +204,7 @@ const Outcomes = (props: Props) => {
         onClick={() => {
           removeOutcome(index)
         }}
+        tabIndex={-1}
       />
     </OutcomeItem>
   ))
