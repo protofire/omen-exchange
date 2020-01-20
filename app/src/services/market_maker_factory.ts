@@ -47,6 +47,7 @@ class MarketMakerFactoryService {
   constantContract: Contract
   signerAddress: Maybe<string>
   provider: any
+  address: string
 
   constructor(address: string, provider: any, signerAddress: Maybe<string>) {
     if (signerAddress) {
@@ -60,6 +61,7 @@ class MarketMakerFactoryService {
     this.constantContract = new ethers.Contract(address, marketMakerFactoryCallAbi, provider)
     this.signerAddress = signerAddress
     this.provider = provider
+    this.address = address
   }
 
   predictMarketMakerAddress = async (
@@ -67,11 +69,8 @@ class MarketMakerFactoryService {
     conditionalTokenAddress: string,
     collateralAddress: string,
     conditionId: string,
+    signerAddress: string,
   ): Promise<string> => {
-    if (!this.signerAddress) {
-      throw new Error('Wallet needs to be connected to use this method')
-    }
-
     const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
     const cloneFactoryInterface = new utils.Interface([
       'function cloneConstructor(bytes consData) external',
@@ -92,7 +91,7 @@ class MarketMakerFactoryService {
           '0xff',
           this.contract.address,
           utils.keccak256(
-            utils.defaultAbiCoder.encode(['address', 'uint'], [this.signerAddress, saltNonce]),
+            utils.defaultAbiCoder.encode(['address', 'uint'], [signerAddress, saltNonce]),
           ),
           utils.keccak256(
             `0x3d3d606380380380913d393d73${this.contract.address.slice(
@@ -193,6 +192,37 @@ class MarketMakerFactoryService {
     const validMarkets = marketsWithExtraData.filter(market => market.fee.eq(feeBN))
 
     return validMarkets
+  }
+
+  static encodeCreateMarketMaker = (
+    saltNonce: number,
+    conditionalTokenAddress: string,
+    collateralAddress: string,
+    conditionId: string,
+  ): string => {
+    const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
+
+    const create2FixedProductMarketMakerInterface = new utils.Interface([
+      `function create2FixedProductMarketMaker(
+            uint saltNonce,
+            address conditionalTokens,
+            address collateralToken,
+            bytes32[] conditionIds,
+            uint fee,
+            uint initialFunds,
+            uint[] distributionHint
+      ) public returns (address)`,
+    ])
+
+    return create2FixedProductMarketMakerInterface.functions.create2FixedProductMarketMaker.encode([
+      saltNonce,
+      conditionalTokenAddress,
+      collateralAddress,
+      [conditionId],
+      feeBN,
+      '0x',
+      [],
+    ])
   }
 }
 

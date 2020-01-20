@@ -1,4 +1,4 @@
-import { Contract, ethers, Wallet } from 'ethers'
+import { Contract, ethers, utils, Wallet } from 'ethers'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import { Moment } from 'moment'
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
@@ -27,6 +27,7 @@ class RealitioService {
   constantContract: Contract
   signerAddress: Maybe<string>
   provider: any
+  address: string
 
   constructor(address: string, provider: any, signerAddress: Maybe<string>) {
     if (signerAddress) {
@@ -40,6 +41,7 @@ class RealitioService {
     this.constantContract = new ethers.Contract(address, realitioCallAbi, provider)
     this.signerAddress = signerAddress
     this.provider = provider
+    this.address = address
   }
 
   /**
@@ -165,6 +167,77 @@ class RealitioService {
       )
       throw err
     }
+  }
+
+  static encodeAskQuestion = (
+    question: string,
+    outcomes: Outcome[],
+    category: string,
+    arbitratorAddress: string,
+    openingDateMoment: Moment,
+    networkId: number,
+  ): any => {
+    const openingTimestamp = openingDateMoment.unix()
+    const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
+    const questionText = RealitioQuestionLib.encodeText(
+      'single-select',
+      question,
+      outcomeNames,
+      category,
+    )
+
+    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+
+    const args = [
+      SINGLE_SELECT_TEMPLATE_ID,
+      questionText,
+      arbitratorAddress,
+      timeoutResolution,
+      openingTimestamp,
+      0,
+    ]
+
+    const askQuestionInterface = new utils.Interface([
+      'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public payable returns (bytes32)',
+    ])
+
+    return askQuestionInterface.functions.askQuestion.encode(args)
+  }
+
+  askQuestionConstant = async (
+    question: string,
+    outcomes: Outcome[],
+    category: string,
+    arbitratorAddress: string,
+    openingDateMoment: Moment,
+    networkId: number,
+    signerAddress: string,
+  ): Promise<string> => {
+    const openingTimestamp = openingDateMoment.unix()
+    const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
+    const questionText = RealitioQuestionLib.encodeText(
+      'single-select',
+      question,
+      outcomeNames,
+      category,
+    )
+
+    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+
+    const args = [
+      SINGLE_SELECT_TEMPLATE_ID,
+      questionText,
+      arbitratorAddress,
+      timeoutResolution,
+      openingTimestamp,
+      0,
+    ]
+
+    const questionId = await this.constantContract.askQuestion(...args, {
+      from: signerAddress,
+    })
+
+    return questionId
   }
 }
 

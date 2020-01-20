@@ -151,6 +151,31 @@ class ConditionalTokenService {
 
     return setApprovalForAllInterface.functions.setApprovalForAll.encode([address, approved])
   }
+
+  static encodePrepareCondition = (
+    questionId: string,
+    oracleAddress: string,
+    outcomeSlotCount: number,
+  ): any => {
+    const prepareConditionInterface = new utils.Interface([
+      'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
+    ])
+
+    return prepareConditionInterface.functions.prepareCondition.encode([
+      oracleAddress,
+      questionId,
+      new BigNumber(outcomeSlotCount),
+    ])
+  }
+
+  getConditionId = (questionId: string, oracleAddress: string, outcomeSlotCount: number) => {
+    const conditionId = ethers.utils.solidityKeccak256(
+      ['address', 'bytes32', 'uint256'],
+      [oracleAddress, questionId, outcomeSlotCount],
+    )
+
+    return conditionId
+  }
 }
 
 export { ConditionalTokenService }
