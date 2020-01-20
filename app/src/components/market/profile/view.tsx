@@ -59,7 +59,6 @@ const ViewWrapper = (props: Props) => {
   React.useEffect(() => {
     if (account && nextPath) {
       history.replace({ pathname: nextPath })
-      // setNextPath(null)
     }
   }, [account, nextPath])
 
