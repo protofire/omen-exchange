@@ -11,12 +11,13 @@ import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { ERC20Service } from '../../../services'
-import { useConnectedWeb3Context, WhenConnected } from '../../../hooks/connectedWeb3'
+import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
 import { useContracts } from '../../../hooks/useContracts'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
 import { MARKET_FEE } from '../../../common/constants'
+import { ModalConnectWallet } from '../../common/modal_connect_wallet'
 
 const Grid = styled.div`
   display: grid;
@@ -43,6 +44,8 @@ interface Props {
   arbitrator: Maybe<Arbitrator>
 }
 
+type ButtonClicked = 'redeem' | 'resolve'
+
 const logger = getLogger('Market::ClosedMarketDetail')
 
 export const ClosedMarketDetailWrapper = (props: Props) => {
@@ -64,6 +67,8 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
+  const [isModalOpen, setModalState] = useState(false)
+  const [buttonClicked, setButtonClicked] = useState<Maybe<ButtonClicked>>(null)
 
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
@@ -135,6 +140,18 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     disabledColumns.push(OutcomeTableValue.Shares)
   }
 
+  React.useEffect(() => {
+    if (!account || !buttonClicked) {
+      return
+    }
+    if (buttonClicked === 'redeem') {
+      redeem()
+    } else {
+      resolveCondition()
+    }
+    setButtonClicked(null)
+  }, [account, buttonClicked])
+
   return (
     <>
       <ClosedMarket date={resolutionFormat} />
@@ -164,17 +181,34 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <Grid>
           <TitleValue title="Collateral" value={collateralFormat} />
         </Grid>
-        <WhenConnected>
-          <ButtonContainer>
-            {winningOutcome && !winningOutcome.shares.isZero() && (
-              <Button onClick={() => redeem()}>Redeem</Button>
-            )}
-            {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() && (
-              <Button onClick={resolveCondition}>Resolve Condition</Button>
-            )}
-          </ButtonContainer>
-        </WhenConnected>
+        <ButtonContainer>
+          {winningOutcome && !winningOutcome.shares.isZero() && (
+            <Button
+              onClick={() => {
+                if (!account) {
+                  setModalState(true)
+                }
+                setButtonClicked('redeem')
+              }}
+            >
+              Redeem
+            </Button>
+          )}
+          {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() && (
+            <Button
+              onClick={() => {
+                if (!account) {
+                  setModalState(true)
+                }
+                setButtonClicked('resolve')
+              }}
+            >
+              Resolve Condition
+            </Button>
+          )}
+        </ButtonContainer>
       </ViewCard>
+      <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
       {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>
   )

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 
@@ -14,6 +14,7 @@ import { TitleValue } from '../../common/title_value'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
 import { GridThreeColumns } from '../../common/grid_three_columns'
 import { WhenConnected } from '../../../hooks/connectedWeb3'
+import { ModalConnectWallet } from '../../common/modal_connect_wallet'
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
   margin-bottom: 0;
@@ -30,10 +31,12 @@ interface Props extends RouteComponentProps<{}> {
   status: Status
   marketMakerAddress: string
   funding: BigNumber
+  location: any
 }
 
 const ViewWrapper = (props: Props) => {
   const {
+    account,
     balances,
     collateral,
     status,
@@ -41,6 +44,7 @@ const ViewWrapper = (props: Props) => {
     marketMakerAddress,
     arbitrator,
     category,
+    history,
   } = props
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
@@ -49,6 +53,15 @@ const ViewWrapper = (props: Props) => {
   })
 
   const probabilities = balances.map(balance => balance.probability)
+  const [isModalOpen, setModalState] = useState(false)
+  const [nextPath, setNextPath] = useState<Maybe<string>>(null)
+
+  React.useEffect(() => {
+    if (account && nextPath) {
+      history.replace({ pathname: nextPath })
+      // setNextPath(null)
+    }
+  }, [account, nextPath])
 
   const renderTableData = () => {
     const disabledColumns = [OutcomeTableValue.Payout]
@@ -103,19 +116,46 @@ const ViewWrapper = (props: Props) => {
         <SubsectionTitleStyled>Outcomes</SubsectionTitleStyled>
         {renderTableData()}
         {marketHasDetails && details()}
-        <WhenConnected>
-          <ButtonContainer>
-            <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
-            {userHasShares && (
-              <ButtonAnchor href={`/#/${marketMakerAddress}/sell`}>Sell</ButtonAnchor>
-            )}
-            <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
-          </ButtonContainer>
-        </WhenConnected>
+        <ButtonContainer>
+          <ButtonAnchor
+            onClick={() => {
+              if (!account) {
+                setModalState(true)
+              }
+              setNextPath(`${marketMakerAddress}/fund`)
+            }}
+          >
+            Fund
+          </ButtonAnchor>
+          {userHasShares && (
+            <ButtonAnchor
+              onClick={() => {
+                if (!account) {
+                  setModalState(true)
+                }
+                setNextPath(`${marketMakerAddress}/sell`)
+              }}
+            >
+              Sell
+            </ButtonAnchor>
+          )}
+          <ButtonAnchor
+            onClick={() => {
+              if (!account) {
+                setModalState(true)
+              }
+              setNextPath(`${marketMakerAddress}/buy`)
+            }}
+          >
+            Buy
+          </ButtonAnchor>
+        </ButtonContainer>
       </ViewCard>
       <WhenConnected>
         <ThreeBoxComments threadName={marketMakerAddress} />
       </WhenConnected>
+      <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
+
       {status === Status.Loading ? <FullLoading /> : null}
     </>
   )
