@@ -51,9 +51,9 @@ interface Props {
     spread: number
     funding: BigNumber
     outcomes: Outcome[]
+    loadedQuestionId: Maybe<string>
   }
   marketCreationStatus: MarketCreationStatus
-  questionId: string | null
   marketMakerAddress: string | null
 }
 
@@ -61,7 +61,7 @@ const CreateMarketStep = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { library: provider, account } = context
 
-  const { marketMakerAddress, values, marketCreationStatus, questionId } = props
+  const { marketMakerAddress, values, marketCreationStatus } = props
   const {
     collateral,
     question,
@@ -71,6 +71,7 @@ const CreateMarketStep = (props: Props) => {
     spread,
     funding,
     outcomes,
+    loadedQuestionId,
   } = values
 
   const back = () => {
@@ -148,16 +149,16 @@ const CreateMarketStep = (props: Props) => {
           )
         })}
       </Table>
-      {questionId || marketMakerAddress ? (
+      {loadedQuestionId || marketMakerAddress ? (
         <>
           <SubsectionTitle>Created Market Information</SubsectionTitle>
           <Grid>
-            {questionId ? (
+            {loadedQuestionId ? (
               <TitleValue
                 title={'Realitio'}
                 value={[
                   <a
-                    href={`https://realitio.github.io/#!/question/${questionId}`}
+                    href={`https://realitio.github.io/#!/question/${loadedQuestionId}`}
                     key="1"
                     rel="noopener noreferrer"
                     target="_blank"

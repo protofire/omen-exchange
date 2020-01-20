@@ -22,7 +22,6 @@ const MarketWizardCreatorContainer: FC = () => {
   const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(
     MarketCreationStatus.ready(),
   )
-  const [questionId] = useState<string | null>(null)
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
   const handleSubmit = async (marketData: MarketData) => {
@@ -68,7 +67,6 @@ const MarketWizardCreatorContainer: FC = () => {
       <MarketWizardCreator
         callback={handleSubmit}
         marketMakerAddress={marketMakerAddress}
-        questionId={questionId}
         marketCreationStatus={marketCreationStatus}
       />
       <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
