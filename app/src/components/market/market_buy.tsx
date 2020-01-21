@@ -153,14 +153,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Buying ${formatBigNumber(tradedShares, collateral.decimals)} shares ...`)
 
-      // add 10% to the approved amount because there can be precision errors
-      // this can be improved if, instead of adding the 1% fee manually in the front, we use the `calcMarketFee`
-      // contract method and add it to the result of `calcNetCost` result
-      const costWithErrorMargin = cost.mul(11000).div(10000)
-
       await CPKService.buyOutcomes({
         provider,
-        cost: costWithErrorMargin,
+        cost,
         amount,
         outcomeIndex,
         marketMaker,
