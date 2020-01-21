@@ -38,10 +38,11 @@ interface Props {
     loadedQuestionId: Maybe<string>
   }
   handleOutcomesChange: (newOutcomes: Outcome[]) => any
+  handleDistributeUniformly: () => void
 }
 
 const OutcomesStep = (props: Props) => {
-  const { handleOutcomesChange, values } = props
+  const { handleOutcomesChange, handleDistributeUniformly, values } = props
   const { question, outcomes, loadedQuestionId } = values
 
   const [newOutcomeName, setNewOutcomeName] = useState('')
@@ -95,6 +96,10 @@ const OutcomesStep = (props: Props) => {
         errorMessages={errorMessages}
         disabled={!!loadedQuestionId}
       />
+      <ButtonContainerStyled>
+        <Button onClick={handleDistributeUniformly}>=</Button>
+      </ButtonContainerStyled>
+
       {canAddOutcome && (
         <NewOutcome>
           <Textfield

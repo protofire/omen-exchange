@@ -206,6 +206,18 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
+  const distributeProbabilities = (outcomes: Outcome[]) => {
+    const uniformProbability = 100 / outcomes.length
+    return outcomes.map(outcome => {
+      outcome.probability = uniformProbability
+      return outcome
+    })
+  }
+
+  const handleDistributeUniformly = () => {
+    handleOutcomesChange(distributeProbabilities(marketData.outcomes))
+  }
+
   const handleOutcomesChange = (outcomes: Outcome[]) => {
     const newMarketData = {
       ...marketData,
@@ -286,6 +298,7 @@ export const MarketWizardCreator = (props: Props) => {
               question,
               loadedQuestionId,
             }}
+            handleDistributeUniformly={handleDistributeUniformly}
             handleOutcomesChange={handleOutcomesChange}
           />
         )
