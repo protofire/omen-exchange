@@ -81,25 +81,6 @@ class CPKService {
           value: 0,
           data: MarketMakerService.encodeBuy(amount, outcomeIndex, outcomeTokensToBuy),
         },
-        // Step 4: Approve to move shares for the cpkAddress
-        {
-          operation: CPK.CALL,
-          to: conditionalTokensAddress,
-          value: 0,
-          data: ConditionalTokenService.encodeSetApprovalForAll(cpkAddress, true),
-        },
-        // Step 5: Transfer outcome tokens from CPK to the user
-        {
-          operation: CPK.CALL,
-          to: conditionalTokensAddress,
-          value: 0,
-          data: ConditionalTokenService.encodeSafeTransferFrom(
-            cpkAddress,
-            account,
-            positionIdForCollectionId,
-            outcomeTokensToBuy,
-          ),
-        },
       ]
 
       // Check  if the allowance of the CPK to the market maker is enough.
