@@ -13,13 +13,13 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   onClose: () => void
 }
 
-
 const OutcomeInfo = styled(Well)`
   margin-bottom: 30px;
 `
 
 const ButtonContainer = styled.div`
-    float: right;
+  display: flex;
+  flex-direction: row-reverse;
 `
 
 const TwitterGlobalButton = styled.button`
@@ -28,16 +28,13 @@ const TwitterGlobalButton = styled.button`
   border: 0;
   border-radius: 3px;
   width: 92px;
-  float: right;
-
-  div {
-    float: left;
-  }
+`
+const TwitterShareButtonExt = styled(TwitterShareButton)`
+  display: flex;
 `
 
 const Text = styled.p`
-    margin: 8px 0px;
-    float: right;
+  margin: 8px 0px;
 `
 
 export const ModalTwitterShare = (props: Props) => {
@@ -45,16 +42,14 @@ export const ModalTwitterShare = (props: Props) => {
 
   return (
     <ModalWrapper isOpen={isOpen} onRequestClose={onClose} title={title}>
-      <OutcomeInfo>
-      {description}   
-      </OutcomeInfo>
+      <OutcomeInfo>{description}</OutcomeInfo>
 
       <ButtonContainer>
         <TwitterGlobalButton>
-          <TwitterShareButton url={shareUrl} title={description}>
-            <TwitterIcon size={32} /> 
-            <Text>Tweet</Text> 
-          </TwitterShareButton>
+          <TwitterShareButtonExt url={shareUrl} title={description}>
+            <TwitterIcon size={32} />
+            <Text>Tweet</Text>
+          </TwitterShareButtonExt>
         </TwitterGlobalButton>
       </ButtonContainer>
     </ModalWrapper>
