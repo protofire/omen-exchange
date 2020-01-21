@@ -4,6 +4,7 @@ declare module '3box-comments-react'
 declare module '@realitio/realitio-lib/formatters/question'
 declare module '@realitio/realitio-lib/formatters/template'
 declare module 'contract-proxy-kit'
+declare module 'react-share'
 
 declare type Maybe<T> = T | null
 
