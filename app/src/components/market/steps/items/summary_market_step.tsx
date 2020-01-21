@@ -70,18 +70,15 @@ const SummaryMarketStep = (props: Props) => {
 
   return (
     <>
-      <SectionTitle title="Conditional Exchange" subTitle="Your new market has been created!" />
+      <SectionTitle title="Conditional Exchange" subTitle="A new market has been created!" />
       <CreateCard>
-        <SubsectionTitle>Market&apos;s URL</SubsectionTitle>
         <OutcomeInfo>
           <Paragraph>
-            You can access your markets from the <NavLinkStyled to="/">Markets</NavLinkStyled>{' '}
+            You can now find your market on the <NavLinkStyled to="/">Markets</NavLinkStyled>{' '}
             section.
           </Paragraph>
           <Paragraph>
-            <a target="_blank" rel="noopener noreferrer" href={`/#/${marketMakerAddress}`}>
-              {marketMakerURL}
-            </a>
+            Get the URL to your market
             <CopyText value={marketMakerURL} />
           </Paragraph>
         </OutcomeInfo>
