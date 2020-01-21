@@ -66,51 +66,60 @@ class CPKService {
         collectionId,
       )
 
-      const txObject = await cpk.execTransactions(
-        [
-          // Step 1: Transfer an amount (cost) from the user to the CPK
-          {
-            operation: CPK.CALL,
-            to: collateralAddress,
-            value: 0,
-            data: ERC20Service.encodeTransferFrom(account, cpkAddress, cost),
-          },
-          // Step 2: Approve unlimited amount to be transferred to the market maker)
-          {
-            operation: CPK.CALL,
-            to: collateralAddress,
-            value: 0,
-            data: ERC20Service.encodeApproveUnlimited(marketMakerAddress),
-          },
-          // Step 3: Buy outcome tokens with the CPK
-          {
-            operation: CPK.CALL,
-            to: marketMakerAddress,
-            value: 0,
-            data: MarketMakerService.encodeBuy(amount, outcomeIndex, outcomeTokensToBuy),
-          },
-          // Step 4: Approve to move shares for the cpkAddress
-          {
-            operation: CPK.CALL,
-            to: conditionalTokensAddress,
-            value: 0,
-            data: ConditionalTokenService.encodeSetApprovalForAll(cpkAddress, true),
-          },
-          // Step 5: Transfer outcome tokens from CPK to the user
-          {
-            operation: CPK.CALL,
-            to: conditionalTokensAddress,
-            value: 0,
-            data: ConditionalTokenService.encodeSafeTransferFrom(
-              cpkAddress,
-              account,
-              positionIdForCollectionId,
-              outcomeTokensToBuy,
-            ),
-          },
-        ],
-        { gasLimit: 1000000 },
+      const transactions = [
+        // Step 2: Transfer an amount (cost) from the user to the CPK
+        {
+          operation: CPK.CALL,
+          to: collateralAddress,
+          value: 0,
+          data: ERC20Service.encodeTransferFrom(account, cpkAddress, cost),
+        },
+        // Step 3: Buy outcome tokens with the CPK
+        {
+          operation: CPK.CALL,
+          to: marketMakerAddress,
+          value: 0,
+          data: MarketMakerService.encodeBuy(amount, outcomeIndex, outcomeTokensToBuy),
+        },
+        // Step 4: Approve to move shares for the cpkAddress
+        {
+          operation: CPK.CALL,
+          to: conditionalTokensAddress,
+          value: 0,
+          data: ConditionalTokenService.encodeSetApprovalForAll(cpkAddress, true),
+        },
+        // Step 5: Transfer outcome tokens from CPK to the user
+        {
+          operation: CPK.CALL,
+          to: conditionalTokensAddress,
+          value: 0,
+          data: ConditionalTokenService.encodeSafeTransferFrom(
+            cpkAddress,
+            account,
+            positionIdForCollectionId,
+            outcomeTokensToBuy,
+          ),
+        },
+      ]
+
+      // Check  if the allowance of the CPK to the market maker is enough.
+      const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
+        cpkAddress,
+        marketMakerAddress,
+        cost,
       )
+
+      if (!hasCPKEnoughAlowance) {
+        // Step 1:  Approve unlimited amount to be transferred to the market maker)
+        transactions.unshift({
+          operation: CPK.CALL,
+          to: collateralAddress,
+          value: 0,
+          data: ERC20Service.encodeApproveUnlimited(marketMakerAddress),
+        })
+      }
+
+      const txObject = await cpk.execTransactions(transactions, { gasLimit: 1000000 })
 
       logger.log(`Transaction hash: ${txObject.hash}`)
       await provider.waitForTransaction(txObject.hash)
