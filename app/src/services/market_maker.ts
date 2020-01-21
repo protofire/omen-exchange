@@ -251,9 +251,7 @@ class MarketMakerService {
     outcomeIndex: number,
     outcomeTokensToBuy: BigNumber,
   ): any => {
-    const buyInterface = new utils.Interface([
-      'function buy(uint investmentAmount, uint outcomeIndex, uint minOutcomeTokensToBuy) external',
-    ])
+    const buyInterface = new utils.Interface(marketMakerAbi)
 
     return buyInterface.functions.buy.encode([amount, outcomeIndex, outcomeTokensToBuy])
   }

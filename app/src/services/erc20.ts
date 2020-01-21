@@ -14,6 +14,7 @@ const erc20Abi = [
   'function symbol() external view returns (string)',
   'function name() external view returns (string)',
   'function decimals() external view returns (uint8)',
+  'function transferFrom(address sender, address recipient, uint256 amount) public returns (bool)',
 ]
 
 class ERC20Service {
@@ -109,25 +110,19 @@ class ERC20Service {
   }
 
   static encodeTransferFrom = (from: string, to: string, amount: BigNumber): any => {
-    const transferFromInterface = new utils.Interface([
-      'function transferFrom(address sender, address recipient, uint256 amount) public returns (bool)',
-    ])
+    const transferFromInterface = new utils.Interface(erc20Abi)
 
     return transferFromInterface.functions.transferFrom.encode([from, to, amount])
   }
 
   static encodeApprove = (spenderAccount: string, amount: BigNumber): any => {
-    const approveInterface = new utils.Interface([
-      'function approve(address spender, uint256 amount) external returns (bool)',
-    ])
+    const approveInterface = new utils.Interface(erc20Abi)
 
     return approveInterface.functions.approve.encode([spenderAccount, amount])
   }
 
   static encodeApproveUnlimited = (spenderAccount: string): any => {
-    const approveInterface = new utils.Interface([
-      'function approve(address spender, uint256 amount) external returns (bool)',
-    ])
+    const approveInterface = new utils.Interface(erc20Abi)
 
     return approveInterface.functions.approve.encode([spenderAccount, ethers.constants.MaxUint256])
   }

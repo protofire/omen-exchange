@@ -17,6 +17,7 @@ const conditionalTokensAbi = [
   'function getCollectionId(bytes32 parentCollectionId, bytes32 conditionId, uint indexSet) external view returns (bytes32) ',
   'function getPositionId(address collateralToken, bytes32 collectionId) external pure returns (uint) ',
   'function balanceOf(address owner, uint256 positionId) external view returns (uint256)',
+  'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data) external',
 ]
 
 class ConditionalTokenService {
@@ -132,9 +133,7 @@ class ConditionalTokenService {
     positionId: BigNumber,
     outcomeTokensToTransfer: BigNumber,
   ): any => {
-    const safeTransferFromInterface = new utils.Interface([
-      'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data) external',
-    ])
+    const safeTransferFromInterface = new utils.Interface(conditionalTokensAbi)
 
     return safeTransferFromInterface.functions.safeTransferFrom.encode([
       addressFrom,
@@ -146,9 +145,7 @@ class ConditionalTokenService {
   }
 
   static encodeSetApprovalForAll = (address: string, approved: boolean): any => {
-    const setApprovalForAllInterface = new utils.Interface([
-      'function setApprovalForAll(address operator, bool approved) external',
-    ])
+    const setApprovalForAllInterface = new utils.Interface(conditionalTokensAbi)
 
     return setApprovalForAllInterface.functions.setApprovalForAll.encode([address, approved])
   }
