@@ -325,6 +325,9 @@ class CPKService {
           data: ConditionalTokenService.encodeSetApprovalForAll(cpkAddress, true),
         },
         // Step 6: Transfer outcome tokens from CPK to the user
+        // TODO: we have a problem when we try to move the pool shares right now,
+        // we don't know the amount of shares for every outcome to move with the function safeTransferFrom,
+        // and we can't calculate the amounts inside the batch transaction
       ]
 
       const txObject = await cpk.execTransactions(transactions, { gasLimit: 1000000 })
