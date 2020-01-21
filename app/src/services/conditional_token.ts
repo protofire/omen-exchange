@@ -36,7 +36,7 @@ class ConditionalTokenService {
     this.provider = provider
   }
 
-  getAddress = (): string => {
+  get address(): string {
     return this.contract.address
   }
 

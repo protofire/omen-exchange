@@ -30,8 +30,8 @@ class CPKService {
       const account = await signer.getAddress()
 
       const collateralAddress = await marketMaker.getCollateralToken()
-      const marketMakerAddress = marketMaker.getAddress()
-      const conditionalTokensAddress = conditionalTokens.getAddress()
+      const marketMakerAddress = marketMaker.address
+      const conditionalTokensAddress = conditionalTokens.address
 
       const cpk = await CPK.create({ ethers, signer })
       const cpkAddress = cpk.address

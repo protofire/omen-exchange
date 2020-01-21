@@ -31,7 +31,7 @@ class ERC20Service {
     }
   }
 
-  getAddress = (): string => {
+  get address(): string {
     return this.contract.address
   }
 
