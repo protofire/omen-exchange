@@ -214,16 +214,16 @@ export const MarketWizardCreator = (props: Props) => {
     })
   }
 
-  const handleDistributeUniformly = () => {
-    handleOutcomesChange(distributeProbabilities(marketData.outcomes))
-  }
-
   const handleOutcomesChange = (outcomes: Outcome[]) => {
     const newMarketData = {
       ...marketData,
       outcomes,
     }
     setMarketdata(newMarketData)
+  }
+
+  const handleDistributeUniformly = () => {
+    handleOutcomesChange(distributeProbabilities(marketData.outcomes))
   }
 
   const handleDateChange = (date: Date | null) => {
