@@ -31,7 +31,6 @@ interface Props extends RouteComponentProps<{}> {
   status: Status
   marketMakerAddress: string
   funding: BigNumber
-  location: any
 }
 
 const ViewWrapper = (props: Props) => {
