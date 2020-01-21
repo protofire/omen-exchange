@@ -50,7 +50,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           defaultOption={currentFilter}
           options={[
             MarketFilter.allMarkets(),
-            MarketFilter.myMarkets(context.account),
             MarketFilter.fundedMarkets(context.account),
             MarketFilter.predictedOnMarkets(context.account),
             MarketFilter.winningResultMarkets(context.account),
