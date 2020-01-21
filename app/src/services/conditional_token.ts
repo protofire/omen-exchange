@@ -22,7 +22,6 @@ const conditionalTokensAbi = [
 
 class ConditionalTokenService {
   contract: Contract
-  address: string
   signerAddress: Maybe<string>
   provider: any
 
@@ -33,9 +32,12 @@ class ConditionalTokenService {
     } else {
       this.contract = new ethers.Contract(address, conditionalTokensAbi, provider)
     }
-    this.address = address
     this.signerAddress = signerAddress
     this.provider = provider
+  }
+
+  getAddress = (): string => {
+    return this.contract.address
   }
 
   prepareCondition = async (

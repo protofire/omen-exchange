@@ -96,14 +96,14 @@ const MarketWizardCreatorContainer: FC = () => {
         const saltNonce = Math.round(Math.random() * 1000000)
         const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
           saltNonce,
-          conditionalTokens.address,
+          conditionalTokens.getAddress(),
           collateral.address,
           conditionId,
         )
         logger.log(`Predicted market address: ${predictedMarketMakerAddress}`)
         const marketMakerAddress = await marketMakerFactory.createMarketMaker(
           saltNonce,
-          conditionalTokens.address,
+          conditionalTokens.getAddress(),
           collateral.address,
           conditionId,
         )

@@ -29,7 +29,6 @@ class MarketMakerService {
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
   provider: any
-  address: string
 
   constructor(
     address: string,
@@ -49,7 +48,10 @@ class MarketMakerService {
     this.conditionalTokens = conditionalTokens
     this.realitio = realitio
     this.provider = provider
-    this.address = address
+  }
+
+  getAddress = (): string => {
+    return this.contract.address
   }
 
   getConditionalTokens = async (): Promise<string> => {

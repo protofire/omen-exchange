@@ -18,12 +18,10 @@ const erc20Abi = [
 ]
 
 class ERC20Service {
-  tokenAddress: string
   provider: any
   contract: Contract
 
   constructor(provider: any, signerAddress: Maybe<string>, tokenAddress: string) {
-    this.tokenAddress = tokenAddress
     this.provider = provider
     if (signerAddress) {
       const signer: Wallet = provider.getSigner()
@@ -31,6 +29,10 @@ class ERC20Service {
     } else {
       this.contract = new ethers.Contract(tokenAddress, erc20Abi, provider)
     }
+  }
+
+  getAddress = (): string => {
+    return this.contract.address
   }
 
   /**
@@ -79,11 +81,11 @@ class ERC20Service {
 
   isValidErc20 = async (): Promise<boolean> => {
     try {
-      if (!isAddress(this.tokenAddress)) {
+      if (!isAddress(this.contract.address)) {
         throw new Error('Is not a valid erc20 address')
       }
 
-      if (!isContract(this.provider, this.tokenAddress)) {
+      if (!isContract(this.provider, this.contract.address)) {
         throw new Error('Is not a valid contract')
       }
 
@@ -103,7 +105,7 @@ class ERC20Service {
     const [decimals, symbol] = await Promise.all([this.contract.decimals(), this.contract.symbol()])
 
     return {
-      address: this.tokenAddress,
+      address: this.contract.address,
       decimals,
       symbol,
     }
