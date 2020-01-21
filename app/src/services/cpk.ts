@@ -75,7 +75,7 @@ class CPKService {
             value: 0,
             data: ERC20Service.encodeTransferFrom(account, cpkAddress, cost),
           },
-          // Step 2: Approve an amount(cost) to be used by the market maker (later that amount(cost) will be transferred to the market maker)
+          // Step 2: Approve unlimited amount to be transferred to the market maker)
           {
             operation: CPK.CALL,
             to: collateralAddress,
