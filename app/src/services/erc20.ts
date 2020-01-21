@@ -109,19 +109,19 @@ class ERC20Service {
     }
   }
 
-  static encodeTransferFrom = (from: string, to: string, amount: BigNumber): any => {
+  static encodeTransferFrom = (from: string, to: string, amount: BigNumber): string => {
     const transferFromInterface = new utils.Interface(erc20Abi)
 
     return transferFromInterface.functions.transferFrom.encode([from, to, amount])
   }
 
-  static encodeApprove = (spenderAccount: string, amount: BigNumber): any => {
+  static encodeApprove = (spenderAccount: string, amount: BigNumber): string => {
     const approveInterface = new utils.Interface(erc20Abi)
 
     return approveInterface.functions.approve.encode([spenderAccount, amount])
   }
 
-  static encodeApproveUnlimited = (spenderAccount: string): any => {
+  static encodeApproveUnlimited = (spenderAccount: string): string => {
     const approveInterface = new utils.Interface(erc20Abi)
 
     return approveInterface.functions.approve.encode([spenderAccount, ethers.constants.MaxUint256])

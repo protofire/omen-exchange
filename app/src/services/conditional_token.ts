@@ -132,7 +132,7 @@ class ConditionalTokenService {
     addressTo: string,
     positionId: BigNumber,
     outcomeTokensToTransfer: BigNumber,
-  ): any => {
+  ): string => {
     const safeTransferFromInterface = new utils.Interface(conditionalTokensAbi)
 
     return safeTransferFromInterface.functions.safeTransferFrom.encode([
@@ -144,7 +144,7 @@ class ConditionalTokenService {
     ])
   }
 
-  static encodeSetApprovalForAll = (address: string, approved: boolean): any => {
+  static encodeSetApprovalForAll = (address: string, approved: boolean): string => {
     const setApprovalForAllInterface = new utils.Interface(conditionalTokensAbi)
 
     return setApprovalForAllInterface.functions.setApprovalForAll.encode([address, approved])
