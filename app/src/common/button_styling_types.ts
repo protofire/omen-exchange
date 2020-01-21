@@ -16,6 +16,7 @@ export interface ButtonComponentProps {
   buttonType?: ButtonType
   children?: ReactNode
   onClick?: (e?: any) => void
+  tabIndex?: number
 }
 
 const DisabledCSS = css`

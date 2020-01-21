@@ -99,7 +99,8 @@ class ConditionalTokenService {
   }
 
   setApprovalForAll = async (marketMakerAddress: string): Promise<string> => {
-    return this.contract.setApprovalForAll(marketMakerAddress, true)
+    const transactionObject = await this.contract.setApprovalForAll(marketMakerAddress, true)
+    return this.provider.waitForTransaction(transactionObject.hash)
   }
 
   isApprovedForAll = async (marketMakerAddress: string): Promise<boolean> => {
