@@ -32,7 +32,7 @@ const Grid = styled.div`
   grid-column-gap: 20px;
   grid-row-gap: 14px;
   grid-template-columns: 1fr 1fr;
-  margin-bottom: 25px;
+  margin-bottom: 14px;
 `
 
 const TitleValueStyled = styled(TitleValue)`
@@ -115,7 +115,6 @@ const CreateMarketStep = (props: Props) => {
       <Grid>
         <TitleValue title={'Category'} value={category} />
         <TitleValue title={'Resolution date'} value={resolutionDate} />
-        <TitleValue title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
         <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
         {collateral && (
           <TitleValue
@@ -127,6 +126,10 @@ const CreateMarketStep = (props: Props) => {
           />
         )}
       </Grid>
+      <TitleValueStyled
+        title={'Arbitrator'}
+        value={<DisplayArbitrator arbitrator={arbitrator} />}
+      />
       <SubsectionTitle>Outcomes</SubsectionTitle>
       <Table
         head={
