@@ -9,6 +9,7 @@ import { MarketData, Token } from '../util/types'
 import { ConnectedWeb3Context } from '../hooks/connectedWeb3'
 import { getContractAddress } from '../util/networks'
 import { MarketMakerFactoryService } from './market_maker_factory'
+import { TransactionReceipt } from 'ethers/providers'
 
 const logger = getLogger('Services::CPKService')
 
@@ -18,7 +19,6 @@ interface CPKBuyOutcomesParams {
   amount: BigNumber
   outcomeIndex: number
   marketMaker: MarketMakerService
-  conditionalTokens: ConditionalTokenService
 }
 
 interface CPKCreateMarketParams {
@@ -45,15 +45,13 @@ class CPKService {
     amount,
     outcomeIndex,
     marketMaker,
-    conditionalTokens,
-  }: CPKBuyOutcomesParams): Promise<any> => {
+  }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
       const signer: Wallet = provider.getSigner()
       const account = await signer.getAddress()
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const marketMakerAddress = marketMaker.address
-      const conditionalTokensAddress = conditionalTokens.address
 
       const cpk = await CPK.create({ ethers, signer })
       const cpkAddress = cpk.address
@@ -74,19 +72,6 @@ class CPKService {
 
       const outcomeTokensToBuy = await marketMaker.calcBuyAmount(amount, outcomeIndex)
       logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
-
-      const conditionId = await marketMaker.getConditionId()
-      const collectionId = await conditionalTokens.getCollectionIdForOutcome(
-        conditionId,
-        1 << outcomeIndex,
-      )
-      logger.debug(
-        `Collection ID for outcome index ${outcomeIndex} and condition id ${conditionId} : ${collectionId}`,
-      )
-      const positionIdForCollectionId = await conditionalTokens.getPositionId(
-        collateralAddress,
-        collectionId,
-      )
 
       const transactions = [
         // Step 2: Transfer an amount (cost) from the user to the CPK

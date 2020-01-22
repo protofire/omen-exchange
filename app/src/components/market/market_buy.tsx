@@ -99,7 +99,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { library: provider } = context
 
-  const { buildMarketMaker, conditionalTokens } = useContracts(context)
+  const { buildMarketMaker } = useContracts(context)
 
   const { marketMakerAddress, balances, collateral, question, resolution } = props
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -162,7 +162,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         amount,
         outcomeIndex,
         marketMaker,
-        conditionalTokens,
       })
 
       setMessageTwitter(
