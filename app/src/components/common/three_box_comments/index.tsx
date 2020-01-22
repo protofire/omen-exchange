@@ -47,6 +47,17 @@ const ThreeBoxCustom = styled.div`
         padding: 5px 12px 5px 60px;
       }
 
+      .input_emptyUser {
+        max-height: 100%;
+        min-height: 44px;
+        min-width: 44px;
+      }
+
+      .input_login,
+      .input_postLoading_text {
+        display: none;
+      }
+
       .input_commentAs {
         color: ${props => props.theme.colors.textColorLight};
         left: auto;
