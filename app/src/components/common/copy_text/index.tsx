@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, useState } from 'react'
+import React, { HTMLAttributes, useState, useCallback } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import styled from 'styled-components'
 import { MessageType, Message } from '../message'
@@ -26,10 +26,10 @@ interface Props extends HTMLAttributes<HTMLButtonElement> {
 }
 
 export const CopyText: React.FC<Props> = (props: Props) => {
-  const { value, ...restProps } = props
+  const { toastMessage = 'Text copied to your clipboard!', value, ...restProps } = props
   const [showMessage, setShowMessage] = useState(false)
 
-  const showCopyMessage = () => setShowMessage(true)
+  const showCopyMessage = useCallback(() => setShowMessage(true), [])
 
   return (
     <>
@@ -38,9 +38,7 @@ export const CopyText: React.FC<Props> = (props: Props) => {
           <img onClick={showCopyMessage} src={Copy} alt="" />
         </CopyToClipboard>
       </CopyWrapper>
-      {showMessage && (
-        <Message type={MessageType.ok} text="URL copied to your clipboard!" hideDelay={5000} />
-      )}
+      {showMessage && <Message type={MessageType.ok} text={toastMessage} hideDelay={5000} />}
     </>
   )
 }
