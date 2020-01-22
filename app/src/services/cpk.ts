@@ -4,6 +4,7 @@ import CPK from 'contract-proxy-kit'
 import { getLogger } from '../util/logger'
 import { ConditionalTokenService, ERC20Service, MarketMakerService } from './index'
 import { BigNumber } from 'ethers/utils'
+import { TransactionReceipt } from 'ethers/providers'
 
 const logger = getLogger('Services::CPKService')
 
@@ -24,7 +25,7 @@ class CPKService {
     outcomeIndex,
     marketMaker,
     conditionalTokens,
-  }: CPKBuyOutcomesParams) => {
+  }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
       const signer: Wallet = provider.getSigner()
       const account = await signer.getAddress()
@@ -103,7 +104,7 @@ class CPKService {
       const txObject = await cpk.execTransactions(transactions, { gasLimit: 1000000 })
 
       logger.log(`Transaction hash: ${txObject.hash}`)
-      await provider.waitForTransaction(txObject.hash)
+      return provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
       throw err
