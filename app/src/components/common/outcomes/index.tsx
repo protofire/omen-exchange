@@ -10,6 +10,7 @@ import { Well } from '../well'
 import { ButtonAdd } from '../button_add'
 
 import IconDelete from './img/delete.svg'
+import { Checkbox } from '../checkbox'
 
 const BUTTON_DIMENSIONS = '30px'
 
@@ -121,7 +122,6 @@ interface Props {
   totalProbabilities: number
   disabled: boolean
   canAddOutcome: boolean
-  isUniform: boolean
 }
 
 const Outcomes = (props: Props) => {
@@ -291,7 +291,7 @@ const Outcomes = (props: Props) => {
         </TotalWrapper>
       </OutcomesWrapper>
 
-      <input type="checkbox" title="Distribute uniformly" onChange={handleIsUniformChanged} />
+      <Checkbox title="Distribute uniformly" onChange={handleIsUniformChanged} />
 
       {canAddOutcome && (
         <NewOutcome>
