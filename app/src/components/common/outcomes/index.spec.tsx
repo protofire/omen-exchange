@@ -293,15 +293,16 @@ test('should distribute probabilities when isUniform is checked', () => {
     ],
     onChange: onChangeFn,
     isUniform: false,
+    setIsUniform: jest.fn(),
     canAddOutcome: true,
   })
 
   const isUniformCheckbox = getByTitle('Distribute uniformly')
-  fireEvent.change(isUniformCheckbox, { target: { checked: true } })
+  fireEvent.click(isUniformCheckbox)
   expect(isUniformCheckbox).toBeChecked()
-  // expect(onChangeFn).toHaveBeenCalledWith([
-  //   { name: 'red', probability: 100 / 3 },
-  //   { name: 'green', probability: 100 / 3 },
-  //   { name: 'blue', probability: 100 / 3 },
-  // ])
+  expect(onChangeFn).toHaveBeenCalledWith([
+    { name: 'red', probability: 100 / 3 },
+    { name: 'green', probability: 100 / 3 },
+    { name: 'blue', probability: 100 / 3 },
+  ])
 })

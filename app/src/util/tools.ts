@@ -99,6 +99,10 @@ export const computeBalanceAfterTrade = (
  * Computes the distribution hint that should be used for setting the initial odds to `initialOdds`
  */
 export const calcDistributionHint = (initialOdds: number[]): BigNumber[] => {
+  const allEqual = initialOdds.every(x => x === initialOdds[0])
+  if (allEqual) {
+    return []
+  }
   const initialOddsBig = initialOdds.map(x => new Big(x))
   const product = initialOddsBig.reduce((a, b) => a.mul(b))
 
