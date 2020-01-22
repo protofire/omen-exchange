@@ -81,7 +81,7 @@ interface Props extends HTMLAttributes<HTMLButtonElement> {
 }
 
 const BarDiagramComponent: React.FC<Props> = (props: Props) => {
-  const { outcomeName, probability, isWinning, winningOutcome, withWinningOutcome } = props
+  const { outcomeName, probability, winningOutcome, withWinningOutcome } = props
   const progressColor =
     winningOutcome && withWinningOutcome ? theme.colors.primary : theme.colors.darkGray
 

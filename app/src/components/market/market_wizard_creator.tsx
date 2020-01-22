@@ -89,7 +89,7 @@ export const MarketWizardCreator = (props: Props) => {
     return () => {
       isSubscribed = false
     }
-  }, [networkId])
+  }, [networkId, marketData])
 
   const next = (): void => {
     const actualCurrentStep = currentStep >= 3 ? 4 : currentStep + 1
