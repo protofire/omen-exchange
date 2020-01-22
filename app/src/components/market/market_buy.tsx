@@ -28,6 +28,7 @@ import { ButtonType } from '../../common/button_styling_types'
 import { MARKET_FEE } from '../../common/constants'
 import { FormError } from '../common/form_error'
 import { useCollateralBalance } from '../../hooks/useCollateralBalance'
+import { ModalTwitterShare } from '../common/modal_twitter_share'
 import { CPKService } from '../../services/cpk'
 
 const ButtonLinkStyled = styled(ButtonLink)`
@@ -108,6 +109,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
+  const [isModalTwitterShareOpen, setModalTwitterShareState] = useState(false)
+  const [messageTwitter, setMessageTwitter] = useState('')
 
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
@@ -153,22 +156,25 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Buying ${formatBigNumber(tradedShares, collateral.decimals)} shares ...`)
 
-      // add 10% to the approved amount because there can be precision errors
-      // this can be improved if, instead of adding the 1% fee manually in the front, we use the `calcMarketFee`
-      // contract method and add it to the result of `calcNetCost` result
-      const costWithErrorMargin = cost.mul(11000).div(10000)
-
       await CPKService.buyOutcomes({
         provider,
-        cost: costWithErrorMargin,
+        cost,
         amount,
         outcomeIndex,
         marketMaker,
         conditionalTokens,
       })
 
+      setMessageTwitter(
+        `Your outcome was successfully created. You obtain ${formatBigNumber(
+          tradedShares,
+          collateral.decimals,
+        )} shares.`,
+      )
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
+
+      setModalTwitterShareState(true)
     } catch (err) {
       setStatus(Status.Error)
       logger.log(`Error trying to buy: ${err.message}`)
@@ -272,6 +278,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           </Button>
         </ButtonContainer>
       </ViewCard>
+      <ModalTwitterShare
+        title={'Outcome created'}
+        description={messageTwitter}
+        shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
+        isOpen={isModalTwitterShareOpen}
+        onClose={() => setModalTwitterShareState(false)}
+      />
       {status === Status.Loading ? <FullLoading message={message} /> : null}
     </>
   )

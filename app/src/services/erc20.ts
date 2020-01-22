@@ -14,15 +14,14 @@ const erc20Abi = [
   'function symbol() external view returns (string)',
   'function name() external view returns (string)',
   'function decimals() external view returns (uint8)',
+  'function transferFrom(address sender, address recipient, uint256 amount) public returns (bool)',
 ]
 
 class ERC20Service {
-  tokenAddress: string
   provider: any
   contract: Contract
 
   constructor(provider: any, signerAddress: Maybe<string>, tokenAddress: string) {
-    this.tokenAddress = tokenAddress
     this.provider = provider
     if (signerAddress) {
       const signer: Wallet = provider.getSigner()
@@ -30,6 +29,10 @@ class ERC20Service {
     } else {
       this.contract = new ethers.Contract(tokenAddress, erc20Abi, provider)
     }
+  }
+
+  get address(): string {
+    return this.contract.address
   }
 
   /**
@@ -78,11 +81,11 @@ class ERC20Service {
 
   isValidErc20 = async (): Promise<boolean> => {
     try {
-      if (!isAddress(this.tokenAddress)) {
+      if (!isAddress(this.contract.address)) {
         throw new Error('Is not a valid erc20 address')
       }
 
-      if (!isContract(this.provider, this.tokenAddress)) {
+      if (!isContract(this.provider, this.contract.address)) {
         throw new Error('Is not a valid contract')
       }
 
@@ -102,32 +105,26 @@ class ERC20Service {
     const [decimals, symbol] = await Promise.all([this.contract.decimals(), this.contract.symbol()])
 
     return {
-      address: this.tokenAddress,
+      address: this.contract.address,
       decimals,
       symbol,
     }
   }
 
-  static encodeTransferFrom = (from: string, to: string, amount: BigNumber): any => {
-    const transferFromInterface = new utils.Interface([
-      'function transferFrom(address sender, address recipient, uint256 amount) public returns (bool)',
-    ])
+  static encodeTransferFrom = (from: string, to: string, amount: BigNumber): string => {
+    const transferFromInterface = new utils.Interface(erc20Abi)
 
     return transferFromInterface.functions.transferFrom.encode([from, to, amount])
   }
 
-  static encodeApprove = (spenderAccount: string, amount: BigNumber): any => {
-    const approveInterface = new utils.Interface([
-      'function approve(address spender, uint256 amount) external returns (bool)',
-    ])
+  static encodeApprove = (spenderAccount: string, amount: BigNumber): string => {
+    const approveInterface = new utils.Interface(erc20Abi)
 
     return approveInterface.functions.approve.encode([spenderAccount, amount])
   }
 
-  static encodeApproveUnlimited = (spenderAccount: string): any => {
-    const approveInterface = new utils.Interface([
-      'function approve(address spender, uint256 amount) external returns (bool)',
-    ])
+  static encodeApproveUnlimited = (spenderAccount: string): string => {
+    const approveInterface = new utils.Interface(erc20Abi)
 
     return approveInterface.functions.approve.encode([spenderAccount, ethers.constants.MaxUint256])
   }

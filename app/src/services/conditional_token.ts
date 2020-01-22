@@ -17,11 +17,11 @@ const conditionalTokensAbi = [
   'function getCollectionId(bytes32 parentCollectionId, bytes32 conditionId, uint indexSet) external view returns (bytes32) ',
   'function getPositionId(address collateralToken, bytes32 collectionId) external pure returns (uint) ',
   'function balanceOf(address owner, uint256 positionId) external view returns (uint256)',
+  'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data) external',
 ]
 
 class ConditionalTokenService {
   contract: Contract
-  address: string
   signerAddress: Maybe<string>
   provider: any
 
@@ -32,9 +32,12 @@ class ConditionalTokenService {
     } else {
       this.contract = new ethers.Contract(address, conditionalTokensAbi, provider)
     }
-    this.address = address
     this.signerAddress = signerAddress
     this.provider = provider
+  }
+
+  get address(): string {
+    return this.contract.address
   }
 
   prepareCondition = async (
@@ -131,10 +134,8 @@ class ConditionalTokenService {
     addressTo: string,
     positionId: BigNumber,
     outcomeTokensToTransfer: BigNumber,
-  ): any => {
-    const safeTransferFromInterface = new utils.Interface([
-      'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data) external',
-    ])
+  ): string => {
+    const safeTransferFromInterface = new utils.Interface(conditionalTokensAbi)
 
     return safeTransferFromInterface.functions.safeTransferFrom.encode([
       addressFrom,
@@ -145,10 +146,8 @@ class ConditionalTokenService {
     ])
   }
 
-  static encodeSetApprovalForAll = (address: string, approved: boolean): any => {
-    const setApprovalForAllInterface = new utils.Interface([
-      'function setApprovalForAll(address operator, bool approved) external',
-    ])
+  static encodeSetApprovalForAll = (address: string, approved: boolean): string => {
+    const setApprovalForAllInterface = new utils.Interface(conditionalTokensAbi)
 
     return setApprovalForAllInterface.functions.setApprovalForAll.encode([address, approved])
   }

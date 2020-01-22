@@ -29,7 +29,6 @@ class MarketMakerService {
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
   provider: any
-  address: string
 
   constructor(
     address: string,
@@ -49,7 +48,10 @@ class MarketMakerService {
     this.conditionalTokens = conditionalTokens
     this.realitio = realitio
     this.provider = provider
-    this.address = address
+  }
+
+  get address(): string {
+    return this.contract.address
   }
 
   getConditionalTokens = async (): Promise<string> => {
@@ -250,10 +252,8 @@ class MarketMakerService {
     amount: BigNumber,
     outcomeIndex: number,
     outcomeTokensToBuy: BigNumber,
-  ): any => {
-    const buyInterface = new utils.Interface([
-      'function buy(uint investmentAmount, uint outcomeIndex, uint minOutcomeTokensToBuy) external',
-    ])
+  ): string => {
+    const buyInterface = new utils.Interface(marketMakerAbi)
 
     return buyInterface.functions.buy.encode([amount, outcomeIndex, outcomeTokensToBuy])
   }
