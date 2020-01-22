@@ -2,7 +2,7 @@ import { ethers, Wallet } from 'ethers'
 import CPK from 'contract-proxy-kit'
 
 import { getLogger } from '../util/logger'
-import { ConditionalTokenService, ERC20Service, MarketMakerService } from './index'
+import { ERC20Service, MarketMakerService } from './index'
 import { BigNumber } from 'ethers/utils'
 import { TransactionReceipt } from 'ethers/providers'
 
@@ -14,7 +14,6 @@ interface CPKBuyOutcomesParams {
   amount: BigNumber
   outcomeIndex: number
   marketMaker: MarketMakerService
-  conditionalTokens: ConditionalTokenService
 }
 
 class CPKService {
@@ -24,7 +23,6 @@ class CPKService {
     amount,
     outcomeIndex,
     marketMaker,
-    conditionalTokens,
   }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
       const signer: Wallet = provider.getSigner()
@@ -32,7 +30,6 @@ class CPKService {
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const marketMakerAddress = marketMaker.address
-      const conditionalTokensAddress = conditionalTokens.address
 
       const cpk = await CPK.create({ ethers, signer })
       const cpkAddress = cpk.address
@@ -53,19 +50,6 @@ class CPKService {
 
       const outcomeTokensToBuy = await marketMaker.calcBuyAmount(amount, outcomeIndex)
       logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
-
-      const conditionId = await marketMaker.getConditionId()
-      const collectionId = await conditionalTokens.getCollectionIdForOutcome(
-        conditionId,
-        1 << outcomeIndex,
-      )
-      logger.debug(
-        `Collection ID for outcome index ${outcomeIndex} and condition id ${conditionId} : ${collectionId}`,
-      )
-      const positionIdForCollectionId = await conditionalTokens.getPositionId(
-        collateralAddress,
-        collectionId,
-      )
 
       const transactions = [
         // Step 2: Transfer an amount (cost) from the user to the CPK
