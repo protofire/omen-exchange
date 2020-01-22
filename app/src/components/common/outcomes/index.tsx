@@ -122,20 +122,12 @@ interface Props {
   disabled: boolean
   canAddOutcome: boolean
   isUniform: boolean
-  setIsUniform: (value: boolean) => any
 }
 
 const Outcomes = (props: Props) => {
-  const {
-    outcomes,
-    totalProbabilities,
-    disabled,
-    errorMessages,
-    canAddOutcome,
-    isUniform,
-    setIsUniform,
-  } = props
+  const { outcomes, totalProbabilities, disabled, errorMessages, canAddOutcome } = props
   const [newOutcomeName, setNewOutcomeName] = React.useState('')
+  const [isUniform, setIsUniform] = React.useState(false)
 
   const updateOutcomeProbability = (index: number, newProbability: number) => {
     if (newProbability < 0 || newProbability > 100) {

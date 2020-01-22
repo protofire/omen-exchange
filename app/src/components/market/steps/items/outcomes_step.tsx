@@ -34,7 +34,6 @@ interface Props {
 const OutcomesStep = (props: Props) => {
   const { handleOutcomesChange, values } = props
   const { question, outcomes, loadedQuestionId } = values
-  const [isUniform, setIsUniform] = React.useState(false)
 
   const errorMessages = []
 
@@ -75,8 +74,6 @@ const OutcomesStep = (props: Props) => {
         errorMessages={errorMessages}
         disabled={!!loadedQuestionId}
         canAddOutcome={canAddOutcome}
-        isUniform={isUniform}
-        setIsUniform={setIsUniform}
       />
 
       <ButtonContainerStyled>

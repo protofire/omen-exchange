@@ -1,7 +1,7 @@
 /* eslint-env jest */
 import '@testing-library/jest-dom/extend-expect'
 import React from 'react'
-import { render, fireEvent, getByPlaceholderText, getByTitle } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 import { ThemeProvider } from 'styled-components'
 import theme from '../../../theme'
 
@@ -198,9 +198,9 @@ test('should maintain uniform probabilities when an outcome is removed', () => {
       { name: 'black', probability: 25 },
     ],
     onChange: onChangeFn,
-    isUniform: true,
   })
 
+  fireEvent.click(getByTitle('Distribute uniformly'))
   fireEvent.click(getByTitle('Remove outcome 2'))
 
   expect(onChangeFn).toHaveBeenCalledWith([
@@ -220,7 +220,6 @@ test('should add an outcome', () => {
       { name: 'blue', probability: 25 },
     ],
     onChange: onChangeFn,
-    isUniform: false,
     canAddOutcome: true,
   })
 
@@ -247,9 +246,10 @@ test('should maintain uniform probabilities when an outcome is added', () => {
       { name: 'blue', probability: 25 },
     ],
     onChange: onChangeFn,
-    isUniform: true,
     canAddOutcome: true,
   })
+
+  fireEvent.click(getByTitle('Distribute uniformly'))
 
   const newOutcomeInput: any = getByPlaceholderText('Add new outcome')
   fireEvent.change(newOutcomeInput, { target: { value: 'black' } })
@@ -274,10 +274,10 @@ test('should disable probabilities inputs when isUniform is checked', () => {
       { name: 'blue', probability: 25 },
     ],
     onChange: onChangeFn,
-    isUniform: true,
     canAddOutcome: true,
   })
 
+  fireEvent.click(getByTitle('Distribute uniformly'))
   const firstInput = getByTestId('outcome_0')
   expect(firstInput).toBeDisabled()
 })
@@ -292,7 +292,6 @@ test('should distribute probabilities when isUniform is checked', () => {
       { name: 'blue', probability: 15 },
     ],
     onChange: onChangeFn,
-    isUniform: false,
     setIsUniform: jest.fn(),
     canAddOutcome: true,
   })
