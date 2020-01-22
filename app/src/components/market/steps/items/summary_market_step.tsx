@@ -17,6 +17,7 @@ import { useQuestion } from '../../../../hooks/useQuestion'
 import { FullLoading } from '../../../common/full_loading'
 import { NavLink } from 'react-router-dom'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
+import { ButtonType } from '../../../../common/button_styling_types'
 import { ButtonAnchor } from '../../../common/button_anchor'
 import { MARKET_FEE } from '../../../../common/constants'
 
@@ -44,8 +45,16 @@ const TitleValueStyled = styled(TitleValue)`
   margin-bottom: 14px;
 `
 
+const TitleValueFinalStyled = styled(TitleValue)`
+  margin-bottom: 25px;
+`
+
 const Button = styled(ButtonAnchor)`
   flex-grow: 1;
+`
+
+const SubsectionTitleNoMargin = styled(SubsectionTitle)`
+  margin-bottom: 0;
 `
 
 interface Props {
@@ -79,7 +88,7 @@ const SummaryMarketStep = (props: Props) => {
           </Paragraph>
           <Paragraph>
             Get the URL to your market
-            <CopyText value={marketMakerURL} />
+            <CopyText value={marketMakerURL} toastMessage="URL copied to your clipboard!" />
           </Paragraph>
         </OutcomeInfo>
         <SubsectionTitle>Details</SubsectionTitle>
@@ -87,7 +96,6 @@ const SummaryMarketStep = (props: Props) => {
         <Grid>
           <TitleValue title={'Category'} value={category} />
           <TitleValue title={'Resolution date'} value={resolutionDate} />
-          <TitleValue title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
           <TitleValue title={'Spread / Fee'} value={`${MARKET_FEE}%`} />
           <TitleValue
             title={'Funding'}
@@ -97,7 +105,11 @@ const SummaryMarketStep = (props: Props) => {
             ]}
           />
         </Grid>
-        <SubsectionTitle>Outcomes</SubsectionTitle>
+        <TitleValueFinalStyled
+          title={'Arbitrator'}
+          value={<DisplayArbitrator arbitrator={arbitrator} />}
+        />
+        <SubsectionTitleNoMargin>Outcomes</SubsectionTitleNoMargin>
         <Table
           head={
             <THead>
@@ -119,7 +131,12 @@ const SummaryMarketStep = (props: Props) => {
           })}
         </Table>
         <ButtonContainer>
-          <Button rel="noopener noreferrer" href={`/#/${marketMakerAddress}`} target="_blank">
+          <Button
+            buttonType={ButtonType.primary}
+            rel="noopener noreferrer"
+            href={`/#/${marketMakerAddress}`}
+            target="_blank"
+          >
             View Market
           </Button>
         </ButtonContainer>

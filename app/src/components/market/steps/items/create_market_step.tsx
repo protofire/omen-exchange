@@ -44,6 +44,14 @@ const TitleValueStyled = styled(TitleValue)`
   margin-bottom: 14px;
 `
 
+const TitleValueFinalStyled = styled(TitleValue)`
+  margin-bottom: 25px;
+`
+
+const SubsectionTitleNoMargin = styled(SubsectionTitle)`
+  margin-bottom: 0;
+`
+
 interface Props {
   back: () => void
   submit: () => void
@@ -66,7 +74,7 @@ const CreateMarketStep = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { library: provider, account } = context
 
-  const { marketMakerAddress, values, marketCreationStatus, questionId } = props
+  const { values, marketCreationStatus } = props
   const {
     collateral,
     question,
@@ -134,11 +142,11 @@ const CreateMarketStep = (props: Props) => {
           />
         )}
       </Grid>
-      <TitleValueStyled
+      <TitleValueFinalStyled
         title={'Arbitrator'}
         value={<DisplayArbitrator arbitrator={arbitrator} />}
       />
-      <SubsectionTitle>Outcomes</SubsectionTitle>
+      <SubsectionTitleNoMargin>Outcomes</SubsectionTitleNoMargin>
       <Table
         head={
           <THead>
@@ -159,31 +167,6 @@ const CreateMarketStep = (props: Props) => {
           )
         })}
       </Table>
-      {questionId || marketMakerAddress ? (
-        <>
-          <SubsectionTitle>Created Market Information</SubsectionTitle>
-          <Grid>
-            {questionId ? (
-              <TitleValue
-                title={'Realitio'}
-                value={[
-                  <a
-                    href={`https://realitio.github.io/#!/question/${questionId}`}
-                    key="1"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    Question URL
-                  </a>,
-                ]}
-              />
-            ) : null}
-            {marketMakerAddress ? (
-              <TitleValue title={'Market Maker'} value={`Deployed at ${marketMakerAddress}`} />
-            ) : null}
-          </Grid>
-        </>
-      ) : null}
       {!MarketCreationStatus.is.ready(marketCreationStatus) &&
       !MarketCreationStatus.is.error(marketCreationStatus) ? (
         <FullLoading message={`${marketCreationStatus._type}...`} />
