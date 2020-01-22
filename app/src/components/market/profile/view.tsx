@@ -113,9 +113,7 @@ const ViewWrapper = (props: Props) => {
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>
-      <WhenConnected>
-        <ThreeBoxComments threadName={marketMakerAddress} />
-      </WhenConnected>
+      <ThreeBoxComments threadName={marketMakerAddress} />
       {status === Status.Loading ? <FullLoading /> : null}
     </>
   )
