@@ -1,7 +1,7 @@
 /* eslint-env jest */
 import '@testing-library/jest-dom/extend-expect'
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+import { render, fireEvent, getByPlaceholderText, getByTitle } from '@testing-library/react'
 import { ThemeProvider } from 'styled-components'
 import theme from '../../../theme'
 
@@ -163,4 +163,145 @@ test('should pass some message errors', () => {
 
   expect(firstErrorMessage.textContent).toEqual('Error message one')
   expect(secondErrorMessage.textContent).toEqual('Error message two')
+})
+
+test('should remove an outcome', () => {
+  const onChangeFn = jest.fn()
+
+  const { getByTitle } = renderOutcomes({
+    outcomes: [
+      { name: 'red', probability: 25 },
+      { name: 'green', probability: 25 },
+      { name: 'blue', probability: 25 },
+      { name: 'black', probability: 25 },
+    ],
+    onChange: onChangeFn,
+  })
+
+  fireEvent.click(getByTitle('Remove outcome 2'))
+
+  expect(onChangeFn).toHaveBeenCalledWith([
+    { name: 'red', probability: 25 },
+    { name: 'blue', probability: 25 },
+    { name: 'black', probability: 25 },
+  ])
+})
+
+test('should maintain uniform probabilities when an outcome is removed', () => {
+  const onChangeFn = jest.fn()
+
+  const { getByTitle } = renderOutcomes({
+    outcomes: [
+      { name: 'red', probability: 25 },
+      { name: 'green', probability: 25 },
+      { name: 'blue', probability: 25 },
+      { name: 'black', probability: 25 },
+    ],
+    onChange: onChangeFn,
+    isUniform: true,
+  })
+
+  fireEvent.click(getByTitle('Remove outcome 2'))
+
+  expect(onChangeFn).toHaveBeenCalledWith([
+    { name: 'red', probability: 100 / 3 },
+    { name: 'blue', probability: 100 / 3 },
+    { name: 'black', probability: 100 / 3 },
+  ])
+})
+
+test('should add an outcome', () => {
+  const onChangeFn = jest.fn()
+
+  const { getByTitle, getByPlaceholderText } = renderOutcomes({
+    outcomes: [
+      { name: 'red', probability: 25 },
+      { name: 'green', probability: 25 },
+      { name: 'blue', probability: 25 },
+    ],
+    onChange: onChangeFn,
+    isUniform: false,
+    canAddOutcome: true,
+  })
+
+  const newOutcomeInput: any = getByPlaceholderText('Add new outcome')
+  fireEvent.change(newOutcomeInput, { target: { value: 'black' } })
+  fireEvent.click(getByTitle('Add new outcome'))
+
+  expect(newOutcomeInput.value).toEqual('')
+  expect(onChangeFn).toHaveBeenCalledWith([
+    { name: 'red', probability: 25 },
+    { name: 'green', probability: 25 },
+    { name: 'blue', probability: 25 },
+    { name: 'black', probability: 0 },
+  ])
+})
+
+test('should maintain uniform probabilities when an outcome is added', () => {
+  const onChangeFn = jest.fn()
+
+  const { getByTitle, getByPlaceholderText } = renderOutcomes({
+    outcomes: [
+      { name: 'red', probability: 25 },
+      { name: 'green', probability: 25 },
+      { name: 'blue', probability: 25 },
+    ],
+    onChange: onChangeFn,
+    isUniform: true,
+    canAddOutcome: true,
+  })
+
+  const newOutcomeInput: any = getByPlaceholderText('Add new outcome')
+  fireEvent.change(newOutcomeInput, { target: { value: 'black' } })
+  fireEvent.click(getByTitle('Add new outcome'))
+
+  expect(newOutcomeInput.value).toEqual('')
+  expect(onChangeFn).toHaveBeenCalledWith([
+    { name: 'red', probability: 25 },
+    { name: 'green', probability: 25 },
+    { name: 'blue', probability: 25 },
+    { name: 'black', probability: 25 },
+  ])
+})
+
+test('should disable probabilities inputs when isUniform is checked', () => {
+  const onChangeFn = jest.fn()
+
+  const { getByTestId, getByTitle } = renderOutcomes({
+    outcomes: [
+      { name: 'red', probability: 25 },
+      { name: 'green', probability: 25 },
+      { name: 'blue', probability: 25 },
+    ],
+    onChange: onChangeFn,
+    isUniform: true,
+    canAddOutcome: true,
+  })
+
+  const firstInput = getByTestId('outcome_0')
+  expect(firstInput).toBeDisabled()
+})
+
+test('should distribute probabilities when isUniform is checked', () => {
+  const onChangeFn = jest.fn()
+
+  const { getByTitle } = renderOutcomes({
+    outcomes: [
+      { name: 'red', probability: 5 },
+      { name: 'green', probability: 35 },
+      { name: 'blue', probability: 15 },
+    ],
+    onChange: onChangeFn,
+    isUniform: false,
+    canAddOutcome: true,
+  })
+
+  const isUniformCheckbox = getByTitle('Distribute uniformly')
+  fireEvent.change(isUniformCheckbox, { target: { checked: true } })
+  expect(isUniformCheckbox).toBeChecked()
+  // expect(onChangeFn).toHaveBeenCalledWith([
+  //   { name: 'red', probability: 100 / 3 },
+  //   { name: 'green', probability: 100 / 3 },
+  //   { name: 'blue', probability: 100 / 3 },
+  // ])
 })

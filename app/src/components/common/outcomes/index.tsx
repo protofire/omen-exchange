@@ -6,6 +6,9 @@ import { FormLabel } from '../form_label'
 import { Tooltip } from '../tooltip'
 import { FormError } from '../form_error'
 import { Button } from '../button'
+import { Well } from '../well'
+import { ButtonAdd } from '../button_add'
+
 import IconDelete from './img/delete.svg'
 
 const BUTTON_DIMENSIONS = '30px'
@@ -99,6 +102,13 @@ const TotalValueColor = styled(TotalText)<{ error?: boolean }>`
   color: ${props => (props.error ? props.theme.colors.error : props.theme.colors.textColor)};
 `
 
+const NewOutcome = styled(Well)`
+  column-gap: 15px;
+  display: grid;
+  grid-template-columns: 1fr 26px;
+  margin-top: auto;
+`
+
 export interface Outcome {
   name: string
   probability: number
@@ -110,10 +120,22 @@ interface Props {
   errorMessages?: string[]
   totalProbabilities: number
   disabled: boolean
+  canAddOutcome: boolean
+  isUniform: boolean
+  setIsUniform: (value: boolean) => any
 }
 
 const Outcomes = (props: Props) => {
-  const { outcomes, totalProbabilities, disabled, errorMessages } = props
+  const {
+    outcomes,
+    totalProbabilities,
+    disabled,
+    errorMessages,
+    canAddOutcome,
+    isUniform,
+    setIsUniform,
+  } = props
+  const [newOutcomeName, setNewOutcomeName] = React.useState('')
 
   const updateOutcomeProbability = (index: number, newProbability: number) => {
     if (newProbability < 0 || newProbability > 100) {
@@ -173,9 +195,46 @@ const Outcomes = (props: Props) => {
     )
   }
 
+  const addNewOutcome = () => {
+    const newOutcome = {
+      name: newOutcomeName.trim(),
+      probability: 0,
+    }
+    const newOutcomes = outcomes.concat(newOutcome)
+    props.onChange(
+      isUniform
+        ? newOutcomes.map(o => {
+            o.probability = 100 / newOutcomes.length
+            return o
+          })
+        : newOutcomes,
+    )
+    setNewOutcomeName('')
+  }
+
   const removeOutcome = (index: number) => {
     outcomes.splice(index, 1)
-    props.onChange(outcomes)
+    props.onChange(
+      isUniform
+        ? outcomes.map(o => {
+            o.probability = 100 / outcomes.length
+            return o
+          })
+        : outcomes,
+    )
+  }
+
+  const handleIsUniformChanged = (event: any) => {
+    const value = event.target.checked
+    props.onChange(
+      value
+        ? outcomes.map(o => {
+            o.probability = 100 / outcomes.length
+            return o
+          })
+        : outcomes,
+    )
+    setIsUniform(value)
   }
 
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
@@ -194,6 +253,7 @@ const Outcomes = (props: Props) => {
             min={0}
             onChange={e => updateOutcomeProbability(index, +e.currentTarget.value)}
             type="number"
+            disabled={isUniform}
             value={outcome.probability}
           />
         }
@@ -204,36 +264,55 @@ const Outcomes = (props: Props) => {
         onClick={() => {
           removeOutcome(index)
         }}
+        title={`Remove outcome ${index + 1}`}
         tabIndex={-1}
       />
     </OutcomeItem>
   ))
 
   return (
-    <OutcomesWrapper>
-      <OutcomesTitles>
-        <FormLabel>Outcome</FormLabel>
-        <FormLabelWrapper>
-          <FormLabel>Probability</FormLabel>
-          <Tooltip
-            description="If an event has already a probability different than 50-50 you can adjust it here. It is important that the probabilities add up to 100%"
-            id="probability"
+    <>
+      <OutcomesWrapper>
+        <OutcomesTitles>
+          <FormLabel>Outcome</FormLabel>
+          <FormLabelWrapper>
+            <FormLabel>Probability</FormLabel>
+            <Tooltip
+              description="If an event has already a probability different than 50-50 you can adjust it here. It is important that the probabilities add up to 100%"
+              id="probability"
+            />
+          </FormLabelWrapper>
+          <div />
+        </OutcomesTitles>
+        <OutcomeItems>{outcomesToRender}</OutcomeItems>
+        {messageErrorToRender()}
+        <TotalWrapper>
+          <TotalTitle>
+            <strong>Total:</strong> {outcomes.length} outcomes
+          </TotalTitle>
+          <TotalValue>
+            <TotalValueColor error={totalProbabilities !== 100}>
+              {totalProbabilities}
+            </TotalValueColor>
+            %
+          </TotalValue>
+        </TotalWrapper>
+      </OutcomesWrapper>
+
+      <input type="checkbox" title="Distribute uniformly" onChange={handleIsUniformChanged} />
+
+      {canAddOutcome && (
+        <NewOutcome>
+          <Textfield
+            type="text"
+            placeholder="Add new outcome"
+            value={newOutcomeName}
+            onChange={e => setNewOutcomeName(e.target.value)}
           />
-        </FormLabelWrapper>
-        <div />
-      </OutcomesTitles>
-      <OutcomeItems>{outcomesToRender}</OutcomeItems>
-      {messageErrorToRender()}
-      <TotalWrapper>
-        <TotalTitle>
-          <strong>Total:</strong> {outcomes.length} outcomes
-        </TotalTitle>
-        <TotalValue>
-          <TotalValueColor error={totalProbabilities !== 100}>{totalProbabilities}</TotalValueColor>
-          %
-        </TotalValue>
-      </TotalWrapper>
-    </OutcomesWrapper>
+          <ButtonAdd disabled={!newOutcomeName} onClick={addNewOutcome} title="Add new outcome" />
+        </NewOutcome>
+      )}
+    </>
   )
 }
 
