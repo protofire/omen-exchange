@@ -2,13 +2,17 @@ import { useEffect, useState } from 'react'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts, Contracts } from './useContracts'
-import { EARLIEST_BLOCK_TO_CHECK, FETCH_EVENTS_CHUNK_SIZE } from '../common/constants'
+import { FETCH_EVENTS_CHUNK_SIZE } from '../common/constants'
 import { asyncFilter } from '../util/async_filter'
 import { MarketWithExtraData } from '../util/types'
 import { MarketFilter } from '../util/market_filter'
 import { callInChunks, Range } from '../util/call_in_chunks'
 import { RemoteData } from '../util/remote_data'
 import { BigNumber } from 'ethers/utils'
+import { getEarliestBlockToCheck } from '../util/networks'
+import { getLogger } from '../util/logger'
+
+const logger = getLogger('Hooks::useMarkets')
 
 const buildFilterFn = (filter: MarketFilter, contracts: Contracts) => async (
   market: MarketWithExtraData,
@@ -109,9 +113,12 @@ export const useMarkets = (
   const [moreMarkets, setMoreMarkets] = useState(true)
   const [needFetchMore, setNeedFetchMore] = useState(true)
 
+  const earliestBlockToCheck = getEarliestBlockToCheck(context.networkId)
+  logger.log(`Earliest block to check ${earliestBlockToCheck}`)
+
   useEffect(() => {
-    setMoreMarkets(latestBlockToCheck === null || latestBlockToCheck > EARLIEST_BLOCK_TO_CHECK)
-  }, [latestBlockToCheck])
+    setMoreMarkets(latestBlockToCheck === null || latestBlockToCheck > earliestBlockToCheck)
+  }, [latestBlockToCheck, earliestBlockToCheck])
 
   // Set `needFetchMore` to true when it makes sense to fetch more markets
   useEffect(() => {
@@ -163,13 +170,21 @@ export const useMarkets = (
     }
 
     if (latestBlockToCheck && needFetchMore) {
-      run([EARLIEST_BLOCK_TO_CHECK, latestBlockToCheck])
+      run([earliestBlockToCheck, latestBlockToCheck])
     }
 
     return () => {
       didCancel = true
     }
-  }, [context, filter, latestBlockToCheck, expectedMarketsCount, needFetchMore, contracts])
+  }, [
+    context,
+    filter,
+    latestBlockToCheck,
+    earliestBlockToCheck,
+    expectedMarketsCount,
+    needFetchMore,
+    contracts,
+  ])
 
   return {
     markets,

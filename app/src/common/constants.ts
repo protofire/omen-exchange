@@ -7,11 +7,7 @@ export const GIT_COMMIT: string = process.env.COMMIT_REF || ''
 export const INFURA_PROJECT_ID: string =
   process.env.REACT_APP_INFURA_PROJECT_ID || '7e977d73f2f143ce84ea5ff54f1601fd'
 export const REALITIO_TIMEOUT = process.env.REACT_APP_REALITIO_TIMEOUT
-
-export const EARLIEST_BLOCK_TO_CHECK = parseInt(
-  process.env.REACT_APP_EARLIEST_BLOCK_TO_CHECK || '1',
-  10,
-)
+export const EARLIEST_BLOCK_TO_CHECK = process.env.REACT_APP_EARLIEST_BLOCK_TO_CHECK
 export const FETCH_EVENTS_CHUNK_SIZE = parseInt(
   process.env.REACT_APP_FETCH_EVENTS_CHUNK_SIZE || '500000',
   10,
