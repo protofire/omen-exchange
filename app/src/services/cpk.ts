@@ -35,7 +35,6 @@ interface CPKFundMarketParams {
   collateral: Token
   marketMakerAddress: string
   outcomes: BigNumber[]
-  conditionalTokens: ConditionalTokenService
 }
 
 class CPKService {
@@ -206,6 +205,7 @@ class CPKService {
       )
       logger.log(`ConditionID: ${conditionId}`)
 
+      // Step 3: Create market maker
       const saltNonce = Math.round(Math.random() * 1000000)
       const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
         saltNonce,
@@ -214,8 +214,8 @@ class CPKService {
         conditionId,
         cpkAddress,
       )
+      logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
 
-      // Step 3: Create market maker
       transactions.push({
         operation: CPK.CALL,
         to: marketMakerFactory.address,
@@ -245,8 +245,7 @@ class CPKService {
     funding,
     marketMakerAddress,
     outcomes,
-    conditionalTokens,
-  }: CPKFundMarketParams): Promise<any> => {
+  }: CPKFundMarketParams): Promise<TransactionReceipt> => {
     try {
       const { library: provider, account } = context
       if (!account) {
@@ -278,32 +277,31 @@ class CPKService {
           value: 0,
           data: ERC20Service.encodeTransferFrom(account, cpkAddress, funding),
         },
-        // Step 3: Approve the collateral to the market maker
-        {
-          operation: CPK.CALL,
-          to: collateral.address,
-          value: 0,
-          data: ERC20Service.encodeApprove(marketMakerAddress, funding),
-        },
-        // Step 4: Add funding
+        // Step 3: Add funding
         {
           operation: CPK.CALL,
           to: marketMakerAddress,
           value: 0,
           data: MarketMakerService.encodeAddFunding(funding, outcomes),
         },
-        // Step 5: Approve to move shares for the cpkAddress
-        {
-          operation: CPK.CALL,
-          to: conditionalTokens.address,
-          value: 0,
-          data: ConditionalTokenService.encodeSetApprovalForAll(cpkAddress, true),
-        },
-        // Step 6: Transfer outcome tokens from CPK to the user
-        // TODO: we have a problem when we try to move the pool shares right now,
-        // we don't know the amount of shares for every outcome to move with the function safeTransferFrom,
-        // and we can't calculate the amounts inside the batch transaction
       ]
+
+      // Check  if the allowance of the CPK to the market maker is enough.
+      const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
+        cpkAddress,
+        marketMakerAddress,
+        funding,
+      )
+
+      if (!hasCPKEnoughAlowance) {
+        // Step 4:  Approve unlimited funding to be transferred to the market maker)
+        transactions.unshift({
+          operation: CPK.CALL,
+          to: collateral.address,
+          value: 0,
+          data: ERC20Service.encodeApproveUnlimited(marketMakerAddress),
+        })
+      }
 
       const txObject = await cpk.execTransactions(transactions, { gasLimit: 1000000 })
       logger.log(`Transaction hash: ${txObject.hash}`)

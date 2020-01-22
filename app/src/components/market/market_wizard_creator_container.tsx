@@ -41,7 +41,6 @@ const MarketWizardCreatorContainer: FC = () => {
           realitio,
           marketMakerFactory,
         })
-        logger.log(`Market maker address ${marketMakerAddress}`)
         setMarketMakerAddress(marketMakerAddress)
 
         setMarketCreationStatus(MarketCreationStatus.addFunding())
@@ -51,7 +50,6 @@ const MarketWizardCreatorContainer: FC = () => {
           marketMakerAddress,
           collateral: marketData.collateral,
           outcomes: marketData.outcomes.map(o => new BigNumber(o.probability)),
-          conditionalTokens,
         })
 
         setMarketCreationStatus(MarketCreationStatus.done())
