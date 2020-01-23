@@ -6,7 +6,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { BalanceItem, Status, OutcomeTableValue, Token } from '../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../common'
-import { MarketMakerService } from '../../services'
+import { ERC20Service, MarketMakerService } from '../../services'
 import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { ViewCard } from '../common/view_card'
@@ -155,6 +155,23 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     try {
       setStatus(Status.Loading)
       setMessage(`Buying ${formatBigNumber(tradedShares, collateral.decimals)} shares ...`)
+
+      const signer = provider.getSigner()
+      const account = await signer.getAddress()
+
+      const cpk = await CPKService.getCPK(provider)
+      const collateralAddress = await marketMaker.getCollateralToken()
+
+      const collateralService = new ERC20Service(provider, account, collateralAddress)
+      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
+        account,
+        cpk.address,
+        cost,
+      )
+
+      if (!hasEnoughAlowance) {
+        await collateralService.approveUnlimited(cpk.address)
+      }
 
       await CPKService.buyOutcomes({
         provider,
