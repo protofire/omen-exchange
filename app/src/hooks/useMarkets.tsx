@@ -114,7 +114,7 @@ export const useMarkets = (
   const [needFetchMore, setNeedFetchMore] = useState(true)
 
   const earliestBlockToCheck = getEarliestBlockToCheck(context.networkId)
-  logger.log(`Earliest block to check ${earliestBlockToCheck}`)
+  logger.debug(`Earliest block to check ${earliestBlockToCheck}`)
 
   useEffect(() => {
     setMoreMarkets(latestBlockToCheck === null || latestBlockToCheck > earliestBlockToCheck)
