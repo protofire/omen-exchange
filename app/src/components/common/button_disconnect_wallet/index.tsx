@@ -32,7 +32,7 @@ export const ButtonDisconnectWallet = (props: Props) => {
 
   return (
     <Wrapper buttonType={ButtonType.secondary} onClick={logout} {...restProps}>
-      DISCONNECT
+      Disconnect
     </Wrapper>
   )
 }

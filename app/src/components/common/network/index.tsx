@@ -6,17 +6,15 @@ import { truncateStringInTheMiddle } from '../../../util/tools'
 import { getContractAddressName } from '../../../util/networks'
 
 const NetworkWrapper = styled.div`
-  align-items: flex-end;
+  align-items: center;
   display: flex;
-  flex-direction: column;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    align-items: center;
-    flex-direction: row;
-  }
+  flex-direction: row;
 `
 
-const NetworkContainer = styled.div``
+const NetworkContainer = styled.div`
+  align-items: center;
+  display: flex;
+`
 
 const IconStyled = styled.img`
   height: 13px;
@@ -38,21 +36,20 @@ const NetworkName = styled.span`
   color: ${props => props.theme.header.color};
   font-size: 14px;
   font-weight: 400;
+  line-height: 1.2;
 `
 
 const ConnectionStatusWrapper = styled.div`
+  ${Separator}
   align-items: center;
   display: flex;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    ${Separator}
-  }
 `
 
 const ConnectionStatusText = styled.span`
   color: ${props => props.theme.header.color};
   font-size: 14px;
   font-weight: 400;
+  line-height: 1.2;
 `
 
 const ConnectionStatusDot = styled.div`

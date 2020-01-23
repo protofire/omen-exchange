@@ -16,7 +16,7 @@ interface Props {
 
 export const ButtonConnectWallet = (props: Props) => {
   const { modalState, onClick, ...restProps } = props
-  const buttonMessage = modalState ? 'CONNECTING...' : 'CONNECT TO A WALLET'
+  const buttonMessage = modalState ? 'Connecting...' : 'Connect'
 
   return (
     <Wrapper

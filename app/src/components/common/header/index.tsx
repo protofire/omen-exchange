@@ -34,6 +34,7 @@ const HeaderInner = styled.div`
   margin: 0 auto;
   max-width: 100%;
   padding: 0 10px;
+  position: relative;
   width: ${props => props.theme.themeBreakPoints.xxl};
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
@@ -59,23 +60,26 @@ const MainMenuStyled = styled(MainMenu)`
 
 const NetworkStyled = styled(Network)`
   margin: 0 0 0 auto;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    background-color: #fefefe;
+    border-bottom: 1px solid ${props => props.theme.borders.borderColor};
+    height: 23px;
+    justify-content: flex-end;
+    left: 0;
+    padding: 0 10px;
+    position: absolute;
+    top: calc(100% + 1px);
+    width: 100%;
+  }
 `
 
 const ButtonDisconnectWalletStyled = styled(ButtonDisconnectWallet)`
-  display: none;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: initial;
-    margin: 0 0 0 25px;
-  }
+  margin: 0 0 0 25px;
 `
 
 const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
-  display: none;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: initial;
-  }
+  margin: 0 0 0 auto;
 `
 
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
