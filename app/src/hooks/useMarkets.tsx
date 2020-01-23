@@ -133,21 +133,13 @@ export const useMarkets = (
 
   // restart values when the filter changes
   useEffect(() => {
-    let didCancel = false
-
     const run = async () => {
-      if (!didCancel) {
-        const blockNumber = await context.library.getBlockNumber()
-        setMarkets(RemoteData.notAsked())
-        setLatestBlockTocheck(blockNumber)
-        setNeedFetchMore(true)
-      }
+      const blockNumber = await context.library.getBlockNumber()
+      setMarkets(RemoteData.notAsked())
+      setLatestBlockTocheck(blockNumber)
+      setNeedFetchMore(true)
     }
     run()
-
-    return () => {
-      didCancel = true
-    }
   }, [context, filter])
 
   // fetch markets
