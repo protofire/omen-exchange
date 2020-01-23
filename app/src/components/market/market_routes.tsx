@@ -13,6 +13,7 @@ import { MARKET_FEE } from '../../common/constants'
 import { getLogger } from '../../util/logger'
 import { MarketNotFound } from '../common/market_not_found'
 import { MessageWarning } from '../common/message_warning'
+import { MarketViewContainer } from '..'
 
 const logger = getLogger('Market::Routes')
 
@@ -22,9 +23,10 @@ interface RouteParams {
 
 interface Props {
   marketMakerAddress: string
+  card?: boolean
 }
 
-const MarketValidation: React.FC<Props> = (props: Props) => {
+export const MarketValidation: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account } = context
 
@@ -48,6 +50,10 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
   if (!fee.eq(feeBN)) {
     logger.log(`Market was not created with this app (different fee)`)
     return <SectionTitle title={'Invalid market'} />
+  }
+
+  if (props.card) {
+    return <MarketViewContainer marketMakerAddress={props.marketMakerAddress} />
   }
 
   return (
