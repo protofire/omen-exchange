@@ -1,4 +1,4 @@
-import React, { ReactPortal, useState, HTMLAttributes } from 'react'
+import React, { ReactPortal, useState, useCallback, useEffect, HTMLAttributes } from 'react'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
@@ -98,24 +98,32 @@ const CloseButton = styled.button`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  hideDelay?: number | undefined
   hideCloseButton?: boolean
+  hidingTimeout?: number | undefined
+  onHide?: () => void
   text: string
   type?: MessageType
 }
 
 export const Message: React.FC<Props> = (props: Props): ReactPortal => {
-  const { text, type = MessageType.default, hideDelay, hideCloseButton } = props
-  const [showNotification, setShowNotification] = useState(true)
+  const { onHide, text, type = MessageType.default, hidingTimeout, hideCloseButton } = props
+  const [notificate, setNotificate] = useState(true)
 
-  if (hideDelay !== undefined) {
-    setTimeout(() => setShowNotification(false), hideDelay)
-  }
+  const hideNotification = useCallback(() => {
+    setNotificate(false)
+    onHide && onHide()
+  }, [setNotificate, onHide])
 
-  const hideNotification = () => setShowNotification(false)
+  useEffect(() => {
+    if (hidingTimeout !== undefined) {
+      setTimeout(() => {
+        hideNotification()
+      }, hidingTimeout)
+    }
+  }, [hidingTimeout, hideNotification])
 
   return ReactDOM.createPortal(
-    showNotification && (
+    notificate && (
       <Wrapper>
         <MessageWrapper type={type}>
           {hideCloseButton ? null : <CloseButton onClick={hideNotification} />}

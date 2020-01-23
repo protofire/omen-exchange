@@ -1,9 +1,9 @@
-import React, { HTMLAttributes, useState, useCallback } from 'react'
+import React, { HTMLAttributes, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import styled from 'styled-components'
 import { MessageType, Message } from '../message'
 
-import Copy from './img/copy.svg'
+import CopySVG from './img/copy.svg'
 
 const CopyWrapper = styled.button`
   background-color: transparent;
@@ -29,16 +29,24 @@ export const CopyText: React.FC<Props> = (props: Props) => {
   const { toastMessage = 'Text copied to your clipboard!', value, ...restProps } = props
   const [showMessage, setShowMessage] = useState(false)
 
-  const showCopyMessage = useCallback(() => setShowMessage(true), [])
+  const showCopyMessage = () => setShowMessage(true)
+  const hideCopyMessage = () => setShowMessage(false)
 
   return (
     <>
       <CopyWrapper {...restProps}>
         <CopyToClipboard text={value}>
-          <img onClick={showCopyMessage} src={Copy} alt="" />
+          <img onClick={showCopyMessage} src={CopySVG} alt="" />
         </CopyToClipboard>
       </CopyWrapper>
-      {showMessage && <Message type={MessageType.ok} text={toastMessage} hideDelay={5000} />}
+      {showMessage && (
+        <Message
+          hidingTimeout={5000}
+          onHide={hideCopyMessage}
+          text={toastMessage}
+          type={MessageType.ok}
+        />
+      )}
     </>
   )
 }
