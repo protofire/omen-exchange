@@ -14,7 +14,7 @@ import { computeBalanceAfterTrade, formatBigNumber, formatDate } from '../../uti
 import { getLogger } from '../../util/logger'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
-import { FullLoading } from '../common/full_loading'
+import { Loading } from '../common/loading'
 import { ButtonContainer } from '../common/button_container'
 import { ButtonLink } from '../common/button_link'
 import { FormRow } from '../common/form_row'
@@ -297,7 +297,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         isOpen={isModalTwitterShareOpen}
         onClose={() => setModalTwitterShareState(false)}
       />
-      {status === Status.Loading ? <FullLoading message={message} /> : null}
+      {status === Status.Loading ? <Loading message={message} full={true} /> : null}
     </>
   )
 }

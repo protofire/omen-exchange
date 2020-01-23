@@ -10,7 +10,7 @@ import { ListItem } from '../common/list_item'
 import { SectionTitle } from '../common/section_title'
 import { Filter } from '../common/filter'
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { MarketLoading } from '../common/market_loading'
+import { Loading } from '../common/loading'
 
 const FilterStyled = styled(Filter)`
   margin: -30px auto 10px;
@@ -68,7 +68,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         )}
         {showMoreButton}
       </ListCard>
-      {RemoteData.is.loading(markets) ? <MarketLoading message="Loading markets..." /> : null}
+      {RemoteData.is.loading(markets) ? <Loading message="Loading markets..." /> : null}
     </>
   )
 }

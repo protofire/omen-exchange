@@ -4,7 +4,7 @@ import { MarketFund } from './market_fund'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useQuestion } from '../../hooks/useQuestion'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
-import { FullLoading } from '../common/full_loading'
+import { Loading } from '../common/loading'
 
 interface Props {
   marketMakerAddress: string
@@ -26,7 +26,7 @@ const MarketFundContainer: React.FC<Props> = (props: Props) => {
   } = marketMakerData
 
   if (!collateral) {
-    return <FullLoading />
+    return <Loading full={true} />
   }
 
   return (

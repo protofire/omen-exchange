@@ -1,8 +1,9 @@
 import React, { HTMLAttributes } from 'react'
-import styled from 'styled-components'
+import ReactDOM from 'react-dom'
 import { Spinner } from '../spinner'
+import styled from 'styled-components'
 
-const MarketLoadingStyled = styled.div`
+const LoadingStyled = styled.div`
   align-items: center;
   background-color: rgba(255, 255, 255, 0.75);
   display: flex;
@@ -15,6 +16,7 @@ const MarketLoadingStyled = styled.div`
   width: 100vw;
   z-index: 100;
 `
+
 const Message = styled.p`
   color: #333;
   font-size: 15px;
@@ -27,17 +29,33 @@ const Message = styled.p`
   width: 480px;
 `
 
-interface MarketLoadingProps extends HTMLAttributes<HTMLDivElement> {
+interface InnerLoadingProps {
   message?: string
 }
 
-export const MarketLoading: React.FC<MarketLoadingProps> = (props: MarketLoadingProps) => {
+const InnerLoading = (props: InnerLoadingProps) => {
   const { message = 'Loading...', ...restProps } = props
 
   return (
-    <MarketLoadingStyled {...restProps}>
+    <LoadingStyled {...restProps}>
       <Spinner />
       {message ? <Message>{message}</Message> : null}
-    </MarketLoadingStyled>
+    </LoadingStyled>
   )
+}
+
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  message?: string
+  full?: boolean
+}
+
+export const Loading: React.FC<Props> = (props: Props) => {
+  const { message, full, ...restProps } = props
+
+  if (full) {
+    const portal: any = document.getElementById('portalContainer')
+    return ReactDOM.createPortal(<InnerLoading message={message} {...restProps} />, portal)
+  } else {
+    return <InnerLoading message={message} {...restProps} />
+  }
 }

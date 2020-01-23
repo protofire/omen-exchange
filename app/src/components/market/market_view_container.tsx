@@ -2,7 +2,7 @@ import React from 'react'
 
 import { MarketView } from './market_view'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { FullLoading } from '../common/full_loading'
+import { Loading } from '../common/loading'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
 
 interface Props {
@@ -30,7 +30,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
   } = marketMakerData
 
   if (!collateral) {
-    return <FullLoading />
+    return <Loading full={true} />
   }
 
   return (

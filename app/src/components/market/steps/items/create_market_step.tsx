@@ -8,7 +8,7 @@ import { ButtonLink } from '../../../common/button_link'
 import { CreateCard } from '../../../common/create_card'
 import { Arbitrator, Token } from '../../../../util/types'
 import { Paragraph } from '../../../common/paragraph'
-import { FullLoading } from '../../../common/full_loading'
+import { Loading } from '../../../common/loading'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
@@ -178,7 +178,7 @@ const CreateMarketStep = (props: Props) => {
       ) : null}
       {!MarketCreationStatus.is.ready(marketCreationStatus) &&
       !MarketCreationStatus.is.error(marketCreationStatus) ? (
-        <FullLoading message={`${marketCreationStatus._type}...`} />
+        <Loading full={true} message={`${marketCreationStatus._type}...`} />
       ) : null}
       <ButtonContainer>
         <ButtonLinkStyled

@@ -4,7 +4,7 @@ import { BigNumber } from 'ethers/utils'
 
 import { ViewCard } from '../../common/view_card'
 import { Button, OutcomeTable } from '../../common'
-import { FullLoading } from '../../common/full_loading'
+import { Loading } from '../../common/loading'
 import { ButtonContainer } from '../../common/button_container'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { TitleValue } from '../../common/title_value'
@@ -175,7 +175,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>
-      {status === Status.Loading ? <FullLoading message={message} /> : null}
+      {status === Status.Loading ? <Loading full={true} message={message} /> : null}
     </>
   )
 }
