@@ -125,8 +125,6 @@ class CPKService {
         throw new Error('You must be connected to your wallet.')
       }
 
-      const signer = provider.getSigner()
-
       const {
         collateral,
         arbitrator,
@@ -141,8 +139,7 @@ class CPKService {
         throw new Error('Resolution time was not specified')
       }
 
-      const cpk = await CPK.create({ ethers, signer })
-      const cpkAddress = cpk.address
+      const cpk = await CPK.getCPK(provider)
       const conditionalTokensAddress = conditionalTokens.address
       const realitioAddress = realitio.address
 
@@ -176,7 +173,7 @@ class CPKService {
           arbitrator.address,
           openingDateMoment,
           networkId,
-          cpkAddress,
+          cpk.address,
         )
       }
       logger.log(`QuestionID ${questionId}`)
@@ -208,7 +205,7 @@ class CPKService {
         conditionalTokens.address,
         collateral.address,
         conditionId,
-        cpkAddress,
+        cpk.address,
       )
       logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
 
@@ -248,21 +245,18 @@ class CPKService {
         throw new Error('You must be connected to your wallet.')
       }
 
-      const signer = provider.getSigner()
-
-      const cpk = await CPK.create({ ethers, signer })
-      const cpkAddress = cpk.address
+      const cpk = await CPK.getCPK(provider)
 
       // Step 1: Approve collateral to the proxy contract
       const collateralService = new ERC20Service(provider, account, collateral.address)
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
         account,
-        cpkAddress,
+        cpk.address,
         funding,
       )
 
       if (!hasEnoughAlowance) {
-        await collateralService.approveUnlimited(cpkAddress)
+        await collateralService.approveUnlimited(cpk.address)
       }
 
       const transactions = [
@@ -271,7 +265,7 @@ class CPKService {
           operation: CPK.CALL,
           to: collateral.address,
           value: 0,
-          data: ERC20Service.encodeTransferFrom(account, cpkAddress, funding),
+          data: ERC20Service.encodeTransferFrom(account, cpk.address, funding),
         },
         // Step 3: Add funding
         {
@@ -284,7 +278,7 @@ class CPKService {
 
       // Check  if the allowance of the CPK to the market maker is enough.
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
-        cpkAddress,
+        cpk.address,
         marketMakerAddress,
         funding,
       )
