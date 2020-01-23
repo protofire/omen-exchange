@@ -6,9 +6,17 @@ import { truncateStringInTheMiddle } from '../../../util/tools'
 import { getContractAddressName } from '../../../util/networks'
 
 const NetworkWrapper = styled.div`
-  align-items: center;
+  align-items: flex-end;
   display: flex;
+  flex-direction: column;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    align-items: center;
+    flex-direction: row;
+  }
 `
+
+const NetworkContainer = styled.div``
 
 const IconStyled = styled.img`
   height: 13px;
@@ -35,7 +43,10 @@ const NetworkName = styled.span`
 const ConnectionStatusWrapper = styled.div`
   align-items: center;
   display: flex;
-  ${Separator}
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    ${Separator}
+  }
 `
 
 const ConnectionStatusText = styled.span`
@@ -63,8 +74,10 @@ export const Network: React.FC = props => {
   }
   return (
     <NetworkWrapper {...restProps}>
-      <IconStyled src={Icon} alt="" />
-      {networkName ? <NetworkName>{networkName}</NetworkName> : null}
+      <NetworkContainer>
+        <IconStyled src={Icon} alt="" />
+        {networkName ? <NetworkName>{networkName}</NetworkName> : null}
+      </NetworkContainer>
       <ConnectionStatusWrapper>
         <ConnectionStatusDot />
         <ConnectionStatusText>

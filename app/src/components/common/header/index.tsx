@@ -1,15 +1,16 @@
 import React, { useState } from 'react'
-import { Network } from '../network'
-import { ButtonDisconnectWallet } from '../button_disconnect_wallet'
-import { MainMenu } from '../main_menu'
-import { MobileMenu } from '../mobile_menu'
 import styled from 'styled-components'
-import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
-import { ButtonConnectWallet } from '../button_connect_wallet'
-import { ModalConnectWallet } from '../modal_connect_wallet'
-import { useWeb3Context } from 'web3-react/dist'
 import { withRouter } from 'react-router'
 import { RouteComponentProps } from 'react-router-dom'
+import { useWeb3Context } from 'web3-react/dist'
+
+import { ButtonConnectWallet } from '../button_connect_wallet'
+import { ButtonDisconnectWallet } from '../button_disconnect_wallet'
+import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
+import { MainMenu } from '../main_menu'
+import { MobileMenu } from '../mobile_menu'
+import { ModalConnectWallet } from '../modal_connect_wallet'
+import { Network } from '../network'
 
 const HeaderWrapper = styled.div`
   background: ${props => props.theme.header.backgroundColor};
@@ -40,14 +41,6 @@ const HeaderInner = styled.div`
   }
 `
 
-const NetworkStyled = styled(Network)`
-  margin: 0 0 0 auto;
-`
-
-const LogoutStyled = styled(ButtonDisconnectWallet)`
-  margin: 0 0 0 auto;
-`
-
 const MobileMenuStyled = styled(MobileMenu)`
   display: inherit;
 
@@ -61,6 +54,27 @@ const MainMenuStyled = styled(MainMenu)`
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: inherit;
+  }
+`
+
+const NetworkStyled = styled(Network)`
+  margin: 0 0 0 auto;
+`
+
+const ButtonDisconnectWalletStyled = styled(ButtonDisconnectWallet)`
+  display: none;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: initial;
+    margin: 0 0 0 25px;
+  }
+`
+
+const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
+  display: none;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: initial;
   }
 `
 
@@ -79,14 +93,14 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
         <MobileMenuStyled toggleMenu={toggleMenu} isMenuOpen={isMenuOpen} {...restProps} />
         <ConnectedWeb3>
           <NetworkStyled />
-          <LogoutStyled
+          <ButtonDisconnectWalletStyled
             callback={() => {
               setModalState(false)
             }}
           />
         </ConnectedWeb3>
         {!context.account && (
-          <ButtonConnectWallet
+          <ButtonConnectWalletStyled
             onClick={() => {
               setModalState(true)
             }}

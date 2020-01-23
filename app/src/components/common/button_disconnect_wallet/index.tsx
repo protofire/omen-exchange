@@ -4,16 +4,17 @@ import { Button } from '../button'
 import { ButtonType } from '../../../common/button_styling_types'
 import { useWeb3Context } from 'web3-react'
 
-const ButtonStyled = styled(Button)`
+const Wrapper = styled(Button)`
   font-size: 13px;
-  height: 28px;
-  margin-left: 11px;
+  height: 24px;
+  padding: 0 10px;
 `
 interface Props {
   callback: () => void
 }
 
 export const ButtonDisconnectWallet = (props: Props) => {
+  const { callback, ...restProps } = props
   const context = useWeb3Context()
   const { active, error, connectorName, account } = context
 
@@ -23,15 +24,15 @@ export const ButtonDisconnectWallet = (props: Props) => {
 
   const logout = () => {
     if (active || (error && connectorName)) {
-      props.callback()
+      callback()
       localStorage.removeItem('CONNECTOR')
       context.setConnector('Infura')
     }
   }
 
   return (
-    <ButtonStyled buttonType={ButtonType.secondary} onClick={logout}>
+    <Wrapper buttonType={ButtonType.secondary} onClick={logout} {...restProps}>
       DISCONNECT
-    </ButtonStyled>
+    </Wrapper>
   )
 }
