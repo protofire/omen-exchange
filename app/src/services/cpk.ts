@@ -242,27 +242,17 @@ class CPKService {
       const signer: Wallet = this.provider.getSigner()
       const account = await signer.getAddress()
 
-      // Step 1: Approve collateral to the proxy contract
       const collateralService = new ERC20Service(this.provider, account, collateral.address)
-      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
-        account,
-        this.cpk.address,
-        funding,
-      )
-
-      if (!hasEnoughAlowance) {
-        await collateralService.approveUnlimited(this.cpk.address)
-      }
 
       const transactions = [
-        // Step 2: Move the collateral to the CPK
+        // Step 1: Move the collateral to the CPK
         {
           operation: CPK.CALL,
           to: collateral.address,
           value: 0,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, funding),
         },
-        // Step 3: Add funding
+        // Step 2: Add funding
         {
           operation: CPK.CALL,
           to: marketMakerAddress,
@@ -279,7 +269,7 @@ class CPKService {
       )
 
       if (!hasCPKEnoughAlowance) {
-        // Step 4:  Approve unlimited funding to be transferred to the market maker)
+        // Step 3:  Approve unlimited funding to be transferred to the market maker)
         transactions.unshift({
           operation: CPK.CALL,
           to: collateral.address,

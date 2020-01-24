@@ -9,6 +9,7 @@ import { useContracts } from '../../hooks/useContracts'
 import { ModalConnectWallet } from '../common/modal_connect_wallet'
 import { MarketCreationStatus } from '../../util/market_creation_status_data'
 import { CPKService } from '../../services/cpk'
+import { ERC20Service } from '../../services'
 
 const logger = getLogger('Market::MarketWizardCreatorContainer')
 
@@ -44,6 +45,18 @@ const MarketWizardCreatorContainer: FC = () => {
           marketMakerFactory,
         })
         setMarketMakerAddress(marketMakerAddress)
+
+        // Approve collateral to the proxy contract
+        const collateralService = new ERC20Service(provider, account, marketData.collateral.address)
+        const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
+          account,
+          cpk.address,
+          marketData.funding,
+        )
+
+        if (!hasEnoughAlowance) {
+          await collateralService.approveUnlimited(cpk.address)
+        }
 
         setMarketCreationStatus(MarketCreationStatus.addFunding())
         await cpk.addFundsToTheMarket({
