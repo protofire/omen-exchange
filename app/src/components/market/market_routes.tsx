@@ -54,9 +54,9 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
     <Switch>
       <Route exact path="/:address" component={MarketDetailsPage} />
       {!account ? (
-        <MessageWarning message="Please connect to your wallet to open the market..." />
+        <MessageWarning text="Please connect to your wallet to open the market..." />
       ) : isQuestionFinalized ? (
-        <MessageWarning message="Market closed, question finalized..." />
+        <MessageWarning text="Market closed, question finalized..." />
       ) : (
         <>
           <Route exact path="/:address/buy" component={MarketBuyPage} />
