@@ -58,12 +58,12 @@ export const QuestionInput = (props: Props) => {
   return (
     <>
       <Textfield
-        value={value}
+        disabled={disabled}
         name={name}
         onChange={onChange}
         placeholder={placeholder}
-        disabled={disabled}
         type="text"
+        value={value}
       />
       <Wrapper>
         <Note>

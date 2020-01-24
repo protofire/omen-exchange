@@ -19,7 +19,7 @@ const OutcomesWrapper = styled.div`
 const OutcomesTitles = styled.div`
   column-gap: 12px;
   display: grid;
-  grid-template-columns: 2.4fr 1fr ${BUTTON_DIMENSIONS};
+  grid-template-columns: 2fr 1fr ${BUTTON_DIMENSIONS};
   margin-bottom: 12px;
 `
 
