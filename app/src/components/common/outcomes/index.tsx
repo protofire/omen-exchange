@@ -209,45 +209,31 @@ const Outcomes = (props: Props) => {
     )
   }
 
+  const uniform = (outcomes: Outcome[]): Outcome[] => {
+    return outcomes.map(o => {
+      o.probability = 100 / outcomes.length
+      return o
+    })
+  }
+
   const addNewOutcome = () => {
     const newOutcome = {
       name: newOutcomeName.trim(),
       probability: 0,
     }
     const newOutcomes = outcomes.concat(newOutcome)
-    props.onChange(
-      isUniform
-        ? newOutcomes.map(o => {
-            o.probability = 100 / newOutcomes.length
-            return o
-          })
-        : newOutcomes,
-    )
+    props.onChange(isUniform ? uniform(newOutcomes) : newOutcomes)
     setNewOutcomeName('')
   }
 
   const removeOutcome = (index: number) => {
     outcomes.splice(index, 1)
-    props.onChange(
-      isUniform
-        ? outcomes.map(o => {
-            o.probability = 100 / outcomes.length
-            return o
-          })
-        : outcomes,
-    )
+    props.onChange(isUniform ? uniform(outcomes) : outcomes)
   }
 
   const handleIsUniformChanged = (event: any) => {
     const value = event.target.checked
-    props.onChange(
-      value
-        ? outcomes.map(o => {
-            o.probability = 100 / outcomes.length
-            return o
-          })
-        : outcomes,
-    )
+    props.onChange(value ? uniform(outcomes) : outcomes)
     setIsUniform(value)
   }
 
