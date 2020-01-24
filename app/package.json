@@ -26,6 +26,7 @@
     "@walletconnect/qrcode-modal": "^1.0.0-beta.35",
     "@walletconnect/web3-subprovider": "^1.0.0-beta.1",
     "big.js": "^5.2.2",
+    "contract-proxy-kit": "^1.0.0",
     "ethers": "^4.0.36",
     "ipfs-deploy": "^7.10.5",
     "lodash.unionby": "^4.8.0",
