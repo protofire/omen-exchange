@@ -6,7 +6,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { BalanceItem, Status, OutcomeTableValue, Token } from '../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../common'
-import { ERC20Service, MarketMakerService } from '../../services'
+import { CPKService, ERC20Service, MarketMakerService } from '../../services'
 import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { ViewCard } from '../common/view_card'
@@ -98,7 +98,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { library: provider } = context
 
-  const { buildMarketMaker, cpk } = useContracts(context)
+  const { buildMarketMaker } = useContracts(context)
 
   const { marketMakerAddress, balances, collateral, question, resolution } = props
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -157,6 +157,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       const signer = provider.getSigner()
       const account = await signer.getAddress()
+
+      const cpk = await CPKService.create(provider)
 
       const collateralAddress = await marketMaker.getCollateralToken()
 

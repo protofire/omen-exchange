@@ -13,7 +13,7 @@ import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 import { ViewCard } from '../common/view_card'
-import { MarketMakerService } from '../../services'
+import { CPKService, MarketMakerService } from '../../services'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getLogger } from '../../util/logger'
 import { BigNumberInputReturn } from '../common/big_number_input'
@@ -76,7 +76,7 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { buildMarketMaker, conditionalTokens, cpk } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens } = useContracts(context)
 
   const { balances, marketMakerAddress, collateral, question, resolution } = props
 
@@ -150,6 +150,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Selling ${formatBigNumber(amountShares, collateral.decimals)} shares ...`)
+
+      const cpk = await CPKService.create(context.library)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,

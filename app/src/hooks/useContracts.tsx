@@ -8,8 +8,6 @@ import {
   OracleService,
   RealitioService,
 } from '../services'
-import { useAsyncDerivedValue } from './useAsyncDerivedValue'
-import { CPKService } from '../services/cpk'
 
 export const useContracts = (context: ConnectedWeb3Context) => {
   const { library: provider, networkId, account } = context
@@ -46,16 +44,6 @@ export const useContracts = (context: ConnectedWeb3Context) => {
     [conditionalTokens, realitio, provider, account],
   )
 
-  const createCPK = useMemo(
-    () => async (): Promise<any> => {
-      const cpk = await CPKService.create(provider)
-      return cpk
-    },
-    [provider],
-  )
-
-  const cpk = useAsyncDerivedValue(null, null, createCPK)
-
   return useMemo(
     () => ({
       conditionalTokens,
@@ -63,9 +51,8 @@ export const useContracts = (context: ConnectedWeb3Context) => {
       realitio,
       oracle,
       buildMarketMaker,
-      cpk,
     }),
-    [conditionalTokens, marketMakerFactory, realitio, oracle, buildMarketMaker, cpk],
+    [conditionalTokens, marketMakerFactory, realitio, oracle, buildMarketMaker],
   )
 }
 
