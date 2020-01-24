@@ -173,6 +173,18 @@ class MarketMakerService {
     }
   }
 
+  calcSellAmount = async (amount: BigNumber, outcomeIndex: number): Promise<BigNumber> => {
+    try {
+      return this.contract.calcSellAmount(amount, outcomeIndex)
+    } catch (err) {
+      logger.error(
+        `There was an error computing the sell amount for amount '${amount.toString()}' and outcome index '${outcomeIndex}'`,
+        err.message,
+      )
+      throw err
+    }
+  }
+
   poolSharesTotalSupply = async (): Promise<BigNumber> => {
     try {
       return this.contract.totalSupply()
@@ -256,6 +268,16 @@ class MarketMakerService {
     const buyInterface = new utils.Interface(marketMakerAbi)
 
     return buyInterface.functions.buy.encode([amount, outcomeIndex, outcomeTokensToBuy])
+  }
+
+  static encodeSell = (
+    amount: BigNumber,
+    outcomeIndex: number,
+    maxOutcomeTokensToSell: BigNumber,
+  ): string => {
+    const sellInterface = new utils.Interface(marketMakerAbi)
+
+    return sellInterface.functions.sell.encode([amount, outcomeIndex, maxOutcomeTokensToSell])
   }
 }
 
