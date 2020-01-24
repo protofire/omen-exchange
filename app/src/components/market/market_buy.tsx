@@ -29,7 +29,6 @@ import { MARKET_FEE } from '../../common/constants'
 import { FormError } from '../common/form_error'
 import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 import { ModalTwitterShare } from '../common/modal_twitter_share'
-import { CPKService } from '../../services/cpk'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -99,7 +98,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { library: provider } = context
 
-  const { buildMarketMaker } = useContracts(context)
+  const { buildMarketMaker, cpk } = useContracts(context)
 
   const { marketMakerAddress, balances, collateral, question, resolution } = props
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -159,7 +158,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const signer = provider.getSigner()
       const account = await signer.getAddress()
 
-      const cpk = await CPKService.create(provider)
       const collateralAddress = await marketMaker.getCollateralToken()
 
       const collateralService = new ERC20Service(provider, account, collateralAddress)
