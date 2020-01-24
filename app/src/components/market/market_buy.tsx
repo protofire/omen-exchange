@@ -159,7 +159,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const signer = provider.getSigner()
       const account = await signer.getAddress()
 
-      const cpk = await CPKService.getCPK(provider)
+      const cpk = await CPKService.create(provider)
       const collateralAddress = await marketMaker.getCollateralToken()
 
       const collateralService = new ERC20Service(provider, account, collateralAddress)
@@ -173,7 +173,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         await collateralService.approveUnlimited(cpk.address)
       }
 
-      await CPKService.buyOutcomes({
+      await cpk.buyOutcomes({
         provider,
         cost,
         amount,

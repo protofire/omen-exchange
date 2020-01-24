@@ -17,32 +17,40 @@ interface CPKBuyOutcomesParams {
 }
 
 class CPKService {
-  static getCPK = async (provider: any) => {
-    const signer: Wallet = provider.getSigner()
+  cpk: any
+  provider: any
 
-    const cpk = await CPK.create({ ethers, signer })
-    return cpk
+  constructor(cpk: any, provider: any) {
+    this.cpk = cpk
+    this.provider = provider
   }
 
-  static buyOutcomes = async ({
-    provider,
+  static async create(provider: any) {
+    const signer: Wallet = provider.getSigner()
+    const cpk = await CPK.create({ ethers, signer })
+    return new CPKService(cpk, provider)
+  }
+
+  get address(): string {
+    return this.cpk.address
+  }
+
+  buyOutcomes = async ({
     cost,
     amount,
     outcomeIndex,
     marketMaker,
   }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
-      const signer: Wallet = provider.getSigner()
+      const signer: Wallet = this.provider.getSigner()
       const account = await signer.getAddress()
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const marketMakerAddress = marketMaker.address
 
-      const cpk = await CPK.getCPK(provider)
+      const collateralService = new ERC20Service(this.provider, account, collateralAddress)
 
-      const collateralService = new ERC20Service(provider, account, collateralAddress)
-
-      logger.log(`CPK address: ${cpk.address}`)
+      logger.log(`CPK address: ${this.cpk.address}`)
 
       const outcomeTokensToBuy = await marketMaker.calcBuyAmount(amount, outcomeIndex)
       logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
@@ -53,7 +61,7 @@ class CPKService {
           operation: CPK.CALL,
           to: collateralAddress,
           value: 0,
-          data: ERC20Service.encodeTransferFrom(account, cpk.address, cost),
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, cost),
         },
         // Step 3: Buy outcome tokens with the CPK
         {
@@ -66,7 +74,7 @@ class CPKService {
 
       // Check  if the allowance of the CPK to the market maker is enough.
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
-        cpk.address,
+        this.cpk.address,
         marketMakerAddress,
         cost,
       )
@@ -81,10 +89,10 @@ class CPKService {
         })
       }
 
-      const txObject = await cpk.execTransactions(transactions, { gasLimit: 1000000 })
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
 
       logger.log(`Transaction hash: ${txObject.hash}`)
-      return provider.waitForTransaction(txObject.hash)
+      return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
       throw err
