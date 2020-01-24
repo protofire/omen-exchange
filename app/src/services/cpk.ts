@@ -118,24 +118,17 @@ class CPKService {
       const transactions = [
         {
           operation: CPK.CALL,
+          to: conditionalTokens.address,
+          value: 0,
+          data: ConditionalTokenService.encodeSetApprovalForAll(marketMaker.address, true),
+        },
+        {
+          operation: CPK.CALL,
           to: marketMaker.address,
           value: 0,
           data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
         },
       ]
-
-      const isApprovedForAll = await conditionalTokens.isApprovedForAll(
-        this.cpk.address,
-        marketMaker.address,
-      )
-      if (!isApprovedForAll) {
-        transactions.unshift({
-          operation: CPK.CALL,
-          to: conditionalTokens.address,
-          value: 0,
-          data: ConditionalTokenService.encodeSetApprovalForAll(marketMaker.address, true),
-        })
-      }
 
       const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
 
