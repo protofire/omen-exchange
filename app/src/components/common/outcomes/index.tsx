@@ -210,10 +210,10 @@ const Outcomes = (props: Props) => {
   }
 
   const uniform = (outcomes: Outcome[]): Outcome[] => {
-    return outcomes.map(o => {
-      o.probability = 100 / outcomes.length
-      return o
-    })
+    return outcomes.map(o => ({
+      ...o,
+      probability: 100 / outcomes.length,
+    }))
   }
 
   const addNewOutcome = () => {
