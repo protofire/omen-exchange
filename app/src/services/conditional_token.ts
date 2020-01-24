@@ -1,4 +1,4 @@
-import { ethers, Wallet, Contract } from 'ethers'
+import { ethers, Wallet, Contract, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
@@ -17,11 +17,11 @@ const conditionalTokensAbi = [
   'function getCollectionId(bytes32 parentCollectionId, bytes32 conditionId, uint indexSet) external view returns (bytes32) ',
   'function getPositionId(address collateralToken, bytes32 collectionId) external pure returns (uint) ',
   'function balanceOf(address owner, uint256 positionId) external view returns (uint256)',
+  'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data) external',
 ]
 
 class ConditionalTokenService {
   contract: Contract
-  address: string
   signerAddress: Maybe<string>
   provider: any
 
@@ -32,9 +32,12 @@ class ConditionalTokenService {
     } else {
       this.contract = new ethers.Contract(address, conditionalTokensAbi, provider)
     }
-    this.address = address
     this.signerAddress = signerAddress
     this.provider = provider
+  }
+
+  get address(): string {
+    return this.contract.address
   }
 
   prepareCondition = async (
@@ -124,6 +127,29 @@ class ConditionalTokenService {
     )
 
     await this.provider.waitForTransaction(transactionObject.hash)
+  }
+
+  static encodeSafeTransferFrom = (
+    addressFrom: string,
+    addressTo: string,
+    positionId: BigNumber,
+    outcomeTokensToTransfer: BigNumber,
+  ): string => {
+    const safeTransferFromInterface = new utils.Interface(conditionalTokensAbi)
+
+    return safeTransferFromInterface.functions.safeTransferFrom.encode([
+      addressFrom,
+      addressTo,
+      positionId,
+      outcomeTokensToTransfer,
+      '0x',
+    ])
+  }
+
+  static encodeSetApprovalForAll = (address: string, approved: boolean): string => {
+    const setApprovalForAllInterface = new utils.Interface(conditionalTokensAbi)
+
+    return setApprovalForAllInterface.functions.setApprovalForAll.encode([address, approved])
   }
 }
 
