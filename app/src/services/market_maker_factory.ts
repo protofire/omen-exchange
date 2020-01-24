@@ -47,7 +47,6 @@ class MarketMakerFactoryService {
   constantContract: Contract
   signerAddress: Maybe<string>
   provider: any
-  address: string
 
   constructor(address: string, provider: any, signerAddress: Maybe<string>) {
     if (signerAddress) {
@@ -61,7 +60,10 @@ class MarketMakerFactoryService {
     this.constantContract = new ethers.Contract(address, marketMakerFactoryCallAbi, provider)
     this.signerAddress = signerAddress
     this.provider = provider
-    this.address = address
+  }
+
+  get address(): string {
+    return this.contract.address
   }
 
   predictMarketMakerAddress = async (
