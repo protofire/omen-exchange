@@ -88,6 +88,9 @@ export const MarketWizardCreator = (props: Props) => {
     return () => {
       isSubscribed = false
     }
+    /* NOTE: The linter want us to add marketData to the dependency array, but it
+    creates a sort of infinite loop, so I'm not gonna do it for now */
+    // eslint-disable-next-line
   }, [networkId])
 
   const next = (): void => {
@@ -292,7 +295,6 @@ export const MarketWizardCreator = (props: Props) => {
         return (
           <CreateMarketStep
             back={() => back()}
-            marketMakerAddress={marketMakerAddress}
             marketCreationStatus={marketCreationStatus}
             submit={() => submit()}
             values={marketData}

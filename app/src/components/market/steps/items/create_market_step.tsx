@@ -5,10 +5,11 @@ import styled from 'styled-components'
 import { Button } from '../../../common/index'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
+import { Well } from '../../../common/well'
 import { CreateCard } from '../../../common/create_card'
 import { Arbitrator, Token } from '../../../../util/types'
 import { Paragraph } from '../../../common/paragraph'
-import { FullLoading } from '../../../common/full_loading'
+import { Loading } from '../../../common/loading'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
 import { SubsectionTitle } from '../../../common/subsection_title'
@@ -22,6 +23,10 @@ import { getLogger } from '../../../../util/logger'
 import { ERC20Service } from '../../../../services'
 
 const logger = getLogger('MarketCreationItems::CreateMarketStep')
+
+const OutcomeInfo = styled(Well)`
+  margin-bottom: 30px;
+`
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -39,6 +44,14 @@ const TitleValueStyled = styled(TitleValue)`
   margin-bottom: 14px;
 `
 
+const TitleValueFinalStyled = styled(TitleValue)`
+  margin-bottom: 25px;
+`
+
+const SubsectionTitleNoMargin = styled(SubsectionTitle)`
+  margin-bottom: 0;
+`
+
 interface Props {
   back: () => void
   submit: () => void
@@ -51,17 +64,15 @@ interface Props {
     spread: number
     funding: BigNumber
     outcomes: Outcome[]
-    loadedQuestionId: Maybe<string>
   }
   marketCreationStatus: MarketCreationStatus
-  marketMakerAddress: string | null
 }
 
 const CreateMarketStep = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { library: provider, account } = context
 
-  const { marketMakerAddress, values, marketCreationStatus } = props
+  const { values, marketCreationStatus } = props
   const {
     collateral,
     question,
@@ -71,7 +82,6 @@ const CreateMarketStep = (props: Props) => {
     spread,
     funding,
     outcomes,
-    loadedQuestionId,
   } = values
 
   const back = () => {
@@ -104,13 +114,16 @@ const CreateMarketStep = (props: Props) => {
 
   return (
     <CreateCard>
-      <Paragraph>
-        Please <strong>check all the information is correct</strong>. You can go back and edit
-        anything you need.
-      </Paragraph>
-      <Paragraph>
-        <strong>If everything is OK</strong> proceed to create the new market.
-      </Paragraph>
+      <OutcomeInfo>
+        <Paragraph>
+          Please <strong>check all the information is correct</strong>. You can go back and edit
+          anything you need.
+        </Paragraph>
+        <Paragraph>
+          <strong>If everything is OK</strong> proceed to create the new market.
+        </Paragraph>
+      </OutcomeInfo>
+
       <SubsectionTitle>Details</SubsectionTitle>
       <TitleValueStyled title={'Question'} value={question} />
       <Grid>
@@ -127,11 +140,11 @@ const CreateMarketStep = (props: Props) => {
           />
         )}
       </Grid>
-      <TitleValueStyled
+      <TitleValueFinalStyled
         title={'Arbitrator'}
         value={<DisplayArbitrator arbitrator={arbitrator} />}
       />
-      <SubsectionTitle>Outcomes</SubsectionTitle>
+      <SubsectionTitleNoMargin>Outcomes</SubsectionTitleNoMargin>
       <Table
         head={
           <THead>
@@ -152,34 +165,9 @@ const CreateMarketStep = (props: Props) => {
           )
         })}
       </Table>
-      {loadedQuestionId || marketMakerAddress ? (
-        <>
-          <SubsectionTitle>Created Market Information</SubsectionTitle>
-          <Grid>
-            {loadedQuestionId ? (
-              <TitleValue
-                title={'Realitio'}
-                value={[
-                  <a
-                    href={`https://realitio.github.io/#!/question/${loadedQuestionId}`}
-                    key="1"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    Question URL
-                  </a>,
-                ]}
-              />
-            ) : null}
-            {marketMakerAddress ? (
-              <TitleValue title={'Market Maker'} value={`Deployed at ${marketMakerAddress}`} />
-            ) : null}
-          </Grid>
-        </>
-      ) : null}
       {!MarketCreationStatus.is.ready(marketCreationStatus) &&
       !MarketCreationStatus.is.error(marketCreationStatus) ? (
-        <FullLoading message={`${marketCreationStatus._type}...`} />
+        <Loading full={true} message={`${marketCreationStatus._type}...`} />
       ) : null}
       <ButtonContainer>
         <ButtonLinkStyled

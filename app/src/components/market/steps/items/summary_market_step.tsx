@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { CreateCard } from '../../../common/create_card'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
+import { Well } from '../../../common/well'
 import { Paragraph } from '../../../common/paragraph'
 import { Table, TD, TH, THead, TR } from '../../../common/table'
 import { TitleValue } from '../../../common/title_value'
@@ -13,9 +14,10 @@ import { CopyText } from '../../../common/copy_text'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { useMarketMakerData } from '../../../../hooks/useMarketMakerData'
 import { useQuestion } from '../../../../hooks/useQuestion'
-import { FullLoading } from '../../../common/full_loading'
+import { Loading } from '../../../common/loading'
 import { NavLink } from 'react-router-dom'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
+import { ButtonType } from '../../../../common/button_styling_types'
 import { ButtonAnchor } from '../../../common/button_anchor'
 import { MARKET_FEE } from '../../../../common/constants'
 
@@ -26,6 +28,9 @@ const NavLinkStyled = styled(NavLink)`
   &:hover {
     text-decoration: none;
   }
+`
+const OutcomeInfo = styled(Well)`
+  margin-bottom: 30px;
 `
 
 const Grid = styled.div`
@@ -40,8 +45,16 @@ const TitleValueStyled = styled(TitleValue)`
   margin-bottom: 14px;
 `
 
+const TitleValueFinalStyled = styled(TitleValue)`
+  margin-bottom: 25px;
+`
+
 const Button = styled(ButtonAnchor)`
   flex-grow: 1;
+`
+
+const SubsectionTitleNoMargin = styled(SubsectionTitle)`
+  margin-bottom: 0;
 `
 
 interface Props {
@@ -61,30 +74,28 @@ const SummaryMarketStep = (props: Props) => {
   const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`
 
   if (!collateral || !arbitrator) {
-    return <FullLoading />
+    return <Loading full={true} />
   }
 
   return (
     <>
-      <SectionTitle title="Conditional Exchange" subTitle="Your new market has been created!" />
+      <SectionTitle title="Conditional Exchange" subTitle="A new market has been created!" />
       <CreateCard>
-        <SubsectionTitle>Market&apos;s URL</SubsectionTitle>
-        <Paragraph>
-          You can access your markets from the <NavLinkStyled to="/">Markets</NavLinkStyled>{' '}
-          section.
-        </Paragraph>
-        <Paragraph>
-          <a target="_blank" rel="noopener noreferrer" href={`/#/${marketMakerAddress}`}>
-            {marketMakerURL}
-          </a>
-          <CopyText value={marketMakerURL} />
-        </Paragraph>
+        <OutcomeInfo>
+          <Paragraph>
+            You can now find your market on the <NavLinkStyled to="/">Markets</NavLinkStyled>{' '}
+            section.
+          </Paragraph>
+          <Paragraph>
+            Get the URL to your market
+            <CopyText value={marketMakerURL} toastMessage="URL copied to your clipboard!" />
+          </Paragraph>
+        </OutcomeInfo>
         <SubsectionTitle>Details</SubsectionTitle>
         <TitleValueStyled title={'Question'} value={question} />
         <Grid>
           <TitleValue title={'Category'} value={category} />
           <TitleValue title={'Resolution date'} value={resolutionDate} />
-          <TitleValue title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
           <TitleValue title={'Spread / Fee'} value={`${MARKET_FEE}%`} />
           <TitleValue
             title={'Funding'}
@@ -94,7 +105,11 @@ const SummaryMarketStep = (props: Props) => {
             ]}
           />
         </Grid>
-        <SubsectionTitle>Outcomes</SubsectionTitle>
+        <TitleValueFinalStyled
+          title={'Arbitrator'}
+          value={<DisplayArbitrator arbitrator={arbitrator} />}
+        />
+        <SubsectionTitleNoMargin>Outcomes</SubsectionTitleNoMargin>
         <Table
           head={
             <THead>
@@ -116,7 +131,12 @@ const SummaryMarketStep = (props: Props) => {
           })}
         </Table>
         <ButtonContainer>
-          <Button rel="noopener noreferrer" href={`/#/${marketMakerAddress}`} target="_blank">
+          <Button
+            buttonType={ButtonType.primary}
+            rel="noopener noreferrer"
+            href={`/#/${marketMakerAddress}`}
+            target="_blank"
+          >
             View Market
           </Button>
         </ButtonContainer>
