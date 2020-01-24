@@ -1,4 +1,4 @@
-import { Contract, ethers, Wallet } from 'ethers'
+import { Contract, ethers, utils, Wallet } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
@@ -14,15 +14,14 @@ const erc20Abi = [
   'function symbol() external view returns (string)',
   'function name() external view returns (string)',
   'function decimals() external view returns (uint8)',
+  'function transferFrom(address sender, address recipient, uint256 amount) public returns (bool)',
 ]
 
 class ERC20Service {
-  tokenAddress: string
   provider: any
   contract: Contract
 
   constructor(provider: any, signerAddress: Maybe<string>, tokenAddress: string) {
-    this.tokenAddress = tokenAddress
     this.provider = provider
     if (signerAddress) {
       const signer: Wallet = provider.getSigner()
@@ -30,6 +29,10 @@ class ERC20Service {
     } else {
       this.contract = new ethers.Contract(tokenAddress, erc20Abi, provider)
     }
+  }
+
+  get address(): string {
+    return this.contract.address
   }
 
   /**
@@ -41,7 +44,6 @@ class ERC20Service {
     neededAmount: BigNumber,
   ): Promise<boolean> => {
     const allowance: BigNumber = await this.contract.allowance(owner, spender)
-
     return allowance.gte(neededAmount)
   }
 
@@ -53,7 +55,7 @@ class ERC20Service {
       value: '0x0',
     })
     logger.log(`Approve transaccion hash: ${transactionObject.hash}`)
-    await this.provider.waitForTransaction(transactionObject.hash)
+    return this.provider.waitForTransaction(transactionObject.hash)
   }
 
   /**
@@ -64,7 +66,7 @@ class ERC20Service {
       value: '0x0',
     })
     logger.log(`Approve unlimited transaccion hash: ${transactionObject.hash}`)
-    await this.provider.waitForTransaction(transactionObject.hash)
+    return this.provider.waitForTransaction(transactionObject.hash)
   }
 
   getCollateral = async (marketMakerAddress: string): Promise<any> => {
@@ -79,11 +81,11 @@ class ERC20Service {
 
   isValidErc20 = async (): Promise<boolean> => {
     try {
-      if (!isAddress(this.tokenAddress)) {
+      if (!isAddress(this.contract.address)) {
         throw new Error('Is not a valid erc20 address')
       }
 
-      if (!isContract(this.provider, this.tokenAddress)) {
+      if (!isContract(this.provider, this.contract.address)) {
         throw new Error('Is not a valid contract')
       }
 
@@ -103,10 +105,28 @@ class ERC20Service {
     const [decimals, symbol] = await Promise.all([this.contract.decimals(), this.contract.symbol()])
 
     return {
-      address: this.tokenAddress,
+      address: this.contract.address,
       decimals,
       symbol,
     }
+  }
+
+  static encodeTransferFrom = (from: string, to: string, amount: BigNumber): string => {
+    const transferFromInterface = new utils.Interface(erc20Abi)
+
+    return transferFromInterface.functions.transferFrom.encode([from, to, amount])
+  }
+
+  static encodeApprove = (spenderAccount: string, amount: BigNumber): string => {
+    const approveInterface = new utils.Interface(erc20Abi)
+
+    return approveInterface.functions.approve.encode([spenderAccount, amount])
+  }
+
+  static encodeApproveUnlimited = (spenderAccount: string): string => {
+    const approveInterface = new utils.Interface(erc20Abi)
+
+    return approveInterface.functions.approve.encode([spenderAccount, ethers.constants.MaxUint256])
   }
 }
 
