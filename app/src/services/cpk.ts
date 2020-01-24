@@ -2,7 +2,7 @@ import { ethers, Wallet } from 'ethers'
 import CPK from 'contract-proxy-kit'
 
 import { getLogger } from '../util/logger'
-import { ERC20Service, MarketMakerService } from './index'
+import { ConditionalTokenService, ERC20Service, MarketMakerService } from './index'
 import { BigNumber } from 'ethers/utils'
 import { TransactionReceipt } from 'ethers/providers'
 
@@ -14,6 +14,13 @@ interface CPKBuyOutcomesParams {
   amount: BigNumber
   outcomeIndex: number
   marketMaker: MarketMakerService
+}
+
+interface CPKSellOutcomesParams {
+  amount: BigNumber
+  outcomeIndex: number
+  marketMaker: MarketMakerService
+  conditionalTokens: ConditionalTokenService
 }
 
 class CPKService {
@@ -95,6 +102,47 @@ class CPKService {
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
+      throw err
+    }
+  }
+
+  sellOutcomes = async ({
+    amount,
+    outcomeIndex,
+    marketMaker,
+    conditionalTokens,
+  }: CPKSellOutcomesParams): Promise<TransactionReceipt> => {
+    try {
+      const outcomeTokensToSell = await marketMaker.calcSellAmount(amount, outcomeIndex)
+
+      const transactions = [
+        {
+          operation: CPK.CALL,
+          to: marketMaker.address,
+          value: 0,
+          data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
+        },
+      ]
+
+      const isApprovedForAll = await conditionalTokens.isApprovedForAll(
+        this.cpk.address,
+        marketMaker.address,
+      )
+      if (!isApprovedForAll) {
+        transactions.unshift({
+          operation: CPK.CALL,
+          to: conditionalTokens.address,
+          value: 0,
+          data: ConditionalTokenService.encodeSetApprovalForAll(marketMaker.address, true),
+        })
+      }
+
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
+
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
       throw err
     }
   }

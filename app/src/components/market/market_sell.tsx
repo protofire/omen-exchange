@@ -76,11 +76,11 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { buildMarketMaker, conditionalTokens } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens, cpk } = useContracts(context)
 
   const { balances, marketMakerAddress, collateral, question, resolution } = props
 
-  const marketMakerService = buildMarketMaker(marketMakerAddress)
+  const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
@@ -151,12 +151,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Selling ${formatBigNumber(amountShares, collateral.decimals)} shares ...`)
 
-      const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketMakerAddress)
-      if (!isApprovedForAll) {
-        await conditionalTokens.setApprovalForAll(marketMakerAddress)
-      }
-
-      await marketMakerService.sell(tradedCollateral, outcomeIndex)
+      await cpk.sellOutcomes({
+        amount: tradedCollateral,
+        outcomeIndex,
+        marketMaker,
+        conditionalTokens,
+      })
 
       setAmountShares(new BigNumber(0))
       setStatus(Status.Ready)
