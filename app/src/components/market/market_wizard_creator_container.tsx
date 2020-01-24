@@ -14,7 +14,7 @@ const logger = getLogger('Market::MarketWizardCreatorContainer')
 
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
-  const { account } = context
+  const { library: provider, account, networkId } = context
 
   const [isModalOpen, setModalState] = useState(false)
   const { conditionalTokens, marketMakerFactory, realitio } = useContracts(context)
@@ -34,8 +34,10 @@ const MarketWizardCreatorContainer: FC = () => {
         }
 
         setMarketCreationStatus(MarketCreationStatus.creatingAMarket())
-        const marketMakerAddress = await CPKService.createMarket({
-          context,
+
+        const cpk = await CPKService.create(provider)
+        const marketMakerAddress = await cpk.createMarket({
+          networkId,
           marketData,
           conditionalTokens,
           realitio,
@@ -44,8 +46,7 @@ const MarketWizardCreatorContainer: FC = () => {
         setMarketMakerAddress(marketMakerAddress)
 
         setMarketCreationStatus(MarketCreationStatus.addFunding())
-        await CPKService.addFundsToTheMarket({
-          context,
+        await cpk.addFundsToTheMarket({
           funding: marketData.funding,
           marketMakerAddress,
           collateral: marketData.collateral,

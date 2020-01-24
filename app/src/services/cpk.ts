@@ -6,7 +6,6 @@ import { getLogger } from '../util/logger'
 import { ConditionalTokenService, ERC20Service, MarketMakerService, RealitioService } from './index'
 import { BigNumber } from 'ethers/utils'
 import { MarketData, Token } from '../util/types'
-import { ConnectedWeb3Context } from '../hooks/connectedWeb3'
 import { getContractAddress } from '../util/networks'
 import { MarketMakerFactoryService } from './market_maker_factory'
 import { TransactionReceipt } from 'ethers/providers'
@@ -22,7 +21,7 @@ interface CPKBuyOutcomesParams {
 }
 
 interface CPKCreateMarketParams {
-  context: ConnectedWeb3Context
+  networkId: number
   marketData: MarketData
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
@@ -30,7 +29,6 @@ interface CPKCreateMarketParams {
 }
 
 interface CPKFundMarketParams {
-  context: ConnectedWeb3Context
   funding: BigNumber
   collateral: Token
   marketMakerAddress: string
@@ -120,19 +118,14 @@ class CPKService {
     }
   }
 
-  static createMarket = async ({
-    context,
+  createMarket = async ({
+    networkId,
     marketData,
     conditionalTokens,
     realitio,
     marketMakerFactory,
   }: CPKCreateMarketParams): Promise<string> => {
     try {
-      const { library: provider, networkId, account } = context
-      if (!account) {
-        throw new Error('You must be connected to your wallet.')
-      }
-
       const {
         collateral,
         arbitrator,
@@ -147,7 +140,6 @@ class CPKService {
         throw new Error('Resolution time was not specified')
       }
 
-      const cpk = await CPK.getCPK(provider)
       const conditionalTokensAddress = conditionalTokens.address
       const realitioAddress = realitio.address
 
@@ -181,7 +173,7 @@ class CPKService {
           arbitrator.address,
           openingDateMoment,
           networkId,
-          cpk.address,
+          this.cpk.address,
         )
       }
       logger.log(`QuestionID ${questionId}`)
@@ -213,7 +205,7 @@ class CPKService {
         conditionalTokens.address,
         collateral.address,
         conditionId,
-        cpk.address,
+        this.cpk.address,
       )
       logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
 
@@ -229,10 +221,10 @@ class CPKService {
         ),
       })
 
-      const txObject = await cpk.execTransactions(transactions, { gasLimit: 1000000 })
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
       logger.log(`Transaction hash: ${txObject.hash}`)
 
-      await provider.waitForTransaction(txObject.hash)
+      await this.provider.waitForTransaction(txObject.hash)
       return predictedMarketMakerAddress
     } catch (err) {
       logger.error(`There was an error creating the market maker`, err.message)
@@ -240,31 +232,26 @@ class CPKService {
     }
   }
 
-  static addFundsToTheMarket = async ({
-    context,
+  addFundsToTheMarket = async ({
     collateral,
     funding,
     marketMakerAddress,
     outcomes,
   }: CPKFundMarketParams): Promise<TransactionReceipt> => {
     try {
-      const { library: provider, account } = context
-      if (!account) {
-        throw new Error('You must be connected to your wallet.')
-      }
-
-      const cpk = await CPK.getCPK(provider)
+      const signer: Wallet = this.provider.getSigner()
+      const account = await signer.getAddress()
 
       // Step 1: Approve collateral to the proxy contract
-      const collateralService = new ERC20Service(provider, account, collateral.address)
+      const collateralService = new ERC20Service(this.provider, account, collateral.address)
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
         account,
-        cpk.address,
+        this.cpk.address,
         funding,
       )
 
       if (!hasEnoughAlowance) {
-        await collateralService.approveUnlimited(cpk.address)
+        await collateralService.approveUnlimited(this.cpk.address)
       }
 
       const transactions = [
@@ -273,7 +260,7 @@ class CPKService {
           operation: CPK.CALL,
           to: collateral.address,
           value: 0,
-          data: ERC20Service.encodeTransferFrom(account, cpk.address, funding),
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, funding),
         },
         // Step 3: Add funding
         {
@@ -286,7 +273,7 @@ class CPKService {
 
       // Check  if the allowance of the CPK to the market maker is enough.
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
-        cpk.address,
+        this.cpk.address,
         marketMakerAddress,
         funding,
       )
@@ -301,10 +288,10 @@ class CPKService {
         })
       }
 
-      const txObject = await cpk.execTransactions(transactions, { gasLimit: 1000000 })
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
       logger.log(`Transaction hash: ${txObject.hash}`)
 
-      return provider.waitForTransaction(txObject.hash)
+      return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`There was an error adding funding to the market maker`, err.message)
       throw err
