@@ -156,7 +156,7 @@ class ConditionalTokenService {
     questionId: string,
     oracleAddress: string,
     outcomeSlotCount: number,
-  ): any => {
+  ): string => {
     const prepareConditionInterface = new utils.Interface([
       'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
     ])
@@ -168,7 +168,11 @@ class ConditionalTokenService {
     ])
   }
 
-  getConditionId = (questionId: string, oracleAddress: string, outcomeSlotCount: number) => {
+  getConditionId = (
+    questionId: string,
+    oracleAddress: string,
+    outcomeSlotCount: number,
+  ): string => {
     const conditionId = ethers.utils.solidityKeccak256(
       ['address', 'bytes32', 'uint256'],
       [oracleAddress, questionId, outcomeSlotCount],
