@@ -14,7 +14,7 @@ import { CopyText } from '../../../common/copy_text'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { useMarketMakerData } from '../../../../hooks/useMarketMakerData'
 import { useQuestion } from '../../../../hooks/useQuestion'
-import { FullLoading } from '../../../common/full_loading'
+import { Loading } from '../../../common/loading'
 import { NavLink } from 'react-router-dom'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
 import { ButtonType } from '../../../../common/button_styling_types'
@@ -74,7 +74,7 @@ const SummaryMarketStep = (props: Props) => {
   const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`
 
   if (!collateral || !arbitrator) {
-    return <FullLoading />
+    return <Loading full={true} />
   }
 
   return (

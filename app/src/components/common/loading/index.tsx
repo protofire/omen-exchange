@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { Spinner } from '../spinner'
 import styled from 'styled-components'
 
-const FullLoadingStyled = styled.div`
+const LoadingStyled = styled.div`
   align-items: center;
   background-color: rgba(255, 255, 255, 0.75);
   display: flex;
@@ -29,19 +29,33 @@ const Message = styled.p`
   width: 480px;
 `
 
-interface Props extends HTMLAttributes<HTMLDivElement> {
+interface InnerLoadingProps {
   message?: string
 }
 
-export const FullLoading: React.FC<Props> = (props: Props) => {
+const InnerLoading = (props: InnerLoadingProps) => {
   const { message = 'Loading...', ...restProps } = props
-  const portal: any = document.getElementById('portalContainer')
 
-  return ReactDOM.createPortal(
-    <FullLoadingStyled {...restProps}>
+  return (
+    <LoadingStyled {...restProps}>
       <Spinner />
       {message ? <Message>{message}</Message> : null}
-    </FullLoadingStyled>,
-    portal,
+    </LoadingStyled>
   )
+}
+
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  message?: string
+  full?: boolean
+}
+
+export const Loading: React.FC<Props> = (props: Props) => {
+  const { message, full, ...restProps } = props
+
+  if (full) {
+    const portal: any = document.getElementById('portalContainer')
+    return ReactDOM.createPortal(<InnerLoading message={message} {...restProps} />, portal)
+  } else {
+    return <InnerLoading message={message} {...restProps} />
+  }
 }
