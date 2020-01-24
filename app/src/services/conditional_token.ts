@@ -108,10 +108,7 @@ class ConditionalTokenService {
   }
 
   isApprovedForAll = async (owner: string, spender: string): Promise<TransactionReceipt> => {
-    const overrides = {
-      from: owner,
-    }
-    const transactionObject = await this.contract.isApprovedForAll(owner, spender, overrides)
+    const transactionObject = await this.contract.isApprovedForAll(owner, spender)
     return this.provider.waitForTransaction(transactionObject.hash)
   }
 
