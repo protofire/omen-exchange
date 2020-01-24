@@ -59,6 +59,10 @@ const ErrorStyled = styled(FormError)`
   margin: 0 0 10px 0;
 `
 
+const CheckboxWrapper = styled.div`
+  text-align: right;
+`
+
 const ButtonRemove = styled(Button)`
   background-color: transparent;
   background-image: url(${IconDelete});
@@ -99,8 +103,26 @@ const TotalValue = styled(TotalText)`
   text-align: right;
 `
 
-const TotalValueColor = styled(TotalText)<{ error?: boolean }>`
-  color: ${props => (props.error ? props.theme.colors.error : props.theme.colors.textColor)};
+const StyledCheckbox = styled(Checkbox)`
+  font-size: 12px;
+  margin-right: 5px;
+`
+
+const StyledLabel = styled.label`
+  color: ${props => props.theme.colors.textColor};
+  display: inline;
+  font-size: 12px;
+  line-height: 1.2;
+  margin: 0;
+`
+
+const TotalValueColor = styled(TotalText)<{ error?: boolean; isUniform: boolean }>`
+  color: ${props =>
+    props.error
+      ? props.theme.colors.error
+      : props.isUniform
+      ? props.theme.colors.primary
+      : props.theme.colors.textColor};
 `
 
 const NewOutcome = styled(Well)`
@@ -282,16 +304,23 @@ const Outcomes = (props: Props) => {
           <TotalTitle>
             <strong>Total:</strong> {outcomes.length} outcomes
           </TotalTitle>
+
           <TotalValue>
-            <TotalValueColor error={totalProbabilities !== 100}>
+            <TotalValueColor error={totalProbabilities !== 100} isUniform={isUniform}>
               {totalProbabilities}
             </TotalValueColor>
             %
           </TotalValue>
         </TotalWrapper>
+        <CheckboxWrapper>
+          <StyledCheckbox
+            title="Distribute uniformly"
+            name="distributeUniformly"
+            onChange={handleIsUniformChanged}
+          />
+          <StyledLabel htmlFor="distributeUniformly">Distribute uniformly</StyledLabel>
+        </CheckboxWrapper>
       </OutcomesWrapper>
-
-      <Checkbox title="Distribute uniformly" onChange={handleIsUniformChanged} />
 
       {canAddOutcome && (
         <NewOutcome>
