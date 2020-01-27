@@ -28,7 +28,7 @@ interface CPKCreateMarketParams {
   marketMakerFactory: MarketMakerFactoryService
 }
 
-interface CPKAddFundingParams {
+interface CPKFundingParams {
   amount: BigNumber
   collateral: Token
   marketMaker: MarketMakerService
@@ -258,7 +258,7 @@ class CPKService {
     amount,
     collateral,
     marketMaker,
-  }: CPKAddFundingParams): Promise<TransactionReceipt> => {
+  }: CPKFundingParams): Promise<TransactionReceipt> => {
     try {
       const signer: Wallet = this.provider.getSigner()
       const account = await signer.getAddress()
@@ -291,6 +291,55 @@ class CPKService {
     } catch (err) {
       logger.error(
         `There was an error adding an amount of '${amount.toString()}' for funding`,
+        err.message,
+      )
+      throw err
+    }
+  }
+
+  removeFunding = async ({
+    amount,
+    collateral,
+    marketMaker,
+  }: CPKFundingParams): Promise<TransactionReceipt> => {
+    try {
+      const signer: Wallet = this.provider.getSigner()
+      const account = await signer.getAddress()
+
+      const transactions = [
+        {
+          operation: CPK.CALL,
+          to: collateral.address,
+          value: 0,
+          data: ERC20Service.encodeApproveUnlimited(this.cpk.address),
+        },
+        {
+          operation: CPK.CALL,
+          to: marketMaker.address,
+          value: 0,
+          data: MarketMakerService.encodeRemoveFunding(amount),
+        },
+        {
+          operation: CPK.CALL,
+          to: collateral.address,
+          value: 0,
+          data: ERC20Service.encodeApproveUnlimited(account),
+        },
+        {
+          operation: CPK.CALL,
+          to: collateral.address,
+          value: 0,
+          data: ERC20Service.encodeTransferFrom(this.cpk.address, account, amount),
+        },
+      ]
+
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
+
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(
+        `There was an error removing amount '${amount.toString()}' for funding`,
         err.message,
       )
       throw err
