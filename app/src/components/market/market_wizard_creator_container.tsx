@@ -1,5 +1,4 @@
 import React, { FC, useState } from 'react'
-import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../../util/logger'
 import { MarketWizardCreator } from './market_wizard_creator'
@@ -37,14 +36,6 @@ const MarketWizardCreatorContainer: FC = () => {
         setMarketCreationStatus(MarketCreationStatus.creatingAMarket())
 
         const cpk = await CPKService.create(provider)
-        const marketMakerAddress = await cpk.createMarket({
-          networkId,
-          marketData,
-          conditionalTokens,
-          realitio,
-          marketMakerFactory,
-        })
-        setMarketMakerAddress(marketMakerAddress)
 
         // Approve collateral to the proxy contract
         const collateralService = new ERC20Service(provider, account, marketData.collateral.address)
@@ -58,13 +49,15 @@ const MarketWizardCreatorContainer: FC = () => {
           await collateralService.approveUnlimited(cpk.address)
         }
 
-        setMarketCreationStatus(MarketCreationStatus.addFunding())
-        await cpk.addFundsToTheMarket({
-          funding: marketData.funding,
-          marketMakerAddress,
-          collateral: marketData.collateral,
-          outcomes: marketData.outcomes.map(o => new BigNumber(o.probability)),
+        const marketMakerAddress = await cpk.createMarket({
+          networkId,
+          marketData,
+          conditionalTokens,
+          realitio,
+          marketMakerFactory,
+          account,
         })
+        setMarketMakerAddress(marketMakerAddress)
 
         setMarketCreationStatus(MarketCreationStatus.done())
       }

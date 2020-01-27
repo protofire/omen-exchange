@@ -1,4 +1,5 @@
 import { Contract, ethers, Wallet, utils } from 'ethers'
+import { BigNumber } from 'ethers/utils'
 import { LogDescription } from 'ethers/utils/interface'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -201,6 +202,8 @@ class MarketMakerFactoryService {
     conditionalTokenAddress: string,
     collateralAddress: string,
     conditionId: string,
+    initialFunds: BigNumber,
+    distributionHint: BigNumber[],
   ): string => {
     const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
 
@@ -222,8 +225,8 @@ class MarketMakerFactoryService {
       collateralAddress,
       [conditionId],
       feeBN,
-      '0x',
-      [],
+      initialFunds,
+      distributionHint,
     ])
   }
 }
