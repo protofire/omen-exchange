@@ -31,18 +31,31 @@ cd realitio-gnosis-proxy
 REALITIO_PROXY_ADDRESS=$(jq -r '.networks["50"].address' build/contracts/RealitioProxy.json)
 cd ..
 
+# deploy cpk contracts
+cd contract-proxy-kit
+./node_modules/.bin/truffle migrate --network development
+cd ..
+
 # save contracts addresses
+echo "Main contracts:" >> contracts_addresses.txt
 echo "realitio: ${REALITIO_ADDRESS}" >> contracts_addresses.txt
-echo "realitio arbitrator: $(jq -r '.networks["50"].address' realitio/truffle/build/contracts/Arbitrator.json)" >> contracts_addresses.txt
+echo "market maker factory: $(jq -r '.networks["50"].address' conditional-tokens-market-makers/build/contracts/FPMMDeterministicFactory.json)" >> contracts_addresses.txt
+echo "conditional tokens: ${CONDITIONAL_TOKENS_ADDRESS}" >> contracts_addresses.txt
+echo "oracle: ${REALITIO_PROXY_ADDRESS}" >> contracts_addresses.txt
+echo "" >> contracts_addresses.txt
+echo "Tokens:" >> contracts_addresses.txt
 echo "mock cdai: ${MOCK_CDAI_ADDRESS}" >> contracts_addresses.txt
 echo "mock dai: ${MOCK_DAI_ADDRESS}" >> contracts_addresses.txt
 echo "mock usdc: ${MOCK_USDC_ADDRESS}" >> contracts_addresses.txt
 echo "mock owl: ${MOCK_OWL_ADDRESS}" >> contracts_addresses.txt
 echo "mock weth: ${MOCK_WETH_ADDRESS}" >> contracts_addresses.txt
 echo "mock chai: ${MOCK_CHAI_ADDRESS}" >> contracts_addresses.txt
-echo "conditional tokens: ${CONDITIONAL_TOKENS_ADDRESS}" >> contracts_addresses.txt
-echo "market maker factory: $(jq -r '.networks["50"].address' conditional-tokens-market-makers/build/contracts/FPMMDeterministicFactory.json)" >> contracts_addresses.txt
-echo "realitio proxy: ${REALITIO_PROXY_ADDRESS}" >> contracts_addresses.txt
+echo "" >> contracts_addresses.txt
+echo "CPK:" >> contracts_addresses.txt
+echo "masterCopyAddress: $(jq -r '.networks["50"].address' contract-proxy-kit/build/contracts/GnosisSafe.json)" >> contracts_addresses.txt
+echo "proxyFactoryAddress: $(jq -r '.networks["50"].address' contract-proxy-kit/build/contracts/CPKFactory.json)" >> contracts_addresses.txt
+echo "multiSendAddress: $(jq -r '.networks["50"].address' contract-proxy-kit/build/contracts/MultiSend.json)" >> contracts_addresses.txt
+echo "fallbackHandlerAddress: $(jq -r '.networks["50"].address' contract-proxy-kit/build/contracts/DefaultCallbackHandler.json)" >> contracts_addresses.txt
 
 # stop ganache
 kill $PID

@@ -1,4 +1,5 @@
-import { ethers, Wallet } from 'ethers'
+import { ethers } from 'ethers'
+import { Web3Provider } from 'ethers/providers'
 import CPK from 'contract-proxy-kit'
 import moment from 'moment'
 
@@ -6,7 +7,7 @@ import { getLogger } from '../util/logger'
 import { ConditionalTokenService, ERC20Service, MarketMakerService, RealitioService } from './index'
 import { BigNumber } from 'ethers/utils'
 import { MarketData } from '../util/types'
-import { getContractAddress } from '../util/networks'
+import { getContractAddress, getCPKAddresses } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { MarketMakerFactoryService } from './market_maker_factory'
 import { TransactionReceipt } from 'ethers/providers'
@@ -14,7 +15,7 @@ import { TransactionReceipt } from 'ethers/providers'
 const logger = getLogger('Services::CPKService')
 
 interface CPKBuyOutcomesParams {
-  provider: any
+  provider: Web3Provider
   cost: BigNumber
   amount: BigNumber
   outcomeIndex: number
@@ -30,16 +31,27 @@ interface CPKCreateMarketParams {
 
 class CPKService {
   cpk: any
-  provider: any
+  provider: Web3Provider
 
-  constructor(cpk: any, provider: any) {
+  constructor(cpk: any, provider: Web3Provider) {
     this.cpk = cpk
     this.provider = provider
   }
 
-  static async create(provider: any) {
-    const signer: Wallet = provider.getSigner()
-    const cpk = await CPK.create({ ethers, signer })
+  static async create(provider: Web3Provider) {
+    const signer = provider.getSigner()
+    const network = await provider.getNetwork()
+    const cpkAddresses = getCPKAddresses(network.chainId)
+    const networks = cpkAddresses
+      ? {
+          [network.chainId]: cpkAddresses,
+        }
+      : {}
+    const cpk = await CPK.create({
+      ethers,
+      signer,
+      networks,
+    })
     return new CPKService(cpk, provider)
   }
 
@@ -54,7 +66,7 @@ class CPKService {
     marketMaker,
   }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
-      const signer: Wallet = this.provider.getSigner()
+      const signer = this.provider.getSigner()
       const account = await signer.getAddress()
 
       const collateralAddress = await marketMaker.getCollateralToken()
@@ -132,10 +144,10 @@ class CPKService {
         throw new Error('Resolution time was not specified')
       }
 
-      const signer: Wallet = this.provider.getSigner()
+      const signer = this.provider.getSigner()
       const account = await signer.getAddress()
 
-      const network = await this.provider.ready
+      const network = await this.provider.getNetwork()
       const networkId = network.chainId
 
       const conditionalTokensAddress = conditionalTokens.address
