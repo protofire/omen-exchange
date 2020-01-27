@@ -5,14 +5,20 @@ import { getLogger } from '../util/logger'
 import { ERC20Service, MarketMakerService } from './index'
 import { BigNumber } from 'ethers/utils'
 import { TransactionReceipt } from 'ethers/providers'
+import { Token } from '../util/types'
 
 const logger = getLogger('Services::CPKService')
 
 interface CPKBuyOutcomesParams {
-  provider: any
   cost: BigNumber
   amount: BigNumber
   outcomeIndex: number
+  marketMaker: MarketMakerService
+}
+
+interface CPKAddFundingParams {
+  amount: BigNumber
+  collateral: Token
   marketMaker: MarketMakerService
 }
 
@@ -95,6 +101,49 @@ class CPKService {
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
+      throw err
+    }
+  }
+
+  addFunding = async ({
+    amount,
+    collateral,
+    marketMaker,
+  }: CPKAddFundingParams): Promise<TransactionReceipt> => {
+    try {
+      const signer: Wallet = this.provider.getSigner()
+      const account = await signer.getAddress()
+
+      const transactions = [
+        {
+          operation: CPK.CALL,
+          to: collateral.address,
+          value: 0,
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+        },
+        {
+          operation: CPK.CALL,
+          to: collateral.address,
+          value: 0,
+          data: ERC20Service.encodeApproveUnlimited(marketMaker.address),
+        },
+        {
+          operation: CPK.CALL,
+          to: marketMaker.address,
+          value: 0,
+          data: MarketMakerService.encodeAddFunding(amount),
+        },
+      ]
+
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 2000000 })
+
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(
+        `There was an error adding an amount of '${amount.toString()}' for funding`,
+        err.message,
+      )
       throw err
     }
   }

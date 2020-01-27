@@ -26,6 +26,7 @@ import { ButtonType } from '../../common/button_styling_types'
 import { FormError } from '../common/form_error'
 import { FormLabel } from '../common/form_label'
 import { useCollateralBalance } from '../../hooks/useCollateralBalance'
+import { CPKService } from '../../services/cpk'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -88,7 +89,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   const { library: provider, account } = context
 
   const { buildMarketMaker } = useContracts(context)
-  const marketMakerService = buildMarketMaker(marketMakerAddress)
+  const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -103,6 +104,10 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
 
   const addFunding = async () => {
     try {
+      if (!account) {
+        throw new Error('Please connect to your wallet to perform this action.')
+      }
+
       setStatus(Status.Loading)
       setMessage(
         `Add funding amount: ${formatBigNumber(amount, collateral.decimals)} ${
@@ -110,14 +115,29 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         } ...`,
       )
 
-      const collateralAddress = await marketMakerService.getCollateralToken()
+      const cpk = await CPKService.create(provider)
+
+      const collateralAddress = await marketMaker.getCollateralToken()
       const collateralService = new ERC20Service(provider, account, collateralAddress)
 
-      await collateralService.approve(marketMakerAddress, amount)
+      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
+        account,
+        cpk.address,
+        amount,
+      )
 
-      await marketMakerService.addFunding(amount)
+      if (!hasEnoughAlowance) {
+        await collateralService.approveUnlimited(cpk.address)
+      }
+
+      await cpk.addFunding({
+        amount,
+        collateral,
+        marketMaker,
+      })
 
       setStatus(Status.Ready)
+      setAmount(new BigNumber(0))
     } catch (err) {
       setStatus(Status.Error)
       logger.log(`Error trying to add funding: ${err.message}`)
@@ -134,7 +154,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         )} ...`,
       )
 
-      await marketMakerService.removeFunding(marketMakerUserFunding)
+      await marketMaker.removeFunding(marketMakerUserFunding)
 
       setStatus(Status.Ready)
     } catch (err) {
