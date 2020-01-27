@@ -8,6 +8,7 @@ import { getArbitratorFromAddress } from '../util/networks'
 import { useContracts } from './useContracts'
 import { getLogger } from '../util/logger'
 import { BalanceItem, Status, Token, Arbitrator } from '../util/types'
+import { CPKService } from '../services/cpk'
 
 const logger = getLogger('Market::useMarketMakerData')
 
@@ -78,6 +79,8 @@ export const useMarketMakerData = (
 
     const arbitrator = getArbitratorFromAddress(networkId, arbitratorAddress)
 
+    const cpk = await CPKService.create(provider)
+
     const [
       userShares,
       marketMakerShares,
@@ -89,15 +92,17 @@ export const useMarketMakerData = (
       fee,
       isQuestionFinalized,
     ] = await Promise.all([
-      account
-        ? marketMaker.getBalanceInformation(account, outcomes.length)
+      account && cpk && cpk.address
+        ? marketMaker.getBalanceInformation(cpk.address, outcomes.length)
         : outcomes.map(() => new BigNumber(0)),
       marketMaker.getBalanceInformation(marketMakerAddress, outcomes.length),
       marketMaker.getTotalSupply(),
-      account ? marketMaker.balanceOf(account) : new BigNumber(0),
+      account && cpk && cpk.address ? marketMaker.balanceOf(cpk.address) : new BigNumber(0),
       marketMaker.getCollateralToken(),
       marketMaker.poolSharesTotalSupply(),
-      account ? marketMaker.poolSharesBalanceOf(account) : new BigNumber(0),
+      account && cpk && cpk.address
+        ? marketMaker.poolSharesBalanceOf(account && cpk && cpk.address)
+        : new BigNumber(0),
       marketMaker.getFee(),
       realitio.isFinalized(questionId),
     ])
