@@ -5,7 +5,7 @@ import moment from 'moment'
 import { getLogger } from '../util/logger'
 import { ConditionalTokenService, ERC20Service, MarketMakerService, RealitioService } from './index'
 import { BigNumber } from 'ethers/utils'
-import { MarketData, Token } from '../util/types'
+import { MarketData } from '../util/types'
 import { getContractAddress } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { MarketMakerFactoryService } from './market_maker_factory'
@@ -22,19 +22,10 @@ interface CPKBuyOutcomesParams {
 }
 
 interface CPKCreateMarketParams {
-  networkId: number
   marketData: MarketData
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
-  account: string
-}
-
-interface CPKFundMarketParams {
-  funding: BigNumber
-  collateral: Token
-  marketMakerAddress: string
-  outcomes: BigNumber[]
 }
 
 class CPKService {
@@ -121,12 +112,10 @@ class CPKService {
   }
 
   createMarket = async ({
-    networkId,
     marketData,
     conditionalTokens,
     realitio,
     marketMakerFactory,
-    account,
   }: CPKCreateMarketParams): Promise<string> => {
     try {
       const {
@@ -142,6 +131,12 @@ class CPKService {
       if (!resolution) {
         throw new Error('Resolution time was not specified')
       }
+
+      const signer: Wallet = this.provider.getSigner()
+      const account = await signer.getAddress()
+
+      const network = await this.provider.ready
+      const networkId = network.chainId
 
       const conditionalTokensAddress = conditionalTokens.address
       const realitioAddress = realitio.address
