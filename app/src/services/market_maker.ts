@@ -263,6 +263,12 @@ class MarketMakerService {
 
     return addFundingInterface.functions.addFunding.encode([amount, distributionHint])
   }
+
+  static encodeRemoveFunding = (amount: BigNumber): string => {
+    const removeFundingInterface = new utils.Interface(marketMakerAbi)
+
+    return removeFundingInterface.functions.removeFunding.encode([amount])
+  }
 }
 
 export { MarketMakerService }
