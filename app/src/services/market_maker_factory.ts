@@ -207,17 +207,7 @@ class MarketMakerFactoryService {
   ): string => {
     const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
 
-    const create2FixedProductMarketMakerInterface = new utils.Interface([
-      `function create2FixedProductMarketMaker(
-            uint saltNonce,
-            address conditionalTokens,
-            address collateralToken,
-            bytes32[] conditionIds,
-            uint fee,
-            uint initialFunds,
-            uint[] distributionHint
-      ) public returns (address)`,
-    ])
+    const create2FixedProductMarketMakerInterface = new utils.Interface(marketMakerFactoryAbi)
 
     return create2FixedProductMarketMakerInterface.functions.create2FixedProductMarketMaker.encode([
       saltNonce,

@@ -178,7 +178,7 @@ class RealitioService {
     arbitratorAddress: string,
     openingDateMoment: Moment,
     networkId: number,
-  ): any => {
+  ): string => {
     const openingTimestamp = openingDateMoment.unix()
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
     const questionText = RealitioQuestionLib.encodeText(
@@ -199,9 +199,7 @@ class RealitioService {
       0,
     ]
 
-    const askQuestionInterface = new utils.Interface([
-      'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public payable returns (bytes32)',
-    ])
+    const askQuestionInterface = new utils.Interface(realitioAbi)
 
     return askQuestionInterface.functions.askQuestion.encode(args)
   }

@@ -259,9 +259,7 @@ class MarketMakerService {
   }
 
   static encodeAddFunding = (amount: BigNumber, distributionHint: BigNumber[] = []): string => {
-    const addFundingInterface = new utils.Interface([
-      'function addFunding(uint addedFunds, uint[] distributionHint) external',
-    ])
+    const addFundingInterface = new utils.Interface(marketMakerAbi)
 
     return addFundingInterface.functions.addFunding.encode([amount, distributionHint])
   }
