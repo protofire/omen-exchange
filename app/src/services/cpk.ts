@@ -1,9 +1,14 @@
 import { ethers, Wallet } from 'ethers'
 import CPK from 'contract-proxy-kit'
+import moment from 'moment'
 
 import { getLogger } from '../util/logger'
-import { ERC20Service, MarketMakerService } from './index'
+import { ConditionalTokenService, ERC20Service, MarketMakerService, RealitioService } from './index'
 import { BigNumber } from 'ethers/utils'
+import { MarketData } from '../util/types'
+import { getContractAddress } from '../util/networks'
+import { calcDistributionHint } from '../util/tools'
+import { MarketMakerFactoryService } from './market_maker_factory'
 import { TransactionReceipt } from 'ethers/providers'
 
 const logger = getLogger('Services::CPKService')
@@ -14,6 +19,13 @@ interface CPKBuyOutcomesParams {
   amount: BigNumber
   outcomeIndex: number
   marketMaker: MarketMakerService
+}
+
+interface CPKCreateMarketParams {
+  marketData: MarketData
+  conditionalTokens: ConditionalTokenService
+  realitio: RealitioService
+  marketMakerFactory: MarketMakerFactoryService
 }
 
 class CPKService {
@@ -95,6 +107,143 @@ class CPKService {
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
+      throw err
+    }
+  }
+
+  createMarket = async ({
+    marketData,
+    conditionalTokens,
+    realitio,
+    marketMakerFactory,
+  }: CPKCreateMarketParams): Promise<string> => {
+    try {
+      const {
+        collateral,
+        arbitrator,
+        question,
+        resolution,
+        outcomes,
+        category,
+        loadedQuestionId,
+      } = marketData
+
+      if (!resolution) {
+        throw new Error('Resolution time was not specified')
+      }
+
+      const signer: Wallet = this.provider.getSigner()
+      const account = await signer.getAddress()
+
+      const network = await this.provider.ready
+      const networkId = network.chainId
+
+      const conditionalTokensAddress = conditionalTokens.address
+      const realitioAddress = realitio.address
+
+      const openingDateMoment = moment(resolution)
+
+      const transactions = []
+
+      // Question interaction
+      let questionId: string
+      if (loadedQuestionId) {
+        questionId = loadedQuestionId
+      } else {
+        // Step 1: Create question in realitio
+        transactions.push({
+          operation: CPK.CALL,
+          to: realitioAddress,
+          value: 0,
+          data: RealitioService.encodeAskQuestion(
+            question,
+            outcomes,
+            category,
+            arbitrator.address,
+            openingDateMoment,
+            networkId,
+          ),
+        })
+        questionId = await realitio.askQuestionConstant(
+          question,
+          outcomes,
+          category,
+          arbitrator.address,
+          openingDateMoment,
+          networkId,
+          this.cpk.address,
+        )
+      }
+      logger.log(`QuestionID ${questionId}`)
+
+      // Step 2: Prepare condition
+      const oracleAddress = getContractAddress(networkId, 'oracle')
+      transactions.push({
+        operation: CPK.CALL,
+        to: conditionalTokensAddress,
+        value: 0,
+        data: ConditionalTokenService.encodePrepareCondition(
+          questionId,
+          oracleAddress,
+          outcomes.length,
+        ),
+      })
+
+      const conditionId = conditionalTokens.getConditionId(
+        questionId,
+        oracleAddress,
+        outcomes.length,
+      )
+      logger.log(`ConditionID: ${conditionId}`)
+
+      // Step 3: Approve collateral for factory
+      transactions.push({
+        operation: CPK.CALL,
+        to: collateral.address,
+        value: 0,
+        data: ERC20Service.encodeApproveUnlimited(marketMakerFactory.address),
+      })
+
+      // Step 4: Transfer funding from user
+      transactions.push({
+        operation: CPK.CALL,
+        to: collateral.address,
+        value: 0,
+        data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
+      })
+
+      // Step 5: Create market maker
+      const saltNonce = Math.round(Math.random() * 1000000)
+      const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
+        saltNonce,
+        conditionalTokens.address,
+        collateral.address,
+        conditionId,
+        this.cpk.address,
+      )
+      logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
+      const distributionHint = calcDistributionHint(marketData.outcomes.map(o => o.probability))
+      transactions.push({
+        operation: CPK.CALL,
+        to: marketMakerFactory.address,
+        value: 0,
+        data: MarketMakerFactoryService.encodeCreateMarketMaker(
+          saltNonce,
+          conditionalTokens.address,
+          collateral.address,
+          conditionId,
+          marketData.funding,
+          distributionHint,
+        ),
+      })
+
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 2000000 })
+      logger.log(`Transaction hash: ${txObject.hash}`)
+
+      await this.provider.waitForTransaction(txObject.hash)
+      return predictedMarketMakerAddress
+    } catch (err) {
+      logger.error(`There was an error creating the market maker`, err.message)
       throw err
     }
   }

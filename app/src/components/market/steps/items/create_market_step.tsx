@@ -66,8 +66,6 @@ interface Props {
     outcomes: Outcome[]
   }
   marketCreationStatus: MarketCreationStatus
-  questionId: string | null
-  marketMakerAddress: string | null
 }
 
 const CreateMarketStep = (props: Props) => {
