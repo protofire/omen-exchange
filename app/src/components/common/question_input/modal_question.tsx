@@ -60,10 +60,10 @@ export const ModalQuestion = (props: Props) => {
   const [isSpinnerOn, setSpinnerOn] = useState<boolean>(false)
 
   const extractId = (questionURL: string): string => {
-    const reQuestionId = /0x.*/
+    const reQuestionId = /question\/(0x[0-9A-Fa-f]{64})/
     if (!questionURL) return ''
     const questionMatch = questionURL.match(reQuestionId)
-    return questionMatch ? questionMatch[0] : ''
+    return questionMatch ? questionMatch[1] : ''
   }
 
   const fetchQuestion = useMemo(
