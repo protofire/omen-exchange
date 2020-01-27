@@ -157,9 +157,7 @@ class ConditionalTokenService {
     oracleAddress: string,
     outcomeSlotCount: number,
   ): string => {
-    const prepareConditionInterface = new utils.Interface([
-      'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
-    ])
+    const prepareConditionInterface = new utils.Interface(conditionalTokensAbi)
 
     return prepareConditionInterface.functions.prepareCondition.encode([
       oracleAddress,
