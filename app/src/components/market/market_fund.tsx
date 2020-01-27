@@ -154,7 +154,13 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         )} ...`,
       )
 
-      await marketMaker.removeFunding(marketMakerUserFunding)
+      const cpk = await CPKService.create(provider)
+
+      await cpk.removeFunding({
+        amount: marketMakerUserFunding,
+        collateral,
+        marketMaker,
+      })
 
       setStatus(Status.Ready)
     } catch (err) {
