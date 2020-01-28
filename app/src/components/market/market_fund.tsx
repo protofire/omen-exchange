@@ -8,7 +8,7 @@ import { ViewCard } from '../common/view_card/'
 import { Table, TD, TR } from '../common/table'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { OutcomeTable } from '../common/outcome_table'
-import { FullLoading } from '../common/full_loading'
+import { Loading } from '../common/loading'
 import { SubsectionTitle } from '../common/subsection_title'
 import { BigNumberInput, BigNumberInputReturn } from '../common/big_number_input'
 import { FormRow } from '../common/form_row'
@@ -244,7 +244,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
           </Button>
         </ButtonContainer>
       </ViewCard>
-      {status === Status.Loading ? <FullLoading message={message} /> : null}
+      {status === Status.Loading ? <Loading message={message} /> : null}
     </>
   )
 }

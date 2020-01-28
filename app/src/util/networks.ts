@@ -1,4 +1,9 @@
-import { INFURA_PROJECT_ID } from '../common/constants'
+import {
+  INFURA_PROJECT_ID,
+  EARLIEST_GANACHE_BLOCK_TO_CHECK,
+  EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+  EARLIEST_MAINNET_BLOCK_TO_CHECK,
+} from '../common/constants'
 import { entries, isNotNull } from '../util/type-utils'
 
 import { Token, Arbitrator } from './types'
@@ -11,16 +16,25 @@ export const networkIds = {
   GANACHE: 50,
 } as const
 
+type CPKAddresses = {
+  masterCopyAddress: string
+  proxyFactoryAddress: string
+  multiSendAddress: string
+  fallbackHandlerAddress: string
+}
+
 interface Network {
   label: string
   url: string
   realitioTimeout: number
+  earliestBlockToCheck: number
   contracts: {
     realitio: string
     marketMakerFactory: string
     conditionalTokens: string
     oracle: string
   }
+  cpk?: CPKAddresses
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -39,6 +53,9 @@ const networks: { [K in NetworkId]: Network } = {
     label: 'Mainnet',
     url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
     realitioTimeout: 86400,
+    earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK
+      ? parseInt(EARLIEST_MAINNET_BLOCK_TO_CHECK, 10)
+      : 9294139,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
       marketMakerFactory: '0x17227353c2782A361ec65DCe27d05830Df41D3D3',
@@ -50,6 +67,9 @@ const networks: { [K in NetworkId]: Network } = {
     label: 'Rinkeby',
     url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
     realitioTimeout: 10,
+    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK
+      ? parseInt(EARLIEST_RINKEBY_BLOCK_TO_CHECK, 10)
+      : 5827230,
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
       marketMakerFactory: '0x578138c6211913c3fb23bfb8a7c9d220882d1a50',
@@ -61,11 +81,20 @@ const networks: { [K in NetworkId]: Network } = {
     label: 'Ganache',
     url: `http://localhost:8545`,
     realitioTimeout: 10,
+    earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK
+      ? parseInt(EARLIEST_GANACHE_BLOCK_TO_CHECK, 10)
+      : 1,
     contracts: {
       realitio: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
       marketMakerFactory: '0x5017A545b09ab9a30499DE7F431DF0855bCb7275',
       conditionalTokens: '0xD86C8F0327494034F60e25074420BcCF560D5610',
       oracle: '0x2D8BE6BF0baA74e0A907016679CaE9190e80dD0A',
+    },
+    cpk: {
+      masterCopyAddress: '0x1b88Bdb8269A1aB1372459F5a4eC3663D6f5cCc4',
+      proxyFactoryAddress: '0xaf5C4C6C7920B4883bC6252e9d9B8fE27187Cf68',
+      multiSendAddress: '0xEC5d4F247aF81A843612eb1371CBCfa88b762119',
+      fallbackHandlerAddress: '0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E',
     },
   },
 }
@@ -355,6 +384,14 @@ export const getRealitioTimeout = (networkId: number): number => {
   return networks[networkId].realitioTimeout
 }
 
+export const getEarliestBlockToCheck = (networkId: number): number => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  return networks[networkId].earliestBlockToCheck
+}
+
 export const getArbitratorsByNetwork = (networkId: number): Arbitrator[] => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
@@ -376,4 +413,13 @@ export const getArbitratorsByNetwork = (networkId: number): Arbitrator[] => {
       return null
     })
     .filter(isNotNull)
+}
+
+export const getCPKAddresses = (networkId: number): Maybe<CPKAddresses> => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  const cpkAddresses = networks[networkId].cpk
+  return cpkAddresses || null
 }

@@ -17,7 +17,7 @@ import { CPKService, MarketMakerService } from '../../services'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getLogger } from '../../util/logger'
 import { BigNumberInputReturn } from '../common/big_number_input'
-import { FullLoading } from '../common/full_loading'
+import { Loading } from '../common/loading'
 import {
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
@@ -251,7 +251,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           </Button>
         </ButtonContainer>
       </ViewCard>
-      {status === Status.Loading ? <FullLoading message={message} /> : null}
+      {status === Status.Loading ? <Loading full={true} message={message} /> : null}
     </>
   )
 }

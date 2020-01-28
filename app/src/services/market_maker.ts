@@ -279,6 +279,12 @@ class MarketMakerService {
 
     return sellInterface.functions.sell.encode([amount, outcomeIndex, maxOutcomeTokensToSell])
   }
+
+  static encodeAddFunding = (amount: BigNumber, distributionHint: BigNumber[] = []): string => {
+    const addFundingInterface = new utils.Interface(marketMakerAbi)
+
+    return addFundingInterface.functions.addFunding.encode([amount, distributionHint])
+  }
 }
 
 export { MarketMakerService }

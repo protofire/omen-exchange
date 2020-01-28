@@ -1,4 +1,5 @@
 import { Contract, ethers, Wallet, utils } from 'ethers'
+import { BigNumber } from 'ethers/utils'
 import { LogDescription } from 'ethers/utils/interface'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -62,16 +63,17 @@ class MarketMakerFactoryService {
     this.provider = provider
   }
 
+  get address(): string {
+    return this.contract.address
+  }
+
   predictMarketMakerAddress = async (
     saltNonce: number,
     conditionalTokenAddress: string,
     collateralAddress: string,
     conditionId: string,
+    signerAddress: string,
   ): Promise<string> => {
-    if (!this.signerAddress) {
-      throw new Error('Wallet needs to be connected to use this method')
-    }
-
     const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
     const cloneFactoryInterface = new utils.Interface([
       'function cloneConstructor(bytes consData) external',
@@ -92,7 +94,7 @@ class MarketMakerFactoryService {
           '0xff',
           this.contract.address,
           utils.keccak256(
-            utils.defaultAbiCoder.encode(['address', 'uint'], [this.signerAddress, saltNonce]),
+            utils.defaultAbiCoder.encode(['address', 'uint'], [signerAddress, saltNonce]),
           ),
           utils.keccak256(
             `0x3d3d606380380380913d393d73${this.contract.address.slice(
@@ -193,6 +195,29 @@ class MarketMakerFactoryService {
     const validMarkets = marketsWithExtraData.filter(market => market.fee.eq(feeBN))
 
     return validMarkets
+  }
+
+  static encodeCreateMarketMaker = (
+    saltNonce: number,
+    conditionalTokenAddress: string,
+    collateralAddress: string,
+    conditionId: string,
+    initialFunds: BigNumber,
+    distributionHint: BigNumber[],
+  ): string => {
+    const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
+
+    const create2FixedProductMarketMakerInterface = new utils.Interface(marketMakerFactoryAbi)
+
+    return create2FixedProductMarketMakerInterface.functions.create2FixedProductMarketMaker.encode([
+      saltNonce,
+      conditionalTokenAddress,
+      collateralAddress,
+      [conditionId],
+      feeBN,
+      initialFunds,
+      distributionHint,
+    ])
   }
 }
 
