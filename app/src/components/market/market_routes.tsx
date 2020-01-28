@@ -8,7 +8,7 @@ import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useCheckContractExists } from '../../hooks/useCheckContractExists'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
 import { SectionTitle } from '../common/section_title'
-import { FullLoading } from '../common/full_loading'
+import { Loading } from '../common/loading'
 import { MARKET_FEE } from '../../common/constants'
 import { getLogger } from '../../util/logger'
 import { MarketNotFound } from '../common/market_not_found'
@@ -41,7 +41,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
   // Validate Markets with wrong FEE
   const { fee, isQuestionFinalized } = marketMakerData
   if (fee === null) {
-    return <FullLoading />
+    return <Loading full={true} />
   }
 
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
@@ -54,9 +54,9 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
     <Switch>
       <Route exact path="/:address" component={MarketDetailsPage} />
       {!account ? (
-        <MessageWarning message="Please connect to your wallet to open the market..." />
+        <MessageWarning text="Please connect to your wallet to open the market..." />
       ) : isQuestionFinalized ? (
-        <MessageWarning message="Market closed, question finalized..." />
+        <MessageWarning text="Market closed, question finalized..." />
       ) : (
         <>
           <Route exact path="/:address/buy" component={MarketBuyPage} />

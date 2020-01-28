@@ -14,7 +14,7 @@ import { computeBalanceAfterTrade, formatBigNumber, formatDate } from '../../uti
 import { getLogger } from '../../util/logger'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
-import { FullLoading } from '../common/full_loading'
+import { Loading } from '../common/loading'
 import { ButtonContainer } from '../common/button_container'
 import { ButtonLink } from '../common/button_link'
 import { FormRow } from '../common/form_row'
@@ -29,6 +29,7 @@ import { MARKET_FEE } from '../../common/constants'
 import { FormError } from '../common/form_error'
 import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 import { ModalTwitterShare } from '../common/modal_twitter_share'
+import { CPKService } from '../../services/cpk'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -101,7 +102,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker } = useContracts(context)
 
   const { marketMakerAddress, balances, collateral, question, resolution } = props
-  const marketMakerService = buildMarketMaker(marketMakerAddress)
+  const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
@@ -114,7 +115,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[]]> => {
-      const tradedShares = await marketMakerService.calcBuyAmount(amount, outcomeIndex)
+      const tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
       const balanceAfterTrade = computeBalanceAfterTrade(
         balances.map(b => b.holdings),
         outcomeIndex,
@@ -127,7 +128,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       return [tradedShares, probabilities]
     },
-    [balances, marketMakerService, outcomeIndex],
+    [balances, marketMaker, outcomeIndex],
   )
 
   const [tradedShares, probabilities] = useAsyncDerivedValue(
@@ -155,27 +156,30 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Buying ${formatBigNumber(tradedShares, collateral.decimals)} shares ...`)
 
-      const user = await provider.getSigner().getAddress()
+      const signer = provider.getSigner()
+      const account = await signer.getAddress()
 
-      const collateralAddress = await marketMakerService.getCollateralToken()
+      const cpk = await CPKService.create(provider)
+      const collateralAddress = await marketMaker.getCollateralToken()
 
-      const collateralService = new ERC20Service(provider, user, collateralAddress)
-
+      const collateralService = new ERC20Service(provider, account, collateralAddress)
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
-        user,
-        marketMakerAddress,
+        account,
+        cpk.address,
         cost,
       )
 
       if (!hasEnoughAlowance) {
-        // add 10% to the approved amount because there can be precision errors
-        // this can be improved if, instead of adding the 1% fee manually in the front, we use the `calcMarketFee`
-        // contract method and add it to the result of `calcNetCost` result
-        const costWithErrorMargin = cost.mul(11000).div(10000)
-        await collateralService.approve(marketMakerAddress, costWithErrorMargin)
+        await collateralService.approveUnlimited(cpk.address)
       }
 
-      await marketMakerService.buy(amount, outcomeIndex)
+      await cpk.buyOutcomes({
+        provider,
+        cost,
+        amount,
+        outcomeIndex,
+        marketMaker,
+      })
 
       setMessageTwitter(
         `Your outcome was successfully created. You obtain ${formatBigNumber(
@@ -297,7 +301,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         isOpen={isModalTwitterShareOpen}
         onClose={() => setModalTwitterShareState(false)}
       />
-      {status === Status.Loading ? <FullLoading message={message} /> : null}
+      {status === Status.Loading ? <Loading message={message} full={true} /> : null}
     </>
   )
 }

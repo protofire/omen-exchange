@@ -1,4 +1,4 @@
-import { Contract, ethers, Wallet } from 'ethers'
+import { Contract, ethers, utils, Wallet } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -48,6 +48,10 @@ class MarketMakerService {
     this.conditionalTokens = conditionalTokens
     this.realitio = realitio
     this.provider = provider
+  }
+
+  get address(): string {
+    return this.contract.address
   }
 
   getConditionalTokens = async (): Promise<string> => {
@@ -242,6 +246,22 @@ class MarketMakerService {
       status: marketStatus,
       fee,
     }
+  }
+
+  static encodeBuy = (
+    amount: BigNumber,
+    outcomeIndex: number,
+    outcomeTokensToBuy: BigNumber,
+  ): string => {
+    const buyInterface = new utils.Interface(marketMakerAbi)
+
+    return buyInterface.functions.buy.encode([amount, outcomeIndex, outcomeTokensToBuy])
+  }
+
+  static encodeAddFunding = (amount: BigNumber, distributionHint: BigNumber[] = []): string => {
+    const addFundingInterface = new utils.Interface(marketMakerAbi)
+
+    return addFundingInterface.functions.addFunding.encode([amount, distributionHint])
   }
 }
 
