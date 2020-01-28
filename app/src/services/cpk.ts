@@ -1,4 +1,5 @@
 import { ethers, Wallet } from 'ethers'
+import { Web3Provider } from 'ethers/providers'
 import CPK from 'contract-proxy-kit'
 import moment from 'moment'
 
@@ -14,8 +15,7 @@ import { TransactionReceipt } from 'ethers/providers'
 const logger = getLogger('Services::CPKService')
 
 interface CPKBuyOutcomesParams {
-  provider: any
-  cost: BigNumber
+  provider: Web3Provider
   amount: BigNumber
   outcomeIndex: number
   marketMaker: MarketMakerService
@@ -48,7 +48,6 @@ class CPKService {
   }
 
   buyOutcomes = async ({
-    cost,
     amount,
     outcomeIndex,
     marketMaker,
@@ -68,12 +67,12 @@ class CPKService {
       logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
 
       const transactions = [
-        // Step 2: Transfer an amount (cost) from the user to the CPK
+        // Step 2: Transfer the amount of collateral being spent from the user to the CPK
         {
           operation: CPK.CALL,
           to: collateralAddress,
           value: 0,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, cost),
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
         },
         // Step 3: Buy outcome tokens with the CPK
         {
@@ -88,7 +87,7 @@ class CPKService {
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
         marketMakerAddress,
-        cost,
+        amount,
       )
 
       if (!hasCPKEnoughAlowance) {
