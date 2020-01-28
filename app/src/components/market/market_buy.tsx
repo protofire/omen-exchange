@@ -175,7 +175,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       await cpk.buyOutcomes({
         provider,
-        cost,
         amount,
         outcomeIndex,
         marketMaker,
