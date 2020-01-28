@@ -16,6 +16,13 @@ export const networkIds = {
   GANACHE: 50,
 } as const
 
+type CPKAddresses = {
+  masterCopyAddress: string
+  proxyFactoryAddress: string
+  multiSendAddress: string
+  fallbackHandlerAddress: string
+}
+
 interface Network {
   label: string
   url: string
@@ -27,6 +34,7 @@ interface Network {
     conditionalTokens: string
     oracle: string
   }
+  cpk?: CPKAddresses
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -81,6 +89,12 @@ const networks: { [K in NetworkId]: Network } = {
       marketMakerFactory: '0x5017A545b09ab9a30499DE7F431DF0855bCb7275',
       conditionalTokens: '0xD86C8F0327494034F60e25074420BcCF560D5610',
       oracle: '0x2D8BE6BF0baA74e0A907016679CaE9190e80dD0A',
+    },
+    cpk: {
+      masterCopyAddress: '0x1b88Bdb8269A1aB1372459F5a4eC3663D6f5cCc4',
+      proxyFactoryAddress: '0xaf5C4C6C7920B4883bC6252e9d9B8fE27187Cf68',
+      multiSendAddress: '0xEC5d4F247aF81A843612eb1371CBCfa88b762119',
+      fallbackHandlerAddress: '0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E',
     },
   },
 }
@@ -399,4 +413,13 @@ export const getArbitratorsByNetwork = (networkId: number): Arbitrator[] => {
       return null
     })
     .filter(isNotNull)
+}
+
+export const getCPKAddresses = (networkId: number): Maybe<CPKAddresses> => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  const cpkAddresses = networks[networkId].cpk
+  return cpkAddresses || null
 }
