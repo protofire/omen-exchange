@@ -5,7 +5,7 @@ import moment from 'moment'
 import { getLogger } from '../util/logger'
 import { ConditionalTokenService, ERC20Service, MarketMakerService, RealitioService } from './index'
 import { BigNumber } from 'ethers/utils'
-import { MarketData } from '../util/types'
+import { ConditionLog, MarketData } from '../util/types'
 import { getContractAddress } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { MarketMakerFactoryService } from './market_maker_factory'
@@ -145,7 +145,6 @@ class CPKService {
 
       const transactions = []
 
-      // Question interaction
       let questionId: string
       if (loadedQuestionId) {
         questionId = loadedQuestionId
@@ -176,24 +175,37 @@ class CPKService {
       }
       logger.log(`QuestionID ${questionId}`)
 
-      // Step 2: Prepare condition
       const oracleAddress = getContractAddress(networkId, 'oracle')
-      transactions.push({
-        operation: CPK.CALL,
-        to: conditionalTokensAddress,
-        value: 0,
-        data: ConditionalTokenService.encodePrepareCondition(
-          questionId,
-          oracleAddress,
-          outcomes.length,
-        ),
-      })
-
       const conditionId = conditionalTokens.getConditionId(
         questionId,
         oracleAddress,
         outcomes.length,
       )
+
+      let conditionLog: Maybe<ConditionLog> = null
+      if (loadedQuestionId) {
+        try {
+          conditionLog = await conditionalTokens.getConditionIdFromLogs(conditionId)
+          logger.log(`ConditionId found: '${conditionId}'`)
+        } catch (err) {
+          logger.log(`ConditionId is not already prepared: '${err.message}'`)
+        }
+      }
+
+      if (!conditionLog) {
+        // Step 2: Prepare condition
+        transactions.push({
+          operation: CPK.CALL,
+          to: conditionalTokensAddress,
+          value: 0,
+          data: ConditionalTokenService.encodePrepareCondition(
+            questionId,
+            oracleAddress,
+            outcomes.length,
+          ),
+        })
+      }
+
       logger.log(`ConditionID: ${conditionId}`)
 
       // Step 3: Approve collateral for factory
