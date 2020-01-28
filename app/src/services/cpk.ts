@@ -303,9 +303,6 @@ class CPKService {
     marketMaker,
   }: CPKFundingParams): Promise<TransactionReceipt> => {
     try {
-      const signer: Wallet = this.provider.getSigner()
-      const account = await signer.getAddress()
-
       const transactions = [
         {
           operation: CPK.CALL,
@@ -318,18 +315,6 @@ class CPKService {
           to: marketMaker.address,
           value: 0,
           data: MarketMakerService.encodeRemoveFunding(amount),
-        },
-        {
-          operation: CPK.CALL,
-          to: collateral.address,
-          value: 0,
-          data: ERC20Service.encodeApproveUnlimited(account),
-        },
-        {
-          operation: CPK.CALL,
-          to: collateral.address,
-          value: 0,
-          data: ERC20Service.encodeTransferFrom(this.cpk.address, account, amount),
         },
       ]
 
