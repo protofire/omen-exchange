@@ -56,11 +56,19 @@ export const ModalQuestion = (props: Props) => {
 
   const { realitio } = useContracts(context)
 
-  const [questionId, setQuestionId] = useState<string>('')
+  const [questionURL, setQuestionURL] = useState<string>('')
   const [isSpinnerOn, setSpinnerOn] = useState<boolean>(false)
+
+  const extractId = (questionURL: string): string => {
+    const reQuestionId = /question\/(0x[0-9A-Fa-f]{64})/
+    if (!questionURL) return ''
+    const questionMatch = questionURL.match(reQuestionId)
+    return questionMatch ? questionMatch[1] : ''
+  }
 
   const fetchQuestion = useMemo(
     () => async (): Promise<[Maybe<Question>, Maybe<Arbitrator>, Maybe<string>]> => {
+      const questionId = extractId(questionURL)
       if (!questionId) {
         return [null, null, null]
       }
@@ -76,7 +84,7 @@ export const ModalQuestion = (props: Props) => {
         return [null, null, `No data found for question ID ${questionId}`]
       }
     },
-    [questionId, realitio, context],
+    [questionURL, realitio, context],
   )
 
   const [question, arbitrator, errorMessage] = useAsyncDerivedValue(
@@ -136,18 +144,18 @@ export const ModalQuestion = (props: Props) => {
           <Textfield
             hasError={!!errorMessage}
             hasSuccess={validQuestion}
-            name="questionId"
+            name="questionURL"
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               const { value } = event.target
-              setQuestionId(value.trim())
+              setQuestionURL(value.trim())
             }}
-            placeholder="0xd27a6a4dbc3930b0e319aad2c7b2c478fa9d8ff785f474415bdec1285838b3e9"
+            placeholder="https://realitio.github.io/#!/question/0xd27a6a4dbc3930b0e319aad2c7b2c478fa9d8ff785f474415bdec1285838b3e9"
             type="text"
           />
         }
         error={errorMessage || ''}
-        title={'Question ID'}
-        tooltip={{ id: 'questionId', description: 'Enter a valid question ID from realit.io.' }}
+        title={'Question URL'}
+        tooltip={{ id: 'questionURL', description: 'Enter a valid question URL from realit.io.' }}
       />
       {questionDetails()}
       {spinner()}
