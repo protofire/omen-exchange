@@ -182,18 +182,22 @@ class CPKService {
         outcomes.length,
       )
 
-      let conditionLog: Maybe<ConditionLog> = null
+      let outcomeSlotCount = new BigNumber(0)
       if (loadedQuestionId) {
         try {
-          conditionLog = await conditionalTokens.getConditionIdFromLogs(conditionId)
-          logger.log(`ConditionId found: '${conditionId}'`)
+          outcomeSlotCount = await conditionalTokens.getOutcomeSlotCount(conditionId)
+          logger.log(
+            `ConditionId found: '${conditionId}', Outcome slot count: '${outcomeSlotCount}'`,
+          )
         } catch (err) {
           logger.log(`ConditionId is not already prepared: '${err.message}'`)
         }
       }
 
-      if (!conditionLog) {
+      if (outcomeSlotCount.isZero()) {
         // Step 2: Prepare condition
+        logger.log(`Adding prepareCondition transaction`)
+
         transactions.push({
           operation: CPK.CALL,
           to: conditionalTokensAddress,

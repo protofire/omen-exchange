@@ -5,6 +5,7 @@ import { getLogger } from '../util/logger'
 import { getIndexSets } from '../util/tools'
 import { ConditionLog } from '../util/types'
 import { getEarliestBlockToCheck } from '../util/networks'
+import { TransactionReceipt } from 'ethers/providers'
 
 const logger = getLogger('Services::Conditional-Token')
 
@@ -20,6 +21,7 @@ const conditionalTokensAbi = [
   'function getPositionId(address collateralToken, bytes32 collectionId) external pure returns (uint) ',
   'function balanceOf(address owner, uint256 positionId) external view returns (uint256)',
   'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data) external',
+  'function getOutcomeSlotCount(bytes32 conditionId) external view returns (uint)',
 ]
 
 class ConditionalTokenService {
@@ -106,7 +108,7 @@ class ConditionalTokenService {
     return event.values.questionId
   }
 
-  setApprovalForAll = async (marketMakerAddress: string): Promise<string> => {
+  setApprovalForAll = async (marketMakerAddress: string): Promise<TransactionReceipt> => {
     const transactionObject = await this.contract.setApprovalForAll(marketMakerAddress, true)
     return this.provider.waitForTransaction(transactionObject.hash)
   }
@@ -121,7 +123,11 @@ class ConditionalTokenService {
     return !payoutDenominator.isZero()
   }
 
-  redeemPositions = async (collateralToken: string, conditionId: string, outcomesCount: number) => {
+  redeemPositions = async (
+    collateralToken: string,
+    conditionId: string,
+    outcomesCount: number,
+  ): Promise<TransactionReceipt> => {
     const indexSets = getIndexSets(outcomesCount)
 
     const transactionObject = await this.contract.redeemPositions(
@@ -131,7 +137,7 @@ class ConditionalTokenService {
       indexSets,
     )
 
-    await this.provider.waitForTransaction(transactionObject.hash)
+    return this.provider.waitForTransaction(transactionObject.hash)
   }
 
   static encodeSafeTransferFrom = (
@@ -169,6 +175,10 @@ class ConditionalTokenService {
       questionId,
       new BigNumber(outcomeSlotCount),
     ])
+  }
+
+  getOutcomeSlotCount = async (conditionId: string): Promise<BigNumber> => {
+    return this.contract.getOutcomeSlotCount(conditionId)
   }
 
   getConditionId = (
