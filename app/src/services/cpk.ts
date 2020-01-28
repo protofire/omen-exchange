@@ -182,19 +182,12 @@ class CPKService {
         outcomes.length,
       )
 
-      let outcomeSlotCount = new BigNumber(0)
+      let conditionExists = false
       if (loadedQuestionId) {
-        try {
-          outcomeSlotCount = await conditionalTokens.getOutcomeSlotCount(conditionId)
-          logger.log(
-            `ConditionId found: '${conditionId}', Outcome slot count: '${outcomeSlotCount}'`,
-          )
-        } catch (err) {
-          logger.log(`ConditionId is not already prepared: '${err.message}'`)
-        }
+        conditionExists = await conditionalTokens.isConditionExists(conditionId)
       }
 
-      if (outcomeSlotCount.isZero()) {
+      if (!conditionExists) {
         // Step 2: Prepare condition
         logger.log(`Adding prepareCondition transaction`)
 
