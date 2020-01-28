@@ -6,7 +6,7 @@ import { ThreeBoxComments } from '../../common/three_box_comments'
 import { ViewCard } from '../../common/view_card'
 import { Status, BalanceItem, Token, Arbitrator, OutcomeTableValue } from '../../../util/types'
 import { ButtonAnchor, OutcomeTable } from '../../common'
-import { FullLoading } from '../../common/full_loading'
+import { Loading } from '../../common/loading'
 import { ButtonContainer } from '../../common/button_container'
 import { SubsectionTitle } from '../../common/subsection_title'
 import { BigNumber } from 'ethers/utils'
@@ -114,7 +114,7 @@ const ViewWrapper = (props: Props) => {
         </WhenConnected>
       </ViewCard>
       <ThreeBoxComments threadName={marketMakerAddress} />
-      {status === Status.Loading ? <FullLoading /> : null}
+      {status === Status.Loading ? <Loading full={true} /> : null}
     </>
   )
 }

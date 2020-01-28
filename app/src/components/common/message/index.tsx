@@ -1,135 +1,137 @@
-import React, { ReactPortal, useState } from 'react'
+import React, { ReactPortal, useState, useCallback, useEffect, HTMLAttributes } from 'react'
 import ReactDOM from 'react-dom'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 import WarningSVG from './img/warning.svg'
-import InfoSVG from './img/info.svg'
+import ErrorSVG from './img/error.svg'
+import OkSVG from './img/ok.svg'
+import CloseSVG from './img/close.svg'
 
-const WarningIcon = styled.div`
-  background-image: url(${WarningSVG});
-  width: 25px;
-  height: 25px;
-  object-fit: contain;
-  position: fixed;
-  left: 15px;
-  top: 13px;
-`
+export enum MessageType {
+  default,
+  ok,
+  error,
+  warning,
+}
 
-const InfoIcon = styled.div`
-  background-image: url(${InfoSVG});
-  width: 25px;
-  height: 21.9px;
-  object-fit: contain;
-  position: fixed;
-  left: 15px;
-  top: 13px;
-`
+const getBorderColor = (type: MessageType, colors: any): string => {
+  return (
+    (type === MessageType.ok && colors.primary) ||
+    (type === MessageType.error && colors.secondary) ||
+    (type === MessageType.warning && colors.warning) ||
+    (type === MessageType.default && colors.gray)
+  )
+}
 
-const MessageWrapperCss = css`
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 322px;
-  height: 53px;
-  border-radius: 5px;
-  box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.08);
-  background-color: #ffffff;
-  position: fixed;
+const getIcon = (type: MessageType): string => {
+  return (
+    (type === MessageType.ok && OkSVG) ||
+    (type === MessageType.error && ErrorSVG) ||
+    (type === MessageType.warning && WarningSVG) ||
+    ''
+  )
+}
+
+const Wrapper = styled.div`
   left: 50%;
-  transform: translate(-50%, 0);
-  top: 79px;
-  cursor: pointer;
+  max-width: 100%;
+  position: fixed;
+  top: 0;
+  transform: translateX(-50%);
   z-index: 12345;
 `
 
-const OkMessageWrapper = styled.div`
-  ${MessageWrapperCss}
-  border: solid 1px #00be95;
+const MessageWrapper = styled.div<{ type: MessageType }>`
+  align-items: center;
+  background-color: #fff;
+  border-radius: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: ${props => getBorderColor(props.type, props.theme.colors)};
+  box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.08);
+  display: flex;
+  margin-top: 25px;
+  max-width: 100%;
+  padding: 11px 14px;
+  position: relative;
+  width: 322px;
 `
 
-const InfoMessageWrapper = styled.div`
-  ${MessageWrapperCss}
-  border: solid 1px #b7b7b7;
+const Icon = styled.div<{ type: MessageType }>`
+  background-image: url(${props => getIcon(props.type)});
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  flex-grow: 0;
+  flex-shrink: 0;
+  height: 25px;
+  margin-right: 10px;
+  width: 25px;
 `
 
-const WarningMessageWrapper = styled.div`
-  ${MessageWrapperCss}
-  border: solid 1px #ff7848;
-`
-
-const MessageBlockCss = css`
-  width: 300px;
-  height: 42px;
-  font-family: Roboto;
+const Text = styled.p`
+  color: ${props => props.theme.colors.textColor};
   font-size: 13px;
   font-weight: normal;
-  font-stretch: normal;
-  font-style: normal;
   line-height: 1.38;
-  letter-spacing: normal;
-  text-align: left;
-  color: #333333;
+  margin: 0 10px 0 0;
 `
 
-const MessageBlockInfo = styled.p`
-  ${MessageBlockCss}
-  padding: 4px 11px 17px 44px;
+const CloseButton = styled.button`
+  background-color: transparent;
+  background-image: url(${CloseSVG});
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  height: 24px;
+  margin: 0;
+  outline: none;
+  padding: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 24px;
+
+  &[disabled] {
+    opacity: 0.5;
+  }
 `
 
-const MessageBlockWarning = styled.p`
-  ${MessageBlockCss}
-  padding: 4px 4px 9px 44px;
-`
-
-const MessageBlockOk = styled.p`
-  ${MessageBlockCss}
-  padding: 4px 11px 4px 11px;
-`
-
-type MessageType = 'info' | 'warning' | 'ok'
-
-interface Props {
-  delay?: number
-  message: string
-  type: MessageType
-  onClick: () => void
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  hideCloseButton?: boolean
+  hidingTimeout?: number | undefined
+  onHide?: () => void
+  text: string
+  type?: MessageType
 }
 
 export const Message: React.FC<Props> = (props: Props): ReactPortal => {
-  const { message, type, delay = 1000, onClick } = props
-  const portal: any = document.getElementById('portalContainer')
+  const { onHide, text, type = MessageType.default, hidingTimeout, hideCloseButton } = props
+  const [notificate, setNotificate] = useState(true)
 
-  const [showNotification, setShowNotification] = useState(false)
+  const hideNotification = useCallback(() => {
+    setNotificate(false)
+    onHide && onHide()
+  }, [setNotificate, onHide])
 
-  setTimeout(() => setShowNotification(true), delay)
-
-  const Message = () => {
-    switch (type) {
-      case 'info':
-        return (
-          <InfoMessageWrapper onClick={() => onClick()}>
-            <InfoIcon />
-            <MessageBlockInfo>{message}</MessageBlockInfo>
-          </InfoMessageWrapper>
-        )
-      case 'warning':
-        return (
-          <WarningMessageWrapper onClick={() => onClick()}>
-            <WarningIcon />
-            <MessageBlockWarning>{message}</MessageBlockWarning>
-          </WarningMessageWrapper>
-        )
-      case 'ok':
-        return (
-          <OkMessageWrapper>
-            <MessageBlockOk onClick={() => onClick()}>{message}</MessageBlockOk>
-          </OkMessageWrapper>
-        )
+  useEffect(() => {
+    if (hidingTimeout !== undefined) {
+      setTimeout(() => {
+        hideNotification()
+      }, hidingTimeout)
     }
-  }
+  }, [hidingTimeout, hideNotification])
 
-  const messageToRender = <>{showNotification && <Message />}</>
-
-  return ReactDOM.createPortal(messageToRender, portal)
+  return ReactDOM.createPortal(
+    notificate && (
+      <Wrapper>
+        <MessageWrapper type={type}>
+          {hideCloseButton ? null : <CloseButton onClick={hideNotification} />}
+          {type !== MessageType.default && <Icon type={type} />}
+          <Text>{text}</Text>
+        </MessageWrapper>
+      </Wrapper>
+    ),
+    document.getElementById('portalContainer') as HTMLDivElement,
+  )
 }

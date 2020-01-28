@@ -73,6 +73,7 @@ export const DateField = (props: Props) => {
   return (
     <DateFieldWrapper {...restProps} disabled={disabled}>
       <DatePicker
+        autoComplete="off"
         dateFormat="Pp"
         disabled={disabled}
         minDate={minDate}
