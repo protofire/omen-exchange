@@ -271,7 +271,11 @@ class CPKService {
     conditionalTokens,
   }: CPKSellOutcomesParams): Promise<TransactionReceipt> => {
     try {
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+
       const outcomeTokensToSell = await marketMaker.calcSellAmount(amount, outcomeIndex)
+      const collateralAddress = await marketMaker.getCollateralToken()
 
       const transactions = [
         {
@@ -285,6 +289,18 @@ class CPKService {
           to: marketMaker.address,
           value: 0,
           data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
+        },
+        {
+          operation: CPK.CALL,
+          to: collateralAddress,
+          value: 0,
+          data: ERC20Service.encodeApproveUnlimited(account),
+        },
+        {
+          operation: CPK.CALL,
+          to: collateralAddress,
+          value: 0,
+          data: ERC20Service.encodeTransferFrom(this.cpk.address, account, amount),
         },
       ]
 
