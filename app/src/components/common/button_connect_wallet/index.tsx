@@ -3,9 +3,10 @@ import styled from 'styled-components'
 import { Button } from '../button'
 import { ButtonType } from '../../../common/button_styling_types'
 
-const ButtonStyled = styled(Button)`
+const Wrapper = styled(Button)`
   font-size: 13px;
-  height: 28px;
+  height: 24px;
+  padding: 0 10px;
 `
 
 interface Props {
@@ -14,17 +15,17 @@ interface Props {
 }
 
 export const ButtonConnectWallet = (props: Props) => {
-  const buttonMessage = props.modalState ? 'CONNECTING...' : 'CONNECT TO A WALLET'
+  const { modalState, onClick, ...restProps } = props
+  const buttonMessage = modalState ? 'Connecting...' : 'Connect'
 
   return (
-    <ButtonStyled
+    <Wrapper
       buttonType={ButtonType.secondary}
-      disabled={props.modalState}
-      onClick={() => {
-        props.onClick()
-      }}
+      disabled={modalState}
+      onClick={onClick}
+      {...restProps}
     >
       {buttonMessage}
-    </ButtonStyled>
+    </Wrapper>
   )
 }
