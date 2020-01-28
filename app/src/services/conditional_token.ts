@@ -82,7 +82,7 @@ class ConditionalTokenService {
   getQuestionId = async (conditionId: string): Promise<string> => {
     const filter: any = this.contract.filters.ConditionPreparation(conditionId)
 
-    const network = await this.provider.ready
+    const network = await this.provider.getNetwork()
     const networkId = network.chainId
 
     const logs = await this.provider.getLogs({
@@ -185,7 +185,7 @@ class ConditionalTokenService {
   }
 
   getConditionIdFromLogs = async (conditionId: string): Promise<ConditionLog> => {
-    const network = await this.provider.ready
+    const network = await this.provider.getNetwork()
     const networkId = network.chainId
 
     const filter: any = this.contract.filters.ConditionPreparation(conditionId)

@@ -135,7 +135,7 @@ class CPKService {
       const signer: Wallet = this.provider.getSigner()
       const account = await signer.getAddress()
 
-      const network = await this.provider.ready
+      const network = await this.provider.getNetwork()
       const networkId = network.chainId
 
       const conditionalTokensAddress = conditionalTokens.address

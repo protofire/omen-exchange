@@ -103,7 +103,7 @@ class RealitioService {
 
   getQuestion = async (questionId: string): Promise<Question> => {
     const filter: any = this.contract.filters.LogNewQuestion(questionId)
-    const network = await this.provider.ready
+    const network = await this.provider.getNetwork()
     const networkId = network.chainId
 
     const logs = await this.provider.getLogs({
