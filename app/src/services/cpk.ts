@@ -1,4 +1,5 @@
-import { ethers, Wallet } from 'ethers'
+import { ethers } from 'ethers'
+import { Web3Provider } from 'ethers/providers'
 import CPK from 'contract-proxy-kit'
 import moment from 'moment'
 
@@ -6,7 +7,7 @@ import { getLogger } from '../util/logger'
 import { ConditionalTokenService, ERC20Service, MarketMakerService, RealitioService } from './index'
 import { BigNumber } from 'ethers/utils'
 import { MarketData } from '../util/types'
-import { getContractAddress } from '../util/networks'
+import { getContractAddress, getCPKAddresses } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { MarketMakerFactoryService } from './market_maker_factory'
 import { TransactionReceipt } from 'ethers/providers'
@@ -15,7 +16,6 @@ import { Token } from '../util/types'
 const logger = getLogger('Services::CPKService')
 
 interface CPKBuyOutcomesParams {
-  cost: BigNumber
   amount: BigNumber
   outcomeIndex: number
   marketMaker: MarketMakerService
@@ -36,16 +36,27 @@ interface CPKFundingParams {
 
 class CPKService {
   cpk: any
-  provider: any
+  provider: Web3Provider
 
-  constructor(cpk: any, provider: any) {
+  constructor(cpk: any, provider: Web3Provider) {
     this.cpk = cpk
     this.provider = provider
   }
 
-  static async create(provider: any) {
-    const signer: Wallet = provider.getSigner()
-    const cpk = await CPK.create({ ethers, signer })
+  static async create(provider: Web3Provider) {
+    const signer = provider.getSigner()
+    const network = await provider.getNetwork()
+    const cpkAddresses = getCPKAddresses(network.chainId)
+    const networks = cpkAddresses
+      ? {
+          [network.chainId]: cpkAddresses,
+        }
+      : {}
+    const cpk = await CPK.create({
+      ethers,
+      signer,
+      networks,
+    })
     return new CPKService(cpk, provider)
   }
 
@@ -54,13 +65,12 @@ class CPKService {
   }
 
   buyOutcomes = async ({
-    cost,
     amount,
     outcomeIndex,
     marketMaker,
   }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
-      const signer: Wallet = this.provider.getSigner()
+      const signer = this.provider.getSigner()
       const account = await signer.getAddress()
 
       const collateralAddress = await marketMaker.getCollateralToken()
@@ -74,12 +84,12 @@ class CPKService {
       logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
 
       const transactions = [
-        // Step 2: Transfer an amount (cost) from the user to the CPK
+        // Step 2: Transfer the amount of collateral being spent from the user to the CPK
         {
           operation: CPK.CALL,
           to: collateralAddress,
           value: 0,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, cost),
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
         },
         // Step 3: Buy outcome tokens with the CPK
         {
@@ -94,7 +104,7 @@ class CPKService {
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
         marketMakerAddress,
-        cost,
+        amount,
       )
 
       if (!hasCPKEnoughAlowance) {
@@ -138,10 +148,10 @@ class CPKService {
         throw new Error('Resolution time was not specified')
       }
 
-      const signer: Wallet = this.provider.getSigner()
+      const signer = this.provider.getSigner()
       const account = await signer.getAddress()
 
-      const network = await this.provider.ready
+      const network = await this.provider.getNetwork()
       const networkId = network.chainId
 
       const conditionalTokensAddress = conditionalTokens.address
@@ -260,7 +270,7 @@ class CPKService {
     marketMaker,
   }: CPKFundingParams): Promise<TransactionReceipt> => {
     try {
-      const signer: Wallet = this.provider.getSigner()
+      const signer = this.provider.getSigner()
       const account = await signer.getAddress()
 
       const transactions = [
