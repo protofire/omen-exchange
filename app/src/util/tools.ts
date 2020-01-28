@@ -1,5 +1,6 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import Big from 'big.js'
+import moment from 'moment'
 import { BigNumber, getAddress, bigNumberify, formatUnits } from 'ethers/utils'
 
 import { getLogger } from './logger'
@@ -22,8 +23,7 @@ export const truncateStringInTheMiddle = (
 }
 
 export const formatDate = (date: Date): string => {
-  const dateParts = date.toString().split(/\s+/)
-  return dateParts.slice(1, 6).join(' ')
+  return moment(date).format('lll')
 }
 
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
