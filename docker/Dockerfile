@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y jq
 
 WORKDIR ganache
 ENV PATH="./node_modules/.bin:${PATH}"
-RUN npm install ganache-cli@6.6.0 eth-cli@2.0.0-beta-5
+RUN npm install ganache-cli@6.8.2 eth-cli@2.0.0-beta-5
 
 # clone realitio and install dependencies
 RUN git clone https://github.com/realitio/realitio-contracts.git realitio && \
@@ -26,6 +26,11 @@ RUN git clone https://github.com/fvictorio/realitio-gnosis-proxy && \
   cd realitio-gnosis-proxy && \
   git checkout 040dce3e9c0c8edbb36767e7b029bbe6ccf1af4a && \
   yarn
+
+RUN git clone https://github.com/fvictorio/contract-proxy-kit && \
+  cd contract-proxy-kit && \
+  git checkout 68b811dd0f2c6afa08fa5bd3f595965fefe592e7 && \
+  npm install
 
 # deploy contracts in ganache
 COPY prepare_db.sh ERC20.bin ./
