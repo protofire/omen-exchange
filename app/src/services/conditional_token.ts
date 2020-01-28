@@ -3,7 +3,6 @@ import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
 import { getIndexSets } from '../util/tools'
-import { ConditionLog } from '../util/types'
 import { getEarliestBlockToCheck } from '../util/networks'
 import { TransactionReceipt } from 'ethers/providers'
 
@@ -192,40 +191,6 @@ class ConditionalTokenService {
     )
 
     return conditionId
-  }
-
-  getConditionIdFromLogs = async (conditionId: string): Promise<ConditionLog> => {
-    const network = await this.provider.getNetwork()
-    const networkId = network.chainId
-
-    const filter: any = this.contract.filters.ConditionPreparation(conditionId)
-
-    const logs = await this.provider.getLogs({
-      ...filter,
-      fromBlock: getEarliestBlockToCheck(networkId),
-      toBlock: 'latest',
-    })
-
-    if (logs.length === 0) {
-      throw new Error(`No ConditionPreparation event found for conditionId '${conditionId}'`)
-    }
-    if (logs.length > 1) {
-      logger.warn(
-        `There should be only one ConditionPreparation event for conditionId '${conditionId}'`,
-      )
-    }
-
-    const iface = new ethers.utils.Interface(conditionalTokensAbi)
-    const event = iface.parseLog(logs[0])
-
-    const { oracle, questionId, outcomeSlotCount } = event.values
-
-    return {
-      conditionId,
-      oracle,
-      questionId,
-      outcomeSlotCount,
-    }
   }
 }
 

@@ -125,10 +125,3 @@ export interface MarketData {
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
 }
-
-export interface ConditionLog {
-  conditionId: string
-  oracle: string
-  questionId: string
-  outcomeSlotCount: number
-}
