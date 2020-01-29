@@ -193,7 +193,7 @@ class CPKService {
 
       let conditionExists = false
       if (loadedQuestionId) {
-        conditionExists = await conditionalTokens.isConditionExists(conditionId)
+        conditionExists = await conditionalTokens.doesConditionExist(conditionId)
       }
 
       if (!conditionExists) {

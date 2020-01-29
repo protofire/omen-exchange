@@ -193,7 +193,7 @@ class ConditionalTokenService {
     return conditionId
   }
 
-  isConditionExists = async (conditionId: string): Promise<boolean> => {
+  doesConditionExist = async (conditionId: string): Promise<boolean> => {
     const outcomeSlotCount = await this.getOutcomeSlotCount(conditionId)
     return !outcomeSlotCount.isZero()
   }
