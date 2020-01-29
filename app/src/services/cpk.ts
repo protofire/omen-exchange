@@ -154,7 +154,6 @@ class CPKService {
 
       const transactions = []
 
-      // Question interaction
       let questionId: string
       if (loadedQuestionId) {
         questionId = loadedQuestionId
@@ -185,24 +184,34 @@ class CPKService {
       }
       logger.log(`QuestionID ${questionId}`)
 
-      // Step 2: Prepare condition
       const oracleAddress = getContractAddress(networkId, 'oracle')
-      transactions.push({
-        operation: CPK.CALL,
-        to: conditionalTokensAddress,
-        value: 0,
-        data: ConditionalTokenService.encodePrepareCondition(
-          questionId,
-          oracleAddress,
-          outcomes.length,
-        ),
-      })
-
       const conditionId = conditionalTokens.getConditionId(
         questionId,
         oracleAddress,
         outcomes.length,
       )
+
+      let conditionExists = false
+      if (loadedQuestionId) {
+        conditionExists = await conditionalTokens.doesConditionExist(conditionId)
+      }
+
+      if (!conditionExists) {
+        // Step 2: Prepare condition
+        logger.log(`Adding prepareCondition transaction`)
+
+        transactions.push({
+          operation: CPK.CALL,
+          to: conditionalTokensAddress,
+          value: 0,
+          data: ConditionalTokenService.encodePrepareCondition(
+            questionId,
+            oracleAddress,
+            outcomes.length,
+          ),
+        })
+      }
+
       logger.log(`ConditionID: ${conditionId}`)
 
       // Step 3: Approve collateral for factory
