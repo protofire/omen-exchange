@@ -58,7 +58,7 @@ const networks: { [K in NetworkId]: Network } = {
       : 9294139,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
-      marketMakerFactory: '0x17227353c2782A361ec65DCe27d05830Df41D3D3',
+      marketMakerFactory: '0xe7E502789B8f4cDC99e6Cf9d3963E8C76784da51',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
       oracle: '0x7B46FEcfBA4eB9D14970bc248dA15a3Fb4457A27',
     },
@@ -72,7 +72,7 @@ const networks: { [K in NetworkId]: Network } = {
       : 5827230,
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
-      marketMakerFactory: '0x578138c6211913c3fb23bfb8a7c9d220882d1a50',
+      marketMakerFactory: '0x89F54625565792729fd3Fa5F689c46e7612b4E8b',
       conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
       oracle: '0x5A90132C104CA33652Ee71E2E645D5A4d8E5d7D6',
     },
