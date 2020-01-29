@@ -107,9 +107,8 @@ class ConditionalTokenService {
     return this.provider.waitForTransaction(transactionObject.hash)
   }
 
-  isApprovedForAll = async (owner: string, spender: string): Promise<TransactionReceipt> => {
-    const transactionObject = await this.contract.isApprovedForAll(owner, spender)
-    return this.provider.waitForTransaction(transactionObject.hash)
+  isApprovedForAll = async (owner: string, spender: string): Promise<boolean> => {
+    return this.contract.isApprovedForAll(owner, spender)
   }
 
   isConditionResolved = async (conditionId: string): Promise<boolean> => {
