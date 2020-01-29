@@ -8,6 +8,12 @@ import { getContractAddressName } from '../../../util/networks'
 const NetworkWrapper = styled.div`
   align-items: center;
   display: flex;
+  flex-direction: row;
+`
+
+const NetworkContainer = styled.div`
+  align-items: center;
+  display: flex;
 `
 
 const IconStyled = styled.img`
@@ -30,18 +36,20 @@ const NetworkName = styled.span`
   color: ${props => props.theme.header.color};
   font-size: 14px;
   font-weight: 400;
+  line-height: 1.2;
 `
 
 const ConnectionStatusWrapper = styled.div`
+  ${Separator}
   align-items: center;
   display: flex;
-  ${Separator}
 `
 
 const ConnectionStatusText = styled.span`
   color: ${props => props.theme.header.color};
   font-size: 14px;
   font-weight: 400;
+  line-height: 1.2;
 `
 
 const ConnectionStatusDot = styled.div`
@@ -63,8 +71,10 @@ export const Network: React.FC = props => {
   }
   return (
     <NetworkWrapper {...restProps}>
-      <IconStyled src={Icon} alt="" />
-      {networkName ? <NetworkName>{networkName}</NetworkName> : null}
+      <NetworkContainer>
+        <IconStyled src={Icon} alt="" />
+        {networkName ? <NetworkName>{networkName}</NetworkName> : null}
+      </NetworkContainer>
       <ConnectionStatusWrapper>
         <ConnectionStatusDot />
         <ConnectionStatusText>
