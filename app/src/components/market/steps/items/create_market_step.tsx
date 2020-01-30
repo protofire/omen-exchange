@@ -21,6 +21,7 @@ import { ButtonType } from '../../../../common/button_styling_types'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { getLogger } from '../../../../util/logger'
 import { ERC20Service } from '../../../../services'
+import { FormError } from '../../../common/form_error'
 
 const logger = getLogger('MarketCreationItems::CreateMarketStep')
 
@@ -30,6 +31,10 @@ const OutcomeInfo = styled(Well)`
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
+`
+
+const ErrorStyled = styled(FormError)`
+  margin: 0 0 10px 0;
 `
 
 const Grid = styled.div`
@@ -90,18 +95,6 @@ const CreateMarketStep = (props: Props) => {
 
   const submit = async () => {
     try {
-      if (account) {
-        const collateralService = new ERC20Service(provider, account, collateral.address)
-
-        const hasEnoughBalanceToFund = await collateralService.hasEnoughBalanceToFund(
-          account,
-          funding,
-        )
-        if (!hasEnoughBalanceToFund) {
-          throw new Error('there are not enough collateral balance for funding')
-        }
-      }
-
       props.submit()
     } catch (err) {
       logger.error(err)
@@ -111,6 +104,33 @@ const CreateMarketStep = (props: Props) => {
   const resolutionDate = resolution && formatDate(resolution)
 
   const buttonText = account ? 'Create' : 'Connect Wallet'
+
+  const [hasEnoughBalanceToFund, setHasEnoughBalanceToFund] = React.useState(false)
+  const [fundingErrorMessage, setfundingErrorMessage] = React.useState('')
+  React.useEffect(() => {
+    const checkBalance = async () => {
+      if (account) {
+        const collateralService = new ERC20Service(provider, account, collateral.address)
+
+        const balance = await collateralService.getCollateral(account)
+        const hasEnoughBalance = balance.gte(funding)
+
+        setHasEnoughBalanceToFund(hasEnoughBalance)
+        if (!hasEnoughBalance) {
+          setfundingErrorMessage(
+            `You entered ${formatBigNumber(
+              funding,
+              collateral.decimals,
+            )} DAI of funding but your account only has ${formatBigNumber(
+              balance,
+              collateral.decimals,
+            )} DAI`,
+          )
+        }
+      }
+    }
+    checkBalance()
+  }, [account])
 
   return (
     <CreateCard>
@@ -169,6 +189,8 @@ const CreateMarketStep = (props: Props) => {
       !MarketCreationStatus.is.error(marketCreationStatus) ? (
         <Loading full={true} message={`${marketCreationStatus._type}...`} />
       ) : null}
+
+      {fundingErrorMessage && <ErrorStyled>{fundingErrorMessage}</ErrorStyled>}
       <ButtonContainer>
         <ButtonLinkStyled
           disabled={
@@ -182,8 +204,9 @@ const CreateMarketStep = (props: Props) => {
         <Button
           buttonType={ButtonType.primary}
           disabled={
-            !MarketCreationStatus.is.ready(marketCreationStatus) &&
-            !MarketCreationStatus.is.error(marketCreationStatus)
+            (!MarketCreationStatus.is.ready(marketCreationStatus) &&
+              !MarketCreationStatus.is.error(marketCreationStatus)) ||
+            (!hasEnoughBalanceToFund && !!account)
           }
           onClick={submit}
         >
