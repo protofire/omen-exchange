@@ -15,6 +15,7 @@ const erc20Abi = [
   'function name() external view returns (string)',
   'function decimals() external view returns (uint8)',
   'function transferFrom(address sender, address recipient, uint256 amount) public returns (bool)',
+  'function transfer(address to, uint256 value) public returns (bool)',
 ]
 
 class ERC20Service {
@@ -115,6 +116,12 @@ class ERC20Service {
     const transferFromInterface = new utils.Interface(erc20Abi)
 
     return transferFromInterface.functions.transferFrom.encode([from, to, amount])
+  }
+
+  static encodeTransfer = (to: string, amount: BigNumber): string => {
+    const transferInterface = new utils.Interface(erc20Abi)
+
+    return transferInterface.functions.transfer.encode([to, amount])
   }
 
   static encodeApprove = (spenderAccount: string, amount: BigNumber): string => {

@@ -8,7 +8,7 @@ import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from '../common/constants
 import { getLogger } from '../util/logger'
 import { OutcomeSlot, Question, QuestionLog } from '../util/types'
 import { Outcome } from '../components/common/outcomes'
-import { getRealitioTimeout } from '../util/networks'
+import { getEarliestBlockToCheck, getRealitioTimeout } from '../util/networks'
 
 const logger = getLogger('Services::Realitio')
 
@@ -103,10 +103,12 @@ class RealitioService {
 
   getQuestion = async (questionId: string): Promise<Question> => {
     const filter: any = this.contract.filters.LogNewQuestion(questionId)
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
 
     const logs = await this.provider.getLogs({
       ...filter,
-      fromBlock: 1,
+      fromBlock: getEarliestBlockToCheck(networkId),
       toBlock: 'latest',
     })
 

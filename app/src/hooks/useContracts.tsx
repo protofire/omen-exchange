@@ -10,38 +10,38 @@ import {
 } from '../services'
 
 export const useContracts = (context: ConnectedWeb3Context) => {
-  const { library, networkId, account } = context
+  const { library: provider, networkId, account } = context
 
   const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
   const conditionalTokens = useMemo(
-    () => new ConditionalTokenService(conditionalTokensAddress, library, account),
-    [conditionalTokensAddress, library, account],
+    () => new ConditionalTokenService(conditionalTokensAddress, provider, account),
+    [conditionalTokensAddress, provider, account],
   )
 
   const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
   const marketMakerFactory = useMemo(
-    () => new MarketMakerFactoryService(marketMakerFactoryAddress, library, account),
-    [marketMakerFactoryAddress, library, account],
+    () => new MarketMakerFactoryService(marketMakerFactoryAddress, provider, account),
+    [marketMakerFactoryAddress, provider, account],
   )
 
   const realitioAddress = getContractAddress(networkId, 'realitio')
-  const realitio = useMemo(() => new RealitioService(realitioAddress, library, account), [
+  const realitio = useMemo(() => new RealitioService(realitioAddress, provider, account), [
     realitioAddress,
-    library,
+    provider,
     account,
   ])
 
   const oracleAddress = getContractAddress(networkId, 'oracle')
-  const oracle = useMemo(() => new OracleService(oracleAddress, library, account), [
+  const oracle = useMemo(() => new OracleService(oracleAddress, provider, account), [
     oracleAddress,
-    library,
+    provider,
     account,
   ])
 
   const buildMarketMaker = useMemo(
     () => (address: string) =>
-      new MarketMakerService(address, conditionalTokens, realitio, library, account),
-    [conditionalTokens, realitio, library, account],
+      new MarketMakerService(address, conditionalTokens, realitio, provider, account),
+    [conditionalTokens, realitio, provider, account],
   )
 
   return useMemo(

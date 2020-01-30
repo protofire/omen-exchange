@@ -20,6 +20,13 @@ interface CPKBuyOutcomesParams {
   marketMaker: MarketMakerService
 }
 
+interface CPKSellOutcomesParams {
+  amount: BigNumber
+  outcomeIndex: number
+  marketMaker: MarketMakerService
+  conditionalTokens: ConditionalTokenService
+}
+
 interface CPKCreateMarketParams {
   marketData: MarketData
   conditionalTokens: ConditionalTokenService
@@ -154,7 +161,6 @@ class CPKService {
 
       const transactions = []
 
-      // Question interaction
       let questionId: string
       if (loadedQuestionId) {
         questionId = loadedQuestionId
@@ -185,24 +191,34 @@ class CPKService {
       }
       logger.log(`QuestionID ${questionId}`)
 
-      // Step 2: Prepare condition
       const oracleAddress = getContractAddress(networkId, 'oracle')
-      transactions.push({
-        operation: CPK.CALL,
-        to: conditionalTokensAddress,
-        value: 0,
-        data: ConditionalTokenService.encodePrepareCondition(
-          questionId,
-          oracleAddress,
-          outcomes.length,
-        ),
-      })
-
       const conditionId = conditionalTokens.getConditionId(
         questionId,
         oracleAddress,
         outcomes.length,
       )
+
+      let conditionExists = false
+      if (loadedQuestionId) {
+        conditionExists = await conditionalTokens.doesConditionExist(conditionId)
+      }
+
+      if (!conditionExists) {
+        // Step 2: Prepare condition
+        logger.log(`Adding prepareCondition transaction`)
+
+        transactions.push({
+          operation: CPK.CALL,
+          to: conditionalTokensAddress,
+          value: 0,
+          data: ConditionalTokenService.encodePrepareCondition(
+            questionId,
+            oracleAddress,
+            outcomes.length,
+          ),
+        })
+      }
+
       logger.log(`ConditionID: ${conditionId}`)
 
       // Step 3: Approve collateral for factory
@@ -253,6 +269,59 @@ class CPKService {
       return predictedMarketMakerAddress
     } catch (err) {
       logger.error(`There was an error creating the market maker`, err.message)
+      throw err
+    }
+  }
+
+  sellOutcomes = async ({
+    amount,
+    outcomeIndex,
+    marketMaker,
+    conditionalTokens,
+  }: CPKSellOutcomesParams): Promise<TransactionReceipt> => {
+    try {
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+
+      const outcomeTokensToSell = await marketMaker.calcSellAmount(amount, outcomeIndex)
+      const collateralAddress = await marketMaker.getCollateralToken()
+
+      const transactions = []
+      const isAlreadyApprovedForMarketMaker = await conditionalTokens.isApprovedForAll(
+        this.cpk.address,
+        marketMaker.address,
+      )
+
+      if (!isAlreadyApprovedForMarketMaker) {
+        transactions.push({
+          operation: CPK.CALL,
+          to: conditionalTokens.address,
+          value: 0,
+          data: ConditionalTokenService.encodeSetApprovalForAll(marketMaker.address, true),
+        })
+      }
+
+      transactions.push(
+        {
+          operation: CPK.CALL,
+          to: marketMaker.address,
+          value: 0,
+          data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
+        },
+        {
+          operation: CPK.CALL,
+          to: collateralAddress,
+          value: 0,
+          data: ERC20Service.encodeTransfer(account, amount),
+        },
+      )
+
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
+
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
       throw err
     }
   }
