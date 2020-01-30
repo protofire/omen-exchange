@@ -4,7 +4,13 @@ import CPK from 'contract-proxy-kit'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
-import { ConditionalTokenService, ERC20Service, MarketMakerService, RealitioService } from './index'
+import {
+  ConditionalTokenService,
+  ERC20Service,
+  MarketMakerService,
+  OracleService,
+  RealitioService,
+} from './index'
 import { BigNumber } from 'ethers/utils'
 import { MarketData } from '../util/types'
 import { getContractAddress, getCPKAddresses } from '../util/networks'
@@ -32,6 +38,15 @@ interface CPKCreateMarketParams {
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
+}
+
+interface CPKRedeemParams {
+  isConditionResolved: boolean
+  questionId: string
+  numOutcomes: number
+  oracle: OracleService
+  marketMaker: MarketMakerService
+  conditionalTokens: ConditionalTokenService
 }
 
 class CPKService {
@@ -322,6 +337,52 @@ class CPKService {
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
+      throw err
+    }
+  }
+
+  redeemPositions = async ({
+    isConditionResolved,
+    oracle,
+    questionId,
+    numOutcomes,
+    marketMaker,
+    conditionalTokens,
+  }: CPKRedeemParams): Promise<TransactionReceipt> => {
+    try {
+      const transactions = []
+      if (!isConditionResolved) {
+        transactions.push({
+          operation: CPK.CALL,
+          to: oracle.address,
+          value: 0,
+          data: OracleService.encodeResolveCondition(questionId, numOutcomes),
+        })
+      }
+
+      const collateralAddress = await marketMaker.getCollateralToken()
+      const conditionId = await marketMaker.getConditionId()
+
+      transactions.push({
+        operation: CPK.CALL,
+        to: conditionalTokens.address,
+        value: 0,
+        data: ConditionalTokenService.encodeRedeemPositions(
+          collateralAddress,
+          conditionId,
+          numOutcomes,
+        ),
+      })
+
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
+
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(
+        `Error trying to resolve condition or redeem for questionId '${questionId}'`,
+        err.message,
+      )
       throw err
     }
   }
