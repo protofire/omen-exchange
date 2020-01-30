@@ -3,12 +3,11 @@ import { BigNumber } from 'ethers/utils'
 
 import { usePolling } from './usePolling'
 import { ConnectedWeb3Context } from './connectedWeb3'
-import { ERC20Service, MarketMakerService } from '../services'
+import { CPKService, ERC20Service, MarketMakerService } from '../services'
 import { getArbitratorFromAddress } from '../util/networks'
 import { useContracts } from './useContracts'
 import { getLogger } from '../util/logger'
 import { BalanceItem, Status, Token, Arbitrator } from '../util/types'
-import { CPKService } from '../services/cpk'
 
 const logger = getLogger('Market::useMarketMakerData')
 
@@ -79,7 +78,10 @@ export const useMarketMakerData = (
 
     const arbitrator = getArbitratorFromAddress(networkId, arbitratorAddress)
 
-    const cpk = await CPKService.create(provider)
+    let cpk: Maybe<CPKService> = null
+    if (account) {
+      cpk = await CPKService.create(provider)
+    }
 
     const [
       userShares,
@@ -92,17 +94,15 @@ export const useMarketMakerData = (
       fee,
       isQuestionFinalized,
     ] = await Promise.all([
-      account && cpk && cpk.address
+      cpk && cpk.address
         ? marketMaker.getBalanceInformation(cpk.address, outcomes.length)
         : outcomes.map(() => new BigNumber(0)),
       marketMaker.getBalanceInformation(marketMakerAddress, outcomes.length),
       marketMaker.getTotalSupply(),
-      account && cpk && cpk.address ? marketMaker.balanceOf(cpk.address) : new BigNumber(0),
+      cpk && cpk.address ? marketMaker.balanceOf(cpk.address) : new BigNumber(0),
       marketMaker.getCollateralToken(),
       marketMaker.poolSharesTotalSupply(),
-      account && cpk && cpk.address
-        ? marketMaker.poolSharesBalanceOf(account && cpk && cpk.address)
-        : new BigNumber(0),
+      cpk && cpk.address ? marketMaker.poolSharesBalanceOf(cpk.address) : new BigNumber(0),
       marketMaker.getFee(),
       realitio.isFinalized(questionId),
     ])

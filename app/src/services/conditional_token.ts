@@ -3,6 +3,8 @@ import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
 import { getIndexSets } from '../util/tools'
+import { getEarliestBlockToCheck } from '../util/networks'
+import { TransactionReceipt } from 'ethers/providers'
 
 const logger = getLogger('Services::Conditional-Token')
 
@@ -18,6 +20,7 @@ const conditionalTokensAbi = [
   'function getPositionId(address collateralToken, bytes32 collectionId) external pure returns (uint) ',
   'function balanceOf(address owner, uint256 positionId) external view returns (uint256)',
   'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data) external',
+  'function getOutcomeSlotCount(bytes32 conditionId) external view returns (uint)',
 ]
 
 class ConditionalTokenService {
@@ -80,9 +83,12 @@ class ConditionalTokenService {
   getQuestionId = async (conditionId: string): Promise<string> => {
     const filter: any = this.contract.filters.ConditionPreparation(conditionId)
 
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+
     const logs = await this.provider.getLogs({
       ...filter,
-      fromBlock: 1,
+      fromBlock: getEarliestBlockToCheck(networkId),
       toBlock: 'latest',
     })
 
@@ -101,13 +107,13 @@ class ConditionalTokenService {
     return event.values.questionId
   }
 
-  setApprovalForAll = async (marketMakerAddress: string): Promise<string> => {
-    const transactionObject = await this.contract.setApprovalForAll(marketMakerAddress, true)
+  setApprovalForAll = async (spender: string): Promise<TransactionReceipt> => {
+    const transactionObject = await this.contract.setApprovalForAll(spender, true)
     return this.provider.waitForTransaction(transactionObject.hash)
   }
 
-  isApprovedForAll = async (marketMakerAddress: string): Promise<boolean> => {
-    return this.contract.isApprovedForAll(this.signerAddress, marketMakerAddress)
+  isApprovedForAll = async (owner: string, spender: string): Promise<boolean> => {
+    return this.contract.isApprovedForAll(owner, spender)
   }
 
   isConditionResolved = async (conditionId: string): Promise<boolean> => {
@@ -116,7 +122,11 @@ class ConditionalTokenService {
     return !payoutDenominator.isZero()
   }
 
-  redeemPositions = async (collateralToken: string, conditionId: string, outcomesCount: number) => {
+  redeemPositions = async (
+    collateralToken: string,
+    conditionId: string,
+    outcomesCount: number,
+  ): Promise<TransactionReceipt> => {
     const indexSets = getIndexSets(outcomesCount)
 
     const transactionObject = await this.contract.redeemPositions(
@@ -126,7 +136,7 @@ class ConditionalTokenService {
       indexSets,
     )
 
-    await this.provider.waitForTransaction(transactionObject.hash)
+    return this.provider.waitForTransaction(transactionObject.hash)
   }
 
   static encodeSafeTransferFrom = (
@@ -166,6 +176,10 @@ class ConditionalTokenService {
     ])
   }
 
+  getOutcomeSlotCount = async (conditionId: string): Promise<BigNumber> => {
+    return this.contract.getOutcomeSlotCount(conditionId)
+  }
+
   getConditionId = (
     questionId: string,
     oracleAddress: string,
@@ -177,6 +191,11 @@ class ConditionalTokenService {
     )
 
     return conditionId
+  }
+
+  doesConditionExist = async (conditionId: string): Promise<boolean> => {
+    const outcomeSlotCount = await this.getOutcomeSlotCount(conditionId)
+    return !outcomeSlotCount.isZero()
   }
 }
 

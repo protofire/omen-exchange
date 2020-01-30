@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { CreateCard } from '../../../common/create_card'
 import { Button } from '../../../common/index'
@@ -7,8 +7,6 @@ import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
 import { Well } from '../../../common/well'
 import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
-import { Textfield } from '../../../common/textfield'
-import { ButtonAdd } from '../../../common/button_add'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -20,13 +18,6 @@ const OutcomeInfo = styled(Well)`
 
 const ButtonContainerStyled = styled(ButtonContainer)`
   padding-top: 10px;
-`
-
-const NewOutcome = styled(Well)`
-  column-gap: 15px;
-  display: grid;
-  grid-template-columns: 1fr 26px;
-  margin-top: auto;
 `
 
 interface Props {
@@ -43,8 +34,6 @@ interface Props {
 const OutcomesStep = (props: Props) => {
   const { handleOutcomesChange, values } = props
   const { question, outcomes, loadedQuestionId } = values
-
-  const [newOutcomeName, setNewOutcomeName] = useState('')
 
   const errorMessages = []
 
@@ -70,17 +59,7 @@ const OutcomesStep = (props: Props) => {
   const error =
     totalProbabilities !== 100 || someEmptyName || someEmptyProbability || outcomes.length < 2
 
-  const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED
-
-  const addNewOutcome = () => {
-    const newOutcome = {
-      name: newOutcomeName.trim(),
-      probability: 0,
-    }
-    outcomes.push(newOutcome)
-    handleOutcomesChange(outcomes)
-    setNewOutcomeName('')
-  }
+  const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
   return (
     <CreateCard>
@@ -94,19 +73,8 @@ const OutcomesStep = (props: Props) => {
         onChange={handleOutcomesChange}
         errorMessages={errorMessages}
         disabled={!!loadedQuestionId}
+        canAddOutcome={canAddOutcome}
       />
-      {canAddOutcome && (
-        <NewOutcome>
-          <Textfield
-            disabled={!!loadedQuestionId}
-            type="text"
-            placeholder="Add new outcome"
-            value={newOutcomeName}
-            onChange={e => setNewOutcomeName(e.target.value)}
-          />
-          <ButtonAdd disabled={!newOutcomeName || !!loadedQuestionId} onClick={addNewOutcome} />
-        </NewOutcome>
-      )}
 
       <ButtonContainerStyled>
         <ButtonLinkStyled onClick={props.back}>‹ Back</ButtonLinkStyled>

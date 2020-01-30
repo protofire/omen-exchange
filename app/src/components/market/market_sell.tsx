@@ -13,7 +13,7 @@ import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 import { ViewCard } from '../common/view_card'
-import { MarketMakerService } from '../../services'
+import { CPKService, MarketMakerService } from '../../services'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getLogger } from '../../util/logger'
 import { BigNumberInputReturn } from '../common/big_number_input'
@@ -80,7 +80,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const { balances, marketMakerAddress, collateral, question, resolution } = props
 
-  const marketMakerService = buildMarketMaker(marketMakerAddress)
+  const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
@@ -151,12 +151,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Selling ${formatBigNumber(amountShares, collateral.decimals)} shares ...`)
 
-      const isApprovedForAll = await conditionalTokens.isApprovedForAll(marketMakerAddress)
-      if (!isApprovedForAll) {
-        await conditionalTokens.setApprovalForAll(marketMakerAddress)
-      }
+      const cpk = await CPKService.create(context.library)
 
-      await marketMakerService.sell(tradedCollateral, outcomeIndex)
+      await cpk.sellOutcomes({
+        amount: tradedCollateral,
+        outcomeIndex,
+        marketMaker,
+        conditionalTokens,
+      })
 
       setAmountShares(new BigNumber(0))
       setStatus(Status.Ready)
