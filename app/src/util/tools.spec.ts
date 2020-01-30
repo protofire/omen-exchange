@@ -59,7 +59,6 @@ describe('tools', () => {
 
   describe('calcDistributionHint', () => {
     const testCases = [
-      [[50, 50], [1000000, 1000000]],
       [[60, 40], [816497, 1224745]],
       [[40, 60], [1224745, 816497]],
       [[15, 20, 65], [9309493, 6982120, 2148345]],
@@ -90,6 +89,11 @@ describe('tools', () => {
         )
       })
     }
+
+    it('should return an empty array when all the odds are equal', () => {
+      expect(calcDistributionHint([50, 50])).toEqual([])
+      expect(calcDistributionHint([100 / 3, 100 / 3, 100 / 3])).toEqual([])
+    })
   })
 
   describe('calcSellAmountInCollateral', () => {
