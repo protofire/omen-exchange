@@ -6,7 +6,7 @@ import { withRouter, RouteComponentProps } from 'react-router-dom'
 
 import { BalanceItem, Status, OutcomeTableValue, Token } from '../../util/types'
 import { Button, BigNumberInput, OutcomeTable } from '../common'
-import { ERC20Service, MarketMakerService } from '../../services'
+import { CPKService, ERC20Service, MarketMakerService } from '../../services'
 import { SubsectionTitle } from '../common/subsection_title'
 import { Table, TD, TR } from '../common/table'
 import { ViewCard } from '../common/view_card'
@@ -29,7 +29,6 @@ import { MARKET_FEE } from '../../common/constants'
 import { FormError } from '../common/form_error'
 import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 import { ModalTwitterShare } from '../common/modal_twitter_share'
-import { CPKService } from '../../services/cpk'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -160,6 +159,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const account = await signer.getAddress()
 
       const cpk = await CPKService.create(provider)
+
       const collateralAddress = await marketMaker.getCollateralToken()
 
       const collateralService = new ERC20Service(provider, account, collateralAddress)

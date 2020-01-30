@@ -107,13 +107,13 @@ class ConditionalTokenService {
     return event.values.questionId
   }
 
-  setApprovalForAll = async (marketMakerAddress: string): Promise<TransactionReceipt> => {
-    const transactionObject = await this.contract.setApprovalForAll(marketMakerAddress, true)
+  setApprovalForAll = async (spender: string): Promise<TransactionReceipt> => {
+    const transactionObject = await this.contract.setApprovalForAll(spender, true)
     return this.provider.waitForTransaction(transactionObject.hash)
   }
 
-  isApprovedForAll = async (marketMakerAddress: string): Promise<boolean> => {
-    return this.contract.isApprovedForAll(this.signerAddress, marketMakerAddress)
+  isApprovedForAll = async (owner: string, spender: string): Promise<boolean> => {
+    return this.contract.isApprovedForAll(owner, spender)
   }
 
   isConditionResolved = async (conditionId: string): Promise<boolean> => {
