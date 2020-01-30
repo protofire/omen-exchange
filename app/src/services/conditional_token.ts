@@ -197,6 +197,22 @@ class ConditionalTokenService {
     const outcomeSlotCount = await this.getOutcomeSlotCount(conditionId)
     return !outcomeSlotCount.isZero()
   }
+
+  static encodeRedeemPositions = (
+    collateralToken: string,
+    conditionId: string,
+    outcomesCount: number,
+  ): string => {
+    const redeemPositionsInterface = new utils.Interface(conditionalTokensAbi)
+    const indexSets = getIndexSets(outcomesCount)
+
+    return redeemPositionsInterface.functions.redeemPositions.encode([
+      collateralToken,
+      ethers.constants.HashZero,
+      conditionId,
+      indexSets,
+    ])
+  }
 }
 
 export { ConditionalTokenService }
