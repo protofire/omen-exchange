@@ -342,7 +342,27 @@ class CPKService {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
 
-      const transactions = [
+      // Check  if the allowance of the CPK to the market maker is enough.
+      const collateralService = new ERC20Service(this.provider, account, collateral.address)
+
+      const transactions = []
+      const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
+        this.cpk.address,
+        marketMaker.address,
+        amount,
+      )
+
+      if (!hasCPKEnoughAlowance) {
+        // Step 1:  Approve unlimited amount to be transferred to the market maker
+        transactions.push({
+          operation: CPK.CALL,
+          to: collateral.address,
+          value: 0,
+          data: ERC20Service.encodeApproveUnlimited(marketMaker.address),
+        })
+      }
+
+      transactions.push(
         {
           operation: CPK.CALL,
           to: collateral.address,
@@ -351,17 +371,11 @@ class CPKService {
         },
         {
           operation: CPK.CALL,
-          to: collateral.address,
-          value: 0,
-          data: ERC20Service.encodeApproveUnlimited(marketMaker.address),
-        },
-        {
-          operation: CPK.CALL,
           to: marketMaker.address,
           value: 0,
           data: MarketMakerService.encodeAddFunding(amount),
         },
-      ]
+      )
 
       const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 2000000 })
 
