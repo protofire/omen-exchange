@@ -92,7 +92,7 @@ export const ModalConnectWallet = (props: Props) => {
 
   const onClickWallet = (wallet: Wallet) => setWalletSelected(wallet)
 
-  const ItemWallet = () => (
+  const ItemWalletConnect = () => (
     <Item
       onClick={() => {
         onClickWallet(Wallet.WalletConnect)
@@ -157,12 +157,14 @@ export const ModalConnectWallet = (props: Props) => {
     localStorage.setItem('CONNECTOR', walletSelected)
   }
 
+  const doesMetamaskExist = 'ethereum' in window || 'web3' in window
+
   return (
     <>
       {!context.account && (
         <ModalWrapper isOpen={isOpen} onRequestClose={onClickCloseButton} title={`Choose a Wallet`}>
-          <ItemMetamask />
-          <ItemWallet />
+          {doesMetamaskExist && <ItemMetamask />}
+          <ItemWalletConnect />
           <ButtonStyled buttonType={ButtonType.primary} onClick={onConnect}>
             Connect
           </ButtonStyled>
