@@ -399,12 +399,6 @@ class CPKService {
       const transactions = [
         {
           operation: CPK.CALL,
-          to: collateral.address,
-          value: 0,
-          data: ERC20Service.encodeApproveUnlimited(this.cpk.address),
-        },
-        {
-          operation: CPK.CALL,
           to: marketMaker.address,
           value: 0,
           data: MarketMakerService.encodeRemoveFunding(amount),
