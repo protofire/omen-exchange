@@ -44,16 +44,16 @@ export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
  */
 export const calcPrice = (holdingsBN: BigNumber[]): number[] => {
   const holdings = holdingsBN.map(h => new Big(h.toString()))
-  const product = holdings.reduce((a, b) => a.mul(b))
-  const denominator = holdings
-    .map(h => (h.toString() === '0' ? new Big(0) : product.div(h)))
-    .reduce((a, b) => a.add(b))
 
-  const prices = holdings.map(holding =>
-    product.toString() === '0' || denominator.toString() === '0'
-      ? new Big(0)
-      : product.div(holding).div(denominator),
-  )
+  const doesHoldingsAreZero = holdings.every(h => h.toString() === '0')
+  if (doesHoldingsAreZero) {
+    return holdings.map(() => 0)
+  }
+
+  const product = holdings.reduce((a, b) => a.mul(b))
+  const denominator = holdings.map(h => product.div(h)).reduce((a, b) => a.add(b))
+
+  const prices = holdings.map(holding => product.div(holding).div(denominator))
 
   return prices.map(price => +price.valueOf())
 }
