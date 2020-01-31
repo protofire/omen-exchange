@@ -84,6 +84,8 @@ export const ModalConnectWallet = (props: Props) => {
 
   if (context.error) {
     logger.error('Error in web3 context', context.error)
+    localStorage.removeItem('CONNECTOR')
+    props.onClose()
   }
 
   const [walletSelected, setWalletSelected] = useState(Wallet.MetaMask)
