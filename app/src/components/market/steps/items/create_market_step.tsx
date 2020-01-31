@@ -105,28 +105,26 @@ const CreateMarketStep = (props: Props) => {
 
   const buttonText = account ? 'Create' : 'Connect Wallet'
 
-  const [hasEnoughBalanceToFund, setHasEnoughBalanceToFund] = React.useState(false)
-  const [fundingErrorMessage, setfundingErrorMessage] = React.useState('')
+  const [balance, setBalance] = React.useState<Maybe<BigNumber>>(null)
+  const hasEnoughBalance = balance && balance.gte(funding)
+  let fundingErrorMessage = ''
+  if (balance && !hasEnoughBalance) {
+    fundingErrorMessage = `You entered ${formatBigNumber(
+      funding,
+      collateral.decimals,
+    )} DAI of funding but your account only has ${formatBigNumber(
+      balance,
+      collateral.decimals,
+    )} DAI`
+  }
+
   React.useEffect(() => {
     const checkBalance = async () => {
       if (account) {
         const collateralService = new ERC20Service(provider, account, collateral.address)
 
         const balance = await collateralService.getCollateral(account)
-        const hasEnoughBalance = balance.gte(funding)
-
-        setHasEnoughBalanceToFund(hasEnoughBalance)
-        if (!hasEnoughBalance) {
-          setfundingErrorMessage(
-            `You entered ${formatBigNumber(
-              funding,
-              collateral.decimals,
-            )} DAI of funding but your account only has ${formatBigNumber(
-              balance,
-              collateral.decimals,
-            )} DAI`,
-          )
-        }
+        setBalance(balance)
       }
     }
     checkBalance()
@@ -204,9 +202,11 @@ const CreateMarketStep = (props: Props) => {
         <Button
           buttonType={ButtonType.primary}
           disabled={
-            (!MarketCreationStatus.is.ready(marketCreationStatus) &&
-              !MarketCreationStatus.is.error(marketCreationStatus)) ||
-            (!hasEnoughBalanceToFund && !!account)
+            !(
+              MarketCreationStatus.is.ready(marketCreationStatus) &&
+              !MarketCreationStatus.is.error(marketCreationStatus) &&
+              hasEnoughBalance
+            ) && !!account
           }
           onClick={submit}
         >
