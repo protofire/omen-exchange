@@ -99,6 +99,13 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     }
   }, [collateral, provider, account, marketMakerAddress, marketMaker])
 
+  const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
+  const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${
+    collateralToken.symbol
+  }`
+  const resolutionFormat = resolution ? formatDate(resolution) : ''
+  const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
+
   const redeem = async () => {
     try {
       setStatus(Status.Loading)
@@ -108,9 +115,11 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
       await cpk.redeemPositions({
         isConditionResolved,
-        oracle,
         questionId,
         numOutcomes: balances.length,
+        winningOutcome,
+        oracle,
+        collateralToken,
         marketMaker,
         conditionalTokens,
       })
@@ -121,13 +130,6 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       logger.log(`Error trying to resolve condition or redeem: ${err.message}`)
     }
   }
-
-  const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
-  const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${
-    collateralToken.symbol
-  }`
-  const resolutionFormat = resolution ? formatDate(resolution) : ''
-  const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
 
   const probabilities = balances.map(balance => balance.probability)
 

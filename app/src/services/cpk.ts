@@ -12,7 +12,7 @@ import {
   RealitioService,
 } from './index'
 import { BigNumber } from 'ethers/utils'
-import { MarketData } from '../util/types'
+import { BalanceItem, MarketData, Token } from '../util/types'
 import { getContractAddress, getCPKAddresses } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { MarketMakerFactoryService } from './market_maker_factory'
@@ -44,6 +44,8 @@ interface CPKRedeemParams {
   isConditionResolved: boolean
   questionId: string
   numOutcomes: number
+  winningOutcome: BalanceItem | undefined
+  collateralToken: Token
   oracle: OracleService
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
@@ -343,13 +345,18 @@ class CPKService {
 
   redeemPositions = async ({
     isConditionResolved,
-    oracle,
     questionId,
     numOutcomes,
+    winningOutcome,
+    oracle,
+    collateralToken,
     marketMaker,
     conditionalTokens,
   }: CPKRedeemParams): Promise<TransactionReceipt> => {
     try {
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+
       const transactions = []
       if (!isConditionResolved) {
         transactions.push({
@@ -360,7 +367,6 @@ class CPKService {
         })
       }
 
-      const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
 
       transactions.push({
@@ -368,11 +374,20 @@ class CPKService {
         to: conditionalTokens.address,
         value: 0,
         data: ConditionalTokenService.encodeRedeemPositions(
-          collateralAddress,
+          collateralToken.address,
           conditionId,
           numOutcomes,
         ),
       })
+
+      if (winningOutcome) {
+        transactions.push({
+          operation: CPK.CALL,
+          to: collateralToken.address,
+          value: 0,
+          data: ERC20Service.encodeTransfer(account, winningOutcome.shares),
+        })
+      }
 
       const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
 
