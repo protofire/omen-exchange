@@ -45,8 +45,8 @@ export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
 export const calcPrice = (holdingsBN: BigNumber[]): number[] => {
   const holdings = holdingsBN.map(h => new Big(h.toString()))
 
-  const doesHoldingsAreZero = holdings.every(h => h.toString() === '0')
-  if (doesHoldingsAreZero) {
+  const hasZeroHoldings = holdings.every(h => h.toString() === '0')
+  if (hasZeroHoldings) {
     return holdings.map(() => 0)
   }
 
