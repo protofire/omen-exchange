@@ -22,6 +22,8 @@ import { MarketCreationStatus } from '../../../../util/market_creation_status_da
 import { getLogger } from '../../../../util/logger'
 import { ERC20Service } from '../../../../services'
 import { FormError } from '../../../common/form_error'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchAccountBalance } from '../../../../store/reducer'
 
 const logger = getLogger('MarketCreationItems::CreateMarketStep')
 
@@ -104,8 +106,9 @@ const CreateMarketStep = (props: Props) => {
   const resolutionDate = resolution && formatDate(resolution)
 
   const buttonText = account ? 'Create' : 'Connect Wallet'
+  const balance = useSelector((state: any) => state.balance && new BigNumber(state.balance))
+  const dispatch = useDispatch()
 
-  const [balance, setBalance] = React.useState<Maybe<BigNumber>>(null)
   const hasEnoughBalance = balance && balance.gte(funding)
   let fundingErrorMessage = ''
   if (balance && !hasEnoughBalance) {
@@ -119,16 +122,8 @@ const CreateMarketStep = (props: Props) => {
   }
 
   React.useEffect(() => {
-    const checkBalance = async () => {
-      if (account) {
-        const collateralService = new ERC20Service(provider, account, collateral.address)
-
-        const balance = await collateralService.getCollateral(account)
-        setBalance(balance)
-      }
-    }
-    checkBalance()
-  }, [account])
+    dispatch(fetchAccountBalance(account, provider, collateral))
+  }, [account, provider, collateral])
 
   return (
     <CreateCard>
