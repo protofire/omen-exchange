@@ -32,7 +32,7 @@ export const CustomizableTokensSelect = (props: Props) => {
       <Tokens
         customValues={customValues}
         name={name}
-        networkId={context.networkId}
+        context={context}
         onTokenChange={onCollateralChange}
         value={value}
       />

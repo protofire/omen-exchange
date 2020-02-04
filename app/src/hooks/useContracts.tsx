@@ -8,6 +8,7 @@ import {
   OracleService,
   RealitioService,
 } from '../services'
+import { KlerosInteractionService } from '../services/kleros_interaction'
 
 export const useContracts = (context: ConnectedWeb3Context) => {
   const { library: provider, networkId, account } = context
@@ -38,6 +39,12 @@ export const useContracts = (context: ConnectedWeb3Context) => {
     account,
   ])
 
+  const klerosInteractionAddress = getContractAddress(networkId, 'klerosInteraction')
+  const klerosInteraction = useMemo(
+    () => new KlerosInteractionService(provider, account, klerosInteractionAddress),
+    [klerosInteractionAddress, provider, account],
+  )
+
   const buildMarketMaker = useMemo(
     () => (address: string) =>
       new MarketMakerService(address, conditionalTokens, realitio, provider, account),
@@ -51,8 +58,9 @@ export const useContracts = (context: ConnectedWeb3Context) => {
       realitio,
       oracle,
       buildMarketMaker,
+      klerosInteraction,
     }),
-    [conditionalTokens, marketMakerFactory, realitio, oracle, buildMarketMaker],
+    [conditionalTokens, marketMakerFactory, realitio, oracle, klerosInteraction, buildMarketMaker],
   )
 }
 
