@@ -15,13 +15,17 @@ import { lighten } from 'polished'
 
 const logger = getLogger('ModalConnectWallet::Index')
 
-const Item = styled.div`
+const Item = styled.div<{ disabled?: boolean }>`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   padding: 15px 5px;
-
+  pointer-events: ${props => (props.disabled ? 'none' : 'auto')};
+  &[disabled] {
+    cursor: not-allowed !important;
+    opacity: 0.5;
+  }
   &:hover {
     background-color: ${props => lighten(0.6, props.theme.colors.primary)};
   }
@@ -88,7 +92,11 @@ export const ModalConnectWallet = (props: Props) => {
     props.onClose()
   }
 
-  const [walletSelected, setWalletSelected] = useState(Wallet.MetaMask)
+  const doesMetamaskExist = 'ethereum' in window || 'web3' in window
+
+  const [walletSelected, setWalletSelected] = useState(
+    doesMetamaskExist ? Wallet.MetaMask : Wallet.WalletConnect,
+  )
 
   const onClickWallet = (wallet: Wallet) => setWalletSelected(wallet)
 
@@ -112,8 +120,9 @@ export const ModalConnectWallet = (props: Props) => {
     </Item>
   )
 
-  const ItemMetamask = () => (
+  const ItemMetamask = (props: { disabled: boolean }) => (
     <Item
+      disabled={props.disabled}
       onClick={() => {
         onClickWallet(Wallet.MetaMask)
       }}
@@ -126,6 +135,7 @@ export const ModalConnectWallet = (props: Props) => {
       <RadioInputStyled
         checked={walletSelected === Wallet.MetaMask}
         name="wallet"
+        disabled={props.disabled}
         onChange={(e: any) => setWalletSelected(e.target.value as Wallet)}
         value={Wallet.MetaMask}
       />
@@ -157,13 +167,11 @@ export const ModalConnectWallet = (props: Props) => {
     localStorage.setItem('CONNECTOR', walletSelected)
   }
 
-  const doesMetamaskExist = 'ethereum' in window || 'web3' in window
-
   return (
     <>
       {!context.account && (
         <ModalWrapper isOpen={isOpen} onRequestClose={onClickCloseButton} title={`Choose a Wallet`}>
-          {doesMetamaskExist && <ItemMetamask />}
+          <ItemMetamask disabled={!doesMetamaskExist} />
           <ItemWalletConnect />
           <ButtonStyled buttonType={ButtonType.primary} onClick={onConnect}>
             Connect
