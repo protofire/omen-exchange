@@ -11,6 +11,7 @@ import { getContractAddress, getCPKAddresses } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { MarketMakerFactoryService } from './market_maker_factory'
 import { TransactionReceipt } from 'ethers/providers'
+import { Token } from '../util/types'
 
 const logger = getLogger('Services::CPKService')
 
@@ -32,6 +33,12 @@ interface CPKCreateMarketParams {
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
+}
+
+interface CPKFundingParams {
+  amount: BigNumber
+  collateral: Token
+  marketMaker: MarketMakerService
 }
 
 class CPKService {
@@ -322,6 +329,91 @@ class CPKService {
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
+      throw err
+    }
+  }
+
+  addFunding = async ({
+    amount,
+    collateral,
+    marketMaker,
+  }: CPKFundingParams): Promise<TransactionReceipt> => {
+    try {
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+
+      // Check  if the allowance of the CPK to the market maker is enough.
+      const collateralService = new ERC20Service(this.provider, account, collateral.address)
+
+      const transactions = []
+      const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
+        this.cpk.address,
+        marketMaker.address,
+        amount,
+      )
+
+      if (!hasCPKEnoughAlowance) {
+        // Step 1:  Approve unlimited amount to be transferred to the market maker
+        transactions.push({
+          operation: CPK.CALL,
+          to: collateral.address,
+          value: 0,
+          data: ERC20Service.encodeApproveUnlimited(marketMaker.address),
+        })
+      }
+
+      transactions.push(
+        {
+          operation: CPK.CALL,
+          to: collateral.address,
+          value: 0,
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+        },
+        {
+          operation: CPK.CALL,
+          to: marketMaker.address,
+          value: 0,
+          data: MarketMakerService.encodeAddFunding(amount),
+        },
+      )
+
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 2000000 })
+
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(
+        `There was an error adding an amount of '${amount.toString()}' for funding`,
+        err.message,
+      )
+      throw err
+    }
+  }
+
+  removeFunding = async ({
+    amount,
+    collateral,
+    marketMaker,
+  }: CPKFundingParams): Promise<TransactionReceipt> => {
+    try {
+      const transactions = [
+        {
+          operation: CPK.CALL,
+          to: marketMaker.address,
+          value: 0,
+          data: MarketMakerService.encodeRemoveFunding(amount),
+        },
+      ]
+
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
+
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(
+        `There was an error removing amount '${amount.toString()}' for funding`,
+        err.message,
+      )
       throw err
     }
   }
