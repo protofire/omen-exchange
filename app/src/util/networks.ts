@@ -33,6 +33,7 @@ interface Network {
     marketMakerFactory: string
     conditionalTokens: string
     oracle: string
+    klerosInteraction: string
   }
   cpk?: CPKAddresses
 }
@@ -61,6 +62,7 @@ const networks: { [K in NetworkId]: Network } = {
       marketMakerFactory: '0xe7E502789B8f4cDC99e6Cf9d3963E8C76784da51',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
       oracle: '0x7B46FEcfBA4eB9D14970bc248dA15a3Fb4457A27',
+      klerosInteraction: '0xebcf3bca271b26ae4b162ba560e243055af0e679',
     },
   },
   [networkIds.RINKEBY]: {
@@ -75,6 +77,7 @@ const networks: { [K in NetworkId]: Network } = {
       marketMakerFactory: '0x89F54625565792729fd3Fa5F689c46e7612b4E8b',
       conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
       oracle: '0x5A90132C104CA33652Ee71E2E645D5A4d8E5d7D6',
+      klerosInteraction: '0x0',
     },
   },
   [networkIds.GANACHE]: {
@@ -89,6 +92,7 @@ const networks: { [K in NetworkId]: Network } = {
       marketMakerFactory: '0x5017A545b09ab9a30499DE7F431DF0855bCb7275',
       conditionalTokens: '0xD86C8F0327494034F60e25074420BcCF560D5610',
       oracle: '0x2D8BE6BF0baA74e0A907016679CaE9190e80dD0A',
+      klerosInteraction: '0x0',
     },
     cpk: {
       masterCopyAddress: '0x1b88Bdb8269A1aB1372459F5a4eC3663D6f5cCc4',
