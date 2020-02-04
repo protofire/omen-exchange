@@ -54,9 +54,7 @@ const WrongNetworkMessageContainer = (props: Props) => {
           Please check the network configuration in your wallet and come back again.
         </WrappedText>
         <ButtonContainer>
-          <ButtonLinkStyled onClick={() => window.location.reload(false)}>
-            Reload with Infura
-          </ButtonLinkStyled>
+          <ButtonLinkStyled onClick={() => window.location.reload(false)}>Reload</ButtonLinkStyled>
         </ButtonContainer>
       </ViewCard>
     </>
