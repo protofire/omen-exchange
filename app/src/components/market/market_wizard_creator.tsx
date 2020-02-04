@@ -18,6 +18,7 @@ import { Outcome } from '../common/outcomes'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../util/networks'
 import { MarketCreationStatus } from '../../util/market_creation_status_data'
+import { ERC20Service } from '../../services'
 
 interface Props {
   callback: (param: MarketData) => void
@@ -27,7 +28,7 @@ interface Props {
 
 export const MarketWizardCreator = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { networkId } = context
+  const { library: provider, networkId } = context
 
   const { callback, marketCreationStatus, marketMakerAddress } = props
 
@@ -145,11 +146,14 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const handleCollateralChange = (collateral: Token) => {
+  const handleCollateralChange = async (collateral: Token) => {
+    const erc20Service = new ERC20Service(provider, '', collateral.address)
+    const tokenSummary = await erc20Service.getProfileSummary()
+
     const newMarketData = {
       ...marketData,
       funding: ethers.constants.Zero, // when the collateral changes, reset the value of funding
-      collateral,
+      collateral: tokenSummary,
     }
     setMarketdata(newMarketData)
   }
