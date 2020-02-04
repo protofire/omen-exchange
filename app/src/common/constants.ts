@@ -19,3 +19,9 @@ export const MAX_OUTCOME_ALLOWED = parseInt(process.env.REACT_APP_MAX_OUTCOME_AL
 export const SINGLE_SELECT_TEMPLATE_ID = 2
 
 export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
+
+// TODO: update the graph url with the right one
+export const GRAPH_HTTP =
+  process.env.REACT_APP_GRAPH_HTTP || 'https://api.thegraph.com/subgraphs/name/infinitestyles/pm'
+export const GRAPH_WS =
+  process.env.REACT_APP_GRAPH_WS || 'wss://api.thegraph.com/subgraphs/name/infinitestyles/pm'

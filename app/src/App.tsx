@@ -3,6 +3,9 @@ import Web3Provider from 'web3-react'
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
+import { ApolloProvider } from '@apollo/react-hooks'
+
+import { client } from './apolloClientConfig'
 import theme from './theme'
 import connectors from './util/connectors'
 import { Main } from './components'
@@ -35,12 +38,14 @@ const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <Web3Provider connectors={connectors} libraryName="ethers.js">
-        <GlobalStyle />
-        <Main />
-      </Web3Provider>
-    </ThemeProvider>
+    <ApolloProvider client={client}>
+      <ThemeProvider theme={theme}>
+        <Web3Provider connectors={connectors} libraryName="ethers.js">
+          <GlobalStyle />
+          <Main />
+        </Web3Provider>
+      </ThemeProvider>
+    </ApolloProvider>
   )
 }
 
