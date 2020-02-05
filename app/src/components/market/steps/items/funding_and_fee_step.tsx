@@ -11,7 +11,6 @@ import { ButtonLink } from '../../../common/button_link'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { BalanceToken } from '../../../common/balance_token'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
-import { CustomizableTokensSelect } from '../../../common/customizable_tokens_select'
 import { Token } from '../../../../util/types'
 import { FormError } from '../../../common/form_error'
 import { MARKET_FEE } from '../../../../common/constants'
@@ -22,12 +21,9 @@ interface Props {
   next: () => void
   values: {
     collateral: Token
-    collateralsCustom: Token[]
     spread: number
     funding: BigNumber
   }
-  handleCollateralChange: (collateral: Token) => void
-  addCollateralCustom: (collateral: Token) => void
   handleChange: (
     event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn,
   ) => any
@@ -49,8 +45,8 @@ const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account } = context
 
-  const { values, addCollateralCustom, handleChange, handleCollateralChange } = props
-  const { funding, spread, collateral, collateralsCustom } = values
+  const { values, handleChange } = props
+  const { funding, spread, collateral } = values
 
   const collateralBalance = useCollateralBalance(collateral, context)
 
@@ -94,23 +90,6 @@ const FundingAndFeeStep = (props: Props) => {
         tooltip={{
           id: `spreadFee`,
           description: `The fee taken from every trade. Temporarily fixed at ${MARKET_FEE}%.`,
-        }}
-      />
-      <FormRow
-        formField={
-          <CustomizableTokensSelect
-            addCustomValue={addCollateralCustom}
-            context={context}
-            customValues={collateralsCustom}
-            name="collateralId"
-            onCollateralChange={handleCollateralChange}
-            value={collateral}
-          />
-        }
-        title={'Collateral token'}
-        tooltip={{
-          id: `collateralToken`,
-          description: `Select the token you want to use as collateral.`,
         }}
       />
       <FormRow
