@@ -20,7 +20,6 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ButtonType } from '../../../../common/button_styling_types'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { getLogger } from '../../../../util/logger'
-import { ERC20Service } from '../../../../services'
 import { FormError } from '../../../common/form_error'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchAccountBalance } from '../../../../store/reducer'
@@ -77,6 +76,9 @@ interface Props {
 
 const CreateMarketStep = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const balance = useSelector((state: any) => state.balance && new BigNumber(state.balance))
+  const dispatch = useDispatch()
+
   const { library: provider, account } = context
 
   const { values, marketCreationStatus } = props
@@ -90,6 +92,10 @@ const CreateMarketStep = (props: Props) => {
     funding,
     outcomes,
   } = values
+
+  React.useEffect(() => {
+    dispatch(fetchAccountBalance(account, provider, collateral))
+  }, [account, provider, collateral])
 
   const back = () => {
     props.back()
@@ -106,8 +112,6 @@ const CreateMarketStep = (props: Props) => {
   const resolutionDate = resolution && formatDate(resolution)
 
   const buttonText = account ? 'Create' : 'Connect Wallet'
-  const balance = useSelector((state: any) => state.balance && new BigNumber(state.balance))
-  const dispatch = useDispatch()
 
   const hasEnoughBalance = balance && balance.gte(funding)
   let fundingErrorMessage = ''
@@ -120,10 +124,6 @@ const CreateMarketStep = (props: Props) => {
       collateral.decimals,
     )} DAI`
   }
-
-  React.useEffect(() => {
-    dispatch(fetchAccountBalance(account, provider, collateral))
-  }, [account, provider, collateral])
 
   return (
     <CreateCard>

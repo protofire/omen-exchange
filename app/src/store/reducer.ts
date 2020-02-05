@@ -31,6 +31,8 @@ export const fetchAccountBalance = (account: any, provider: any, collateral: any
     if (account) {
       const balance = await collateralService.getCollateral(account)
       dispatch(setBalance({ balance: balance.toString() }))
+    } else {
+      dispatch(setBalance({ balance: null }))
     }
   } catch (err) {
     console.error(err)
