@@ -4,14 +4,19 @@ import CPK from 'contract-proxy-kit'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
-import { ConditionalTokenService, ERC20Service, MarketMakerService, RealitioService } from './index'
+import {
+  ConditionalTokenService,
+  ERC20Service,
+  MarketMakerService,
+  OracleService,
+  RealitioService,
+} from './index'
 import { BigNumber } from 'ethers/utils'
-import { MarketData } from '../util/types'
+import { BalanceItem, MarketData, Token } from '../util/types'
 import { getContractAddress, getCPKAddresses } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { MarketMakerFactoryService } from './market_maker_factory'
 import { TransactionReceipt } from 'ethers/providers'
-import { Token } from '../util/types'
 
 const logger = getLogger('Services::CPKService')
 
@@ -39,6 +44,17 @@ interface CPKFundingParams {
   amount: BigNumber
   collateral: Token
   marketMaker: MarketMakerService
+}
+
+interface CPKRedeemParams {
+  isConditionResolved: boolean
+  questionId: string
+  numOutcomes: number
+  winningOutcome: BalanceItem | undefined
+  collateralToken: Token
+  oracle: OracleService
+  marketMaker: MarketMakerService
+  conditionalTokens: ConditionalTokenService
 }
 
 class CPKService {
@@ -412,6 +428,65 @@ class CPKService {
     } catch (err) {
       logger.error(
         `There was an error removing amount '${amount.toString()}' for funding`,
+        err.message,
+      )
+      throw err
+    }
+  }
+
+  redeemPositions = async ({
+    isConditionResolved,
+    questionId,
+    numOutcomes,
+    winningOutcome,
+    oracle,
+    collateralToken,
+    marketMaker,
+    conditionalTokens,
+  }: CPKRedeemParams): Promise<TransactionReceipt> => {
+    try {
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+
+      const transactions = []
+      if (!isConditionResolved) {
+        transactions.push({
+          operation: CPK.CALL,
+          to: oracle.address,
+          value: 0,
+          data: OracleService.encodeResolveCondition(questionId, numOutcomes),
+        })
+      }
+
+      const conditionId = await marketMaker.getConditionId()
+
+      transactions.push({
+        operation: CPK.CALL,
+        to: conditionalTokens.address,
+        value: 0,
+        data: ConditionalTokenService.encodeRedeemPositions(
+          collateralToken.address,
+          conditionId,
+          numOutcomes,
+        ),
+      })
+
+      if (winningOutcome) {
+        transactions.push({
+          operation: CPK.CALL,
+          to: collateralToken.address,
+          value: 0,
+          data: ERC20Service.encodeTransfer(account, winningOutcome.shares),
+        })
+      }
+
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
+
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(
+        `Error trying to resolve condition or redeem for questionId '${questionId}'`,
         err.message,
       )
       throw err
