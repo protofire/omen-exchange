@@ -10,7 +10,7 @@ import { SubsectionTitle } from '../../common/subsection_title'
 import { TitleValue } from '../../common/title_value'
 import { ClosedMarket } from '../../common/closed_market'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
-import { ERC20Service } from '../../../services'
+import { CPKService, ERC20Service } from '../../../services'
 import { useConnectedWeb3Context, WhenConnected } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
@@ -99,20 +99,30 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     }
   }, [collateral, provider, account, marketMakerAddress, marketMaker])
 
+  const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
+  const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${
+    collateralToken.symbol
+  }`
+  const resolutionFormat = resolution ? formatDate(resolution) : ''
+  const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
+
   const redeem = async () => {
     try {
       setStatus(Status.Loading)
-      if (!isConditionResolved) {
-        setMessage('Resolving condition...')
-        // Balances length is the number of outcomes
-        await oracle.resolveCondition(questionId, balances.length)
-      }
-
       setMessage('Redeem payout...')
-      const collateralAddress = await marketMaker.getCollateralToken()
-      const conditionId = await marketMaker.getConditionId()
 
-      await conditionalTokens.redeemPositions(collateralAddress, conditionId, balances.length)
+      const cpk = await CPKService.create(provider)
+
+      await cpk.redeemPositions({
+        isConditionResolved,
+        questionId,
+        numOutcomes: balances.length,
+        winningOutcome,
+        oracle,
+        collateralToken,
+        marketMaker,
+        conditionalTokens,
+      })
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -120,13 +130,6 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       logger.log(`Error trying to resolve condition or redeem: ${err.message}`)
     }
   }
-
-  const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
-  const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${
-    collateralToken.symbol
-  }`
-  const resolutionFormat = resolution ? formatDate(resolution) : ''
-  const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
 
   const probabilities = balances.map(balance => balance.probability)
 
