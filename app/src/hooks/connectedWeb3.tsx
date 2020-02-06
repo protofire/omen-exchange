@@ -2,6 +2,9 @@ import { providers } from 'ethers'
 import React, { useState, useEffect } from 'react'
 import { useWeb3Context } from 'web3-react'
 import connectors from '../util/connectors'
+import { getLogger } from '../util/logger'
+
+const logger = getLogger('Hooks::ConnectedWeb3')
 
 export interface ConnectedWeb3Context {
   account: Maybe<string>
@@ -36,7 +39,7 @@ interface Props {
 export const ConnectedWeb3: React.FC<Props> = props => {
   const [networkId, setNetworkId] = useState<number | null>(null)
   const context = useWeb3Context()
-  const { active, library, account } = context
+  const { active, library, account, error } = context
 
   useEffect(() => {
     let isSubscribed = true
@@ -46,6 +49,8 @@ export const ConnectedWeb3: React.FC<Props> = props => {
       if (connector && connector in connectors) {
         context.setConnector(connector)
       }
+    } else if (error) {
+      logger.debug(error.message)
     } else {
       context.setConnector('Infura')
     }
@@ -62,7 +67,7 @@ export const ConnectedWeb3: React.FC<Props> = props => {
     return () => {
       isSubscribed = false
     }
-  }, [context, library, active])
+  }, [context, library, active, error])
 
   if (!networkId) {
     return null
