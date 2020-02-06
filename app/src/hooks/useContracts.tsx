@@ -51,7 +51,7 @@ export const useContracts = (context: ConnectedWeb3Context) => {
         provider,
         account,
       ),
-    [klerosBadgeAddress, klerosTokenViewAddress, provider, account],
+    [klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, provider, account],
   )
 
   const buildMarketMaker = useMemo(
