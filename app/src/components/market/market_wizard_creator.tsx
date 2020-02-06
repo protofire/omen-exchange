@@ -36,7 +36,6 @@ export const MarketWizardCreator = (props: Props) => {
 
   const marketDataDefault: MarketData = {
     collateral: defaultCollateral,
-    collateralsCustom: [],
     arbitratorsCustom: [],
     categoriesCustom: [],
     question: '',
@@ -221,7 +220,6 @@ export const MarketWizardCreator = (props: Props) => {
   const currentStepFn = () => {
     const {
       collateral,
-      collateralsCustom,
       question,
       category,
       categoriesCustom,
@@ -264,7 +262,7 @@ export const MarketWizardCreator = (props: Props) => {
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
             next={() => next()}
-            values={{ collateral, spread, funding, collateralsCustom }}
+            values={{ collateral, spread, funding }}
           />
         )
       case 3:

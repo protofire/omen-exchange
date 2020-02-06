@@ -22,7 +22,6 @@ interface Props {
   next: () => void
   values: {
     collateral: Token
-    collateralsCustom: Token[]
     spread: number
     funding: BigNumber
   }
@@ -49,7 +48,7 @@ const FundingAndFeeStep = (props: Props) => {
   const { account } = context
 
   const { values, handleChange, handleCollateralChange } = props
-  const { funding, spread, collateral, collateralsCustom } = values
+  const { funding, spread, collateral } = values
 
   const collateralBalance = useCollateralBalance(collateral, context)
 
@@ -96,7 +95,6 @@ const FundingAndFeeStep = (props: Props) => {
         }}
       />
       <Tokens
-        customValues={collateralsCustom}
         name="collateralId"
         networkId={context.networkId}
         onTokenChange={handleCollateralChange}

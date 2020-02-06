@@ -12,17 +12,15 @@ interface Props {
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
   readOnly?: boolean
   value: Token
-  customValues: Token[]
   networkId: number
 }
 
 const FormOption = styled.option``
 
 export const Tokens = (props: Props) => {
-  const { networkId, value, customValues, onTokenChange, ...restProps } = props
+  const { networkId, value, onTokenChange, ...restProps } = props
 
-  const knownTokens = getTokensByNetwork(networkId)
-  const tokens = knownTokens.concat(customValues)
+  const tokens = getTokensByNetwork(networkId)
   const options = tokens.map(token => ({
     label: token.symbol,
     value: token.address,
