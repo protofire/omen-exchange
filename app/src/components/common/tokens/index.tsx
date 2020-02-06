@@ -23,17 +23,17 @@ export const Tokens = (props: Props) => {
   const { context, value, customValues, onTokenChange, ...restProps } = props
 
   const [tokens, setTokens] = useState<Token[]>([])
-  const { klerosInteraction } = useContracts(context)
+  const { kleros } = useContracts(context)
 
   useEffect(() => {
     const fetchTokens = async () => {
-      const tokens = await klerosInteraction.queryTokens()
+      const tokens = await kleros.queryTokens()
       tokens.concat(customValues)
       setTokens(tokens)
     }
 
     fetchTokens()
-  }, [klerosInteraction])
+  }, [kleros, customValues])
 
   const options = tokens.map(token => ({
     label: token.symbol,
