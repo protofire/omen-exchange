@@ -15,15 +15,18 @@ import { Token } from '../../../../util/types'
 import { FormError } from '../../../common/form_error'
 import { MARKET_FEE } from '../../../../common/constants'
 import { useCollateralBalance } from '../../../../hooks/useCollateralBalance'
+import { Tokens } from '../../../common/tokens/index'
 
 interface Props {
   back: () => void
   next: () => void
   values: {
     collateral: Token
+    collateralsCustom: Token[]
     spread: number
     funding: BigNumber
   }
+  handleCollateralChange: (collateral: Token) => void
   handleChange: (
     event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn,
   ) => any
@@ -45,8 +48,8 @@ const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account } = context
 
-  const { values, handleChange } = props
-  const { funding, spread, collateral } = values
+  const { values, handleChange, handleCollateralChange } = props
+  const { funding, spread, collateral, collateralsCustom } = values
 
   const collateralBalance = useCollateralBalance(collateral, context)
 
@@ -91,6 +94,13 @@ const FundingAndFeeStep = (props: Props) => {
           id: `spreadFee`,
           description: `The fee taken from every trade. Temporarily fixed at ${MARKET_FEE}%.`,
         }}
+      />
+      <Tokens
+        customValues={collateralsCustom}
+        name="collateralId"
+        networkId={context.networkId}
+        onTokenChange={handleCollateralChange}
+        value={collateral}
       />
       <FormRow
         formField={

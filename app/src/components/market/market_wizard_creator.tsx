@@ -36,6 +36,7 @@ export const MarketWizardCreator = (props: Props) => {
 
   const marketDataDefault: MarketData = {
     collateral: defaultCollateral,
+    collateralsCustom: [],
     arbitratorsCustom: [],
     categoriesCustom: [],
     question: '',
@@ -165,6 +166,15 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
+  const handleCollateralChange = (collateral: Token) => {
+    const newMarketData = {
+      ...marketData,
+      funding: ethers.constants.Zero, // when the collateral changes, reset the value of funding
+      collateral,
+    }
+    setMarketdata(newMarketData)
+  }
+
   const handleClearQuestion = () => {
     const newMarketData = {
       ...marketData,
@@ -211,6 +221,7 @@ export const MarketWizardCreator = (props: Props) => {
   const currentStepFn = () => {
     const {
       collateral,
+      collateralsCustom,
       question,
       category,
       categoriesCustom,
@@ -251,8 +262,9 @@ export const MarketWizardCreator = (props: Props) => {
           <FundingAndFeeStep
             back={() => back()}
             handleChange={handleChange}
+            handleCollateralChange={handleCollateralChange}
             next={() => next()}
-            values={{ collateral, spread, funding }}
+            values={{ collateral, spread, funding, collateralsCustom }}
           />
         )
       case 3:
