@@ -116,8 +116,8 @@ class KlerosService {
       return tokens.sort((tokenA: Token, tokenB: Token) => {
         let sortBy: number
 
-        const indexOfB = basicOrder.indexOf(tokenB.symbol.toLowerCase())
         const indexOfA = basicOrder.indexOf(tokenA.symbol.toLowerCase())
+        const indexOfB = basicOrder.indexOf(tokenB.symbol.toLowerCase())
         if (indexOfB !== -1 || indexOfA !== -1) {
           sortBy = indexOfB - indexOfA
         } else {
