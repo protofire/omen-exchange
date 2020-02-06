@@ -91,7 +91,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
-  const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  const [amountToFund, setAmountToFund] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
 
@@ -110,7 +110,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(
-        `Add funding amount: ${formatBigNumber(amount, collateral.decimals)} ${
+        `Add funding amount: ${formatBigNumber(amountToFund, collateral.decimals)} ${
           collateral.symbol
         } ...`,
       )
@@ -123,7 +123,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
         account,
         cpk.address,
-        amount,
+        amountToFund,
       )
 
       if (!hasEnoughAlowance) {
@@ -131,13 +131,13 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
       }
 
       await cpk.addFunding({
-        amount,
+        amount: amountToFund,
         collateral,
         marketMaker,
       })
 
       setStatus(Status.Ready)
-      setAmount(new BigNumber(0))
+      setAmountToFund(new BigNumber(0))
     } catch (err) {
       setStatus(Status.Error)
       logger.log(`Error trying to add funding: ${err.message}`)
@@ -171,8 +171,8 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
 
   const collateralBalance = useCollateralBalance(collateral, context)
 
-  const isFundingGreaterThanBalance = amount.gt(collateralBalance)
-  const error = amount.isZero() || isFundingGreaterThanBalance
+  const isFundingGreaterThanBalance = amountToFund.gt(collateralBalance)
+  const error = amountToFund.isZero() || isFundingGreaterThanBalance
 
   const fundingMessageError = isFundingGreaterThanBalance
     ? `You don't have enough collateral in your balance.`
@@ -200,8 +200,8 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
                   <BigNumberInputTextRight
                     decimals={collateral.decimals}
                     name="amount"
-                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                    value={amount}
+                    onChange={(e: BigNumberInputReturn) => setAmountToFund(e.value)}
+                    value={amountToFund}
                   />
                 }
                 placeholderText={collateral.symbol}
@@ -215,7 +215,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
               <BalanceToken
                 collateral={collateral}
                 collateralBalance={collateralBalance}
-                onClickAddMaxCollateral={() => setAmount(collateralBalance)}
+                onClickAddMaxCollateral={() => setAmountToFund(collateralBalance)}
               />
               <FormError>{fundingMessageError}</FormError>
             </>
