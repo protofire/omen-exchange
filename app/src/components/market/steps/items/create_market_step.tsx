@@ -22,7 +22,7 @@ import { MarketCreationStatus } from '../../../../util/market_creation_status_da
 import { getLogger } from '../../../../util/logger'
 import { FormError } from '../../../common/form_error'
 import { useSelector, useDispatch } from 'react-redux'
-import { fetchAccountBalance } from '../../../../store/reducer'
+import { fetchAccountBalance, BalanceState } from '../../../../store/reducer'
 
 const logger = getLogger('MarketCreationItems::CreateMarketStep')
 
@@ -76,7 +76,9 @@ interface Props {
 
 const CreateMarketStep = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const balance = useSelector((state: any) => state.balance && new BigNumber(state.balance))
+  const balance = useSelector(
+    (state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance),
+  )
   const dispatch = useDispatch()
 
   const { library: provider, account } = context
@@ -110,8 +112,6 @@ const CreateMarketStep = (props: Props) => {
   }
 
   const resolutionDate = resolution && formatDate(resolution)
-
-  const buttonText = account ? 'Create' : 'Connect Wallet'
 
   const hasEnoughBalance = balance && balance.gte(funding)
   let fundingErrorMessage = ''

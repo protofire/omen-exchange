@@ -1,11 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { ERC20Service } from '../services'
 import { BigNumber } from 'ethers/utils'
+import { getLogger } from '../util/logger'
 
-type BalanceState = {
+export type BalanceState = {
   balance: Maybe<BigNumber>
 }
 
+const logger = getLogger('Store::BalanceReducer')
 const initialState: BalanceState = {
   balance: null,
 }
@@ -35,6 +37,6 @@ export const fetchAccountBalance = (account: any, provider: any, collateral: any
       dispatch(setBalance({ balance: null }))
     }
   } catch (err) {
-    console.error(err)
+    logger.error(err)
   }
 }
