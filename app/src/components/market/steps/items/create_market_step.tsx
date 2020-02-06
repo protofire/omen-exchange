@@ -194,19 +194,23 @@ const CreateMarketStep = (props: Props) => {
         >
           ‹ Back
         </ButtonLinkStyled>
-        <Button
-          buttonType={ButtonType.primary}
-          disabled={
-            !(
-              MarketCreationStatus.is.ready(marketCreationStatus) &&
-              !MarketCreationStatus.is.error(marketCreationStatus) &&
-              hasEnoughBalance
-            ) && !!account
-          }
-          onClick={submit}
-        >
-          {buttonText}
-        </Button>
+        {account ? (
+          <Button
+            buttonType={ButtonType.primary}
+            onClick={submit}
+            disabled={
+              !MarketCreationStatus.is.ready(marketCreationStatus) ||
+              MarketCreationStatus.is.error(marketCreationStatus) ||
+              !hasEnoughBalance
+            }
+          >
+            Create
+          </Button>
+        ) : (
+          <Button buttonType={ButtonType.primary} onClick={submit}>
+            Connect Wallet
+          </Button>
+        )}
       </ButtonContainer>
     </CreateCard>
   )
