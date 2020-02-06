@@ -28,25 +28,17 @@ class KlerosService {
   ) {
     this.provider = provider
     this.tcrAddress = tcrAddress
+
+    this.badgeContract = new ethers.Contract(badgeContractAddress, klerosBadgeAbi, provider)
+    this.tokensViewContract = new ethers.Contract(
+      tokensViewContractAddress,
+      klerosTokensViewAbi,
+      provider,
+    )
     if (signerAddress) {
       const signer = provider.getSigner()
-      this.badgeContract = new ethers.Contract(
-        badgeContractAddress,
-        klerosBadgeAbi,
-        provider,
-      ).connect(signer)
-      this.tokensViewContract = new ethers.Contract(
-        tokensViewContractAddress,
-        klerosTokensViewAbi,
-        provider,
-      ).connect(signer)
-    } else {
-      this.badgeContract = new ethers.Contract(badgeContractAddress, klerosBadgeAbi, provider)
-      this.tokensViewContract = new ethers.Contract(
-        tokensViewContractAddress,
-        klerosTokensViewAbi,
-        provider,
-      )
+      this.badgeContract = this.badgeContract.connect(signer)
+      this.tokensViewContract = this.tokensViewContract.connect(signer)
     }
   }
 
