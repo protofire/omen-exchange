@@ -1,7 +1,7 @@
 import { Contract, ethers } from 'ethers'
 
 import { Token } from '../util/types'
-import { getContractAddress, getTokensByNetwork, networkIds } from '../util/networks'
+import { getTokensByNetwork, networkIds } from '../util/networks'
 import { Web3Provider } from 'ethers/providers'
 
 const klerosBadgeAbi = [
@@ -17,14 +17,17 @@ class KlerosService {
   provider: Web3Provider
   badgeContract: Contract
   tokensViewContract: Contract
+  tcrAddress: string
 
   constructor(
     badgeContractAddress: string,
     tokensViewContractAddress: string,
+    tcrAddress: string,
     provider: Web3Provider,
     signerAddress: Maybe<string>,
   ) {
     this.provider = provider
+    this.tcrAddress = tcrAddress
     if (signerAddress) {
       const signer = provider.getSigner()
       this.badgeContract = new ethers.Contract(
@@ -89,16 +92,13 @@ class KlerosService {
       }
 
       // Fetch their submission IDs on the TCR.
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
-      const klerosTCRAddress = getContractAddress(networkId, 'klerosTCR')
       const submissionIDs = await this.tokensViewContract.getTokensIDsForAddresses(
-        klerosTCRAddress,
+        this.tcrAddress,
         addressesWithBadge,
       )
 
       // With the token IDs, get the information and add it to the object.
-      const fetchedTokens = await this.tokensViewContract.getTokens(klerosTCRAddress, submissionIDs)
+      const fetchedTokens = await this.tokensViewContract.getTokens(this.tcrAddress, submissionIDs)
       const tokens = fetchedTokens
         .filter((tokenInfo: any) => tokenInfo[3] !== ethers.constants.AddressZero)
         .map(
