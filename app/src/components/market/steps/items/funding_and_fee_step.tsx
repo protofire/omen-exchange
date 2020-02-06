@@ -94,11 +94,20 @@ const FundingAndFeeStep = (props: Props) => {
           description: `The fee taken from every trade. Temporarily fixed at ${MARKET_FEE}%.`,
         }}
       />
-      <Tokens
-        name="collateralId"
-        networkId={context.networkId}
-        onTokenChange={handleCollateralChange}
-        value={collateral}
+      <FormRow
+        formField={
+          <Tokens
+            name="collateralId"
+            networkId={context.networkId}
+            onTokenChange={handleCollateralChange}
+            value={collateral}
+          />
+        }
+        title={'Collateral token'}
+        tooltip={{
+          id: `collateralToken`,
+          description: `Select the token you want to use as collateral.`,
+        }}
       />
       <FormRow
         formField={
