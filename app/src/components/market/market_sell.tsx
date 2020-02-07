@@ -181,10 +181,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     return (
       <>
         <BalanceShares
-          balanceItem={balanceItem}
+          shares={balanceItem.shares}
           collateral={collateral}
-          onClickMax={(balanceItemSet?: BalanceItem) => {
-            if (balanceItemSet) setAmountShares(balanceItemSet.shares)
+          onClickMax={(shares: BigNumber) => {
+            setAmountShares(shares)
           }}
         />
         <FormError>{sharesMessageError}</FormError>
