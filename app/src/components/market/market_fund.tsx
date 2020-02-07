@@ -29,6 +29,7 @@ import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 import { CPKService } from '../../services/cpk'
 import { useFundingBalance } from '../../hooks/useFundingBalance'
 import { BalanceShares } from '../common/balance_shares'
+import { ToggleTokenLock } from '../common/toggle_token_lock'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -215,6 +216,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
                 }
                 placeholderText={collateral.symbol}
               />
+              <ToggleTokenLock context={context} amount={amountToFund} collateral={collateral} />
             </>
           }
           title={'Amount to fund'}
