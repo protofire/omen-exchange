@@ -20,7 +20,9 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ButtonType } from '../../../../common/button_styling_types'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { getLogger } from '../../../../util/logger'
-import { ERC20Service } from '../../../../services'
+import { FormError } from '../../../common/form_error'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchAccountBalance, BalanceState } from '../../../../store/reducer'
 
 const logger = getLogger('MarketCreationItems::CreateMarketStep')
 
@@ -30,6 +32,10 @@ const OutcomeInfo = styled(Well)`
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
+`
+
+const ErrorStyled = styled(FormError)`
+  margin: 0 0 10px 0;
 `
 
 const Grid = styled.div`
@@ -70,6 +76,11 @@ interface Props {
 
 const CreateMarketStep = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const balance = useSelector(
+    (state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance),
+  )
+  const dispatch = useDispatch()
+
   const { library: provider, account } = context
 
   const { values, marketCreationStatus } = props
@@ -84,24 +95,16 @@ const CreateMarketStep = (props: Props) => {
     outcomes,
   } = values
 
+  React.useEffect(() => {
+    dispatch(fetchAccountBalance(account, provider, collateral))
+  }, [account, provider, collateral])
+
   const back = () => {
     props.back()
   }
 
   const submit = async () => {
     try {
-      if (account) {
-        const collateralService = new ERC20Service(provider, account, collateral.address)
-
-        const hasEnoughBalanceToFund = await collateralService.hasEnoughBalanceToFund(
-          account,
-          funding,
-        )
-        if (!hasEnoughBalanceToFund) {
-          throw new Error('there are not enough collateral balance for funding')
-        }
-      }
-
       props.submit()
     } catch (err) {
       logger.error(err)
@@ -110,7 +113,17 @@ const CreateMarketStep = (props: Props) => {
 
   const resolutionDate = resolution && formatDate(resolution)
 
-  const buttonText = account ? 'Create' : 'Connect Wallet'
+  const hasEnoughBalance = balance && balance.gte(funding)
+  let fundingErrorMessage = ''
+  if (balance && !hasEnoughBalance) {
+    fundingErrorMessage = `You entered ${formatBigNumber(
+      funding,
+      collateral.decimals,
+    )} DAI of funding but your account only has ${formatBigNumber(
+      balance,
+      collateral.decimals,
+    )} DAI`
+  }
 
   return (
     <CreateCard>
@@ -169,6 +182,8 @@ const CreateMarketStep = (props: Props) => {
       !MarketCreationStatus.is.error(marketCreationStatus) ? (
         <Loading full={true} message={`${marketCreationStatus._type}...`} />
       ) : null}
+
+      {fundingErrorMessage && <ErrorStyled>{fundingErrorMessage}</ErrorStyled>}
       <ButtonContainer>
         <ButtonLinkStyled
           disabled={
@@ -179,16 +194,23 @@ const CreateMarketStep = (props: Props) => {
         >
           ‹ Back
         </ButtonLinkStyled>
-        <Button
-          buttonType={ButtonType.primary}
-          disabled={
-            !MarketCreationStatus.is.ready(marketCreationStatus) &&
-            !MarketCreationStatus.is.error(marketCreationStatus)
-          }
-          onClick={submit}
-        >
-          {buttonText}
-        </Button>
+        {account ? (
+          <Button
+            buttonType={ButtonType.primary}
+            onClick={submit}
+            disabled={
+              !MarketCreationStatus.is.ready(marketCreationStatus) ||
+              MarketCreationStatus.is.error(marketCreationStatus) ||
+              !hasEnoughBalance
+            }
+          >
+            Create
+          </Button>
+        ) : (
+          <Button buttonType={ButtonType.primary} onClick={submit}>
+            Connect Wallet
+          </Button>
+        )}
       </ButtonContainer>
     </CreateCard>
   )
