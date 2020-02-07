@@ -29,6 +29,7 @@ import { MARKET_FEE } from '../../common/constants'
 import { FormError } from '../common/form_error'
 import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 import { ModalTwitterShare } from '../common/modal_twitter_share'
+import { ToggleTokenLock } from '../common/toggle_token_lock'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -235,17 +236,20 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         />
         <AmountWrapper
           formField={
-            <TextfieldCustomPlaceholder
-              formField={
-                <BigNumberInputTextRight
-                  name="amount"
-                  value={amount}
-                  onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                  decimals={collateral.decimals}
-                />
-              }
-              placeholderText={collateral.symbol}
-            />
+            <>
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInputTextRight
+                    name="amount"
+                    value={amount}
+                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                    decimals={collateral.decimals}
+                  />
+                }
+                placeholderText={collateral.symbol}
+              />
+              <ToggleTokenLock context={context} amount={amount} collateral={collateral} />
+            </>
           }
           note={noteAmount}
           title={'Total cost'}
