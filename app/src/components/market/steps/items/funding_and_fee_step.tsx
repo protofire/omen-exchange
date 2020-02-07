@@ -98,7 +98,7 @@ const FundingAndFeeStep = (props: Props) => {
         formField={
           <Tokens
             name="collateralId"
-            networkId={context.networkId}
+            context={context}
             onTokenChange={handleCollateralChange}
             value={collateral}
           />
