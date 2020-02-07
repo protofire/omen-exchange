@@ -27,7 +27,7 @@ export const useFundingBalance = (
       setFundingBalance(fundingBalance)
     }
     fetchFundingBalance()
-  }, [account, provider])
+  }, [account, provider, buildMarketMaker, marketMakerAddress])
 
   return fundingBalance
 }

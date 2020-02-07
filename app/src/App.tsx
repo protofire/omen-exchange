@@ -10,6 +10,9 @@ import theme from './theme'
 import connectors from './util/connectors'
 import { Main } from './components'
 import { WalletConnectStylesOverride } from './common/wallet_connect_styles_override'
+import { configureStore } from '@reduxjs/toolkit'
+import balanceReducer from './store/reducer'
+import { Provider } from 'react-redux'
 
 type ThemeType = typeof theme
 
@@ -35,14 +38,17 @@ const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
   ${WalletConnectStylesOverride}
 
 `
+const store = configureStore({ reducer: balanceReducer })
 
 const App: React.FC = () => {
   return (
     <ApolloProvider client={client}>
       <ThemeProvider theme={theme}>
         <Web3Provider connectors={connectors} libraryName="ethers.js">
-          <GlobalStyle />
-          <Main />
+          <Provider store={store}>
+            <GlobalStyle />
+            <Main />
+          </Provider>
         </Web3Provider>
       </ThemeProvider>
     </ApolloProvider>
