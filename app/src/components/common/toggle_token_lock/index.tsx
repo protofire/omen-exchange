@@ -5,6 +5,7 @@ import { Button } from '../button'
 import { CPKService, ERC20Service } from '../../../services'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { BigNumber } from 'ethers/utils'
+import { Loading } from '../loading'
 
 interface Props {
   collateral: Token
@@ -15,6 +16,7 @@ interface Props {
 enum CollateralStatus {
   Lock = 'Lock',
   Unlock = 'Unlock',
+  Waiting = 'Waiting',
 }
 
 export const ToggleTokenLock = (props: Props) => {
@@ -45,6 +47,7 @@ export const ToggleTokenLock = (props: Props) => {
     const collateralService = new ERC20Service(provider, account, collateral.address)
     const cpk = await CPKService.create(provider)
 
+    setStatus(CollateralStatus.Waiting)
     if (status === CollateralStatus.Lock) {
       await collateralService.approveUnlimited(cpk.address)
       setStatus(CollateralStatus.Unlock)
@@ -57,5 +60,10 @@ export const ToggleTokenLock = (props: Props) => {
   const textButton =
     status === CollateralStatus.Lock ? `Unlock ${collateral.symbol}` : `Lock ${collateral.symbol}`
 
-  return <>{!amount.isZero() && <Button onClick={toggle}>{textButton}</Button>}</>
+  return (
+    <>
+      {!amount.isZero() && <Button onClick={toggle}>{textButton}</Button>}
+      {status === CollateralStatus.Waiting && <Loading full={true} />}
+    </>
+  )
 }
