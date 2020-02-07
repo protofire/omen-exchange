@@ -1,6 +1,7 @@
-import { Contract, ethers, Wallet } from 'ethers'
+import { Contract, ethers, utils, Wallet } from 'ethers'
 
 import { getLogger } from '../util/logger'
+import { TransactionReceipt } from 'ethers/providers'
 
 const logger = getLogger('Services::Oracle')
 
@@ -22,16 +23,23 @@ export class OracleService {
     this.provider = provider
   }
 
+  get address(): string {
+    return this.contract.address
+  }
+
   /**
    * Resolve the condition with the given questionId
    */
-  resolveCondition = async (questionId: string, numOutcomes: number): Promise<void> => {
+  resolveCondition = async (
+    questionId: string,
+    numOutcomes: number,
+  ): Promise<TransactionReceipt> => {
     try {
       const transactionObject = await this.contract.resolveSingleSelectCondition(
         questionId,
         numOutcomes,
       )
-      await this.provider.waitForTransaction(transactionObject.hash)
+      return this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
       logger.error(
         `There was an error resolving the condition with questionid '${questionId}'`,
@@ -39,5 +47,11 @@ export class OracleService {
       )
       throw err
     }
+  }
+
+  static encodeResolveCondition = (questionId: string, numOutcomes: number): string => {
+    const oracleInterface = new utils.Interface(oracleAbi)
+
+    return oracleInterface.functions.resolveSingleSelectCondition.encode([questionId, numOutcomes])
   }
 }

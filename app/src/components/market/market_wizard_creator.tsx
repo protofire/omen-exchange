@@ -36,7 +36,6 @@ export const MarketWizardCreator = (props: Props) => {
 
   const marketDataDefault: MarketData = {
     collateral: defaultCollateral,
-    collateralsCustom: [],
     arbitratorsCustom: [],
     categoriesCustom: [],
     question: '',
@@ -103,16 +102,6 @@ export const MarketWizardCreator = (props: Props) => {
     setCurrentStep(actualCurrentStep)
   }
 
-  const addCollateralCustom = (collateral: Token): void => {
-    const collateralsCustom = marketData.collateralsCustom
-    collateralsCustom.push(collateral)
-    const newMarketData = {
-      ...marketData,
-      collateralsCustom,
-    }
-    setMarketdata(newMarketData)
-  }
-
   const addArbitratorCustom = (arbitrator: Arbitrator): void => {
     const arbitratorsCustom = marketData.arbitratorsCustom
     arbitratorsCustom.push(arbitrator)
@@ -145,15 +134,6 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const handleCollateralChange = async (collateral: Token) => {
-    const newMarketData = {
-      ...marketData,
-      funding: ethers.constants.Zero, // when the collateral changes, reset the value of funding
-      collateral,
-    }
-    setMarketdata(newMarketData)
-  }
-
   const handleArbitratorChange = (arbitrator: Arbitrator) => {
     const newMarketData = {
       ...marketData,
@@ -182,6 +162,15 @@ export const MarketWizardCreator = (props: Props) => {
       loadedQuestionId: questionId,
     }
 
+    setMarketdata(newMarketData)
+  }
+
+  const handleCollateralChange = (collateral: Token) => {
+    const newMarketData = {
+      ...marketData,
+      funding: ethers.constants.Zero, // when the collateral changes, reset the value of funding
+      collateral,
+    }
     setMarketdata(newMarketData)
   }
 
@@ -231,7 +220,6 @@ export const MarketWizardCreator = (props: Props) => {
   const currentStepFn = () => {
     const {
       collateral,
-      collateralsCustom,
       question,
       category,
       categoriesCustom,
@@ -273,9 +261,8 @@ export const MarketWizardCreator = (props: Props) => {
             back={() => back()}
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
-            addCollateralCustom={addCollateralCustom}
             next={() => next()}
-            values={{ collateral, collateralsCustom, spread, funding }}
+            values={{ collateral, spread, funding }}
           />
         )
       case 3:

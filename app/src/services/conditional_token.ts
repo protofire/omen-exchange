@@ -76,7 +76,7 @@ class ConditionalTokenService {
     return this.contract.getPositionId(collateralAddress, collectionId)
   }
 
-  getBalanceOf = async (ownerAddress: string, positionId: string): Promise<any> => {
+  getBalanceOf = async (ownerAddress: string, positionId: string): Promise<BigNumber> => {
     return this.contract.balanceOf(ownerAddress, positionId)
   }
 
@@ -196,6 +196,22 @@ class ConditionalTokenService {
   doesConditionExist = async (conditionId: string): Promise<boolean> => {
     const outcomeSlotCount = await this.getOutcomeSlotCount(conditionId)
     return !outcomeSlotCount.isZero()
+  }
+
+  static encodeRedeemPositions = (
+    collateralToken: string,
+    conditionId: string,
+    outcomesCount: number,
+  ): string => {
+    const redeemPositionsInterface = new utils.Interface(conditionalTokensAbi)
+    const indexSets = getIndexSets(outcomesCount)
+
+    return redeemPositionsInterface.functions.redeemPositions.encode([
+      collateralToken,
+      ethers.constants.HashZero,
+      conditionId,
+      indexSets,
+    ])
   }
 }
 

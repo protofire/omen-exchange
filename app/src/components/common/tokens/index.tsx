@@ -13,14 +13,13 @@ interface Props {
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
   readOnly?: boolean
   value: Token
-  customValues: Token[]
   context: ConnectedWeb3Context
 }
 
 const FormOption = styled.option``
 
 export const Tokens = (props: Props) => {
-  const { context, value, customValues, onTokenChange, ...restProps } = props
+  const { context, value, onTokenChange, ...restProps } = props
 
   const [tokens, setTokens] = useState<Token[]>([])
   const { kleros } = useContracts(context)
@@ -28,12 +27,11 @@ export const Tokens = (props: Props) => {
   useEffect(() => {
     const fetchTokens = async () => {
       const tokens = await kleros.queryTokens()
-      tokens.concat(customValues)
       setTokens(tokens)
     }
 
     fetchTokens()
-  }, [kleros, customValues])
+  }, [kleros])
 
   const options = tokens.map(token => ({
     label: token.symbol,

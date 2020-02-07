@@ -4,9 +4,15 @@ import CPK from 'contract-proxy-kit'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
-import { ConditionalTokenService, ERC20Service, MarketMakerService, RealitioService } from './index'
+import {
+  ConditionalTokenService,
+  ERC20Service,
+  MarketMakerService,
+  OracleService,
+  RealitioService,
+} from './index'
 import { BigNumber } from 'ethers/utils'
-import { MarketData } from '../util/types'
+import { BalanceItem, MarketData, Token } from '../util/types'
 import { getContractAddress, getCPKAddresses } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { MarketMakerFactoryService } from './market_maker_factory'
@@ -32,6 +38,23 @@ interface CPKCreateMarketParams {
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
+}
+
+interface CPKFundingParams {
+  amount: BigNumber
+  collateral: Token
+  marketMaker: MarketMakerService
+}
+
+interface CPKRedeemParams {
+  isConditionResolved: boolean
+  questionId: string
+  numOutcomes: number
+  winningOutcome: BalanceItem | undefined
+  collateralToken: Token
+  oracle: OracleService
+  marketMaker: MarketMakerService
+  conditionalTokens: ConditionalTokenService
 }
 
 class CPKService {
@@ -322,6 +345,150 @@ class CPKService {
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
+      throw err
+    }
+  }
+
+  addFunding = async ({
+    amount,
+    collateral,
+    marketMaker,
+  }: CPKFundingParams): Promise<TransactionReceipt> => {
+    try {
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+
+      // Check  if the allowance of the CPK to the market maker is enough.
+      const collateralService = new ERC20Service(this.provider, account, collateral.address)
+
+      const transactions = []
+      const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
+        this.cpk.address,
+        marketMaker.address,
+        amount,
+      )
+
+      if (!hasCPKEnoughAlowance) {
+        // Step 1:  Approve unlimited amount to be transferred to the market maker
+        transactions.push({
+          operation: CPK.CALL,
+          to: collateral.address,
+          value: 0,
+          data: ERC20Service.encodeApproveUnlimited(marketMaker.address),
+        })
+      }
+
+      transactions.push(
+        {
+          operation: CPK.CALL,
+          to: collateral.address,
+          value: 0,
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+        },
+        {
+          operation: CPK.CALL,
+          to: marketMaker.address,
+          value: 0,
+          data: MarketMakerService.encodeAddFunding(amount),
+        },
+      )
+
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 2000000 })
+
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(
+        `There was an error adding an amount of '${amount.toString()}' for funding`,
+        err.message,
+      )
+      throw err
+    }
+  }
+
+  removeFunding = async ({
+    amount,
+    collateral,
+    marketMaker,
+  }: CPKFundingParams): Promise<TransactionReceipt> => {
+    try {
+      const transactions = [
+        {
+          operation: CPK.CALL,
+          to: marketMaker.address,
+          value: 0,
+          data: MarketMakerService.encodeRemoveFunding(amount),
+        },
+      ]
+
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
+
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(
+        `There was an error removing amount '${amount.toString()}' for funding`,
+        err.message,
+      )
+      throw err
+    }
+  }
+
+  redeemPositions = async ({
+    isConditionResolved,
+    questionId,
+    numOutcomes,
+    winningOutcome,
+    oracle,
+    collateralToken,
+    marketMaker,
+    conditionalTokens,
+  }: CPKRedeemParams): Promise<TransactionReceipt> => {
+    try {
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+
+      const transactions = []
+      if (!isConditionResolved) {
+        transactions.push({
+          operation: CPK.CALL,
+          to: oracle.address,
+          value: 0,
+          data: OracleService.encodeResolveCondition(questionId, numOutcomes),
+        })
+      }
+
+      const conditionId = await marketMaker.getConditionId()
+
+      transactions.push({
+        operation: CPK.CALL,
+        to: conditionalTokens.address,
+        value: 0,
+        data: ConditionalTokenService.encodeRedeemPositions(
+          collateralToken.address,
+          conditionId,
+          numOutcomes,
+        ),
+      })
+
+      if (winningOutcome) {
+        transactions.push({
+          operation: CPK.CALL,
+          to: collateralToken.address,
+          value: 0,
+          data: ERC20Service.encodeTransfer(account, winningOutcome.shares),
+        })
+      }
+
+      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
+
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(
+        `Error trying to resolve condition or redeem for questionId '${questionId}'`,
+        err.message,
+      )
       throw err
     }
   }
