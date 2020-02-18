@@ -15,7 +15,9 @@ const TooltipStyled = styled(Tooltip)`
   margin-left: auto;
 `
 
-const TitleWrapper = styled.div`
+const TitleWrapper = styled.div.attrs({
+  className: 'form-title',
+})`
   align-items: center;
   display: flex;
   margin-bottom: 14px;

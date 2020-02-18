@@ -12,6 +12,7 @@ interface Props {
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
   readOnly?: boolean
   value: string
+  label?: string
 }
 
 const SelectWrapper = styled.div<{ disabled?: boolean }>`
@@ -28,6 +29,12 @@ const SelectWrapper = styled.div<{ disabled?: boolean }>`
   }
 `
 
+const StyledLabel = styled.label`
+  font-size: 11px;
+  line-height: 1.36;
+  color: ${props => props.theme.textfield.placeholder};
+`
+
 SelectWrapper.defaultProps = {
   disabled: false,
 }
@@ -38,7 +45,7 @@ const FormSelect = styled.select`
   appearance: none;
   ${TextfieldCSS}
   padding: ${props =>
-    `${props.theme.textfield.paddingVertical} 25px ${props.theme.textfield.paddingVertical} ${props.theme.textfield.paddingHorizontal};`}
+    `${props.theme.textfield.paddingVertical} 25px ${props.theme.textfield.paddingVertical} 0;`}
   position: relative;
   z-index: 2;
 
@@ -49,10 +56,11 @@ const FormSelect = styled.select`
 `
 
 export const Select = (props: Props) => {
-  const { children, ...restProps } = props
+  const { children, label, ...restProps } = props
 
   return (
     <SelectWrapper>
+      {label && <StyledLabel>{label}</StyledLabel>}
       <FormSelect {...restProps}>{children}</FormSelect>
       <IconSelect />
     </SelectWrapper>

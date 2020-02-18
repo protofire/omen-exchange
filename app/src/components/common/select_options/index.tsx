@@ -16,19 +16,16 @@ interface Props {
 
 const FormOption = styled.option``
 
-export const Categories = (props: Props) => {
+export const SelectOptions = (props: Props) => {
   const { customValues, label, ...restProps } = props
 
-  const categories = ['Miscellaneous', 'Politics']
-  const allCategories = categories.concat(customValues.filter(item => categories.indexOf(item) < 0))
-  const options = allCategories.map(category => ({
-    label: category,
-    value: category,
+  const options = customValues.map(option => ({
+    label: option,
+    value: option,
   }))
 
   return (
     <Select {...restProps} label={label}>
-      <FormOption value="">Select a category</FormOption>
       {options.map(option => {
         return (
           <FormOption key={option.value} value={option.value}>

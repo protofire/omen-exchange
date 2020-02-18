@@ -22,7 +22,7 @@ const theme = {
     border: 'none',
     borderRadius: '5px',
     boxShadow: '0 0 18px 0 rgba(0, 0, 0, 0.08)',
-    paddingHorizontal: '15px',
+    paddingHorizontal: '18px',
     paddingVertical: '20px',
     textColor: '#000',
     textColorSecondary: '#333',

@@ -39,10 +39,6 @@ const Title = styled.h1`
   font-weight: 500;
   line-height: 1.33;
   margin: 0 0 5px 0;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin-bottom: 0;
-  }
 `
 
 const Info = styled.div`
@@ -50,8 +46,20 @@ const Info = styled.div`
   flex-direction: column;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    align-items: center;
     flex-direction: row;
+  }
+`
+
+const TextWrapper = styled.div`
+  p {
+    color: #999999;
+    font-size: 13px;
+    margin: 0 0 3px;
+    line-height: 18px;
+
+    strong {
+      font-weight: bold;
+    }
   }
 `
 
@@ -143,6 +151,19 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     <ListItemWrapper address={address}>
       <Contents>
         <Title>{question}</Title>
+        {/* harcoded text */}
+        <TextWrapper>
+          <p>
+            Current Prediction: <strong>60% YES</strong>
+          </p>
+          <p>
+            End in <strong>2 days</strong>
+          </p>
+          <p>
+            <strong>155,234.00</strong> DAI Volume / <strong>100,000.00</strong> DAI at Stake /{' '}
+            <strong>2,000.00</strong> Pool Shares
+          </p>
+        </TextWrapper>
         <Info>
           <ResolutionDate>
             <CalendarIconStyled />

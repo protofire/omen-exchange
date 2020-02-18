@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="12px" viewBox="0 0 14 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>check-square</title>
+    <desc>Created with Sketch.</desc>
+    <g id="symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="atoms-/-icons-/-check" transform="translate(-5.000000, -6.000000)" fill="#FFFFFF" fill-rule="nonzero">
+            <g id="Group" transform="translate(4.000000, 4.000000)">
+                <g id="check-square">
+                    <g id="check" transform="translate(1.000000, 2.000000)">
+                        <g id="Mask">
+                            <path d="M12.9753829,0.134693182 L4.14608108,9.68065909 L1.02461712,6.30582955 C0.87686036,6.14607955 0.637283784,6.14607955 0.489495495,6.30582955 L0.132779279,6.6915 C-0.0149774775,6.85125 -0.0149774775,7.11027273 0.132779279,7.27005682 L3.87853604,11.3198523 C4.02629279,11.4796023 4.26586937,11.4796023 4.41365766,11.3198523 L13.8672207,1.09895455 C14.0149775,0.939204545 14.0149775,0.680181818 13.8672207,0.520397727 L13.510473,0.134693182 C13.3627162,-0.0250568182 13.1231396,-0.0250568182 12.9753829,0.134693182 Z" id="Path"></path>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
