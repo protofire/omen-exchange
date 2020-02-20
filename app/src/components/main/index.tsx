@@ -9,6 +9,7 @@ import { MarketRoutes } from '../market/market_routes'
 import { ConnectedWeb3 } from '../../hooks/connectedWeb3'
 import { MarketWizardCreatorContainer } from '../market/market_wizard_creator_container'
 import { MarketHomeContainer } from '../market/market_home_container'
+import { NewDesign } from '../new_design/index'
 import { useWeb3Context } from 'web3-react'
 import { WrongNetworkMessage } from '../common/wrong_network_message'
 
@@ -27,6 +28,7 @@ export const Main: React.FC = () => {
             {!context.error && (
               <Switch>
                 <Route exact path="/" component={MarketHomeContainer} />
+                <Route exact path="/new-design" component={NewDesign} />
                 <Route exact path="/create" component={MarketWizardCreatorContainer} />
                 <Route path="/:address" component={MarketRoutes} />
                 <Route component={RedirectToHome} />

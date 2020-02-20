@@ -11,9 +11,6 @@ import { SectionTitle } from '../common/section_title'
 import { Filter } from '../common/filter'
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { Loading } from '../common/loading'
-import { useQuery } from '@apollo/react-hooks'
-import { fetchConditionsQuery } from '../../queries/example'
-import { getLogger } from '../../util/logger'
 
 const FilterStyled = styled(Filter)`
   margin: -30px auto 10px;
@@ -35,14 +32,8 @@ interface Props {
   onShowMore: () => void
 }
 
-const logger = getLogger('Market::Home')
-
 export const MarketHome: React.FC<Props> = (props: Props) => {
   const { count, markets, context, currentFilter, onFilterChange, onShowMore } = props
-
-  // TODO, remove this, only for testing
-  const { data } = useQuery(fetchConditionsQuery)
-  logger.log(data)
 
   const showMoreButton =
     props.moreMarkets && !RemoteData.is.loading(markets) ? (

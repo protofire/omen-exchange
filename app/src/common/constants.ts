@@ -22,6 +22,6 @@ export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
 
 // TODO: update the graph url with the right one
 export const GRAPH_HTTP =
-  process.env.REACT_APP_GRAPH_HTTP || 'https://api.thegraph.com/subgraphs/name/infinitestyles/pm'
+  process.env.REACT_APP_GRAPH_HTTP || 'https://api.thegraph.com/subgraphs/name/cag/omen-rinkeby'
 export const GRAPH_WS =
-  process.env.REACT_APP_GRAPH_WS || 'wss://api.thegraph.com/subgraphs/name/infinitestyles/pm'
+  process.env.REACT_APP_GRAPH_WS || 'wss://api.thegraph.com/subgraphs/name/cag/omen-rinkeby'
