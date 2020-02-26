@@ -3,17 +3,10 @@ import moment from 'moment'
 import { ethers } from 'ethers'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { ERC20Service } from './../../services/erc20'
+import { calcPrice } from './../../util/tools'
+
 interface Props {
   market: any
-}
-
-const SEPARATOR = '␟'
-
-const parseQuestionTemplate = (templateId: string) => {
-  if (templateId === '0x2') {
-    return 'Binary'
-  }
-  throw new Error(`Invalid question template ${templateId}`)
 }
 
 export const MarketCard = (props: Props) => {
@@ -24,15 +17,13 @@ export const MarketCard = (props: Props) => {
 
   const { market } = props
   const { question } = market.conditions[0]
-  const endsIn = moment(new Date(question.openingTimestamp * 1000)).fromNow()
-  const [questionString, , category] = question.data.split(SEPARATOR) // if category undefined => Misc
-  const questionTemplate = parseQuestionTemplate(question.template.id)
-  console.log(category, questionTemplate)
-  const { collateralToken, collateralVolume } = market
+  const endsIn = moment(new Date(question.openingTimestamp * 1000)).fromNow() // TODO Add function to calculate for past markets
+
+  const { title, outcomes } = question
+  const { collateralToken, collateralVolume, outcomeTokenAmounts } = market
 
   useEffect(() => {
     const setToken = async () => {
-      console.log(provider, account)
       if (!account) {
         return
       }
@@ -48,14 +39,16 @@ export const MarketCard = (props: Props) => {
     setToken()
   }, [collateralToken, account])
 
-  console.log(collateralToken)
+  const percentages = calcPrice(outcomeTokenAmounts)
+  const indexMax = percentages.indexOf(Math.max(...percentages))
+
   return (
     <div>
       <div>
-        <strong>{questionString}</strong>
+        <strong>{title}</strong>
       </div>
       <div>
-        <span>60% YES</span>·{' '}
+        <span>{`${(percentages[indexMax] * 100).toFixed(2)}% ${outcomes[indexMax]} `}</span>·{' '}
         <span>
           {amount} {symbol} Volume
         </span>{' '}

@@ -4,8 +4,8 @@ import gql from 'graphql-tag'
 // first, skip
 // where { }
 export const MARKETS = gql`
-  query GetMarkets($first: Int!, $skip: Int!) {
-    fixedProductMarketMakers(first: $first, skip: $skip) {
+  query GetMarkets($first: Int!, $skip: Int!, $criteria: String) {
+    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $criteria) {
       id
       collateralVolume
       collateralToken
@@ -14,11 +14,11 @@ export const MARKETS = gql`
       conditions(first: 1) {
         question {
           id
-          data
+          title
+          category
+          arbitrator
+          outcomes
           openingTimestamp
-          template {
-            id
-          }
         }
       }
     }

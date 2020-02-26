@@ -5,18 +5,22 @@ import { MARKETS } from '../../queries/markets_home'
 import { MarketCard } from './market_card'
 
 const NewDesign: React.FC = () => {
-  const FIRST = 1
+  const FIRST = 10
   const SKIP = 1
   const [skip, setSkip] = useState(0)
   const [markets, setMarkets] = useState([] as any)
   const [moreData, setMoreData] = useState(true)
-  const { data, loading } = useQuery(MARKETS, { variables: { first: FIRST, skip } })
+  const [orderCriteria, setOrderCriteria] = useState<Maybe<string>>(null)
+  const { data, loading, error } = useQuery(MARKETS, {
+    variables: { first: FIRST, skip, criteria: orderCriteria },
+  })
 
+  console.log(error)
   useEffect(() => {
     if (data) {
       if (data.fixedProductMarketMakers.length) {
+        setMoreData(true)
         const { fixedProductMarketMakers } = data
-        console.log(data)
         setMarkets([...markets, ...fixedProductMarketMakers])
       } else {
         setMoreData(false)
@@ -28,8 +32,21 @@ const NewDesign: React.FC = () => {
     setSkip(skip + SKIP)
   }
 
+  const resetPagination = () => {
+    setMarkets([])
+    setSkip(SKIP)
+  }
+
   return (
     <div>
+      <button
+        onClick={() => {
+          resetPagination()
+          orderCriteria ? setOrderCriteria(null) : setOrderCriteria('collateralVolume')
+        }}
+      >
+        Sort by Volume
+      </button>
       {/* <Waypoint onEnter={loadMore}> */}
       <div>
         {markets.map((market: any) => (
