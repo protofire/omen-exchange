@@ -52,7 +52,7 @@ export const MarketCard = (props: Props) => {
         <span>
           {amount} {symbol} Volume
         </span>{' '}
-        · <span>Ends in {endsIn}</span>
+        · <span>Ends {endsIn}</span>
       </div>
     </div>
   )
