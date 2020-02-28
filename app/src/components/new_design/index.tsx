@@ -17,7 +17,7 @@ const NewDesign: React.FC = () => {
   const [markets, setMarkets] = useState([] as any)
   const [filterSelected, setFilterSelected] = useState('OPEN')
   const [orderCriteria, setOrderCriteria] = useState<Maybe<string>>(null)
-  const { data, loading, error } = useQuery(MARKETS_HOME[filterSelected], {
+  const { data, loading } = useQuery(MARKETS_HOME[filterSelected], {
     variables: { first: FIRST, skip, criteria: orderCriteria, now: NOW },
   })
 

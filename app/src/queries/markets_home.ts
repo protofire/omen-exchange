@@ -1,21 +1,5 @@
 import gql from 'graphql-tag'
 
-// orderBy, orderDirection
-// first, skip
-// where { }
-
-// Open (_gt) - Closed (_lte)
-// , $now: Int
-// where: { creationTimestamp_lte: $now }
-
-// TODO Use fragments
-
-// {
-//   fixedProductMarketMakers(where: {creator: "0x997A54BB34a64f9817e7EaDbd6650550E757F42c"}) {
-//     id
-//   }
-// }
-
 enum queries {
   open = 'OPEN',
   closed = 'CLOSED',
@@ -25,6 +9,26 @@ type Queries = {
   [K in queries]?: string
 }
 
+const MarketDataFragment = gql`
+  fragment marketData on FixedProductMarketMaker {
+    id
+    collateralVolume
+    collateralToken
+    outcomeTokenAmounts
+    creationTimestamp
+    conditions(first: 1) {
+      question {
+        id
+        title
+        category
+        arbitrator
+        outcomes
+        openingTimestamp
+      }
+    }
+  }
+`
+
 const OPEN = gql`
   query GetMarkets($first: Int!, $skip: Int!, $criteria: String, $now: BigInt) {
     fixedProductMarketMakers(
@@ -33,23 +37,10 @@ const OPEN = gql`
       orderBy: $criteria
       where: { creationTimestamp_gt: $now }
     ) {
-      id
-      collateralVolume
-      collateralToken
-      outcomeTokenAmounts
-      creationTimestamp
-      conditions(first: 1) {
-        question {
-          id
-          title
-          category
-          arbitrator
-          outcomes
-          openingTimestamp
-        }
-      }
+      ...marketData
     }
   }
+  ${MarketDataFragment}
 `
 
 const CLOSED = gql`
@@ -60,23 +51,10 @@ const CLOSED = gql`
       orderBy: $criteria
       where: { creationTimestamp_lte: $now }
     ) {
-      id
-      collateralVolume
-      collateralToken
-      outcomeTokenAmounts
-      creationTimestamp
-      conditions(first: 1) {
-        question {
-          id
-          title
-          category
-          arbitrator
-          outcomes
-          openingTimestamp
-        }
-      }
+      ...marketData
     }
   }
+  ${MarketDataFragment}
 `
 
 const MY_MARKETS = gql`
@@ -87,23 +65,10 @@ const MY_MARKETS = gql`
       orderBy: $criteria
       where: { creationTimestamp_gt: $now }
     ) {
-      id
-      collateralVolume
-      collateralToken
-      outcomeTokenAmounts
-      creationTimestamp
-      conditions(first: 1) {
-        question {
-          id
-          title
-          category
-          arbitrator
-          outcomes
-          openingTimestamp
-        }
-      }
+      ...marketData
     }
   }
+  ${MarketDataFragment}
 `
 
 export const MARKETS_HOME: any = { OPEN, CLOSED, MY_MARKETS }
