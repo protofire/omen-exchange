@@ -9,6 +9,13 @@ import gql from 'graphql-tag'
 // where: { creationTimestamp_lte: $now }
 
 // TODO Use fragments
+
+// {
+//   fixedProductMarketMakers(where: {creator: "0x997A54BB34a64f9817e7EaDbd6650550E757F42c"}) {
+//     id
+//   }
+// }
+
 enum queries {
   open = 'OPEN',
   closed = 'CLOSED',
@@ -73,8 +80,13 @@ const CLOSED = gql`
 `
 
 const MY_MARKETS = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $criteria: String) {
-    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $criteria) {
+  query GetMarkets($first: Int!, $skip: Int!, $criteria: String, $now: BigInt) {
+    fixedProductMarketMakers(
+      first: $first
+      skip: $skip
+      orderBy: $criteria
+      where: { creationTimestamp_gt: $now }
+    ) {
       id
       collateralVolume
       collateralToken

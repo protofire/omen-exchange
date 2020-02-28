@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import { Waypoint } from 'react-waypoint'
 import { useQuery } from '@apollo/react-hooks'
-// OPEN, CLOSED, MY_MARKETS
 import { MARKETS_HOME } from '../../queries/markets_home'
 import { MarketCard } from './market_card'
 import styled from 'styled-components'
+import { Loading } from '../common/loading'
 
 const SelectableButton = styled.div<{ selected?: boolean }>`
   background: ${(props: any) => (props.selected ? 'aquamarine' : 'initial')};
 `
 const NewDesign: React.FC = () => {
   const FIRST = 10
-  const SKIP = 1
   const NOW = Math.floor(Date.now() / 1000)
 
   const [skip, setSkip] = useState(0)
   const [markets, setMarkets] = useState([] as any)
-  const [moreData, setMoreData] = useState(true)
   const [filterSelected, setFilterSelected] = useState('OPEN')
   const [orderCriteria, setOrderCriteria] = useState<Maybe<string>>(null)
   const { data, loading, error } = useQuery(MARKETS_HOME[filterSelected], {
@@ -25,28 +23,29 @@ const NewDesign: React.FC = () => {
 
   useEffect(() => {
     if (data) {
-      if (data.fixedProductMarketMakers.length) {
-        setMoreData(true)
-        const { fixedProductMarketMakers } = data
+      const { fixedProductMarketMakers } = data
+      if (fixedProductMarketMakers.length) {
         setMarkets([...markets, ...fixedProductMarketMakers])
-      } else {
-        setMoreData(false)
       }
     }
   }, [data])
 
   const loadMore = () => {
-    setSkip(skip + SKIP)
+    setSkip(skip + FIRST)
   }
 
   const resetPagination = () => {
     setMarkets([])
-    setSkip(SKIP)
+    setSkip(0)
   }
 
   const changeFilterSelected = (filter: string) => {
     resetPagination()
     setFilterSelected(filter)
+  }
+
+  if (loading) {
+    return <Loading full={true}></Loading>
   }
 
   return (
@@ -88,9 +87,7 @@ const NewDesign: React.FC = () => {
         ))}
       </div>
       {/* </Waypoint> */}
-      <button onClick={loadMore} disabled={!moreData}>
-        LOAD MORE
-      </button>
+      <button onClick={loadMore}>LOAD MORE</button>
     </div>
   )
 }
