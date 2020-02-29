@@ -1,6 +1,6 @@
+import { darken } from 'polished'
 import { ReactNode } from 'react'
 import { css } from 'styled-components'
-import { darken } from 'polished'
 
 export enum ButtonType {
   primaryLine,
@@ -50,15 +50,13 @@ const PrimaryCSS = css<ButtonProps>`
   &.disabled:hover,
   &[disabled],
   &[disabled]:hover {
-    background-color: ${props =>
-      props.buttonType && props.theme.colors[ButtonType[props.buttonType]]};
+    background-color: ${props => props.buttonType && props.theme.colors[ButtonType[props.buttonType]]};
     border-color: ${props => props.buttonType && props.theme.colors[ButtonType[props.buttonType]]};
     color: #fff;
   }
 
   &:hover {
-    background-color: ${props =>
-      props.buttonType && darken(0.1, props.theme.colors[ButtonType[props.buttonType]])};
+    background-color: ${props => props.buttonType && darken(0.1, props.theme.colors[ButtonType[props.buttonType]])};
   }
 `
 
