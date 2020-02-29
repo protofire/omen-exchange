@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
 import { withRouter } from 'react-router'
 import { RouteComponentProps } from 'react-router-dom'
+import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
+import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
 import { ButtonConnectWallet } from '../button_connect_wallet'
 import { ButtonDisconnectWallet } from '../button_disconnect_wallet'
-import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
 import { MainMenu } from '../main_menu'
 import { MobileMenu } from '../mobile_menu'
 import { ModalConnectWallet } from '../modal_connect_wallet'
@@ -94,7 +94,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
     <HeaderWrapper {...restProps}>
       <HeaderInner>
         <MainMenuStyled {...restProps} />
-        <MobileMenuStyled toggleMenu={toggleMenu} isMenuOpen={isMenuOpen} {...restProps} />
+        <MobileMenuStyled isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} {...restProps} />
         <ConnectedWeb3>
           <NetworkStyled />
           <ButtonDisconnectWalletStyled
@@ -105,10 +105,10 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
         </ConnectedWeb3>
         {!context.account && (
           <ButtonConnectWalletStyled
+            modalState={isModalOpen}
             onClick={() => {
               setModalState(true)
             }}
-            modalState={isModalOpen}
           />
         )}
         <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />

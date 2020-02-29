@@ -1,10 +1,11 @@
 import React from 'react'
 
-import { MarketFund } from './market_fund'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { useQuestion } from '../../hooks/useQuestion'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
+import { useQuestion } from '../../hooks/useQuestion'
 import { Loading } from '../common/loading'
+
+import { MarketFund } from './market_fund'
 
 interface Props {
   marketMakerAddress: string
@@ -17,12 +18,12 @@ const MarketFundContainer: React.FC<Props> = (props: Props) => {
   const { question, resolution } = useQuestion(marketMakerAddress, context)
   const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
   const {
-    totalPoolShares,
-    userPoolShares,
     balances,
+    collateral,
     marketMakerFunding,
     marketMakerUserFunding,
-    collateral,
+    totalPoolShares,
+    userPoolShares,
   } = marketMakerData
 
   if (!collateral) {
@@ -31,15 +32,15 @@ const MarketFundContainer: React.FC<Props> = (props: Props) => {
 
   return (
     <MarketFund
+      balances={balances}
+      collateral={collateral}
       marketMakerAddress={marketMakerAddress}
+      marketMakerFunding={marketMakerFunding}
+      marketMakerUserFunding={marketMakerUserFunding}
       question={question || ''}
       resolution={resolution}
       totalPoolShares={totalPoolShares}
       userPoolShares={userPoolShares}
-      marketMakerFunding={marketMakerFunding}
-      marketMakerUserFunding={marketMakerUserFunding}
-      balances={balances}
-      collateral={collateral}
     />
   )
 }

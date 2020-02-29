@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import { ButtonCSS, ButtonComponentProps, ButtonProps } from '../../../common/button_styling_types'
+
+import { ButtonCSS, ButtonComponentProps, ButtonProps } from '../../../theme/component_styles/button_styling_types'
 
 interface ButtonComponentPropsLocal extends ButtonComponentProps {
   disabled?: boolean

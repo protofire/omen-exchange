@@ -1,19 +1,19 @@
-import React from 'react'
-import styled from 'styled-components'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
-
-import { ThreeBoxComments } from '../../common/three_box_comments'
-import { ViewCard } from '../../common/view_card'
-import { Status, BalanceItem, Token, Arbitrator, OutcomeTableValue } from '../../../util/types'
-import { ButtonAnchor, OutcomeTable } from '../../common'
-import { Loading } from '../../common/loading'
-import { ButtonContainer } from '../../common/button_container'
-import { SubsectionTitle } from '../../common/subsection_title'
 import { BigNumber } from 'ethers/utils'
-import { TitleValue } from '../../common/title_value'
+import React from 'react'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
+import styled from 'styled-components'
+
+import { WhenConnected } from '../../../hooks/connectedWeb3'
+import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
+import { ButtonAnchor, OutcomeTable } from '../../common'
+import { ButtonContainer } from '../../common/button_container'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
 import { GridThreeColumns } from '../../common/grid_three_columns'
-import { WhenConnected } from '../../../hooks/connectedWeb3'
+import { Loading } from '../../common/loading'
+import { SubsectionTitle } from '../../common/subsection_title'
+import { ThreeBoxComments } from '../../common/three_box_comments'
+import { TitleValue } from '../../common/title_value'
+import { ViewCard } from '../../common/view_card'
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
   margin-bottom: 0;
@@ -33,15 +33,7 @@ interface Props extends RouteComponentProps<{}> {
 }
 
 const ViewWrapper = (props: Props) => {
-  const {
-    balances,
-    collateral,
-    status,
-    questionId,
-    marketMakerAddress,
-    arbitrator,
-    category,
-  } = props
+  const { arbitrator, balances, category, collateral, marketMakerAddress, questionId, status } = props
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -59,8 +51,8 @@ const ViewWrapper = (props: Props) => {
       <OutcomeTable
         balances={balances}
         collateral={collateral}
-        displayRadioSelection={false}
         disabledColumns={disabledColumns}
+        displayRadioSelection={false}
         probabilities={probabilities}
       />
     )
@@ -72,10 +64,7 @@ const ViewWrapper = (props: Props) => {
         <SubsectionTitle>Details</SubsectionTitle>
         <GridThreeColumns>
           {category && <TitleValue title={'Category'} value={category} />}
-          <TitleValue
-            title={'Arbitrator'}
-            value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />}
-          />
+          <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
           {questionId && (
             <TitleValue
               title={'Realitio'}
@@ -106,9 +95,7 @@ const ViewWrapper = (props: Props) => {
         <WhenConnected>
           <ButtonContainer>
             <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
-            {userHasShares && (
-              <ButtonAnchor href={`/#/${marketMakerAddress}/sell`}>Sell</ButtonAnchor>
-            )}
+            {userHasShares && <ButtonAnchor href={`/#/${marketMakerAddress}/sell`}>Sell</ButtonAnchor>}
             <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
           </ButtonContainer>
         </WhenConnected>

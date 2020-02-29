@@ -1,11 +1,12 @@
-import React from 'react'
-import styled from 'styled-components'
-import DatePicker from 'react-datepicker'
 import moment from 'moment'
+import React from 'react'
+import DatePicker from 'react-datepicker'
 import ReactDOM from 'react-dom'
+import styled from 'styled-components'
+
+import { TextfieldCSS } from '../textfield'
 
 import IconCalendar from './img/icon.svg'
-import { TextfieldCSS } from '../textfield'
 
 interface Props {
   disabled?: boolean
@@ -67,7 +68,7 @@ const CalendarPortal = (props: CalendarPortalProps) => {
 }
 
 export const DateField = (props: Props) => {
-  const { onChange, selected, minDate, name, disabled, ...restProps } = props
+  const { disabled, minDate, name, onChange, selected, ...restProps } = props
   const timeInputLabel = `Time (UTC${moment().format('Z')})`
 
   return (

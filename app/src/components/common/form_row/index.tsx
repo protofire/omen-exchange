@@ -1,9 +1,10 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
-import { FormLabel } from '../form_label'
-import { Tooltip } from '../tooltip'
-import { FormRowNote } from '../form_row_note'
+
 import { FormError } from '../form_error'
+import { FormLabel } from '../form_label'
+import { FormRowNote } from '../form_row_note'
+import { Tooltip } from '../tooltip'
 
 const FormRowWrapper = styled.div`
   margin-bottom: 25px;
@@ -33,7 +34,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const FormRow = (props: Props) => {
-  const { error, formField, title, note, tooltip, ...restProps } = props
+  const { error, formField, note, title, tooltip, ...restProps } = props
   return (
     <FormRowWrapper {...restProps}>
       <TitleWrapper>

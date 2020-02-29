@@ -1,16 +1,16 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { MarketWithExtraData } from '../../util/types'
+import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { MarketFilter } from '../../util/market_filter'
 import { RemoteData } from '../../util/remote_data'
+import { MarketWithExtraData } from '../../util/types'
 import { Button } from '../common/button'
+import { Filter } from '../common/filter'
 import { ListCard } from '../common/list_card'
 import { ListItem } from '../common/list_item'
-import { SectionTitle } from '../common/section_title'
-import { Filter } from '../common/filter'
-import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { Loading } from '../common/loading'
+import { SectionTitle } from '../common/section_title'
 
 const FilterStyled = styled(Filter)`
   margin: -30px auto 10px;
@@ -33,7 +33,7 @@ interface Props {
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { count, markets, context, currentFilter, onFilterChange, onShowMore } = props
+  const { context, count, currentFilter, markets, onFilterChange, onShowMore } = props
 
   const showMoreButton =
     props.moreMarkets && !RemoteData.is.loading(markets) ? (
@@ -48,20 +48,20 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       {context.account && (
         <FilterStyled
           defaultOption={currentFilter}
+          onFilterChange={onFilterChange}
           options={[
             MarketFilter.allMarkets(),
             MarketFilter.fundedMarkets(context.account),
             MarketFilter.predictedOnMarkets(context.account),
             MarketFilter.winningResultMarkets(context.account),
           ]}
-          onFilterChange={onFilterChange}
         />
       )}
       <ListCard>
         {RemoteData.hasData(markets) &&
           markets.data.length > 0 &&
           markets.data.slice(0, count).map(item => {
-            return <ListItem key={`${item.address}_${item.conditionId}`} data={item}></ListItem>
+            return <ListItem data={item} key={`${item.address}_${item.conditionId}`}></ListItem>
           })}
         {RemoteData.is.success(markets) && markets.data.length === 0 && (
           <NoMarketsAvailable title={'No markets available'} />

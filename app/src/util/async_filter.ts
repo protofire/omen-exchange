@@ -1,7 +1,4 @@
-export async function asyncFilter<T>(
-  array: T[],
-  filterFn: (x: T) => boolean | Promise<boolean>,
-): Promise<T[]> {
+export async function asyncFilter<T>(array: T[], filterFn: (x: T) => boolean | Promise<boolean>): Promise<T[]> {
   const result: T[] = []
 
   for (const x of array) {

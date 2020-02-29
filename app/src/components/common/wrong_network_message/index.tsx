@@ -1,14 +1,14 @@
 import React from 'react'
-import styled, { withTheme } from 'styled-components'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
+import styled, { withTheme } from 'styled-components'
 
-import { SectionTitle } from '../section_title'
-import { ViewCard } from '../view_card'
-import { SubsectionTitle } from '../subsection_title'
+import { networkIds } from '../../../util/networks'
 import { ButtonContainer } from '../button_container'
 import { ButtonLink } from '../button_link'
-import { networkIds } from '../../../util/networks'
+import { SectionTitle } from '../section_title'
+import { SubsectionTitle } from '../subsection_title'
+import { ViewCard } from '../view_card'
 
 const WrappedText = styled.div`
   font-family: Roboto;
@@ -32,15 +32,13 @@ interface Props extends RouteComponentProps<{}> {
   theme?: any
 }
 
-const WrongNetworkMessageContainer = (props: Props) => {
+const WrongNetworkMessageContainer = () => {
   return (
     <>
       <SectionTitle title="THERE WAS A PROBLEM..." />
       <ViewCard>
         <SubsectionTitle>Wrong network configuration</SubsectionTitle>
-        <WrappedText>
-          We couldn&apos;t find the network with the provided wallet configuration.
-        </WrappedText>
+        <WrappedText>We couldn&apos;t find the network with the provided wallet configuration.</WrappedText>
         <WrappedText>
           The valid networks to use are{' '}
           <strong>
@@ -51,9 +49,7 @@ const WrongNetworkMessageContainer = (props: Props) => {
           </strong>
           .
         </WrappedText>
-        <WrappedText>
-          Please check the network configuration in your wallet and come back again.
-        </WrappedText>
+        <WrappedText>Please check the network configuration in your wallet and come back again.</WrappedText>
         <ButtonContainer>
           <ButtonLinkStyled onClick={() => window.location.reload(false)}>Reload</ButtonLinkStyled>
         </ButtonContainer>

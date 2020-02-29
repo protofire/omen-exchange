@@ -1,8 +1,9 @@
 import React, { HTMLAttributes } from 'react'
 import styled, { withTheme } from 'styled-components'
 
-import WinningOutcomeBadge from './img/badge.svg'
 import theme from '../../../theme'
+
+import WinningOutcomeBadge from './img/badge.svg'
 
 interface ProgressBarProps {
   color?: string
@@ -82,14 +83,13 @@ interface Props extends HTMLAttributes<HTMLButtonElement> {
 
 const BarDiagramComponent: React.FC<Props> = (props: Props) => {
   const { outcomeName, probability, winningOutcome, withWinningOutcome } = props
-  const progressColor =
-    winningOutcome && withWinningOutcome ? theme.colors.primary : theme.colors.darkGray
+  const progressColor = winningOutcome && withWinningOutcome ? theme.colors.primary : theme.colors.darkGray
 
   return (
     <BarDiagramWrapper>
       {withWinningOutcome && (
         <BadgeWrapper>
-          {winningOutcome ? <BadgeImg src={WinningOutcomeBadge} alt="Winning Outcome" /> : null}
+          {winningOutcome ? <BadgeImg alt="Winning Outcome" src={WinningOutcomeBadge} /> : null}
         </BadgeWrapper>
       )}
       <Outcome>

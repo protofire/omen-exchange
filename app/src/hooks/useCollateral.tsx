@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
 
-import { ConnectedWeb3Context } from './connectedWeb3'
-import { getTokenFromAddress } from '../util/networks'
 import { ERC20Service } from '../services'
+import { getTokenFromAddress } from '../util/networks'
 import { Token } from '../util/types'
 
-const getTokenFromAddressIfExists = (
-  networkId: number,
-  collateralAddress: string,
-): Maybe<Token> => {
+import { ConnectedWeb3Context } from './connectedWeb3'
+
+const getTokenFromAddressIfExists = (networkId: number, collateralAddress: string): Maybe<Token> => {
   try {
     return getTokenFromAddress(networkId, collateralAddress)
   } catch (err) {
@@ -20,7 +18,7 @@ export const useCollateral = (
   collateralAddress: string,
   context: ConnectedWeb3Context,
 ): { collateral: Maybe<Token>; errorMessage: Maybe<string>; isSpinnerOn: boolean } => {
-  const { library: provider, networkId, account } = context
+  const { account, library: provider, networkId } = context
 
   const [collateral, setCollateral] = useState<Maybe<Token>>(null)
   const [errorMessage, setErrorMessage] = useState<Maybe<string>>(null)

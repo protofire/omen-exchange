@@ -1,16 +1,17 @@
-import React, { useState, HTMLAttributes, ChangeEvent } from 'react'
+import React, { ChangeEvent, HTMLAttributes, useState } from 'react'
 import styled from 'styled-components'
-import { Textfield } from '../textfield'
-import { SubsectionTitle } from '../subsection_title'
-import { TitleValue } from '../title_value'
-import { Button } from '../button'
-import { Token } from '../../../util/types'
-import { useCollateral } from '../../../hooks/useCollateral'
+
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { ButtonType } from '../../../common/button_styling_types'
-import ModalWrapper from '../modal_wrapper'
+import { useCollateral } from '../../../hooks/useCollateral'
+import { ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { Token } from '../../../util/types'
+import { Button } from '../button'
 import { FormRow } from '../form_row'
+import ModalWrapper from '../modal_wrapper'
 import { Spinner } from '../spinner'
+import { SubsectionTitle } from '../subsection_title'
+import { Textfield } from '../textfield'
+import { TitleValue } from '../title_value'
 
 const Grid = styled.div`
   column-gap: 20px;
@@ -47,13 +48,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const ModalCollateral = (props: Props) => {
-  const { onClose, onSave, context, isOpen } = props
+  const { context, isOpen, onClose, onSave } = props
   const [collateralAddress, setCollateralAddress] = useState<string>('')
   const { collateral, errorMessage, isSpinnerOn } = useCollateral(collateralAddress, context)
 
-  const validCollateralAddress: Maybe<Token> = collateral
-    ? { address: collateralAddress, ...collateral }
-    : null
+  const validCollateralAddress: Maybe<Token> = collateral ? { address: collateralAddress, ...collateral } : null
 
   const onClickSaveButton = () => {
     if (validCollateralAddress) {
@@ -72,14 +71,8 @@ export const ModalCollateral = (props: Props) => {
         <>
           <SubsectionTitleStyled>Details</SubsectionTitleStyled>
           <Grid>
-            <TitleValueStyled
-              title={'Symbol:'}
-              value={validCollateralAddress && validCollateralAddress.symbol}
-            />
-            <TitleValueStyled
-              title={'Decimals:'}
-              value={validCollateralAddress && validCollateralAddress.decimals}
-            />
+            <TitleValueStyled title={'Symbol:'} value={validCollateralAddress && validCollateralAddress.symbol} />
+            <TitleValueStyled title={'Decimals:'} value={validCollateralAddress && validCollateralAddress.decimals} />
           </Grid>
         </>
       )
@@ -89,6 +82,7 @@ export const ModalCollateral = (props: Props) => {
   return (
     <ModalWrapper isOpen={isOpen} onRequestClose={onClose} title={`Add custom token`}>
       <FormRow
+        error={errorMessage || ''}
         formField={
           <Textfield
             hasError={errorMessage ? true : false}
@@ -102,17 +96,12 @@ export const ModalCollateral = (props: Props) => {
             type="text"
           />
         }
-        error={errorMessage || ''}
         title={'Collateral Token Address'}
         tooltip={{ id: 'ERC20', description: 'Enter a valid ERC20 address.' }}
       />
       {tokenDetails()}
       {spinner()}
-      <ButtonStyled
-        buttonType={ButtonType.primary}
-        disabled={!validCollateralAddress}
-        onClick={onClickSaveButton}
-      >
+      <ButtonStyled buttonType={ButtonType.primary} disabled={!validCollateralAddress} onClick={onClickSaveButton}>
         Add
       </ButtonStyled>
     </ModalWrapper>

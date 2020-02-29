@@ -1,8 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Select } from '../select'
+
 import { getTokensByNetwork } from '../../../util/networks'
 import { Token } from '../../../util/types'
+import { Select } from '../select'
 
 interface Props {
   autoFocus?: boolean
@@ -19,7 +20,7 @@ interface Props {
 const FormOption = styled.option``
 
 export const Tokens = (props: Props) => {
-  const { networkId, value, customValues, onTokenChange, ...restProps } = props
+  const { customValues, networkId, onTokenChange, value, ...restProps } = props
 
   const knownTokens = getTokensByNetwork(networkId)
   const tokens = knownTokens.concat(customValues)
@@ -37,7 +38,7 @@ export const Tokens = (props: Props) => {
   }
 
   return (
-    <Select {...restProps} value={value.address} onChange={e => onChange(e.target.value)}>
+    <Select {...restProps} onChange={e => onChange(e.target.value)} value={value.address}>
       {options.map(option => {
         return (
           <FormOption key={option.value} value={option.value}>

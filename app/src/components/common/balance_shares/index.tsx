@@ -3,8 +3,8 @@ import styled from 'styled-components'
 
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, Token } from '../../../util/types'
-import { FormRowNote } from '../form_row_note'
 import { FormRowLink } from '../form_row_link'
+import { FormRowNote } from '../form_row_note'
 
 interface Props {
   balanceItem?: BalanceItem
@@ -29,9 +29,7 @@ const Note = styled(FormRowNote)`
 
 export const BalanceShares = (props: Props) => {
   const { balanceItem, collateral, onClickMax } = props
-  const sharesBalanceFormatted = balanceItem
-    ? formatBigNumber(balanceItem.shares, collateral.decimals)
-    : ''
+  const sharesBalanceFormatted = balanceItem ? formatBigNumber(balanceItem.shares, collateral.decimals) : ''
 
   return (
     <>

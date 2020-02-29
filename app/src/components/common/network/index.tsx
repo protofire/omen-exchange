@@ -1,9 +1,11 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
-import Icon from './img/icon.svg'
+
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { truncateStringInTheMiddle } from '../../../util/tools'
 import { getContractAddressName } from '../../../util/networks'
+import { truncateStringInTheMiddle } from '../../../util/tools'
+
+import Icon from './img/icon.svg'
 
 const NetworkWrapper = styled.div`
   align-items: center;
@@ -72,7 +74,7 @@ export const Network: React.FC = props => {
   return (
     <NetworkWrapper {...restProps}>
       <NetworkContainer>
-        <IconStyled src={Icon} alt="" />
+        <IconStyled alt="" src={Icon} />
         {networkName ? <NetworkName>{networkName}</NetworkName> : null}
       </NetworkContainer>
       <ConnectionStatusWrapper>

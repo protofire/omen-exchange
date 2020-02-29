@@ -1,6 +1,6 @@
 import React from 'react'
-import styled from 'styled-components'
 import Dropdown from 'react-dropdown'
+import styled from 'styled-components'
 import 'react-dropdown/style.css'
 
 import { MarketFilter } from '../../../util/market_filter'
@@ -90,7 +90,7 @@ interface Props {
 }
 
 export const Filter: React.FC<Props> = (props: Props) => {
-  const { options, defaultOption, onFilterChange, ...restProps } = props
+  const { defaultOption, onFilterChange, options, ...restProps } = props
 
   const onChange = (selectedOption: { value: string }) => {
     for (const option of options) {
@@ -104,10 +104,10 @@ export const Filter: React.FC<Props> = (props: Props) => {
   return (
     <FilterWrapper {...restProps}>
       <Dropdown
-        options={options.map(option => option.label)}
         onChange={onChange}
-        value={defaultOption}
+        options={options.map(option => option.label)}
         placeholder="Select an option"
+        value={defaultOption}
       />
     </FilterWrapper>
   )

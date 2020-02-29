@@ -1,5 +1,6 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
+
 import CloseIcon from './img/close.svg'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -56,12 +57,12 @@ const ModalClose = styled.button`
 
 class ModalTitle extends React.Component<Props> {
   public render = () => {
-    const { onClick, title, disableCloseButton, ...restProps } = this.props
+    const { disableCloseButton, onClick, title, ...restProps } = this.props
 
     return (
       <ModalTitleWrapper {...restProps}>
         <ModalTitleText>{title}</ModalTitleText>
-        <ModalClose onClick={onClick} disabled={disableCloseButton} />
+        <ModalClose disabled={disableCloseButton} onClick={onClick} />
       </ModalTitleWrapper>
     )
   }

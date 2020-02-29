@@ -1,6 +1,6 @@
 // Taken from https://github.com/faizrr/use-api-polling and modified
 
-import { useCallback, useState, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type APIPollingOptions<T> = {
   fetchFunc: () => Promise<T>
@@ -10,7 +10,7 @@ export type APIPollingOptions<T> = {
 }
 
 export function usePolling<T>(opts: APIPollingOptions<T>): T {
-  const { initialState, fetchFunc, delay, onError } = opts
+  const { delay, fetchFunc, initialState, onError } = opts
 
   const timerId = useRef<number>()
   const cancelled = useRef<boolean>(false)

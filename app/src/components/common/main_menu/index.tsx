@@ -1,6 +1,7 @@
 import React from 'react'
-import styled from 'styled-components'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
+import styled from 'styled-components'
+
 import { MainMenuItem } from '../main_menu_item'
 
 const MainMenuWrapper = styled.div`

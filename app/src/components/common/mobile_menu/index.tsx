@@ -1,8 +1,10 @@
 import React, { HTMLAttributes } from 'react'
-import styled from 'styled-components'
-import MenuIcon from './img/menu.svg'
-import { MainMenu } from '../main_menu'
 import { RouteComponentProps } from 'react-router-dom'
+import styled from 'styled-components'
+
+import { MainMenu } from '../main_menu'
+
+import MenuIcon from './img/menu.svg'
 
 const MobileMenuWrapper = styled.div`
   display: flex;

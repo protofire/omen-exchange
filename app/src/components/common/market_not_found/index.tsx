@@ -1,13 +1,13 @@
 import React from 'react'
-import styled, { withTheme } from 'styled-components'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
+import styled, { withTheme } from 'styled-components'
 
-import { SectionTitle } from '../section_title'
-import { ViewCard } from '../view_card'
-import { SubsectionTitle } from '../subsection_title'
 import { ButtonContainer } from '../button_container'
 import { ButtonLink } from '../button_link'
+import { SectionTitle } from '../section_title'
+import { SubsectionTitle } from '../subsection_title'
+import { ViewCard } from '../view_card'
 
 const WrappedText = styled.div`
   font-family: Roboto;

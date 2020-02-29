@@ -1,4 +1,4 @@
-import React, { ReactNode, HTMLAttributes } from 'react'
+import React, { HTMLAttributes, ReactNode } from 'react'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`

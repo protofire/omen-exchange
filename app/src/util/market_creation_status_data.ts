@@ -26,10 +26,8 @@ interface Error {
 export type MarketCreationStatus = Ready | CreatingAMarket | AddFunding | Done | Error
 
 const isReady = (mcsd: MarketCreationStatus): mcsd is Ready => mcsd._type === Types.Ready
-const isCreatingAMarket = (mcsd: MarketCreationStatus): mcsd is CreatingAMarket =>
-  mcsd._type === Types.CreatingAMarket
-const isAddFunding = (mcsd: MarketCreationStatus): mcsd is AddFunding =>
-  mcsd._type === Types.AddFunding
+const isCreatingAMarket = (mcsd: MarketCreationStatus): mcsd is CreatingAMarket => mcsd._type === Types.CreatingAMarket
+const isAddFunding = (mcsd: MarketCreationStatus): mcsd is AddFunding => mcsd._type === Types.AddFunding
 const isDone = (mcsd: MarketCreationStatus): mcsd is Done => mcsd._type === Types.Done
 const isError = (mcsd: MarketCreationStatus): mcsd is Error => mcsd._type === Types.Error
 

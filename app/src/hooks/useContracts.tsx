@@ -1,22 +1,25 @@
 import { useMemo } from 'react'
-import { ConnectedWeb3Context } from './connectedWeb3'
-import { getContractAddress } from '../util/networks'
+
 import {
   ConditionalTokenService,
-  MarketMakerService,
   MarketMakerFactoryService,
+  MarketMakerService,
   OracleService,
   RealitioService,
 } from '../services'
+import { getContractAddress } from '../util/networks'
+
+import { ConnectedWeb3Context } from './connectedWeb3'
 
 export const useContracts = (context: ConnectedWeb3Context) => {
-  const { library: provider, networkId, account } = context
+  const { account, library: provider, networkId } = context
 
   const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
-  const conditionalTokens = useMemo(
-    () => new ConditionalTokenService(conditionalTokensAddress, provider, account),
-    [conditionalTokensAddress, provider, account],
-  )
+  const conditionalTokens = useMemo(() => new ConditionalTokenService(conditionalTokensAddress, provider, account), [
+    conditionalTokensAddress,
+    provider,
+    account,
+  ])
 
   const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
   const marketMakerFactory = useMemo(
@@ -32,15 +35,10 @@ export const useContracts = (context: ConnectedWeb3Context) => {
   ])
 
   const oracleAddress = getContractAddress(networkId, 'oracle')
-  const oracle = useMemo(() => new OracleService(oracleAddress, provider, account), [
-    oracleAddress,
-    provider,
-    account,
-  ])
+  const oracle = useMemo(() => new OracleService(oracleAddress, provider, account), [oracleAddress, provider, account])
 
   const buildMarketMaker = useMemo(
-    () => (address: string) =>
-      new MarketMakerService(address, conditionalTokens, realitio, provider, account),
+    () => (address: string) => new MarketMakerService(address, conditionalTokens, realitio, provider, account),
     [conditionalTokens, realitio, provider, account],
   )
 

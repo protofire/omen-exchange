@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { Message, MessageType } from '../message'
 
 interface MessageWarningProps {

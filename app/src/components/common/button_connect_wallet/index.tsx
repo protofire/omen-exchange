@@ -1,7 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
+
+import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { Button } from '../button'
-import { ButtonType } from '../../../common/button_styling_types'
 
 const Wrapper = styled(Button)`
   font-size: 13px;
@@ -19,12 +20,7 @@ export const ButtonConnectWallet = (props: Props) => {
   const buttonMessage = modalState ? 'Connecting...' : 'Connect'
 
   return (
-    <Wrapper
-      buttonType={ButtonType.secondary}
-      disabled={modalState}
-      onClick={onClick}
-      {...restProps}
-    >
+    <Wrapper buttonType={ButtonType.secondary} disabled={modalState} onClick={onClick} {...restProps}>
       {buttonMessage}
     </Wrapper>
   )

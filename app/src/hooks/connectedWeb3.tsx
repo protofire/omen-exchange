@@ -1,6 +1,7 @@
 import { providers } from 'ethers'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
+
 import connectors from '../util/connectors'
 import { getLogger } from '../util/logger'
 
@@ -39,7 +40,7 @@ interface Props {
 export const ConnectedWeb3: React.FC<Props> = props => {
   const [networkId, setNetworkId] = useState<number | null>(null)
   const context = useWeb3Context()
-  const { active, library, account, error } = context
+  const { account, active, error, library } = context
 
   useEffect(() => {
     let isSubscribed = true
@@ -80,9 +81,7 @@ export const ConnectedWeb3: React.FC<Props> = props => {
     rawWeb3Context: context,
   }
 
-  return (
-    <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
-  )
+  return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
 
 export const WhenConnected: React.FC<Props> = props => {
