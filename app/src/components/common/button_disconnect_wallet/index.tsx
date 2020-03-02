@@ -1,15 +1,9 @@
 import React from 'react'
-import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
 import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { Button } from '../button'
 
-const Wrapper = styled(Button)`
-  font-size: 13px;
-  height: 24px;
-  padding: 0 10px;
-`
 interface Props {
   callback: () => void
 }
@@ -32,8 +26,8 @@ export const ButtonDisconnectWallet = (props: Props) => {
   }
 
   return (
-    <Wrapper buttonType={ButtonType.secondary} onClick={logout} {...restProps}>
+    <Button buttonType={ButtonType.primary} onClick={logout} {...restProps}>
       Disconnect
-    </Wrapper>
+    </Button>
   )
 }
