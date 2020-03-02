@@ -34,9 +34,6 @@ const theme = {
     height: '60px',
     color: '#666',
   },
-  footer: {
-    color: '#000',
-  },
   themeBreakPoints: {
     lg: '992px',
     md: '768px',

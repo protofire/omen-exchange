@@ -3,7 +3,6 @@ import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
 
 import { ConnectedWeb3 } from '../../hooks/connectedWeb3'
-import { Footer } from '../common/footer'
 import { Header } from '../common/header'
 import { MainScroll } from '../common/main_scroll'
 import { MainWrapper } from '../common/main_wrapper'
@@ -32,7 +31,6 @@ export const Main: React.FC = () => {
                 <Route component={RedirectToHome} />
               </Switch>
             )}
-            <Footer />
           </MainScroll>
         </MainWrapper>
       </Router>
