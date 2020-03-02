@@ -1,7 +1,6 @@
 import React from 'react'
-import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
-import styled, { withTheme } from 'styled-components'
+import styled from 'styled-components'
 
 import { networkIds } from '../../../util/networks'
 import { ButtonContainer } from '../button_container'
@@ -11,26 +10,22 @@ import { SubsectionTitle } from '../subsection_title'
 import { ViewCard } from '../view_card'
 
 const WrappedText = styled.div`
+  color: #555;
   font-family: Roboto;
   font-size: 14px;
-  font-weight: normal;
   font-stretch: normal;
   font-style: normal;
-  line-height: 1.36;
+  font-weight: normal;
   letter-spacing: normal;
-  text-align: left;
-  color: #555555;
-  margin-top: 20px;
+  line-height: 1.36;
   margin-bottom: 10px;
+  margin-top: 20px;
+  text-align: left;
 `
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
-
-interface Props extends RouteComponentProps<{}> {
-  theme?: any
-}
 
 const WrongNetworkMessageContainer = () => {
   return (
@@ -58,4 +53,4 @@ const WrongNetworkMessageContainer = () => {
   )
 }
 
-export const WrongNetworkMessage = withRouter(withTheme(WrongNetworkMessageContainer))
+export const WrongNetworkMessage = withRouter(WrongNetworkMessageContainer)
