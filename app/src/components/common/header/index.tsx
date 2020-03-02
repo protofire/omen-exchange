@@ -1,21 +1,18 @@
 import React, { useState } from 'react'
 import { withRouter } from 'react-router'
-import { RouteComponentProps } from 'react-router-dom'
+import { NavLink, RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
 import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
 import { ButtonConnectWallet } from '../button_connect_wallet'
 import { ButtonDisconnectWallet } from '../button_disconnect_wallet'
-import { MainMenu } from '../main_menu'
-import { MobileMenu } from '../mobile_menu'
+import { Logo } from '../logo'
 import { ModalConnectWallet } from '../modal_connect_wallet'
 import { Network } from '../network'
 
 const HeaderWrapper = styled.div`
   background: ${props => props.theme.header.backgroundColor};
-  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
-  display: flex;
   display: flex;
   flex-grow: 0;
   flex-shrink: 0;
@@ -39,22 +36,6 @@ const HeaderInner = styled.div`
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     padding: 0 ${props => props.theme.paddings.mainPadding};
-  }
-`
-
-const MobileMenuStyled = styled(MobileMenu)`
-  display: inherit;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: none;
-  }
-`
-
-const MainMenuStyled = styled(MainMenu)`
-  display: none;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: inherit;
   }
 `
 
@@ -82,19 +63,20 @@ const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
   margin: 0 0 0 auto;
 `
 
+const LogoWrapper = styled(NavLink)``
+
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   const context = useWeb3Context()
 
   const { ...restProps } = props
-  const [isMenuOpen, setMenuState] = useState(false)
   const [isModalOpen, setModalState] = useState(false)
-  const toggleMenu = () => setMenuState(!isMenuOpen)
 
   return (
     <HeaderWrapper {...restProps}>
       <HeaderInner>
-        <MainMenuStyled {...restProps} />
-        <MobileMenuStyled isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} {...restProps} />
+        <LogoWrapper to="/">
+          <Logo />
+        </LogoWrapper>
         <ConnectedWeb3>
           <NetworkStyled />
           <ButtonDisconnectWalletStyled
