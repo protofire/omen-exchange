@@ -86,7 +86,7 @@ const CreateMarketStep = (props: Props) => {
 
   React.useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, collateral))
-  }, [account, provider, collateral])
+  }, [account, provider, collateral, dispatch])
 
   const back = () => {
     props.back()
