@@ -23,10 +23,12 @@ const Item = styled.div<{ disabled?: boolean }>`
   justify-content: space-between;
   padding: 15px 5px;
   pointer-events: ${props => (props.disabled ? 'none' : 'auto')};
+
   &[disabled] {
     cursor: not-allowed !important;
     opacity: 0.5;
   }
+
   &:hover {
     background-color: ${props => lighten(0.6, props.theme.colors.primary)};
   }
@@ -169,7 +171,7 @@ export const ModalConnectWallet = (props: Props) => {
   return (
     <>
       {!context.account && (
-        <ModalWrapper isOpen={isOpen} onRequestClose={onClickCloseButton} title={`Choose a Wallet`}>
+        <ModalWrapper isOpen={isOpen} onRequestClose={onClickCloseButton} title={`Connect a Wallet`}>
           <ItemMetamask disabled={!doesMetamaskExist} />
           <ItemWalletConnect />
           <ButtonStyled buttonType={ButtonType.primary} onClick={onConnect}>

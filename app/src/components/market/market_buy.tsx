@@ -69,9 +69,8 @@ const TextLight = styled.span`
 `
 
 const CssText = css`
-  font-family: Roboto;
-  font-size: 13px;
   color: ${props => props.theme.colors.textColor};
+  font-size: 13px;
 `
 
 const TextBold = styled.span`

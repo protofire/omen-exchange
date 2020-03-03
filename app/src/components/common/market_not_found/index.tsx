@@ -10,17 +10,16 @@ import { SubsectionTitle } from '../subsection_title'
 import { ViewCard } from '../view_card'
 
 const WrappedText = styled.div`
-  font-family: Roboto;
+  color: #555;
   font-size: 14px;
-  font-weight: normal;
   font-stretch: normal;
   font-style: normal;
-  line-height: 1.36;
+  font-weight: normal;
   letter-spacing: normal;
-  text-align: left;
-  color: #555555;
-  margin-top: 20px;
+  line-height: 1.36;
   margin-bottom: 10px;
+  margin-top: 20px;
+  text-align: left;
 `
 
 const ButtonLinkStyled = styled(ButtonLink)`
