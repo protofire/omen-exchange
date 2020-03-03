@@ -6,7 +6,7 @@ import { WalletConnectStylesOverride } from '../overrides/wallet_connect_styles_
 type ThemeType = typeof theme
 
 export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
-  body {
+  html body {
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
     background-color: ${props => props.theme.colors.mainBodyBackground};

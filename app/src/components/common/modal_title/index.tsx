@@ -9,8 +9,10 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   title: string
 }
 
+const CLOSE_BUTTON_DIMENSIONS = '34px'
+
 const ModalTitleWrapper = styled.div`
-  align-items: flex-start;
+  align-items: center;
   display: flex;
   justify-content: space-between;
   margin: 0 0 20px;
@@ -18,40 +20,44 @@ const ModalTitleWrapper = styled.div`
 `
 
 const ModalTitleText = styled.h2`
-  color: ${props => props.theme.colors.commonText};
-  font-size: 18px;
-  font-weight: 700;
+  color: ${props => props.theme.colors.textColorDark};
+  font-family: ${props => props.theme.fonts.fontFamily};
+  font-size: 17px;
+  font-weight: 500;
   line-height: 1.2;
-  margin: 0;
+  margin: 0 auto;
   overflow: hidden;
-  padding: 0 10px 0 0;
+  padding: 0 5px 0 ${CLOSE_BUTTON_DIMENSIONS};
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
 `
 
 const ModalClose = styled.button`
-  align-items: flex-start;
   background-color: transparent;
   background-image: url(${CloseIcon});
-  background-position: 100% 0;
+  background-position: 50% 50%;
   background-repeat: no-repeat;
-  border: none;
+  border-radius: 50%;
+  border: 1px solid ${props => props.theme.colors.tertiary};
   cursor: pointer;
   display: flex;
-  height: 24px;
-  justify-content: flex-end;
+  height: ${CLOSE_BUTTON_DIMENSIONS};
   outline: none;
   padding: 0;
-  width: 24px;
+  width: ${CLOSE_BUTTON_DIMENSIONS};
 
-  &:active {
-    opacity: 0.8;
+  &:hover {
+    border-color: ${props => props.theme.colors.tertiaryDark};
   }
 
   &[disabled] {
-    cursor: not-allowed;
-    opacity: 0.5;
+    &,
+    &:hover {
+      border-color: ${props => props.theme.colors.tertiary};
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
   }
 `
 
