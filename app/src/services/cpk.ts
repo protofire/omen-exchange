@@ -35,9 +35,14 @@ interface CPKCreateMarketParams {
   marketMakerFactory: MarketMakerFactoryService
 }
 
-interface CPKFundingParams {
+interface CPKAddFundingParams {
   amount: BigNumber
   collateral: Token
+  marketMaker: MarketMakerService
+}
+
+interface CPKRemoveFundingParams {
+  amount: BigNumber
   marketMaker: MarketMakerService
 }
 
@@ -324,7 +329,7 @@ class CPKService {
     }
   }
 
-  addFunding = async ({ amount, collateral, marketMaker }: CPKFundingParams): Promise<TransactionReceipt> => {
+  addFunding = async ({ amount, collateral, marketMaker }: CPKAddFundingParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
@@ -374,7 +379,7 @@ class CPKService {
     }
   }
 
-  removeFunding = async ({ amount, marketMaker }: CPKFundingParams): Promise<TransactionReceipt> => {
+  removeFunding = async ({ amount, marketMaker }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
     try {
       const transactions = [
         {

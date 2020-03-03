@@ -1,29 +1,39 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { getTokensByNetwork } from '../../../util/networks'
+import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { useContracts } from '../../../hooks/useContracts'
 import { Token } from '../../../util/types'
 import { Select } from '../select'
 
 interface Props {
   autoFocus?: boolean
+  context: ConnectedWeb3Context
   disabled?: boolean
   name: string
-  onTokenChange: (token: Token) => any
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
+  onTokenChange: (token: Token) => any
   readOnly?: boolean
   value: Token
-  customValues: Token[]
-  networkId: number
 }
 
 const FormOption = styled.option``
 
 export const Tokens = (props: Props) => {
-  const { customValues, networkId, onTokenChange, value, ...restProps } = props
+  const { context, onTokenChange, value, ...restProps } = props
 
-  const knownTokens = getTokensByNetwork(networkId)
-  const tokens = knownTokens.concat(customValues)
+  const [tokens, setTokens] = useState<Token[]>([])
+  const { kleros } = useContracts(context)
+
+  useEffect(() => {
+    const fetchTokens = async () => {
+      const tokens = await kleros.queryTokens()
+      setTokens(tokens)
+    }
+
+    fetchTokens()
+  }, [kleros])
+
   const options = tokens.map(token => ({
     label: token.symbol,
     value: token.address,

@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import {
   ConditionalTokenService,
+  KlerosService,
   MarketMakerFactoryService,
   MarketMakerService,
   OracleService,
@@ -37,6 +38,14 @@ export const useContracts = (context: ConnectedWeb3Context) => {
   const oracleAddress = getContractAddress(networkId, 'oracle')
   const oracle = useMemo(() => new OracleService(oracleAddress, provider, account), [oracleAddress, provider, account])
 
+  const klerosBadgeAddress = getContractAddress(networkId, 'klerosBadge')
+  const klerosTokenViewAddress = getContractAddress(networkId, 'klerosTokenView')
+  const klerosTCRAddress = getContractAddress(networkId, 'klerosTCR')
+  const kleros = useMemo(
+    () => new KlerosService(klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, provider, account),
+    [klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, provider, account],
+  )
+
   const buildMarketMaker = useMemo(
     () => (address: string) => new MarketMakerService(address, conditionalTokens, realitio, provider, account),
     [conditionalTokens, realitio, provider, account],
@@ -49,8 +58,9 @@ export const useContracts = (context: ConnectedWeb3Context) => {
       realitio,
       oracle,
       buildMarketMaker,
+      kleros,
     }),
-    [conditionalTokens, marketMakerFactory, realitio, oracle, buildMarketMaker],
+    [conditionalTokens, marketMakerFactory, realitio, oracle, kleros, buildMarketMaker],
   )
 }
 

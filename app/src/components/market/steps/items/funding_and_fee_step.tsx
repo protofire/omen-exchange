@@ -11,23 +11,21 @@ import { BigNumberInputReturn } from '../../../common/big_number_input'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
 import { CreateCard } from '../../../common/create_card'
-import { CustomizableTokensSelect } from '../../../common/customizable_tokens_select'
 import { FormError } from '../../../common/form_error'
 import { FormRow } from '../../../common/form_row'
 import { BigNumberInput, Button, Textfield } from '../../../common/index'
 import { TextfieldCustomPlaceholder } from '../../../common/textfield_custom_placeholder'
+import { Tokens } from '../../../common/tokens/index'
 
 interface Props {
   back: () => void
   next: () => void
   values: {
     collateral: Token
-    collateralsCustom: Token[]
     spread: number
     funding: BigNumber
   }
   handleCollateralChange: (collateral: Token) => void
-  addCollateralCustom: (collateral: Token) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
 }
 
@@ -47,8 +45,8 @@ const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account } = context
 
-  const { addCollateralCustom, handleChange, handleCollateralChange, values } = props
-  const { collateral, collateralsCustom, funding, spread } = values
+  const { handleChange, handleCollateralChange, values } = props
+  const { collateral, funding, spread } = values
 
   const collateralBalance = useCollateralBalance(collateral, context)
 
@@ -94,14 +92,7 @@ const FundingAndFeeStep = (props: Props) => {
       />
       <FormRow
         formField={
-          <CustomizableTokensSelect
-            addCustomValue={addCollateralCustom}
-            context={context}
-            customValues={collateralsCustom}
-            name="collateralId"
-            onCollateralChange={handleCollateralChange}
-            value={collateral}
-          />
+          <Tokens context={context} name="collateralId" onTokenChange={handleCollateralChange} value={collateral} />
         }
         title={'Collateral token'}
         tooltip={{

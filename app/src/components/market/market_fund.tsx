@@ -6,12 +6,14 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 import { useContracts } from '../../hooks/useContracts'
+import { useFundingBalance } from '../../hooks/useFundingBalance'
 import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
 import { divBN, formatBigNumber, formatDate } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
+import { BalanceShares } from '../common/balance_shares'
 import { BalanceToken } from '../common/balance_token'
 import { BigNumberInput, BigNumberInputReturn } from '../common/big_number_input'
 import { Button } from '../common/button'
@@ -91,7 +93,8 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
-  const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  const [amountToFund, setAmountToFund] = useState<BigNumber>(new BigNumber(0))
+  const [amountToRemove, setAmountToRemove] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
 
@@ -109,27 +112,27 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
       }
 
       setStatus(Status.Loading)
-      setMessage(`Add funding amount: ${formatBigNumber(amount, collateral.decimals)} ${collateral.symbol} ...`)
+      setMessage(`Add funding amount: ${formatBigNumber(amountToFund, collateral.decimals)} ${collateral.symbol} ...`)
 
       const cpk = await CPKService.create(provider)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const collateralService = new ERC20Service(provider, account, collateralAddress)
 
-      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, amount)
+      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, amountToFund)
 
       if (!hasEnoughAlowance) {
         await collateralService.approveUnlimited(cpk.address)
       }
 
       await cpk.addFunding({
-        amount,
+        amount: amountToFund,
         collateral,
         marketMaker,
       })
 
       setStatus(Status.Ready)
-      setAmount(new BigNumber(0))
+      setAmountToFund(new BigNumber(0))
     } catch (err) {
       setStatus(Status.Error)
       logger.log(`Error trying to add funding: ${err.message}`)
@@ -139,17 +142,17 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   const removeFunding = async () => {
     try {
       setStatus(Status.Loading)
-      setMessage(`Remove all funding amount: ${formatBigNumber(marketMakerUserFunding, collateral.decimals)} ...`)
+      setMessage(`Remove funding amount: ${formatBigNumber(amountToRemove, collateral.decimals)} shares...`)
 
       const cpk = await CPKService.create(provider)
 
       await cpk.removeFunding({
-        amount: marketMakerUserFunding,
-        collateral,
+        amount: amountToRemove,
         marketMaker,
       })
 
       setStatus(Status.Ready)
+      setAmountToRemove(new BigNumber(0))
     } catch (err) {
       setStatus(Status.Error)
       logger.log(`Error trying to remove funding: ${err.message}`)
@@ -158,10 +161,21 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
 
   const collateralBalance = useCollateralBalance(collateral, context)
 
-  const isFundingGreaterThanBalance = amount.gt(collateralBalance)
-  const error = amount.isZero() || isFundingGreaterThanBalance
+  const isFundingToAddGreaterThanBalance = amountToFund.gt(collateralBalance)
+  const errorFundingToAdd = amountToFund.isZero() || isFundingToAddGreaterThanBalance
 
-  const fundingMessageError = isFundingGreaterThanBalance ? `You don't have enough collateral in your balance.` : ''
+  const fundingToAddMessageError = isFundingToAddGreaterThanBalance
+    ? `You don't have enough collateral in your balance.`
+    : ''
+
+  const fundingBalance = useFundingBalance(marketMakerAddress, context)
+
+  const isFundingToRemoveGreaterThanFundingBalance = amountToRemove.gt(fundingBalance)
+  const errorFundingToRemove = amountToRemove.isZero() || isFundingToRemoveGreaterThanFundingBalance
+
+  const fundingToRemoveMessageError = isFundingToRemoveGreaterThanFundingBalance
+    ? `You don't have enough funding in your balance.`
+    : ''
 
   const probabilities = balances.map(balance => balance.probability)
 
@@ -184,9 +198,9 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
                 formField={
                   <BigNumberInputTextRight
                     decimals={collateral.decimals}
-                    name="amount"
-                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                    value={amount}
+                    name="amountToFund"
+                    onChange={(e: BigNumberInputReturn) => setAmountToFund(e.value)}
+                    value={amountToFund}
                   />
                 }
                 placeholderText={collateral.symbol}
@@ -198,13 +212,42 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
               <BalanceToken
                 collateral={collateral}
                 collateralBalance={collateralBalance}
-                onClickAddMaxCollateral={() => setAmount(collateralBalance)}
+                onClickAddMaxCollateral={() => setAmountToFund(collateralBalance)}
               />
-              <FormError>{fundingMessageError}</FormError>
+              <FormError>{fundingToAddMessageError}</FormError>
             </>
           }
-          title={'Amount'}
-          tooltip={{ id: 'amount', description: 'Funds you will add to this market.' }}
+          title={'Amount to fund'}
+          tooltip={{ id: 'amountToFund', description: 'Funds you will add to this market.' }}
+        />
+        <AmountWrapper
+          formField={
+            <>
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInputTextRight
+                    decimals={collateral.decimals}
+                    name="amountToRemove"
+                    onChange={(e: BigNumberInputReturn) => setAmountToRemove(e.value)}
+                    value={amountToRemove}
+                  />
+                }
+                placeholderText="shares"
+              />
+            </>
+          }
+          note={
+            <>
+              <BalanceShares
+                collateral={collateral}
+                onClickMax={(shares: BigNumber) => setAmountToRemove(shares)}
+                shares={fundingBalance}
+              />
+              <FormError>{fundingToRemoveMessageError}</FormError>
+            </>
+          }
+          title={'Amount to remove'}
+          tooltip={{ id: 'amountToRemove', description: 'Funds you will remove from this market.' }}
         />
         <FormLabelStyled>Totals</FormLabelStyled>
         <TableStyled>
@@ -237,14 +280,10 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
         </TableStyled>
         <ButtonContainer>
           <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>‹ Back</ButtonLinkStyled>
-          <Button
-            buttonType={ButtonType.secondary}
-            disabled={marketMakerUserFunding && marketMakerUserFunding.isZero()}
-            onClick={() => removeFunding()}
-          >
+          <Button buttonType={ButtonType.secondary} disabled={errorFundingToRemove} onClick={() => removeFunding()}>
             Remove funds
           </Button>
-          <Button buttonType={ButtonType.primary} disabled={error} onClick={() => addFunding()}>
+          <Button buttonType={ButtonType.primary} disabled={errorFundingToAdd} onClick={() => addFunding()}>
             Fund
           </Button>
         </ButtonContainer>

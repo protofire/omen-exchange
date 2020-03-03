@@ -1,7 +1,10 @@
+import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { fetchConditionsQuery } from '../../queries/example'
+import { getLogger } from '../../util/logger'
 import { MarketFilter } from '../../util/market_filter'
 import { RemoteData } from '../../util/remote_data'
 import { MarketWithExtraData } from '../../util/types'
@@ -32,8 +35,15 @@ interface Props {
   onShowMore: () => void
 }
 
+const logger = getLogger('Market::Home')
+
 export const MarketHome: React.FC<Props> = (props: Props) => {
   const { context, count, currentFilter, markets, onFilterChange, onShowMore } = props
+
+  // eslint-disable-next-line no-warning-comments
+  // TODO, remove this, only for testing
+  const { data } = useQuery(fetchConditionsQuery)
+  logger.log(data)
 
   const showMoreButton =
     props.moreMarkets && !RemoteData.is.loading(markets) ? (

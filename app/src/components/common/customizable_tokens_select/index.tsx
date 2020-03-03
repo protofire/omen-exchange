@@ -24,19 +24,13 @@ const Link = styled(FormRowLink)`
 `
 
 export const CustomizableTokensSelect = (props: Props) => {
-  const { addCustomValue, context, customValues, name, onCollateralChange, value } = props
+  const { addCustomValue, context, name, onCollateralChange, value } = props
 
   const [isModalCollateralOpen, setModalCollateralState] = useState(false)
 
   return (
     <>
-      <Tokens
-        customValues={customValues}
-        name={name}
-        networkId={context.networkId}
-        onTokenChange={onCollateralChange}
-        value={value}
-      />
+      <Tokens context={context} name={name} onTokenChange={onCollateralChange} value={value} />
       <Link onClick={() => setModalCollateralState(true)}>Add custom token</Link>
       <ModalCollateral
         context={context}
