@@ -1,10 +1,14 @@
-import React, { HTMLAttributes } from 'react'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { MarketWithExtraData, MarketStatus } from '../../../util/types'
-import { formatDate } from '../../../util/tools'
+import { formatDate, calcPrice } from '../../../util/tools'
 import { CalendarIcon } from '../calendar_icon'
 import { ChevronRightIcon } from '../chevron_right_icon'
 import { NavLink } from 'react-router-dom'
+import { ERC20Service } from '../../../services'
+import { ethers } from 'ethers'
+import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import moment from 'moment'
 
 const ListItemCss = css`
   align-items: center;
@@ -121,7 +125,7 @@ const Chevron = styled(ChevronRightIcon)`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  data: MarketWithExtraData
+  market: any
 }
 
 interface ListItemWrapperProps {
@@ -136,21 +140,52 @@ const ListItemWrapper: React.FC<ListItemWrapperProps> = (props: ListItemWrapperP
 }
 
 export const ListItem: React.FC<Props> = (props: Props) => {
-  const { data } = props
-  const { address, question, resolution, status } = data
+  const context = useConnectedWeb3Context()
+  const { library: provider, account } = context
+  const [amount, setAmount] = useState('')
+  const [symbol, setSymbol] = useState('')
+
+  const { market } = props
+  const { id: address, collateralToken, collateralVolume, outcomeTokenAmounts } = market
+
+  const { question } = market.conditions[0]
+  const { title, outcomes } = question
+
+  const endsIn = moment(new Date(question.openingTimestamp * 1000)).fromNow() // TODO Add function to calculate for past markets
+
+  useEffect(() => {
+    const setToken = async () => {
+      if (!account) {
+        return
+      }
+      const erc20Service = new ERC20Service(provider, account, collateralToken)
+      const { symbol, decimals } = await erc20Service.getProfileSummary()
+
+      const amount = ethers.utils.formatUnits(collateralVolume, decimals)
+
+      setAmount(amount)
+      setSymbol(symbol)
+    }
+
+    setToken()
+  }, [collateralToken, account])
+
+  const percentages = calcPrice(outcomeTokenAmounts)
+  const indexMax = percentages.indexOf(Math.max(...percentages))
 
   return (
     <ListItemWrapper address={address}>
       <Contents>
-        <Title>{question}</Title>
+        <Title>{title}</Title>
         <Info>
+          <span>{`${(percentages[indexMax] * 100).toFixed(2)}% ${outcomes[indexMax]} `}</span>·{' '}
+          <span>
+            {amount} {symbol} Volume
+          </span>
           <ResolutionDate>
             <CalendarIconStyled />
-            <Bold>Resolution Date:</Bold>
-            <ResolutionText>{resolution ? formatDate(resolution) : ''}</ResolutionText>
+            <ResolutionText>Ends {endsIn}</ResolutionText>
           </ResolutionDate>
-          <Separator>-</Separator>
-          <Status resolved={status === MarketStatus.Closed}>{status}</Status>
         </Info>
       </Contents>
       <Chevron />

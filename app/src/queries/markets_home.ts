@@ -1,14 +1,5 @@
 import gql from 'graphql-tag'
 
-enum queries {
-  open = 'OPEN',
-  closed = 'CLOSED',
-  myMarkets = 'MY_MARKETS',
-}
-type Queries = {
-  [K in queries]?: string
-}
-
 const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
     id
@@ -30,13 +21,8 @@ const MarketDataFragment = gql`
 `
 
 const OPEN = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $criteria: String, $now: BigInt) {
-    fixedProductMarketMakers(
-      first: $first
-      skip: $skip
-      orderBy: $criteria
-      where: { creationTimestamp_gt: $now }
-    ) {
+  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String) {
+    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy) {
       ...marketData
     }
   }
@@ -44,13 +30,8 @@ const OPEN = gql`
 `
 
 const CLOSED = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $criteria: String, $now: BigInt) {
-    fixedProductMarketMakers(
-      first: $first
-      skip: $skip
-      orderBy: $criteria
-      where: { creationTimestamp_lte: $now }
-    ) {
+  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String) {
+    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy) {
       ...marketData
     }
   }
@@ -58,11 +39,11 @@ const CLOSED = gql`
 `
 
 const MY_MARKETS = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $criteria: String, $now: BigInt, $account: String!) {
+  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $account: String!) {
     fixedProductMarketMakers(
       first: $first
       skip: $skip
-      orderBy: $criteria
+      orderBy: $sortBy
       where: { creator: $account }
     ) {
       ...marketData
