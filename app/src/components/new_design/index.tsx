@@ -5,20 +5,51 @@ import { MARKETS_HOME } from '../../queries/markets_home'
 import { MarketCard } from './market_card'
 import styled from 'styled-components'
 import { Loading } from '../common/loading'
+import { CPKService } from '../../services/cpk'
+import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 
+const CATEGORIES = ['All', 'Politics', 'Cryptocurrencies', 'Sports', 'Esports', 'NBA']
 const SelectableButton = styled.div<{ selected?: boolean }>`
   background: ${(props: any) => (props.selected ? 'aquamarine' : 'initial')};
 `
+
+const CategoryItem = styled.li<{ selected?: boolean }>`
+  background: ${(props: any) => (props.selected ? 'yellow' : 'initial')};
+  margin-left: 1px;
+  border-style: solid;
+  padding: 3px;
+  border-width: 0.5px;
+  display: inline;
+`
+
 const NewDesign: React.FC = () => {
-  const FIRST = 10
+  const FIRST = 1
   const NOW = Math.floor(Date.now() / 1000)
 
   const [skip, setSkip] = useState(0)
   const [markets, setMarkets] = useState([] as any)
   const [filterSelected, setFilterSelected] = useState('OPEN')
+  const [category, setCategory] = useState('All')
   const [orderCriteria, setOrderCriteria] = useState<Maybe<string>>(null)
-  const { data, loading } = useQuery(MARKETS_HOME[filterSelected], {
-    variables: { first: FIRST, skip, criteria: orderCriteria, now: NOW },
+  const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
+
+  const context = useConnectedWeb3Context()
+  const { library: provider } = context
+
+  const { data, loading, error } = useQuery(MARKETS_HOME[filterSelected], {
+    fetchPolicy: 'no-cache',
+    variables: { first: FIRST, skip, criteria: orderCriteria, now: NOW, account: cpkAddress },
+  })
+
+  console.log(loading, error)
+
+  useEffect(() => {
+    const getCpkAddress = async () => {
+      const cpk = await CPKService.create(provider)
+      setCpkAddress(cpk.address)
+    }
+
+    getCpkAddress()
   })
 
   useEffect(() => {
@@ -44,12 +75,27 @@ const NewDesign: React.FC = () => {
     setFilterSelected(filter)
   }
 
+  const changeCategorySelected = (category: string) => {
+    setCategory(category)
+  }
+
   if (loading) {
     return <Loading full={true}></Loading>
   }
 
   return (
     <div>
+      <ul>
+        {CATEGORIES.map((c, index) => (
+          <CategoryItem
+            key={index}
+            selected={c === category}
+            onClick={() => changeCategorySelected(c)}
+          >
+            {c}
+          </CategoryItem>
+        ))}
+      </ul>
       <hr></hr>
       <div className="filters">
         <SelectableButton
