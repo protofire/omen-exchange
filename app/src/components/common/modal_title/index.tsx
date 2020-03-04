@@ -15,7 +15,6 @@ const ModalTitleWrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: space-between;
-  margin: 0 0 20px;
   padding: 0;
 `
 
@@ -45,6 +44,7 @@ const ModalClose = styled.button`
   height: ${CLOSE_BUTTON_DIMENSIONS};
   outline: none;
   padding: 0;
+  transition: border-color 0.15s linear;
   width: ${CLOSE_BUTTON_DIMENSIONS};
 
   &:hover {
