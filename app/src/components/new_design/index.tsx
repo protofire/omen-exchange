@@ -32,40 +32,48 @@ const NewDesign: React.FC = () => {
   const [category, setCategory] = useState('All')
   const [orderCriteria, setOrderCriteria] = useState<Maybe<string>>(null)
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
+  const [loadingCpkAddress, setLoadingCpkAddress] = useState(false)
+  const [skipQuery, setSkipQuery] = useState(false)
 
   const context = useConnectedWeb3Context()
   const { library: provider } = context
 
-  const { data, loading, error } = useQuery(MARKETS_HOME[filterSelected], {
+  const { data, loading: loadingQuery, error } = useQuery(MARKETS_HOME[filterSelected], {
     fetchPolicy: 'no-cache',
+    skip: skipQuery,
     variables: { first: FIRST, skip, criteria: orderCriteria, now: NOW, account: cpkAddress },
   })
-
-  console.log(loading, error)
 
   useEffect(() => {
     const getCpkAddress = async () => {
       const cpk = await CPKService.create(provider)
       setCpkAddress(cpk.address)
+      setLoadingCpkAddress(false)
     }
-
+    setLoadingCpkAddress(true)
     getCpkAddress()
-  })
+  }, [provider])
 
   useEffect(() => {
     if (data) {
-      const { fixedProductMarketMakers } = data
-      if (fixedProductMarketMakers.length) {
+      if (data.fixedProductMarketMakers.length) {
+        const { fixedProductMarketMakers } = data
+
+        setSkipQuery(true)
         setMarkets([...markets, ...fixedProductMarketMakers])
       }
     }
   }, [data])
 
+  const loading = loadingCpkAddress || loadingQuery
+
   const loadMore = () => {
+    setSkipQuery(false)
     setSkip(skip + FIRST)
   }
 
   const resetPagination = () => {
+    setSkipQuery(false)
     setMarkets([])
     setSkip(0)
   }
@@ -133,7 +141,11 @@ const NewDesign: React.FC = () => {
         ))}
       </div>
       {/* </Waypoint> */}
-      <button onClick={loadMore}>LOAD MORE</button>
+      {skipQuery && (
+        <button onClick={loadMore} disabled={!skipQuery}>
+          LOAD MORE
+        </button>
+      )}
     </div>
   )
 }
