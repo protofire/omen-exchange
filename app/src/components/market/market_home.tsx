@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 
-import { MarketWithExtraData } from '../../util/types'
-import { MarketFilter } from '../../util/market_filter'
 import { RemoteData } from '../../util/remote_data'
 import { Button } from '../common/button'
 import { ListCard } from '../common/list_card'

@@ -3,9 +3,7 @@ import { Waypoint } from 'react-waypoint'
 
 import { MarketHome } from './market_home'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { useMarkets } from '../../hooks/useMarkets'
 import { RemoteData } from '../../util/remote_data'
-import { MarketFilter } from '../../util/market_filter'
 import { useQuery } from '@apollo/react-hooks'
 import { MARKETS_HOME } from '../../queries/markets_home'
 import { CPKService } from '../../services'
@@ -23,18 +21,13 @@ const MarketHomeContainer: React.FC = () => {
   })
   const [markets, setMarkets] = useState<RemoteData<any>>(RemoteData.notAsked())
   const [count, setCount] = useState(0)
+  const [skipQuery, setSkipQuery] = useState(false)
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const { library: provider } = context
 
-  const showMore = () => setCount(count => count + PAGE_SIZE)
-  const onFilterChange = (filter: MarketFilter) => {
-    setCount(0)
-    setFilter(filter)
-  }
-
   const { data, loading, error, variables } = useQuery(MARKETS_HOME[filter.state], {
     fetchPolicy: 'no-cache',
-    //skip: skipQuery,
+    skip: skipQuery,
     variables: { first: PAGE_SIZE, skip: count, account: cpkAddress, ...filter },
   })
 
@@ -53,16 +46,28 @@ const MarketHomeContainer: React.FC = () => {
       console.log(data)
       if (data.fixedProductMarketMakers.length) {
         const { fixedProductMarketMakers } = data
-        // setSkipQuery(true)
+        setSkipQuery(true)
         const currentMarkets = RemoteData.getDataOr(markets, [])
         setMarkets(RemoteData.success([...currentMarkets, ...fixedProductMarketMakers]))
       }
     }
   }, [data, loading, error])
 
+  const showMore = () => {
+    setSkipQuery(false)
+    setCount(count => count + PAGE_SIZE)
+  }
+  const onFilterChange = (filter: any) => {
+    setCount(0)
+    setSkipQuery(false)
+    setFilter(filter)
+  }
+
   // if (loading) {
-  //   setMarkets(RemoteData.loading())
-  //   console.log('LOADING')
+  // setMarkets(markets =>
+  //   RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading(),
+  // )
+  //  //   console.log('LOADING')
   //   return null
   // } else if (error) {
   //   setMarkets(RemoteData.failure(error))

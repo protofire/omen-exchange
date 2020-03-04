@@ -1,7 +1,6 @@
 import React, { HTMLAttributes, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
-import { MarketWithExtraData, MarketStatus } from '../../../util/types'
-import { formatDate, calcPrice } from '../../../util/tools'
+import { calcPrice } from '../../../util/tools'
 import { CalendarIcon } from '../calendar_icon'
 import { ChevronRightIcon } from '../chevron_right_icon'
 import { NavLink } from 'react-router-dom'
