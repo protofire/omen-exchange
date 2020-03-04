@@ -32,7 +32,7 @@ const theme = {
     backgroundColor: '#fff',
     backgroundColorHover: '#fff',
     borderColor: '#D6EBFD',
-    borderColorHover: '#bfd1e2',
+    borderColorHover: '#90CAF9',
     color: '#37474F',
     colorHover: '#37474F',
   },
