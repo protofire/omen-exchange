@@ -58,8 +58,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     </Button>
   ) : null
 
-  console.log(markets)
-
   return (
     <>
       <SectionTitle title={'MARKETS'} />

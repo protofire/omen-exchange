@@ -20,15 +20,12 @@ const MarketHomeContainer: React.FC = () => {
     sortBy: null,
   })
   const [markets, setMarkets] = useState<RemoteData<any>>(RemoteData.notAsked())
-  const [count, setCount] = useState(0)
-  const [skipQuery, setSkipQuery] = useState(false)
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const { library: provider } = context
 
-  const { data, loading, error, variables } = useQuery(MARKETS_HOME[filter.state], {
-    fetchPolicy: 'no-cache',
-    skip: skipQuery,
-    variables: { first: PAGE_SIZE, skip: count, account: cpkAddress, ...filter },
+  const { data, loading, fetchMore, error, variables } = useQuery(MARKETS_HOME[filter.state], {
+    notifyOnNetworkStatusChange: true,
+    variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, ...filter },
   })
 
   console.log(variables)
@@ -42,43 +39,45 @@ const MarketHomeContainer: React.FC = () => {
   }, [provider])
 
   useEffect(() => {
-    if (data && !loading && !error) {
-      console.log(data)
+    if (loading) {
+      setMarkets(markets =>
+        RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading(),
+      )
+    } else if (error) {
+      setMarkets(RemoteData.failure(error))
+    } else if (data) {
       if (data.fixedProductMarketMakers.length) {
         const { fixedProductMarketMakers } = data
-        setSkipQuery(true)
-        const currentMarkets = RemoteData.getDataOr(markets, [])
-        setMarkets(RemoteData.success([...currentMarkets, ...fixedProductMarketMakers]))
+        setMarkets(RemoteData.success(fixedProductMarketMakers))
       }
     }
   }, [data, loading, error])
 
   const showMore = () => {
-    setSkipQuery(false)
-    setCount(count => count + PAGE_SIZE)
+    fetchMore({
+      variables: {
+        skip: data.fixedProductMarketMakers.length,
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return prev
+        return Object.assign({}, prev, {
+          fixedProductMarketMakers: [
+            ...prev.fixedProductMarketMakers,
+            ...fetchMoreResult.fixedProductMarketMakers,
+          ],
+        })
+      },
+    })
   }
   const onFilterChange = (filter: any) => {
-    setCount(0)
-    setSkipQuery(false)
     setFilter(filter)
   }
-
-  // if (loading) {
-  // setMarkets(markets =>
-  //   RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading(),
-  // )
-  //  //   console.log('LOADING')
-  //   return null
-  // } else if (error) {
-  //   setMarkets(RemoteData.failure(error))
-  //   console.log('ERROR')
-  // }
 
   return (
     <>
       <MarketHome
         markets={markets}
-        count={count}
+        count={data ? data.fixedProductMarketMakers.length : 0}
         context={context}
         currentFilter={filter}
         onFilterChange={onFilterChange}
