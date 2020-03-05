@@ -79,7 +79,7 @@ const SummaryMarketStep = (props: Props) => {
 
   return (
     <>
-      <SectionTitle subTitle="A new market has been created!" title="Conditional Exchange" />
+      <SectionTitle title="Conditional Exchange" />
       <CreateCard>
         <OutcomeInfo>
           <Paragraph>

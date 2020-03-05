@@ -5,7 +5,7 @@ import { Card } from '../card/index'
 
 const CardStyled = styled(Card)`
   margin: 0 auto;
-  max-width: ${props => props.theme.viewMarket.maxWidth};
+  max-width: ${props => props.theme.mainContainer.maxWidth};
   min-height: 550px;
   width: 100%;
 `

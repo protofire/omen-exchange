@@ -12,7 +12,7 @@ import { useContracts } from '../../hooks/useContracts'
 import { CPKService, ERC20Service, MarketMakerService } from '../../services'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
-import { computeBalanceAfterTrade, formatBigNumber, formatDate } from '../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { BigNumberInput, Button, OutcomeTable } from '../common'
 import { BalanceToken } from '../common/balance_token'
@@ -99,7 +99,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const { buildMarketMaker } = useContracts(context)
 
-  const { balances, collateral, marketMakerAddress, question, resolution } = props
+  const { balances, collateral, marketMakerAddress, question } = props
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -215,7 +215,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle subTitle={resolution ? formatDate(resolution) : ''} title={question} />
+      <SectionTitle goBackEnabled title={question} />
       <ViewCard>
         <SubsectionTitleStyled>Choose the shares you want to buy</SubsectionTitleStyled>
         <OutcomeTable

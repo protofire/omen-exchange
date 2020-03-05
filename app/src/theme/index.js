@@ -101,13 +101,7 @@ const theme = {
     paddingVertical: '6px',
     placeholderColor: '#999',
   },
-  createSteps: {
-    maxWidth: '586px',
-  },
-  viewMarket: {
-    maxWidth: '586px',
-  },
-  list: {
+  mainContainer: {
     maxWidth: '586px',
   },
   dropdown: {

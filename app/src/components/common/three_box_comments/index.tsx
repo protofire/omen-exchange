@@ -20,7 +20,7 @@ const CommentsTitle = styled.h3`
 
 const ThreeBoxCustom = styled.div`
   margin: 30px auto;
-  max-width: ${props => props.theme.viewMarket.maxWidth};
+  max-width: ${props => props.theme.mainContainer.maxWidth};
   width: 100%;
 
   > .threebox-comments-react {

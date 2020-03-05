@@ -10,13 +10,7 @@ import { useContracts } from '../../hooks/useContracts'
 import { CPKService, MarketMakerService } from '../../services'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
-import {
-  calcSellAmountInCollateral,
-  computeBalanceAfterTrade,
-  formatBigNumber,
-  formatDate,
-  mulBN,
-} from '../../util/tools'
+import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { BigNumberInput, Button, OutcomeTable } from '../common'
 import { BalanceShares } from '../common/balance_shares'
@@ -78,7 +72,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
 
-  const { balances, collateral, marketMakerAddress, question, resolution } = props
+  const { balances, collateral, marketMakerAddress, question } = props
 
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
@@ -187,7 +181,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle subTitle={resolution ? formatDate(resolution) : ''} title={question} />
+      <SectionTitle goBackEnabled title={question} />
       <ViewCard>
         <SubsectionTitleStyled>Choose the shares you want to sell</SubsectionTitleStyled>
         <OutcomeTable

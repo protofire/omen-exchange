@@ -1,7 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
-import { formatDate } from '../../util/tools'
 import { Arbitrator, BalanceItem, Status, Token } from '../../util/types'
 import { SectionTitle } from '../common/section_title'
 
@@ -25,22 +24,15 @@ interface Props {
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {
-  const { balances, isQuestionFinalized, question, resolution } = props
+  const { isQuestionFinalized, question } = props
 
   const renderView = () => {
     return isQuestionFinalized ? <ClosedMarketDetail {...props} /> : <View {...props} />
   }
 
-  const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
-
-  const formattedResolution = resolution ? formatDate(resolution) : ''
-  const subtitle = isQuestionFinalized
-    ? `Final Outcome: ${winningOutcome && winningOutcome.outcomeName}`
-    : formattedResolution
-
   return (
     <>
-      <SectionTitle subTitle={subtitle} title={question} />
+      <SectionTitle goBackEnabled title={question} />
       {renderView()}
     </>
   )

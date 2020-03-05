@@ -11,7 +11,7 @@ import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
-import { divBN, formatBigNumber, formatDate } from '../../util/tools'
+import { divBN, formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { BalanceShares } from '../common/balance_shares'
 import { BalanceToken } from '../common/balance_token'
@@ -82,7 +82,6 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
     marketMakerFunding,
     marketMakerUserFunding,
     question,
-    resolution,
     totalPoolShares,
     userPoolShares,
   } = props
@@ -181,7 +180,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle subTitle={resolution ? formatDate(resolution) : ''} title={question} />
+      <SectionTitle goBackEnabled title={question} />
       <ViewCard>
         <SubsectionTitleStyled>Fund this market</SubsectionTitleStyled>
         <OutcomeTable

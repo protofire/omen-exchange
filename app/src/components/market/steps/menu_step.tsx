@@ -19,7 +19,7 @@ interface StepItem {
 const Wrapper = styled.div`
   display: flex;
   margin: 0 auto 20px;
-  max-width: ${props => props.theme.createSteps.maxWidth};
+  max-width: ${props => props.theme.mainContainer.maxWidth};
   width: 100%;
 `
 
@@ -67,7 +67,7 @@ class MenuStep extends Component<Props, State> {
 
     return (
       <>
-        <SectionTitle subTitle={'Create A New Market'} title={'Conditional Exchange'} />
+        <SectionTitle title={'Conditional Exchange'} />
         <Wrapper>{stepsBlocks}</Wrapper>
       </>
     )

@@ -17,7 +17,7 @@ import { SectionTitle } from '../common/section_title'
 
 const FilterStyled = styled(Filter)`
   margin: -30px auto 10px;
-  max-width: ${props => props.theme.list.maxWidth};
+  max-width: ${props => props.theme.mainContainer.maxWidth};
   width: 100%;
 `
 
@@ -26,11 +26,11 @@ const NoMarketsAvailable = styled(SectionTitle)`
 `
 
 interface Props {
-  markets: RemoteData<MarketWithExtraData[]>
-  count: number
-  moreMarkets: boolean
   context: ConnectedWeb3Context
+  count: number
   currentFilter: MarketFilter
+  markets: RemoteData<MarketWithExtraData[]>
+  moreMarkets: boolean
   onFilterChange: (filter: MarketFilter) => void
   onShowMore: () => void
 }

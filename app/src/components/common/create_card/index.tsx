@@ -5,7 +5,7 @@ import { Card } from '../card'
 
 const CardStyled = styled(Card)`
   margin: 0 auto;
-  max-width: ${props => props.theme.createSteps.maxWidth};
+  max-width: ${props => props.theme.mainContainer.maxWidth};
   min-height: 530px;
   width: 100%;
 `
