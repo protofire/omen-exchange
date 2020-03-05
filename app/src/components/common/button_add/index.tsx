@@ -1,7 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
+
+import { ButtonComponentProps } from '../../../theme/component_styles/button_styling_types'
 import { Button } from '../button'
-import { ButtonComponentProps } from '../../../common/button_styling_types'
+
 import IconAdd from './img/add-button.svg'
 
 interface ButtonComponentPropsLocal extends ButtonComponentProps {
@@ -27,9 +29,7 @@ const ButtonContainer = styled(Button)`
   }
 `
 
-export const ButtonAdd: React.FC<ButtonComponentPropsLocal> = (
-  props: ButtonComponentPropsLocal,
-) => {
+export const ButtonAdd: React.FC<ButtonComponentPropsLocal> = (props: ButtonComponentPropsLocal) => {
   const { disabled = false, onClick, ...restProps } = props
 
   return <ButtonContainer disabled={disabled} onClick={onClick} type="button" {...restProps} />

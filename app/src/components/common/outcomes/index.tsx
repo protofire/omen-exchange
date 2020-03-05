@@ -1,16 +1,17 @@
 import React from 'react'
 import styled from 'styled-components'
+
+import { Button } from '../button'
+import { ButtonAdd } from '../button_add'
+import { Checkbox } from '../checkbox'
+import { FormError } from '../form_error'
+import { FormLabel } from '../form_label'
 import { Textfield } from '../index'
 import { TextfieldCustomPlaceholder } from '../textfield_custom_placeholder'
-import { FormLabel } from '../form_label'
 import { Tooltip } from '../tooltip'
-import { FormError } from '../form_error'
-import { Button } from '../button'
 import { Well } from '../well'
-import { ButtonAdd } from '../button_add'
 
 import IconDelete from './img/delete.svg'
-import { Checkbox } from '../checkbox'
 
 const BUTTON_DIMENSIONS = '30px'
 
@@ -147,7 +148,7 @@ interface Props {
 }
 
 const Outcomes = (props: Props) => {
-  const { outcomes, totalProbabilities, disabled, errorMessages, canAddOutcome } = props
+  const { canAddOutcome, disabled, errorMessages, outcomes, totalProbabilities } = props
   const [newOutcomeName, setNewOutcomeName] = React.useState('')
   const [isUniform, setIsUniform] = React.useState(false)
 
@@ -240,20 +241,20 @@ const Outcomes = (props: Props) => {
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
     <OutcomeItem key={index}>
       <Textfield
+        disabled={disabled}
         name={`outcome_${index}`}
+        onChange={e => updateOutcomeName(index, e.currentTarget.value)}
         type="text"
         value={outcome.name}
-        onChange={e => updateOutcomeName(index, e.currentTarget.value)}
-        disabled={disabled}
       />
       <TextfieldCustomPlaceholder
         formField={
           <TextFieldTextRight
             data-testid={`outcome_${index}`}
+            disabled={isUniform}
             min={0}
             onChange={e => updateOutcomeProbability(index, +e.currentTarget.value)}
             type="number"
-            disabled={isUniform}
             value={outcome.probability}
           />
         }
@@ -264,8 +265,8 @@ const Outcomes = (props: Props) => {
         onClick={() => {
           removeOutcome(index)
         }}
-        title={`Remove outcome ${index + 1}`}
         tabIndex={-1}
+        title={`Remove outcome ${index + 1}`}
       />
     </OutcomeItem>
   ))
@@ -299,11 +300,7 @@ const Outcomes = (props: Props) => {
           </TotalValue>
         </TotalWrapper>
         <CheckboxWrapper>
-          <StyledCheckbox
-            title="Distribute uniformly"
-            name="distributeUniformly"
-            onChange={handleIsUniformChanged}
-          />
+          <StyledCheckbox name="distributeUniformly" onChange={handleIsUniformChanged} title="Distribute uniformly" />
           <StyledLabel htmlFor="distributeUniformly">Distribute uniformly</StyledLabel>
         </CheckboxWrapper>
       </OutcomesWrapper>
@@ -311,10 +308,10 @@ const Outcomes = (props: Props) => {
       {canAddOutcome && (
         <NewOutcome>
           <Textfield
-            type="text"
-            placeholder="Add new outcome"
-            value={newOutcomeName}
             onChange={e => setNewOutcomeName(e.target.value)}
+            placeholder="Add new outcome"
+            type="text"
+            value={newOutcomeName}
           />
           <ButtonAdd disabled={!newOutcomeName} onClick={addNewOutcome} title="Add new outcome" />
         </NewOutcome>

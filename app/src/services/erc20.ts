@@ -1,4 +1,4 @@
-import { Contract, ethers, utils, Wallet } from 'ethers'
+import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
@@ -39,11 +39,7 @@ class ERC20Service {
   /**
    * @returns A boolean indicating if `spender` has enough allowance to transfer `neededAmount` tokens from `spender`.
    */
-  hasEnoughAllowance = async (
-    owner: string,
-    spender: string,
-    neededAmount: BigNumber,
-  ): Promise<boolean> => {
+  hasEnoughAllowance = async (owner: string, spender: string, neededAmount: BigNumber): Promise<boolean> => {
     const allowance: BigNumber = await this.contract.allowance(owner, spender)
     return allowance.gte(neededAmount)
   }
@@ -90,10 +86,7 @@ class ERC20Service {
         throw new Error('Is not a valid contract')
       }
 
-      const [decimals, symbol] = await Promise.all([
-        this.contract.decimals(),
-        this.contract.symbol(),
-      ])
+      const [decimals, symbol] = await Promise.all([this.contract.decimals(), this.contract.symbol()])
 
       return !!(decimals && symbol)
     } catch (err) {

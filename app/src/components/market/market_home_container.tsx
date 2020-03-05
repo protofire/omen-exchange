@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
-import { MarketHome } from './market_home'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useMarkets } from '../../hooks/useMarkets'
-import { RemoteData } from '../../util/remote_data'
 import { MarketFilter } from '../../util/market_filter'
+import { RemoteData } from '../../util/remote_data'
+
+import { MarketHome } from './market_home'
 
 const PAGE_SIZE = 10
 
@@ -26,11 +27,11 @@ const MarketHomeContainer: React.FC = () => {
   return (
     <>
       <MarketHome
-        markets={markets}
-        count={count}
-        moreMarkets={moreMarkets}
         context={context}
+        count={count}
         currentFilter={filter}
+        markets={markets}
+        moreMarkets={moreMarkets}
         onFilterChange={onFilterChange}
         onShowMore={showMore}
       />

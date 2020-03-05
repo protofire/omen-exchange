@@ -1,15 +1,13 @@
+import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import { ConnectedWeb3Context } from './connectedWeb3'
 import { ERC20Service } from '../services'
 import { Token } from '../util/types'
-import { BigNumber } from 'ethers/utils'
 
-export const useCollateralBalance = (
-  collateral: Token,
-  context: ConnectedWeb3Context,
-): BigNumber => {
-  const { library: provider, account } = context
+import { ConnectedWeb3Context } from './connectedWeb3'
+
+export const useCollateralBalance = (collateral: Token, context: ConnectedWeb3Context): BigNumber => {
+  const { account, library: provider } = context
 
   const [collateralBalance, setCollateralBalance] = useState<BigNumber>(new BigNumber(0))
 

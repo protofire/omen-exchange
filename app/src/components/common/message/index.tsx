@@ -1,11 +1,11 @@
-import React, { ReactPortal, useState, useCallback, useEffect, HTMLAttributes } from 'react'
+import React, { HTMLAttributes, ReactPortal, useCallback, useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
-import WarningSVG from './img/warning.svg'
+import CloseSVG from './img/close.svg'
 import ErrorSVG from './img/error.svg'
 import OkSVG from './img/ok.svg'
-import CloseSVG from './img/close.svg'
+import WarningSVG from './img/warning.svg'
 
 export enum MessageType {
   default,

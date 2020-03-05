@@ -1,6 +1,7 @@
 import React, { HTMLAttributes } from 'react'
-import { Card } from '../card/index'
 import styled from 'styled-components'
+
+import { Card } from '../card/index'
 
 const CardStyled = styled(Card)`
   margin: 0 auto;

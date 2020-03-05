@@ -1,19 +1,19 @@
+import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 import styled from 'styled-components'
 
-import { MarketWithExtraData } from '../../util/types'
-import { MarketFilter } from '../../util/market_filter'
-import { RemoteData } from '../../util/remote_data'
-import { Button } from '../common/button'
-import { ListCard } from '../common/list_card'
-import { ListItem } from '../common/list_item'
-import { SectionTitle } from '../common/section_title'
-import { Filter } from '../common/filter'
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { Loading } from '../common/loading'
-import { useQuery } from '@apollo/react-hooks'
 import { fetchConditionsQuery } from '../../queries/example'
 import { getLogger } from '../../util/logger'
+import { MarketFilter } from '../../util/market_filter'
+import { RemoteData } from '../../util/remote_data'
+import { MarketWithExtraData } from '../../util/types'
+import { Button } from '../common/button'
+import { Filter } from '../common/filter'
+import { ListCard } from '../common/list_card'
+import { ListItem } from '../common/list_item'
+import { Loading } from '../common/loading'
+import { SectionTitle } from '../common/section_title'
 
 const FilterStyled = styled(Filter)`
   margin: -30px auto 10px;
@@ -38,8 +38,9 @@ interface Props {
 const logger = getLogger('Market::Home')
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { count, markets, context, currentFilter, onFilterChange, onShowMore } = props
+  const { context, count, currentFilter, markets, onFilterChange, onShowMore } = props
 
+  // eslint-disable-next-line no-warning-comments
   // TODO, remove this, only for testing
   const { data } = useQuery(fetchConditionsQuery)
   logger.log(data)
@@ -57,20 +58,20 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       {context.account && (
         <FilterStyled
           defaultOption={currentFilter}
+          onFilterChange={onFilterChange}
           options={[
             MarketFilter.allMarkets(),
             MarketFilter.fundedMarkets(context.account),
             MarketFilter.predictedOnMarkets(context.account),
             MarketFilter.winningResultMarkets(context.account),
           ]}
-          onFilterChange={onFilterChange}
         />
       )}
       <ListCard>
         {RemoteData.hasData(markets) &&
           markets.data.length > 0 &&
           markets.data.slice(0, count).map(item => {
-            return <ListItem key={`${item.address}_${item.conditionId}`} data={item}></ListItem>
+            return <ListItem data={item} key={`${item.address}_${item.conditionId}`}></ListItem>
           })}
         {RemoteData.is.success(markets) && markets.data.length === 0 && (
           <NoMarketsAvailable title={'No markets available'} />

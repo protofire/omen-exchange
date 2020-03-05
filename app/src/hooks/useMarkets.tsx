@@ -1,16 +1,17 @@
+import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import { ConnectedWeb3Context } from './connectedWeb3'
-import { useContracts, Contracts } from './useContracts'
 import { FETCH_EVENTS_CHUNK_SIZE } from '../common/constants'
 import { asyncFilter } from '../util/async_filter'
-import { MarketWithExtraData } from '../util/types'
-import { MarketFilter } from '../util/market_filter'
-import { callInChunks, Range } from '../util/call_in_chunks'
-import { RemoteData } from '../util/remote_data'
-import { BigNumber } from 'ethers/utils'
-import { getEarliestBlockToCheck } from '../util/networks'
+import { Range, callInChunks } from '../util/call_in_chunks'
 import { getLogger } from '../util/logger'
+import { MarketFilter } from '../util/market_filter'
+import { getEarliestBlockToCheck } from '../util/networks'
+import { RemoteData } from '../util/remote_data'
+import { MarketWithExtraData } from '../util/types'
+
+import { ConnectedWeb3Context } from './connectedWeb3'
+import { Contracts, useContracts } from './useContracts'
 
 const logger = getLogger('Hooks::useMarkets')
 
@@ -26,10 +27,7 @@ const buildFilterFn = (filter: MarketFilter, contracts: Contracts) => async (
     const poolShares = await marketMakerService.poolSharesBalanceOf(filter.account)
 
     return poolShares.gt(0)
-  } else if (
-    MarketFilter.is.predictedOnMarkets(filter) ||
-    MarketFilter.is.winningResultMarkets(filter)
-  ) {
+  } else if (MarketFilter.is.predictedOnMarkets(filter) || MarketFilter.is.winningResultMarkets(filter)) {
     const marketMakerService = buildMarketMaker(market.address)
     const questionId = await conditionalTokens.getQuestionId(market.conditionId)
     const { outcomes } = await realitio.getQuestion(questionId)
@@ -86,14 +84,12 @@ const fetchMarkets = async (
     delay: 100,
   })
 
-  const marketsOrdered = marketsPage.sort(
-    (marketA: MarketWithExtraData, marketB: MarketWithExtraData) => {
-      if (marketA.resolution && marketB.resolution) {
-        return marketB.resolution.getTime() - marketA.resolution.getTime()
-      }
-      return 0
-    },
-  )
+  const marketsOrdered = marketsPage.sort((marketA: MarketWithExtraData, marketB: MarketWithExtraData) => {
+    if (marketA.resolution && marketB.resolution) {
+      return marketB.resolution.getTime() - marketA.resolution.getTime()
+    }
+    return 0
+  })
 
   return { markets: marketsOrdered, usedRange }
 }
@@ -122,11 +118,7 @@ export const useMarkets = (
 
   // Set `needFetchMore` to true when it makes sense to fetch more markets
   useEffect(() => {
-    if (
-      RemoteData.is.success(markets) &&
-      markets.data.length < expectedMarketsCount &&
-      moreMarkets
-    ) {
+    if (RemoteData.is.success(markets) && markets.data.length < expectedMarketsCount && moreMarkets) {
       setNeedFetchMore(true)
     }
   }, [markets, moreMarkets, expectedMarketsCount])
@@ -148,9 +140,7 @@ export const useMarkets = (
 
     const run = async (range: Range) => {
       try {
-        setMarkets(markets =>
-          RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading(),
-        )
+        setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
         const result = await fetchMarkets(filter, range, expectedMarketsCount, contracts)
 
         if (!didCancel) {
@@ -176,15 +166,7 @@ export const useMarkets = (
     return () => {
       didCancel = true
     }
-  }, [
-    context,
-    filter,
-    latestBlockToCheck,
-    earliestBlockToCheck,
-    expectedMarketsCount,
-    needFetchMore,
-    contracts,
-  ])
+  }, [context, filter, latestBlockToCheck, earliestBlockToCheck, expectedMarketsCount, needFetchMore, contracts])
 
   return {
     markets,

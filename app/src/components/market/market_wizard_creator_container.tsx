@@ -1,27 +1,26 @@
 import React, { FC, useState } from 'react'
 
-import { getLogger } from '../../util/logger'
-import { MarketWizardCreator } from './market_wizard_creator'
-import { MarketData } from '../../util/types'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useContracts } from '../../hooks/useContracts'
-import { ModalConnectWallet } from '../common/modal_connect_wallet'
-import { MarketCreationStatus } from '../../util/market_creation_status_data'
-import { CPKService } from '../../services/cpk'
 import { ERC20Service } from '../../services'
+import { CPKService } from '../../services/cpk'
+import { getLogger } from '../../util/logger'
+import { MarketCreationStatus } from '../../util/market_creation_status_data'
+import { MarketData } from '../../util/types'
+import { ModalConnectWallet } from '../common/modal_connect_wallet'
+
+import { MarketWizardCreator } from './market_wizard_creator'
 
 const logger = getLogger('Market::MarketWizardCreatorContainer')
 
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
-  const { library: provider, account } = context
+  const { account, library: provider } = context
 
   const [isModalOpen, setModalState] = useState(false)
   const { conditionalTokens, marketMakerFactory, realitio } = useContracts(context)
 
-  const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(
-    MarketCreationStatus.ready(),
-  )
+  const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(MarketCreationStatus.ready())
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
   const handleSubmit = async (marketData: MarketData) => {
@@ -39,11 +38,7 @@ const MarketWizardCreatorContainer: FC = () => {
 
         // Approve collateral to the proxy contract
         const collateralService = new ERC20Service(provider, account, marketData.collateral.address)
-        const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
-          account,
-          cpk.address,
-          marketData.funding,
-        )
+        const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, marketData.funding)
 
         if (!hasEnoughAlowance) {
           await collateralService.approveUnlimited(cpk.address)
@@ -69,8 +64,8 @@ const MarketWizardCreatorContainer: FC = () => {
     <>
       <MarketWizardCreator
         callback={handleSubmit}
-        marketMakerAddress={marketMakerAddress}
         marketCreationStatus={marketCreationStatus}
+        marketMakerAddress={marketMakerAddress}
       />
       <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
     </>

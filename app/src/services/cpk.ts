@@ -1,22 +1,17 @@
-import { ethers } from 'ethers'
-import { Web3Provider } from 'ethers/providers'
 import CPK from 'contract-proxy-kit'
+import { ethers } from 'ethers'
+import { TransactionReceipt, Web3Provider } from 'ethers/providers'
+import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
-import {
-  ConditionalTokenService,
-  ERC20Service,
-  MarketMakerService,
-  OracleService,
-  RealitioService,
-} from './index'
-import { BigNumber } from 'ethers/utils'
-import { BalanceItem, MarketData, Token } from '../util/types'
-import { getContractAddress, getCPKAddresses } from '../util/networks'
+import { getCPKAddresses, getContractAddress } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
+import { BalanceItem, MarketData, Token } from '../util/types'
+
 import { MarketMakerFactoryService } from './market_maker_factory'
-import { TransactionReceipt } from 'ethers/providers'
+
+import { ConditionalTokenService, ERC20Service, MarketMakerService, OracleService, RealitioService } from './index'
 
 const logger = getLogger('Services::CPKService')
 
@@ -92,11 +87,7 @@ class CPKService {
     return this.cpk.address
   }
 
-  buyOutcomes = async ({
-    amount,
-    outcomeIndex,
-    marketMaker,
-  }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
+  buyOutcomes = async ({ amount, marketMaker, outcomeIndex }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
@@ -156,21 +147,13 @@ class CPKService {
   }
 
   createMarket = async ({
-    marketData,
     conditionalTokens,
-    realitio,
+    marketData,
     marketMakerFactory,
+    realitio,
   }: CPKCreateMarketParams): Promise<string> => {
     try {
-      const {
-        collateral,
-        arbitrator,
-        question,
-        resolution,
-        outcomes,
-        category,
-        loadedQuestionId,
-      } = marketData
+      const { arbitrator, category, collateral, loadedQuestionId, outcomes, question, resolution } = marketData
 
       if (!resolution) {
         throw new Error('Resolution time was not specified')
@@ -220,11 +203,7 @@ class CPKService {
       logger.log(`QuestionID ${questionId}`)
 
       const oracleAddress = getContractAddress(networkId, 'oracle')
-      const conditionId = conditionalTokens.getConditionId(
-        questionId,
-        oracleAddress,
-        outcomes.length,
-      )
+      const conditionId = conditionalTokens.getConditionId(questionId, oracleAddress, outcomes.length)
 
       let conditionExists = false
       if (loadedQuestionId) {
@@ -239,11 +218,7 @@ class CPKService {
           operation: CPK.CALL,
           to: conditionalTokensAddress,
           value: 0,
-          data: ConditionalTokenService.encodePrepareCondition(
-            questionId,
-            oracleAddress,
-            outcomes.length,
-          ),
+          data: ConditionalTokenService.encodePrepareCondition(questionId, oracleAddress, outcomes.length),
         })
       }
 
@@ -303,9 +278,9 @@ class CPKService {
 
   sellOutcomes = async ({
     amount,
-    outcomeIndex,
-    marketMaker,
     conditionalTokens,
+    marketMaker,
+    outcomeIndex,
   }: CPKSellOutcomesParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -354,11 +329,7 @@ class CPKService {
     }
   }
 
-  addFunding = async ({
-    amount,
-    collateral,
-    marketMaker,
-  }: CPKAddFundingParams): Promise<TransactionReceipt> => {
+  addFunding = async ({ amount, collateral, marketMaker }: CPKAddFundingParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
@@ -403,18 +374,12 @@ class CPKService {
       logger.log(`Transaction hash: ${txObject.hash}`)
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
-      logger.error(
-        `There was an error adding an amount of '${amount.toString()}' for funding`,
-        err.message,
-      )
+      logger.error(`There was an error adding an amount of '${amount.toString()}' for funding`, err.message)
       throw err
     }
   }
 
-  removeFunding = async ({
-    amount,
-    marketMaker,
-  }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
+  removeFunding = async ({ amount, marketMaker }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
     try {
       const transactions = [
         {
@@ -430,23 +395,20 @@ class CPKService {
       logger.log(`Transaction hash: ${txObject.hash}`)
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
-      logger.error(
-        `There was an error removing amount '${amount.toString()}' for funding`,
-        err.message,
-      )
+      logger.error(`There was an error removing amount '${amount.toString()}' for funding`, err.message)
       throw err
     }
   }
 
   redeemPositions = async ({
-    isConditionResolved,
-    questionId,
-    numOutcomes,
-    winningOutcome,
-    oracle,
     collateralToken,
-    marketMaker,
     conditionalTokens,
+    isConditionResolved,
+    marketMaker,
+    numOutcomes,
+    oracle,
+    questionId,
+    winningOutcome,
   }: CPKRedeemParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -468,11 +430,7 @@ class CPKService {
         operation: CPK.CALL,
         to: conditionalTokens.address,
         value: 0,
-        data: ConditionalTokenService.encodeRedeemPositions(
-          collateralToken.address,
-          conditionId,
-          numOutcomes,
-        ),
+        data: ConditionalTokenService.encodeRedeemPositions(collateralToken.address, conditionId, numOutcomes),
       })
 
       if (winningOutcome) {
@@ -489,10 +447,7 @@ class CPKService {
       logger.log(`Transaction hash: ${txObject.hash}`)
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
-      logger.error(
-        `Error trying to resolve condition or redeem for questionId '${questionId}'`,
-        err.message,
-      )
+      logger.error(`Error trying to resolve condition or redeem for questionId '${questionId}'`, err.message)
       throw err
     }
   }

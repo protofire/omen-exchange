@@ -1,22 +1,22 @@
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
-import { BigNumber } from 'ethers/utils'
 
-import { ViewCard } from '../../common/view_card'
-import { Button, OutcomeTable } from '../../common'
-import { Loading } from '../../common/loading'
-import { ButtonContainer } from '../../common/button_container'
-import { SubsectionTitle } from '../../common/subsection_title'
-import { TitleValue } from '../../common/title_value'
-import { ClosedMarket } from '../../common/closed_market'
-import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
+import { MARKET_FEE } from '../../../common/constants'
+import { WhenConnected, useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { useContracts } from '../../../hooks/useContracts'
 import { CPKService, ERC20Service } from '../../../services'
-import { useConnectedWeb3Context, WhenConnected } from '../../../hooks/connectedWeb3'
 import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
-import { useContracts } from '../../../hooks/useContracts'
+import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
+import { Button, OutcomeTable } from '../../common'
+import { ButtonContainer } from '../../common/button_container'
+import { ClosedMarket } from '../../common/closed_market'
 import { DisplayArbitrator } from '../../common/display_arbitrator'
-import { MARKET_FEE } from '../../../common/constants'
+import { Loading } from '../../common/loading'
+import { SubsectionTitle } from '../../common/subsection_title'
+import { TitleValue } from '../../common/title_value'
+import { ViewCard } from '../../common/view_card'
 
 const Grid = styled.div`
   display: grid;
@@ -47,18 +47,18 @@ const logger = getLogger('Market::ClosedMarketDetail')
 
 export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { library: provider, account } = context
-  const { conditionalTokens, oracle, buildMarketMaker } = useContracts(context)
+  const { account, library: provider } = context
+  const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
 
   const {
-    collateral: collateralToken,
+    arbitrator,
     balances,
-    marketMakerAddress,
-    resolution,
+    collateral: collateralToken,
     funding,
     isConditionResolved,
+    marketMakerAddress,
     questionId,
-    arbitrator,
+    resolution,
   } = props
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -100,9 +100,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   }, [collateral, provider, account, marketMakerAddress, marketMaker])
 
   const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
-  const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${
-    collateralToken.symbol
-  }`
+  const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${collateralToken.symbol}`
   const resolutionFormat = resolution ? formatDate(resolution) : ''
   const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
 
@@ -147,18 +145,15 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
           balances={balances}
           collateral={collateralToken}
           disabledColumns={disabledColumns}
-          withWinningOutcome={true}
           displayRadioSelection={false}
           probabilities={probabilities}
+          withWinningOutcome={true}
         />
 
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
           <TitleValue title="Category" value="Politics" />
-          <TitleValue
-            title={'Arbitrator'}
-            value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />}
-          />
+          <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
           <TitleValue title="Resolution Date" value={resolutionFormat} />
           <TitleValue title="Fee" value={`${MARKET_FEE}%`} />
           <TitleValue title="Funding" value={fundingFormat} />
@@ -169,9 +164,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         </Grid>
         <WhenConnected>
           <ButtonContainer>
-            {winningOutcome && !winningOutcome.shares.isZero() && (
-              <Button onClick={() => redeem()}>Redeem</Button>
-            )}
+            {winningOutcome && !winningOutcome.shares.isZero() && <Button onClick={() => redeem()}>Redeem</Button>}
             {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() && (
               <Button onClick={resolveCondition}>Resolve Condition</Button>
             )}

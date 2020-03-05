@@ -1,7 +1,8 @@
 import React, { HTMLAttributes } from 'react'
 import ReactDOM from 'react-dom'
-import { Spinner } from '../spinner'
 import styled from 'styled-components'
+
+import { Spinner } from '../spinner'
 
 const LoadingStyled = styled.div`
   align-items: center;
@@ -50,7 +51,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const Loading: React.FC<Props> = (props: Props) => {
-  const { message, full, ...restProps } = props
+  const { full, message, ...restProps } = props
 
   if (full) {
     const portal: any = document.getElementById('portalContainer')

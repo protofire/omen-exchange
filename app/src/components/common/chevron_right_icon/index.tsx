@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+
 import ChevronRightSVG from './img/chevron-right.svg'
 
 const Icon = styled.div`

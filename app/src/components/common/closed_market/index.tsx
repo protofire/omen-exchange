@@ -1,5 +1,6 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
+
 import LockIcon from './img/lock.svg'
 
 const ClosedMarketWrapper = styled.div`
@@ -28,7 +29,7 @@ export const ClosedMarket: React.FC<Props> = (props: Props) => {
 
   return (
     <ClosedMarketWrapper {...restProps}>
-      <img src={LockIcon} alt="" />
+      <img alt="" src={LockIcon} />
       <Text>Closed on {date}</Text>
     </ClosedMarketWrapper>
   )

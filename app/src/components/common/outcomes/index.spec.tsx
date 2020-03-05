@@ -1,8 +1,9 @@
 /* eslint-env jest */
 import '@testing-library/jest-dom/extend-expect'
+import { fireEvent, render } from '@testing-library/react'
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
 import { ThemeProvider } from 'styled-components'
+
 import theme from '../../../theme'
 
 import { Outcomes } from './index'
@@ -102,11 +103,7 @@ test('should not modify the probabilities of the other inputs if there are more 
   const onChangeFn = jest.fn()
 
   const { getByTestId } = renderOutcomes({
-    outcomes: [
-      { name: 'red', probability: 33 },
-      { name: 'green', probability: 33 },
-      { name: 'blue', probability: 34 },
-    ],
+    outcomes: [{ name: 'red', probability: 33 }, { name: 'green', probability: 33 }, { name: 'blue', probability: 34 }],
     onChange: onChangeFn,
   })
 
@@ -125,11 +122,7 @@ test('should change the probability of the third input', () => {
   const onChangeFn = jest.fn()
 
   const { getByTestId } = renderOutcomes({
-    outcomes: [
-      { name: 'red', probability: 30 },
-      { name: 'green', probability: 33 },
-      { name: 'blue', probability: 34 },
-    ],
+    outcomes: [{ name: 'red', probability: 30 }, { name: 'green', probability: 33 }, { name: 'blue', probability: 34 }],
     onChange: onChangeFn,
   })
 
@@ -213,12 +206,8 @@ test('should maintain uniform probabilities when an outcome is removed', () => {
 test('should add an outcome', () => {
   const onChangeFn = jest.fn()
 
-  const { getByTitle, getByPlaceholderText } = renderOutcomes({
-    outcomes: [
-      { name: 'red', probability: 25 },
-      { name: 'green', probability: 25 },
-      { name: 'blue', probability: 25 },
-    ],
+  const { getByPlaceholderText, getByTitle } = renderOutcomes({
+    outcomes: [{ name: 'red', probability: 25 }, { name: 'green', probability: 25 }, { name: 'blue', probability: 25 }],
     onChange: onChangeFn,
     canAddOutcome: true,
   })
@@ -239,12 +228,8 @@ test('should add an outcome', () => {
 test('should maintain uniform probabilities when an outcome is added', () => {
   const onChangeFn = jest.fn()
 
-  const { getByTitle, getByPlaceholderText } = renderOutcomes({
-    outcomes: [
-      { name: 'red', probability: 25 },
-      { name: 'green', probability: 25 },
-      { name: 'blue', probability: 25 },
-    ],
+  const { getByPlaceholderText, getByTitle } = renderOutcomes({
+    outcomes: [{ name: 'red', probability: 25 }, { name: 'green', probability: 25 }, { name: 'blue', probability: 25 }],
     onChange: onChangeFn,
     canAddOutcome: true,
   })
@@ -268,11 +253,7 @@ test('should disable probabilities inputs when isUniform is checked', () => {
   const onChangeFn = jest.fn()
 
   const { getByTestId, getByTitle } = renderOutcomes({
-    outcomes: [
-      { name: 'red', probability: 25 },
-      { name: 'green', probability: 25 },
-      { name: 'blue', probability: 25 },
-    ],
+    outcomes: [{ name: 'red', probability: 25 }, { name: 'green', probability: 25 }, { name: 'blue', probability: 25 }],
     onChange: onChangeFn,
     canAddOutcome: true,
   })
@@ -286,11 +267,7 @@ test('should distribute probabilities when isUniform is checked', () => {
   const onChangeFn = jest.fn()
 
   const { getByTitle } = renderOutcomes({
-    outcomes: [
-      { name: 'red', probability: 5 },
-      { name: 'green', probability: 35 },
-      { name: 'blue', probability: 15 },
-    ],
+    outcomes: [{ name: 'red', probability: 5 }, { name: 'green', probability: 35 }, { name: 'blue', probability: 15 }],
     onChange: onChangeFn,
     setIsUniform: jest.fn(),
     canAddOutcome: true,

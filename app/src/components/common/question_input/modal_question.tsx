@@ -1,20 +1,20 @@
-import React, { useState, HTMLAttributes, ChangeEvent, useMemo } from 'react'
+import React, { ChangeEvent, HTMLAttributes, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
-import { Textfield } from '../textfield'
-import { SubsectionTitle } from '../subsection_title'
-import { TitleValue } from '../title_value'
-import { Button } from '../button'
-import { Arbitrator, Question } from '../../../util/types'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { ButtonType } from '../../../common/button_styling_types'
-import ModalWrapper from '../modal_wrapper'
-import { FormRow } from '../form_row'
-import { useContracts } from '../../../hooks/useContracts'
-import { formatDate, truncateStringInTheMiddle } from '../../../util/tools'
-import { getArbitratorFromAddress } from '../../../util/networks'
 import { useAsyncDerivedValue } from '../../../hooks/useAsyncDerivedValue'
+import { useContracts } from '../../../hooks/useContracts'
+import { ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { getArbitratorFromAddress } from '../../../util/networks'
+import { formatDate, truncateStringInTheMiddle } from '../../../util/tools'
+import { Arbitrator, Question } from '../../../util/types'
+import { Button } from '../button'
+import { FormRow } from '../form_row'
+import ModalWrapper from '../modal_wrapper'
 import { Spinner } from '../spinner'
+import { SubsectionTitle } from '../subsection_title'
+import { Textfield } from '../textfield'
+import { TitleValue } from '../title_value'
 
 const ButtonStyled = styled(Button)`
   margin-top: 80px;
@@ -52,7 +52,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const ModalQuestion = (props: Props) => {
-  const { onClose, onSave, context, isOpen } = props
+  const { context, isOpen, onClose, onSave } = props
 
   const { realitio } = useContracts(context)
 
@@ -87,11 +87,7 @@ export const ModalQuestion = (props: Props) => {
     [questionURL, realitio, context],
   )
 
-  const [question, arbitrator, errorMessage] = useAsyncDerivedValue(
-    '',
-    [null, null, null],
-    fetchQuestion,
-  )
+  const [question, arbitrator, errorMessage] = useAsyncDerivedValue('', [null, null, null], fetchQuestion)
 
   const validQuestion = !!question && !errorMessage
 
@@ -121,11 +117,7 @@ export const ModalQuestion = (props: Props) => {
               <TitleValueStyled
                 title={'Arbitrator:'}
                 value={
-                  <span
-                    title={`Name: ${arbitrator && arbitrator.name} - Address: ${
-                      question.arbitratorAddress
-                    }`}
-                  >
+                  <span title={`Name: ${arbitrator && arbitrator.name} - Address: ${question.arbitratorAddress}`}>
                     {truncateStringInTheMiddle(question.arbitratorAddress, 6, 4)}
                   </span>
                 }
@@ -140,6 +132,7 @@ export const ModalQuestion = (props: Props) => {
   return (
     <ModalWrapper isOpen={isOpen} onRequestClose={onClose} title={`Add question from realit.io`}>
       <FormRow
+        error={errorMessage || ''}
         formField={
           <Textfield
             hasError={!!errorMessage}
@@ -153,17 +146,12 @@ export const ModalQuestion = (props: Props) => {
             type="text"
           />
         }
-        error={errorMessage || ''}
         title={'Question URL'}
         tooltip={{ id: 'questionURL', description: 'Enter a valid question URL from realit.io.' }}
       />
       {questionDetails()}
       {spinner()}
-      <ButtonStyled
-        buttonType={ButtonType.primary}
-        disabled={!validQuestion}
-        onClick={onClickSaveButton}
-      >
+      <ButtonStyled buttonType={ButtonType.primary} disabled={!validQuestion} onClick={onClickSaveButton}>
         Add
       </ButtonStyled>
     </ModalWrapper>
