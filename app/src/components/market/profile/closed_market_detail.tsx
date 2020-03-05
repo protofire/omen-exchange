@@ -9,14 +9,17 @@ import { CPKService, ERC20Service } from '../../../services'
 import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
-import { Button, OutcomeTable } from '../../common'
-import { ButtonContainer } from '../../common/button_container'
-import { ClosedMarket } from '../../common/closed_market'
-import { DisplayArbitrator } from '../../common/display_arbitrator'
-import { Loading } from '../../common/loading'
-import { SubsectionTitle } from '../../common/subsection_title'
-import { TitleValue } from '../../common/title_value'
-import { ViewCard } from '../../common/view_card'
+import {
+  Button,
+  ButtonContainer,
+  ClosedMarket,
+  DisplayArbitrator,
+  Loading,
+  OutcomeTable,
+  SubsectionTitle,
+  TitleValue,
+  ViewCard,
+} from '../../common'
 
 const Grid = styled.div`
   display: grid;

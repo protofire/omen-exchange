@@ -2,7 +2,7 @@ import React from 'react'
 
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
-import { Loading } from '../common/loading'
+import { Loading } from '../common'
 
 import { MarketView } from './market_view'
 

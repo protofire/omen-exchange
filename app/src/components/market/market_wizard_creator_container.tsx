@@ -7,7 +7,7 @@ import { CPKService } from '../../services/cpk'
 import { getLogger } from '../../util/logger'
 import { MarketCreationStatus } from '../../util/market_creation_status_data'
 import { MarketData } from '../../util/types'
-import { ModalConnectWallet } from '../common/modal_connect_wallet'
+import { ModalConnectWallet } from '../common'
 
 import { MarketWizardCreator } from './market_wizard_creator'
 

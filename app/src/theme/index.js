@@ -112,6 +112,9 @@ const theme = {
     lightTextColor: '#666',
     textColor: '#000',
   },
+  resolutions: {
+    colors: ['#E1BEE7', '#B2DFDB', '#FFE0B2', '#e7e7be', '#bedfb2', '#ffb2f0'],
+  },
   modalStyle: {
     content: {
       backgroundColor: '#fff',

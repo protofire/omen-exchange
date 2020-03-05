@@ -6,16 +6,20 @@ import { MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { useCollateralBalance } from '../../../../hooks/useCollateralBalance'
 import { Token } from '../../../../util/types'
-import { BalanceToken } from '../../../common/balance_token'
+import {
+  BalanceToken,
+  BigNumberInput,
+  Button,
+  ButtonContainer,
+  ButtonLink,
+  CreateCard,
+  FormError,
+  FormRow,
+  Textfield,
+  TextfieldCustomPlaceholder,
+  Tokens,
+} from '../../../common'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
-import { ButtonContainer } from '../../../common/button_container'
-import { ButtonLink } from '../../../common/button_link'
-import { CreateCard } from '../../../common/create_card'
-import { FormError } from '../../../common/form_error'
-import { FormRow } from '../../../common/form_row'
-import { BigNumberInput, Button, Textfield } from '../../../common/index'
-import { TextfieldCustomPlaceholder } from '../../../common/textfield_custom_placeholder'
-import { Tokens } from '../../../common/tokens/index'
 
 interface Props {
   back: () => void

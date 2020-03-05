@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 
-import { SectionTitle } from '../../common/section_title'
+import { SectionTitle } from '../../common'
 
 interface Props {
   currentStep: number

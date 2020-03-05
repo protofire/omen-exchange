@@ -5,15 +5,18 @@ import styled from 'styled-components'
 
 import { WhenConnected } from '../../../hooks/connectedWeb3'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
-import { ButtonAnchor, OutcomeTable } from '../../common'
-import { ButtonContainer } from '../../common/button_container'
-import { DisplayArbitrator } from '../../common/display_arbitrator'
-import { GridThreeColumns } from '../../common/grid_three_columns'
-import { Loading } from '../../common/loading'
-import { SubsectionTitle } from '../../common/subsection_title'
-import { ThreeBoxComments } from '../../common/three_box_comments'
-import { TitleValue } from '../../common/title_value'
-import { ViewCard } from '../../common/view_card'
+import {
+  ButtonAnchor,
+  ButtonContainer,
+  DisplayArbitrator,
+  GridThreeColumns,
+  Loading,
+  OutcomeTable,
+  SubsectionTitle,
+  ThreeBoxComments,
+  TitleValue,
+  ViewCard,
+} from '../../common'
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
   margin-bottom: 0;

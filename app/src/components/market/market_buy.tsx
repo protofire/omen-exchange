@@ -14,21 +14,27 @@ import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
 import { computeBalanceAfterTrade, formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
-import { BigNumberInput, Button, OutcomeTable } from '../common'
-import { BalanceToken } from '../common/balance_token'
+import {
+  BalanceToken,
+  BigNumberInput,
+  Button,
+  ButtonContainer,
+  ButtonLink,
+  FormError,
+  FormLabel,
+  FormRow,
+  Loading,
+  ModalTwitterShare,
+  OutcomeTable,
+  SectionTitle,
+  SubsectionTitle,
+  TD,
+  TR,
+  Table,
+  TextfieldCustomPlaceholder,
+  ViewCard,
+} from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
-import { ButtonContainer } from '../common/button_container'
-import { ButtonLink } from '../common/button_link'
-import { FormError } from '../common/form_error'
-import { FormLabel } from '../common/form_label'
-import { FormRow } from '../common/form_row'
-import { Loading } from '../common/loading'
-import { ModalTwitterShare } from '../common/modal_twitter_share'
-import { SectionTitle } from '../common/section_title'
-import { SubsectionTitle } from '../common/subsection_title'
-import { TD, TR, Table } from '../common/table'
-import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
-import { ViewCard } from '../common/view_card'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;

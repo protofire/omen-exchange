@@ -2,25 +2,25 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
 import { Arbitrator, BalanceItem, Status, Token } from '../../util/types'
-import { SectionTitle } from '../common/section_title'
+import { SectionTitle } from '../common'
 
 import { ClosedMarketDetail } from './profile/closed_market_detail'
 import { View } from './profile/view'
 
 interface Props {
   account: Maybe<string>
+  arbitrator: Maybe<Arbitrator>
   balances: BalanceItem[]
-  funding: BigNumber
-  status: Status
-  marketMakerAddress: string
+  category: string
   collateral: Token
+  funding: BigNumber
+  isConditionResolved: boolean
+  isQuestionFinalized: boolean
+  marketMakerAddress: string
   question: string
   questionId: string
-  category: string
   resolution: Maybe<Date>
-  arbitrator: Maybe<Arbitrator>
-  isQuestionFinalized: boolean
-  isConditionResolved: boolean
+  status: Status
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {

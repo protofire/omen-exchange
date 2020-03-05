@@ -8,18 +8,24 @@ import { useMarketMakerData } from '../../../../hooks/useMarketMakerData'
 import { useQuestion } from '../../../../hooks/useQuestion'
 import { ButtonType } from '../../../../theme/component_styles/button_styling_types'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
-import { ButtonAnchor } from '../../../common/button_anchor'
-import { ButtonContainer } from '../../../common/button_container'
-import { CopyText } from '../../../common/copy_text'
-import { CreateCard } from '../../../common/create_card'
-import { DisplayArbitrator } from '../../../common/display_arbitrator'
-import { Loading } from '../../../common/loading'
-import { Paragraph } from '../../../common/paragraph'
-import { SectionTitle } from '../../../common/section_title'
-import { SubsectionTitle } from '../../../common/subsection_title'
-import { TD, TH, THead, TR, Table } from '../../../common/table'
-import { TitleValue } from '../../../common/title_value'
-import { Well } from '../../../common/well'
+import {
+  ButtonAnchor,
+  ButtonContainer,
+  CopyText,
+  CreateCard,
+  DisplayArbitrator,
+  Loading,
+  Paragraph,
+  SectionTitle,
+  SubsectionTitle,
+  TD,
+  TH,
+  THead,
+  TR,
+  Table,
+  TitleValue,
+  Well,
+} from '../../../common'
 
 const NavLinkStyled = styled(NavLink)`
   color: ${props => props.theme.colors.textColor};

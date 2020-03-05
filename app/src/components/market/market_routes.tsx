@@ -9,10 +9,7 @@ import { useMarketMakerData } from '../../hooks/useMarketMakerData'
 import { MarketBuyPage, MarketDetailsPage, MarketFundPage, MarketSellPage } from '../../pages'
 import { getLogger } from '../../util/logger'
 import { isAddress } from '../../util/tools'
-import { Loading } from '../common/loading'
-import { MarketNotFound } from '../common/market_not_found'
-import { MessageWarning } from '../common/message_warning'
-import { SectionTitle } from '../common/section_title'
+import { Loading, MarketNotFound, MessageWarning, SectionTitle } from '../common'
 
 const logger = getLogger('Market::Routes')
 

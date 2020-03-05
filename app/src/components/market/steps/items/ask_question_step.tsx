@@ -3,15 +3,18 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
-import { Arbitrators } from '../../../common/arbitrators'
-import { ButtonContainer } from '../../../common/button_container'
-import { CreateCard } from '../../../common/create_card'
-import { DateField } from '../../../common/date_field'
-import { DisplayArbitrator } from '../../../common/display_arbitrator'
-import { FormRow } from '../../../common/form_row'
-import { Button, Categories } from '../../../common/index'
-import { QuestionInput } from '../../../common/question_input'
-import { Well } from '../../../common/well'
+import {
+  Arbitrators,
+  Button,
+  ButtonContainer,
+  Categories,
+  CreateCard,
+  DateField,
+  DisplayArbitrator,
+  FormRow,
+  QuestionInput,
+  Well,
+} from '../../../common'
 
 interface Props {
   next: () => void
