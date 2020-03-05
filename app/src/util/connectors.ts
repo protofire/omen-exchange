@@ -1,9 +1,9 @@
-import { Connectors } from 'web3-react'
 import WalletConnectApi from '@walletconnect/web3-subprovider'
+import { Connectors } from 'web3-react'
 
 import { infuraNetworkURL, supportedNetworkIds, supportedNetworkURLs } from '../util/networks'
 
-const { InjectedConnector, WalletConnectConnector, NetworkOnlyConnector } = Connectors
+const { InjectedConnector, NetworkOnlyConnector, WalletConnectConnector } = Connectors
 
 const MetaMask = new InjectedConnector({
   supportedNetworks: supportedNetworkIds,

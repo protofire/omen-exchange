@@ -1,17 +1,18 @@
-import React, { useState, HTMLAttributes, useEffect, useCallback } from 'react'
-import { useWeb3Context } from 'web3-react'
-import styled from 'styled-components'
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
-
-import { Button } from '../button'
-import { RadioInput } from '../radio_input'
-import { Wallet } from '../../../util/types'
-import WalletConnectSVG from './img/wallet_connect.svg'
-import MetaMaskSVG from './img/metamask.svg'
-import { getLogger } from '../../../util/logger'
-import ModalWrapper from '../modal_wrapper'
-import { ButtonType } from '../../../common/button_styling_types'
 import { lighten } from 'polished'
+import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
+import styled from 'styled-components'
+import { useWeb3Context } from 'web3-react'
+
+import { ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { getLogger } from '../../../util/logger'
+import { Wallet } from '../../../util/types'
+import { Button } from '../button'
+import ModalWrapper from '../modal_wrapper'
+import { RadioInput } from '../radio_input'
+
+import MetaMaskSVG from './img/metamask.svg'
+import WalletConnectSVG from './img/wallet_connect.svg'
 
 const logger = getLogger('ModalConnectWallet::Index')
 
@@ -94,9 +95,7 @@ export const ModalConnectWallet = (props: Props) => {
 
   const doesMetamaskExist = 'ethereum' in window || 'web3' in window
 
-  const [walletSelected, setWalletSelected] = useState(
-    doesMetamaskExist ? Wallet.MetaMask : Wallet.WalletConnect,
-  )
+  const [walletSelected, setWalletSelected] = useState(doesMetamaskExist ? Wallet.MetaMask : Wallet.WalletConnect)
 
   const onClickWallet = (wallet: Wallet) => setWalletSelected(wallet)
 
@@ -134,8 +133,8 @@ export const ModalConnectWallet = (props: Props) => {
       </Text>
       <RadioInputStyled
         checked={walletSelected === Wallet.MetaMask}
-        name="wallet"
         disabled={props.disabled}
+        name="wallet"
         onChange={(e: any) => setWalletSelected(e.target.value as Wallet)}
         value={Wallet.MetaMask}
       />

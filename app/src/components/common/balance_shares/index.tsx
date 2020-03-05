@@ -1,11 +1,11 @@
+import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
 import { formatBigNumber } from '../../../util/tools'
 import { Token } from '../../../util/types'
-import { FormRowNote } from '../form_row_note'
 import { FormRowLink } from '../form_row_link'
-import { BigNumber } from 'ethers/utils'
+import { FormRowNote } from '../form_row_note'
 
 interface Props {
   shares: BigNumber
@@ -29,7 +29,7 @@ const Note = styled(FormRowNote)`
 `
 
 export const BalanceShares = (props: Props) => {
-  const { shares, collateral, onClickMax } = props
+  const { collateral, onClickMax, shares } = props
 
   return (
     <Wrapper>

@@ -1,9 +1,9 @@
 import React, { HTMLAttributes } from 'react'
-
+import { TwitterIcon, TwitterShareButton } from 'react-share'
 import styled from 'styled-components'
+
 import ModalWrapper from '../modal_wrapper'
 import { Well } from '../well'
-import { TwitterIcon, TwitterShareButton } from 'react-share'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   title: string
@@ -38,7 +38,7 @@ const Text = styled.p`
 `
 
 export const ModalTwitterShare = (props: Props) => {
-  const { title, shareUrl, description, isOpen, onClose } = props
+  const { description, isOpen, onClose, shareUrl, title } = props
 
   return (
     <ModalWrapper isOpen={isOpen} onRequestClose={onClose} title={title}>
@@ -46,7 +46,7 @@ export const ModalTwitterShare = (props: Props) => {
 
       <ButtonContainer>
         <TwitterGlobalButton>
-          <TwitterShareButtonExt url={shareUrl} title={description}>
+          <TwitterShareButtonExt title={description} url={shareUrl}>
             <TwitterIcon size={32} />
             <Text>Tweet</Text>
           </TwitterShareButtonExt>

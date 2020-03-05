@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
 import Box from '3box'
 import ThreeBoxCommentsReact from '3box-comments-react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
-import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+
 import { THREEBOX_ADMIN_ADDRESS, THREEBOX_SPACE_NAME } from '../../../common/constants'
-import { ButtonCSS } from '../../../common/button_styling_types'
+import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { ButtonCSS } from '../../../theme/component_styles/button_styling_types'
 
 const MAIN_AVATAR_DIMENSIONS = '40px'
 const COMMENT_AVATAR_DIMENSIONS = '32px'
@@ -192,6 +193,7 @@ export const ThreeBoxComments = (props: Props) => {
   const { threadName } = props
 
   const [box, setBox] = useState<any>(null)
+  // eslint-disable-next-line no-warning-comments
   // TODO: fix with useConnectedWeb3Wallet context
   const [currentUserAddress] = useState<string>(context.account || '')
 
@@ -204,13 +206,13 @@ export const ThreeBoxComments = (props: Props) => {
     <ThreeBoxCustom>
       <CommentsTitle>Comments</CommentsTitle>
       <ThreeBoxCommentsReact
-        spaceName={THREEBOX_SPACE_NAME}
+        adminEthAddr={THREEBOX_ADMIN_ADDRESS}
         box={box}
         currentUserAddr={currentUserAddress}
-        threadName={threadName}
-        adminEthAddr={THREEBOX_ADMIN_ADDRESS}
         loginFunction={handleLogin}
         showCommentCount={10}
+        spaceName={THREEBOX_SPACE_NAME}
+        threadName={threadName}
         useHovers={true}
       />
     </ThreeBoxCustom>

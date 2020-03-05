@@ -40,12 +40,7 @@ const CLOSED = gql`
 
 const MY_MARKETS = gql`
   query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $account: String!) {
-    fixedProductMarketMakers(
-      first: $first
-      skip: $skip
-      orderBy: $sortBy
-      where: { creator: $account }
-    ) {
+    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, where: { creator: $account }) {
       ...marketData
     }
   }

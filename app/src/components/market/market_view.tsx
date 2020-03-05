@@ -1,11 +1,12 @@
-import React from 'react'
 import { BigNumber } from 'ethers/utils'
+import React from 'react'
 
-import { SectionTitle } from '../common/section_title'
-import { ClosedMarketDetail } from './profile/closed_market_detail'
-import { Status, BalanceItem, Token, Arbitrator } from '../../util/types'
-import { View } from './profile/view'
 import { formatDate } from '../../util/tools'
+import { Arbitrator, BalanceItem, Status, Token } from '../../util/types'
+import { SectionTitle } from '../common/section_title'
+
+import { ClosedMarketDetail } from './profile/closed_market_detail'
+import { View } from './profile/view'
 
 interface Props {
   account: Maybe<string>
@@ -24,7 +25,7 @@ interface Props {
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {
-  const { balances, question, resolution, isQuestionFinalized } = props
+  const { balances, isQuestionFinalized, question, resolution } = props
 
   const renderView = () => {
     return isQuestionFinalized ? <ClosedMarketDetail {...props} /> : <View {...props} />
@@ -39,7 +40,7 @@ const MarketView: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle title={question} subTitle={subtitle} />
+      <SectionTitle subTitle={subtitle} title={question} />
       {renderView()}
     </>
   )

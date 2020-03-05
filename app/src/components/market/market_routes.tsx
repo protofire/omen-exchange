@@ -1,18 +1,18 @@
+import { ethers } from 'ethers'
 import React from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
-import { ethers } from 'ethers'
 
-import { MarketBuyPage, MarketDetailsPage, MarketFundPage, MarketSellPage } from '../../pages'
-import { isAddress } from '../../util/tools'
+import { MARKET_FEE } from '../../common/constants'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useCheckContractExists } from '../../hooks/useCheckContractExists'
 import { useMarketMakerData } from '../../hooks/useMarketMakerData'
-import { SectionTitle } from '../common/section_title'
-import { Loading } from '../common/loading'
-import { MARKET_FEE } from '../../common/constants'
+import { MarketBuyPage, MarketDetailsPage, MarketFundPage, MarketSellPage } from '../../pages'
 import { getLogger } from '../../util/logger'
+import { isAddress } from '../../util/tools'
+import { Loading } from '../common/loading'
 import { MarketNotFound } from '../common/market_not_found'
 import { MessageWarning } from '../common/message_warning'
+import { SectionTitle } from '../common/section_title'
 
 const logger = getLogger('Market::Routes')
 
@@ -52,16 +52,16 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
 
   return (
     <Switch>
-      <Route exact path="/:address" component={MarketDetailsPage} />
+      <Route component={MarketDetailsPage} exact path="/:address" />
       {!account ? (
         <MessageWarning text="Please connect to your wallet to open the market..." />
       ) : isQuestionFinalized ? (
         <MessageWarning text="Market closed, question finalized..." />
       ) : (
         <>
-          <Route exact path="/:address/buy" component={MarketBuyPage} />
-          <Route exact path="/:address/sell" component={MarketSellPage} />
-          <Route exact path="/:address/fund" component={MarketFundPage} />
+          <Route component={MarketBuyPage} exact path="/:address/buy" />
+          <Route component={MarketSellPage} exact path="/:address/sell" />
+          <Route component={MarketFundPage} exact path="/:address/fund" />
         </>
       )}
     </Switch>

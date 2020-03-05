@@ -1,12 +1,13 @@
 import React, { ChangeEvent, useState } from 'react'
 import styled from 'styled-components'
 
-import { ModalQuestion } from './modal_question'
-import { Arbitrator, Question } from '../../../util/types'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { Arbitrator, Question } from '../../../util/types'
 import { FormRowLink } from '../form_row_link'
-import { Textfield } from '../textfield'
 import { FormRowNote } from '../form_row_note'
+import { Textfield } from '../textfield'
+
+import { ModalQuestion } from './modal_question'
 
 interface Props {
   value: string
@@ -41,16 +42,16 @@ const Link = styled(FormRowLink)`
 
 export const QuestionInput = (props: Props) => {
   const {
-    value,
+    addArbitratorCustomValue,
+    addCategoryCustomValue,
+    context,
+    disabled,
     name = 'question',
     onChange,
     onChangeQuestion,
     onClearQuestion,
     placeholder = 'Type in a question...',
-    context,
-    disabled,
-    addArbitratorCustomValue,
-    addCategoryCustomValue,
+    value,
   } = props
 
   const [isModalQuestionOpen, setModalQuestionState] = useState(false)
@@ -67,8 +68,8 @@ export const QuestionInput = (props: Props) => {
       />
       <Wrapper>
         <Note>
-          <strong>For example:</strong> <i>&quot;Will France win?&quot;</i> is not an acceptable
-          question, but <i>&quot;Will France win the 2020 FIFA World Cup?&quot;</i> is a good one.
+          <strong>For example:</strong> <i>&quot;Will France win?&quot;</i> is not an acceptable question, but{' '}
+          <i>&quot;Will France win the 2020 FIFA World Cup?&quot;</i> is a good one.
         </Note>
         {!disabled && <Link onClick={() => setModalQuestionState(true)}>Add question</Link>}
         {disabled && <Link onClick={onClearQuestion}>Clear question</Link>}

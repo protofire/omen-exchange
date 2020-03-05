@@ -35,8 +35,7 @@ export const TextfieldCSS = css<{ hasError?: boolean; hasSuccess?: boolean }>`
   font-weight: ${props => props.theme.textfield.fontWeight};
   line-height: 1.2;
   outline: ${props => props.theme.textfield.outline};
-  padding: ${props =>
-    props.theme.textfield.paddingVertical + ' ' + props.theme.textfield.paddingHorizontal};
+  padding: ${props => props.theme.textfield.paddingVertical + ' ' + props.theme.textfield.paddingHorizontal};
   width: 100%;
 
   &::placeholder {

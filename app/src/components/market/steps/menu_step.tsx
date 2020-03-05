@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
+
 import { SectionTitle } from '../../common/section_title'
 
 interface Props {
@@ -61,15 +62,12 @@ class MenuStep extends Component<Props, State> {
     const currentStepItemSelected = steps.find(step => step.value === this.props.currentStep)
 
     const stepsBlocks = steps.map((step, index) => (
-      <Step
-        active={currentStepItemSelected && step.value <= currentStepItemSelected.value}
-        key={index}
-      ></Step>
+      <Step active={currentStepItemSelected && step.value <= currentStepItemSelected.value} key={index}></Step>
     ))
 
     return (
       <>
-        <SectionTitle title={'Conditional Exchange'} subTitle={'Create A New Market'} />
+        <SectionTitle subTitle={'Create A New Market'} title={'Conditional Exchange'} />
         <Wrapper>{stepsBlocks}</Wrapper>
       </>
     )

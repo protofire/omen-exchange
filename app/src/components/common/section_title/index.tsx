@@ -30,7 +30,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const SectionTitle: React.FC<Props> = (props: Props) => {
-  const { title, subTitle = '', ...restProps } = props
+  const { subTitle = '', title, ...restProps } = props
 
   return (
     <SectionTitleWrapper {...restProps}>

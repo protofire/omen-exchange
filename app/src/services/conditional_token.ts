@@ -1,10 +1,10 @@
-import { ethers, Wallet, Contract, utils } from 'ethers'
+import { Contract, Wallet, ethers, utils } from 'ethers'
+import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
-import { getIndexSets } from '../util/tools'
 import { getEarliestBlockToCheck } from '../util/networks'
-import { TransactionReceipt } from 'ethers/providers'
+import { getIndexSets } from '../util/tools'
 
 const logger = getLogger('Services::Conditional-Token')
 
@@ -43,11 +43,7 @@ class ConditionalTokenService {
     return this.contract.address
   }
 
-  prepareCondition = async (
-    questionId: string,
-    oracleAddress: string,
-    outcomeSlotCount = 2,
-  ): Promise<string> => {
+  prepareCondition = async (questionId: string, oracleAddress: string, outcomeSlotCount = 2): Promise<string> => {
     const transactionObject = await this.contract.prepareCondition(
       oracleAddress,
       questionId,
@@ -96,9 +92,7 @@ class ConditionalTokenService {
       throw new Error(`No ConditionPreparation event found for conditionId '${conditionId}'`)
     }
     if (logs.length > 1) {
-      logger.warn(
-        `There should be only one ConditionPreparation event for conditionId '${conditionId}'`,
-      )
+      logger.warn(`There should be only one ConditionPreparation event for conditionId '${conditionId}'`)
     }
 
     const iface = new ethers.utils.Interface(conditionalTokensAbi)
@@ -162,11 +156,7 @@ class ConditionalTokenService {
     return setApprovalForAllInterface.functions.setApprovalForAll.encode([address, approved])
   }
 
-  static encodePrepareCondition = (
-    questionId: string,
-    oracleAddress: string,
-    outcomeSlotCount: number,
-  ): string => {
+  static encodePrepareCondition = (questionId: string, oracleAddress: string, outcomeSlotCount: number): string => {
     const prepareConditionInterface = new utils.Interface(conditionalTokensAbi)
 
     return prepareConditionInterface.functions.prepareCondition.encode([
@@ -180,11 +170,7 @@ class ConditionalTokenService {
     return this.contract.getOutcomeSlotCount(conditionId)
   }
 
-  getConditionId = (
-    questionId: string,
-    oracleAddress: string,
-    outcomeSlotCount: number,
-  ): string => {
+  getConditionId = (questionId: string, oracleAddress: string, outcomeSlotCount: number): string => {
     const conditionId = ethers.utils.solidityKeccak256(
       ['address', 'bytes32', 'uint256'],
       [oracleAddress, questionId, outcomeSlotCount],
@@ -198,11 +184,7 @@ class ConditionalTokenService {
     return !outcomeSlotCount.isZero()
   }
 
-  static encodeRedeemPositions = (
-    collateralToken: string,
-    conditionId: string,
-    outcomesCount: number,
-  ): string => {
+  static encodeRedeemPositions = (collateralToken: string, conditionId: string, outcomesCount: number): string => {
     const redeemPositionsInterface = new utils.Interface(conditionalTokensAbi)
     const indexSets = getIndexSets(outcomesCount)
 

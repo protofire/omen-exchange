@@ -1,28 +1,28 @@
-import React from 'react'
 import { BigNumber } from 'ethers/utils'
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { Button } from '../../../common/index'
+import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { BalanceState, fetchAccountBalance } from '../../../../store/reducer'
+import { ButtonType } from '../../../../theme/component_styles/button_styling_types'
+import { getLogger } from '../../../../util/logger'
+import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
+import { formatBigNumber, formatDate } from '../../../../util/tools'
+import { Arbitrator, Token } from '../../../../util/types'
 import { ButtonContainer } from '../../../common/button_container'
 import { ButtonLink } from '../../../common/button_link'
-import { Well } from '../../../common/well'
 import { CreateCard } from '../../../common/create_card'
-import { Arbitrator, Token } from '../../../../util/types'
-import { Paragraph } from '../../../common/paragraph'
-import { Loading } from '../../../common/loading'
-import { Table, TD, TH, THead, TR } from '../../../common/table'
-import { TitleValue } from '../../../common/title_value'
-import { SubsectionTitle } from '../../../common/subsection_title'
-import { Outcome } from '../../../common/outcomes'
-import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { DisplayArbitrator } from '../../../common/display_arbitrator'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { ButtonType } from '../../../../common/button_styling_types'
-import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
-import { getLogger } from '../../../../util/logger'
 import { FormError } from '../../../common/form_error'
-import { useSelector, useDispatch } from 'react-redux'
-import { fetchAccountBalance, BalanceState } from '../../../../store/reducer'
+import { Button } from '../../../common/index'
+import { Loading } from '../../../common/loading'
+import { Outcome } from '../../../common/outcomes'
+import { Paragraph } from '../../../common/paragraph'
+import { SubsectionTitle } from '../../../common/subsection_title'
+import { TD, TH, THead, TR, Table } from '../../../common/table'
+import { TitleValue } from '../../../common/title_value'
+import { Well } from '../../../common/well'
 
 const logger = getLogger('MarketCreationItems::CreateMarketStep')
 
@@ -76,24 +76,13 @@ interface Props {
 
 const CreateMarketStep = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const balance = useSelector(
-    (state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance),
-  )
+  const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
 
-  const { library: provider, account } = context
+  const { account, library: provider } = context
 
-  const { values, marketCreationStatus } = props
-  const {
-    collateral,
-    question,
-    category,
-    arbitrator,
-    resolution,
-    spread,
-    funding,
-    outcomes,
-  } = values
+  const { marketCreationStatus, values } = props
+  const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
   React.useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, collateral))
@@ -119,18 +108,14 @@ const CreateMarketStep = (props: Props) => {
     fundingErrorMessage = `You entered ${formatBigNumber(
       funding,
       collateral.decimals,
-    )} DAI of funding but your account only has ${formatBigNumber(
-      balance,
-      collateral.decimals,
-    )} DAI`
+    )} DAI of funding but your account only has ${formatBigNumber(balance, collateral.decimals)} DAI`
   }
 
   return (
     <CreateCard>
       <OutcomeInfo>
         <Paragraph>
-          Please <strong>check all the information is correct</strong>. You can go back and edit
-          anything you need.
+          Please <strong>check all the information is correct</strong>. You can go back and edit anything you need.
         </Paragraph>
         <Paragraph>
           <strong>If everything is OK</strong> proceed to create the new market.
@@ -146,17 +131,11 @@ const CreateMarketStep = (props: Props) => {
         {collateral && (
           <TitleValue
             title={'Funding'}
-            value={[
-              formatBigNumber(funding, collateral.decimals),
-              <strong key="1"> {collateral.symbol}</strong>,
-            ]}
+            value={[formatBigNumber(funding, collateral.decimals), <strong key="1"> {collateral.symbol}</strong>]}
           />
         )}
       </Grid>
-      <TitleValueFinalStyled
-        title={'Arbitrator'}
-        value={<DisplayArbitrator arbitrator={arbitrator} />}
-      />
+      <TitleValueFinalStyled title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
       <SubsectionTitleNoMargin>Outcomes</SubsectionTitleNoMargin>
       <Table
         head={
@@ -178,8 +157,7 @@ const CreateMarketStep = (props: Props) => {
           )
         })}
       </Table>
-      {!MarketCreationStatus.is.ready(marketCreationStatus) &&
-      !MarketCreationStatus.is.error(marketCreationStatus) ? (
+      {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
         <Loading full={true} message={`${marketCreationStatus._type}...`} />
       ) : null}
 
@@ -187,8 +165,7 @@ const CreateMarketStep = (props: Props) => {
       <ButtonContainer>
         <ButtonLinkStyled
           disabled={
-            !MarketCreationStatus.is.ready(marketCreationStatus) &&
-            !MarketCreationStatus.is.error(marketCreationStatus)
+            !MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus)
           }
           onClick={back}
         >
@@ -197,12 +174,12 @@ const CreateMarketStep = (props: Props) => {
         {account ? (
           <Button
             buttonType={ButtonType.primary}
-            onClick={submit}
             disabled={
               !MarketCreationStatus.is.ready(marketCreationStatus) ||
               MarketCreationStatus.is.error(marketCreationStatus) ||
               !hasEnoughBalance
             }
+            onClick={submit}
           >
             Create
           </Button>

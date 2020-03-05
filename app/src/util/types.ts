@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers/utils'
+
 import { Outcome } from '../components/common/outcomes'
 
 export enum Status {

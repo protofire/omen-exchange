@@ -1,7 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { IconSelect } from './img/IconSelect'
+
 import { TextfieldCSS } from '../textfield'
+
+import { IconSelect } from './img/IconSelect'
 
 interface Props {
   autoFocus?: boolean

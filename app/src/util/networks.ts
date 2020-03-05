@@ -1,12 +1,12 @@
 import {
-  INFURA_PROJECT_ID,
   EARLIEST_GANACHE_BLOCK_TO_CHECK,
-  EARLIEST_RINKEBY_BLOCK_TO_CHECK,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
+  EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+  INFURA_PROJECT_ID,
 } from '../common/constants'
 import { entries, isNotNull } from '../util/type-utils'
 
-import { Token, Arbitrator } from './types'
+import { Arbitrator, Token } from './types'
 
 export type NetworkId = 1 | 4 | 50
 
@@ -56,9 +56,7 @@ const networks: { [K in NetworkId]: Network } = {
     label: 'Mainnet',
     url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
     realitioTimeout: 86400,
-    earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK
-      ? parseInt(EARLIEST_MAINNET_BLOCK_TO_CHECK, 10)
-      : 9294139,
+    earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK ? parseInt(EARLIEST_MAINNET_BLOCK_TO_CHECK, 10) : 9294139,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
       marketMakerFactory: '0xe7E502789B8f4cDC99e6Cf9d3963E8C76784da51',
@@ -73,34 +71,30 @@ const networks: { [K in NetworkId]: Network } = {
     label: 'Rinkeby',
     url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
     realitioTimeout: 10,
-    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK
-      ? parseInt(EARLIEST_RINKEBY_BLOCK_TO_CHECK, 10)
-      : 5827230,
+    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK ? parseInt(EARLIEST_RINKEBY_BLOCK_TO_CHECK, 10) : 5827230,
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
       marketMakerFactory: '0xe7E502789B8f4cDC99e6Cf9d3963E8C76784da51',
       conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
       oracle: '0x5A90132C104CA33652Ee71E2E645D5A4d8E5d7D6',
-      klerosBadge: '0x0',
-      klerosTokenView: '0x0',
-      klerosTCR: '0x0',
+      klerosBadge: '0x0000000000000000000000000000000000000000',
+      klerosTokenView: '0x0000000000000000000000000000000000000000',
+      klerosTCR: '0x0000000000000000000000000000000000000000',
     },
   },
   [networkIds.GANACHE]: {
     label: 'Ganache',
     url: `http://localhost:8545`,
     realitioTimeout: 10,
-    earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK
-      ? parseInt(EARLIEST_GANACHE_BLOCK_TO_CHECK, 10)
-      : 1,
+    earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK ? parseInt(EARLIEST_GANACHE_BLOCK_TO_CHECK, 10) : 1,
     contracts: {
       realitio: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
       marketMakerFactory: '0x5017A545b09ab9a30499DE7F431DF0855bCb7275',
       conditionalTokens: '0xD86C8F0327494034F60e25074420BcCF560D5610',
       oracle: '0x2D8BE6BF0baA74e0A907016679CaE9190e80dD0A',
-      klerosBadge: '0x0',
-      klerosTokenView: '0x0',
-      klerosTCR: '0x0',
+      klerosBadge: '0x0000000000000000000000000000000000000000',
+      klerosTokenView: '0x0000000000000000000000000000000000000000',
+      klerosTCR: '0x0000000000000000000000000000000000000000',
     },
     cpk: {
       masterCopyAddress: '0x1b88Bdb8269A1aB1372459F5a4eC3663D6f5cCc4',
@@ -123,8 +117,7 @@ export const supportedNetworkURLs = entries(networks).reduce<{
   {},
 )
 
-export const infuraNetworkURL =
-  process.env.NODE_ENV === 'development' ? networks[4].url : networks[1].url
+export const infuraNetworkURL = process.env.NODE_ENV === 'development' ? networks[4].url : networks[1].url
 
 export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   cdai: {
@@ -249,8 +242,7 @@ export const getTokenFromAddress = (networkId: number, address: string): Token =
 
 export const getContractAddressName = (networkId: number) => {
   const networkName = Object.keys(networkIds).find(key => (networkIds as any)[key] === networkId)
-  const networkNameCase =
-    networkName && networkName.substr(0, 1).toUpperCase() + networkName.substr(1).toLowerCase()
+  const networkNameCase = networkName && networkName.substr(0, 1).toUpperCase() + networkName.substr(1).toLowerCase()
   return networkNameCase
 }
 
@@ -369,10 +361,7 @@ export const getArbitratorFromAddress = (networkId: number, address: string): Ma
   }
 }
 
-export const getKnowArbitratorFromAddress = (
-  networkId: number,
-  address: string,
-): KnownArbitrator => {
+export const getKnowArbitratorFromAddress = (networkId: number, address: string): KnownArbitrator => {
   for (const key in knownArbitrators) {
     const arbitratorAddress = knownArbitrators[key as KnownArbitrator].addresses[networkId]
 

@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
 import { Button } from '../common/button'
+import { Filter } from '../common/filter'
 import { ListCard } from '../common/list_card'
 import { ListItem } from '../common/list_item'
-import { SectionTitle } from '../common/section_title'
-import { Filter } from '../common/filter'
-import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { Loading } from '../common/loading'
+import { SectionTitle } from '../common/section_title'
 
-const FilterStyled = styled(Filter)`
-  margin: -30px auto 10px;
-  max-width: ${props => props.theme.list.maxWidth};
-  width: 100%;
-`
+// const FilterStyled = styled(Filter)`
+//   margin: -30px auto 10px;
+//   max-width: ${props => props.theme.list.maxWidth};
+//   width: 100%;
+// `
 
 const NoMarketsAvailable = styled(SectionTitle)`
   margin-top: 150px;
@@ -43,7 +43,7 @@ interface Props {
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { count, markets, context, onFilterChange, onShowMore } = props
+  const { context, count, markets, onFilterChange, onShowMore } = props
   const [state, setState] = useState('OPEN')
   const [category, setCategory] = useState('All')
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
@@ -65,23 +65,20 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <div>
           <ul>
             {CATEGORIES.map((c, index) => (
-              <CategoryItem key={index} selected={c === category} onClick={() => setCategory(c)}>
+              <CategoryItem key={index} onClick={() => setCategory(c)} selected={c === category}>
                 {c}
               </CategoryItem>
             ))}
           </ul>
           <hr></hr>
           <div className="filters">
-            <SelectableButton selected={state === 'OPEN'} onClick={() => setState('OPEN')}>
+            <SelectableButton onClick={() => setState('OPEN')} selected={state === 'OPEN'}>
               Open
             </SelectableButton>
-            <SelectableButton selected={state === 'CLOSED'} onClick={() => setState('CLOSED')}>
+            <SelectableButton onClick={() => setState('CLOSED')} selected={state === 'CLOSED'}>
               Closed
             </SelectableButton>
-            <SelectableButton
-              selected={state === 'MY_MARKETS'}
-              onClick={() => setState('MY_MARKETS')}
-            >
+            <SelectableButton onClick={() => setState('MY_MARKETS')} selected={state === 'MY_MARKETS'}>
               My Markets
             </SelectableButton>
             <button

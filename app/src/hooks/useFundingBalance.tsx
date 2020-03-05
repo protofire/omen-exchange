@@ -1,15 +1,13 @@
+import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import { ConnectedWeb3Context } from './connectedWeb3'
 import { CPKService } from '../services'
-import { BigNumber } from 'ethers/utils'
+
+import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
 
-export const useFundingBalance = (
-  marketMakerAddress: string,
-  context: ConnectedWeb3Context,
-): BigNumber => {
-  const { library: provider, account } = context
+export const useFundingBalance = (marketMakerAddress: string, context: ConnectedWeb3Context): BigNumber => {
+  const { account, library: provider } = context
   const { buildMarketMaker } = useContracts(context)
 
   const [fundingBalance, setFundingBalance] = useState<BigNumber>(new BigNumber(0))

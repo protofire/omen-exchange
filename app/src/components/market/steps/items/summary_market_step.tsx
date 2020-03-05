@@ -1,25 +1,25 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { CreateCard } from '../../../common/create_card'
-import { formatBigNumber, formatDate } from '../../../../util/tools'
-import { Well } from '../../../common/well'
-import { Paragraph } from '../../../common/paragraph'
-import { Table, TD, TH, THead, TR } from '../../../common/table'
-import { TitleValue } from '../../../common/title_value'
-import { SubsectionTitle } from '../../../common/subsection_title'
-import { ButtonContainer } from '../../../common/button_container'
-import { SectionTitle } from '../../../common/section_title'
-import { CopyText } from '../../../common/copy_text'
+import { MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { useMarketMakerData } from '../../../../hooks/useMarketMakerData'
 import { useQuestion } from '../../../../hooks/useQuestion'
-import { Loading } from '../../../common/loading'
-import { NavLink } from 'react-router-dom'
-import { DisplayArbitrator } from '../../../common/display_arbitrator'
-import { ButtonType } from '../../../../common/button_styling_types'
+import { ButtonType } from '../../../../theme/component_styles/button_styling_types'
+import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { ButtonAnchor } from '../../../common/button_anchor'
-import { MARKET_FEE } from '../../../../common/constants'
+import { ButtonContainer } from '../../../common/button_container'
+import { CopyText } from '../../../common/copy_text'
+import { CreateCard } from '../../../common/create_card'
+import { DisplayArbitrator } from '../../../common/display_arbitrator'
+import { Loading } from '../../../common/loading'
+import { Paragraph } from '../../../common/paragraph'
+import { SectionTitle } from '../../../common/section_title'
+import { SubsectionTitle } from '../../../common/subsection_title'
+import { TD, TH, THead, TR, Table } from '../../../common/table'
+import { TitleValue } from '../../../common/title_value'
+import { Well } from '../../../common/well'
 
 const NavLinkStyled = styled(NavLink)`
   color: ${props => props.theme.colors.textColor};
@@ -66,9 +66,9 @@ const SummaryMarketStep = (props: Props) => {
 
   const { marketMakerAddress } = props
 
-  const { question, resolution, category } = useQuestion(marketMakerAddress, context)
+  const { category, question, resolution } = useQuestion(marketMakerAddress, context)
   const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
-  const { marketMakerFunding, collateral, arbitrator, balances } = marketMakerData
+  const { arbitrator, balances, collateral, marketMakerFunding } = marketMakerData
 
   const resolutionDate = resolution && formatDate(resolution)
   const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`
@@ -79,16 +79,15 @@ const SummaryMarketStep = (props: Props) => {
 
   return (
     <>
-      <SectionTitle title="Conditional Exchange" subTitle="A new market has been created!" />
+      <SectionTitle subTitle="A new market has been created!" title="Conditional Exchange" />
       <CreateCard>
         <OutcomeInfo>
           <Paragraph>
-            You can now find your market on the <NavLinkStyled to="/">Markets</NavLinkStyled>{' '}
-            section.
+            You can now find your market on the <NavLinkStyled to="/">Markets</NavLinkStyled> section.
           </Paragraph>
           <Paragraph>
             Get the URL to your market
-            <CopyText value={marketMakerURL} toastMessage="URL copied to your clipboard!" />
+            <CopyText toastMessage="URL copied to your clipboard!" value={marketMakerURL} />
           </Paragraph>
         </OutcomeInfo>
         <SubsectionTitle>Details</SubsectionTitle>
@@ -105,10 +104,7 @@ const SummaryMarketStep = (props: Props) => {
             ]}
           />
         </Grid>
-        <TitleValueFinalStyled
-          title={'Arbitrator'}
-          value={<DisplayArbitrator arbitrator={arbitrator} />}
-        />
+        <TitleValueFinalStyled title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
         <SubsectionTitleNoMargin>Outcomes</SubsectionTitleNoMargin>
         <Table
           head={
@@ -133,8 +129,8 @@ const SummaryMarketStep = (props: Props) => {
         <ButtonContainer>
           <Button
             buttonType={ButtonType.primary}
-            rel="noopener noreferrer"
             href={`/#/${marketMakerAddress}`}
+            rel="noopener noreferrer"
             target="_blank"
           >
             View Market

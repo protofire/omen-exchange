@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import { ConnectedWeb3Context } from './connectedWeb3'
+
 import { isContract } from '../util/tools'
 
-export const useCheckContractExists = (
-  marketMakerAddress: string,
-  context: ConnectedWeb3Context,
-): boolean => {
+import { ConnectedWeb3Context } from './connectedWeb3'
+
+export const useCheckContractExists = (marketMakerAddress: string, context: ConnectedWeb3Context): boolean => {
   const [contractExists, setContractExists] = useState<boolean>(true)
 
   useEffect(() => {

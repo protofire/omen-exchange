@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import { useQuery } from '@apollo/react-hooks'
+import React, { useEffect, useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
-import { MarketHome } from './market_home'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { RemoteData } from '../../util/remote_data'
-import { useQuery } from '@apollo/react-hooks'
 import { MARKETS_HOME } from '../../queries/markets_home'
 import { CPKService } from '../../services'
+import { RemoteData } from '../../util/remote_data'
+
+import { MarketHome } from './market_home'
 
 const PAGE_SIZE = 1
 
@@ -23,12 +24,10 @@ const MarketHomeContainer: React.FC = () => {
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const { library: provider } = context
 
-  const { data, loading, fetchMore, error, variables } = useQuery(MARKETS_HOME[filter.state], {
+  const { data, error, fetchMore, loading } = useQuery(MARKETS_HOME[filter.state], {
     notifyOnNetworkStatusChange: true,
     variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, ...filter },
   })
-
-  console.log(variables)
 
   useEffect(() => {
     const getCpkAddress = async () => {
@@ -40,9 +39,7 @@ const MarketHomeContainer: React.FC = () => {
 
   useEffect(() => {
     if (loading) {
-      setMarkets(markets =>
-        RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading(),
-      )
+      setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
     } else if (error) {
       setMarkets(RemoteData.failure(error))
     } else if (data) {
@@ -61,10 +58,7 @@ const MarketHomeContainer: React.FC = () => {
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) return prev
         return Object.assign({}, prev, {
-          fixedProductMarketMakers: [
-            ...prev.fixedProductMarketMakers,
-            ...fetchMoreResult.fixedProductMarketMakers,
-          ],
+          fixedProductMarketMakers: [...prev.fixedProductMarketMakers, ...fetchMoreResult.fixedProductMarketMakers],
         })
       },
     })
@@ -76,10 +70,10 @@ const MarketHomeContainer: React.FC = () => {
   return (
     <>
       <MarketHome
-        markets={markets}
-        count={data ? data.fixedProductMarketMakers.length : 0}
         context={context}
+        count={data ? data.fixedProductMarketMakers.length : 0}
         currentFilter={filter}
+        markets={markets}
         onFilterChange={onFilterChange}
         onShowMore={showMore}
       />
