@@ -36,6 +36,9 @@ const theme = {
     color: '#37474F',
     colorHover: '#37474F',
   },
+  buttonCircle: {
+    dimensions: '34px',
+  },
   colors: {
     activeListItemBackground: '#fafafa',
     darkGray: '#acacac',
