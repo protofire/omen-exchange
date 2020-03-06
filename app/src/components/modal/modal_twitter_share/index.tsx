@@ -2,15 +2,15 @@ import React, { HTMLAttributes } from 'react'
 import { TwitterIcon, TwitterShareButton } from 'react-share'
 import styled from 'styled-components'
 
-import ModalWrapper from '../modal_wrapper'
-import { Well } from '../well'
+import { Well } from '../../common/well'
+import { ModalWrapper } from '../../modal/modal_wrapper'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  title: string
   description: string
-  shareUrl: string
   isOpen: boolean
   onClose: () => void
+  shareUrl: string
+  title: string
 }
 
 const OutcomeInfo = styled(Well)`
@@ -43,7 +43,6 @@ export const ModalTwitterShare = (props: Props) => {
   return (
     <ModalWrapper isOpen={isOpen} onRequestClose={onClose} title={title}>
       <OutcomeInfo>{description}</OutcomeInfo>
-
       <ButtonContainer>
         <TwitterGlobalButton>
           <TwitterShareButtonExt title={description} url={shareUrl}>

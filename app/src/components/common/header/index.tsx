@@ -4,12 +4,12 @@ import { NavLink, RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
-import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
+import { ConnectedWeb3 } from '../../../hooks'
 import { ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { ModalConnectWallet } from '../../modal'
 import { Button } from '../button'
 import { ButtonConnectWallet } from '../button_connect_wallet'
 import { Logo } from '../logo'
-import { ModalConnectWallet } from '../modal_connect_wallet'
 import { Network } from '../network'
 
 const HeaderWrapper = styled.div`

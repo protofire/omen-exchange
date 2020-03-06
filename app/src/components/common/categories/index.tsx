@@ -1,17 +1,17 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Select } from '../select'
+import { Select } from '../../common/select'
 
 interface Props {
   autoFocus?: boolean
+  customValues: string[]
   disabled?: boolean
   name: string
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => any
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
   readOnly?: boolean
   value: string
-  customValues: string[]
 }
 
 const FormOption = styled.option``

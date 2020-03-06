@@ -5,10 +5,8 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
 import { MARKET_FEE } from '../../common/constants'
+import { useAsyncDerivedValue, useCollateralBalance, useContracts } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
-import { useCollateralBalance } from '../../hooks/useCollateralBalance'
-import { useContracts } from '../../hooks/useContracts'
 import { CPKService, ERC20Service, MarketMakerService } from '../../services'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
@@ -24,8 +22,6 @@ import {
   FormLabel,
   FormRow,
   Loading,
-  ModalTwitterShare,
-  OutcomeTable,
   SectionTitle,
   SubsectionTitle,
   TD,
@@ -35,6 +31,8 @@ import {
   ViewCard,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
+import { OutcomeTable } from '../common/outcome_table'
+import { ModalTwitterShare } from '../modal'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;

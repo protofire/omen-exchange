@@ -11,12 +11,12 @@ import {
   DisplayArbitrator,
   GridThreeColumns,
   Loading,
-  OutcomeTable,
   SubsectionTitle,
   ThreeBoxComments,
   TitleValue,
   ViewCard,
 } from '../../common'
+import { OutcomeTable } from '../../common/outcome_table'
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
   margin-bottom: 0;

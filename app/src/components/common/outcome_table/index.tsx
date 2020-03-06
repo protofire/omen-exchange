@@ -3,9 +3,8 @@ import styled from 'styled-components'
 
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../util/types'
-import { BarDiagram } from '../bar_diagram_probabilities'
-import { RadioInput } from '../radio_input/index'
-import { TD, TH, THead, TR, Table } from '../table/index'
+import { BarDiagram, RadioInput } from '../../common'
+import { TD, TH, THead, TR, Table } from '../table'
 
 interface Props {
   balances: BalanceItem[]

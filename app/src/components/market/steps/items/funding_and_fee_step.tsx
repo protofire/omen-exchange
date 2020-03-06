@@ -3,8 +3,8 @@ import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../../../common/constants'
+import { useCollateralBalance } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { useCollateralBalance } from '../../../../hooks/useCollateralBalance'
 import { Token } from '../../../../util/types'
 import {
   BalanceToken,

@@ -3,10 +3,8 @@ import React, { useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { useCollateralBalance, useContracts, useFundingBalance } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { useCollateralBalance } from '../../hooks/useCollateralBalance'
-import { useContracts } from '../../hooks/useContracts'
-import { useFundingBalance } from '../../hooks/useFundingBalance'
 import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
@@ -24,7 +22,6 @@ import {
   FormLabel,
   FormRow,
   Loading,
-  OutcomeTable,
   SectionTitle,
   SubsectionTitle,
   TD,
@@ -34,6 +31,7 @@ import {
   ViewCard,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
+import { OutcomeTable } from '../common/outcome_table'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string

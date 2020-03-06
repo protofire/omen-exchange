@@ -12,9 +12,9 @@ import {
   DateField,
   DisplayArbitrator,
   FormRow,
-  QuestionInput,
   Well,
 } from '../../../common'
+import { QuestionInput } from '../../../common/question_input'
 
 interface Props {
   next: () => void

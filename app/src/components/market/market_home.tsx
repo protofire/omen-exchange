@@ -8,12 +8,7 @@ import { getLogger } from '../../util/logger'
 import { MarketFilter } from '../../util/market_filter'
 import { RemoteData } from '../../util/remote_data'
 import { MarketWithExtraData } from '../../util/types'
-import { Button } from '../common/button'
-import { Filter } from '../common/filter'
-import { ListCard } from '../common/list_card'
-import { ListItem } from '../common/list_item'
-import { Loading } from '../common/loading'
-import { SectionTitle } from '../common/section_title'
+import { Button, Filter, ListCard, ListItem, Loading, SectionTitle } from '../common'
 
 const FilterStyled = styled(Filter)`
   margin: -30px auto 10px;

@@ -4,9 +4,8 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../common/constants'
+import { useAsyncDerivedValue, useContracts } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
-import { useContracts } from '../../hooks/useContracts'
 import { CPKService, MarketMakerService } from '../../services'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
@@ -22,7 +21,6 @@ import {
   FormLabel,
   FormRow,
   Loading,
-  OutcomeTable,
   Paragraph,
   SectionTitle,
   SubsectionTitle,
@@ -34,6 +32,7 @@ import {
   Well,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
+import { OutcomeTable } from '../common/outcome_table'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;

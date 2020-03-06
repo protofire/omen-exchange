@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from 'react'
+import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
 const SubsectionTitleWrapper = styled.h2`
@@ -18,11 +18,7 @@ const SubsectionTitleWrapper = styled.h2`
   }
 `
 
-interface Props extends HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode
-}
-
-export const SubsectionTitle: React.FC<Props> = (props: Props) => {
+export const SubsectionTitle: React.FC<DOMAttributes<HTMLDivElement>> = props => {
   const { children, ...restProps } = props
 
   return <SubsectionTitleWrapper {...restProps}>{children}</SubsectionTitleWrapper>

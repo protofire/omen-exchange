@@ -3,9 +3,8 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../../../common/constants'
+import { useMarketMakerData, useQuestion } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { useMarketMakerData } from '../../../../hooks/useMarketMakerData'
-import { useQuestion } from '../../../../hooks/useQuestion'
 import { ButtonType } from '../../../../theme/component_styles/button_styling_types'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import {

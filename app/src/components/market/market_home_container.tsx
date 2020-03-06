@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
+import { useMarkets } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { useMarkets } from '../../hooks/useMarkets'
 import { MarketFilter } from '../../util/market_filter'
 import { RemoteData } from '../../util/remote_data'
 

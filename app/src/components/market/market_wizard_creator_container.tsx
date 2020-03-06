@@ -1,13 +1,13 @@
 import React, { FC, useState } from 'react'
 
+import { useContracts } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { useContracts } from '../../hooks/useContracts'
 import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
 import { getLogger } from '../../util/logger'
 import { MarketCreationStatus } from '../../util/market_creation_status_data'
 import { MarketData } from '../../util/types'
-import { ModalConnectWallet } from '../common'
+import { ModalConnectWallet } from '../modal'
 
 import { MarketWizardCreator } from './market_wizard_creator'
 
