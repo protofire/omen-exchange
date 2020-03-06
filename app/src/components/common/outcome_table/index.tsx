@@ -3,8 +3,7 @@ import styled from 'styled-components'
 
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../util/types'
-import { BarDiagram, RadioInput } from '../../common'
-import { TD, TH, THead, TR, Table } from '../table'
+import { BarDiagram, RadioInput, TD, TH, THead, TR, Table } from '../../common'
 
 interface Props {
   balances: BalanceItem[]
@@ -18,6 +17,8 @@ interface Props {
 }
 
 const TableWrapper = styled.div`
+  margin-left: -${props => props.theme.cards.paddingHorizontal};
+  margin-right: -${props => props.theme.cards.paddingHorizontal};
   margin-bottom: 30px;
 `
 

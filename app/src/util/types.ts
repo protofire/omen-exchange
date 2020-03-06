@@ -57,7 +57,7 @@ export interface Question {
 }
 
 export enum OutcomeTableValue {
-  Probabilities = 'Outcome probabilities',
+  Probabilities = 'Outcome / Probability',
   CurrentPrice = 'Current Price',
   Shares = 'Shares',
   Payout = 'Payout',
