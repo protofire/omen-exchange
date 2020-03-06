@@ -9,12 +9,12 @@ import { TD, TH, THead, TR, Table } from '../table'
 interface Props {
   balances: BalanceItem[]
   collateral: Token
-  probabilities: number[]
-  outcomeSelected?: number
-  outcomeHandleChange?: (e: number) => void
   disabledColumns?: OutcomeTableValue[]
-  withWinningOutcome?: boolean
   displayRadioSelection?: boolean
+  outcomeHandleChange?: (e: number) => void
+  outcomeSelected?: number
+  probabilities: number[]
+  withWinningOutcome?: boolean
 }
 
 const TableWrapper = styled.div`
@@ -55,13 +55,6 @@ export const OutcomeTable = (props: Props) => {
     OutcomeTableValue.Payout,
   ]
 
-  const outcomeMaxProbability = probabilities.reduce(
-    (max, balance, index, balances) => (balance > balances[max] ? index : max),
-    0,
-  )
-
-  const equalProbabilities = probabilities.every(b => b === probabilities[0])
-
   const TableCellsAlign = ['left', 'right', 'right', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
@@ -82,10 +75,7 @@ export const OutcomeTable = (props: Props) => {
 
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
     const { currentPrice, outcomeName, shares, winningOutcome } = balanceItem
-    const isWinning = !equalProbabilities && outcomeIndex === outcomeMaxProbability
-
     const currentPriceFormatted = Number(currentPrice).toFixed(4)
-
     const probability = probabilities[outcomeIndex]
 
     return (
@@ -97,29 +87,18 @@ export const OutcomeTable = (props: Props) => {
               data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
               name="outcome"
               onChange={(e: any) => outcomeHandleChange && outcomeHandleChange(+e.target.value)}
+              outcomeIndex={outcomeIndex}
               value={outcomeIndex}
             />
           </TDNoHorizontalPadding>
         )}
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]} winningOutcome={winningOutcome}>
-            <BarDiagram
-              isWinning={isWinning}
-              outcomeName={outcomeName}
-              probability={probability}
-              winningOutcome={winningOutcome}
-              withWinningOutcome={withWinningOutcome}
-            />
+            <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
           </TDStyled>
         ) : (
           <TD textAlign={TableCellsAlign[1]}>
-            <BarDiagram
-              isWinning={isWinning}
-              outcomeName={outcomeName}
-              probability={probability}
-              winningOutcome={winningOutcome}
-              withWinningOutcome={withWinningOutcome}
-            />
+            <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
           </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
