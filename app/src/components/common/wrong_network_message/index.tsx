@@ -11,7 +11,6 @@ import { ViewCard } from '../view_card'
 
 const WrappedText = styled.div`
   color: #555;
-  font-family: Roboto;
   font-size: 14px;
   font-stretch: normal;
   font-style: normal;
