@@ -4,6 +4,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { WhenConnected } from '../../../hooks/connectedWeb3'
+import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import {
   ButtonAnchor,
@@ -97,9 +98,17 @@ const ViewWrapper = (props: Props) => {
         {marketHasDetails && details()}
         <WhenConnected>
           <ButtonContainer>
-            <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
-            {userHasShares && <ButtonAnchor href={`/#/${marketMakerAddress}/sell`}>Sell</ButtonAnchor>}
-            <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
+            <ButtonAnchor buttonType={ButtonType.secondaryLine} href={`/#/${marketMakerAddress}/fund`}>
+              Fund
+            </ButtonAnchor>
+            {userHasShares && (
+              <ButtonAnchor buttonType={ButtonType.secondaryLine} href={`/#/${marketMakerAddress}/sell`}>
+                Sell
+              </ButtonAnchor>
+            )}
+            <ButtonAnchor buttonType={ButtonType.secondaryLine} href={`/#/${marketMakerAddress}/buy`}>
+              Buy
+            </ButtonAnchor>
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>
