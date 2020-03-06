@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 const Wrapper = styled.button`
   align-items: center;
+  background-color: #fff;
   border-radius: 50%;
   border: 1px solid ${props => props.theme.colors.tertiary};
   cursor: pointer;
