@@ -1,5 +1,6 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
+
 import RadioOff from './img/RadioOff'
 import RadioOn from './img/RadioOn'
 
@@ -37,18 +38,11 @@ const RadioWrapper = styled.div`
 `
 
 export const RadioInput: React.FC<Props> = (props: Props) => {
-  const { onChange, value, disabled, name, checked, ...restProps } = props
+  const { checked, disabled, name, onChange, value, ...restProps } = props
   return (
     <RadioWrapper {...restProps}>
       {checked ? <RadioOn /> : <RadioOff />}
-      <input
-        checked={checked}
-        name={name}
-        onChange={onChange}
-        disabled={disabled}
-        type="radio"
-        value={value}
-      />
+      <input checked={checked} disabled={disabled} name={name} onChange={onChange} type="radio" value={value} />
     </RadioWrapper>
   )
 }

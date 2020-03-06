@@ -1,25 +1,26 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { Select } from '../select'
-import { Token } from '../../../util/types'
+
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { useContracts } from '../../../hooks/useContracts'
+import { Token } from '../../../util/types'
+import { Select } from '../select'
 
 interface Props {
   autoFocus?: boolean
+  context: ConnectedWeb3Context
   disabled?: boolean
   name: string
-  onTokenChange: (token: Token) => any
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
+  onTokenChange: (token: Token) => any
   readOnly?: boolean
   value: Token
-  context: ConnectedWeb3Context
 }
 
 const FormOption = styled.option``
 
 export const Tokens = (props: Props) => {
-  const { context, value, onTokenChange, ...restProps } = props
+  const { context, onTokenChange, value, ...restProps } = props
 
   const [tokens, setTokens] = useState<Token[]>([])
   const { kleros } = useContracts(context)
@@ -47,7 +48,7 @@ export const Tokens = (props: Props) => {
   }
 
   return (
-    <Select {...restProps} value={value.address} onChange={e => onChange(e.target.value)}>
+    <Select {...restProps} onChange={e => onChange(e.target.value)} value={value.address}>
       {options.map(option => {
         return (
           <FormOption key={option.value} value={option.value}>

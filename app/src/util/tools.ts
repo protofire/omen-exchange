@@ -1,23 +1,16 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import Big from 'big.js'
+import { BigNumber, bigNumberify, formatUnits, getAddress } from 'ethers/utils'
 import moment from 'moment'
-import { BigNumber, getAddress, bigNumberify, formatUnits } from 'ethers/utils'
 
 import { getLogger } from './logger'
 
 const logger = getLogger('Tools')
 
-export const truncateStringInTheMiddle = (
-  str: string,
-  strPositionStart: number,
-  strPositionEnd: number,
-) => {
+export const truncateStringInTheMiddle = (str: string, strPositionStart: number, strPositionEnd: number) => {
   const minTruncatedLength = strPositionStart + strPositionEnd
   if (minTruncatedLength < str.length) {
-    return `${str.substr(0, strPositionStart)}...${str.substr(
-      str.length - strPositionEnd,
-      str.length,
-    )}`
+    return `${str.substr(0, strPositionStart)}...${str.substr(str.length - strPositionEnd, str.length)}`
   }
   return str
 }
@@ -91,9 +84,7 @@ export const computeBalanceAfterTrade = (
   amountShares: BigNumber, // amount of `outcome` shares being traded
 ): BigNumber[] => {
   if (outcomeIndex < 0 || outcomeIndex >= holdings.length) {
-    throw new Error(
-      `Outcome index '${outcomeIndex}' must be between 0 and '${holdings.length}' - 1`,
-    )
+    throw new Error(`Outcome index '${outcomeIndex}' must be between 0 and '${holdings.length}' - 1`)
   }
 
   return holdings.map((h, i) => {
@@ -143,9 +134,7 @@ export const calcSellAmountInCollateral = (
 
   const f = (r: Big) => {
     const numerator = otherHoldingsBig.reduce((a, b) => a.mul(b), holdingsBig)
-    const denominator = otherHoldingsBig
-      .map(h => h.minus(r).minus(r.mul(fee)))
-      .reduce((a, b) => a.mul(b))
+    const denominator = otherHoldingsBig.map(h => h.minus(r).minus(r.mul(fee))).reduce((a, b) => a.mul(b))
     return holdingsBig
       .minus(r)
       .plus(sharesToSellBig)

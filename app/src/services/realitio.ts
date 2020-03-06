@@ -1,14 +1,15 @@
-import { Contract, ethers, utils, Wallet } from 'ethers'
-import { BigNumber, bigNumberify } from 'ethers/utils'
-import { Moment } from 'moment'
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
+import { Contract, Wallet, ethers, utils } from 'ethers'
+import { BigNumber, bigNumberify } from 'ethers/utils'
+// eslint-disable-next-line import/named
+import { Moment } from 'moment'
 
 import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from '../common/constants'
-import { getLogger } from '../util/logger'
-import { OutcomeSlot, Question, QuestionLog } from '../util/types'
 import { Outcome } from '../components/common/outcomes'
+import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck, getRealitioTimeout } from '../util/networks'
+import { OutcomeSlot, Question, QuestionLog } from '../util/types'
 
 const logger = getLogger('Services::Realitio')
 
@@ -69,23 +70,11 @@ class RealitioService {
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
-    const questionText = RealitioQuestionLib.encodeText(
-      'single-select',
-      question,
-      outcomeNames,
-      category,
-    )
+    const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
 
     const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
 
-    const args = [
-      SINGLE_SELECT_TEMPLATE_ID,
-      questionText,
-      arbitratorAddress,
-      timeoutResolution,
-      openingTimestamp,
-      0,
-    ]
+    const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
 
     const questionId = await this.constantContract.askQuestion(...args, {
       from: this.signerAddress,
@@ -122,17 +111,14 @@ class RealitioService {
     const iface = new ethers.utils.Interface(realitioAbi)
     const event = iface.parseLog(logs[0])
 
-    const { question, template_id: templateId, opening_ts: openingTs, arbitrator } = event.values
+    const { arbitrator, opening_ts: openingTs, question, template_id: templateId } = event.values
 
     const templates = ['bool', 'uint', 'single-select', 'multiple-select', 'datetime']
 
     const templateType = templates[(templateId as BigNumber).toNumber()]
 
     const template = RealitioTemplateLib.defaultTemplateForType(templateType)
-    const questionLog: QuestionLog = RealitioQuestionLib.populatedJSONForTemplate(
-      template,
-      question,
-    )
+    const questionLog: QuestionLog = RealitioQuestionLib.populatedJSONForTemplate(template, question)
 
     const { category, title, outcomes = [OutcomeSlot.Yes, OutcomeSlot.No] } = questionLog
 
@@ -151,10 +137,7 @@ class RealitioService {
       const isFinalized = await this.contract.isFinalized(questionId)
       return isFinalized
     } catch (err) {
-      logger.error(
-        `There was an error querying if the question with id '${questionId}' is finalized`,
-        err.message,
-      )
+      logger.error(`There was an error querying if the question with id '${questionId}' is finalized`, err.message)
       throw err
     }
   }
@@ -165,10 +148,7 @@ class RealitioService {
       const resultBN = bigNumberify(result)
       return +resultBN.toString()
     } catch (err) {
-      logger.error(
-        `There was an error querying the result for question with id '${questionId}'`,
-        err.message,
-      )
+      logger.error(`There was an error querying the result for question with id '${questionId}'`, err.message)
       throw err
     }
   }
@@ -183,23 +163,11 @@ class RealitioService {
   ): string => {
     const openingTimestamp = openingDateMoment.unix()
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
-    const questionText = RealitioQuestionLib.encodeText(
-      'single-select',
-      question,
-      outcomeNames,
-      category,
-    )
+    const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
 
     const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
 
-    const args = [
-      SINGLE_SELECT_TEMPLATE_ID,
-      questionText,
-      arbitratorAddress,
-      timeoutResolution,
-      openingTimestamp,
-      0,
-    ]
+    const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
 
     const askQuestionInterface = new utils.Interface(realitioAbi)
 
@@ -217,23 +185,11 @@ class RealitioService {
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
-    const questionText = RealitioQuestionLib.encodeText(
-      'single-select',
-      question,
-      outcomeNames,
-      category,
-    )
+    const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
 
     const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
 
-    const args = [
-      SINGLE_SELECT_TEMPLATE_ID,
-      questionText,
-      arbitratorAddress,
-      timeoutResolution,
-      openingTimestamp,
-      0,
-    ]
+    const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
 
     const questionId = await this.constantContract.askQuestion(...args, {
       from: signerAddress,

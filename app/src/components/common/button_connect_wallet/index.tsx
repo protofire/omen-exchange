@@ -1,13 +1,7 @@
 import React from 'react'
-import styled from 'styled-components'
-import { Button } from '../button'
-import { ButtonType } from '../../../common/button_styling_types'
 
-const Wrapper = styled(Button)`
-  font-size: 13px;
-  height: 24px;
-  padding: 0 10px;
-`
+import { ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { Button } from '../button'
 
 interface Props {
   modalState: boolean
@@ -19,13 +13,8 @@ export const ButtonConnectWallet = (props: Props) => {
   const buttonMessage = modalState ? 'Connecting...' : 'Connect'
 
   return (
-    <Wrapper
-      buttonType={ButtonType.secondary}
-      disabled={modalState}
-      onClick={onClick}
-      {...restProps}
-    >
+    <Button buttonType={ButtonType.primary} disabled={modalState} onClick={onClick} {...restProps}>
       {buttonMessage}
-    </Wrapper>
+    </Button>
   )
 }

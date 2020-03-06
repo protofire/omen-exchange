@@ -1,14 +1,14 @@
-import { Contract, ethers, Wallet, utils } from 'ethers'
+import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import { LogDescription } from 'ethers/utils/interface'
+
+import { MARKET_FEE } from '../common/constants'
+import { getLogger } from '../util/logger'
+import { Log, Market, MarketWithExtraData } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
 import { MarketMakerService } from './market_maker'
 import { RealitioService } from './realitio'
-
-import { getLogger } from '../util/logger'
-import { Market, MarketWithExtraData, Log } from '../util/types'
-import { MARKET_FEE } from '../common/constants'
 
 const logger = getLogger('Services::MarketMakerFactory')
 
@@ -75,9 +75,7 @@ class MarketMakerFactoryService {
     signerAddress: string,
   ): Promise<string> => {
     const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
-    const cloneFactoryInterface = new utils.Interface([
-      'function cloneConstructor(bytes consData) external',
-    ])
+    const cloneFactoryInterface = new utils.Interface(['function cloneConstructor(bytes consData) external'])
     const cloneConstructorEncodedCall = cloneFactoryInterface.functions.cloneConstructor.encode([
       utils.defaultAbiCoder.encode(
         ['address', 'address', 'bytes32[]', 'uint'],
@@ -93,9 +91,7 @@ class MarketMakerFactoryService {
         [
           '0xff',
           this.contract.address,
-          utils.keccak256(
-            utils.defaultAbiCoder.encode(['address', 'uint'], [signerAddress, saltNonce]),
-          ),
+          utils.keccak256(utils.defaultAbiCoder.encode(['address', 'uint'], [signerAddress, saltNonce])),
           utils.keccak256(
             `0x3d3d606380380380913d393d73${this.contract.address.slice(
               2,
@@ -116,15 +112,7 @@ class MarketMakerFactoryService {
   ): Promise<string> => {
     const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
 
-    const args = [
-      saltNonce,
-      conditionalTokenAddress,
-      collateralAddress,
-      [conditionId],
-      feeBN,
-      0,
-      [],
-    ]
+    const args = [saltNonce, conditionalTokenAddress, collateralAddress, [conditionId], feeBN, 0, []]
 
     const marketMakerAddress = await this.constantContract.create2FixedProductMarketMaker(...args, {
       from: this.signerAddress,
@@ -156,7 +144,7 @@ class MarketMakerFactoryService {
     const markets = logs.map(
       (log: Log): Market => {
         const parsedLog: LogDescription = interfaceMarketMakerFactory.parseLog(log)
-        const { fixedProductMarketMaker, creator, collateralToken, conditionIds } = parsedLog.values
+        const { collateralToken, conditionIds, creator, fixedProductMarketMaker } = parsedLog.values
 
         return {
           address: fixedProductMarketMaker,

@@ -1,8 +1,8 @@
 import { Contract, ethers } from 'ethers'
-
-import { Token } from '../util/types'
-import { getTokensByNetwork, networkIds } from '../util/networks'
 import { Web3Provider } from 'ethers/providers'
+
+import { getTokensByNetwork, networkIds } from '../util/networks'
+import { Token } from '../util/types'
 
 const klerosBadgeAbi = [
   'function queryAddresses(address _cursor, uint _count, bool[8] _filter, bool _oldestFirst) external view returns (address[] values, bool hasMore)',
@@ -29,15 +29,11 @@ class KlerosService {
     this.provider = provider
     this.tcrAddress = tcrAddress
 
-    const networkId = provider.network.chainId
+    const networkId = provider.network ? provider.network.chainId : null
     // TODO: remove this conditional when these contracts were deployed to the supported testnets
     if (networkId === networkIds.MAINNET) {
       this.badgeContract = new ethers.Contract(badgeContractAddress, klerosBadgeAbi, provider)
-      this.tokensViewContract = new ethers.Contract(
-        tokensViewContractAddress,
-        klerosTokensViewAbi,
-        provider,
-      )
+      this.tokensViewContract = new ethers.Contract(tokensViewContractAddress, klerosTokensViewAbi, provider)
       if (signerAddress) {
         const signer = provider.getSigner()
         this.badgeContract = this.badgeContract.connect(signer)
@@ -76,12 +72,7 @@ class KlerosService {
       // Fetch addresses of tokens that have the badge.
       // Since the contract returns fixed sized arrays, we must filter out unused items.
       while (hasMore) {
-        const result = await this.badgeContract.queryAddresses(
-          ethers.constants.AddressZero,
-          1000,
-          filter,
-          true,
-        )
+        const result = await this.badgeContract.queryAddresses(ethers.constants.AddressZero, 1000, filter, true)
         addressesWithBadge = addressesWithBadge.concat(
           result[0].filter((address: string) => address !== ethers.constants.AddressZero),
         )
@@ -89,10 +80,7 @@ class KlerosService {
       }
 
       // Fetch their submission IDs on the TCR.
-      const submissionIDs = await this.tokensViewContract.getTokensIDsForAddresses(
-        this.tcrAddress,
-        addressesWithBadge,
-      )
+      const submissionIDs = await this.tokensViewContract.getTokensIDsForAddresses(this.tcrAddress, addressesWithBadge)
 
       // With the token IDs, get the information and add it to the object.
       const fetchedTokens = await this.tokensViewContract.getTokens(this.tcrAddress, submissionIDs)

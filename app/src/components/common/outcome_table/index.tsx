@@ -1,11 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Table, TD, TH, THead, TR } from '../table/index'
-import { RadioInput } from '../radio_input/index'
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../util/types'
 import { BarDiagram } from '../bar_diagram_probabilities'
+import { RadioInput } from '../radio_input/index'
+import { TD, TH, THead, TR, Table } from '../table/index'
 
 interface Props {
   balances: BalanceItem[]
@@ -71,11 +71,7 @@ export const OutcomeTable = (props: Props) => {
         <TR>
           {TableHead.map((value, index) => {
             return !disabledColumns.includes(value) ? (
-              <TH
-                colSpan={index === 0 && displayRadioSelection ? 2 : 1}
-                textAlign={TableCellsAlign[index]}
-                key={index}
-              >
+              <TH colSpan={index === 0 && displayRadioSelection ? 2 : 1} key={index} textAlign={TableCellsAlign[index]}>
                 {value}
               </TH>
             ) : null
@@ -86,7 +82,7 @@ export const OutcomeTable = (props: Props) => {
   }
 
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
-    const { outcomeName, currentPrice, shares, winningOutcome } = balanceItem
+    const { currentPrice, outcomeName, shares, winningOutcome } = balanceItem
     const isWinning = !equalProbabilities && outcomeIndex === outcomeMaxProbability
 
     const currentPriceFormatted = Number(currentPrice).toFixed(4)
@@ -109,21 +105,21 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]} winningOutcome={winningOutcome}>
             <BarDiagram
-              outcomeName={outcomeName}
               isWinning={isWinning}
+              outcomeName={outcomeName}
               probability={probability}
-              withWinningOutcome={withWinningOutcome}
               winningOutcome={winningOutcome}
+              withWinningOutcome={withWinningOutcome}
             />
           </TDStyled>
         ) : (
           <TD textAlign={TableCellsAlign[1]}>
             <BarDiagram
-              outcomeName={outcomeName}
               isWinning={isWinning}
+              outcomeName={outcomeName}
               probability={probability}
-              withWinningOutcome={withWinningOutcome}
               winningOutcome={winningOutcome}
+              withWinningOutcome={withWinningOutcome}
             />
           </TD>
         )}
@@ -161,7 +157,7 @@ export const OutcomeTable = (props: Props) => {
 
   return (
     <TableWrapper>
-      <Table maxHeight="266px" head={renderTableHeader()}>
+      <Table head={renderTableHeader()} maxHeight="266px">
         {renderTable()}
       </Table>
     </TableWrapper>

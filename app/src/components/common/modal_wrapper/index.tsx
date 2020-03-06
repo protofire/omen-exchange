@@ -1,6 +1,7 @@
 import React from 'react'
 import Modal from 'react-modal'
 import { withTheme } from 'styled-components'
+
 import ModalTitle from '../modal_title'
 
 interface Props extends React.ComponentProps<typeof Modal> {
@@ -11,7 +12,7 @@ interface Props extends React.ComponentProps<typeof Modal> {
 }
 
 const ModalWrapper: React.FC<Props> = props => {
-  const { onRequestClose, theme, title, children, disableCloseButton, ...restProps } = props
+  const { children, disableCloseButton, onRequestClose, theme, title, ...restProps } = props
   const { modalStyle } = theme
 
   React.useEffect(() => {
@@ -19,19 +20,8 @@ const ModalWrapper: React.FC<Props> = props => {
   }, [])
 
   return (
-    <Modal
-      {...restProps}
-      onRequestClose={onRequestClose}
-      shouldCloseOnOverlayClick={true}
-      style={modalStyle}
-    >
-      {title ? (
-        <ModalTitle
-          title={title}
-          onClick={onRequestClose}
-          disableCloseButton={disableCloseButton}
-        />
-      ) : null}
+    <Modal {...restProps} onRequestClose={onRequestClose} shouldCloseOnOverlayClick={true} style={modalStyle}>
+      {title ? <ModalTitle disableCloseButton={disableCloseButton} onClick={onRequestClose} title={title} /> : null}
       {children}
     </Modal>
   )

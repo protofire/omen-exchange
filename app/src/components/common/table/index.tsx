@@ -1,5 +1,6 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
+
 import { TableOverflow } from '../table_overflow'
 
 const TableWrapper = styled.table<{ stickyHeader?: boolean }>`
@@ -83,7 +84,7 @@ interface Props extends HTMLAttributes<HTMLTableElement> {
 }
 
 export const Table: React.FC<Props> = (props: Props) => {
-  const { head, children, maxHeight, ...restProps } = props
+  const { children, head, maxHeight, ...restProps } = props
   const stickyHeader: boolean = maxHeight ? true : false
 
   return (

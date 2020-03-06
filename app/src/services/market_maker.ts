@@ -1,11 +1,12 @@
-import { Contract, ethers, utils, Wallet } from 'ethers'
+import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
+
+import { getLogger } from '../util/logger'
+import { calcDistributionHint, calcPrice } from '../util/tools'
+import { Market, MarketStatus, MarketWithExtraData } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
 import { RealitioService } from './realitio'
-import { getLogger } from '../util/logger'
-import { Market, MarketStatus, MarketWithExtraData } from '../util/types'
-import { calcDistributionHint, calcPrice } from '../util/tools'
 
 const logger = getLogger('Services::MarketMaker')
 
@@ -109,31 +110,17 @@ class MarketMakerService {
     return calcPrice(holdings)
   }
 
-  getBalanceInformation = async (
-    ownerAddress: string,
-    outcomeQuantity: number,
-  ): Promise<BigNumber[]> => {
+  getBalanceInformation = async (ownerAddress: string, outcomeQuantity: number): Promise<BigNumber[]> => {
     const conditionId = await this.getConditionId()
     const collateralTokenAddress = await this.getCollateralToken()
 
     const balances = []
     logger.debug(`Outcomes quantity ${outcomeQuantity}`)
     for (let i = 0; i < outcomeQuantity; i++) {
-      const collectionId = await this.conditionalTokens.getCollectionIdForOutcome(
-        conditionId,
-        1 << i,
-      )
-      logger.debug(
-        `Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
-      )
-      const positionIdForCollectionId = await this.conditionalTokens.getPositionId(
-        collateralTokenAddress,
-        collectionId,
-      )
-      const balance = await this.conditionalTokens.getBalanceOf(
-        ownerAddress,
-        positionIdForCollectionId,
-      )
+      const collectionId = await this.conditionalTokens.getCollectionIdForOutcome(conditionId, 1 << i)
+      logger.debug(`Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`)
+      const positionIdForCollectionId = await this.conditionalTokens.getPositionId(collateralTokenAddress, collectionId)
+      const balance = await this.conditionalTokens.getBalanceOf(ownerAddress, positionIdForCollectionId)
       logger.debug(`Balance ${balance.toString()}`)
       balances.push(balance)
     }
@@ -153,10 +140,7 @@ class MarketMakerService {
       })
       await this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
-      logger.error(
-        `There was an error buying '${amount.toString()}' for outcome '${outcomeIndex}'`,
-        err.message,
-      )
+      logger.error(`There was an error buying '${amount.toString()}' for outcome '${outcomeIndex}'`, err.message)
       throw err
     }
   }
@@ -198,10 +182,7 @@ class MarketMakerService {
     try {
       return this.contract.balanceOf(address)
     } catch (err) {
-      logger.error(
-        `There was an error getting the balance of pool shares for '${address}''`,
-        err.message,
-      )
+      logger.error(`There was an error getting the balance of pool shares for '${address}''`, err.message)
       throw err
     }
   }
@@ -214,18 +195,10 @@ class MarketMakerService {
         gasLimit: 750000,
       }
 
-      const transactionObject = await this.contract.sell(
-        amount,
-        outcomeIndex,
-        outcomeTokensToSell,
-        overrides,
-      )
+      const transactionObject = await this.contract.sell(amount, outcomeIndex, outcomeTokensToSell, overrides)
       await this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
-      logger.error(
-        `There was an error selling '${amount.toString()}' for outcome index '${outcomeIndex}'`,
-        err.message,
-      )
+      logger.error(`There was an error selling '${amount.toString()}' for outcome index '${outcomeIndex}'`, err.message)
       throw err
     }
   }
@@ -234,13 +207,7 @@ class MarketMakerService {
     const { conditionId } = market
     // Get question data
     const questionId = await this.conditionalTokens.getQuestionId(conditionId)
-    const {
-      question,
-      resolution,
-      arbitratorAddress,
-      category,
-      outcomes,
-    } = await this.realitio.getQuestion(questionId)
+    const { arbitratorAddress, category, outcomes, question, resolution } = await this.realitio.getQuestion(questionId)
     // Know if a market is open or closed
     const isQuestionFinalized = await this.realitio.isFinalized(questionId)
     const marketStatus = isQuestionFinalized ? MarketStatus.Closed : MarketStatus.Open
@@ -260,21 +227,13 @@ class MarketMakerService {
     }
   }
 
-  static encodeBuy = (
-    amount: BigNumber,
-    outcomeIndex: number,
-    outcomeTokensToBuy: BigNumber,
-  ): string => {
+  static encodeBuy = (amount: BigNumber, outcomeIndex: number, outcomeTokensToBuy: BigNumber): string => {
     const buyInterface = new utils.Interface(marketMakerAbi)
 
     return buyInterface.functions.buy.encode([amount, outcomeIndex, outcomeTokensToBuy])
   }
 
-  static encodeSell = (
-    amount: BigNumber,
-    outcomeIndex: number,
-    maxOutcomeTokensToSell: BigNumber,
-  ): string => {
+  static encodeSell = (amount: BigNumber, outcomeIndex: number, maxOutcomeTokensToSell: BigNumber): string => {
     const sellInterface = new utils.Interface(marketMakerAbi)
 
     return sellInterface.functions.sell.encode([amount, outcomeIndex, maxOutcomeTokensToSell])

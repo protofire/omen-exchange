@@ -1,10 +1,11 @@
 import React, { HTMLAttributes } from 'react'
+import { NavLink } from 'react-router-dom'
 import styled, { css } from 'styled-components'
-import { MarketWithExtraData, MarketStatus } from '../../../util/types'
+
 import { formatDate } from '../../../util/tools'
+import { MarketStatus, MarketWithExtraData } from '../../../util/types'
 import { CalendarIcon } from '../calendar_icon'
 import { ChevronRightIcon } from '../chevron_right_icon'
-import { NavLink } from 'react-router-dom'
 
 const ListItemCss = css`
   align-items: center;
@@ -103,8 +104,7 @@ interface StatusProps {
 }
 
 const Status = styled.div<StatusProps>`
-  color: ${props =>
-    props.resolved ? props.theme.colors.textColorLight : props.theme.colors.primary};
+  color: ${props => (props.resolved ? props.theme.colors.textColorLight : props.theme.colors.primary)};
   font-size: 13px;
   font-weight: 500;
   line-height: 1.38;

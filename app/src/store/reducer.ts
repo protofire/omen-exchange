@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { ERC20Service } from '../services'
 import { BigNumber } from 'ethers/utils'
+
+import { ERC20Service } from '../services'
 import { getLogger } from '../util/logger'
 
 export type BalanceState = {
@@ -25,9 +26,7 @@ const balanceSlice = createSlice({
 export const { setBalance } = balanceSlice.actions
 export default balanceSlice.reducer
 
-export const fetchAccountBalance = (account: any, provider: any, collateral: any) => async (
-  dispatch: any,
-) => {
+export const fetchAccountBalance = (account: any, provider: any, collateral: any) => async (dispatch: any) => {
   const collateralService = new ERC20Service(provider, account, collateral.address)
   try {
     if (account) {

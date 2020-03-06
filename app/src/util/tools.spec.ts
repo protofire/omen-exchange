@@ -1,6 +1,7 @@
 /* eslint-env jest */
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
+
 import {
   calcDistributionHint,
   calcNetCost,
@@ -163,23 +164,17 @@ describe('tools', () => {
 
     it('should throw if index is negative', () => {
       const holdings = [100, 100, 100].map(bigNumberify)
-      expect(() =>
-        computeBalanceAfterTrade(holdings, -1, bigNumberify(50), bigNumberify(100)),
-      ).toThrow()
+      expect(() => computeBalanceAfterTrade(holdings, -1, bigNumberify(50), bigNumberify(100))).toThrow()
     })
 
     it("should throw if index is equal to array's length", () => {
       const holdings = [100, 100, 100].map(bigNumberify)
-      expect(() =>
-        computeBalanceAfterTrade(holdings, 3, bigNumberify(50), bigNumberify(100)),
-      ).toThrow()
+      expect(() => computeBalanceAfterTrade(holdings, 3, bigNumberify(50), bigNumberify(100))).toThrow()
     })
 
     it("should throw if index is bigger than array's length", () => {
       const holdings = [100, 100, 100].map(bigNumberify)
-      expect(() =>
-        computeBalanceAfterTrade(holdings, 10, bigNumberify(50), bigNumberify(100)),
-      ).toThrow()
+      expect(() => computeBalanceAfterTrade(holdings, 10, bigNumberify(50), bigNumberify(100))).toThrow()
     })
   })
 

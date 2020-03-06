@@ -1,13 +1,11 @@
-import { Contract, ethers, utils, Wallet } from 'ethers'
+import { Contract, Wallet, ethers, utils } from 'ethers'
+import { TransactionReceipt } from 'ethers/providers'
 
 import { getLogger } from '../util/logger'
-import { TransactionReceipt } from 'ethers/providers'
 
 const logger = getLogger('Services::Oracle')
 
-const oracleAbi = [
-  'function resolveSingleSelectCondition(bytes32 questionId, uint256 numOutcomes) public',
-]
+const oracleAbi = ['function resolveSingleSelectCondition(bytes32 questionId, uint256 numOutcomes) public']
 
 export class OracleService {
   contract: Contract
@@ -30,21 +28,12 @@ export class OracleService {
   /**
    * Resolve the condition with the given questionId
    */
-  resolveCondition = async (
-    questionId: string,
-    numOutcomes: number,
-  ): Promise<TransactionReceipt> => {
+  resolveCondition = async (questionId: string, numOutcomes: number): Promise<TransactionReceipt> => {
     try {
-      const transactionObject = await this.contract.resolveSingleSelectCondition(
-        questionId,
-        numOutcomes,
-      )
+      const transactionObject = await this.contract.resolveSingleSelectCondition(questionId, numOutcomes)
       return this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
-      logger.error(
-        `There was an error resolving the condition with questionid '${questionId}'`,
-        err.message,
-      )
+      logger.error(`There was an error resolving the condition with questionid '${questionId}'`, err.message)
       throw err
     }
   }
