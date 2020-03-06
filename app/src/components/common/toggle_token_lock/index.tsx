@@ -16,13 +16,13 @@ interface Props {
 enum CollateralStatus {
   Lock = 'Lock',
   Unlock = 'Unlock',
-  Waiting = 'Waiting',
 }
 
 export const ToggleTokenLock = (props: Props) => {
   const { collateral, amount, context } = props
   const { library: provider, account } = context
   const [status, setStatus] = useState(CollateralStatus.Lock)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (!account) {
@@ -32,11 +32,7 @@ export const ToggleTokenLock = (props: Props) => {
     const fetchAllowance = async () => {
       const cpk = await CPKService.create(provider)
       const collateralService = new ERC20Service(provider, account, collateral.address)
-      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(
-        account,
-        cpk.address,
-        amount,
-      )
+      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, amount)
       setStatus(hasEnoughAlowance ? CollateralStatus.Unlock : CollateralStatus.Lock)
     }
 
@@ -47,7 +43,7 @@ export const ToggleTokenLock = (props: Props) => {
     const collateralService = new ERC20Service(provider, account, collateral.address)
     const cpk = await CPKService.create(provider)
 
-    setStatus(CollateralStatus.Waiting)
+    setLoading(true)
     if (status === CollateralStatus.Lock) {
       await collateralService.approveUnlimited(cpk.address)
       setStatus(CollateralStatus.Unlock)
@@ -55,15 +51,15 @@ export const ToggleTokenLock = (props: Props) => {
       await collateralService.approve(cpk.address, new BigNumber(0))
       setStatus(CollateralStatus.Lock)
     }
+    setLoading(false)
   }
 
-  const textButton =
-    status === CollateralStatus.Lock ? `Unlock ${collateral.symbol}` : `Lock ${collateral.symbol}`
+  const textButton = status === CollateralStatus.Lock ? `Unlock ${collateral.symbol}` : `Lock ${collateral.symbol}`
 
   return (
     <>
       {!amount.isZero() && <Button onClick={toggle}>{textButton}</Button>}
-      {status === CollateralStatus.Waiting && <Loading full={true} />}
+      {loading && <Loading full={true} />}
     </>
   )
 }
