@@ -1,7 +1,8 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import CloseIcon from './img/close.svg'
+import { ButtonCircle } from '../button_circle'
+import { IconClose } from '../icons/IconClose'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   disableCloseButton?: boolean
@@ -10,59 +11,36 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 const ModalTitleWrapper = styled.div`
-  align-items: flex-start;
+  align-items: center;
   display: flex;
   justify-content: space-between;
-  margin: 0 0 20px;
   padding: 0;
 `
 
 const ModalTitleText = styled.h2`
-  color: ${props => props.theme.colors.commonText};
-  font-size: 18px;
-  font-weight: 700;
+  color: ${props => props.theme.colors.textColorDark};
+  font-family: ${props => props.theme.fonts.fontFamily};
+  font-size: 17px;
+  font-weight: 500;
   line-height: 1.2;
-  margin: 0;
+  margin: 0 auto;
   overflow: hidden;
-  padding: 0 10px 0 0;
+  padding: 0 5px 0 ${props => props.theme.buttonCircle.dimensions};
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
 `
 
-const ModalClose = styled.button`
-  align-items: flex-start;
-  background-color: transparent;
-  background-image: url(${CloseIcon});
-  background-position: 100% 0;
-  background-repeat: no-repeat;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  height: 24px;
-  justify-content: flex-end;
-  outline: none;
-  padding: 0;
-  width: 24px;
-
-  &:active {
-    opacity: 0.8;
-  }
-
-  &[disabled] {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-`
-
 class ModalTitle extends React.Component<Props> {
   public render = () => {
-    const { disableCloseButton, onClick, title, ...restProps } = this.props
+    const { disableCloseButton = false, onClick, title, ...restProps } = this.props
 
     return (
       <ModalTitleWrapper {...restProps}>
         <ModalTitleText>{title}</ModalTitleText>
-        <ModalClose disabled={disableCloseButton} onClick={onClick} />
+        <ButtonCircle disabled={disableCloseButton} onClick={onClick}>
+          <IconClose />
+        </ButtonCircle>
       </ModalTitleWrapper>
     )
   }

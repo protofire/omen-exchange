@@ -6,37 +6,37 @@ exports[`should accept a selected outcome 1`] = `
     class="sc-cSHVUG cUnUqJ"
   >
     <div
-      class="sc-bdVaJa ietEQA"
+      class="sc-iwsKbI iYbeZE"
     >
       <table
-        class="sc-bwzfXH ivNcPN"
+        class="sc-gZMcBi iEBVrQ"
       >
         <thead
-          class="sc-htpNat KtFsv"
+          class="sc-gqjmRU hnZXkc"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <th
-              class="sc-ifAKCX giynAj"
+              class="sc-jTzLTM iEIHDF"
               colspan="2"
             >
               Outcome probabilities
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Current Price
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Shares
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Payout
@@ -44,16 +44,16 @@ exports[`should accept a selected outcome 1`] = `
           </tr>
         </thead>
         <tbody
-          class="sc-bZQynM bOrPFB"
+          class="sc-jzJRlG enxKql"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje sc-chPdSV bRCJQq"
+              class="sc-fjdhpX sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-gzVnrw WkcJn"
+                class="sc-dnqmqq klMOwB"
                 data-testid="outcome_table_radio_Yes"
               >
                 <svg
@@ -97,33 +97,33 @@ exports[`should accept a selected outcome 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       Yes
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       50.00%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG dxyKLL"
+                      class="sc-htoDjs dYIKGE"
                       color="#acacac"
                       width="50"
                     />
@@ -132,7 +132,7 @@ exports[`should accept a selected outcome 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.5000 
               <strong>
@@ -140,24 +140,24 @@ exports[`should accept a selected outcome 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
           </tr>
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje sc-chPdSV bRCJQq"
+              class="sc-fjdhpX sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-gzVnrw WkcJn"
+                class="sc-dnqmqq klMOwB"
                 data-testid="outcome_table_radio_No"
               >
                 <svg
@@ -193,33 +193,33 @@ exports[`should accept a selected outcome 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       No
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       50.00%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG dxyKLL"
+                      class="sc-htoDjs dYIKGE"
                       color="#acacac"
                       width="50"
                     />
@@ -228,7 +228,7 @@ exports[`should accept a selected outcome 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.5000 
               <strong>
@@ -236,12 +236,12 @@ exports[`should accept a selected outcome 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
@@ -259,37 +259,37 @@ exports[`should hide radio selections 1`] = `
     class="sc-cSHVUG cUnUqJ"
   >
     <div
-      class="sc-bdVaJa ietEQA"
+      class="sc-iwsKbI iYbeZE"
     >
       <table
-        class="sc-bwzfXH ivNcPN"
+        class="sc-gZMcBi iEBVrQ"
       >
         <thead
-          class="sc-htpNat KtFsv"
+          class="sc-gqjmRU hnZXkc"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <th
-              class="sc-ifAKCX giynAj"
+              class="sc-jTzLTM iEIHDF"
               colspan="1"
             >
               Outcome probabilities
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Current Price
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Shares
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Payout
@@ -297,39 +297,39 @@ exports[`should hide radio selections 1`] = `
           </tr>
         </thead>
         <tbody
-          class="sc-bZQynM bOrPFB"
+          class="sc-jzJRlG enxKql"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       Yes
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       50.00%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG dxyKLL"
+                      class="sc-htoDjs dYIKGE"
                       color="#acacac"
                       width="50"
                     />
@@ -338,7 +338,7 @@ exports[`should hide radio selections 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.5000 
               <strong>
@@ -346,47 +346,47 @@ exports[`should hide radio selections 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
           </tr>
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       No
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       50.00%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG dxyKLL"
+                      class="sc-htoDjs dYIKGE"
                       color="#acacac"
                       width="50"
                     />
@@ -395,7 +395,7 @@ exports[`should hide radio selections 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.5000 
               <strong>
@@ -403,12 +403,12 @@ exports[`should hide radio selections 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
@@ -426,37 +426,37 @@ exports[`should show no as winning token 1`] = `
     class="sc-cSHVUG cUnUqJ"
   >
     <div
-      class="sc-bdVaJa ietEQA"
+      class="sc-iwsKbI iYbeZE"
     >
       <table
-        class="sc-bwzfXH ivNcPN"
+        class="sc-gZMcBi iEBVrQ"
       >
         <thead
-          class="sc-htpNat KtFsv"
+          class="sc-gqjmRU hnZXkc"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <th
-              class="sc-ifAKCX giynAj"
+              class="sc-jTzLTM iEIHDF"
               colspan="2"
             >
               Outcome probabilities
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Current Price
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Shares
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Payout
@@ -464,49 +464,49 @@ exports[`should show no as winning token 1`] = `
           </tr>
         </thead>
         <tbody
-          class="sc-bZQynM bOrPFB"
+          class="sc-jzJRlG enxKql"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje sc-kAzzGY foKdFt"
+              class="sc-fjdhpX sc-kAzzGY bvCUaX"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-dnqmqq fBoLxT"
+                  class="sc-bwzfXH isTgkr"
                 >
                   <img
                     alt="Winning Outcome"
-                    class="sc-iwsKbI jiPRqw"
+                    class="sc-htpNat dMAkQL"
                     src="badge.svg"
                   />
                 </div>
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       No
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       50.00%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG ljbcag"
-                      color="#00be95"
+                      class="sc-htoDjs kNACnj"
+                      color="#1565C0"
                       width="50"
                     />
                   </div>
@@ -514,7 +514,7 @@ exports[`should show no as winning token 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje sc-kAzzGY foKdFt"
+              class="sc-fjdhpX sc-kAzzGY bvCUaX"
             >
               0.5000 
               <strong>
@@ -522,50 +522,50 @@ exports[`should show no as winning token 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje sc-kAzzGY foKdFt"
+              class="sc-fjdhpX sc-kAzzGY bvCUaX"
             >
               0.00
             </td>
             <td
-              class="sc-EHOje sc-kAzzGY foKdFt"
+              class="sc-fjdhpX sc-kAzzGY bvCUaX"
             >
               0.00
             </td>
           </tr>
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje sc-kAzzGY CGYbl"
+              class="sc-fjdhpX sc-kAzzGY CGYbl"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-dnqmqq fBoLxT"
+                  class="sc-bwzfXH isTgkr"
                 />
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       Yes
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       50.00%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG dxyKLL"
+                      class="sc-htoDjs dYIKGE"
                       color="#acacac"
                       width="50"
                     />
@@ -574,7 +574,7 @@ exports[`should show no as winning token 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje sc-kAzzGY CGYbl"
+              class="sc-fjdhpX sc-kAzzGY CGYbl"
             >
               0.5000 
               <strong>
@@ -582,12 +582,12 @@ exports[`should show no as winning token 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje sc-kAzzGY CGYbl"
+              class="sc-fjdhpX sc-kAzzGY CGYbl"
             >
               0.00
             </td>
             <td
-              class="sc-EHOje sc-kAzzGY CGYbl"
+              class="sc-fjdhpX sc-kAzzGY CGYbl"
             >
               0.00
             </td>
@@ -605,37 +605,37 @@ exports[`should show probabilities 1`] = `
     class="sc-cSHVUG cUnUqJ"
   >
     <div
-      class="sc-bdVaJa ietEQA"
+      class="sc-iwsKbI iYbeZE"
     >
       <table
-        class="sc-bwzfXH ivNcPN"
+        class="sc-gZMcBi iEBVrQ"
       >
         <thead
-          class="sc-htpNat KtFsv"
+          class="sc-gqjmRU hnZXkc"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <th
-              class="sc-ifAKCX giynAj"
+              class="sc-jTzLTM iEIHDF"
               colspan="2"
             >
               Outcome probabilities
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Current Price
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Shares
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Payout
@@ -643,16 +643,16 @@ exports[`should show probabilities 1`] = `
           </tr>
         </thead>
         <tbody
-          class="sc-bZQynM bOrPFB"
+          class="sc-jzJRlG enxKql"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje sc-chPdSV bRCJQq"
+              class="sc-fjdhpX sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-gzVnrw WkcJn"
+                class="sc-dnqmqq klMOwB"
                 data-testid="outcome_table_radio_Yes"
               >
                 <svg
@@ -688,33 +688,33 @@ exports[`should show probabilities 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       Yes
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       0.75%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG hdnyfq"
+                      class="sc-htoDjs cqJBiZ"
                       color="#acacac"
                       width="0.75"
                     />
@@ -723,7 +723,7 @@ exports[`should show probabilities 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.5000 
               <strong>
@@ -731,24 +731,24 @@ exports[`should show probabilities 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
           </tr>
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje sc-chPdSV bRCJQq"
+              class="sc-fjdhpX sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-gzVnrw WkcJn"
+                class="sc-dnqmqq klMOwB"
                 data-testid="outcome_table_radio_No"
               >
                 <svg
@@ -784,33 +784,33 @@ exports[`should show probabilities 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       No
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       0.25%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG hupGLW"
+                      class="sc-htoDjs fklaqh"
                       color="#acacac"
                       width="0.25"
                     />
@@ -819,7 +819,7 @@ exports[`should show probabilities 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.5000 
               <strong>
@@ -827,12 +827,12 @@ exports[`should show probabilities 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
@@ -850,37 +850,37 @@ exports[`should show yes as winning token 1`] = `
     class="sc-cSHVUG cUnUqJ"
   >
     <div
-      class="sc-bdVaJa ietEQA"
+      class="sc-iwsKbI iYbeZE"
     >
       <table
-        class="sc-bwzfXH ivNcPN"
+        class="sc-gZMcBi iEBVrQ"
       >
         <thead
-          class="sc-htpNat KtFsv"
+          class="sc-gqjmRU hnZXkc"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <th
-              class="sc-ifAKCX giynAj"
+              class="sc-jTzLTM iEIHDF"
               colspan="2"
             >
               Outcome probabilities
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Current Price
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Shares
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Payout
@@ -888,49 +888,49 @@ exports[`should show yes as winning token 1`] = `
           </tr>
         </thead>
         <tbody
-          class="sc-bZQynM bOrPFB"
+          class="sc-jzJRlG enxKql"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje sc-kAzzGY foKdFt"
+              class="sc-fjdhpX sc-kAzzGY bvCUaX"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-dnqmqq fBoLxT"
+                  class="sc-bwzfXH isTgkr"
                 >
                   <img
                     alt="Winning Outcome"
-                    class="sc-iwsKbI jiPRqw"
+                    class="sc-htpNat dMAkQL"
                     src="badge.svg"
                   />
                 </div>
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       Yes
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       50.00%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG ljbcag"
-                      color="#00be95"
+                      class="sc-htoDjs kNACnj"
+                      color="#1565C0"
                       width="50"
                     />
                   </div>
@@ -938,7 +938,7 @@ exports[`should show yes as winning token 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje sc-kAzzGY foKdFt"
+              class="sc-fjdhpX sc-kAzzGY bvCUaX"
             >
               0.5000 
               <strong>
@@ -946,50 +946,50 @@ exports[`should show yes as winning token 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje sc-kAzzGY foKdFt"
+              class="sc-fjdhpX sc-kAzzGY bvCUaX"
             >
               0.00
             </td>
             <td
-              class="sc-EHOje sc-kAzzGY foKdFt"
+              class="sc-fjdhpX sc-kAzzGY bvCUaX"
             >
               0.00
             </td>
           </tr>
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje sc-kAzzGY CGYbl"
+              class="sc-fjdhpX sc-kAzzGY CGYbl"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-dnqmqq fBoLxT"
+                  class="sc-bwzfXH isTgkr"
                 />
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       No
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       50.00%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG dxyKLL"
+                      class="sc-htoDjs dYIKGE"
                       color="#acacac"
                       width="50"
                     />
@@ -998,7 +998,7 @@ exports[`should show yes as winning token 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje sc-kAzzGY CGYbl"
+              class="sc-fjdhpX sc-kAzzGY CGYbl"
             >
               0.5000 
               <strong>
@@ -1006,12 +1006,12 @@ exports[`should show yes as winning token 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje sc-kAzzGY CGYbl"
+              class="sc-fjdhpX sc-kAzzGY CGYbl"
             >
               0.00
             </td>
             <td
-              class="sc-EHOje sc-kAzzGY CGYbl"
+              class="sc-fjdhpX sc-kAzzGY CGYbl"
             >
               0.00
             </td>
@@ -1029,31 +1029,31 @@ exports[`should work with disabled columns 1`] = `
     class="sc-cSHVUG cUnUqJ"
   >
     <div
-      class="sc-bdVaJa ietEQA"
+      class="sc-iwsKbI iYbeZE"
     >
       <table
-        class="sc-bwzfXH ivNcPN"
+        class="sc-gZMcBi iEBVrQ"
       >
         <thead
-          class="sc-htpNat KtFsv"
+          class="sc-gqjmRU hnZXkc"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <th
-              class="sc-ifAKCX giynAj"
+              class="sc-jTzLTM iEIHDF"
               colspan="2"
             >
               Outcome probabilities
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Current Price
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Shares
@@ -1061,16 +1061,16 @@ exports[`should work with disabled columns 1`] = `
           </tr>
         </thead>
         <tbody
-          class="sc-bZQynM bOrPFB"
+          class="sc-jzJRlG enxKql"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje sc-chPdSV bRCJQq"
+              class="sc-fjdhpX sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-gzVnrw WkcJn"
+                class="sc-dnqmqq klMOwB"
                 data-testid="outcome_table_radio_Yes"
               >
                 <svg
@@ -1106,33 +1106,33 @@ exports[`should work with disabled columns 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       Yes
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       50.00%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG dxyKLL"
+                      class="sc-htoDjs dYIKGE"
                       color="#acacac"
                       width="50"
                     />
@@ -1141,7 +1141,7 @@ exports[`should work with disabled columns 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.5000 
               <strong>
@@ -1149,19 +1149,19 @@ exports[`should work with disabled columns 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
           </tr>
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje sc-chPdSV bRCJQq"
+              class="sc-fjdhpX sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-gzVnrw WkcJn"
+                class="sc-dnqmqq klMOwB"
                 data-testid="outcome_table_radio_No"
               >
                 <svg
@@ -1197,33 +1197,33 @@ exports[`should work with disabled columns 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       No
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       50.00%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG dxyKLL"
+                      class="sc-htoDjs dYIKGE"
                       color="#acacac"
                       width="50"
                     />
@@ -1232,7 +1232,7 @@ exports[`should work with disabled columns 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.5000 
               <strong>
@@ -1240,7 +1240,7 @@ exports[`should work with disabled columns 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
@@ -1258,37 +1258,37 @@ exports[`should work with minimal props 1`] = `
     class="sc-cSHVUG cUnUqJ"
   >
     <div
-      class="sc-bdVaJa ietEQA"
+      class="sc-iwsKbI iYbeZE"
     >
       <table
-        class="sc-bwzfXH ivNcPN"
+        class="sc-gZMcBi iEBVrQ"
       >
         <thead
-          class="sc-htpNat KtFsv"
+          class="sc-gqjmRU hnZXkc"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <th
-              class="sc-ifAKCX giynAj"
+              class="sc-jTzLTM iEIHDF"
               colspan="2"
             >
               Outcome probabilities
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Current Price
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Shares
             </th>
             <th
-              class="sc-ifAKCX ipPSVf"
+              class="sc-jTzLTM chZvYq"
               colspan="1"
             >
               Payout
@@ -1296,16 +1296,16 @@ exports[`should work with minimal props 1`] = `
           </tr>
         </thead>
         <tbody
-          class="sc-bZQynM bOrPFB"
+          class="sc-jzJRlG enxKql"
         >
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje sc-chPdSV bRCJQq"
+              class="sc-fjdhpX sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-gzVnrw WkcJn"
+                class="sc-dnqmqq klMOwB"
                 data-testid="outcome_table_radio_Yes"
               >
                 <svg
@@ -1341,33 +1341,33 @@ exports[`should work with minimal props 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       Yes
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       50.00%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG dxyKLL"
+                      class="sc-htoDjs dYIKGE"
                       color="#acacac"
                       width="50"
                     />
@@ -1376,7 +1376,7 @@ exports[`should work with minimal props 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.5000 
               <strong>
@@ -1384,24 +1384,24 @@ exports[`should work with minimal props 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
           </tr>
           <tr
-            class="sc-bxivhb gowuVX"
+            class="sc-VigVT jehSmX"
           >
             <td
-              class="sc-EHOje sc-chPdSV bRCJQq"
+              class="sc-fjdhpX sc-chPdSV bRCJQq"
             >
               <div
-                class="sc-gzVnrw WkcJn"
+                class="sc-dnqmqq klMOwB"
                 data-testid="outcome_table_radio_No"
               >
                 <svg
@@ -1437,33 +1437,33 @@ exports[`should work with minimal props 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               <div
-                class="sc-htoDjs fOXRuD"
+                class="sc-bdVaJa cCEGee"
               >
                 <div
-                  class="sc-gZMcBi cwfHym"
+                  class="sc-bxivhb khxFsg"
                 >
                   <div
-                    class="sc-gqjmRU kpOMxt"
+                    class="sc-ifAKCX iBCBrN"
                   >
                     <h2
-                      class="sc-VigVT eyMLak"
+                      class="sc-EHOje dzdiCk"
                     >
                       No
                     </h2>
                     <p
-                      class="sc-jTzLTM hqAejy"
+                      class="sc-bZQynM jEPqPz"
                     >
                       50.00%
                     </p>
                   </div>
                   <div
-                    class="sc-fjdhpX iZcRRn"
+                    class="sc-gzVnrw dcgayZ"
                   >
                     <div
-                      class="sc-jzJRlG dxyKLL"
+                      class="sc-htoDjs dYIKGE"
                       color="#acacac"
                       width="50"
                     />
@@ -1472,7 +1472,7 @@ exports[`should work with minimal props 1`] = `
               </div>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.5000 
               <strong>
@@ -1480,12 +1480,12 @@ exports[`should work with minimal props 1`] = `
               </strong>
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
             <td
-              class="sc-EHOje cxvido"
+              class="sc-fjdhpX igGLZk"
             >
               0.00
             </td>
