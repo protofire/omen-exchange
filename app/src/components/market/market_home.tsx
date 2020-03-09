@@ -12,8 +12,8 @@ import { Button, Filter, ListCard, ListItem, Loading, SectionTitle } from '../co
 
 const FilterStyled = styled(Filter)`
   margin: -30px auto 10px;
-  max-width: ${props => props.theme.mainContainer.maxWidth};
-  width: 100%;
+  max-width: 100%;
+  width: ${props => props.theme.mainContainer.maxWidth};
 `
 
 const NoMarketsAvailable = styled(SectionTitle)`

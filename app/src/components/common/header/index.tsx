@@ -41,12 +41,32 @@ const HeaderInner = styled.div`
   }
 `
 
+const ButtonCreate = styled(Button)`
+  font-size: 12px;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    font-size: 14px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+`
+
 const NetworkStyled = styled(Network)`
-  margin: 0 0 0 12px;
+  margin: 0 0 0 5px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-left: 12px;
+  }
 `
 
 const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
-  margin: 0 0 0 12px;
+  margin: 0 0 0 5px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-left: 12px;
+  }
 `
 
 const ContentsRight = styled.div`
@@ -70,9 +90,9 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
           <Logo />
         </LogoWrapper>
         <ContentsRight>
-          <Button buttonType={ButtonType.secondaryLine} onClick={() => history.push('/create')}>
+          <ButtonCreate buttonType={ButtonType.secondaryLine} onClick={() => history.push('/create')}>
             Create Market
-          </Button>
+          </ButtonCreate>
           {!context.account && (
             <ButtonConnectWalletStyled
               modalState={isModalOpen}

@@ -62,8 +62,9 @@ const theme = {
     tertiary: '#D6EBFD',
     tertiaryDark: '#90CAF9',
     textColor: '#757575',
-    textColorLight: '#999',
     textColorDark: '#37474F',
+    textColorDarker: '#333',
+    textColorLight: '#999',
     warning: '#37474F',
   },
   cards: {

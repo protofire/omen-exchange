@@ -8,8 +8,8 @@ const ClosedMarketWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
   margin: 0 auto 10px;
-  max-width: ${props => props.theme.mainContainer.maxWidth};
-  width: 100%;
+  max-width: 100%;
+  width: ${props => props.theme.mainContainer.maxWidth};
 `
 
 const Text = styled.span`

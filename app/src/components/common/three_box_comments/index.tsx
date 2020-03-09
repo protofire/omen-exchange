@@ -20,8 +20,9 @@ const CommentsTitle = styled.h3`
 
 const ThreeBoxCustom = styled.div`
   margin: 30px auto;
-  max-width: ${props => props.theme.mainContainer.maxWidth};
-  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  width: ${props => props.theme.mainContainer.maxWidth};
 
   > .threebox-comments-react {
     max-width: 100%;
@@ -44,7 +45,9 @@ const ThreeBoxCustom = styled.div`
         font-weight: normal;
         height: 54px;
         line-height: 1.2;
+        max-width: 100%;
         min-height: 54px;
+        min-width: 100%;
         padding: 5px 12px 5px 60px;
       }
 
@@ -151,6 +154,7 @@ const ThreeBoxCustom = styled.div`
       height: auto;
       justify-content: flex-end;
       margin: 0 0 15px;
+      min-width: 0;
 
       .context_text {
         color: ${props => props.theme.colors.textColorLight};

@@ -5,9 +5,9 @@ import { Card } from '../card/index'
 
 const CardStyled = styled(Card)`
   margin: 0 auto;
-  max-width: ${props => props.theme.mainContainer.maxWidth};
+  max-width: 100%;
   min-height: 550px;
-  width: 100%;
+  width: ${props => props.theme.mainContainer.maxWidth};
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {

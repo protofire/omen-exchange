@@ -19,8 +19,8 @@ interface StepItem {
 const Wrapper = styled.div`
   display: flex;
   margin: 0 auto 20px;
-  max-width: ${props => props.theme.mainContainer.maxWidth};
-  width: 100%;
+  max-width: 100%;
+  width: ${props => props.theme.mainContainer.maxWidth};
 `
 
 const Step = styled.div<{ active?: boolean }>`

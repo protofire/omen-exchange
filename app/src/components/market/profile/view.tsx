@@ -10,7 +10,7 @@ import {
   Button,
   ButtonContainer,
   DisplayArbitrator,
-  GridThreeColumns,
+  GridTwoColumns,
   Loading,
   SubsectionTitle,
   ThreeBoxComments,
@@ -19,12 +19,14 @@ import {
 } from '../../common'
 import { OutcomeTable } from '../../common/outcome_table'
 
+const SubsectionTitleWrapper = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+`
 const LeftButton = styled(Button)`
   margin-right: auto;
-`
-
-const SubsectionTitleStyled = styled(SubsectionTitle)`
-  margin-bottom: 0;
 `
 
 interface Props extends RouteComponentProps<{}> {
@@ -69,8 +71,7 @@ const ViewWrapper = (props: Props) => {
   const details = () => {
     return (
       <>
-        <SubsectionTitle>Details</SubsectionTitle>
-        <GridThreeColumns>
+        <GridTwoColumns>
           {category && <TitleValue title={'Category'} value={category} />}
           <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
           {questionId && (
@@ -87,7 +88,7 @@ const ViewWrapper = (props: Props) => {
               }
             />
           )}
-        </GridThreeColumns>
+        </GridTwoColumns>
       </>
     )
   }
@@ -97,9 +98,11 @@ const ViewWrapper = (props: Props) => {
   return (
     <>
       <ViewCard>
-        <SubsectionTitleStyled>Outcomes</SubsectionTitleStyled>
-        {renderTableData()}
+        <SubsectionTitleWrapper>
+          <SubsectionTitle>Market Information</SubsectionTitle>
+        </SubsectionTitleWrapper>
         {marketHasDetails && details()}
+        {renderTableData()}
         <WhenConnected>
           <ButtonContainer>
             <LeftButton
@@ -110,7 +113,6 @@ const ViewWrapper = (props: Props) => {
             >
               Pool Liquidity
             </LeftButton>
-
             <Button
               buttonType={ButtonType.secondaryLine}
               disabled={!userHasShares}
@@ -120,7 +122,6 @@ const ViewWrapper = (props: Props) => {
             >
               Sell
             </Button>
-
             <Button
               buttonType={ButtonType.secondaryLine}
               onClick={() => {
