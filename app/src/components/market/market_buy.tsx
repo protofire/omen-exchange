@@ -5,34 +5,31 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
 import { MARKET_FEE } from '../../common/constants'
-import { useAsyncDerivedValue, useCollateralBalance, useContracts } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
+import { useCollateralBalance } from '../../hooks/useCollateralBalance'
+import { useContracts } from '../../hooks/useContracts'
 import { CPKService, ERC20Service, MarketMakerService } from '../../services'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
-import { computeBalanceAfterTrade, formatBigNumber } from '../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber, formatDate } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
-import {
-  BalanceToken,
-  BigNumberInput,
-  Button,
-  ButtonContainer,
-  ButtonLink,
-  FormError,
-  FormLabel,
-  FormRow,
-  Loading,
-  SectionTitle,
-  SubsectionTitle,
-  TD,
-  TR,
-  Table,
-  TextfieldCustomPlaceholder,
-  ViewCard,
-} from '../common'
+import { BigNumberInput, Button, OutcomeTable } from '../common'
+import { BalanceToken } from '../common/balance_token'
 import { BigNumberInputReturn } from '../common/big_number_input'
-import { OutcomeTable } from '../common/outcome_table'
-import { ModalTwitterShare } from '../modal'
+import { ButtonContainer } from '../common/button_container'
+import { ButtonLink } from '../common/button_link'
+import { FormError } from '../common/form_error'
+import { FormLabel } from '../common/form_label'
+import { FormRow } from '../common/form_row'
+import { Loading } from '../common/loading'
+import { ModalTwitterShare } from '../common/modal_twitter_share'
+import { SectionTitle } from '../common/section_title'
+import { SubsectionTitle } from '../common/subsection_title'
+import { TD, TR, Table } from '../common/table'
+import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
+import { ToggleTokenLock } from '../common/toggle_token_lock'
+import { ViewCard } from '../common/view_card'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -103,7 +100,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const { buildMarketMaker } = useContracts(context)
 
-  const { balances, collateral, marketMakerAddress, question } = props
+  const { balances, collateral, marketMakerAddress, question, resolution } = props
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -219,7 +216,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle goBackEnabled title={question} />
+      <SectionTitle subTitle={resolution ? formatDate(resolution) : ''} title={question} />
       <ViewCard>
         <SubsectionTitleStyled>Choose the shares you want to buy</SubsectionTitleStyled>
         <OutcomeTable
@@ -232,17 +229,20 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         />
         <AmountWrapper
           formField={
-            <TextfieldCustomPlaceholder
-              formField={
-                <BigNumberInputTextRight
-                  decimals={collateral.decimals}
-                  name="amount"
-                  onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                  value={amount}
-                />
-              }
-              placeholderText={collateral.symbol}
-            />
+            <>
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInputTextRight
+                    decimals={collateral.decimals}
+                    name="amount"
+                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                    value={amount}
+                  />
+                }
+                placeholderText={collateral.symbol}
+              />
+              <ToggleTokenLock amount={amount} collateral={collateral} context={context} />
+            </>
           }
           note={noteAmount}
           title={'Total cost'}

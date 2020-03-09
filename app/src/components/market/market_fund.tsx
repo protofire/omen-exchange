@@ -3,35 +3,33 @@ import React, { useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useCollateralBalance, useContracts, useFundingBalance } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { useCollateralBalance } from '../../hooks/useCollateralBalance'
+import { useContracts } from '../../hooks/useContracts'
+import { useFundingBalance } from '../../hooks/useFundingBalance'
 import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
-import { divBN, formatBigNumber } from '../../util/tools'
+import { divBN, formatBigNumber, formatDate } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
-import {
-  BalanceShares,
-  BalanceToken,
-  BigNumberInput,
-  Button,
-  ButtonContainer,
-  ButtonLink,
-  FormError,
-  FormLabel,
-  FormRow,
-  Loading,
-  SectionTitle,
-  SubsectionTitle,
-  TD,
-  TR,
-  Table,
-  TextfieldCustomPlaceholder,
-  ViewCard,
-} from '../common'
-import { BigNumberInputReturn } from '../common/big_number_input'
+import { BalanceShares } from '../common/balance_shares'
+import { BalanceToken } from '../common/balance_token'
+import { BigNumberInput, BigNumberInputReturn } from '../common/big_number_input'
+import { Button } from '../common/button'
+import { ButtonContainer } from '../common/button_container'
+import { ButtonLink } from '../common/button_link'
+import { FormError } from '../common/form_error'
+import { FormLabel } from '../common/form_label'
+import { FormRow } from '../common/form_row'
+import { Loading } from '../common/loading'
 import { OutcomeTable } from '../common/outcome_table'
+import { SectionTitle } from '../common/section_title'
+import { SubsectionTitle } from '../common/subsection_title'
+import { TD, TR, Table } from '../common/table'
+import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
+import { ToggleTokenLock } from '../common/toggle_token_lock'
+import { ViewCard } from '../common/view_card/'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -85,6 +83,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
     marketMakerFunding,
     marketMakerUserFunding,
     question,
+    resolution,
     totalPoolShares,
     userPoolShares,
   } = props
@@ -183,7 +182,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle goBackEnabled title={question} />
+      <SectionTitle subTitle={resolution ? formatDate(resolution) : ''} title={question} />
       <ViewCard>
         <SubsectionTitleStyled>Fund this market</SubsectionTitleStyled>
         <OutcomeTable
@@ -207,6 +206,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
                 }
                 placeholderText={collateral.symbol}
               />
+              <ToggleTokenLock amount={amountToFund} collateral={collateral} context={context} />
             </>
           }
           note={
