@@ -16,11 +16,6 @@ const defaultProps = { name: 'test', value: new BigNumber('123'), decimals: 2 }
 
 const renderBigNumberInput = props => render(<BigNumberInput {...defaultProps} {...props} />)
 
-test('should work with minimal props', () => {
-  const { asFragment } = renderBigNumberInput({ onChange: noop })
-  expect(asFragment()).toMatchSnapshot()
-})
-
 test('should be initialized with value', () => {
   // given
   const expectedValue = '1.23'

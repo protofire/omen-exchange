@@ -29,6 +29,7 @@ import { SubsectionTitle } from '../common/subsection_title'
 import { TD, TR, Table } from '../common/table'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 import { ViewCard } from '../common/view_card/'
+import { ToggleTokenLock } from '../common/toggle_token_lock'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -205,6 +206,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
                 }
                 placeholderText={collateral.symbol}
               />
+              <ToggleTokenLock context={context} amount={amountToFund} collateral={collateral} />
             </>
           }
           note={
