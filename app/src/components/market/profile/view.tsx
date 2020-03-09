@@ -7,7 +7,7 @@ import { WhenConnected } from '../../../hooks/connectedWeb3'
 import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import {
-  ButtonAnchor,
+  Button,
   ButtonContainer,
   DisplayArbitrator,
   GridThreeColumns,
@@ -18,6 +18,10 @@ import {
   ViewCard,
 } from '../../common'
 import { OutcomeTable } from '../../common/outcome_table'
+
+const LeftButton = styled(Button)`
+  margin-right: auto;
+`
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
   margin-bottom: 0;
@@ -37,7 +41,7 @@ interface Props extends RouteComponentProps<{}> {
 }
 
 const ViewWrapper = (props: Props) => {
-  const { arbitrator, balances, category, collateral, marketMakerAddress, questionId, status } = props
+  const { arbitrator, balances, category, collateral, history, marketMakerAddress, questionId, status } = props
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -98,17 +102,33 @@ const ViewWrapper = (props: Props) => {
         {marketHasDetails && details()}
         <WhenConnected>
           <ButtonContainer>
-            <ButtonAnchor buttonType={ButtonType.secondaryLine} href={`/#/${marketMakerAddress}/fund`}>
-              Fund
-            </ButtonAnchor>
-            {userHasShares && (
-              <ButtonAnchor buttonType={ButtonType.secondaryLine} href={`/#/${marketMakerAddress}/sell`}>
-                Sell
-              </ButtonAnchor>
-            )}
-            <ButtonAnchor buttonType={ButtonType.secondaryLine} href={`/#/${marketMakerAddress}/buy`}>
+            <LeftButton
+              buttonType={ButtonType.secondaryLine}
+              onClick={() => {
+                history.push(`/#/${marketMakerAddress}/fund`)
+              }}
+            >
+              Pool Liquidity
+            </LeftButton>
+
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={!userHasShares}
+              onClick={() => {
+                history.push(`/#/${marketMakerAddress}/sell`)
+              }}
+            >
+              Sell
+            </Button>
+
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              onClick={() => {
+                history.push(`/#/${marketMakerAddress}/buy`)
+              }}
+            >
               Buy
-            </ButtonAnchor>
+            </Button>
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>

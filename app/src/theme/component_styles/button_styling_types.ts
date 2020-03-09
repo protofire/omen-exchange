@@ -20,19 +20,8 @@ export interface ButtonComponentProps {
   title?: string
 }
 
-const DisabledCSS = css`
-  &[disabled] {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-`
-
 const PrimaryCSS = css`
-  &,
-  &.disabled,
-  &.disabled:hover,
-  &[disabled],
-  &[disabled]:hover {
+  & {
     background-color: ${props => props.theme.buttonPrimary.backgroundColor};
     border-color: ${props => props.theme.buttonPrimary.borderColor};
     color: ${props => props.theme.buttonPrimary.color};
@@ -43,14 +32,19 @@ const PrimaryCSS = css`
     border-color: ${props => props.theme.buttonPrimary.borderColorHover};
     color: ${props => props.theme.buttonPrimary.colorHover};
   }
+
+  &[disabled],
+  &[disabled]:hover {
+    background-color: ${props => props.theme.buttonPrimary.backgroundColorDisabled};
+    border-color: ${props => props.theme.buttonPrimary.borderColorDisabled};
+    color: ${props => props.theme.buttonPrimary.colorDisabled};
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 `
 
 const PrimaryLineCSS = css`
-  &,
-  &.disabled,
-  &.disabled:hover,
-  &[disabled],
-  &[disabled]:hover {
+  & {
     background-color: ${props => props.theme.buttonPrimaryLine.backgroundColor};
     border-color: ${props => props.theme.buttonPrimaryLine.borderColor};
     color: ${props => props.theme.buttonPrimaryLine.color};
@@ -61,14 +55,19 @@ const PrimaryLineCSS = css`
     border-color: ${props => props.theme.buttonPrimaryLine.borderColorHover};
     color: ${props => props.theme.buttonPrimaryLine.colorHover};
   }
+
+  &[disabled],
+  &[disabled]:hover {
+    background-color: ${props => props.theme.buttonPrimaryLine.backgroundColorDisabled};
+    border-color: ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
+    color: ${props => props.theme.buttonPrimaryLine.colorDisabled};
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 `
 
 const SecondaryCSS = css`
-  &,
-  &.disabled,
-  &.disabled:hover,
-  &[disabled],
-  &[disabled]:hover {
+  & {
     background-color: ${props => props.theme.buttonSecondary.backgroundColor};
     border-color: ${props => props.theme.buttonSecondary.borderColor};
     color: ${props => props.theme.buttonSecondary.color};
@@ -79,14 +78,19 @@ const SecondaryCSS = css`
     border-color: ${props => props.theme.buttonSecondary.borderColorHover};
     color: ${props => props.theme.buttonSecondary.colorHover};
   }
+
+  &[disabled],
+  &[disabled]:hover {
+    background-color: ${props => props.theme.buttonSecondary.backgroundColorDisabled};
+    border-color: ${props => props.theme.buttonSecondary.borderColorDisabled};
+    color: ${props => props.theme.buttonSecondary.colorDisabled};
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 `
 
 const SecondaryLineCSS = css`
-  &,
-  &.disabled,
-  &.disabled:hover,
-  &[disabled],
-  &[disabled]:hover {
+  & {
     background-color: ${props => props.theme.buttonSecondaryLine.backgroundColor};
     border-color: ${props => props.theme.buttonSecondaryLine.borderColor};
     color: ${props => props.theme.buttonSecondaryLine.color};
@@ -96,6 +100,14 @@ const SecondaryLineCSS = css`
     background-color: ${props => props.theme.buttonSecondaryLine.backgroundColorHover};
     border-color: ${props => props.theme.buttonSecondaryLine.borderColorHover};
     color: ${props => props.theme.buttonSecondaryLine.colorHover};
+  }
+
+  &[disabled],
+  &[disabled]:hover {
+    background-color: ${props => props.theme.buttonSecondaryLine.backgroundColorDisabled};
+    border-color: ${props => props.theme.buttonSecondaryLine.borderColorDisabled};
+    color: ${props => props.theme.buttonSecondaryLine.colorDisabled};
+    cursor: not-allowed;
   }
 `
 
@@ -139,5 +151,4 @@ export const ButtonCSS = css<ButtonProps>`
   white-space: nowrap;
 
   ${props => getButtonTypeStyles(props.buttonType)}
-  ${DisabledCSS}
 `
