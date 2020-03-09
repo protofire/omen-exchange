@@ -24,11 +24,12 @@ import { FormLabel } from '../common/form_label'
 import { FormRow } from '../common/form_row'
 import { Loading } from '../common/loading'
 import { ModalTwitterShare } from '../common/modal_twitter_share'
-import { SectionTitle } from '../common/section_title'
+import { ToggleTokenLock } from '../common/toggle_token_lock'
+import { Table, TR, TD } from '../common/table'
 import { SubsectionTitle } from '../common/subsection_title'
-import { TD, TR, Table } from '../common/table'
-import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
+import { SectionTitle } from '../common/section_title'
 import { ViewCard } from '../common/view_card'
+import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -228,17 +229,20 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         />
         <AmountWrapper
           formField={
-            <TextfieldCustomPlaceholder
-              formField={
-                <BigNumberInputTextRight
-                  decimals={collateral.decimals}
-                  name="amount"
-                  onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                  value={amount}
-                />
-              }
-              placeholderText={collateral.symbol}
-            />
+            <>
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInputTextRight
+                    name="amount"
+                    value={amount}
+                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                    decimals={collateral.decimals}
+                  />
+                }
+                placeholderText={collateral.symbol}
+              />
+              <ToggleTokenLock context={context} amount={amount} collateral={collateral} />
+            </>
           }
           note={noteAmount}
           title={'Total cost'}

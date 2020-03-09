@@ -4,6 +4,7 @@ import { BigNumber } from 'ethers/utils'
 import { getLogger } from '../util/logger'
 import { isAddress, isContract } from '../util/tools'
 import { Token } from '../util/types'
+import { TransactionReceipt } from 'ethers/providers'
 
 const logger = getLogger('Services::Erc20')
 
@@ -47,7 +48,7 @@ class ERC20Service {
   /**
    * Approve `spender` to transfer `amount` tokens on behalf of the connected user.
    */
-  approve = async (spender: string, amount: BigNumber): Promise<any> => {
+  approve = async (spender: string, amount: BigNumber): Promise<TransactionReceipt> => {
     const transactionObject = await this.contract.approve(spender, amount, {
       value: '0x0',
     })
@@ -58,7 +59,7 @@ class ERC20Service {
   /**
    * Approve `spender` to transfer an "unlimited" amount of tokens on behalf of the connected user.
    */
-  approveUnlimited = async (spender: string): Promise<any> => {
+  approveUnlimited = async (spender: string): Promise<TransactionReceipt> => {
     const transactionObject = await this.contract.approve(spender, ethers.constants.MaxUint256, {
       value: '0x0',
     })

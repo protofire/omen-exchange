@@ -15,8 +15,8 @@ const klerosTokensViewAbi = [
 
 class KlerosService {
   provider: Web3Provider
-  badgeContract: Contract
-  tokensViewContract: Contract
+  badgeContract: Contract | undefined
+  tokensViewContract: Contract | undefined
   tcrAddress: string
 
   constructor(
@@ -29,12 +29,16 @@ class KlerosService {
     this.provider = provider
     this.tcrAddress = tcrAddress
 
-    this.badgeContract = new ethers.Contract(badgeContractAddress, klerosBadgeAbi, provider)
-    this.tokensViewContract = new ethers.Contract(tokensViewContractAddress, klerosTokensViewAbi, provider)
-    if (signerAddress) {
-      const signer = provider.getSigner()
-      this.badgeContract = this.badgeContract.connect(signer)
-      this.tokensViewContract = this.tokensViewContract.connect(signer)
+    const networkId = provider.network ? provider.network.chainId : null
+    // TODO: remove this conditional when these contracts were deployed to the supported testnets
+    if (networkId === networkIds.MAINNET) {
+      this.badgeContract = new ethers.Contract(badgeContractAddress, klerosBadgeAbi, provider)
+      this.tokensViewContract = new ethers.Contract(tokensViewContractAddress, klerosTokensViewAbi, provider)
+      if (signerAddress) {
+        const signer = provider.getSigner()
+        this.badgeContract = this.badgeContract.connect(signer)
+        this.tokensViewContract = this.tokensViewContract.connect(signer)
+      }
     }
   }
 
@@ -46,7 +50,8 @@ class KlerosService {
     const network = await this.provider.getNetwork()
     const networkId = network.chainId
 
-    if (networkId !== networkIds.MAINNET) {
+    // TODO: remove this check about the contracts, when these contracts were deployed to the supported testnets
+    if (networkId !== networkIds.MAINNET || !this.badgeContract || !this.tokensViewContract) {
       // Use mocked information from networks file
       return getTokensByNetwork(networkId)
     } else {
