@@ -72,8 +72,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           <NoMarketsAvailable title={'No markets available'} />
         )}
         {showMoreButton}
+        {RemoteData.is.loading(markets) ? <Loading message="Loading markets..." /> : null}
       </ListCard>
-      {RemoteData.is.loading(markets) ? <Loading message="Loading markets..." /> : null}
     </>
   )
 }
