@@ -2,14 +2,14 @@ import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
 const SubsectionTitleWrapper = styled.h2`
-  color: #000;
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 1.33;
-  margin: 0 0 15px;
+  color: #333;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
 
   a {
-    color: #000;
+    color: #333;
     text-decoration: underline;
 
     &:hover {
