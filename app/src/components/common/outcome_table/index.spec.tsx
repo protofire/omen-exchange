@@ -6,7 +6,7 @@ import React from 'react'
 import { ThemeProvider } from 'styled-components'
 
 import theme from '../../../theme'
-import { BalanceItem, OutcomeSlot, OutcomeTableValue } from '../../../util/types'
+import { BalanceItem, OutcomeSlot } from '../../../util/types'
 
 import { OutcomeTable } from './index'
 

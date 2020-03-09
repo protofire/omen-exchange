@@ -30,6 +30,7 @@ class KlerosService {
     this.tcrAddress = tcrAddress
 
     const networkId = provider.network ? provider.network.chainId : null
+    // eslint-disable-next-line no-warning-comments
     // TODO: remove this conditional when these contracts were deployed to the supported testnets
     if (networkId === networkIds.MAINNET) {
       this.badgeContract = new ethers.Contract(badgeContractAddress, klerosBadgeAbi, provider)
@@ -50,6 +51,7 @@ class KlerosService {
     const network = await this.provider.getNetwork()
     const networkId = network.chainId
 
+    // eslint-disable-next-line no-warning-comments
     // TODO: remove this check about the contracts, when these contracts were deployed to the supported testnets
     if (networkId !== networkIds.MAINNET || !this.badgeContract || !this.tokensViewContract) {
       // Use mocked information from networks file

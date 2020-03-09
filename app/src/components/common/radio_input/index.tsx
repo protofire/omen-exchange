@@ -37,7 +37,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const RadioInput: React.FC<Props> = (props: Props) => {
-  const { checked, disabled, name, onChange, outcomeIndex, value, ...restProps } = props
+  const { checked, disabled, name, onChange, value, ...restProps } = props
   return (
     <RadioWrapper {...restProps}>
       {checked ? <RadioOn /> : <RadioOff />}
