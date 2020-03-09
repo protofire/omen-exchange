@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
+import React, { useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -13,18 +13,14 @@ import {
   GridTwoColumns,
   Loading,
   SubsectionTitle,
+  SubsectionTitleAction,
+  SubsectionTitleWrapper,
   ThreeBoxComments,
   TitleValue,
   ViewCard,
 } from '../../common'
 import { OutcomeTable } from '../../common/outcome_table'
 
-const SubsectionTitleWrapper = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-`
 const LeftButton = styled(Button)`
   margin-right: auto;
 `
@@ -44,6 +40,10 @@ interface Props extends RouteComponentProps<{}> {
 
 const ViewWrapper = (props: Props) => {
   const { arbitrator, balances, category, collateral, history, marketMakerAddress, questionId, status } = props
+  const [showingExtraInformation, setExtraInformation] = useState(false)
+
+  const toggleExtraInformation = () =>
+    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -68,7 +68,7 @@ const ViewWrapper = (props: Props) => {
     )
   }
 
-  const details = () => {
+  const details = (showExtraDetails: boolean) => {
     return (
       <>
         <GridTwoColumns>
@@ -88,6 +88,14 @@ const ViewWrapper = (props: Props) => {
               }
             />
           )}
+          {showExtraDetails ? (
+            <>
+              <TitleValue title={'Mocked Title 1'} value={'Mocked Value 1'} />
+              <TitleValue title={'Mocked Title 2'} value={'Longer Mocked Value to have and idea how it looks'} />
+              <TitleValue title={'Mocked Title 3'} value={'Mocked Value 3'} />
+              <TitleValue title={'Mocked Title 4'} value={'Mocked Value 4'} />
+            </>
+          ) : null}
         </GridTwoColumns>
       </>
     )
@@ -100,8 +108,11 @@ const ViewWrapper = (props: Props) => {
       <ViewCard>
         <SubsectionTitleWrapper>
           <SubsectionTitle>Market Information</SubsectionTitle>
+          <SubsectionTitleAction onClick={toggleExtraInformation}>
+            {showingExtraInformation ? 'Hide' : 'Show'} Pool Information
+          </SubsectionTitleAction>
         </SubsectionTitleWrapper>
-        {marketHasDetails && details()}
+        {marketHasDetails && details(showingExtraInformation)}
         {renderTableData()}
         <WhenConnected>
           <ButtonContainer>

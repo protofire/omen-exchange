@@ -6,7 +6,6 @@ import { Card } from '../card/index'
 const CardStyled = styled(Card)`
   margin: 0 auto;
   max-width: 100%;
-  min-height: 550px;
   width: ${props => props.theme.mainContainer.maxWidth};
 `
 

@@ -6,7 +6,6 @@ const Grid = styled.div`
   grid-column-gap: 30px;
   grid-row-gap: 12px;
   grid-template-columns: 1fr;
-  margin-bottom: 20px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     grid-template-columns: 1fr 1fr;

@@ -6,12 +6,10 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: flex-end;
   margin-top: auto;
-  padding-top: 35px;
+  padding-top: 20px;
 
   > * {
-    margin-bottom: 0;
-    margin-left: 10px;
-    width: auto;
+    margin-left: 14px;
 
     &:first-child {
       margin-left: 0;

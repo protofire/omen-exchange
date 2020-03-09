@@ -15,10 +15,12 @@ const Wrapper = styled.div`
 
 const Title = styled.h2`
   color: ${props => props.theme.colors.textColorDarker};
+  flex-shrink: 0;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
-  margin: 0 0 5px;
+  margin: 0 5px 5px 0;
+  white-space: nowrap;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-bottom: 0;
