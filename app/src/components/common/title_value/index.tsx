@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from 'react'
+import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
@@ -44,7 +44,7 @@ const Value = styled.p`
   }
 `
 
-interface Props extends HTMLAttributes<HTMLDivElement> {
+interface Props extends DOMAttributes<HTMLDivElement> {
   title: string
   value: any
 }

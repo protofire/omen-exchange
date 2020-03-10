@@ -56,6 +56,7 @@ const theme = {
     darkGray: '#acacac',
     error: '#fa0000',
     gray: '#b7b7b7',
+    green: '#4B9E98',
     mainBodyBackground: '#fff',
     primary: '#1565C0',
     secondary: '#E3F2FD',
@@ -64,8 +65,8 @@ const theme = {
     textColor: '#757575',
     textColorDark: '#37474F',
     textColorDarker: '#333',
-    textColorLightish: '#7D8189',
     textColorLight: '#999',
+    textColorLightish: '#7D8189',
     warning: '#37474F',
   },
   cards: {

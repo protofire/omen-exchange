@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../common/constants'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
@@ -27,13 +27,12 @@ import {
   SubsectionTitle,
   SubsectionTitleAction,
   SubsectionTitleWrapper,
-  TD,
-  TR,
-  Table,
   TextfieldCustomPlaceholder,
   TitleValue,
   ToggleTokenLock,
   TransactionDetailsCard,
+  TransactionDetailsLine,
+  TransactionDetailsRow,
   ViewCard,
   WalletBalance,
 } from '../common'
@@ -41,42 +40,15 @@ import { BigNumberInputReturn } from '../common/big_number_input'
 import { ButtonStates } from '../common/button_stateful'
 import { OutcomeTable } from '../common/outcome_table'
 import { SetAllowance } from '../common/set_allowance'
+import { ValueStates } from '../common/transaction_details_row'
 import { ModalTwitterShare } from '../modal/modal_twitter_share'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
 `
 
-const TableStyled = styled(Table)`
-  margin-bottom: 30px;
-`
-
 const BigNumberInputTextRight = styled<any>(BigNumberInput)`
   text-align: right;
-`
-
-const TextLight = styled.span`
-  color: ${props => props.theme.colors.textColorLight};
-  flex-shrink: 0;
-  font-size: 13px;
-  font-weight: normal;
-  line-height: 1.4;
-  text-align: right;
-`
-
-const CssText = css`
-  color: ${props => props.theme.colors.textColor};
-  font-size: 13px;
-`
-
-const TextBold = styled.span`
-  ${CssText}
-  font-weight: bold;
-`
-
-const TextNormal = styled.span`
-  ${CssText}
-  font-weight: normal;
 `
 
 const logger = getLogger('Market::Buy')
@@ -92,12 +64,9 @@ interface Props extends RouteComponentProps<any> {
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { library: provider } = context
-
   const { buildMarketMaker } = useContracts(context)
-
   const { balances, collateral, marketMakerAddress, question } = props
   const marketMaker = buildMarketMaker(marketMakerAddress)
-
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
@@ -267,6 +236,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     }, 3000)
   }, [])
 
+  const mockedPotential = 1.03
+  const fee = `${formatBigNumber(amountFee.mul(-1), collateral.decimals)} ${collateral.symbol}`
+  const baseCost = `${formatBigNumber(amount.sub(amountFee), collateral.decimals)} ${collateral.symbol}`
+  const potentialProfit = `${mockedPotential} ${collateral.symbol}`
+  const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
+  const total = `${sharesTotal} Shares`
+
   return (
     <>
       <SectionTitle goBackEnabled title={question} />
@@ -286,40 +262,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
         />
-
-        {/*  */}
-        <TableStyled>
-          <TR>
-            <TD>
-              <TextLight>Trading Fee</TextLight>
-            </TD>
-            <TD textAlign="right">
-              <TextNormal>{formatBigNumber(amountFee.mul(-1), collateral.decimals)}</TextNormal>{' '}
-              <TextLight>{collateral.symbol}</TextLight>
-            </TD>
-          </TR>
-          <TR>
-            <TD>
-              <TextLight>Base Cost</TextLight>
-            </TD>
-            <TD textAlign="right">
-              <TextNormal>{formatBigNumber(amount.sub(amountFee), collateral.decimals)}</TextNormal>{' '}
-              <TextLight>{collateral.symbol}</TextLight>
-            </TD>
-          </TR>
-          <TR>
-            <TD withBorder={false}>
-              <TextLight>You will receive</TextLight>
-            </TD>
-            <TD textAlign="right" withBorder={false}>
-              <TextBold>{formatBigNumber(tradedShares, collateral.decimals)} </TextBold>{' '}
-              <TextLight>
-                <strong>Shares</strong>
-              </TextLight>
-            </TD>
-          </TR>
-        </TableStyled>
-        {/*  */}
         <GridTransactionDetails>
           <div>
             <WalletBalance value={noteAmount} />
@@ -345,7 +287,18 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             />
           </div>
           <div>
-            <TransactionDetailsCard>kjk</TransactionDetailsCard>
+            <TransactionDetailsCard>
+              <TransactionDetailsRow title={'Fee'} value={fee} />
+              <TransactionDetailsRow title={'Base Cost'} value={baseCost} />
+              <TransactionDetailsLine />
+              <TransactionDetailsRow
+                emphasizeValue={mockedPotential > 0}
+                state={ValueStates.success}
+                title={'Potential Profit'}
+                value={potentialProfit}
+              />
+              <TransactionDetailsRow emphasizeValue={parseFloat(sharesTotal) > 0} title={'Total'} value={total} />
+            </TransactionDetailsCard>
           </div>
         </GridTransactionDetails>
         <SetAllowance onSetAllowance={setAllowance} state={allowanceState} />
