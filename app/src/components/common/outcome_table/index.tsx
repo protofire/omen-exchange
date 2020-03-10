@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../util/types'
@@ -22,20 +22,26 @@ const TableWrapper = styled.div`
   margin-top: 20px;
 `
 
-const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
-  color: ${props => (props.winningOutcome ? props.theme.colors.primary : 'inherit')};
-  font-weight: ${props => (props.winningOutcome ? '700' : '400')};
-  opacity: ${props => (props.winningOutcome ? '1' : '0.35')};
-`
-
-const TDNoHorizontalPadding = styled(TD)`
-  padding-left: 0;
+const PaddingCSS = css`
+  padding-left: 25px;
   padding-right: 0;
+
+  &:last-child {
+    padding-right: 25px;
+  }
 `
 
-TDStyled.defaultProps = {
-  winningOutcome: false,
-}
+const THStyled = styled(TH)`
+  ${PaddingCSS}
+`
+
+const TDStyled = styled(TD)`
+  ${PaddingCSS}
+`
+const TDRadio = styled(TD)`
+  ${PaddingCSS}
+  width: 20px;
+`
 
 export const OutcomeTable = (props: Props) => {
   const {
@@ -64,9 +70,13 @@ export const OutcomeTable = (props: Props) => {
         <TR>
           {TableHead.map((value, index) => {
             return !disabledColumns.includes(value) ? (
-              <TH colSpan={index === 0 && displayRadioSelection ? 2 : 1} key={index} textAlign={TableCellsAlign[index]}>
+              <THStyled
+                colSpan={index === 0 && displayRadioSelection ? 2 : 1}
+                key={index}
+                textAlign={TableCellsAlign[index]}
+              >
                 {value}
-              </TH>
+              </THStyled>
             ) : null
           })}
         </TR>
@@ -75,14 +85,14 @@ export const OutcomeTable = (props: Props) => {
   }
 
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
-    const { currentPrice, outcomeName, shares, winningOutcome } = balanceItem
+    const { currentPrice, outcomeName, shares } = balanceItem
     const currentPriceFormatted = Number(currentPrice).toFixed(4)
     const probability = probabilities[outcomeIndex]
 
     return (
       <TR key={outcomeName}>
         {!displayRadioSelection || withWinningOutcome ? null : (
-          <TDNoHorizontalPadding textAlign={TableCellsAlign[0]}>
+          <TDRadio textAlign={TableCellsAlign[0]}>
             <RadioInput
               checked={outcomeSelected === outcomeIndex}
               data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
@@ -91,39 +101,35 @@ export const OutcomeTable = (props: Props) => {
               outcomeIndex={outcomeIndex}
               value={outcomeIndex}
             />
-          </TDNoHorizontalPadding>
+          </TDRadio>
         )}
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[1]} winningOutcome={winningOutcome}>
+          <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
           </TDStyled>
         ) : (
-          <TD textAlign={TableCellsAlign[1]}>
+          <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
-          </TD>
+          </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[2]} winningOutcome={winningOutcome}>
+          <TDStyled textAlign={TableCellsAlign[2]}>
             {currentPriceFormatted} <strong>{collateral.symbol}</strong>
           </TDStyled>
         ) : (
-          <TD textAlign={TableCellsAlign[2]}>
+          <TDStyled textAlign={TableCellsAlign[2]}>
             {currentPriceFormatted} <strong>{collateral.symbol}</strong>
-          </TD>
+          </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Shares) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[3]} winningOutcome={winningOutcome}>
-            {formatBigNumber(shares, collateral.decimals)}
-          </TDStyled>
+          <TDStyled textAlign={TableCellsAlign[3]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
         ) : (
-          <TD textAlign={TableCellsAlign[3]}>{formatBigNumber(shares, collateral.decimals)}</TD>
+          <TDStyled textAlign={TableCellsAlign[3]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Payout) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[4]} winningOutcome={winningOutcome}>
-            {formatBigNumber(shares, collateral.decimals)}
-          </TDStyled>
+          <TDStyled textAlign={TableCellsAlign[4]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
         ) : (
-          <TD textAlign={TableCellsAlign[4]}>{formatBigNumber(shares, collateral.decimals)}</TD>
+          <TDStyled textAlign={TableCellsAlign[4]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
         )}
       </TR>
     )
