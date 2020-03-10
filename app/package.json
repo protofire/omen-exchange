@@ -79,7 +79,7 @@
     "prettier": "prettier './src/**/*.{js,ts,tsx}'",
     "prettier:check": "yarn prettier --check",
     "prettier:fix": "yarn prettier --write",
-    "starasdt": "react-scripts start",
+    "start:base": "react-scripts start",
     "start": "craco start",
     "test": "react-scripts test --passWithNoTests"
   },
