@@ -119,7 +119,7 @@ const ViewWrapper = (props: Props) => {
             <LeftButton
               buttonType={ButtonType.secondaryLine}
               onClick={() => {
-                history.push(`/#/${marketMakerAddress}/fund`)
+                history.push(`${marketMakerAddress}/fund`)
               }}
             >
               Pool Liquidity
@@ -128,7 +128,7 @@ const ViewWrapper = (props: Props) => {
               buttonType={ButtonType.secondaryLine}
               disabled={!userHasShares}
               onClick={() => {
-                history.push(`/#/${marketMakerAddress}/sell`)
+                history.push(`${marketMakerAddress}/sell`)
               }}
             >
               Sell
@@ -136,7 +136,7 @@ const ViewWrapper = (props: Props) => {
             <Button
               buttonType={ButtonType.secondaryLine}
               onClick={() => {
-                history.push(`/#/${marketMakerAddress}/buy`)
+                history.push(`${marketMakerAddress}/buy`)
               }}
             >
               Buy
