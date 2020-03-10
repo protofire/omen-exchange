@@ -1,10 +1,10 @@
 import React from 'react'
 import { useWeb3Context } from 'web3-react'
 
-import { ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { ButtonProps, ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { Button } from '../button'
 
-interface Props {
+interface Props extends ButtonProps {
   callback: () => void
 }
 

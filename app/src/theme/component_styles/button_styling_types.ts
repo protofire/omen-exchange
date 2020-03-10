@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { AnchorHTMLAttributes, ButtonHTMLAttributes } from 'react'
 import { css } from 'styled-components'
 
 export enum ButtonType {
@@ -8,17 +8,14 @@ export enum ButtonType {
   secondaryLine,
 }
 
-export interface ButtonProps {
+export interface ButtonCommonProps {
   buttonType?: ButtonType
+  theme?: any
 }
 
-export interface ButtonComponentProps {
-  buttonType?: ButtonType
-  children?: ReactNode
-  onClick?: (e?: any) => void
-  tabIndex?: number
-  title?: string
-}
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, ButtonCommonProps {}
+
+export interface ButtonLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement>, ButtonCommonProps {}
 
 const PrimaryCSS = css`
   & {
