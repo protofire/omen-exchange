@@ -15,7 +15,6 @@ import { getLogger } from '../../util/logger'
 import { computeBalanceAfterTrade, formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import {
-  BalanceToken,
   BigNumberInput,
   Button,
   ButtonContainer,
@@ -37,6 +36,7 @@ import {
   TitleValue,
   ToggleTokenLock,
   ViewCard,
+  WalletBalance,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { ButtonStates } from '../common/button_stateful'
@@ -207,24 +207,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const isBuyAmountGreaterThanBalance = amount.gt(collateralBalance)
 
-  const buyMessageError = isBuyAmountGreaterThanBalance ? `You don't have enough collateral in your balance.` : ''
-
   const error =
     (status !== Status.Ready && status !== Status.Error) ||
     cost.isZero() ||
     isBuyAmountGreaterThanBalance ||
     amount.isZero()
 
-  const noteAmount = (
-    <>
-      <BalanceToken
-        collateral={collateral}
-        collateralBalance={collateralBalance}
-        onClickAddMaxCollateral={() => setAmount(collateralBalance)}
-      />
-      <FormError>{buyMessageError}</FormError>
-    </>
-  )
+  const noteAmount = `${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`
 
   const amountFee = cost.sub(amount)
 
@@ -316,28 +305,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         />
 
         {/*  */}
-        <AmountWrapper
-          formField={
-            <>
-              <TextfieldCustomPlaceholder
-                formField={
-                  <BigNumberInputTextRight
-                    decimals={collateral.decimals}
-                    name="amount"
-                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                    value={amount}
-                  />
-                }
-                placeholderText={collateral.symbol}
-              />
-              <ToggleTokenLock amount={amount} collateral={collateral} context={context} />
-            </>
-          }
-          note={noteAmount}
-          title={'Total cost'}
-          tooltip={{ id: 'amount', description: 'Shares to buy with this amount of collateral.' }}
-        />
-        <FormLabelStyled>Transaction details</FormLabelStyled>
         <TableStyled>
           <TR>
             <TD>
@@ -371,7 +338,29 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         </TableStyled>
         {/*  */}
         <GridTransactionDetails>
-          <div>dfdsf</div>
+          <div>
+            <WalletBalance value={noteAmount} />
+            <AmountWrapper
+              formField={
+                <>
+                  <TextfieldCustomPlaceholder
+                    formField={
+                      <BigNumberInputTextRight
+                        decimals={collateral.decimals}
+                        name="amount"
+                        onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                        value={amount}
+                      />
+                    }
+                    placeholderText={collateral.symbol}
+                  />
+                  <ToggleTokenLock amount={amount} collateral={collateral} context={context} />
+                </>
+              }
+              title={'Total cost'}
+              tooltip={{ id: 'amount', description: 'Shares to buy with this amount of collateral.' }}
+            />
+          </div>
           <div>dfdsf</div>
         </GridTransactionDetails>
         <SetAllowance onSetAllowance={setAllowance} state={allowanceState} />
