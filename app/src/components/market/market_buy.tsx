@@ -19,8 +19,6 @@ import {
   Button,
   ButtonContainer,
   DisplayArbitrator,
-  FormError,
-  FormLabel,
   FormRow,
   GridTransactionDetails,
   GridTwoColumns,
@@ -50,19 +48,6 @@ const LeftButton = styled(Button)`
 
 const TableStyled = styled(Table)`
   margin-bottom: 30px;
-`
-
-const AmountWrapper = styled(FormRow)`
-  margin-bottom: 30px;
-  width: 100%;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    width: 50%;
-  }
-`
-
-const FormLabelStyled = styled(FormLabel)`
-  margin-bottom: 10px;
 `
 
 const BigNumberInputTextRight = styled<any>(BigNumberInput)`
@@ -340,7 +325,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <GridTransactionDetails>
           <div>
             <WalletBalance value={noteAmount} />
-            <AmountWrapper
+            <FormRow
               formField={
                 <>
                   <TextfieldCustomPlaceholder
