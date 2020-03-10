@@ -23,6 +23,7 @@ import {
   FormError,
   FormLabel,
   FormRow,
+  GridTransactionDetails,
   GridTwoColumns,
   Loading,
   SectionTitle,
@@ -369,6 +370,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           </TR>
         </TableStyled>
         {/*  */}
+        <GridTransactionDetails>
+          <div>dfdsf</div>
+          <div>dfdsf</div>
+        </GridTransactionDetails>
         <SetAllowance onSetAllowance={setAllowance} state={allowanceState} />
         <ButtonContainer>
           <LeftButton
