@@ -5,6 +5,7 @@ const Wrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: space-between;
+  margin-bottom: 24px;
 `
 
 const Title = styled.h3`

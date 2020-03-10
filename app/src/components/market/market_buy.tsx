@@ -33,6 +33,7 @@ import {
   TextfieldCustomPlaceholder,
   TitleValue,
   ToggleTokenLock,
+  TransactionDetailsCard,
   ViewCard,
   WalletBalance,
 } from '../common'
@@ -156,11 +157,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       const signer = provider.getSigner()
       const account = await signer.getAddress()
-
       const cpk = await CPKService.create(provider)
-
       const collateralAddress = await marketMaker.getCollateralToken()
-
       const collateralService = new ERC20Service(provider, account, collateralAddress)
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, cost)
 
@@ -346,7 +344,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               tooltip={{ id: 'amount', description: 'Shares to buy with this amount of collateral.' }}
             />
           </div>
-          <div>dfdsf</div>
+          <div>
+            <TransactionDetailsCard>kjk</TransactionDetailsCard>
+          </div>
         </GridTransactionDetails>
         <SetAllowance onSetAllowance={setAllowance} state={allowanceState} />
         <ButtonContainer>
