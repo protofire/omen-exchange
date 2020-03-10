@@ -24,7 +24,7 @@ const MarketHomeContainer: React.FC = () => {
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const { library: provider } = context
 
-  const { data, error, fetchMore, loading } = useQuery(MARKETS_HOME[filter.state], {
+  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(MARKETS_HOME[filter.state], {
     notifyOnNetworkStatusChange: true,
     variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, ...filter },
   })
@@ -42,39 +42,39 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
     } else if (error) {
       setMarkets(RemoteData.failure(error))
-    } else if (data) {
-      if (data.fixedProductMarketMakers.length) {
-        const { fixedProductMarketMakers } = data
+    } else if (fetchedMarkets) {
+      if (fetchedMarkets.fixedProductMarketMakers.length) {
+        const { fixedProductMarketMakers } = fetchedMarkets
         setMarkets(RemoteData.success(fixedProductMarketMakers))
       }
     }
-  }, [data, loading, error])
+  }, [fetchedMarkets, loading, error])
 
   const showMore = () => {
     fetchMore({
       variables: {
-        skip: data.fixedProductMarketMakers.length,
+        skip: fetchedMarkets.fixedProductMarketMakers.length,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) return prev
-        return Object.assign({}, prev, {
-          fixedProductMarketMakers: [...prev.fixedProductMarketMakers, ...fetchMoreResult.fixedProductMarketMakers],
-        })
+        return {
+          ...prev,
+          ...{
+            fixedProductMarketMakers: [...prev.fixedProductMarketMakers, ...fetchMoreResult.fixedProductMarketMakers],
+          },
+        }
       },
     })
-  }
-  const onFilterChange = (filter: any) => {
-    setFilter(filter)
   }
 
   return (
     <>
       <MarketHome
         context={context}
-        count={data ? data.fixedProductMarketMakers.length : 0}
+        count={fetchedMarkets ? fetchedMarkets.fixedProductMarketMakers.length : 0}
         currentFilter={filter}
         markets={markets}
-        onFilterChange={onFilterChange}
+        onFilterChange={setFilter}
         onShowMore={showMore}
       />
       {RemoteData.is.success(markets) && <Waypoint onEnter={showMore} />}
