@@ -1,8 +1,7 @@
-import React from 'react'
+import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
-import { ButtonType } from '../../../theme/component_styles/button_styling_types'
-import { Button } from '../../common'
+import { ButtonStateful, ButtonStates } from '../button_stateful'
 
 const Wrapper = styled.div``
 
@@ -30,17 +29,24 @@ const Description = styled.p`
   margin: 0 25px 0 0;
 `
 
-export const SetAllowance: React.FC = props => {
-  const { ...restProps } = props
+export interface SetAllowanceProps extends DOMAttributes<HTMLDivElement> {
+  onSetAllowance?: () => void | undefined
+  state: ButtonStates
+}
+
+export const SetAllowance: React.FC<SetAllowanceProps> = (props: SetAllowanceProps) => {
+  const { onSetAllowance, state, ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
       <Title>Set Allowance</Title>
       <DescriptionWrapper>
         <Description>
-          This permission allows Omen smart contracts to interact with your DAI. This has to bedone for each new token.
+          This permission allows Omen smart contracts to interact with your DAI. This has to be done for each new token.
         </Description>
-        <Button buttonType={ButtonType.primary}>Set</Button>
+        <ButtonStateful onClick={onSetAllowance} state={state}>
+          Set
+        </ButtonStateful>
       </DescriptionWrapper>
     </Wrapper>
   )

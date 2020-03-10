@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled, { css } from 'styled-components'
 
@@ -38,6 +38,7 @@ import {
   ViewCard,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
+import { ButtonStates } from '../common/button_stateful'
 import { OutcomeTable } from '../common/outcome_table'
 import { SetAllowance } from '../common/set_allowance'
 import { ModalTwitterShare } from '../modal/modal_twitter_share'
@@ -117,8 +118,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTwitterShareOpen, setModalTwitterShareState] = useState(false)
   const [messageTwitter, setMessageTwitter] = useState('')
-
+  const [allowanceState, setAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [showingExtraInformation, setExtraInformation] = useState(false)
+
   const toggleExtraInformation = () =>
     showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
 
@@ -285,6 +287,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     )
   }
 
+  const setAllowance = useCallback(() => {
+    setAllowanceState(ButtonStates.working)
+    setTimeout(() => {
+      setAllowanceState(ButtonStates.finished)
+    }, 3000)
+  }, [])
+
   return (
     <>
       <SectionTitle goBackEnabled title={question} />
@@ -360,7 +369,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           </TR>
         </TableStyled>
         {/*  */}
-        <SetAllowance />
+        <SetAllowance onSetAllowance={setAllowance} state={allowanceState} />
         <ButtonContainer>
           <LeftButton
             buttonType={ButtonType.secondaryLine}
