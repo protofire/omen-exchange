@@ -64,6 +64,7 @@ const theme = {
     textColor: '#757575',
     textColorDark: '#37474F',
     textColorDarker: '#333',
+    textColorLightish: '#7D8189',
     textColorLight: '#999',
     warning: '#37474F',
   },
@@ -95,6 +96,7 @@ const theme = {
   },
   borders: {
     borderColor: '#ECEFF1',
+    borderColorLighter: '#E8EAF6',
     commonBorderRadius: '6px',
   },
   paddings: {

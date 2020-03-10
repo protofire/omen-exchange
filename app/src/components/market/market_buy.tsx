@@ -19,7 +19,6 @@ import {
   BigNumberInput,
   Button,
   ButtonContainer,
-  ButtonLink,
   DisplayArbitrator,
   FormError,
   FormLabel,
@@ -40,9 +39,10 @@ import {
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { OutcomeTable } from '../common/outcome_table'
+import { SetAllowance } from '../common/set_allowance'
 import { ModalTwitterShare } from '../modal/modal_twitter_share'
 
-const ButtonLinkStyled = styled(ButtonLink)`
+const LeftButton = styled(Button)`
   margin-right: auto;
 `
 
@@ -304,6 +304,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
         />
+
+        {/*  */}
         <AmountWrapper
           formField={
             <>
@@ -357,9 +359,16 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             </TD>
           </TR>
         </TableStyled>
+        {/*  */}
+        <SetAllowance />
         <ButtonContainer>
-          <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>‹ Back</ButtonLinkStyled>
-          <Button buttonType={ButtonType.primary} disabled={error} onClick={() => finish()}>
+          <LeftButton
+            buttonType={ButtonType.secondaryLine}
+            onClick={() => props.history.push(`/${marketMakerAddress}`)}
+          >
+            Cancel
+          </LeftButton>
+          <Button buttonType={ButtonType.secondaryLine} disabled={error} onClick={() => finish()}>
             Buy
           </Button>
         </ButtonContainer>
