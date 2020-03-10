@@ -4,17 +4,10 @@ import styled from 'styled-components'
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
 import { Button } from '../common/button'
-import { Filter } from '../common/filter'
 import { ListCard } from '../common/list_card'
 import { ListItem } from '../common/list_item'
 import { Loading } from '../common/loading'
 import { SectionTitle } from '../common/section_title'
-
-// const FilterStyled = styled(Filter)`
-//   margin: -30px auto 10px;
-//   max-width: ${props => props.theme.list.maxWidth};
-//   width: 100%;
-// `
 
 const NoMarketsAvailable = styled(SectionTitle)`
   margin-top: 150px;
