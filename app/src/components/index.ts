@@ -1,7 +1,7 @@
 export { MarketWizardCreator } from './market/market_wizard_creator'
 export { MarketWizardCreatorContainer } from './market/market_wizard_creator_container'
 export { MarketViewContainer } from './market/market_view_container'
-export { MarketFundContainer } from './market/market_fund_container'
+export { MarketPoolLiquidityContainer } from './market/market_pool_liquidity_container'
 export { MarketBuyContainer } from './market/market_buy_container'
 export { MarketSellContainer } from './market/market_sell_container'
 export { MarketHome } from './market/market_home'

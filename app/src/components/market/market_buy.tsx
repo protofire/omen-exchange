@@ -222,7 +222,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle title={question} />
+      <SectionTitle goBackEnabled title={question} />
       <ViewCard>
         <SubsectionTitleStyled>Choose the shares you want to buy</SubsectionTitleStyled>
         <OutcomeTable

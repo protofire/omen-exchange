@@ -29,7 +29,7 @@ import { SubsectionTitle } from '../common/subsection_title'
 import { TD, TR, Table } from '../common/table'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 import { ToggleTokenLock } from '../common/toggle_token_lock'
-import { ViewCard } from '../common/view_card/'
+import { ViewCard } from '../common/view_card'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -75,7 +75,7 @@ const SubsectionTitleStyled = styled(SubsectionTitle)`
 
 const logger = getLogger('Market::Fund')
 
-const MarketFundWrapper: React.FC<Props> = (props: Props) => {
+const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const {
     balances,
     collateral,
@@ -181,7 +181,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle title={question} />
+      <SectionTitle goBackEnabled title={question} />
       <ViewCard>
         <SubsectionTitleStyled>Fund this market</SubsectionTitleStyled>
         <OutcomeTable
@@ -294,4 +294,4 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   )
 }
 
-export const MarketFund = withRouter(MarketFundWrapper)
+export const MarketPoolLiquidity = withRouter(MarketPoolLiquidityWrapper)
