@@ -40,27 +40,26 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
   const { marketMakerData, status } = useMarketMakerData(marketMakerAddress, context)
   const { library: provider } = context
 
-  const [lastDayVolume, setLastDayVolume] = useState<Maybe<BigNumber>>(null)
+  const [lastDayVolume, setLastDayVolume] = useState<Maybe<string>>(null)
 
-  const { data: volumeNow } = useQuery(GET_COLLATERAL_VOLUME_NOW, {
+  const { data: volumeNow, error: errorVolumeNow } = useQuery(GET_COLLATERAL_VOLUME_NOW, {
     skip: !!lastDayVolume,
     variables: { id: marketMakerAddress.toLowerCase() },
   })
 
-  const { data: volumeBefore } = useQuery(buildQuery24hsEarlier(hash && hash.toLowerCase()), {
+  const { data: volumeBefore, error: errorVolumeBefore } = useQuery(buildQuery24hsEarlier(hash && hash.toLowerCase()), {
     skip: !!lastDayVolume,
     variables: { id: marketMakerAddress.toLowerCase() },
   })
 
-  if (volumeNow && volumeBefore) {
+  if (errorVolumeBefore || errorVolumeNow) {
+    setLastDayVolume('-')
+  } else if (volumeNow && volumeBefore) {
     const now = new BigNumber(volumeNow.fixedProductMarketMakers[0].collateralVolume)
     const before = new BigNumber(volumeBefore.fixedProductMarketMakers[0].collateralVolume)
 
-    setLastDayVolume(now.sub(before))
+    setLastDayVolume(now.sub(before).toString())
   }
-
-  console.log('lastDayVolume', lastDayVolume && lastDayVolume.toString())
-  console.log('skipquery', !!lastDayVolume)
 
   const {
     arbitrator,
