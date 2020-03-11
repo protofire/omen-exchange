@@ -1,10 +1,16 @@
 import React from 'react'
-import styled, { keyframes } from 'styled-components'
+import styled, { css, keyframes } from 'styled-components'
 
 import { ButtonCSS, ButtonProps, ButtonType } from '../../../theme/component_styles/button_styling_types'
 
 import CheckSVG from './img/check.svg'
 import SpinnerSVG from './img/spinner.svg'
+
+export enum ButtonStates {
+  idle,
+  working,
+  finished,
+}
 
 const rotate = keyframes`
   from {
@@ -15,10 +21,7 @@ const rotate = keyframes`
   }
 `
 
-const Wrapper = styled.button<ButtonProps>`
-  ${ButtonCSS}
-  position: relative;
-
+const DisabledCSS = css`
   &[disabled],
   &[disabled]:hover {
     background-color: ${props => props.theme.buttonPrimaryLine.backgroundColor};
@@ -29,9 +32,27 @@ const Wrapper = styled.button<ButtonProps>`
   }
 `
 
+const IdleDisabledCSS = css`
+  &[disabled],
+  &[disabled]:hover {
+    background-color: ${props => props.theme.buttonPrimary.backgroundColor};
+    border-color: ${props => props.theme.buttonPrimary.borderColor};
+    color: ${props => props.theme.buttonPrimary.color};
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+`
+
+const Wrapper = styled.button<ButtonStatefulProps>`
+  ${ButtonCSS}
+  position: relative;
+  ${props => (props.state === ButtonStates.idle ? IdleDisabledCSS : DisabledCSS)};
+`
+
 const Text = styled.span<{ hide: boolean }>`
   opacity: ${props => (props.hide ? '0' : '1')};
   position: relative;
+  user-select: none;
   z-index: 1;
 `
 
@@ -53,24 +74,19 @@ const Spinner = styled.img`
 
 const Check = styled.img``
 
-export enum ButtonStates {
-  idle,
-  working,
-  finished,
-}
-
 interface ButtonStatefulProps extends ButtonProps {
   state?: ButtonStates
 }
 
 export const ButtonStateful: React.FC<ButtonStatefulProps> = (props: ButtonStatefulProps) => {
-  const { children, disabled, onClick, state, ...restProps } = props
+  const { children, disabled, onClick, state = ButtonStates.idle, ...restProps } = props
 
   return (
     <Wrapper
       buttonType={state === ButtonStates.idle ? ButtonType.primary : ButtonType.primaryLine}
-      disabled={disabled || state === ButtonStates.working || state === ButtonStates.finished}
+      disabled={disabled || state === ButtonStates.working}
       onClick={onClick}
+      state={state}
       {...restProps}
     >
       <Text hide={state !== ButtonStates.idle}>{children}</Text>

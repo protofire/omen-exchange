@@ -4,24 +4,24 @@ import React, { useEffect, useState } from 'react'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { CPKService, ERC20Service } from '../../../services'
 import { Token } from '../../../util/types'
-import { Button } from '../button'
-import { Loading } from '../loading'
+import { ButtonStateful, ButtonStates } from '../button_stateful'
 
-interface Props {
-  collateral: Token
+export interface ToggleTokenLockProps {
   amount: BigNumber
+  collateral: Token
   context: ConnectedWeb3Context
 }
 
 enum CollateralStatus {
   Lock = 'Lock',
+  Undefined = 'Undefined',
   Unlock = 'Unlock',
 }
 
-export const ToggleTokenLock = (props: Props) => {
+export const ToggleTokenLock = (props: ToggleTokenLockProps) => {
   const { amount, collateral, context } = props
   const { account, library: provider } = context
-  const [status, setStatus] = useState(CollateralStatus.Lock)
+  const [status, setStatus] = useState(CollateralStatus.Undefined)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -33,7 +33,14 @@ export const ToggleTokenLock = (props: Props) => {
       const cpk = await CPKService.create(provider)
       const collateralService = new ERC20Service(provider, account, collateral.address)
       const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, amount)
-      setStatus(hasEnoughAlowance ? CollateralStatus.Unlock : CollateralStatus.Lock)
+
+      const status =
+        (amount.isZero() && CollateralStatus.Undefined) ||
+        (hasEnoughAlowance && CollateralStatus.Unlock) ||
+        (!hasEnoughAlowance && CollateralStatus.Lock) ||
+        CollateralStatus.Undefined
+
+      setStatus(status)
     }
 
     fetchAllowance()
@@ -54,12 +61,15 @@ export const ToggleTokenLock = (props: Props) => {
     setLoading(false)
   }
 
-  const textButton = status === CollateralStatus.Lock ? `Unlock ${collateral.symbol}` : `Lock ${collateral.symbol}`
-
   return (
-    <>
-      {!amount.isZero() && <Button onClick={toggle}>{textButton}</Button>}
-      {loading && <Loading full={true} />}
-    </>
+    <ButtonStateful
+      disabled={amount.isZero() || loading}
+      onClick={toggle}
+      state={(loading && ButtonStates.working) || ButtonStates.idle}
+    >
+      {(status === CollateralStatus.Undefined && 'Set') ||
+        (status === CollateralStatus.Lock && 'Lock') ||
+        (status === CollateralStatus.Unlock && 'Unlock')}
+    </ButtonStateful>
   )
 }

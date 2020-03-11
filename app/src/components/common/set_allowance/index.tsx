@@ -1,7 +1,7 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
-import { ButtonStateful, ButtonStates } from '../button_stateful'
+import { ToggleTokenLock, ToggleTokenLockProps } from '../toggle_token_lock'
 
 const Wrapper = styled.div``
 
@@ -29,13 +29,10 @@ const Description = styled.p`
   margin: 0 25px 0 0;
 `
 
-export interface SetAllowanceProps extends DOMAttributes<HTMLDivElement> {
-  onSetAllowance?: () => void | undefined
-  state: ButtonStates
-}
+export interface SetAllowanceProps extends DOMAttributes<HTMLDivElement>, ToggleTokenLockProps {}
 
 export const SetAllowance: React.FC<SetAllowanceProps> = (props: SetAllowanceProps) => {
-  const { onSetAllowance, state, ...restProps } = props
+  const { amount, collateral, context, ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
@@ -44,9 +41,7 @@ export const SetAllowance: React.FC<SetAllowanceProps> = (props: SetAllowancePro
         <Description>
           This permission allows Omen smart contracts to interact with your DAI. This has to be done for each new token.
         </Description>
-        <ButtonStateful onClick={onSetAllowance} state={state}>
-          Set
-        </ButtonStateful>
+        <ToggleTokenLock amount={amount} collateral={collateral} context={context} />
       </DescriptionWrapper>
     </Wrapper>
   )

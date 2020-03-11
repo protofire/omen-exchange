@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 export enum ValueStates {
   error,
+  important,
   normal,
   success,
 }
@@ -31,6 +32,7 @@ const Value = styled.p<{ state: ValueStates; emphasizeValue?: boolean }>`
   color: ${props =>
     (props.state === ValueStates.success && props.theme.colors.green) ||
     (props.state === ValueStates.error && props.theme.colors.error) ||
+    (props.state === ValueStates.important && props.theme.colors.textColorDark) ||
     props.theme.colors.textColorLightish};
   font-weight: ${props => (props.emphasizeValue ? '500' : '400')};
   margin: 0;

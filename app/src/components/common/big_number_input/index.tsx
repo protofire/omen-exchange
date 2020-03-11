@@ -94,6 +94,7 @@ export const BigNumberInput = (props: Props) => {
 
   return (
     <Input
+      autoComplete="off"
       className={className}
       data-testid={name}
       disabled={disabled}

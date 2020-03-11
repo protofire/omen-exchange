@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -28,7 +28,6 @@ import {
   SubsectionTitleWrapper,
   TextfieldCustomPlaceholder,
   TitleValue,
-  ToggleTokenLock,
   TransactionDetailsCard,
   TransactionDetailsLine,
   TransactionDetailsRow,
@@ -36,7 +35,6 @@ import {
   WalletBalance,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
-import { ButtonStates } from '../common/button_stateful'
 import { OutcomeTable } from '../common/outcome_table'
 import { SetAllowance } from '../common/set_allowance'
 import { ValueStates } from '../common/transaction_details_row'
@@ -69,7 +67,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTwitterShareOpen, setModalTwitterShareState] = useState(false)
   const [messageTwitter, setMessageTwitter] = useState('')
-  const [allowanceState, setAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [showingExtraInformation, setExtraInformation] = useState(false)
 
   const toggleExtraInformation = () =>
@@ -224,13 +221,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     )
   }
 
-  const setAllowance = useCallback(() => {
-    setAllowanceState(ButtonStates.working)
-    setTimeout(() => {
-      setAllowanceState(ButtonStates.finished)
-    }, 3000)
-  }, [])
-
   const mockedPotential = 1.03
   const fee = `${formatBigNumber(amountFee.mul(-1), collateral.decimals)} ${collateral.symbol}`
   const baseCost = `${formatBigNumber(amount.sub(amountFee), collateral.decimals)} ${collateral.symbol}`
@@ -271,7 +261,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               }
               placeholderText={collateral.symbol}
             />
-            <ToggleTokenLock amount={amount} collateral={collateral} context={context} />
           </div>
           <div>
             <TransactionDetailsCard>
@@ -284,11 +273,16 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
                 title={'Potential Profit'}
                 value={potentialProfit}
               />
-              <TransactionDetailsRow emphasizeValue={parseFloat(sharesTotal) > 0} title={'Total'} value={total} />
+              <TransactionDetailsRow
+                emphasizeValue={parseFloat(sharesTotal) > 0}
+                state={(parseFloat(sharesTotal) > 0 && ValueStates.important) || ValueStates.normal}
+                title={'Total'}
+                value={total}
+              />
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetails>
-        <SetAllowance onSetAllowance={setAllowance} state={allowanceState} />
+        <SetAllowance amount={amount} collateral={collateral} context={context} />
         <ButtonContainer>
           <LeftButton
             buttonType={ButtonType.secondaryLine}
