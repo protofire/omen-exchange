@@ -1,6 +1,12 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
+export enum ValueStates {
+  error,
+  normal,
+  success,
+}
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -18,15 +24,21 @@ const Title = styled.h2`
   white-space: nowrap;
 `
 
-const Value = styled.p`
-  color: ${props => props.theme.colors.textColor};
+const Value = styled.p<{ state: ValueStates }>`
+  color: ${props =>
+    (props.state === ValueStates.success && props.theme.colors.green) ||
+    (props.state === ValueStates.error && props.theme.colors.error) ||
+    props.theme.colors.textColor};
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
   margin: 0;
 
   a {
-    color: ${props => props.theme.colors.textColor};
+    color: ${props =>
+      (props.state === ValueStates.success && props.theme.colors.green) ||
+      (props.state === ValueStates.error && props.theme.colors.error) ||
+      props.theme.colors.textColor};
     text-decoration: none;
 
     &:hover {
@@ -36,17 +48,18 @@ const Value = styled.p`
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
+  state?: ValueStates
   title: string
   value: any
 }
 
 export const TitleValue: React.FC<Props> = (props: Props) => {
-  const { title, value, ...restProps } = props
+  const { state = ValueStates.normal, title, value, ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
       <Title>{title}</Title>
-      <Value>{value}</Value>
+      <Value state={state}>{value}</Value>
     </Wrapper>
   )
 }

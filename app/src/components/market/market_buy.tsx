@@ -19,7 +19,6 @@ import {
   Button,
   ButtonContainer,
   DisplayArbitrator,
-  FormRow,
   GridTransactionDetails,
   GridTwoColumns,
   Loading,
@@ -45,10 +44,6 @@ import { ModalTwitterShare } from '../modal/modal_twitter_share'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
-`
-
-const BigNumberInputTextRight = styled<any>(BigNumberInput)`
-  text-align: right;
 `
 
 const logger = getLogger('Market::Buy')
@@ -265,26 +260,18 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <GridTransactionDetails>
           <div>
             <WalletBalance value={noteAmount} />
-            <FormRow
+            <TextfieldCustomPlaceholder
               formField={
-                <>
-                  <TextfieldCustomPlaceholder
-                    formField={
-                      <BigNumberInputTextRight
-                        decimals={collateral.decimals}
-                        name="amount"
-                        onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                        value={amount}
-                      />
-                    }
-                    placeholderText={collateral.symbol}
-                  />
-                  <ToggleTokenLock amount={amount} collateral={collateral} context={context} />
-                </>
+                <BigNumberInput
+                  decimals={collateral.decimals}
+                  name="amount"
+                  onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                  value={amount}
+                />
               }
-              title={'Total cost'}
-              tooltip={{ id: 'amount', description: 'Shares to buy with this amount of collateral.' }}
+              placeholderText={collateral.symbol}
             />
+            <ToggleTokenLock amount={amount} collateral={collateral} context={context} />
           </div>
           <div>
             <TransactionDetailsCard>
