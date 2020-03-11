@@ -22,10 +22,12 @@ const MarketHomeContainer: React.FC = () => {
   })
   const [markets, setMarkets] = useState<RemoteData<any>>(RemoteData.notAsked())
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
+  const [moreMarkets, setMoreMarkets] = useState(true)
+
   const { library: provider } = context
 
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(MARKETS_HOME[filter.state], {
-    notifyOnNetworkStatusChange: false,
+    notifyOnNetworkStatusChange: true,
     variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, ...filter },
   })
 
@@ -38,7 +40,7 @@ const MarketHomeContainer: React.FC = () => {
   }, [provider])
 
   useEffect(() => {
-    if (loading) {
+    if (loading && moreMarkets) {
       setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
     } else if (error) {
       setMarkets(RemoteData.failure(error))
@@ -48,14 +50,20 @@ const MarketHomeContainer: React.FC = () => {
         setMarkets(RemoteData.success(fixedProductMarketMakers))
       }
     }
-  }, [fetchedMarkets, loading, error])
+  }, [fetchedMarkets, moreMarkets, loading, error])
 
+  const onFilterChange = (filter: any) => {
+    setMoreMarkets(true)
+    setFilter(filter)
+  }
   const showMore = () => {
+    if (!moreMarkets) return
     fetchMore({
       variables: {
         skip: fetchedMarkets.fixedProductMarketMakers.length,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
+        setMoreMarkets(!!fetchMoreResult.fixedProductMarketMakers.length)
         if (!fetchMoreResult) return prev
         return {
           ...prev,
@@ -74,10 +82,11 @@ const MarketHomeContainer: React.FC = () => {
         count={fetchedMarkets ? fetchedMarkets.fixedProductMarketMakers.length : 0}
         currentFilter={filter}
         markets={markets}
-        onFilterChange={setFilter}
+        moreMarkets={moreMarkets}
+        onFilterChange={onFilterChange}
         onShowMore={showMore}
       />
-      {RemoteData.is.success(markets) && <Waypoint onEnter={showMore} />}
+      {RemoteData.is.success(markets) && moreMarkets && <Waypoint onEnter={showMore} />}
     </>
   )
 }
