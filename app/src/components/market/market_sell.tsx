@@ -4,36 +4,35 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../common/constants'
+import { useAsyncDerivedValue, useContracts } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
-import { useContracts } from '../../hooks/useContracts'
 import { CPKService, MarketMakerService } from '../../services'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
-import {
-  calcSellAmountInCollateral,
-  computeBalanceAfterTrade,
-  formatBigNumber,
-  formatDate,
-  mulBN,
-} from '../../util/tools'
+import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
-import { BigNumberInput, Button, OutcomeTable } from '../common'
-import { BalanceShares } from '../common/balance_shares'
+import {
+  BalanceShares,
+  BigNumberInput,
+  Button,
+  ButtonContainer,
+  ButtonLink,
+  FormError,
+  FormLabel,
+  FormRow,
+  Loading,
+  Paragraph,
+  SectionTitle,
+  SubsectionTitle,
+  TD,
+  TR,
+  Table,
+  TextfieldCustomPlaceholder,
+  ViewCard,
+  Well,
+} from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
-import { ButtonContainer } from '../common/button_container'
-import { ButtonLink } from '../common/button_link'
-import { FormError } from '../common/form_error'
-import { FormLabel } from '../common/form_label'
-import { FormRow } from '../common/form_row'
-import { Loading } from '../common/loading'
-import { Paragraph } from '../common/paragraph'
-import { SectionTitle } from '../common/section_title'
-import { SubsectionTitle } from '../common/subsection_title'
-import { TD, TR, Table } from '../common/table'
-import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
-import { ViewCard } from '../common/view_card'
-import { Well } from '../common/well'
+import { OutcomeTable } from '../common/outcome_table'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -78,7 +77,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
 
-  const { balances, collateral, marketMakerAddress, question, resolution } = props
+  const { balances, collateral, marketMakerAddress, question } = props
 
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
@@ -187,7 +186,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle subTitle={resolution ? formatDate(resolution) : ''} title={question} />
+      <SectionTitle goBackEnabled title={question} />
       <ViewCard>
         <SubsectionTitleStyled>Choose the shares you want to sell</SubsectionTitleStyled>
         <OutcomeTable

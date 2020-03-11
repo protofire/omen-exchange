@@ -4,8 +4,8 @@ import styled from 'styled-components'
 
 import { formatBigNumber } from '../../../util/tools'
 import { Token } from '../../../util/types'
-import { FormRowLink } from '../form_row_link'
-import { FormRowNote } from '../form_row_note'
+import { FormRowLink } from '../../common/form_row_link'
+import { FormRowNote } from '../../common/form_row_note'
 
 interface Props {
   collateral: Token

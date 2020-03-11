@@ -4,12 +4,12 @@ import { NavLink, RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
-import { ConnectedWeb3 } from '../../../hooks/connectedWeb3'
+import { ConnectedWeb3 } from '../../../hooks'
 import { ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { ModalConnectWallet } from '../../modal'
 import { Button } from '../button'
 import { ButtonConnectWallet } from '../button_connect_wallet'
 import { Logo } from '../logo'
-import { ModalConnectWallet } from '../modal_connect_wallet'
 import { Network } from '../network'
 
 const HeaderWrapper = styled.div`
@@ -41,12 +41,32 @@ const HeaderInner = styled.div`
   }
 `
 
+const ButtonCreate = styled(Button)`
+  font-size: 12px;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    font-size: 14px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+`
+
 const NetworkStyled = styled(Network)`
-  margin: 0 0 0 12px;
+  margin: 0 0 0 5px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-left: 12px;
+  }
 `
 
 const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
-  margin: 0 0 0 12px;
+  margin: 0 0 0 5px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-left: 12px;
+  }
 `
 
 const ContentsRight = styled.div`
@@ -70,9 +90,9 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
           <Logo />
         </LogoWrapper>
         <ContentsRight>
-          <Button buttonType={ButtonType.secondaryLine} onClick={() => history.push('/create')}>
+          <ButtonCreate buttonType={ButtonType.secondaryLine} onClick={() => history.push('/create')}>
             Create Market
-          </Button>
+          </ButtonCreate>
           {!context.account && (
             <ButtonConnectWalletStyled
               modalState={isModalOpen}

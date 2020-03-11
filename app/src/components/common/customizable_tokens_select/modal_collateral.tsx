@@ -1,17 +1,12 @@
 import React, { ChangeEvent, HTMLAttributes, useState } from 'react'
 import styled from 'styled-components'
 
+import { useCollateral } from '../../../hooks'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { useCollateral } from '../../../hooks/useCollateral'
 import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { Token } from '../../../util/types'
-import { Button } from '../button'
-import { FormRow } from '../form_row'
-import ModalWrapper from '../modal_wrapper'
-import { Spinner } from '../spinner'
-import { SubsectionTitle } from '../subsection_title'
-import { Textfield } from '../textfield'
-import { TitleValue } from '../title_value'
+import { Button, FormRow, Spinner, SubsectionTitle, Textfield, TitleValue } from '../../common'
+import { ModalWrapper } from '../../modal/modal_wrapper'
 
 const Grid = styled.div`
   column-gap: 20px;

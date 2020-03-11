@@ -11,7 +11,8 @@ const CardStyled = styled.div<{ noPadding?: boolean }>`
   ${props =>
     props.noPadding
       ? 'padding: 0'
-      : 'padding: ' + props.theme.cards.paddingVertical + ' ' + props.theme.cards.paddingHorizontal + ';'}
+      : 'padding: ' + props.theme.cards.paddingVertical + ' ' + props.theme.cards.paddingHorizontal + ';'};
+  position: relative;
 `
 
 CardStyled.defaultProps = {

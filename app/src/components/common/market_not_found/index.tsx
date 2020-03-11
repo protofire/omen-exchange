@@ -3,11 +3,7 @@ import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 import styled, { withTheme } from 'styled-components'
 
-import { ButtonContainer } from '../button_container'
-import { ButtonLink } from '../button_link'
-import { SectionTitle } from '../section_title'
-import { SubsectionTitle } from '../subsection_title'
-import { ViewCard } from '../view_card'
+import { ButtonContainer, ButtonLink, SectionTitle, SubsectionTitle, ViewCard } from '../../common'
 
 const WrappedText = styled.div`
   color: #555;

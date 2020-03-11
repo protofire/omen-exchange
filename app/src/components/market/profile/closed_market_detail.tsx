@@ -3,20 +3,23 @@ import React, { useEffect, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 
 import { MARKET_FEE } from '../../../common/constants'
+import { useContracts } from '../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { useContracts } from '../../../hooks/useContracts'
 import { CPKService, ERC20Service } from '../../../services'
 import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
-import { Button, OutcomeTable } from '../../common'
-import { ButtonContainer } from '../../common/button_container'
-import { ClosedMarket } from '../../common/closed_market'
-import { DisplayArbitrator } from '../../common/display_arbitrator'
-import { Loading } from '../../common/loading'
-import { SubsectionTitle } from '../../common/subsection_title'
-import { TitleValue } from '../../common/title_value'
-import { ViewCard } from '../../common/view_card'
+import {
+  Button,
+  ButtonContainer,
+  ClosedMarket,
+  DisplayArbitrator,
+  Loading,
+  SubsectionTitle,
+  TitleValue,
+  ViewCard,
+} from '../../common'
+import { OutcomeTable } from '../../common/outcome_table'
 
 const Grid = styled.div`
   display: grid;

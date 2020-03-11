@@ -8,8 +8,8 @@ import { MarketCreationStatus } from '../../util/market_creation_status_data'
 import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../util/networks'
 import { Arbitrator, MarketData, Question, Token } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
-import { Outcome } from '../common/outcomes'
 
+import { Outcome } from './outcomes'
 import {
   AskQuestionStep,
   CreateMarketStep,

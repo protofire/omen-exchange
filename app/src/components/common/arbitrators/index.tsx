@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import { getArbitratorsByNetwork } from '../../../util/networks'
 import { Arbitrator } from '../../../util/types'
-import { Select } from '../select'
+import { Select } from '../../common/select'
 
 interface Props {
   autoFocus?: boolean

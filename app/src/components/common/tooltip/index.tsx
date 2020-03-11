@@ -73,8 +73,8 @@ const TooltipPopup = styled.div`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  id: string
   description: string
+  id: string
 }
 
 export const Tooltip = (props: Props) => {

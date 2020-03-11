@@ -8,6 +8,7 @@ const Wrapper = styled.button`
   border: 1px solid ${props => props.theme.colors.tertiary};
   cursor: pointer;
   display: flex;
+  flex-shrink: 0;
   height: ${props => props.theme.buttonCircle.dimensions};
   justify-content: center;
   outline: none;

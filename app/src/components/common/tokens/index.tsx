@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { useContracts } from '../../../hooks'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { useContracts } from '../../../hooks/useContracts'
 import { Token } from '../../../util/types'
 import { Select } from '../select'
 

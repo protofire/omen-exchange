@@ -3,23 +3,20 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../util/types'
-import { FormRowLink } from '../form_row_link'
-import { FormRowNote } from '../form_row_note'
-import { Textfield } from '../textfield'
-
-import { ModalQuestion } from './modal_question'
+import { FormRowLink, FormRowNote, Textfield } from '../../common'
+import { ModalQuestion } from '../../modal'
 
 interface Props {
-  value: string
+  addArbitratorCustomValue: (arbitrator: Arbitrator) => void
+  addCategoryCustomValue: (category: string) => void
+  context: ConnectedWeb3Context
+  disabled: boolean
   name: string
   onChange: (event: ChangeEvent<HTMLInputElement>) => any
   onChangeQuestion: (question: Question, arbitrator: Arbitrator) => any
   onClearQuestion: () => void
   placeholder: string
-  context: ConnectedWeb3Context
-  disabled: boolean
-  addArbitratorCustomValue: (arbitrator: Arbitrator) => void
-  addCategoryCustomValue: (category: string) => void
+  value: string
 }
 
 const Wrapper = styled.div`

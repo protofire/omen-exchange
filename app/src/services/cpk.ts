@@ -9,9 +9,12 @@ import { getCPKAddresses, getContractAddress } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { BalanceItem, MarketData, Token } from '../util/types'
 
+import { ConditionalTokenService } from './conditional_token'
+import { ERC20Service } from './erc20'
+import { MarketMakerService } from './market_maker'
 import { MarketMakerFactoryService } from './market_maker_factory'
-
-import { ConditionalTokenService, ERC20Service, MarketMakerService, OracleService, RealitioService } from './index'
+import { OracleService } from './oracle'
+import { RealitioService } from './realitio'
 
 const logger = getLogger('Services::CPKService')
 
