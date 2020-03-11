@@ -40,12 +40,12 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
     variables: { id: marketMakerAddress.toLowerCase() },
   })
 
-  const { data: volume2, variables: vars2 } = useQuery(GET_COLLATERAL_VOLUME_24HS_EARLIER, {
+  const { data: volume2, variables: vars2, error } = useQuery(GET_COLLATERAL_VOLUME_24HS_EARLIER, {
     variables: { id: marketMakerAddress.toLowerCase(), hash: hash && hash.toLowerCase() },
   })
 
   console.log('Volume1', volume1, vars1)
-  console.log('Volume2', volume2, vars2)
+  console.log('Volume2', volume2, vars2, error)
 
   const {
     arbitrator,
