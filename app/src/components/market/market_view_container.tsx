@@ -7,6 +7,7 @@ import { Loading } from '../common'
 import { MarketView } from './market_view'
 import gql from 'graphql-tag'
 import { useQuery } from '@apollo/react-hooks'
+import { BigNumber } from 'ethers/utils'
 
 interface Props {
   marketMakerAddress: string
@@ -19,13 +20,16 @@ const GET_COLLATERAL_VOLUME_NOW = gql`
     }
   }
 `
-const GET_COLLATERAL_VOLUME_24HS_EARLIER = gql`
-  query AfterHash($id: String, $hash: String!) {
-    fixedProductMarketMakers(where: { id: $id }, block: { hash: $hash }) {
+
+const buildQuery24hsEarlier = (hash: Maybe<string>) => {
+  return gql`
+  query AfterHash($id: String) {
+    fixedProductMarketMakers(where: { id: $id }, block: { hash: "${hash}" }) {
       collateralVolume
     }
   }
 `
+}
 
 const MarketViewContainer: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
@@ -36,16 +40,27 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
   const { marketMakerData, status } = useMarketMakerData(marketMakerAddress, context)
   const { library: provider } = context
 
-  const { data: volume1, variables: vars1 } = useQuery(GET_COLLATERAL_VOLUME_NOW, {
+  const [lastDayVolume, setLastDayVolume] = useState<Maybe<BigNumber>>(null)
+
+  const { data: volumeNow } = useQuery(GET_COLLATERAL_VOLUME_NOW, {
+    skip: !!lastDayVolume,
     variables: { id: marketMakerAddress.toLowerCase() },
   })
 
-  const { data: volume2, variables: vars2, error } = useQuery(GET_COLLATERAL_VOLUME_24HS_EARLIER, {
-    variables: { id: marketMakerAddress.toLowerCase(), hash: hash && hash.toLowerCase() },
+  const { data: volumeBefore } = useQuery(buildQuery24hsEarlier(hash && hash.toLowerCase()), {
+    skip: !!lastDayVolume,
+    variables: { id: marketMakerAddress.toLowerCase() },
   })
 
-  console.log('Volume1', volume1, vars1)
-  console.log('Volume2', volume2, vars2, error)
+  if (volumeNow && volumeBefore) {
+    const now = new BigNumber(volumeNow.fixedProductMarketMakers[0].collateralVolume)
+    const before = new BigNumber(volumeBefore.fixedProductMarketMakers[0].collateralVolume)
+
+    setLastDayVolume(now.sub(before))
+  }
+
+  console.log('lastDayVolume', lastDayVolume && lastDayVolume.toString())
+  console.log('skipquery', !!lastDayVolume)
 
   const {
     arbitrator,
@@ -65,10 +80,8 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
       const BLOCKS_PER_SECOND = 15
       const OFFSET = (60 * 60 * 24) / BLOCKS_PER_SECOND
       const lastBlock = await provider.getBlockNumber()
-      console.log('lastblock', lastBlock)
-      const { hash, number } = await provider.getBlock(lastBlock - OFFSET)
+      const { hash } = await provider.getBlock(lastBlock - OFFSET)
       setHash(hash)
-      console.log('block', number)
     }
 
     get24hsVolume()
