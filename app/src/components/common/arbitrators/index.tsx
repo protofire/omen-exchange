@@ -1,10 +1,10 @@
+import unionBy from 'lodash.unionby'
 import React from 'react'
 import styled from 'styled-components'
-import unionBy from 'lodash.unionby'
 
-import { Select } from '../select'
 import { getArbitratorsByNetwork } from '../../../util/networks'
 import { Arbitrator } from '../../../util/types'
+import { Select } from '../../common/select'
 
 interface Props {
   autoFocus?: boolean
@@ -21,7 +21,7 @@ interface Props {
 const FormOption = styled.option``
 
 export const Arbitrators = (props: Props) => {
-  const { networkId, value, customValues, onChangeArbitrator, ...restProps } = props
+  const { customValues, networkId, onChangeArbitrator, value, ...restProps } = props
 
   const arbitrators = getArbitratorsByNetwork(networkId)
   const allArbitrators = unionBy(arbitrators, customValues, 'id')
@@ -40,11 +40,7 @@ export const Arbitrators = (props: Props) => {
   }
 
   return (
-    <Select
-      {...restProps}
-      value={value.id}
-      onChange={e => onChange(e.target.value as KnownArbitrator)}
-    >
+    <Select {...restProps} onChange={e => onChange(e.target.value as KnownArbitrator)} value={value.id}>
       {options.map(option => {
         return (
           <FormOption key={option.value} value={option.value}>

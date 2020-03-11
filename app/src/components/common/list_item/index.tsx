@@ -1,10 +1,14 @@
-import React, { HTMLAttributes } from 'react'
+import { ethers } from 'ethers'
+import moment from 'moment'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
+import { NavLink } from 'react-router-dom'
 import styled, { css } from 'styled-components'
-import { MarketWithExtraData, MarketStatus } from '../../../util/types'
-import { formatDate } from '../../../util/tools'
+
+import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { ERC20Service } from '../../../services'
+import { calcPrice } from '../../../util/tools'
 import { CalendarIcon } from '../calendar_icon'
 import { ChevronRightIcon } from '../chevron_right_icon'
-import { NavLink } from 'react-router-dom'
 
 const ListItemCss = css`
   align-items: center;
@@ -69,9 +73,9 @@ const ResolutionDate = styled.div`
   }
 `
 
-const Bold = styled.div`
-  font-weight: 700;
-`
+// const Bold = styled.div`
+//   font-weight: 700;
+// `
 
 const CalendarIconStyled = styled(CalendarIcon)`
   margin: -2px 5px 0 0;
@@ -85,35 +89,34 @@ const ResolutionText = styled.div`
   }
 `
 
-const Separator = styled.div`
-  display: none;
+// const Separator = styled.div`
+//   display: none;
 
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    color: ${props => props.theme.colors.textColorLight};
-    display: block;
-    font-size: 13px;
-    font-weight: normal;
-    line-height: 1.2;
-    margin: 0 5px;
-  }
-`
+//   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+//     color: ${props => props.theme.colors.textColorLight};
+//     display: block;
+//     font-size: 13px;
+//     font-weight: normal;
+//     line-height: 1.2;
+//     margin: 0 5px;
+//   }
+// `
 
 interface StatusProps {
   resolved?: boolean
 }
 
-const Status = styled.div<StatusProps>`
-  color: ${props =>
-    props.resolved ? props.theme.colors.textColorLight : props.theme.colors.primary};
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.38;
-  margin: 0 0 0 18px;
+// const Status = styled.div<StatusProps>`
+//   color: ${props => (props.resolved ? props.theme.colors.textColorLight : props.theme.colors.primary)};
+//   font-size: 13px;
+//   font-weight: 500;
+//   line-height: 1.38;
+//   margin: 0 0 0 18px;
 
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin-left: 0;
-  }
-`
+//   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+//     margin-left: 0;
+//   }
+// `
 
 const Chevron = styled(ChevronRightIcon)`
   flex-grow: 0;
@@ -121,7 +124,7 @@ const Chevron = styled(ChevronRightIcon)`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  data: MarketWithExtraData
+  market: any
 }
 
 interface ListItemWrapperProps {
@@ -136,21 +139,52 @@ const ListItemWrapper: React.FC<ListItemWrapperProps> = (props: ListItemWrapperP
 }
 
 export const ListItem: React.FC<Props> = (props: Props) => {
-  const { data } = props
-  const { address, question, resolution, status } = data
+  const context = useConnectedWeb3Context()
+  const { account, library: provider } = context
+  const [amount, setAmount] = useState('')
+  const [symbol, setSymbol] = useState('')
+
+  const { market } = props
+  const { collateralToken, collateralVolume, id: address, outcomeTokenAmounts } = market
+
+  const { question } = market.conditions[0]
+  const { outcomes, title } = question
+
+  const endsIn = moment(new Date(question.openingTimestamp * 1000)).fromNow()
+
+  useEffect(() => {
+    const setToken = async () => {
+      if (!account) {
+        return
+      }
+      const erc20Service = new ERC20Service(provider, account, collateralToken)
+      const { decimals, symbol } = await erc20Service.getProfileSummary()
+
+      const amount = ethers.utils.formatUnits(collateralVolume, decimals)
+
+      setAmount(amount)
+      setSymbol(symbol)
+    }
+
+    setToken()
+  }, [collateralToken, account])
+
+  const percentages = calcPrice(outcomeTokenAmounts)
+  const indexMax = percentages.indexOf(Math.max(...percentages))
 
   return (
     <ListItemWrapper address={address}>
       <Contents>
-        <Title>{question}</Title>
+        <Title>{title}</Title>
         <Info>
+          <span>{`${(percentages[indexMax] * 100).toFixed(2)}% ${outcomes[indexMax]} `}</span>·{' '}
+          <span>
+            {amount} {symbol} Volume
+          </span>
           <ResolutionDate>
             <CalendarIconStyled />
-            <Bold>Resolution Date:</Bold>
-            <ResolutionText>{resolution ? formatDate(resolution) : ''}</ResolutionText>
+            <ResolutionText>Ends {endsIn}</ResolutionText>
           </ResolutionDate>
-          <Separator>-</Separator>
-          <Status resolved={status === MarketStatus.Closed}>{status}</Status>
         </Info>
       </Contents>
       <Chevron />

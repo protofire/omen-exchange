@@ -1,36 +1,36 @@
+import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
-import { BigNumber } from 'ethers/utils'
 
-import { Button, Textfield, BigNumberInput } from '../../../common/index'
-import { ButtonContainer } from '../../../common/button_container'
-import { CreateCard } from '../../../common/create_card'
-import { FormRow } from '../../../common/form_row'
-import { TextfieldCustomPlaceholder } from '../../../common/textfield_custom_placeholder'
-import { ButtonLink } from '../../../common/button_link'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { BalanceToken } from '../../../common/balance_token'
-import { BigNumberInputReturn } from '../../../common/big_number_input'
-import { CustomizableTokensSelect } from '../../../common/customizable_tokens_select'
-import { Token } from '../../../../util/types'
-import { FormError } from '../../../common/form_error'
 import { MARKET_FEE } from '../../../../common/constants'
-import { useCollateralBalance } from '../../../../hooks/useCollateralBalance'
+import { useCollateralBalance } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { Token } from '../../../../util/types'
+import {
+  BalanceToken,
+  BigNumberInput,
+  Button,
+  ButtonContainer,
+  ButtonLink,
+  CreateCard,
+  FormError,
+  FormRow,
+  Textfield,
+  TextfieldCustomPlaceholder,
+  Tokens,
+} from '../../../common'
+import { BigNumberInputReturn } from '../../../common/big_number_input'
 
 interface Props {
   back: () => void
   next: () => void
   values: {
     collateral: Token
-    collateralsCustom: Token[]
     spread: number
     funding: BigNumber
   }
   handleCollateralChange: (collateral: Token) => void
-  addCollateralCustom: (collateral: Token) => void
-  handleChange: (
-    event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn,
-  ) => any
+  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
 }
 
 const ButtonLinkStyled = styled(ButtonLink)`
@@ -49,17 +49,15 @@ const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account } = context
 
-  const { values, addCollateralCustom, handleChange, handleCollateralChange } = props
-  const { funding, spread, collateral, collateralsCustom } = values
+  const { handleChange, handleCollateralChange, values } = props
+  const { collateral, funding, spread } = values
 
   const collateralBalance = useCollateralBalance(collateral, context)
 
   const isFundingGreaterThanBalance = account ? funding.gt(collateralBalance) : false
   const error = !spread || funding.isZero() || isFundingGreaterThanBalance
 
-  const fundingMessageError = isFundingGreaterThanBalance
-    ? `You don't have enough collateral in your balance.`
-    : ''
+  const fundingMessageError = isFundingGreaterThanBalance ? `You don't have enough collateral in your balance.` : ''
 
   const back = () => {
     props.back()
@@ -98,14 +96,7 @@ const FundingAndFeeStep = (props: Props) => {
       />
       <FormRow
         formField={
-          <CustomizableTokensSelect
-            addCustomValue={addCollateralCustom}
-            context={context}
-            customValues={collateralsCustom}
-            name="collateralId"
-            onCollateralChange={handleCollateralChange}
-            value={collateral}
-          />
+          <Tokens context={context} name="collateralId" onTokenChange={handleCollateralChange} value={collateral} />
         }
         title={'Collateral token'}
         tooltip={{
@@ -127,25 +118,23 @@ const FundingAndFeeStep = (props: Props) => {
             placeholderText={collateral.symbol}
           />
         }
-        title={'Funding'}
-        tooltip={{
-          id: `funding`,
-          description: `Initial funding to fund the market maker.`,
-        }}
         note={
           <>
             {account && (
               <BalanceToken
                 collateral={collateral}
                 collateralBalance={collateralBalance}
-                onClickAddMaxCollateral={() =>
-                  handleChange({ name: 'funding', value: collateralBalance })
-                }
+                onClickAddMaxCollateral={() => handleChange({ name: 'funding', value: collateralBalance })}
               />
             )}
             <FormError>{fundingMessageError}</FormError>
           </>
         }
+        title={'Funding'}
+        tooltip={{
+          id: `funding`,
+          description: `Initial funding to fund the market maker.`,
+        }}
       />
       <ButtonContainer>
         <ButtonLinkStyled onClick={() => back()}>‹ Back</ButtonLinkStyled>

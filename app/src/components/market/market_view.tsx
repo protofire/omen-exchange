@@ -1,45 +1,38 @@
-import React from 'react'
 import { BigNumber } from 'ethers/utils'
+import React from 'react'
 
-import { SectionTitle } from '../common/section_title'
+import { Arbitrator, BalanceItem, Status, Token } from '../../util/types'
+import { SectionTitle } from '../common'
+
 import { ClosedMarketDetail } from './profile/closed_market_detail'
-import { Status, BalanceItem, Token, Arbitrator } from '../../util/types'
 import { View } from './profile/view'
-import { formatDate } from '../../util/tools'
 
 interface Props {
   account: Maybe<string>
+  arbitrator: Maybe<Arbitrator>
   balances: BalanceItem[]
-  funding: BigNumber
-  status: Status
-  marketMakerAddress: string
+  category: string
   collateral: Token
+  funding: BigNumber
+  isConditionResolved: boolean
+  isQuestionFinalized: boolean
+  marketMakerAddress: string
   question: string
   questionId: string
-  category: string
   resolution: Maybe<Date>
-  arbitrator: Maybe<Arbitrator>
-  isQuestionFinalized: boolean
-  isConditionResolved: boolean
+  status: Status
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {
-  const { balances, question, resolution, isQuestionFinalized } = props
+  const { isQuestionFinalized, question } = props
 
   const renderView = () => {
     return isQuestionFinalized ? <ClosedMarketDetail {...props} /> : <View {...props} />
   }
 
-  const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
-
-  const formattedResolution = resolution ? formatDate(resolution) : ''
-  const subtitle = isQuestionFinalized
-    ? `Final Outcome: ${winningOutcome && winningOutcome.outcomeName}`
-    : formattedResolution
-
   return (
     <>
-      <SectionTitle title={question} subTitle={subtitle} />
+      <SectionTitle goBackEnabled title={question} />
       {renderView()}
     </>
   )

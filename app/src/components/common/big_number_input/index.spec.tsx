@@ -1,11 +1,12 @@
 /* eslint-env jest */
 import '@testing-library/jest-dom/extend-expect'
-import { render, fireEvent } from '@testing-library/react'
+import { fireEvent, render } from '@testing-library/react'
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
-import { BigNumberInput } from './index'
 import { getLogger } from '../../../util/logger'
+
+import { BigNumberInput } from './index'
 
 const logger = getLogger('BigNumberInput::Spec')
 
@@ -14,11 +15,6 @@ const noop = () => ({})
 const defaultProps = { name: 'test', value: new BigNumber('123'), decimals: 2 }
 
 const renderBigNumberInput = props => render(<BigNumberInput {...defaultProps} {...props} />)
-
-test('should work with minimal props', () => {
-  const { asFragment } = renderBigNumberInput({ onChange: noop })
-  expect(asFragment()).toMatchSnapshot()
-})
 
 test('should be initialized with value', () => {
   // given
@@ -56,12 +52,10 @@ test('should change when value changes', async () => {
   })
 
   expect(
-    renderBigNumberInput({ value: new BigNumber('123'), onChange: changeHandler }).container
-      .firstChild.value,
+    renderBigNumberInput({ value: new BigNumber('123'), onChange: changeHandler }).container.firstChild.value,
   ).toEqual('1.23')
   expect(
-    renderBigNumberInput({ value: new BigNumber('321'), onChange: changeHandler }).container
-      .firstChild.value,
+    renderBigNumberInput({ value: new BigNumber('321'), onChange: changeHandler }).container.firstChild.value,
   ).toEqual('3.21')
 })
 
@@ -126,8 +120,6 @@ test('should allow initialize with an empty string', async () => {
     logger.log('changeHandler mock triggered')
   })
 
-  expect(
-    renderBigNumberInput({ value: null, onChange: changeHandler }).container.firstChild.value,
-  ).toEqual('')
+  expect(renderBigNumberInput({ value: null, onChange: changeHandler }).container.firstChild.value).toEqual('')
   expect(changeHandler).toHaveBeenCalledTimes(0)
 })

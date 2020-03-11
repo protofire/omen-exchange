@@ -1,6 +1,7 @@
 import React, { HTMLAttributes } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
+
 import { IconInfo } from './img/IconInfo'
 
 const TooltipPopup = styled.div`
@@ -72,24 +73,24 @@ const TooltipPopup = styled.div`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  id: string
   description: string
+  id: string
 }
 
 export const Tooltip = (props: Props) => {
-  const { id, description, ...restProps } = props
+  const { description, id, ...restProps } = props
 
   return (
     <TooltipPopup
       data-class="reactTooltip"
+      data-for={id}
+      data-html={true}
       data-multiline={true}
       data-tip={description}
-      data-html={true}
-      data-for={id}
       {...restProps}
     >
       <IconInfo />
-      <ReactTooltip id={id} clickable={true} effect="solid" delayHide={500} />
+      <ReactTooltip clickable={true} delayHide={500} effect="solid" id={id} />
     </TooltipPopup>
   )
 }

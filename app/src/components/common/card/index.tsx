@@ -11,11 +11,8 @@ const CardStyled = styled.div<{ noPadding?: boolean }>`
   ${props =>
     props.noPadding
       ? 'padding: 0'
-      : 'padding: ' +
-        props.theme.cards.paddingVertical +
-        ' ' +
-        props.theme.cards.paddingHorizontal +
-        ';'}
+      : 'padding: ' + props.theme.cards.paddingVertical + ' ' + props.theme.cards.paddingHorizontal + ';'};
+  position: relative;
 `
 
 CardStyled.defaultProps = {
@@ -50,7 +47,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const Card: React.FC<Props> = (props: Props) => {
-  const { title, children, noPadding, titleAlign, ...restProps } = props
+  const { children, noPadding, title, titleAlign, ...restProps } = props
   return (
     <CardStyled noPadding={noPadding} {...restProps}>
       {title ? <Title titleAlign={titleAlign}>{title}</Title> : null}

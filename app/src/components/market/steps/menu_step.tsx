@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
-import { SectionTitle } from '../../common/section_title'
+
+import { SectionTitle } from '../../common'
 
 interface Props {
   currentStep: number
@@ -18,8 +19,8 @@ interface StepItem {
 const Wrapper = styled.div`
   display: flex;
   margin: 0 auto 20px;
-  max-width: ${props => props.theme.createSteps.maxWidth};
-  width: 100%;
+  max-width: 100%;
+  width: ${props => props.theme.mainContainer.maxWidth};
 `
 
 const Step = styled.div<{ active?: boolean }>`
@@ -61,15 +62,12 @@ class MenuStep extends Component<Props, State> {
     const currentStepItemSelected = steps.find(step => step.value === this.props.currentStep)
 
     const stepsBlocks = steps.map((step, index) => (
-      <Step
-        active={currentStepItemSelected && step.value <= currentStepItemSelected.value}
-        key={index}
-      ></Step>
+      <Step active={currentStepItemSelected && step.value <= currentStepItemSelected.value} key={index}></Step>
     ))
 
     return (
       <>
-        <SectionTitle title={'Conditional Exchange'} subTitle={'Create A New Market'} />
+        <SectionTitle title={'Conditional Exchange'} />
         <Wrapper>{stepsBlocks}</Wrapper>
       </>
     )

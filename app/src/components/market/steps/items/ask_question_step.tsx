@@ -1,17 +1,20 @@
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
-import { CreateCard } from '../../../common/create_card'
-import { Button, Categories } from '../../../common/index'
-import { FormRow } from '../../../common/form_row'
-import { DateField } from '../../../common/date_field'
-import { ButtonContainer } from '../../../common/button_container'
-import { Well } from '../../../common/well'
-import { Arbitrators } from '../../../common/arbitrators'
-import { QuestionInput } from '../../../common/question_input'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
-import { DisplayArbitrator } from '../../../common/display_arbitrator'
+import {
+  Arbitrators,
+  Button,
+  ButtonContainer,
+  Categories,
+  CreateCard,
+  DateField,
+  DisplayArbitrator,
+  FormRow,
+  Well,
+} from '../../../common'
+import { QuestionInput } from '../../../common/question_input'
 
 interface Props {
   next: () => void
@@ -42,25 +45,17 @@ const AskQuestionStep = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const {
-    values,
-    handleChange,
-    handleClearQuestion,
-    handleQuestionChange,
-    handleArbitratorChange,
-    handleDateChange,
     addArbitratorCustom,
     addCategoryCustom,
+    handleArbitratorChange,
+    handleChange,
+    handleClearQuestion,
+    handleDateChange,
+    handleQuestionChange,
     next,
+    values,
   } = props
-  const {
-    question,
-    category,
-    categoriesCustom,
-    resolution,
-    arbitrator,
-    arbitratorsCustom,
-    loadedQuestionId,
-  } = values
+  const { arbitrator, arbitratorsCustom, categoriesCustom, category, loadedQuestionId, question, resolution } = values
 
   const error = !question || !category || !resolution
 
@@ -77,16 +72,16 @@ const AskQuestionStep = (props: Props) => {
       <FormRow
         formField={
           <QuestionInput
-            value={question}
+            addArbitratorCustomValue={addArbitratorCustom}
+            addCategoryCustomValue={addCategoryCustom}
+            context={context}
+            disabled={!!loadedQuestionId}
             name="question"
             onChange={handleChange}
             onChangeQuestion={handleQuestionChange}
             onClearQuestion={handleClearQuestion}
-            addArbitratorCustomValue={addArbitratorCustom}
-            addCategoryCustomValue={addCategoryCustom}
             placeholder="Type in a question..."
-            context={context}
-            disabled={!!loadedQuestionId}
+            value={question}
           />
         }
         title={'Question'}
@@ -98,11 +93,11 @@ const AskQuestionStep = (props: Props) => {
       <FormRow
         formField={
           <Categories
-            name="category"
-            disabled={!!loadedQuestionId}
-            value={category}
-            onChange={handleChange}
             customValues={categoriesCustom}
+            disabled={!!loadedQuestionId}
+            name="category"
+            onChange={handleChange}
+            value={category}
           />
         }
         title={'Category'}
@@ -130,12 +125,12 @@ const AskQuestionStep = (props: Props) => {
       <FormRow
         formField={
           <Arbitrators
+            customValues={arbitratorsCustom}
             disabled={!!loadedQuestionId}
             name="arbitrator"
-            value={arbitrator}
-            onChangeArbitrator={handleArbitratorChange}
-            customValues={arbitratorsCustom}
             networkId={context.networkId}
+            onChangeArbitrator={handleArbitratorChange}
+            value={arbitrator}
           />
         }
         title={'Arbitrator'}

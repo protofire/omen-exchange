@@ -1,7 +1,10 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { HTMLAttributes, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import styled from 'styled-components'
-import { MessageType, Message } from '../message'
+
+import { Message, MessageType } from '../message'
 
 import CopySVG from './img/copy.svg'
 
@@ -36,16 +39,11 @@ export const CopyText: React.FC<Props> = (props: Props) => {
     <>
       <CopyWrapper {...restProps}>
         <CopyToClipboard text={value}>
-          <img onClick={showCopyMessage} src={CopySVG} alt="" />
+          <img alt="" onClick={showCopyMessage} src={CopySVG} />
         </CopyToClipboard>
       </CopyWrapper>
       {showMessage && (
-        <Message
-          hidingTimeout={5000}
-          onHide={hideCopyMessage}
-          text={toastMessage}
-          type={MessageType.ok}
-        />
+        <Message hidingTimeout={5000} onHide={hideCopyMessage} text={toastMessage} type={MessageType.ok} />
       )}
     </>
   )

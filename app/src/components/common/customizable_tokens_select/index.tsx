@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { Tokens } from '../tokens'
-import { ModalCollateral } from './modal_collateral'
-import { Token } from '../../../util/types'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { Token } from '../../../util/types'
 import { FormRowLink } from '../form_row_link'
+import { Tokens } from '../tokens'
+
+import { ModalCollateral } from './modal_collateral'
 
 interface Props {
   name: string
@@ -23,19 +24,13 @@ const Link = styled(FormRowLink)`
 `
 
 export const CustomizableTokensSelect = (props: Props) => {
-  const { context, name, value, customValues, onCollateralChange, addCustomValue } = props
+  const { addCustomValue, context, name, onCollateralChange, value } = props
 
   const [isModalCollateralOpen, setModalCollateralState] = useState(false)
 
   return (
     <>
-      <Tokens
-        customValues={customValues}
-        name={name}
-        networkId={context.networkId}
-        onTokenChange={onCollateralChange}
-        value={value}
-      />
+      <Tokens context={context} name={name} onTokenChange={onCollateralChange} value={value} />
       <Link onClick={() => setModalCollateralState(true)}>Add custom token</Link>
       <ModalCollateral
         context={context}

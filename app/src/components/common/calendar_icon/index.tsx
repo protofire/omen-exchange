@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+
 import CalendarSVG from './img/calendar.svg'
 
 const Icon = styled.div`

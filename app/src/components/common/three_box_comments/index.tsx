@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
 import Box from '3box'
 import ThreeBoxCommentsReact from '3box-comments-react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
-import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+
 import { THREEBOX_ADMIN_ADDRESS, THREEBOX_SPACE_NAME } from '../../../common/constants'
-import { ButtonCSS } from '../../../common/button_styling_types'
+import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { ButtonCSS } from '../../../theme/component_styles/button_styling_types'
 
 const MAIN_AVATAR_DIMENSIONS = '40px'
 const COMMENT_AVATAR_DIMENSIONS = '32px'
@@ -19,8 +20,9 @@ const CommentsTitle = styled.h3`
 
 const ThreeBoxCustom = styled.div`
   margin: 30px auto;
-  max-width: ${props => props.theme.viewMarket.maxWidth};
-  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  width: ${props => props.theme.mainContainer.maxWidth};
 
   > .threebox-comments-react {
     max-width: 100%;
@@ -43,7 +45,9 @@ const ThreeBoxCustom = styled.div`
         font-weight: normal;
         height: 54px;
         line-height: 1.2;
+        max-width: 100%;
         min-height: 54px;
+        min-width: 100%;
         padding: 5px 12px 5px 60px;
       }
 
@@ -150,6 +154,7 @@ const ThreeBoxCustom = styled.div`
       height: auto;
       justify-content: flex-end;
       margin: 0 0 15px;
+      min-width: 0;
 
       .context_text {
         color: ${props => props.theme.colors.textColorLight};
@@ -192,6 +197,7 @@ export const ThreeBoxComments = (props: Props) => {
   const { threadName } = props
 
   const [box, setBox] = useState<any>(null)
+  // eslint-disable-next-line no-warning-comments
   // TODO: fix with useConnectedWeb3Wallet context
   const [currentUserAddress] = useState<string>(context.account || '')
 
@@ -204,13 +210,13 @@ export const ThreeBoxComments = (props: Props) => {
     <ThreeBoxCustom>
       <CommentsTitle>Comments</CommentsTitle>
       <ThreeBoxCommentsReact
-        spaceName={THREEBOX_SPACE_NAME}
+        adminEthAddr={THREEBOX_ADMIN_ADDRESS}
         box={box}
         currentUserAddr={currentUserAddress}
-        threadName={threadName}
-        adminEthAddr={THREEBOX_ADMIN_ADDRESS}
         loginFunction={handleLogin}
         showCommentCount={10}
+        spaceName={THREEBOX_SPACE_NAME}
+        threadName={threadName}
         useHovers={true}
       />
     </ThreeBoxCustom>

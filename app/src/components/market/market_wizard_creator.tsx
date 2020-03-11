@@ -1,23 +1,23 @@
-import React, { ChangeEvent, useEffect, useState } from 'react'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 
+import { MARKET_FEE } from '../../common/constants'
+import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { MarketCreationStatus } from '../../util/market_creation_status_data'
+import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../util/networks'
+import { Arbitrator, MarketData, Question, Token } from '../../util/types'
+import { BigNumberInputReturn } from '../common/big_number_input'
+
+import { Outcome } from './outcomes'
 import {
   AskQuestionStep,
-  FundingAndFeeStep,
-  OutcomesStep,
   CreateMarketStep,
+  FundingAndFeeStep,
   MenuStep,
+  OutcomesStep,
   SummaryMarketStep,
 } from './steps'
-
-import { Arbitrator, MarketData, Question, Token } from '../../util/types'
-import { MARKET_FEE } from '../../common/constants'
-import { BigNumberInputReturn } from '../common/big_number_input'
-import { Outcome } from '../common/outcomes'
-import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../util/networks'
-import { MarketCreationStatus } from '../../util/market_creation_status_data'
 
 interface Props {
   callback: (param: MarketData) => void
@@ -36,7 +36,6 @@ export const MarketWizardCreator = (props: Props) => {
 
   const marketDataDefault: MarketData = {
     collateral: defaultCollateral,
-    collateralsCustom: [],
     arbitratorsCustom: [],
     categoriesCustom: [],
     question: '',
@@ -65,10 +64,7 @@ export const MarketWizardCreator = (props: Props) => {
     let isSubscribed = true
 
     const updateMarketData = async () => {
-      const collateral = getToken(
-        networkId,
-        marketData.collateral.symbol.toLowerCase() as KnownToken,
-      )
+      const collateral = getToken(networkId, marketData.collateral.symbol.toLowerCase() as KnownToken)
 
       const arbitrator = getArbitrator(networkId, marketData.arbitrator.id)
 
@@ -103,16 +99,6 @@ export const MarketWizardCreator = (props: Props) => {
     setCurrentStep(actualCurrentStep)
   }
 
-  const addCollateralCustom = (collateral: Token): void => {
-    const collateralsCustom = marketData.collateralsCustom
-    collateralsCustom.push(collateral)
-    const newMarketData = {
-      ...marketData,
-      collateralsCustom,
-    }
-    setMarketdata(newMarketData)
-  }
-
   const addArbitratorCustom = (arbitrator: Arbitrator): void => {
     const arbitratorsCustom = marketData.arbitratorsCustom
     arbitratorsCustom.push(arbitrator)
@@ -145,15 +131,6 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const handleCollateralChange = (collateral: Token) => {
-    const newMarketData = {
-      ...marketData,
-      funding: ethers.constants.Zero, // when the collateral changes, reset the value of funding
-      collateral,
-    }
-    setMarketdata(newMarketData)
-  }
-
   const handleArbitratorChange = (arbitrator: Arbitrator) => {
     const newMarketData = {
       ...marketData,
@@ -163,7 +140,7 @@ export const MarketWizardCreator = (props: Props) => {
   }
 
   const handleQuestionChange = (questionObj: Question, arbitrator: Arbitrator) => {
-    const { questionId, question, resolution, category, outcomes } = questionObj
+    const { category, outcomes, question, questionId, resolution } = questionObj
 
     const outcomesFromQuestion = outcomes.map(outcomeName => {
       return {
@@ -182,6 +159,15 @@ export const MarketWizardCreator = (props: Props) => {
       loadedQuestionId: questionId,
     }
 
+    setMarketdata(newMarketData)
+  }
+
+  const handleCollateralChange = (collateral: Token) => {
+    const newMarketData = {
+      ...marketData,
+      funding: ethers.constants.Zero, // when the collateral changes, reset the value of funding
+      collateral,
+    }
     setMarketdata(newMarketData)
   }
 
@@ -230,31 +216,30 @@ export const MarketWizardCreator = (props: Props) => {
 
   const currentStepFn = () => {
     const {
-      collateral,
-      collateralsCustom,
-      question,
-      category,
-      categoriesCustom,
-      resolution,
       arbitrator,
       arbitratorsCustom,
-      spread,
+      categoriesCustom,
+      category,
+      collateral,
       funding,
-      outcomes,
       loadedQuestionId,
+      outcomes,
+      question,
+      resolution,
+      spread,
     } = marketData
 
     switch (currentStep) {
       case 1:
         return (
           <AskQuestionStep
-            handleChange={handleChange}
-            handleDateChange={handleDateChange}
-            handleArbitratorChange={handleArbitratorChange}
-            handleQuestionChange={handleQuestionChange}
-            handleClearQuestion={handleClearQuestion}
             addArbitratorCustom={addArbitratorCustom}
             addCategoryCustom={addCategoryCustom}
+            handleArbitratorChange={handleArbitratorChange}
+            handleChange={handleChange}
+            handleClearQuestion={handleClearQuestion}
+            handleDateChange={handleDateChange}
+            handleQuestionChange={handleQuestionChange}
             next={() => next()}
             values={{
               question,
@@ -273,22 +258,21 @@ export const MarketWizardCreator = (props: Props) => {
             back={() => back()}
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
-            addCollateralCustom={addCollateralCustom}
             next={() => next()}
-            values={{ collateral, collateralsCustom, spread, funding }}
+            values={{ collateral, spread, funding }}
           />
         )
       case 3:
         return (
           <OutcomesStep
             back={() => back()}
+            handleOutcomesChange={handleOutcomesChange}
             next={() => next()}
             values={{
               outcomes,
               question,
               loadedQuestionId,
             }}
-            handleOutcomesChange={handleOutcomesChange}
           />
         )
       case 4:
@@ -303,13 +287,13 @@ export const MarketWizardCreator = (props: Props) => {
       default:
         return (
           <AskQuestionStep
-            handleChange={handleChange}
-            handleDateChange={handleDateChange}
-            handleArbitratorChange={handleArbitratorChange}
-            handleQuestionChange={handleQuestionChange}
-            handleClearQuestion={handleClearQuestion}
             addArbitratorCustom={addArbitratorCustom}
             addCategoryCustom={addCategoryCustom}
+            handleArbitratorChange={handleArbitratorChange}
+            handleChange={handleChange}
+            handleClearQuestion={handleClearQuestion}
+            handleDateChange={handleDateChange}
+            handleQuestionChange={handleQuestionChange}
             next={() => next()}
             values={{
               question,

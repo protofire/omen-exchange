@@ -1,11 +1,12 @@
 import React, { HTMLAttributes } from 'react'
 import ReactDOM from 'react-dom'
-import { Spinner } from '../spinner'
 import styled from 'styled-components'
 
-const LoadingStyled = styled.div`
+import { Spinner } from '../spinner'
+
+const FullLoadingWrapper = styled.div`
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.75);
+  background-color: rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -17,10 +18,24 @@ const LoadingStyled = styled.div`
   z-index: 100;
 `
 
+const InnerLoadingWrapper = styled.div`
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+`
+
 const Message = styled.p`
-  color: #333;
-  font-size: 15px;
-  font-weight: 600;
+  color: #86909e;
+  font-size: 14px;
+  font-weight: 400;
   line-height: 1.2;
   margin: 0 auto;
   max-width: 100%;
@@ -29,18 +44,29 @@ const Message = styled.p`
   width: 480px;
 `
 
-interface InnerLoadingProps {
+interface LoadingProps {
   message?: string
 }
 
-const InnerLoading = (props: InnerLoadingProps) => {
+const FullLoading = (props: LoadingProps) => {
   const { message = 'Loading...', ...restProps } = props
 
   return (
-    <LoadingStyled {...restProps}>
+    <FullLoadingWrapper {...restProps}>
       <Spinner />
       {message ? <Message>{message}</Message> : null}
-    </LoadingStyled>
+    </FullLoadingWrapper>
+  )
+}
+
+const InnerLoading = (props: LoadingProps) => {
+  const { message = 'Loading...', ...restProps } = props
+
+  return (
+    <InnerLoadingWrapper {...restProps}>
+      <Spinner />
+      {message ? <Message>{message}</Message> : null}
+    </InnerLoadingWrapper>
   )
 }
 
@@ -50,11 +76,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const Loading: React.FC<Props> = (props: Props) => {
-  const { message, full, ...restProps } = props
+  const { full, message, ...restProps } = props
 
   if (full) {
     const portal: any = document.getElementById('portalContainer')
-    return ReactDOM.createPortal(<InnerLoading message={message} {...restProps} />, portal)
+    return ReactDOM.createPortal(<FullLoading message={message} {...restProps} />, portal)
   } else {
     return <InnerLoading message={message} {...restProps} />
   }

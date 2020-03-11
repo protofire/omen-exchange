@@ -1,24 +1,22 @@
 import React, { ChangeEvent, useState } from 'react'
 import styled from 'styled-components'
 
-import { ModalQuestion } from './modal_question'
-import { Arbitrator, Question } from '../../../util/types'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { FormRowLink } from '../form_row_link'
-import { Textfield } from '../textfield'
-import { FormRowNote } from '../form_row_note'
+import { Arbitrator, Question } from '../../../util/types'
+import { FormRowLink, FormRowNote, Textfield } from '../../common'
+import { ModalQuestion } from '../../modal'
 
 interface Props {
-  value: string
+  addArbitratorCustomValue: (arbitrator: Arbitrator) => void
+  addCategoryCustomValue: (category: string) => void
+  context: ConnectedWeb3Context
+  disabled: boolean
   name: string
   onChange: (event: ChangeEvent<HTMLInputElement>) => any
   onChangeQuestion: (question: Question, arbitrator: Arbitrator) => any
   onClearQuestion: () => void
   placeholder: string
-  context: ConnectedWeb3Context
-  disabled: boolean
-  addArbitratorCustomValue: (arbitrator: Arbitrator) => void
-  addCategoryCustomValue: (category: string) => void
+  value: string
 }
 
 const Wrapper = styled.div`
@@ -41,16 +39,16 @@ const Link = styled(FormRowLink)`
 
 export const QuestionInput = (props: Props) => {
   const {
-    value,
+    addArbitratorCustomValue,
+    addCategoryCustomValue,
+    context,
+    disabled,
     name = 'question',
     onChange,
     onChangeQuestion,
     onClearQuestion,
     placeholder = 'Type in a question...',
-    context,
-    disabled,
-    addArbitratorCustomValue,
-    addCategoryCustomValue,
+    value,
   } = props
 
   const [isModalQuestionOpen, setModalQuestionState] = useState(false)
@@ -67,8 +65,8 @@ export const QuestionInput = (props: Props) => {
       />
       <Wrapper>
         <Note>
-          <strong>For example:</strong> <i>&quot;Will France win?&quot;</i> is not an acceptable
-          question, but <i>&quot;Will France win the 2020 FIFA World Cup?&quot;</i> is a good one.
+          <strong>For example:</strong> <i>&quot;Will France win?&quot;</i> is not an acceptable question, but{' '}
+          <i>&quot;Will France win the 2020 FIFA World Cup?&quot;</i> is a good one.
         </Note>
         {!disabled && <Link onClick={() => setModalQuestionState(true)}>Add question</Link>}
         {disabled && <Link onClick={onClearQuestion}>Clear question</Link>}

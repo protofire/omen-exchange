@@ -1,22 +1,28 @@
-import React from 'react'
-import styled from 'styled-components'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
-
-import { ThreeBoxComments } from '../../common/three_box_comments'
-import { ViewCard } from '../../common/view_card'
-import { Status, BalanceItem, Token, Arbitrator, OutcomeTableValue } from '../../../util/types'
-import { ButtonAnchor, OutcomeTable } from '../../common'
-import { Loading } from '../../common/loading'
-import { ButtonContainer } from '../../common/button_container'
-import { SubsectionTitle } from '../../common/subsection_title'
 import { BigNumber } from 'ethers/utils'
-import { TitleValue } from '../../common/title_value'
-import { DisplayArbitrator } from '../../common/display_arbitrator'
-import { GridThreeColumns } from '../../common/grid_three_columns'
-import { WhenConnected } from '../../../hooks/connectedWeb3'
+import React, { useState } from 'react'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
+import styled from 'styled-components'
 
-const SubsectionTitleStyled = styled(SubsectionTitle)`
-  margin-bottom: 0;
+import { WhenConnected } from '../../../hooks/connectedWeb3'
+import { ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
+import {
+  Button,
+  ButtonContainer,
+  DisplayArbitrator,
+  GridTwoColumns,
+  Loading,
+  SubsectionTitle,
+  SubsectionTitleAction,
+  SubsectionTitleWrapper,
+  ThreeBoxComments,
+  TitleValue,
+  ViewCard,
+} from '../../common'
+import { OutcomeTable } from '../../common/outcome_table'
+
+const LeftButton = styled(Button)`
+  margin-right: auto;
 `
 
 interface Props extends RouteComponentProps<{}> {
@@ -33,15 +39,11 @@ interface Props extends RouteComponentProps<{}> {
 }
 
 const ViewWrapper = (props: Props) => {
-  const {
-    balances,
-    collateral,
-    status,
-    questionId,
-    marketMakerAddress,
-    arbitrator,
-    category,
-  } = props
+  const { arbitrator, balances, category, collateral, history, marketMakerAddress, questionId, status } = props
+  const [showingExtraInformation, setExtraInformation] = useState(false)
+
+  const toggleExtraInformation = () =>
+    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -59,23 +61,19 @@ const ViewWrapper = (props: Props) => {
       <OutcomeTable
         balances={balances}
         collateral={collateral}
-        displayRadioSelection={false}
         disabledColumns={disabledColumns}
+        displayRadioSelection={false}
         probabilities={probabilities}
       />
     )
   }
 
-  const details = () => {
+  const details = (showExtraDetails: boolean) => {
     return (
       <>
-        <SubsectionTitle>Details</SubsectionTitle>
-        <GridThreeColumns>
+        <GridTwoColumns>
           {category && <TitleValue title={'Category'} value={category} />}
-          <TitleValue
-            title={'Arbitrator'}
-            value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />}
-          />
+          <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
           {questionId && (
             <TitleValue
               title={'Realitio'}
@@ -90,7 +88,15 @@ const ViewWrapper = (props: Props) => {
               }
             />
           )}
-        </GridThreeColumns>
+          {showExtraDetails ? (
+            <>
+              <TitleValue title={'Mocked Title 1'} value={'Mocked Value 1'} />
+              <TitleValue title={'Mocked Title 2'} value={'Longer Mocked Value to have and idea how it looks'} />
+              <TitleValue title={'Mocked Title 3'} value={'Mocked Value 3'} />
+              <TitleValue title={'Mocked Title 4'} value={'Mocked Value 4'} />
+            </>
+          ) : null}
+        </GridTwoColumns>
       </>
     )
   }
@@ -100,16 +106,41 @@ const ViewWrapper = (props: Props) => {
   return (
     <>
       <ViewCard>
-        <SubsectionTitleStyled>Outcomes</SubsectionTitleStyled>
+        <SubsectionTitleWrapper>
+          <SubsectionTitle>Market Information</SubsectionTitle>
+          <SubsectionTitleAction onClick={toggleExtraInformation}>
+            {showingExtraInformation ? 'Hide' : 'Show'} Pool Information
+          </SubsectionTitleAction>
+        </SubsectionTitleWrapper>
+        {marketHasDetails && details(showingExtraInformation)}
         {renderTableData()}
-        {marketHasDetails && details()}
         <WhenConnected>
           <ButtonContainer>
-            <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
-            {userHasShares && (
-              <ButtonAnchor href={`/#/${marketMakerAddress}/sell`}>Sell</ButtonAnchor>
-            )}
-            <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
+            <LeftButton
+              buttonType={ButtonType.secondaryLine}
+              onClick={() => {
+                history.push(`${marketMakerAddress}/fund`)
+              }}
+            >
+              Pool Liquidity
+            </LeftButton>
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={!userHasShares}
+              onClick={() => {
+                history.push(`${marketMakerAddress}/sell`)
+              }}
+            >
+              Sell
+            </Button>
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              onClick={() => {
+                history.push(`${marketMakerAddress}/buy`)
+              }}
+            >
+              Buy
+            </Button>
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>

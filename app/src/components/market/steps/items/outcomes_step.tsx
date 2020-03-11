@@ -1,12 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { CreateCard } from '../../../common/create_card'
-import { Button } from '../../../common/index'
-import { Outcomes, Outcome } from '../../../common/outcomes'
-import { ButtonContainer } from '../../../common/button_container'
-import { ButtonLink } from '../../../common/button_link'
-import { Well } from '../../../common/well'
+
 import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
+import { Button, ButtonContainer, ButtonLink, CreateCard, Well } from '../../../common'
+import { Outcome, Outcomes } from '../../outcomes'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -33,7 +30,7 @@ interface Props {
 
 const OutcomesStep = (props: Props) => {
   const { handleOutcomesChange, values } = props
-  const { question, outcomes, loadedQuestionId } = values
+  const { loadedQuestionId, outcomes, question } = values
 
   const errorMessages = []
 
@@ -56,24 +53,22 @@ const OutcomesStep = (props: Props) => {
     errorMessages.push('Please enter at least 2 outcomes')
   }
 
-  const error =
-    totalProbabilities !== 100 || someEmptyName || someEmptyProbability || outcomes.length < 2
+  const error = totalProbabilities !== 100 || someEmptyName || someEmptyProbability || outcomes.length < 2
 
   const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
   return (
     <CreateCard>
       <OutcomeInfo>
-        Please add all the possible outcomes for the <strong>&quot;{question}&quot;</strong>{' '}
-        question.
+        Please add all the possible outcomes for the <strong>&quot;{question}&quot;</strong> question.
       </OutcomeInfo>
       <Outcomes
+        canAddOutcome={canAddOutcome}
+        disabled={!!loadedQuestionId}
+        errorMessages={errorMessages}
+        onChange={handleOutcomesChange}
         outcomes={outcomes}
         totalProbabilities={totalProbabilities}
-        onChange={handleOutcomesChange}
-        errorMessages={errorMessages}
-        disabled={!!loadedQuestionId}
-        canAddOutcome={canAddOutcome}
       />
 
       <ButtonContainerStyled>

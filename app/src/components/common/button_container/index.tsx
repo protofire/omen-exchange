@@ -1,4 +1,4 @@
-import React, { ReactNode, HTMLAttributes } from 'react'
+import React, { HTMLAttributes, ReactNode } from 'react'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
@@ -6,12 +6,10 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: flex-end;
   margin-top: auto;
-  padding-top: 30px;
+  padding-top: 20px;
 
   > * {
-    margin-bottom: 0;
-    margin-left: 10px;
-    width: auto;
+    margin-left: 14px;
 
     &:first-child {
       margin-left: 0;

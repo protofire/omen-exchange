@@ -29,10 +29,8 @@ export type MarketFilter = AllMarkets | FundedMarkets | PredictedOnMarkets | Win
 
 const isAllMarkets = (mf: MarketFilter): mf is AllMarkets => mf._type === Types.allMarkets
 const isFundedMarkets = (mf: MarketFilter): mf is FundedMarkets => mf._type === Types.fundedMarkets
-const isPredictedOnMarkets = (mf: MarketFilter): mf is PredictedOnMarkets =>
-  mf._type === Types.predictedOnMarkets
-const isWinningResultMarkets = (mf: MarketFilter): mf is WinningResultMarkets =>
-  mf._type === Types.winningResultMarkets
+const isPredictedOnMarkets = (mf: MarketFilter): mf is PredictedOnMarkets => mf._type === Types.predictedOnMarkets
+const isWinningResultMarkets = (mf: MarketFilter): mf is WinningResultMarkets => mf._type === Types.winningResultMarkets
 
 export const MarketFilter = {
   allMarkets: (): AllMarkets => ({ _type: Types.allMarkets, label: 'All Markets' }),

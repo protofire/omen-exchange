@@ -1,5 +1,6 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
+
 import LockIcon from './img/lock.svg'
 
 const ClosedMarketWrapper = styled.div`
@@ -7,8 +8,8 @@ const ClosedMarketWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
   margin: 0 auto 10px;
-  max-width: ${props => props.theme.viewMarket.maxWidth};
-  width: 100%;
+  max-width: 100%;
+  width: ${props => props.theme.mainContainer.maxWidth};
 `
 
 const Text = styled.span`
@@ -28,7 +29,7 @@ export const ClosedMarket: React.FC<Props> = (props: Props) => {
 
   return (
     <ClosedMarketWrapper {...restProps}>
-      <img src={LockIcon} alt="" />
+      <img alt="" src={LockIcon} />
       <Text>Closed on {date}</Text>
     </ClosedMarketWrapper>
   )

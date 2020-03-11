@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers/utils'
-import { Outcome } from '../components/common/outcomes'
+
+import { Outcome } from '../components/market/outcomes'
 
 export enum Status {
   Ready = 'Ready',
@@ -56,7 +57,7 @@ export interface Question {
 }
 
 export enum OutcomeTableValue {
-  Probabilities = 'Outcome probabilities',
+  Probabilities = 'Outcome/Probability',
   CurrentPrice = 'Current Price',
   Shares = 'Shares',
   Payout = 'Payout',
@@ -113,7 +114,6 @@ export enum Wallet {
 
 export interface MarketData {
   collateral: Token
-  collateralsCustom: Token[]
   arbitratorsCustom: Arbitrator[]
   categoriesCustom: string[]
   question: string

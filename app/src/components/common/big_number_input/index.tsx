@@ -1,7 +1,7 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
-import styled from 'styled-components'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
+import styled from 'styled-components'
 
 export interface BigNumberInputReturn {
   name: string
@@ -9,18 +9,18 @@ export interface BigNumberInputReturn {
 }
 
 interface Props {
-  decimals: number
-  name: string
   autofocus?: boolean
   className?: string
-  placeholder?: string
+  decimals: number
+  disabled?: boolean
   max?: BigNumber
   min?: BigNumber
+  name: string
   onChange: (value: BigNumberInputReturn) => void
+  placeholder?: string
   step?: BigNumber
   value: Maybe<BigNumber>
   valueFixedDecimals?: number
-  disabled?: boolean
 }
 
 const Input = styled.input`
@@ -38,17 +38,17 @@ const Input = styled.input`
 
 export const BigNumberInput = (props: Props) => {
   const {
-    placeholder = '0.00',
     autofocus = false,
-    value,
-    decimals,
-    name,
-    step,
-    min,
-    max,
     className,
+    decimals,
     disabled = false,
+    max,
+    min,
+    name,
     onChange,
+    placeholder = '0.00',
+    step,
+    value,
   } = props
 
   const [currentValue, setCurrentValue] = useState('')
@@ -94,18 +94,18 @@ export const BigNumberInput = (props: Props) => {
 
   return (
     <Input
-      data-testid={name}
       className={className}
+      data-testid={name}
+      disabled={disabled}
       max={currentMax}
       min={currentMin}
+      name={name}
       onChange={updateValue}
+      placeholder={placeholder}
       ref={inputRef}
       step={currentStep}
       type={'number'}
-      name={name}
       value={currentValue}
-      placeholder={placeholder}
-      disabled={disabled}
     />
   )
 }

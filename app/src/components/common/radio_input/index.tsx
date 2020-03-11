@@ -1,16 +1,8 @@
-import React, { HTMLAttributes } from 'react'
+import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
+
 import RadioOff from './img/RadioOff'
 import RadioOn from './img/RadioOn'
-
-interface OwnProps {
-  checked?: boolean
-  disabled?: boolean
-  name: string
-  value?: any
-}
-
-interface Props extends HTMLAttributes<HTMLDivElement>, OwnProps {}
 
 const RadioWrapper = styled.div`
   cursor: pointer;
@@ -36,19 +28,20 @@ const RadioWrapper = styled.div`
   }
 `
 
+interface Props extends DOMAttributes<HTMLDivElement> {
+  checked?: boolean
+  disabled?: boolean
+  name: string
+  outcomeIndex?: number
+  value?: any
+}
+
 export const RadioInput: React.FC<Props> = (props: Props) => {
-  const { onChange, value, disabled, name, checked, ...restProps } = props
+  const { checked, disabled, name, onChange, value, ...restProps } = props
   return (
     <RadioWrapper {...restProps}>
       {checked ? <RadioOn /> : <RadioOff />}
-      <input
-        checked={checked}
-        name={name}
-        onChange={onChange}
-        disabled={disabled}
-        type="radio"
-        value={value}
-      />
+      <input checked={checked} disabled={disabled} name={name} onChange={onChange} type="radio" value={value} />
     </RadioWrapper>
   )
 }

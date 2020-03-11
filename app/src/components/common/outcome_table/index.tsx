@@ -1,25 +1,25 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Table, TD, TH, THead, TR } from '../table/index'
-import { RadioInput } from '../radio_input/index'
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../util/types'
-import { BarDiagram } from '../bar_diagram_probabilities'
+import { BarDiagram, RadioInput, TD, TH, THead, TR, Table } from '../../common'
 
 interface Props {
   balances: BalanceItem[]
   collateral: Token
-  probabilities: number[]
-  outcomeSelected?: number
-  outcomeHandleChange?: (e: number) => void
   disabledColumns?: OutcomeTableValue[]
-  withWinningOutcome?: boolean
   displayRadioSelection?: boolean
+  outcomeHandleChange?: (e: number) => void
+  outcomeSelected?: number
+  probabilities: number[]
+  withWinningOutcome?: boolean
 }
 
 const TableWrapper = styled.div`
-  margin-bottom: 30px;
+  margin-left: -${props => props.theme.cards.paddingHorizontal};
+  margin-right: -${props => props.theme.cards.paddingHorizontal};
+  margin-top: 20px;
 `
 
 const TDStyled = styled(TD)<{ winningOutcome?: boolean }>`
@@ -56,13 +56,6 @@ export const OutcomeTable = (props: Props) => {
     OutcomeTableValue.Payout,
   ]
 
-  const outcomeMaxProbability = probabilities.reduce(
-    (max, balance, index, balances) => (balance > balances[max] ? index : max),
-    0,
-  )
-
-  const equalProbabilities = probabilities.every(b => b === probabilities[0])
-
   const TableCellsAlign = ['left', 'right', 'right', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
@@ -71,11 +64,7 @@ export const OutcomeTable = (props: Props) => {
         <TR>
           {TableHead.map((value, index) => {
             return !disabledColumns.includes(value) ? (
-              <TH
-                colSpan={index === 0 && displayRadioSelection ? 2 : 1}
-                textAlign={TableCellsAlign[index]}
-                key={index}
-              >
+              <TH colSpan={index === 0 && displayRadioSelection ? 2 : 1} key={index} textAlign={TableCellsAlign[index]}>
                 {value}
               </TH>
             ) : null
@@ -86,11 +75,8 @@ export const OutcomeTable = (props: Props) => {
   }
 
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
-    const { outcomeName, currentPrice, shares, winningOutcome } = balanceItem
-    const isWinning = !equalProbabilities && outcomeIndex === outcomeMaxProbability
-
+    const { currentPrice, outcomeName, shares, winningOutcome } = balanceItem
     const currentPriceFormatted = Number(currentPrice).toFixed(4)
-
     const probability = probabilities[outcomeIndex]
 
     return (
@@ -102,29 +88,18 @@ export const OutcomeTable = (props: Props) => {
               data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
               name="outcome"
               onChange={(e: any) => outcomeHandleChange && outcomeHandleChange(+e.target.value)}
+              outcomeIndex={outcomeIndex}
               value={outcomeIndex}
             />
           </TDNoHorizontalPadding>
         )}
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]} winningOutcome={winningOutcome}>
-            <BarDiagram
-              outcomeName={outcomeName}
-              isWinning={isWinning}
-              probability={probability}
-              withWinningOutcome={withWinningOutcome}
-              winningOutcome={winningOutcome}
-            />
+            <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
           </TDStyled>
         ) : (
           <TD textAlign={TableCellsAlign[1]}>
-            <BarDiagram
-              outcomeName={outcomeName}
-              isWinning={isWinning}
-              probability={probability}
-              withWinningOutcome={withWinningOutcome}
-              winningOutcome={winningOutcome}
-            />
+            <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
           </TD>
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
@@ -161,7 +136,7 @@ export const OutcomeTable = (props: Props) => {
 
   return (
     <TableWrapper>
-      <Table maxHeight="266px" head={renderTableHeader()}>
+      <Table head={renderTableHeader()} maxHeight="332px">
         {renderTable()}
       </Table>
     </TableWrapper>

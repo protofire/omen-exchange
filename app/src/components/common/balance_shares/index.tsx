@@ -1,15 +1,16 @@
+import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
 import { formatBigNumber } from '../../../util/tools'
-import { BalanceItem, Token } from '../../../util/types'
-import { FormRowNote } from '../form_row_note'
-import { FormRowLink } from '../form_row_link'
+import { Token } from '../../../util/types'
+import { FormRowLink } from '../../common/form_row_link'
+import { FormRowNote } from '../../common/form_row_note'
 
 interface Props {
-  balanceItem?: BalanceItem
   collateral: Token
-  onClickMax: (balanceItem?: BalanceItem) => void
+  onClickMax: (shares: BigNumber) => void
+  shares: BigNumber
 }
 
 const Wrapper = styled.div`
@@ -28,21 +29,14 @@ const Note = styled(FormRowNote)`
 `
 
 export const BalanceShares = (props: Props) => {
-  const { balanceItem, collateral, onClickMax } = props
-  const sharesBalanceFormatted = balanceItem
-    ? formatBigNumber(balanceItem.shares, collateral.decimals)
-    : ''
+  const { collateral, onClickMax, shares } = props
 
   return (
-    <>
-      {sharesBalanceFormatted && (
-        <Wrapper>
-          <Note>
-            Balance <strong>{sharesBalanceFormatted}</strong>
-          </Note>
-          <FormRowLink onClick={() => onClickMax(balanceItem)}>Add all funds</FormRowLink>
-        </Wrapper>
-      )}
-    </>
+    <Wrapper>
+      <Note>
+        Current Balance <strong>{formatBigNumber(shares, collateral.decimals)} shares</strong>
+      </Note>
+      <FormRowLink onClick={() => onClickMax(shares)}>Add all shares</FormRowLink>
+    </Wrapper>
   )
 }

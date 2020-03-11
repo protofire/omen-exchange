@@ -1,5 +1,6 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
+
 import { TableOverflow } from '../table_overflow'
 
 const TableWrapper = styled.table<{ stickyHeader?: boolean }>`
@@ -15,7 +16,17 @@ const TableWrapper = styled.table<{ stickyHeader?: boolean }>`
     z-index: 12;
 
     &::before {
-      background-color: ${props => props.theme.borders.borderColor};
+      background-color: #e8eaf6;
+      content: '';
+      height: 1px;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+
+    &::after {
+      background-color: #e8eaf6;
       bottom: 0;
       content: '';
       height: 1px;
@@ -28,26 +39,15 @@ const TableWrapper = styled.table<{ stickyHeader?: boolean }>`
 
 export const THead = styled.thead``
 
-export const TR = styled.tr`
-  th,
-  td {
-    &:first-child {
-      padding-left: 0;
-    }
-
-    &:last-child {
-      padding-right: 0;
-    }
-  }
-`
+export const TR = styled.tr``
 
 export const TH = styled.th<{ textAlign?: string }>`
   border: none;
-  color: #999;
-  font-size: 12px;
-  font-weight: 500;
+  color: ${props => props.theme.colors.textColor};
+  font-size: 14px;
+  font-weight: 400;
   line-height: 1.2;
-  padding: 14px 10px;
+  padding: 12px 25px;
   text-align: ${props => props.textAlign};
   white-space: nowrap;
 `
@@ -57,15 +57,15 @@ TH.defaultProps = {
 }
 
 export const TD = styled.td<{ textAlign?: string; withBorder?: boolean }>`
-  border-bottom: ${props => (props.withBorder ? 'solid 1px #d5d5d5' : 'none')};
+  border-bottom: ${props => (props.withBorder ? 'solid 1px #E8EAF6' : 'none')};
   border-left: none;
   border-right: none;
   border-top: none;
-  color: #000;
-  font-size: 13px;
-  font-weight: normal;
+  color: ${props => props.theme.colors.textColorDark};
+  font-size: 14px;
+  font-weight: 500;
   line-height: 1.2;
-  padding: 14px 10px;
+  padding: 20px 25px;
   text-align: ${props => props.textAlign};
 `
 
@@ -83,7 +83,7 @@ interface Props extends HTMLAttributes<HTMLTableElement> {
 }
 
 export const Table: React.FC<Props> = (props: Props) => {
-  const { head, children, maxHeight, ...restProps } = props
+  const { children, head, maxHeight, ...restProps } = props
   const stickyHeader: boolean = maxHeight ? true : false
 
   return (

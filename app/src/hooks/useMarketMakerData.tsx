@@ -1,13 +1,14 @@
-import { useCallback, useMemo, useState } from 'react'
 import { BigNumber } from 'ethers/utils'
+import { useCallback, useMemo, useState } from 'react'
 
-import { usePolling } from './usePolling'
-import { ConnectedWeb3Context } from './connectedWeb3'
 import { CPKService, ERC20Service, MarketMakerService } from '../services'
-import { getArbitratorFromAddress } from '../util/networks'
-import { useContracts } from './useContracts'
 import { getLogger } from '../util/logger'
-import { BalanceItem, Status, Token, Arbitrator } from '../util/types'
+import { getArbitratorFromAddress } from '../util/networks'
+import { Arbitrator, BalanceItem, Status, Token } from '../util/types'
+
+import { ConnectedWeb3Context } from './connectedWeb3'
+import { useContracts } from './useContracts'
+import { usePolling } from './usePolling'
 
 const logger = getLogger('Market::useMarketMakerData')
 
@@ -33,8 +34,8 @@ export const useMarketMakerData = (
   marketMakerAddress: string,
   context: ConnectedWeb3Context,
 ): { marketMakerData: MarketMakerData; status: Status } => {
-  const { conditionalTokens, realitio, buildMarketMaker } = useContracts(context)
-  const { library: provider, networkId, account } = context
+  const { buildMarketMaker, conditionalTokens, realitio } = useContracts(context)
+  const { account, library: provider, networkId } = context
 
   const [status, setStatus] = useState(Status.Ready)
 
@@ -68,13 +69,7 @@ export const useMarketMakerData = (
     const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
 
     const questionId = await conditionalTokens.getQuestionId(conditionId)
-    const {
-      question,
-      resolution,
-      arbitratorAddress,
-      category,
-      outcomes,
-    } = await realitio.getQuestion(questionId)
+    const { arbitratorAddress, category, outcomes, question, resolution } = await realitio.getQuestion(questionId)
 
     const arbitrator = getArbitratorFromAddress(networkId, arbitratorAddress)
 
@@ -150,15 +145,7 @@ export const useMarketMakerData = (
       isConditionResolved,
       fee,
     }
-  }, [
-    conditionalTokens,
-    provider,
-    networkId,
-    account,
-    marketMakerAddress,
-    realitio,
-    buildMarketMaker,
-  ])
+  }, [conditionalTokens, provider, networkId, account, marketMakerAddress, realitio, buildMarketMaker])
 
   const marketMakerData = usePolling<MarketMakerData>({
     fetchFunc,

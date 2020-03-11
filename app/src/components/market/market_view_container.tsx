@@ -1,9 +1,10 @@
 import React from 'react'
 
-import { MarketView } from './market_view'
+import { useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { Loading } from '../common/loading'
-import { useMarketMakerData } from '../../hooks/useMarketMakerData'
+import { Loading } from '../common'
+
+import { MarketView } from './market_view'
 
 interface Props {
   marketMakerAddress: string
@@ -17,16 +18,16 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
   const { marketMakerData, status } = useMarketMakerData(marketMakerAddress, context)
 
   const {
-    marketMakerFunding,
+    arbitrator,
     balances,
+    category,
     collateral,
+    isConditionResolved,
+    isQuestionFinalized,
+    marketMakerFunding,
     question,
     questionId,
     resolution,
-    arbitrator,
-    category,
-    isConditionResolved,
-    isQuestionFinalized,
   } = marketMakerData
 
   if (!collateral) {
@@ -36,18 +37,18 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
   return (
     <MarketView
       account={context.account}
-      balances={balances}
-      funding={marketMakerFunding}
-      marketMakerAddress={marketMakerAddress}
-      status={status}
-      collateral={collateral}
-      questionId={questionId}
-      question={question || ''}
-      category={category || ''}
-      resolution={resolution}
       arbitrator={arbitrator}
-      isQuestionFinalized={isQuestionFinalized}
+      balances={balances}
+      category={category || ''}
+      collateral={collateral}
+      funding={marketMakerFunding}
       isConditionResolved={isConditionResolved}
+      isQuestionFinalized={isQuestionFinalized}
+      marketMakerAddress={marketMakerAddress}
+      question={question || ''}
+      questionId={questionId}
+      resolution={resolution}
+      status={status}
     />
   )
 }

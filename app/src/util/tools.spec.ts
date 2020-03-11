@@ -1,6 +1,7 @@
 /* eslint-env jest */
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
+
 import {
   calcDistributionHint,
   calcNetCost,
@@ -15,14 +16,38 @@ import {
 describe('tools', () => {
   describe('calcPrice', () => {
     const testCases = [
-      [[100, 100], [0.5, 0.5]],
-      [[150, 50], [0.25, 0.75]],
-      [[50, 150], [0.75, 0.25]],
-      [[100, 100, 100], [0.3333, 0.3333, 0.3333]],
-      [[200, 100, 100], [0.2, 0.4, 0.4]],
-      [[100, 200, 100], [0.4, 0.2, 0.4]],
-      [[100, 100, 200], [0.4, 0.4, 0.2]],
-      [[100, 200, 300], [0.5454, 0.2727, 0.1818]],
+      [
+        [100, 100],
+        [0.5, 0.5],
+      ],
+      [
+        [150, 50],
+        [0.25, 0.75],
+      ],
+      [
+        [50, 150],
+        [0.75, 0.25],
+      ],
+      [
+        [100, 100, 100],
+        [0.3333, 0.3333, 0.3333],
+      ],
+      [
+        [200, 100, 100],
+        [0.2, 0.4, 0.4],
+      ],
+      [
+        [100, 200, 100],
+        [0.4, 0.2, 0.4],
+      ],
+      [
+        [100, 100, 200],
+        [0.4, 0.4, 0.2],
+      ],
+      [
+        [100, 200, 300],
+        [0.5454, 0.2727, 0.1818],
+      ],
     ]
 
     for (const [holdings, expectedResult] of testCases) {
@@ -59,18 +84,54 @@ describe('tools', () => {
 
   describe('calcDistributionHint', () => {
     const testCases = [
-      [[60, 40], [816497, 1224745]],
-      [[40, 60], [1224745, 816497]],
-      [[15, 20, 65], [9309493, 6982120, 2148345]],
-      [[15, 65, 20], [9309493, 2148345, 6982120]],
-      [[20, 15, 65], [6982120, 9309493, 2148345]],
-      [[20, 65, 15], [6982120, 2148345, 9309493]],
-      [[65, 20, 15], [2148345, 6982120, 9309493]],
-      [[65, 15, 20], [2148345, 9309493, 6982120]],
-      [[10, 10, 10, 70], [26457513, 26457513, 26457513, 3779645]],
-      [[10, 10, 70, 10], [26457513, 26457513, 3779645, 26457513]],
-      [[10, 70, 10, 10], [26457513, 3779645, 26457513, 26457513]],
-      [[70, 10, 10, 10], [3779645, 26457513, 26457513, 26457513]],
+      [
+        [60, 40],
+        [816497, 1224745],
+      ],
+      [
+        [40, 60],
+        [1224745, 816497],
+      ],
+      [
+        [15, 20, 65],
+        [9309493, 6982120, 2148345],
+      ],
+      [
+        [15, 65, 20],
+        [9309493, 2148345, 6982120],
+      ],
+      [
+        [20, 15, 65],
+        [6982120, 9309493, 2148345],
+      ],
+      [
+        [20, 65, 15],
+        [6982120, 2148345, 9309493],
+      ],
+      [
+        [65, 20, 15],
+        [2148345, 6982120, 9309493],
+      ],
+      [
+        [65, 15, 20],
+        [2148345, 9309493, 6982120],
+      ],
+      [
+        [10, 10, 10, 70],
+        [26457513, 26457513, 26457513, 3779645],
+      ],
+      [
+        [10, 10, 70, 10],
+        [26457513, 26457513, 3779645, 26457513],
+      ],
+      [
+        [10, 70, 10, 10],
+        [26457513, 3779645, 26457513, 26457513],
+      ],
+      [
+        [70, 10, 10, 10],
+        [3779645, 26457513, 26457513, 26457513],
+      ],
     ]
 
     for (const [odds, expectedHintsNumbers] of testCases) {
@@ -128,7 +189,11 @@ describe('tools', () => {
   })
 
   describe('getIndexSets', () => {
-    const testCases: any = [[3, [1, 2, 4]], [4, [1, 2, 4, 8]], [5, [1, 2, 4, 8, 16]]]
+    const testCases: any = [
+      [3, [1, 2, 4]],
+      [4, [1, 2, 4, 8]],
+      [5, [1, 2, 4, 8, 16]],
+    ]
 
     for (const [outcomesCount, expected] of testCases) {
       it(`should get the correct indexSet`, () => {
@@ -141,9 +206,18 @@ describe('tools', () => {
 
   describe('computeBalanceAfterTrade', () => {
     const testCases: [[number[], number, number, number], number[]][] = [
-      [[[100, 100], 0, 50, 100], [50, 150]],
-      [[[100, 100], 1, 50, 100], [150, 50]],
-      [[[100, 100, 100], 2, 50, 100], [150, 150, 50]],
+      [
+        [[100, 100], 0, 50, 100],
+        [50, 150],
+      ],
+      [
+        [[100, 100], 1, 50, 100],
+        [150, 50],
+      ],
+      [
+        [[100, 100, 100], 2, 50, 100],
+        [150, 150, 50],
+      ],
     ]
 
     for (const [[holdings, outcomeIndex, collateral, shares], expected] of testCases) {
@@ -163,23 +237,17 @@ describe('tools', () => {
 
     it('should throw if index is negative', () => {
       const holdings = [100, 100, 100].map(bigNumberify)
-      expect(() =>
-        computeBalanceAfterTrade(holdings, -1, bigNumberify(50), bigNumberify(100)),
-      ).toThrow()
+      expect(() => computeBalanceAfterTrade(holdings, -1, bigNumberify(50), bigNumberify(100))).toThrow()
     })
 
     it("should throw if index is equal to array's length", () => {
       const holdings = [100, 100, 100].map(bigNumberify)
-      expect(() =>
-        computeBalanceAfterTrade(holdings, 3, bigNumberify(50), bigNumberify(100)),
-      ).toThrow()
+      expect(() => computeBalanceAfterTrade(holdings, 3, bigNumberify(50), bigNumberify(100))).toThrow()
     })
 
     it("should throw if index is bigger than array's length", () => {
       const holdings = [100, 100, 100].map(bigNumberify)
-      expect(() =>
-        computeBalanceAfterTrade(holdings, 10, bigNumberify(50), bigNumberify(100)),
-      ).toThrow()
+      expect(() => computeBalanceAfterTrade(holdings, 10, bigNumberify(50), bigNumberify(100))).toThrow()
     })
   })
 

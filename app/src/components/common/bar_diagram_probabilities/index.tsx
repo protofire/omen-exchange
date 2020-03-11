@@ -1,29 +1,9 @@
-import React, { HTMLAttributes } from 'react'
-import styled, { withTheme } from 'styled-components'
-
-import WinningOutcomeBadge from './img/badge.svg'
-import theme from '../../../theme'
-
-interface ProgressBarProps {
-  color?: string
-  width: number
-}
+import React, { DOMAttributes } from 'react'
+import styled from 'styled-components'
 
 const BarDiagramWrapper = styled.div`
   display: flex;
   min-width: 100px;
-`
-
-const BadgeWrapper = styled.div`
-  align-items: center;
-  display: flex;
-  flex-shrink: 0;
-  justify-content: flex-start;
-  width: 26px;
-`
-
-const BadgeImg = styled.img`
-  display: block;
 `
 
 const Outcome = styled.div`
@@ -33,13 +13,13 @@ const Outcome = styled.div`
 const OutcomeText = styled.div`
   display: flex;
   justify-content: space-between;
-  margin: 0 0 3px;
+  margin: 0 0 10px;
 `
 
 const OutcomeName = styled.h2`
-  color: #000;
+  color: ${props => props.theme.colors.textColorDark};
   flex-grow: 1;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
   margin: 0 15px 0 0;
@@ -47,9 +27,9 @@ const OutcomeName = styled.h2`
 `
 
 const OutcomeValue = styled.p`
-  color: #272727;
+  color: ${props => props.theme.colors.textColorDark};
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
   margin: 0;
@@ -58,51 +38,40 @@ const OutcomeValue = styled.p`
 
 const ProgressBar = styled.div`
   background-color: #f5f5f5;
-  border-radius: 3px;
-  height: 10px;
+  border-radius: 4px;
+  height: 6px;
   overflow: hidden;
 `
 
-const Progress = styled.div<ProgressBarProps>`
-  background-color: ${props => props.color};
-  border-radius: 3px;
+const Progress = styled.div<{ width: number; outcomeIndex: number }>`
+  background-color: ${props =>
+    props.theme.outcomes.colors[props.outcomeIndex] ? props.theme.outcomes.colors[props.outcomeIndex] : '#333'};
+  border-radius: 4px;
   height: 100%;
+  transition: width 0.5s ease-out;
   width: ${props => props.width}%;
-  transition: width 1s;
 `
 
-interface Props extends HTMLAttributes<HTMLButtonElement> {
-  isWinning: boolean
+interface Props extends DOMAttributes<HTMLDivElement> {
+  outcomeIndex: number
   outcomeName: string
   probability: number
-  theme?: any
-  winningOutcome: boolean
-  withWinningOutcome: boolean
 }
 
-const BarDiagramComponent: React.FC<Props> = (props: Props) => {
-  const { outcomeName, probability, winningOutcome, withWinningOutcome } = props
-  const progressColor =
-    winningOutcome && withWinningOutcome ? theme.colors.primary : theme.colors.darkGray
+export const BarDiagram: React.FC<Props> = (props: Props) => {
+  const { outcomeIndex, outcomeName, probability } = props
 
   return (
     <BarDiagramWrapper>
-      {withWinningOutcome && (
-        <BadgeWrapper>
-          {winningOutcome ? <BadgeImg src={WinningOutcomeBadge} alt="Winning Outcome" /> : null}
-        </BadgeWrapper>
-      )}
       <Outcome>
         <OutcomeText>
           <OutcomeName>{outcomeName}</OutcomeName>
           <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
         </OutcomeText>
         <ProgressBar>
-          <Progress color={progressColor} width={probability} />
+          <Progress outcomeIndex={outcomeIndex} width={probability} />
         </ProgressBar>
       </Outcome>
     </BarDiagramWrapper>
   )
 }
-
-export const BarDiagram = withTheme(BarDiagramComponent)
