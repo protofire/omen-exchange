@@ -13,14 +13,14 @@ const rotate = keyframes`
 `
 
 const RotatingSpinner = styled.div<{ height: string; width: string }>`
-  animation: ${rotate} 4s linear infinite;
+  animation: ${rotate} 2s linear infinite;
   height: ${props => props.height};
   width: ${props => props.width};
 `
 
 RotatingSpinner.defaultProps = {
-  height: '40px',
-  width: '40px',
+  height: '45px',
+  width: '45px',
 }
 
 const SpinnerIcon = styled.img`

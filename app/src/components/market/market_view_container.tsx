@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
+import { useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { useMarketMakerData } from '../../hooks/useMarketMakerData'
-import { Loading } from '../common/loading'
+import { Loading } from '../common'
 
 import { MarketView } from './market_view'
 import gql from 'graphql-tag'

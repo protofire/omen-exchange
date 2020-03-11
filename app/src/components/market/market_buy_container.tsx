@@ -1,9 +1,8 @@
 import React from 'react'
 
+import { useMarketMakerData, useQuestion } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { useMarketMakerData } from '../../hooks/useMarketMakerData'
-import { useQuestion } from '../../hooks/useQuestion'
-import { Loading } from '../common/loading'
+import { Loading } from '../common'
 
 import { MarketBuy } from './market_buy'
 

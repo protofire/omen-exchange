@@ -1,20 +1,19 @@
 import React, { ChangeEvent, HTMLAttributes, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
+import { useAsyncDerivedValue, useContracts } from '../../../hooks'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { useAsyncDerivedValue } from '../../../hooks/useAsyncDerivedValue'
-import { useContracts } from '../../../hooks/useContracts'
 import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { getArbitratorFromAddress } from '../../../util/networks'
 import { formatDate, truncateStringInTheMiddle } from '../../../util/tools'
 import { Arbitrator, Question } from '../../../util/types'
-import { Button } from '../button'
-import { FormRow } from '../form_row'
-import ModalWrapper from '../modal_wrapper'
-import { Spinner } from '../spinner'
-import { SubsectionTitle } from '../subsection_title'
-import { Textfield } from '../textfield'
-import { TitleValue } from '../title_value'
+import { Button } from '../../common/button'
+import { FormRow } from '../../common/form_row'
+import { Spinner } from '../../common/spinner'
+import { SubsectionTitle } from '../../common/subsection_title'
+import { Textfield } from '../../common/textfield'
+import { TitleValue } from '../../common/title_value'
+import { ModalWrapper } from '../../modal/modal_wrapper'
 
 const ButtonStyled = styled(Button)`
   margin-top: 80px;

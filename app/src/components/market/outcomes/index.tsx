@@ -1,15 +1,17 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Button } from '../button'
-import { ButtonAdd } from '../button_add'
-import { Checkbox } from '../checkbox'
-import { FormError } from '../form_error'
-import { FormLabel } from '../form_label'
-import { Textfield } from '../index'
-import { TextfieldCustomPlaceholder } from '../textfield_custom_placeholder'
-import { Tooltip } from '../tooltip'
-import { Well } from '../well'
+import {
+  Button,
+  ButtonAdd,
+  Checkbox,
+  FormError,
+  FormLabel,
+  Textfield,
+  TextfieldCustomPlaceholder,
+  Tooltip,
+  Well,
+} from '../../common/index'
 
 import IconDelete from './img/delete.svg'
 
@@ -52,8 +54,8 @@ const TextFieldTextRight = styled(Textfield)`
 `
 
 const ErrorsWrapper = styled.div`
-  padding: 10px 0 0 0;
   margin: auto 0 0 0;
+  padding: 10px 0 0 0;
 `
 
 const ErrorStyled = styled(FormError)`
@@ -139,12 +141,12 @@ export interface Outcome {
 }
 
 interface Props {
-  outcomes: Outcome[]
-  onChange: (newOutcomes: Outcome[]) => any
-  errorMessages?: string[]
-  totalProbabilities: number
-  disabled: boolean
   canAddOutcome: boolean
+  disabled: boolean
+  errorMessages?: string[]
+  onChange: (newOutcomes: Outcome[]) => any
+  outcomes: Outcome[]
+  totalProbabilities: number
 }
 
 const Outcomes = (props: Props) => {

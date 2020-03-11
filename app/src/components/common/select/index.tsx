@@ -40,7 +40,7 @@ const FormSelect = styled.select`
   appearance: none;
   ${TextfieldCSS}
   padding: ${props =>
-    `${props.theme.textfield.paddingVertical} 25px ${props.theme.textfield.paddingVertical} ${props.theme.textfield.paddingHorizontal};`}
+    `${props.theme.textfield.paddingVertical} 25px ${props.theme.textfield.paddingVertical} ${props.theme.textfield.paddingHorizontal};`};
   position: relative;
   z-index: 2;
 

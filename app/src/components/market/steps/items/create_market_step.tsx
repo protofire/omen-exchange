@@ -10,19 +10,25 @@ import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { Arbitrator, Token } from '../../../../util/types'
-import { ButtonContainer } from '../../../common/button_container'
-import { ButtonLink } from '../../../common/button_link'
-import { CreateCard } from '../../../common/create_card'
-import { DisplayArbitrator } from '../../../common/display_arbitrator'
-import { FormError } from '../../../common/form_error'
-import { Button } from '../../../common/index'
-import { Loading } from '../../../common/loading'
-import { Outcome } from '../../../common/outcomes'
-import { Paragraph } from '../../../common/paragraph'
-import { SubsectionTitle } from '../../../common/subsection_title'
-import { TD, TH, THead, TR, Table } from '../../../common/table'
-import { TitleValue } from '../../../common/title_value'
-import { Well } from '../../../common/well'
+import {
+  Button,
+  ButtonContainer,
+  ButtonLink,
+  CreateCard,
+  DisplayArbitrator,
+  FormError,
+  Loading,
+  Paragraph,
+  SubsectionTitle,
+  TD,
+  TH,
+  THead,
+  TR,
+  Table,
+  TitleValue,
+  Well,
+} from '../../../common'
+import { Outcome } from '../../outcomes'
 
 const logger = getLogger('MarketCreationItems::CreateMarketStep')
 

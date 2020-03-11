@@ -11,7 +11,7 @@ interface Props extends React.ComponentProps<typeof Modal> {
   title?: string
 }
 
-const ModalWrapper: React.FC<Props> = props => {
+const ModalContainer: React.FC<Props> = props => {
   const { children, disableCloseButton, onRequestClose, theme, title, ...restProps } = props
   const { modalStyle } = theme
 
@@ -27,4 +27,4 @@ const ModalWrapper: React.FC<Props> = props => {
   )
 }
 
-export default withTheme(ModalWrapper)
+export const ModalWrapper = withTheme(ModalContainer)

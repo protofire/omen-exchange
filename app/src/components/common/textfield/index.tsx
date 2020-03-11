@@ -1,21 +1,11 @@
-import React, { HTMLAttributes } from 'react'
+import React, { InputHTMLAttributes } from 'react'
 import styled, { css } from 'styled-components'
 
-interface Props extends HTMLAttributes<HTMLInputElement> {
-  autoFocus?: boolean
+interface Props extends InputHTMLAttributes<HTMLInputElement> {
   defaultValue?: any
-  disabled?: boolean
   hasError?: boolean
   hasSuccess?: boolean
   focusOutline?: boolean
-  min?: number
-  name?: string
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => any
-  onClick?: (event: React.MouseEvent<HTMLInputElement>) => any
-  placeholder?: string
-  readOnly?: boolean
-  type: string
-  value?: any
 }
 
 export const TextfieldCSS = css<{ hasError?: boolean; hasSuccess?: boolean }>`

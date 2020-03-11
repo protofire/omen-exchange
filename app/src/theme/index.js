@@ -6,34 +6,46 @@ const theme = {
   },
   buttonPrimary: {
     backgroundColor: '#1565C0',
+    backgroundColorDisabled: '#1565C0',
     backgroundColorHover: '#0d4584',
     borderColor: '#1565C0',
+    borderColorDisabled: '#1565C0',
     borderColorHover: '#0d4584',
     color: '#fff',
+    colorDisabled: '#fff',
     colorHover: '#fff',
   },
   buttonPrimaryLine: {
     backgroundColor: '#fff',
+    backgroundColorDisabled: '#fff',
     backgroundColorHover: '#fff',
     borderColor: '#1565C0',
+    borderColorDisabled: '#1565C0',
     borderColorHover: '#0d4584',
     color: '#1565C0',
+    colorDisabled: '#1565C0',
     colorHover: '#0d4584',
   },
   buttonSecondary: {
     backgroundColor: '#E3F2FD',
+    backgroundColorDisabled: '#E3F2FD',
     backgroundColorHover: '#d1e1ec',
     borderColor: '#E3F2FD',
+    borderColorDisabled: '#E3F2FD',
     borderColorHover: '#d1e1ec',
     color: '#1565C0',
+    colorDisabled: '#1565C0',
     colorHover: '#1565C0',
   },
   buttonSecondaryLine: {
     backgroundColor: '#fff',
+    backgroundColorDisabled: '#fff',
     backgroundColorHover: '#fff',
     borderColor: '#D6EBFD',
-    borderColorHover: '#90CAF9',
+    borderColorDisabled: '#E8EAF6',
+    borderColorHover: '#BBDEFB',
     color: '#37474F',
+    colorDisabled: '#757575',
     colorHover: '#37474F',
   },
   buttonCircle: {
@@ -50,8 +62,9 @@ const theme = {
     tertiary: '#D6EBFD',
     tertiaryDark: '#90CAF9',
     textColor: '#757575',
-    textColorLight: '#999',
     textColorDark: '#37474F',
+    textColorDarker: '#333',
+    textColorLight: '#999',
     warning: '#37474F',
   },
   cards: {
@@ -101,13 +114,7 @@ const theme = {
     paddingVertical: '6px',
     placeholderColor: '#999',
   },
-  createSteps: {
-    maxWidth: '586px',
-  },
-  viewMarket: {
-    maxWidth: '586px',
-  },
-  list: {
+  mainContainer: {
     maxWidth: '586px',
   },
   dropdown: {
@@ -117,6 +124,9 @@ const theme = {
     boxShadow: '0 0 12px 0 rgba(0, 0, 0, 0.12)',
     lightTextColor: '#666',
     textColor: '#000',
+  },
+  outcomes: {
+    colors: ['#e1bee7', '#b2dfdb', '#ffe0b2', '#e7e7be', '#bedfb2', '#ffb2f0'],
   },
   modalStyle: {
     content: {

@@ -3,16 +3,13 @@ import React from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 
 import { MARKET_FEE } from '../../common/constants'
+import { useCheckContractExists, useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { useCheckContractExists } from '../../hooks/useCheckContractExists'
-import { useMarketMakerData } from '../../hooks/useMarketMakerData'
 import { MarketBuyPage, MarketDetailsPage, MarketFundPage, MarketSellPage } from '../../pages'
 import { getLogger } from '../../util/logger'
 import { isAddress } from '../../util/tools'
-import { Loading } from '../common/loading'
+import { Loading, MessageWarning, SectionTitle } from '../common'
 import { MarketNotFound } from '../common/market_not_found'
-import { MessageWarning } from '../common/message_warning'
-import { SectionTitle } from '../common/section_title'
 
 const logger = getLogger('Market::Routes')
 

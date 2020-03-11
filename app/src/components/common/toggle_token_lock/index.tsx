@@ -1,10 +1,10 @@
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
+import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { CPKService, ERC20Service } from '../../../services'
 import { Token } from '../../../util/types'
 import { Button } from '../button'
-import { CPKService, ERC20Service } from '../../../services'
-import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { BigNumber } from 'ethers/utils'
 import { Loading } from '../loading'
 
 interface Props {
@@ -19,8 +19,8 @@ enum CollateralStatus {
 }
 
 export const ToggleTokenLock = (props: Props) => {
-  const { collateral, amount, context } = props
-  const { library: provider, account } = context
+  const { amount, collateral, context } = props
+  const { account, library: provider } = context
   const [status, setStatus] = useState(CollateralStatus.Lock)
   const [loading, setLoading] = useState(false)
 

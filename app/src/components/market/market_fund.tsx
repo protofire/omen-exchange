@@ -11,7 +11,7 @@ import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
-import { divBN, formatBigNumber, formatDate } from '../../util/tools'
+import { divBN, formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { BalanceShares } from '../common/balance_shares'
 import { BalanceToken } from '../common/balance_token'
@@ -28,8 +28,8 @@ import { SectionTitle } from '../common/section_title'
 import { SubsectionTitle } from '../common/subsection_title'
 import { TD, TR, Table } from '../common/table'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
-import { ViewCard } from '../common/view_card/'
 import { ToggleTokenLock } from '../common/toggle_token_lock'
+import { ViewCard } from '../common/view_card/'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -83,7 +83,6 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
     marketMakerFunding,
     marketMakerUserFunding,
     question,
-    resolution,
     totalPoolShares,
     userPoolShares,
   } = props
@@ -182,7 +181,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle subTitle={resolution ? formatDate(resolution) : ''} title={question} />
+      <SectionTitle title={question} />
       <ViewCard>
         <SubsectionTitleStyled>Fund this market</SubsectionTitleStyled>
         <OutcomeTable
@@ -206,7 +205,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
                 }
                 placeholderText={collateral.symbol}
               />
-              <ToggleTokenLock context={context} amount={amountToFund} collateral={collateral} />
+              <ToggleTokenLock amount={amountToFund} collateral={collateral} context={context} />
             </>
           }
           note={

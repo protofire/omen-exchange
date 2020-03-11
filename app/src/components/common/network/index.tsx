@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { useConnectedWeb3Context } from '../../../hooks'
 import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { truncateStringInTheMiddle } from '../../../util/tools'
 import { Button } from '../button'
@@ -9,14 +9,24 @@ import { Button } from '../button'
 import { ConnectionIcon } from './img/ConnectionIcon'
 
 const Wrapper = styled(Button)`
-  padding-left: 12px;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    padding-left: 12px;
+    padding-right: 20px;
+  }
 `
 
 const ConnectionStatusText = styled.span`
   color: ${props => props.theme.header.color};
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 1.2;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    font-size: 14px;
+  }
 `
 
 const ConnectionStatusDot = styled.div`

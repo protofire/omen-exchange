@@ -2,12 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
-import { ButtonContainer } from '../../../common/button_container'
-import { ButtonLink } from '../../../common/button_link'
-import { CreateCard } from '../../../common/create_card'
-import { Button } from '../../../common/index'
-import { Outcome, Outcomes } from '../../../common/outcomes'
-import { Well } from '../../../common/well'
+import { Button, ButtonContainer, ButtonLink, CreateCard, Well } from '../../../common'
+import { Outcome, Outcomes } from '../../outcomes'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;

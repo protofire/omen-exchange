@@ -1,22 +1,28 @@
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
+import React, { useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { WhenConnected } from '../../../hooks/connectedWeb3'
+import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
-import { ButtonAnchor, OutcomeTable } from '../../common'
-import { ButtonContainer } from '../../common/button_container'
-import { DisplayArbitrator } from '../../common/display_arbitrator'
-import { GridThreeColumns } from '../../common/grid_three_columns'
-import { Loading } from '../../common/loading'
-import { SubsectionTitle } from '../../common/subsection_title'
-import { ThreeBoxComments } from '../../common/three_box_comments'
-import { TitleValue } from '../../common/title_value'
-import { ViewCard } from '../../common/view_card'
+import {
+  Button,
+  ButtonContainer,
+  DisplayArbitrator,
+  GridTwoColumns,
+  Loading,
+  SubsectionTitle,
+  SubsectionTitleAction,
+  SubsectionTitleWrapper,
+  ThreeBoxComments,
+  TitleValue,
+  ViewCard,
+} from '../../common'
+import { OutcomeTable } from '../../common/outcome_table'
 
-const SubsectionTitleStyled = styled(SubsectionTitle)`
-  margin-bottom: 0;
+const LeftButton = styled(Button)`
+  margin-right: auto;
 `
 
 interface Props extends RouteComponentProps<{}> {
@@ -33,7 +39,11 @@ interface Props extends RouteComponentProps<{}> {
 }
 
 const ViewWrapper = (props: Props) => {
-  const { arbitrator, balances, category, collateral, marketMakerAddress, questionId, status } = props
+  const { arbitrator, balances, category, collateral, history, marketMakerAddress, questionId, status } = props
+  const [showingExtraInformation, setExtraInformation] = useState(false)
+
+  const toggleExtraInformation = () =>
+    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -58,11 +68,10 @@ const ViewWrapper = (props: Props) => {
     )
   }
 
-  const details = () => {
+  const details = (showExtraDetails: boolean) => {
     return (
       <>
-        <SubsectionTitle>Details</SubsectionTitle>
-        <GridThreeColumns>
+        <GridTwoColumns>
           {category && <TitleValue title={'Category'} value={category} />}
           <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
           {questionId && (
@@ -79,7 +88,15 @@ const ViewWrapper = (props: Props) => {
               }
             />
           )}
-        </GridThreeColumns>
+          {showExtraDetails ? (
+            <>
+              <TitleValue title={'Mocked Title 1'} value={'Mocked Value 1'} />
+              <TitleValue title={'Mocked Title 2'} value={'Longer Mocked Value to have and idea how it looks'} />
+              <TitleValue title={'Mocked Title 3'} value={'Mocked Value 3'} />
+              <TitleValue title={'Mocked Title 4'} value={'Mocked Value 4'} />
+            </>
+          ) : null}
+        </GridTwoColumns>
       </>
     )
   }
@@ -89,14 +106,41 @@ const ViewWrapper = (props: Props) => {
   return (
     <>
       <ViewCard>
-        <SubsectionTitleStyled>Outcomes</SubsectionTitleStyled>
+        <SubsectionTitleWrapper>
+          <SubsectionTitle>Market Information</SubsectionTitle>
+          <SubsectionTitleAction onClick={toggleExtraInformation}>
+            {showingExtraInformation ? 'Hide' : 'Show'} Pool Information
+          </SubsectionTitleAction>
+        </SubsectionTitleWrapper>
+        {marketHasDetails && details(showingExtraInformation)}
         {renderTableData()}
-        {marketHasDetails && details()}
         <WhenConnected>
           <ButtonContainer>
-            <ButtonAnchor href={`/#/${marketMakerAddress}/fund`}>Fund</ButtonAnchor>
-            {userHasShares && <ButtonAnchor href={`/#/${marketMakerAddress}/sell`}>Sell</ButtonAnchor>}
-            <ButtonAnchor href={`/#/${marketMakerAddress}/buy`}>Buy</ButtonAnchor>
+            <LeftButton
+              buttonType={ButtonType.secondaryLine}
+              onClick={() => {
+                history.push(`${marketMakerAddress}/fund`)
+              }}
+            >
+              Pool Liquidity
+            </LeftButton>
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={!userHasShares}
+              onClick={() => {
+                history.push(`${marketMakerAddress}/sell`)
+              }}
+            >
+              Sell
+            </Button>
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              onClick={() => {
+                history.push(`${marketMakerAddress}/buy`)
+              }}
+            >
+              Buy
+            </Button>
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>

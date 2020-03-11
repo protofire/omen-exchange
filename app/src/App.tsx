@@ -9,7 +9,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
 
 import { client } from './apolloClientConfig'
-import { Main } from './components'
+import { Main } from './components/main'
 import balanceReducer from './store/reducer'
 import theme from './theme'
 import { GlobalStyle } from './theme/component_styles/global_style'

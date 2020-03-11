@@ -1,10 +1,10 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
+import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
 import { isAddress, isContract } from '../util/tools'
 import { Token } from '../util/types'
-import { TransactionReceipt } from 'ethers/providers'
 
 const logger = getLogger('Services::Erc20')
 

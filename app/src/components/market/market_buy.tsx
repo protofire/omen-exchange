@@ -12,24 +12,30 @@ import { useContracts } from '../../hooks/useContracts'
 import { CPKService, ERC20Service, MarketMakerService } from '../../services'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
-import { computeBalanceAfterTrade, formatBigNumber, formatDate } from '../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
-import { BigNumberInput, Button, OutcomeTable } from '../common'
-import { BalanceToken } from '../common/balance_token'
+import {
+  BalanceToken,
+  BigNumberInput,
+  Button,
+  ButtonContainer,
+  ButtonLink,
+  FormError,
+  FormLabel,
+  FormRow,
+  Loading,
+  SectionTitle,
+  SubsectionTitle,
+  TD,
+  TR,
+  Table,
+  TextfieldCustomPlaceholder,
+  ToggleTokenLock,
+  ViewCard,
+} from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
-import { ButtonContainer } from '../common/button_container'
-import { ButtonLink } from '../common/button_link'
-import { FormError } from '../common/form_error'
-import { FormLabel } from '../common/form_label'
-import { FormRow } from '../common/form_row'
-import { Loading } from '../common/loading'
-import { ModalTwitterShare } from '../common/modal_twitter_share'
-import { ToggleTokenLock } from '../common/toggle_token_lock'
-import { Table, TR, TD } from '../common/table'
-import { SubsectionTitle } from '../common/subsection_title'
-import { SectionTitle } from '../common/section_title'
-import { ViewCard } from '../common/view_card'
-import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
+import { OutcomeTable } from '../common/outcome_table'
+import { ModalTwitterShare } from '../modal/modal_twitter_share'
 
 const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
@@ -100,7 +106,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const { buildMarketMaker } = useContracts(context)
 
-  const { balances, collateral, marketMakerAddress, question, resolution } = props
+  const { balances, collateral, marketMakerAddress, question } = props
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -216,7 +222,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle subTitle={resolution ? formatDate(resolution) : ''} title={question} />
+      <SectionTitle title={question} />
       <ViewCard>
         <SubsectionTitleStyled>Choose the shares you want to buy</SubsectionTitleStyled>
         <OutcomeTable
@@ -233,15 +239,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               <TextfieldCustomPlaceholder
                 formField={
                   <BigNumberInputTextRight
-                    name="amount"
-                    value={amount}
-                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
                     decimals={collateral.decimals}
+                    name="amount"
+                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                    value={amount}
                   />
                 }
                 placeholderText={collateral.symbol}
               />
-              <ToggleTokenLock context={context} amount={amount} collateral={collateral} />
+              <ToggleTokenLock amount={amount} collateral={collateral} context={context} />
             </>
           }
           note={noteAmount}

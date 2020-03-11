@@ -9,18 +9,18 @@ export interface BigNumberInputReturn {
 }
 
 interface Props {
-  decimals: number
-  name: string
   autofocus?: boolean
   className?: string
-  placeholder?: string
+  decimals: number
+  disabled?: boolean
   max?: BigNumber
   min?: BigNumber
+  name: string
   onChange: (value: BigNumberInputReturn) => void
+  placeholder?: string
   step?: BigNumber
   value: Maybe<BigNumber>
   valueFixedDecimals?: number
-  disabled?: boolean
 }
 
 const Input = styled.input`
