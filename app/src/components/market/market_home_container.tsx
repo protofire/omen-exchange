@@ -9,7 +9,7 @@ import { RemoteData } from '../../util/remote_data'
 
 import { MarketHome } from './market_home'
 
-const PAGE_SIZE = 1
+const PAGE_SIZE = 10
 
 const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
