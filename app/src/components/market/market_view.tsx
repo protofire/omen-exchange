@@ -21,6 +21,7 @@ interface Props {
   questionId: string
   resolution: Maybe<Date>
   status: Status
+  lastDayVolume: Maybe<string>
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {

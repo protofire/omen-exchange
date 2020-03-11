@@ -42,18 +42,19 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
 
   const [lastDayVolume, setLastDayVolume] = useState<Maybe<string>>(null)
 
+  // TODO Move all this to another component
   const { data: volumeNow, error: errorVolumeNow } = useQuery(GET_COLLATERAL_VOLUME_NOW, {
     skip: !!lastDayVolume,
     variables: { id: marketMakerAddress.toLowerCase() },
   })
 
   const { data: volumeBefore, error: errorVolumeBefore } = useQuery(buildQuery24hsEarlier(hash && hash.toLowerCase()), {
-    skip: !!lastDayVolume,
+    skip: !!lastDayVolume || !hash,
     variables: { id: marketMakerAddress.toLowerCase() },
   })
 
   if (errorVolumeBefore || errorVolumeNow) {
-    setLastDayVolume('-')
+    setLastDayVolume(null)
   } else if (volumeNow && volumeBefore) {
     const now = new BigNumber(volumeNow.fixedProductMarketMakers[0].collateralVolume)
     const before = new BigNumber(volumeBefore.fixedProductMarketMakers[0].collateralVolume)
@@ -83,7 +84,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
       setHash(hash)
     }
 
-    get24hsVolume()
+    provider && get24hsVolume()
   }, [provider])
 
   if (!collateral) {
@@ -105,6 +106,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
       questionId={questionId}
       resolution={resolution}
       status={status}
+      lastDayVolume={lastDayVolume}
     />
   )
 }

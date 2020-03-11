@@ -36,10 +36,21 @@ interface Props extends RouteComponentProps<{}> {
   status: Status
   marketMakerAddress: string
   funding: BigNumber
+  lastDayVolume: Maybe<string>
 }
 
 const ViewWrapper = (props: Props) => {
-  const { arbitrator, balances, category, collateral, history, marketMakerAddress, questionId, status } = props
+  const {
+    arbitrator,
+    balances,
+    category,
+    collateral,
+    history,
+    marketMakerAddress,
+    questionId,
+    status,
+    lastDayVolume,
+  } = props
   const [showingExtraInformation, setExtraInformation] = useState(false)
 
   const toggleExtraInformation = () =>
@@ -88,6 +99,7 @@ const ViewWrapper = (props: Props) => {
               }
             />
           )}
+          <TitleValue title="24h Volume" value={lastDayVolume ? `${lastDayVolume} ${collateral.symbol}` : '-'} />
           {showExtraDetails ? (
             <>
               <TitleValue title={'Mocked Title 1'} value={'Mocked Value 1'} />
