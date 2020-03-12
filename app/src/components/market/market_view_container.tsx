@@ -8,6 +8,9 @@ import { MarketView } from './market_view'
 import gql from 'graphql-tag'
 import { useQuery } from '@apollo/react-hooks'
 import { BigNumber } from 'ethers/utils'
+import { getLogger } from '../../util/logger'
+
+const logger = getLogger('Market::View')
 
 interface Props {
   marketMakerAddress: string
@@ -40,7 +43,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
   const { marketMakerData, status } = useMarketMakerData(marketMakerAddress, context)
   const { library: provider } = context
 
-  const [lastDayVolume, setLastDayVolume] = useState<Maybe<string>>(null)
+  const [lastDayVolume, setLastDayVolume] = useState<Maybe<BigNumber>>(null)
 
   const { data: volumeNow, error: errorVolumeNow } = useQuery(GET_COLLATERAL_VOLUME_NOW, {
     skip: !!lastDayVolume,
@@ -48,17 +51,19 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
   })
 
   const { data: volumeBefore, error: errorVolumeBefore } = useQuery(buildQuery24hsEarlier(hash && hash.toLowerCase()), {
-    skip: !!lastDayVolume,
+    skip: !!lastDayVolume || !hash,
     variables: { id: marketMakerAddress.toLowerCase() },
   })
 
   if (errorVolumeBefore || errorVolumeNow) {
-    setLastDayVolume('-')
+    setLastDayVolume(null)
+    errorVolumeBefore && logger.log(errorVolumeBefore)
+    errorVolumeNow && logger.log(errorVolumeNow)
   } else if (volumeNow && volumeBefore) {
     const now = new BigNumber(volumeNow.fixedProductMarketMakers[0].collateralVolume)
     const before = new BigNumber(volumeBefore.fixedProductMarketMakers[0].collateralVolume)
 
-    setLastDayVolume(now.sub(before).toString())
+    setLastDayVolume(now.sub(before))
   }
 
   const {
@@ -77,7 +82,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     const get24hsVolume = async () => {
       const BLOCKS_PER_SECOND = 15
-      const OFFSET = (60 * 60 * 24) / BLOCKS_PER_SECOND
+      const OFFSET = Math.round((60 * 60 * 24) / BLOCKS_PER_SECOND)
       const lastBlock = await provider.getBlockNumber()
       const { hash } = await provider.getBlock(lastBlock - OFFSET)
       setHash(hash)
