@@ -133,7 +133,35 @@ const theme = {
     textColor: '#000',
   },
   outcomes: {
-    colors: ['#e1bee7', '#b2dfdb', '#ffe0b2', '#e7e7be', '#bedfb2', '#ffb2f0'],
+    colors: [
+      {
+        darker: '#c2a0c7',
+        medium: '#e1bee7',
+      },
+      {
+        darker: '#00897B',
+        medium: '#b2dfdb',
+      },
+
+      {
+        darker: '#d2b994',
+        medium: '#ffe0b2',
+      },
+
+      {
+        darker: '#b9b992',
+        medium: '#e7e7be',
+      },
+
+      {
+        darker: '#9db992',
+        medium: '#bedfb2',
+      },
+      {
+        darker: '#ca89bd',
+        medium: '#ffb2f0',
+      },
+    ],
   },
   modalStyle: {
     content: {

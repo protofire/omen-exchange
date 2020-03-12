@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components'
 
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../util/types'
-import { BarDiagram, RadioInput, TD, TH, THead, TR, Table } from '../../common'
+import { BarDiagram, NewValue, RadioInput, TD, TH, THead, TR, Table } from '../../common'
 
 interface Props {
   balances: BalanceItem[]
@@ -43,16 +43,23 @@ const TDRadio = styled(TD)`
   width: 20px;
 `
 
+const TDFlexDiv = styled.div<{ textAlign?: string }>`
+  align-items: center;
+  display: flex;
+  justify-content: ${props =>
+    props.textAlign && 'right' ? 'flex-end' : props.textAlign && 'center' ? 'center' : 'flex-start'};
+`
+
 export const OutcomeTable = (props: Props) => {
   const {
     balances,
     collateral,
-    probabilities,
-    outcomeSelected,
-    outcomeHandleChange,
     disabledColumns = [],
-    withWinningOutcome = false,
     displayRadioSelection = true,
+    outcomeHandleChange,
+    outcomeSelected,
+    probabilities,
+    withWinningOutcome = false,
   } = props
 
   const TableHead: OutcomeTableValue[] = [
@@ -75,7 +82,7 @@ export const OutcomeTable = (props: Props) => {
                 key={index}
                 textAlign={TableCellsAlign[index]}
               >
-                {value}
+                {value} {value === OutcomeTableValue.CurrentPrice && `(${collateral.symbol})`}
               </THStyled>
             ) : null
           })}
@@ -86,8 +93,10 @@ export const OutcomeTable = (props: Props) => {
 
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
     const { currentPrice, outcomeName, shares } = balanceItem
-    const currentPriceFormatted = Number(currentPrice).toFixed(4)
+    const currentPriceFormatted = Number(currentPrice).toFixed(2)
     const probability = probabilities[outcomeIndex]
+
+    console.log(collateral)
 
     return (
       <TR key={outcomeName}>
@@ -114,11 +123,17 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[2]}>
-            {currentPriceFormatted} <strong>{collateral.symbol}</strong>
+            <TDFlexDiv textAlign={TableCellsAlign[2]}>
+              {currentPriceFormatted}{' '}
+              {outcomeSelected === outcomeIndex && <NewValue outcomeIndex={outcomeIndex} value="1.23" />}
+            </TDFlexDiv>
           </TDStyled>
         ) : (
           <TDStyled textAlign={TableCellsAlign[2]}>
-            {currentPriceFormatted} <strong>{collateral.symbol}</strong>
+            <TDFlexDiv textAlign={TableCellsAlign[2]}>
+              {currentPriceFormatted}{' '}
+              {outcomeSelected === outcomeIndex && <NewValue outcomeIndex={outcomeIndex} value="1.23" />}
+            </TDFlexDiv>
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Shares) ? null : withWinningOutcome ? (
