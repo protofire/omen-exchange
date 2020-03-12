@@ -1,42 +1,34 @@
 import React, { DOMAttributes } from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 const RadioWrapper = styled.div`
   cursor: pointer;
   position: relative;
-
-  > input {
-    cursor: pointer;
-    height: 100%;
-    left: 0;
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 5;
-  }
 `
 
-const RadioCSS = css`
+const Radio = styled.div<{ outcomeIndex: number; checked: boolean }>`
+  border-color: ${props =>
+    props.theme.outcomes.colors[props.outcomeIndex].darker
+      ? props.theme.outcomes.colors[props.outcomeIndex].darker
+      : props.theme.colors.primary};
   border-radius: 50%;
   border-style: solid;
+  border-width: ${props => (props.checked ? '4px' : '2px')};
   height: 20px;
+  opacity: ${props => (props.checked ? '1' : '0.5')};
+  transition: all 0.15s linear;
   width: 20px;
 `
 
-const RadioOn = styled.div<{ outcomeIndex: number }>`
-  ${RadioCSS}
-  border-color: ${props =>
-    props.theme.outcomes.colors[props.outcomeIndex] ? props.theme.outcomes.colors[props.outcomeIndex] : '#999'};
-  border-width: 4px;
-`
-
-const RadioOff = styled.div<{ outcomeIndex: number }>`
-  ${RadioCSS}
-  border-color: ${props =>
-    props.theme.outcomes.colors[props.outcomeIndex] ? props.theme.outcomes.colors[props.outcomeIndex] : '#999'};
-  border-width: 2px;
-  opacity: 0.5;
+const Input = styled.input`
+  cursor: pointer;
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 5;
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -48,11 +40,11 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const RadioInput: React.FC<Props> = (props: Props) => {
-  const { checked, disabled, name, onChange, outcomeIndex, value, ...restProps } = props
+  const { checked = false, disabled, name, onChange, outcomeIndex, value, ...restProps } = props
   return (
     <RadioWrapper {...restProps}>
-      {checked ? <RadioOn outcomeIndex={outcomeIndex} /> : <RadioOff outcomeIndex={outcomeIndex} />}
-      <input checked={checked} disabled={disabled} name={name} onChange={onChange} type="radio" value={value} />
+      <Radio checked={checked} outcomeIndex={outcomeIndex} />
+      <Input checked={checked} disabled={disabled} name={name} onChange={onChange} type="radio" value={value} />
     </RadioWrapper>
   )
 }
