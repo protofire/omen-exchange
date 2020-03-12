@@ -20,6 +20,7 @@ import {
   ViewCard,
 } from '../../common'
 import { OutcomeTable } from '../../common/outcome_table'
+import { formatBigNumber } from '../../../util/tools'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -37,6 +38,8 @@ interface Props extends RouteComponentProps<{}> {
   marketMakerAddress: string
   funding: BigNumber
   lastDayVolume: Maybe<string>
+  totalPoolShares: BigNumber
+  userPoolShares: BigNumber
 }
 
 const ViewWrapper = (props: Props) => {
@@ -50,6 +53,8 @@ const ViewWrapper = (props: Props) => {
     questionId,
     status,
     lastDayVolume,
+    totalPoolShares,
+    userPoolShares,
   } = props
   const [showingExtraInformation, setExtraInformation] = useState(false)
 
@@ -102,10 +107,16 @@ const ViewWrapper = (props: Props) => {
           <TitleValue title="24h Volume" value={lastDayVolume ? `${lastDayVolume} ${collateral.symbol}` : '-'} />
           {showExtraDetails ? (
             <>
-              <TitleValue title={'Mocked Title 1'} value={'Mocked Value 1'} />
-              <TitleValue title={'Mocked Title 2'} value={'Longer Mocked Value to have and idea how it looks'} />
-              <TitleValue title={'Mocked Title 3'} value={'Mocked Value 3'} />
-              <TitleValue title={'Mocked Title 4'} value={'Mocked Value 4'} />
+              <TitleValue
+                title={'Total Pool Tokens'}
+                value={totalPoolShares ? formatBigNumber(totalPoolShares, collateral.decimals) : '0'}
+              />
+              <TitleValue
+                title={'My Pool Tokens'}
+                value={userPoolShares ? formatBigNumber(userPoolShares, collateral.decimals) : '0'}
+              />
+              <TitleValue title={'Total Pool Earnings'} value={'Mocked Value 3'} />
+              <TitleValue title={'My Earnings'} value={'Mocked Value 4'} />
             </>
           ) : null}
         </GridTwoColumns>

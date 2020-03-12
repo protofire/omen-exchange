@@ -22,6 +22,8 @@ interface Props {
   resolution: Maybe<Date>
   status: Status
   lastDayVolume: Maybe<string>
+  totalPoolShares: BigNumber
+  userPoolShares: BigNumber
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {
