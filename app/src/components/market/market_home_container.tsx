@@ -63,7 +63,7 @@ const MarketHomeContainer: React.FC = () => {
         skip: fetchedMarkets.fixedProductMarketMakers.length,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
-        setMoreMarkets(!!fetchMoreResult.fixedProductMarketMakers.length)
+        setMoreMarkets(fetchMoreResult.fixedProductMarketMakers.length > 0)
         if (!fetchMoreResult) return prev
         return {
           ...prev,
