@@ -40,7 +40,7 @@ const MarketHomeContainer: React.FC = () => {
   }, [provider])
 
   useEffect(() => {
-    if (loading && moreMarkets) {
+    if (loading) {
       setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
     } else if (error) {
       setMarkets(RemoteData.failure(error))
@@ -50,7 +50,7 @@ const MarketHomeContainer: React.FC = () => {
         setMarkets(RemoteData.success(fixedProductMarketMakers))
       }
     }
-  }, [fetchedMarkets, moreMarkets, loading, error])
+  }, [fetchedMarkets, loading, error])
 
   const onFilterChange = (filter: any) => {
     setMoreMarkets(true)
