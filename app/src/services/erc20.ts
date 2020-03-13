@@ -46,6 +46,13 @@ class ERC20Service {
   }
 
   /**
+   * @returns The allowance given by `owner` to `spender`.
+   */
+  allowance = async (owner: string, spender: string): Promise<BigNumber> => {
+    return this.contract.allowance(owner, spender)
+  }
+
+  /**
    * Approve `spender` to transfer `amount` tokens on behalf of the connected user.
    */
   approve = async (spender: string, amount: BigNumber): Promise<TransactionReceipt> => {
