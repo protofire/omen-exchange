@@ -68,11 +68,9 @@ class MenuStep extends Component<Props, State> {
     const stepsBlocks = steps.map((step, index) => {
       const active = currentStepItemSelected && step.value <= currentStepItemSelected.value
       return (
-        <>
-          <Step active={active} key={index}>
-            <StepName active={active}>{step.name}</StepName>
-          </Step>
-        </>
+        <Step active={active} key={index}>
+          <StepName active={active}>{step.name}</StepName>
+        </Step>
       )
     })
 
