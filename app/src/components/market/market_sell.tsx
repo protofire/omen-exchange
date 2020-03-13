@@ -12,63 +12,39 @@ import { getLogger } from '../../util/logger'
 import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import {
-  BalanceShares,
   BigNumberInput,
   Button,
   ButtonContainer,
-  ButtonLink,
-  FormError,
-  FormLabel,
-  FormRow,
+  DisplayArbitrator,
+  GridTransactionDetails,
+  GridTwoColumns,
   Loading,
-  Paragraph,
   SectionTitle,
   SubsectionTitle,
-  TD,
-  TR,
-  Table,
+  SubsectionTitleAction,
+  SubsectionTitleWrapper,
   TextfieldCustomPlaceholder,
+  TitleValue,
+  TransactionDetailsCard,
+  TransactionDetailsLine,
+  TransactionDetailsRow,
   ViewCard,
-  Well,
+  WalletBalance,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { OutcomeTable } from '../common/outcome_table'
+import { ValueStates } from '../common/transaction_details_row'
 
-const ButtonLinkStyled = styled(ButtonLink)`
+const LeftButton = styled(Button)`
   margin-right: auto;
-`
-
-const TableStyled = styled(Table)`
-  margin-bottom: 30px;
-`
-
-const AmountWrapper = styled(FormRow)`
-  margin-bottom: 30px;
-  width: 100%;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    width: 50%;
-  }
-`
-
-const FormLabelStyled = styled(FormLabel)`
-  margin-bottom: 10px;
-`
-
-const SubsectionTitleStyled = styled(SubsectionTitle)`
-  margin-bottom: 0;
-`
-
-const BigNumberInputTextRight = styled<any>(BigNumberInput)`
-  text-align: right;
 `
 
 const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
-  marketMakerAddress: string
   balances: BalanceItem[]
   collateral: Token
+  marketMakerAddress: string
   question: string
   resolution: Maybe<Date>
 }
@@ -86,6 +62,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
+  const [showingExtraInformation, setExtraInformation] = useState(false)
+
+  const toggleExtraInformation = () =>
+    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
 
   const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
 
@@ -167,32 +147,86 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const error = (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || !haveEnoughShares
 
-  const sharesMessageError = !haveEnoughShares ? `You don't have enough shares in your balance.` : ''
+  const details = (showExtraDetails: boolean) => {
+    const mockedDetails = [
+      {
+        title: 'Total Pool Tokens',
+        value: '5000',
+      },
+      {
+        title: 'Total Pool Earning',
+        value: '25,232 DAI',
+      },
+      {
+        title: 'My Pool Tokens',
+        value: '0',
+      },
+      {
+        title: 'My Earnings',
+        value: '0 DAI',
+      },
 
-  const note = () => {
+      {
+        title: 'Category',
+        value: 'Politics',
+      },
+      {
+        title: 'Resolution Date',
+        value: '25.09.19 - 09:00',
+      },
+      {
+        title: 'Arbitrator/Oracle',
+        value: (
+          <DisplayArbitrator
+            arbitrator={{ id: 'realitio', address: '0x1234567890', name: 'Realit.io', url: 'https://realit.io/' }}
+          />
+        ),
+      },
+      {
+        title: '24h Volume',
+        value: '425,523 DAI',
+      },
+    ]
+    const mockedDetailsLastHalf = mockedDetails.splice(4, 8)
+
     return (
       <>
-        <BalanceShares
-          collateral={collateral}
-          onClickMax={(shares: BigNumber) => {
-            setAmountShares(shares)
-          }}
-          shares={balanceItem.shares}
-        />
-        <FormError>{sharesMessageError}</FormError>
+        <GridTwoColumns>
+          {showExtraDetails ? (
+            <>
+              {mockedDetails.map((item, index) => (
+                <TitleValue key={index} title={item.title} value={item.value} />
+              ))}
+            </>
+          ) : null}
+          {mockedDetailsLastHalf.map((item, index) => (
+            <TitleValue key={index} title={item.title} value={item.value} />
+          ))}
+        </GridTwoColumns>
       </>
     )
   }
+
+  const noteAmount = `${formatBigNumber(balanceItem.shares, collateral.decimals)} shares`
+
+  const mockedPotential = '1.03'
+  const mockedSellAmount = '0.00'
 
   return (
     <>
       <SectionTitle goBackEnabled title={question} />
       <ViewCard>
-        <SubsectionTitleStyled>Choose the shares you want to sell</SubsectionTitleStyled>
+        <SubsectionTitleWrapper>
+          <SubsectionTitle>Choose the shares you want to sell</SubsectionTitle>
+          <SubsectionTitleAction onClick={toggleExtraInformation}>
+            {showingExtraInformation ? 'Hide' : 'Show'} Pool Information
+          </SubsectionTitleAction>
+        </SubsectionTitleWrapper>
+        {details(showingExtraInformation)}
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          disabledColumns={[OutcomeTableValue.Payout]}
+          disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Shares]}
           outcomeHandleChange={(value: number) => {
             setOutcomeIndex(value)
             setBalanceItem(balances[value])
@@ -200,43 +234,62 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
         />
-        <AmountWrapper
-          formField={
+        <GridTransactionDetails>
+          <div>
+            <WalletBalance value={noteAmount} />
             <TextfieldCustomPlaceholder
               formField={
-                <BigNumberInputTextRight
+                <BigNumberInput
                   decimals={collateral.decimals}
                   name="amount"
                   onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
                   value={amountShares}
                 />
               }
-              placeholderText="Shares"
+              placeholderText={''}
             />
-          }
-          note={note()}
-          title={'Amount'}
-          tooltip={{ id: 'amount', description: 'Amount of shares to sell.' }}
-        />
-        <FormLabelStyled>Totals</FormLabelStyled>
-        <TableStyled>
-          <TR>
-            <TD>Total {collateral.symbol} Return</TD>
-            <TD textAlign="right">
-              {tradedCollateral ? formatBigNumber(tradedCollateral, collateral.decimals) : '-'}{' '}
-              <strong>{collateral.symbol}</strong>
-            </TD>
-          </TR>
-        </TableStyled>
-        <Well>
-          <Paragraph>
-            • You will be charged an extra {MARKET_FEE}% trade fee of &nbsp;
-            <strong>{costFee ? formatBigNumber(costFee, collateral.decimals, 10) : '-'}</strong>
-          </Paragraph>
-        </Well>
+          </div>
+          <div>
+            <TransactionDetailsCard>
+              <TransactionDetailsRow title={'Sell Amount'} value={`${mockedSellAmount} ${collateral.symbol}`} />
+              <TransactionDetailsRow
+                emphasizeValue={parseFloat(mockedPotential) > 0}
+                state={ValueStates.success}
+                title={'Profit'}
+                value={`${mockedPotential} ${collateral.symbol}`}
+              />
+              <TransactionDetailsRow
+                title={'Trading Fee'}
+                value={`${costFee ? formatBigNumber(costFee, collateral.decimals, 2) : '0.00'} ${collateral.symbol}`}
+              />
+              <TransactionDetailsLine />
+              <TransactionDetailsRow
+                emphasizeValue={
+                  (tradedCollateral && parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0) ||
+                  false
+                }
+                state={
+                  (tradedCollateral &&
+                    parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0 &&
+                    ValueStates.important) ||
+                  ValueStates.normal
+                }
+                title={'Total'}
+                value={`${tradedCollateral ? formatBigNumber(tradedCollateral, collateral.decimals, 2) : '0.00'} ${
+                  collateral.symbol
+                }`}
+              />
+            </TransactionDetailsCard>
+          </div>
+        </GridTransactionDetails>
         <ButtonContainer>
-          <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>‹ Back</ButtonLinkStyled>
-          <Button buttonType={ButtonType.primary} disabled={error} onClick={() => finish()}>
+          <LeftButton
+            buttonType={ButtonType.secondaryLine}
+            onClick={() => props.history.push(`/${marketMakerAddress}`)}
+          >
+            Cancel
+          </LeftButton>
+          <Button buttonType={ButtonType.secondaryLine} disabled={error} onClick={() => finish()}>
             Sell
           </Button>
         </ButtonContainer>
