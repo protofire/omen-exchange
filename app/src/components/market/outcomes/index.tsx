@@ -234,10 +234,8 @@ const Outcomes = (props: Props) => {
     props.onChange(isUniform ? uniform(outcomes) : outcomes)
   }
 
-  const handleIsUniformChanged = (event: any) => {
-    const value = event.target.checked
-    props.onChange(value ? uniform(outcomes) : outcomes)
-    setIsUniform(value)
+  const handleIsUniformChanged = () => {
+    setIsUniform(value => !value)
   }
 
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
@@ -275,6 +273,21 @@ const Outcomes = (props: Props) => {
 
   return (
     <>
+      <FormLabel>Add Outcome</FormLabel>
+      <StyledLabel onClick={handleIsUniformChanged}>
+        {isUniform ? 'Set manual probability' : 'Set uniformly'}
+      </StyledLabel>
+      {canAddOutcome && (
+        <NewOutcome>
+          <Textfield
+            onChange={e => setNewOutcomeName(e.target.value)}
+            placeholder="Add new outcome"
+            type="text"
+            value={newOutcomeName}
+          />
+          <ButtonAdd disabled={!newOutcomeName} onClick={addNewOutcome} title="Add new outcome" />
+        </NewOutcome>
+      )}
       <OutcomesWrapper>
         <OutcomesTitles>
           <FormLabel>Outcome</FormLabel>
@@ -289,7 +302,7 @@ const Outcomes = (props: Props) => {
         </OutcomesTitles>
         <OutcomeItems>{outcomesToRender}</OutcomeItems>
         {messageErrorToRender()}
-        <TotalWrapper>
+        {/* <TotalWrapper>
           <TotalTitle>
             <strong>Total:</strong> {outcomes.length} outcomes
           </TotalTitle>
@@ -300,24 +313,8 @@ const Outcomes = (props: Props) => {
             </TotalValueColor>
             %
           </TotalValue>
-        </TotalWrapper>
-        <CheckboxWrapper>
-          <StyledCheckbox name="distributeUniformly" onChange={handleIsUniformChanged} title="Distribute uniformly" />
-          <StyledLabel htmlFor="distributeUniformly">Distribute uniformly</StyledLabel>
-        </CheckboxWrapper>
+        </TotalWrapper> */}
       </OutcomesWrapper>
-
-      {canAddOutcome && (
-        <NewOutcome>
-          <Textfield
-            onChange={e => setNewOutcomeName(e.target.value)}
-            placeholder="Add new outcome"
-            type="text"
-            value={newOutcomeName}
-          />
-          <ButtonAdd disabled={!newOutcomeName} onClick={addNewOutcome} title="Add new outcome" />
-        </NewOutcome>
-      )}
     </>
   )
 }

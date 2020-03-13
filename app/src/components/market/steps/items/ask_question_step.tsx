@@ -141,16 +141,16 @@ const AskQuestionStep = (props: Props) => {
             value={question}
           />
         }
-        title={'Question'}
+        title={'Set Market Question'}
         tooltip={{
           id: `question`,
           description: `Ensure that your market is phrased in a way that it can be unambiguous, resolvable, contains all the necessary parameters and is clearly understandable. As a guide you could use the <a target="_blank" href="https://augur.guide/2-market-creators/checksheet.html">check sheet</a> prepared by Augur for creating markets.`,
         }}
       />
 
-      <OutcomeInfo>
+      {/* <OutcomeInfo>
         Please add all the possible outcomes for the <strong>&quot;{question}&quot;</strong> question.
-      </OutcomeInfo>
+      </OutcomeInfo> */}
       <Outcomes
         canAddOutcome={canAddOutcome}
         disabled={!!loadedQuestionId}
