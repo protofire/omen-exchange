@@ -90,7 +90,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
       setHash(hash)
     }
 
-    provider && get24hsVolume()
+    get24hsVolume()
   }, [provider])
 
   if (!collateral) {

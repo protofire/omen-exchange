@@ -104,7 +104,10 @@ const ViewWrapper = (props: Props) => {
               }
             />
           )}
-          <TitleValue title="24h Volume" value={lastDayVolume ? `${lastDayVolume} ${collateral.symbol}` : '-'} />
+          <TitleValue
+            title="24h Volume"
+            value={lastDayVolume ? `${formatBigNumber(lastDayVolume, collateral.decimals)} ${collateral.symbol}` : '-'}
+          />
           {showExtraDetails ? (
             <>
               <TitleValue
