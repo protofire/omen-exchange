@@ -9,7 +9,9 @@ import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useAsyncDerivedValue } from '../../hooks/useAsyncDerivedValue'
 import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 import { useContracts } from '../../hooks/useContracts'
-import { CPKService, ERC20Service, MarketMakerService } from '../../services'
+import { useCpk } from '../../hooks/useCpk'
+import { useCpkAllowance } from '../../hooks/useCpkAllowance'
+import { MarketMakerService } from '../../services'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
 import { computeBalanceAfterTrade, formatBigNumber } from '../../util/tools'
@@ -101,12 +103,14 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const cpk = useCpk()
   const { library: provider } = context
+  const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
 
   const { balances, collateral, marketMakerAddress, question } = props
-  const marketMaker = buildMarketMaker(marketMakerAddress)
+  const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
@@ -115,6 +119,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTwitterShareOpen, setModalTwitterShareState] = useState(false)
   const [messageTwitter, setMessageTwitter] = useState('')
+
+  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
+
+  const hasEnoughAllowance = allowance && allowance.gte(amount)
 
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
@@ -151,28 +159,26 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       .mul(weiPerUnit)
       .div(10000)
     setCost(costWithFee)
-  }, [amount, collateral])
+  }, [amount, collateral.decimals])
 
   const collateralBalance = useCollateralBalance(collateral, context)
 
+  const unlockCollateral = async () => {
+    if (!cpk) {
+      return
+    }
+
+    unlock()
+  }
+
   const finish = async () => {
     try {
+      if (!cpk) {
+        return
+      }
+
       setStatus(Status.Loading)
       setMessage(`Buying ${formatBigNumber(tradedShares, collateral.decimals)} shares ...`)
-
-      const signer = provider.getSigner()
-      const account = await signer.getAddress()
-
-      const cpk = await CPKService.create(provider)
-
-      const collateralAddress = await marketMaker.getCollateralToken()
-
-      const collateralService = new ERC20Service(provider, account, collateralAddress)
-      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, cost)
-
-      if (!hasEnoughAlowance) {
-        await collateralService.approveUnlimited(cpk.address)
-      }
 
       await cpk.buyOutcomes({
         amount,
@@ -204,7 +210,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     (status !== Status.Ready && status !== Status.Error) ||
     cost.isZero() ||
     isBuyAmountGreaterThanBalance ||
-    amount.isZero()
+    amount.isZero() ||
+    !hasEnoughAllowance
 
   const noteAmount = (
     <>
@@ -218,6 +225,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const amountFee = cost.sub(amount)
+
+  const hasZeroAllowance = allowance && allowance.isZero()
+  const showSetAllowance = hasZeroAllowance || !hasEnoughAllowance
 
   return (
     <>
@@ -252,6 +262,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           title={'Total cost'}
           tooltip={{ id: 'amount', description: 'Shares to buy with this amount of collateral.' }}
         />
+        {showSetAllowance && <button onClick={unlockCollateral}>Set allowance{allowance === null && '...'}</button>}
         <FormLabelStyled>Transaction details</FormLabelStyled>
         <TableStyled>
           <TR>
