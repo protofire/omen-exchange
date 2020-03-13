@@ -45,9 +45,10 @@ const MarketHomeContainer: React.FC = () => {
     } else if (error) {
       setMarkets(RemoteData.failure(error))
     } else if (fetchedMarkets) {
-      if (fetchedMarkets.fixedProductMarketMakers.length) {
-        const { fixedProductMarketMakers } = fetchedMarkets
-        setMarkets(RemoteData.success(fixedProductMarketMakers))
+      const { fixedProductMarketMakers } = fetchedMarkets
+      setMarkets(RemoteData.success(fixedProductMarketMakers))
+      if (fixedProductMarketMakers.length === 0) {
+        setMoreMarkets(false)
       }
     }
   }, [fetchedMarkets, loading, error])
