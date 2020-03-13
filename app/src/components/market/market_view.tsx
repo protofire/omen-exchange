@@ -21,7 +21,7 @@ interface Props {
   questionId: string
   resolution: Maybe<Date>
   status: Status
-  lastDayVolume: Maybe<string>
+  lastDayVolume: Maybe<BigNumber>
   totalPoolShares: BigNumber
   userPoolShares: BigNumber
 }

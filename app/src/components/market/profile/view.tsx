@@ -37,7 +37,7 @@ interface Props extends RouteComponentProps<{}> {
   status: Status
   marketMakerAddress: string
   funding: BigNumber
-  lastDayVolume: Maybe<string>
+  lastDayVolume: Maybe<BigNumber>
   totalPoolShares: BigNumber
   userPoolShares: BigNumber
 }
