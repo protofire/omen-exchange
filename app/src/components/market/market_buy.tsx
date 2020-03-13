@@ -30,7 +30,6 @@ import {
   TR,
   Table,
   TextfieldCustomPlaceholder,
-  ToggleTokenLock,
   ViewCard,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
@@ -247,7 +246,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
                 }
                 placeholderText={collateral.symbol}
               />
-              <ToggleTokenLock amount={amount} collateral={collateral} context={context} />
             </>
           }
           note={noteAmount}
