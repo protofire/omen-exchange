@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import { WhenConnected } from '../../../hooks/connectedWeb3'
 import { ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { formatBigNumber } from '../../../util/tools'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import {
   Button,
@@ -20,7 +21,6 @@ import {
   ViewCard,
 } from '../../common'
 import { OutcomeTable } from '../../common/outcome_table'
-import { formatBigNumber } from '../../../util/tools'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -49,10 +49,10 @@ const ViewWrapper = (props: Props) => {
     category,
     collateral,
     history,
+    lastDayVolume,
     marketMakerAddress,
     questionId,
     status,
-    lastDayVolume,
     totalPoolShares,
     userPoolShares,
   } = props

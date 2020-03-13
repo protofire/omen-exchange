@@ -1,14 +1,14 @@
+import { useQuery } from '@apollo/react-hooks'
+import { BigNumber } from 'ethers/utils'
+import gql from 'graphql-tag'
 import React, { useEffect, useState } from 'react'
 
 import { useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { getLogger } from '../../util/logger'
 import { Loading } from '../common'
 
 import { MarketView } from './market_view'
-import gql from 'graphql-tag'
-import { useQuery } from '@apollo/react-hooks'
-import { BigNumber } from 'ethers/utils'
-import { getLogger } from '../../util/logger'
 
 const logger = getLogger('Market::View')
 
@@ -39,13 +39,12 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
 
   const { marketMakerAddress } = props
 
-  const [hash, setHash] = useState<Maybe<String>>(null)
+  const [hash, setHash] = useState<Maybe<string>>(null)
   const { marketMakerData, status } = useMarketMakerData(marketMakerAddress, context)
   const { library: provider } = context
 
   const [lastDayVolume, setLastDayVolume] = useState<Maybe<BigNumber>>(null)
 
-  // TODO Move all this to another component
   const { data: volumeNow, error: errorVolumeNow } = useQuery(GET_COLLATERAL_VOLUME_NOW, {
     skip: !!lastDayVolume,
     variables: { id: marketMakerAddress.toLowerCase() },
@@ -108,12 +107,12 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
       funding={marketMakerFunding}
       isConditionResolved={isConditionResolved}
       isQuestionFinalized={isQuestionFinalized}
+      lastDayVolume={lastDayVolume}
       marketMakerAddress={marketMakerAddress}
       question={question || ''}
       questionId={questionId}
       resolution={resolution}
       status={status}
-      lastDayVolume={lastDayVolume}
       totalPoolShares={totalPoolShares}
       userPoolShares={userPoolShares}
     />
