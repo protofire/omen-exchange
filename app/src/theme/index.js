@@ -135,7 +135,7 @@ const theme = {
   outcomes: {
     colors: [
       {
-        darker: '#c2a0c7',
+        darker: '#8E24AA',
         medium: '#e1bee7',
       },
       {

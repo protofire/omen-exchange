@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components'
 
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../util/types'
-import { BarDiagram, NewValue, RadioInput, TD, TH, THead, TR, Table } from '../../common'
+import { BarDiagram, NewValue, OwnedShares, RadioInput, TD, TH, THead, TR, Table } from '../../common'
 
 interface Props {
   balances: BalanceItem[]
@@ -96,8 +96,6 @@ export const OutcomeTable = (props: Props) => {
     const currentPriceFormatted = Number(currentPrice).toFixed(2)
     const probability = probabilities[outcomeIndex]
 
-    console.log(collateral)
-
     return (
       <TR key={outcomeName}>
         {!displayRadioSelection || withWinningOutcome ? null : (
@@ -115,10 +113,12 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
+            {outcomeSelected === outcomeIndex && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
           </TDStyled>
         ) : (
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
+            {outcomeSelected === outcomeIndex && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
