@@ -26,7 +26,7 @@ export const ButtonDisconnectWallet = (props: Props) => {
   }
 
   return (
-    <Button buttonType={ButtonType.primary} onClick={logout} {...restProps}>
+    <Button buttonType={ButtonType.secondaryLine} onClick={logout} {...restProps}>
       Disconnect
     </Button>
   )
