@@ -25,15 +25,16 @@ const Value = styled.p`
 `
 
 interface Props {
+  text?: string
   value: string
 }
 
 export const WalletBalance: React.FC<Props> = props => {
-  const { value, ...restProps } = props
+  const { text = 'Wallet Balance', value, ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
-      <Title>Wallet Balance</Title>
+      <Title>{text}</Title>
       <Value>{value}</Value>
     </Wrapper>
   )

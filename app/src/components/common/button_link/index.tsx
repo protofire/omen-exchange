@@ -2,7 +2,7 @@ import { darken } from 'polished'
 import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-const ButtonContainer = styled.button`
+const Wrapper = styled.button`
   align-items: center;
   background-color: transparent;
   border-radius: 0;
@@ -37,5 +37,5 @@ export const ButtonLink: React.FC<ButtonHTMLAttributes<HTMLButtonElement>> = (
 ) => {
   const { children, ...restProps } = props
 
-  return <ButtonContainer {...restProps}>{children}</ButtonContainer>
+  return <Wrapper {...restProps}>{children}</Wrapper>
 }

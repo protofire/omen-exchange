@@ -13,23 +13,31 @@ import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
 import { divBN, formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
-import { BalanceShares } from '../common/balance_shares'
-import { BalanceToken } from '../common/balance_token'
-import { BigNumberInput, BigNumberInputReturn } from '../common/big_number_input'
-import { Button } from '../common/button'
-import { ButtonContainer } from '../common/button_container'
-import { ButtonLink } from '../common/button_link'
-import { FormError } from '../common/form_error'
-import { FormLabel } from '../common/form_label'
-import { FormRow } from '../common/form_row'
-import { Loading } from '../common/loading'
+import {
+  BigNumberInput,
+  Button,
+  ButtonContainer,
+  ButtonTab,
+  DisplayArbitrator,
+  GridTransactionDetails,
+  GridTwoColumns,
+  Loading,
+  SectionTitle,
+  SubsectionTitle,
+  SubsectionTitleAction,
+  SubsectionTitleWrapper,
+  TextfieldCustomPlaceholder,
+  TitleValue,
+  TransactionDetailsCard,
+  TransactionDetailsLine,
+  TransactionDetailsRow,
+  ViewCard,
+  WalletBalance,
+} from '../common'
+import { BigNumberInputReturn } from '../common/big_number_input'
 import { OutcomeTable } from '../common/outcome_table'
-import { SectionTitle } from '../common/section_title'
-import { SubsectionTitle } from '../common/subsection_title'
-import { TD, TR, Table } from '../common/table'
-import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
-import { ToggleTokenLock } from '../common/toggle_token_lock'
-import { ViewCard } from '../common/view_card'
+import { SetAllowance } from '../common/set_allowance'
+import { ValueStates } from '../common/transaction_details_row'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -44,33 +52,15 @@ interface Props extends RouteComponentProps<any> {
   collateral: Token
 }
 
-const TableStyled = styled(Table)`
-  margin-bottom: 30px;
-`
-
-const AmountWrapper = styled(FormRow)`
-  margin-bottom: 30px;
-  width: 100%;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    width: 50%;
-  }
-`
-
-const ButtonLinkStyled = styled(ButtonLink)`
+const LeftButton = styled(Button)`
   margin-right: auto;
 `
 
-const BigNumberInputTextRight = styled<any>(BigNumberInput)`
-  text-align: right;
-`
-
-const FormLabelStyled = styled(FormLabel)`
-  margin-bottom: 10px;
-`
-
-const SubsectionTitleStyled = styled(SubsectionTitle)`
-  margin-bottom: 0;
+const TabsGrid = styled.div`
+  display: grid;
+  grid-column-gap: 13px;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 0 25px;
 `
 
 const logger = getLogger('Market::Fund')
@@ -80,12 +70,17 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances,
     collateral,
     marketMakerAddress,
-    marketMakerFunding,
-    marketMakerUserFunding,
+    // marketMakerFunding,
+    // marketMakerUserFunding,
     question,
-    totalPoolShares,
-    userPoolShares,
+    // totalPoolShares,
+    // userPoolShares,
   } = props
+
+  enum Tabs {
+    deposit,
+    withdraw,
+  }
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
@@ -97,13 +92,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [amountToRemove, setAmountToRemove] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
+  const [showingExtraInformation, setExtraInformation] = useState(false)
 
-  const marketMakerFundingPercentage: Maybe<number> = marketMakerFunding.isZero()
-    ? null
-    : 100 * divBN(marketMakerUserFunding, marketMakerFunding)
-  const userPoolSharesPercentage: Maybe<number> = totalPoolShares.isZero()
-    ? null
-    : 100 * divBN(userPoolShares, totalPoolShares)
+  const toggleExtraInformation = () =>
+    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
+
+  const [activeTab, setActiveTab] = useState(Tabs.deposit)
+
+  // const marketMakerFundingPercentage: Maybe<number> = marketMakerFunding.isZero()
+  //   ? null
+  //   : 100 * divBN(marketMakerUserFunding, marketMakerFunding)
+  // const userPoolSharesPercentage: Maybe<number> = totalPoolShares.isZero()
+  //   ? null
+  //   : 100 * divBN(userPoolShares, totalPoolShares)
 
   const addFunding = async () => {
     try {
@@ -164,129 +165,205 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const isFundingToAddGreaterThanBalance = amountToFund.gt(collateralBalance)
   const errorFundingToAdd = amountToFund.isZero() || isFundingToAddGreaterThanBalance
 
-  const fundingToAddMessageError = isFundingToAddGreaterThanBalance
-    ? `You don't have enough collateral in your balance.`
-    : ''
-
   const fundingBalance = useFundingBalance(marketMakerAddress, context)
 
   const isFundingToRemoveGreaterThanFundingBalance = amountToRemove.gt(fundingBalance)
   const errorFundingToRemove = amountToRemove.isZero() || isFundingToRemoveGreaterThanFundingBalance
 
-  const fundingToRemoveMessageError = isFundingToRemoveGreaterThanFundingBalance
-    ? `You don't have enough funding in your balance.`
-    : ''
-
   const probabilities = balances.map(balance => balance.probability)
+
+  const mockedEarnTradingFee = 1.23
+  const mockedEarned = 3.33
+  const mockedPoolTokens = 1.12
+  const mockedDeposited = 0.55
+  const mockedTokenTotals = 11.55
+
+  const details = (showExtraDetails: boolean) => {
+    const mockedDetails = [
+      {
+        title: 'Total Pool Tokens',
+        value: '5000',
+      },
+      {
+        title: 'Total Pool Earning',
+        value: '25,232 DAI',
+      },
+      {
+        title: 'My Pool Tokens',
+        value: '0',
+      },
+      {
+        title: 'My Earnings',
+        value: '0 DAI',
+      },
+
+      {
+        title: 'Category',
+        value: 'Politics',
+      },
+      {
+        title: 'Resolution Date',
+        value: '25.09.19 - 09:00',
+      },
+      {
+        title: 'Arbitrator/Oracle',
+        value: (
+          <DisplayArbitrator
+            arbitrator={{ id: 'realitio', address: '0x1234567890', name: 'Realit.io', url: 'https://realit.io/' }}
+          />
+        ),
+      },
+      {
+        title: '24h Volume',
+        value: '425,523 DAI',
+      },
+    ]
+    const mockedDetailsLastHalf = mockedDetails.splice(4, 8)
+
+    return (
+      <>
+        <GridTwoColumns>
+          {showExtraDetails ? (
+            <>
+              {mockedDetails.map((item, index) => (
+                <TitleValue key={index} title={item.title} value={item.value} />
+              ))}
+            </>
+          ) : null}
+          {mockedDetailsLastHalf.map((item, index) => (
+            <TitleValue key={index} title={item.title} value={item.value} />
+          ))}
+        </GridTwoColumns>
+      </>
+    )
+  }
 
   return (
     <>
       <SectionTitle goBackEnabled title={question} />
       <ViewCard>
-        <SubsectionTitleStyled>Fund this market</SubsectionTitleStyled>
+        <SubsectionTitleWrapper>
+          <SubsectionTitle>Pool Liquidity</SubsectionTitle>
+          <SubsectionTitleAction onClick={toggleExtraInformation}>
+            {showingExtraInformation ? 'Hide' : 'Show'} Market Information
+          </SubsectionTitleAction>
+        </SubsectionTitleWrapper>
+        {details(showingExtraInformation)}
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          disabledColumns={[OutcomeTableValue.CurrentPrice, OutcomeTableValue.Payout]}
+          disabledColumns={[OutcomeTableValue.Payout]}
           displayRadioSelection={false}
           probabilities={probabilities}
         />
-        <AmountWrapper
-          formField={
-            <>
-              <TextfieldCustomPlaceholder
-                formField={
-                  <BigNumberInputTextRight
-                    decimals={collateral.decimals}
-                    name="amountToFund"
-                    onChange={(e: BigNumberInputReturn) => setAmountToFund(e.value)}
-                    value={amountToFund}
-                  />
-                }
-                placeholderText={collateral.symbol}
-              />
-              <ToggleTokenLock amount={amountToFund} collateral={collateral} context={context} />
-            </>
-          }
-          note={
-            <>
-              <BalanceToken
-                collateral={collateral}
-                collateralBalance={collateralBalance}
-                onClickAddMaxCollateral={() => setAmountToFund(collateralBalance)}
-              />
-              <FormError>{fundingToAddMessageError}</FormError>
-            </>
-          }
-          title={'Amount to fund'}
-          tooltip={{ id: 'amountToFund', description: 'Funds you will add to this market.' }}
-        />
-        <AmountWrapper
-          formField={
-            <>
-              <TextfieldCustomPlaceholder
-                formField={
-                  <BigNumberInputTextRight
-                    decimals={collateral.decimals}
-                    name="amountToRemove"
-                    onChange={(e: BigNumberInputReturn) => setAmountToRemove(e.value)}
-                    value={amountToRemove}
-                  />
-                }
-                placeholderText="shares"
-              />
-            </>
-          }
-          note={
-            <>
-              <BalanceShares
-                collateral={collateral}
-                onClickMax={(shares: BigNumber) => setAmountToRemove(shares)}
-                shares={fundingBalance}
-              />
-              <FormError>{fundingToRemoveMessageError}</FormError>
-            </>
-          }
-          title={'Amount to remove'}
-          tooltip={{ id: 'amountToRemove', description: 'Funds you will remove from this market.' }}
-        />
-        <FormLabelStyled>Totals</FormLabelStyled>
-        <TableStyled>
-          <TR>
-            <TD>Total funding</TD>
-            <TD textAlign="right">
-              {marketMakerFunding ? formatBigNumber(marketMakerFunding, collateral.decimals) : '0'}{' '}
-            </TD>
-          </TR>
-          <TR>
-            <TD>Your funding</TD>
-            <TD textAlign="right">
-              {marketMakerUserFunding ? formatBigNumber(marketMakerUserFunding, collateral.decimals) : '0'} (
-              {marketMakerFundingPercentage && marketMakerFundingPercentage.toFixed(2)}%){' '}
-            </TD>
-          </TR>
-          <TR>
-            <TD>Total pool shares</TD>
-            <TD textAlign="right">
-              {totalPoolShares ? formatBigNumber(totalPoolShares, collateral.decimals) : '0'} <strong>shares</strong>
-            </TD>
-          </TR>
-          <TR>
-            <TD>Your pool shares</TD>
-            <TD textAlign="right">
-              {userPoolShares ? formatBigNumber(userPoolShares, collateral.decimals) : '0'} (
-              {userPoolSharesPercentage && userPoolSharesPercentage.toFixed(2)}%) <strong>shares</strong>
-            </TD>
-          </TR>
-        </TableStyled>
+        <GridTransactionDetails>
+          <div>
+            <TabsGrid>
+              <ButtonTab active={activeTab === Tabs.deposit} onClick={() => setActiveTab(Tabs.deposit)}>
+                Deposit
+              </ButtonTab>
+              <ButtonTab active={activeTab === Tabs.withdraw} onClick={() => setActiveTab(Tabs.withdraw)}>
+                Withdraw
+              </ButtonTab>
+            </TabsGrid>
+            {activeTab === Tabs.deposit && (
+              <>
+                <WalletBalance
+                  value={`${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`}
+                />
+                <TextfieldCustomPlaceholder
+                  formField={
+                    <BigNumberInput
+                      decimals={collateral.decimals}
+                      name="amountToFund"
+                      onChange={(e: BigNumberInputReturn) => setAmountToFund(e.value)}
+                      value={amountToFund}
+                    />
+                  }
+                  placeholderText={collateral.symbol}
+                />
+              </>
+            )}
+            {activeTab === Tabs.withdraw && (
+              <>
+                <WalletBalance
+                  text="My Pool Tokens"
+                  value={`${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`}
+                />
+                <TextfieldCustomPlaceholder
+                  formField={
+                    <BigNumberInput
+                      decimals={collateral.decimals}
+                      name="amountToRemove"
+                      onChange={(e: BigNumberInputReturn) => setAmountToRemove(e.value)}
+                      value={amountToRemove}
+                    />
+                  }
+                  placeholderText={collateral.symbol}
+                />
+              </>
+            )}
+          </div>
+          <div>
+            {activeTab === Tabs.deposit && (
+              <TransactionDetailsCard>
+                <TransactionDetailsRow
+                  emphasizeValue={mockedEarned > 0}
+                  state={ValueStates.success}
+                  title={'Earn Trading Fee'}
+                  value={mockedEarned}
+                />
+                <TransactionDetailsLine />
+                <TransactionDetailsRow
+                  emphasizeValue={mockedPoolTokens > 0}
+                  state={(mockedPoolTokens > 0 && ValueStates.important) || ValueStates.normal}
+                  title={'Pool Tokens'}
+                  value={`(2.22%) ${mockedPoolTokens ? mockedPoolTokens : '0.00'} ${collateral.symbol}`}
+                />
+              </TransactionDetailsCard>
+            )}
+            {activeTab === Tabs.withdraw && (
+              <TransactionDetailsCard>
+                <TransactionDetailsRow
+                  emphasizeValue={mockedEarnTradingFee > 0}
+                  state={ValueStates.success}
+                  title={'Earned'}
+                  value={mockedEarnTradingFee}
+                />
+                <TransactionDetailsRow state={ValueStates.success} title={'Deposited'} value={mockedDeposited} />
+                <TransactionDetailsLine />
+                <TransactionDetailsRow
+                  emphasizeValue={mockedTokenTotals > 0}
+                  state={(mockedTokenTotals > 0 && ValueStates.important) || ValueStates.normal}
+                  title={'Total'}
+                  value={`${mockedTokenTotals ? mockedTokenTotals : '0.00'} ${collateral.symbol}`}
+                />
+              </TransactionDetailsCard>
+            )}
+          </div>
+        </GridTransactionDetails>
+        {activeTab === Tabs.deposit && <SetAllowance amount={amountToFund} collateral={collateral} context={context} />}
         <ButtonContainer>
-          <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>‹ Back</ButtonLinkStyled>
-          <Button buttonType={ButtonType.secondary} disabled={errorFundingToRemove} onClick={() => removeFunding()}>
-            Remove funds
-          </Button>
-          <Button buttonType={ButtonType.primary} disabled={errorFundingToAdd} onClick={() => addFunding()}>
-            Fund
-          </Button>
+          <LeftButton
+            buttonType={ButtonType.secondaryLine}
+            onClick={() => props.history.push(`/${marketMakerAddress}`)}
+          >
+            Cancel
+          </LeftButton>
+          {activeTab === Tabs.deposit && (
+            <Button buttonType={ButtonType.secondaryLine} disabled={errorFundingToAdd} onClick={() => addFunding()}>
+              Deposit
+            </Button>
+          )}
+          {activeTab === Tabs.withdraw && (
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={errorFundingToRemove}
+              onClick={() => removeFunding()}
+            >
+              Withdraw
+            </Button>
+          )}
         </ButtonContainer>
       </ViewCard>
       {status === Status.Loading ? <Loading message={message} /> : null}

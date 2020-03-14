@@ -6,7 +6,7 @@ import { Button } from '../button'
 
 import IconAdd from './img/add-button.svg'
 
-const ButtonContainer = styled(Button)`
+const Wrapper = styled(Button)`
   background-color: transparent;
   background-image: url(${IconAdd});
   background-position: 50% 50%;
@@ -25,4 +25,4 @@ const ButtonContainer = styled(Button)`
   }
 `
 
-export const ButtonAdd: React.FC<ButtonProps> = (props: ButtonProps) => <ButtonContainer type="button" {...props} />
+export const ButtonAdd: React.FC<ButtonProps> = (props: ButtonProps) => <Wrapper type="button" {...props} />
