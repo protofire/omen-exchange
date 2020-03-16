@@ -74,7 +74,7 @@ const networks: { [K in NetworkId]: Network } = {
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK ? parseInt(EARLIEST_RINKEBY_BLOCK_TO_CHECK, 10) : 5827230,
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
-      marketMakerFactory: '0xe7E502789B8f4cDC99e6Cf9d3963E8C76784da51',
+      marketMakerFactory: '0x0fB4340432e56c014fa96286de17222822a9281b',
       conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
       oracle: '0x5A90132C104CA33652Ee71E2E645D5A4d8E5d7D6',
       klerosBadge: '0x0000000000000000000000000000000000000000',
