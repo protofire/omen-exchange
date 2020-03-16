@@ -2454,6 +2454,13 @@
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha512-rr+OQyAjxze7GgWrSaJwydHStIhHq2lvY3BOC2Mj7KnzI7XK0Uw1TOOdI9lDoajEbSWLiYgoo4f1R51erQfhPQ==
 
+"@types/contract-proxy-kit@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@types/contract-proxy-kit/-/contract-proxy-kit-1.0.1.tgz#2426fffb2ca89a98414cb0efb45002c286006f47"
+  integrity sha512-Ty1mlhmlL04GM7KowufxDxlEeCbv7eHMB9yuEFOQdfKppI8qgo2IfdayR98zdMahZsIYXj+eM4X6MFW5ZHTzFg==
+  dependencies:
+    ethers "^4.0.43"
+
 "@types/eslint-visitor-keys@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@types/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#1ee30d79544ca84d68d4b3cdb0af4f205663dd2d"
@@ -8372,7 +8379,7 @@ ethers@4.0.0-beta.3:
     uuid "2.0.1"
     xmlhttprequest "1.8.0"
 
-ethers@^4.0.20, ethers@^4.0.36, ethers@~4.0.4:
+ethers@^4.0.20, ethers@^4.0.36, ethers@^4.0.43, ethers@~4.0.4:
   version "4.0.45"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.45.tgz#8d4cd764d7c7690836b583d4849203c225eb56e2"
   integrity sha512-N/Wmc6Mw4pQO+Sss1HnKDCSS6KSCx0luoBMiPNq+1GbOaO3YaZOyplBEhj+NEoYsizZYODtkITg2oecPeNnidQ==
