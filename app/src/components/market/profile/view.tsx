@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import { WhenConnected } from '../../../hooks/connectedWeb3'
 import { ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { formatBigNumber } from '../../../util/tools'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import {
   Button,
@@ -36,10 +37,25 @@ interface Props extends RouteComponentProps<{}> {
   status: Status
   marketMakerAddress: string
   funding: BigNumber
+  lastDayVolume: Maybe<BigNumber>
+  totalPoolShares: BigNumber
+  userPoolShares: BigNumber
 }
 
 const ViewWrapper = (props: Props) => {
-  const { arbitrator, balances, category, collateral, history, marketMakerAddress, questionId, status } = props
+  const {
+    arbitrator,
+    balances,
+    category,
+    collateral,
+    history,
+    lastDayVolume,
+    marketMakerAddress,
+    questionId,
+    status,
+    totalPoolShares,
+    userPoolShares,
+  } = props
   const [showingExtraInformation, setExtraInformation] = useState(false)
 
   const toggleExtraInformation = () =>
@@ -88,12 +104,22 @@ const ViewWrapper = (props: Props) => {
               }
             />
           )}
+          <TitleValue
+            title="24h Volume"
+            value={lastDayVolume ? `${formatBigNumber(lastDayVolume, collateral.decimals)} ${collateral.symbol}` : '-'}
+          />
           {showExtraDetails ? (
             <>
-              <TitleValue title={'Mocked Title 1'} value={'Mocked Value 1'} />
-              <TitleValue title={'Mocked Title 2'} value={'Longer Mocked Value to have and idea how it looks'} />
-              <TitleValue title={'Mocked Title 3'} value={'Mocked Value 3'} />
-              <TitleValue title={'Mocked Title 4'} value={'Mocked Value 4'} />
+              <TitleValue
+                title={'Total Pool Tokens'}
+                value={totalPoolShares ? formatBigNumber(totalPoolShares, collateral.decimals) : '0'}
+              />
+              <TitleValue
+                title={'My Pool Tokens'}
+                value={userPoolShares ? formatBigNumber(userPoolShares, collateral.decimals) : '0'}
+              />
+              <TitleValue title={'Total Pool Earnings'} value={'Mocked Value 3'} />
+              <TitleValue title={'My Earnings'} value={'Mocked Value 4'} />
             </>
           ) : null}
         </GridTwoColumns>

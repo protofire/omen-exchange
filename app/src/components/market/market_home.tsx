@@ -37,7 +37,7 @@ interface Props {
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { context, count, markets, onFilterChange, onShowMore, moreMarkets } = props
+  const { context, count, markets, moreMarkets, onFilterChange, onShowMore } = props
   const [state, setState] = useState('OPEN')
   const [category, setCategory] = useState('All')
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
