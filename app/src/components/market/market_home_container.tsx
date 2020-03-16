@@ -5,9 +5,12 @@ import { Waypoint } from 'react-waypoint'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { MARKETS_HOME } from '../../queries/markets_home'
 import { CPKService } from '../../services'
+import { getLogger } from '../../util/logger'
 import { RemoteData } from '../../util/remote_data'
 
 import { MarketHome } from './market_home'
+
+const logger = getLogger('MarketHomeContainer')
 
 const PAGE_SIZE = 10
 
@@ -24,7 +27,7 @@ const MarketHomeContainer: React.FC = () => {
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const [moreMarkets, setMoreMarkets] = useState(true)
 
-  const { library: provider } = context
+  const { account, library: provider } = context
 
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(MARKETS_HOME[filter.state], {
     notifyOnNetworkStatusChange: true,
@@ -33,11 +36,17 @@ const MarketHomeContainer: React.FC = () => {
 
   useEffect(() => {
     const getCpkAddress = async () => {
-      const cpk = await CPKService.create(provider)
-      setCpkAddress(cpk.address)
+      try {
+        const cpk = await CPKService.create(provider)
+        setCpkAddress(cpk.address)
+      } catch (e) {
+        logger.error('Could not get address of CPK', e.message)
+      }
     }
-    getCpkAddress()
-  }, [provider])
+    if (account) {
+      getCpkAddress()
+    }
+  }, [provider, account])
 
   useEffect(() => {
     if (loading) {
