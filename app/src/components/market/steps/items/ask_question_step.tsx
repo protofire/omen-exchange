@@ -19,6 +19,7 @@ import { QuestionInput } from '../../../common/question_input'
 
 import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
 import { Outcome, Outcomes } from '../../outcomes'
+import { useHistory } from 'react-router'
 
 interface Props {
   next: () => void
@@ -84,6 +85,8 @@ const AskQuestionStep = (props: Props) => {
     question,
     resolution,
   } = values
+
+  const history = useHistory()
 
   const validate = (e: any) => {
     e.preventDefault()
@@ -162,22 +165,6 @@ const AskQuestionStep = (props: Props) => {
 
       <FormRow
         formField={
-          <Categories
-            customValues={categoriesCustom}
-            disabled={!!loadedQuestionId}
-            name="category"
-            onChange={handleChange}
-            value={category}
-          />
-        }
-        title={'Category'}
-        tooltip={{
-          id: `category`,
-          description: `You can choose among several categories. Your selection will classify the subject/topic of your market.`,
-        }}
-      />
-      <FormRow
-        formField={
           <DateField
             disabled={!!loadedQuestionId}
             minDate={new Date()}
@@ -192,6 +179,23 @@ const AskQuestionStep = (props: Props) => {
           description: `Precisely indicate when the market is resolved. The time is displayed in ISO 8601 format.`,
         }}
       />
+      <FormRow
+        formField={
+          <Categories
+            customValues={categoriesCustom}
+            disabled={!!loadedQuestionId}
+            name="category"
+            onChange={handleChange}
+            value={category}
+          />
+        }
+        title={'Category'}
+        tooltip={{
+          id: `category`,
+          description: `You can choose among several categories. Your selection will classify the subject/topic of your market.`,
+        }}
+      />
+
       <FormRow
         formField={
           <Arbitrators
@@ -214,7 +218,7 @@ const AskQuestionStep = (props: Props) => {
         <DisplayArbitrator arbitrator={arbitrator} />
       </OracleInfo>
       <ButtonContainerStyled>
-        <ButtonLinkStyled onClick={props.next}>‹ Cancel</ButtonLinkStyled>
+        <ButtonLinkStyled onClick={() => history.push(`/`)}>‹ Cancel</ButtonLinkStyled>
         <Button disabled={error} onClick={props.next}>
           Next
         </Button>

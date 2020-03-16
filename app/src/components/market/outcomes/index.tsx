@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import {
@@ -151,8 +151,9 @@ interface Props {
 
 const Outcomes = (props: Props) => {
   const { canAddOutcome, disabled, errorMessages, outcomes, totalProbabilities } = props
-  const [newOutcomeName, setNewOutcomeName] = React.useState('')
-  const [isUniform, setIsUniform] = React.useState(false)
+  const [newOutcomeName, setNewOutcomeName] = useState('')
+  const [newOutcomeProbability, setNewOutcomeProbability] = useState(0)
+  const [isUniform, setIsUniform] = useState(false)
 
   const updateOutcomeProbability = (index: number, newProbability: number) => {
     if (newProbability < 0 || newProbability > 100) {
@@ -222,11 +223,12 @@ const Outcomes = (props: Props) => {
   const addNewOutcome = () => {
     const newOutcome = {
       name: newOutcomeName.trim(),
-      probability: 0,
+      probability: newOutcomeProbability,
     }
     const newOutcomes = outcomes.concat(newOutcome)
     props.onChange(isUniform ? uniform(newOutcomes) : newOutcomes)
     setNewOutcomeName('')
+    setNewOutcomeProbability(0)
   }
 
   const removeOutcome = (index: number) => {
@@ -236,6 +238,11 @@ const Outcomes = (props: Props) => {
 
   const handleIsUniformChanged = () => {
     setIsUniform(value => !value)
+  }
+
+  const setMax = () => {
+    const sum = outcomes.reduce((acum, b) => acum + b.probability, 0)
+    setNewOutcomeProbability(100 - sum)
   }
 
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
@@ -285,6 +292,15 @@ const Outcomes = (props: Props) => {
             type="text"
             value={newOutcomeName}
           />
+          {!isUniform && (
+            <Textfield
+              onChange={e => setNewOutcomeProbability(Number(e.target.value))}
+              placeholder="0.00"
+              type="text"
+              value={newOutcomeProbability}
+            />
+          )}
+          {!isUniform && outcomes.length && <StyledLabel onClick={setMax}>Set Max</StyledLabel>}
           <ButtonAdd disabled={!newOutcomeName} onClick={addNewOutcome} title="Add new outcome" />
         </NewOutcome>
       )}
