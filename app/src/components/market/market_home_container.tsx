@@ -24,7 +24,7 @@ const MarketHomeContainer: React.FC = () => {
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const [moreMarkets, setMoreMarkets] = useState(true)
 
-  const { library: provider } = context
+  const { library: provider, account } = context
 
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(MARKETS_HOME[filter.state], {
     notifyOnNetworkStatusChange: true,
@@ -36,8 +36,10 @@ const MarketHomeContainer: React.FC = () => {
       const cpk = await CPKService.create(provider)
       setCpkAddress(cpk.address)
     }
-    getCpkAddress()
-  }, [provider])
+    if (account) {
+      getCpkAddress()
+    }
+  }, [provider, account])
 
   useEffect(() => {
     if (loading) {
