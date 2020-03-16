@@ -27,7 +27,7 @@ const MarketHomeContainer: React.FC = () => {
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const [moreMarkets, setMoreMarkets] = useState(true)
 
-  const { library: provider, account } = context
+  const { account, library: provider } = context
 
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(MARKETS_HOME[filter.state], {
     notifyOnNetworkStatusChange: true,
