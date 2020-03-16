@@ -14,7 +14,7 @@
       "jsx": true
     }
   },
-  "plugins": ["react", "@typescript-eslint", "import", "jsx-a11y", "sort-destructure-keys", "prettier"],
+  "plugins": ["react", "react-hooks", "@typescript-eslint", "import", "jsx-a11y", "sort-destructure-keys", "prettier"],
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -71,6 +71,8 @@
       {
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }
-    ]
+    ],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }
