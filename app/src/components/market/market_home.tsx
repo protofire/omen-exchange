@@ -31,12 +31,13 @@ interface Props {
   count: number
   context: ConnectedWeb3Context
   currentFilter: any
+  moreMarkets: boolean
   onFilterChange: (filter: any) => void
   onShowMore: () => void
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { context, count, markets, onFilterChange, onShowMore } = props
+  const { context, count, markets, moreMarkets, onFilterChange, onShowMore } = props
   const [state, setState] = useState('OPEN')
   const [category, setCategory] = useState('All')
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
@@ -93,7 +94,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         {RemoteData.is.success(markets) && markets.data.length === 0 && (
           <NoMarketsAvailable title={'No markets available'} />
         )}
-        {showMoreButton}
+        {moreMarkets && showMoreButton}
       </ListCard>
       {RemoteData.is.loading(markets) ? <Loading message="Loading markets..." /> : null}
     </>
