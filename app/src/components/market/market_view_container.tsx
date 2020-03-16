@@ -1,14 +1,14 @@
+import { useQuery } from '@apollo/react-hooks'
+import { BigNumber } from 'ethers/utils'
+import gql from 'graphql-tag'
 import React, { useEffect, useState } from 'react'
 
 import { useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { getLogger } from '../../util/logger'
 import { Loading } from '../common'
 
 import { MarketView } from './market_view'
-import gql from 'graphql-tag'
-import { useQuery } from '@apollo/react-hooks'
-import { BigNumber } from 'ethers/utils'
-import { getLogger } from '../../util/logger'
 
 const logger = getLogger('Market::View')
 
@@ -39,7 +39,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
 
   const { marketMakerAddress } = props
 
-  const [hash, setHash] = useState<Maybe<String>>(null)
+  const [hash, setHash] = useState<Maybe<string>>(null)
   const { marketMakerData, status } = useMarketMakerData(marketMakerAddress, context)
   const { library: provider } = context
 
