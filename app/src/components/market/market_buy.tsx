@@ -262,7 +262,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           title={'Total cost'}
           tooltip={{ id: 'amount', description: 'Shares to buy with this amount of collateral.' }}
         />
-        {showSetAllowance && <button onClick={unlockCollateral}>Set allowance{allowance === null && '...'}</button>}
+        {showSetAllowance && (
+          <button disabled={allowance === null} onClick={unlockCollateral}>
+            Set allowance{allowance === null && '...'}
+          </button>
+        )}
         <FormLabelStyled>Transaction details</FormLabelStyled>
         <TableStyled>
           <TR>
