@@ -6045,9 +6045,9 @@ content-type@~1.0.4:
   integrity sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==
 
 contract-proxy-kit@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/contract-proxy-kit/-/contract-proxy-kit-1.0.0.tgz#1123d6c8b794057fd4ab7a74509e7bf78a7e33a6"
-  integrity sha512-yH3Cw4r5mVLkqvzS7q05NxsWyP4twjldRLpqIcfnDAUzEiJd18VmhF8kIYDbLKeIjRTxBfPewZmmW5Brte3dvA==
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/contract-proxy-kit/-/contract-proxy-kit-1.1.1.tgz#17700eebc91a9140da0e106f51a234ee5e335412"
+  integrity sha512-Tm0LSoMDrd8QFTqCahju3hNzMGFvrPz28HnuObbT9CeFVLSKhTSZmxYuftiz2zV+KzL1Ji83TgLsC7CIw0fJJA==
 
 convert-source-map@1.6.0:
   version "1.6.0"
