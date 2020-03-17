@@ -243,42 +243,41 @@ const FundingAndFeeStep = (props: Props) => {
             description: `Initial funding to fund the market maker.`,
           }}
         />
-        <ButtonContainer>
-          {!MarketCreationStatus.is.ready(marketCreationStatus) &&
-          !MarketCreationStatus.is.error(marketCreationStatus) ? (
-            <Loading full={true} message={`${marketCreationStatus._type}...`} />
-          ) : null}
+        {!MarketCreationStatus.is.ready(marketCreationStatus) &&
+        !MarketCreationStatus.is.error(marketCreationStatus) ? (
+          <Loading full={true} message={`${marketCreationStatus._type}...`} />
+        ) : null}
 
-          {fundingErrorMessage && <ErrorStyled>{fundingErrorMessage}</ErrorStyled>}
-          <ButtonContainer>
-            <ButtonLinkStyled
+        {fundingErrorMessage && <ErrorStyled>{fundingErrorMessage}</ErrorStyled>}
+
+        <ButtonContainer>
+          <ButtonLinkStyled
+            disabled={
+              !MarketCreationStatus.is.ready(marketCreationStatus) &&
+              !MarketCreationStatus.is.error(marketCreationStatus)
+            }
+            onClick={back}
+          >
+            ‹ Back
+          </ButtonLinkStyled>
+          {account ? (
+            <Button
+              buttonType={ButtonType.primary}
               disabled={
-                !MarketCreationStatus.is.ready(marketCreationStatus) &&
-                !MarketCreationStatus.is.error(marketCreationStatus)
+                !MarketCreationStatus.is.ready(marketCreationStatus) ||
+                MarketCreationStatus.is.error(marketCreationStatus) ||
+                !hasEnoughBalance ||
+                error
               }
-              onClick={back}
+              onClick={submit}
             >
-              ‹ Back
-            </ButtonLinkStyled>
-            {account ? (
-              <Button
-                buttonType={ButtonType.primary}
-                disabled={
-                  !MarketCreationStatus.is.ready(marketCreationStatus) ||
-                  MarketCreationStatus.is.error(marketCreationStatus) ||
-                  !hasEnoughBalance ||
-                  error
-                }
-                onClick={submit}
-              >
-                Create
-              </Button>
-            ) : (
-              <Button buttonType={ButtonType.primary} onClick={submit}>
-                Connect Wallet
-              </Button>
-            )}
-          </ButtonContainer>
+              Create
+            </Button>
+          ) : (
+            <Button buttonType={ButtonType.primary} onClick={submit}>
+              Connect Wallet
+            </Button>
+          )}
         </ButtonContainer>
       </CreateCard>
     </>
