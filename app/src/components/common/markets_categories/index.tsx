@@ -1,5 +1,5 @@
 import { useInterval } from '@react-corekit/use-interval'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import Draggable from 'react-draggable'
 import styled from 'styled-components'
 
@@ -42,7 +42,7 @@ enum SliderDirection {
   none,
 }
 
-export const MarketsCategories: React.FC = props => {
+export const MarketsCategories: React.FC<HTMLAttributes<HTMLDivElement>> = props => {
   const { children } = props
   const [sliderXDisplacement, setSliderXDisplacement] = useState<number>(0)
   const [sliderMoving, setSliderMoving] = useState<SliderDirection>(SliderDirection.none)

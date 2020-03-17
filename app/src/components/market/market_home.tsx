@@ -35,9 +35,10 @@ const FiltersButtons = styled.div`
 `
 
 const ListWrapper = styled.div`
+  border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
-  min-height: 200px;
   flex-direction: column;
+  min-height: 200px;
 `
 
 const NoMarketsAvailable = styled.p`
