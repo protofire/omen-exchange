@@ -11,6 +11,10 @@ import { IconChevronRight } from '../common/icons/IconChevronRight'
 
 const CATEGORIES = ['All', 'Politics', 'Cryptocurrencies', 'Sports', 'Esports', 'NBA']
 
+const SectionTitleMarket = styled(SectionTitle)`
+  font-size: 18px;
+`
+
 const TopContents = styled.div`
   padding: 25px;
 `
@@ -79,14 +83,21 @@ interface Props {
   onShowMore: () => void
 }
 
+enum SliderDirection {
+  left,
+  right,
+  none,
+}
+
 export const MarketHome: React.FC<Props> = (props: Props) => {
   const { context, count, markets, moreMarkets, onFilterChange, onShowMore } = props
   const [state, setState] = useState('OPEN')
   const [category, setCategory] = useState('All')
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
-  const [xMove, setxMove] = useState(0)
-  const [movingRight, setMoveRightState] = useState(false)
-  const [movingLeft, setMoveLeftState] = useState(false)
+  const [sliderXDisplacement, setSliderXDisplacement] = useState<number>(0)
+  const [sliderMoving, setSliderMoving] = useState<SliderDirection>(SliderDirection.none)
+  const [sliderButtonDisabled, setSliderButtonDisabled] = useState<SliderDirection>(SliderDirection.left)
+  const [sliderRange, setSliderRange] = useState<number>(0)
 
   useEffect(() => {
     onFilterChange({ category, sortBy, state })
@@ -103,43 +114,69 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const X_DISPLACEMENT = 5
   const DISPLACEMENT_TIMER = 5
 
-  useInterval(
-    () => {
-      const widthDiff = categoriesButtonsInnerRef.current.clientWidth - categoriesButtonsRef.current.clientWidth
-      const moveResult = xMove - X_DISPLACEMENT
+  const resetSliderButtons = useCallback(() => {
+    if (sliderButtonDisabled !== SliderDirection.none) {
+      setSliderButtonDisabled(SliderDirection.none)
+    }
+  }, [sliderButtonDisabled])
 
-      if (Math.abs(moveResult) > widthDiff) return
-
-      setxMove(moveResult)
+  const sliderShouldMove = useCallback(
+    (sliderDirection: SliderDirection) => {
+      return sliderMoving === sliderDirection ? DISPLACEMENT_TIMER : null
     },
-    movingRight ? DISPLACEMENT_TIMER : null,
+    [sliderMoving],
   )
 
-  useInterval(
-    () => {
-      const moveResult = xMove + X_DISPLACEMENT
+  useEffect(() => {
+    if (categoriesButtonsInnerRef.current.clientWidth < categoriesButtonsRef.current.clientWidth) {
+      setSliderRange(0)
+    } else {
+      setSliderRange(categoriesButtonsInnerRef.current.clientWidth - categoriesButtonsRef.current.clientWidth)
+    }
+  }, [categoriesButtonsInnerRef, categoriesButtonsRef])
 
-      if (moveResult > 0) return
+  useInterval(() => {
+    const moveResult = sliderXDisplacement - X_DISPLACEMENT
 
-      setxMove(moveResult)
-    },
-    movingLeft ? DISPLACEMENT_TIMER : null,
-  )
+    if (Math.abs(moveResult) > sliderRange) {
+      setSliderButtonDisabled(SliderDirection.right)
+      return
+    }
+
+    resetSliderButtons()
+    setSliderXDisplacement(moveResult)
+  }, sliderShouldMove(SliderDirection.right))
+
+  useInterval(() => {
+    const moveResult = sliderXDisplacement + X_DISPLACEMENT
+
+    if (moveResult > 0) {
+      setSliderButtonDisabled(SliderDirection.left)
+      return
+    }
+
+    resetSliderButtons()
+    setSliderXDisplacement(moveResult)
+  }, sliderShouldMove(SliderDirection.left))
 
   const cancelSliding = () => {
-    setMoveLeftState(false)
-    setMoveRightState(false)
+    setSliderMoving(SliderDirection.none)
   }
 
   return (
     <>
-      <SectionTitle title={'Markets'} />
+      <SectionTitleMarket title={'Markets'} />
       <ListCard>
         {context.account && (
           <TopContents>
             <CategoriesWrapper>
               <CategoriesButtons ref={categoriesButtonsRef}>
-                <Draggable axis="x" defaultPosition={{ x: 0, y: 0 }} disabled position={{ x: xMove, y: 0 }}>
+                <Draggable
+                  axis="x"
+                  defaultPosition={{ x: 0, y: 0 }}
+                  disabled
+                  position={{ x: sliderXDisplacement, y: 0 }}
+                >
                   <CategoriesButtonsInner ref={categoriesButtonsInnerRef}>
                     {CATEGORIES.map((item, index) => (
                       <SelectableButton active={item === category} key={index} onClick={() => setCategory(item)}>
@@ -149,22 +186,26 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                   </CategoriesButtonsInner>
                 </Draggable>
               </CategoriesButtons>
-              <CategoriesControls onMouseLeave={cancelSliding}>
-                <ButtonCircle
-                  onMouseDown={() => setMoveLeftState(true)}
-                  onMouseLeave={cancelSliding}
-                  onMouseUp={cancelSliding}
-                >
-                  <IconChevronLeft />
-                </ButtonCircle>
-                <ButtonCircle
-                  onMouseDown={() => setMoveRightState(true)}
-                  onMouseLeave={cancelSliding}
-                  onMouseUp={cancelSliding}
-                >
-                  <IconChevronRight />
-                </ButtonCircle>
-              </CategoriesControls>
+              {sliderRange !== 0 && (
+                <CategoriesControls onMouseLeave={cancelSliding}>
+                  <ButtonCircle
+                    disabled={sliderButtonDisabled === SliderDirection.left}
+                    onMouseDown={() => setSliderMoving(SliderDirection.left)}
+                    onMouseLeave={cancelSliding}
+                    onMouseUp={cancelSliding}
+                  >
+                    <IconChevronLeft />
+                  </ButtonCircle>
+                  <ButtonCircle
+                    disabled={sliderButtonDisabled === SliderDirection.right}
+                    onMouseDown={() => setSliderMoving(SliderDirection.right)}
+                    onMouseLeave={cancelSliding}
+                    onMouseUp={cancelSliding}
+                  >
+                    <IconChevronRight />
+                  </ButtonCircle>
+                </CategoriesControls>
+              )}
             </CategoriesWrapper>
             <FiltersWrapper>
               <FiltersButtons>
