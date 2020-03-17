@@ -1,6 +1,8 @@
 import React, { ChangeEvent } from 'react'
+import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
+import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
 import {
@@ -16,10 +18,7 @@ import {
   Well,
 } from '../../../common'
 import { QuestionInput } from '../../../common/question_input'
-
-import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
 import { Outcome, Outcomes } from '../../outcomes'
-import { useHistory } from 'react-router'
 
 interface Props {
   next: () => void
@@ -51,10 +50,6 @@ const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
 
-const OutcomeInfo = styled(Well)`
-  margin-bottom: 30px;
-`
-
 const ButtonContainerStyled = styled(ButtonContainer)`
   padding-top: 10px;
 `
@@ -69,9 +64,8 @@ const AskQuestionStep = (props: Props) => {
     handleChange,
     handleClearQuestion,
     handleDateChange,
-    handleQuestionChange,
     handleOutcomesChange,
-    next,
+    handleQuestionChange,
     values,
   } = props
 
@@ -88,13 +82,6 @@ const AskQuestionStep = (props: Props) => {
 
   const history = useHistory()
 
-  const validate = (e: any) => {
-    e.preventDefault()
-
-    if (!error) {
-      next()
-    }
-  }
   const errorMessages = []
 
   const someEmptyName = outcomes.some(outcome => !outcome.name)

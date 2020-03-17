@@ -311,7 +311,6 @@ test('should distribute probabilities when isUniform is checked', () => {
 
   const isUniformCheckbox = getByTitle('Distribute uniformly')
   fireEvent.click(isUniformCheckbox)
-  expect(isUniformCheckbox).toBeChecked()
   expect(onChangeFn).toHaveBeenCalledWith([
     { name: 'red', probability: 100 / 3 },
     { name: 'green', probability: 100 / 3 },

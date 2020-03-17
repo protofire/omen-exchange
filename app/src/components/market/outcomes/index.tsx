@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import {
   Button,
   ButtonAdd,
-  Checkbox,
   FormError,
   FormLabel,
   Textfield,
@@ -62,10 +61,6 @@ const ErrorStyled = styled(FormError)`
   margin: 0 0 10px 0;
 `
 
-const CheckboxWrapper = styled.div`
-  text-align: right;
-`
-
 const ButtonRemove = styled(Button)`
   background-color: transparent;
   background-image: url(${IconDelete});
@@ -104,11 +99,6 @@ const TotalTitle = styled(TotalText)`
 const TotalValue = styled(TotalText)`
   font-weight: 600;
   text-align: right;
-`
-
-const StyledCheckbox = styled(Checkbox)`
-  font-size: 12px;
-  margin-right: 5px;
 `
 
 const StyledLabel = styled.label`
@@ -238,6 +228,7 @@ const Outcomes = (props: Props) => {
 
   const handleIsUniformChanged = () => {
     setIsUniform(value => !value)
+    props.onChange(!isUniform ? uniform(outcomes) : outcomes)
   }
 
   const setMax = () => {
@@ -281,7 +272,10 @@ const Outcomes = (props: Props) => {
   return (
     <>
       <FormLabel>Add Outcome</FormLabel>
-      <StyledLabel onClick={handleIsUniformChanged}>
+      <StyledLabel
+        onClick={handleIsUniformChanged}
+        title={isUniform ? 'Set manual probability' : 'Distribute uniformly'}
+      >
         {isUniform ? 'Set manual probability' : 'Set uniformly'}
       </StyledLabel>
       {canAddOutcome && (
@@ -318,7 +312,7 @@ const Outcomes = (props: Props) => {
         </OutcomesTitles>
         <OutcomeItems>{outcomesToRender}</OutcomeItems>
         {messageErrorToRender()}
-        {/* <TotalWrapper>
+        <TotalWrapper>
           <TotalTitle>
             <strong>Total:</strong> {outcomes.length} outcomes
           </TotalTitle>
@@ -329,7 +323,7 @@ const Outcomes = (props: Props) => {
             </TotalValueColor>
             %
           </TotalValue>
-        </TotalWrapper> */}
+        </TotalWrapper>
       </OutcomesWrapper>
     </>
   )

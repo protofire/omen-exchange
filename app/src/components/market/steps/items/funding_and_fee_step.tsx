@@ -1,11 +1,16 @@
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../../../common/constants'
 import { useCollateralBalance } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { Token } from '../../../../util/types'
+import { BalanceState, fetchAccountBalance } from '../../../../store/reducer'
+import { ButtonType } from '../../../../theme/component_styles/button_styling_types'
+import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
+import { formatBigNumber, formatDate } from '../../../../util/tools'
+import { Arbitrator, Token } from '../../../../util/types'
 import {
   BalanceToken,
   BigNumberInput,
@@ -13,22 +18,40 @@ import {
   ButtonContainer,
   ButtonLink,
   CreateCard,
+  DisplayArbitrator,
   FormError,
   FormRow,
+  Loading,
+  Paragraph,
+  SubsectionTitle,
+  TD,
+  TH,
+  THead,
+  TR,
+  Table,
   Textfield,
   TextfieldCustomPlaceholder,
+  TitleValue,
   Tokens,
+  Well,
 } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
+import { Outcome } from '../../outcomes'
 
 interface Props {
   back: () => void
-  next: () => void
+  submit: () => void
   values: {
     collateral: Token
+    question: string
+    category: string
+    resolution: Date | null
+    arbitrator: Arbitrator
     spread: number
     funding: BigNumber
+    outcomes: Outcome[]
   }
+  marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
 }
@@ -45,12 +68,46 @@ const BigNumberInputTextRight = styled<any>(BigNumberInput)`
   text-align: right;
 `
 
+const OutcomeInfo = styled(Well)`
+  margin-bottom: 30px;
+`
+
+const ErrorStyled = styled(FormError)`
+  margin: 0 0 10px 0;
+`
+
+const Grid = styled.div`
+  display: grid;
+  grid-column-gap: 20px;
+  grid-row-gap: 14px;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 14px;
+`
+
+const TitleValueStyled = styled(TitleValue)`
+  margin-bottom: 14px;
+`
+
+const TitleValueFinalStyled = styled(TitleValue)`
+  margin-bottom: 25px;
+`
+
+const SubsectionTitleNoMargin = styled(SubsectionTitle)`
+  margin-bottom: 0;
+`
+
 const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { account } = context
+  const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
+  const dispatch = useDispatch()
+  const { account, library: provider } = context
 
-  const { handleChange, handleCollateralChange, values } = props
-  const { collateral, funding, spread } = values
+  const { handleChange, handleCollateralChange, marketCreationStatus, submit, values } = props
+  const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
+
+  React.useEffect(() => {
+    dispatch(fetchAccountBalance(account, provider, collateral))
+  }, [dispatch, account, provider, collateral])
 
   const collateralBalance = useCollateralBalance(collateral, context)
 
@@ -58,91 +115,173 @@ const FundingAndFeeStep = (props: Props) => {
   const error = !spread || funding.isZero() || isFundingGreaterThanBalance
 
   const fundingMessageError = isFundingGreaterThanBalance ? `You don't have enough collateral in your balance.` : ''
+  const resolutionDate = resolution && formatDate(resolution)
 
   const back = () => {
     props.back()
   }
 
-  const nextSection = (e: any) => {
-    e.preventDefault()
-    if (!error) {
-      props.next()
-    }
+  const hasEnoughBalance = balance && balance.gte(funding)
+  let fundingErrorMessage = ''
+  if (balance && !hasEnoughBalance) {
+    fundingErrorMessage = `You entered ${formatBigNumber(
+      funding,
+      collateral.decimals,
+    )} DAI of funding but your account only has ${formatBigNumber(balance, collateral.decimals)} DAI`
   }
 
   return (
-    <CreateCard>
-      <FormRow
-        formField={
-          <TextfieldCustomPlaceholder
-            disabled={true}
-            formField={
-              <TextfieldStyledRight
-                defaultValue={spread}
-                disabled
-                name="spread"
-                onChange={handleChange}
-                type="number"
-              />
-            }
-            placeholderText="%"
-          />
-        }
-        title={'Spread / Fee'}
-        tooltip={{
-          id: `spreadFee`,
-          description: `The fee taken from every trade. Temporarily fixed at ${MARKET_FEE}%.`,
-        }}
-      />
-      <FormRow
-        formField={
-          <Tokens context={context} name="collateralId" onTokenChange={handleCollateralChange} value={collateral} />
-        }
-        title={'Collateral token'}
-        tooltip={{
-          id: `collateralToken`,
-          description: `Select the token you want to use as collateral.`,
-        }}
-      />
-      <FormRow
-        formField={
-          <TextfieldCustomPlaceholder
-            formField={
-              <BigNumberInputTextRight
-                decimals={collateral.decimals}
-                name="funding"
-                onChange={handleChange}
-                value={funding}
-              />
-            }
-            placeholderText={collateral.symbol}
-          />
-        }
-        note={
-          <>
-            {account && (
-              <BalanceToken
-                collateral={collateral}
-                collateralBalance={collateralBalance}
-                onClickAddMaxCollateral={() => handleChange({ name: 'funding', value: collateralBalance })}
-              />
+    <>
+      <CreateCard>
+        <OutcomeInfo>
+          <Paragraph>
+            Please <strong>check all the information is correct</strong>. You can go back and edit anything you need.
+          </Paragraph>
+          <Paragraph>
+            <strong>If everything is OK</strong> proceed to create the new market.
+          </Paragraph>
+        </OutcomeInfo>
+
+        <SubsectionTitle>Details</SubsectionTitle>
+        <TitleValueStyled title={'Question'} value={question} />
+        <Grid>
+          <TitleValue title={'Category'} value={category} />
+          <TitleValue title={'Resolution date'} value={resolutionDate} />
+          <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
+          {collateral && (
+            <TitleValue
+              title={'Funding'}
+              value={[formatBigNumber(funding, collateral.decimals), <strong key="1"> {collateral.symbol}</strong>]}
+            />
+          )}
+        </Grid>
+        <TitleValueFinalStyled title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
+        <SubsectionTitleNoMargin>Outcomes</SubsectionTitleNoMargin>
+        <Table
+          head={
+            <THead>
+              <TR>
+                <TH>Outcome</TH>
+                <TH textAlign="right">Probabilities</TH>
+              </TR>
+            </THead>
+          }
+          maxHeight="130px"
+        >
+          {outcomes.map((outcome, index) => {
+            return (
+              <TR key={index}>
+                <TD>{outcome.name}</TD>
+                <TD textAlign="right">{outcome.probability}%</TD>
+              </TR>
+            )
+          })}
+        </Table>
+      </CreateCard>
+      <CreateCard>
+        <FormRow
+          formField={
+            <TextfieldCustomPlaceholder
+              disabled={true}
+              formField={
+                <TextfieldStyledRight
+                  defaultValue={spread}
+                  disabled
+                  name="spread"
+                  onChange={handleChange}
+                  type="number"
+                />
+              }
+              placeholderText="%"
+            />
+          }
+          title={'Spread / Fee'}
+          tooltip={{
+            id: `spreadFee`,
+            description: `The fee taken from every trade. Temporarily fixed at ${MARKET_FEE}%.`,
+          }}
+        />
+        <FormRow
+          formField={
+            <Tokens context={context} name="collateralId" onTokenChange={handleCollateralChange} value={collateral} />
+          }
+          title={'Collateral token'}
+          tooltip={{
+            id: `collateralToken`,
+            description: `Select the token you want to use as collateral.`,
+          }}
+        />
+        <FormRow
+          formField={
+            <TextfieldCustomPlaceholder
+              formField={
+                <BigNumberInputTextRight
+                  decimals={collateral.decimals}
+                  name="funding"
+                  onChange={handleChange}
+                  value={funding}
+                />
+              }
+              placeholderText={collateral.symbol}
+            />
+          }
+          note={
+            <>
+              {account && (
+                <BalanceToken
+                  collateral={collateral}
+                  collateralBalance={collateralBalance}
+                  onClickAddMaxCollateral={() => handleChange({ name: 'funding', value: collateralBalance })}
+                />
+              )}
+              <FormError>{fundingMessageError}</FormError>
+            </>
+          }
+          title={'Funding'}
+          tooltip={{
+            id: `funding`,
+            description: `Initial funding to fund the market maker.`,
+          }}
+        />
+        <ButtonContainer>
+          {!MarketCreationStatus.is.ready(marketCreationStatus) &&
+          !MarketCreationStatus.is.error(marketCreationStatus) ? (
+            <Loading full={true} message={`${marketCreationStatus._type}...`} />
+          ) : null}
+
+          {fundingErrorMessage && <ErrorStyled>{fundingErrorMessage}</ErrorStyled>}
+          <ButtonContainer>
+            <ButtonLinkStyled
+              disabled={
+                !MarketCreationStatus.is.ready(marketCreationStatus) &&
+                !MarketCreationStatus.is.error(marketCreationStatus)
+              }
+              onClick={back}
+            >
+              ‹ Back
+            </ButtonLinkStyled>
+            {account ? (
+              <Button
+                buttonType={ButtonType.primary}
+                disabled={
+                  !MarketCreationStatus.is.ready(marketCreationStatus) ||
+                  MarketCreationStatus.is.error(marketCreationStatus) ||
+                  !hasEnoughBalance ||
+                  error
+                }
+                onClick={submit}
+              >
+                Create
+              </Button>
+            ) : (
+              <Button buttonType={ButtonType.primary} onClick={submit}>
+                Connect Wallet
+              </Button>
             )}
-            <FormError>{fundingMessageError}</FormError>
-          </>
-        }
-        title={'Funding'}
-        tooltip={{
-          id: `funding`,
-          description: `Initial funding to fund the market maker.`,
-        }}
-      />
-      <ButtonContainer>
-        <ButtonLinkStyled onClick={() => back()}>‹ Back</ButtonLinkStyled>
-        <Button disabled={error} onClick={(e: any) => nextSection(e)}>
-          Next
-        </Button>
-      </ButtonContainer>
-    </CreateCard>
+          </ButtonContainer>
+        </ButtonContainer>
+      </CreateCard>
+    </>
   )
 }
 

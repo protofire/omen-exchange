@@ -10,7 +10,7 @@ import { Arbitrator, MarketData, Question, Token } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
 
 import { Outcome } from './outcomes'
-import { AskQuestionStep, CreateMarketStep, FundingAndFeeStep, MenuStep, SummaryMarketStep } from './steps'
+import { AskQuestionStep, FundingAndFeeStep, MenuStep, SummaryMarketStep } from './steps'
 
 interface Props {
   callback: (param: MarketData) => void
@@ -213,13 +213,10 @@ export const MarketWizardCreator = (props: Props) => {
       arbitratorsCustom,
       categoriesCustom,
       category,
-      collateral,
-      funding,
       loadedQuestionId,
       outcomes,
       question,
       resolution,
-      spread,
     } = marketData
 
     switch (currentStep) {
@@ -232,8 +229,8 @@ export const MarketWizardCreator = (props: Props) => {
             handleChange={handleChange}
             handleClearQuestion={handleClearQuestion}
             handleDateChange={handleDateChange}
-            handleQuestionChange={handleQuestionChange}
             handleOutcomesChange={handleOutcomesChange}
+            handleQuestionChange={handleQuestionChange}
             next={() => next()}
             values={{
               question,
@@ -253,19 +250,12 @@ export const MarketWizardCreator = (props: Props) => {
             back={() => back()}
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
-            next={() => next()}
-            values={{ collateral, spread, funding }}
-          />
-        )
-      case 4:
-        return (
-          <CreateMarketStep
-            back={() => back()}
             marketCreationStatus={marketCreationStatus}
             submit={() => submit()}
             values={marketData}
           />
         )
+
       default:
         return (
           <AskQuestionStep
@@ -275,8 +265,8 @@ export const MarketWizardCreator = (props: Props) => {
             handleChange={handleChange}
             handleClearQuestion={handleClearQuestion}
             handleDateChange={handleDateChange}
-            handleQuestionChange={handleQuestionChange}
             handleOutcomesChange={handleOutcomesChange}
+            handleQuestionChange={handleQuestionChange}
             next={() => next()}
             values={{
               question,

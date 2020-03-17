@@ -60,8 +60,10 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
     errorVolumeBefore && logger.log(errorVolumeBefore)
     errorVolumeNow && logger.log(errorVolumeNow)
   } else if (volumeNow && volumeBefore) {
-    const now = new BigNumber(volumeNow.fixedProductMarketMakers[0].collateralVolume)
-    const before = new BigNumber(volumeBefore.fixedProductMarketMakers[0].collateralVolume)
+    const marketNow = volumeNow.fixedProductMarketMakers[0]
+    const marketBefore = volumeBefore.fixedProductMarketMakers[0]
+    const now = new BigNumber(marketNow ? marketNow.collateralVolume : 0)
+    const before = new BigNumber(marketBefore ? marketBefore.collateralVolume : 0)
 
     setLastDayVolume(now.sub(before))
   }
