@@ -5,9 +5,15 @@ import { ButtonCSS, ButtonProps, ButtonType } from '../../../theme/component_sty
 
 const Wrapper = styled.button<ButtonSelectableProps>`
   ${ButtonCSS}
+
   border-color: transparent !important;
   border-radius: 6px;
   font-weight: ${props => (props.active ? '700' : '400')};
+
+  &:hover {
+    background-color: ${props => props.theme.buttonSecondary.backgroundColor};
+    color: ${props => props.theme.buttonSecondary.color};
+  }
 `
 
 interface ButtonSelectableProps extends ButtonProps {
@@ -18,7 +24,7 @@ export const ButtonSelectable: React.FC<ButtonSelectableProps> = (props: ButtonS
   const { active = false, children, ...restProps } = props
 
   return (
-    <Wrapper buttonType={active ? ButtonType.secondary : ButtonType.secondaryLine} {...restProps}>
+    <Wrapper active={active} buttonType={active ? ButtonType.secondary : ButtonType.secondaryLine} {...restProps}>
       {children}
     </Wrapper>
   )
