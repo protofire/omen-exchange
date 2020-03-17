@@ -2166,6 +2166,11 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
+"@react-corekit/use-interval@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@react-corekit/use-interval/-/use-interval-1.1.1.tgz#579914c1a6507e136887cff3c05475b58758b435"
+  integrity sha512-aC+d3NkzNVQqzr55WIRSuay2ydY0GFjZ/rxeUm0SOeiM4uzTnP245EKDt6fhakffXAYhociip2gRVhgj5TCwkQ==
+
 "@realitio/realitio-contracts@^2.0.0":
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/@realitio/realitio-contracts/-/realitio-contracts-2.1.1.tgz#070a3a27a98fae6b9066056316d446ee637c10e4"
@@ -17877,6 +17882,14 @@ react-dom@^16.9.0:
     object-assign "^4.1.1"
     prop-types "^15.6.2"
     scheduler "^0.19.0"
+
+react-draggable@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-4.2.0.tgz#40cc5209082ca7d613104bf6daf31372cc0e1114"
+  integrity sha512-5wFq//gEoeTYprnd4ze8GrFc+Rbnx+9RkOMR3vk4EbWxj02U6L6T3yrlKeiw4X5CtjD2ma2+b3WujghcXNRzkw==
+  dependencies:
+    classnames "^2.2.5"
+    prop-types "^15.6.0"
 
 react-dropdown@^1.6.4:
   version "1.6.4"

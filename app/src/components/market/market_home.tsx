@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import { useInterval } from '@react-corekit/use-interval'
+import React, { useCallback, useEffect, useState } from 'react'
+import Draggable from 'react-draggable'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
-import { Button, ButtonSelectable, ListCard, ListItem, Loading, SectionTitle } from '../common'
+import { Button, ButtonCircle, ButtonSelectable, ListCard, ListItem, Loading, SectionTitle } from '../common'
+import { IconChevronLeft } from '../common/icons/IconChevronLeft'
+import { IconChevronRight } from '../common/icons/IconChevronRight'
 
 const CATEGORIES = ['All', 'Politics', 'Cryptocurrencies', 'Sports', 'Esports', 'NBA']
 
@@ -17,6 +21,27 @@ const CategoriesWrapper = styled.div`
   display: flex;
   margin-bottom: 20px;
   padding-bottom: 20px;
+  width: 100%;
+`
+
+const CategoriesButtons = styled.div`
+  flex-grow: 1;
+  overflow: hidden;
+`
+
+const CategoriesButtonsInner = styled.div`
+  align-items: center;
+  display: flex;
+  width: fit-content;
+`
+
+const CategoriesControls = styled.div`
+  column-gap: 10px;
+  display: grid;
+  flex-grow: 0;
+  flex-shrink: 0;
+  grid-template-columns: 1fr 1fr;
+  margin-left: 15px;
 `
 
 const SelectableButton = styled(ButtonSelectable)`
@@ -35,7 +60,6 @@ const FiltersWrapper = styled.div`
 const FiltersButtons = styled.div`
   align-items: center;
   display: flex;
-  margin-right: 25px;
 `
 
 const NoMarketsAvailable = styled.p`
@@ -60,6 +84,9 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [state, setState] = useState('OPEN')
   const [category, setCategory] = useState('All')
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
+  const [xMove, setxMove] = useState(0)
+  const [movingRight, setMoveRightState] = useState(false)
+  const [movingLeft, setMoveLeftState] = useState(false)
 
   useEffect(() => {
     onFilterChange({ category, sortBy, state })
@@ -71,6 +98,34 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     </Button>
   ) : null
 
+  const categoriesButtonsRef: any = React.createRef()
+  const categoriesButtonsInnerRef: any = React.createRef()
+  const X_DISPLACEMENT = 5
+  const DISPLACEMENT_TIMER = 5
+
+  useInterval(
+    () => {
+      const widthDiff = categoriesButtonsInnerRef.current.clientWidth - categoriesButtonsRef.current.clientWidth
+      const moveResult = xMove - X_DISPLACEMENT
+
+      if (Math.abs(moveResult) > widthDiff) return
+
+      setxMove(moveResult)
+    },
+    movingRight ? DISPLACEMENT_TIMER : null,
+  )
+
+  useInterval(
+    () => {
+      const moveResult = xMove + X_DISPLACEMENT
+
+      if (moveResult > 0) return
+
+      setxMove(moveResult)
+    },
+    movingLeft ? DISPLACEMENT_TIMER : null,
+  )
+
   return (
     <>
       <SectionTitle title={'Markets'} />
@@ -78,11 +133,25 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         {context.account && (
           <TopContents>
             <CategoriesWrapper>
-              {CATEGORIES.map((c, index) => (
-                <SelectableButton active={c === category} key={index} onClick={() => setCategory(c)}>
-                  {c}
-                </SelectableButton>
-              ))}
+              <CategoriesButtons ref={categoriesButtonsRef}>
+                <Draggable axis="x" defaultPosition={{ x: 0, y: 0 }} disabled position={{ x: xMove, y: 0 }}>
+                  <CategoriesButtonsInner ref={categoriesButtonsInnerRef}>
+                    {CATEGORIES.map((item, index) => (
+                      <SelectableButton active={item === category} key={index} onClick={() => setCategory(item)}>
+                        {item}
+                      </SelectableButton>
+                    ))}
+                  </CategoriesButtonsInner>
+                </Draggable>
+              </CategoriesButtons>
+              <CategoriesControls>
+                <ButtonCircle onMouseDown={() => setMoveLeftState(true)} onMouseUp={() => setMoveLeftState(false)}>
+                  <IconChevronLeft />
+                </ButtonCircle>
+                <ButtonCircle onMouseDown={() => setMoveRightState(true)} onMouseUp={() => setMoveRightState(false)}>
+                  <IconChevronRight />
+                </ButtonCircle>
+              </CategoriesControls>
             </CategoriesWrapper>
             <FiltersWrapper>
               <FiltersButtons>
