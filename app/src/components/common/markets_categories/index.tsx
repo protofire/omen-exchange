@@ -50,7 +50,7 @@ export const MarketsCategories: React.FC<HTMLAttributes<HTMLDivElement>> = props
   const [sliderRange, setSliderRange] = useState<number>(0)
   const categoriesButtonsRef: any = React.createRef()
   const categoriesButtonsInnerRef: any = React.createRef()
-  const X_DISPLACEMENT = 5
+  const X_DISPLACEMENT = 3
   const DISPLACEMENT_TIMER = 5
 
   const resetSliderButtons = useCallback(() => {

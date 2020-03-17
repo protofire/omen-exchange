@@ -3,10 +3,10 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
-import { Button, ButtonSelectable, ListCard, ListItem, Loading, SectionTitle } from '../common'
+import { Button, ButtonCircle, ButtonSelectable, ListCard, ListItem, Loading, SectionTitle } from '../common'
+import { IconFilter } from '../common/icons/IconFilter'
+import { IconSearch } from '../common/icons/IconSearch'
 import { MarketsCategories } from '../common/markets_categories'
-
-const CATEGORIES = ['All', 'Politics', 'Cryptocurrencies', 'Sports', 'Esports', 'NBA']
 
 const SectionTitleMarket = styled(SectionTitle)`
   font-size: 18px;
@@ -27,9 +27,20 @@ const SelectableButton = styled(ButtonSelectable)`
 const FiltersWrapper = styled.div`
   align-items: center;
   display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    flex-direction: row;
+  }
 `
 
-const FiltersButtons = styled.div`
+const FiltersCategories = styled.div`
+  align-items: center;
+  display: flex;
+`
+
+const FiltersControls = styled.div`
   align-items: center;
   display: flex;
 `
@@ -38,11 +49,12 @@ const ListWrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
   flex-direction: column;
-  min-height: 200px;
+  min-height: 380px;
 `
 
 const NoMarketsAvailable = styled.p`
-  font-size: 18px;
+  color: ${props => props.theme.colors.textColor};
+  font-size: 14px;
   margin: auto 0;
   text-align: center;
 `
@@ -57,11 +69,35 @@ interface Props {
   onShowMore: () => void
 }
 
+enum FiltersStates {
+  open = 'OPEN',
+  closed = 'CLOSED',
+  myMarkets = 'MY_MARKETS',
+}
+
 export const MarketHome: React.FC<Props> = (props: Props) => {
   const { context, count, markets, moreMarkets, onFilterChange, onShowMore } = props
-  const [state, setState] = useState('OPEN')
+  const [state, setState] = useState<FiltersStates>(FiltersStates.open)
   const [category, setCategory] = useState('All')
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
+  const CATEGORIES = ['All', 'Politics', 'Cryptocurrencies', 'Sports', 'Esports', 'NBA']
+  const filters = [
+    {
+      title: 'Open',
+      active: state === FiltersStates.open,
+      onClick: () => setState(FiltersStates.open),
+    },
+    {
+      title: 'Closed',
+      active: state === FiltersStates.closed,
+      onClick: () => setState(FiltersStates.closed),
+    },
+    {
+      title: 'My Markets',
+      active: state === FiltersStates.myMarkets,
+      onClick: () => setState(FiltersStates.myMarkets),
+    },
+  ]
 
   useEffect(() => {
     onFilterChange({ category, sortBy, state })
@@ -87,24 +123,30 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               ))}
             </MarketsCategories>
             <FiltersWrapper>
-              <FiltersButtons>
-                <SelectableButton active={state === 'OPEN'} onClick={() => setState('OPEN')}>
-                  Open
-                </SelectableButton>
-                <SelectableButton active={state === 'CLOSED'} onClick={() => setState('CLOSED')}>
-                  Closed
-                </SelectableButton>
-                <SelectableButton active={state === 'MY_MARKETS'} onClick={() => setState('MY_MARKETS')}>
-                  My Markets
-                </SelectableButton>
-              </FiltersButtons>
-              <button
-                onClick={() => {
-                  sortBy ? setSortBy(null) : setSortBy('collateralVolume')
-                }}
-              >
-                Sort by Volume
-              </button>
+              <FiltersCategories>
+                {filters.map((item, index) => {
+                  return (
+                    <SelectableButton active={item.active} key={index} onClick={item.onClick}>
+                      {item.title}
+                    </SelectableButton>
+                  )
+                })}
+              </FiltersCategories>
+              <FiltersControls>
+                <ButtonCircle active={true}>
+                  <IconSearch />
+                </ButtonCircle>
+                <ButtonCircle active={false}>
+                  <IconFilter />
+                </ButtonCircle>
+                <button
+                  onClick={() => {
+                    sortBy ? setSortBy(null) : setSortBy('collateralVolume')
+                  }}
+                >
+                  Sort by Volume
+                </button>
+              </FiltersControls>
             </FiltersWrapper>
           </TopContents>
         )}
