@@ -1,11 +1,13 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 import { useContracts } from '../../hooks/useContracts'
+import { useCpk } from '../../hooks/useCpk'
+import { useCpkAllowance } from '../../hooks/useCpkAllowance'
 import { useFundingBalance } from '../../hooks/useFundingBalance'
 import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
@@ -28,7 +30,6 @@ import { SectionTitle } from '../common/section_title'
 import { SubsectionTitle } from '../common/subsection_title'
 import { TD, TR, Table } from '../common/table'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
-import { ToggleTokenLock } from '../common/toggle_token_lock'
 import { ViewCard } from '../common/view_card/'
 
 interface Props extends RouteComponentProps<any> {
@@ -89,6 +90,8 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
+  const signer = useMemo(() => provider.getSigner(), [provider])
+  const cpk = useCpk()
 
   const { buildMarketMaker } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -97,6 +100,10 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   const [amountToRemove, setAmountToRemove] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
+
+  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
+
+  const hasEnoughAllowance = allowance && allowance.gte(amountToFund)
 
   const marketMakerFundingPercentage: Maybe<number> = marketMakerFunding.isZero()
     ? null
@@ -107,21 +114,17 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
 
   const addFunding = async () => {
     try {
-      if (!account) {
+      if (!account || !cpk) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
 
       setStatus(Status.Loading)
       setMessage(`Add funding amount: ${formatBigNumber(amountToFund, collateral.decimals)} ${collateral.symbol} ...`)
 
-      const cpk = await CPKService.create(provider)
-
       const collateralAddress = await marketMaker.getCollateralToken()
       const collateralService = new ERC20Service(provider, account, collateralAddress)
 
-      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, amountToFund)
-
-      if (!hasEnoughAlowance) {
+      if (!hasEnoughAllowance) {
         await collateralService.approveUnlimited(cpk.address)
       }
 
@@ -162,7 +165,9 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
   const collateralBalance = useCollateralBalance(collateral, context)
 
   const isFundingToAddGreaterThanBalance = amountToFund.gt(collateralBalance)
-  const errorFundingToAdd = amountToFund.isZero() || isFundingToAddGreaterThanBalance
+  const hasZeroAllowance = allowance && allowance.isZero()
+  const errorFundingToAdd =
+    amountToFund.isZero() || isFundingToAddGreaterThanBalance || hasZeroAllowance || !hasEnoughAllowance
 
   const fundingToAddMessageError = isFundingToAddGreaterThanBalance
     ? `You don't have enough collateral in your balance.`
@@ -178,6 +183,16 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
     : ''
 
   const probabilities = balances.map(balance => balance.probability)
+
+  const unlockCollateral = async () => {
+    if (!cpk) {
+      return
+    }
+
+    unlock()
+  }
+
+  const showSetAllowance = hasZeroAllowance || !hasEnoughAllowance
 
   return (
     <>
@@ -205,7 +220,6 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
                 }
                 placeholderText={collateral.symbol}
               />
-              <ToggleTokenLock amount={amountToFund} collateral={collateral} context={context} />
             </>
           }
           note={
@@ -250,6 +264,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
           title={'Amount to remove'}
           tooltip={{ id: 'amountToRemove', description: 'Funds you will remove from this market.' }}
         />
+        {showSetAllowance && <button onClick={unlockCollateral}>Set allowance{allowance === null && '...'}</button>}
         <FormLabelStyled>Totals</FormLabelStyled>
         <TableStyled>
           <TR>

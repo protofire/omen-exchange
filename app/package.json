@@ -91,7 +91,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged --allow-empty"
+      "pre-commit": "lint-staged --allow-empty",
+      "pre-push": "yarn lint:check"
     }
   },
   "browserslist": {
@@ -111,6 +112,7 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@types/big.js": "^4.0.5",
+    "@types/contract-proxy-kit": "^1.0.1",
     "@typescript-eslint/eslint-plugin": "^2.1.0",
     "@typescript-eslint/parser": "^2.1.0",
     "eslint": "^6.8.0",

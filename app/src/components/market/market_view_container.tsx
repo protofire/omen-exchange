@@ -77,6 +77,8 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
     question,
     questionId,
     resolution,
+    totalPoolShares,
+    userPoolShares,
   } = marketMakerData
 
   useEffect(() => {
@@ -105,11 +107,14 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
       funding={marketMakerFunding}
       isConditionResolved={isConditionResolved}
       isQuestionFinalized={isQuestionFinalized}
+      lastDayVolume={lastDayVolume}
       marketMakerAddress={marketMakerAddress}
       question={question || ''}
       questionId={questionId}
       resolution={resolution}
       status={status}
+      totalPoolShares={totalPoolShares}
+      userPoolShares={userPoolShares}
     />
   )
 }
