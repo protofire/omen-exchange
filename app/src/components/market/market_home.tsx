@@ -126,6 +126,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     movingLeft ? DISPLACEMENT_TIMER : null,
   )
 
+  const cancelSliding = () => {
+    setMoveLeftState(false)
+    setMoveRightState(false)
+  }
+
   return (
     <>
       <SectionTitle title={'Markets'} />
@@ -144,11 +149,19 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                   </CategoriesButtonsInner>
                 </Draggable>
               </CategoriesButtons>
-              <CategoriesControls>
-                <ButtonCircle onMouseDown={() => setMoveLeftState(true)} onMouseUp={() => setMoveLeftState(false)}>
+              <CategoriesControls onMouseLeave={cancelSliding}>
+                <ButtonCircle
+                  onMouseDown={() => setMoveLeftState(true)}
+                  onMouseLeave={cancelSliding}
+                  onMouseUp={cancelSliding}
+                >
                   <IconChevronLeft />
                 </ButtonCircle>
-                <ButtonCircle onMouseDown={() => setMoveRightState(true)} onMouseUp={() => setMoveRightState(false)}>
+                <ButtonCircle
+                  onMouseDown={() => setMoveRightState(true)}
+                  onMouseLeave={cancelSliding}
+                  onMouseUp={cancelSliding}
+                >
                   <IconChevronRight />
                 </ButtonCircle>
               </CategoriesControls>
