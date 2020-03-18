@@ -5,9 +5,13 @@ export const THREEBOX_SPACE_NAME: string = process.env.REACT_APP_THREEBOX_SPACE_
 export const GIT_COMMIT: string = process.env.COMMIT_REF || ''
 export const INFURA_PROJECT_ID: string = process.env.REACT_APP_INFURA_PROJECT_ID || '7e977d73f2f143ce84ea5ff54f1601fd'
 export const REALITIO_TIMEOUT = process.env.REACT_APP_REALITIO_TIMEOUT
-export const EARLIEST_MAINNET_BLOCK_TO_CHECK = process.env.REACT_APP_EARLIEST_MAINNET_BLOCK_TO_CHECK
-export const EARLIEST_RINKEBY_BLOCK_TO_CHECK = process.env.REACT_APP_EARLIEST_RINKEBY_BLOCK_TO_CHECK
-export const EARLIEST_GANACHE_BLOCK_TO_CHECK = process.env.REACT_APP_EARLIEST_GANACHE_BLOCK_TO_CHECK
+export const EARLIEST_MAINNET_BLOCK_TO_CHECK = parseInt(
+  process.env.REACT_APP_EARLIEST_MAINNET_BLOCK_TO_CHECK || '9294139',
+)
+export const EARLIEST_RINKEBY_BLOCK_TO_CHECK = parseInt(
+  process.env.REACT_APP_EARLIEST_MAINNET_BLOCK_TO_CHECK || '6127043',
+)
+export const EARLIEST_GANACHE_BLOCK_TO_CHECK = parseInt(process.env.REACT_APP_EARLIEST_MAINNET_BLOCK_TO_CHECK || '1')
 export const FETCH_EVENTS_CHUNK_SIZE = parseInt(process.env.REACT_APP_FETCH_EVENTS_CHUNK_SIZE || '500000', 10)
 export const MAX_OUTCOME_ALLOWED = parseInt(process.env.REACT_APP_MAX_OUTCOME_ALLOWED || '4', 10)
 
@@ -17,5 +21,6 @@ export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
 
 // eslint-disable-next-line no-warning-comments
 // TODO: update the graph url with the right one
-export const GRAPH_HTTP = process.env.REACT_APP_GRAPH_HTTP || 'https://api.thegraph.com/subgraphs/name/cag/omen-rinkeby'
-export const GRAPH_WS = process.env.REACT_APP_GRAPH_WS || 'wss://api.thegraph.com/subgraphs/name/cag/omen-rinkeby'
+export const GRAPH_HTTP =
+  process.env.REACT_APP_GRAPH_HTTP || 'https://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
+export const GRAPH_WS = process.env.REACT_APP_GRAPH_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
