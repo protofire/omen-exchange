@@ -12,7 +12,18 @@ import { SectionTitle } from '../common/section_title'
 const NoMarketsAvailable = styled(SectionTitle)`
   margin-top: 150px;
 `
-const CATEGORIES = ['All', 'Politics', 'Cryptocurrencies', 'Sports', 'Esports', 'NBA']
+const CATEGORIES = [
+  'All',
+  'Arts',
+  'Business & Finance',
+  'Cryptocurrency',
+  'News & Politics',
+  'Science & Tech',
+  'Sports',
+  'Weather',
+  'Miscellaneous',
+]
+
 const SelectableButton = styled.div<{ selected?: boolean }>`
   background: ${(props: any) => (props.selected ? 'aquamarine' : 'initial')};
 `

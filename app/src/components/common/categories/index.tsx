@@ -19,7 +19,17 @@ const FormOption = styled.option``
 export const Categories = (props: Props) => {
   const { customValues, ...restProps } = props
 
-  const categories = ['Miscellaneous', 'Politics']
+  const categories = [
+    'Arts',
+    'Business & Finance',
+    'Cryptocurrency',
+    'News & Politics',
+    'Science & Tech',
+    'Sports',
+    'Weather',
+    'Miscellaneous',
+  ]
+
   const allCategories = categories.concat(customValues.filter(item => categories.indexOf(item) < 0))
   const options = allCategories.map(category => ({
     label: category,
