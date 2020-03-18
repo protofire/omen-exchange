@@ -167,7 +167,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     }
 
     setToken()
-  }, [collateralToken, account, provider, collateralVolume])
+  }, [collateralToken, account, collateralVolume, provider])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))

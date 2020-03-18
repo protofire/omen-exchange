@@ -1,25 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ButtonCSS, ButtonComponentProps, ButtonProps } from '../../../theme/component_styles/button_styling_types'
+import { ButtonCSS, ButtonProps } from '../../../theme/component_styles/button_styling_types'
 
-interface ButtonComponentPropsLocal extends ButtonComponentProps {
-  disabled?: boolean
-  type?: 'button' | 'submit' | 'reset' | undefined
-}
-
-const ButtonContainer = styled.button<ButtonProps>`
+const Wrapper = styled.button<ButtonProps>`
   ${ButtonCSS}
 `
 
-const ButtonComponent: React.FC<ButtonComponentPropsLocal> = (props: ButtonComponentPropsLocal) => {
-  const { buttonType, children, disabled = false, onClick, ...restProps } = props
+export const Button: React.FC<ButtonProps> = (props: ButtonProps) => {
+  const { children, ...restProps } = props
 
-  return (
-    <ButtonContainer buttonType={buttonType} disabled={disabled} onClick={onClick} {...restProps}>
-      {children}
-    </ButtonContainer>
-  )
+  return <Wrapper {...restProps}>{children}</Wrapper>
 }
-
-export const Button = ButtonComponent

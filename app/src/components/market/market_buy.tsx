@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../common/constants'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
@@ -17,78 +17,33 @@ import { getLogger } from '../../util/logger'
 import { computeBalanceAfterTrade, formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import {
-  BalanceToken,
   BigNumberInput,
   Button,
   ButtonContainer,
-  ButtonLink,
-  FormError,
-  FormLabel,
-  FormRow,
+  DisplayArbitrator,
+  GridTransactionDetails,
+  GridTwoColumns,
   Loading,
   SectionTitle,
   SubsectionTitle,
-  TD,
-  TR,
-  Table,
+  SubsectionTitleAction,
+  SubsectionTitleWrapper,
   TextfieldCustomPlaceholder,
+  TitleValue,
+  TransactionDetailsCard,
+  TransactionDetailsLine,
+  TransactionDetailsRow,
   ViewCard,
+  WalletBalance,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { OutcomeTable } from '../common/outcome_table'
+import { SetAllowance } from '../common/set_allowance'
+import { ValueStates } from '../common/transaction_details_row'
 import { ModalTwitterShare } from '../modal/modal_twitter_share'
 
-const ButtonLinkStyled = styled(ButtonLink)`
+const LeftButton = styled(Button)`
   margin-right: auto;
-`
-
-const TableStyled = styled(Table)`
-  margin-bottom: 30px;
-`
-
-const AmountWrapper = styled(FormRow)`
-  margin-bottom: 30px;
-  width: 100%;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    width: 50%;
-  }
-`
-
-const FormLabelStyled = styled(FormLabel)`
-  margin-bottom: 10px;
-`
-
-const SubsectionTitleStyled = styled(SubsectionTitle)`
-  margin-bottom: 0;
-`
-
-const BigNumberInputTextRight = styled<any>(BigNumberInput)`
-  text-align: right;
-`
-
-const TextLight = styled.span`
-  color: ${props => props.theme.colors.textColorLight};
-  flex-shrink: 0;
-  font-size: 13px;
-  font-weight: normal;
-  line-height: 1.4;
-  text-align: right;
-`
-
-const CssText = css`
-  color: ${props => props.theme.colors.textColor};
-  font-size: 13px;
-`
-
-const TextBold = styled.span`
-  ${CssText}
-  font-weight: bold;
-`
-
-const TextNormal = styled.span`
-  ${CssText}
-  font-weight: normal;
 `
 
 const logger = getLogger('Market::Buy')
@@ -108,7 +63,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
-
   const { balances, collateral, marketMakerAddress, question } = props
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
@@ -119,7 +73,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTwitterShareOpen, setModalTwitterShareState] = useState(false)
   const [messageTwitter, setMessageTwitter] = useState('')
+  const [showingExtraInformation, setExtraInformation] = useState(false)
 
+  const toggleExtraInformation = () =>
+    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
+
+  const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const hasEnoughAllowance = allowance && allowance.gte(amount)
@@ -168,7 +127,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       return
     }
 
-    unlock()
+    await unlock()
+    setAllowanceFinished(true)
   }
 
   const finish = async () => {
@@ -204,8 +164,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const isBuyAmountGreaterThanBalance = amount.gt(collateralBalance)
 
-  const buyMessageError = isBuyAmountGreaterThanBalance ? `You don't have enough collateral in your balance.` : ''
-
   const error =
     (status !== Status.Ready && status !== Status.Error) ||
     cost.isZero() ||
@@ -213,95 +171,150 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     amount.isZero() ||
     !hasEnoughAllowance
 
-  const noteAmount = (
-    <>
-      <BalanceToken
-        collateral={collateral}
-        collateralBalance={collateralBalance}
-        onClickAddMaxCollateral={() => setAmount(collateralBalance)}
-      />
-      <FormError>{buyMessageError}</FormError>
-    </>
-  )
+  const noteAmount = `${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`
 
   const amountFee = cost.sub(amount)
 
+  const details = (showExtraDetails: boolean) => {
+    const mockedDetails = [
+      {
+        title: 'Total Pool Tokens',
+        value: '5000',
+      },
+      {
+        title: 'Total Pool Earning',
+        value: '25,232 DAI',
+      },
+      {
+        title: 'My Pool Tokens',
+        value: '0',
+      },
+      {
+        title: 'My Earnings',
+        value: '0 DAI',
+      },
+
+      {
+        title: 'Category',
+        value: 'Politics',
+      },
+      {
+        title: 'Resolution Date',
+        value: '25.09.19 - 09:00',
+      },
+      {
+        title: 'Arbitrator/Oracle',
+        value: (
+          <DisplayArbitrator
+            arbitrator={{ id: 'realitio', address: '0x1234567890', name: 'Realit.io', url: 'https://realit.io/' }}
+          />
+        ),
+      },
+      {
+        title: '24h Volume',
+        value: '425,523 DAI',
+      },
+    ]
+    const mockedDetailsLastHalf = mockedDetails.splice(4, 8)
+
+    return (
+      <>
+        <GridTwoColumns>
+          {showExtraDetails ? (
+            <>
+              {mockedDetails.map((item, index) => (
+                <TitleValue key={index} title={item.title} value={item.value} />
+              ))}
+            </>
+          ) : null}
+          {mockedDetailsLastHalf.map((item, index) => (
+            <TitleValue key={index} title={item.title} value={item.value} />
+          ))}
+        </GridTwoColumns>
+      </>
+    )
+  }
+
+  const mockedPotential = 1.03
+  const fee = `${formatBigNumber(amountFee.mul(-1), collateral.decimals)} ${collateral.symbol}`
+  const baseCost = `${formatBigNumber(amount.sub(amountFee), collateral.decimals)} ${collateral.symbol}`
+  const potentialProfit = `${mockedPotential} ${collateral.symbol}`
+  const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
+  const total = `${sharesTotal} Shares`
+
   const hasZeroAllowance = allowance && allowance.isZero()
-  const showSetAllowance = hasZeroAllowance || !hasEnoughAllowance
+  const showSetAllowance = allowanceFinished || hasZeroAllowance || !hasEnoughAllowance
 
   return (
     <>
-      <SectionTitle title={question} />
+      <SectionTitle goBackEnabled title={question} />
       <ViewCard>
-        <SubsectionTitleStyled>Choose the shares you want to buy</SubsectionTitleStyled>
+        <SubsectionTitleWrapper>
+          <SubsectionTitle>Purchase Outcome</SubsectionTitle>
+          <SubsectionTitleAction onClick={toggleExtraInformation}>
+            {showingExtraInformation ? 'Hide' : 'Show'} Pool Information
+          </SubsectionTitleAction>
+        </SubsectionTitleWrapper>
+        {details(showingExtraInformation)}
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          disabledColumns={[OutcomeTableValue.Payout]}
+          disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Shares]}
           outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
         />
-        <AmountWrapper
-          formField={
-            <>
-              <TextfieldCustomPlaceholder
-                formField={
-                  <BigNumberInputTextRight
-                    decimals={collateral.decimals}
-                    name="amount"
-                    onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                    value={amount}
-                  />
-                }
-                placeholderText={collateral.symbol}
+        <GridTransactionDetails>
+          <div>
+            <WalletBalance value={noteAmount} />
+            <TextfieldCustomPlaceholder
+              formField={
+                <BigNumberInput
+                  decimals={collateral.decimals}
+                  name="amount"
+                  onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                  value={amount}
+                />
+              }
+              placeholderText={collateral.symbol}
+            />
+          </div>
+          <div>
+            <TransactionDetailsCard>
+              <TransactionDetailsRow title={'Fee'} value={fee} />
+              <TransactionDetailsRow title={'Base Cost'} value={baseCost} />
+              <TransactionDetailsLine />
+              <TransactionDetailsRow
+                emphasizeValue={mockedPotential > 0}
+                state={ValueStates.success}
+                title={'Potential Profit'}
+                value={potentialProfit}
               />
-            </>
-          }
-          note={noteAmount}
-          title={'Total cost'}
-          tooltip={{ id: 'amount', description: 'Shares to buy with this amount of collateral.' }}
-        />
+              <TransactionDetailsRow
+                emphasizeValue={parseFloat(sharesTotal) > 0}
+                state={(parseFloat(sharesTotal) > 0 && ValueStates.important) || ValueStates.normal}
+                title={'Total'}
+                value={total}
+              />
+            </TransactionDetailsCard>
+          </div>
+        </GridTransactionDetails>
         {showSetAllowance && (
-          <button disabled={allowance === null} onClick={unlockCollateral}>
-            Set allowance{allowance === null && '...'}
-          </button>
+          <SetAllowance
+            collateral={collateral}
+            finished={allowanceFinished}
+            loading={allowance === null}
+            onUnlock={unlockCollateral}
+          />
         )}
-        <FormLabelStyled>Transaction details</FormLabelStyled>
-        <TableStyled>
-          <TR>
-            <TD>
-              <TextLight>Trading Fee</TextLight>
-            </TD>
-            <TD textAlign="right">
-              <TextNormal>{formatBigNumber(amountFee.mul(-1), collateral.decimals)}</TextNormal>{' '}
-              <TextLight>{collateral.symbol}</TextLight>
-            </TD>
-          </TR>
-          <TR>
-            <TD>
-              <TextLight>Base Cost</TextLight>
-            </TD>
-            <TD textAlign="right">
-              <TextNormal>{formatBigNumber(amount.sub(amountFee), collateral.decimals)}</TextNormal>{' '}
-              <TextLight>{collateral.symbol}</TextLight>
-            </TD>
-          </TR>
-          <TR>
-            <TD withBorder={false}>
-              <TextLight>You will receive</TextLight>
-            </TD>
-            <TD textAlign="right" withBorder={false}>
-              <TextBold>{formatBigNumber(tradedShares, collateral.decimals)} </TextBold>{' '}
-              <TextLight>
-                <strong>Shares</strong>
-              </TextLight>
-            </TD>
-          </TR>
-        </TableStyled>
         <ButtonContainer>
-          <ButtonLinkStyled onClick={() => props.history.push(`/${marketMakerAddress}`)}>‹ Back</ButtonLinkStyled>
-          <Button buttonType={ButtonType.primary} disabled={error} onClick={() => finish()}>
+          <LeftButton
+            buttonType={ButtonType.secondaryLine}
+            onClick={() => props.history.push(`/${marketMakerAddress}`)}
+          >
+            Cancel
+          </LeftButton>
+          <Button buttonType={ButtonType.secondaryLine} disabled={error} onClick={() => finish()}>
             Buy
           </Button>
         </ButtonContainer>

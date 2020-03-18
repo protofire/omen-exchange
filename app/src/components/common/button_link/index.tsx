@@ -1,8 +1,8 @@
 import { darken } from 'polished'
-import React, { HTMLAttributes, ReactNode } from 'react'
+import React, { ButtonHTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-const ButtonContainer = styled.button`
+const Wrapper = styled.button`
   align-items: center;
   background-color: transparent;
   border-radius: 0;
@@ -32,19 +32,10 @@ const ButtonContainer = styled.button`
   }
 `
 
-interface Props extends HTMLAttributes<HTMLButtonElement> {
-  children: ReactNode
-  disabled?: boolean
-  onClick?: (e?: any) => void
-  type?: 'button' | 'submit' | 'reset' | undefined
-}
+export const ButtonLink: React.FC<ButtonHTMLAttributes<HTMLButtonElement>> = (
+  props: ButtonHTMLAttributes<HTMLButtonElement>,
+) => {
+  const { children, ...restProps } = props
 
-export const ButtonLink: React.FC<Props> = (props: Props) => {
-  const { children, disabled = false, onClick, ...restProps } = props
-
-  return (
-    <ButtonContainer disabled={disabled} onClick={onClick} {...restProps}>
-      {children}
-    </ButtonContainer>
-  )
+  return <Wrapper {...restProps}>{children}</Wrapper>
 }

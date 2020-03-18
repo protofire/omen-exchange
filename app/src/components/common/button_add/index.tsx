@@ -1,16 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ButtonComponentProps } from '../../../theme/component_styles/button_styling_types'
+import { ButtonProps } from '../../../theme/component_styles/button_styling_types'
 import { Button } from '../button'
 
 import IconAdd from './img/add-button.svg'
 
-interface ButtonComponentPropsLocal extends ButtonComponentProps {
-  disabled?: boolean
-}
-
-const ButtonContainer = styled(Button)`
+const Wrapper = styled(Button)`
   background-color: transparent;
   background-image: url(${IconAdd});
   background-position: 50% 50%;
@@ -29,8 +25,4 @@ const ButtonContainer = styled(Button)`
   }
 `
 
-export const ButtonAdd: React.FC<ButtonComponentPropsLocal> = (props: ButtonComponentPropsLocal) => {
-  const { disabled = false, onClick, ...restProps } = props
-
-  return <ButtonContainer disabled={disabled} onClick={onClick} type="button" {...restProps} />
-}
+export const ButtonAdd: React.FC<ButtonProps> = (props: ButtonProps) => <Wrapper type="button" {...props} />

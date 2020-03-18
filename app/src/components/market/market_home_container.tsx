@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
@@ -54,17 +54,19 @@ const MarketHomeContainer: React.FC = () => {
     } else if (error) {
       setMarkets(RemoteData.failure(error))
     } else if (fetchedMarkets) {
-      if (fetchedMarkets.fixedProductMarketMakers.length) {
-        const { fixedProductMarketMakers } = fetchedMarkets
-        setMarkets(RemoteData.success(fixedProductMarketMakers))
+      const { fixedProductMarketMakers } = fetchedMarkets
+      setMarkets(RemoteData.success(fixedProductMarketMakers))
+      if (fixedProductMarketMakers.length === 0) {
+        setMoreMarkets(false)
       }
     }
   }, [fetchedMarkets, loading, error])
 
-  const onFilterChange = (filter: any) => {
+  const onFilterChange = useCallback((filter: any) => {
     setMoreMarkets(true)
     setFilter(filter)
-  }
+  }, [])
+
   const showMore = () => {
     if (!moreMarkets) return
     fetchMore({

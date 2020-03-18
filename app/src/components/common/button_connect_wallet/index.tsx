@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { ButtonProps, ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { Button } from '../button'
 
 const Wrapper = styled(Button)`
@@ -16,17 +16,16 @@ const Wrapper = styled(Button)`
   }
 `
 
-interface Props {
+interface Props extends ButtonProps {
   modalState: boolean
-  onClick: () => void
 }
 
 export const ButtonConnectWallet = (props: Props) => {
-  const { modalState, onClick, ...restProps } = props
+  const { modalState, ...restProps } = props
   const buttonMessage = modalState ? 'Connecting...' : 'Connect'
 
   return (
-    <Wrapper buttonType={ButtonType.primary} disabled={modalState} onClick={onClick} {...restProps}>
+    <Wrapper buttonType={ButtonType.primary} disabled={modalState} {...restProps}>
       {buttonMessage}
     </Wrapper>
   )

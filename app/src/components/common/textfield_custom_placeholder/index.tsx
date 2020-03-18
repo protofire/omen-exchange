@@ -8,31 +8,48 @@ interface Props {
 }
 
 const FieldWrapper = styled.div<{ disabled?: boolean }>`
-  border-bottom-color: ${props => (props.disabled ? 'rgba(153, 153, 153, 0.5)' : '#999')};
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
+  align-items: center;
+  background-color: ${props => props.theme.textfield.backgroundColor};
+  border-color: ${props => props.theme.textfield.borderColor};
+  border-style: ${props => props.theme.textfield.borderStyle};
+  border-width: ${props => props.theme.textfield.borderWidth};
+  border-radius: ${props => props.theme.textfield.borderRadius};
+  height: ${props => props.theme.textfield.height};
   display: flex;
   outline: none;
-  padding: 6px 4px;
+  padding: ${props => props.theme.textfield.paddingVertical + ' ' + props.theme.textfield.paddingHorizontal};
+  transition: border-color 0.15s ease-in-out;
   width: 100%;
+
+  &:focus-within {
+    border-color: ${props => props.theme.textfield.borderColorActive};
+  }
 
   > input {
     border: none;
-    color: ${props => props.theme.colors.textColor};
+    color: ${props => props.theme.textfield.color};
     flex-grow: 1;
     font-family: ${props => props.theme.fonts.fontFamily};
-    font-size: 13px;
-    font-weight: normal;
+    font-size: ${props => props.theme.textfield.fontSize};
+    font-weight: ${props => props.theme.textfield.fontWeight};
+    line-height: 1.2;
     margin: 0 5px 0 0;
+    outline: ${props => props.theme.textfield.outline};
     padding: 0;
 
     &::placeholder {
-      color: ${props => props.theme.colors.textColorLight};
-      font-family: ${props => props.theme.fonts.fontFamily};
-      font-size: 13px;
+      color: ${props => props.theme.textfield.placeholderColor};
+      font-size: ${props => props.theme.textfield.placeholderFontSize};
+      font-size: ${props => props.theme.textfield.placeholderFontWeight};
     }
 
-    &:disabled {
+    &:read-only,
+    [readonly] {
+      cursor: not-allowed;
+    }
+
+    &:disabled,
+    &[disabled] {
       cursor: not-allowed;
       opacity: 0.5;
     }
@@ -51,11 +68,11 @@ FieldWrapper.defaultProps = {
 }
 
 const Placeholder = styled.span`
-  color: ${props => props.theme.colors.textColorLight};
+  color: ${props => props.theme.colors.primary};
   flex-shrink: 0;
-  font-size: 13px;
-  font-weight: normal;
-  line-height: 1.4;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
   text-align: right;
 `
 
