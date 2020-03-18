@@ -9,6 +9,8 @@ const Wrapper = styled.button<ButtonSelectableProps>`
   border-color: transparent !important;
   border-radius: 6px;
   font-weight: ${props => (props.active ? '700' : '400')};
+  padding-left: 12px;
+  padding-right: 12px;
 
   &:hover {
     background-color: ${props => props.theme.buttonSecondary.backgroundColor};

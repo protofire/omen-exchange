@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
 import { Button, ButtonCircle, ButtonSelectable, ListCard, ListItem, Loading, SectionTitle } from '../common'
+import { AdvancedFilters } from '../common/advanced_filters'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../common/dropdown'
 import { IconFilter } from '../common/icons/IconFilter'
 import { IconSearch } from '../common/icons/IconSearch'
@@ -19,7 +20,7 @@ const TopContents = styled.div`
 `
 
 const SelectableButton = styled(ButtonSelectable)`
-  margin-right: 10px;
+  margin-right: 15px;
 
   &:last-child {
     margin-right: 0;
@@ -65,6 +66,10 @@ const NoMarketsAvailable = styled.p`
   text-align: center;
 `
 
+const SortDropdown = styled(Dropdown)`
+  width: 130px;
+`
+
 interface Props {
   context: ConnectedWeb3Context
   count: number
@@ -87,7 +92,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [category, setCategory] = useState('All')
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
   const [showSearch, setShowSearch] = useState<boolean>(false)
-  const [showFilters, setShowFilters] = useState<boolean>(false)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
   const CATEGORIES = ['All', 'Politics', 'Cryptocurrencies', 'Sports', 'Esports', 'NBA']
   const filters = [
     {
@@ -122,8 +127,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   }, [showSearch])
 
   const toggleFilters = useCallback(() => {
-    setShowFilters(!showFilters)
-  }, [showFilters])
+    setShowAdvancedFilters(!showAdvancedFilters)
+  }, [showAdvancedFilters])
 
   const sortOptions: Array<DropdownItemProps> = [
     {
@@ -175,15 +180,16 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                 <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
                   <IconSearch />
                 </ButtonCircleStyled>
-                <ButtonCircleStyled active={showFilters} onClick={toggleFilters}>
+                <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
                   <IconFilter />
                 </ButtonCircleStyled>
-                <Dropdown dropdownPosition={DropdownPosition.right} items={sortOptions} placeholder={'Sort By'} />
+                <SortDropdown dropdownPosition={DropdownPosition.right} items={sortOptions} placeholder={'Sort By'} />
               </FiltersControls>
             </FiltersWrapper>
           </TopContents>
         )}
         {showSearch && <Search />}
+        {showAdvancedFilters && <AdvancedFilters />}
         <ListWrapper>
           {RemoteData.hasData(markets) &&
             markets.data.length > 0 &&

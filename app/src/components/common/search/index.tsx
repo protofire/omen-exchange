@@ -3,12 +3,12 @@ import styled from 'styled-components'
 
 import { Textfield } from '../../common'
 
-const SearchWrapper = styled.div`
+const Wrapper = styled.div`
   padding: 0 25px 25px 25px;
 `
 
 export const Search = () => (
-  <SearchWrapper>
+  <Wrapper>
     <Textfield placeholder="Search Market" />
-  </SearchWrapper>
+  </Wrapper>
 )

@@ -1,4 +1,4 @@
-import React, { DOMAttributes, createRef, useCallback, useState } from 'react'
+import React, { DOMAttributes, createRef, useCallback, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { ChevronDown } from './img/ChevronDown'
@@ -28,6 +28,7 @@ const Wrapper = styled.div<{ active?: boolean }>`
 
   &:focus-within {
     background: ${props => props.theme.colors.secondary};
+    z-index: 12345;
 
     .currentItem {
       color: ${props => props.theme.colors.primary};
@@ -62,6 +63,9 @@ const CurrentItem = styled.div`
   font-weight: normal;
   line-height: 1.2;
   margin: 0 10px 0 0;
+  max-width: calc(100% - 20px);
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 `
 
@@ -98,8 +102,9 @@ Items.defaultProps = {
   dropdownPosition: DropdownPosition.left,
 }
 
-const Item = styled.div`
+const Item = styled.div<{ active: boolean }>`
   align-items: center;
+  background-color: ${props => (props.active ? 'rgba(227, 242, 253, 0.4)' : 'transparent')};
   cursor: pointer;
   display: flex;
   height: 48px;
@@ -108,6 +113,10 @@ const Item = styled.div`
   &:hover {
     background: rgba(227, 242, 253, 0.4);
   }
+`
+
+const ChevronWrapper = styled.div`
+  flex-shrink: 0;
 `
 
 const HelperFocusItem = styled.span`
@@ -124,16 +133,17 @@ export interface DropdownItemProps {
 }
 
 interface Props extends DOMAttributes<HTMLDivElement> {
-  currentItem?: number
+  currentItem?: number | undefined
   items: any
   placeholder?: React.ReactNode | string | undefined
   dropdownPosition?: DropdownPosition | undefined
 }
 
 export const Dropdown: React.FC<Props> = props => {
-  const { dropdownPosition, currentItem = -1, items, placeholder, ...restProps } = props
+  const { currentItem, dropdownPosition, items, placeholder, ...restProps } = props
   const myRef = createRef<HTMLDivElement>()
-  const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
+  const [currentItemIndex, setCurrentItemIndex] = useState<number | undefined>(currentItem)
+  const [isDirty, setIsDirty] = useState<boolean>(false)
 
   const closeDropdown = useCallback(() => {
     if (myRef.current) {
@@ -145,10 +155,17 @@ export const Dropdown: React.FC<Props> = props => {
     (onClick: () => void, itemIndex: number) => {
       setCurrentItemIndex(itemIndex)
       onClick()
+      setIsDirty(true)
       closeDropdown()
     },
     [closeDropdown],
   )
+
+  useEffect(() => {
+    if (!placeholder && !currentItemIndex && !isDirty) {
+      setCurrentItemIndex(0)
+    }
+  }, [currentItemIndex, isDirty, placeholder])
 
   return (
     <>
@@ -156,15 +173,21 @@ export const Dropdown: React.FC<Props> = props => {
       <Wrapper tabIndex={-1} {...restProps}>
         <DropdownButton>
           <CurrentItem className="currentItem">
-            {currentItemIndex > -1 ? items[currentItemIndex].content : placeholder}
+            {placeholder && !isDirty ? placeholder : items[currentItemIndex || 0].content}
           </CurrentItem>
-          <ChevronDown />
-          <ChevronUp />
+          <ChevronWrapper>
+            <ChevronDown />
+            <ChevronUp />
+          </ChevronWrapper>
         </DropdownButton>
         <Items className="dropdownItems" dropdownPosition={dropdownPosition}>
           {items.map((item: DropdownItemProps, index: string) => {
             return (
-              <Item key={index} onClick={() => optionClick(item.onClick, parseInt(index))}>
+              <Item
+                active={parseInt(index) === currentItemIndex}
+                key={index}
+                onClick={() => optionClick(item.onClick, parseInt(index))}
+              >
                 {item.content}
               </Item>
             )
