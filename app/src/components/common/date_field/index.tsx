@@ -84,7 +84,7 @@ export const DateField = (props: Props) => {
         popperContainer={CalendarPortal}
         selected={selected}
         showDisabledMonthNavigation
-        showTimeInput
+        showTimeSelect
         timeInputLabel={timeInputLabel}
       />
     </DateFieldWrapper>
