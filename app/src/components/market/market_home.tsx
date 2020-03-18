@@ -3,10 +3,11 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
-import { Button, ButtonCircle, ButtonSelectable, ListCard, ListItem, Loading, SectionTitle, Textfield } from '../common'
+import { Button, ButtonCircle, ButtonSelectable, ListCard, ListItem, Loading, SectionTitle } from '../common'
 import { IconFilter } from '../common/icons/IconFilter'
 import { IconSearch } from '../common/icons/IconSearch'
 import { MarketsCategories } from '../common/markets_categories'
+import { Search } from '../common/search'
 
 const SectionTitleMarket = styled(SectionTitle)`
   font-size: 18px;
@@ -61,10 +62,6 @@ const NoMarketsAvailable = styled.p`
   font-size: 14px;
   margin: auto 0;
   text-align: center;
-`
-
-const SearchWrapper = styled.div`
-  padding: 0 25px 25px 25px;
 `
 
 interface Props {
@@ -168,11 +165,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             </FiltersWrapper>
           </TopContents>
         )}
-        {showSearch && (
-          <SearchWrapper>
-            <Textfield placeholder="Search Market" />
-          </SearchWrapper>
-        )}
+        {showSearch && <Search />}
         <ListWrapper>
           {RemoteData.hasData(markets) &&
             markets.data.length > 0 &&
