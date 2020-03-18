@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
-import { Button, ButtonCircle, ButtonSelectable, ListCard, ListItem, Loading, SectionTitle } from '../common'
+import { Button, ButtonCircle, ButtonSelectable, Dropdown, ListCard, ListItem, Loading, SectionTitle } from '../common'
 import { IconFilter } from '../common/icons/IconFilter'
 import { IconSearch } from '../common/icons/IconSearch'
 import { MarketsCategories } from '../common/markets_categories'
@@ -124,6 +124,29 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
+  const sortOptions = [
+    {
+      content: 'Volume',
+      onClick: () => {
+        setSortBy('collateralVolume')
+      },
+    },
+    {
+      content: 'Option 1',
+      onClick: () => {
+        setSortBy(null)
+        console.warn('Sort by option 1')
+      },
+    },
+    {
+      content: 'Option 2',
+      onClick: () => {
+        setSortBy(null)
+        console.warn('Sort by option 2')
+      },
+    },
+  ]
+
   return (
     <>
       <SectionTitleMarket title={'Markets'} />
@@ -154,13 +177,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                 <ButtonCircleStyled active={showFilters} onClick={toggleFilters}>
                   <IconFilter />
                 </ButtonCircleStyled>
-                <button
-                  onClick={() => {
-                    sortBy ? setSortBy(null) : setSortBy('collateralVolume')
-                  }}
-                >
-                  Sort by Volume
-                </button>
+                <Dropdown items={sortOptions} placeholder={'Sort By'} />
               </FiltersControls>
             </FiltersWrapper>
           </TopContents>
