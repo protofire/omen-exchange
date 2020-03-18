@@ -3,7 +3,8 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
-import { Button, ButtonCircle, ButtonSelectable, Dropdown, ListCard, ListItem, Loading, SectionTitle } from '../common'
+import { Button, ButtonCircle, ButtonSelectable, ListCard, ListItem, Loading, SectionTitle } from '../common'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../common/dropdown'
 import { IconFilter } from '../common/icons/IconFilter'
 import { IconSearch } from '../common/icons/IconSearch'
 import { MarketsCategories } from '../common/markets_categories'
@@ -124,7 +125,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     setShowFilters(!showFilters)
   }, [showFilters])
 
-  const sortOptions = [
+  const sortOptions: Array<DropdownItemProps> = [
     {
       content: 'Volume',
       onClick: () => {
@@ -177,7 +178,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                 <ButtonCircleStyled active={showFilters} onClick={toggleFilters}>
                   <IconFilter />
                 </ButtonCircleStyled>
-                <Dropdown items={sortOptions} placeholder={'Sort By'} />
+                <Dropdown dropdownPosition={DropdownPosition.right} items={sortOptions} placeholder={'Sort By'} />
               </FiltersControls>
             </FiltersWrapper>
           </TopContents>
