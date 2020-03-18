@@ -78,6 +78,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const toggleExtraInformation = () =>
     showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
 
+  const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const hasEnoughAllowance = allowance && allowance.gte(amount)
@@ -126,7 +127,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       return
     }
 
-    unlock()
+    await unlock()
+    setAllowanceFinished(true)
   }
 
   const finish = async () => {
@@ -241,7 +243,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const total = `${sharesTotal} Shares`
 
   const hasZeroAllowance = allowance && allowance.isZero()
-  const showSetAllowance = hasZeroAllowance || !hasEnoughAllowance
+  const showSetAllowance = allowanceFinished || hasZeroAllowance || !hasEnoughAllowance
 
   return (
     <>
@@ -298,7 +300,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           </div>
         </GridTransactionDetails>
         {showSetAllowance && (
-          <SetAllowance amount={amount} collateral={collateral} context={context} onUnlock={unlockCollateral} />
+          <SetAllowance
+            collateral={collateral}
+            finished={allowanceFinished}
+            loading={allowance === null}
+            onUnlock={unlockCollateral}
+          />
         )}
         <ButtonContainer>
           <LeftButton

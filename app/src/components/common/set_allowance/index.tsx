@@ -1,6 +1,7 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
+import { Token } from '../../../util/types'
 import { ToggleTokenLock, ToggleTokenLockProps } from '../toggle_token_lock'
 
 const Wrapper = styled.div``
@@ -29,19 +30,23 @@ const Description = styled.p`
   margin: 0 25px 0 0;
 `
 
-export interface SetAllowanceProps extends DOMAttributes<HTMLDivElement>, ToggleTokenLockProps {}
+export type SetAllowanceProps = DOMAttributes<HTMLDivElement> &
+  ToggleTokenLockProps & {
+    collateral: Token
+  }
 
 export const SetAllowance: React.FC<SetAllowanceProps> = (props: SetAllowanceProps) => {
-  const { amount, collateral, context, ...restProps } = props
+  const { collateral, finished, loading, onUnlock, ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
       <Title>Set Allowance</Title>
       <DescriptionWrapper>
         <Description>
-          This permission allows Omen smart contracts to interact with your DAI. This has to be done for each new token.
+          This permission allows Omen smart contracts to interact with your {collateral.symbol}. This has to be done for
+          each new token.
         </Description>
-        <ToggleTokenLock amount={amount} collateral={collateral} context={context} />
+        <ToggleTokenLock finished={finished} loading={loading} onUnlock={onUnlock} />
       </DescriptionWrapper>
     </Wrapper>
   )

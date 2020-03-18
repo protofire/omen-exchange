@@ -30,13 +30,20 @@ export const useCpkAllowance = (signer: Signer, tokenAddress: string) => {
 
   const unlock = useCallback(async () => {
     if (cpk) {
+      const previousAllowance = allowance
       setAllowance(null)
       const account = await signer.getAddress()
       const collateralService = new ERC20Service(provider, account, tokenAddress)
-      await collateralService.approveUnlimited(cpk.address)
+      try {
+        await collateralService.approveUnlimited(cpk.address)
+      } catch (e) {
+        // reset allowance if the user rejects or there's an error
+        setAllowance(previousAllowance)
+        throw e
+      }
       updateAllowance()
     }
-  }, [provider, cpk, signer, tokenAddress, updateAllowance])
+  }, [allowance, provider, cpk, signer, tokenAddress, updateAllowance])
 
   useEffect(() => {
     updateAllowance()
