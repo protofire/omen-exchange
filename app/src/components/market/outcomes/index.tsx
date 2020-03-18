@@ -1,10 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import {
   Button,
   ButtonAdd,
-  Checkbox,
   FormError,
   FormLabel,
   Textfield,
@@ -62,10 +61,6 @@ const ErrorStyled = styled(FormError)`
   margin: 0 0 10px 0;
 `
 
-const CheckboxWrapper = styled.div`
-  text-align: right;
-`
-
 const ButtonRemove = styled(Button)`
   background-color: transparent;
   background-image: url(${IconDelete});
@@ -104,11 +99,6 @@ const TotalTitle = styled(TotalText)`
 const TotalValue = styled(TotalText)`
   font-weight: 600;
   text-align: right;
-`
-
-const StyledCheckbox = styled(Checkbox)`
-  font-size: 12px;
-  margin-right: 5px;
 `
 
 const StyledLabel = styled.label`
@@ -151,8 +141,9 @@ interface Props {
 
 const Outcomes = (props: Props) => {
   const { canAddOutcome, disabled, errorMessages, outcomes, totalProbabilities } = props
-  const [newOutcomeName, setNewOutcomeName] = React.useState('')
-  const [isUniform, setIsUniform] = React.useState(false)
+  const [newOutcomeName, setNewOutcomeName] = useState('')
+  const [newOutcomeProbability, setNewOutcomeProbability] = useState(0)
+  const [isUniform, setIsUniform] = useState(false)
 
   const updateOutcomeProbability = (index: number, newProbability: number) => {
     if (newProbability < 0 || newProbability > 100) {
@@ -222,11 +213,12 @@ const Outcomes = (props: Props) => {
   const addNewOutcome = () => {
     const newOutcome = {
       name: newOutcomeName.trim(),
-      probability: 0,
+      probability: newOutcomeProbability,
     }
     const newOutcomes = outcomes.concat(newOutcome)
     props.onChange(isUniform ? uniform(newOutcomes) : newOutcomes)
     setNewOutcomeName('')
+    setNewOutcomeProbability(0)
   }
 
   const removeOutcome = (index: number) => {
@@ -234,10 +226,14 @@ const Outcomes = (props: Props) => {
     props.onChange(isUniform ? uniform(outcomes) : outcomes)
   }
 
-  const handleIsUniformChanged = (event: any) => {
-    const value = event.target.checked
-    props.onChange(value ? uniform(outcomes) : outcomes)
-    setIsUniform(value)
+  const handleIsUniformChanged = () => {
+    setIsUniform(value => !value)
+    props.onChange(!isUniform ? uniform(outcomes) : outcomes)
+  }
+
+  const setMax = () => {
+    const sum = outcomes.reduce((acum, b) => acum + b.probability, 0)
+    setNewOutcomeProbability(100 - sum)
   }
 
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
@@ -275,6 +271,33 @@ const Outcomes = (props: Props) => {
 
   return (
     <>
+      <FormLabel>Add Outcome</FormLabel>
+      <StyledLabel
+        onClick={handleIsUniformChanged}
+        title={isUniform ? 'Set manual probability' : 'Distribute uniformly'}
+      >
+        {isUniform ? 'Set manual probability' : 'Set uniformly'}
+      </StyledLabel>
+      {canAddOutcome && (
+        <NewOutcome>
+          <Textfield
+            onChange={e => setNewOutcomeName(e.target.value)}
+            placeholder="Add new outcome"
+            type="text"
+            value={newOutcomeName}
+          />
+          {!isUniform && (
+            <Textfield
+              onChange={e => setNewOutcomeProbability(Number(e.target.value))}
+              placeholder="0.00"
+              type="text"
+              value={newOutcomeProbability}
+            />
+          )}
+          {!isUniform && outcomes.length && <StyledLabel onClick={setMax}>Set Max</StyledLabel>}
+          <ButtonAdd disabled={!newOutcomeName} onClick={addNewOutcome} title="Add new outcome" />
+        </NewOutcome>
+      )}
       <OutcomesWrapper>
         <OutcomesTitles>
           <FormLabel>Outcome</FormLabel>
@@ -301,23 +324,7 @@ const Outcomes = (props: Props) => {
             %
           </TotalValue>
         </TotalWrapper>
-        <CheckboxWrapper>
-          <StyledCheckbox name="distributeUniformly" onChange={handleIsUniformChanged} title="Distribute uniformly" />
-          <StyledLabel htmlFor="distributeUniformly">Distribute uniformly</StyledLabel>
-        </CheckboxWrapper>
       </OutcomesWrapper>
-
-      {canAddOutcome && (
-        <NewOutcome>
-          <Textfield
-            onChange={e => setNewOutcomeName(e.target.value)}
-            placeholder="Add new outcome"
-            type="text"
-            value={newOutcomeName}
-          />
-          <ButtonAdd disabled={!newOutcomeName} onClick={addNewOutcome} title="Add new outcome" />
-        </NewOutcome>
-      )}
     </>
   )
 }
