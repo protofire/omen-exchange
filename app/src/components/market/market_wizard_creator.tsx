@@ -10,14 +10,7 @@ import { Arbitrator, MarketData, Question, Token } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
 
 import { Outcome } from './outcomes'
-import {
-  AskQuestionStep,
-  CreateMarketStep,
-  FundingAndFeeStep,
-  MenuStep,
-  OutcomesStep,
-  SummaryMarketStep,
-} from './steps'
+import { AskQuestionStep, FundingAndFeeStep, MenuStep, SummaryMarketStep } from './steps'
 
 interface Props {
   callback: (param: MarketData) => void
@@ -220,13 +213,10 @@ export const MarketWizardCreator = (props: Props) => {
       arbitratorsCustom,
       categoriesCustom,
       category,
-      collateral,
-      funding,
       loadedQuestionId,
       outcomes,
       question,
       resolution,
-      spread,
     } = marketData
 
     switch (currentStep) {
@@ -239,16 +229,18 @@ export const MarketWizardCreator = (props: Props) => {
             handleChange={handleChange}
             handleClearQuestion={handleClearQuestion}
             handleDateChange={handleDateChange}
+            handleOutcomesChange={handleOutcomesChange}
             handleQuestionChange={handleQuestionChange}
             next={() => next()}
             values={{
               question,
+              outcomes,
+              loadedQuestionId,
               category,
               categoriesCustom,
               resolution,
               arbitrator,
               arbitratorsCustom,
-              loadedQuestionId,
             }}
           />
         )
@@ -258,32 +250,12 @@ export const MarketWizardCreator = (props: Props) => {
             back={() => back()}
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
-            next={() => next()}
-            values={{ collateral, spread, funding }}
-          />
-        )
-      case 3:
-        return (
-          <OutcomesStep
-            back={() => back()}
-            handleOutcomesChange={handleOutcomesChange}
-            next={() => next()}
-            values={{
-              outcomes,
-              question,
-              loadedQuestionId,
-            }}
-          />
-        )
-      case 4:
-        return (
-          <CreateMarketStep
-            back={() => back()}
             marketCreationStatus={marketCreationStatus}
             submit={() => submit()}
             values={marketData}
           />
         )
+
       default:
         return (
           <AskQuestionStep
@@ -293,16 +265,18 @@ export const MarketWizardCreator = (props: Props) => {
             handleChange={handleChange}
             handleClearQuestion={handleClearQuestion}
             handleDateChange={handleDateChange}
+            handleOutcomesChange={handleOutcomesChange}
             handleQuestionChange={handleQuestionChange}
             next={() => next()}
             values={{
               question,
+              outcomes,
+              loadedQuestionId,
               category,
               categoriesCustom,
               resolution,
               arbitrator,
               arbitratorsCustom,
-              loadedQuestionId,
             }}
           />
         )

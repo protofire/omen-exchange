@@ -25,6 +25,10 @@ const Wrapper = styled.div`
 
 const Step = styled.div<{ active?: boolean }>`
   background-color: ${props => (props.active ? props.theme.colors.secondary : '#ddd')};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   height: 6px;
   margin-right: 30px;
   width: 100%;
@@ -35,24 +39,24 @@ const Step = styled.div<{ active?: boolean }>`
   }
 `
 
+const StepName = styled.div<{ active?: boolean }>`
+  color: ${props => (props.active ? props.theme.colors.secondary : '#ddd')};
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 19px;
+  letter-spacing: 0.4px;
+`
+
 class MenuStep extends Component<Props, State> {
   public state: State = {
     steps: [
       {
-        name: 'Step One',
+        name: 'Configure Market',
         value: 1,
       },
       {
-        name: 'Step Two',
+        name: 'Fund Market',
         value: 2,
-      },
-      {
-        name: 'Step Tree',
-        value: 3,
-      },
-      {
-        name: 'Step Four',
-        value: 4,
       },
     ],
   }
@@ -61,13 +65,18 @@ class MenuStep extends Component<Props, State> {
     const { steps } = this.state
     const currentStepItemSelected = steps.find(step => step.value === this.props.currentStep)
 
-    const stepsBlocks = steps.map((step, index) => (
-      <Step active={currentStepItemSelected && step.value <= currentStepItemSelected.value} key={index}></Step>
-    ))
+    const stepsBlocks = steps.map((step, index) => {
+      const active = currentStepItemSelected && step.value <= currentStepItemSelected.value
+      return (
+        <Step active={active} key={index}>
+          <StepName active={active}>{step.name}</StepName>
+        </Step>
+      )
+    })
 
     return (
       <>
-        <SectionTitle title={'Conditional Exchange'} />
+        <SectionTitle title={'Create Market'} />
         <Wrapper>{stepsBlocks}</Wrapper>
       </>
     )
