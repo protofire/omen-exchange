@@ -123,10 +123,12 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   ) : null
 
   const toggleSearch = useCallback(() => {
+    setShowAdvancedFilters(false)
     setShowSearch(!showSearch)
   }, [showSearch])
 
   const toggleFilters = useCallback(() => {
+    setShowSearch(false)
     setShowAdvancedFilters(!showAdvancedFilters)
   }, [showAdvancedFilters])
 

@@ -1,0 +1,1 @@
+export { DxDaoIcon } from './DxDaoIcon'

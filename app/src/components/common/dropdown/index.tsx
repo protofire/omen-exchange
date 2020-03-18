@@ -18,7 +18,7 @@ const Wrapper = styled.div<{ active?: boolean }>`
   cursor: pointer;
   height: 34px;
   outline: none;
-  padding: 0 17px;
+  padding: 0 14px;
   position: relative;
   user-select: none;
 
@@ -56,11 +56,14 @@ const DropdownButton = styled.div`
 `
 
 const CurrentItem = styled.div`
+  align-items: center;
   color: ${props => props.theme.colors.textColorDark};
+  display: flex;
   flex-grow: 1;
   flex-shrink: 0;
   font-size: 14px;
   font-weight: normal;
+  height: 20px;
   line-height: 1.2;
   margin: 0 10px 0 0;
   max-width: calc(100% - 20px);

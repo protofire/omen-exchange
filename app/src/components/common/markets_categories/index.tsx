@@ -18,7 +18,12 @@ const CategoriesWrapper = styled.div`
 
 const CategoriesButtons = styled.div`
   flex-grow: 1;
+  margin-bottom: 20px;
   overflow: hidden;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-bottom: 0;
+  }
 `
 
 const CategoriesButtonsInner = styled.div`
