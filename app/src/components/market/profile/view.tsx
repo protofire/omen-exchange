@@ -145,7 +145,7 @@ const ViewWrapper = (props: Props) => {
             <LeftButton
               buttonType={ButtonType.secondaryLine}
               onClick={() => {
-                history.push(`${marketMakerAddress}/fund`)
+                history.push(`${marketMakerAddress}/pool-liquidity`)
               }}
             >
               Pool Liquidity

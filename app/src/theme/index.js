@@ -56,6 +56,7 @@ const theme = {
     darkGray: '#acacac',
     error: '#fa0000',
     gray: '#b7b7b7',
+    green: '#4B9E98',
     mainBodyBackground: '#fff',
     primary: '#1565C0',
     secondary: '#E3F2FD',
@@ -65,6 +66,7 @@ const theme = {
     textColorDark: '#37474F',
     textColorDarker: '#333',
     textColorLight: '#999',
+    textColorLightish: '#7D8189',
     warning: '#37474F',
   },
   cards: {
@@ -95,6 +97,7 @@ const theme = {
   },
   borders: {
     borderColor: '#ECEFF1',
+    borderColorLighter: '#E8EAF6',
     commonBorderRadius: '6px',
   },
   paddings: {
@@ -102,17 +105,21 @@ const theme = {
   },
   textfield: {
     backgroundColor: 'transparent',
-    borderColor: '#999',
-    borderRadius: '0',
+    borderColor: '#D6EBFD',
+    borderColorActive: '#90CAF9',
+    borderRadius: '32px',
     borderStyle: 'solid',
     borderWidth: '1px',
-    color: '#333',
-    fontSize: '13px',
-    fontWeight: '400',
+    color: '#37474F',
+    fontSize: '14px',
+    fontWeight: '500',
+    height: '36px',
     outline: 'none',
-    paddingHorizontal: '4px',
-    paddingVertical: '6px',
-    placeholderColor: '#999',
+    paddingHorizontal: '25px',
+    paddingVertical: '10px',
+    placeholderColor: '#86909E',
+    placeholderFontSize: '14px',
+    placeholderFontWeight: '400',
   },
   mainContainer: {
     maxWidth: '586px',
@@ -126,7 +133,35 @@ const theme = {
     textColor: '#000',
   },
   outcomes: {
-    colors: ['#e1bee7', '#b2dfdb', '#ffe0b2', '#e7e7be', '#bedfb2', '#ffb2f0'],
+    colors: [
+      {
+        darker: '#8E24AA',
+        medium: '#e1bee7',
+      },
+      {
+        darker: '#00897B',
+        medium: '#b2dfdb',
+      },
+
+      {
+        darker: '#d2b994',
+        medium: '#ffe0b2',
+      },
+
+      {
+        darker: '#b9b992',
+        medium: '#e7e7be',
+      },
+
+      {
+        darker: '#9db992',
+        medium: '#bedfb2',
+      },
+      {
+        darker: '#ca89bd',
+        medium: '#ffb2f0',
+      },
+    ],
   },
   modalStyle: {
     content: {

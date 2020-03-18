@@ -45,7 +45,9 @@ const ProgressBar = styled.div`
 
 const Progress = styled.div<{ width: number; outcomeIndex: number }>`
   background-color: ${props =>
-    props.theme.outcomes.colors[props.outcomeIndex] ? props.theme.outcomes.colors[props.outcomeIndex] : '#333'};
+    props.theme.outcomes.colors[props.outcomeIndex].medium
+      ? props.theme.outcomes.colors[props.outcomeIndex].medium
+      : '#333'};
   border-radius: 4px;
   height: 100%;
   transition: width 0.5s ease-out;

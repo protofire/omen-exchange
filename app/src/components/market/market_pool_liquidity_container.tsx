@@ -4,13 +4,13 @@ import { useMarketMakerData, useQuestion } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { Loading } from '../common/loading'
 
-import { MarketFund } from './market_fund'
+import { MarketPoolLiquidity } from './market_pool_liquidity'
 
 interface Props {
   marketMakerAddress: string
 }
 
-const MarketFundContainer: React.FC<Props> = (props: Props) => {
+const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const { marketMakerAddress } = props
@@ -30,7 +30,7 @@ const MarketFundContainer: React.FC<Props> = (props: Props) => {
   }
 
   return (
-    <MarketFund
+    <MarketPoolLiquidity
       balances={balances}
       collateral={collateral}
       marketMakerAddress={marketMakerAddress}
@@ -44,4 +44,4 @@ const MarketFundContainer: React.FC<Props> = (props: Props) => {
   )
 }
 
-export { MarketFundContainer }
+export { MarketPoolLiquidityContainer }

@@ -44,7 +44,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     onFilterChange({ category, sortBy, state })
-  }, [category, sortBy, state])
+  }, [category, sortBy, state, onFilterChange])
 
   const showMoreButton = !RemoteData.is.loading(markets) ? (
     <Button disabled={RemoteData.is.reloading(markets)} onClick={onShowMore}>

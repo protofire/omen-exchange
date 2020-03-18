@@ -6,11 +6,8 @@ import { useWeb3Context } from 'web3-react/dist'
 
 import { ConnectedWeb3 } from '../../../hooks'
 import { ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { Button, ButtonConnectWallet, ButtonDisconnectWallet, Logo, Network } from '../../common'
 import { ModalConnectWallet } from '../../modal'
-import { Button } from '../button'
-import { ButtonConnectWallet } from '../button_connect_wallet'
-import { Logo } from '../logo'
-import { Network } from '../network'
 
 const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -69,6 +66,15 @@ const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
   }
 `
 
+const ButtonDisconnectWalletStyled = styled(ButtonDisconnectWallet)`
+  display: none;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: flex;
+    margin-left: 12px;
+  }
+`
+
 const ContentsRight = styled.div`
   align-items: center;
   display: flex;
@@ -103,6 +109,11 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
           )}
           <ConnectedWeb3>
             <NetworkStyled />
+            <ButtonDisconnectWalletStyled
+              callback={() => {
+                setModalState(false)
+              }}
+            />
           </ConnectedWeb3>
         </ContentsRight>
         <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />

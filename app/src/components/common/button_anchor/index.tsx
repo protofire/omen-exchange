@@ -1,22 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ButtonCSS, ButtonComponentProps, ButtonProps } from '../../../theme/component_styles/button_styling_types'
+import { ButtonCSS, ButtonLinkProps } from '../../../theme/component_styles/button_styling_types'
 
-interface ButtonComponentPropsLocal extends ButtonComponentProps {
-  href?: string
-  rel?: string
-  target?: string
-}
-
-const ButtonContainer = styled.a<ButtonProps>`
+const Wrapper = styled.a<ButtonLinkProps>`
   ${ButtonCSS}
 `
 
-const ButtonAnchorComponent: React.FC<ButtonComponentPropsLocal> = (props: ButtonComponentPropsLocal) => {
+export const ButtonAnchor: React.FC<ButtonLinkProps> = (props: ButtonLinkProps) => {
   const { children, ...restProps } = props
 
-  return <ButtonContainer {...restProps}>{children}</ButtonContainer>
+  return <Wrapper {...restProps}>{children}</Wrapper>
 }
-
-export const ButtonAnchor = ButtonAnchorComponent

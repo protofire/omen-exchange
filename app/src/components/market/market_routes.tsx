@@ -5,7 +5,7 @@ import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 import { MARKET_FEE } from '../../common/constants'
 import { useCheckContractExists, useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { MarketBuyPage, MarketDetailsPage, MarketFundPage, MarketSellPage } from '../../pages'
+import { MarketBuyPage, MarketDetailsPage, MarketPoolLiquidityPage, MarketSellPage } from '../../pages'
 import { getLogger } from '../../util/logger'
 import { isAddress } from '../../util/tools'
 import { Loading, MessageWarning, SectionTitle } from '../common'
@@ -58,7 +58,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
         <>
           <Route component={MarketBuyPage} exact path="/:address/buy" />
           <Route component={MarketSellPage} exact path="/:address/sell" />
-          <Route component={MarketFundPage} exact path="/:address/fund" />
+          <Route component={MarketPoolLiquidityPage} exact path="/:address/pool-liquidity" />
         </>
       )}
     </Switch>
