@@ -2,11 +2,14 @@ import React, { ButtonHTMLAttributes } from 'react'
 import styled, { css } from 'styled-components'
 
 const ActiveCSS = css`
-  background-color: ${props => props.theme.colors.secondary};
-  border-color: ${props => props.theme.colors.secondary};
+  &,
+  &:hover {
+    background-color: ${props => props.theme.colors.secondary};
+    border-color: ${props => props.theme.colors.secondary};
 
-  > svg path {
-    fill: ${props => props.theme.colors.primary};
+    > svg path {
+      fill: ${props => props.theme.colors.primary};
+    }
   }
 `
 
@@ -29,6 +32,8 @@ const Wrapper = styled.button<{ active?: boolean }>`
     border-color: ${props => props.theme.colors.tertiaryDark};
   }
 
+  ${props => (props.active ? ActiveCSS : '')};
+
   &[disabled] {
     &,
     &:hover {
@@ -37,8 +42,6 @@ const Wrapper = styled.button<{ active?: boolean }>`
       opacity: 0.5;
     }
   }
-
-  ${props => (props.active ? ActiveCSS : '')};
 `
 
 Wrapper.defaultProps = {

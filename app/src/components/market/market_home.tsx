@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
-import { Button, ButtonCircle, ButtonSelectable, ListCard, ListItem, Loading, SectionTitle } from '../common'
+import { Button, ButtonCircle, ButtonSelectable, ListCard, ListItem, Loading, SectionTitle, Textfield } from '../common'
 import { IconFilter } from '../common/icons/IconFilter'
 import { IconSearch } from '../common/icons/IconSearch'
 import { MarketsCategories } from '../common/markets_categories'
@@ -45,6 +45,10 @@ const FiltersControls = styled.div`
   display: flex;
 `
 
+const ButtonCircleStyled = styled(ButtonCircle)`
+  margin-right: 10px;
+`
+
 const ListWrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
@@ -57,6 +61,10 @@ const NoMarketsAvailable = styled.p`
   font-size: 14px;
   margin: auto 0;
   text-align: center;
+`
+
+const SearchWrapper = styled.div`
+  padding: 0 25px 25px 25px;
 `
 
 interface Props {
@@ -80,6 +88,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [state, setState] = useState<FiltersStates>(FiltersStates.open)
   const [category, setCategory] = useState('All')
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
+  const [showSearch, setShowSearch] = useState<boolean>(false)
+  const [showFilters, setShowFilters] = useState<boolean>(false)
   const CATEGORIES = ['All', 'Politics', 'Cryptocurrencies', 'Sports', 'Esports', 'NBA']
   const filters = [
     {
@@ -109,6 +119,14 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     </Button>
   ) : null
 
+  const toggleSearch = useCallback(() => {
+    setShowSearch(!showSearch)
+  }, [showSearch])
+
+  const toggleFilters = useCallback(() => {
+    setShowFilters(!showFilters)
+  }, [showFilters])
+
   return (
     <>
       <SectionTitleMarket title={'Markets'} />
@@ -133,12 +151,12 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                 })}
               </FiltersCategories>
               <FiltersControls>
-                <ButtonCircle active={true}>
+                <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
                   <IconSearch />
-                </ButtonCircle>
-                <ButtonCircle active={false}>
+                </ButtonCircleStyled>
+                <ButtonCircleStyled active={showFilters} onClick={toggleFilters}>
                   <IconFilter />
-                </ButtonCircle>
+                </ButtonCircleStyled>
                 <button
                   onClick={() => {
                     sortBy ? setSortBy(null) : setSortBy('collateralVolume')
@@ -149,6 +167,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               </FiltersControls>
             </FiltersWrapper>
           </TopContents>
+        )}
+        {showSearch && (
+          <SearchWrapper>
+            <Textfield placeholder="Search Market" />
+          </SearchWrapper>
         )}
         <ListWrapper>
           {RemoteData.hasData(markets) &&
