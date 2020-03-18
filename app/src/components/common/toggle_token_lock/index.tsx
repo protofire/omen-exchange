@@ -1,36 +1,20 @@
-import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
-import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { Token } from '../../../util/types'
 import { ButtonStateful, ButtonStates } from '../button_stateful'
 
 export interface ToggleTokenLockProps {
-  amount: BigNumber
-  collateral: Token
-  context: ConnectedWeb3Context
   onUnlock?: any
+  loading: boolean
+  finished: boolean
 }
 
 export const ToggleTokenLock = (props: ToggleTokenLockProps) => {
-  const { amount, context, onUnlock } = props
-  const { account } = context
-  const [loading, setLoading] = useState(false)
+  const { finished, loading, onUnlock } = props
 
-  useEffect(() => {
-    if (!account) {
-      return
-    }
-
-    setLoading(false)
-  }, [account, setLoading])
+  const state = loading ? ButtonStates.working : finished ? ButtonStates.finished : ButtonStates.idle
 
   return (
-    <ButtonStateful
-      disabled={amount.isZero() || loading}
-      onClick={onUnlock}
-      state={(loading && ButtonStates.working) || ButtonStates.idle}
-    >
+    <ButtonStateful disabled={loading || finished} onClick={onUnlock} state={state}>
       Set
     </ButtonStateful>
   )

@@ -1,17 +1,19 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { useCollateralBalance } from '../../hooks/useCollateralBalance'
 import { useContracts } from '../../hooks/useContracts'
+import { useCpk } from '../../hooks/useCpk'
+import { useCpkAllowance } from '../../hooks/useCpkAllowance'
 import { useFundingBalance } from '../../hooks/useFundingBalance'
 import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
 import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
-import { divBN, formatBigNumber } from '../../util/tools'
+import { formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import {
   BigNumberInput,
@@ -84,9 +86,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
+  const cpk = useCpk()
 
   const { buildMarketMaker } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
+
+  const signer = useMemo(() => provider.getSigner(), [provider])
+  const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const [amountToFund, setAmountToFund] = useState<BigNumber>(new BigNumber(0))
   const [amountToRemove, setAmountToRemove] = useState<BigNumber>(new BigNumber(0))
@@ -160,6 +167,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const unlockCollateral = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await unlock()
+
+    setAllowanceFinished(true)
+  }
+
   const collateralBalance = useCollateralBalance(collateral, context)
 
   const isFundingToAddGreaterThanBalance = amountToFund.gt(collateralBalance)
@@ -171,6 +188,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const errorFundingToRemove = amountToRemove.isZero() || isFundingToRemoveGreaterThanFundingBalance
 
   const probabilities = balances.map(balance => balance.probability)
+
+  const hasZeroAllowance = allowance && allowance.isZero()
+  const hasEnoughAllowance = allowance && allowance.gte(amountToFund)
+  const showSetAllowance = allowanceFinished || hasZeroAllowance || !hasEnoughAllowance
 
   const mockedEarnTradingFee = 1.23
   const mockedEarned = 3.33
@@ -342,7 +363,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             )}
           </div>
         </GridTransactionDetails>
-        {activeTab === Tabs.deposit && <SetAllowance amount={amountToFund} collateral={collateral} context={context} />}
+        {activeTab === Tabs.deposit && showSetAllowance && (
+          <SetAllowance
+            collateral={collateral}
+            finished={allowanceFinished}
+            loading={allowance === null}
+            onUnlock={unlockCollateral}
+          />
+        )}
         <ButtonContainer>
           <LeftButton
             buttonType={ButtonType.secondaryLine}
@@ -351,7 +379,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             Cancel
           </LeftButton>
           {activeTab === Tabs.deposit && (
-            <Button buttonType={ButtonType.secondaryLine} disabled={errorFundingToAdd} onClick={() => addFunding()}>
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={errorFundingToAdd || hasZeroAllowance || !hasEnoughAllowance}
+              onClick={() => addFunding()}
+            >
               Deposit
             </Button>
           )}
