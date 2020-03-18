@@ -56,7 +56,7 @@ const networks: { [K in NetworkId]: Network } = {
     label: 'Mainnet',
     url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
     realitioTimeout: 86400,
-    earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK ? parseInt(EARLIEST_MAINNET_BLOCK_TO_CHECK, 10) : 9294139,
+    earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
       marketMakerFactory: '0xe7E502789B8f4cDC99e6Cf9d3963E8C76784da51',
@@ -71,7 +71,7 @@ const networks: { [K in NetworkId]: Network } = {
     label: 'Rinkeby',
     url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
     realitioTimeout: 10,
-    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK ? parseInt(EARLIEST_RINKEBY_BLOCK_TO_CHECK, 10) : 5827230,
+    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
       marketMakerFactory: '0x0fB4340432e56c014fa96286de17222822a9281b',
@@ -86,7 +86,7 @@ const networks: { [K in NetworkId]: Network } = {
     label: 'Ganache',
     url: `http://localhost:8545`,
     realitioTimeout: 10,
-    earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK ? parseInt(EARLIEST_GANACHE_BLOCK_TO_CHECK, 10) : 1,
+    earliestBlockToCheck: EARLIEST_GANACHE_BLOCK_TO_CHECK,
     contracts: {
       realitio: '0xcfeb869f69431e42cdb54a4f4f105c19c080a601',
       marketMakerFactory: '0x5017A545b09ab9a30499DE7F431DF0855bCb7275',
