@@ -93,7 +93,6 @@ export const ModalCollateral = (props: Props) => {
           />
         }
         title={'Collateral Token Address'}
-        tooltip={{ id: 'ERC20', description: 'Enter a valid ERC20 address.' }}
       />
       {tokenDetails()}
       {spinner()}
