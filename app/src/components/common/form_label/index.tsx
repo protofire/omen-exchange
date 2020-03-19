@@ -2,9 +2,9 @@ import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
 const FormLabelWrapper = styled.label`
-  color: #000;
-  font-size: 15px;
-  font-weight: 500;
+  color: ${props => props.theme.colors.textColorDark};
+  font-size: 14px;
+  font-weight: 400;
   line-height: 1.2;
 `
 

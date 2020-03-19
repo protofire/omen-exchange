@@ -3,7 +3,6 @@ import React, { ChangeEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { MARKET_FEE } from '../../../../common/constants'
 import { useCollateralBalance } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { BalanceState, fetchAccountBalance } from '../../../../store/reducer'
@@ -194,20 +193,12 @@ const FundingAndFeeStep = (props: Props) => {
             />
           }
           title={'Spread / Fee'}
-          tooltip={{
-            id: `spreadFee`,
-            description: `The fee taken from every trade. Temporarily fixed at ${MARKET_FEE}%.`,
-          }}
         />
         <FormRow
           formField={
             <Tokens context={context} name="collateralId" onTokenChange={handleCollateralChange} value={collateral} />
           }
           title={'Collateral token'}
-          tooltip={{
-            id: `collateralToken`,
-            description: `Select the token you want to use as collateral.`,
-          }}
         />
         <FormRow
           formField={
@@ -236,10 +227,6 @@ const FundingAndFeeStep = (props: Props) => {
             </>
           }
           title={'Funding'}
-          tooltip={{
-            id: `funding`,
-            description: `Initial funding to fund the market maker.`,
-          }}
         />
         {!MarketCreationStatus.is.ready(marketCreationStatus) &&
         !MarketCreationStatus.is.error(marketCreationStatus) ? (

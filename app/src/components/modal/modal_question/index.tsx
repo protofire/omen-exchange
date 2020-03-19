@@ -142,7 +142,6 @@ export const ModalQuestion = (props: Props) => {
           />
         }
         title={'Question URL'}
-        tooltip={{ id: 'questionURL', description: 'Enter a valid question URL from realit.io.' }}
       />
       {questionDetails()}
       {spinner()}

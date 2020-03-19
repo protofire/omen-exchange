@@ -23,6 +23,14 @@ const Wrapper = styled.div`
   width: ${props => props.theme.mainContainer.maxWidth};
 `
 
+const CreateTitle = styled(SectionTitle)`
+  margin-bottom: 28px;
+  .titleText {
+    color: #263238;
+    font-size: 20px;
+  }
+`
+
 const Step = styled.div<{ active?: boolean }>`
   background-color: ${props => (props.active ? props.theme.colors.secondary : '#ddd')};
   display: flex;
@@ -76,7 +84,7 @@ class MenuStep extends Component<Props, State> {
 
     return (
       <>
-        <SectionTitle title={'Create Market'} />
+        <CreateTitle title={'Create Market'} />
         <Wrapper>{stepsBlocks}</Wrapper>
       </>
     )

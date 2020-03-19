@@ -5,7 +5,8 @@ import styled from 'styled-components'
 import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
-import { Button, ButtonContainer, ButtonLink } from '../../../button'
+import { Button, ButtonContainer } from '../../../button'
+import { ButtonType } from '../../../button/button_styling_types'
 import { Arbitrators, Categories, CreateCard, DateField, DisplayArbitrator, FormRow, Well } from '../../../common'
 import { QuestionInput } from '../../../common/question_input'
 import { Outcome, Outcomes } from '../../outcomes'
@@ -36,12 +37,9 @@ const OracleInfo = styled(Well)`
   font-style: italic;
   text-align: center;
 `
-const ButtonLinkStyled = styled(ButtonLink)`
-  margin-right: auto;
-`
 
-const ButtonContainerStyled = styled(ButtonContainer)`
-  padding-top: 10px;
+const LeftButton = styled(Button)`
+  margin-right: auto;
 `
 
 const AskQuestionStep = (props: Props) => {
@@ -117,20 +115,12 @@ const AskQuestionStep = (props: Props) => {
             onChange={handleChange}
             onChangeQuestion={handleQuestionChange}
             onClearQuestion={handleClearQuestion}
-            placeholder="Type in a question..."
+            placeholder="What question do you want the world predict?"
             value={question}
           />
         }
         title={'Set Market Question'}
-        tooltip={{
-          id: `question`,
-          description: `Ensure that your market is phrased in a way that it can be unambiguous, resolvable, contains all the necessary parameters and is clearly understandable. As a guide you could use the <a target="_blank" href="https://augur.guide/2-market-creators/checksheet.html">check sheet</a> prepared by Augur for creating markets.`,
-        }}
       />
-
-      {/* <OutcomeInfo>
-        Please add all the possible outcomes for the <strong>&quot;{question}&quot;</strong> question.
-      </OutcomeInfo> */}
       <Outcomes
         canAddOutcome={canAddOutcome}
         disabled={!!loadedQuestionId}
@@ -139,7 +129,6 @@ const AskQuestionStep = (props: Props) => {
         outcomes={outcomes}
         totalProbabilities={totalProbabilities}
       />
-
       <FormRow
         formField={
           <DateField
@@ -151,10 +140,6 @@ const AskQuestionStep = (props: Props) => {
           />
         }
         title={'Resolution Date'}
-        tooltip={{
-          id: `resolution`,
-          description: `Precisely indicate when the market is resolved. The time is displayed in ISO 8601 format.`,
-        }}
       />
       <FormRow
         formField={
@@ -167,12 +152,7 @@ const AskQuestionStep = (props: Props) => {
           />
         }
         title={'Category'}
-        tooltip={{
-          id: `category`,
-          description: `You can choose among several categories. Your selection will classify the subject/topic of your market.`,
-        }}
       />
-
       <FormRow
         formField={
           <Arbitrators
@@ -185,21 +165,18 @@ const AskQuestionStep = (props: Props) => {
           />
         }
         title={'Arbitrator'}
-        tooltip={{
-          id: `arbitrator`,
-          description: `If you want to learn how <a target="_blank" href="https://realit.io">realit.io</a> and <a target="_blank" href="https://kleros.io">Kleros</a> work, please visit their websites.
-`,
-        }}
       />
       <OracleInfo>
         <DisplayArbitrator arbitrator={arbitrator} />
       </OracleInfo>
-      <ButtonContainerStyled>
-        <ButtonLinkStyled onClick={() => history.push(`/`)}>‹ Cancel</ButtonLinkStyled>
-        <Button disabled={error} onClick={props.next}>
+      <ButtonContainer>
+        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
+          Cancel
+        </LeftButton>
+        <Button buttonType={ButtonType.secondaryLine} disabled={error} onClick={props.next}>
           Next
         </Button>
-      </ButtonContainerStyled>
+      </ButtonContainer>
     </CreateCard>
   )
 }
