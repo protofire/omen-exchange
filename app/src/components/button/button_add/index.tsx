@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ButtonProps } from '../../../theme/component_styles/button_styling_types'
 import { Button } from '../button'
+import { ButtonProps } from '../button_styling_types'
 
 import IconAdd from './img/add-button.svg'
 

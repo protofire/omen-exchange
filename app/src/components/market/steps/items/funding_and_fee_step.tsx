@@ -7,16 +7,14 @@ import { MARKET_FEE } from '../../../../common/constants'
 import { useCollateralBalance } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { BalanceState, fetchAccountBalance } from '../../../../store/reducer'
-import { ButtonType } from '../../../../theme/component_styles/button_styling_types'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { Arbitrator, Token } from '../../../../util/types'
+import { Button, ButtonContainer, ButtonLink } from '../../../button'
+import { ButtonType } from '../../../button/button_styling_types'
 import {
   BalanceToken,
   BigNumberInput,
-  Button,
-  ButtonContainer,
-  ButtonLink,
   CreateCard,
   DisplayArbitrator,
   FormError,

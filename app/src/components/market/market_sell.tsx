@@ -7,14 +7,13 @@ import { MARKET_FEE } from '../../common/constants'
 import { useAsyncDerivedValue, useContracts } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { CPKService, MarketMakerService } from '../../services'
-import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
 import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
+import { Button, ButtonContainer } from '../button'
+import { ButtonType } from '../button/button_styling_types'
 import {
   BigNumberInput,
-  Button,
-  ButtonContainer,
   DisplayArbitrator,
   GridTransactionDetails,
   GridTwoColumns,

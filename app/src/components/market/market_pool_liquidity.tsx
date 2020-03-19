@@ -11,15 +11,13 @@ import { useCpkAllowance } from '../../hooks/useCpkAllowance'
 import { useFundingBalance } from '../../hooks/useFundingBalance'
 import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
-import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
 import { formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
+import { Button, ButtonContainer, ButtonTab } from '../button'
+import { ButtonType } from '../button/button_styling_types'
 import {
   BigNumberInput,
-  Button,
-  ButtonContainer,
-  ButtonTab,
   DisplayArbitrator,
   GridTransactionDetails,
   GridTwoColumns,

@@ -3,10 +3,10 @@ import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
-import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
-import { Button } from '../../common/button'
+import { Button } from '../../button'
+import { ButtonType } from '../../button/button_styling_types'
 import { MadeBy } from '../../common/made_by'
 import { ModalWrapper } from '../../modal/modal_wrapper'
 

@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ButtonProps, ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { Button } from '../button'
+import { ButtonProps, ButtonType } from '../button_styling_types'
 
 const Wrapper = styled(Button)`
   font-size: 12px;

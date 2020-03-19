@@ -2,9 +2,9 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks'
-import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { truncateStringInTheMiddle } from '../../../util/tools'
-import { Button } from '../button'
+import { Button } from '../../button'
+import { ButtonType } from '../../button/button_styling_types'
 
 import { ConnectionIcon } from './img/ConnectionIcon'
 

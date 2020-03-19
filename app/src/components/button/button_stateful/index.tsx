@@ -1,7 +1,7 @@
 import React from 'react'
 import styled, { css, keyframes } from 'styled-components'
 
-import { ButtonCSS, ButtonProps, ButtonType } from '../../../theme/component_styles/button_styling_types'
+import { ButtonCSS, ButtonProps, ButtonType } from '../button_styling_types'
 
 import CheckSVG from './img/check.svg'
 import SpinnerSVG from './img/spinner.svg'

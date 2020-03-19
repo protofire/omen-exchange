@@ -5,18 +5,8 @@ import styled from 'styled-components'
 import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
-import {
-  Arbitrators,
-  Button,
-  ButtonContainer,
-  ButtonLink,
-  Categories,
-  CreateCard,
-  DateField,
-  DisplayArbitrator,
-  FormRow,
-  Well,
-} from '../../../common'
+import { Button, ButtonContainer, ButtonLink } from '../../../button'
+import { Arbitrators, Categories, CreateCard, DateField, DisplayArbitrator, FormRow, Well } from '../../../common'
 import { QuestionInput } from '../../../common/question_input'
 import { Outcome, Outcomes } from '../../outcomes'
 

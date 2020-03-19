@@ -12,14 +12,13 @@ import { useContracts } from '../../hooks/useContracts'
 import { useCpk } from '../../hooks/useCpk'
 import { useCpkAllowance } from '../../hooks/useCpkAllowance'
 import { MarketMakerService } from '../../services'
-import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
 import { computeBalanceAfterTrade, formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
+import { Button, ButtonContainer } from '../button'
+import { ButtonType } from '../button/button_styling_types'
 import {
   BigNumberInput,
-  Button,
-  ButtonContainer,
   DisplayArbitrator,
   GridTransactionDetails,
   GridTwoColumns,

@@ -4,12 +4,11 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { WhenConnected } from '../../../hooks/connectedWeb3'
-import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { formatBigNumber } from '../../../util/tools'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
+import { Button, ButtonContainer } from '../../button'
+import { ButtonType } from '../../button/button_styling_types'
 import {
-  Button,
-  ButtonContainer,
   DisplayArbitrator,
   GridTwoColumns,
   SubsectionTitle,

@@ -3,7 +3,7 @@ import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import Draggable from 'react-draggable'
 import styled from 'styled-components'
 
-import { ButtonCircle } from '../../common'
+import { ButtonCircle } from '../../button'
 import { IconChevronLeft } from '../icons/IconChevronLeft'
 import { IconChevronRight } from '../icons/IconChevronRight'
 
