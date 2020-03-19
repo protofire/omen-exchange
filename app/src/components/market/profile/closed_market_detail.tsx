@@ -14,12 +14,12 @@ import {
   ButtonContainer,
   ClosedMarket,
   DisplayArbitrator,
-  Loading,
   SubsectionTitle,
   TitleValue,
   ViewCard,
 } from '../../common'
 import { OutcomeTable } from '../../common/outcome_table'
+import { FullLoading } from '../../loading'
 
 const Grid = styled.div`
   display: grid;
@@ -174,7 +174,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>
-      {status === Status.Loading ? <Loading full={true} message={message} /> : null}
+      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

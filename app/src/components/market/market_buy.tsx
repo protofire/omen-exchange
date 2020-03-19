@@ -23,7 +23,6 @@ import {
   DisplayArbitrator,
   GridTransactionDetails,
   GridTwoColumns,
-  Loading,
   SectionTitle,
   SubsectionTitle,
   SubsectionTitleAction,
@@ -40,6 +39,7 @@ import { BigNumberInputReturn } from '../common/big_number_input'
 import { OutcomeTable } from '../common/outcome_table'
 import { SetAllowance } from '../common/set_allowance'
 import { ValueStates } from '../common/transaction_details_row'
+import { FullLoading } from '../loading'
 import { ModalTwitterShare } from '../modal/modal_twitter_share'
 
 const LeftButton = styled(Button)`
@@ -326,7 +326,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
         title={'Outcome created'}
       />
-      {status === Status.Loading ? <Loading full={true} message={message} /> : null}
+      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

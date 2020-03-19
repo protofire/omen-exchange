@@ -24,13 +24,13 @@ import { ButtonLink } from '../common/button_link'
 import { FormError } from '../common/form_error'
 import { FormLabel } from '../common/form_label'
 import { FormRow } from '../common/form_row'
-import { Loading } from '../common/loading'
 import { OutcomeTable } from '../common/outcome_table'
 import { SectionTitle } from '../common/section_title'
 import { SubsectionTitle } from '../common/subsection_title'
 import { TD, TR, Table } from '../common/table'
 import { TextfieldCustomPlaceholder } from '../common/textfield_custom_placeholder'
 import { ViewCard } from '../common/view_card/'
+import { FullLoading } from '../loading/full_loading'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -304,7 +304,7 @@ const MarketFundWrapper: React.FC<Props> = (props: Props) => {
           </Button>
         </ButtonContainer>
       </ViewCard>
-      {status === Status.Loading ? <Loading message={message} /> : null}
+      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

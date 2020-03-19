@@ -45,7 +45,9 @@ export const SectionTitle: React.FC<Props> = (props: Props) => {
           <IconArrowBack />
         </ButtonCircle>
       )}
-      <Text goBackEnabled={enableGoBack}>{title}</Text>
+      <Text className="titleText" goBackEnabled={enableGoBack}>
+        {title}
+      </Text>
     </SectionTitleWrapper>
   )
 }

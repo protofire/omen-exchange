@@ -2,17 +2,21 @@ import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { RemoteData } from '../../util/remote_data'
-import { Button, ButtonCircle, ButtonSelectable, ListCard, ListItem, Loading, SectionTitle } from '../common'
+import { Button, ButtonCircle, ButtonSelectable, ListCard, ListItem, SectionTitle } from '../common'
 import { AdvancedFilters } from '../common/advanced_filters'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../common/dropdown'
 import { IconFilter } from '../common/icons/IconFilter'
 import { IconSearch } from '../common/icons/IconSearch'
 import { MarketsCategories } from '../common/markets_categories'
 import { Search } from '../common/search'
+import { InlineLoading } from '../loading'
 
 const SectionTitleMarket = styled(SectionTitle)`
-  font-size: 18px;
+  .titleText {
+    font-size: 18px;
+  }
 `
 
 const TopContents = styled.div`
@@ -82,6 +86,13 @@ const SortDropdown = styled(Dropdown)`
   width: 130px;
 `
 
+const LoadMoreWrapper = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 20px 15px 25px;
+`
+
 interface Props {
   context: ConnectedWeb3Context
   count: number
@@ -89,7 +100,7 @@ interface Props {
   markets: RemoteData<any[]>
   moreMarkets: boolean
   onFilterChange: (filter: any) => void
-  onShowMore: () => void
+  onLoadMore: () => void
 }
 
 enum FiltersStates {
@@ -99,7 +110,7 @@ enum FiltersStates {
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { context, count, markets, moreMarkets, onFilterChange, onShowMore } = props
+  const { context, count, markets, moreMarkets, onFilterChange, onLoadMore } = props
   const [state, setState] = useState<FiltersStates>(FiltersStates.open)
   const [category, setCategory] = useState('All')
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
@@ -127,12 +138,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     onFilterChange({ category, sortBy, state })
   }, [category, sortBy, state, onFilterChange])
-
-  const showMoreButton = !RemoteData.is.loading(markets) ? (
-    <Button disabled={RemoteData.is.reloading(markets)} onClick={onShowMore}>
-      {RemoteData.is.reloading(markets) ? 'Loading...' : 'Show more'}
-    </Button>
-  ) : null
 
   const toggleSearch = useCallback(() => {
     setShowAdvancedFilters(false)
@@ -213,10 +218,20 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           {RemoteData.is.success(markets) && markets.data.length === 0 && (
             <NoMarketsAvailable title={'No markets available'} />
           )}
+          {RemoteData.is.loading(markets) && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
-        {moreMarkets && showMoreButton}
+        {moreMarkets && !RemoteData.is.loading(markets) && (
+          <LoadMoreWrapper>
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={RemoteData.is.reloading(markets)}
+              onClick={onLoadMore}
+            >
+              {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load more'}
+            </Button>
+          </LoadMoreWrapper>
+        )}
       </ListCard>
-      {RemoteData.is.loading(markets) ? <Loading message="Loading markets..." /> : null}
     </>
   )
 }

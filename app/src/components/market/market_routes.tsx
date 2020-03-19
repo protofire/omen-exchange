@@ -8,8 +8,9 @@ import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { MarketBuyPage, MarketDetailsPage, MarketPoolLiquidityPage, MarketSellPage } from '../../pages'
 import { getLogger } from '../../util/logger'
 import { isAddress } from '../../util/tools'
-import { Loading, MessageWarning, SectionTitle } from '../common'
+import { MessageWarning, SectionTitle } from '../common'
 import { MarketNotFound } from '../common/market_not_found'
+import { FullLoading } from '../loading'
 
 const logger = getLogger('Market::Routes')
 
@@ -38,7 +39,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
   // Validate Markets with wrong FEE
   const { fee, isQuestionFinalized } = marketMakerData
   if (fee === null) {
-    return <Loading full={true} />
+    return <FullLoading />
   }
 
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))

@@ -21,7 +21,6 @@ import {
   DisplayArbitrator,
   FormError,
   FormRow,
-  Loading,
   Paragraph,
   SubsectionTitle,
   TD,
@@ -36,6 +35,7 @@ import {
   Well,
 } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
+import { FullLoading } from '../../../loading'
 import { Outcome } from '../../outcomes'
 
 interface Props {
@@ -245,7 +245,7 @@ const FundingAndFeeStep = (props: Props) => {
         />
         {!MarketCreationStatus.is.ready(marketCreationStatus) &&
         !MarketCreationStatus.is.error(marketCreationStatus) ? (
-          <Loading full={true} message={`${marketCreationStatus._type}...`} />
+          <FullLoading message={`${marketCreationStatus._type}...`} />
         ) : null}
 
         {fundingErrorMessage && <ErrorStyled>{fundingErrorMessage}</ErrorStyled>}

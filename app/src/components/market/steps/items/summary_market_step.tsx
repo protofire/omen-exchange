@@ -13,7 +13,6 @@ import {
   CopyText,
   CreateCard,
   DisplayArbitrator,
-  Loading,
   Paragraph,
   SectionTitle,
   SubsectionTitle,
@@ -25,6 +24,7 @@ import {
   TitleValue,
   Well,
 } from '../../../common'
+import { FullLoading } from '../../../loading'
 
 const NavLinkStyled = styled(NavLink)`
   color: ${props => props.theme.colors.textColor};
@@ -79,7 +79,7 @@ const SummaryMarketStep = (props: Props) => {
   const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`
 
   if (!collateral || !arbitrator) {
-    return <Loading full={true} />
+    return <FullLoading />
   }
 
   return (

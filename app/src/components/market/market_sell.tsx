@@ -18,7 +18,6 @@ import {
   DisplayArbitrator,
   GridTransactionDetails,
   GridTwoColumns,
-  Loading,
   SectionTitle,
   SubsectionTitle,
   SubsectionTitleAction,
@@ -34,6 +33,7 @@ import {
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { OutcomeTable } from '../common/outcome_table'
 import { ValueStates } from '../common/transaction_details_row'
+import { FullLoading } from '../loading'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -294,7 +294,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           </Button>
         </ButtonContainer>
       </ViewCard>
-      {status === Status.Loading ? <Loading full={true} message={message} /> : null}
+      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

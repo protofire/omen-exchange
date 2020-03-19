@@ -23,7 +23,6 @@ import {
   DisplayArbitrator,
   GridTransactionDetails,
   GridTwoColumns,
-  Loading,
   SectionTitle,
   SubsectionTitle,
   SubsectionTitleAction,
@@ -40,6 +39,7 @@ import { BigNumberInputReturn } from '../common/big_number_input'
 import { OutcomeTable } from '../common/outcome_table'
 import { SetAllowance } from '../common/set_allowance'
 import { ValueStates } from '../common/transaction_details_row'
+import { FullLoading } from '../loading'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -398,7 +398,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
         </ButtonContainer>
       </ViewCard>
-      {status === Status.Loading ? <Loading message={message} /> : null}
+      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

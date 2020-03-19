@@ -12,7 +12,6 @@ import {
   ButtonContainer,
   DisplayArbitrator,
   GridTwoColumns,
-  Loading,
   SubsectionTitle,
   SubsectionTitleAction,
   SubsectionTitleWrapper,
@@ -21,6 +20,7 @@ import {
   ViewCard,
 } from '../../common'
 import { OutcomeTable } from '../../common/outcome_table'
+import { FullLoading } from '../../loading'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -171,7 +171,7 @@ const ViewWrapper = (props: Props) => {
         </WhenConnected>
       </ViewCard>
       <ThreeBoxComments threadName={marketMakerAddress} />
-      {status === Status.Loading ? <Loading full={true} /> : null}
+      {status === Status.Loading && <FullLoading />}
     </>
   )
 }
