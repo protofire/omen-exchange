@@ -18,12 +18,7 @@ const CategoriesWrapper = styled.div`
 
 const CategoriesButtons = styled.div`
   flex-grow: 1;
-  margin-bottom: 20px;
   overflow: hidden;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin-bottom: 0;
-  }
 `
 
 const CategoriesButtonsInner = styled.div`
@@ -115,20 +110,20 @@ export const MarketsCategories: React.FC<HTMLAttributes<HTMLDivElement>> = props
         </Draggable>
       </CategoriesButtons>
       {sliderRange !== 0 && (
-        <CategoriesControls onMouseLeave={cancelSliding}>
+        <CategoriesControls onPointerLeave={cancelSliding}>
           <ButtonCircle
             disabled={sliderButtonDisabled === SliderDirection.left}
-            onMouseDown={() => setSliderMoving(SliderDirection.left)}
-            onMouseLeave={cancelSliding}
-            onMouseUp={cancelSliding}
+            onPointerDown={() => setSliderMoving(SliderDirection.left)}
+            onPointerLeave={cancelSliding}
+            onPointerUp={cancelSliding}
           >
             <IconChevronLeft />
           </ButtonCircle>
           <ButtonCircle
             disabled={sliderButtonDisabled === SliderDirection.right}
-            onMouseDown={() => setSliderMoving(SliderDirection.right)}
-            onMouseLeave={cancelSliding}
-            onMouseUp={cancelSliding}
+            onPointerDown={() => setSliderMoving(SliderDirection.right)}
+            onPointerLeave={cancelSliding}
+            onPointerUp={cancelSliding}
           >
             <IconChevronRight />
           </ButtonCircle>

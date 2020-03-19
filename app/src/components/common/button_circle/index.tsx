@@ -26,6 +26,7 @@ const Wrapper = styled.button<{ active?: boolean }>`
   outline: none;
   padding: 0;
   transition: border-color 0.15s linear;
+  user-select: none;
   width: ${props => props.theme.buttonCircle.dimensions};
 
   &:hover {

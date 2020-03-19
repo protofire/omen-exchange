@@ -9,11 +9,11 @@ import { BatIcon, DaiIcon, EtherIcon } from './img/currency'
 const Wrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
   column-gap: 20px;
-  row-gap: 20px;
   display: grid;
   grid-template-columns: 1fr;
   margin: 0 25px;
   padding: 20px 0 25px 0;
+  row-gap: 20px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     grid-template-columns: 1fr 1fr 1fr;

@@ -41,11 +41,23 @@ const FiltersWrapper = styled.div`
 const FiltersCategories = styled.div`
   align-items: center;
   display: flex;
+  margin-bottom: 20px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-bottom: 0;
+  }
 `
 
 const FiltersControls = styled.div`
   align-items: center;
   display: flex;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-left: 0;
+    margin-right: 0;
+  }
 `
 
 const ButtonCircleStyled = styled(ButtonCircle)`

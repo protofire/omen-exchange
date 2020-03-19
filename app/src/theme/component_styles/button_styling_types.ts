@@ -145,6 +145,7 @@ export const ButtonCSS = css<ButtonProps>`
   padding: 0 20px;
   text-align: center;
   transition: all 0.15s ease-out;
+  user-select: none;
   white-space: nowrap;
 
   ${props => getButtonTypeStyles(props.buttonType)}
