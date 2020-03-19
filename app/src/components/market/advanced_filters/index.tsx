@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../common/dropdown'
+import { TokenItem } from '../token_item'
 
 import { DxDaoIcon } from './img/arbitrators'
 import { BatIcon, DaiIcon, EtherIcon } from './img/currency'
@@ -38,56 +39,22 @@ const Options = styled(Dropdown)`
   max-width: 100%;
 `
 
-const Item = styled.div`
-  align-items: center;
-  display: flex;
-  height: 100%;
-`
-
-const Icon = styled.div`
-  align-items: center;
-  display: flex;
-  height: 100%;
-  margin-right: 8px;
-  max-height: 100%;
-
-  svg {
-    max-height: 100%;
-  }
-`
-
-const Text = styled.div`
-  line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`
-
-const getItem = (icon: any, text: string) => {
-  return (
-    <Item>
-      <Icon>{icon}</Icon>
-      <Text>{text}</Text>
-    </Item>
-  )
-}
-
 export const AdvancedFilters = () => {
   const currencyOptions: Array<DropdownItemProps> = [
     {
-      content: getItem(<EtherIcon />, 'Ether'),
+      content: <TokenItem icon={<EtherIcon />} text="Ether" />,
       onClick: () => {
         console.warn('Option Ether')
       },
     },
     {
-      content: getItem(<DaiIcon />, 'DAI'),
+      content: <TokenItem icon={<DaiIcon />} text="DAI" />,
       onClick: () => {
         console.warn('Option DAI')
       },
     },
     {
-      content: getItem(<BatIcon />, 'Basic Atentio Token'),
+      content: <TokenItem icon={<BatIcon />} text="Basic Atentio Token" />,
       onClick: () => {
         console.warn('Option Basic Atention Token')
       },
@@ -111,7 +78,7 @@ export const AdvancedFilters = () => {
 
   const arbitratorOptions: Array<DropdownItemProps> = [
     {
-      content: getItem(<DxDaoIcon />, 'DxDAO'),
+      content: <TokenItem icon={<DxDaoIcon />} text="DxDAO" />,
       onClick: () => {
         console.warn('Option DxDao')
       },
