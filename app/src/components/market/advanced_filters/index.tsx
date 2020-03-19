@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../dropdown'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../common/dropdown'
 
 import { DxDaoIcon } from './img/arbitrators'
 import { BatIcon, DaiIcon, EtherIcon } from './img/currency'

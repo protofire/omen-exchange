@@ -9,8 +9,9 @@ import { MarketBuyPage, MarketDetailsPage, MarketPoolLiquidityPage, MarketSellPa
 import { getLogger } from '../../util/logger'
 import { isAddress } from '../../util/tools'
 import { MessageWarning, SectionTitle } from '../common'
-import { MarketNotFound } from '../common/market_not_found'
 import { FullLoading } from '../loading'
+
+import { MarketNotFound } from './market_not_found'
 
 const logger = getLogger('Market::Routes')
 

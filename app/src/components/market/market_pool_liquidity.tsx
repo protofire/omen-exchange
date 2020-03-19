@@ -27,17 +27,17 @@ import {
   SubsectionTitleWrapper,
   TextfieldCustomPlaceholder,
   TitleValue,
-  TransactionDetailsCard,
-  TransactionDetailsLine,
-  TransactionDetailsRow,
   ViewCard,
   WalletBalance,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { OutcomeTable } from '../common/outcome_table'
 import { SetAllowance } from '../common/set_allowance'
-import { ValueStates } from '../common/transaction_details_row'
 import { FullLoading } from '../loading'
+
+import { TransactionDetailsCard } from './transaction_details_card'
+import { TransactionDetailsLine } from './transaction_details_line'
+import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string

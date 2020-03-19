@@ -4,8 +4,8 @@ import Draggable from 'react-draggable'
 import styled from 'styled-components'
 
 import { ButtonCircle } from '../../button'
-import { IconChevronLeft } from '../icons/IconChevronLeft'
-import { IconChevronRight } from '../icons/IconChevronRight'
+import { IconChevronLeft } from '../../common/icons/IconChevronLeft'
+import { IconChevronRight } from '../../common/icons/IconChevronRight'
 
 const CategoriesWrapper = styled.div`
   align-items: center;

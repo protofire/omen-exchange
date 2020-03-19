@@ -6,13 +6,14 @@ import { RemoteData } from '../../util/remote_data'
 import { Button, ButtonCircle, ButtonSelectable } from '../button'
 import { ButtonType } from '../button/button_styling_types'
 import { ListCard, ListItem, SectionTitle } from '../common'
-import { AdvancedFilters } from '../common/advanced_filters'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../common/dropdown'
 import { IconFilter } from '../common/icons/IconFilter'
 import { IconSearch } from '../common/icons/IconSearch'
-import { MarketsCategories } from '../common/markets_categories'
 import { Search } from '../common/search'
 import { InlineLoading } from '../loading'
+
+import { AdvancedFilters } from './advanced_filters'
+import { MarketsCategories } from './markets_categories'
 
 const SectionTitleMarket = styled(SectionTitle)`
   .titleText {
