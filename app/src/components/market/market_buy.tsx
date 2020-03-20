@@ -13,21 +13,15 @@ import { useCpk } from '../../hooks/useCpk'
 import { useCpkAllowance } from '../../hooks/useCpkAllowance'
 import { MarketMakerService } from '../../services'
 import { getLogger } from '../../util/logger'
-import { computeBalanceAfterTrade, formatBigNumber, formatDate } from '../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { Button, ButtonContainer } from '../button'
 import { ButtonType } from '../button/button_styling_types'
 import {
   BigNumberInput,
-  DisplayArbitrator,
   GridTransactionDetails,
-  GridTwoColumns,
   SectionTitle,
-  SubsectionTitle,
-  SubsectionTitleAction,
-  SubsectionTitleWrapper,
   TextfieldCustomPlaceholder,
-  TitleValue,
   ViewCard,
   WalletBalance,
 } from '../common'
@@ -40,7 +34,7 @@ import { ModalTwitterShare } from '../modal/modal_twitter_share'
 import { TransactionDetailsCard } from './transaction_details_card'
 import { TransactionDetailsLine } from './transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
-import { useMarketMakerData } from '../../hooks'
+import { MarketTopDetails } from './market_top_details'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -65,16 +59,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker } = useContracts(context)
   const { balances, collateral, marketMakerAddress, question } = props
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
-  const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
-  const {
-    userEarnings,
-    totalEarnings,
-    marketMakerFunding,
-    marketMakerUserFunding,
-    arbitrator,
-    resolution,
-    category,
-  } = marketMakerData
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
@@ -83,10 +67,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTwitterShareOpen, setModalTwitterShareState] = useState(false)
   const [messageTwitter, setMessageTwitter] = useState('')
-  const [showingExtraInformation, setExtraInformation] = useState(false)
-
-  const toggleExtraInformation = () =>
-    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -198,40 +178,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle goBackEnabled title={question} />
       <ViewCard>
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Purchase Outcome</SubsectionTitle>
-          <SubsectionTitleAction onClick={toggleExtraInformation}>
-            {showingExtraInformation ? 'Hide' : 'Show'} Pool Information
-          </SubsectionTitleAction>
-        </SubsectionTitleWrapper>
-
-        <GridTwoColumns>
-          {showingExtraInformation ? (
-            <>
-              <TitleValue
-                title={'Total Pool Tokens'}
-                value={formatBigNumber(marketMakerFunding, collateral.decimals)}
-              />
-              <TitleValue
-                title={'Total Pool Earings'}
-                value={`${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
-              />
-              <TitleValue
-                title={'My Pool Tokens'}
-                value={formatBigNumber(marketMakerUserFunding, collateral.decimals)}
-              />
-              <TitleValue
-                title={'My Pool Earnings'}
-                value={`${formatBigNumber(totalEarnings, collateral.decimals)} ${collateral.symbol}`}
-              />
-            </>
-          ) : null}
-          <TitleValue title={'Category'} value={category} />
-          <TitleValue title={'Resolution Date'} value={resolution && formatDate(resolution)} />
-          <TitleValue title={'Arbitrator/Oracle'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
-          <TitleValue title={'24h Volume'} value={'425,523 DAI'} />
-        </GridTwoColumns>
-
+        <MarketTopDetails
+          toggleTitleAction="Pool Information"
+          title="Purchase Outcome"
+          marketMakerAddress={marketMakerAddress}
+        />
         <OutcomeTable
           balances={balances}
           collateral={collateral}

@@ -33,6 +33,7 @@ import { FullLoading } from '../loading'
 import { TransactionDetailsCard } from './transaction_details_card'
 import { TransactionDetailsLine } from './transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
+import { MarketTopDetails } from './market_top_details'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -146,66 +147,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const error = (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || !haveEnoughShares
 
-  const details = (showExtraDetails: boolean) => {
-    const mockedDetails = [
-      {
-        title: 'Total Pool Tokens',
-        value: '5000',
-      },
-      {
-        title: 'Total Pool Earning',
-        value: '25,232 DAI',
-      },
-      {
-        title: 'My Pool Tokens',
-        value: '0',
-      },
-      {
-        title: 'My Earnings',
-        value: '0 DAI',
-      },
-
-      {
-        title: 'Category',
-        value: 'Politics',
-      },
-      {
-        title: 'Resolution Date',
-        value: '25.09.19 - 09:00',
-      },
-      {
-        title: 'Arbitrator/Oracle',
-        value: (
-          <DisplayArbitrator
-            arbitrator={{ id: 'realitio', address: '0x1234567890', name: 'Realit.io', url: 'https://realit.io/' }}
-          />
-        ),
-      },
-      {
-        title: '24h Volume',
-        value: '425,523 DAI',
-      },
-    ]
-    const mockedDetailsLastHalf = mockedDetails.splice(4, 8)
-
-    return (
-      <>
-        <GridTwoColumns>
-          {showExtraDetails ? (
-            <>
-              {mockedDetails.map((item, index) => (
-                <TitleValue key={index} title={item.title} value={item.value} />
-              ))}
-            </>
-          ) : null}
-          {mockedDetailsLastHalf.map((item, index) => (
-            <TitleValue key={index} title={item.title} value={item.value} />
-          ))}
-        </GridTwoColumns>
-      </>
-    )
-  }
-
   const noteAmount = `${formatBigNumber(balanceItem.shares, collateral.decimals)} shares`
 
   const mockedPotential = '1.03'
@@ -215,13 +156,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle goBackEnabled title={question} />
       <ViewCard>
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Choose the shares you want to sell</SubsectionTitle>
-          <SubsectionTitleAction onClick={toggleExtraInformation}>
-            {showingExtraInformation ? 'Hide' : 'Show'} Pool Information
-          </SubsectionTitleAction>
-        </SubsectionTitleWrapper>
-        {details(showingExtraInformation)}
+        <MarketTopDetails
+          title="Choose the shares you want to sell"
+          toggleTitleAction="Pool Information"
+          marketMakerAddress={marketMakerAddress}
+        />
         <OutcomeTable
           balances={balances}
           collateral={collateral}

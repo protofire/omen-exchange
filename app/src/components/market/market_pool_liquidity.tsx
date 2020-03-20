@@ -38,6 +38,7 @@ import { FullLoading } from '../loading'
 import { TransactionDetailsCard } from './transaction_details_card'
 import { TransactionDetailsLine } from './transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
+import { MarketTopDetails } from './market_top_details'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -197,77 +198,15 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const mockedDeposited = 0.55
   const mockedTokenTotals = 11.55
 
-  const details = (showExtraDetails: boolean) => {
-    const mockedDetails = [
-      {
-        title: 'Total Pool Tokens',
-        value: '5000',
-      },
-      {
-        title: 'Total Pool Earning',
-        value: '25,232 DAI',
-      },
-      {
-        title: 'My Pool Tokens',
-        value: '0',
-      },
-      {
-        title: 'My Earnings',
-        value: '0 DAI',
-      },
-
-      {
-        title: 'Category',
-        value: 'Politics',
-      },
-      {
-        title: 'Resolution Date',
-        value: '25.09.19 - 09:00',
-      },
-      {
-        title: 'Arbitrator/Oracle',
-        value: (
-          <DisplayArbitrator
-            arbitrator={{ id: 'realitio', address: '0x1234567890', name: 'Realit.io', url: 'https://realit.io/' }}
-          />
-        ),
-      },
-      {
-        title: '24h Volume',
-        value: '425,523 DAI',
-      },
-    ]
-    const mockedDetailsLastHalf = mockedDetails.splice(4, 8)
-
-    return (
-      <>
-        <GridTwoColumns>
-          {showExtraDetails ? (
-            <>
-              {mockedDetails.map((item, index) => (
-                <TitleValue key={index} title={item.title} value={item.value} />
-              ))}
-            </>
-          ) : null}
-          {mockedDetailsLastHalf.map((item, index) => (
-            <TitleValue key={index} title={item.title} value={item.value} />
-          ))}
-        </GridTwoColumns>
-      </>
-    )
-  }
-
   return (
     <>
       <SectionTitle goBackEnabled title={question} />
       <ViewCard>
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Pool Liquidity</SubsectionTitle>
-          <SubsectionTitleAction onClick={toggleExtraInformation}>
-            {showingExtraInformation ? 'Hide' : 'Show'} Market Information
-          </SubsectionTitleAction>
-        </SubsectionTitleWrapper>
-        {details(showingExtraInformation)}
+        <MarketTopDetails
+          title="Pool Liquidity"
+          toggleTitleAction="Market Information"
+          marketMakerAddress={marketMakerAddress}
+        />
         <OutcomeTable
           balances={balances}
           collateral={collateral}
