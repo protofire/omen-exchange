@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Select } from '../../common/select'
+import { CATEGORIES } from '../../../common/constants'
 
 interface Props {
   autoFocus?: boolean
@@ -19,18 +20,7 @@ const FormOption = styled.option``
 export const Categories = (props: Props) => {
   const { customValues, ...restProps } = props
 
-  const categories = [
-    'Arts',
-    'Business & Finance',
-    'Cryptocurrency',
-    'News & Politics',
-    'Science & Tech',
-    'Sports',
-    'Weather',
-    'Miscellaneous',
-  ]
-
-  const allCategories = categories.concat(customValues.filter(item => categories.indexOf(item) < 0))
+  const allCategories = CATEGORIES.concat(customValues.filter(item => CATEGORIES.indexOf(item) < 0))
   const options = allCategories.map(category => ({
     label: category,
     value: category,

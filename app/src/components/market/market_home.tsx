@@ -8,21 +8,12 @@ import { ListCard } from '../common/list_card'
 import { ListItem } from '../common/list_item'
 import { Loading } from '../common/loading'
 import { SectionTitle } from '../common/section_title'
+import { CATEGORIES } from '../../common/constants'
 
 const NoMarketsAvailable = styled(SectionTitle)`
   margin-top: 150px;
 `
-const CATEGORIES = [
-  'All',
-  'Arts',
-  'Business & Finance',
-  'Cryptocurrency',
-  'News & Politics',
-  'Science & Tech',
-  'Sports',
-  'Weather',
-  'Miscellaneous',
-]
+const CATEGORIES_WITH_ALL = ['All', ...CATEGORIES]
 
 const SelectableButton = styled.div<{ selected?: boolean }>`
   background: ${(props: any) => (props.selected ? 'aquamarine' : 'initial')};
@@ -69,7 +60,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       {context.account && (
         <div>
           <ul>
-            {CATEGORIES.map((c, index) => (
+            {CATEGORIES_WITH_ALL.map((c, index) => (
               <CategoryItem key={index} onClick={() => setCategory(c)} selected={c === category}>
                 {c}
               </CategoryItem>
