@@ -13,7 +13,7 @@ import { useCpk } from '../../hooks/useCpk'
 import { useCpkAllowance } from '../../hooks/useCpkAllowance'
 import { MarketMakerService } from '../../services'
 import { getLogger } from '../../util/logger'
-import { computeBalanceAfterTrade, formatBigNumber } from '../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber, formatDate } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { Button, ButtonContainer } from '../button'
 import { ButtonType } from '../button/button_styling_types'
@@ -40,6 +40,7 @@ import { ModalTwitterShare } from '../modal/modal_twitter_share'
 import { TransactionDetailsCard } from './transaction_details_card'
 import { TransactionDetailsLine } from './transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
+import { useMarketMakerData } from '../../hooks'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -64,6 +65,16 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker } = useContracts(context)
   const { balances, collateral, marketMakerAddress, question } = props
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
+  const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
+  const {
+    userEarnings,
+    totalEarnings,
+    marketMakerFunding,
+    marketMakerUserFunding,
+    arbitrator,
+    resolution,
+    category,
+  } = marketMakerData
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
@@ -173,67 +184,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const noteAmount = `${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`
 
   const amountFee = cost.sub(amount)
-
-  const details = (showExtraDetails: boolean) => {
-    const mockedDetails = [
-      {
-        title: 'Total Pool Tokens',
-        value: '5000',
-      },
-      {
-        title: 'Total Pool Earning',
-        value: '25,232 DAI',
-      },
-      {
-        title: 'My Pool Tokens',
-        value: '0',
-      },
-      {
-        title: 'My Earnings',
-        value: '0 DAI',
-      },
-
-      {
-        title: 'Category',
-        value: 'Politics',
-      },
-      {
-        title: 'Resolution Date',
-        value: '25.09.19 - 09:00',
-      },
-      {
-        title: 'Arbitrator/Oracle',
-        value: (
-          <DisplayArbitrator
-            arbitrator={{ id: 'realitio', address: '0x1234567890', name: 'Realit.io', url: 'https://realit.io/' }}
-          />
-        ),
-      },
-      {
-        title: '24h Volume',
-        value: '425,523 DAI',
-      },
-    ]
-    const mockedDetailsLastHalf = mockedDetails.splice(4, 8)
-
-    return (
-      <>
-        <GridTwoColumns>
-          {showExtraDetails ? (
-            <>
-              {mockedDetails.map((item, index) => (
-                <TitleValue key={index} title={item.title} value={item.value} />
-              ))}
-            </>
-          ) : null}
-          {mockedDetailsLastHalf.map((item, index) => (
-            <TitleValue key={index} title={item.title} value={item.value} />
-          ))}
-        </GridTwoColumns>
-      </>
-    )
-  }
-
   const mockedPotential = 1.03
   const fee = `${formatBigNumber(amountFee.mul(-1), collateral.decimals)} ${collateral.symbol}`
   const baseCost = `${formatBigNumber(amount.sub(amountFee), collateral.decimals)} ${collateral.symbol}`
@@ -254,7 +204,34 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             {showingExtraInformation ? 'Hide' : 'Show'} Pool Information
           </SubsectionTitleAction>
         </SubsectionTitleWrapper>
-        {details(showingExtraInformation)}
+
+        <GridTwoColumns>
+          {showingExtraInformation ? (
+            <>
+              <TitleValue
+                title={'Total Pool Tokens'}
+                value={formatBigNumber(marketMakerFunding, collateral.decimals)}
+              />
+              <TitleValue
+                title={'Total Pool Earings'}
+                value={`${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
+              />
+              <TitleValue
+                title={'My Pool Tokens'}
+                value={formatBigNumber(marketMakerUserFunding, collateral.decimals)}
+              />
+              <TitleValue
+                title={'My Pool Earnings'}
+                value={`${formatBigNumber(totalEarnings, collateral.decimals)} ${collateral.symbol}`}
+              />
+            </>
+          ) : null}
+          <TitleValue title={'Category'} value={category} />
+          <TitleValue title={'Resolution Date'} value={resolution && formatDate(resolution)} />
+          <TitleValue title={'Arbitrator/Oracle'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
+          <TitleValue title={'24h Volume'} value={'425,523 DAI'} />
+        </GridTwoColumns>
+
         <OutcomeTable
           balances={balances}
           collateral={collateral}

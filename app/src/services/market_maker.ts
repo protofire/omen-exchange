@@ -19,6 +19,8 @@ const marketMakerAbi = [
   'function addFunding(uint addedFunds, uint[] distributionHint) external',
   'function removeFunding(uint sharesToBurn) external',
   'function totalSupply() external view returns (uint256)',
+  'function collectedFees() external view returns (uint)',
+  'function feesWithdrawableBy(address addr) public view returns (uint)',
   'function buy(uint investmentAmount, uint outcomeIndex, uint minOutcomeTokensToBuy) external',
   'function calcBuyAmount(uint investmentAmount, uint outcomeIndex) public view returns (uint)',
   'function sell(uint returnAmount, uint outcomeIndex, uint maxOutcomeTokensToSell) external',
@@ -73,6 +75,14 @@ class MarketMakerService {
 
   getTotalSupply = async (): Promise<BigNumber> => {
     return this.contract.totalSupply()
+  }
+
+  getCollectedFees = async (): Promise<BigNumber> => {
+    return this.contract.collectedFees()
+  }
+
+  getFeesWithdrawableBy = async (account: string): Promise<BigNumber> => {
+    return this.contract.feesWithdrawableBy(account)
   }
 
   addInitialFunding = async (amount: BigNumber, initialOdds: number[]) => {
