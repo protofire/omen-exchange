@@ -1,10 +1,9 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { WhenConnected } from '../../../hooks/connectedWeb3'
-import { formatBigNumber } from '../../../util/tools'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -62,9 +61,9 @@ const ViewWrapper = (props: Props) => {
     <>
       <ViewCard>
         <MarketTopDetails
+          marketMakerAddress={marketMakerAddress}
           title="Purchase Outcome"
           toggleTitleAction="Pool Information"
-          marketMakerAddress={marketMakerAddress}
         />
         {renderTableData()}
         <WhenConnected>

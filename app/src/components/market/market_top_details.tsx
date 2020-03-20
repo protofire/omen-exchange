@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import { useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getLogger } from '../../util/logger'
+import { formatBigNumber, formatDate } from '../../util/tools'
 import {
   DisplayArbitrator,
   GridTwoColumns,
@@ -14,7 +15,6 @@ import {
   SubsectionTitleWrapper,
   TitleValue,
 } from '../common'
-import { formatBigNumber, formatDate } from '../../util/tools'
 const logger = getLogger('Market::View')
 
 interface Props {
@@ -79,14 +79,14 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
     setLastDayVolume(now.sub(before))
   }
   const {
-    userEarnings,
-    totalEarnings,
-    marketMakerUserFunding,
     arbitrator,
     category,
     collateral,
     marketMakerFunding,
+    marketMakerUserFunding,
     resolution,
+    totalEarnings,
+    userEarnings,
   } = marketMakerData
 
   useEffect(() => {

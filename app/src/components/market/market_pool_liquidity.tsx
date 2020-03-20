@@ -18,15 +18,9 @@ import { Button, ButtonContainer, ButtonTab } from '../button'
 import { ButtonType } from '../button/button_styling_types'
 import {
   BigNumberInput,
-  DisplayArbitrator,
   GridTransactionDetails,
-  GridTwoColumns,
   SectionTitle,
-  SubsectionTitle,
-  SubsectionTitleAction,
-  SubsectionTitleWrapper,
   TextfieldCustomPlaceholder,
-  TitleValue,
   ViewCard,
   WalletBalance,
 } from '../common'
@@ -35,10 +29,10 @@ import { OutcomeTable } from '../common/outcome_table'
 import { SetAllowance } from '../common/set_allowance'
 import { FullLoading } from '../loading'
 
+import { MarketTopDetails } from './market_top_details'
 import { TransactionDetailsCard } from './transaction_details_card'
 import { TransactionDetailsLine } from './transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
-import { MarketTopDetails } from './market_top_details'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -98,10 +92,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [amountToRemove, setAmountToRemove] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
-  const [showingExtraInformation, setExtraInformation] = useState(false)
-
-  const toggleExtraInformation = () =>
-    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
 
   const [activeTab, setActiveTab] = useState(Tabs.deposit)
 
@@ -203,9 +193,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       <SectionTitle goBackEnabled title={question} />
       <ViewCard>
         <MarketTopDetails
+          marketMakerAddress={marketMakerAddress}
           title="Pool Liquidity"
           toggleTitleAction="Market Information"
-          marketMakerAddress={marketMakerAddress}
         />
         <OutcomeTable
           balances={balances}

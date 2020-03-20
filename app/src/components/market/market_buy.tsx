@@ -31,10 +31,10 @@ import { SetAllowance } from '../common/set_allowance'
 import { FullLoading } from '../loading'
 import { ModalTwitterShare } from '../modal/modal_twitter_share'
 
+import { MarketTopDetails } from './market_top_details'
 import { TransactionDetailsCard } from './transaction_details_card'
 import { TransactionDetailsLine } from './transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
-import { MarketTopDetails } from './market_top_details'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -179,9 +179,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <SectionTitle goBackEnabled title={question} />
       <ViewCard>
         <MarketTopDetails
-          toggleTitleAction="Pool Information"
-          title="Purchase Outcome"
           marketMakerAddress={marketMakerAddress}
+          title="Purchase Outcome"
+          toggleTitleAction="Pool Information"
         />
         <OutcomeTable
           balances={balances}

@@ -14,15 +14,9 @@ import { Button, ButtonContainer } from '../button'
 import { ButtonType } from '../button/button_styling_types'
 import {
   BigNumberInput,
-  DisplayArbitrator,
   GridTransactionDetails,
-  GridTwoColumns,
   SectionTitle,
-  SubsectionTitle,
-  SubsectionTitleAction,
-  SubsectionTitleWrapper,
   TextfieldCustomPlaceholder,
-  TitleValue,
   ViewCard,
   WalletBalance,
 } from '../common'
@@ -30,10 +24,10 @@ import { BigNumberInputReturn } from '../common/big_number_input'
 import { OutcomeTable } from '../common/outcome_table'
 import { FullLoading } from '../loading'
 
+import { MarketTopDetails } from './market_top_details'
 import { TransactionDetailsCard } from './transaction_details_card'
 import { TransactionDetailsLine } from './transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
-import { MarketTopDetails } from './market_top_details'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -62,10 +56,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
-  const [showingExtraInformation, setExtraInformation] = useState(false)
-
-  const toggleExtraInformation = () =>
-    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
 
   const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
 
@@ -157,9 +147,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       <SectionTitle goBackEnabled title={question} />
       <ViewCard>
         <MarketTopDetails
+          marketMakerAddress={marketMakerAddress}
           title="Choose the shares you want to sell"
           toggleTitleAction="Pool Information"
-          marketMakerAddress={marketMakerAddress}
         />
         <OutcomeTable
           balances={balances}
