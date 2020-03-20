@@ -119,7 +119,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
   const [showSearch, setShowSearch] = useState<boolean>(false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
-  const CATEGORIES__WITH_ALL = ['All', ...CATEGORIES]
+  const CATEGORIES_WITH_ALL = ['All', ...CATEGORIES]
   const filters = [
     {
       title: 'Open',
@@ -182,7 +182,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         {context.account && (
           <TopContents>
             <MarketsCategories>
-              {CATEGORIES__WITH_ALL.map((item, index) => (
+              {CATEGORIES_WITH_ALL.map((item, index) => (
                 <SelectableButton active={item === category} key={index} onClick={() => setCategory(item)}>
                   {item}
                 </SelectableButton>
