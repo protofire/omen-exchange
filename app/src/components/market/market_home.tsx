@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { CATEGORIES } from '../../common/constants'
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
 import { Button, ButtonCircle, ButtonSelectable } from '../button'
@@ -14,7 +15,6 @@ import { InlineLoading } from '../loading'
 
 import { AdvancedFilters } from './advanced_filters'
 import { MarketsCategories } from './markets_categories'
-import { CATEGORIES } from '../../common/constants'
 
 const SectionTitleMarket = styled(SectionTitle)`
   .titleText {

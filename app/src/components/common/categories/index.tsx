@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Select } from '../../common/select'
 import { CATEGORIES } from '../../../common/constants'
+import { Select } from '../../common/select'
 
 interface Props {
   autoFocus?: boolean
