@@ -3,9 +3,10 @@ import styled from 'styled-components'
 
 import { useCollateral } from '../../../hooks'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { Token } from '../../../util/types'
-import { Button, FormRow, Spinner, SubsectionTitle, Textfield, TitleValue } from '../../common'
+import { Button } from '../../button'
+import { ButtonType } from '../../button/button_styling_types'
+import { FormRow, Spinner, SubsectionTitle, Textfield, TitleValue } from '../../common'
 import { ModalWrapper } from '../../modal/modal_wrapper'
 
 const Grid = styled.div`

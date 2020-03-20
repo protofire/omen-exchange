@@ -5,15 +5,13 @@ import styled from 'styled-components'
 import { MARKET_FEE } from '../../../../common/constants'
 import { useMarketMakerData, useQuestion } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { ButtonType } from '../../../../theme/component_styles/button_styling_types'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
+import { ButtonAnchor, ButtonContainer } from '../../../button'
+import { ButtonType } from '../../../button/button_styling_types'
 import {
-  ButtonAnchor,
-  ButtonContainer,
   CopyText,
   CreateCard,
   DisplayArbitrator,
-  Loading,
   Paragraph,
   SectionTitle,
   SubsectionTitle,
@@ -25,6 +23,7 @@ import {
   TitleValue,
   Well,
 } from '../../../common'
+import { FullLoading } from '../../../loading'
 
 const NavLinkStyled = styled(NavLink)`
   color: ${props => props.theme.colors.textColor};
@@ -79,7 +78,7 @@ const SummaryMarketStep = (props: Props) => {
   const marketMakerURL = `${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`
 
   if (!collateral || !arbitrator) {
-    return <Loading full={true} />
+    return <FullLoading />
   }
 
   return (

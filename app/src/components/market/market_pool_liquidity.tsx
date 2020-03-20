@@ -11,35 +11,33 @@ import { useCpkAllowance } from '../../hooks/useCpkAllowance'
 import { useFundingBalance } from '../../hooks/useFundingBalance'
 import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
-import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
 import { formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
+import { Button, ButtonContainer, ButtonTab } from '../button'
+import { ButtonType } from '../button/button_styling_types'
 import {
   BigNumberInput,
-  Button,
-  ButtonContainer,
-  ButtonTab,
   DisplayArbitrator,
   GridTransactionDetails,
   GridTwoColumns,
-  Loading,
   SectionTitle,
   SubsectionTitle,
   SubsectionTitleAction,
   SubsectionTitleWrapper,
   TextfieldCustomPlaceholder,
   TitleValue,
-  TransactionDetailsCard,
-  TransactionDetailsLine,
-  TransactionDetailsRow,
   ViewCard,
   WalletBalance,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { OutcomeTable } from '../common/outcome_table'
 import { SetAllowance } from '../common/set_allowance'
-import { ValueStates } from '../common/transaction_details_row'
+import { FullLoading } from '../loading'
+
+import { TransactionDetailsCard } from './transaction_details_card'
+import { TransactionDetailsLine } from './transaction_details_line'
+import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -398,7 +396,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
         </ButtonContainer>
       </ViewCard>
-      {status === Status.Loading ? <Loading message={message} /> : null}
+      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

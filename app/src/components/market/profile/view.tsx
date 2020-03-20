@@ -4,15 +4,13 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { WhenConnected } from '../../../hooks/connectedWeb3'
-import { ButtonType } from '../../../theme/component_styles/button_styling_types'
 import { formatBigNumber } from '../../../util/tools'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
+import { Button, ButtonContainer } from '../../button'
+import { ButtonType } from '../../button/button_styling_types'
 import {
-  Button,
-  ButtonContainer,
   DisplayArbitrator,
   GridTwoColumns,
-  Loading,
   SubsectionTitle,
   SubsectionTitleAction,
   SubsectionTitleWrapper,
@@ -21,6 +19,7 @@ import {
   ViewCard,
 } from '../../common'
 import { OutcomeTable } from '../../common/outcome_table'
+import { FullLoading } from '../../loading'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -171,7 +170,7 @@ const ViewWrapper = (props: Props) => {
         </WhenConnected>
       </ViewCard>
       <ThreeBoxComments threadName={marketMakerAddress} />
-      {status === Status.Loading ? <Loading full={true} /> : null}
+      {status === Status.Loading && <FullLoading />}
     </>
   )
 }

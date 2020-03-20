@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import { THREEBOX_ADMIN_ADDRESS, THREEBOX_SPACE_NAME } from '../../../common/constants'
 import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { ButtonCSS } from '../../../theme/component_styles/button_styling_types'
+import { ButtonCSS } from '../../button/button_styling_types'
 
 const MAIN_AVATAR_DIMENSIONS = '40px'
 const COMMENT_AVATAR_DIMENSIONS = '32px'

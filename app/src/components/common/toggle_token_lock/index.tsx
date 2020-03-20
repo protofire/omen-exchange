@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ButtonStateful, ButtonStates } from '../button_stateful'
+import { ButtonStateful, ButtonStates } from '../../button/button_stateful'
 
 export interface ToggleTokenLockProps {
   onUnlock?: any

@@ -7,21 +7,18 @@ import { MARKET_FEE } from '../../../../common/constants'
 import { useCollateralBalance } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { BalanceState, fetchAccountBalance } from '../../../../store/reducer'
-import { ButtonType } from '../../../../theme/component_styles/button_styling_types'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { Arbitrator, Token } from '../../../../util/types'
+import { Button, ButtonContainer, ButtonLink } from '../../../button'
+import { ButtonType } from '../../../button/button_styling_types'
 import {
   BalanceToken,
   BigNumberInput,
-  Button,
-  ButtonContainer,
-  ButtonLink,
   CreateCard,
   DisplayArbitrator,
   FormError,
   FormRow,
-  Loading,
   Paragraph,
   SubsectionTitle,
   TD,
@@ -36,6 +33,7 @@ import {
   Well,
 } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
+import { FullLoading } from '../../../loading'
 import { Outcome } from '../../outcomes'
 
 interface Props {
@@ -245,7 +243,7 @@ const FundingAndFeeStep = (props: Props) => {
         />
         {!MarketCreationStatus.is.ready(marketCreationStatus) &&
         !MarketCreationStatus.is.error(marketCreationStatus) ? (
-          <Loading full={true} message={`${marketCreationStatus._type}...`} />
+          <FullLoading message={`${marketCreationStatus._type}...`} />
         ) : null}
 
         {fundingErrorMessage && <ErrorStyled>{fundingErrorMessage}</ErrorStyled>}

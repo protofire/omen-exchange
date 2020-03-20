@@ -1,16 +1,8 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import {
-  Button,
-  ButtonAdd,
-  FormError,
-  FormLabel,
-  Textfield,
-  TextfieldCustomPlaceholder,
-  Tooltip,
-  Well,
-} from '../../common/index'
+import { Button, ButtonAdd } from '../../button'
+import { FormError, FormLabel, Textfield, TextfieldCustomPlaceholder, Tooltip, Well } from '../../common'
 
 import IconDelete from './img/delete.svg'
 

@@ -67,7 +67,7 @@ const MarketHomeContainer: React.FC = () => {
     setFilter(filter)
   }, [])
 
-  const showMore = () => {
+  const loadMore = () => {
     if (!moreMarkets) return
     fetchMore({
       variables: {
@@ -95,9 +95,9 @@ const MarketHomeContainer: React.FC = () => {
         markets={markets}
         moreMarkets={moreMarkets}
         onFilterChange={onFilterChange}
-        onShowMore={showMore}
+        onLoadMore={loadMore}
       />
-      {RemoteData.is.success(markets) && moreMarkets && <Waypoint onEnter={showMore} />}
+      {RemoteData.is.success(markets) && moreMarkets && <Waypoint onEnter={loadMore} />}
     </>
   )
 }
