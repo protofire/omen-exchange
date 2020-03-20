@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom'
 import { useLastLocation } from 'react-router-last-location'
 import styled from 'styled-components'
 
-import { ButtonCircle } from '../button_circle'
+import { ButtonCircle } from '../../button'
 import { IconArrowBack } from '../icons/IconArrowBack'
 
 const SectionTitleWrapper = styled.div`
@@ -45,7 +45,9 @@ export const SectionTitle: React.FC<Props> = (props: Props) => {
           <IconArrowBack />
         </ButtonCircle>
       )}
-      <Text goBackEnabled={enableGoBack}>{title}</Text>
+      <Text className="titleText" goBackEnabled={enableGoBack}>
+        {title}
+      </Text>
     </SectionTitleWrapper>
   )
 }

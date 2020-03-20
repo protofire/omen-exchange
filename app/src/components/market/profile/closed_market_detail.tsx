@@ -9,17 +9,10 @@ import { CPKService, ERC20Service } from '../../../services'
 import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
-import {
-  Button,
-  ButtonContainer,
-  ClosedMarket,
-  DisplayArbitrator,
-  Loading,
-  SubsectionTitle,
-  TitleValue,
-  ViewCard,
-} from '../../common'
+import { Button, ButtonContainer } from '../../button'
+import { ClosedMarket, DisplayArbitrator, SubsectionTitle, TitleValue, ViewCard } from '../../common'
 import { OutcomeTable } from '../../common/outcome_table'
+import { FullLoading } from '../../loading'
 
 const Grid = styled.div`
   display: grid;
@@ -176,7 +169,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>
-      {status === Status.Loading ? <Loading full={true} message={message} /> : null}
+      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

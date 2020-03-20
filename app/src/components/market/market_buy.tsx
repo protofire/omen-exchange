@@ -12,35 +12,34 @@ import { useContracts } from '../../hooks/useContracts'
 import { useCpk } from '../../hooks/useCpk'
 import { useCpkAllowance } from '../../hooks/useCpkAllowance'
 import { MarketMakerService } from '../../services'
-import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
 import { computeBalanceAfterTrade, formatBigNumber } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
+import { Button, ButtonContainer } from '../button'
+import { ButtonType } from '../button/button_styling_types'
 import {
   BigNumberInput,
-  Button,
-  ButtonContainer,
   DisplayArbitrator,
   GridTransactionDetails,
   GridTwoColumns,
-  Loading,
   SectionTitle,
   SubsectionTitle,
   SubsectionTitleAction,
   SubsectionTitleWrapper,
   TextfieldCustomPlaceholder,
   TitleValue,
-  TransactionDetailsCard,
-  TransactionDetailsLine,
-  TransactionDetailsRow,
   ViewCard,
   WalletBalance,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { OutcomeTable } from '../common/outcome_table'
 import { SetAllowance } from '../common/set_allowance'
-import { ValueStates } from '../common/transaction_details_row'
+import { FullLoading } from '../loading'
 import { ModalTwitterShare } from '../modal/modal_twitter_share'
+
+import { TransactionDetailsCard } from './transaction_details_card'
+import { TransactionDetailsLine } from './transaction_details_line'
+import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -326,7 +325,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
         title={'Outcome created'}
       />
-      {status === Status.Loading ? <Loading full={true} message={message} /> : null}
+      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

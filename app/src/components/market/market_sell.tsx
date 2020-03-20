@@ -7,33 +7,32 @@ import { MARKET_FEE } from '../../common/constants'
 import { useAsyncDerivedValue, useContracts } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { CPKService, MarketMakerService } from '../../services'
-import { ButtonType } from '../../theme/component_styles/button_styling_types'
 import { getLogger } from '../../util/logger'
 import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
+import { Button, ButtonContainer } from '../button'
+import { ButtonType } from '../button/button_styling_types'
 import {
   BigNumberInput,
-  Button,
-  ButtonContainer,
   DisplayArbitrator,
   GridTransactionDetails,
   GridTwoColumns,
-  Loading,
   SectionTitle,
   SubsectionTitle,
   SubsectionTitleAction,
   SubsectionTitleWrapper,
   TextfieldCustomPlaceholder,
   TitleValue,
-  TransactionDetailsCard,
-  TransactionDetailsLine,
-  TransactionDetailsRow,
   ViewCard,
   WalletBalance,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
 import { OutcomeTable } from '../common/outcome_table'
-import { ValueStates } from '../common/transaction_details_row'
+import { FullLoading } from '../loading'
+
+import { TransactionDetailsCard } from './transaction_details_card'
+import { TransactionDetailsLine } from './transaction_details_line'
+import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -294,7 +293,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           </Button>
         </ButtonContainer>
       </ViewCard>
-      {status === Status.Loading ? <Loading full={true} message={message} /> : null}
+      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

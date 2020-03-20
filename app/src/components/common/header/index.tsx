@@ -5,8 +5,9 @@ import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
 import { ConnectedWeb3 } from '../../../hooks'
-import { ButtonType } from '../../../theme/component_styles/button_styling_types'
-import { Button, ButtonConnectWallet, ButtonDisconnectWallet, Logo, Network } from '../../common'
+import { Button, ButtonConnectWallet, ButtonDisconnectWallet } from '../../button'
+import { ButtonType } from '../../button/button_styling_types'
+import { Logo, Network } from '../../common'
 import { ModalConnectWallet } from '../../modal'
 
 const HeaderWrapper = styled.div`

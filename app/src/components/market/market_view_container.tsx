@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react'
 import { useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { getLogger } from '../../util/logger'
-import { Loading } from '../common'
+import { FullLoading } from '../loading'
 
 import { MarketView } from './market_view'
 
@@ -96,7 +96,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
   }, [provider])
 
   if (!collateral) {
-    return <Loading full={true} />
+    return <FullLoading />
   }
 
   return (

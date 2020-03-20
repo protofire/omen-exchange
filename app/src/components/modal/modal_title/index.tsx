@@ -1,7 +1,7 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { ButtonCircle } from '../../common/button_circle'
+import { ButtonCircle } from '../../button'
 import { IconClose } from '../../common/icons/IconClose'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
