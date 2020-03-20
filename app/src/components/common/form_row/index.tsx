@@ -9,6 +9,10 @@ const FormRowWrapper = styled.div`
   margin-bottom: 20px;
   position: relative;
   z-index: 1;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `
 
 const TitleWrapper = styled.div`

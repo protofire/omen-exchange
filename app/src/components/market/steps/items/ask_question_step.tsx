@@ -7,9 +7,32 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { Arbitrators, Categories, CreateCard, DateField, DisplayArbitrator, FormRow, Well } from '../../../common'
+import { Arbitrators, Categories, CreateCard, DateField, FormRow } from '../../../common'
 import { QuestionInput } from '../../../common/question_input'
 import { Outcome, Outcomes } from '../../outcomes'
+
+const LeftButton = styled(Button)`
+  margin-right: auto;
+`
+
+const GridThreeColumns = styled.div`
+  border-top: 1px solid ${props => props.theme.borders.borderColor};
+  column-gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  padding: 20px 25px;
+  row-gap: 20px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+`
+
+const Column = styled.div`
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    max-width: 165px;
+  }
+`
 
 interface Props {
   next: () => void
@@ -23,24 +46,15 @@ interface Props {
     loadedQuestionId: Maybe<string>
     outcomes: Outcome[]
   }
-  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
-  handleDateChange: (date: Date | null) => any
-  handleQuestionChange: (question: Question, arbitrator: Arbitrator) => any
-  handleArbitratorChange: (arbitrator: Arbitrator) => any
-  handleOutcomesChange: (newOutcomes: Outcome[]) => any
-  handleClearQuestion: () => any
   addArbitratorCustom: (arbitrator: Arbitrator) => void
   addCategoryCustom: (category: string) => void
+  handleArbitratorChange: (arbitrator: Arbitrator) => any
+  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
+  handleClearQuestion: () => any
+  handleDateChange: (date: Date | null) => any
+  handleOutcomesChange: (newOutcomes: Outcome[]) => any
+  handleQuestionChange: (question: Question, arbitrator: Arbitrator) => any
 }
-
-const OracleInfo = styled(Well)`
-  font-style: italic;
-  text-align: center;
-`
-
-const LeftButton = styled(Button)`
-  margin-right: auto;
-`
 
 const AskQuestionStep = (props: Props) => {
   const context = useConnectedWeb3Context()
@@ -129,46 +143,52 @@ const AskQuestionStep = (props: Props) => {
         outcomes={outcomes}
         totalProbabilities={totalProbabilities}
       />
-      <FormRow
-        formField={
-          <DateField
-            disabled={!!loadedQuestionId}
-            minDate={new Date()}
-            name="resolution"
-            onChange={handleDateChange}
-            selected={resolution}
+
+      <GridThreeColumns>
+        <Column>
+          <FormRow
+            formField={
+              <DateField
+                disabled={!!loadedQuestionId}
+                minDate={new Date()}
+                name="resolution"
+                onChange={handleDateChange}
+                selected={resolution}
+              />
+            }
+            title={'Resolution Date'}
           />
-        }
-        title={'Resolution Date'}
-      />
-      <FormRow
-        formField={
-          <Categories
-            customValues={categoriesCustom}
-            disabled={!!loadedQuestionId}
-            name="category"
-            onChange={handleChange}
-            value={category}
+        </Column>
+        <Column>
+          <FormRow
+            formField={
+              <Categories
+                customValues={categoriesCustom}
+                disabled={!!loadedQuestionId}
+                name="category"
+                onChange={handleChange}
+                value={category}
+              />
+            }
+            title={'Category'}
           />
-        }
-        title={'Category'}
-      />
-      <FormRow
-        formField={
-          <Arbitrators
-            customValues={arbitratorsCustom}
-            disabled={!!loadedQuestionId}
-            name="arbitrator"
-            networkId={context.networkId}
-            onChangeArbitrator={handleArbitratorChange}
-            value={arbitrator}
+        </Column>
+        <Column>
+          <FormRow
+            formField={
+              <Arbitrators
+                customValues={arbitratorsCustom}
+                disabled={!!loadedQuestionId}
+                name="arbitrator"
+                networkId={context.networkId}
+                onChangeArbitrator={handleArbitratorChange}
+                value={arbitrator}
+              />
+            }
+            title={'Arbitrator'}
           />
-        }
-        title={'Arbitrator'}
-      />
-      <OracleInfo>
-        <DisplayArbitrator arbitrator={arbitrator} />
-      </OracleInfo>
+        </Column>
+      </GridThreeColumns>
       <ButtonContainer>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
           Cancel
