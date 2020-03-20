@@ -7,8 +7,9 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { Arbitrators, Categories, CreateCard, DateField, FormRow } from '../../../common'
+import { Categories, CreateCard, DateField, FormRow } from '../../../common'
 import { QuestionInput } from '../../../common/question_input'
+import { Arbitrators } from '../../arbitrators'
 import { Outcome, Outcomes } from '../../outcomes'
 
 const LeftButton = styled(Button)`
@@ -71,16 +72,7 @@ const AskQuestionStep = (props: Props) => {
     values,
   } = props
 
-  const {
-    arbitrator,
-    arbitratorsCustom,
-    categoriesCustom,
-    category,
-    loadedQuestionId,
-    outcomes,
-    question,
-    resolution,
-  } = values
+  const { arbitratorsCustom, categoriesCustom, category, loadedQuestionId, outcomes, question, resolution } = values
 
   const history = useHistory()
 
@@ -178,11 +170,8 @@ const AskQuestionStep = (props: Props) => {
             formField={
               <Arbitrators
                 customValues={arbitratorsCustom}
-                disabled={!!loadedQuestionId}
-                name="arbitrator"
                 networkId={context.networkId}
                 onChangeArbitrator={handleArbitratorChange}
-                value={arbitrator}
               />
             }
             title={'Arbitrator'}

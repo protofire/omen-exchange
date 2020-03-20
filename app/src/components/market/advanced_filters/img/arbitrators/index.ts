@@ -1,1 +1,0 @@
-export { DxDaoIcon } from './DxDaoIcon'

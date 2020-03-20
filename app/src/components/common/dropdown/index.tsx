@@ -10,6 +10,11 @@ export enum DropdownPosition {
   center,
 }
 
+export enum DropdownDirection {
+  downwards,
+  upwards,
+}
+
 const Wrapper = styled.div<{ active?: boolean }>`
   background-color: #fff;
   border-radius: 32px;
@@ -85,7 +90,15 @@ const DropdownPositionCenterCSS = css`
   transform: translateX(-50%);
 `
 
-const Items = styled.div<{ dropdownPosition?: DropdownPosition }>`
+const DropdownDirectionDownwardsCSS = css`
+  top: calc(100% + 10px);
+`
+
+const DropdownDirectionUpwardsCSS = css`
+  bottom: calc(100% + 10px);
+`
+
+const Items = styled.div<{ dropdownPosition?: DropdownPosition; dropdownDirection?: DropdownDirection }>`
   background-color: #fff;
   border-radius: 16px;
   border: solid 1px ${props => props.theme.borders.borderColor};
@@ -94,15 +107,18 @@ const Items = styled.div<{ dropdownPosition?: DropdownPosition }>`
   min-width: 240px;
   padding: 12px 0;
   position: absolute;
-  top: calc(100% + 10px);
 
   ${props => (props.dropdownPosition === DropdownPosition.left ? DropdownPositionLeftCSS : '')}
   ${props => (props.dropdownPosition === DropdownPosition.right ? DropdownPositionRightCSS : '')}
   ${props => (props.dropdownPosition === DropdownPosition.center ? DropdownPositionCenterCSS : '')}
+
+  ${props => (props.dropdownDirection === DropdownDirection.downwards ? DropdownDirectionDownwardsCSS : '')}
+  ${props => (props.dropdownDirection === DropdownDirection.upwards ? DropdownDirectionUpwardsCSS : '')}
 `
 
 Items.defaultProps = {
   dropdownPosition: DropdownPosition.left,
+  dropdownDirection: DropdownDirection.downwards,
 }
 
 const Item = styled.div<{ active: boolean }>`
@@ -137,13 +153,15 @@ export interface DropdownItemProps {
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   currentItem?: number | undefined
-  items: any
-  placeholder?: React.ReactNode | string | undefined
   dropdownPosition?: DropdownPosition | undefined
+  dropdownDirection?: DropdownDirection | undefined
+  items: any
+  onClick?: () => void
+  placeholder?: React.ReactNode | string | undefined
 }
 
 export const Dropdown: React.FC<Props> = props => {
-  const { currentItem, dropdownPosition, items, placeholder, ...restProps } = props
+  const { currentItem, dropdownDirection, dropdownPosition, items, onClick, placeholder, ...restProps } = props
   const myRef = createRef<HTMLDivElement>()
   const [currentItemIndex, setCurrentItemIndex] = useState<number | undefined>(currentItem)
   const [isDirty, setIsDirty] = useState<boolean>(false)
@@ -173,7 +191,7 @@ export const Dropdown: React.FC<Props> = props => {
   return (
     <>
       <HelperFocusItem ref={myRef} tabIndex={-1} />
-      <Wrapper tabIndex={-1} {...restProps}>
+      <Wrapper onClick={onClick} tabIndex={-1} {...restProps}>
         <DropdownButton>
           <CurrentItem className="currentItem">
             {placeholder && !isDirty ? placeholder : items[currentItemIndex || 0].content}
@@ -183,7 +201,7 @@ export const Dropdown: React.FC<Props> = props => {
             <ChevronUp />
           </ChevronWrapper>
         </DropdownButton>
-        <Items className="dropdownItems" dropdownPosition={dropdownPosition}>
+        <Items className="dropdownItems" dropdownDirection={dropdownDirection} dropdownPosition={dropdownPosition}>
           {items.map((item: DropdownItemProps, index: string) => {
             return (
               <Item

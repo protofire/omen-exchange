@@ -2,10 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../common/dropdown'
+import { BatIcon, DaiIcon, DxDaoIcon, EtherIcon } from '../../common/icons'
 import { TokenItem } from '../token_item'
-
-import { DxDaoIcon } from './img/arbitrators'
-import { BatIcon, DaiIcon, EtherIcon } from './img/currency'
 
 const Wrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};

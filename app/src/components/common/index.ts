@@ -1,4 +1,3 @@
-export { Arbitrators } from './arbitrators'
 export { BalanceShares } from './balance_shares'
 export { BalanceToken } from './balance_token'
 export { BarDiagram } from './bar_diagram_probabilities'
