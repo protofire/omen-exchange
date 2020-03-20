@@ -7,16 +7,12 @@ const MarketDataFragment = gql`
     collateralToken
     outcomeTokenAmounts
     creationTimestamp
-    conditions(first: 1) {
-      question {
-        id
-        title
-        category
-        arbitrator
-        outcomes
-        openingTimestamp
-      }
-    }
+    title
+    outcomes
+    openingTimestamp
+    resolutionTimestamp
+    arbitrator
+    category
   }
 `
 

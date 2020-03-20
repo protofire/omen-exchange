@@ -61,12 +61,17 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const [symbol, setSymbol] = useState('')
 
   const { market } = props
-  const { collateralToken, collateralVolume, id: address, outcomeTokenAmounts } = market
+  const {
+    collateralToken,
+    collateralVolume,
+    id: address,
+    outcomeTokenAmounts,
+    title,
+    outcomes,
+    openingTimestamp,
+  } = market
 
-  const { question } = market.conditions[0]
-  const { outcomes, title } = question
-
-  const endsIn = moment(new Date(question.openingTimestamp * 1000)).fromNow()
+  const endsIn = moment(new Date(openingTimestamp * 1000)).fromNow()
 
   useEffect(() => {
     const setToken = async () => {
@@ -92,7 +97,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     <Wrapper to={address}>
       <Title>{title}</Title>
       <Info>
-        <Outcome>{`${(percentages[indexMax] * 100).toFixed(2)}% ${outcomes[indexMax]} `}</Outcome>
+        <Outcome>{outcomes && `${(percentages[indexMax] * 100).toFixed(2)}% ${outcomes[indexMax]} `}</Outcome>
         <Separator>·</Separator>
         <span>
           {amount} {symbol} Volume
