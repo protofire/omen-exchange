@@ -26,8 +26,8 @@ export const buildQueryMarkets = (options = { onlyMyMarkets: false, category: nu
     .filter(s => s.length)
     .join(',')
   return gql`
-    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $title: String, $account: String!) {
-      fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, where: { ${whereClause} }) {
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $title: String, $account: String!, $fee: String) {
+      fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, where: { fee: $fee, ${whereClause} }) {
         ...marketData
       }
     }
