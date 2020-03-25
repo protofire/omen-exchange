@@ -19,15 +19,9 @@ import { Button, ButtonContainer } from '../button'
 import { ButtonType } from '../button/button_styling_types'
 import {
   BigNumberInput,
-  DisplayArbitrator,
   GridTransactionDetails,
-  GridTwoColumns,
   SectionTitle,
-  SubsectionTitle,
-  SubsectionTitleAction,
-  SubsectionTitleWrapper,
   TextfieldCustomPlaceholder,
-  TitleValue,
   ViewCard,
   WalletBalance,
 } from '../common'
@@ -37,6 +31,7 @@ import { SetAllowance } from '../common/set_allowance'
 import { FullLoading } from '../loading'
 import { ModalTwitterShare } from '../modal/modal_twitter_share'
 
+import { MarketTopDetails } from './market_top_details'
 import { TransactionDetailsCard } from './transaction_details_card'
 import { TransactionDetailsLine } from './transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
@@ -72,10 +67,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTwitterShareOpen, setModalTwitterShareState] = useState(false)
   const [messageTwitter, setMessageTwitter] = useState('')
-  const [showingExtraInformation, setExtraInformation] = useState(false)
-
-  const toggleExtraInformation = () =>
-    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -173,67 +164,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const noteAmount = `${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`
 
   const amountFee = cost.sub(amount)
-
-  const details = (showExtraDetails: boolean) => {
-    const mockedDetails = [
-      {
-        title: 'Total Pool Tokens',
-        value: '5000',
-      },
-      {
-        title: 'Total Pool Earning',
-        value: '25,232 DAI',
-      },
-      {
-        title: 'My Pool Tokens',
-        value: '0',
-      },
-      {
-        title: 'My Earnings',
-        value: '0 DAI',
-      },
-
-      {
-        title: 'Category',
-        value: 'Politics',
-      },
-      {
-        title: 'Resolution Date',
-        value: '25.09.19 - 09:00',
-      },
-      {
-        title: 'Arbitrator/Oracle',
-        value: (
-          <DisplayArbitrator
-            arbitrator={{ id: 'realitio', address: '0x1234567890', name: 'Realit.io', url: 'https://realit.io/' }}
-          />
-        ),
-      },
-      {
-        title: '24h Volume',
-        value: '425,523 DAI',
-      },
-    ]
-    const mockedDetailsLastHalf = mockedDetails.splice(4, 8)
-
-    return (
-      <>
-        <GridTwoColumns>
-          {showExtraDetails ? (
-            <>
-              {mockedDetails.map((item, index) => (
-                <TitleValue key={index} title={item.title} value={item.value} />
-              ))}
-            </>
-          ) : null}
-          {mockedDetailsLastHalf.map((item, index) => (
-            <TitleValue key={index} title={item.title} value={item.value} />
-          ))}
-        </GridTwoColumns>
-      </>
-    )
-  }
-
   const mockedPotential = 1.03
   const fee = `${formatBigNumber(amountFee.mul(-1), collateral.decimals)} ${collateral.symbol}`
   const baseCost = `${formatBigNumber(amount.sub(amountFee), collateral.decimals)} ${collateral.symbol}`
@@ -248,13 +178,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle goBackEnabled title={question} />
       <ViewCard>
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Purchase Outcome</SubsectionTitle>
-          <SubsectionTitleAction onClick={toggleExtraInformation}>
-            {showingExtraInformation ? 'Hide' : 'Show'} Pool Information
-          </SubsectionTitleAction>
-        </SubsectionTitleWrapper>
-        {details(showingExtraInformation)}
+        <MarketTopDetails
+          marketMakerAddress={marketMakerAddress}
+          title="Purchase Outcome"
+          toggleTitleAction="Pool Information"
+        />
         <OutcomeTable
           balances={balances}
           collateral={collateral}

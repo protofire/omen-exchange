@@ -28,6 +28,8 @@ interface MarketMakerData {
   isConditionResolved: boolean
   fee: Maybe<BigNumber>
   isQuestionFinalized: boolean
+  userEarnings: BigNumber
+  totalEarnings: BigNumber
 }
 
 export const useMarketMakerData = (
@@ -56,6 +58,8 @@ export const useMarketMakerData = (
       isQuestionFinalized: false,
       isConditionResolved: false,
       fee: null,
+      userEarnings: new BigNumber(0),
+      totalEarnings: new BigNumber(0),
     }),
     [],
   )
@@ -88,6 +92,7 @@ export const useMarketMakerData = (
       userPoolShares,
       fee,
       isQuestionFinalized,
+      userEarnings,
     ] = await Promise.all([
       cpk && cpk.address
         ? marketMaker.getBalanceInformation(cpk.address, outcomes.length)
@@ -100,7 +105,10 @@ export const useMarketMakerData = (
       cpk && cpk.address ? marketMaker.poolSharesBalanceOf(cpk.address) : new BigNumber(0),
       marketMaker.getFee(),
       realitio.isFinalized(questionId),
+      cpk && cpk.address ? marketMaker.getFeesWithdrawableBy(cpk.address) : new BigNumber(0),
     ])
+
+    const totalEarnings = await marketMaker.getCollectedFees()
 
     const winnerOutcome = isQuestionFinalized ? await realitio.getWinnerOutcome(questionId) : null
 
@@ -144,6 +152,8 @@ export const useMarketMakerData = (
       isQuestionFinalized,
       isConditionResolved,
       fee,
+      userEarnings,
+      totalEarnings,
     }
   }, [conditionalTokens, provider, networkId, account, marketMakerAddress, realitio, buildMarketMaker])
 
