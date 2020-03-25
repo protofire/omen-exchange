@@ -1,6 +1,6 @@
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent, useCallback, useState } from 'react'
 import { useHistory } from 'react-router'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
@@ -15,6 +15,31 @@ import { Outcome, Outcomes } from '../../outcomes'
 const LeftButton = styled(Button)`
   margin-right: auto;
 `
+
+const ButtonCategoryFocusCSS = css`
+  &,
+  &:hover {
+    background-color: ${props => props.theme.colors.secondary};
+    border-color: ${props => props.theme.colors.secondary};
+    color: ${props => props.theme.colors.primary};
+    font-weight: 500;
+  }
+`
+
+const ButtonCategory = styled(Button)<{ focus: boolean }>`
+  &,
+  &:hover {
+    color: #86909e;
+    font-weight: 400;
+    width: 100%;
+  }
+
+  ${props => (props.focus ? ButtonCategoryFocusCSS : '')}
+`
+
+ButtonCategory.defaultProps = {
+  focus: false,
+}
 
 const GridThreeColumns = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
@@ -108,6 +133,12 @@ const AskQuestionStep = (props: Props) => {
 
   const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
+  const [categoryButtonFocus, setCategoryButtonFocus] = useState(false)
+
+  const toggleCategoryButtonFocus = useCallback(() => {
+    setCategoryButtonFocus(!categoryButtonFocus)
+  }, [categoryButtonFocus])
+
   return (
     <CreateCard>
       <FormRow
@@ -153,13 +184,13 @@ const AskQuestionStep = (props: Props) => {
         <Column>
           <FormRow
             formField={
-              <Categories
-                customValues={categoriesCustom}
-                disabled={!!loadedQuestionId}
-                name="category"
-                onChange={handleChange}
-                value={category}
-              />
+              <ButtonCategory
+                buttonType={ButtonType.secondaryLine}
+                focus={categoryButtonFocus}
+                onClick={toggleCategoryButtonFocus}
+              >
+                Select Category
+              </ButtonCategory>
             }
             title={'Category'}
           />
@@ -177,6 +208,15 @@ const AskQuestionStep = (props: Props) => {
           />
         </Column>
       </GridThreeColumns>
+      {categoryButtonFocus && (
+        <Categories
+          customValues={categoriesCustom}
+          disabled={!!loadedQuestionId}
+          name="category"
+          onChange={handleChange}
+          value={category}
+        />
+      )}
       <ButtonContainer>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
           Cancel
