@@ -118,7 +118,7 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
               value={collateral && formatBigNumber(marketMakerFunding, collateral.decimals)}
             />
             <TitleValue
-              title={'Total Pool Earings'}
+              title={'Total Pool Earnings'}
               value={collateral && `${formatBigNumber(totalEarnings, collateral.decimals)} ${collateral.symbol}`}
             />
             <TitleValue
