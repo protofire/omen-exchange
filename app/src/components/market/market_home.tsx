@@ -120,6 +120,9 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
   const [showSearch, setShowSearch] = useState<boolean>(false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
+  const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
+  const [currency, setCurrency] = useState<Maybe<string>>(null)
+  const [templateId, setTemplateId] = useState<Maybe<string>>(null)
   const CATEGORIES_WITH_ALL = ['All', ...CATEGORIES]
   const filters = [
     {
@@ -140,8 +143,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   ]
 
   useEffect(() => {
-    onFilterChange({ category, sortBy, state, title })
-  }, [category, sortBy, state, title, onFilterChange])
+    onFilterChange({ arbitrator, templateId, currency, category, sortBy, state, title })
+  }, [arbitrator, templateId, currency, category, sortBy, state, title, onFilterChange])
 
   const toggleSearch = useCallback(() => {
     setShowAdvancedFilters(false)
@@ -210,7 +213,13 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           </TopContents>
         )}
         {showSearch && <Search onChange={setTitle} value={title} />}
-        {showAdvancedFilters && <AdvancedFilters />}
+        {showAdvancedFilters && (
+          <AdvancedFilters
+            onChangeArbitrator={setArbitrator}
+            onChangeCurrency={setCurrency}
+            onChangeTemplateId={setTemplateId}
+          />
+        )}
         <ListWrapper>
           {RemoteData.hasData(markets) &&
             markets.data.length > 0 &&

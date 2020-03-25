@@ -18,19 +18,30 @@ const MarketDataFragment = gql`
 `
 
 export const buildQueryMarkets = (
-  options = { onlyMyMarkets: false, onlyClosedMarkets: false, category: null, title: null },
+  options = {
+    onlyMyMarkets: false,
+    onlyClosedMarkets: false,
+    category: null,
+    title: null,
+    arbitrator: null,
+    templateId: null,
+    currency: null,
+  },
 ) => {
-  const { category, onlyMyMarkets, title, onlyClosedMarkets } = options
+  const { arbitrator, category, currency, onlyClosedMarkets, onlyMyMarkets, templateId, title } = options
   const whereClause = [
     onlyClosedMarkets ? 'answerFinalizedTimestamp_not: null' : '',
     onlyMyMarkets ? 'creator: $account' : '',
     category === 'All' ? '' : 'category: $category',
     title ? 'title_contains: $title' : '',
+    currency ? 'collateralToken: $currency' : '',
+    arbitrator ? 'arbitrator: $arbitrator' : '',
+    templateId ? 'templateId: $templateId' : '',
   ]
     .filter(s => s.length)
     .join(',')
   const query = gql`
-    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $title: String, $account: String!, $fee: String) {
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $title: String, $currency: String, $arbitrator: String, $templateId: String, $account: String!, $fee: String) {
       fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: desc, where: { fee: $fee, ${whereClause} }) {
         ...marketData
       }

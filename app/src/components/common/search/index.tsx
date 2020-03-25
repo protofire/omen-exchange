@@ -17,7 +17,7 @@ export const Search = (props: Props) => {
 
   return (
     <Wrapper>
-      <Textfield placeholder="Search Market" value={value} onChange={e => onChange(e.target.value)} />
+      <Textfield onChange={e => onChange(e.target.value)} placeholder="Search Market" value={value} />
     </Wrapper>
   )
 }
