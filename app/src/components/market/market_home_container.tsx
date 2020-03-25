@@ -11,6 +11,7 @@ import { RemoteData } from '../../util/remote_data'
 import { MarketHome } from './market_home'
 import { MARKET_FEE } from './../../common/constants'
 import { BigNumber } from 'ethers/utils'
+import { ethers } from 'ethers'
 
 const logger = getLogger('MarketHomeContainer')
 
@@ -30,12 +31,10 @@ const MarketHomeContainer: React.FC = () => {
 
   const { account, library: provider } = context
 
-  const feeBN = new BigNumber(MARKET_FEE * 10)
-  let factor = new BigNumber(10)
-  factor = factor.pow(15)
+  const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(MARKETS_HOME[filter.state], {
     notifyOnNetworkStatusChange: true,
-    variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, fee: feeBN.mul(factor).toString(), ...filter },
+    variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, fee: feeBN.toString(), ...filter },
   })
 
   useEffect(() => {
