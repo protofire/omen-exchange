@@ -19,6 +19,17 @@ export const SINGLE_SELECT_TEMPLATE_ID = 2
 
 export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
 
+export const CATEGORIES = [
+  'Arts',
+  'Business & Finance',
+  'Cryptocurrency',
+  'News & Politics',
+  'Science & Tech',
+  'Sports',
+  'Weather',
+  'Miscellaneous',
+]
+
 // eslint-disable-next-line no-warning-comments
 // TODO: update the graph url with the right one
 export const GRAPH_HTTP =
