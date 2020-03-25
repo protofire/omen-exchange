@@ -21,7 +21,7 @@ const MarketHomeContainer: React.FC = () => {
 
   const [filter, setFilter] = useState<any>({
     state: 'OPEN',
-    searchText: '',
+    title: '',
     sortBy: null,
   })
   const [markets, setMarkets] = useState<RemoteData<any>>(RemoteData.notAsked())

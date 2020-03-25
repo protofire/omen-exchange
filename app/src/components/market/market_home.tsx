@@ -116,6 +116,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const { context, count, markets, moreMarkets, onFilterChange, onLoadMore } = props
   const [state, setState] = useState<FiltersStates>(FiltersStates.open)
   const [category, setCategory] = useState('All')
+  const [title, setTitle] = useState('')
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
   const [showSearch, setShowSearch] = useState<boolean>(false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
@@ -139,8 +140,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   ]
 
   useEffect(() => {
-    onFilterChange({ category, sortBy, state })
-  }, [category, sortBy, state, onFilterChange])
+    onFilterChange({ category, sortBy, state, title })
+  }, [category, sortBy, state, title, onFilterChange])
 
   const toggleSearch = useCallback(() => {
     setShowAdvancedFilters(false)
@@ -208,7 +209,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             </FiltersWrapper>
           </TopContents>
         )}
-        {showSearch && <Search />}
+        {showSearch && <Search onChange={setTitle} value={title} />}
         {showAdvancedFilters && <AdvancedFilters />}
         <ListWrapper>
           {RemoteData.hasData(markets) &&

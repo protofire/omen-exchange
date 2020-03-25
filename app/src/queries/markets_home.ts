@@ -25,7 +25,7 @@ export const buildQueryMarkets = (
     onlyClosedMarkets ? 'answerFinalizedTimestamp_not: null' : '',
     onlyMyMarkets ? 'creator: $account' : '',
     category === 'All' ? '' : 'category: $category',
-    title ? 'title: $title' : '',
+    title ? 'title_contains: $title' : '',
   ]
     .filter(s => s.length)
     .join(',')
