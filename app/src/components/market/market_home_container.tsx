@@ -32,7 +32,11 @@ const MarketHomeContainer: React.FC = () => {
 
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(
-    buildQueryMarkets({ onlyMyMarkets: filter.state === 'MY_MARKETS', ...filter }),
+    buildQueryMarkets({
+      onlyMyMarkets: filter.state === 'MY_MARKETS',
+      onlyClosedMarkets: filter.state === 'CLOSED',
+      ...filter,
+    }),
     {
       notifyOnNetworkStatusChange: true,
       variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, fee: feeBN.toString(), ...filter },
