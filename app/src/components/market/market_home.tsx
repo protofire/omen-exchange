@@ -159,17 +159,15 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       },
     },
     {
-      content: 'Option 1',
+      content: 'Creation date',
       onClick: () => {
-        setSortBy(null)
-        console.warn('Sort by option 1')
+        setSortBy('creationTimestamp')
       },
     },
     {
-      content: 'Option 2',
+      content: 'Opening date',
       onClick: () => {
-        setSortBy(null)
-        console.warn('Sort by option 2')
+        setSortBy('openingTimestamp')
       },
     },
   ]

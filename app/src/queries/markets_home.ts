@@ -17,8 +17,8 @@ const MarketDataFragment = gql`
 `
 
 const OPEN = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String) {
-    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy) {
+  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $fee: String!) {
+    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, where: { category: $category, fee: $fee }) {
       ...marketData
     }
   }
@@ -26,8 +26,8 @@ const OPEN = gql`
 `
 
 const CLOSED = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String) {
-    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy) {
+  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $fee: String) {
+    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, where: { category: $category, fee: $fee }) {
       ...marketData
     }
   }
@@ -35,8 +35,13 @@ const CLOSED = gql`
 `
 
 const MY_MARKETS = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $account: String!) {
-    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, where: { creator: $account }) {
+  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $account: String!, $category: String, $fee: String) {
+    fixedProductMarketMakers(
+      first: $first
+      skip: $skip
+      orderBy: $sortBy
+      where: { creator: $account, category: $category, fee: $fee }
+    ) {
       ...marketData
     }
   }

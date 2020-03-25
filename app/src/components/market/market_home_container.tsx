@@ -9,6 +9,8 @@ import { getLogger } from '../../util/logger'
 import { RemoteData } from '../../util/remote_data'
 
 import { MarketHome } from './market_home'
+import { MARKET_FEE } from './../../common/constants'
+import { BigNumber } from 'ethers/utils'
 
 const logger = getLogger('MarketHomeContainer')
 
@@ -19,7 +21,6 @@ const MarketHomeContainer: React.FC = () => {
 
   const [filter, setFilter] = useState<any>({
     state: 'OPEN',
-    category: 'All',
     searchText: '',
     sortBy: null,
   })
@@ -29,9 +30,12 @@ const MarketHomeContainer: React.FC = () => {
 
   const { account, library: provider } = context
 
+  const feeBN = new BigNumber(MARKET_FEE * 10)
+  let factor = new BigNumber(10)
+  factor = factor.pow(15)
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(MARKETS_HOME[filter.state], {
     notifyOnNetworkStatusChange: true,
-    variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, ...filter },
+    variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, fee: feeBN.mul(factor).toString(), ...filter },
   })
 
   useEffect(() => {
@@ -64,6 +68,9 @@ const MarketHomeContainer: React.FC = () => {
 
   const onFilterChange = useCallback((filter: any) => {
     setMoreMarkets(true)
+    if (filter.category === 'All') {
+      delete filter.category
+    }
     setFilter(filter)
   }, [])
 
