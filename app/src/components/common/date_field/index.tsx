@@ -30,7 +30,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
       input {
         background-color: #fff;
         border-radius: 16px;
-        border: 1px solid ${props => props.theme.colors.tertiary};
+        border: 1px solid ${props => props.theme.buttonSecondaryLine.borderColor};
         box-shadow: none;
         color: ${props => props.theme.colors.textColorDark};
         cursor: pointer;
@@ -42,7 +42,12 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
         outline: none;
         padding: 0 10px;
         text-align: center;
+        transition: border-color 0.15s ease-out;
         width: 100%;
+
+        &:hover {
+          border-color: ${props => props.theme.buttonSecondaryLine.borderColorHover};
+        }
 
         &:focus {
           background-color: ${props => props.theme.colors.secondary};

@@ -135,7 +135,6 @@ const AskQuestionStep = (props: Props) => {
         outcomes={outcomes}
         totalProbabilities={totalProbabilities}
       />
-
       <GridThreeColumns>
         <Column>
           <FormRow
