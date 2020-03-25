@@ -16,36 +16,21 @@ const MarketDataFragment = gql`
   }
 `
 
-const OPEN = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $fee: String!) {
-    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, where: { category: $category, fee: $fee }) {
-      ...marketData
+export const buildQueryMarkets = (options = { onlyMyMarkets: false, category: null, title: null }) => {
+  const { category, onlyMyMarkets, title } = options
+  const whereClause = [
+    onlyMyMarkets ? 'creator: $account' : '',
+    category === 'All' ? '' : 'category: $category',
+    title ? 'title: $title' : '',
+  ]
+    .filter(s => s.length)
+    .join(',')
+  return gql`
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $title: String, $account: String!) {
+      fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, where: { ${whereClause} }) {
+        ...marketData
+      }
     }
-  }
-  ${MarketDataFragment}
-`
-
-const CLOSED = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $fee: String) {
-    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, where: { category: $category, fee: $fee }) {
-      ...marketData
-    }
-  }
-  ${MarketDataFragment}
-`
-
-const MY_MARKETS = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $account: String!, $category: String, $fee: String) {
-    fixedProductMarketMakers(
-      first: $first
-      skip: $skip
-      orderBy: $sortBy
-      where: { creator: $account, category: $category, fee: $fee }
-    ) {
-      ...marketData
-    }
-  }
-  ${MarketDataFragment}
-`
-
-export const MARKETS_HOME: any = { OPEN, CLOSED, MY_MARKETS }
+    ${MarketDataFragment}
+  `
+}

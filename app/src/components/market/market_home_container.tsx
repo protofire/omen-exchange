@@ -1,17 +1,16 @@
 import { useQuery } from '@apollo/react-hooks'
+import { ethers } from 'ethers'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { MARKETS_HOME } from '../../queries/markets_home'
+import { buildQueryMarkets } from '../../queries/markets_home'
 import { CPKService } from '../../services'
 import { getLogger } from '../../util/logger'
 import { RemoteData } from '../../util/remote_data'
 
-import { MarketHome } from './market_home'
 import { MARKET_FEE } from './../../common/constants'
-import { BigNumber } from 'ethers/utils'
-import { ethers } from 'ethers'
+import { MarketHome } from './market_home'
 
 const logger = getLogger('MarketHomeContainer')
 
@@ -32,10 +31,13 @@ const MarketHomeContainer: React.FC = () => {
   const { account, library: provider } = context
 
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
-  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(MARKETS_HOME[filter.state], {
-    notifyOnNetworkStatusChange: true,
-    variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, fee: feeBN.toString(), ...filter },
-  })
+  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(
+    buildQueryMarkets({ onlyMyMarkets: filter.state === 'MY_MARKETS', ...filter }),
+    {
+      notifyOnNetworkStatusChange: true,
+      variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, fee: feeBN.toString(), ...filter },
+    },
+  )
 
   useEffect(() => {
     const getCpkAddress = async () => {
@@ -67,9 +69,6 @@ const MarketHomeContainer: React.FC = () => {
 
   const onFilterChange = useCallback((filter: any) => {
     setMoreMarkets(true)
-    if (filter.category === 'All') {
-      delete filter.category
-    }
     setFilter(filter)
   }, [])
 
