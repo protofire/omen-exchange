@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { CATEGORIES } from '../../common/constants'
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
 import { Button, ButtonCircle, ButtonSelectable } from '../button'
@@ -118,7 +119,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
   const [showSearch, setShowSearch] = useState<boolean>(false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
-  const CATEGORIES = ['All', 'Politics', 'Cryptocurrencies', 'Sports', 'Esports', 'NBA']
+  const CATEGORIES_WITH_ALL = ['All', ...CATEGORIES]
   const filters = [
     {
       title: 'Open',
@@ -179,7 +180,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         {context.account && (
           <TopContents>
             <MarketsCategories>
-              {CATEGORIES.map((item, index) => (
+              {CATEGORIES_WITH_ALL.map((item, index) => (
                 <SelectableButton active={item === category} key={index} onClick={() => setCategory(item)}>
                   {item}
                 </SelectableButton>

@@ -65,10 +65,10 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     collateralToken,
     collateralVolume,
     id: address,
-    outcomeTokenAmounts,
-    title,
-    outcomes,
     openingTimestamp,
+    outcomeTokenAmounts,
+    outcomes,
+    title,
   } = market
 
   const endsIn = moment(new Date(openingTimestamp * 1000)).fromNow()
