@@ -12,6 +12,13 @@ import { QuestionInput } from '../../../common/question_input'
 import { Arbitrators } from '../../arbitrators'
 import { Outcome, Outcomes } from '../../outcomes'
 
+const ButtonContainerFullWidth = styled(ButtonContainer)`
+  margin-left: -${props => props.theme.cards.paddingHorizontal};
+  margin-right: -${props => props.theme.cards.paddingHorizontal};
+  padding-left: ${props => props.theme.cards.paddingHorizontal};
+  padding-right: ${props => props.theme.cards.paddingHorizontal};
+`
+
 const LeftButton = styled(Button)`
   margin-right: auto;
 `
@@ -186,6 +193,7 @@ const AskQuestionStep = (props: Props) => {
             formField={
               <ButtonCategory
                 buttonType={ButtonType.secondaryLine}
+                disabled={!!loadedQuestionId}
                 focus={categoryButtonFocus}
                 onClick={toggleCategoryButtonFocus}
               >
@@ -209,22 +217,16 @@ const AskQuestionStep = (props: Props) => {
         </Column>
       </GridThreeColumns>
       {categoryButtonFocus && (
-        <Categories
-          customValues={categoriesCustom}
-          disabled={!!loadedQuestionId}
-          name="category"
-          onChange={handleChange}
-          value={category}
-        />
+        <Categories categories={categoriesCustom} name="category" onChange={handleChange} selectedCategory={category} />
       )}
-      <ButtonContainer>
+      <ButtonContainerFullWidth borderTop={true}>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
           Cancel
         </LeftButton>
         <Button buttonType={ButtonType.secondaryLine} disabled={error} onClick={props.next}>
           Next
         </Button>
-      </ButtonContainer>
+      </ButtonContainerFullWidth>
     </CreateCard>
   )
 }

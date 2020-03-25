@@ -113,9 +113,15 @@ export const MarketWizardCreator = (props: Props) => {
   }
 
   const handleChange = (
-    event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn,
+    event:
+      | ChangeEvent<HTMLInputElement>
+      | ChangeEvent<HTMLSelectElement>
+      | BigNumberInputReturn
+      | ChangeEvent<HTMLButtonElement>,
   ) => {
     const { name, value } = 'target' in event ? event.target : event
+
+    console.warn(`Name: ${name} - Value: ${value}`)
 
     const newMarketData = {
       ...marketData,
