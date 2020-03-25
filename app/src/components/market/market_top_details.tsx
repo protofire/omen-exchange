@@ -119,7 +119,7 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
             />
             <TitleValue
               title={'Total Pool Earings'}
-              value={collateral && `${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
+              value={collateral && `${formatBigNumber(totalEarnings, collateral.decimals)} ${collateral.symbol}`}
             />
             <TitleValue
               title={'My Pool Tokens'}
@@ -127,7 +127,7 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
             />
             <TitleValue
               title={'My Pool Earnings'}
-              value={collateral && `${formatBigNumber(totalEarnings, collateral.decimals)} ${collateral.symbol}`}
+              value={collateral && `${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
             />
           </>
         ) : null}
