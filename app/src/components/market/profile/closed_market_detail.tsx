@@ -30,6 +30,7 @@ interface Props {
   theme?: any
   balances: BalanceItem[]
   collateral: Token
+  category: string
   funding: BigNumber
   question: string
   questionId: string
@@ -49,6 +50,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const {
     arbitrator,
     balances,
+    category,
     collateral: collateralToken,
     funding,
     isConditionResolved,
@@ -148,7 +150,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
-          <TitleValue title="Category" value="Politics" />
+          <TitleValue title="Category" value={category} />
           <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
           <TitleValue title="Resolution Date" value={resolutionFormat} />
           <TitleValue title="Fee" value={`${MARKET_FEE}%`} />
