@@ -4,10 +4,6 @@ import DatePicker from 'react-datepicker'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
-import { TextfieldCSS } from '../textfield'
-
-import IconCalendar from './img/icon.svg'
-
 interface Props {
   disabled?: boolean
   minDate?: any
@@ -32,14 +28,45 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
       width: 100%;
 
       input {
-        ${TextfieldCSS}
-        background-image: url(${IconCalendar});
-        background-position: calc(100% - 4px) 50%;
-        background-repeat: no-repeat;
-        cursor: ${props => (props.disabled ? 'not-allowed' : 'text')};
-        opacity: ${props => (props.disabled ? '0.5' : '1')};
-        padding: ${props =>
-          `${props.theme.textfield.paddingVertical} 25px ${props.theme.textfield.paddingVertical} ${props.theme.textfield.paddingHorizontal};`}
+        background-color: #fff;
+        border-radius: 16px;
+        border: 1px solid ${props => props.theme.colors.tertiary};
+        box-shadow: none;
+        color: ${props => props.theme.colors.textColorDark};
+        cursor: pointer;
+        display: block;
+        font-size: 14px;
+        height: 34px;
+        letter-spacing: 0.2px;
+        line-height: 1.2;
+        outline: none;
+        padding: 0 10px;
+        text-align: center;
+        width: 100%;
+
+        &:focus {
+          background-color: ${props => props.theme.colors.secondary};
+          border-color: ${props => props.theme.colors.secondary};
+          font-weight: 500;
+          /**
+            These two hide the blinking cursor
+          */
+          color: transparent;
+          text-shadow: 0 0 0 ${props => props.theme.colors.primary};
+
+          &::placeholder {
+            color: ${props => props.theme.colors.primary};
+            font-weight: 500;
+          }
+        }
+
+        &::placeholder {
+          color: #86909e;
+          font-size: 14px;
+          letter-spacing: 0.2px;
+          line-height: 1.2;
+          opacity: 1;
+        }
       }
     }
   }
@@ -80,7 +107,7 @@ export const DateField = (props: Props) => {
         minDate={minDate}
         name={name}
         onChange={onChange}
-        placeholderText="Pick a date..."
+        placeholderText="Select Date"
         popperContainer={CalendarPortal}
         selected={selected}
         showDisabledMonthNavigation
