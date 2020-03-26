@@ -177,7 +177,6 @@ const AskQuestionStep = (props: Props) => {
             value={question}
           />
         }
-        title={'Set Market Question'}
       />
       <Outcomes
         canAddOutcome={canAddOutcome}
