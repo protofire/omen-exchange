@@ -33,15 +33,29 @@ const ButtonCategoryFocusCSS = css`
   }
 `
 
-const ButtonCategory = styled(Button)<{ focus: boolean }>`
+const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boolean }>`
   &,
   &:hover {
-    color: #86909e;
+    color: ${props => (props.isACategorySelected ? props.theme.colors.textColorDark : '#86909e')};
     font-weight: 400;
-    width: 100%;
   }
 
+  max-width: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 100%;
+
   ${props => (props.focus ? ButtonCategoryFocusCSS : '')}
+`
+
+const ButtonCategoryTextOverflow = styled.span`
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
 `
 
 ButtonCategory.defaultProps = {
@@ -195,9 +209,10 @@ const AskQuestionStep = (props: Props) => {
                 buttonType={ButtonType.secondaryLine}
                 disabled={!!loadedQuestionId}
                 focus={categoryButtonFocus}
+                isACategorySelected={category !== ''}
                 onClick={toggleCategoryButtonFocus}
               >
-                Select Category
+                <ButtonCategoryTextOverflow>{category ? category : 'Select Category'}</ButtonCategoryTextOverflow>
               </ButtonCategory>
             }
             title={'Category'}
