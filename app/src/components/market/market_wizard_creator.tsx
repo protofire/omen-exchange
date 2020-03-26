@@ -37,16 +37,18 @@ export const MarketWizardCreator = (props: Props) => {
     arbitrator: defaultArbitrator,
     spread: MARKET_FEE,
     funding: new BigNumber('0'),
-    outcomes: [
-      {
-        name: 'Yes',
-        probability: 50,
-      },
-      {
-        name: 'No',
-        probability: 50,
-      },
-    ],
+    // I'll comment this out for now, new design shows no outcomes by default
+    // outcomes: [
+    //   {
+    //     name: 'Yes',
+    //     probability: 50,
+    //   },
+    //   {
+    //     name: 'No',
+    //     probability: 50,
+    //   },
+    // ],
+    outcomes: [],
     loadedQuestionId: null,
   }
 

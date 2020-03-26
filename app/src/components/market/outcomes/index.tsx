@@ -1,14 +1,71 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
-import { Button, ButtonAdd } from '../../button'
-import { FormError, FormLabel, Textfield, TextfieldCustomPlaceholder, Tooltip, Well } from '../../common'
+import { ButtonCircle } from '../../button'
+import { FormError, FormLabel, FormRowLink, Textfield, TextfieldCustomPlaceholder, Tooltip } from '../../common'
+import { AddIcon, RemoveIcon } from '../../common/icons'
 
-import IconDelete from './img/delete.svg'
+const BUTTON_DIMENSIONS = '34px'
 
-const BUTTON_DIMENSIONS = '30px'
+const OutcomeGridCSS = css`
+  align-items: center;
+  column-gap: 20px;
+  display: grid;
+`
+
+const OutcomeIsUniformGridCSS = css`
+  ${OutcomeGridCSS}
+  grid-template-columns: 1fr ${BUTTON_DIMENSIONS};
+`
+
+const OutcomeIsManualGridCSS = css`
+  ${OutcomeGridCSS}
+  grid-template-columns: 1fr 146px ${BUTTON_DIMENSIONS};
+`
+
+const TitleWrapper = styled.div<{ uniformProbabilities: boolean }>`
+  ${props => props.uniformProbabilities && OutcomeIsUniformGridCSS}
+  ${props => !props.uniformProbabilities && OutcomeIsManualGridCSS}
+  margin-bottom: 12px;
+`
+
+const TitleText = styled.div`
+  direction: rtl;
+  text-align: right;
+  white-space: nowrap;
+`
+
+const NewOutcome = styled.div<{ uniformProbabilities: boolean }>`
+  ${props => props.uniformProbabilities && OutcomeIsUniformGridCSS}
+  ${props => !props.uniformProbabilities && OutcomeIsManualGridCSS}
+  margin-bottom: 20px;
+`
+
+const CustomButtonCircle = styled(ButtonCircle)`
+  &,
+  &[disabled] {
+    border-color: ${props => props.theme.borders.borderColorLighter};
+  }
+
+  height: ${BUTTON_DIMENSIONS};
+  width: ${BUTTON_DIMENSIONS};
+`
+
+const CustomButtonCircleAddReadyCSS = css`
+  background-color: ${props => props.theme.colors.primary};
+  border-color: ${props => props.theme.colors.primary};
+
+  path {
+    fill: #fff;
+  }
+`
+
+const CustomButtonCircleAdd = styled(CustomButtonCircle)<{ readyToAdd: boolean }>`
+  ${props => props.readyToAdd && CustomButtonCircleAddReadyCSS}
+`
 
 const OutcomesWrapper = styled.div`
+  border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -40,10 +97,6 @@ const FormLabelWrapper = styled.div`
   justify-content: space-between;
 `
 
-const TextFieldTextRight = styled(Textfield)`
-  text-align: right;
-`
-
 const ErrorsWrapper = styled.div`
   margin: auto 0 0 0;
   padding: 10px 0 0 0;
@@ -51,25 +104,6 @@ const ErrorsWrapper = styled.div`
 
 const ErrorStyled = styled(FormError)`
   margin: 0 0 10px 0;
-`
-
-const ButtonRemove = styled(Button)`
-  background-color: transparent;
-  background-image: url(${IconDelete});
-  background-position: 5px 5px;
-  background-repeat: no-repeat;
-  border: none;
-  height: ${BUTTON_DIMENSIONS};
-  padding: 0;
-  width: ${BUTTON_DIMENSIONS};
-
-  &:hover {
-    background-color: transparent;
-  }
-
-  &:active {
-    opacity: 0.5;
-  }
 `
 
 const TotalWrapper = styled(OutcomesTitles)`
@@ -93,28 +127,13 @@ const TotalValue = styled(TotalText)`
   text-align: right;
 `
 
-const StyledLabel = styled.label`
-  color: ${props => props.theme.colors.textColor};
-  display: inline;
-  font-size: 12px;
-  line-height: 1.2;
-  margin: 0;
-`
-
-const TotalValueColor = styled(TotalText)<{ error?: boolean; isUniform: boolean }>`
+const TotalValueColor = styled(TotalText)<{ error?: boolean; uniformProbabilities: boolean }>`
   color: ${props =>
     props.error
       ? props.theme.colors.error
-      : props.isUniform
+      : props.uniformProbabilities
       ? props.theme.colors.primary
       : props.theme.colors.textColor};
-`
-
-const NewOutcome = styled(Well)`
-  column-gap: 15px;
-  display: grid;
-  grid-template-columns: 1fr 26px;
-  margin-top: auto;
 `
 
 export interface Outcome {
@@ -135,7 +154,7 @@ const Outcomes = (props: Props) => {
   const { canAddOutcome, disabled, errorMessages, outcomes, totalProbabilities } = props
   const [newOutcomeName, setNewOutcomeName] = useState('')
   const [newOutcomeProbability, setNewOutcomeProbability] = useState(0)
-  const [isUniform, setIsUniform] = useState(false)
+  const [uniformProbabilities, setIsUniform] = useState(false)
 
   const updateOutcomeProbability = (index: number, newProbability: number) => {
     if (newProbability < 0 || newProbability > 100) {
@@ -208,19 +227,19 @@ const Outcomes = (props: Props) => {
       probability: newOutcomeProbability,
     }
     const newOutcomes = outcomes.concat(newOutcome)
-    props.onChange(isUniform ? uniform(newOutcomes) : newOutcomes)
+    props.onChange(uniformProbabilities ? uniform(newOutcomes) : newOutcomes)
     setNewOutcomeName('')
     setNewOutcomeProbability(0)
   }
 
   const removeOutcome = (index: number) => {
     outcomes.splice(index, 1)
-    props.onChange(isUniform ? uniform(outcomes) : outcomes)
+    props.onChange(uniformProbabilities ? uniform(outcomes) : outcomes)
   }
 
   const handleIsUniformChanged = () => {
     setIsUniform(value => !value)
-    props.onChange(!isUniform ? uniform(outcomes) : outcomes)
+    props.onChange(!uniformProbabilities ? uniform(outcomes) : outcomes)
   }
 
   const setMax = () => {
@@ -239,9 +258,9 @@ const Outcomes = (props: Props) => {
       />
       <TextfieldCustomPlaceholder
         formField={
-          <TextFieldTextRight
+          <Textfield
             data-testid={`outcome_${index}`}
-            disabled={isUniform}
+            disabled={uniformProbabilities}
             min={0}
             onChange={e => updateOutcomeProbability(index, +e.currentTarget.value)}
             type="number"
@@ -250,46 +269,68 @@ const Outcomes = (props: Props) => {
         }
         placeholderText="%"
       />
-      <ButtonRemove
+      <CustomButtonCircle
         disabled={disabled}
         onClick={() => {
           removeOutcome(index)
         }}
-        tabIndex={-1}
-        title={`Remove outcome ${index + 1}`}
-      />
+      >
+        <RemoveIcon />
+      </CustomButtonCircle>
     </OutcomeItem>
   ))
 
+  const manualProbabilities = !uniformProbabilities
+  const manualProbabilitiesAndThereAreOutcomes = manualProbabilities && outcomes.length > 0
+  const manualProbabilitiesAndNoOutcomes = manualProbabilities && outcomes.length === 0
+
   return (
     <>
-      <FormLabel>Add Outcome</FormLabel>
-      <StyledLabel
-        onClick={handleIsUniformChanged}
-        title={isUniform ? 'Set manual probability' : 'Distribute uniformly'}
-      >
-        {isUniform ? 'Set manual probability' : 'Set uniformly'}
-      </StyledLabel>
-      {canAddOutcome && (
-        <NewOutcome>
-          <Textfield
-            onChange={e => setNewOutcomeName(e.target.value)}
-            placeholder="Add new outcome"
-            type="text"
-            value={newOutcomeName}
+      <TitleWrapper uniformProbabilities={uniformProbabilities}>
+        <FormLabel>Add Outcome</FormLabel>
+        {manualProbabilities && <FormLabel>Probability</FormLabel>}
+        {manualProbabilitiesAndNoOutcomes && (
+          <TitleText>
+            <FormRowLink onClick={handleIsUniformChanged}>set uniformly</FormRowLink>
+          </TitleText>
+        )}
+        {manualProbabilitiesAndThereAreOutcomes && (
+          <TitleText>
+            <FormRowLink onClick={setMax}>set max</FormRowLink>
+          </TitleText>
+        )}
+        {uniformProbabilities && (
+          <TitleText>
+            <FormRowLink onClick={handleIsUniformChanged}>set manual probability</FormRowLink>
+          </TitleText>
+        )}
+      </TitleWrapper>
+      <NewOutcome uniformProbabilities={uniformProbabilities}>
+        <Textfield
+          disabled={!canAddOutcome}
+          onChange={e => setNewOutcomeName(e.target.value)}
+          placeholder="Add new outcome"
+          type="text"
+          value={newOutcomeName}
+        />
+        {!uniformProbabilities && (
+          <TextfieldCustomPlaceholder
+            formField={
+              <Textfield
+                min={0}
+                onChange={e => setNewOutcomeProbability(Number(e.target.value))}
+                placeholder="0.00"
+                type="number"
+                value={newOutcomeProbability ? newOutcomeProbability : ''}
+              />
+            }
+            placeholderText="%"
           />
-          {!isUniform && (
-            <Textfield
-              onChange={e => setNewOutcomeProbability(Number(e.target.value))}
-              placeholder="0.00"
-              type="text"
-              value={newOutcomeProbability}
-            />
-          )}
-          {!isUniform && outcomes.length && <StyledLabel onClick={setMax}>Set Max</StyledLabel>}
-          <ButtonAdd disabled={!newOutcomeName} onClick={addNewOutcome} title="Add new outcome" />
-        </NewOutcome>
-      )}
+        )}
+        <CustomButtonCircleAdd disabled={!newOutcomeName} onClick={addNewOutcome} readyToAdd={newOutcomeName !== ''}>
+          <AddIcon />
+        </CustomButtonCircleAdd>
+      </NewOutcome>
       <OutcomesWrapper>
         <OutcomesTitles>
           <FormLabel>Outcome</FormLabel>
@@ -300,7 +341,6 @@ const Outcomes = (props: Props) => {
               id="probability"
             />
           </FormLabelWrapper>
-          <div />
         </OutcomesTitles>
         <OutcomeItems>{outcomesToRender}</OutcomeItems>
         {messageErrorToRender()}
@@ -308,9 +348,8 @@ const Outcomes = (props: Props) => {
           <TotalTitle>
             <strong>Total:</strong> {outcomes.length} outcomes
           </TotalTitle>
-
           <TotalValue>
-            <TotalValueColor error={totalProbabilities !== 100} isUniform={isUniform}>
+            <TotalValueColor error={totalProbabilities !== 100} uniformProbabilities={uniformProbabilities}>
               {totalProbabilities}
             </TotalValueColor>
             %
