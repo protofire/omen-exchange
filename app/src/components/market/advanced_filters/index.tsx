@@ -6,7 +6,7 @@ import { TokenItem } from '../token_item'
 
 import { useConnectedWeb3Context } from './../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork, getTokensByNetwork } from './../../../util/networks'
-import { DxDaoIcon } from './img/arbitrators'
+//import { DxDaoIcon } from './img/arbitrators'
 import { BatIcon, DaiIcon, EtherIcon } from './img/currency'
 
 const Wrapper = styled.div`
@@ -42,9 +42,15 @@ const Options = styled(Dropdown)`
 `
 
 interface Props {
-  onChangeCurrency: (currency: string) => void
-  onChangeArbitrator: (arbitrator: string) => void
-  onChangeTemplateId: (templateId: string) => void
+  onChangeCurrency: (currency: Maybe<string>) => void
+  onChangeArbitrator: (arbitrator: Maybe<string>) => void
+  onChangeTemplateId: (templateId: Maybe<string>) => void
+}
+
+const currencyIcons: { [index: string]: JSX.Element } = {
+  BAT: <BatIcon />,
+  DAI: <DaiIcon />,
+  ETH: <EtherIcon />,
 }
 
 export const AdvancedFilters = (props: Props) => {
@@ -56,34 +62,21 @@ export const AdvancedFilters = (props: Props) => {
 
   const { onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
 
-  const currencyOptions: Array<DropdownItemProps> = tokens.map(({ address, symbol }, index) => {
-    return {
-      content: symbol,
-      onClick: () => onChangeCurrency(address),
-    }
-  })
-  // [
-  //   {
-  //     content: <TokenItem icon={<EtherIcon />} text="Ether" />,
-  //     onClick: () => {
-  //       console.warn('Option Ether')
-  //     },
-  //   },
-  //   {
-  //     content: <TokenItem icon={<DaiIcon />} text="DAI" />,
-  //     onClick: () => {
-  //       console.warn('Option DAI')
-  //     },
-  //   },
-  //   {
-  //     content: <TokenItem icon={<BatIcon />} text="Basic Atentio Token" />,
-  //     onClick: () => {
-  //       console.warn('Option Basic Atention Token')
-  //     },
-  //   },
-  // ]
+  const currencyOptions: Array<DropdownItemProps> = [{ address: null, symbol: 'All' }, ...tokens].map(
+    ({ address, symbol }, index) => {
+      const icon = currencyIcons[symbol]
+      return {
+        content: <TokenItem icon={icon} text={symbol} />,
+        onClick: () => onChangeCurrency(address),
+      }
+    },
+  )
 
   const questionTypeOptions: Array<DropdownItemProps> = [
+    {
+      content: 'All',
+      onClick: () => onChangeTemplateId(null),
+    },
     {
       content: 'Binary',
       onClick: () => onChangeTemplateId('2'),
@@ -94,26 +87,14 @@ export const AdvancedFilters = (props: Props) => {
     },
   ]
 
-  const arbitratorOptions: Array<DropdownItemProps> = arbitrators.map(({ address, name }, index) => {
-    return {
-      content: name,
-      onClick: () => onChangeArbitrator(address),
-    }
-  })
-  // [
-  //   {
-  //     content: <TokenItem icon={<DxDaoIcon />} text="DxDAO" />,
-  //     onClick: () => {
-  //       console.warn('Option DxDao')
-  //     },
-  //   },
-  //   {
-  //     content: 'Realit.io',
-  //     onClick: () => {
-  //       console.warn('Option Realit.io')
-  //     },
-  //   },
-  // ]
+  const arbitratorOptions: Array<DropdownItemProps> = [{ address: null, name: 'All' }, ...arbitrators].map(
+    ({ address, name }, index) => {
+      return {
+        content: name,
+        onClick: () => onChangeArbitrator(address),
+      }
+    },
+  )
 
   return (
     <Wrapper>
