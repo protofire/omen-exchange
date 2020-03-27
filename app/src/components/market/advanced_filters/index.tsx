@@ -79,11 +79,11 @@ export const AdvancedFilters = (props: Props) => {
     },
     {
       content: 'Binary',
-      onClick: () => onChangeTemplateId('2'),
+      onClick: () => onChangeTemplateId('0'),
     },
     {
-      content: 'Other',
-      onClick: () => onChangeTemplateId('1'),
+      content: 'Single Select',
+      onClick: () => onChangeTemplateId('2'),
     },
   ]
 

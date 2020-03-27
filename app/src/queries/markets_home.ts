@@ -36,7 +36,7 @@ export const buildQueryMarkets = (
     title ? 'title_contains: $title' : '',
     currency ? 'collateralToken: $currency' : '',
     arbitrator ? 'arbitrator: $arbitrator' : '',
-    templateId ? 'templateId: $templateId' : '',
+    templateId ? 'templateId: $templateId' : 'templateId_in: ["0", "2"]',
   ]
     .filter(s => s.length)
     .join(',')
