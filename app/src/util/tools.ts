@@ -175,3 +175,17 @@ export const getIndexSets = (outcomesCount: number) => {
   const range = (length: number) => [...Array(length)].map((x, i) => i)
   return range(outcomesCount).map(x => 1 << x)
 }
+
+export const calcPoolTokens = (
+  addedFunds: BigNumber,
+  holdingsBN: BigNumber[],
+  poolShareSupply: BigNumber,
+): BigNumber => {
+  if (poolShareSupply.gt(0)) {
+    const poolWeight = holdingsBN.reduce((max: BigNumber, h: BigNumber) => (h.gt(max) ? h : max))
+
+    return addedFunds.mul(poolShareSupply).div(poolWeight)
+  } else {
+    return addedFunds
+  }
+}

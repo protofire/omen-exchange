@@ -12,7 +12,7 @@ import { useFundingBalance } from '../../hooks/useFundingBalance'
 import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
 import { getLogger } from '../../util/logger'
-import { formatBigNumber } from '../../util/tools'
+import { formatBigNumber, calcPoolTokens } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../button'
 import { ButtonType } from '../button/button_styling_types'
@@ -33,6 +33,7 @@ import { MarketTopDetails } from './market_top_details'
 import { TransactionDetailsCard } from './transaction_details_card'
 import { TransactionDetailsLine } from './transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
+import { MARKET_FEE } from '../../common/constants'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerAddress: string
@@ -68,7 +69,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     // marketMakerFunding,
     // marketMakerUserFunding,
     question,
-    // totalPoolShares,
+    totalPoolShares,
     // userPoolShares,
   } = props
 
@@ -101,6 +102,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   // const userPoolSharesPercentage: Maybe<number> = totalPoolShares.isZero()
   //   ? null
   //   : 100 * divBN(userPoolShares, totalPoolShares)
+
+  const poolTokens = calcPoolTokens(
+    amountToFund,
+    balances.map(b => b.holdings),
+    totalPoolShares,
+  )
 
   const addFunding = async () => {
     try {
@@ -256,17 +263,17 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             {activeTab === Tabs.deposit && (
               <TransactionDetailsCard>
                 <TransactionDetailsRow
-                  emphasizeValue={mockedEarned > 0}
+                  emphasizeValue={MARKET_FEE > 0}
                   state={ValueStates.success}
                   title={'Earn Trading Fee'}
-                  value={mockedEarned}
+                  value={MARKET_FEE}
                 />
                 <TransactionDetailsLine />
                 <TransactionDetailsRow
-                  emphasizeValue={mockedPoolTokens > 0}
-                  state={(mockedPoolTokens > 0 && ValueStates.important) || ValueStates.normal}
+                  emphasizeValue={poolTokens.gt(0)}
+                  state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                   title={'Pool Tokens'}
-                  value={`(2.22%) ${mockedPoolTokens ? mockedPoolTokens : '0.00'} ${collateral.symbol}`}
+                  value={`${formatBigNumber(poolTokens, collateral.decimals)}`}
                 />
               </TransactionDetailsCard>
             )}
