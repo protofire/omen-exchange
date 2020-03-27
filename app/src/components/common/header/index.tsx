@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
 import { IS_CORONA_VERSION } from '../../../common/constants'
-import { ConnectedWeb3 } from '../../../hooks'
+import { ConnectedWeb3, useIsBlacklistedCountry } from '../../../hooks'
 import { Button, ButtonConnectWallet, ButtonDisconnectWallet } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Logo, Network } from '../../common'
@@ -86,10 +86,14 @@ const ContentsRight = styled.div`
 const LogoWrapper = styled(NavLink)``
 
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
+  const isBlacklistedCountry = useIsBlacklistedCountry()
   const context = useWeb3Context()
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
+
+  // hide connect button if country is blacklisted, or the info isn't available yet
+  const hideConnectButton = IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)
 
   return (
     <HeaderWrapper {...restProps}>
@@ -103,7 +107,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               Create Market
             </ButtonCreate>
           )}
-          {!context.account && (
+          {!context.account && !hideConnectButton && (
             <ButtonConnectWalletStyled
               modalState={isModalOpen}
               onClick={() => {
