@@ -9,11 +9,7 @@ export const CurrencySelector: React.FC = () => {
   return (
     <div>
       {currenciesData.map((item, index) => {
-        return (
-          <>
-            {item.icon} {item.token}
-          </>
-        )
+        return <TokenItem icon={item.icon} key={index} text={item.token} />
       })}
     </div>
   )
