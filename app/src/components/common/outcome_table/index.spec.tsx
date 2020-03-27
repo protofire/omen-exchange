@@ -6,14 +6,14 @@ import React from 'react'
 import { ThemeProvider } from 'styled-components'
 
 import theme from '../../../theme'
-import { BalanceItem, OutcomeSlot } from '../../../util/types'
+import { BalanceItem } from '../../../util/types'
 
 import { OutcomeTable } from './index'
 
 const getBalances = (yes: Partial<BalanceItem> = {}, no: Partial<BalanceItem> = {}) => {
   return [
     {
-      outcomeName: OutcomeSlot.Yes,
+      outcomeName: 'Yes',
       probability: 50,
       currentPrice: 0.5,
       shares: new BigNumber(0),
@@ -22,7 +22,7 @@ const getBalances = (yes: Partial<BalanceItem> = {}, no: Partial<BalanceItem> = 
       ...yes,
     },
     {
-      outcomeName: OutcomeSlot.No,
+      outcomeName: 'No',
       probability: 50,
       currentPrice: 0.5,
       shares: new BigNumber(0),

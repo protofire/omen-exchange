@@ -5,6 +5,8 @@ import { useWeb3Context } from 'web3-react'
 import connectors from '../util/connectors'
 import { getLogger } from '../util/logger'
 
+import { useIsBlacklistedCountry } from './geoJs'
+
 const logger = getLogger('Hooks::ConnectedWeb3')
 
 export interface ConnectedWeb3Context {
@@ -29,22 +31,24 @@ export const useConnectedWeb3Context = () => {
   return context
 }
 
-interface Props {
-  children: React.ReactNode
-}
-
 /**
  * Component used to render components that depend on Web3 being available. These components can then
  * `useConnectedWeb3Context` safely to get web3 stuff without having to null check it.
  */
-export const ConnectedWeb3: React.FC<Props> = props => {
+export const ConnectedWeb3: React.FC = props => {
   const [networkId, setNetworkId] = useState<number | null>(null)
   const context = useWeb3Context()
   const { account, active, error, library } = context
+  const isBlacklistedCountry = useIsBlacklistedCountry()
 
   useEffect(() => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
+
+    if (isBlacklistedCountry === true) {
+      localStorage.removeItem('CONNECTOR')
+      context.setConnector('Infura')
+    }
 
     if (active) {
       if (connector && connector in connectors) {
@@ -68,7 +72,7 @@ export const ConnectedWeb3: React.FC<Props> = props => {
     return () => {
       isSubscribed = false
     }
-  }, [context, library, active, error])
+  }, [context, library, active, error, isBlacklistedCountry])
 
   if (!networkId) {
     return null
@@ -84,7 +88,7 @@ export const ConnectedWeb3: React.FC<Props> = props => {
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
 
-export const WhenConnected: React.FC<Props> = props => {
+export const WhenConnected: React.FC = props => {
   const { account } = useConnectedWeb3Context()
 
   return <>{account && props.children}</>
