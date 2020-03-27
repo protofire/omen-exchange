@@ -124,33 +124,12 @@ const AskQuestionStep = (props: Props) => {
 
   const errorMessages = []
 
-  const someEmptyName = outcomes.some(outcome => !outcome.name)
-  if (someEmptyName) {
-    errorMessages.push('The names of the outcomes should not be empty.')
-  }
-
-  const someEmptyProbability = outcomes.some(outcome => outcome.probability === 0)
-  if (someEmptyProbability) {
-    errorMessages.push('The probabilities of the outcomes should not be zero.')
-  }
-
   const totalProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
   if (totalProbabilities !== 100) {
-    errorMessages.push('The sum of all probabilities must be equal to 100%.')
+    errorMessages.push('The total of all probabilities must be 100%')
   }
 
-  if (outcomes.length < 2) {
-    errorMessages.push('Please enter at least 2 outcomes')
-  }
-
-  const error =
-    totalProbabilities !== 100 ||
-    someEmptyName ||
-    someEmptyProbability ||
-    outcomes.length < 2 ||
-    !question ||
-    !category ||
-    !resolution
+  const error = totalProbabilities !== 100 || !question || !category || !resolution
 
   const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 

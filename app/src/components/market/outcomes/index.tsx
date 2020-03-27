@@ -223,8 +223,9 @@ const Outcomes = (props: Props) => {
   const [newOutcomeProbability, setNewOutcomeProbability] = useState(0)
   const [uniformProbabilities, setIsUniform] = useState(false)
 
+  // NOTE: Error handling is kind of icky, we should fix this
   const messageErrorToRender = () => {
-    if (!errorMessages) {
+    if (!errorMessages || outcomes.length === 0) {
       return
     }
 
