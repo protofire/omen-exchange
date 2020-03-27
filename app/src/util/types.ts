@@ -49,6 +49,8 @@ export enum StepProfile {
 
 export interface Question {
   questionId: string
+  questionRaw: string
+  questionTemplateId: BigNumber
   question: string
   resolution: Maybe<Date>
   arbitratorAddress: string

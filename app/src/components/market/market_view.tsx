@@ -19,6 +19,8 @@ interface Props {
   marketMakerAddress: string
   question: string
   questionId: string
+  questionRaw: string
+  questionTemplateId: BigNumber
   resolution: Maybe<Date>
   status: Status
   totalPoolShares: BigNumber

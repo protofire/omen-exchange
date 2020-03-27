@@ -129,6 +129,8 @@ class RealitioService {
       resolution: new Date(openingTs * 1000),
       arbitratorAddress: arbitrator,
       outcomes: outcomes,
+      questionTemplateId: templateId,
+      questionRaw: question,
     }
   }
 
