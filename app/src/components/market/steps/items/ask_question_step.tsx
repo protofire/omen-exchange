@@ -99,7 +99,6 @@ const AskQuestionStep = (props: Props) => {
     someEmptyProbability ||
     outcomes.length < 2 ||
     !question ||
-    !category ||
     !resolution
 
   const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId

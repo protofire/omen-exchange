@@ -1,7 +1,7 @@
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { bigNumberify } from 'ethers/utils'
 // eslint-disable-next-line import/named
 import { Moment } from 'moment'
 
@@ -9,7 +9,7 @@ import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from '../common/constants
 import { Outcome } from '../components/market/outcomes'
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck, getRealitioTimeout } from '../util/networks'
-import { OutcomeSlot, Question, QuestionLog } from '../util/types'
+import { Question, QuestionLog } from '../util/types'
 
 const logger = getLogger('Services::Realitio')
 
@@ -111,16 +111,28 @@ class RealitioService {
     const iface = new ethers.utils.Interface(realitioAbi)
     const event = iface.parseLog(logs[0])
 
-    const { arbitrator, opening_ts: openingTs, question, template_id: templateId } = event.values
+    const { arbitrator, opening_ts: openingTs, question } = event.values
+    const templateId = event.values.template_id.toNumber()
+
+    const isNuancedBinary = templateId === 5 || templateId === 6
+
+    const nuancedBinaryTemplate = JSON.stringify({
+      title: '%s',
+      type: 'single-select',
+      outcomes: ['No', 'Mostly No', 'Undecided', 'Mostly Yes', 'Yes'],
+      category: '%s',
+      lang: '%s',
+    })
 
     const templates = ['bool', 'uint', 'single-select', 'multiple-select', 'datetime']
 
-    const templateType = templates[(templateId as BigNumber).toNumber()]
-
-    const template = RealitioTemplateLib.defaultTemplateForType(templateType)
+    const templateType = templates[templateId]
+    const template = isNuancedBinary ? nuancedBinaryTemplate : RealitioTemplateLib.defaultTemplateForType(templateType)
     const questionLog: QuestionLog = RealitioQuestionLib.populatedJSONForTemplate(template, question)
 
-    const { category, title, outcomes = [OutcomeSlot.Yes, OutcomeSlot.No] } = questionLog
+    const { category, title } = questionLog
+
+    const outcomes = isNuancedBinary || !questionLog.outcomes ? ['No', 'Yes'] : questionLog.outcomes
 
     return {
       questionId,
