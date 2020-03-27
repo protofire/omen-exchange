@@ -40,6 +40,7 @@
     "big.js": "^5.2.2",
     "circular-dependency-plugin": "^5.2.0",
     "contract-proxy-kit": "^1.1.1",
+    "disqus-react": "^1.0.8",
     "ethers": "^4.0.36",
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.1",
