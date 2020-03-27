@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 
-import { Outcome } from '../components/market/outcomes'
+import { Outcome } from '../components/market/steps/outcomes'
 
 export enum Status {
   Ready = 'Ready',

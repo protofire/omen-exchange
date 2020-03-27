@@ -7,17 +7,12 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { Categories, CreateCard, DateField, FormRow } from '../../../common'
+import { CreateCard, DateField, FormRow } from '../../../common'
 import { QuestionInput } from '../../../common/question_input'
 import { Arbitrators } from '../../arbitrators'
-import { Outcome, Outcomes } from '../../outcomes'
-
-const ButtonContainerFullWidth = styled(ButtonContainer)`
-  margin-left: -${props => props.theme.cards.paddingHorizontal};
-  margin-right: -${props => props.theme.cards.paddingHorizontal};
-  padding-left: ${props => props.theme.cards.paddingHorizontal};
-  padding-right: ${props => props.theme.cards.paddingHorizontal};
-`
+import { Categories } from '../../categories'
+import { ButtonContainerFullWidth, ButtonWithReadyToGoStatus } from '../common_styled'
+import { Outcome, Outcomes } from '../outcomes'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -216,9 +211,14 @@ const AskQuestionStep = (props: Props) => {
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
           Cancel
         </LeftButton>
-        <Button buttonType={ButtonType.secondaryLine} disabled={error} onClick={props.next}>
+        <ButtonWithReadyToGoStatus
+          buttonType={ButtonType.secondaryLine}
+          disabled={error}
+          onClick={props.next}
+          readyToGo={!error}
+        >
           Next
-        </Button>
+        </ButtonWithReadyToGoStatus>
       </ButtonContainerFullWidth>
     </CreateCard>
   )

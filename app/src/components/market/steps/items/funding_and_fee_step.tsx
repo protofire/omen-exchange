@@ -33,7 +33,7 @@ import {
 } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
 import { FullLoading } from '../../../loading'
-import { Outcome } from '../../outcomes'
+import { Outcome } from '../outcomes'
 
 interface Props {
   back: () => void
