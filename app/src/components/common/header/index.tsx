@@ -4,6 +4,7 @@ import { NavLink, RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
+import { IS_CORONA_VERSION } from '../../../common/constants'
 import { ConnectedWeb3 } from '../../../hooks'
 import { Button, ButtonConnectWallet, ButtonDisconnectWallet } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -97,9 +98,11 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
           <Logo />
         </LogoWrapper>
         <ContentsRight>
-          <ButtonCreate buttonType={ButtonType.secondaryLine} onClick={() => history.push('/create')}>
-            Create Market
-          </ButtonCreate>
+          {!IS_CORONA_VERSION && (
+            <ButtonCreate buttonType={ButtonType.secondaryLine} onClick={() => history.push('/create')}>
+              Create Market
+            </ButtonCreate>
+          )}
           {!context.account && (
             <ButtonConnectWalletStyled
               modalState={isModalOpen}
