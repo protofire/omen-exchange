@@ -110,7 +110,7 @@ const FundingAndFeeStep = (props: Props) => {
   const collateralBalance = useCollateralBalance(collateral, context)
 
   const isFundingGreaterThanBalance = account ? funding.gt(collateralBalance) : false
-  const error = !spread || funding.isZero() || isFundingGreaterThanBalance
+  const error = funding.isZero() || isFundingGreaterThanBalance
 
   const fundingMessageError = isFundingGreaterThanBalance ? `You don't have enough collateral in your balance.` : ''
   const resolutionDate = resolution && formatDate(resolution)
