@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
+import { IS_CORONA_VERSION } from '../../../common/constants'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { Token } from '../../../util/types'
 import { FormRowLink } from '../form_row_link'
@@ -31,7 +32,7 @@ export const CustomizableTokensSelect = (props: Props) => {
   return (
     <>
       <Tokens context={context} name={name} onTokenChange={onCollateralChange} value={value} />
-      <Link onClick={() => setModalCollateralState(true)}>Add custom token</Link>
+      {!IS_CORONA_VERSION && <Link onClick={() => setModalCollateralState(true)}>Add custom token</Link>}
       <ModalCollateral
         context={context}
         isOpen={isModalCollateralOpen}

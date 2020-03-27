@@ -35,3 +35,6 @@ export const CATEGORIES = [
 export const GRAPH_HTTP =
   process.env.REACT_APP_GRAPH_HTTP || 'https://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
 export const GRAPH_WS = process.env.REACT_APP_GRAPH_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
+
+// Corona version options
+export const IS_CORONA_VERSION = process.env.REACT_APP_IS_CORONA_VERSION === 'true'

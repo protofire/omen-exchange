@@ -3,6 +3,7 @@ import {
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
   INFURA_PROJECT_ID,
+  IS_CORONA_VERSION,
 } from '../common/constants'
 import { entries, isNotNull } from '../util/type-utils'
 
@@ -251,7 +252,7 @@ export const getDefaultToken = (networkId: number) => {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
 
-  return getToken(networkId, 'dai')
+  return IS_CORONA_VERSION ? getToken(networkId, 'usdc') : getToken(networkId, 'dai')
 }
 
 export const getTokensByNetwork = (networkId: number): Token[] => {
