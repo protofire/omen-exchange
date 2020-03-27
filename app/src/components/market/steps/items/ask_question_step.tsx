@@ -11,12 +11,8 @@ import { CreateCard, DateField, FormRow } from '../../../common'
 import { QuestionInput } from '../../../common/question_input'
 import { Arbitrators } from '../../arbitrators'
 import { Categories } from '../../categories'
-import { ButtonContainerFullWidth, ButtonWithReadyToGoStatus } from '../common_styled'
+import { ButtonContainerFullWidth, ButtonWithReadyToGoStatus, LeftButton } from '../common_styled'
 import { Outcome, Outcomes } from '../outcomes'
-
-const LeftButton = styled(Button)`
-  margin-right: auto;
-`
 
 const ButtonCategoryFocusCSS = css`
   &,

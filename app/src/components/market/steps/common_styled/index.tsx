@@ -2,6 +2,10 @@ import styled, { css } from 'styled-components'
 
 import { Button, ButtonContainer } from '../../../button'
 
+export const LeftButton = styled(Button)`
+  margin-right: auto;
+`
+
 const ButtonWithReadyToGoStatusCSS = css`
   &,
   &:hover {
@@ -42,7 +46,7 @@ export const OutcomesTHead = styled.thead``
 
 export const OutcomesTBody = styled.tbody``
 
-export const OutcomesTH = styled.th`
+export const OutcomesTH = styled.th<{ textAlign?: string }>`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
   color: ${props => props.theme.colors.textColor};
   font-size: 14px;
@@ -50,9 +54,13 @@ export const OutcomesTH = styled.th`
   height: 40px;
   line-height: 1.2;
   padding: 0 15px 0 0;
-  text-align: left;
+  text-align: ${props => props.textAlign};
   white-space: nowrap;
 `
+
+OutcomesTH.defaultProps = {
+  textAlign: 'left',
+}
 
 export const OutcomesTR = styled.tr`
   height: fit-content;
@@ -72,7 +80,7 @@ export const OutcomesTR = styled.tr`
   }
 `
 
-export const OutcomesTD = styled.td`
+export const OutcomesTD = styled.td<{ textAlign?: string }>`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
   color: ${props => props.theme.colors.textColorDark};
   font-size: 14px;
@@ -80,9 +88,13 @@ export const OutcomesTD = styled.td`
   height: 56px;
   line-height: 1.2;
   padding: 0 15px 0 0;
-  text-align: left;
+  text-align: ${props => props.textAlign};
   white-space: nowrap;
 `
+
+OutcomesTH.defaultProps = {
+  textAlign: 'left',
+}
 
 export const OutcomeItemTextWrapper = styled.div`
   align-items: center;

@@ -9,7 +9,7 @@ import { BalanceState, fetchAccountBalance } from '../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { Arbitrator, Token } from '../../../../util/types'
-import { Button, ButtonContainer, ButtonLink } from '../../../button'
+import { Button } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import {
   BalanceToken,
@@ -18,21 +18,29 @@ import {
   DisplayArbitrator,
   FormError,
   FormRow,
-  Paragraph,
   SubsectionTitle,
-  TD,
-  TH,
-  THead,
-  TR,
-  Table,
   Textfield,
   TextfieldCustomPlaceholder,
   TitleValue,
   Tokens,
-  Well,
 } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
 import { FullLoading } from '../../../loading'
+import {
+  ButtonContainerFullWidth,
+  ButtonWithReadyToGoStatus,
+  LeftButton,
+  OutcomeItemLittleBallOfJoyAndDifferentColors,
+  OutcomeItemText,
+  OutcomeItemTextWrapper,
+  OutcomesTBody,
+  OutcomesTD,
+  OutcomesTH,
+  OutcomesTHead,
+  OutcomesTR,
+  OutcomesTable,
+  OutcomesTableWrapper,
+} from '../common_styled'
 import { Outcome } from '../outcomes'
 
 interface Props {
@@ -53,8 +61,31 @@ interface Props {
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
 }
 
-const ButtonLinkStyled = styled(ButtonLink)`
-  margin-right: auto;
+const CreateCardTop = styled(CreateCard)`
+  margin-bottom: 20px;
+  min-height: 0;
+`
+
+const CreateCardBottom = styled(CreateCard)`
+  min-height: 0;
+`
+
+const SubsectionTitleStyled = styled(SubsectionTitle)`
+  margin-bottom: 20px;
+`
+
+const QuestionTitle = styled.h3`
+  color: ${props => props.theme.colors.textColorDarker};
+  font-size: 14px;
+  font-weight: normal;
+  margin: 0 0 6px;
+`
+
+const QuestionText = styled.p`
+  color: ${props => props.theme.colors.textColor};
+  font-size: 14px;
+  font-weight: normal;
+  margin: 0 0 20px;
 `
 
 const TextfieldStyledRight = styled<any>(Textfield)`
@@ -65,32 +96,23 @@ const BigNumberInputTextRight = styled<any>(BigNumberInput)`
   text-align: right;
 `
 
-const OutcomeInfo = styled(Well)`
-  margin-bottom: 30px;
-`
-
-const ErrorStyled = styled(FormError)`
-  margin: 0 0 10px 0;
-`
-
 const Grid = styled.div`
   display: grid;
-  grid-column-gap: 20px;
-  grid-row-gap: 14px;
-  grid-template-columns: 1fr 1fr;
-  margin-bottom: 14px;
+  grid-column-gap: 50px;
+  grid-row-gap: 20px;
+  grid-template-columns: 1fr;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 `
 
-const TitleValueStyled = styled(TitleValue)`
-  margin-bottom: 14px;
-`
+const TitleValueVertical = styled(TitleValue)`
+  flex-direction: column;
 
-const TitleValueFinalStyled = styled(TitleValue)`
-  margin-bottom: 25px;
-`
-
-const SubsectionTitleNoMargin = styled(SubsectionTitle)`
-  margin-bottom: 0;
+  > h2 {
+    margin: 0 0 6px;
+  }
 `
 
 const FundingAndFeeStep = (props: Props) => {
@@ -129,53 +151,51 @@ const FundingAndFeeStep = (props: Props) => {
 
   return (
     <>
-      <CreateCard>
-        <OutcomeInfo>
-          <Paragraph>
-            Please <strong>check all the information is correct</strong>. You can go back and edit anything you need.
-          </Paragraph>
-          <Paragraph>
-            <strong>If everything is OK</strong> proceed to create the new market.
-          </Paragraph>
-        </OutcomeInfo>
-
-        <SubsectionTitle>Details</SubsectionTitle>
-        <TitleValueStyled title={'Question'} value={question} />
+      <CreateCardTop>
+        <SubsectionTitleStyled>Your Market</SubsectionTitleStyled>
+        <QuestionTitle>Market Question</QuestionTitle>
+        <QuestionText>{question}</QuestionText>
+        <OutcomesTableWrapper>
+          <OutcomesTable>
+            <OutcomesTHead>
+              <OutcomesTR>
+                <OutcomesTH>Outcome</OutcomesTH>
+                <OutcomesTH textAlign="right">Probability</OutcomesTH>
+                <OutcomesTH textAlign="right">My Shares</OutcomesTH>
+              </OutcomesTR>
+            </OutcomesTHead>
+            <OutcomesTBody>
+              {outcomes.map((outcome, index) => {
+                return (
+                  <OutcomesTR key={index}>
+                    <OutcomesTD>
+                      <OutcomeItemTextWrapper>
+                        <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
+                        <OutcomeItemText>{outcome.name}</OutcomeItemText>
+                      </OutcomeItemTextWrapper>
+                    </OutcomesTD>
+                    <OutcomesTD textAlign="right">{outcome.probability}%</OutcomesTD>
+                    <OutcomesTD textAlign="right">0</OutcomesTD>
+                  </OutcomesTR>
+                )
+              })}
+            </OutcomesTBody>
+          </OutcomesTable>
+        </OutcomesTableWrapper>
         <Grid>
-          <TitleValue title={'Category'} value={category} />
-          <TitleValue title={'Resolution date'} value={resolutionDate} />
-          <TitleValue title={'Spread / Fee'} value={`${spread}%`} />
-          {collateral && (
+          <TitleValueVertical title={'Category'} value={category} />
+          <TitleValueVertical title={'Resolution date'} value={resolutionDate} />
+          <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
+        </Grid>
+      </CreateCardTop>
+      {/* {collateral && (
             <TitleValue
               title={'Funding'}
               value={[formatBigNumber(funding, collateral.decimals), <strong key="1"> {collateral.symbol}</strong>]}
             />
-          )}
-        </Grid>
-        <TitleValueFinalStyled title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
-        <SubsectionTitleNoMargin>Outcomes</SubsectionTitleNoMargin>
-        <Table
-          head={
-            <THead>
-              <TR>
-                <TH>Outcome</TH>
-                <TH textAlign="right">Probabilities</TH>
-              </TR>
-            </THead>
-          }
-          maxHeight="130px"
-        >
-          {outcomes.map((outcome, index) => {
-            return (
-              <TR key={index}>
-                <TD>{outcome.name}</TD>
-                <TD textAlign="right">{outcome.probability}%</TD>
-              </TR>
-            )
-          })}
-        </Table>
-      </CreateCard>
-      <CreateCard>
+          )} */}
+      {/* <TitleValue title={'Spread / Fee'} value={`${spread}%`} /> */}
+      <CreateCardBottom>
         <FormRow
           formField={
             <TextfieldCustomPlaceholder
@@ -232,39 +252,47 @@ const FundingAndFeeStep = (props: Props) => {
         !MarketCreationStatus.is.error(marketCreationStatus) ? (
           <FullLoading message={`${marketCreationStatus._type}...`} />
         ) : null}
-
-        {fundingErrorMessage && <ErrorStyled>{fundingErrorMessage}</ErrorStyled>}
-
-        <ButtonContainer>
-          <ButtonLinkStyled
+        {fundingErrorMessage && <FormError>{fundingErrorMessage}</FormError>}
+        <ButtonContainerFullWidth>
+          <LeftButton
+            buttonType={ButtonType.secondaryLine}
             disabled={
               !MarketCreationStatus.is.ready(marketCreationStatus) &&
               !MarketCreationStatus.is.error(marketCreationStatus)
             }
             onClick={back}
           >
-            ‹ Back
-          </ButtonLinkStyled>
-          {account ? (
-            <Button
-              buttonType={ButtonType.primary}
-              disabled={
-                !MarketCreationStatus.is.ready(marketCreationStatus) ||
-                MarketCreationStatus.is.error(marketCreationStatus) ||
-                !hasEnoughBalance ||
-                error
-              }
-              onClick={submit}
-            >
-              Create
-            </Button>
-          ) : (
+            Back
+          </LeftButton>
+          {!account && (
             <Button buttonType={ButtonType.primary} onClick={submit}>
               Connect Wallet
             </Button>
           )}
-        </ButtonContainer>
-      </CreateCard>
+          <ButtonWithReadyToGoStatus
+            buttonType={ButtonType.primary}
+            disabled={
+              !MarketCreationStatus.is.ready(marketCreationStatus) ||
+              MarketCreationStatus.is.error(marketCreationStatus) ||
+              !hasEnoughBalance ||
+              error ||
+              !account
+            }
+            onClick={submit}
+            readyToGo={
+              !(
+                !MarketCreationStatus.is.ready(marketCreationStatus) ||
+                MarketCreationStatus.is.error(marketCreationStatus) ||
+                !hasEnoughBalance ||
+                error ||
+                !account
+              )
+            }
+          >
+            Create Market
+          </ButtonWithReadyToGoStatus>
+        </ButtonContainerFullWidth>
+      </CreateCardBottom>
     </>
   )
 }
