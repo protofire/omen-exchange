@@ -38,3 +38,11 @@ export const GRAPH_WS = process.env.REACT_APP_GRAPH_WS || 'wss://api.thegraph.co
 
 // Corona version options
 export const IS_CORONA_VERSION = process.env.REACT_APP_IS_CORONA_VERSION === 'true'
+
+export const CORONA_MARKET_CREATORS = (process.env.REACT_APP_CORONA_MARKET_CREATORS || '')
+  .split(',')
+  .filter(x => x.length)
+  .map(x => x.toLowerCase())
+if (IS_CORONA_VERSION && !CORONA_MARKET_CREATORS.length) {
+  throw new Error('You need to set the REACT_APP_CORONA_MARKET_CREATORS environment variable')
+}
