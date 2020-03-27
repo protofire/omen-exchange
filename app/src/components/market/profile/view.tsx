@@ -70,14 +70,16 @@ const ViewWrapper = (props: Props) => {
         {renderTableData()}
         <WhenConnected>
           <ButtonContainer>
-            <LeftButton
-              buttonType={ButtonType.secondaryLine}
-              onClick={() => {
-                history.push(`${marketMakerAddress}/pool-liquidity`)
-              }}
-            >
-              Pool Liquidity
-            </LeftButton>
+            {!IS_CORONA_VERSION && (
+              <LeftButton
+                buttonType={ButtonType.secondaryLine}
+                onClick={() => {
+                  history.push(`${marketMakerAddress}/pool-liquidity`)
+                }}
+              >
+                Pool Liquidity
+              </LeftButton>
+            )}
             <Button
               buttonType={ButtonType.secondaryLine}
               disabled={!userHasShares}
