@@ -46,3 +46,8 @@ export const CORONA_MARKET_CREATORS = (process.env.REACT_APP_CORONA_MARKET_CREAT
 if (IS_CORONA_VERSION && !CORONA_MARKET_CREATORS.length) {
   throw new Error('You need to set the REACT_APP_CORONA_MARKET_CREATORS environment variable')
 }
+
+export const CORONA_REALITIO_ARBITRATOR: string = process.env.REACT_APP_CORONA_REALITIO_ARBITRATOR || ''
+if (IS_CORONA_VERSION && !CORONA_REALITIO_ARBITRATOR) {
+  throw new Error('You need to set the REACT_APP_CORONA_REALITIO_ARBITRATOR environment variable')
+}

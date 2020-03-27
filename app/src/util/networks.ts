@@ -1,4 +1,5 @@
 import {
+  CORONA_REALITIO_ARBITRATOR,
   EARLIEST_GANACHE_BLOCK_TO_CHECK,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
@@ -303,6 +304,15 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
       [networkIds.GANACHE]: '0x000000000000000000000000000000003ea11710',
     },
   },
+  corona: {
+    name: 'Coronavirus markets arbitrator',
+    url: '',
+    addresses: {
+      [networkIds.MAINNET]: CORONA_REALITIO_ARBITRATOR,
+      [networkIds.RINKEBY]: CORONA_REALITIO_ARBITRATOR,
+      [networkIds.GANACHE]: CORONA_REALITIO_ARBITRATOR,
+    },
+  },
   unknown: {
     name: 'Unknown',
     url: '',
@@ -326,12 +336,12 @@ export const getArbitrator = (networkId: number, arbitratorId: KnownArbitrator):
   }
 }
 
-export const getDefaultArbitrator = (networkId: number) => {
+export const getDefaultArbitrator = (networkId: number): Arbitrator => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
 
-  return getArbitrator(networkId, 'realitio')
+  return IS_CORONA_VERSION ? getArbitrator(networkId, 'corona') : getArbitrator(networkId, 'realitio')
 }
 
 export const getArbitratorFromAddress = (networkId: number, address: string): Maybe<Arbitrator> => {
