@@ -24,6 +24,7 @@ import {
 } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
 import { FullLoading } from '../../../loading'
+import { CurrencySelector } from '../../currency_selector'
 import { TransactionDetailsCard } from '../../transaction_details_card'
 import { TransactionDetailsLine } from '../../transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../transaction_details_row'
@@ -108,6 +109,15 @@ const TitleValueVertical = styled(TitleValue)`
   }
 `
 
+const CurrenciesWrapper = styled.div`
+  margin-bottom: 20px;
+`
+
+const GridTransactionDetailsStyled = styled(GridTransactionDetails)`
+  border-top: 1px solid ${props => props.theme.borders.borderColor};
+  padding-top: 20px;
+`
+
 const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
@@ -180,21 +190,13 @@ const FundingAndFeeStep = (props: Props) => {
           <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
         </Grid>
       </CreateCardTop>
-      {/* {collateral && (
-            <TitleValue
-              title={'Funding'}
-              value={[formatBigNumber(funding, collateral.decimals), <strong key="1"> {collateral.symbol}</strong>]}
-            />
-          )} */}
-      {/* <TitleValue title={'Spread / Fee'} value={`${spread}%`} /> */}
       <CreateCardBottom>
         <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
-        <SubTitle>Choose Currency</SubTitle>
-        <div className="adsd">
-          Currencies here
-          <br /> <br />
-        </div>
-        <GridTransactionDetails>
+        <CurrenciesWrapper>
+          <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
+          <CurrencySelector />
+        </CurrenciesWrapper>
+        <GridTransactionDetailsStyled>
           <div>
             <WalletBalance value={formatBigNumber(collateralBalance, collateral.decimals)} />
             <TextfieldCustomPlaceholder
@@ -206,12 +208,12 @@ const FundingAndFeeStep = (props: Props) => {
           </div>
           <div>
             <TransactionDetailsCard>
-              <TransactionDetailsRow state={ValueStates.important} title={'Earn Trading Fee'} value={spread} />
+              <TransactionDetailsRow state={ValueStates.important} title={'Earn Trading Fee'} value={`${spread}%`} />
               <TransactionDetailsLine />
-              <TransactionDetailsRow title={'Pool Tokens'} value={`(0.00%) 0.00`} />
+              <TransactionDetailsRow title={'Pool Tokens'} value={formatBigNumber(funding, collateral.decimals)} />
             </TransactionDetailsCard>
           </div>
-        </GridTransactionDetails>
+        </GridTransactionDetailsStyled>
         {!MarketCreationStatus.is.ready(marketCreationStatus) &&
         !MarketCreationStatus.is.error(marketCreationStatus) ? (
           <FullLoading message={`${marketCreationStatus._type}...`} />

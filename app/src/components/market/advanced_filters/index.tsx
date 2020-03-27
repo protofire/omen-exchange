@@ -2,7 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../common/dropdown'
-import { BatIcon, DaiIcon, DxDaoIcon, EtherIcon } from '../../common/icons'
+import { DxDaoIcon } from '../../common/icons'
+import { BatIcon, DaiIcon, EtherIcon } from '../../common/icons/currencies'
 import { TokenItem } from '../token_item'
 
 const Wrapper = styled.div`

@@ -1,0 +1,6 @@
+export { BatIcon } from './BatIcon'
+export { CDaiIcon } from './CDaiIcon'
+export { ChaiIcon } from './ChaiIcon'
+export { DaiIcon } from './DaiIcon'
+export { EtherIcon } from './EtherIcon'
+export { UsdcIcon } from './UsdcIcon'
