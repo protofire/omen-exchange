@@ -12,20 +12,21 @@ import { Arbitrator, Token } from '../../../../util/types'
 import { Button } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import {
-  BalanceToken,
   BigNumberInput,
   CreateCard,
   DisplayArbitrator,
   FormError,
-  FormRow,
+  GridTransactionDetails,
   SubsectionTitle,
-  Textfield,
   TextfieldCustomPlaceholder,
   TitleValue,
-  Tokens,
+  WalletBalance,
 } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
 import { FullLoading } from '../../../loading'
+import { TransactionDetailsCard } from '../../transaction_details_card'
+import { TransactionDetailsLine } from '../../transaction_details_line'
+import { TransactionDetailsRow, ValueStates } from '../../transaction_details_row'
 import {
   ButtonContainerFullWidth,
   ButtonWithReadyToGoStatus,
@@ -74,7 +75,7 @@ const SubsectionTitleStyled = styled(SubsectionTitle)`
   margin-bottom: 20px;
 `
 
-const QuestionTitle = styled.h3`
+const SubTitle = styled.h3`
   color: ${props => props.theme.colors.textColorDarker};
   font-size: 14px;
   font-weight: normal;
@@ -86,14 +87,6 @@ const QuestionText = styled.p`
   font-size: 14px;
   font-weight: normal;
   margin: 0 0 20px;
-`
-
-const TextfieldStyledRight = styled<any>(Textfield)`
-  text-align: right;
-`
-
-const BigNumberInputTextRight = styled<any>(BigNumberInput)`
-  text-align: right;
 `
 
 const Grid = styled.div`
@@ -121,7 +114,7 @@ const FundingAndFeeStep = (props: Props) => {
   const dispatch = useDispatch()
   const { account, library: provider } = context
 
-  const { handleChange, handleCollateralChange, marketCreationStatus, submit, values } = props
+  const { handleChange, marketCreationStatus, submit, values } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
   React.useEffect(() => {
@@ -133,7 +126,6 @@ const FundingAndFeeStep = (props: Props) => {
   const isFundingGreaterThanBalance = account ? funding.gt(collateralBalance) : false
   const error = !spread || funding.isZero() || isFundingGreaterThanBalance
 
-  const fundingMessageError = isFundingGreaterThanBalance ? `You don't have enough collateral in your balance.` : ''
   const resolutionDate = resolution && formatDate(resolution)
 
   const back = () => {
@@ -153,7 +145,7 @@ const FundingAndFeeStep = (props: Props) => {
     <>
       <CreateCardTop>
         <SubsectionTitleStyled>Your Market</SubsectionTitleStyled>
-        <QuestionTitle>Market Question</QuestionTitle>
+        <SubTitle>Market Question</SubTitle>
         <QuestionText>{question}</QuestionText>
         <OutcomesTableWrapper>
           <OutcomesTable>
@@ -196,58 +188,30 @@ const FundingAndFeeStep = (props: Props) => {
           )} */}
       {/* <TitleValue title={'Spread / Fee'} value={`${spread}%`} /> */}
       <CreateCardBottom>
-        <FormRow
-          formField={
-            <TextfieldCustomPlaceholder
-              disabled={true}
-              formField={
-                <TextfieldStyledRight
-                  defaultValue={spread}
-                  disabled
-                  name="spread"
-                  onChange={handleChange}
-                  type="number"
-                />
-              }
-              placeholderText="%"
-            />
-          }
-          title={'Spread / Fee'}
-        />
-        <FormRow
-          formField={
-            <Tokens context={context} name="collateralId" onTokenChange={handleCollateralChange} value={collateral} />
-          }
-          title={'Collateral token'}
-        />
-        <FormRow
-          formField={
+        <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
+        <SubTitle>Choose Currency</SubTitle>
+        <div className="adsd">
+          Currencies here
+          <br /> <br />
+        </div>
+        <GridTransactionDetails>
+          <div>
+            <WalletBalance value={formatBigNumber(collateralBalance, collateral.decimals)} />
             <TextfieldCustomPlaceholder
               formField={
-                <BigNumberInputTextRight
-                  decimals={collateral.decimals}
-                  name="funding"
-                  onChange={handleChange}
-                  value={funding}
-                />
+                <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
               }
               placeholderText={collateral.symbol}
             />
-          }
-          note={
-            <>
-              {account && (
-                <BalanceToken
-                  collateral={collateral}
-                  collateralBalance={collateralBalance}
-                  onClickAddMaxCollateral={() => handleChange({ name: 'funding', value: collateralBalance })}
-                />
-              )}
-              <FormError>{fundingMessageError}</FormError>
-            </>
-          }
-          title={'Funding'}
-        />
+          </div>
+          <div>
+            <TransactionDetailsCard>
+              <TransactionDetailsRow state={ValueStates.important} title={'Earn Trading Fee'} value={spread} />
+              <TransactionDetailsLine />
+              <TransactionDetailsRow title={'Pool Tokens'} value={`(0.00%) 0.00`} />
+            </TransactionDetailsCard>
+          </div>
+        </GridTransactionDetails>
         {!MarketCreationStatus.is.ready(marketCreationStatus) &&
         !MarketCreationStatus.is.error(marketCreationStatus) ? (
           <FullLoading message={`${marketCreationStatus._type}...`} />
