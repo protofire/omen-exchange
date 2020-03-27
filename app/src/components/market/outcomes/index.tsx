@@ -2,14 +2,14 @@ import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { ButtonCircle } from '../../button'
-import { FormError, FormLabel, FormRowLink, Textfield, TextfieldCustomPlaceholder, Tooltip } from '../../common'
+import { FormError, FormLabel, FormRowLink, Textfield, TextfieldCustomPlaceholder } from '../../common'
 import { AddIcon, RemoveIcon } from '../../common/icons'
 
 const BUTTON_DIMENSIONS = '34px'
 
 const OutcomeGridCSS = css`
   align-items: center;
-  column-gap: 20px;
+  column-gap: 16px;
   display: grid;
 `
 
@@ -20,7 +20,7 @@ const OutcomeIsUniformGridCSS = css`
 
 const OutcomeIsManualGridCSS = css`
   ${OutcomeGridCSS}
-  grid-template-columns: 1fr 146px ${BUTTON_DIMENSIONS};
+  grid-template-columns: minmax(120px, 1fr) minmax(100px, 146px) ${BUTTON_DIMENSIONS};
 `
 
 const TitleWrapper = styled.div<{ uniformProbabilities: boolean }>`
@@ -64,11 +64,65 @@ const CustomButtonCircleAdd = styled(CustomButtonCircle)<{ readyToAdd: boolean }
   ${props => props.readyToAdd && CustomButtonCircleAddReadyCSS}
 `
 
-const OutcomesWrapper = styled.div`
+const OutcomesTableWrapper = styled.div`
+  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
   border-top: 1px solid ${props => props.theme.borders.borderColor};
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
+  margin-bottom: 20px;
+  margin-left: -${props => props.theme.cards.paddingHorizontal};
+  margin-right: -${props => props.theme.cards.paddingHorizontal};
+  min-height: 180px;
+  overflow-x: auto;
+`
+
+const OutcomesTable = styled.table`
+  border-collapse: collapse;
+  min-width: 100%;
+`
+
+const OutcomesTHead = styled.thead``
+
+const OutcomesTBody = styled.tbody``
+
+const OutcomesTH = styled.th`
+  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
+  color: ${props => props.theme.colors.textColor};
+  font-size: 14px;
+  font-weight: 400;
+  height: 40px;
+  line-height: 1.2;
+  padding: 0 15px 0 0;
+  text-align: left;
+  white-space: nowrap;
+`
+
+const OutcomesTR = styled.tr`
+  height: fit-content;
+
+  &:last-child > td {
+    border-bottom: none;
+  }
+
+  > th:first-child,
+  > td:first-child {
+    padding-left: ${props => props.theme.cards.paddingHorizontal};
+  }
+
+  > th:last-child,
+  > td:last-child {
+    padding-right: ${props => props.theme.cards.paddingHorizontal};
+  }
+`
+
+const OutcomesTD = styled.td`
+  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
+  color: ${props => props.theme.colors.textColorDark};
+  font-size: 14px;
+  font-weight: 500;
+  height: 56px;
+  line-height: 1.2;
+  padding: 0 15px 0 0;
+  text-align: left;
+  white-space: nowrap;
 `
 
 const OutcomesTitles = styled.div`
@@ -78,23 +132,36 @@ const OutcomesTitles = styled.div`
   margin-bottom: 12px;
 `
 
-const OutcomeItems = styled.div`
-  max-height: 200px;
-  overflow: auto;
+const OutcomeItemTextWrapper = styled.div`
+  align-items: center;
+  display: flex;
 `
 
-const OutcomeItem = styled(OutcomesTitles)`
-  margin-bottom: 20px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+const OutcomeItemText = styled.div`
+  color: ${props => props.theme.colors.textColorDark};
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 0 16px;
+  text-align: left;
+  white-space: nowrap;
 `
 
-const FormLabelWrapper = styled.div`
+const OutcomeItemLittleBallOfJoyAndDifferentColors = styled.div<{ outcomeIndex: number }>`
+  background-color: ${props => props.theme.outcomes.colors[props.outcomeIndex].medium};
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+`
+
+const OutcomeItemProbability = styled.div`
   align-items: center;
   display: flex;
   justify-content: space-between;
+`
+
+const OutcomeItemProbabilityText = styled.div`
+  margin: 0 25px 0 0;
 `
 
 const ErrorsWrapper = styled.div`
@@ -156,48 +223,6 @@ const Outcomes = (props: Props) => {
   const [newOutcomeProbability, setNewOutcomeProbability] = useState(0)
   const [uniformProbabilities, setIsUniform] = useState(false)
 
-  const updateOutcomeProbability = (index: number, newProbability: number) => {
-    if (newProbability < 0 || newProbability > 100) {
-      return
-    }
-
-    // for binary markets, change the probability of the other outcome so that they add to 100
-    if (outcomes.length === 2) {
-      const otherProbability = 100 - newProbability
-
-      const newOutcomes = [
-        {
-          ...outcomes[0],
-          probability: index === 0 ? newProbability : otherProbability,
-        },
-        {
-          ...outcomes[1],
-          probability: index === 0 ? otherProbability : newProbability,
-        },
-      ]
-
-      props.onChange(newOutcomes)
-    } else {
-      const newOutcome = {
-        ...outcomes[index],
-        probability: newProbability,
-      }
-
-      const newOutcomes = [...outcomes.slice(0, index), newOutcome, ...outcomes.slice(index + 1)]
-      props.onChange(newOutcomes)
-    }
-  }
-
-  const updateOutcomeName = (index: number, newName: string) => {
-    const newOutcome = {
-      ...outcomes[index],
-      name: newName,
-    }
-
-    const newOutcomes = [...outcomes.slice(0, index), newOutcome, ...outcomes.slice(index + 1)]
-    props.onChange(newOutcomes)
-  }
-
   const messageErrorToRender = () => {
     if (!errorMessages) {
       return
@@ -248,41 +273,33 @@ const Outcomes = (props: Props) => {
   }
 
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
-    <OutcomeItem key={index}>
-      <Textfield
-        disabled={disabled}
-        name={`outcome_${index}`}
-        onChange={e => updateOutcomeName(index, e.currentTarget.value)}
-        type="text"
-        value={outcome.name}
-      />
-      <TextfieldCustomPlaceholder
-        formField={
-          <Textfield
-            data-testid={`outcome_${index}`}
-            disabled={uniformProbabilities}
-            min={0}
-            onChange={e => updateOutcomeProbability(index, +e.currentTarget.value)}
-            type="number"
-            value={outcome.probability}
-          />
-        }
-        placeholderText="%"
-      />
-      <CustomButtonCircle
-        disabled={disabled}
-        onClick={() => {
-          removeOutcome(index)
-        }}
-      >
-        <RemoveIcon />
-      </CustomButtonCircle>
-    </OutcomeItem>
+    <OutcomesTR key={index}>
+      <OutcomesTD>
+        <OutcomeItemTextWrapper>
+          <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
+          <OutcomeItemText>{outcome.name}</OutcomeItemText>
+        </OutcomeItemTextWrapper>
+      </OutcomesTD>
+      <OutcomesTD>
+        <OutcomeItemProbability>
+          <OutcomeItemProbabilityText>{outcome.probability}%</OutcomeItemProbabilityText>
+          <CustomButtonCircle
+            disabled={disabled}
+            onClick={() => {
+              removeOutcome(index)
+            }}
+          >
+            <RemoveIcon />
+          </CustomButtonCircle>
+        </OutcomeItemProbability>
+      </OutcomesTD>
+    </OutcomesTR>
   ))
 
   const manualProbabilities = !uniformProbabilities
   const manualProbabilitiesAndThereAreOutcomes = manualProbabilities && outcomes.length > 0
   const manualProbabilitiesAndNoOutcomes = manualProbabilities && outcomes.length === 0
+  const maxOutcomesReached = outcomes.length >= 6
 
   return (
     <>
@@ -307,7 +324,7 @@ const Outcomes = (props: Props) => {
       </TitleWrapper>
       <NewOutcome uniformProbabilities={uniformProbabilities}>
         <Textfield
-          disabled={!canAddOutcome}
+          disabled={!canAddOutcome || maxOutcomesReached}
           onChange={e => setNewOutcomeName(e.target.value)}
           placeholder="Add new outcome"
           type="text"
@@ -317,6 +334,7 @@ const Outcomes = (props: Props) => {
           <TextfieldCustomPlaceholder
             formField={
               <Textfield
+                disabled={maxOutcomesReached}
                 min={0}
                 onChange={e => setNewOutcomeProbability(Number(e.target.value))}
                 placeholder="0.00"
@@ -327,35 +345,37 @@ const Outcomes = (props: Props) => {
             placeholderText="%"
           />
         )}
-        <CustomButtonCircleAdd disabled={!newOutcomeName} onClick={addNewOutcome} readyToAdd={newOutcomeName !== ''}>
+        <CustomButtonCircleAdd
+          disabled={!newOutcomeName || maxOutcomesReached}
+          onClick={addNewOutcome}
+          readyToAdd={newOutcomeName !== ''}
+        >
           <AddIcon />
         </CustomButtonCircleAdd>
       </NewOutcome>
-      <OutcomesWrapper>
-        <OutcomesTitles>
-          <FormLabel>Outcome</FormLabel>
-          <FormLabelWrapper>
-            <FormLabel>Probability</FormLabel>
-            <Tooltip
-              description="If an event has already a probability different than 50-50 you can adjust it here. It is important that the probabilities add up to 100%"
-              id="probability"
-            />
-          </FormLabelWrapper>
-        </OutcomesTitles>
-        <OutcomeItems>{outcomesToRender}</OutcomeItems>
-        {messageErrorToRender()}
-        <TotalWrapper>
-          <TotalTitle>
-            <strong>Total:</strong> {outcomes.length} outcomes
-          </TotalTitle>
-          <TotalValue>
-            <TotalValueColor error={totalProbabilities !== 100} uniformProbabilities={uniformProbabilities}>
-              {totalProbabilities}
-            </TotalValueColor>
-            %
-          </TotalValue>
-        </TotalWrapper>
-      </OutcomesWrapper>
+      <OutcomesTableWrapper>
+        <OutcomesTable>
+          <OutcomesTHead>
+            <OutcomesTR>
+              <OutcomesTH style={{ width: '70%' }}>Outcome</OutcomesTH>
+              <OutcomesTH>Probability</OutcomesTH>
+            </OutcomesTR>
+          </OutcomesTHead>
+          <OutcomesTBody>{outcomesToRender}</OutcomesTBody>
+        </OutcomesTable>
+      </OutcomesTableWrapper>
+      {messageErrorToRender()}
+      <TotalWrapper>
+        <TotalTitle>
+          <strong>Total:</strong> {outcomes.length} outcomes
+        </TotalTitle>
+        <TotalValue>
+          <TotalValueColor error={totalProbabilities !== 100} uniformProbabilities={uniformProbabilities}>
+            {totalProbabilities}
+          </TotalValueColor>
+          %
+        </TotalValue>
+      </TotalWrapper>
     </>
   )
 }
