@@ -189,3 +189,12 @@ export const calcPoolTokens = (
     return addedFunds
   }
 }
+
+export const calcDepositedTokens = (
+  removedFunds: BigNumber,
+  holdingsBN: BigNumber[],
+  poolShareSupply: BigNumber,
+): BigNumber => {
+  const sendAmounts = holdingsBN.map(h => h.mul(removedFunds).div(poolShareSupply))
+  return sendAmounts.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
+}

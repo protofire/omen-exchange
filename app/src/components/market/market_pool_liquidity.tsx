@@ -12,7 +12,7 @@ import { useFundingBalance } from '../../hooks/useFundingBalance'
 import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
 import { getLogger } from '../../util/logger'
-import { formatBigNumber, calcPoolTokens } from '../../util/tools'
+import { formatBigNumber, calcPoolTokens, calcDepositedTokens } from '../../util/tools'
 import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../button'
 import { ButtonType } from '../button/button_styling_types'
@@ -109,6 +109,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     totalPoolShares,
   )
 
+  const depositedTokens = calcDepositedTokens(
+    amountToRemove,
+    balances.map(b => b.holdings),
+    totalPoolShares,
+  )
+
   const addFunding = async () => {
     try {
       if (!account) {
@@ -189,11 +195,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const hasEnoughAllowance = allowance && allowance.gte(amountToFund)
   const showSetAllowance = allowanceFinished || hasZeroAllowance || !hasEnoughAllowance
 
-  const mockedEarnTradingFee = 1.23
-  const mockedEarned = 3.33
-  const mockedPoolTokens = 1.12
-  const mockedDeposited = 0.55
-  const mockedTokenTotals = 11.55
+  const mockedEarnTradingFee = new BigNumber(10).pow(18)
+  const mockedTokenTotals = depositedTokens.add(mockedEarnTradingFee)
 
   return (
     <>
@@ -280,18 +283,22 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             {activeTab === Tabs.withdraw && (
               <TransactionDetailsCard>
                 <TransactionDetailsRow
-                  emphasizeValue={mockedEarnTradingFee > 0}
+                  emphasizeValue={mockedEarnTradingFee.gt(0)}
                   state={ValueStates.success}
                   title={'Earned'}
-                  value={mockedEarnTradingFee}
+                  value={formatBigNumber(mockedEarnTradingFee, collateral.decimals)}
                 />
-                <TransactionDetailsRow state={ValueStates.success} title={'Deposited'} value={mockedDeposited} />
+                <TransactionDetailsRow
+                  state={ValueStates.success}
+                  title={'Deposited'}
+                  value={formatBigNumber(depositedTokens, collateral.decimals)}
+                />
                 <TransactionDetailsLine />
                 <TransactionDetailsRow
-                  emphasizeValue={mockedTokenTotals > 0}
-                  state={(mockedTokenTotals > 0 && ValueStates.important) || ValueStates.normal}
+                  emphasizeValue={mockedTokenTotals.gt(0)}
+                  state={(mockedTokenTotals.gt(0) && ValueStates.important) || ValueStates.normal}
                   title={'Total'}
-                  value={`${mockedTokenTotals ? mockedTokenTotals : '0.00'} ${collateral.symbol}`}
+                  value={`${formatBigNumber(mockedTokenTotals, collateral.decimals)} ${collateral.symbol}`}
                 />
               </TransactionDetailsCard>
             )}
