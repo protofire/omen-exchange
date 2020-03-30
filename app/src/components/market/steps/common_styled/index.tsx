@@ -131,3 +131,10 @@ export const OutcomeItemProbabilityText = styled.div`
 export const ErrorsWrapper = styled.div`
   margin: 0 0 20px;
 `
+
+export const TDFlexDiv = styled.div<{ textAlign?: string }>`
+  align-items: center;
+  display: flex;
+  justify-content: ${props =>
+    props.textAlign && 'right' ? 'flex-end' : props.textAlign && 'center' ? 'center' : 'flex-start'};
+`

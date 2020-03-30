@@ -21,10 +21,10 @@ import {
   WalletBalance,
 } from '../common'
 import { BigNumberInputReturn } from '../common/big_number_input'
-import { OutcomeTable } from '../common/outcome_table'
 import { FullLoading } from '../loading'
 
 import { MarketTopDetails } from './market_top_details'
+import { OutcomeTable } from './outcome_table'
 import { TransactionDetailsCard } from './transaction_details_card'
 import { TransactionDetailsLine } from './transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from './transaction_details_row'

@@ -18,6 +18,7 @@ import {
   DisplayArbitrator,
   FormError,
   GridTransactionDetails,
+  NewValue,
   SubsectionTitle,
   TextfieldCustomPlaceholder,
   TitleValue,
@@ -44,6 +45,7 @@ import {
   OutcomesTR,
   OutcomesTable,
   OutcomesTableWrapper,
+  TDFlexDiv,
 } from '../common_styled'
 import { Outcome } from '../outcomes'
 
@@ -187,7 +189,11 @@ const FundingAndFeeStep = (props: Props) => {
                       </OutcomeItemTextWrapper>
                     </OutcomesTD>
                     <OutcomesTD textAlign="right">{outcome.probability}%</OutcomesTD>
-                    <OutcomesTD textAlign="right">0</OutcomesTD>
+                    <OutcomesTD textAlign="right">
+                      <TDFlexDiv textAlign="right">
+                        0 <NewValue outcomeIndex={index} value="2.35" />
+                      </TDFlexDiv>
+                    </OutcomesTD>
                   </OutcomesTR>
                 )
               })}

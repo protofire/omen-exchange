@@ -10,9 +10,9 @@ import { Button, ButtonContainer } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { ThreeBoxComments, ViewCard } from '../../common'
 import { DisqusComments } from '../../common/disqus_comments'
-import { OutcomeTable } from '../../common/outcome_table'
 import { FullLoading } from '../../loading'
 import { MarketTopDetails } from '../market_top_details'
+import { OutcomeTable } from '../outcome_table'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
