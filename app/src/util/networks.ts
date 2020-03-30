@@ -61,7 +61,7 @@ const networks: { [K in NetworkId]: Network } = {
     earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
-      marketMakerFactory: '0xe7E502789B8f4cDC99e6Cf9d3963E8C76784da51',
+      marketMakerFactory: '0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
       oracle: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
       klerosBadge: '0xcb4aae35333193232421e86cd2e9b6c91f3b125f',
