@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
@@ -23,6 +23,7 @@ import {
   WalletBalance,
 } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
+import { currenciesData } from '../../../common/icons/currencies/currencies_data'
 import { FullLoading } from '../../../loading'
 import { CurrencySelector } from '../../currency_selector'
 import { TransactionDetailsCard } from '../../transaction_details_card'
@@ -102,6 +103,7 @@ const Grid = styled.div`
 `
 
 const TitleValueVertical = styled(TitleValue)`
+  align-items: flex-start;
   flex-direction: column;
 
   > h2 {
@@ -110,7 +112,7 @@ const TitleValueVertical = styled(TitleValue)`
 `
 
 const CurrenciesWrapper = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 `
 
 const GridTransactionDetailsStyled = styled(GridTransactionDetails)`
@@ -149,6 +151,13 @@ const FundingAndFeeStep = (props: Props) => {
       funding,
       collateral.decimals,
     )} DAI of funding but your account only has ${formatBigNumber(balance, collateral.decimals)} DAI`
+  }
+
+  currenciesData.sort()
+  const [selectedCurrency, setSelectedCurrency] = useState(currenciesData[0].token)
+
+  const selectCurrency = (currency: string) => {
+    setSelectedCurrency(currency)
   }
 
   return (
@@ -194,7 +203,7 @@ const FundingAndFeeStep = (props: Props) => {
         <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
         <CurrenciesWrapper>
           <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
-          <CurrencySelector />
+          <CurrencySelector onSelect={selectCurrency} selectedCategory={selectedCurrency} />
         </CurrenciesWrapper>
         <GridTransactionDetailsStyled>
           <div>
