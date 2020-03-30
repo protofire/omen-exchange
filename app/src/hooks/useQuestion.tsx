@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
 import { getLogger } from '../util/logger'
@@ -17,6 +18,8 @@ export const useQuestion = (marketMakerAddress: string, context: ConnectedWeb3Co
   const [arbitratorAddress, setArbitratorAddress] = useState<string>('')
   const [category, setCategory] = useState<string>('')
   const [outcomes, setOutcomes] = useState<string[]>([])
+  const [questionTemplateId, setQuestionTemplateId] = useState<BigNumber>(new BigNumber(0))
+  const [questionRaw, setQuestionRaw] = useState<string>('')
 
   useEffect(() => {
     let isSubscribed = true
@@ -26,11 +29,21 @@ export const useQuestion = (marketMakerAddress: string, context: ConnectedWeb3Co
 
         const conditionId = await marketMaker.getConditionId()
         const questionId = await conditionalTokens.getQuestionId(conditionId)
-        const { arbitratorAddress, category, outcomes, question, resolution } = await realitio.getQuestion(questionId)
+        const {
+          arbitratorAddress,
+          category,
+          outcomes,
+          question,
+          questionRaw,
+          questionTemplateId,
+          resolution,
+        } = await realitio.getQuestion(questionId)
 
         if (isSubscribed) {
           setQuestionId(questionId)
           setQuestion(question)
+          setQuestionRaw(questionRaw)
+          setQuestionTemplateId(questionTemplateId)
           setResolution(resolution)
           setArbitratorAddress(arbitratorAddress)
           setCategory(category)
@@ -47,5 +60,5 @@ export const useQuestion = (marketMakerAddress: string, context: ConnectedWeb3Co
     }
   }, [marketMakerAddress, context, conditionalTokens, realitio, buildMarketMaker])
 
-  return { questionId, question, resolution, category, arbitratorAddress, outcomes }
+  return { questionId, question, questionTemplateId, questionRaw, resolution, category, arbitratorAddress, outcomes }
 }

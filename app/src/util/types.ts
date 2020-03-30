@@ -10,11 +10,6 @@ export enum Status {
   Error = 'Error',
 }
 
-export enum OutcomeSlot {
-  Yes = 'Yes',
-  No = 'No',
-}
-
 export interface BalanceItem {
   outcomeName: string
   probability: number
@@ -49,6 +44,8 @@ export enum StepProfile {
 
 export interface Question {
   questionId: string
+  questionRaw: string
+  questionTemplateId: BigNumber
   question: string
   resolution: Maybe<Date>
   arbitratorAddress: string

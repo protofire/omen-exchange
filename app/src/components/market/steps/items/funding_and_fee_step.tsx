@@ -3,6 +3,7 @@ import React, { ChangeEvent, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
+import { IS_CORONA_VERSION } from '../../../../common/constants'
 import { useCollateralBalance } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { BalanceState, fetchAccountBalance } from '../../../../store/reducer'
@@ -103,8 +104,8 @@ const Grid = styled.div`
 `
 
 const TitleValueVertical = styled(TitleValue)`
-  align-items: flex-start;
   flex-direction: column;
+  justify-content: flex-start;
 
   > h2 {
     margin: 0 0 6px;
@@ -136,7 +137,7 @@ const FundingAndFeeStep = (props: Props) => {
   const collateralBalance = useCollateralBalance(collateral, context)
 
   const isFundingGreaterThanBalance = account ? funding.gt(collateralBalance) : false
-  const error = !spread || funding.isZero() || isFundingGreaterThanBalance
+  const error = funding.isZero() || isFundingGreaterThanBalance
 
   const resolutionDate = resolution && formatDate(resolution)
 
@@ -203,7 +204,11 @@ const FundingAndFeeStep = (props: Props) => {
         <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
         <CurrenciesWrapper>
           <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
-          <CurrencySelector onSelect={selectCurrency} selectedCategory={selectedCurrency} />
+          <CurrencySelector
+            disabled={IS_CORONA_VERSION}
+            onSelect={selectCurrency}
+            selectedCategory={selectedCurrency}
+          />
         </CurrenciesWrapper>
         <GridTransactionDetailsStyled>
           <div>

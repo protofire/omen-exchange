@@ -39,12 +39,13 @@ const CurrencyDropdown = styled(Dropdown)<{ selected: boolean }>`
 `
 
 interface Props {
+  disabled?: boolean
   onSelect: (currency: string) => void
   selectedCategory: string
 }
 
 export const CurrencySelector: React.FC<Props> = props => {
-  const { onSelect, selectedCategory, ...restProps } = props
+  const { disabled, onSelect, selectedCategory, ...restProps } = props
 
   currenciesData.sort()
 
@@ -56,9 +57,13 @@ export const CurrencySelector: React.FC<Props> = props => {
   currencyOptions.forEach(item =>
     currencyDropdownData.push({
       content: <TokenItem icon={item.icon} text={item.token} />,
-      onClick: () => {
-        onSelect(item.token)
-      },
+      onClick: !disabled
+        ? () => {
+            onSelect(item.token)
+          }
+        : () => {
+            return
+          },
     }),
   )
 
@@ -76,6 +81,7 @@ export const CurrencySelector: React.FC<Props> = props => {
         return (
           <CurrencyButton
             buttonType={ButtonType.secondaryLine}
+            disabled={disabled}
             key={index}
             onClick={() => {
               onSelect(item.token)
@@ -87,6 +93,7 @@ export const CurrencySelector: React.FC<Props> = props => {
         )
       })}
       <CurrencyDropdown
+        disabled={disabled}
         dropdownPosition={DropdownPosition.right}
         items={currencyDropdownData}
         selected={isValueInDropdown(selectedCategory)}

@@ -2,7 +2,7 @@ import React, { ChangeEvent, useCallback, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled, { css } from 'styled-components'
 
-import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
+import { IS_CORONA_VERSION, MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
 import { Button } from '../../../button'
@@ -120,7 +120,7 @@ const AskQuestionStep = (props: Props) => {
     errorMessages.push('The total of all probabilities must be 100%')
   }
 
-  const error = totalProbabilities !== 100 || !question || !category || !resolution
+  const error = totalProbabilities !== 100 || outcomes.length < 2 || !question || !resolution
 
   const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
@@ -192,6 +192,7 @@ const AskQuestionStep = (props: Props) => {
             formField={
               <Arbitrators
                 customValues={arbitratorsCustom}
+                disabled={!!loadedQuestionId || IS_CORONA_VERSION}
                 networkId={context.networkId}
                 onChangeArbitrator={handleArbitratorChange}
               />
