@@ -22,6 +22,7 @@ const MarketHomeContainer: React.FC = () => {
 
   const [filter, setFilter] = useState<any>({
     state: 'OPEN',
+    category: 'All',
     title: '',
     sortBy: null,
   })

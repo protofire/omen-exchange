@@ -46,18 +46,19 @@ export const buildQueryMarkets = (
     title ? 'title_contains: $title' : '',
     currency ? 'collateralToken: $currency' : '',
     arbitrator ? 'arbitrator: $arbitrator' : '',
-    templateId ? 'templateId: $templateId' : 'templateId_in: ["0", "2","6"]',
+    templateId ? 'templateId: $templateId' : !isCoronaVersion ? 'templateId_in: ["0", "2","6"]' : '',
+    isCoronaVersion ? '' : 'fee: $fee',
   ]
     .filter(s => s.length)
     .join(',')
   const query = gql`
     query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $title: String, $currency: String, $arbitrator: String, $templateId: String, $accounts: [String!], $fee: String) {
-      fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: desc, where: { fee: $fee, ${whereClause} }) {
+      fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: desc, where: { ${whereClause} }) {
         ...marketData
       }
     }
     ${MarketDataFragment}
   `
-  //console.log(query)
+  console.log(query)
   return query
 }
