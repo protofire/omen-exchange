@@ -22,8 +22,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     marketMakerFunding,
     marketMakerUserFunding,
     totalPoolShares,
-    userPoolShares,
     userEarnings,
+    userPoolShares,
   } = marketMakerData
 
   if (!collateral) {
@@ -37,10 +37,10 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       marketMakerAddress={marketMakerAddress}
       marketMakerFunding={marketMakerFunding}
       marketMakerUserFunding={marketMakerUserFunding}
-      userEarnings={userEarnings}
       question={question || ''}
       resolution={resolution}
       totalPoolShares={totalPoolShares}
+      userEarnings={userEarnings}
       userPoolShares={userPoolShares}
     />
   )
