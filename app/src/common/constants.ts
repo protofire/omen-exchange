@@ -17,7 +17,7 @@ export const MAX_OUTCOME_ALLOWED = parseInt(process.env.REACT_APP_MAX_OUTCOME_AL
 
 export const SINGLE_SELECT_TEMPLATE_ID = 2
 
-export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
+export const MARKET_FEE = 0 // parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
 
 export const CATEGORIES = [
   'Arts',
@@ -43,6 +43,7 @@ export const CORONA_MARKET_CREATORS = (process.env.REACT_APP_CORONA_MARKET_CREAT
   .split(',')
   .filter(x => x.length)
   .map(x => x.toLowerCase())
+  .concat('0xb5f201c925e24a6f1c5a850d87c510fc73f8d742')
 if (IS_CORONA_VERSION && !CORONA_MARKET_CREATORS.length) {
   throw new Error('You need to set the REACT_APP_CORONA_MARKET_CREATORS environment variable')
 }
