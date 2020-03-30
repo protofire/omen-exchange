@@ -22,6 +22,10 @@ const TitleWrapper = styled.div`
   margin-bottom: 12px;
 `
 
+const Error = styled(FormError)`
+  margin-top: 10px;
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   error?: any
   formField: any
@@ -40,7 +44,7 @@ export const FormRow = (props: Props) => {
       </TitleWrapper>
       {formField}
       {note && <FormRowNote>{note}</FormRowNote>}
-      {error && <FormError>{error}</FormError>}
+      {error && <Error>{error}</Error>}
     </FormRowWrapper>
   )
 }
