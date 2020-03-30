@@ -2,26 +2,17 @@ import React, { ChangeEvent, useCallback, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled, { css } from 'styled-components'
 
-import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
+import { IS_CORONA_VERSION, MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
-import { Button, ButtonContainer } from '../../../button'
+import { Button } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { Categories, CreateCard, DateField, FormRow } from '../../../common'
+import { CreateCard, DateField, FormRow } from '../../../common'
 import { QuestionInput } from '../../../common/question_input'
 import { Arbitrators } from '../../arbitrators'
-import { Outcome, Outcomes } from '../../outcomes'
-
-const ButtonContainerFullWidth = styled(ButtonContainer)`
-  margin-left: -${props => props.theme.cards.paddingHorizontal};
-  margin-right: -${props => props.theme.cards.paddingHorizontal};
-  padding-left: ${props => props.theme.cards.paddingHorizontal};
-  padding-right: ${props => props.theme.cards.paddingHorizontal};
-`
-
-const LeftButton = styled(Button)`
-  margin-right: auto;
-`
+import { Categories } from '../../categories'
+import { ButtonContainerFullWidth, ButtonWithReadyToGoStatus, LeftButton } from '../common_styled'
+import { Outcome, Outcomes } from '../outcomes'
 
 const ButtonCategoryFocusCSS = css`
   &,
@@ -124,33 +115,12 @@ const AskQuestionStep = (props: Props) => {
 
   const errorMessages = []
 
-  const someEmptyName = outcomes.some(outcome => !outcome.name)
-  if (someEmptyName) {
-    errorMessages.push('The names of the outcomes should not be empty.')
-  }
-
-  const someEmptyProbability = outcomes.some(outcome => outcome.probability === 0)
-  if (someEmptyProbability) {
-    errorMessages.push('The probabilities of the outcomes should not be zero.')
-  }
-
   const totalProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
   if (totalProbabilities !== 100) {
-    errorMessages.push('The sum of all probabilities must be equal to 100%.')
+    errorMessages.push('The total of all probabilities must be 100%')
   }
 
-  if (outcomes.length < 2) {
-    errorMessages.push('Please enter at least 2 outcomes')
-  }
-
-  const error =
-    totalProbabilities !== 100 ||
-    someEmptyName ||
-    someEmptyProbability ||
-    outcomes.length < 2 ||
-    !question ||
-    !category ||
-    !resolution
+  const error = totalProbabilities !== 100 || outcomes.length < 2 || !question || !resolution
 
   const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
@@ -222,6 +192,7 @@ const AskQuestionStep = (props: Props) => {
             formField={
               <Arbitrators
                 customValues={arbitratorsCustom}
+                disabled={!!loadedQuestionId || IS_CORONA_VERSION}
                 networkId={context.networkId}
                 onChangeArbitrator={handleArbitratorChange}
               />
@@ -237,9 +208,14 @@ const AskQuestionStep = (props: Props) => {
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
           Cancel
         </LeftButton>
-        <Button buttonType={ButtonType.secondaryLine} disabled={error} onClick={props.next}>
+        <ButtonWithReadyToGoStatus
+          buttonType={ButtonType.secondaryLine}
+          disabled={error}
+          onClick={props.next}
+          readyToGo={!error}
+        >
           Next
-        </Button>
+        </ButtonWithReadyToGoStatus>
       </ButtonContainerFullWidth>
     </CreateCard>
   )

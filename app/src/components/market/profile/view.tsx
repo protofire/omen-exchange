@@ -3,14 +3,16 @@ import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { IS_CORONA_VERSION } from '../../../common/constants'
 import { WhenConnected } from '../../../hooks/connectedWeb3'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { ThreeBoxComments, ViewCard } from '../../common'
-import { OutcomeTable } from '../../common/outcome_table'
+import { DisqusComments } from '../../common/disqus_comments'
 import { FullLoading } from '../../loading'
 import { MarketTopDetails } from '../market_top_details'
+import { OutcomeTable } from '../outcome_table'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -68,14 +70,16 @@ const ViewWrapper = (props: Props) => {
         {renderTableData()}
         <WhenConnected>
           <ButtonContainer>
-            <LeftButton
-              buttonType={ButtonType.secondaryLine}
-              onClick={() => {
-                history.push(`${marketMakerAddress}/pool-liquidity`)
-              }}
-            >
-              Pool Liquidity
-            </LeftButton>
+            {!IS_CORONA_VERSION && (
+              <LeftButton
+                buttonType={ButtonType.secondaryLine}
+                onClick={() => {
+                  history.push(`${marketMakerAddress}/pool-liquidity`)
+                }}
+              >
+                Pool Liquidity
+              </LeftButton>
+            )}
             <Button
               buttonType={ButtonType.secondaryLine}
               disabled={!userHasShares}
@@ -96,7 +100,11 @@ const ViewWrapper = (props: Props) => {
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>
-      <ThreeBoxComments threadName={marketMakerAddress} />
+      {IS_CORONA_VERSION ? (
+        <DisqusComments marketMakerAddress={marketMakerAddress} />
+      ) : (
+        <ThreeBoxComments threadName={marketMakerAddress} />
+      )}
       {status === Status.Loading && <FullLoading />}
     </>
   )

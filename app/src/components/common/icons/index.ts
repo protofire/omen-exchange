@@ -1,8 +1,5 @@
 export { AddIcon } from './AddIcon'
-export { BatIcon } from './BatIcon'
-export { DaiIcon } from './DaiIcon'
 export { DxDaoIcon } from './DxDaoIcon'
-export { EtherIcon } from './EtherIcon'
 export { IconArrowBack } from './IconArrowBack'
 export { IconChevronLeft } from './IconChevronLeft'
 export { IconChevronRight } from './IconChevronRight'

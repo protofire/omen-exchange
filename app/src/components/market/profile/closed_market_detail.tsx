@@ -11,8 +11,8 @@ import { formatBigNumber, formatDate } from '../../../util/tools'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ClosedMarket, DisplayArbitrator, SubsectionTitle, TitleValue, ViewCard } from '../../common'
-import { OutcomeTable } from '../../common/outcome_table'
 import { FullLoading } from '../../loading'
+import { OutcomeTable } from '../outcome_table'
 
 const Grid = styled.div`
   display: grid;
@@ -34,6 +34,8 @@ interface Props {
   funding: BigNumber
   question: string
   questionId: string
+  questionRaw: string
+  questionTemplateId: BigNumber
   resolution: Date | null
   marketMakerAddress: string
   isConditionResolved: boolean
@@ -56,6 +58,8 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     isConditionResolved,
     marketMakerAddress,
     questionId,
+    questionRaw,
+    questionTemplateId,
     resolution,
   } = props
 
@@ -71,7 +75,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       setMessage('Resolve condition...')
 
       // Balances length is the number of outcomes
-      await oracle.resolveCondition(questionId, balances.length)
+      await oracle.resolveCondition(questionId, questionTemplateId, questionRaw, balances.length)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -112,6 +116,8 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       await cpk.redeemPositions({
         isConditionResolved,
         questionId,
+        questionRaw,
+        questionTemplateId,
         numOutcomes: balances.length,
         winningOutcome,
         oracle,

@@ -15,15 +15,17 @@ export enum DropdownDirection {
   upwards,
 }
 
-const Wrapper = styled.div<{ active?: boolean }>`
+const Wrapper = styled.div<{ active?: boolean; disabled: boolean }>`
   background-color: #fff;
   border-radius: 32px;
   border: 1px solid ${props => props.theme.colors.tertiary};
   box-sizing: border-box;
   cursor: pointer;
   height: 34px;
+  opacity: ${props => (props.disabled ? '0.5' : '1')};
   outline: none;
   padding: 0 14px;
+  pointer-events: ${props => (props.disabled ? 'none' : 'initial')};
   position: relative;
   user-select: none;
 
@@ -153,6 +155,7 @@ export interface DropdownItemProps {
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   currentItem?: number | undefined
+  disabled?: boolean
   dropdownPosition?: DropdownPosition | undefined
   dropdownDirection?: DropdownDirection | undefined
   items: any
@@ -161,7 +164,16 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const Dropdown: React.FC<Props> = props => {
-  const { currentItem, dropdownDirection, dropdownPosition, items, onClick, placeholder, ...restProps } = props
+  const {
+    currentItem,
+    disabled = false,
+    dropdownDirection,
+    dropdownPosition,
+    items,
+    onClick,
+    placeholder,
+    ...restProps
+  } = props
   const myRef = createRef<HTMLDivElement>()
   const [currentItemIndex, setCurrentItemIndex] = useState<number | undefined>(currentItem)
   const [isDirty, setIsDirty] = useState<boolean>(false)
@@ -191,7 +203,7 @@ export const Dropdown: React.FC<Props> = props => {
   return (
     <>
       <HelperFocusItem ref={myRef} tabIndex={-1} />
-      <Wrapper onClick={onClick} tabIndex={-1} {...restProps}>
+      <Wrapper disabled={disabled} onClick={onClick} tabIndex={-1} {...restProps}>
         <DropdownButton>
           <CurrentItem className="currentItem">
             {placeholder && !isDirty ? placeholder : items[currentItemIndex || 0].content}

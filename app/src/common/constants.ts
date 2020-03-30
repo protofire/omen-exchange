@@ -35,3 +35,33 @@ export const CATEGORIES = [
 export const GRAPH_HTTP =
   process.env.REACT_APP_GRAPH_HTTP || 'https://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
 export const GRAPH_WS = process.env.REACT_APP_GRAPH_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
+
+// Corona version options
+export const IS_CORONA_VERSION = process.env.REACT_APP_IS_CORONA_VERSION === 'true'
+
+export const CORONA_MARKET_CREATORS = (process.env.REACT_APP_CORONA_MARKET_CREATORS || '')
+  .split(',')
+  .filter(x => x.length)
+  .map(x => x.toLowerCase())
+if (IS_CORONA_VERSION && !CORONA_MARKET_CREATORS.length) {
+  throw new Error('You need to set the REACT_APP_CORONA_MARKET_CREATORS environment variable')
+}
+
+export const CORONA_REALITIO_ARBITRATOR: string = process.env.REACT_APP_CORONA_REALITIO_ARBITRATOR || ''
+if (IS_CORONA_VERSION && !CORONA_REALITIO_ARBITRATOR) {
+  throw new Error('You need to set the REACT_APP_CORONA_REALITIO_ARBITRATOR environment variable')
+}
+
+export const DISQUS_SHORTNAME: string = process.env.REACT_APP_DISQUS_SHORTNAME || ''
+if (IS_CORONA_VERSION && !DISQUS_SHORTNAME) {
+  throw new Error('You need to set the REACT_APP_DISQUS_SHORTNAME environment variable')
+}
+
+export const DISQUS_URL: string = process.env.REACT_APP_DISQUS_URL || ''
+if (IS_CORONA_VERSION && !DISQUS_URL) {
+  throw new Error('You need to set the REACT_APP_DISQUS_URL environment variable')
+}
+
+export const GEO_JS_ENDPOINT = process.env.REACT_APP_GEO_JS_ENDPOINT || 'https://get.geojs.io/v1/ip/geo.json'
+
+export const BLACKLISTED_COUNTRIES = (process.env.REACT_APP_BLACKLISTED_COUNTRIES || '').split(',').filter(Boolean)

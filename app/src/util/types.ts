@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 
-import { Outcome } from '../components/market/outcomes'
+import { Outcome } from '../components/market/steps/outcomes'
 
 export enum Status {
   Ready = 'Ready',
@@ -8,11 +8,6 @@ export enum Status {
   Refreshing = 'Refreshing',
   Done = 'Done',
   Error = 'Error',
-}
-
-export enum OutcomeSlot {
-  Yes = 'Yes',
-  No = 'No',
 }
 
 export interface BalanceItem {
@@ -49,6 +44,8 @@ export enum StepProfile {
 
 export interface Question {
   questionId: string
+  questionRaw: string
+  questionTemplateId: BigNumber
   question: string
   resolution: Maybe<Date>
   arbitratorAddress: string

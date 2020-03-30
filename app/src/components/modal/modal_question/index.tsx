@@ -8,15 +8,15 @@ import { formatDate, truncateStringInTheMiddle } from '../../../util/tools'
 import { Arbitrator, Question } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
-import { FormRow, Spinner, SubsectionTitle, Textfield, TitleValue } from '../../common'
+import { FormLabel, FormRow, Spinner, Textfield, TitleValue } from '../../common'
 import { ModalWrapper } from '../../modal/modal_wrapper'
 
 const ButtonStyled = styled(Button)`
   margin-top: 80px;
 `
 
-const SubsectionTitleStyled = styled(SubsectionTitle)`
-  font-size: 15px;
+const SubsectionTitleStyled = styled(FormLabel)`
+  margin-bottom: 20px;
 `
 
 const GridOneColumn = styled.div`
@@ -141,6 +141,7 @@ export const ModalQuestion = (props: Props) => {
             type="text"
           />
         }
+        style={{ marginTop: '20px' }}
         title={'Question URL'}
       />
       {questionDetails()}

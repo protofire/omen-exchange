@@ -4,7 +4,7 @@ import { fireEvent, render } from '@testing-library/react'
 import React from 'react'
 import { ThemeProvider } from 'styled-components'
 
-import theme from '../../../theme'
+import theme from '../../../../theme'
 
 import { Outcomes } from './index'
 

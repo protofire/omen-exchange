@@ -43,4 +43,13 @@ const MY_MARKETS = gql`
   ${MarketDataFragment}
 `
 
-export const MARKETS_HOME: any = { OPEN, CLOSED, MY_MARKETS }
+const CORONA = gql`
+  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $accounts: [String]) {
+    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, where: { creator_in: $accounts }) {
+      ...marketData
+    }
+  }
+  ${MarketDataFragment}
+`
+
+export const MARKETS_HOME: any = { OPEN, CLOSED, CORONA, MY_MARKETS }

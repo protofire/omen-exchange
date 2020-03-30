@@ -9,8 +9,8 @@ import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '
 import { Arbitrator, MarketData, Question, Token } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
 
-import { Outcome } from './outcomes'
 import { AskQuestionStep, FundingAndFeeStep, MenuStep } from './steps'
+import { Outcome } from './steps/outcomes'
 
 interface Props {
   callback: (param: MarketData) => void
@@ -122,8 +122,6 @@ export const MarketWizardCreator = (props: Props) => {
       | ChangeEvent<HTMLButtonElement>,
   ) => {
     const { name, value } = 'target' in event ? event.target : event
-
-    console.warn(`Name: ${name} - Value: ${value}`)
 
     const newMarketData = {
       ...marketData,
