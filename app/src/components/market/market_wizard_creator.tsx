@@ -10,7 +10,7 @@ import { Arbitrator, MarketData, Question, Token } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
 
 import { Outcome } from './outcomes'
-import { AskQuestionStep, FundingAndFeeStep, MenuStep, SummaryMarketStep } from './steps'
+import { AskQuestionStep, FundingAndFeeStep, MenuStep } from './steps'
 
 interface Props {
   callback: (param: MarketData) => void
@@ -22,7 +22,7 @@ export const MarketWizardCreator = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { networkId } = context
 
-  const { callback, marketCreationStatus, marketMakerAddress } = props
+  const { callback, marketCreationStatus } = props
 
   const defaultCollateral = getDefaultToken(networkId)
   const defaultArbitrator = getDefaultArbitrator(networkId)
@@ -295,10 +295,6 @@ export const MarketWizardCreator = (props: Props) => {
     return <MenuStep currentStep={currentStep} />
   }
 
-  const summaryMarketStep = () => {
-    return marketMakerAddress ? <SummaryMarketStep marketMakerAddress={marketMakerAddress} /> : ''
-  }
-
   return (
     <>
       {!MarketCreationStatus.is.done(marketCreationStatus) && (
@@ -306,7 +302,6 @@ export const MarketWizardCreator = (props: Props) => {
           {currentMenu()} {currentStepFn()}
         </>
       )}
-      {MarketCreationStatus.is.done(marketCreationStatus) && summaryMarketStep()}
     </>
   )
 }
