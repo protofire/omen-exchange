@@ -43,6 +43,7 @@ interface Props extends RouteComponentProps<any> {
   userPoolShares: BigNumber
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
+  userEarnings: BigNumber
   balances: BalanceItem[]
   theme?: any
   collateral: Token
@@ -70,6 +71,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     // marketMakerUserFunding,
     question,
     totalPoolShares,
+    userEarnings,
     // userPoolShares,
   } = props
 
@@ -195,8 +197,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const hasEnoughAllowance = allowance && allowance.gte(amountToFund)
   const showSetAllowance = allowanceFinished || hasZeroAllowance || !hasEnoughAllowance
 
-  const mockedEarnTradingFee = new BigNumber(10).pow(18)
-  const mockedTokenTotals = depositedTokens.add(mockedEarnTradingFee)
+  const depositedTokensTotal = depositedTokens.add(userEarnings)
 
   return (
     <>
@@ -283,10 +284,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             {activeTab === Tabs.withdraw && (
               <TransactionDetailsCard>
                 <TransactionDetailsRow
-                  emphasizeValue={mockedEarnTradingFee.gt(0)}
+                  emphasizeValue={userEarnings.gt(0)}
                   state={ValueStates.success}
                   title={'Earned'}
-                  value={formatBigNumber(mockedEarnTradingFee, collateral.decimals)}
+                  value={formatBigNumber(userEarnings, collateral.decimals)}
                 />
                 <TransactionDetailsRow
                   state={ValueStates.success}
@@ -295,10 +296,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 />
                 <TransactionDetailsLine />
                 <TransactionDetailsRow
-                  emphasizeValue={mockedTokenTotals.gt(0)}
-                  state={(mockedTokenTotals.gt(0) && ValueStates.important) || ValueStates.normal}
+                  emphasizeValue={depositedTokensTotal.gt(0)}
+                  state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                   title={'Total'}
-                  value={`${formatBigNumber(mockedTokenTotals, collateral.decimals)} ${collateral.symbol}`}
+                  value={`${formatBigNumber(depositedTokensTotal, collateral.decimals)} ${collateral.symbol}`}
                 />
               </TransactionDetailsCard>
             )}
