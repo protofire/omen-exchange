@@ -2,7 +2,7 @@ import React, { ChangeEvent } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
-import { MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
+import { IS_CORONA_VERSION, MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonLink } from '../../../button'
@@ -99,7 +99,6 @@ const AskQuestionStep = (props: Props) => {
     someEmptyProbability ||
     outcomes.length < 2 ||
     !question ||
-    !category ||
     !resolution
 
   const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
@@ -177,7 +176,7 @@ const AskQuestionStep = (props: Props) => {
         formField={
           <Arbitrators
             customValues={arbitratorsCustom}
-            disabled={!!loadedQuestionId}
+            disabled={!!loadedQuestionId || IS_CORONA_VERSION}
             name="arbitrator"
             networkId={context.networkId}
             onChangeArbitrator={handleArbitratorChange}

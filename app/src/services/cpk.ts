@@ -52,6 +52,8 @@ interface CPKRemoveFundingParams {
 interface CPKRedeemParams {
   isConditionResolved: boolean
   questionId: string
+  questionRaw: string
+  questionTemplateId: BigNumber
   numOutcomes: number
   winningOutcome: BalanceItem | undefined
   collateralToken: Token
@@ -411,6 +413,8 @@ class CPKService {
     numOutcomes,
     oracle,
     questionId,
+    questionRaw,
+    questionTemplateId,
     winningOutcome,
   }: CPKRedeemParams): Promise<TransactionReceipt> => {
     try {
@@ -423,7 +427,7 @@ class CPKService {
           operation: CPK.CALL,
           to: oracle.address,
           value: 0,
-          data: OracleService.encodeResolveCondition(questionId, numOutcomes),
+          data: OracleService.encodeResolveCondition(questionId, questionTemplateId, questionRaw, numOutcomes),
         })
       }
 

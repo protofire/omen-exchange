@@ -3,7 +3,7 @@ import React, { ChangeEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { MARKET_FEE } from '../../../../common/constants'
+import { IS_CORONA_VERSION, MARKET_FEE } from '../../../../common/constants'
 import { useCollateralBalance } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { BalanceState, fetchAccountBalance } from '../../../../store/reducer'
@@ -110,7 +110,7 @@ const FundingAndFeeStep = (props: Props) => {
   const collateralBalance = useCollateralBalance(collateral, context)
 
   const isFundingGreaterThanBalance = account ? funding.gt(collateralBalance) : false
-  const error = !spread || funding.isZero() || isFundingGreaterThanBalance
+  const error = funding.isZero() || isFundingGreaterThanBalance
 
   const fundingMessageError = isFundingGreaterThanBalance ? `You don't have enough collateral in your balance.` : ''
   const resolutionDate = resolution && formatDate(resolution)
@@ -201,7 +201,13 @@ const FundingAndFeeStep = (props: Props) => {
         />
         <FormRow
           formField={
-            <Tokens context={context} name="collateralId" onTokenChange={handleCollateralChange} value={collateral} />
+            <Tokens
+              context={context}
+              disabled={IS_CORONA_VERSION}
+              name="collateralId"
+              onTokenChange={handleCollateralChange}
+              value={collateral}
+            />
           }
           title={'Collateral token'}
           tooltip={{

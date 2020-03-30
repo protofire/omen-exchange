@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/react-hooks'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
+import { CORONA_MARKET_CREATORS, IS_CORONA_VERSION } from '../../common/constants'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { MARKETS_HOME } from '../../queries/markets_home'
 import { CPKService } from '../../services'
@@ -29,9 +30,14 @@ const MarketHomeContainer: React.FC = () => {
 
   const { account, library: provider } = context
 
-  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(MARKETS_HOME[filter.state], {
+  const query = IS_CORONA_VERSION ? MARKETS_HOME.CORONA : MARKETS_HOME[filter.state]
+  const marketsQueryVariables = { first: PAGE_SIZE, skip: 0, account: cpkAddress, ...filter }
+  if (IS_CORONA_VERSION) {
+    marketsQueryVariables.accounts = CORONA_MARKET_CREATORS
+  }
+  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(query, {
     notifyOnNetworkStatusChange: true,
-    variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, ...filter },
+    variables: marketsQueryVariables,
   })
 
   useEffect(() => {
@@ -63,8 +69,10 @@ const MarketHomeContainer: React.FC = () => {
   }, [fetchedMarkets, loading, error])
 
   const onFilterChange = useCallback((filter: any) => {
-    setMoreMarkets(true)
-    setFilter(filter)
+    if (!IS_CORONA_VERSION) {
+      setMoreMarkets(true)
+      setFilter(filter)
+    }
   }, [])
 
   const loadMore = () => {
