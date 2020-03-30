@@ -3,6 +3,7 @@ import { ethers } from 'ethers'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
+import { CORONA_MARKET_CREATORS, IS_CORONA_VERSION } from '../../common/constants'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { buildQueryMarkets } from '../../queries/markets_home'
 import { CPKService } from '../../services'
@@ -31,17 +32,21 @@ const MarketHomeContainer: React.FC = () => {
   const { account, library: provider } = context
 
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
-  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(
-    buildQueryMarkets({
-      onlyMyMarkets: filter.state === 'MY_MARKETS',
-      onlyClosedMarkets: filter.state === 'CLOSED',
-      ...filter,
-    }),
-    {
-      notifyOnNetworkStatusChange: true,
-      variables: { first: PAGE_SIZE, skip: 0, account: cpkAddress, fee: feeBN.toString(), ...filter },
-    },
-  )
+
+  const query = buildQueryMarkets({
+    onlyMyMarkets: filter.state === 'MY_MARKETS',
+    onlyClosedMarkets: filter.state === 'CLOSED',
+    isCoronaVersion: IS_CORONA_VERSION,
+    ...filter,
+  })
+  const marketsQueryVariables = { first: PAGE_SIZE, skip: 0, accounts: [cpkAddress], fee: feeBN.toString(), ...filter }
+  if (IS_CORONA_VERSION) {
+    marketsQueryVariables.accounts = CORONA_MARKET_CREATORS
+  }
+  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(query, {
+    notifyOnNetworkStatusChange: true,
+    variables: marketsQueryVariables,
+  })
 
   useEffect(() => {
     const getCpkAddress = async () => {
@@ -72,8 +77,10 @@ const MarketHomeContainer: React.FC = () => {
   }, [fetchedMarkets, loading, error])
 
   const onFilterChange = useCallback((filter: any) => {
-    setMoreMarkets(true)
-    setFilter(filter)
+    if (!IS_CORONA_VERSION) {
+      setMoreMarkets(true)
+      setFilter(filter)
+    }
   }, [])
 
   const loadMore = () => {

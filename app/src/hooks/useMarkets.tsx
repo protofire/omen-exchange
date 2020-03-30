@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import { FETCH_EVENTS_CHUNK_SIZE } from '../common/constants'
+import { CORONA_MARKET_CREATORS, FETCH_EVENTS_CHUNK_SIZE, IS_CORONA_VERSION } from '../common/constants'
 import { asyncFilter } from '../util/async_filter'
 import { Range, callInChunks } from '../util/call_in_chunks'
 import { getLogger } from '../util/logger'
@@ -19,6 +19,11 @@ const buildFilterFn = (filter: MarketFilter, contracts: Contracts) => async (
   market: MarketWithExtraData,
 ): Promise<boolean> => {
   const { buildMarketMaker, conditionalTokens, realitio } = contracts
+
+  if (IS_CORONA_VERSION) {
+    const creator = market.ownerAddress.toLowerCase()
+    return CORONA_MARKET_CREATORS.includes(creator)
+  }
 
   if (MarketFilter.is.allMarkets(filter)) {
     return true

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { CATEGORIES } from '../../common/constants'
+import { CATEGORIES, IS_CORONA_VERSION } from '../../common/constants'
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
 import { Button, ButtonCircle, ButtonSelectable } from '../button'
@@ -191,15 +191,17 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               ))}
             </MarketsCategories>
             <FiltersWrapper>
-              <FiltersCategories>
-                {filters.map((item, index) => {
-                  return (
-                    <SelectableButton active={item.active} key={index} onClick={item.onClick}>
-                      {item.title}
-                    </SelectableButton>
-                  )
-                })}
-              </FiltersCategories>
+              {!IS_CORONA_VERSION && (
+                <FiltersCategories>
+                  {filters.map((item, index) => {
+                    return (
+                      <SelectableButton active={item.active} key={index} onClick={item.onClick}>
+                        {item.title}
+                      </SelectableButton>
+                    )
+                  })}
+                </FiltersCategories>
+              )}
               <FiltersControls>
                 <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
                   <IconSearch />
