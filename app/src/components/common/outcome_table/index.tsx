@@ -160,9 +160,7 @@ export const OutcomeTable = (props: Props) => {
 
   return (
     <TableWrapper>
-      <Table head={renderTableHeader()} maxHeight="332px">
-        {renderTable()}
-      </Table>
+      <Table head={renderTableHeader()}>{renderTable()}</Table>
     </TableWrapper>
   )
 }
