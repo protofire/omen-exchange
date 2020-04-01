@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
+import { IS_CORONA_VERSION } from '../../../common/constants'
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { Token } from '../../../util/types'
 import { FormRowLink } from '../form_row_link'
@@ -15,6 +16,7 @@ interface Props {
   customValues: Token[]
   addCustomValue: (collateral: Token) => void
   context: ConnectedWeb3Context
+  disabled?: boolean
 }
 
 const Link = styled(FormRowLink)`
@@ -24,14 +26,14 @@ const Link = styled(FormRowLink)`
 `
 
 export const CustomizableTokensSelect = (props: Props) => {
-  const { addCustomValue, context, name, onCollateralChange, value } = props
+  const { addCustomValue, context, disabled = false, name, onCollateralChange, value } = props
 
   const [isModalCollateralOpen, setModalCollateralState] = useState(false)
 
   return (
     <>
-      <Tokens context={context} name={name} onTokenChange={onCollateralChange} value={value} />
-      <Link onClick={() => setModalCollateralState(true)}>Add custom token</Link>
+      <Tokens context={context} disabled={disabled} name={name} onTokenChange={onCollateralChange} value={value} />
+      {!IS_CORONA_VERSION && <Link onClick={() => setModalCollateralState(true)}>Add custom token</Link>}
       <ModalCollateral
         context={context}
         isOpen={isModalCollateralOpen}
