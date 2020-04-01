@@ -3,8 +3,10 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
 import {
+  calcDepositedTokens,
   calcDistributionHint,
   calcNetCost,
+  calcPoolTokens,
   calcPrice,
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
@@ -261,5 +263,29 @@ describe('tools', () => {
       expect(truncate('foobarbaz', 3, 2)).toBe('foo...az')
       expect(truncate('foobarbaz', 1, 1)).toBe('f...z')
     })
+  })
+
+  describe('calcPoolTokens', () => {
+    it('should return addedFunds if poolShares are zero', () =>
+      expect(calcPoolTokens(bigNumberify(20), [1, 2, 3].map(bigNumberify), bigNumberify(0))).toStrictEqual(
+        bigNumberify(20),
+      ))
+
+    it('should return funds*supply/poolWeight', () =>
+      expect(calcPoolTokens(bigNumberify(20), [1, 2, 3].map(bigNumberify), bigNumberify(2))).toStrictEqual(
+        bigNumberify(13),
+      ))
+  })
+
+  describe('calcDepositedTokens', () => {
+    it('should return min of holdings mapped to factor', () =>
+      expect(calcDepositedTokens(bigNumberify(20), [1, 2, 3].map(bigNumberify), bigNumberify(2))).toStrictEqual(
+        bigNumberify(10),
+      ))
+
+    it('should return 0 with no holdings', () =>
+      expect(calcDepositedTokens(bigNumberify(20), [100, 20, 0].map(bigNumberify), bigNumberify(10))).toStrictEqual(
+        bigNumberify(0),
+      ))
   })
 })
