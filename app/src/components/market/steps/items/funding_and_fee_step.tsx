@@ -150,10 +150,9 @@ const FundingAndFeeStep = (props: Props) => {
   const hasEnoughBalance = balance && balance.gte(funding)
   let fundingErrorMessage = ''
   if (balance && !hasEnoughBalance) {
-    fundingErrorMessage = `You entered ${formatBigNumber(
-      funding,
-      collateral.decimals,
-    )} DAI of funding but your account only has ${formatBigNumber(balance, collateral.decimals)} DAI`
+    fundingErrorMessage = `You entered ${formatBigNumber(funding, collateral.decimals)} ${
+      collateral.symbol
+    } of funding but your account only has ${formatBigNumber(balance, collateral.decimals)} ${collateral.symbol}`
   }
 
   currenciesData.sort()
