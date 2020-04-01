@@ -130,6 +130,15 @@ export const DatepickerStylesOverride = css`
           color: ${props => props.theme.colors.primary};
         }
       }
+
+      .react-datepicker__time-container
+        .react-datepicker__time
+        .react-datepicker__time-box
+        ul.react-datepicker__time-list
+        li.react-datepicker__time-list-item--selected {
+        background-color: ${props => props.theme.colors.primary};
+        color: #fff;
+      }
     }
   }
 
