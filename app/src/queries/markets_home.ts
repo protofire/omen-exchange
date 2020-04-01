@@ -33,11 +33,11 @@ export const buildQueryMarkets = (
     arbitrator,
     category,
     currency,
+    isCoronaVersion,
     onlyClosedMarkets,
     onlyMyMarkets,
     templateId,
     title,
-    isCoronaVersion,
   } = options
   const whereClause = [
     onlyClosedMarkets ? 'answerFinalizedTimestamp_not: null' : '',
@@ -59,6 +59,5 @@ export const buildQueryMarkets = (
     }
     ${MarketDataFragment}
   `
-  console.log(query)
   return query
 }
