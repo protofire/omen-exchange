@@ -129,7 +129,7 @@ const FundingAndFeeStep = (props: Props) => {
   const dispatch = useDispatch()
   const { account, library: provider } = context
 
-  const { handleChange, marketCreationStatus, submit, values } = props
+  const { handleChange, handleCollateralChange, marketCreationStatus, submit, values } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
   React.useEffect(() => {
@@ -153,13 +153,6 @@ const FundingAndFeeStep = (props: Props) => {
     fundingErrorMessage = `You entered ${formatBigNumber(funding, collateral.decimals)} ${
       collateral.symbol
     } of funding but your account only has ${formatBigNumber(balance, collateral.decimals)} ${collateral.symbol}`
-  }
-
-  currenciesData.sort()
-  const [selectedCurrency, setSelectedCurrency] = useState(currenciesData[0].token)
-
-  const selectCurrency = (currency: string) => {
-    setSelectedCurrency(currency)
   }
 
   return (
@@ -212,8 +205,8 @@ const FundingAndFeeStep = (props: Props) => {
           <CurrencySelector
             context={context}
             disabled={IS_CORONA_VERSION}
-            onSelect={selectCurrency}
-            selectedCategory={selectedCurrency}
+            onSelect={handleCollateralChange}
+            selectedCurrency={collateral}
           />
         </CurrenciesWrapper>
         <GridTransactionDetailsStyled>

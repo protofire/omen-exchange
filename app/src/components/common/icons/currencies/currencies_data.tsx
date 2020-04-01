@@ -5,26 +5,32 @@ import * as Icons from './index'
 export const currenciesData = [
   {
     icon: <Icons.BatIcon />,
+    text: 'BAT',
     token: 'BAT',
   },
   {
     icon: <Icons.CDaiIcon />,
-    token: 'cDAI',
+    text: 'cDAI',
+    token: 'CDAI',
   },
   {
     icon: <Icons.DaiIcon />,
+    text: 'DAI',
     token: 'DAI',
   },
   {
     icon: <Icons.ChaiIcon />,
-    token: 'Chai',
+    text: 'Chai',
+    token: 'CHAI',
   },
   {
     icon: <Icons.UsdcIcon />,
-    token: 'USCD',
+    text: 'USDC',
+    token: 'USDC',
   },
   {
     icon: <Icons.EtherIcon />,
-    token: 'Ether',
+    text: 'Ether',
+    token: 'ETH',
   },
 ]
