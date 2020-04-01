@@ -3,13 +3,13 @@ import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { LastLocationProvider } from 'react-router-last-location'
 import { useWeb3Context } from 'web3-react'
 
+import { IS_CORONA_VERSION } from '../../common/constants'
 import { ConnectedWeb3, GeoJsProvider, useDocumentTitle } from '../../hooks'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { Header } from '../common/header'
 import { MarketHomeContainer } from '../market/market_home_container'
 import { MarketRoutes } from '../market/market_routes'
 import { MarketWizardCreatorContainer } from '../market/market_wizard_creator_container'
-import { IS_CORONA_VERSION } from '../../common/constants'
 
 const RedirectToHome = () => <Redirect to="/" />
 

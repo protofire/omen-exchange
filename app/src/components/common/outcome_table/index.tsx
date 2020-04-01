@@ -1,10 +1,10 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
 
+import { IS_CORONA_VERSION } from '../../../common/constants'
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../util/types'
 import { BarDiagram, NewValue, OwnedShares, RadioInput, TD, TH, THead, TR, Table } from '../../common'
-import { IS_CORONA_VERSION } from '../../../common/constants'
 
 interface Props {
   balances: BalanceItem[]
