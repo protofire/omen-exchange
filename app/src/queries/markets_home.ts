@@ -46,7 +46,7 @@ export const buildQueryMarkets = (
     title ? 'title_contains: $title' : '',
     currency ? 'collateralToken: $currency' : '',
     arbitrator ? 'arbitrator: $arbitrator' : '',
-    templateId ? 'templateId: $templateId' : !isCoronaVersion ? 'templateId_in: ["0", "2","6"]' : '',
+    templateId ? 'templateId: $templateId' : !isCoronaVersion ? 'templateId_in: ["0", "2", "6"]' : '',
     isCoronaVersion ? '' : 'fee: $fee',
   ]
     .filter(s => s.length)
