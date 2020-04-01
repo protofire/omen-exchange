@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components'
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../util/types'
 import { BarDiagram, NewValue, OwnedShares, RadioInput, TD, TH, THead, TR, Table } from '../../common'
+import { IS_CORONA_VERSION } from '../../../common/constants'
 
 interface Props {
   balances: BalanceItem[]
@@ -95,6 +96,8 @@ export const OutcomeTable = (props: Props) => {
     const { currentPrice, outcomeName, shares } = balanceItem
     const currentPriceFormatted = Number(currentPrice).toFixed(2)
     const probability = probabilities[outcomeIndex]
+    const isOutcomeSelected = outcomeSelected === outcomeIndex
+    const showSharesAndPriceChange = isOutcomeSelected && !IS_CORONA_VERSION
 
     return (
       <TR key={outcomeName}>
@@ -113,26 +116,26 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
-            {outcomeSelected === outcomeIndex && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
+            {showSharesAndPriceChange && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
           </TDStyled>
         ) : (
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
-            {outcomeSelected === outcomeIndex && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
+            {showSharesAndPriceChange && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[2]}>
             <TDFlexDiv textAlign={TableCellsAlign[2]}>
               {currentPriceFormatted}{' '}
-              {outcomeSelected === outcomeIndex && <NewValue outcomeIndex={outcomeIndex} value="1.23" />}
+              {showSharesAndPriceChange && <NewValue outcomeIndex={outcomeIndex} value="1.23" />}
             </TDFlexDiv>
           </TDStyled>
         ) : (
           <TDStyled textAlign={TableCellsAlign[2]}>
             <TDFlexDiv textAlign={TableCellsAlign[2]}>
               {currentPriceFormatted}{' '}
-              {outcomeSelected === outcomeIndex && <NewValue outcomeIndex={outcomeIndex} value="1.23" />}
+              {showSharesAndPriceChange && <NewValue outcomeIndex={outcomeIndex} value="1.23" />}
             </TDFlexDiv>
           </TDStyled>
         )}
