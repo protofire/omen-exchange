@@ -210,6 +210,7 @@ const FundingAndFeeStep = (props: Props) => {
         <CurrenciesWrapper>
           <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
           <CurrencySelector
+            context={context}
             disabled={IS_CORONA_VERSION}
             onSelect={selectCurrency}
             selectedCategory={selectedCurrency}
