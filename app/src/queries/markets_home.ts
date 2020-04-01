@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 
-const MarketDataFragment = gql`
+export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
     id
     collateralVolume
@@ -17,18 +17,18 @@ const MarketDataFragment = gql`
   }
 `
 
-export const buildQueryMarkets = (
-  options = {
-    onlyMyMarkets: false,
-    onlyClosedMarkets: false,
-    isCoronaVersion: false,
-    category: null,
-    title: null,
-    arbitrator: null,
-    templateId: null,
-    currency: null,
-  },
-) => {
+export const DEFAULT_OPTIONS = {
+  onlyMyMarkets: false,
+  onlyClosedMarkets: false,
+  isCoronaVersion: false,
+  category: 'All',
+  title: null as Maybe<string>,
+  arbitrator: null as Maybe<string>,
+  templateId: null as Maybe<string>,
+  currency: null as Maybe<string>,
+}
+
+export const buildQueryMarkets = (options = DEFAULT_OPTIONS) => {
   const {
     arbitrator,
     category,
