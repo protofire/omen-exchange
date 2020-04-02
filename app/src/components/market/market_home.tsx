@@ -27,7 +27,7 @@ const TopContents = styled.div`
 `
 
 const SelectableButton = styled(ButtonSelectable)`
-  margin-right: 15px;
+  margin-right: 10px;
 
   &:last-child {
     margin-right: 0;
