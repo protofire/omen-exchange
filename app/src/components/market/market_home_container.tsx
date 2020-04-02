@@ -1,14 +1,16 @@
 import { useQuery } from '@apollo/react-hooks'
+import { ethers } from 'ethers'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
 import { CORONA_MARKET_CREATORS, IS_CORONA_VERSION } from '../../common/constants'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { MARKETS_HOME } from '../../queries/markets_home'
+import { buildQueryMarkets } from '../../queries/markets_home'
 import { CPKService } from '../../services'
 import { getLogger } from '../../util/logger'
 import { RemoteData } from '../../util/remote_data'
 
+import { MARKET_FEE } from './../../common/constants'
 import { MarketHome } from './market_home'
 
 const logger = getLogger('MarketHomeContainer')
@@ -21,7 +23,7 @@ const MarketHomeContainer: React.FC = () => {
   const [filter, setFilter] = useState<any>({
     state: 'OPEN',
     category: 'All',
-    searchText: '',
+    title: '',
     sortBy: null,
   })
   const [markets, setMarkets] = useState<RemoteData<any>>(RemoteData.notAsked())
@@ -30,8 +32,15 @@ const MarketHomeContainer: React.FC = () => {
 
   const { account, library: provider } = context
 
-  const query = IS_CORONA_VERSION ? MARKETS_HOME.CORONA : MARKETS_HOME[filter.state]
-  const marketsQueryVariables = { first: PAGE_SIZE, skip: 0, account: cpkAddress, ...filter }
+  const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
+
+  const query = buildQueryMarkets({
+    onlyMyMarkets: filter.state === 'MY_MARKETS',
+    onlyClosedMarkets: filter.state === 'CLOSED',
+    isCoronaVersion: IS_CORONA_VERSION,
+    ...filter,
+  })
+  const marketsQueryVariables = { first: PAGE_SIZE, skip: 0, accounts: [cpkAddress], fee: feeBN.toString(), ...filter }
   if (IS_CORONA_VERSION) {
     marketsQueryVariables.accounts = CORONA_MARKET_CREATORS
   }

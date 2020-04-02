@@ -4,7 +4,9 @@ import styled from 'styled-components'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../common/dropdown'
 import { TokenItem } from '../token_item'
 
-import { DxDaoIcon } from './img/arbitrators'
+import { useConnectedWeb3Context } from './../../../hooks/connectedWeb3'
+import { getArbitratorsByNetwork, getTokensByNetwork } from './../../../util/networks'
+//import { DxDaoIcon } from './img/arbitrators'
 import { BatIcon, DaiIcon, EtherIcon } from './img/currency'
 
 const Wrapper = styled.div`
@@ -39,57 +41,60 @@ const Options = styled(Dropdown)`
   max-width: 100%;
 `
 
-export const AdvancedFilters = () => {
-  const currencyOptions: Array<DropdownItemProps> = [
-    {
-      content: <TokenItem icon={<EtherIcon />} text="Ether" />,
-      onClick: () => {
-        console.warn('Option Ether')
-      },
+interface Props {
+  onChangeCurrency: (currency: Maybe<string>) => void
+  onChangeArbitrator: (arbitrator: Maybe<string>) => void
+  onChangeTemplateId: (templateId: Maybe<string>) => void
+}
+
+const currencyIcons: { [index: string]: JSX.Element } = {
+  BAT: <BatIcon />,
+  DAI: <DaiIcon />,
+  ETH: <EtherIcon />,
+}
+
+export const AdvancedFilters = (props: Props) => {
+  const context = useConnectedWeb3Context()
+  const { networkId } = context
+
+  const arbitrators = getArbitratorsByNetwork(networkId)
+  const tokens = getTokensByNetwork(networkId)
+
+  const { onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
+
+  const currencyOptions: Array<DropdownItemProps> = [{ address: null, symbol: 'All' }, ...tokens].map(
+    ({ address, symbol }, index) => {
+      const icon = currencyIcons[symbol]
+      return {
+        content: <TokenItem icon={icon} text={symbol} />,
+        onClick: () => onChangeCurrency(address),
+      }
     },
-    {
-      content: <TokenItem icon={<DaiIcon />} text="DAI" />,
-      onClick: () => {
-        console.warn('Option DAI')
-      },
-    },
-    {
-      content: <TokenItem icon={<BatIcon />} text="Basic Atentio Token" />,
-      onClick: () => {
-        console.warn('Option Basic Atention Token')
-      },
-    },
-  ]
+  )
 
   const questionTypeOptions: Array<DropdownItemProps> = [
     {
-      content: 'Binary',
-      onClick: () => {
-        console.warn('Option Binary')
-      },
+      content: 'All',
+      onClick: () => onChangeTemplateId(null),
     },
     {
-      content: 'Other',
-      onClick: () => {
-        console.warn('Option Other')
-      },
+      content: 'Binary',
+      onClick: () => onChangeTemplateId('0'),
+    },
+    {
+      content: 'Single Select',
+      onClick: () => onChangeTemplateId('2'),
     },
   ]
 
-  const arbitratorOptions: Array<DropdownItemProps> = [
-    {
-      content: <TokenItem icon={<DxDaoIcon />} text="DxDAO" />,
-      onClick: () => {
-        console.warn('Option DxDao')
-      },
+  const arbitratorOptions: Array<DropdownItemProps> = [{ address: null, name: 'All' }, ...arbitrators].map(
+    ({ address, name }, index) => {
+      return {
+        content: name,
+        onClick: () => onChangeArbitrator(address),
+      }
     },
-    {
-      content: 'Realit.io',
-      onClick: () => {
-        console.warn('Option Realit.io')
-      },
-    },
-  ]
+  )
 
   return (
     <Wrapper>

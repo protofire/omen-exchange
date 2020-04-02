@@ -116,9 +116,13 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const { context, count, markets, moreMarkets, onFilterChange, onLoadMore } = props
   const [state, setState] = useState<FiltersStates>(FiltersStates.open)
   const [category, setCategory] = useState('All')
+  const [title, setTitle] = useState('')
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
   const [showSearch, setShowSearch] = useState<boolean>(false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
+  const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
+  const [currency, setCurrency] = useState<Maybe<string>>(null)
+  const [templateId, setTemplateId] = useState<Maybe<string>>(null)
   const CATEGORIES_WITH_ALL = ['All', ...CATEGORIES]
   const filters = [
     {
@@ -139,8 +143,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   ]
 
   useEffect(() => {
-    onFilterChange({ category, sortBy, state })
-  }, [category, sortBy, state, onFilterChange])
+    onFilterChange({ arbitrator, templateId, currency, category, sortBy, state, title })
+  }, [arbitrator, templateId, currency, category, sortBy, state, title, onFilterChange])
 
   const toggleSearch = useCallback(() => {
     setShowAdvancedFilters(false)
@@ -160,17 +164,15 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       },
     },
     {
-      content: 'Option 1',
+      content: 'Creation date',
       onClick: () => {
-        setSortBy(null)
-        console.warn('Sort by option 1')
+        setSortBy('creationTimestamp')
       },
     },
     {
-      content: 'Option 2',
+      content: 'Opening date',
       onClick: () => {
-        setSortBy(null)
-        console.warn('Sort by option 2')
+        setSortBy('openingTimestamp')
       },
     },
   ]
@@ -212,8 +214,14 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             </FiltersWrapper>
           </TopContents>
         )}
-        {showSearch && <Search />}
-        {showAdvancedFilters && <AdvancedFilters />}
+        {showSearch && <Search onChange={setTitle} value={title} />}
+        {showAdvancedFilters && (
+          <AdvancedFilters
+            onChangeArbitrator={setArbitrator}
+            onChangeCurrency={setCurrency}
+            onChangeTemplateId={setTemplateId}
+          />
+        )}
         <ListWrapper>
           {RemoteData.hasData(markets) &&
             markets.data.length > 0 &&
