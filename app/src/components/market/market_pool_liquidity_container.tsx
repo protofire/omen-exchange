@@ -22,6 +22,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     marketMakerFunding,
     marketMakerUserFunding,
     totalPoolShares,
+    userEarnings,
     userPoolShares,
   } = marketMakerData
 
@@ -39,6 +40,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       question={question || ''}
       resolution={resolution}
       totalPoolShares={totalPoolShares}
+      userEarnings={userEarnings}
       userPoolShares={userPoolShares}
     />
   )
