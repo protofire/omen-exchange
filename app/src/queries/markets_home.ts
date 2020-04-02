@@ -47,7 +47,7 @@ export const buildQueryMarkets = (options = DEFAULT_OPTIONS) => {
     currency ? 'collateralToken: $currency' : '',
     arbitrator ? 'arbitrator: $arbitrator' : '',
     templateId ? 'templateId: $templateId' : !isCoronaVersion ? 'templateId_in: ["0", "2", "6"]' : '',
-    isCoronaVersion ? '' : 'fee: $fee',
+    'fee: $fee',
   ]
     .filter(s => s.length)
     .join(',')
