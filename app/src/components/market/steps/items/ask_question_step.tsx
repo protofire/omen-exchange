@@ -1,14 +1,76 @@
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent, useCallback, useState } from 'react'
 import { useHistory } from 'react-router'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import { IS_CORONA_VERSION, MAX_OUTCOME_ALLOWED } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
-import { Button, ButtonContainer, ButtonLink } from '../../../button'
-import { Arbitrators, Categories, CreateCard, DateField, DisplayArbitrator, FormRow, Well } from '../../../common'
+import { Button } from '../../../button'
+import { ButtonType } from '../../../button/button_styling_types'
+import { CreateCard, DateField, FormRow } from '../../../common'
 import { QuestionInput } from '../../../common/question_input'
-import { Outcome, Outcomes } from '../../outcomes'
+import { Arbitrators } from '../../arbitrators'
+import { Categories } from '../../categories'
+import { ButtonContainerFullWidth, ButtonWithReadyToGoStatus, LeftButton } from '../common_styled'
+import { Outcome, Outcomes } from '../outcomes'
+
+const ButtonCategoryFocusCSS = css`
+  &,
+  &:hover {
+    background-color: ${props => props.theme.colors.secondary};
+    border-color: ${props => props.theme.colors.secondary};
+    color: ${props => props.theme.colors.primary};
+    font-weight: 500;
+  }
+`
+
+const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boolean }>`
+  &,
+  &:hover {
+    color: ${props => (props.isACategorySelected ? props.theme.colors.textColorDark : '#86909e')};
+    font-weight: 400;
+  }
+
+  max-width: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 100%;
+
+  ${props => (props.focus ? ButtonCategoryFocusCSS : '')}
+`
+
+const ButtonCategoryTextOverflow = styled.span`
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+`
+
+ButtonCategory.defaultProps = {
+  focus: false,
+}
+
+const GridThreeColumns = styled.div`
+  border-top: 1px solid ${props => props.theme.borders.borderColor};
+  column-gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  padding: 20px 0;
+  row-gap: 20px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+`
+
+const Column = styled.div`
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    max-width: 165px;
+  }
+`
 
 interface Props {
   next: () => void
@@ -22,27 +84,15 @@ interface Props {
     loadedQuestionId: Maybe<string>
     outcomes: Outcome[]
   }
-  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
-  handleDateChange: (date: Date | null) => any
-  handleQuestionChange: (question: Question, arbitrator: Arbitrator) => any
-  handleArbitratorChange: (arbitrator: Arbitrator) => any
-  handleOutcomesChange: (newOutcomes: Outcome[]) => any
-  handleClearQuestion: () => any
   addArbitratorCustom: (arbitrator: Arbitrator) => void
   addCategoryCustom: (category: string) => void
+  handleArbitratorChange: (arbitrator: Arbitrator) => any
+  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
+  handleClearQuestion: () => any
+  handleDateChange: (date: Date | null) => any
+  handleOutcomesChange: (newOutcomes: Outcome[]) => any
+  handleQuestionChange: (question: Question, arbitrator: Arbitrator) => any
 }
-
-const OracleInfo = styled(Well)`
-  font-style: italic;
-  text-align: center;
-`
-const ButtonLinkStyled = styled(ButtonLink)`
-  margin-right: auto;
-`
-
-const ButtonContainerStyled = styled(ButtonContainer)`
-  padding-top: 10px;
-`
 
 const AskQuestionStep = (props: Props) => {
   const context = useConnectedWeb3Context()
@@ -59,49 +109,26 @@ const AskQuestionStep = (props: Props) => {
     values,
   } = props
 
-  const {
-    arbitrator,
-    arbitratorsCustom,
-    categoriesCustom,
-    category,
-    loadedQuestionId,
-    outcomes,
-    question,
-    resolution,
-  } = values
+  const { arbitratorsCustom, categoriesCustom, category, loadedQuestionId, outcomes, question, resolution } = values
 
   const history = useHistory()
 
   const errorMessages = []
 
-  const someEmptyName = outcomes.some(outcome => !outcome.name)
-  if (someEmptyName) {
-    errorMessages.push('The names of the outcomes should not be empty.')
-  }
-
-  const someEmptyProbability = outcomes.some(outcome => outcome.probability === 0)
-  if (someEmptyProbability) {
-    errorMessages.push('The probabilities of the outcomes should not be zero.')
-  }
-
   const totalProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
   if (totalProbabilities !== 100) {
-    errorMessages.push('The sum of all probabilities must be equal to 100%.')
+    errorMessages.push('The total of all probabilities must be 100%')
   }
 
-  if (outcomes.length < 2) {
-    errorMessages.push('Please enter at least 2 outcomes')
-  }
-
-  const error =
-    totalProbabilities !== 100 ||
-    someEmptyName ||
-    someEmptyProbability ||
-    outcomes.length < 2 ||
-    !question ||
-    !resolution
+  const error = totalProbabilities !== 100 || outcomes.length < 2 || !question || !resolution
 
   const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
+
+  const [categoryButtonFocus, setCategoryButtonFocus] = useState(false)
+
+  const toggleCategoryButtonFocus = useCallback(() => {
+    setCategoryButtonFocus(!categoryButtonFocus)
+  }, [categoryButtonFocus])
 
   return (
     <CreateCard>
@@ -116,20 +143,11 @@ const AskQuestionStep = (props: Props) => {
             onChange={handleChange}
             onChangeQuestion={handleQuestionChange}
             onClearQuestion={handleClearQuestion}
-            placeholder="Type in a question..."
+            placeholder="What question do you want the world predict?"
             value={question}
           />
         }
-        title={'Set Market Question'}
-        tooltip={{
-          id: `question`,
-          description: `Ensure that your market is phrased in a way that it can be unambiguous, resolvable, contains all the necessary parameters and is clearly understandable. As a guide you could use the <a target="_blank" href="https://augur.guide/2-market-creators/checksheet.html">check sheet</a> prepared by Augur for creating markets.`,
-        }}
       />
-
-      {/* <OutcomeInfo>
-        Please add all the possible outcomes for the <strong>&quot;{question}&quot;</strong> question.
-      </OutcomeInfo> */}
       <Outcomes
         canAddOutcome={canAddOutcome}
         disabled={!!loadedQuestionId}
@@ -138,67 +156,67 @@ const AskQuestionStep = (props: Props) => {
         outcomes={outcomes}
         totalProbabilities={totalProbabilities}
       />
-
-      <FormRow
-        formField={
-          <DateField
-            disabled={!!loadedQuestionId}
-            minDate={new Date()}
-            name="resolution"
-            onChange={handleDateChange}
-            selected={resolution}
+      <GridThreeColumns>
+        <Column>
+          <FormRow
+            formField={
+              <DateField
+                disabled={!!loadedQuestionId}
+                minDate={new Date()}
+                name="resolution"
+                onChange={handleDateChange}
+                selected={resolution}
+              />
+            }
+            title={'Resolution Date'}
           />
-        }
-        title={'Resolution Date'}
-        tooltip={{
-          id: `resolution`,
-          description: `Precisely indicate when the market is resolved. The time is displayed in ISO 8601 format.`,
-        }}
-      />
-      <FormRow
-        formField={
-          <Categories
-            customValues={categoriesCustom}
-            disabled={!!loadedQuestionId}
-            name="category"
-            onChange={handleChange}
-            value={category}
+        </Column>
+        <Column>
+          <FormRow
+            formField={
+              <ButtonCategory
+                buttonType={ButtonType.secondaryLine}
+                disabled={!!loadedQuestionId}
+                focus={categoryButtonFocus}
+                isACategorySelected={category !== ''}
+                onClick={toggleCategoryButtonFocus}
+              >
+                <ButtonCategoryTextOverflow>{category ? category : 'Select Category'}</ButtonCategoryTextOverflow>
+              </ButtonCategory>
+            }
+            title={'Category'}
           />
-        }
-        title={'Category'}
-        tooltip={{
-          id: `category`,
-          description: `You can choose among several categories. Your selection will classify the subject/topic of your market.`,
-        }}
-      />
-
-      <FormRow
-        formField={
-          <Arbitrators
-            customValues={arbitratorsCustom}
-            disabled={!!loadedQuestionId || IS_CORONA_VERSION}
-            name="arbitrator"
-            networkId={context.networkId}
-            onChangeArbitrator={handleArbitratorChange}
-            value={arbitrator}
+        </Column>
+        <Column>
+          <FormRow
+            formField={
+              <Arbitrators
+                customValues={arbitratorsCustom}
+                disabled={!!loadedQuestionId || IS_CORONA_VERSION}
+                networkId={context.networkId}
+                onChangeArbitrator={handleArbitratorChange}
+              />
+            }
+            title={'Arbitrator'}
           />
-        }
-        title={'Arbitrator'}
-        tooltip={{
-          id: `arbitrator`,
-          description: `If you want to learn how <a target="_blank" href="https://realit.io">realit.io</a> and <a target="_blank" href="https://kleros.io">Kleros</a> work, please visit their websites.
-`,
-        }}
-      />
-      <OracleInfo>
-        <DisplayArbitrator arbitrator={arbitrator} />
-      </OracleInfo>
-      <ButtonContainerStyled>
-        <ButtonLinkStyled onClick={() => history.push(`/`)}>‹ Cancel</ButtonLinkStyled>
-        <Button disabled={error} onClick={props.next}>
+        </Column>
+      </GridThreeColumns>
+      {categoryButtonFocus && (
+        <Categories categories={categoriesCustom} name="category" onChange={handleChange} selectedCategory={category} />
+      )}
+      <ButtonContainerFullWidth borderTop={true}>
+        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
+          Cancel
+        </LeftButton>
+        <ButtonWithReadyToGoStatus
+          buttonType={ButtonType.secondaryLine}
+          disabled={error}
+          onClick={props.next}
+          readyToGo={!error}
+        >
           Next
-        </Button>
-      </ButtonContainerStyled>
+        </ButtonWithReadyToGoStatus>
+      </ButtonContainerFullWidth>
     </CreateCard>
   )
 }

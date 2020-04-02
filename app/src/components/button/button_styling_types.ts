@@ -143,6 +143,7 @@ export const ButtonCSS = css<ButtonProps>`
   line-height: 1.2;
   outline: none;
   padding: 0 20px;
+  pointer-events: ${props => (props.disabled ? 'none' : 'initial')};
   text-align: center;
   transition: all 0.15s ease-out;
   user-select: none;

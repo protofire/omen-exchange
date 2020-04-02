@@ -1,6 +1,7 @@
 import { createGlobalStyle } from 'styled-components'
 
 import theme from '../index'
+import { DatepickerStylesOverride } from '../overrides/datepicker_styles_override'
 import { WalletConnectStylesOverride } from '../overrides/wallet_connect_styles_override'
 
 type ThemeType = typeof theme
@@ -25,5 +26,6 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
   }
 
   ${WalletConnectStylesOverride}
+  ${DatepickerStylesOverride}
 
 `

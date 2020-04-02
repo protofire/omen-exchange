@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react'
+import { useHistory } from 'react-router'
 
 import { useContracts } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
@@ -16,6 +17,7 @@ const logger = getLogger('Market::MarketWizardCreatorContainer')
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
+  const history = useHistory()
 
   const [isModalOpen, setModalState] = useState(false)
   const { conditionalTokens, marketMakerFactory, realitio } = useContracts(context)
@@ -53,6 +55,7 @@ const MarketWizardCreatorContainer: FC = () => {
         setMarketMakerAddress(marketMakerAddress)
 
         setMarketCreationStatus(MarketCreationStatus.done())
+        history.push(`/${marketMakerAddress}`)
       }
     } catch (err) {
       setMarketCreationStatus(MarketCreationStatus.error(err))

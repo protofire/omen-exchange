@@ -9,8 +9,8 @@ import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '
 import { Arbitrator, MarketData, Question, Token } from '../../util/types'
 import { BigNumberInputReturn } from '../common/big_number_input'
 
-import { Outcome } from './outcomes'
-import { AskQuestionStep, FundingAndFeeStep, MenuStep, SummaryMarketStep } from './steps'
+import { AskQuestionStep, FundingAndFeeStep, MenuStep } from './steps'
+import { Outcome } from './steps/outcomes'
 
 interface Props {
   callback: (param: MarketData) => void
@@ -22,7 +22,7 @@ export const MarketWizardCreator = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { networkId } = context
 
-  const { callback, marketCreationStatus, marketMakerAddress } = props
+  const { callback, marketCreationStatus } = props
 
   const defaultCollateral = getDefaultToken(networkId)
   const defaultArbitrator = getDefaultArbitrator(networkId)
@@ -37,16 +37,18 @@ export const MarketWizardCreator = (props: Props) => {
     arbitrator: defaultArbitrator,
     spread: MARKET_FEE,
     funding: new BigNumber('0'),
-    outcomes: [
-      {
-        name: 'Yes',
-        probability: 50,
-      },
-      {
-        name: 'No',
-        probability: 50,
-      },
-    ],
+    // I'll comment this out for now, new design shows no outcomes by default
+    // outcomes: [
+    //   {
+    //     name: 'Yes',
+    //     probability: 50,
+    //   },
+    //   {
+    //     name: 'No',
+    //     probability: 50,
+    //   },
+    // ],
+    outcomes: [],
     loadedQuestionId: null,
   }
 
@@ -113,7 +115,11 @@ export const MarketWizardCreator = (props: Props) => {
   }
 
   const handleChange = (
-    event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn,
+    event:
+      | ChangeEvent<HTMLInputElement>
+      | ChangeEvent<HTMLSelectElement>
+      | BigNumberInputReturn
+      | ChangeEvent<HTMLButtonElement>,
   ) => {
     const { name, value } = 'target' in event ? event.target : event
 
@@ -287,10 +293,6 @@ export const MarketWizardCreator = (props: Props) => {
     return <MenuStep currentStep={currentStep} />
   }
 
-  const summaryMarketStep = () => {
-    return marketMakerAddress ? <SummaryMarketStep marketMakerAddress={marketMakerAddress} /> : ''
-  }
-
   return (
     <>
       {!MarketCreationStatus.is.done(marketCreationStatus) && (
@@ -298,7 +300,6 @@ export const MarketWizardCreator = (props: Props) => {
           {currentMenu()} {currentStepFn()}
         </>
       )}
-      {MarketCreationStatus.is.done(marketCreationStatus) && summaryMarketStep()}
     </>
   )
 }

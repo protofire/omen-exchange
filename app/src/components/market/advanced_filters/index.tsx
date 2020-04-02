@@ -2,12 +2,12 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../common/dropdown'
+// import { DxDaoIcon } from '../../common/icons'
+import { BatIcon, DaiIcon, EtherIcon } from '../../common/icons/currencies'
 import { TokenItem } from '../token_item'
 
 import { useConnectedWeb3Context } from './../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork, getTokensByNetwork } from './../../../util/networks'
-//import { DxDaoIcon } from './img/arbitrators'
-import { BatIcon, DaiIcon, EtherIcon } from './img/currency'
 
 const Wrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
