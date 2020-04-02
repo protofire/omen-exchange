@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
@@ -25,7 +25,6 @@ import {
   WalletBalance,
 } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/big_number_input'
-import { currenciesData } from '../../../common/icons/currencies/currencies_data'
 import { FullLoading } from '../../../loading'
 import { CurrencySelector } from '../../currency_selector'
 import { TransactionDetailsCard } from '../../transaction_details_card'

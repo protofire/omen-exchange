@@ -165,6 +165,7 @@ const Outcomes = (props: Props) => {
             onClick={() => {
               removeOutcome(index)
             }}
+            title={`Remove outcome ${index + 1}`}
           >
             <RemoveIcon />
           </CustomButtonCircle>
@@ -185,7 +186,9 @@ const Outcomes = (props: Props) => {
         {manualProbabilities && <FormLabel>Probability</FormLabel>}
         {manualProbabilitiesAndNoOutcomes && (
           <TitleText>
-            <FormRowLink onClick={handleIsUniformChanged}>set uniformly</FormRowLink>
+            <FormRowLink onClick={handleIsUniformChanged} title="Distribute uniformly">
+              set uniformly
+            </FormRowLink>
           </TitleText>
         )}
         {manualProbabilitiesAndThereAreOutcomes && (
@@ -226,6 +229,7 @@ const Outcomes = (props: Props) => {
           disabled={!newOutcomeName || maxOutcomesReached}
           onClick={addNewOutcome}
           readyToAdd={newOutcomeName !== ''}
+          title="Add new outcome"
         >
           <AddIcon />
         </CustomButtonCircleAdd>
