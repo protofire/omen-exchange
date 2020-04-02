@@ -22,7 +22,7 @@ test('Query markets with default options', () => {
 
 test('Query markets for corona markets', () => {
   const query = buildQueryMarkets({ ...DEFAULT_OPTIONS, isCoronaVersion: true })
-  const expectedQuery = getExpectedQuery('creator_in: $accounts')
+  const expectedQuery = getExpectedQuery('creator_in: $accounts, fee: $fee')
   expect(query).toBe(expectedQuery)
 })
 
@@ -54,7 +54,7 @@ test('Corona markets with template_id', () => {
     isCoronaVersion: true,
     templateId: '2',
   })
-  const expectedQuery = getExpectedQuery('creator_in: $accounts, templateId: $templateId')
+  const expectedQuery = getExpectedQuery('creator_in: $accounts, templateId: $templateId, fee: $fee')
   expect(query).toBe(expectedQuery)
 })
 
@@ -83,7 +83,7 @@ test('Closed corona markets with currency', () => {
     currency: 'currencyTest',
   })
   const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp_not: null, creator_in: $accounts, title_contains: $title, collateralToken: $currency, templateId: $templateId',
+    'answerFinalizedTimestamp_not: null, creator_in: $accounts, title_contains: $title, collateralToken: $currency, templateId: $templateId, fee: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
