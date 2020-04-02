@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 
-const MarketDataFragment = gql`
+export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
     id
     collateralVolume
@@ -13,43 +13,51 @@ const MarketDataFragment = gql`
     resolutionTimestamp
     arbitrator
     category
+    answerFinalizedTimestamp
   }
 `
 
-const OPEN = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String) {
-    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy) {
-      ...marketData
+export const DEFAULT_OPTIONS = {
+  onlyMyMarkets: false,
+  onlyClosedMarkets: false,
+  isCoronaVersion: false,
+  category: 'All',
+  title: null as Maybe<string>,
+  arbitrator: null as Maybe<string>,
+  templateId: null as Maybe<string>,
+  currency: null as Maybe<string>,
+}
+
+export const buildQueryMarkets = (options = DEFAULT_OPTIONS) => {
+  const {
+    arbitrator,
+    category,
+    currency,
+    isCoronaVersion,
+    onlyClosedMarkets,
+    onlyMyMarkets,
+    templateId,
+    title,
+  } = options
+  const whereClause = [
+    onlyClosedMarkets ? 'answerFinalizedTimestamp_not: null' : '',
+    onlyMyMarkets || isCoronaVersion ? 'creator_in: $accounts' : '',
+    category === 'All' ? '' : 'category: $category',
+    title ? 'title_contains: $title' : '',
+    currency ? 'collateralToken: $currency' : '',
+    arbitrator ? 'arbitrator: $arbitrator' : '',
+    templateId ? 'templateId: $templateId' : !isCoronaVersion ? 'templateId_in: ["0", "2", "6"]' : '',
+    'fee: $fee',
+  ]
+    .filter(s => s.length)
+    .join(',')
+  const query = gql`
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $title: String, $currency: String, $arbitrator: String, $templateId: String, $accounts: [String!], $fee: String) {
+      fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: desc, where: { ${whereClause} }) {
+        ...marketData
+      }
     }
-  }
-  ${MarketDataFragment}
-`
-
-const CLOSED = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String) {
-    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy) {
-      ...marketData
-    }
-  }
-  ${MarketDataFragment}
-`
-
-const MY_MARKETS = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $account: String!) {
-    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, where: { creator: $account }) {
-      ...marketData
-    }
-  }
-  ${MarketDataFragment}
-`
-
-const CORONA = gql`
-  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $accounts: [String]) {
-    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, where: { creator_in: $accounts }) {
-      ...marketData
-    }
-  }
-  ${MarketDataFragment}
-`
-
-export const MARKETS_HOME: any = { OPEN, CLOSED, CORONA, MY_MARKETS }
+    ${MarketDataFragment}
+  `
+  return query
+}

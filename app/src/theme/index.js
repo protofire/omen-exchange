@@ -48,6 +48,26 @@ const theme = {
     colorDisabled: '#757575',
     colorHover: '#37474F',
   },
+  dropdown: {
+    buttonBackgroundColor: '#fff',
+    buttonBackgroundColorHover: '#fff',
+    buttonBorderColor: '#D6EBFD',
+    buttonBorderColorHover: '#BBDEFB',
+    buttonColor: '#37474F',
+    buttonColorHover: '#37474F',
+    dropdownItems: {
+      backgroundColor: '#fff',
+      borderColor: '#ECEFF1',
+      borderRadius: '16px',
+      boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.12)',
+      item: {
+        backgroundColor: 'transparent',
+        backgroundColorActive: 'rgba(227, 242, 253, 0.4)',
+        backgroundColorHover: 'rgba(227, 242, 253, 0.4)',
+        color: '#37474F',
+      },
+    },
+  },
   buttonCircle: {
     dimensions: '34px',
   },
@@ -123,14 +143,6 @@ const theme = {
   },
   mainContainer: {
     maxWidth: '586px',
-  },
-  dropdown: {
-    backgroundColor: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    boxShadow: '0 0 12px 0 rgba(0, 0, 0, 0.12)',
-    lightTextColor: '#666',
-    textColor: '#000',
   },
   outcomes: {
     colors: [

@@ -3,6 +3,7 @@ import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
+import { IS_CORONA_VERSION } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
@@ -135,7 +136,7 @@ export const ModalConnectWallet = (props: Props) => {
             <MetamaskButton disabled={!doesMetamaskExist} />
             <WalletConnectButton />
           </ButtonsWrapper>
-          <MadeBy />
+          {!IS_CORONA_VERSION && <MadeBy />}
         </ModalWrapper>
       )}
     </>

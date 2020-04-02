@@ -16,10 +16,11 @@ export enum DropdownDirection {
 }
 
 const Wrapper = styled.div<{ active?: boolean; disabled: boolean }>`
-  background-color: #fff;
+  background-color: ${props => props.theme.dropdown.buttonBackgroundColor};
   border-radius: 32px;
-  border: 1px solid ${props => props.theme.colors.tertiary};
+  border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
   box-sizing: border-box;
+  color: ${props => props.theme.dropdown.buttonColor};
   cursor: pointer;
   height: 34px;
   opacity: ${props => (props.disabled ? '0.5' : '1')};
@@ -27,10 +28,17 @@ const Wrapper = styled.div<{ active?: boolean; disabled: boolean }>`
   padding: 0 14px;
   pointer-events: ${props => (props.disabled ? 'none' : 'initial')};
   position: relative;
+  transition: border-color 0.15s ease-out;
   user-select: none;
 
   .chevronUp {
     display: none;
+  }
+
+  &:hover {
+    background-color: ${props => props.theme.dropdown.buttonBackgroundColor};
+    border-color: ${props => props.theme.dropdown.buttonBorderColorHover};
+    color: ${props => props.theme.dropdown.buttonColorHover};
   }
 
   &:focus-within {
@@ -64,7 +72,7 @@ const DropdownButton = styled.div`
 
 const CurrentItem = styled.div`
   align-items: center;
-  color: ${props => props.theme.colors.textColorDark};
+  color: ${props => props.theme.dropdown.buttonColor};
   display: flex;
   flex-grow: 1;
   flex-shrink: 0;
@@ -101,10 +109,10 @@ const DropdownDirectionUpwardsCSS = css`
 `
 
 const Items = styled.div<{ dropdownPosition?: DropdownPosition; dropdownDirection?: DropdownDirection }>`
-  background-color: #fff;
-  border-radius: 16px;
-  border: solid 1px ${props => props.theme.borders.borderColor};
-  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.12);
+  background-color: ${props => props.theme.dropdown.dropdownItems.backgroundColor};
+  border-radius: ${props => props.theme.dropdown.dropdownItems.borderRadius};
+  border: solid 1px ${props => props.theme.dropdown.dropdownItems.borderColor};
+  box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
   display: none;
   min-width: 240px;
   padding: 12px 0;
@@ -125,14 +133,18 @@ Items.defaultProps = {
 
 const Item = styled.div<{ active: boolean }>`
   align-items: center;
-  background-color: ${props => (props.active ? 'rgba(227, 242, 253, 0.4)' : 'transparent')};
+  background-color: ${props =>
+    props.active
+      ? props.theme.dropdown.dropdownItems.item.backgroundColorActive
+      : props.theme.dropdown.dropdownItems.item.backgroundColor};
+  color: ${props => props.theme.dropdown.dropdownItems.item.color};
   cursor: pointer;
   display: flex;
   height: 48px;
   padding: 12px 17px;
 
   &:hover {
-    background: rgba(227, 242, 253, 0.4);
+    background: ${props => props.theme.dropdown.dropdownItems.item.backgroundColorHover};
   }
 `
 

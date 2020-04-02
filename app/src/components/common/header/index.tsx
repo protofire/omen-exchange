@@ -10,6 +10,7 @@ import { Button, ButtonConnectWallet, ButtonDisconnectWallet } from '../../butto
 import { ButtonType } from '../../button/button_styling_types'
 import { Logo, Network } from '../../common'
 import { ModalConnectWallet } from '../../modal'
+import { LogoCoronaMarkets } from '../logo'
 
 const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -98,9 +99,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
   return (
     <HeaderWrapper {...restProps}>
       <HeaderInner>
-        <LogoWrapper to="/">
-          <Logo />
-        </LogoWrapper>
+        <LogoWrapper to="/">{IS_CORONA_VERSION ? <LogoCoronaMarkets /> : <Logo />}</LogoWrapper>
         <ContentsRight>
           {!IS_CORONA_VERSION && (
             <ButtonCreate buttonType={ButtonType.secondaryLine} onClick={() => history.push('/create')}>
