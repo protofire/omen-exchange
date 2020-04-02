@@ -181,7 +181,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitleMarket title={'Markets'} />
       <ListCard>
-        {context.account && (
+        {context.account && !IS_CORONA_VERSION && (
           <TopContents>
             <MarketsCategories>
               {CATEGORIES_WITH_ALL.map((item, index) => (
@@ -191,17 +191,15 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               ))}
             </MarketsCategories>
             <FiltersWrapper>
-              {!IS_CORONA_VERSION && (
-                <FiltersCategories>
-                  {filters.map((item, index) => {
-                    return (
-                      <SelectableButton active={item.active} key={index} onClick={item.onClick}>
-                        {item.title}
-                      </SelectableButton>
-                    )
-                  })}
-                </FiltersCategories>
-              )}
+              <FiltersCategories>
+                {filters.map((item, index) => {
+                  return (
+                    <SelectableButton active={item.active} key={index} onClick={item.onClick}>
+                      {item.title}
+                    </SelectableButton>
+                  )
+                })}
+              </FiltersCategories>
               <FiltersControls>
                 <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
                   <IconSearch />
