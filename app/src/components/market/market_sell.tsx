@@ -60,7 +60,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
 
   const calcSellAmount = useMemo(
-    () => async (amountShares: BigNumber): Promise<[number[], Maybe<BigNumber>, Maybe<BigNumber>]> => {
+    () => async (
+      amountShares: BigNumber,
+    ): Promise<[number[], Maybe<BigNumber>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
       const holdings = balances.map(balance => balance.holdings)
       const holdingsOfSoldOutcome = holdings[outcomeIndex]
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
@@ -78,7 +80,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         logger.warn(
           `Could not compute amount of collateral to sell for '${amountShares.toString()}' and '${holdingsOfSoldOutcome.toString()}'`,
         )
-        return [[], null, null]
+        return [[], null, null, null]
       }
 
       const balanceAfterTrade = computeBalanceAfterTrade(
@@ -90,17 +92,18 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
       const costFee = mulBN(amountToSell, marketFeeWithTwoDecimals)
+      const potentialValue = amountToSell.sub(costFee)
 
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
 
-      return [probabilities, costFee, amountToSell]
+      return [probabilities, costFee, amountToSell, potentialValue]
     },
     [outcomeIndex, balances, marketFeeWithTwoDecimals],
   )
 
-  const [probabilities, costFee, tradedCollateral] = useAsyncDerivedValue(
+  const [probabilities, costFee, tradedCollateral, potentialValue] = useAsyncDerivedValue(
     amountShares,
-    [balances.map(() => 0), null, null],
+    [balances.map(() => 0), null, null, null],
     calcSellAmount,
   )
 
@@ -139,9 +142,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const noteAmount = `${formatBigNumber(balanceItem.shares, collateral.decimals)} shares`
 
-  const mockedPotential = '1.03'
-  const mockedSellAmount = '0.00'
-
   return (
     <>
       <SectionTitle goBackEnabled title={question} />
@@ -179,12 +179,19 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           </div>
           <div>
             <TransactionDetailsCard>
-              <TransactionDetailsRow title={'Sell Amount'} value={`${mockedSellAmount} ${collateral.symbol}`} />
               <TransactionDetailsRow
-                emphasizeValue={parseFloat(mockedPotential) > 0}
+                title={'Sell Amount'}
+                value={`${formatBigNumber(amountShares, collateral.decimals)}`}
+              />
+              <TransactionDetailsRow
+                emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
                 state={ValueStates.success}
                 title={'Profit'}
-                value={`${mockedPotential} ${collateral.symbol}`}
+                value={
+                  potentialValue
+                    ? `${formatBigNumber(potentialValue, collateral.decimals, 2)} ${collateral.symbol}`
+                    : '0.00'
+                }
               />
               <TransactionDetailsRow
                 title={'Trading Fee'}

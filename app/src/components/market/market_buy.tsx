@@ -164,10 +164,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const noteAmount = `${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`
 
   const amountFee = cost.sub(amount)
-  const mockedPotential = 1.03
+  const potentialProfitValue = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
   const fee = `${formatBigNumber(amountFee.mul(-1), collateral.decimals)} ${collateral.symbol}`
   const baseCost = `${formatBigNumber(amount.sub(amountFee), collateral.decimals)} ${collateral.symbol}`
-  const potentialProfit = `${mockedPotential} ${collateral.symbol}`
+  const potentialProfit = `${formatBigNumber(potentialProfitValue, collateral.decimals)} ${collateral.symbol}`
   const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
   const total = `${sharesTotal} Shares`
 
@@ -212,7 +212,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               <TransactionDetailsRow title={'Base Cost'} value={baseCost} />
               <TransactionDetailsLine />
               <TransactionDetailsRow
-                emphasizeValue={mockedPotential > 0}
+                emphasizeValue={potentialProfitValue.gt(0)}
                 state={ValueStates.success}
                 title={'Potential Profit'}
                 value={potentialProfit}
