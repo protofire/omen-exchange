@@ -65,3 +65,16 @@ if (IS_CORONA_VERSION && !DISQUS_URL) {
 export const GEO_JS_ENDPOINT = process.env.REACT_APP_GEO_JS_ENDPOINT || 'https://get.geojs.io/v1/ip/geo.json'
 
 export const BLACKLISTED_COUNTRIES = (process.env.REACT_APP_BLACKLISTED_COUNTRIES || '').split(',').filter(Boolean)
+
+export const DOCUMENT_TITLE = process.env.REACT_APP_TITLE || 'Omen'
+export const DOCUMENT_DESCRIPTION = process.env.REACT_APP_DESCRIPTION || 'Omen Information Markets'
+
+export const OG_TITLE = process.env.REACT_APP_OG_TITLE || 'Omen Prediction Markets'
+export const OG_DESCRIPTION = process.env.REACT_APP_OG_DESCRIPTION || 'Omen Information Markets'
+export const OG_IMAGE = process.env.REACT_APP_OG_IMAGE || 'logo_thumbnail.png'
+export const OG_URL = process.env.REACT_APP_OG_URL || ''
+export const OG_SITE_NAME = process.env.REACT_APP_OG_SITE_NAME || 'Omen'
+
+export const TWITTER_CARD = process.env.REACT_APP_TWITTER_CARD || 'summary_large_image'
+export const TWITTER_IMAGE_ALT = process.env.REACT_APP_TWITTER_IMAGE_ALT || 'Omen'
+export const TWITTER_SITE = process.env.REACT_APP_TWITTER_SITE || ''
