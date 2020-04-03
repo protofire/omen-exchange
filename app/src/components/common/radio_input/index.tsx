@@ -1,7 +1,7 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
-const RadioWrapper = styled.div`
+const Wrapper = styled.div`
   cursor: pointer;
   position: relative;
 `
@@ -42,9 +42,9 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 export const RadioInput: React.FC<Props> = (props: Props) => {
   const { checked = false, disabled, name, onChange, outcomeIndex, value, ...restProps } = props
   return (
-    <RadioWrapper {...restProps}>
+    <Wrapper {...restProps}>
       <Radio checked={checked} outcomeIndex={outcomeIndex} />
       <Input checked={checked} disabled={disabled} name={name} onChange={onChange} type="radio" value={value} />
-    </RadioWrapper>
+    </Wrapper>
   )
 }
