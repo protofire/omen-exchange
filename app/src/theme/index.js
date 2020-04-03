@@ -154,17 +154,14 @@ const theme = {
         darker: '#00897B',
         medium: '#b2dfdb',
       },
-
       {
         darker: '#d2b994',
         medium: '#ffe0b2',
       },
-
       {
         darker: '#b9b992',
         medium: '#e7e7be',
       },
-
       {
         darker: '#9db992',
         medium: '#bedfb2',

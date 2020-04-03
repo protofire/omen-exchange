@@ -34,6 +34,7 @@ const FieldWrapper = styled.div<{ disabled?: boolean }>`
     font-weight: ${props => props.theme.textfield.fontWeight};
     line-height: 1.2;
     margin: 0 5px 0 0;
+    min-width: 0;
     outline: ${props => props.theme.textfield.outline};
     padding: 0;
 

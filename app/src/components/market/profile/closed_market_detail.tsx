@@ -11,8 +11,8 @@ import { formatBigNumber, formatDate } from '../../../util/tools'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ClosedMarket, DisplayArbitrator, SubsectionTitle, TitleValue, ViewCard } from '../../common'
-import { OutcomeTable } from '../../common/outcome_table'
 import { FullLoading } from '../../loading'
+import { OutcomeTable } from '../outcome_table'
 
 const Grid = styled.div`
   display: grid;

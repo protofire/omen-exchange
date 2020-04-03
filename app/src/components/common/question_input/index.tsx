@@ -3,8 +3,9 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../util/types'
-import { FormRowLink, FormRowNote, Textfield } from '../../common'
+import { FormRowLink, Textfield } from '../../common'
 import { ModalQuestion } from '../../modal'
+import { FormLabel } from '../form_label'
 
 interface Props {
   addArbitratorCustomValue: (arbitrator: Arbitrator) => void
@@ -19,22 +20,11 @@ interface Props {
   value: string
 }
 
-const Wrapper = styled.div`
+const TitleWrapper = styled.div`
+  align-items: center;
   display: flex;
   justify-content: space-between;
-  margin: 0 0 5px 0;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`
-
-const Note = styled(FormRowNote)`
-  margin: 5px 0 0 0;
-  width: 80%;
-`
-const Link = styled(FormRowLink)`
-  margin: 5px 0 0 0;
+  margin-bottom: 12px;
 `
 
 export const QuestionInput = (props: Props) => {
@@ -55,6 +45,11 @@ export const QuestionInput = (props: Props) => {
 
   return (
     <>
+      <TitleWrapper>
+        <FormLabel>Set Market Question</FormLabel>
+        {!disabled && <FormRowLink onClick={() => setModalQuestionState(true)}>add question</FormRowLink>}
+        {disabled && <FormRowLink onClick={onClearQuestion}>clear question</FormRowLink>}
+      </TitleWrapper>
       <Textfield
         disabled={disabled}
         name={name}
@@ -63,24 +58,16 @@ export const QuestionInput = (props: Props) => {
         type="text"
         value={value}
       />
-      <Wrapper>
-        <Note>
-          <strong>For example:</strong> <i>&quot;Will France win?&quot;</i> is not an acceptable question, but{' '}
-          <i>&quot;Will France win the 2020 FIFA World Cup?&quot;</i> is a good one.
-        </Note>
-        {!disabled && <Link onClick={() => setModalQuestionState(true)}>Add question</Link>}
-        {disabled && <Link onClick={onClearQuestion}>Clear question</Link>}
-        <ModalQuestion
-          context={context}
-          isOpen={isModalQuestionOpen}
-          onClose={() => setModalQuestionState(false)}
-          onSave={(question: Question, arbitrator: Arbitrator) => {
-            addArbitratorCustomValue(arbitrator)
-            addCategoryCustomValue(question.category)
-            onChangeQuestion(question, arbitrator)
-          }}
-        />
-      </Wrapper>
+      <ModalQuestion
+        context={context}
+        isOpen={isModalQuestionOpen}
+        onClose={() => setModalQuestionState(false)}
+        onSave={(question: Question, arbitrator: Arbitrator) => {
+          addArbitratorCustomValue(arbitrator)
+          addCategoryCustomValue(question.category)
+          onChangeQuestion(question, arbitrator)
+        }}
+      />
     </>
   )
 }

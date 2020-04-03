@@ -4,14 +4,13 @@ import styled from 'styled-components'
 const FormRowLinkWrapper = styled.span`
   color: ${props => props.theme.colors.primary};
   cursor: pointer;
-  font-size: 10px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 400;
   line-height: 1.2;
-  text-align: right;
-  text-decoration: underline;
+  text-decoration: none;
 
   &:hover {
-    text-decoration: none;
+    text-decoration: underline;
   }
 `
 
