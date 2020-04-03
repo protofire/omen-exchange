@@ -242,7 +242,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               return <ListItem key={item.id} market={item}></ListItem>
             })}
           {RemoteData.is.success(markets) && markets.data.length === 0 && (
-            <NoMarketsAvailable title={'No markets available'} />
+            <NoMarketsAvailable>No markets available.</NoMarketsAvailable>
           )}
           {RemoteData.is.loading(markets) && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
