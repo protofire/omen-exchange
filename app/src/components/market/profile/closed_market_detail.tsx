@@ -40,6 +40,7 @@ interface Props {
   marketMakerAddress: string
   isConditionResolved: boolean
   arbitrator: Maybe<Arbitrator>
+  payouts: Maybe<number[]>
 }
 
 const logger = getLogger('Market::ClosedMarketDetail')
@@ -57,6 +58,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     funding,
     isConditionResolved,
     marketMakerAddress,
+    payouts,
     questionId,
     questionRaw,
     questionTemplateId,

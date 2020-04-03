@@ -25,6 +25,7 @@ interface Props {
   status: Status
   totalPoolShares: BigNumber
   userPoolShares: BigNumber
+  payouts: Maybe<number[]>
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {
