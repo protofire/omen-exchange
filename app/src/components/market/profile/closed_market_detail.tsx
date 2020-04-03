@@ -35,7 +35,7 @@ interface Props {
   question: string
   questionId: string
   questionRaw: string
-  questionTemplateId: BigNumber
+  questionTemplateId: number
   resolution: Date | null
   marketMakerAddress: string
   isConditionResolved: boolean

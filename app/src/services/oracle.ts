@@ -33,7 +33,7 @@ export class OracleService {
    */
   resolveCondition = async (
     questionId: string,
-    questionTemplateId: BigNumber,
+    questionTemplateId: number,
     questionRaw: string,
     numOutcomes: number,
   ): Promise<TransactionReceipt> => {
@@ -48,7 +48,7 @@ export class OracleService {
 
   static encodeResolveCondition = (
     questionId: string,
-    questionTemplateId: BigNumber,
+    questionTemplateId: number,
     questionRaw: string,
     numOutcomes: number,
   ): string => {

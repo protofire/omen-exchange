@@ -53,7 +53,7 @@ interface CPKRedeemParams {
   isConditionResolved: boolean
   questionId: string
   questionRaw: string
-  questionTemplateId: BigNumber
+  questionTemplateId: number
   numOutcomes: number
   winningOutcome: BalanceItem | undefined
   collateralToken: Token
