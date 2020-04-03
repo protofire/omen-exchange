@@ -122,3 +122,19 @@ export interface MarketData {
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
 }
+
+export enum MarketStates {
+  open = 'OPEN',
+  closed = 'CLOSED',
+  myMarkets = 'MY_MARKETS',
+}
+
+export interface MarketFilters {
+  state: MarketStates
+  category: string
+  title: Maybe<string>
+  sortBy: Maybe<string>
+  arbitrator: Maybe<string>
+  templateId: Maybe<string>
+  currency: Maybe<string>
+}

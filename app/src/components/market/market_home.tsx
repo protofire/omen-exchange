@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { CATEGORIES, IS_CORONA_VERSION } from '../../common/constants'
 import { ConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { RemoteData } from '../../util/remote_data'
+import { MarketFilters, MarketStates } from '../../util/types'
 import { Button, ButtonCircle, ButtonSelectable } from '../button'
 import { ButtonType } from '../button/button_styling_types'
 import { ListCard, ListItem, SectionTitle } from '../common'
@@ -102,19 +103,13 @@ interface Props {
   currentFilter: any
   markets: RemoteData<any[]>
   moreMarkets: boolean
-  onFilterChange: (filter: any) => void
+  onFilterChange: (filter: MarketFilters) => void
   onLoadMore: () => void
-}
-
-enum FiltersStates {
-  open = 'OPEN',
-  closed = 'CLOSED',
-  myMarkets = 'MY_MARKETS',
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
   const { context, count, markets, moreMarkets, onFilterChange, onLoadMore } = props
-  const [state, setState] = useState<FiltersStates>(FiltersStates.open)
+  const [state, setState] = useState<MarketStates>(MarketStates.open)
   const [category, setCategory] = useState('All')
   const [title, setTitle] = useState('')
   const [sortBy, setSortBy] = useState<Maybe<string>>(null)
@@ -126,19 +121,22 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const CATEGORIES_WITH_ALL = ['All', ...CATEGORIES]
   const filters = [
     {
+      state: MarketStates.open,
       title: 'Open',
-      active: state === FiltersStates.open,
-      onClick: () => setState(FiltersStates.open),
+      active: state === MarketStates.open,
+      onClick: () => setState(MarketStates.open),
     },
     {
+      state: MarketStates.closed,
       title: 'Closed',
-      active: state === FiltersStates.closed,
-      onClick: () => setState(FiltersStates.closed),
+      active: state === MarketStates.closed,
+      onClick: () => setState(MarketStates.closed),
     },
     {
+      state: MarketStates.myMarkets,
       title: 'My Markets',
-      active: state === FiltersStates.myMarkets,
-      onClick: () => setState(FiltersStates.myMarkets),
+      active: state === MarketStates.myMarkets,
+      onClick: () => setState(MarketStates.myMarkets),
     },
   ]
 
@@ -181,7 +179,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitleMarket title={'Markets'} />
       <ListCard>
-        {context.account && !IS_CORONA_VERSION && (
+        {context.account && !IS_CORONA_VERSION ? (
           <TopContents>
             <MarketsCategories>
               {CATEGORIES_WITH_ALL.map((item, index) => (
@@ -211,7 +209,24 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               </FiltersControls>
             </FiltersWrapper>
           </TopContents>
+        ) : (
+          <TopContents>
+            <FiltersWrapper>
+              <FiltersCategories>
+                {filters
+                  .filter(f => f.state !== MarketStates.myMarkets)
+                  .map((item, index) => {
+                    return (
+                      <SelectableButton active={item.active} key={index} onClick={item.onClick}>
+                        {item.title}
+                      </SelectableButton>
+                    )
+                  })}
+              </FiltersCategories>
+            </FiltersWrapper>
+          </TopContents>
         )}
+
         {showSearch && <Search onChange={setTitle} value={title} />}
         {showAdvancedFilters && (
           <AdvancedFilters
