@@ -155,6 +155,7 @@ export const OutcomeTable = (props: Props) => {
 
   const renderTable = () =>
     balances
+      .slice()
       .sort((a, b) => (a.winningOutcome === b.winningOutcome ? 0 : a.winningOutcome ? -1 : 1)) // Put winning outcome first
       .map((balanceItem: BalanceItem, index) => renderTableRow(balanceItem, index))
 
