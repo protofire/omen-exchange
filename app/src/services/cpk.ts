@@ -7,7 +7,7 @@ import moment from 'moment'
 import { getLogger } from '../util/logger'
 import { getCPKAddresses, getContractAddress } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
-import { BalanceItem, MarketData, Token } from '../util/types'
+import { MarketData, Token } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
@@ -55,7 +55,7 @@ interface CPKRedeemParams {
   questionRaw: string
   questionTemplateId: number
   numOutcomes: number
-  winningOutcome: BalanceItem | undefined
+  earnedCollateral: BigNumber
   collateralToken: Token
   oracle: OracleService
   marketMaker: MarketMakerService
@@ -408,6 +408,7 @@ class CPKService {
   redeemPositions = async ({
     collateralToken,
     conditionalTokens,
+    earnedCollateral,
     isConditionResolved,
     marketMaker,
     numOutcomes,
@@ -415,7 +416,6 @@ class CPKService {
     questionId,
     questionRaw,
     questionTemplateId,
-    winningOutcome,
   }: CPKRedeemParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -440,12 +440,12 @@ class CPKService {
         data: ConditionalTokenService.encodeRedeemPositions(collateralToken.address, conditionId, numOutcomes),
       })
 
-      if (winningOutcome) {
+      if (earnedCollateral) {
         transactions.push({
           operation: CPK.CALL,
           to: collateralToken.address,
           value: 0,
-          data: ERC20Service.encodeTransfer(account, winningOutcome.shares),
+          data: ERC20Service.encodeTransfer(account, earnedCollateral),
         })
       }
 

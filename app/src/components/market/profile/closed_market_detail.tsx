@@ -106,22 +106,32 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
   const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${collateralToken.symbol}`
   const resolutionFormat = resolution ? formatDate(resolution) : ''
-  const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
 
   const redeem = async () => {
     try {
+      if (!payouts) {
+        return
+      }
       setStatus(Status.Loading)
       setMessage('Redeem payout...')
+
+      const payoutDenominator = payouts.reduce((a, b) => a + b)
+
+      const earnedCollateralPerOutcome = balances.map((balance, index) =>
+        balance.shares.mul(payouts[index]).div(payoutDenominator),
+      )
+
+      const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b))
 
       const cpk = await CPKService.create(provider)
 
       await cpk.redeemPositions({
         isConditionResolved,
+        earnedCollateral,
         questionId,
         questionRaw,
         questionTemplateId,
         numOutcomes: balances.length,
-        winningOutcome,
         oracle,
         collateralToken,
         marketMaker,
