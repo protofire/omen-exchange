@@ -142,6 +142,8 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     disabledColumns.push(OutcomeTableValue.Shares)
   }
 
+  const hasWinningOutcomes = payouts && payouts.some((payout, index) => payout > 0 && balances[index].shares.gt(0))
+
   return (
     <>
       <ClosedMarket date={resolutionFormat} />
@@ -170,8 +172,8 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         </Grid>
         <WhenConnected>
           <ButtonContainer>
-            {winningOutcome && !winningOutcome.shares.isZero() && <Button onClick={() => redeem()}>Redeem</Button>}
-            {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() && (
+            {isConditionResolved && hasWinningOutcomes && <Button onClick={() => redeem()}>Redeem</Button>}
+            {!isConditionResolved && hasWinningOutcomes && (
               <Button onClick={resolveCondition}>Resolve Condition</Button>
             )}
           </ButtonContainer>
