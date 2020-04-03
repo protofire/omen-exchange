@@ -1,30 +1,18 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
-import styled, { withTheme } from 'styled-components'
+import { withTheme } from 'styled-components'
 
-import { MARKET_FEE } from '../../../common/constants'
 import { useContracts } from '../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { CPKService, ERC20Service } from '../../../services'
 import { getLogger } from '../../../util/logger'
-import { formatBigNumber, formatDate } from '../../../util/tools'
+import { formatDate } from '../../../util/tools'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
-import { ClosedMarket, DisplayArbitrator, SubsectionTitle, TitleValue, ViewCard } from '../../common'
+import { ClosedMarket, SubsectionTitle, SubsectionTitleWrapper, ViewCard } from '../../common'
 import { FullLoading } from '../../loading'
+import { ClosedMarketTopDetails } from '../closed_market_top_details'
 import { OutcomeTable } from '../outcome_table'
-
-const Grid = styled.div`
-  display: grid;
-  grid-column-gap: 20px;
-  grid-row-gap: 14px;
-  grid-template-columns: 1fr;
-  margin-bottom: 25px;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-`
 
 interface Props {
   theme?: any
@@ -50,11 +38,8 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
 
   const {
-    arbitrator,
     balances,
-    category,
     collateral: collateralToken,
-    funding,
     isConditionResolved,
     marketMakerAddress,
     questionId,
@@ -101,8 +86,6 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     }
   }, [collateral, provider, account, marketMakerAddress, marketMaker])
 
-  const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
-  const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${collateralToken.symbol}`
   const resolutionFormat = resolution ? formatDate(resolution) : ''
   const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
 
@@ -144,7 +127,12 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     <>
       <ClosedMarket date={resolutionFormat} />
       <ViewCard>
-        {<SubsectionTitle>Balance</SubsectionTitle>}
+        <ClosedMarketTopDetails marketMakerAddress={marketMakerAddress} />
+
+        <SubsectionTitleWrapper>
+          <SubsectionTitle>Balance</SubsectionTitle>
+        </SubsectionTitleWrapper>
+
         <OutcomeTable
           balances={balances}
           collateral={collateralToken}
@@ -154,18 +142,6 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
           withWinningOutcome={true}
         />
 
-        <SubsectionTitle>Details</SubsectionTitle>
-        <Grid>
-          <TitleValue title="Category" value={category} />
-          <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
-          <TitleValue title="Resolution Date" value={resolutionFormat} />
-          <TitleValue title="Fee" value={`${MARKET_FEE}%`} />
-          <TitleValue title="Funding" value={fundingFormat} />
-        </Grid>
-        <SubsectionTitle>Market Results</SubsectionTitle>
-        <Grid>
-          <TitleValue title="Collateral" value={collateralFormat} />
-        </Grid>
         <WhenConnected>
           <ButtonContainer>
             {winningOutcome && !winningOutcome.shares.isZero() && <Button onClick={() => redeem()}>Redeem</Button>}
