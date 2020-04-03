@@ -71,8 +71,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     title,
   } = market
 
-  const endDate = moment(new Date(openingTimestamp * 1000))
-  const diff = endDate.diff(moment())
+  const endDate = new Date(openingTimestamp * 1000)
   const endsText = moment(endDate).fromNow()
 
   useEffect(() => {
@@ -105,7 +104,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
           {amount} {symbol} Volume
         </span>
         <Separator>·</Separator>
-        <span>{diff > 0 ? `Ends ${endsText}` : `Ended ${endsText}`}</span>
+        <span>{moment().isBefore(endDate) ? `Ends ${endsText}` : `Ended ${endsText}`}</span>
       </Info>
     </Wrapper>
   )
