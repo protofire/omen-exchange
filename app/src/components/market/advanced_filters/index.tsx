@@ -63,7 +63,7 @@ export const AdvancedFilters = (props: Props) => {
   const { onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
 
   const currencyOptions: Array<DropdownItemProps> = [{ address: null, symbol: 'All' }, ...tokens].map(
-    ({ address, symbol }, index) => {
+    ({ address, symbol }) => {
       const icon = currencyIcons[symbol]
       return {
         content: <TokenItem icon={icon} text={symbol} />,
@@ -88,7 +88,7 @@ export const AdvancedFilters = (props: Props) => {
   ]
 
   const arbitratorOptions: Array<DropdownItemProps> = [{ address: null, name: 'All' }, ...arbitrators].map(
-    ({ address, name }, index) => {
+    ({ address, name }) => {
       return {
         content: name,
         onClick: () => onChangeArbitrator(address),
