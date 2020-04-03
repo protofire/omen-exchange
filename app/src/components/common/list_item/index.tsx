@@ -105,7 +105,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
           {amount} {symbol} Volume
         </span>
         <Separator>·</Separator>
-        <span>{endDate.isAfter(now) ? `Ends ${endsText}` : `Ended ${endsText}`}</span>
+        <span>{moment(endDate).isAfter(now) ? `Ends ${endsText}` : `Ended ${endsText}`}</span>
       </Info>
     </Wrapper>
   )
