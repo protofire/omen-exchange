@@ -8,7 +8,7 @@ import { WhenConnected } from '../../../hooks/connectedWeb3'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
-import { ThreeBoxComments, ViewCard } from '../../common'
+import { ViewCard } from '../../common'
 import { DisqusComments } from '../../common/disqus_comments'
 import { FullLoading } from '../../loading'
 import { MarketTopDetails } from '../market_top_details'
@@ -100,11 +100,8 @@ const ViewWrapper = (props: Props) => {
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>
-      {IS_CORONA_VERSION ? (
-        <DisqusComments marketMakerAddress={marketMakerAddress} />
-      ) : (
-        <ThreeBoxComments threadName={marketMakerAddress} />
-      )}
+      {IS_CORONA_VERSION ? <DisqusComments marketMakerAddress={marketMakerAddress} /> : null}
+      {/* <ThreeBoxComments threadName={marketMakerAddress} /> */}
       {status === Status.Loading && <FullLoading />}
     </>
   )
