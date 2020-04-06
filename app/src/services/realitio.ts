@@ -157,10 +157,15 @@ class RealitioService {
   }
 
   getWinnerOutcome = async (questionId: string): Promise<number> => {
+    const result: string = await this.getResultFor(questionId)
+    const resultBN = bigNumberify(result)
+    return +resultBN.toString()
+  }
+
+  getResultFor = async (questionId: string): Promise<string> => {
     try {
       const result: string = await this.contract.resultFor(questionId)
-      const resultBN = bigNumberify(result)
-      return +resultBN.toString()
+      return result
     } catch (err) {
       logger.error(`There was an error querying the result for question with id '${questionId}'`, err.message)
       throw err

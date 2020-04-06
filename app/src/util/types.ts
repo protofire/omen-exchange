@@ -45,7 +45,7 @@ export enum StepProfile {
 export interface Question {
   questionId: string
   questionRaw: string
-  questionTemplateId: BigNumber
+  questionTemplateId: number
   question: string
   resolution: Maybe<Date>
   arbitratorAddress: string
@@ -121,4 +121,20 @@ export interface MarketData {
   funding: BigNumber
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
+}
+
+export enum MarketStates {
+  open = 'OPEN',
+  closed = 'CLOSED',
+  myMarkets = 'MY_MARKETS',
+}
+
+export interface MarketFilters {
+  state: MarketStates
+  category: string
+  title: Maybe<string>
+  sortBy: Maybe<string>
+  arbitrator: Maybe<string>
+  templateId: Maybe<string>
+  currency: Maybe<string>
 }

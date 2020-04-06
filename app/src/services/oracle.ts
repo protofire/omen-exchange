@@ -33,7 +33,7 @@ export class OracleService {
    */
   resolveCondition = async (
     questionId: string,
-    questionTemplateId: BigNumber,
+    questionTemplateId: number,
     questionRaw: string,
     numOutcomes: number,
   ): Promise<TransactionReceipt> => {
@@ -48,12 +48,35 @@ export class OracleService {
 
   static encodeResolveCondition = (
     questionId: string,
-    questionTemplateId: BigNumber,
+    questionTemplateId: number,
     questionRaw: string,
     numOutcomes: number,
   ): string => {
     const oracleInterface = new utils.Interface(oracleAbi)
 
     return oracleInterface.functions.resolve.encode([questionId, questionTemplateId, questionRaw, numOutcomes])
+  }
+
+  static getPayouts = (templateId: number, realitioAnswer: string, numOutcomes: number): number[] => {
+    if (realitioAnswer === '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff') {
+      return [...Array(numOutcomes)].map(() => 1)
+    }
+
+    const answer = new BigNumber(realitioAnswer).toNumber()
+
+    if (templateId === 0 || templateId === 2) {
+      const payouts = [...Array(numOutcomes)].map(() => 0)
+      payouts[answer] = 1
+      return payouts
+    } else if (templateId === 5 || templateId === 6) {
+      const payouts = [0, 0]
+
+      payouts[0] = 4 - answer
+      payouts[1] = answer
+
+      return payouts
+    } else {
+      throw new Error(`Unsupported template id: '${templateId}'`)
+    }
   }
 }

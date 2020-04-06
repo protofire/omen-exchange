@@ -9,6 +9,7 @@ import { buildQueryMarkets } from '../../queries/markets_home'
 import { CPKService } from '../../services'
 import { getLogger } from '../../util/logger'
 import { RemoteData } from '../../util/remote_data'
+import { MarketFilters, MarketStates } from '../../util/types'
 
 import { MARKET_FEE } from './../../common/constants'
 import { MarketHome } from './market_home'
@@ -20,11 +21,14 @@ const PAGE_SIZE = 10
 const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
 
-  const [filter, setFilter] = useState<any>({
-    state: 'OPEN',
+  const [filter, setFilter] = useState<MarketFilters>({
+    state: MarketStates.open,
     category: 'All',
     title: '',
     sortBy: null,
+    arbitrator: null,
+    templateId: null,
+    currency: null,
   })
   const [markets, setMarkets] = useState<RemoteData<any>>(RemoteData.notAsked())
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
@@ -35,8 +39,6 @@ const MarketHomeContainer: React.FC = () => {
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
 
   const query = buildQueryMarkets({
-    onlyMyMarkets: filter.state === 'MY_MARKETS',
-    onlyClosedMarkets: filter.state === 'CLOSED',
     isCoronaVersion: IS_CORONA_VERSION,
     ...filter,
   })
@@ -78,10 +80,10 @@ const MarketHomeContainer: React.FC = () => {
   }, [fetchedMarkets, loading, error])
 
   const onFilterChange = useCallback((filter: any) => {
-    if (!IS_CORONA_VERSION) {
-      setMoreMarkets(true)
-      setFilter(filter)
-    }
+    //if (!IS_CORONA_VERSION) {
+    setMoreMarkets(true)
+    setFilter(filter)
+    // }
   }, [])
 
   const loadMore = () => {
@@ -90,7 +92,7 @@ const MarketHomeContainer: React.FC = () => {
       variables: {
         skip: fetchedMarkets.fixedProductMarketMakers.length,
       },
-      updateQuery: (prev, { fetchMoreResult }) => {
+      updateQuery: (prev: any, { fetchMoreResult }) => {
         setMoreMarkets(fetchMoreResult.fixedProductMarketMakers.length > 0)
         if (!fetchMoreResult) return prev
         return {

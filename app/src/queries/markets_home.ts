@@ -1,5 +1,7 @@
 import gql from 'graphql-tag'
 
+import { MarketFilters, MarketStates } from './../util/types'
+
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
     id
@@ -18,30 +20,23 @@ export const MarketDataFragment = gql`
 `
 
 export const DEFAULT_OPTIONS = {
-  onlyMyMarkets: false,
-  onlyClosedMarkets: false,
+  state: MarketStates.open,
   isCoronaVersion: false,
   category: 'All',
   title: null as Maybe<string>,
   arbitrator: null as Maybe<string>,
   templateId: null as Maybe<string>,
   currency: null as Maybe<string>,
+  sortBy: null as Maybe<string>,
 }
 
-export const buildQueryMarkets = (options = DEFAULT_OPTIONS) => {
-  const {
-    arbitrator,
-    category,
-    currency,
-    isCoronaVersion,
-    onlyClosedMarkets,
-    onlyMyMarkets,
-    templateId,
-    title,
-  } = options
+type buildQueryType = MarketFilters & { isCoronaVersion: boolean }
+export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => {
+  const { arbitrator, category, currency, isCoronaVersion, state, templateId, title } = options
   const whereClause = [
-    onlyClosedMarkets ? 'answerFinalizedTimestamp_not: null' : '',
-    onlyMyMarkets || isCoronaVersion ? 'creator_in: $accounts' : '',
+    state === MarketStates.closed ? 'answerFinalizedTimestamp_not: null' : '',
+    state === MarketStates.open ? 'answerFinalizedTimestamp: null' : '',
+    state === MarketStates.myMarkets || isCoronaVersion ? 'creator_in: $accounts' : '',
     category === 'All' ? '' : 'category: $category',
     title ? 'title_contains: $title' : '',
     currency ? 'collateralToken: $currency' : '',
