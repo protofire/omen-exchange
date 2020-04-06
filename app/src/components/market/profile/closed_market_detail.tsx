@@ -45,6 +45,22 @@ interface Props {
 
 const logger = getLogger('Market::ClosedMarketDetail')
 
+const computeEarnedCollateral = (payouts: Maybe<number[]>, balances: BigNumber[]): Maybe<BigNumber> => {
+  if (!payouts) {
+    return null
+  }
+
+  const payoutDenominator = payouts.reduce((a, b) => a + b)
+
+  const earnedCollateralPerOutcome = balances.map((balance, index) =>
+    balance.mul(payouts[index]).div(payoutDenominator),
+  )
+
+  const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b))
+
+  return earnedCollateral
+}
+
 export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
@@ -107,21 +123,18 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${collateralToken.symbol}`
   const resolutionFormat = resolution ? formatDate(resolution) : ''
 
+  const earnedCollateral = computeEarnedCollateral(
+    payouts,
+    balances.map(balance => balance.shares),
+  )
+
   const redeem = async () => {
     try {
-      if (!payouts) {
+      if (!earnedCollateral) {
         return
       }
       setStatus(Status.Loading)
       setMessage('Redeem payout...')
-
-      const payoutDenominator = payouts.reduce((a, b) => a + b)
-
-      const earnedCollateralPerOutcome = balances.map((balance, index) =>
-        balance.shares.mul(payouts[index]).div(payoutDenominator),
-      )
-
-      const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b))
 
       const cpk = await CPKService.create(provider)
 
@@ -152,7 +165,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     disabledColumns.push(OutcomeTableValue.Shares)
   }
 
-  const hasWinningOutcomes = payouts && payouts.some((payout, index) => payout > 0 && balances[index].shares.gt(0))
+  const hasWinningOutcomes = earnedCollateral && earnedCollateral.gt(0)
 
   return (
     <>
