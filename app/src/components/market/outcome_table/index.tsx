@@ -51,6 +51,10 @@ const TDFlexDiv = styled.div<{ textAlign?: string }>`
     props.textAlign && 'right' ? 'flex-end' : props.textAlign && 'center' ? 'center' : 'flex-start'};
 `
 
+const WinningOutcome = () => {
+  return <>Winning Outcome</>
+}
+
 export const OutcomeTable = (props: Props) => {
   const {
     balances,
@@ -70,7 +74,7 @@ export const OutcomeTable = (props: Props) => {
     OutcomeTableValue.Payout,
   ]
 
-  const TableCellsAlign = ['left', 'right', 'right', 'right', 'right', 'right']
+  const TableCellsAlign = ['left', 'center', 'right', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
     return (
@@ -115,6 +119,7 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]}>
+            {balanceItem.winningOutcome && <WinningOutcome />}
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
             {showSharesAndPriceChange && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
           </TDStyled>

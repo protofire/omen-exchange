@@ -1,4 +1,5 @@
 import React from 'react'
+import styled from 'styled-components'
 
 import { useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
@@ -11,30 +12,51 @@ import {
   SubsectionTitleAction,
   SubsectionTitleWrapper,
   TitleValue,
-  Tooltip,
 } from '../common'
+
+const Link = styled.a`
+  color: ${props => props.theme.colors.textColor};
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`
 
 interface Props {
   marketMakerAddress: string
 }
+
+const getMarketTitles = (templateId: any) => {
+  console.log(templateId)
+  if (templateId === 0) {
+    return { marketTitle: 'Binary Market', marketSubtitle: 'What is a binary market?' }
+  } else {
+    return { marketTitle: 'Binary Market 2', marketSubtitle: 'What is a binary market?' }
+  }
+}
+
+const faqURL = 'https://docs.google.com/document/d/1w-mzDZBHqedSCxt_T319e-JzO5jFOMwsGseyCOqFwqQ'
 
 const ClosedMarketTopDetails: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { marketMakerAddress } = props
   const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
 
-  const { arbitrator, category, collateral, resolution } = marketMakerData
+  const { arbitrator, category, collateral, questionTemplateId, resolution } = marketMakerData
 
   const lastDayVolume = use24hsVolume(marketMakerAddress, context)
-  const title = 'Binary Market'
+  const { marketSubtitle, marketTitle } = getMarketTitles(questionTemplateId)
 
   return (
     <>
       <SubsectionTitleWrapper>
-        <SubsectionTitle>{title}</SubsectionTitle>
+        <SubsectionTitle>{marketTitle}</SubsectionTitle>
         <SubsectionTitleAction>
-          What is a binary market?
-          <Tooltip description="mockDescription" id="tooltip-closed-detail"></Tooltip>
+          <Link href={faqURL} target="_blank">
+            {marketSubtitle}
+          </Link>
         </SubsectionTitleAction>
       </SubsectionTitleWrapper>
 

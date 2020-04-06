@@ -31,6 +31,7 @@ interface MarketMakerData {
   userEarnings: BigNumber
   totalEarnings: BigNumber
   payouts: Maybe<number[]>
+  questionTemplateId: Maybe<number>
 }
 
 export const useMarketMakerData = (
@@ -62,6 +63,7 @@ export const useMarketMakerData = (
       userEarnings: new BigNumber(0),
       totalEarnings: new BigNumber(0),
       payouts: null,
+      questionTemplateId: null,
     }),
     [],
   )
@@ -168,6 +170,7 @@ export const useMarketMakerData = (
       userEarnings,
       totalEarnings,
       payouts,
+      questionTemplateId,
     }
   }, [conditionalTokens, provider, networkId, account, marketMakerAddress, realitio, buildMarketMaker])
 
