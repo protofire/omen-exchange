@@ -28,7 +28,7 @@ interface Props {
   marketMakerAddress: string
 }
 
-const getMarketTitles = (templateId: any) => {
+const getMarketTitles = (templateId: Maybe<number>) => {
   if (templateId === 0) {
     return { marketTitle: 'Binary Market', marketSubtitle: 'What is a binary market?' }
   } else {
