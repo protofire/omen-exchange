@@ -28,6 +28,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
     isConditionResolved,
     isQuestionFinalized,
     marketMakerFunding,
+    payouts,
     question,
     questionId,
     resolution,
@@ -50,6 +51,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
       isConditionResolved={isConditionResolved}
       isQuestionFinalized={isQuestionFinalized}
       marketMakerAddress={marketMakerAddress}
+      payouts={payouts}
       question={question || ''}
       questionId={questionId}
       questionRaw={questionRaw}

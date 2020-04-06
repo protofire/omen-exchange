@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
 import { getLogger } from '../util/logger'
@@ -18,7 +17,7 @@ export const useQuestion = (marketMakerAddress: string, context: ConnectedWeb3Co
   const [arbitratorAddress, setArbitratorAddress] = useState<string>('')
   const [category, setCategory] = useState<string>('')
   const [outcomes, setOutcomes] = useState<string[]>([])
-  const [questionTemplateId, setQuestionTemplateId] = useState<BigNumber>(new BigNumber(0))
+  const [questionTemplateId, setQuestionTemplateId] = useState<number>(0)
   const [questionRaw, setQuestionRaw] = useState<string>('')
 
   useEffect(() => {
