@@ -18,7 +18,7 @@ const Wrapper = styled.svg`
   }
 `
 
-export const Logo = () => {
+export const OmenLogo = () => {
   return (
     <Wrapper fill="none" height="28" viewBox="0 0 83 28" width="83" xmlns="http://www.w3.org/2000/svg">
       <path

@@ -1,24 +1,7 @@
 {
-  "short_name": "CE",
-  "name": "Conditional Exchange",
+  "short_name": "IM",
+  "name": "Prediction Markets",
   "orientation": "portrait",
-  "icons": [
-    {
-      "sizes": "16x16",
-      "src": "favicon/favicon-16x16.png",
-      "type": "image/png"
-    },
-    {
-      "sizes": "32x32",
-      "src": "favicon/favicon-32x32.png",
-      "type": "image/png"
-    },
-    {
-      "sizes": "192x192",
-      "src": "favicon/apple-touch-icon.png",
-      "type": "image/png"
-    }
-  ],
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#00be95",

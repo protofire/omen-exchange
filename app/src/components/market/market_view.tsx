@@ -1,6 +1,8 @@
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
+import { Helmet } from 'react-helmet'
 
+import { DOCUMENT_TITLE } from '../../common/constants'
 import { Arbitrator, BalanceItem, Status, Token } from '../../util/types'
 import { SectionTitle } from '../common'
 
@@ -36,6 +38,9 @@ const MarketView: React.FC<Props> = (props: Props) => {
 
   return (
     <>
+      <Helmet>
+        <title>{`${question} - ${DOCUMENT_TITLE}`}</title>
+      </Helmet>
       <SectionTitle goBackEnabled title={question} />
       {renderView()}
     </>
