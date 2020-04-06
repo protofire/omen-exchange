@@ -111,6 +111,10 @@ const TitleValueVertical = styled(TitleValue)`
   > h2 {
     margin: 0 0 6px;
   }
+
+  > p {
+    text-align: left;
+  }
 `
 
 const CurrenciesWrapper = styled.div`
