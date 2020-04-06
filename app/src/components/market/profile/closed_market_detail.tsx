@@ -8,7 +8,7 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../hooks/connected
 import { CPKService, ERC20Service } from '../../../services'
 import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
-import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
+import { MarketMakerData, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ClosedMarket, DisplayArbitrator, SubsectionTitle, TitleValue, ViewCard } from '../../common'
 import { FullLoading } from '../../loading'
@@ -27,20 +27,12 @@ const Grid = styled.div`
 `
 
 interface Props {
-  theme?: any
-  balances: BalanceItem[]
   collateral: Token
-  category: string
-  funding: BigNumber
-  question: string
-  questionId: string
+  theme?: any
+  marketMakerData: MarketMakerData
   questionRaw: string
   questionTemplateId: number
-  resolution: Date | null
   marketMakerAddress: string
-  isConditionResolved: boolean
-  arbitrator: Maybe<Arbitrator>
-  payouts: Maybe<number[]>
 }
 
 const logger = getLogger('Market::ClosedMarketDetail')
@@ -66,20 +58,18 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
 
+  const { collateral: collateralToken, marketMakerAddress, marketMakerData, questionRaw, questionTemplateId } = props
+
   const {
     arbitrator,
     balances,
     category,
-    collateral: collateralToken,
-    funding,
     isConditionResolved,
-    marketMakerAddress,
+    marketMakerFunding: funding,
     payouts,
     questionId,
-    questionRaw,
-    questionTemplateId,
     resolution,
-  } = props
+  } = marketMakerData
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')

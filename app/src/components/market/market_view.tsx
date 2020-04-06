@@ -1,9 +1,8 @@
-import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import { Helmet } from 'react-helmet'
 
 import { DOCUMENT_TITLE } from '../../common/constants'
-import { Arbitrator, BalanceItem, Status, Token } from '../../util/types'
+import { MarketMakerData, Status, Token } from '../../util/types'
 import { SectionTitle } from '../common'
 
 import { ClosedMarketDetail } from './profile/closed_market_detail'
@@ -11,27 +10,18 @@ import { View } from './profile/view'
 
 interface Props {
   account: Maybe<string>
-  arbitrator: Maybe<Arbitrator>
-  balances: BalanceItem[]
-  category: string
   collateral: Token
-  funding: BigNumber
-  isConditionResolved: boolean
-  isQuestionFinalized: boolean
   marketMakerAddress: string
-  question: string
-  questionId: string
+  marketMakerData: MarketMakerData
   questionRaw: string
   questionTemplateId: number
-  resolution: Maybe<Date>
   status: Status
-  totalPoolShares: BigNumber
-  userPoolShares: BigNumber
-  payouts: Maybe<number[]>
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {
-  const { isQuestionFinalized, question } = props
+  const { marketMakerData } = props
+
+  const { isQuestionFinalized, question } = marketMakerData
 
   const renderView = () => {
     return isQuestionFinalized ? <ClosedMarketDetail {...props} /> : <View {...props} />

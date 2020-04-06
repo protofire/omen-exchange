@@ -138,3 +138,24 @@ export interface MarketFilters {
   templateId: Maybe<string>
   currency: Maybe<string>
 }
+
+export interface MarketMakerData {
+  totalPoolShares: BigNumber
+  userPoolShares: BigNumber
+  balances: BalanceItem[]
+  winnerOutcome: Maybe<number>
+  marketMakerFunding: BigNumber
+  marketMakerUserFunding: BigNumber
+  collateral: Maybe<Token>
+  question: string
+  questionId: string
+  category: string
+  resolution: Maybe<Date>
+  arbitrator: Maybe<Arbitrator>
+  isConditionResolved: boolean
+  fee: Maybe<BigNumber>
+  isQuestionFinalized: boolean
+  userEarnings: BigNumber
+  totalEarnings: BigNumber
+  payouts: Maybe<number[]>
+}

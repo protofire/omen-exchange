@@ -1,11 +1,10 @@
-import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { IS_CORONA_VERSION } from '../../../common/constants'
 import { WhenConnected } from '../../../hooks/connectedWeb3'
-import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
+import { BalanceItem, MarketMakerData, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { ViewCard } from '../../common'
@@ -20,21 +19,15 @@ const LeftButton = styled(Button)`
 
 interface Props extends RouteComponentProps<{}> {
   account: Maybe<string>
-  balances: BalanceItem[]
   collateral: Token
-  arbitrator: Maybe<Arbitrator>
-  question: string
-  questionId: string
-  category: string
+  marketMakerData: MarketMakerData
   status: Status
   marketMakerAddress: string
-  funding: BigNumber
-  totalPoolShares: BigNumber
-  userPoolShares: BigNumber
 }
 
 const ViewWrapper = (props: Props) => {
-  const { balances, collateral, history, marketMakerAddress, status } = props
+  const { collateral, history, marketMakerAddress, marketMakerData, status } = props
+  const { balances } = marketMakerData
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem

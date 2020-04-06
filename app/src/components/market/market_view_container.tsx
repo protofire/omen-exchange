@@ -20,21 +20,7 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
 
   const { questionRaw, questionTemplateId } = useQuestion(marketMakerAddress, context)
 
-  const {
-    arbitrator,
-    balances,
-    category,
-    collateral,
-    isConditionResolved,
-    isQuestionFinalized,
-    marketMakerFunding,
-    payouts,
-    question,
-    questionId,
-    resolution,
-    totalPoolShares,
-    userPoolShares,
-  } = marketMakerData
+  const { collateral } = marketMakerData
 
   if (!collateral) {
     return <FullLoading />
@@ -43,23 +29,12 @@ const MarketViewContainer: React.FC<Props> = (props: Props) => {
   return (
     <MarketView
       account={context.account}
-      arbitrator={arbitrator}
-      balances={balances}
-      category={category || ''}
       collateral={collateral}
-      funding={marketMakerFunding}
-      isConditionResolved={isConditionResolved}
-      isQuestionFinalized={isQuestionFinalized}
       marketMakerAddress={marketMakerAddress}
-      payouts={payouts}
-      question={question || ''}
-      questionId={questionId}
+      marketMakerData={marketMakerData}
       questionRaw={questionRaw}
       questionTemplateId={questionTemplateId}
-      resolution={resolution}
       status={status}
-      totalPoolShares={totalPoolShares}
-      userPoolShares={userPoolShares}
     />
   )
 }

@@ -4,34 +4,13 @@ import { useCallback, useMemo, useState } from 'react'
 import { CPKService, ERC20Service, MarketMakerService, OracleService } from '../services'
 import { getLogger } from '../util/logger'
 import { getArbitratorFromAddress } from '../util/networks'
-import { Arbitrator, BalanceItem, Status, Token } from '../util/types'
+import { BalanceItem, MarketMakerData, Status } from '../util/types'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
 import { usePolling } from './usePolling'
 
 const logger = getLogger('Market::useMarketMakerData')
-
-interface MarketMakerData {
-  totalPoolShares: BigNumber
-  userPoolShares: BigNumber
-  balances: BalanceItem[]
-  winnerOutcome: Maybe<number>
-  marketMakerFunding: BigNumber
-  marketMakerUserFunding: BigNumber
-  collateral: Maybe<Token>
-  question: string
-  questionId: string
-  category: string
-  resolution: Maybe<Date>
-  arbitrator: Maybe<Arbitrator>
-  isConditionResolved: boolean
-  fee: Maybe<BigNumber>
-  isQuestionFinalized: boolean
-  userEarnings: BigNumber
-  totalEarnings: BigNumber
-  payouts: Maybe<number[]>
-}
 
 export const useMarketMakerData = (
   marketMakerAddress: string,
