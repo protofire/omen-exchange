@@ -29,7 +29,6 @@ interface Props {
 }
 
 const getMarketTitles = (templateId: any) => {
-  console.log(templateId)
   if (templateId === 0) {
     return { marketTitle: 'Binary Market', marketSubtitle: 'What is a binary market?' }
   } else {
