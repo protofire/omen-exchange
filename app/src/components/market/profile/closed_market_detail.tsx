@@ -35,14 +35,31 @@ interface Props {
   question: string
   questionId: string
   questionRaw: string
-  questionTemplateId: BigNumber
+  questionTemplateId: number
   resolution: Date | null
   marketMakerAddress: string
   isConditionResolved: boolean
   arbitrator: Maybe<Arbitrator>
+  payouts: Maybe<number[]>
 }
 
 const logger = getLogger('Market::ClosedMarketDetail')
+
+const computeEarnedCollateral = (payouts: Maybe<number[]>, balances: BigNumber[]): Maybe<BigNumber> => {
+  if (!payouts) {
+    return null
+  }
+
+  const payoutDenominator = payouts.reduce((a, b) => a + b)
+
+  const earnedCollateralPerOutcome = balances.map((balance, index) =>
+    balance.mul(payouts[index]).div(payoutDenominator),
+  )
+
+  const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b))
+
+  return earnedCollateral
+}
 
 export const ClosedMarketDetailWrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
@@ -57,6 +74,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     funding,
     isConditionResolved,
     marketMakerAddress,
+    payouts,
     questionId,
     questionRaw,
     questionTemplateId,
@@ -104,10 +122,17 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
   const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${collateralToken.symbol}`
   const resolutionFormat = resolution ? formatDate(resolution) : ''
-  const winningOutcome = balances.find((balanceItem: BalanceItem) => balanceItem.winningOutcome)
+
+  const earnedCollateral = computeEarnedCollateral(
+    payouts,
+    balances.map(balance => balance.shares),
+  )
 
   const redeem = async () => {
     try {
+      if (!earnedCollateral) {
+        return
+      }
       setStatus(Status.Loading)
       setMessage('Redeem payout...')
 
@@ -115,11 +140,11 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
       await cpk.redeemPositions({
         isConditionResolved,
+        earnedCollateral,
         questionId,
         questionRaw,
         questionTemplateId,
         numOutcomes: balances.length,
-        winningOutcome,
         oracle,
         collateralToken,
         marketMaker,
@@ -139,6 +164,8 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   if (!account) {
     disabledColumns.push(OutcomeTableValue.Shares)
   }
+
+  const hasWinningOutcomes = earnedCollateral && earnedCollateral.gt(0)
 
   return (
     <>
@@ -168,8 +195,8 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         </Grid>
         <WhenConnected>
           <ButtonContainer>
-            {winningOutcome && !winningOutcome.shares.isZero() && <Button onClick={() => redeem()}>Redeem</Button>}
-            {!isConditionResolved && winningOutcome && winningOutcome.shares.isZero() && (
+            {isConditionResolved && hasWinningOutcomes && <Button onClick={() => redeem()}>Redeem</Button>}
+            {!isConditionResolved && hasWinningOutcomes && (
               <Button onClick={resolveCondition}>Resolve Condition</Button>
             )}
           </ButtonContainer>

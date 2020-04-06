@@ -1,7 +1,7 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useCallback, useMemo, useState } from 'react'
 
-import { CPKService, ERC20Service, MarketMakerService } from '../services'
+import { CPKService, ERC20Service, MarketMakerService, OracleService } from '../services'
 import { getLogger } from '../util/logger'
 import { getArbitratorFromAddress } from '../util/networks'
 import { Arbitrator, BalanceItem, Status, Token } from '../util/types'
@@ -30,6 +30,7 @@ interface MarketMakerData {
   isQuestionFinalized: boolean
   userEarnings: BigNumber
   totalEarnings: BigNumber
+  payouts: Maybe<number[]>
 }
 
 export const useMarketMakerData = (
@@ -60,6 +61,7 @@ export const useMarketMakerData = (
       fee: null,
       userEarnings: new BigNumber(0),
       totalEarnings: new BigNumber(0),
+      payouts: null,
     }),
     [],
   )
@@ -73,7 +75,14 @@ export const useMarketMakerData = (
     const isConditionResolved = await conditionalTokens.isConditionResolved(conditionId)
 
     const questionId = await conditionalTokens.getQuestionId(conditionId)
-    const { arbitratorAddress, category, outcomes, question, resolution } = await realitio.getQuestion(questionId)
+    const {
+      arbitratorAddress,
+      category,
+      outcomes,
+      question,
+      questionTemplateId,
+      resolution,
+    } = await realitio.getQuestion(questionId)
 
     const arbitrator = getArbitratorFromAddress(networkId, arbitratorAddress)
 
@@ -110,7 +119,11 @@ export const useMarketMakerData = (
 
     const totalEarnings = await marketMaker.getCollectedFees()
 
-    const winnerOutcome = isQuestionFinalized ? await realitio.getWinnerOutcome(questionId) : null
+    const realitioAnswer = isQuestionFinalized ? await realitio.getResultFor(questionId) : null
+    const winnerOutcome = realitioAnswer ? bigNumberify(realitioAnswer).toNumber() : null
+    const payouts = realitioAnswer
+      ? OracleService.getPayouts(questionTemplateId, realitioAnswer, outcomes.length)
+      : null
 
     const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
@@ -154,6 +167,7 @@ export const useMarketMakerData = (
       fee,
       userEarnings,
       totalEarnings,
+      payouts,
     }
   }, [conditionalTokens, provider, networkId, account, marketMakerAddress, realitio, buildMarketMaker])
 
