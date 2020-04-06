@@ -1,6 +1,8 @@
 /* eslint-env jest */
 import gql from 'graphql-tag'
 
+import { MarketStates } from '../util/types'
+
 import { DEFAULT_OPTIONS, MarketDataFragment, buildQueryMarkets } from './markets_home'
 
 const getExpectedQuery = (whereClause: string) => {
@@ -16,20 +18,20 @@ const getExpectedQuery = (whereClause: string) => {
 
 test('Query markets with default options', () => {
   const query = buildQueryMarkets(DEFAULT_OPTIONS)
-  const expectedQuery = getExpectedQuery('templateId_in: ["0", "2", "6"], fee: $fee')
+  const expectedQuery = getExpectedQuery('answerFinalizedTimestamp: null, templateId_in: ["0", "2", "6"], fee: $fee')
   expect(query).toBe(expectedQuery)
 })
 
 test('Query markets for corona markets', () => {
   const query = buildQueryMarkets({ ...DEFAULT_OPTIONS, isCoronaVersion: true })
-  const expectedQuery = getExpectedQuery('creator_in: $accounts, fee: $fee')
+  const expectedQuery = getExpectedQuery('answerFinalizedTimestamp: null, creator_in: $accounts, fee: $fee')
   expect(query).toBe(expectedQuery)
 })
 
 test('Query markets not corona markets', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,
-    onlyMyMarkets: true,
+    state: MarketStates.myMarkets,
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
@@ -41,7 +43,7 @@ test('Query markets not corona markets', () => {
 test('Not corona markets with template_id', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,
-    onlyMyMarkets: true,
+    state: MarketStates.myMarkets,
     templateId: '2',
   })
   const expectedQuery = getExpectedQuery('creator_in: $accounts, templateId: $templateId, fee: $fee')
@@ -54,15 +56,17 @@ test('Corona markets with template_id', () => {
     isCoronaVersion: true,
     templateId: '2',
   })
-  const expectedQuery = getExpectedQuery('creator_in: $accounts, templateId: $templateId, fee: $fee')
+  const expectedQuery = getExpectedQuery(
+    'answerFinalizedTimestamp: null, creator_in: $accounts, templateId: $templateId, fee: $fee',
+  )
   expect(query).toBe(expectedQuery)
 })
 
-test('Closed not corona markets with title and arbitrator', () => {
+test('Not corona markets closed with title and arbitrator', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,
     isCoronaVersion: false,
-    onlyClosedMarkets: true,
+    state: MarketStates.closed,
     templateId: '2',
     title: 'test',
     arbitrator: 'arbitratorTest',
@@ -77,7 +81,7 @@ test('Closed corona markets with currency', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,
     isCoronaVersion: true,
-    onlyClosedMarkets: true,
+    state: MarketStates.closed,
     templateId: '2',
     title: 'test',
     currency: 'currencyTest',
