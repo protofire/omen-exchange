@@ -2,13 +2,14 @@ import { ethers } from 'ethers'
 import React from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 
-import { MARKET_FEE } from '../../common/constants'
+import { IS_CORONA_VERSION, MARKET_FEE } from '../../common/constants'
 import { useCheckContractExists, useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { MarketBuyPage, MarketDetailsPage, MarketPoolLiquidityPage, MarketSellPage } from '../../pages'
 import { getLogger } from '../../util/logger'
 import { isAddress } from '../../util/tools'
 import { MessageWarning, SectionTitle } from '../common'
+import { DisqusComments } from '../common/disqus_comments'
 import { FullLoading } from '../loading'
 
 import { MarketNotFound } from './market_not_found'
@@ -50,20 +51,24 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
   }
 
   return (
-    <Switch>
-      <Route component={MarketDetailsPage} exact path="/:address" />
-      {!account ? (
-        <MessageWarning text="Please connect to your wallet to open the market..." />
-      ) : isQuestionFinalized ? (
-        <MessageWarning text="Market closed, question finalized..." />
-      ) : (
-        <>
-          <Route component={MarketBuyPage} exact path="/:address/buy" />
-          <Route component={MarketSellPage} exact path="/:address/sell" />
-          <Route component={MarketPoolLiquidityPage} exact path="/:address/pool-liquidity" />
-        </>
-      )}
-    </Switch>
+    <>
+      <Switch>
+        <Route component={MarketDetailsPage} exact path="/:address" />
+        {!account ? (
+          <MessageWarning text="Please connect to your wallet to open the market..." />
+        ) : isQuestionFinalized ? (
+          <MessageWarning text="Market closed, question finalized..." />
+        ) : (
+          <>
+            <Route component={MarketBuyPage} exact path="/:address/buy" />
+            <Route component={MarketSellPage} exact path="/:address/sell" />
+            <Route component={MarketPoolLiquidityPage} exact path="/:address/pool-liquidity" />
+          </>
+        )}
+      </Switch>
+      {IS_CORONA_VERSION ? <DisqusComments marketMakerAddress={marketMakerAddress} /> : null}
+      {/* <ThreeBoxComments threadName={marketMakerAddress} /> */}
+    </>
   )
 }
 
