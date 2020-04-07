@@ -211,7 +211,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          disabledColumns={[OutcomeTableValue.Payout]}
+          disabledColumns={[OutcomeTableValue.OutcomeProbability, OutcomeTableValue.Payout]}
           displayRadioSelection={false}
           probabilities={probabilities}
         />

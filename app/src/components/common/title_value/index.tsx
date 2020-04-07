@@ -33,6 +33,7 @@ const Value = styled.p<{ state: ValueStates }>`
   font-weight: 400;
   line-height: 1.2;
   margin: 0;
+  text-align: right;
 
   a {
     color: ${props =>
