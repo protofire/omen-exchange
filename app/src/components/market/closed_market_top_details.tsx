@@ -29,10 +29,12 @@ interface Props {
 }
 
 const getMarketTitles = (templateId: Maybe<number>) => {
-  if (templateId === 0) {
-    return { marketTitle: 'Binary Market', marketSubtitle: 'What is a binary market?' }
+  if (templateId === 5 || templateId === 6) {
+    return { marketTitle: 'Nuanced Binary Market', marketSubtitle: 'What is a nuanced-binary market?' }
+  } else if (templateId === 2) {
+    return { marketTitle: 'Single Select Market', marketSubtitle: 'What is a single-select market?' }
   } else {
-    return { marketTitle: 'Binary Market 2', marketSubtitle: 'What is a binary market?' }
+    return { marketTitle: 'Binary Market', marketSubtitle: 'What is a binary market?' }
   }
 }
 
