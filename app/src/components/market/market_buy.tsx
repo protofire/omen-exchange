@@ -58,6 +58,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const { buildMarketMaker } = useContracts(context)
   const { balances, collateral, marketMakerAddress, question } = props
+
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const [status, setStatus] = useState<Status>(Status.Ready)
