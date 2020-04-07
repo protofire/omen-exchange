@@ -21,7 +21,7 @@ Create a `.env` file. See `.env.example` for environment variables which may be 
 > npx react-scripts build
 > ```
 >
-> Make sure you do *not* use `yarn build`. The build script alters `react-scripts` to support building with 3Box. If you use `yarn build`, reinstall the dependencies to build optimally for Corona Informaton Markets.
+> Make sure you do *not* use `yarn build`. The build script alters `react-scripts` to support building with 3Box. If you use `yarn build`, reinstall the dependencies to build optimally for Corona Information Markets.
 
 For normal Omen builds, use `yarn build`, but for Corona Information Markets, see note above.
 
