@@ -1,4 +1,5 @@
-import { BigNumber } from 'ethers/utils'
+import Big from 'big.js'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 
@@ -8,7 +9,7 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../hooks/connected
 import { CPKService, ERC20Service } from '../../../services'
 import { getLogger } from '../../../util/logger'
 import { formatBigNumber, formatDate } from '../../../util/tools'
-import { MarketMakerData, OutcomeTableValue, Status, Token } from '../../../util/types'
+import { MarketMakerData, OutcomeTableValue, Status } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ClosedMarket, DisplayArbitrator, SubsectionTitle, TitleValue, ViewCard } from '../../common'
 import { FullLoading } from '../../loading'
@@ -27,12 +28,8 @@ const Grid = styled.div`
 `
 
 interface Props {
-  collateral: Token
   theme?: any
   marketMakerData: MarketMakerData
-  questionRaw: string
-  questionTemplateId: number
-  marketMakerAddress: string
 }
 
 const logger = getLogger('Market::ClosedMarketDetail')
@@ -42,15 +39,11 @@ const computeEarnedCollateral = (payouts: Maybe<number[]>, balances: BigNumber[]
     return null
   }
 
-  const payoutDenominator = payouts.reduce((a, b) => a + b)
-
-  const earnedCollateralPerOutcome = balances.map((balance, index) =>
-    balance.mul(payouts[index]).div(payoutDenominator),
-  )
+  const earnedCollateralPerOutcome = balances.map((balance, index) => new Big(balance.toString()).mul(payouts[index]))
 
   const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b))
 
-  return earnedCollateral
+  return bigNumberify(earnedCollateral.toString())
 }
 
 export const ClosedMarketDetailWrapper = (props: Props) => {
@@ -58,17 +51,17 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
 
-  const { collateral: collateralToken, marketMakerAddress, marketMakerData, questionRaw, questionTemplateId } = props
+  const { marketMakerData } = props
 
   const {
+    address: marketMakerAddress,
     arbitrator,
     balances,
-    category,
+    collateral: collateralToken,
     isConditionResolved,
     marketMakerFunding: funding,
     payouts,
-    questionId,
-    resolution,
+    question,
   } = marketMakerData
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -83,7 +76,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       setMessage('Resolve condition...')
 
       // Balances length is the number of outcomes
-      await oracle.resolveCondition(questionId, questionTemplateId, questionRaw, balances.length)
+      await oracle.resolveCondition(question, balances.length)
 
       setStatus(Status.Ready)
     } catch (err) {
@@ -111,7 +104,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
   const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
   const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${collateralToken.symbol}`
-  const resolutionFormat = resolution ? formatDate(resolution) : ''
+  const resolutionFormat = question.resolution ? formatDate(question.resolution) : ''
 
   const earnedCollateral = computeEarnedCollateral(
     payouts,
@@ -131,9 +124,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
       await cpk.redeemPositions({
         isConditionResolved,
         earnedCollateral,
-        questionId,
-        questionRaw,
-        questionTemplateId,
+        question,
         numOutcomes: balances.length,
         oracle,
         collateralToken,
@@ -173,7 +164,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
-          <TitleValue title="Category" value={category} />
+          <TitleValue title="Category" value={question.category} />
           <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
           <TitleValue title="Resolution Date" value={resolutionFormat} />
           <TitleValue title="Fee" value={`${MARKET_FEE}%`} />

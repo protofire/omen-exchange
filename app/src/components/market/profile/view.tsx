@@ -4,12 +4,11 @@ import styled from 'styled-components'
 
 import { IS_CORONA_VERSION } from '../../../common/constants'
 import { WhenConnected } from '../../../hooks/connectedWeb3'
-import { BalanceItem, MarketMakerData, OutcomeTableValue, Status, Token } from '../../../util/types'
+import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { ViewCard } from '../../common'
 import { DisqusComments } from '../../common/disqus_comments'
-import { FullLoading } from '../../loading'
 import { MarketTopDetails } from '../market_top_details'
 import { OutcomeTable } from '../outcome_table'
 
@@ -19,15 +18,13 @@ const LeftButton = styled(Button)`
 
 interface Props extends RouteComponentProps<{}> {
   account: Maybe<string>
-  collateral: Token
   marketMakerData: MarketMakerData
-  status: Status
-  marketMakerAddress: string
 }
 
 const ViewWrapper = (props: Props) => {
-  const { collateral, history, marketMakerAddress, marketMakerData, status } = props
-  const { balances } = marketMakerData
+  const { history, marketMakerData } = props
+
+  const { address: marketMakerAddress, balances, collateral } = marketMakerData
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -57,6 +54,7 @@ const ViewWrapper = (props: Props) => {
       <ViewCard>
         <MarketTopDetails
           marketMakerAddress={marketMakerAddress}
+          marketMakerData={marketMakerData}
           title="Purchase Outcome"
           toggleTitleAction="Pool Information"
         />
@@ -95,7 +93,6 @@ const ViewWrapper = (props: Props) => {
       </ViewCard>
       {IS_CORONA_VERSION ? <DisqusComments marketMakerAddress={marketMakerAddress} /> : null}
       {/* <ThreeBoxComments threadName={marketMakerAddress} /> */}
-      {status === Status.Loading && <FullLoading />}
     </>
   )
 }

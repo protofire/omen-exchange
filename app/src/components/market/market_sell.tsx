@@ -9,7 +9,7 @@ import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { CPKService, MarketMakerService } from '../../services'
 import { getLogger } from '../../util/logger'
 import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../util/tools'
-import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
+import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../util/types'
 import { Button, ButtonContainer } from '../button'
 import { ButtonType } from '../button/button_styling_types'
 import {
@@ -36,18 +36,15 @@ const LeftButton = styled(Button)`
 const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
-  balances: BalanceItem[]
-  collateral: Token
-  marketMakerAddress: string
-  question: string
-  resolution: Maybe<Date>
+  marketMakerData: MarketMakerData
 }
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
 
-  const { balances, collateral, marketMakerAddress, question } = props
+  const { marketMakerData } = props
+  const { address: marketMakerAddress, balances, collateral, question } = marketMakerData
 
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
@@ -144,10 +141,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle goBackEnabled title={question} />
+      <SectionTitle goBackEnabled title={question.title} />
       <ViewCard>
         <MarketTopDetails
           marketMakerAddress={marketMakerAddress}
+          marketMakerData={marketMakerData}
           title="Choose the shares you want to sell"
           toggleTitleAction="Pool Information"
         />

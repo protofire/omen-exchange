@@ -103,7 +103,7 @@ export const ModalQuestion = (props: Props) => {
         <>
           <SubsectionTitleStyled>Details</SubsectionTitleStyled>
           <GridOneColumn>
-            {question && <TitleValueStyled title={'Question:'} value={question.question} />}
+            {question && <TitleValueStyled title={'Question:'} value={question.title} />}
             {question && <TitleValueStyled title={'Category:'} value={question.category} />}
             {question && question.resolution && (
               <TitleValueStyled title={'Resolution:'} value={formatDate(question.resolution)} />

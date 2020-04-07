@@ -14,7 +14,7 @@ import { ERC20Service } from '../../services'
 import { CPKService } from '../../services/cpk'
 import { getLogger } from '../../util/logger'
 import { calcDepositedTokens, calcPoolTokens, formatBigNumber } from '../../util/tools'
-import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
+import { MarketMakerData, OutcomeTableValue, Status } from '../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../button'
 import { ButtonType } from '../button/button_styling_types'
 import {
@@ -36,17 +36,8 @@ import { TransactionDetailsLine } from './transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from './transaction_details_row'
 
 interface Props extends RouteComponentProps<any> {
-  marketMakerAddress: string
-  question: string
-  resolution: Maybe<Date>
-  totalPoolShares: BigNumber
-  userPoolShares: BigNumber
-  marketMakerFunding: BigNumber
-  marketMakerUserFunding: BigNumber
-  userEarnings: BigNumber
-  balances: BalanceItem[]
+  marketMakerData: MarketMakerData
   theme?: any
-  collateral: Token
 }
 
 const LeftButton = styled(Button)`
@@ -63,17 +54,8 @@ const TabsGrid = styled.div`
 const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
-  const {
-    balances,
-    collateral,
-    marketMakerAddress,
-    // marketMakerFunding,
-    // marketMakerUserFunding,
-    question,
-    totalPoolShares,
-    userEarnings,
-    // userPoolShares,
-  } = props
+  const { marketMakerData } = props
+  const { address: marketMakerAddress, balances, collateral, question, totalPoolShares, userEarnings } = marketMakerData
 
   enum Tabs {
     deposit,
@@ -201,10 +183,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle goBackEnabled title={question} />
+      <SectionTitle goBackEnabled title={question.title} />
       <ViewCard>
         <MarketTopDetails
           marketMakerAddress={marketMakerAddress}
+          marketMakerData={marketMakerData}
           title="Pool Liquidity"
           toggleTitleAction="Market Information"
         />

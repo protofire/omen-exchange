@@ -198,3 +198,20 @@ export const calcDepositedTokens = (
   const sendAmounts = holdingsBN.map(h => h.mul(removedFunds).div(poolShareSupply))
   return sendAmounts.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
 }
+
+/**
+ * Like Promise.all but for objects.
+ *
+ * Example:
+ *   promiseProps({ a: 1, b: Promise.resolve(2) }) resolves to { a: 1, b: 2 }
+ */
+export async function promiseProps<T>(obj: { [K in keyof T]: Promise<T[K]> | T[K] }): Promise<T> {
+  const keys = Object.keys(obj)
+  const values = await Promise.all(Object.values(obj))
+  const result: any = {}
+  for (let i = 0; i < values.length; i++) {
+    result[keys[i]] = values[i]
+  }
+
+  return result
+}

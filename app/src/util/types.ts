@@ -16,7 +16,6 @@ export interface BalanceItem {
   currentPrice: number
   shares: BigNumber
   holdings: BigNumber
-  winningOutcome: boolean
 }
 
 export enum Stage {
@@ -43,11 +42,11 @@ export enum StepProfile {
 }
 
 export interface Question {
-  questionId: string
-  questionRaw: string
-  questionTemplateId: number
-  question: string
-  resolution: Maybe<Date>
+  id: string
+  raw: string
+  templateId: number
+  title: string
+  resolution: Date
   arbitratorAddress: string
   category: string
   outcomes: string[]
@@ -86,11 +85,11 @@ export enum MarketStatus {
   Closed = 'Closed',
 }
 
-export type MarketWithExtraData = Market &
-  Question & {
-    status: MarketStatus
-    fee: BigNumber
-  }
+export type MarketWithExtraData = Market & {
+  fee: BigNumber
+  question: Question
+  status: MarketStatus
+}
 
 export interface Log {
   topics: Array<string>
@@ -140,22 +139,19 @@ export interface MarketFilters {
 }
 
 export interface MarketMakerData {
-  totalPoolShares: BigNumber
-  userPoolShares: BigNumber
+  address: string
+  arbitrator: Arbitrator
   balances: BalanceItem[]
-  winnerOutcome: Maybe<number>
+  collateral: Token
+  fee: BigNumber
+  isConditionResolved: boolean
+  isQuestionFinalized: boolean
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
-  collateral: Maybe<Token>
-  question: string
-  questionId: string
-  category: string
-  resolution: Maybe<Date>
-  arbitrator: Maybe<Arbitrator>
-  isConditionResolved: boolean
-  fee: Maybe<BigNumber>
-  isQuestionFinalized: boolean
-  userEarnings: BigNumber
-  totalEarnings: BigNumber
   payouts: Maybe<number[]>
+  question: Question
+  totalEarnings: BigNumber
+  totalPoolShares: BigNumber
+  userEarnings: BigNumber
+  userPoolShares: BigNumber
 }
