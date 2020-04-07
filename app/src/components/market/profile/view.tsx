@@ -44,7 +44,7 @@ const ViewWrapper = (props: Props) => {
   const probabilities = balances.map(balance => balance.probability)
 
   const renderTableData = () => {
-    const disabledColumns = [OutcomeTableValue.Payout]
+    const disabledColumns = [OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]
     if (!userHasShares) {
       disabledColumns.push(OutcomeTableValue.Shares)
     }
@@ -64,7 +64,7 @@ const ViewWrapper = (props: Props) => {
       <ViewCard>
         <MarketTopDetails
           marketMakerAddress={marketMakerAddress}
-          title="Purchase Outcome"
+          title="Market Details"
           toggleTitleAction="Pool Information"
         />
         {renderTableData()}

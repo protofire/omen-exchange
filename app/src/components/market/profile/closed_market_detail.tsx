@@ -160,7 +160,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
 
   const probabilities = balances.map(balance => balance.probability)
 
-  const disabledColumns = [OutcomeTableValue.CurrentPrice]
+  const disabledColumns = [OutcomeTableValue.CurrentPrice, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]
   if (!account) {
     disabledColumns.push(OutcomeTableValue.Shares)
   }
