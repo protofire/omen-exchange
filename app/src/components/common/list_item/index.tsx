@@ -15,6 +15,7 @@ const Wrapper = styled(NavLink)`
   flex-direction: column;
   justify-content: center;
   padding: 22px 25px;
+  text-decoration: none;
 
   &:active,
   &:hover {

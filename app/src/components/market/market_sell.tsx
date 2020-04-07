@@ -144,7 +144,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       <SectionTitle goBackEnabled title={question.title} />
       <ViewCard>
         <MarketTopDetails
-          marketMakerAddress={marketMakerAddress}
           marketMakerData={marketMakerData}
           title="Choose the shares you want to sell"
           toggleTitleAction="Pool Information"
@@ -152,7 +151,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Shares]}
+          disabledColumns={[
+            OutcomeTableValue.Payout,
+            OutcomeTableValue.Shares,
+            OutcomeTableValue.Outcome,
+            OutcomeTableValue.Probability,
+          ]}
           outcomeHandleChange={(value: number) => {
             setOutcomeIndex(value)
             setBalanceItem(balances[value])

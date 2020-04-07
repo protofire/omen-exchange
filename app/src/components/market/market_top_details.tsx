@@ -20,7 +20,6 @@ const logger = getLogger('Market::View')
 interface Props {
   toggleTitleAction: string
   title: string
-  marketMakerAddress: string
   marketMakerData: MarketMakerData
 }
 
@@ -49,7 +48,17 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
   const toggleExtraInformation = () =>
     showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
 
-  const { marketMakerAddress, marketMakerData } = props
+  const { marketMakerData } = props
+  const {
+    address: marketMakerAddress,
+    arbitrator,
+    collateral,
+    marketMakerFunding,
+    marketMakerUserFunding,
+    question,
+    totalEarnings,
+    userEarnings,
+  } = marketMakerData
 
   const [hash, setHash] = useState<Maybe<string>>(null)
   const { library: provider } = context
@@ -78,15 +87,6 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
 
     setLastDayVolume(now.sub(before))
   }
-  const {
-    arbitrator,
-    collateral,
-    marketMakerFunding,
-    marketMakerUserFunding,
-    question,
-    totalEarnings,
-    userEarnings,
-  } = marketMakerData
 
   useEffect(() => {
     const get24hsVolume = async () => {

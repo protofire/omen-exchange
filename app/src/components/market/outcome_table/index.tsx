@@ -5,6 +5,11 @@ import { IS_CORONA_VERSION } from '../../../common/constants'
 import { formatBigNumber } from '../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../util/types'
 import { BarDiagram, NewValue, OwnedShares, RadioInput, TD, TH, THead, TR, Table } from '../../common'
+import {
+  OutcomeItemLittleBallOfJoyAndDifferentColors,
+  OutcomeItemText,
+  OutcomeItemTextWrapper,
+} from '../steps/common_styled'
 
 interface Props {
   balances: BalanceItem[]
@@ -64,13 +69,15 @@ export const OutcomeTable = (props: Props) => {
   } = props
 
   const TableHead: OutcomeTableValue[] = [
-    OutcomeTableValue.Probabilities,
+    OutcomeTableValue.OutcomeProbability,
+    OutcomeTableValue.Outcome,
+    OutcomeTableValue.Probability,
     OutcomeTableValue.CurrentPrice,
     OutcomeTableValue.Shares,
     OutcomeTableValue.Payout,
   ]
 
-  const TableCellsAlign = ['left', 'right', 'right', 'right', 'right', 'right']
+  const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
     return (
@@ -113,7 +120,7 @@ export const OutcomeTable = (props: Props) => {
             />
           </TDRadio>
         )}
-        {disabledColumns.includes(OutcomeTableValue.Probabilities) ? null : withWinningOutcome ? (
+        {disabledColumns.includes(OutcomeTableValue.OutcomeProbability) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
             {showSharesAndPriceChange && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
@@ -123,6 +130,17 @@ export const OutcomeTable = (props: Props) => {
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
             {showSharesAndPriceChange && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
           </TDStyled>
+        )}
+        {disabledColumns.includes(OutcomeTableValue.Outcome) ? null : (
+          <TDStyled textAlign={TableCellsAlign[4]}>
+            <OutcomeItemTextWrapper>
+              <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={outcomeIndex} />
+              <OutcomeItemText>{outcomeName}</OutcomeItemText>
+            </OutcomeItemTextWrapper>
+          </TDStyled>
+        )}
+        {disabledColumns.includes(OutcomeTableValue.Probability) ? null : (
+          <TDStyled textAlign={TableCellsAlign[5]}>{probability.toFixed(2)}%</TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[2]}>

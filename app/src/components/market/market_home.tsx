@@ -87,7 +87,7 @@ const NoMarketsAvailable = styled.p`
 `
 
 const SortDropdown = styled(Dropdown)`
-  width: 130px;
+  max-width: 188px;
 `
 
 const LoadMoreWrapper = styled.div`
@@ -95,6 +95,21 @@ const LoadMoreWrapper = styled.div`
   display: flex;
   justify-content: center;
   padding: 20px 15px 25px;
+`
+
+const CustomDropdownItem = styled.div`
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+`
+
+const SortBy = styled.span`
+  color: #86909e;
+  font-size: 14px;
+  line-height: 1.2;
+  margin-right: 6px;
 `
 
 interface Props {
@@ -154,26 +169,33 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     setShowAdvancedFilters(!showAdvancedFilters)
   }, [showAdvancedFilters])
 
-  const sortOptions: Array<DropdownItemProps> = [
+  const sortOptions = [
     {
-      content: 'Volume',
-      onClick: () => {
-        setSortBy('collateralVolume')
-      },
+      title: 'Volume',
+      sortBy: 'collateralVolume',
     },
     {
-      content: 'Creation date',
-      onClick: () => {
-        setSortBy('creationTimestamp')
-      },
+      title: 'Creation date',
+      sortBy: 'creationTimestamp',
     },
     {
-      content: 'Opening date',
-      onClick: () => {
-        setSortBy('openingTimestamp')
-      },
+      title: 'Opening date',
+      sortBy: 'openingTimestamp',
     },
   ]
+
+  const sortItems: Array<DropdownItemProps> = sortOptions.map(item => {
+    return {
+      content: (
+        <CustomDropdownItem>
+          <SortBy>Sort By</SortBy> {item.title}
+        </CustomDropdownItem>
+      ),
+      onClick: () => {
+        setSortBy(item.sortBy)
+      },
+    }
+  })
 
   return (
     <>
@@ -205,7 +227,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                 <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
                   <IconFilter />
                 </ButtonCircleStyled>
-                <SortDropdown dropdownPosition={DropdownPosition.right} items={sortOptions} placeholder={'Sort By'} />
+                <SortDropdown
+                  dropdownPosition={DropdownPosition.right}
+                  items={sortItems}
+                  placeholder={<SortBy>Sort By</SortBy>}
+                />
               </FiltersControls>
             </FiltersWrapper>
           </TopContents>
@@ -226,7 +252,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             </FiltersWrapper>
           </TopContents>
         )}
-
         {showSearch && <Search onChange={setTitle} value={title} />}
         {showAdvancedFilters && (
           <AdvancedFilters

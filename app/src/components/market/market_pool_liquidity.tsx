@@ -186,7 +186,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       <SectionTitle goBackEnabled title={question.title} />
       <ViewCard>
         <MarketTopDetails
-          marketMakerAddress={marketMakerAddress}
           marketMakerData={marketMakerData}
           title="Pool Liquidity"
           toggleTitleAction="Market Information"
@@ -194,7 +193,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          disabledColumns={[OutcomeTableValue.Payout]}
+          disabledColumns={[OutcomeTableValue.OutcomeProbability, OutcomeTableValue.Payout]}
           displayRadioSelection={false}
           probabilities={probabilities}
         />
