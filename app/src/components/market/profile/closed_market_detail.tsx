@@ -11,7 +11,7 @@ import { formatBigNumber, formatDate } from '../../../util/tools'
 import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ClosedMarket, DisplayArbitrator, SubsectionTitle, TitleValue, ViewCard } from '../../common'
-import { FullLoading } from '../../loading'
+import { InlineLoading } from '../../loading'
 import { OutcomeTable } from '../outcome_table'
 
 const Grid = styled.div`
@@ -171,38 +171,42 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     <>
       <ClosedMarket date={resolutionFormat} />
       <ViewCard>
-        {<SubsectionTitle>Balance</SubsectionTitle>}
-        <OutcomeTable
-          balances={balances}
-          collateral={collateralToken}
-          disabledColumns={disabledColumns}
-          displayRadioSelection={false}
-          probabilities={probabilities}
-          withWinningOutcome={true}
-        />
-
-        <SubsectionTitle>Details</SubsectionTitle>
-        <Grid>
-          <TitleValue title="Category" value={category} />
-          <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
-          <TitleValue title="Resolution Date" value={resolutionFormat} />
-          <TitleValue title="Fee" value={`${MARKET_FEE}%`} />
-          <TitleValue title="Funding" value={fundingFormat} />
-        </Grid>
-        <SubsectionTitle>Market Results</SubsectionTitle>
-        <Grid>
-          <TitleValue title="Collateral" value={collateralFormat} />
-        </Grid>
-        <WhenConnected>
-          <ButtonContainer>
-            {isConditionResolved && hasWinningOutcomes && <Button onClick={() => redeem()}>Redeem</Button>}
-            {!isConditionResolved && hasWinningOutcomes && (
-              <Button onClick={resolveCondition}>Resolve Condition</Button>
-            )}
-          </ButtonContainer>
-        </WhenConnected>
+        {status === Status.Loading ? (
+          <InlineLoading message={message} />
+        ) : (
+          <>
+            {<SubsectionTitle>Balance</SubsectionTitle>}
+            <OutcomeTable
+              balances={balances}
+              collateral={collateralToken}
+              disabledColumns={disabledColumns}
+              displayRadioSelection={false}
+              probabilities={probabilities}
+              withWinningOutcome={true}
+            />
+            <SubsectionTitle>Details</SubsectionTitle>
+            <Grid>
+              <TitleValue title="Category" value={category} />
+              <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
+              <TitleValue title="Resolution Date" value={resolutionFormat} />
+              <TitleValue title="Fee" value={`${MARKET_FEE}%`} />
+              <TitleValue title="Funding" value={fundingFormat} />
+            </Grid>
+            <SubsectionTitle>Market Results</SubsectionTitle>
+            <Grid>
+              <TitleValue title="Collateral" value={collateralFormat} />
+            </Grid>
+            <WhenConnected>
+              <ButtonContainer>
+                {isConditionResolved && hasWinningOutcomes && <Button onClick={() => redeem()}>Redeem</Button>}
+                {!isConditionResolved && hasWinningOutcomes && (
+                  <Button onClick={resolveCondition}>Resolve Condition</Button>
+                )}
+              </ButtonContainer>
+            </WhenConnected>
+          </>
+        )}
       </ViewCard>
-      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

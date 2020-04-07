@@ -2,7 +2,7 @@ import React from 'react'
 
 import { useMarketMakerData, useQuestion } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { FullLoading } from '../loading'
+import { InlineLoading } from '../loading'
 
 import { MarketBuy } from './market_buy'
 
@@ -19,7 +19,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
   const { balances, collateral } = marketMakerData
 
   if (!collateral || balances.length === 0) {
-    return <FullLoading />
+    return <InlineLoading />
   }
 
   return (

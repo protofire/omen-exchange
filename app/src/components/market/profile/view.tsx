@@ -9,8 +9,7 @@ import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../..
 import { Button, ButtonContainer } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { ViewCard } from '../../common'
-import { DisqusComments } from '../../common/disqus_comments'
-import { FullLoading } from '../../loading'
+import { InlineLoading } from '../../loading'
 import { MarketTopDetails } from '../market_top_details'
 import { OutcomeTable } from '../outcome_table'
 
@@ -60,50 +59,52 @@ const ViewWrapper = (props: Props) => {
   }
 
   return (
-    <>
-      <ViewCard>
-        <MarketTopDetails
-          marketMakerAddress={marketMakerAddress}
-          title="Market Details"
-          toggleTitleAction="Pool Information"
-        />
-        {renderTableData()}
-        <WhenConnected>
-          <ButtonContainer>
-            {!IS_CORONA_VERSION && (
-              <LeftButton
+    <ViewCard>
+      fdksfjsbgjsbdsjb
+      {status === Status.Loading ? (
+        <InlineLoading message="Loading Market Information..." />
+      ) : (
+        <>
+          <MarketTopDetails
+            marketMakerAddress={marketMakerAddress}
+            title="Market Details"
+            toggleTitleAction="Pool Information"
+          />
+          {renderTableData()}
+          <WhenConnected>
+            <ButtonContainer>
+              {!IS_CORONA_VERSION && (
+                <LeftButton
+                  buttonType={ButtonType.secondaryLine}
+                  onClick={() => {
+                    history.push(`${marketMakerAddress}/pool-liquidity`)
+                  }}
+                >
+                  Pool Liquidity
+                </LeftButton>
+              )}
+              <Button
                 buttonType={ButtonType.secondaryLine}
+                disabled={!userHasShares}
                 onClick={() => {
-                  history.push(`${marketMakerAddress}/pool-liquidity`)
+                  history.push(`${marketMakerAddress}/sell`)
                 }}
               >
-                Pool Liquidity
-              </LeftButton>
-            )}
-            <Button
-              buttonType={ButtonType.secondaryLine}
-              disabled={!userHasShares}
-              onClick={() => {
-                history.push(`${marketMakerAddress}/sell`)
-              }}
-            >
-              Sell
-            </Button>
-            <Button
-              buttonType={ButtonType.secondaryLine}
-              onClick={() => {
-                history.push(`${marketMakerAddress}/buy`)
-              }}
-            >
-              Buy
-            </Button>
-          </ButtonContainer>
-        </WhenConnected>
-      </ViewCard>
-      {IS_CORONA_VERSION ? <DisqusComments marketMakerAddress={marketMakerAddress} /> : null}
-      {/* <ThreeBoxComments threadName={marketMakerAddress} /> */}
-      {status === Status.Loading && <FullLoading />}
-    </>
+                Sell
+              </Button>
+              <Button
+                buttonType={ButtonType.secondaryLine}
+                onClick={() => {
+                  history.push(`${marketMakerAddress}/buy`)
+                }}
+              >
+                Buy
+              </Button>
+            </ButtonContainer>
+          </WhenConnected>
+        </>
+      )}
+    </ViewCard>
   )
 }
 

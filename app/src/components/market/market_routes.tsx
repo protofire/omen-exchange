@@ -10,7 +10,6 @@ import { getLogger } from '../../util/logger'
 import { isAddress } from '../../util/tools'
 import { MessageWarning, SectionTitle } from '../common'
 import { DisqusComments } from '../common/disqus_comments'
-import { FullLoading } from '../loading'
 
 import { MarketNotFound } from './market_not_found'
 
@@ -40,12 +39,9 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
 
   // Validate Markets with wrong FEE
   const { fee, isQuestionFinalized } = marketMakerData
-  if (fee === null) {
-    return <FullLoading />
-  }
 
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
-  if (!fee.eq(feeBN)) {
+  if (fee !== null && !fee.eq(feeBN)) {
     logger.log(`Market was not created with this app (different fee)`)
     return <SectionTitle title={'Invalid market'} />
   }
@@ -74,6 +70,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
 
 const MarketRoutes = (props: RouteComponentProps<RouteParams>) => {
   const marketMakerAddress = props.match.params.address
+
   if (!isAddress(marketMakerAddress)) {
     logger.log(`Contract address not valid`)
     return <Redirect to="/" />

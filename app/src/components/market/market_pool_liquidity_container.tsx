@@ -2,7 +2,7 @@ import React from 'react'
 
 import { useMarketMakerData, useQuestion } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { FullLoading } from '../loading'
+import { InlineLoading } from '../loading'
 
 import { MarketPoolLiquidity } from './market_pool_liquidity'
 
@@ -27,7 +27,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   } = marketMakerData
 
   if (!collateral) {
-    return <FullLoading />
+    return <InlineLoading />
   }
 
   return (
