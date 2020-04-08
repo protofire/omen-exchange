@@ -1,15 +1,16 @@
+import { useInterval } from '@react-corekit/use-interval'
 import { ethers } from 'ethers'
 import React from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 
-import { IS_CORONA_VERSION, MARKET_FEE } from '../../common/constants'
+import { MARKET_FEE } from '../../common/constants'
 import { useCheckContractExists, useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { MarketBuyPage, MarketDetailsPage, MarketPoolLiquidityPage, MarketSellPage } from '../../pages'
 import { getLogger } from '../../util/logger'
 import { isAddress } from '../../util/tools'
 import { MessageWarning, SectionTitle } from '../common'
-import { DisqusComments } from '../common/disqus_comments'
+import { FullLoading } from '../loading'
 
 import { MarketNotFound } from './market_not_found'
 
@@ -31,46 +32,61 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
 
   // Validate contract REALLY exists
   const contractExists = useCheckContractExists(marketMakerAddress, context)
-  const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
+  const { fetchData, marketMakerData } = useMarketMakerData(marketMakerAddress)
+  useInterval(fetchData, 60000)
   if (!contractExists) {
     logger.log(`Market address not found`)
     return <MarketNotFound />
   }
 
-  // Validate Markets with wrong FEE
+  if (!marketMakerData) {
+    return <FullLoading />
+  }
   const { fee, isQuestionFinalized } = marketMakerData
 
+  // Validate Markets with wrong FEE
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
-  if (fee !== null && !fee.eq(feeBN)) {
+  if (!fee.eq(feeBN)) {
     logger.log(`Market was not created with this app (different fee)`)
     return <SectionTitle title={'Invalid market'} />
   }
 
   return (
-    <>
-      <Switch>
-        <Route component={MarketDetailsPage} exact path="/:address" />
-        {!account ? (
-          <MessageWarning text="Please connect to your wallet to open the market..." />
-        ) : isQuestionFinalized ? (
-          <MessageWarning text="Market closed, question finalized..." />
-        ) : (
-          <>
-            <Route component={MarketBuyPage} exact path="/:address/buy" />
-            <Route component={MarketSellPage} exact path="/:address/sell" />
-            <Route component={MarketPoolLiquidityPage} exact path="/:address/pool-liquidity" />
-          </>
-        )}
-      </Switch>
-      {IS_CORONA_VERSION ? <DisqusComments marketMakerAddress={marketMakerAddress} /> : null}
-      {/* <ThreeBoxComments threadName={marketMakerAddress} /> */}
-    </>
+    <Switch>
+      <Route
+        exact
+        path="/:address"
+        render={props => <MarketDetailsPage {...props} marketMakerData={marketMakerData} />}
+      />
+      {!account ? (
+        <MessageWarning text="Please connect to your wallet to open the market..." />
+      ) : isQuestionFinalized ? (
+        <MessageWarning text="Market closed, question finalized..." />
+      ) : (
+        <>
+          <Route
+            exact
+            path="/:address/buy"
+            render={props => <MarketBuyPage {...props} marketMakerData={marketMakerData} />}
+          />
+          <Route
+            exact
+            path="/:address/sell"
+            render={props => <MarketSellPage {...props} marketMakerData={marketMakerData} />}
+          />
+          <Route
+            exact
+            path="/:address/pool-liquidity"
+            render={props => <MarketPoolLiquidityPage {...props} marketMakerData={marketMakerData} />}
+          />
+        </>
+      )}
+    </Switch>
   )
 }
 
 const MarketRoutes = (props: RouteComponentProps<RouteParams>) => {
   const marketMakerAddress = props.match.params.address
-
   if (!isAddress(marketMakerAddress)) {
     logger.log(`Contract address not valid`)
     return <Redirect to="/" />

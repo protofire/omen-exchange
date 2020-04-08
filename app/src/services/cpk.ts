@@ -7,7 +7,7 @@ import moment from 'moment'
 import { getLogger } from '../util/logger'
 import { getCPKAddresses, getContractAddress } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
-import { MarketData, Token } from '../util/types'
+import { MarketData, Question, Token } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
@@ -51,9 +51,7 @@ interface CPKRemoveFundingParams {
 
 interface CPKRedeemParams {
   isConditionResolved: boolean
-  questionId: string
-  questionRaw: string
-  questionTemplateId: number
+  question: Question
   numOutcomes: number
   earnedCollateral: BigNumber
   collateralToken: Token
@@ -413,9 +411,7 @@ class CPKService {
     marketMaker,
     numOutcomes,
     oracle,
-    questionId,
-    questionRaw,
-    questionTemplateId,
+    question,
   }: CPKRedeemParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -427,7 +423,7 @@ class CPKService {
           operation: CPK.CALL,
           to: oracle.address,
           value: 0,
-          data: OracleService.encodeResolveCondition(questionId, questionTemplateId, questionRaw, numOutcomes),
+          data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
         })
       }
 
@@ -454,7 +450,7 @@ class CPKService {
       logger.log(`Transaction hash: ${txObject.hash}`)
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
-      logger.error(`Error trying to resolve condition or redeem for questionId '${questionId}'`, err.message)
+      logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
       throw err
     }
   }

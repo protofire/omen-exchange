@@ -3,6 +3,7 @@ import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
+import { Question } from '../util/types'
 
 const logger = getLogger('Services::Oracle')
 
@@ -31,17 +32,12 @@ export class OracleService {
   /**
    * Resolve the condition with the given questionId
    */
-  resolveCondition = async (
-    questionId: string,
-    questionTemplateId: number,
-    questionRaw: string,
-    numOutcomes: number,
-  ): Promise<TransactionReceipt> => {
+  resolveCondition = async (question: Question, numOutcomes: number): Promise<TransactionReceipt> => {
     try {
-      const transactionObject = await this.contract.resolve(questionId, questionTemplateId, questionRaw, numOutcomes)
+      const transactionObject = await this.contract.resolve(question.id, question.templateId, question.raw, numOutcomes)
       return this.provider.waitForTransaction(transactionObject.hash)
     } catch (err) {
-      logger.error(`There was an error resolving the condition with questionid '${questionId}'`, err.message)
+      logger.error(`There was an error resolving the condition with question id '${question.id}'`, err.message)
       throw err
     }
   }

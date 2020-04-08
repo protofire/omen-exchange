@@ -1,15 +1,14 @@
-import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { IS_CORONA_VERSION } from '../../../common/constants'
 import { WhenConnected } from '../../../hooks/connectedWeb3'
-import { Arbitrator, BalanceItem, OutcomeTableValue, Status, Token } from '../../../util/types'
+import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { ViewCard } from '../../common'
-import { InlineLoading } from '../../loading'
+import { DisqusComments } from '../../common/disqus_comments'
 import { MarketTopDetails } from '../market_top_details'
 import { OutcomeTable } from '../outcome_table'
 
@@ -19,21 +18,13 @@ const LeftButton = styled(Button)`
 
 interface Props extends RouteComponentProps<{}> {
   account: Maybe<string>
-  balances: BalanceItem[]
-  collateral: Token
-  arbitrator: Maybe<Arbitrator>
-  question: string
-  questionId: string
-  category: string
-  status: Status
-  marketMakerAddress: string
-  funding: BigNumber
-  totalPoolShares: BigNumber
-  userPoolShares: BigNumber
+  marketMakerData: MarketMakerData
 }
 
 const ViewWrapper = (props: Props) => {
-  const { balances, collateral, history, marketMakerAddress, status } = props
+  const { history, marketMakerData } = props
+
+  const { address: marketMakerAddress, balances, collateral } = marketMakerData
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -59,52 +50,49 @@ const ViewWrapper = (props: Props) => {
   }
 
   return (
-    <ViewCard>
-      fdksfjsbgjsbdsjb
-      {status === Status.Loading ? (
-        <InlineLoading message="Loading Market Information..." />
-      ) : (
-        <>
-          <MarketTopDetails
-            marketMakerAddress={marketMakerAddress}
-            title="Market Details"
-            toggleTitleAction="Pool Information"
-          />
-          {renderTableData()}
-          <WhenConnected>
-            <ButtonContainer>
-              {!IS_CORONA_VERSION && (
-                <LeftButton
-                  buttonType={ButtonType.secondaryLine}
-                  onClick={() => {
-                    history.push(`${marketMakerAddress}/pool-liquidity`)
-                  }}
-                >
-                  Pool Liquidity
-                </LeftButton>
-              )}
-              <Button
-                buttonType={ButtonType.secondaryLine}
-                disabled={!userHasShares}
-                onClick={() => {
-                  history.push(`${marketMakerAddress}/sell`)
-                }}
-              >
-                Sell
-              </Button>
-              <Button
+    <>
+      <ViewCard>
+        <MarketTopDetails
+          marketMakerData={marketMakerData}
+          title="Market Details"
+          toggleTitleAction="Pool Information"
+        />
+        {renderTableData()}
+        <WhenConnected>
+          <ButtonContainer>
+            {!IS_CORONA_VERSION && (
+              <LeftButton
                 buttonType={ButtonType.secondaryLine}
                 onClick={() => {
-                  history.push(`${marketMakerAddress}/buy`)
+                  history.push(`${marketMakerAddress}/pool-liquidity`)
                 }}
               >
-                Buy
-              </Button>
-            </ButtonContainer>
-          </WhenConnected>
-        </>
-      )}
-    </ViewCard>
+                Pool Liquidity
+              </LeftButton>
+            )}
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={!userHasShares}
+              onClick={() => {
+                history.push(`${marketMakerAddress}/sell`)
+              }}
+            >
+              Sell
+            </Button>
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              onClick={() => {
+                history.push(`${marketMakerAddress}/buy`)
+              }}
+            >
+              Buy
+            </Button>
+          </ButtonContainer>
+        </WhenConnected>
+      </ViewCard>
+      {IS_CORONA_VERSION ? <DisqusComments marketMakerAddress={marketMakerAddress} /> : null}
+      {/* <ThreeBoxComments threadName={marketMakerAddress} /> */}
+    </>
   )
 }
 

@@ -1,67 +1,20 @@
 import React from 'react'
 
-import { useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { useQuestion } from '../../hooks/useQuestion'
-import { InlineLoading } from '../loading'
+import { MarketMakerData } from '../../util/types'
 
 import { MarketView } from './market_view'
 
 interface Props {
-  marketMakerAddress: string
+  marketMakerData: MarketMakerData
 }
 
 const MarketViewContainer: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { marketMakerAddress } = props
+  const { marketMakerData } = props
 
-  const { marketMakerData, status } = useMarketMakerData(marketMakerAddress, context)
-
-  const { questionRaw, questionTemplateId } = useQuestion(marketMakerAddress, context)
-
-  const {
-    arbitrator,
-    balances,
-    category,
-    collateral,
-    isConditionResolved,
-    isQuestionFinalized,
-    marketMakerFunding,
-    payouts,
-    question,
-    questionId,
-    resolution,
-    totalPoolShares,
-    userPoolShares,
-  } = marketMakerData
-
-  if (!collateral) {
-    return <InlineLoading message="Loading Market..." />
-  }
-
-  return (
-    <MarketView
-      account={context.account}
-      arbitrator={arbitrator}
-      balances={balances}
-      category={category || ''}
-      collateral={collateral}
-      funding={marketMakerFunding}
-      isConditionResolved={isConditionResolved}
-      isQuestionFinalized={isQuestionFinalized}
-      marketMakerAddress={marketMakerAddress}
-      payouts={payouts}
-      question={question || ''}
-      questionId={questionId}
-      questionRaw={questionRaw}
-      questionTemplateId={questionTemplateId}
-      resolution={resolution}
-      status={status}
-      totalPoolShares={totalPoolShares}
-      userPoolShares={userPoolShares}
-    />
-  )
+  return <MarketView account={context.account} marketMakerData={marketMakerData} />
 }
 
 export { MarketViewContainer }
