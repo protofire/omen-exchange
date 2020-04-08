@@ -87,7 +87,7 @@ const theme = {
     textColorDarker: '#333',
     textColorLight: '#999',
     textColorLightish: '#7D8189',
-    warning: '#37474F',
+    warning: '#f5e148',
   },
   cards: {
     backgroundColor: '#fff',

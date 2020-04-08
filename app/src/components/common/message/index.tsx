@@ -19,7 +19,7 @@ const getBorderColor = (type: MessageType, colors: any): string => {
     (type === MessageType.ok && colors.primary) ||
     (type === MessageType.error && colors.secondary) ||
     (type === MessageType.warning && colors.warning) ||
-    (type === MessageType.default && colors.gray)
+    ''
   )
 }
 
@@ -47,7 +47,10 @@ const MessageWrapper = styled.div<{ type: MessageType }>`
   border-radius: 5px;
   border-style: solid;
   border-width: 1px;
-  border-color: ${props => getBorderColor(props.type, props.theme.colors)};
+  border-color: ${props =>
+    getBorderColor(props.type, props.theme.colors)
+      ? getBorderColor(props.type, props.theme.colors)
+      : props.theme.borders.borderColor};
   box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.08);
   display: flex;
   margin-top: 25px;

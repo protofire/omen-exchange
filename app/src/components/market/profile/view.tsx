@@ -8,7 +8,6 @@ import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../util/t
 import { Button, ButtonContainer } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { ViewCard } from '../../common'
-import { DisqusComments } from '../../common/disqus_comments'
 import { MarketTopDetails } from '../market_top_details'
 import { OutcomeTable } from '../outcome_table'
 
@@ -90,8 +89,6 @@ const ViewWrapper = (props: Props) => {
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>
-      {IS_CORONA_VERSION ? <DisqusComments marketMakerAddress={marketMakerAddress} /> : null}
-      {/* <ThreeBoxComments threadName={marketMakerAddress} /> */}
     </>
   )
 }

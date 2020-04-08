@@ -3,14 +3,15 @@ import { ethers } from 'ethers'
 import React from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 
-import { MARKET_FEE } from '../../common/constants'
+import { IS_CORONA_VERSION, MARKET_FEE } from '../../common/constants'
 import { useCheckContractExists, useMarketMakerData } from '../../hooks'
 import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { MarketBuyPage, MarketDetailsPage, MarketPoolLiquidityPage, MarketSellPage } from '../../pages'
 import { getLogger } from '../../util/logger'
 import { isAddress } from '../../util/tools'
 import { MessageWarning, SectionTitle } from '../common'
-import { FullLoading } from '../loading'
+import { DisqusComments } from '../common/disqus_comments'
+import { InlineLoading } from '../loading'
 
 import { MarketNotFound } from './market_not_found'
 
@@ -40,7 +41,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
   }
 
   if (!marketMakerData) {
-    return <FullLoading />
+    return <InlineLoading />
   }
   const { fee, isQuestionFinalized } = marketMakerData
 
@@ -51,36 +52,42 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
     return <SectionTitle title={'Invalid market'} />
   }
 
+  console.log('marketMakerAddress ' + marketMakerAddress)
+
   return (
     <Switch>
-      <Route
-        exact
-        path="/:address"
-        render={props => <MarketDetailsPage {...props} marketMakerData={marketMakerData} />}
-      />
-      {!account ? (
-        <MessageWarning text="Please connect to your wallet to open the market..." />
-      ) : isQuestionFinalized ? (
-        <MessageWarning text="Market closed, question finalized..." />
-      ) : (
-        <>
-          <Route
-            exact
-            path="/:address/buy"
-            render={props => <MarketBuyPage {...props} marketMakerData={marketMakerData} />}
-          />
-          <Route
-            exact
-            path="/:address/sell"
-            render={props => <MarketSellPage {...props} marketMakerData={marketMakerData} />}
-          />
-          <Route
-            exact
-            path="/:address/pool-liquidity"
-            render={props => <MarketPoolLiquidityPage {...props} marketMakerData={marketMakerData} />}
-          />
-        </>
-      )}
+      <>
+        <Route
+          exact
+          path="/:address"
+          render={props => <MarketDetailsPage {...props} marketMakerData={marketMakerData} />}
+        />
+        {!account ? (
+          <MessageWarning text="Please connect to your wallet to open the market..." />
+        ) : isQuestionFinalized ? (
+          <MessageWarning text="Market closed, question finalized..." />
+        ) : (
+          <>
+            <Route
+              exact
+              path="/:address/buy"
+              render={props => <MarketBuyPage {...props} marketMakerData={marketMakerData} />}
+            />
+            <Route
+              exact
+              path="/:address/sell"
+              render={props => <MarketSellPage {...props} marketMakerData={marketMakerData} />}
+            />
+            <Route
+              exact
+              path="/:address/pool-liquidity"
+              render={props => <MarketPoolLiquidityPage {...props} marketMakerData={marketMakerData} />}
+            />
+          </>
+        )}
+        {IS_CORONA_VERSION ? <DisqusComments marketMakerAddress={marketMakerAddress} /> : null}
+        {/* <ThreeBoxComments threadName={marketMakerAddress} /> */}
+      </>
     </Switch>
   )
 }
