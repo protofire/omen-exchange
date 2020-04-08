@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../services'
-import { calcPrice } from '../../../util/tools'
+import { calcPrice, formatBigNumber } from '../../../util/tools'
 
 const Wrapper = styled(NavLink)`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
@@ -84,7 +84,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
       const erc20Service = new ERC20Service(provider, account, collateralToken)
       const { decimals, symbol } = await erc20Service.getProfileSummary()
 
-      const amount = ethers.utils.formatUnits(collateralVolume, decimals)
+      const amount = formatBigNumber(collateralVolume, decimals)
 
       setAmount(amount)
       setSymbol(symbol)
