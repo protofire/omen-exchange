@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 
-import { useMarketMakerData } from '../../hooks'
-import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 import { use24hsVolume } from '../../hooks/use24hsVolume'
 import { formatBigNumber, formatDate } from '../../util/tools'
+import { MarketMakerData } from '../../util/types'
 import {
   DisplayArbitrator,
   GridTwoColumns,
@@ -16,31 +15,28 @@ import {
 interface Props {
   toggleTitleAction: string
   title: string
-  marketMakerAddress: string
+  marketMakerData: MarketMakerData
 }
 
 const MarketTopDetails: React.FC<Props> = (props: Props) => {
-  const context = useConnectedWeb3Context()
   const [showingExtraInformation, setExtraInformation] = useState(false)
 
-  const toggleExtraInformation = () =>
-    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
-
-  const { marketMakerAddress } = props
-  const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
-
+  const { marketMakerData } = props
   const {
+    address: marketMakerAddress,
     arbitrator,
-    category,
     collateral,
     marketMakerFunding,
     marketMakerUserFunding,
-    resolution,
+    question,
     totalEarnings,
     userEarnings,
   } = marketMakerData
 
-  const lastDayVolume = use24hsVolume(marketMakerAddress, context)
+  const lastDayVolume = use24hsVolume(marketMakerAddress)
+
+  const toggleExtraInformation = () =>
+    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
 
   return (
     <>
@@ -72,8 +68,8 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
             />
           </>
         ) : null}
-        <TitleValue title={'Category'} value={category} />
-        <TitleValue title={'Resolution Date'} value={resolution && formatDate(resolution)} />
+        <TitleValue title={'Category'} value={question.category} />
+        <TitleValue title={'Resolution Date'} value={question.resolution && formatDate(question.resolution)} />
         <TitleValue title={'Arbitrator/Oracle'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
         <TitleValue
           title={'24h Volume'}

@@ -13,7 +13,7 @@ const WalletConnect = new WalletConnectConnector({
   api: WalletConnectApi,
   bridge: 'https://bridge.walletconnect.org',
   supportedNetworkURLs,
-  defaultNetwork: 4,
+  defaultNetwork: 1,
 })
 
 const Infura = new NetworkOnlyConnector({

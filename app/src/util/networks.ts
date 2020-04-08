@@ -119,7 +119,7 @@ export const supportedNetworkURLs = entries(networks).reduce<{
   {},
 )
 
-export const infuraNetworkURL = process.env.NODE_ENV === 'development' ? networks[4].url : networks[1].url
+export const infuraNetworkURL = networks[1].url
 
 export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   cdai: {
@@ -344,7 +344,7 @@ export const getDefaultArbitrator = (networkId: number): Arbitrator => {
   return IS_CORONA_VERSION ? getArbitrator(networkId, 'corona') : getArbitrator(networkId, 'realitio')
 }
 
-export const getArbitratorFromAddress = (networkId: number, address: string): Maybe<Arbitrator> => {
+export const getArbitratorFromAddress = (networkId: number, address: string): Arbitrator => {
   for (const key in knownArbitrators) {
     const arbitrator = knownArbitrators[key as KnownArbitrator]
     const arbitratorAddress = arbitrator.addresses[networkId]

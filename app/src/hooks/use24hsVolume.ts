@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 
 import { getLogger } from '../util/logger'
 
-import { ConnectedWeb3Context } from './connectedWeb3'
+import { useConnectedWeb3Context } from './connectedWeb3'
 
 const logger = getLogger('Market::use24hsVolume')
 
@@ -27,11 +27,11 @@ const buildQuery24hsEarlier = (hash: Maybe<string>) => {
 `
 }
 
-export const use24hsVolume = (marketMakerAddress: string, context: ConnectedWeb3Context): Maybe<BigNumber> => {
+export const use24hsVolume = (marketMakerAddress: string): Maybe<BigNumber> => {
   const [hash, setHash] = useState<Maybe<string>>(null)
   const [lastDayVolume, setLastDayVolume] = useState<Maybe<BigNumber>>(null)
 
-  const { library: provider } = context
+  const { library: provider } = useConnectedWeb3Context()
 
   const { data: volumeNow, error: errorVolumeNow } = useQuery(GET_COLLATERAL_VOLUME_NOW, {
     skip: !!lastDayVolume,

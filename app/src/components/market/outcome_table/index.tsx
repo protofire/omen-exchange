@@ -75,14 +75,11 @@ export const OutcomeTable = (props: Props) => {
     const { balance, index } = props
 
     if (payouts) {
-      const payoutDenominator = payouts.reduce((a, b) => a + b)
-      // TODO Remove after merge #513
-      const percentages = payouts.map(p => p / payoutDenominator)
       const shares = new BigNumber(balance.shares)
       return (
         <>
-          <div>{percentages[index] < 1 ? `${percentages[index] * 100}% ` : ''}Winning Outcome</div>
-          {`Redeem ${formatBigNumber(shares.mul(percentages[index]), collateral.decimals)}`}
+          <div>{payouts[index] < 1 ? `${payouts[index] * 100}% ` : ''}Winning Outcome</div>
+          {`Redeem ${formatBigNumber(shares.mul(payouts[index]), collateral.decimals)}`}
         </>
       )
     } else {
@@ -127,6 +124,7 @@ export const OutcomeTable = (props: Props) => {
     const probability = probabilities[outcomeIndex]
     const isOutcomeSelected = outcomeSelected === outcomeIndex
     const showSharesAndPriceChange = isOutcomeSelected && !IS_CORONA_VERSION
+    const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
 
     return (
       <TR key={outcomeName}>
@@ -159,7 +157,7 @@ export const OutcomeTable = (props: Props) => {
               <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={outcomeIndex} />
               <OutcomeItemText>{outcomeName}</OutcomeItemText>
             </OutcomeItemTextWrapper>
-            {balanceItem.winningOutcome && <WinningOutcome balance={balanceItem} index={outcomeIndex} />}
+            {isWinningOutcome && <WinningOutcome balance={balanceItem} index={outcomeIndex} />}
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Probability) ? null : (
@@ -188,7 +186,7 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.Payout) ? null : withWinningOutcome && payouts ? (
           <TDStyled textAlign={TableCellsAlign[4]}>{payouts[outcomeIndex]}</TDStyled>
         ) : (
-          <TDStyled textAlign={TableCellsAlign[4]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[4]}>0.00</TDStyled>
         )}
       </TR>
     )

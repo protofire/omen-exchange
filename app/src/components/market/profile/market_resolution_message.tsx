@@ -6,7 +6,7 @@ import { Token } from '../../../util/types'
 
 interface Props {
   earnedCollateral: Maybe<BigNumber>
-  collateral: Token
+  collateralToken: Token
   winnersOutcomes: number
   userWinnersOutcomes: number
   userWinnerShares: BigNumber
@@ -14,13 +14,13 @@ interface Props {
 }
 
 const MarketResolutionMessage = (props: Props) => {
-  const { collateral, earnedCollateral, invalid, userWinnerShares, userWinnersOutcomes, winnersOutcomes } = props
+  const { collateralToken, earnedCollateral, invalid, userWinnerShares, userWinnersOutcomes, winnersOutcomes } = props
 
   if (!earnedCollateral) {
     return null
   }
-  const shares = formatBigNumber(userWinnerShares, collateral.decimals)
-  const redeemString = `${formatBigNumber(earnedCollateral, collateral.decimals)} ${collateral.symbol}`
+  const shares = formatBigNumber(userWinnerShares, collateralToken.decimals)
+  const redeemString = `${formatBigNumber(earnedCollateral, collateralToken.decimals)} ${collateralToken.symbol}`
   if (invalid) {
     return (
       <p>{`Realit.io declared this market invalid. You own ${shares} Shares of ${

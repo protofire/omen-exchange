@@ -1,10 +1,11 @@
+import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { useMarketMakerData } from '../../hooks'
-import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
+import { MARKET_FEE } from '../../common/constants'
 import { use24hsVolume } from '../../hooks/use24hsVolume'
 import { formatBigNumber, formatDate } from '../../util/tools'
+import { MarketMakerData } from '../../util/types'
 import {
   DisplayArbitrator,
   GridTwoColumns,
@@ -25,7 +26,8 @@ const Link = styled.a`
 `
 
 interface Props {
-  marketMakerAddress: string
+  marketMakerData: MarketMakerData
+  collateral: BigNumber
 }
 
 const getMarketTitles = (templateId: Maybe<number>) => {
@@ -41,14 +43,24 @@ const getMarketTitles = (templateId: Maybe<number>) => {
 const faqURL = 'https://docs.google.com/document/d/1w-mzDZBHqedSCxt_T319e-JzO5jFOMwsGseyCOqFwqQ'
 
 const ClosedMarketTopDetails: React.FC<Props> = (props: Props) => {
-  const context = useConnectedWeb3Context()
-  const { marketMakerAddress } = props
-  const { marketMakerData } = useMarketMakerData(marketMakerAddress, context)
+  const { collateral, marketMakerData } = props
 
-  const { arbitrator, category, collateral, questionTemplateId, resolution } = marketMakerData
+  const {
+    address: marketMakerAddress,
+    arbitrator,
+    collateral: collateralToken,
+    marketMakerFunding: funding,
+    question,
+  } = marketMakerData
 
-  const lastDayVolume = use24hsVolume(marketMakerAddress, context)
-  const { marketSubtitle, marketTitle } = getMarketTitles(questionTemplateId)
+  const lastDayVolume = use24hsVolume(marketMakerAddress)
+  const { marketSubtitle, marketTitle } = getMarketTitles(question.templateId)
+  const resolutionFormat = question.resolution ? formatDate(question.resolution) : ''
+  const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
+  const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${collateralToken.symbol}`
+  const lastDayVolumeFormat = lastDayVolume
+    ? `${formatBigNumber(lastDayVolume, collateralToken.decimals)} ${collateralToken.symbol}`
+    : '-'
 
   return (
     <>
@@ -62,17 +74,13 @@ const ClosedMarketTopDetails: React.FC<Props> = (props: Props) => {
       </SubsectionTitleWrapper>
 
       <GridTwoColumns>
-        <TitleValue title={'Category'} value={category} />
-        <TitleValue title={'Resolution Date'} value={resolution && formatDate(resolution)} />
-        <TitleValue title={'Arbitrator/Oracle'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
-        <TitleValue
-          title={'24h Volume'}
-          value={
-            collateral && lastDayVolume
-              ? `${formatBigNumber(lastDayVolume, collateral.decimals)} ${collateral.symbol}`
-              : '-'
-          }
-        />
+        <TitleValue title={'Category'} value={question.category} />
+        <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
+        <TitleValue title="Fee" value={`${MARKET_FEE}%`} />
+        <TitleValue title="Funding" value={fundingFormat} />
+        <TitleValue title={'Resolution Date'} value={resolutionFormat} />
+        <TitleValue title="Collateral" value={collateralFormat} />
+        <TitleValue title={'24h Volume'} value={lastDayVolumeFormat} />
       </GridTwoColumns>
     </>
   )

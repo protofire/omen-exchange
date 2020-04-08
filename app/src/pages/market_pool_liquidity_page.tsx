@@ -1,16 +1,14 @@
 import React from 'react'
-import { RouteComponentProps } from 'react-router'
 
 import { MarketPoolLiquidityContainer } from '../components'
+import { MarketMakerData } from '../util/types'
 
-interface RouteParams {
-  address: string
+type Props = {
+  marketMakerData: MarketMakerData
 }
 
-const MarketPoolLiquidityPage = (props: RouteComponentProps<RouteParams>) => {
-  const marketMakerAddress = props.match.params.address
-
-  return <MarketPoolLiquidityContainer marketMakerAddress={marketMakerAddress} />
+const MarketPoolLiquidityPage: React.FC<Props> = ({ marketMakerData }) => {
+  return <MarketPoolLiquidityContainer marketMakerData={marketMakerData} />
 }
 
 export { MarketPoolLiquidityPage }
