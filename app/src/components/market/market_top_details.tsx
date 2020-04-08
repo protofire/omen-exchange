@@ -132,7 +132,10 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
         ) : null}
         <TitleValue title={'Category'} value={question.category} />
         <TitleValue title={'Resolution Date'} value={question.resolution && formatDate(question.resolution)} />
-        <TitleValue title={'Arbitrator/Oracle'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
+        <TitleValue
+          title={'Arbitrator/Oracle'}
+          value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
+        />
         <TitleValue
           title={'24h Volume'}
           value={
