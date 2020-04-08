@@ -57,7 +57,7 @@ export const use24hsVolume = (marketMakerAddress: string, context: ConnectedWeb3
   }
 
   useEffect(() => {
-    const get24hsVolume = async () => {
+    const setEarlierHash = async () => {
       const BLOCKS_PER_SECOND = 15
       const OFFSET = Math.round((60 * 60 * 24) / BLOCKS_PER_SECOND)
       const lastBlock = await provider.getBlockNumber()
@@ -65,7 +65,7 @@ export const use24hsVolume = (marketMakerAddress: string, context: ConnectedWeb3
       setHash(hash)
     }
 
-    get24hsVolume()
+    setEarlierHash()
   }, [provider])
 
   return lastDayVolume

@@ -14,6 +14,8 @@ import { FullLoading } from '../../loading'
 import { ClosedMarketTopDetails } from '../closed_market_top_details'
 import { OutcomeTable } from '../outcome_table'
 
+import MarketResolutionMessage from './market_resolution_message'
+
 interface Props {
   theme?: any
   balances: BalanceItem[]
@@ -153,6 +155,15 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   }
 
   const hasWinningOutcomes = earnedCollateral && earnedCollateral.gt(0)
+  const winnersOutcomes = payouts ? payouts.filter(payout => payout > 0).length : 0
+  const userWinnersOutcomes = payouts
+    ? payouts.filter((payout, index) => balances[index].shares.gt(0) && payout > 0).length
+    : 0
+  const userWinnerShares = payouts
+    ? balances.reduce((acc, balance, index) => (payouts[index] > 0 ? acc.add(balance.shares) : acc), new BigNumber(0))
+    : new BigNumber(0)
+  const EPS = 0.01
+  const allPayoutsEqual = payouts ? payouts.every(payout => Math.abs(payout - 1 / payouts.length) <= EPS) : false
 
   return (
     <>
@@ -169,11 +180,22 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
           collateral={collateralToken}
           disabledColumns={disabledColumns}
           displayRadioSelection={false}
+          payouts={payouts}
           probabilities={probabilities}
           withWinningOutcome={true}
         />
 
         <WhenConnected>
+          {hasWinningOutcomes && (
+            <MarketResolutionMessage
+              collateral={collateralToken}
+              earnedCollateral={earnedCollateral}
+              invalid={allPayoutsEqual}
+              userWinnerShares={userWinnerShares}
+              userWinnersOutcomes={userWinnersOutcomes}
+              winnersOutcomes={winnersOutcomes}
+            ></MarketResolutionMessage>
+          )}
           <ButtonContainer>
             {isConditionResolved && hasWinningOutcomes && <Button onClick={() => redeem()}>Redeem</Button>}
             {!isConditionResolved && hasWinningOutcomes && (

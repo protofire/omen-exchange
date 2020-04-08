@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled, { css } from 'styled-components'
 
@@ -18,6 +19,7 @@ interface Props {
   displayRadioSelection?: boolean
   outcomeHandleChange?: (e: number) => void
   outcomeSelected?: number
+  payouts?: Maybe<number[]>
   probabilities: number[]
   withWinningOutcome?: boolean
 }
@@ -56,10 +58,6 @@ const TDFlexDiv = styled.div<{ textAlign?: string }>`
     props.textAlign && 'right' ? 'flex-end' : props.textAlign && 'center' ? 'center' : 'flex-start'};
 `
 
-const WinningOutcome = () => {
-  return <>Winning Outcome</>
-}
-
 export const OutcomeTable = (props: Props) => {
   const {
     balances,
@@ -68,9 +66,29 @@ export const OutcomeTable = (props: Props) => {
     displayRadioSelection = true,
     outcomeHandleChange,
     outcomeSelected,
+    payouts = [],
     probabilities,
     withWinningOutcome = false,
   } = props
+
+  const WinningOutcome = (props: any) => {
+    const { balance, index } = props
+
+    if (payouts) {
+      const payoutDenominator = payouts.reduce((a, b) => a + b)
+      // TODO Remove after merge #513
+      const percentages = payouts.map(p => p / payoutDenominator)
+      const shares = new BigNumber(balance.shares)
+      return (
+        <>
+          <div>{percentages[index] < 1 ? `${percentages[index] * 100}% ` : ''}Winning Outcome</div>
+          {`Redeem ${formatBigNumber(shares.mul(percentages[index]), collateral.decimals)}`}
+        </>
+      )
+    } else {
+      return <></>
+    }
+  }
 
   const TableHead: OutcomeTableValue[] = [
     OutcomeTableValue.OutcomeProbability,
@@ -126,7 +144,6 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.OutcomeProbability) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]}>
-            {balanceItem.winningOutcome && <WinningOutcome />}
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
             {showSharesAndPriceChange && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
           </TDStyled>
@@ -142,6 +159,7 @@ export const OutcomeTable = (props: Props) => {
               <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={outcomeIndex} />
               <OutcomeItemText>{outcomeName}</OutcomeItemText>
             </OutcomeItemTextWrapper>
+            {balanceItem.winningOutcome && <WinningOutcome balance={balanceItem} index={outcomeIndex} />}
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Probability) ? null : (
@@ -167,8 +185,8 @@ export const OutcomeTable = (props: Props) => {
         ) : (
           <TDStyled textAlign={TableCellsAlign[3]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
         )}
-        {disabledColumns.includes(OutcomeTableValue.Payout) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[4]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
+        {disabledColumns.includes(OutcomeTableValue.Payout) ? null : withWinningOutcome && payouts ? (
+          <TDStyled textAlign={TableCellsAlign[4]}>{payouts[outcomeIndex]}</TDStyled>
         ) : (
           <TDStyled textAlign={TableCellsAlign[4]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
         )}
@@ -176,8 +194,7 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
-  const renderTable = () =>
-    balances.slice().map((balanceItem: BalanceItem, index) => renderTableRow(balanceItem, index))
+  const renderTable = () => balances.map((balanceItem: BalanceItem, index) => renderTableRow(balanceItem, index))
 
   return (
     <TableWrapper>
