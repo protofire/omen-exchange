@@ -1,16 +1,14 @@
 import React from 'react'
-import { RouteComponentProps } from 'react-router'
 
 import { MarketSellContainer } from '../components'
+import { MarketMakerData } from '../util/types'
 
-interface RouteParams {
-  address: string
+type Props = {
+  marketMakerData: MarketMakerData
 }
 
-const MarketSellPage = (props: RouteComponentProps<RouteParams>) => {
-  const marketMakerAddress = props.match.params.address
-
-  return <MarketSellContainer marketMakerAddress={marketMakerAddress} />
+const MarketSellPage: React.FC<Props> = ({ marketMakerData }) => {
+  return <MarketSellContainer marketMakerData={marketMakerData} />
 }
 
 export { MarketSellPage }

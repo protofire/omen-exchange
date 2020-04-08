@@ -135,14 +135,14 @@ class RealitioService {
     const outcomes = isNuancedBinary || !questionLog.outcomes ? ['No', 'Yes'] : questionLog.outcomes
 
     return {
-      questionId,
-      question: title === 'undefined' ? '' : title,
+      id: questionId,
+      title: title === 'undefined' ? '' : title,
       category: category === 'undefined' ? '' : category,
       resolution: new Date(openingTs * 1000),
       arbitratorAddress: arbitrator,
       outcomes: outcomes,
-      questionTemplateId: templateId,
-      questionRaw: question,
+      templateId,
+      raw: question,
     }
   }
 

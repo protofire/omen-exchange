@@ -14,7 +14,7 @@ import { useCpkAllowance } from '../../hooks/useCpkAllowance'
 import { MarketMakerService } from '../../services'
 import { getLogger } from '../../util/logger'
 import { computeBalanceAfterTrade, formatBigNumber } from '../../util/tools'
-import { BalanceItem, OutcomeTableValue, Status, Token } from '../../util/types'
+import { MarketMakerData, OutcomeTableValue, Status } from '../../util/types'
 import { Button, ButtonContainer } from '../button'
 import { ButtonType } from '../button/button_styling_types'
 import {
@@ -43,11 +43,7 @@ const LeftButton = styled(Button)`
 const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
-  marketMakerAddress: string
-  balances: BalanceItem[]
-  collateral: Token
-  question: string
-  resolution: Maybe<Date>
+  marketMakerData: MarketMakerData
 }
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
@@ -57,7 +53,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
-  const { balances, collateral, marketMakerAddress, question } = props
+  const { marketMakerData } = props
+  const { address: marketMakerAddress, balances, collateral, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -176,10 +173,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle goBackEnabled title={question} />
+      <SectionTitle goBackEnabled title={question.title} />
       <ViewCard>
         <MarketTopDetails
-          marketMakerAddress={marketMakerAddress}
+          marketMakerData={marketMakerData}
           title="Purchase Outcome"
           toggleTitleAction="Pool Information"
         />

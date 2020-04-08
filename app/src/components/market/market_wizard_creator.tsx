@@ -139,7 +139,7 @@ export const MarketWizardCreator = (props: Props) => {
   }
 
   const handleQuestionChange = (questionObj: Question, arbitrator: Arbitrator) => {
-    const { category, outcomes, question, questionId, resolution } = questionObj
+    const { category, id: questionId, outcomes, resolution, title: question } = questionObj
 
     const outcomesFromQuestion = outcomes.map(outcomeName => {
       return {
