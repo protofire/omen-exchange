@@ -1,3 +1,4 @@
+import Big from 'big.js'
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled, { css } from 'styled-components'
@@ -75,11 +76,12 @@ export const OutcomeTable = (props: Props) => {
     const { balance, index } = props
 
     if (payouts) {
-      const shares = new BigNumber(balance.shares)
+      const shares = new Big(balance.shares.toString())
+      const redeemable = new BigNumber(shares.mul(payouts[index]).toString())
       return (
         <>
           <div>{payouts[index] < 1 ? `${payouts[index] * 100}% ` : ''}Winning Outcome</div>
-          {`Redeem ${formatBigNumber(shares.mul(payouts[index]), collateral.decimals)}`}
+          {`Redeem ${formatBigNumber(redeemable, collateral.decimals)}`}
         </>
       )
     } else {
