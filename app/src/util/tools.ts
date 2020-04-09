@@ -135,10 +135,9 @@ export const calcSellAmountInCollateral = (
   const f = (r: Big) => {
     const numerator = otherHoldingsBig.reduce((a, b) => a.mul(b), holdingsBig)
     const denominator = otherHoldingsBig.map(h => h.minus(r).minus(r.mul(fee))).reduce((a, b) => a.mul(b))
-    return holdingsBig
-      .minus(r)
-      .plus(sharesToSellBig)
-      .minus(numerator.div(denominator))
+    const firstTerm = denominator.mul(holdingsBig.minus(r).plus(sharesToSellBig))
+    const secondTerm = numerator
+    return firstTerm.minus(secondTerm)
   }
 
   const r = newtonRaphson(f, sharesToSellBig, { verbose: true, maxIterations: 100 })
