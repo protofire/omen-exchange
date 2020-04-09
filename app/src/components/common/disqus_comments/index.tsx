@@ -13,9 +13,9 @@ const DisqusCustom = styled.div`
 export const DisqusComments: React.FC<{ marketMakerAddress: string }> = ({ marketMakerAddress }) => {
   const config = React.useMemo(() => {
     return {
-      url: `${DISQUS_URL}/${marketMakerAddress}`,
       identifier: marketMakerAddress,
       title: marketMakerAddress,
+      url: `${DISQUS_URL}/${marketMakerAddress}`,
     }
   }, [marketMakerAddress])
 

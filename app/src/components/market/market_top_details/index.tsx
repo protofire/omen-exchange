@@ -3,10 +3,10 @@ import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import React, { useEffect, useState } from 'react'
 
-import { useConnectedWeb3Context } from '../../hooks/connectedWeb3'
-import { getLogger } from '../../util/logger'
-import { formatBigNumber, formatDate } from '../../util/tools'
-import { MarketMakerData } from '../../util/types'
+import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
+import { getLogger } from '../../../util/logger'
+import { formatBigNumber, formatDate } from '../../../util/tools'
+import { MarketMakerData } from '../../../util/types'
 import {
   DisplayArbitrator,
   GridTwoColumns,
@@ -14,7 +14,7 @@ import {
   SubsectionTitleAction,
   SubsectionTitleWrapper,
   TitleValue,
-} from '../common'
+} from '../../common'
 const logger = getLogger('Market::View')
 
 interface Props {
@@ -108,7 +108,6 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
           {showingExtraInformation ? 'Hide' : 'Show'} {props.toggleTitleAction}
         </SubsectionTitleAction>
       </SubsectionTitleWrapper>
-
       <GridTwoColumns>
         {showingExtraInformation ? (
           <>

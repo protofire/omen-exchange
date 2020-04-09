@@ -14,6 +14,8 @@ const rotate = keyframes`
 
 const RotatingSpinner = styled.div<{ height: string; width: string }>`
   animation: ${rotate} 2s linear infinite;
+  flex-grow: 0;
+  flex-shrink: 0;
   height: ${props => props.height};
   width: ${props => props.width};
 `

@@ -2,7 +2,7 @@ import React, { HTMLAttributes } from 'react'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
-import { Spinner } from '../../common/spinner'
+import { Card, Spinner } from '../../common'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -18,14 +18,26 @@ const Wrapper = styled.div`
   z-index: 100;
 `
 
+const LoadingCard = styled(Card)`
+  align-items: center;
+  height: 200px;
+  justify-content: center;
+  width: 280px;
+`
+
+const LoadingSpinner = styled(Spinner)`
+  align-self: center;
+  margin-top: auto;
+`
+
 const Message = styled.p`
-  color: #86909e;
-  font-size: 14px;
-  font-weight: 400;
+  color: ${props => props.theme.colors.textColorDark};
+  font-size: 15px;
+  font-weight: 500;
   letter-spacing: 0.4px;
   line-height: 1.5;
+  margin: auto 0 0 0;
   max-width: 100%;
-  padding: 0 30px;
   text-align: center;
   width: 100%;
 `
@@ -40,8 +52,10 @@ export const FullLoading: React.FC<Props> = (props: Props) => {
 
   return ReactDOM.createPortal(
     <Wrapper {...restProps}>
-      <Spinner />
-      {message ? <Message>{message}</Message> : null}
+      <LoadingCard>
+        <LoadingSpinner />
+        {message ? <Message>{message}</Message> : null}
+      </LoadingCard>
     </Wrapper>,
     portal,
   )
