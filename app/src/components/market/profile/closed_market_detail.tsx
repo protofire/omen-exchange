@@ -165,7 +165,10 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
         <SubsectionTitle>Details</SubsectionTitle>
         <Grid>
           <TitleValue title="Category" value={question.category} />
-          <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
+          <TitleValue
+            title={'Arbitrator'}
+            value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
+          />
           <TitleValue title="Resolution Date" value={resolutionFormat} />
           <TitleValue title="Fee" value={`${MARKET_FEE}%`} />
           <TitleValue title="Funding" value={fundingFormat} />
