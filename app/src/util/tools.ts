@@ -140,7 +140,7 @@ export const calcSellAmountInCollateral = (
     return firstTerm.minus(secondTerm)
   }
 
-  const r = newtonRaphson(f, sharesToSellBig, { verbose: true, maxIterations: 100 })
+  const r = newtonRaphson(f, sharesToSellBig, { maxIterations: 100 })
 
   if (r) {
     const amountToSell = bigNumberify(r.toFixed(0))
