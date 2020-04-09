@@ -4,9 +4,9 @@ import styled from 'styled-components'
 
 import { networkIds } from '../../../util/networks'
 import { ButtonContainer, ButtonLink } from '../../button'
-import { SectionTitle } from '../section_title'
-import { SubsectionTitle } from '../subsection_title'
-import { ViewCard } from '../view_card'
+import { ViewCard } from '../../market/common/view_card'
+import { SectionTitle } from '../text/section_title'
+import { SubsectionTitle } from '../text/subsection_title'
 
 const WrappedText = styled.div`
   color: #555;
