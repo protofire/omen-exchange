@@ -133,11 +133,16 @@ export const calcSellAmountInCollateral = (
   const otherHoldingsBig = otherHoldings.map(x => new Big(x.toString()))
 
   const f = (r: Big) => {
-    const numerator = otherHoldingsBig.reduce((a, b) => a.mul(b), holdingsBig)
-    const denominator = otherHoldingsBig.map(h => h.minus(r).minus(r.mul(fee))).reduce((a, b) => a.mul(b))
-    const firstTerm = denominator.mul(holdingsBig.minus(r).plus(sharesToSellBig))
-    const secondTerm = numerator
-    return firstTerm.minus(secondTerm)
+    // For three outcomes, where the first outcome is the one being sold, the formula is:
+    // f(r) = ((y - r - fee*r) * (z - r - fee*r)) * (x  + a - r) - x*y*z
+    // where:
+    //   `x`, `y`, `z` are the market maker holdings for each outcome
+    //   `a` is the amount of outcomes that are being sold
+    //   `r` (the unknown) is the amount of collateral that will be returned in exchange of `a` tokens
+    const firstTerm = otherHoldingsBig.map(h => h.minus(r).minus(r.mul(fee))).reduce((a, b) => a.mul(b))
+    const secondTerm = holdingsBig.plus(sharesToSellBig).minus(r)
+    const thirdTerm = otherHoldingsBig.reduce((a, b) => a.mul(b), holdingsBig)
+    return firstTerm.mul(secondTerm).minus(thirdTerm)
   }
 
   const r = newtonRaphson(f, sharesToSellBig, { maxIterations: 100 })
