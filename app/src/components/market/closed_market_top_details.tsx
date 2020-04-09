@@ -1,6 +1,5 @@
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
-import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../common/constants'
 import { use24hsVolume } from '../../hooks/use24hsVolume'
@@ -14,16 +13,6 @@ import {
   SubsectionTitleWrapper,
   TitleValue,
 } from '../common'
-
-const Link = styled.a`
-  color: ${props => props.theme.colors.textColor};
-  cursor: pointer;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -66,13 +55,16 @@ const ClosedMarketTopDetails: React.FC<Props> = (props: Props) => {
     <>
       <SubsectionTitleWrapper>
         <SubsectionTitle>{marketTitle}</SubsectionTitle>
-        <SubsectionTitleAction>
-          <Link href={faqURL} target="_blank">
+        {faqURL && (
+          <SubsectionTitleAction
+            onClick={() => {
+              window.open(faqURL)
+            }}
+          >
             {marketSubtitle}
-          </Link>
-        </SubsectionTitleAction>
+          </SubsectionTitleAction>
+        )}
       </SubsectionTitleWrapper>
-
       <GridTwoColumns>
         <TitleValue title={'Category'} value={question.category} />
         <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />

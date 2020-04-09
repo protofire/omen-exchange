@@ -1,4 +1,3 @@
-import { ethers } from 'ethers'
 import moment from 'moment'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
