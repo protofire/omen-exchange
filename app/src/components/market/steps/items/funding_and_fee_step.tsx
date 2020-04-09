@@ -230,10 +230,6 @@ const FundingAndFeeStep = (props: Props) => {
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsStyled>
-        {!MarketCreationStatus.is.ready(marketCreationStatus) &&
-        !MarketCreationStatus.is.error(marketCreationStatus) ? (
-          <FullLoading message={`${marketCreationStatus._type}...`} />
-        ) : null}
         {fundingErrorMessage && <FormError>{fundingErrorMessage}</FormError>}
         <ButtonContainerFullWidth>
           <LeftButton
@@ -275,6 +271,9 @@ const FundingAndFeeStep = (props: Props) => {
           </ButtonWithReadyToGoStatus>
         </ButtonContainerFullWidth>
       </CreateCardBottom>
+      {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
+        <FullLoading message={`${marketCreationStatus._type}...`} />
+      ) : null}
     </>
   )
 }

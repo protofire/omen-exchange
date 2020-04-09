@@ -67,7 +67,10 @@ const ClosedMarketTopDetails: React.FC<Props> = (props: Props) => {
       </SubsectionTitleWrapper>
       <GridTwoColumns>
         <TitleValue title={'Category'} value={question.category} />
-        <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
+        <TitleValue
+          title={'Arbitrator'}
+          value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
+        />
         <TitleValue title="Fee" value={`${MARKET_FEE}%`} />
         <TitleValue title="Funding" value={fundingFormat} />
         <TitleValue title={'Resolution Date'} value={resolutionFormat} />

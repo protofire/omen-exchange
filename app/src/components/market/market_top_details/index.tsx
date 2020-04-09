@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
-import { use24hsVolume } from '../../hooks/use24hsVolume'
-import { formatBigNumber, formatDate } from '../../util/tools'
-import { MarketMakerData } from '../../util/types'
+import { use24hsVolume } from '../../../hooks/use24hsVolume'
+import { formatBigNumber, formatDate } from '../../../util/tools'
+import { MarketMakerData } from '../../../util/types'
 import {
   DisplayArbitrator,
   GridTwoColumns,
@@ -10,7 +10,7 @@ import {
   SubsectionTitleAction,
   SubsectionTitleWrapper,
   TitleValue,
-} from '../common'
+} from '../../common'
 
 interface Props {
   toggleTitleAction: string
@@ -46,7 +46,6 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
           {showingExtraInformation ? 'Hide' : 'Show'} {props.toggleTitleAction}
         </SubsectionTitleAction>
       </SubsectionTitleWrapper>
-
       <GridTwoColumns>
         {showingExtraInformation ? (
           <>
@@ -70,7 +69,10 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
         ) : null}
         <TitleValue title={'Category'} value={question.category} />
         <TitleValue title={'Resolution Date'} value={question.resolution && formatDate(question.resolution)} />
-        <TitleValue title={'Arbitrator/Oracle'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
+        <TitleValue
+          title={'Arbitrator/Oracle'}
+          value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
+        />
         <TitleValue
           title={'24h Volume'}
           value={
