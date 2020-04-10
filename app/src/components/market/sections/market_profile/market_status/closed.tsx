@@ -1,7 +1,7 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
-import { withTheme } from 'styled-components'
+import styled from 'styled-components'
 
 import { useContracts } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
@@ -9,16 +9,19 @@ import { CPKService, ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
-import { SubsectionTitle, SubsectionTitleWrapper } from '../../../../common'
+import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
 import { ClosedMarketTopDetails } from '../../../common/closed_market_top_details'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 
+const LeftButton = styled(Button)`
+  margin-right: auto;
+`
+
 interface Props {
   marketMakerData: MarketMakerData
-  theme?: any
 }
 
 const logger = getLogger('Market::ClosedMarketDetail')
@@ -35,7 +38,7 @@ const computeEarnedCollateral = (payouts: Maybe<number[]>, balances: BigNumber[]
   return bigNumberify(earnedCollateral.toString())
 }
 
-export const ClosedMarketDetailWrapper = (props: Props) => {
+export const ClosedMarketDetail = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
@@ -148,9 +151,6 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     <>
       <ViewCard>
         <ClosedMarketTopDetails collateral={collateral} marketMakerData={marketMakerData} />
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Balance</SubsectionTitle>
-        </SubsectionTitleWrapper>
         <OutcomeTable
           balances={balances}
           collateral={collateralToken}
@@ -161,21 +161,33 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
           withWinningOutcome={true}
         />
         <WhenConnected>
-          {hasWinningOutcomes && (
-            <MarketResolutionMessage
-              collateralToken={collateralToken}
-              earnedCollateral={earnedCollateral}
-              invalid={allPayoutsEqual}
-              userWinnerShares={userWinnerShares}
-              userWinnersOutcomes={userWinnersOutcomes}
-              winnersOutcomes={winnersOutcomes}
-            ></MarketResolutionMessage>
-          )}
+          {/* {hasWinningOutcomes && ( */}
+          <MarketResolutionMessage
+            collateralToken={collateralToken}
+            earnedCollateral={earnedCollateral}
+            invalid={allPayoutsEqual}
+            userWinnerShares={userWinnerShares}
+            userWinnersOutcomes={userWinnersOutcomes}
+            winnersOutcomes={winnersOutcomes}
+          ></MarketResolutionMessage>
+          {/* )} */}
           <ButtonContainer>
-            {isConditionResolved && hasWinningOutcomes && <Button onClick={() => redeem()}>Redeem</Button>}
             {!isConditionResolved && hasWinningOutcomes && (
-              <Button onClick={resolveCondition}>Resolve Condition</Button>
+              <LeftButton buttonType={ButtonType.secondaryLine} onClick={resolveCondition}>
+                Resolve Condition
+              </LeftButton>
             )}
+            {isConditionResolved && hasWinningOutcomes && (
+              <Button buttonType={ButtonType.primary} onClick={() => redeem()}>
+                Redeem
+              </Button>
+            )}
+            <LeftButton buttonType={ButtonType.secondaryLine} onClick={resolveCondition}>
+              Resolve Condition
+            </LeftButton>
+            <Button buttonType={ButtonType.primary} onClick={() => redeem()}>
+              Redeem
+            </Button>
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>
@@ -183,5 +195,3 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     </>
   )
 }
-
-export const ClosedMarketDetail = withTheme(ClosedMarketDetailWrapper)

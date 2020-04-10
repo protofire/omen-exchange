@@ -1,7 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
-import { MARKET_FEE } from '../../../../common/constants'
 import { use24hsVolume } from '../../../../hooks/use24hsVolume'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
@@ -32,21 +31,13 @@ const getMarketTitles = (templateId: Maybe<number>) => {
 const faqURL = 'https://docs.google.com/document/d/1w-mzDZBHqedSCxt_T319e-JzO5jFOMwsGseyCOqFwqQ'
 
 const ClosedMarketTopDetails: React.FC<Props> = (props: Props) => {
-  const { collateral, marketMakerData } = props
+  const { marketMakerData } = props
 
-  const {
-    address: marketMakerAddress,
-    arbitrator,
-    collateral: collateralToken,
-    marketMakerFunding: funding,
-    question,
-  } = marketMakerData
+  const { address: marketMakerAddress, arbitrator, collateral: collateralToken, question } = marketMakerData
 
   const lastDayVolume = use24hsVolume(marketMakerAddress)
   const { marketSubtitle, marketTitle } = getMarketTitles(question.templateId)
   const resolutionFormat = question.resolution ? formatDate(question.resolution) : ''
-  const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
-  const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${collateralToken.symbol}`
   const lastDayVolumeFormat = lastDayVolume
     ? `${formatBigNumber(lastDayVolume, collateralToken.decimals)} ${collateralToken.symbol}`
     : '-'
@@ -67,14 +58,11 @@ const ClosedMarketTopDetails: React.FC<Props> = (props: Props) => {
       </SubsectionTitleWrapper>
       <GridTwoColumns>
         <TitleValue title={'Category'} value={question.category} />
+        <TitleValue title={'Resolution Date'} value={resolutionFormat} />
         <TitleValue
-          title={'Arbitrator'}
+          title={'Arbitrator/Oracle'}
           value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
         />
-        <TitleValue title="Fee" value={`${MARKET_FEE}%`} />
-        <TitleValue title="Funding" value={fundingFormat} />
-        <TitleValue title={'Resolution Date'} value={resolutionFormat} />
-        <TitleValue title="Collateral" value={collateralFormat} />
         <TitleValue title={'24h Volume'} value={lastDayVolumeFormat} />
       </GridTwoColumns>
     </>
