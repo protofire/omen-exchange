@@ -176,7 +176,10 @@ export const ModalConnectWallet = (props: Props) => {
             />
             <TermsText className="clickable" htmlFor="termsCheck">
               I agree to the{' '}
-              <TermsLink href="#" target="_blank">
+              <TermsLink
+                href="https://docs.google.com/document/d/e/2PACX-1vQ_iFS4LhM89B_f7gxuZO3OjqAKIPLP2ODZBn26Fe88tHwc3KTM144cUr-r56C2RVS1_9JTBquFgSDn/pub"
+                target="_blank"
+              >
                 Terms and Conditions
               </TermsLink>
             </TermsText>
