@@ -83,7 +83,10 @@ export const Footer = () => {
           Privacy Policy
         </Link>
         <Break>-</Break>
-        <Link href="#" target="_blank">
+        <Link
+          href="https://docs.google.com/document/d/e/2PACX-1vQ_iFS4LhM89B_f7gxuZO3OjqAKIPLP2ODZBn26Fe88tHwc3KTM144cUr-r56C2RVS1_9JTBquFgSDn/pub"
+          target="_blank"
+        >
           Terms &amp; Conditions
         </Link>
         <Break>-</Break>
