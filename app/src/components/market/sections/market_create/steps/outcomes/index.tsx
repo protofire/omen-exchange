@@ -18,7 +18,7 @@ import {
   OutcomesTR,
   OutcomesTable,
   OutcomesTableWrapper,
-} from '../common_styled'
+} from '../../../../common/common_styled'
 
 const BUTTON_DIMENSIONS = '34px'
 

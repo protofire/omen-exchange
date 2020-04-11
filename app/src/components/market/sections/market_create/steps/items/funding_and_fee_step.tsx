@@ -16,15 +16,6 @@ import { BigNumberInput, FormError, SubsectionTitle, TextfieldCustomPlaceholder 
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { TitleValue } from '../../../../../common/text/title_value'
 import { FullLoading } from '../../../../../loading'
-import { CreateCard } from '../../../../common/create_card'
-import { CurrencySelector } from '../../../../common/currency_selector'
-import { DisplayArbitrator } from '../../../../common/display_arbitrator'
-import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
-import { NewValue } from '../../../../common/new_value'
-import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
-import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
-import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
-import { WalletBalance } from '../../../../common/wallet_balance'
 import {
   ButtonContainerFullWidth,
   ButtonWithReadyToGoStatus,
@@ -40,7 +31,16 @@ import {
   OutcomesTable,
   OutcomesTableWrapper,
   TDFlexDiv,
-} from '../common_styled'
+} from '../../../../common/common_styled'
+import { CreateCard } from '../../../../common/create_card'
+import { CurrencySelector } from '../../../../common/currency_selector'
+import { DisplayArbitrator } from '../../../../common/display_arbitrator'
+import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
+import { NewValue } from '../../../../common/new_value'
+import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
+import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
+import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
+import { WalletBalance } from '../../../../common/wallet_balance'
 import { Outcome } from '../outcomes'
 
 interface Props {

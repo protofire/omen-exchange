@@ -7,12 +7,8 @@ import { IS_CORONA_VERSION } from '../../../../common/constants'
 import { formatBigNumber } from '../../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
-import {
-  OutcomeItemLittleBallOfJoyAndDifferentColors,
-  OutcomeItemText,
-  OutcomeItemTextWrapper,
-} from '../../sections/market_create/steps/common_styled'
 import { BarDiagram } from '../bar_diagram_probabilities'
+import { OutcomeItemLittleBallOfJoyAndDifferentColors, OutcomeItemText, OutcomeItemTextWrapper } from '../common_styled'
 import { NewValue } from '../new_value'
 import { OwnedShares } from '../owned_shares'
 

@@ -8,16 +8,17 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/con
 import { CPKService, ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
-import { Button, ButtonContainer } from '../../../../button'
+import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
 import { ClosedMarketTopDetails } from '../../../common/closed_market_top_details'
+import { ButtonContainerFullWidth } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 
-const LeftButton = styled(Button)`
-  margin-right: auto;
+const MarketResolutionMessageStyled = styled(MarketResolutionMessage)`
+  margin-top: 20px;
 `
 
 interface Props {
@@ -47,6 +48,7 @@ export const ClosedMarketDetail = (props: Props) => {
 
   const {
     address: marketMakerAddress,
+    arbitrator,
     balances,
     collateral: collateralToken,
     isConditionResolved,
@@ -161,34 +163,34 @@ export const ClosedMarketDetail = (props: Props) => {
           withWinningOutcome={true}
         />
         <WhenConnected>
-          {/* {hasWinningOutcomes && ( */}
-          <MarketResolutionMessage
-            collateralToken={collateralToken}
-            earnedCollateral={earnedCollateral}
-            invalid={allPayoutsEqual}
-            userWinnerShares={userWinnerShares}
-            userWinnersOutcomes={userWinnersOutcomes}
-            winnersOutcomes={winnersOutcomes}
-          ></MarketResolutionMessage>
-          {/* )} */}
-          <ButtonContainer>
-            {!isConditionResolved && hasWinningOutcomes && (
-              <LeftButton buttonType={ButtonType.secondaryLine} onClick={resolveCondition}>
-                Resolve Condition
-              </LeftButton>
-            )}
-            {isConditionResolved && hasWinningOutcomes && (
-              <Button buttonType={ButtonType.primary} onClick={() => redeem()}>
-                Redeem
-              </Button>
-            )}
-            <LeftButton buttonType={ButtonType.secondaryLine} onClick={resolveCondition}>
-              Resolve Condition
-            </LeftButton>
-            <Button buttonType={ButtonType.primary} onClick={() => redeem()}>
-              Redeem
-            </Button>
-          </ButtonContainer>
+          {hasWinningOutcomes && (
+            <MarketResolutionMessageStyled
+              arbitrator={arbitrator}
+              collateralToken={collateralToken}
+              earnedCollateral={earnedCollateral}
+              invalid={allPayoutsEqual}
+              userWinnerShares={userWinnerShares}
+              userWinnersOutcomes={userWinnersOutcomes}
+              winnersOutcomes={winnersOutcomes}
+            ></MarketResolutionMessageStyled>
+          )}
+          {isConditionResolved ||
+            (hasWinningOutcomes && (
+              <>
+                <ButtonContainerFullWidth borderTop={true}>
+                  {!isConditionResolved && hasWinningOutcomes && (
+                    <Button buttonType={ButtonType.primary} onClick={resolveCondition}>
+                      Resolve Condition
+                    </Button>
+                  )}
+                  {isConditionResolved && hasWinningOutcomes && (
+                    <Button buttonType={ButtonType.primary} onClick={() => redeem()}>
+                      Redeem
+                    </Button>
+                  )}
+                </ButtonContainerFullWidth>
+              </>
+            ))}
         </WhenConnected>
       </ViewCard>
       {status === Status.Loading && <FullLoading message={message} />}

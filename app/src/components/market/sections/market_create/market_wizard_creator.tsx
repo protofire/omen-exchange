@@ -28,28 +28,17 @@ export const MarketWizardCreator = (props: Props) => {
   const defaultArbitrator = getDefaultArbitrator(networkId)
 
   const marketDataDefault: MarketData = {
-    collateral: defaultCollateral,
+    arbitrator: defaultArbitrator,
     arbitratorsCustom: [],
     categoriesCustom: [],
-    question: '',
     category: '',
-    resolution: null,
-    arbitrator: defaultArbitrator,
-    spread: MARKET_FEE,
+    collateral: defaultCollateral,
     funding: new BigNumber('0'),
-    // I'll comment this out for now, new design shows no outcomes by default
-    // outcomes: [
-    //   {
-    //     name: 'Yes',
-    //     probability: 50,
-    //   },
-    //   {
-    //     name: 'No',
-    //     probability: 50,
-    //   },
-    // ],
-    outcomes: [],
     loadedQuestionId: null,
+    outcomes: [],
+    question: '',
+    resolution: null,
+    spread: MARKET_FEE,
   }
 
   const [currentStep, setCurrentStep] = useState(1)

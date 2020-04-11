@@ -11,8 +11,8 @@ import { DateField, FormRow } from '../../../../../common'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
+import { ButtonContainerFullWidth, ButtonWithReadyToGoStatus, LeftButton } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
-import { ButtonContainerFullWidth, ButtonWithReadyToGoStatus, LeftButton } from '../common_styled'
 import { Outcome, Outcomes } from '../outcomes'
 
 const ButtonCategoryFocusCSS = css`

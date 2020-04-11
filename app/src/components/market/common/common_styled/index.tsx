@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components'
 
-import { Button, ButtonContainer } from '../../../../../button'
+import { Button, ButtonContainer } from '../../../button'
 
 export const LeftButton = styled(Button)`
   margin-right: auto;

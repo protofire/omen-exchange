@@ -61,12 +61,12 @@ class RealitioService {
    * question
    */
   askQuestion = async (
-    question: string,
-    outcomes: Outcome[],
-    category: string,
     arbitratorAddress: string,
-    openingDateMoment: Moment,
+    category: string,
     networkId: number,
+    openingDateMoment: Moment,
+    outcomes: Outcome[],
+    question: string,
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
