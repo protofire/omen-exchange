@@ -36,7 +36,6 @@ const WrongNetworkMessageContainer = () => {
           The valid networks to use are{' '}
           <strong>
             {Object.keys(networkIds)
-              .filter((networkLabel: string) => networkLabel !== 'GANACHE')
               .join(', ')
               .toLowerCase()}
           </strong>
