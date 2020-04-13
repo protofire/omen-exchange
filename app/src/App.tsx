@@ -1,4 +1,3 @@
-import { ApolloProvider } from '@apollo/react-hooks'
 import { configureStore } from '@reduxjs/toolkit'
 import React from 'react'
 import { Provider } from 'react-redux'
@@ -8,8 +7,9 @@ import Web3Provider from 'web3-react'
 import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
 
-import { client } from './apolloClientConfig'
 import { Main } from './components/main'
+import { ApolloProviderWrapper } from './contexts/Apollo'
+import { ConnectedWeb3 } from './hooks'
 import balanceReducer from './store/reducer'
 import theme from './theme'
 import { GlobalStyle } from './theme/component_styles/global_style'
@@ -19,16 +19,18 @@ const store = configureStore({ reducer: balanceReducer })
 
 const App: React.FC = () => {
   return (
-    <ApolloProvider client={client}>
-      <ThemeProvider theme={theme}>
-        <Web3Provider connectors={connectors} libraryName="ethers.js">
-          <Provider store={store}>
-            <GlobalStyle />
-            <Main />
-          </Provider>
-        </Web3Provider>
-      </ThemeProvider>
-    </ApolloProvider>
+    <ThemeProvider theme={theme}>
+      <Web3Provider connectors={connectors} libraryName="ethers.js">
+        <ConnectedWeb3>
+          <ApolloProviderWrapper>
+            <Provider store={store}>
+              <GlobalStyle />
+              <Main />
+            </Provider>
+          </ApolloProviderWrapper>
+        </ConnectedWeb3>
+      </Web3Provider>
+    </ThemeProvider>
   )
 }
 
