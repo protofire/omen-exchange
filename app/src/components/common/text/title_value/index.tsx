@@ -40,10 +40,10 @@ const Value = styled.p<{ state: ValueStates }>`
       (props.state === ValueStates.success && props.theme.colors.green) ||
       (props.state === ValueStates.error && props.theme.colors.error) ||
       props.theme.colors.textColor};
-    text-decoration: none;
+    text-decoration: underline;
 
     &:hover {
-      text-decoration: underline;
+      text-decoration: none;
     }
   }
 `
