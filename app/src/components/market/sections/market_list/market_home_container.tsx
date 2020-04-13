@@ -41,7 +41,13 @@ const MarketHomeContainer: React.FC = () => {
     isCoronaVersion: IS_CORONA_VERSION,
     ...filter,
   })
-  const marketsQueryVariables = { first: PAGE_SIZE, skip: 0, accounts: [cpkAddress], fee: feeBN.toString(), ...filter }
+  const marketsQueryVariables = {
+    first: PAGE_SIZE,
+    skip: 0,
+    accounts: cpkAddress ? [cpkAddress] : null,
+    fee: feeBN.toString(),
+    ...filter,
+  }
   if (IS_CORONA_VERSION) {
     marketsQueryVariables.accounts = CORONA_MARKET_CREATORS
   }
