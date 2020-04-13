@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { ERC20Service } from '../../../services'
+import { getERC20Token } from '../../../hooks/useBlockchainMarketMakerData'
 import { calcPrice } from '../../../util/tools'
 
 const Wrapper = styled(NavLink)`
@@ -57,7 +57,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const ListItem: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { account, library: provider } = context
+  const { library: provider } = context
   const [amount, setAmount] = useState('')
   const [symbol, setSymbol] = useState('')
 
@@ -78,11 +78,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     const setToken = async () => {
-      if (!account) {
-        return
-      }
-      const erc20Service = new ERC20Service(provider, account, collateralToken)
-      const { decimals, symbol } = await erc20Service.getProfileSummary()
+      const { decimals, symbol } = await getERC20Token(provider, collateralToken)
 
       const amount = ethers.utils.formatUnits(collateralVolume, decimals)
 
@@ -91,7 +87,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     }
 
     setToken()
-  }, [collateralToken, account, collateralVolume, provider])
+  }, [collateralToken, collateralVolume, provider])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
