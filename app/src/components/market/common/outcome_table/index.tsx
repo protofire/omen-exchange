@@ -7,6 +7,7 @@ import { IS_CORONA_VERSION } from '../../../../common/constants'
 import { formatBigNumber } from '../../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
+import { DragonBallIcon } from '../../../common/icons'
 import { BarDiagram } from '../bar_diagram_probabilities'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors, OutcomeItemText, OutcomeItemTextWrapper } from '../common_styled'
 import { NewValue } from '../new_value'
@@ -58,6 +59,45 @@ const TDFlexDiv = styled.div<{ textAlign?: string }>`
     props.textAlign && 'right' ? 'flex-end' : props.textAlign && 'center' ? 'center' : 'flex-start'};
 `
 
+const BadgeWrapper = styled.div<{ outcomeIndex: number }>`
+  align-items: center;
+  display: flex;
+  margin: 0 0 0 12px;
+
+  .dragonBallIcon {
+    margin: 0 8px 0 0;
+  }
+
+  .fill {
+    fill: ${props =>
+      props.theme.outcomes.colors[props.outcomeIndex].darker
+        ? props.theme.outcomes.colors[props.outcomeIndex].darker
+        : '#333'};
+  }
+`
+
+const BadgeText = styled.div<{ outcomeIndex: number }>`
+  color: ${props =>
+    props.theme.outcomes.colors[props.outcomeIndex].darker
+      ? props.theme.outcomes.colors[props.outcomeIndex].darker
+      : '#333'};
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+`
+
+const RedeemText = styled.div<{ outcomeIndex: number }>`
+  color: ${props =>
+    props.theme.outcomes.colors[props.outcomeIndex].darker
+      ? props.theme.outcomes.colors[props.outcomeIndex].darker
+      : '#333'};
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 12px 0 0 0;
+  text-align: left;
+`
+
 export const OutcomeTable = (props: Props) => {
   const {
     balances,
@@ -72,20 +112,34 @@ export const OutcomeTable = (props: Props) => {
   } = props
 
   const WinningOutcome = (props: any) => {
+    const { index } = props
+
+    return (
+      payouts && (
+        <BadgeWrapper outcomeIndex={index}>
+          <DragonBallIcon />
+          <BadgeText outcomeIndex={index}>
+            {payouts[index] < 1 ? `${payouts[index] * 100}% ` : ''} Winning Outcome
+          </BadgeText>
+        </BadgeWrapper>
+      )
+    )
+  }
+
+  const RedeemAmount = (props: any) => {
     const { balance, index } = props
 
-    if (payouts) {
-      const shares = new Big(balance.shares.toString())
-      const redeemable = new BigNumber(shares.mul(payouts[index]).toString())
-      return (
-        <>
-          <div>{payouts[index] < 1 ? `${payouts[index] * 100}% ` : ''}Winning Outcome</div>
-          {`Redeem ${formatBigNumber(redeemable, collateral.decimals)}`}
-        </>
-      )
-    } else {
-      return <></>
-    }
+    if (!payouts) return null
+
+    const shares = new Big(balance.shares.toString())
+    const redeemable = new BigNumber(shares.mul(payouts[index]).toString())
+
+    return (
+      <RedeemText outcomeIndex={index}>{`Redeem ${formatBigNumber(
+        redeemable,
+        collateral.decimals,
+      )} (${shares} Shares)`}</RedeemText>
+    )
   }
 
   const TableHead: OutcomeTableValue[] = [
@@ -155,10 +209,11 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.Outcome) ? null : (
           <TDStyled textAlign={TableCellsAlign[4]}>
             <OutcomeItemTextWrapper>
-              <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={outcomeIndex} />
+              {!isWinningOutcome && <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={outcomeIndex} />}
               <OutcomeItemText>{outcomeName}</OutcomeItemText>
+              {isWinningOutcome && <WinningOutcome balance={balanceItem} index={outcomeIndex} />}
             </OutcomeItemTextWrapper>
-            {isWinningOutcome && <WinningOutcome balance={balanceItem} index={outcomeIndex} />}
+            {isWinningOutcome && <RedeemAmount balance={balanceItem} index={outcomeIndex} />}
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Probability) ? null : (

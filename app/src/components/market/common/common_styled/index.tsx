@@ -106,16 +106,16 @@ export const OutcomeItemText = styled.div`
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
-  margin: 0 0 0 16px;
   text-align: left;
   white-space: nowrap;
 `
 
 export const OutcomeItemLittleBallOfJoyAndDifferentColors = styled.div<{ outcomeIndex: number }>`
   background-color: ${props => props.theme.outcomes.colors[props.outcomeIndex].medium};
-  width: 12px;
-  height: 12px;
   border-radius: 50%;
+  height: 12px;
+  margin: 0 16px 0 0;
+  width: 12px;
 `
 
 export const OutcomeItemProbability = styled.div`
