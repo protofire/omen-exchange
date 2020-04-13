@@ -6,7 +6,7 @@ import { bigNumberify } from 'ethers/utils'
 import { Moment } from 'moment'
 
 import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from '../common/constants'
-import { Outcome } from '../components/market/steps/outcomes'
+import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck, getRealitioTimeout } from '../util/networks'
 import { Question, QuestionLog } from '../util/types'
@@ -61,12 +61,12 @@ class RealitioService {
    * question
    */
   askQuestion = async (
-    question: string,
-    outcomes: Outcome[],
-    category: string,
     arbitratorAddress: string,
-    openingDateMoment: Moment,
+    category: string,
     networkId: number,
+    openingDateMoment: Moment,
+    outcomes: Outcome[],
+    question: string,
   ): Promise<string> => {
     const openingTimestamp = openingDateMoment.unix()
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
