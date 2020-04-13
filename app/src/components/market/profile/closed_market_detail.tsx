@@ -1,6 +1,6 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 
 import { MARKET_FEE } from '../../../common/constants'
@@ -68,7 +68,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
   const [message, setMessage] = useState('')
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
-  const marketMaker = buildMarketMaker(marketMakerAddress)
+  const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const resolveCondition = async () => {
     try {
@@ -100,7 +100,7 @@ export const ClosedMarketDetailWrapper = (props: Props) => {
     return () => {
       isSubscribed = false
     }
-  }, [collateral, provider, account, marketMakerAddress, marketMaker])
+  }, [provider, account, marketMakerAddress, marketMaker])
 
   const fundingFormat = formatBigNumber(funding, collateralToken.decimals)
   const collateralFormat = `${formatBigNumber(collateral, collateralToken.decimals)} ${collateralToken.symbol}`
