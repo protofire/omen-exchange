@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet'
 
 import { DOCUMENT_TITLE } from '../../../../common/constants'
 import { MarketMakerData } from '../../../../util/types'
-import { SectionTitle } from '../../../common'
+import { SectionTitle } from '../../../common/text/section_title'
 
 import { ClosedMarketDetail } from './market_status/closed'
 import { OpenMarketDetails } from './market_status/open'
@@ -27,7 +27,7 @@ const MarketView: React.FC<Props> = (props: Props) => {
       <Helmet>
         <title>{`${question.title} - ${DOCUMENT_TITLE}`}</title>
       </Helmet>
-      <SectionTitle goBackEnabled title={question.title} />
+      <SectionTitle backTo="/" title={question.title} />
       {renderView()}
     </>
   )

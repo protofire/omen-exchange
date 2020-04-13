@@ -17,8 +17,9 @@ import { calcDepositedTokens, calcPoolTokens, formatBigNumber } from '../../../.
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, SectionTitle, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { SectionTitle } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketTopDetails } from '../../common/market_top_details'
@@ -74,13 +75,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
 
   const [activeTab, setActiveTab] = useState(Tabs.deposit)
-
-  // const marketMakerFundingPercentage: Maybe<number> = marketMakerFunding.isZero()
-  //   ? null
-  //   : 100 * divBN(marketMakerUserFunding, marketMakerFunding)
-  // const userPoolSharesPercentage: Maybe<number> = totalPoolShares.isZero()
-  //   ? null
-  //   : 100 * divBN(userPoolShares, totalPoolShares)
 
   const poolTokens = calcPoolTokens(
     amountToFund,
@@ -175,10 +169,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const showSetAllowance = allowanceFinished || hasZeroAllowance || !hasEnoughAllowance
 
   const depositedTokensTotal = depositedTokens.add(userEarnings)
+  const goBackToAddress = `/${marketMakerAddress}`
 
   return (
     <>
-      <SectionTitle goBackEnabled title={question.title} />
+      <SectionTitle backTo={goBackToAddress} title={question.title} />
       <ViewCard>
         <MarketTopDetails
           marketMakerData={marketMakerData}
@@ -291,10 +286,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           />
         )}
         <ButtonContainer>
-          <LeftButton
-            buttonType={ButtonType.secondaryLine}
-            onClick={() => props.history.push(`/${marketMakerAddress}`)}
-          >
+          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
             Cancel
           </LeftButton>
           {activeTab === Tabs.deposit && (

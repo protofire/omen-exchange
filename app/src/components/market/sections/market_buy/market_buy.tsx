@@ -17,8 +17,9 @@ import { computeBalanceAfterTrade, formatBigNumber } from '../../../../util/tool
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, SectionTitle, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { SectionTitle } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { ModalTwitterShare } from '../../../modal/modal_twitter_share'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
@@ -165,10 +166,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const hasZeroAllowance = allowance && allowance.isZero()
   const showSetAllowance = allowanceFinished || hasZeroAllowance || !hasEnoughAllowance
+  const goBackToAddress = `/${marketMakerAddress}`
 
   return (
     <>
-      <SectionTitle goBackEnabled title={question.title} />
+      <SectionTitle backTo={goBackToAddress} title={question.title} />
       <ViewCard>
         <MarketTopDetails
           marketMakerData={marketMakerData}
@@ -232,10 +234,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           />
         )}
         <ButtonContainer>
-          <LeftButton
-            buttonType={ButtonType.secondaryLine}
-            onClick={() => props.history.push(`/${marketMakerAddress}`)}
-          >
+          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
             Cancel
           </LeftButton>
           <Button buttonType={ButtonType.secondaryLine} disabled={error} onClick={() => finish()}>
