@@ -13,7 +13,12 @@ import { GraphMarketMakerData } from './useGraphMarketMakerData'
 
 const logger = getLogger('useBlockchainMarketMakerData')
 
-const getBalances = (outcomes: string[], marketMakerShares: BigNumber[], userShares: BigNumber[]): BalanceItem[] => {
+const getBalances = (
+  outcomes: string[],
+  marketMakerShares: BigNumber[],
+  userShares: BigNumber[],
+  payouts: Maybe<number[]>,
+): BalanceItem[] => {
   const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
   const balances: BalanceItem[] = outcomes.map((outcome: string, index: number) => {
@@ -29,6 +34,7 @@ const getBalances = (outcomes: string[], marketMakerShares: BigNumber[], userSha
       currentPrice,
       shares,
       holdings,
+      payout: payouts ? payouts[index] : 0,
     }
   })
 

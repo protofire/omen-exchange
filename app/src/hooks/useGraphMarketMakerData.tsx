@@ -37,32 +37,34 @@ const query = gql`
   }
 `
 
-type GraphResponse = {
-  fixedProductMarketMaker: {
+type GraphResponseFixedProductMarketMaker = {
+  id: string
+  answerFinalizedTimestamp: Maybe<string>
+  arbitrator: string
+  category: string
+  collateralToken: string
+  collateralVolume: string
+  condition: { id: string }
+  creator: string
+  currentAnswer: string
+  fee: string
+  language: string
+  openingTimestamp: string
+  outcomeTokenAmounts: string[]
+  outcomes: Maybe<string[]>
+  payouts: Maybe<string[]>
+  question: {
     id: string
-    answerFinalizedTimestamp: Maybe<string>
-    arbitrator: string
-    category: string
-    collateralToken: string
-    collateralVolume: string
-    condition: { id: string }
-    creator: string
-    currentAnswer: string
-    fee: string
-    language: string
-    openingTimestamp: string
-    outcomeTokenAmounts: string[]
-    outcomes: Maybe<string[]>
-    payouts: Maybe<string[]>
-    question: {
-      id: string
-      data: string
-    }
-    resolutionTimestamp: string
-    templateId: string
-    timeout: string
-    title: string
+    data: string
   }
+  resolutionTimestamp: string
+  templateId: string
+  timeout: string
+  title: string
+}
+
+type GraphResponse = {
+  fixedProductMarketMaker: Maybe<GraphResponseFixedProductMarketMaker>
 }
 
 export type GraphMarketMakerData = {
@@ -90,9 +92,7 @@ const getOutcomes = (networkId: number, templateId: number) => {
   }
 }
 
-const wrangleResponse = (response: GraphResponse, networkId: number): GraphMarketMakerData => {
-  const data = response.fixedProductMarketMaker
-
+const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: number): GraphMarketMakerData => {
   const outcomes = data.outcomes ? data.outcomes : getOutcomes(networkId, +data.templateId)
 
   return {
@@ -128,8 +128,8 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
     variables: { id: marketMakerAddress },
   })
 
-  if (data && !marketMakerData) {
-    setMarketMakerData(wrangleResponse(data, networkId))
+  if (data && data.fixedProductMarketMaker && !marketMakerData) {
+    setMarketMakerData(wrangleResponse(data.fixedProductMarketMaker, networkId))
   }
 
   return {
