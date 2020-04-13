@@ -35,7 +35,8 @@ const Disclaimer = styled.div`
   background: rgba(128, 128, 128, 0.9);
   bottom: 0;
   display: flex;
-  height: 40px;
+  flex-direction: column;
+  min-height: 40px;
   justify-content: center;
   left: 0;
   position: fixed;
@@ -47,6 +48,8 @@ const DisclaimerText = styled.div`
   color: #fff;
   font-size: 13px;
   font-weight: 500;
+  max-width: 900px;
+  padding: 10px;
   text-align: center;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
 `
@@ -54,7 +57,7 @@ const DisclaimerText = styled.div`
 const ButtonStyled = styled(Button)`
   font-size: 12px;
   height: 20px;
-  margin-left: 10px;
+  margin-bottom: 10px;
 `
 
 enum DisclaimerStates {
@@ -101,8 +104,11 @@ export const Footer = () => {
       {acceptedDisclaimer !== DisclaimerStates.hidden && (
         <Disclaimer>
           <DisclaimerText>
-            <strong>Disclaimer:</strong> No medical information is being presented on &quot;Corona Information
-            Markets&quot;, this is a temporary non-profit project.
+            <strong>Disclaimer:</strong> This site, its content and features (together, the &quot;Corona Information
+            Markets&quot;) are provided on a strictly NON-PROFIT NON-FEE BASIS, AS IS and AT YOUR OWN RISK for the sole
+            purpose of fighting the COVID-19 pandemic. Reliance on the Corona Information Markets for medical or other
+            professional guidance or their commercial use is strictly prohibited. Participation in the markets can
+            result in financial loss.
           </DisclaimerText>
           <ButtonStyled buttonType={ButtonType.primaryLine} onClick={toggleDisclaimer}>
             OK
