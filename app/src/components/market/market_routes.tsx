@@ -52,8 +52,6 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
     return <SectionTitle title={'Invalid market'} />
   }
 
-  console.log('marketMakerAddress ' + marketMakerAddress)
-
   return (
     <Switch>
       <>

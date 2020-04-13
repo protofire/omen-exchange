@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
-import { CPKService, ERC20Service, MarketMakerService } from '../services'
+import { CPKService, ERC20Service, MarketMakerService, OracleService } from '../services'
 import { getLogger } from '../util/logger'
 import { getArbitratorFromAddress } from '../util/networks'
 import { promiseProps } from '../util/tools'
@@ -72,6 +72,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       marketMakerFunding,
       marketMakerShares,
       marketMakerUserFunding,
+      realitioAnswer,
       totalEarnings,
       totalPoolShares,
       userEarnings,
@@ -87,6 +88,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       isConditionResolved: conditionalTokens.isConditionResolved(graphMarketMakerData.conditionId),
       marketMakerFunding: marketMaker.getTotalSupply(),
       marketMakerUserFunding: cpk && cpk.address ? marketMaker.balanceOf(cpk.address) : new BigNumber(0),
+      realitioAnswer: isQuestionFinalized ? contracts.realitio.getResultFor(graphMarketMakerData.question.id) : null,
       totalEarnings: marketMaker.getCollectedFees(),
       totalPoolShares: marketMaker.poolSharesTotalSupply(),
       userEarnings: cpk && cpk.address ? marketMaker.getFeesWithdrawableBy(cpk.address) : new BigNumber(0),
@@ -94,7 +96,10 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
     })
 
     const arbitrator = getArbitratorFromAddress(networkId, graphMarketMakerData.arbitratorAddress)
-    const balances = getBalances(outcomes, marketMakerShares, userShares)
+    const payouts = realitioAnswer
+      ? OracleService.getPayouts(graphMarketMakerData.question.templateId, realitioAnswer, outcomes.length)
+      : null
+    const balances = getBalances(outcomes, marketMakerShares, userShares, payouts)
 
     const newMarketMakerData: MarketMakerData = {
       address: graphMarketMakerData.address,
@@ -106,7 +111,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       isQuestionFinalized,
       marketMakerFunding,
       marketMakerUserFunding,
-      payouts: graphMarketMakerData.payouts,
+      payouts,
       question: graphMarketMakerData.question,
       totalEarnings,
       totalPoolShares,

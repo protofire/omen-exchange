@@ -72,7 +72,6 @@ export type GraphMarketMakerData = {
   collateralAddress: string
   conditionId: string
   fee: BigNumber
-  payouts: Maybe<number[]>
   question: Question
 }
 
@@ -103,7 +102,6 @@ const wrangleResponse = (response: GraphResponse, networkId: number): GraphMarke
     collateralAddress: data.collateralToken,
     conditionId: data.condition.id,
     fee: bigNumberify(data.fee),
-    payouts: data.payouts ? data.payouts.map(Number) : null,
     question: {
       id: data.question.id,
       templateId: +data.templateId,
