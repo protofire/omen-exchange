@@ -29,11 +29,14 @@ export const CATEGORIES = [
   'Miscellaneous',
 ]
 
-// eslint-disable-next-line no-warning-comments
-// TODO: update the graph url with the right one
-export const GRAPH_HTTP =
-  process.env.REACT_APP_GRAPH_HTTP || 'https://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
-export const GRAPH_WS = process.env.REACT_APP_GRAPH_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
+export const GRAPH_MAINNET_HTTP =
+  process.env.REACT_APP_GRAPH_MAINNET_HTTP || 'https://api.thegraph.com/subgraphs/name/gnosis/omen'
+export const GRAPH_MAINNET_WS =
+  process.env.REACT_APP_GRAPH_MAINNET_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen'
+export const GRAPH_RINKEBY_HTTP =
+  process.env.REACT_APP_GRAPH_RINKEBY_HTTP || 'https://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
+export const GRAPH_RINKEBY_WS =
+  process.env.REACT_APP_GRAPH_RINKEBY_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
 
 // Corona version options
 export const IS_CORONA_VERSION = process.env.REACT_APP_IS_CORONA_VERSION === 'true'

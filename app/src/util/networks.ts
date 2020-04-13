@@ -2,6 +2,10 @@ import {
   CORONA_REALITIO_ARBITRATOR,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+  GRAPH_MAINNET_HTTP,
+  GRAPH_MAINNET_WS,
+  GRAPH_RINKEBY_HTTP,
+  GRAPH_RINKEBY_WS,
   INFURA_PROJECT_ID,
   IS_CORONA_VERSION,
 } from '../common/constants'
@@ -26,6 +30,8 @@ type CPKAddresses = {
 interface Network {
   label: string
   url: string
+  graphHttpUri: string
+  graphWsUri: string
   realitioTimeout: number
   earliestBlockToCheck: number
   contracts: {
@@ -55,6 +61,8 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     label: 'Mainnet',
     url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+    graphHttpUri: GRAPH_MAINNET_HTTP,
+    graphWsUri: GRAPH_MAINNET_WS,
     realitioTimeout: 86400,
     earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK,
     contracts: {
@@ -70,6 +78,8 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
     url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
+    graphHttpUri: GRAPH_RINKEBY_HTTP,
+    graphWsUri: GRAPH_RINKEBY_WS,
     realitioTimeout: 10,
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     contracts: {
@@ -402,4 +412,14 @@ export const getCPKAddresses = (networkId: number): Maybe<CPKAddresses> => {
 
   const cpkAddresses = networks[networkId].cpk
   return cpkAddresses || null
+}
+
+export const getGraphUris = (networkId: number): { httpUri: string; wsUri: string } => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  const httpUri = networks[networkId].graphHttpUri
+  const wsUri = networks[networkId].graphWsUri
+  return { httpUri, wsUri }
 }
