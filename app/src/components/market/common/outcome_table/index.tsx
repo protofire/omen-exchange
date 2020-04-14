@@ -128,10 +128,10 @@ export const OutcomeTable = (props: Props) => {
 
   const RedeemAmount = (props: any) => {
     const { balance, index } = props
-
-    if (!payouts) return null
-
     const shares = new Big(balance.shares.toString())
+
+    if (!payouts || shares.eq(0)) return null
+
     const redeemable = new BigNumber(shares.mul(payouts[index]).toString())
 
     return (
@@ -210,7 +210,7 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.Outcome) ? null : (
           <TDStyled textAlign={TableCellsAlign[4]}>
             <OutcomeItemTextWrapper>
-              {!isWinningOutcome && <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={outcomeIndex} />}
+              {<OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={outcomeIndex} />}
               <OutcomeItemText>{outcomeName}</OutcomeItemText>
               {isWinningOutcome && <WinningOutcome balance={balanceItem} index={outcomeIndex} />}
             </OutcomeItemTextWrapper>
