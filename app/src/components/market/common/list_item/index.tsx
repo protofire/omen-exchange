@@ -77,12 +77,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     const setToken = async () => {
-      if (!account) {
-        return
-      }
       const erc20Service = new ERC20Service(provider, account, collateralToken)
       const { decimals, symbol } = await erc20Service.getProfileSummary()
-
       const amount = formatBigNumber(collateralVolume, decimals)
 
       setAmount(amount)
@@ -90,7 +86,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     }
 
     setToken()
-  }, [collateralToken, account, collateralVolume, provider])
+  }, [account, collateralToken, collateralVolume, provider])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
