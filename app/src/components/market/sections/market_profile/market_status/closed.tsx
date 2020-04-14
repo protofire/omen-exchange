@@ -178,12 +178,16 @@ export const ClosedMarketDetail = (props: Props) => {
             <>
               <ButtonContainerFullWidth borderTop={true}>
                 {!isConditionResolved && (
-                  <Button buttonType={ButtonType.primary} onClick={resolveCondition}>
+                  <Button
+                    buttonType={ButtonType.primary}
+                    disabled={status === Status.Loading}
+                    onClick={resolveCondition}
+                  >
                     Resolve Condition
                   </Button>
                 )}
                 {isConditionResolved && hasWinningOutcomes && (
-                  <Button buttonType={ButtonType.primary} onClick={() => redeem()}>
+                  <Button buttonType={ButtonType.primary} disabled={status === Status.Loading} onClick={() => redeem()}>
                     Redeem
                   </Button>
                 )}
