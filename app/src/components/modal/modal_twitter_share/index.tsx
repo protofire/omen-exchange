@@ -2,7 +2,7 @@ import React, { HTMLAttributes } from 'react'
 import { TwitterIcon, TwitterShareButton } from 'react-share'
 import styled from 'styled-components'
 
-import { Well } from '../../common/well'
+import { Well } from '../../common/text/well'
 import { ModalWrapper } from '../../modal/modal_wrapper'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {

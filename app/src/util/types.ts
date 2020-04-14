@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 
-import { Outcome } from '../components/market/steps/outcomes'
+import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
 
 export enum Status {
   Ready = 'Ready',
@@ -15,6 +15,7 @@ export interface BalanceItem {
   probability: number
   currentPrice: number
   shares: BigNumber
+  payout: number
   holdings: BigNumber
 }
 

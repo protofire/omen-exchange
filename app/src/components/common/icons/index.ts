@@ -1,4 +1,5 @@
 export { AddIcon } from './AddIcon'
+export { DragonBallIcon } from './DragonBallIcon'
 export { DxDaoIcon } from './DxDaoIcon'
 export { IconArrowBack } from './IconArrowBack'
 export { IconChevronLeft } from './IconChevronLeft'
