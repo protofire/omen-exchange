@@ -15,6 +15,7 @@ export interface BalanceItem {
   probability: number
   currentPrice: number
   shares: BigNumber
+  payout: number
   holdings: BigNumber
 }
 

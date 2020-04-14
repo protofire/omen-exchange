@@ -19,6 +19,7 @@ const getBalances = (yes: Partial<BalanceItem> = {}, no: Partial<BalanceItem> = 
       shares: new BigNumber(0),
       holdings: new BigNumber(0),
       winningOutcome: false,
+      payout: 0,
       ...yes,
     },
     {
@@ -28,6 +29,7 @@ const getBalances = (yes: Partial<BalanceItem> = {}, no: Partial<BalanceItem> = 
       shares: new BigNumber(0),
       holdings: new BigNumber(0),
       winningOutcome: false,
+      payout: 0,
       ...no,
     },
   ]

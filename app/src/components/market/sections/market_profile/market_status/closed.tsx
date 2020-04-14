@@ -1,6 +1,6 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { useContracts } from '../../../../../hooks'
@@ -60,7 +60,7 @@ export const ClosedMarketDetail = (props: Props) => {
   const [message, setMessage] = useState('')
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
-  const marketMaker = buildMarketMaker(marketMakerAddress)
+  const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const resolveCondition = async () => {
     try {
@@ -92,7 +92,7 @@ export const ClosedMarketDetail = (props: Props) => {
     return () => {
       isSubscribed = false
     }
-  }, [collateral, provider, account, marketMakerAddress, marketMaker])
+  }, [provider, account, marketMakerAddress, marketMaker])
 
   const earnedCollateral = computeEarnedCollateral(
     payouts,
