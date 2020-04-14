@@ -41,7 +41,7 @@ const getBalances = (
   return balances
 }
 
-export const getERC20Token = async (provider: any, address: string): Promise<Token> => {
+const getERC20Token = async (provider: any, address: string): Promise<Token> => {
   const erc20Service = new ERC20Service(provider, null, address)
   const token = await erc20Service.getProfileSummary()
 
