@@ -4,7 +4,7 @@ import React from 'react'
 import styled, { css } from 'styled-components'
 
 import { IS_CORONA_VERSION } from '../../../../common/constants'
-import { formatBigNumber } from '../../../../util/tools'
+import { formatBigNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
 import { DragonBallIcon } from '../../../common/icons'
@@ -174,11 +174,12 @@ export const OutcomeTable = (props: Props) => {
   }
 
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
-    const { currentPrice, outcomeName, shares } = balanceItem
+    const { currentPrice, outcomeName, payout, shares } = balanceItem
     const currentPriceFormatted = Number(currentPrice).toFixed(2)
     const probability = probabilities[outcomeIndex]
     const isOutcomeSelected = outcomeSelected === outcomeIndex
     const showSharesAndPriceChange = isOutcomeSelected && !IS_CORONA_VERSION
+    const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
 
     return (
@@ -240,7 +241,7 @@ export const OutcomeTable = (props: Props) => {
           <TDStyled textAlign={TableCellsAlign[3]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Payout) ? null : withWinningOutcome && payouts ? (
-          <TDStyled textAlign={TableCellsAlign[4]}>{payouts[outcomeIndex]}</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[4]}>{formattedPayout}</TDStyled>
         ) : (
           <TDStyled textAlign={TableCellsAlign[4]}>0.00</TDStyled>
         )}
