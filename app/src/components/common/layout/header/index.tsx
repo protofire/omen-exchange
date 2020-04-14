@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
 import { IS_CORONA_VERSION } from '../../../../common/constants'
@@ -28,6 +28,7 @@ const HeaderInner = styled.div`
   align-items: center;
   display: flex;
   flex-direction: row;
+  height: 100%;
   justify-content: space-between;
   margin: 0 auto;
   max-width: 100%;
@@ -38,6 +39,14 @@ const HeaderInner = styled.div`
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     padding: 0 ${props => props.theme.paddings.mainPadding};
   }
+`
+
+const LogoWrapper = styled(NavLink)`
+  align-items: flex-end;
+  display: flex;
+  height: 100%;
+  max-width: 90px;
+  min-width: fit-content;
 `
 
 const ButtonCreate = styled(Button)`
@@ -52,40 +61,42 @@ const ButtonCreate = styled(Button)`
   }
 `
 
+const ButtonCSS = css`
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-left: 12px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+`
+
 const NetworkStyled = styled(Network)`
   margin: 0 0 0 5px;
 
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin-left: 12px;
-  }
+  ${ButtonCSS}
 `
 
 const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
   margin: 0 0 0 5px;
 
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin-left: 12px;
-  }
+  ${ButtonCSS}
 `
 
 const ButtonDisconnectWalletStyled = styled(ButtonDisconnectWallet)`
   display: none;
 
+  ${ButtonCSS}
+
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: flex;
-    margin-left: 12px;
   }
 `
 
 const ContentsRight = styled.div`
   align-items: center;
   display: flex;
-  margin: 0 0 0 auto;
-`
-
-const LogoWrapper = styled(NavLink)`
-  height: 100%;
-  max-width: 90px;
+  margin: auto 0 0 auto;
 `
 
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
