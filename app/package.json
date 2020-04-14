@@ -14,6 +14,7 @@
     "@react-corekit/use-interval": "^1.1.1",
     "@realitio/realitio-lib": "^2.0.1",
     "@reduxjs/toolkit": "^1.2.3",
+    "@types/big.js": "^4.0.5",
     "@types/jest": "24.0.18",
     "@types/lodash.unionby": "^4.8.6",
     "@types/node": "12.7.4",
@@ -115,7 +116,6 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
-    "@types/big.js": "^4.0.5",
     "@types/contract-proxy-kit": "^1.0.1",
     "@typescript-eslint/eslint-plugin": "^2.1.0",
     "@typescript-eslint/parser": "^2.1.0",
