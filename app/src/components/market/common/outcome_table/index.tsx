@@ -130,7 +130,7 @@ export const OutcomeTable = (props: Props) => {
     const { balance, index } = props
     const shares = new Big(balance.shares.toString())
 
-    if (!payouts || shares.eq(0)) return null
+    if (!payouts || !shares.eq(0)) return null
 
     const redeemable = new BigNumber(shares.mul(payouts[index]).toString())
 
@@ -181,6 +181,7 @@ export const OutcomeTable = (props: Props) => {
     const showSharesAndPriceChange = isOutcomeSelected && !IS_CORONA_VERSION
     const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
+    const formattedShares = formatBigNumber(shares, collateral.decimals)
 
     return (
       <TR key={outcomeName}>
@@ -199,12 +200,12 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.OutcomeProbability) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
-            {showSharesAndPriceChange && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
+            {!shares.isZero() && <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />}
           </TDStyled>
         ) : (
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
-            {showSharesAndPriceChange && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
+            {!shares.isZero() && <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />}
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Outcome) ? null : (
@@ -236,9 +237,9 @@ export const OutcomeTable = (props: Props) => {
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Shares) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[3]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[3]}>{formattedShares}</TDStyled>
         ) : (
-          <TDStyled textAlign={TableCellsAlign[3]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[3]}>{formattedShares}</TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Payout) ? null : withWinningOutcome && payouts ? (
           <TDStyled textAlign={TableCellsAlign[4]}>{formattedPayout}</TDStyled>
