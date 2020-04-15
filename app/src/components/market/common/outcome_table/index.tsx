@@ -198,12 +198,7 @@ export const OutcomeTable = (props: Props) => {
             />
           </TDRadio>
         )}
-        {disabledColumns.includes(OutcomeTableValue.OutcomeProbability) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[1]}>
-            <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
-            {showOwnedSharesMessage && <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />}
-          </TDStyled>
-        ) : (
+        {disabledColumns.includes(OutcomeTableValue.OutcomeProbability) ? null : (
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
             {showOwnedSharesMessage && <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />}
@@ -222,14 +217,7 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.Probability) ? null : (
           <TDStyled textAlign={TableCellsAlign[5]}>{probability.toFixed(2)}%</TDStyled>
         )}
-        {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[2]}>
-            <TDFlexDiv textAlign={TableCellsAlign[2]}>
-              {currentPriceFormatted}{' '}
-              {showSharesAndPriceChange && <NewValue outcomeIndex={outcomeIndex} value="1.23" />}
-            </TDFlexDiv>
-          </TDStyled>
-        ) : (
+        {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : (
           <TDStyled textAlign={TableCellsAlign[2]}>
             <TDFlexDiv textAlign={TableCellsAlign[2]}>
               {currentPriceFormatted}{' '}
@@ -237,15 +225,11 @@ export const OutcomeTable = (props: Props) => {
             </TDFlexDiv>
           </TDStyled>
         )}
-        {disabledColumns.includes(OutcomeTableValue.Shares) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[3]}>{formattedShares}</TDStyled>
-        ) : (
+        {disabledColumns.includes(OutcomeTableValue.Shares) ? null : (
           <TDStyled textAlign={TableCellsAlign[3]}>{formattedShares}</TDStyled>
         )}
-        {disabledColumns.includes(OutcomeTableValue.Payout) ? null : withWinningOutcome && payouts ? (
-          <TDStyled textAlign={TableCellsAlign[4]}>{formattedPayout}</TDStyled>
-        ) : (
-          <TDStyled textAlign={TableCellsAlign[4]}>0.00</TDStyled>
+        {disabledColumns.includes(OutcomeTableValue.Payout) ? null : (
+          <TDStyled textAlign={TableCellsAlign[4]}>{withWinningOutcome && payouts ? formattedPayout : '0.00'}</TDStyled>
         )}
       </TR>
     )
