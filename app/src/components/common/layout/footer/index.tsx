@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import {
   DISCLAIMER_TEXT,
+  LINK_COOKIE_POLICY,
   LINK_FAQ,
   LINK_PRIVACY_POLICY,
   LINK_TERMS_AND_CONDITIONS,
@@ -105,6 +106,14 @@ export const Footer = () => {
           <>
             <Link href={LINK_TERMS_AND_CONDITIONS} target="_blank">
               Terms &amp; Conditions
+            </Link>
+            <Break>-</Break>
+          </>
+        )}
+        {LINK_COOKIE_POLICY && (
+          <>
+            <Link href={LINK_COOKIE_POLICY} target="_blank">
+              Cookie Policy
             </Link>
             <Break>-</Break>
           </>

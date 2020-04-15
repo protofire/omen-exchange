@@ -84,5 +84,6 @@ export const TWITTER_SITE = process.env.REACT_APP_TWITTER_SITE || ''
 export const SHOW_FOOTER = process.env.REACT_APP_SHOW_FOOTER === 'true' || false
 export const LINK_PRIVACY_POLICY = process.env.REACT_APP_LINK_PRIVACY_POLICY || false
 export const LINK_TERMS_AND_CONDITIONS = process.env.REACT_APP_LINK_TERMS_AND_CONDITIONS || false
+export const LINK_COOKIE_POLICY = process.env.REACT_APP_LINK_COOKIE_POLICY || false
 export const LINK_FAQ = process.env.REACT_APP_LINK_FAQ || false
 export const DISCLAIMER_TEXT = process.env.REACT_APP_DISCLAIMER_TEXT || false
