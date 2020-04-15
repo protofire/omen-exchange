@@ -1,6 +1,13 @@
 import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 
+import {
+  DISCLAIMER_TEXT,
+  LINK_FAQ,
+  LINK_PRIVACY_POLICY,
+  LINK_TERMS_AND_CONDITIONS,
+  SHOW_FOOTER,
+} from '../../../../common/constants'
 import { Button } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 
@@ -28,6 +35,10 @@ const Link = styled.a`
 
 const Break = styled.span`
   margin: 0 8px;
+
+  &:last-child {
+    display: none;
+  }
 `
 
 const Disclaimer = styled.div`
@@ -79,36 +90,43 @@ export const Footer = () => {
     storage.setItem('acceptedDisclaimer', toggledDisclaimerState)
   }, [acceptedDisclaimer, storage])
 
-  return (
+  return SHOW_FOOTER ? (
     <>
       <Wrapper>
-        <Link href="#" target="_blank">
-          Privacy Policy
-        </Link>
-        <Break>-</Break>
-        <Link
-          href="https://docs.google.com/document/d/e/2PACX-1vQ_iFS4LhM89B_f7gxuZO3OjqAKIPLP2ODZBn26Fe88tHwc3KTM144cUr-r56C2RVS1_9JTBquFgSDn/pub"
-          target="_blank"
-        >
-          Terms &amp; Conditions
-        </Link>
-        <Break>-</Break>
-        <Link href="https://docs.google.com/document/d/1w-mzDZBHqedSCxt_T319e-JzO5jFOMwsGseyCOqFwqQ" target="_blank">
-          FAQ
-        </Link>
-        <Break>-</Break>
-        <Link as="span" onClick={toggleDisclaimer}>
-          Disclaimer
-        </Link>
+        {LINK_PRIVACY_POLICY && (
+          <>
+            <Link href={LINK_PRIVACY_POLICY} target="_blank">
+              Privacy Policy
+            </Link>
+            <Break>-</Break>
+          </>
+        )}
+        {LINK_TERMS_AND_CONDITIONS && (
+          <>
+            <Link href={LINK_TERMS_AND_CONDITIONS} target="_blank">
+              Terms &amp; Conditions
+            </Link>
+            <Break>-</Break>
+          </>
+        )}
+        {LINK_FAQ && (
+          <>
+            <Link href={LINK_FAQ} target="_blank">
+              FAQ
+            </Link>
+            <Break>-</Break>
+          </>
+        )}
+        {DISCLAIMER_TEXT && (
+          <Link as="span" onClick={toggleDisclaimer}>
+            Disclaimer
+          </Link>
+        )}
       </Wrapper>
-      {acceptedDisclaimer !== DisclaimerStates.hidden && (
+      {DISCLAIMER_TEXT && acceptedDisclaimer !== DisclaimerStates.hidden && (
         <Disclaimer>
           <DisclaimerText>
-            <strong>Disclaimer:</strong> This site, its content and features (together, the &quot;Corona Information
-            Markets&quot;) are provided on a strictly NON-PROFIT NON-FEE BASIS, AS IS and AT YOUR OWN RISK for the sole
-            purpose of fighting the COVID-19 pandemic. Reliance on the Corona Information Markets for medical or other
-            professional guidance or their commercial use is strictly prohibited. Participation in the markets can
-            result in financial loss.
+            <strong>Disclaimer:</strong> {DISCLAIMER_TEXT}
           </DisclaimerText>
           <ButtonStyled buttonType={ButtonType.primaryLine} onClick={toggleDisclaimer}>
             OK
@@ -116,5 +134,5 @@ export const Footer = () => {
         </Disclaimer>
       )}
     </>
-  )
+  ) : null
 }

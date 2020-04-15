@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
+import { LINK_FAQ } from '../../../../common/constants'
 import { use24hsVolume } from '../../../../hooks/use24hsVolume'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
@@ -28,7 +29,7 @@ const getMarketTitles = (templateId: Maybe<number>) => {
   }
 }
 
-const faqURL = 'https://docs.google.com/document/d/1w-mzDZBHqedSCxt_T319e-JzO5jFOMwsGseyCOqFwqQ'
+const faqURL = LINK_FAQ
 
 const ClosedMarketTopDetails: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
