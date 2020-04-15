@@ -130,7 +130,7 @@ export const OutcomeTable = (props: Props) => {
     const { balance, index } = props
     const shares = new Big(balance.shares.toString())
 
-    if (!payouts || !shares.eq(0)) return null
+    if (!payouts || shares.eq(0)) return null
 
     const redeemable = new BigNumber(shares.mul(payouts[index]).toString())
 
@@ -180,8 +180,9 @@ export const OutcomeTable = (props: Props) => {
     const isOutcomeSelected = outcomeSelected === outcomeIndex
     const showSharesAndPriceChange = isOutcomeSelected && !IS_CORONA_VERSION
     const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
-    const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
     const formattedShares = formatBigNumber(shares, collateral.decimals)
+    const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
+    const showOwnedSharesMessage = !shares.isZero() && disabledColumns.includes(OutcomeTableValue.Shares)
 
     return (
       <TR key={outcomeName}>
@@ -200,16 +201,12 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.OutcomeProbability) ? null : withWinningOutcome ? (
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
-            {!shares.isZero() && disabledColumns.includes(OutcomeTableValue.Shares) && (
-              <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />
-            )}
+            {showOwnedSharesMessage && <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />}
           </TDStyled>
         ) : (
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
-            {!shares.isZero() && disabledColumns.includes(OutcomeTableValue.Shares) && (
-              <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />
-            )}
+            {showOwnedSharesMessage && <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />}
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Outcome) ? null : (
