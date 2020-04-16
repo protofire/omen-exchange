@@ -85,10 +85,8 @@ const MarketHomeContainer: React.FC = () => {
   }, [fetchedMarkets, loading, error])
 
   const onFilterChange = useCallback((filter: any) => {
-    //if (!IS_CORONA_VERSION) {
     setMoreMarkets(true)
     setFilter(filter)
-    // }
   }, [])
 
   const loadMore = () => {

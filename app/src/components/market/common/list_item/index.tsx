@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { getOutcomes } from '../../../../hooks/useGraphMarketMakerData'
 import { ERC20Service } from '../../../../services'
 import { calcPrice, formatBigNumber } from '../../../../util/tools'
 
@@ -56,7 +57,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const ListItem: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { account, library: provider } = context
+  const { account, library: provider, networkId } = context
   const [amount, setAmount] = useState('')
   const [symbol, setSymbol] = useState('')
 
@@ -68,12 +69,14 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     openingTimestamp,
     outcomeTokenAmounts,
     outcomes,
+    templateId,
     title,
   } = market
 
   const now = moment()
   const endDate = new Date(openingTimestamp * 1000)
   const endsText = moment(endDate).fromNow()
+  const outcomesProcessed = templateId ? outcomes || getOutcomes(networkId, +templateId) : null
 
   useEffect(() => {
     const setToken = async () => {
@@ -95,7 +98,9 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     <Wrapper to={address}>
       <Title>{title}</Title>
       <Info>
-        <Outcome>{outcomes && `${(percentages[indexMax] * 100).toFixed(2)}% ${outcomes[indexMax]} `}</Outcome>
+        <Outcome>
+          {outcomesProcessed && `${(percentages[indexMax] * 100).toFixed(2)}% ${outcomesProcessed[indexMax]} `}
+        </Outcome>
         <Separator>·</Separator>
         <span>
           {amount} {symbol} Volume

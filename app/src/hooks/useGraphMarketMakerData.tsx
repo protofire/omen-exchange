@@ -82,7 +82,7 @@ type Result = {
   status: Status
 }
 
-const getOutcomes = (networkId: number, templateId: number) => {
+export const getOutcomes = (networkId: number, templateId: number) => {
   const isBinary = templateId === 0
   const isNuancedBinary = (networkId === 1 && templateId === 6) || (networkId === 4 && templateId === 5)
   if (isBinary || isNuancedBinary) {

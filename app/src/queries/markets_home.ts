@@ -16,6 +16,7 @@ export const MarketDataFragment = gql`
     arbitrator
     category
     answerFinalizedTimestamp
+    templateId
   }
 `
 
