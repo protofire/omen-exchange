@@ -25,7 +25,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   value: any
 }
 
-export const NewValue: React.FC<Props> = (props: Props) => {
+export const NewValue: React.FC<Props> = () => {
   // const { value, ...restProps } = props
 
   return null
