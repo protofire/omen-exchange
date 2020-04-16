@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { getOutcomes } from '../../../../hooks/useGraphMarketMakerData'
+import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { ERC20Service } from '../../../../services'
 import { calcPrice, formatBigNumber } from '../../../../util/tools'
 
@@ -52,31 +52,21 @@ const Separator = styled.span`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  market: any
+  market: MarketMakerDataItem
 }
 
 export const ListItem: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { account, library: provider, networkId } = context
+  const { account, library: provider } = context
   const [amount, setAmount] = useState('')
   const [symbol, setSymbol] = useState('')
 
   const { market } = props
-  const {
-    collateralToken,
-    collateralVolume,
-    id: address,
-    openingTimestamp,
-    outcomeTokenAmounts,
-    outcomes,
-    templateId,
-    title,
-  } = market
+  const { address, collateralToken, collateralVolume, openingTimestamp, outcomeTokenAmounts, outcomes, title } = market
 
   const now = moment()
-  const endDate = new Date(openingTimestamp * 1000)
+  const endDate = openingTimestamp
   const endsText = moment(endDate).fromNow()
-  const outcomesProcessed = templateId ? outcomes || getOutcomes(networkId, +templateId) : null
 
   useEffect(() => {
     const setToken = async () => {
@@ -98,9 +88,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     <Wrapper to={address}>
       <Title>{title}</Title>
       <Info>
-        <Outcome>
-          {outcomesProcessed && `${(percentages[indexMax] * 100).toFixed(2)}% ${outcomesProcessed[indexMax]} `}
-        </Outcome>
+        <Outcome>{outcomes && `${(percentages[indexMax] * 100).toFixed(2)}% ${outcomes[indexMax]} `}</Outcome>
         <Separator>·</Separator>
         <span>
           {amount} {symbol} Volume

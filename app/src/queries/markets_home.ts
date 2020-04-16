@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
 import { MarketFilters, MarketStates } from './../util/types'
@@ -8,17 +9,40 @@ export const MarketDataFragment = gql`
     collateralVolume
     collateralToken
     outcomeTokenAmounts
-    creationTimestamp
     title
     outcomes
     openingTimestamp
-    resolutionTimestamp
     arbitrator
     category
-    answerFinalizedTimestamp
     templateId
   }
 `
+
+export type GraphMarketMakerDataItem = {
+  id: string
+  collateralVolume: string
+  collateralToken: string
+  outcomeTokenAmounts: string[]
+  title: string
+  outcomes: Maybe<string[]>
+  openingTimestamp: string
+  arbitrator: string
+  category: string
+  templateId: string
+}
+
+export type MarketMakerDataItem = {
+  address: string
+  collateralVolume: BigNumber
+  collateralToken: string
+  outcomeTokenAmounts: BigNumber[]
+  title: string
+  outcomes: Maybe<string[]>
+  openingTimestamp: Date
+  arbitrator: string
+  category: string
+  templateId: string
+}
 
 export const DEFAULT_OPTIONS = {
   state: MarketStates.open,
