@@ -7,13 +7,15 @@ const Wrapper = styled.div`
 `
 
 const Radio = styled.div<{ outcomeIndex: number; checked: boolean }>`
+  background-color: ${props => (props.checked ? props.theme.outcomes.colors[props.outcomeIndex].darker : '#fff')};
   border-color: ${props =>
     props.theme.outcomes.colors[props.outcomeIndex].darker
       ? props.theme.outcomes.colors[props.outcomeIndex].darker
       : props.theme.colors.primary};
   border-radius: 50%;
   border-style: solid;
-  border-width: ${props => (props.checked ? '4px' : '2px')};
+  border-width: 2px;
+  box-shadow: inset 0 0 0 2px #fff;
   height: 20px;
   opacity: ${props => (props.checked ? '1' : '0.5')};
   transition: all 0.15s linear;
