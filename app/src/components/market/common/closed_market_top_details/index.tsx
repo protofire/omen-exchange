@@ -2,7 +2,6 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
 import { LINK_FAQ } from '../../../../common/constants'
-import { use24hsVolume } from '../../../../hooks/use24hsVolume'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import {
@@ -34,13 +33,12 @@ const faqURL = LINK_FAQ
 const ClosedMarketTopDetails: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
 
-  const { address: marketMakerAddress, arbitrator, collateral: collateralToken, question } = marketMakerData
+  const { arbitrator, collateral: collateralToken, collateralVolume, question } = marketMakerData
 
-  const lastDayVolume = use24hsVolume(marketMakerAddress)
   const { marketSubtitle, marketTitle } = getMarketTitles(question.templateId)
   const resolutionFormat = question.resolution ? formatDate(question.resolution) : ''
-  const lastDayVolumeFormat = lastDayVolume
-    ? `${formatBigNumber(lastDayVolume, collateralToken.decimals)} ${collateralToken.symbol}`
+  const totalVolumeFormat = collateralVolume
+    ? `${formatBigNumber(collateralVolume, collateralToken.decimals)} ${collateralToken.symbol}`
     : '-'
 
   return (
@@ -64,7 +62,7 @@ const ClosedMarketTopDetails: React.FC<Props> = (props: Props) => {
           title={'Arbitrator/Oracle'}
           value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
         />
-        <TitleValue title={'24h Volume'} value={lastDayVolumeFormat} />
+        <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
       </GridTwoColumns>
     </>
   )

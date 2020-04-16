@@ -73,6 +73,7 @@ export type GraphMarketMakerData = {
   answerFinalizedTimestamp: Maybe<BigNumber>
   arbitratorAddress: string
   collateralAddress: string
+  collateralVolume: BigNumber
   conditionId: string
   fee: BigNumber
   question: Question
@@ -91,6 +92,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     answerFinalizedTimestamp: data.answerFinalizedTimestamp ? bigNumberify(data.answerFinalizedTimestamp) : null,
     arbitratorAddress: data.arbitrator,
     collateralAddress: data.collateralToken,
+    collateralVolume: bigNumberify(data.collateralVolume),
     conditionId: data.condition.id,
     fee: bigNumberify(data.fee),
     question: {
