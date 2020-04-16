@@ -64,7 +64,7 @@ if (IS_CORONA_VERSION && !DISQUS_URL) {
   throw new Error('You need to set the REACT_APP_DISQUS_URL environment variable')
 }
 
-export const GEO_JS_ENDPOINT = process.env.REACT_APP_GEO_JS_ENDPOINT || 'https://get.geojs.io/v1/ip/geo.json'
+export const GEO_JS_ENDPOINT = process.env.REACT_APP_GEO_JS_ENDPOINT || 'https://get.geojs.io/v1/ip/geo.js'
 
 export const BLACKLISTED_COUNTRIES = (process.env.REACT_APP_BLACKLISTED_COUNTRIES || '').split(',').filter(Boolean)
 
@@ -80,3 +80,10 @@ export const OG_SITE_NAME = process.env.REACT_APP_OG_SITE_NAME || 'Omen'
 export const TWITTER_CARD = process.env.REACT_APP_TWITTER_CARD || 'summary_large_image'
 export const TWITTER_IMAGE_ALT = process.env.REACT_APP_TWITTER_IMAGE_ALT || 'Omen'
 export const TWITTER_SITE = process.env.REACT_APP_TWITTER_SITE || ''
+
+export const SHOW_FOOTER = process.env.REACT_APP_SHOW_FOOTER === 'true' || false
+export const LINK_PRIVACY_POLICY = process.env.REACT_APP_LINK_PRIVACY_POLICY || false
+export const LINK_TERMS_AND_CONDITIONS = process.env.REACT_APP_LINK_TERMS_AND_CONDITIONS || false
+export const LINK_COOKIE_POLICY = process.env.REACT_APP_LINK_COOKIE_POLICY || false
+export const LINK_FAQ = process.env.REACT_APP_LINK_FAQ || false
+export const DISCLAIMER_TEXT = process.env.REACT_APP_DISCLAIMER_TEXT || false

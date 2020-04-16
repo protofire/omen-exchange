@@ -5,6 +5,12 @@ import styled from 'styled-components'
 import { ButtonCircle } from '../../../button'
 import { IconArrowBack } from '../../icons/IconArrowBack'
 
+export enum TextAlign {
+  left = 'left',
+  center = 'center',
+  right = 'right',
+}
+
 const Wrapper = styled.div`
   align-items: center;
   display: flex;
@@ -14,7 +20,7 @@ const Wrapper = styled.div`
   width: ${props => props.theme.mainContainer.maxWidth};
 `
 
-const Text = styled.h1<{ backButtonEnabled: boolean }>`
+const Text = styled.h1<{ backButtonEnabled: boolean; textAlign: TextAlign }>`
   color: #333;
   flex-grow: 1;
   font-size: 16px;
@@ -24,16 +30,17 @@ const Text = styled.h1<{ backButtonEnabled: boolean }>`
   padding-left: 25px;
   padding-right: ${props =>
     props.backButtonEnabled ? `${parseInt(props.theme.buttonCircle.dimensions + 25)}px` : '25px'};
-  text-align: center;
+  text-align: ${props => props.textAlign};
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement>, RouteComponentProps<any> {
   backTo?: string
+  textAlign?: TextAlign
   title: string
 }
 
 export const SectionTitleWrapper: React.FC<Props> = (props: Props) => {
-  const { backTo = '', title, ...restProps } = props
+  const { textAlign = TextAlign.center, backTo = '', title, ...restProps } = props
   const enableGoBack = backTo !== ''
 
   return (
@@ -43,7 +50,7 @@ export const SectionTitleWrapper: React.FC<Props> = (props: Props) => {
           <IconArrowBack />
         </ButtonCircle>
       )}
-      <Text backButtonEnabled={enableGoBack} className="titleText">
+      <Text backButtonEnabled={enableGoBack} className="titleText" textAlign={textAlign}>
         {title}
       </Text>
     </Wrapper>

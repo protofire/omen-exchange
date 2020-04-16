@@ -3,7 +3,7 @@ import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
-import { IS_CORONA_VERSION } from '../../../common/constants'
+import { IS_CORONA_VERSION, LINK_TERMS_AND_CONDITIONS } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
@@ -118,7 +118,7 @@ export const ModalConnectWallet = (props: Props) => {
     props.onClose()
   }, [props])
 
-  const [acceptedTerms, setAcceptedTerms] = useState(false)
+  const [acceptedTerms, setAcceptedTerms] = useState(LINK_TERMS_AND_CONDITIONS ? false : true)
 
   useEffect(() => {
     if (showWalletConnectQR && context.active && !context.account && context.connectorName === Wallet.WalletConnect) {
@@ -172,22 +172,21 @@ export const ModalConnectWallet = (props: Props) => {
             <MetamaskButton disabled={!doesMetamaskExist || !acceptedTerms} />
             <WalletConnectButton disabled={!acceptedTerms} />
           </ButtonsWrapper>
-          <TermsWrapper>
-            <CheckboxInput
-              checked={acceptedTerms}
-              inputId="termsCheck"
-              onChange={() => setAcceptedTerms(!acceptedTerms)}
-            />
-            <TermsText className="clickable" htmlFor="termsCheck">
-              I agree to the{' '}
-              <TermsLink
-                href="https://docs.google.com/document/d/e/2PACX-1vQ_iFS4LhM89B_f7gxuZO3OjqAKIPLP2ODZBn26Fe88tHwc3KTM144cUr-r56C2RVS1_9JTBquFgSDn/pub"
-                target="_blank"
-              >
-                Terms and Conditions
-              </TermsLink>
-            </TermsText>
-          </TermsWrapper>
+          {LINK_TERMS_AND_CONDITIONS && (
+            <TermsWrapper>
+              <CheckboxInput
+                checked={acceptedTerms}
+                inputId="termsCheck"
+                onChange={() => setAcceptedTerms(!acceptedTerms)}
+              />
+              <TermsText className="clickable" htmlFor="termsCheck">
+                I agree to the{' '}
+                <TermsLink href={LINK_TERMS_AND_CONDITIONS} target="_blank">
+                  Terms and Conditions
+                </TermsLink>
+              </TermsText>
+            </TermsWrapper>
+          )}
           {!IS_CORONA_VERSION && <MadeBy />}
         </ModalWrapper>
       )}
