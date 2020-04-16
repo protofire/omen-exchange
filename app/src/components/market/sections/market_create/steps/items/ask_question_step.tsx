@@ -131,6 +131,11 @@ const AskQuestionStep = (props: Props) => {
     setCategoryButtonFocus(!categoryButtonFocus)
   }, [categoryButtonFocus])
 
+  const handleCategoryChange = (e: any) => {
+    setCategoryButtonFocus(false)
+    handleChange(e)
+  }
+
   return (
     <CreateCard>
       <FormRow
@@ -203,7 +208,12 @@ const AskQuestionStep = (props: Props) => {
         </Column>
       </GridThreeColumns>
       {categoryButtonFocus && (
-        <Categories categories={categoriesCustom} name="category" onChange={handleChange} selectedCategory={category} />
+        <Categories
+          categories={categoriesCustom}
+          name="category"
+          onChange={handleCategoryChange}
+          selectedCategory={category}
+        />
       )}
       <ButtonContainerFullWidth borderTop={true}>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
