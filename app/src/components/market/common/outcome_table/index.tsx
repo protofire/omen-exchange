@@ -182,7 +182,7 @@ export const OutcomeTable = (props: Props) => {
     const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
     const formattedShares = formatBigNumber(shares, collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
-    const showOwnedSharesMessage = !shares.isZero() && disabledColumns.includes(OutcomeTableValue.Shares)
+    const showOwnedSharesMessage = !shares.isZero()
 
     return (
       <TR key={outcomeName}>
