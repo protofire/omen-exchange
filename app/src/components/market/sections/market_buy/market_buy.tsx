@@ -172,20 +172,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle backTo={goBackToAddress} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
-        <MarketTopDetails
-          marketMakerData={marketMakerData}
-          title="Purchase Outcome"
-          toggleTitleAction="Pool Information"
-        />
+        <MarketTopDetails marketMakerData={marketMakerData} title="Purchase Outcome" toggleTitle="Pool Information" />
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          disabledColumns={[
-            OutcomeTableValue.Payout,
-            OutcomeTableValue.Shares,
-            OutcomeTableValue.Outcome,
-            OutcomeTableValue.Probability,
-          ]}
+          disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
           outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}

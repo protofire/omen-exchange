@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { use24hsVolume } from '../../../../hooks/use24hsVolume'
+import { IS_CORONA_VERSION } from '../../../../common/constants'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { GridTwoColumns, SubsectionTitle, SubsectionTitleAction, SubsectionTitleWrapper } from '../../../common'
@@ -8,19 +8,19 @@ import { TitleValue } from '../../../common/text/title_value'
 import { DisplayArbitrator } from '../display_arbitrator'
 
 interface Props {
-  toggleTitleAction: string
-  title: string
   marketMakerData: MarketMakerData
+  title: string
+  toggleTitle: string
 }
 
 const MarketTopDetails: React.FC<Props> = (props: Props) => {
   const [showingExtraInformation, setExtraInformation] = useState(false)
 
-  const { marketMakerData } = props
+  const { marketMakerData, title, toggleTitle } = props
   const {
-    address: marketMakerAddress,
     arbitrator,
     collateral,
+    collateralVolume,
     marketMakerFunding,
     marketMakerUserFunding,
     question,
@@ -28,7 +28,9 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
     userEarnings,
   } = marketMakerData
 
-  const lastDayVolume = use24hsVolume(marketMakerAddress)
+  const totalVolumeFormat = collateralVolume
+    ? `${formatBigNumber(collateralVolume, collateral.decimals)} ${collateral.symbol}`
+    : '-'
 
   const toggleExtraInformation = () =>
     showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
@@ -36,10 +38,12 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
   return (
     <>
       <SubsectionTitleWrapper>
-        <SubsectionTitle>{props.title}</SubsectionTitle>
-        <SubsectionTitleAction onClick={toggleExtraInformation}>
-          {showingExtraInformation ? 'Hide' : 'Show'} {props.toggleTitleAction}
-        </SubsectionTitleAction>
+        <SubsectionTitle>{title}</SubsectionTitle>
+        {!IS_CORONA_VERSION && (
+          <SubsectionTitleAction onClick={toggleExtraInformation}>
+            {showingExtraInformation ? 'Hide' : 'Show'} {toggleTitle}
+          </SubsectionTitleAction>
+        )}
       </SubsectionTitleWrapper>
       <GridTwoColumns>
         {showingExtraInformation ? (
@@ -68,14 +72,7 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
           title={'Arbitrator/Oracle'}
           value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
         />
-        <TitleValue
-          title={'24h Volume'}
-          value={
-            collateral && lastDayVolume
-              ? `${formatBigNumber(lastDayVolume, collateral.decimals)} ${collateral.symbol}`
-              : '-'
-          }
-        />
+        <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
       </GridTwoColumns>
     </>
   )
