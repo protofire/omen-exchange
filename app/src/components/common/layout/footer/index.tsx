@@ -79,7 +79,7 @@ enum DisclaimerStates {
 
 export const Footer = () => {
   const storage = window.localStorage
-  const [acceptedDisclaimer, setAcceptedDisclaimer] = useState<string | null>(storage.getItem('acceptedDisclaimer'))
+  const [acceptedDisclaimer, setAcceptedDisclaimer] = useState<string | null>(DisclaimerStates.visible)
 
   const toggleDisclaimer = useCallback(() => {
     const toggledDisclaimerState =
