@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
 import styled, { css } from 'styled-components'
@@ -9,6 +9,7 @@ import { ConnectedWeb3, useIsBlacklistedCountry } from '../../../../hooks'
 import { Button, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { CoronaMarketsLogo, Network, OmenLogo } from '../../../common'
+import { Message, MessageType } from '../../../common/message'
 import { ModalConnectWallet } from '../../../modal'
 
 const HeaderWrapper = styled.div`
@@ -73,19 +74,16 @@ const ButtonCSS = css`
 
 const NetworkStyled = styled(Network)`
   margin: 0 0 0 5px;
-
   ${ButtonCSS}
 `
 
 const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
   margin: 0 0 0 5px;
-
   ${ButtonCSS}
 `
 
 const ButtonDisconnectWalletStyled = styled(ButtonDisconnectWallet)`
   display: none;
-
   ${ButtonCSS}
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
@@ -105,12 +103,41 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
+  const [isAdBlockDetected, setIsAdBlockDetected] = useState(false)
+
+  useEffect(() => {
+    new Promise<boolean>(resolve => {
+      // Creates a bait for ad block
+      const elem = document.createElement('div')
+
+      elem.className = 'adclass'
+      document.body.appendChild(elem)
+
+      let isAdBlockDetected
+
+      window.setTimeout(() => {
+        isAdBlockDetected = !(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length)
+        resolve(isAdBlockDetected)
+      }, 0)
+    }).then(data => {
+      if (data) {
+        setIsAdBlockDetected(true)
+      }
+    })
+  }, [])
 
   // hide connect button if country is blacklisted, or the info isn't available yet
   const hideConnectButton = IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)
 
   return (
     <HeaderWrapper {...restProps}>
+      {isAdBlockDetected && (
+        <Message
+          text="This dApp may not work correctly with your ad blocker enabled."
+          title="Ad Blocker Detected!"
+          type={MessageType.error}
+        />
+      )}
       <HeaderInner>
         <LogoWrapper to="/">{IS_CORONA_VERSION ? <CoronaMarketsLogo /> : <OmenLogo />}</LogoWrapper>
         <ContentsRight>

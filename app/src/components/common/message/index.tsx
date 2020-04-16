@@ -16,10 +16,11 @@ export enum MessageType {
 
 const getBorderColor = (type: MessageType, colors: any): string => {
   return (
-    (type === MessageType.ok && colors.primary) ||
-    (type === MessageType.error && colors.secondary) ||
+    (type === MessageType.ok && colors.ok) ||
+    (type === MessageType.error && colors.error) ||
     (type === MessageType.warning && colors.warning) ||
-    ''
+    (type === MessageType.default && colors.default) ||
+    'transparent'
   )
 }
 
@@ -42,22 +43,18 @@ const Wrapper = styled.div`
 `
 
 const MessageWrapper = styled.div<{ type: MessageType }>`
-  align-items: center;
   background-color: #fff;
   border-radius: 5px;
   border-style: solid;
   border-width: 1px;
-  border-color: ${props =>
-    getBorderColor(props.type, props.theme.colors)
-      ? getBorderColor(props.type, props.theme.colors)
-      : props.theme.borders.borderColor};
-  box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.08);
+  border-color: ${props => props.theme.message.colors && getBorderColor(props.type, props.theme.message.colors)};
+  box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.01);
   display: flex;
   margin-top: 25px;
   max-width: 100%;
   padding: 11px 14px;
   position: relative;
-  width: 322px;
+  width: 400px;
 `
 
 const Icon = styled.div<{ type: MessageType }>`
@@ -71,11 +68,19 @@ const Icon = styled.div<{ type: MessageType }>`
   width: 25px;
 `
 
+const Title = styled.h1`
+  color: ${props => props.theme.colors.textColor};
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin: 0;
+`
+
 const Text = styled.p`
   color: ${props => props.theme.colors.textColor};
-  font-size: 13px;
+  font-size: 14px;
   font-weight: normal;
-  line-height: 1.38;
+  line-height: 1.4;
   margin: 0 10px 0 0;
 `
 
@@ -105,11 +110,12 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   hidingTimeout?: number | undefined
   onHide?: () => void
   text: string
+  title?: string
   type?: MessageType
 }
 
 export const Message: React.FC<Props> = (props: Props): ReactPortal => {
-  const { onHide, text, type = MessageType.default, hidingTimeout, hideCloseButton } = props
+  const { onHide, text, type = MessageType.default, hidingTimeout, hideCloseButton, title = '' } = props
   const [notificate, setNotificate] = useState(true)
 
   const hideNotification = useCallback(() => {
@@ -131,7 +137,10 @@ export const Message: React.FC<Props> = (props: Props): ReactPortal => {
         <MessageWrapper type={type}>
           {hideCloseButton ? null : <CloseButton onClick={hideNotification} />}
           {type !== MessageType.default && <Icon type={type} />}
-          <Text>{text}</Text>
+          <div>
+            {title && <Title>{title}</Title>}
+            <Text>{text}</Text>
+          </div>
         </MessageWrapper>
       </Wrapper>
     ),
