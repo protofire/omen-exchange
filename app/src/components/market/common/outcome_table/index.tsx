@@ -180,7 +180,9 @@ export const OutcomeTable = (props: Props) => {
     const isOutcomeSelected = outcomeSelected === outcomeIndex
     const showSharesAndPriceChange = isOutcomeSelected && !IS_CORONA_VERSION
     const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
+    const formattedShares = formatBigNumber(shares, collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
+    const showOwnedSharesMessage = !shares.isZero() && disabledColumns.includes(OutcomeTableValue.Shares)
 
     return (
       <TR key={outcomeName}>
@@ -196,15 +198,10 @@ export const OutcomeTable = (props: Props) => {
             />
           </TDRadio>
         )}
-        {disabledColumns.includes(OutcomeTableValue.OutcomeProbability) ? null : withWinningOutcome ? (
+        {disabledColumns.includes(OutcomeTableValue.OutcomeProbability) ? null : (
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
-            {showSharesAndPriceChange && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
-          </TDStyled>
-        ) : (
-          <TDStyled textAlign={TableCellsAlign[1]}>
-            <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
-            {showSharesAndPriceChange && <OwnedShares outcomeIndex={outcomeIndex} value="250.55" />}
+            {showOwnedSharesMessage && <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />}
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Outcome) ? null : (
@@ -220,14 +217,7 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.Probability) ? null : (
           <TDStyled textAlign={TableCellsAlign[5]}>{probability.toFixed(2)}%</TDStyled>
         )}
-        {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[2]}>
-            <TDFlexDiv textAlign={TableCellsAlign[2]}>
-              {currentPriceFormatted}{' '}
-              {showSharesAndPriceChange && <NewValue outcomeIndex={outcomeIndex} value="1.23" />}
-            </TDFlexDiv>
-          </TDStyled>
-        ) : (
+        {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : (
           <TDStyled textAlign={TableCellsAlign[2]}>
             <TDFlexDiv textAlign={TableCellsAlign[2]}>
               {currentPriceFormatted}{' '}
@@ -235,15 +225,11 @@ export const OutcomeTable = (props: Props) => {
             </TDFlexDiv>
           </TDStyled>
         )}
-        {disabledColumns.includes(OutcomeTableValue.Shares) ? null : withWinningOutcome ? (
-          <TDStyled textAlign={TableCellsAlign[3]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
-        ) : (
-          <TDStyled textAlign={TableCellsAlign[3]}>{formatBigNumber(shares, collateral.decimals)}</TDStyled>
+        {disabledColumns.includes(OutcomeTableValue.Shares) ? null : (
+          <TDStyled textAlign={TableCellsAlign[3]}>{formattedShares}</TDStyled>
         )}
-        {disabledColumns.includes(OutcomeTableValue.Payout) ? null : withWinningOutcome && payouts ? (
-          <TDStyled textAlign={TableCellsAlign[4]}>{formattedPayout}</TDStyled>
-        ) : (
-          <TDStyled textAlign={TableCellsAlign[4]}>0.00</TDStyled>
+        {disabledColumns.includes(OutcomeTableValue.Payout) ? null : (
+          <TDStyled textAlign={TableCellsAlign[4]}>{withWinningOutcome && payouts ? formattedPayout : '0.00'}</TDStyled>
         )}
       </TR>
     )
