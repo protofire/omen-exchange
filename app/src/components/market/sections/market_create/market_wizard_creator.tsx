@@ -250,7 +250,6 @@ export const MarketWizardCreator = (props: Props) => {
             values={marketData}
           />
         )
-
       default:
         return (
           <AskQuestionStep

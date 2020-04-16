@@ -175,24 +175,18 @@ export const ClosedMarketDetail = (props: Props) => {
             ></MarketResolutionMessageStyled>
           )}
           {isConditionResolved && !hasWinningOutcomes ? null : (
-            <>
-              <ButtonContainerFullWidth borderTop={true}>
-                {!isConditionResolved && (
-                  <Button
-                    buttonType={ButtonType.primary}
-                    disabled={status === Status.Loading}
-                    onClick={resolveCondition}
-                  >
-                    Resolve Condition
-                  </Button>
-                )}
-                {isConditionResolved && hasWinningOutcomes && (
-                  <Button buttonType={ButtonType.primary} disabled={status === Status.Loading} onClick={() => redeem()}>
-                    Redeem
-                  </Button>
-                )}
-              </ButtonContainerFullWidth>
-            </>
+            <ButtonContainerFullWidth borderTop={true}>
+              {!isConditionResolved && (
+                <Button buttonType={ButtonType.primary} disabled={status === Status.Loading} onClick={resolveCondition}>
+                  Resolve Condition
+                </Button>
+              )}
+              {isConditionResolved && hasWinningOutcomes && (
+                <Button buttonType={ButtonType.primary} disabled={status === Status.Loading} onClick={() => redeem()}>
+                  Redeem
+                </Button>
+              )}
+            </ButtonContainerFullWidth>
           )}
         </WhenConnected>
       </ViewCard>

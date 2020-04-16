@@ -19,7 +19,7 @@ import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { SectionTitle } from '../../../common/text/section_title'
+import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { ModalTwitterShare } from '../../../modal/modal_twitter_share'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
@@ -170,7 +170,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle backTo={goBackToAddress} title={question.title} />
+      <SectionTitle backTo={goBackToAddress} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
         <MarketTopDetails
           marketMakerData={marketMakerData}
