@@ -23,7 +23,9 @@ interface Props extends RouteComponentProps<{}> {
 const Wrapper = (props: Props) => {
   const { history, marketMakerData } = props
 
-  const { address: marketMakerAddress, balances, collateral } = marketMakerData
+  const { address: marketMakerAddress, balances, collateral, question } = marketMakerData
+
+  const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -48,44 +50,59 @@ const Wrapper = (props: Props) => {
     )
   }
 
+  const poolButton = (
+    <LeftButton
+      buttonType={ButtonType.secondaryLine}
+      onClick={() => {
+        history.push(`${marketMakerAddress}/pool-liquidity`)
+      }}
+    >
+      Pool Liquidity
+    </LeftButton>
+  )
+
+  const openInRealitioButton = (
+    <Button
+      buttonType={ButtonType.secondaryLine}
+      onClick={() => {
+        window.open(`https://realitio.github.io/#!/question/${question.id}`)
+      }}
+    >
+      Answer in Realit.io
+    </Button>
+  )
+
+  const buySellButtons = (
+    <>
+      <Button
+        buttonType={ButtonType.secondaryLine}
+        disabled={!userHasShares}
+        onClick={() => {
+          history.push(`${marketMakerAddress}/sell`)
+        }}
+      >
+        Sell
+      </Button>
+      <Button
+        buttonType={ButtonType.secondaryLine}
+        onClick={() => {
+          history.push(`${marketMakerAddress}/buy`)
+        }}
+      >
+        Buy
+      </Button>
+    </>
+  )
+
   return (
     <>
       <ViewCard>
-        <MarketTopDetails
-          marketMakerData={marketMakerData}
-          title="Market Details"
-          toggleTitleAction="Pool Information"
-        />
+        <MarketTopDetails marketMakerData={marketMakerData} title="Market Details" toggleTitle="Pool Information" />
         {renderTableData()}
         <WhenConnected>
           <ButtonContainer>
-            {!IS_CORONA_VERSION && (
-              <LeftButton
-                buttonType={ButtonType.secondaryLine}
-                onClick={() => {
-                  history.push(`${marketMakerAddress}/pool-liquidity`)
-                }}
-              >
-                Pool Liquidity
-              </LeftButton>
-            )}
-            <Button
-              buttonType={ButtonType.secondaryLine}
-              disabled={!userHasShares}
-              onClick={() => {
-                history.push(`${marketMakerAddress}/sell`)
-              }}
-            >
-              Sell
-            </Button>
-            <Button
-              buttonType={ButtonType.secondaryLine}
-              onClick={() => {
-                history.push(`${marketMakerAddress}/buy`)
-              }}
-            >
-              Buy
-            </Button>
+            {!IS_CORONA_VERSION && poolButton}
+            {isQuestionOpen ? openInRealitioButton : buySellButtons}
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>

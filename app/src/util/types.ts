@@ -149,6 +149,7 @@ export interface MarketMakerData {
   fee: BigNumber
   isConditionResolved: boolean
   isQuestionFinalized: boolean
+  collateralVolume: BigNumber
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
   payouts: Maybe<number[]>

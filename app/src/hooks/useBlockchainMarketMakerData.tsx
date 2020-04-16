@@ -102,7 +102,9 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
     })
 
     const arbitrator = getArbitratorFromAddress(networkId, graphMarketMakerData.arbitratorAddress)
-    const payouts = realitioAnswer
+    const payouts = graphMarketMakerData.payouts
+      ? graphMarketMakerData.payouts
+      : realitioAnswer
       ? OracleService.getPayouts(graphMarketMakerData.question.templateId, realitioAnswer, outcomes.length)
       : null
     const balances = getBalances(outcomes, marketMakerShares, userShares, payouts)
@@ -113,6 +115,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       balances,
       collateral,
       fee: graphMarketMakerData.fee,
+      collateralVolume: graphMarketMakerData.collateralVolume,
       isConditionResolved,
       isQuestionFinalized,
       marketMakerFunding,

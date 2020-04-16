@@ -17,6 +17,7 @@ const query = gql`
       outcomeTokenAmounts
       condition {
         id
+        payouts
       }
       templateId
       title
@@ -27,7 +28,6 @@ const query = gql`
       openingTimestamp
       timeout
       resolutionTimestamp
-      payouts
       currentAnswer
       answerFinalizedTimestamp
       question {
@@ -45,7 +45,10 @@ type GraphResponseFixedProductMarketMaker = {
   category: string
   collateralToken: string
   collateralVolume: string
-  condition: { id: string }
+  condition: {
+    id: string
+    payouts: Maybe<string[]>
+  }
   creator: string
   currentAnswer: string
   fee: string
@@ -53,7 +56,6 @@ type GraphResponseFixedProductMarketMaker = {
   openingTimestamp: string
   outcomeTokenAmounts: string[]
   outcomes: Maybe<string[]>
-  payouts: Maybe<string[]>
   question: {
     id: string
     data: string
@@ -73,7 +75,9 @@ export type GraphMarketMakerData = {
   answerFinalizedTimestamp: Maybe<BigNumber>
   arbitratorAddress: string
   collateralAddress: string
+  collateralVolume: BigNumber
   conditionId: string
+  payouts: Maybe<number[]>
   fee: BigNumber
   question: Question
 }
@@ -91,7 +95,9 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     answerFinalizedTimestamp: data.answerFinalizedTimestamp ? bigNumberify(data.answerFinalizedTimestamp) : null,
     arbitratorAddress: data.arbitrator,
     collateralAddress: data.collateralToken,
+    collateralVolume: bigNumberify(data.collateralVolume),
     conditionId: data.condition.id,
+    payouts: data.condition.payouts ? data.condition.payouts.map(Number) : null,
     fee: bigNumberify(data.fee),
     question: {
       id: data.question.id,

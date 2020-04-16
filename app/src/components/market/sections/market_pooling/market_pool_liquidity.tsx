@@ -175,11 +175,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle backTo={goBackToAddress} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
-        <MarketTopDetails
-          marketMakerData={marketMakerData}
-          title="Pool Liquidity"
-          toggleTitleAction="Market Information"
-        />
+        <MarketTopDetails marketMakerData={marketMakerData} title="Pool Liquidity" toggleTitle="Market Information" />
         <OutcomeTable
           balances={balances}
           collateral={collateral}
