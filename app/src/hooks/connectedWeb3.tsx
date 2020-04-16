@@ -74,7 +74,7 @@ export const ConnectedWeb3: React.FC = props => {
     }
   }, [context, library, active, error, isBlacklistedCountry])
 
-  if (!networkId) {
+  if (!networkId || !library) {
     return null
   }
 

@@ -96,6 +96,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const ModalConnectWallet = (props: Props) => {
   const context = useWeb3Context()
+  const [showWalletConnectQR, setShowWalletConnectQR] = useState(false)
   const { isOpen } = props
 
   if (context.error) {
@@ -105,11 +106,12 @@ export const ModalConnectWallet = (props: Props) => {
   }
 
   const doesMetamaskExist = 'ethereum' in window || 'web3' in window
-  const [walletSelected, setWalletSelected] = useState(doesMetamaskExist ? Wallet.MetaMask : Wallet.WalletConnect)
   const onClickWallet = (wallet: Wallet) => {
-    setWalletSelected(wallet)
-    context.setConnector(walletSelected)
-    localStorage.setItem('CONNECTOR', walletSelected)
+    if (wallet === Wallet.WalletConnect) {
+      setShowWalletConnectQR(true)
+    }
+    context.setConnector(wallet)
+    localStorage.setItem('CONNECTOR', wallet)
   }
 
   const onClickCloseButton = useCallback(() => {
@@ -119,20 +121,22 @@ export const ModalConnectWallet = (props: Props) => {
   const [acceptedTerms, setAcceptedTerms] = useState(LINK_TERMS_AND_CONDITIONS ? false : true)
 
   useEffect(() => {
-    if (context.active && !context.account && context.connectorName === Wallet.WalletConnect) {
+    if (showWalletConnectQR && context.active && !context.account && context.connectorName === Wallet.WalletConnect) {
       const uri = context.connector.walletConnector.uri
       WalletConnectQRCodeModal.open(uri, () => {
         // Callback passed to the onClose click of the QRCode modal
+        setShowWalletConnectQR(false)
         onClickCloseButton()
         localStorage.removeItem('CONNECTOR')
         context.unsetConnector()
       })
 
       context.connector.walletConnector.on('connect', () => {
+        setShowWalletConnectQR(false)
         WalletConnectQRCodeModal.close()
       })
     }
-  }, [context, onClickCloseButton])
+  }, [context, onClickCloseButton, showWalletConnectQR])
 
   const MetamaskButton = (props: { disabled: boolean }) => (
     <ButtonStyled
