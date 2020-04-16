@@ -1,7 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { IS_CORONA_VERSION } from '../../../../common/constants'
 import { Footer } from '../footer'
 
 const MainScrollStyled = styled.div`
@@ -39,7 +38,7 @@ export const MainScroll: React.FC = props => {
   return (
     <MainScrollStyled {...restProps}>
       <MainScrollInner>{children}</MainScrollInner>
-      {IS_CORONA_VERSION && <Footer />}
+      <Footer />
     </MainScrollStyled>
   )
 }
