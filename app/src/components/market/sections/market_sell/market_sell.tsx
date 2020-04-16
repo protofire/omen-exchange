@@ -143,7 +143,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         <MarketTopDetails
           marketMakerData={marketMakerData}
           title="Choose the shares you want to sell"
-          toggleTitleAction="Pool Information"
+          toggleTitle="Pool Information"
         />
         <OutcomeTable
           balances={balances}
