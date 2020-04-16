@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
+import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
@@ -91,6 +92,10 @@ const ButtonDisconnectWalletStyled = styled(ButtonDisconnectWallet)`
   }
 `
 
+const ButtonWrapper = styled.div`
+  ${ButtonCSS}
+`
+
 const ContentsRight = styled.div`
   align-items: center;
   display: flex;
@@ -126,8 +131,10 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
     })
   }, [])
 
-  // hide connect button if country is blacklisted, or the info isn't available yet
-  const hideConnectButton = IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)
+  const disableConnectButton = IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)
+  const blacklistText = isBlacklistedCountry === true ? 'This action is not allowed in your country' : ''
+  const geolocationErrorText =
+    isBlacklistedCountry === null ? "We couldn't detect your country. Maybe an ad blocker is enabled?" : ''
 
   return (
     <HeaderWrapper {...restProps}>
@@ -142,17 +149,33 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
         <LogoWrapper to="/">{IS_CORONA_VERSION ? <CoronaMarketsLogo /> : <OmenLogo />}</LogoWrapper>
         <ContentsRight>
           {!IS_CORONA_VERSION && (
-            <ButtonCreate buttonType={ButtonType.secondaryLine} onClick={() => history.push('/create')}>
+            <ButtonCreate
+              buttonType={ButtonType.secondaryLine}
+              disabled={disableConnectButton}
+              onClick={() => history.push('/create')}
+            >
               Create Market
             </ButtonCreate>
           )}
-          {!context.account && !hideConnectButton && (
-            <ButtonConnectWalletStyled
-              modalState={isModalOpen}
-              onClick={() => {
-                setModalState(true)
-              }}
-            />
+          {!context.account && (
+            <ButtonWrapper
+              data-class="customTooltip"
+              data-delay-hide="500"
+              data-effect="solid"
+              data-for="connectButtonTooltip"
+              data-multiline={true}
+              data-place="left"
+              data-tip={`${blacklistText}${geolocationErrorText}`}
+            >
+              <ButtonConnectWalletStyled
+                disabled={disableConnectButton}
+                modalState={isModalOpen}
+                onClick={() => {
+                  setModalState(true)
+                }}
+              />
+              {disableConnectButton && <ReactTooltip id="connectButtonTooltip" />}
+            </ButtonWrapper>
           )}
           <ConnectedWeb3>
             <NetworkStyled />
