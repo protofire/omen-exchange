@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { CATEGORIES, IS_CORONA_VERSION } from '../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates } from '../../../../util/types'
 import { Button, ButtonCircle, ButtonSelectable } from '../../../button'
@@ -117,7 +118,7 @@ interface Props {
   context: ConnectedWeb3Context
   count: number
   currentFilter: any
-  markets: RemoteData<any[]>
+  markets: RemoteData<MarketMakerDataItem[]>
   moreMarkets: boolean
   onFilterChange: (filter: MarketFilters) => void
   onLoadMore: () => void
@@ -265,7 +266,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           {RemoteData.hasData(markets) &&
             markets.data.length > 0 &&
             markets.data.slice(0, count).map(item => {
-              return <ListItem key={item.id} market={item}></ListItem>
+              return <ListItem key={item.address} market={item}></ListItem>
             })}
           {RemoteData.is.success(markets) && markets.data.length === 0 && (
             <NoMarketsAvailable>No markets available.</NoMarketsAvailable>

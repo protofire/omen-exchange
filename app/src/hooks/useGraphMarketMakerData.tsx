@@ -3,6 +3,7 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useState } from 'react'
 
+import { getOutcomes } from '../util/networks'
 import { Question, Status } from '../util/types'
 
 const query = gql`
@@ -80,16 +81,6 @@ export type GraphMarketMakerData = {
 type Result = {
   marketMakerData: Maybe<GraphMarketMakerData>
   status: Status
-}
-
-const getOutcomes = (networkId: number, templateId: number) => {
-  const isBinary = templateId === 0
-  const isNuancedBinary = (networkId === 1 && templateId === 6) || (networkId === 4 && templateId === 5)
-  if (isBinary || isNuancedBinary) {
-    return ['No', 'Yes']
-  } else {
-    throw new Error(`Cannot get outcomes for network '${networkId}' and template id '${templateId}'`)
-  }
 }
 
 const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: number): GraphMarketMakerData => {

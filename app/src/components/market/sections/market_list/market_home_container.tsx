@@ -1,13 +1,15 @@
 import { useQuery } from '@apollo/react-hooks'
 import { ethers } from 'ethers'
+import { bigNumberify } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
 import { CORONA_MARKET_CREATORS, IS_CORONA_VERSION, MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { buildQueryMarkets } from '../../../../queries/markets_home'
+import { GraphMarketMakerDataItem, MarketMakerDataItem, buildQueryMarkets } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
+import { getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates } from '../../../../util/types'
 
@@ -16,6 +18,31 @@ import { MarketHome } from './market_home'
 const logger = getLogger('MarketHomeContainer')
 
 const PAGE_SIZE = 10
+
+type GraphResponse = {
+  fixedProductMarketMakers: GraphMarketMakerDataItem[]
+}
+
+const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
+  return data.map((graphMarketMakerDataItem: GraphMarketMakerDataItem) => {
+    const outcomes = graphMarketMakerDataItem.outcomes
+      ? graphMarketMakerDataItem.outcomes
+      : getOutcomes(networkId, +graphMarketMakerDataItem.templateId)
+
+    return {
+      address: graphMarketMakerDataItem.id,
+      collateralVolume: bigNumberify(graphMarketMakerDataItem.collateralVolume),
+      collateralToken: graphMarketMakerDataItem.collateralToken,
+      outcomeTokenAmounts: graphMarketMakerDataItem.outcomeTokenAmounts.map(bigNumberify),
+      title: graphMarketMakerDataItem.title,
+      outcomes,
+      openingTimestamp: new Date(1000 * +graphMarketMakerDataItem.openingTimestamp),
+      arbitrator: graphMarketMakerDataItem.arbitrator,
+      category: graphMarketMakerDataItem.category,
+      templateId: +graphMarketMakerDataItem.templateId,
+    }
+  })
+}
 
 const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
@@ -29,7 +56,7 @@ const MarketHomeContainer: React.FC = () => {
     templateId: null,
     currency: null,
   })
-  const [markets, setMarkets] = useState<RemoteData<any>>(RemoteData.notAsked())
+  const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const [moreMarkets, setMoreMarkets] = useState(true)
 
@@ -51,7 +78,7 @@ const MarketHomeContainer: React.FC = () => {
   if (IS_CORONA_VERSION) {
     marketsQueryVariables.accounts = CORONA_MARKET_CREATORS
   }
-  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery(query, {
+  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
     variables: marketsQueryVariables,
   })
@@ -77,28 +104,27 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(RemoteData.failure(error))
     } else if (fetchedMarkets) {
       const { fixedProductMarketMakers } = fetchedMarkets
-      setMarkets(RemoteData.success(fixedProductMarketMakers))
+
+      setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
       if (fixedProductMarketMakers.length === 0) {
         setMoreMarkets(false)
       }
     }
-  }, [fetchedMarkets, loading, error])
+  }, [fetchedMarkets, loading, error, context.networkId])
 
   const onFilterChange = useCallback((filter: any) => {
-    //if (!IS_CORONA_VERSION) {
     setMoreMarkets(true)
     setFilter(filter)
-    // }
   }, [])
 
   const loadMore = () => {
     if (!moreMarkets) return
     fetchMore({
       variables: {
-        skip: fetchedMarkets.fixedProductMarketMakers.length,
+        skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length,
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        setMoreMarkets(fetchMoreResult.fixedProductMarketMakers.length > 0)
+        setMoreMarkets(fetchMoreResult ? fetchMoreResult.fixedProductMarketMakers.length > 0 : false)
         if (!fetchMoreResult) return prev
         return {
           ...prev,

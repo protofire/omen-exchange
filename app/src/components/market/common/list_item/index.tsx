@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { ERC20Service } from '../../../../services'
 import { calcPrice, formatBigNumber } from '../../../../util/tools'
 
@@ -51,7 +52,7 @@ const Separator = styled.span`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  market: any
+  market: MarketMakerDataItem
 }
 
 export const ListItem: React.FC<Props> = (props: Props) => {
@@ -61,18 +62,10 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const [symbol, setSymbol] = useState('')
 
   const { market } = props
-  const {
-    collateralToken,
-    collateralVolume,
-    id: address,
-    openingTimestamp,
-    outcomeTokenAmounts,
-    outcomes,
-    title,
-  } = market
+  const { address, collateralToken, collateralVolume, openingTimestamp, outcomeTokenAmounts, outcomes, title } = market
 
   const now = moment()
-  const endDate = new Date(openingTimestamp * 1000)
+  const endDate = openingTimestamp
   const endsText = moment(endDate).fromNow()
 
   useEffect(() => {
