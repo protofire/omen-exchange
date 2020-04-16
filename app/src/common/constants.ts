@@ -64,7 +64,7 @@ if (IS_CORONA_VERSION && !DISQUS_URL) {
   throw new Error('You need to set the REACT_APP_DISQUS_URL environment variable')
 }
 
-export const GEO_JS_ENDPOINT = process.env.REACT_APP_GEO_JS_ENDPOINT || 'https://get.geojs.io/v1/ip/geo.json'
+export const GEO_JS_ENDPOINT = process.env.REACT_APP_GEO_JS_ENDPOINT || 'https://get.geojs.io/v1/ip/geo.js'
 
 export const BLACKLISTED_COUNTRIES = (process.env.REACT_APP_BLACKLISTED_COUNTRIES || '').split(',').filter(Boolean)
 
