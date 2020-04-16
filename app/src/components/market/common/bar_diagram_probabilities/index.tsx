@@ -43,25 +43,34 @@ const ProgressBar = styled.div`
   overflow: hidden;
 `
 
-const Progress = styled.div<{ width: number; outcomeIndex: number }>`
+const Progress = styled.div<{ width: number; outcomeIndex: number; selected?: boolean }>`
   background-color: ${props =>
     props.theme.outcomes.colors[props.outcomeIndex].medium
-      ? props.theme.outcomes.colors[props.outcomeIndex].medium
+      ? props.selected
+        ? props.theme.outcomes.colors[props.outcomeIndex].darker
+        : props.theme.outcomes.colors[props.outcomeIndex].medium
       : '#333'};
   border-radius: 4px;
   height: 100%;
-  transition: width 0.5s ease-out;
+  transition: width 0.25s ease-out, background-color 0.25s ease-out;
   width: ${props => props.width}%;
 `
+
+Progress.defaultProps = {
+  outcomeIndex: 0,
+  selected: false,
+  width: 0,
+}
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   outcomeIndex: number
   outcomeName: string
   probability: number
+  selected?: boolean
 }
 
 export const BarDiagram: React.FC<Props> = (props: Props) => {
-  const { outcomeIndex, outcomeName, probability } = props
+  const { outcomeIndex, outcomeName, probability, selected } = props
 
   return (
     <BarDiagramWrapper>
@@ -71,7 +80,7 @@ export const BarDiagram: React.FC<Props> = (props: Props) => {
           <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
         </OutcomeText>
         <ProgressBar>
-          <Progress outcomeIndex={outcomeIndex} width={probability} />
+          <Progress outcomeIndex={outcomeIndex} selected={selected} width={probability} />
         </ProgressBar>
       </Outcome>
     </BarDiagramWrapper>
