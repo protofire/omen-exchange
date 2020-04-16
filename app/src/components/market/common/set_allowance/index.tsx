@@ -43,7 +43,7 @@ export const SetAllowance: React.FC<SetAllowanceProps> = (props: SetAllowancePro
       <Title>Set Allowance</Title>
       <DescriptionWrapper>
         <Description>
-          This permission allows Omen smart contracts to interact with your {collateral.symbol}. This has to be done for
+          This permission allows the smart contracts to interact with your {collateral.symbol}. This has to be done for
           each new token.
         </Description>
         <ToggleTokenLock finished={finished} loading={loading} onUnlock={onUnlock} />
