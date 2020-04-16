@@ -6,10 +6,10 @@ import { Waypoint } from 'react-waypoint'
 
 import { CORONA_MARKET_CREATORS, IS_CORONA_VERSION, MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { getOutcomes } from '../../../../hooks/useGraphMarketMakerData'
 import { GraphMarketMakerDataItem, MarketMakerDataItem, buildQueryMarkets } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
+import { getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates } from '../../../../util/types'
 
@@ -39,7 +39,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       openingTimestamp: new Date(1000 * +graphMarketMakerDataItem.openingTimestamp),
       arbitrator: graphMarketMakerDataItem.arbitrator,
       category: graphMarketMakerDataItem.category,
-      templateId: graphMarketMakerDataItem.templateId,
+      templateId: +graphMarketMakerDataItem.templateId,
     }
   })
 }

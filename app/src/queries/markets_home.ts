@@ -41,7 +41,7 @@ export type MarketMakerDataItem = {
   openingTimestamp: Date
   arbitrator: string
   category: string
-  templateId: string
+  templateId: number
 }
 
 export const DEFAULT_OPTIONS = {
