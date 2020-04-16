@@ -200,7 +200,12 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.OutcomeProbability) ? null : (
           <TDStyled textAlign={TableCellsAlign[1]}>
-            <BarDiagram outcomeIndex={outcomeIndex} outcomeName={outcomeName} probability={probability} />
+            <BarDiagram
+              outcomeIndex={outcomeIndex}
+              outcomeName={outcomeName}
+              probability={probability}
+              selected={outcomeSelected === outcomeIndex}
+            />
             {showOwnedSharesMessage && <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />}
           </TDStyled>
         )}
