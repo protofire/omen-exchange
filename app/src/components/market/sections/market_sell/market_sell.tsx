@@ -148,12 +148,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         <OutcomeTable
           balances={balances}
           collateral={collateral}
-          disabledColumns={[
-            OutcomeTableValue.Payout,
-            OutcomeTableValue.Shares,
-            OutcomeTableValue.Outcome,
-            OutcomeTableValue.Probability,
-          ]}
+          disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
           outcomeHandleChange={(value: number) => {
             setOutcomeIndex(value)
             setBalanceItem(balances[value])
