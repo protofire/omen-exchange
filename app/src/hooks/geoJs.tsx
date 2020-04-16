@@ -35,9 +35,17 @@ export const GeoJsProvider: React.FC = props => {
   const [geoJsData, setGeoJsData] = useState<Maybe<GeoJsResponse>>(null)
 
   useEffect(() => {
-    fetch(GEO_JS_ENDPOINT)
-      .then(response => response.json())
-      .then(setGeoJsData)
+    const win: any = window
+    const script = document.createElement('script')
+
+    script.src = GEO_JS_ENDPOINT
+    script.async = true
+    win.geoip = setGeoJsData
+    document.body.appendChild(script)
+
+    return () => {
+      document.body.removeChild(script)
+    }
   }, [])
 
   return <GeoJsContext.Provider value={geoJsData}>{props.children}</GeoJsContext.Provider>
