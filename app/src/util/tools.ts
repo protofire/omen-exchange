@@ -134,13 +134,15 @@ export const calcSellAmountInCollateral = (
 
   const f = (r: Big) => {
     // For three outcomes, where the first outcome is the one being sold, the formula is:
-    // f(r) = ((y - r - fee*r) * (z - r - fee*r)) * (x  + a - r) - x*y*z
+    // f(r) = ((y - R) * (z - R)) * (x  + a - R) - x*y*z
     // where:
+    //   `R` is r / (1 - fee)
     //   `x`, `y`, `z` are the market maker holdings for each outcome
     //   `a` is the amount of outcomes that are being sold
     //   `r` (the unknown) is the amount of collateral that will be returned in exchange of `a` tokens
-    const firstTerm = otherHoldingsBig.map(h => h.minus(r).minus(r.mul(fee))).reduce((a, b) => a.mul(b))
-    const secondTerm = holdingsBig.plus(sharesToSellBig).minus(r)
+    const R = r.div(1 - fee)
+    const firstTerm = otherHoldingsBig.map(h => h.minus(R)).reduce((a, b) => a.mul(b))
+    const secondTerm = holdingsBig.plus(sharesToSellBig).minus(R)
     const thirdTerm = otherHoldingsBig.reduce((a, b) => a.mul(b), holdingsBig)
     return firstTerm.mul(secondTerm).minus(thirdTerm)
   }
