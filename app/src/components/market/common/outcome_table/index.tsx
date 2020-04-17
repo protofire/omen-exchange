@@ -1,5 +1,3 @@
-import Big from 'big.js'
-import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled, { css } from 'styled-components'
 
@@ -7,11 +5,12 @@ import { IS_CORONA_VERSION } from '../../../../common/constants'
 import { formatBigNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
-import { DragonBallIcon } from '../../../common/icons'
 import { BarDiagram } from '../bar_diagram_probabilities'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors, OutcomeItemText, OutcomeItemTextWrapper } from '../common_styled'
 import { NewValue } from '../new_value'
 import { OwnedShares } from '../owned_shares'
+import { RedeemAmount } from '../redeem_amount'
+import { WinningBadge } from '../winning_badge'
 
 interface Props {
   balances: BalanceItem[]
@@ -59,43 +58,9 @@ const TDFlexDiv = styled.div<{ textAlign?: string }>`
     props.textAlign && 'right' ? 'flex-end' : props.textAlign && 'center' ? 'center' : 'flex-start'};
 `
 
-const BadgeWrapper = styled.div<{ outcomeIndex: number }>`
-  align-items: center;
-  display: flex;
-  margin: 0 0 0 12px;
-
-  .dragonBallIcon {
-    margin: 0 8px 0 0;
-  }
-
-  .fill {
-    fill: ${props =>
-      props.theme.outcomes.colors[props.outcomeIndex].darker
-        ? props.theme.outcomes.colors[props.outcomeIndex].darker
-        : '#333'};
-  }
-`
-
-const BadgeText = styled.div<{ outcomeIndex: number }>`
-  color: ${props =>
-    props.theme.outcomes.colors[props.outcomeIndex].darker
-      ? props.theme.outcomes.colors[props.outcomeIndex].darker
-      : '#333'};
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.2;
-`
-
-const RedeemText = styled.div<{ outcomeIndex: number }>`
-  color: ${props =>
-    props.theme.outcomes.colors[props.outcomeIndex].darker
-      ? props.theme.outcomes.colors[props.outcomeIndex].darker
-      : '#333'};
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.2;
-  margin: 12px 0 0 0;
-  text-align: left;
+const WinningBadgeStyled = styled(WinningBadge)`
+  flex-grow: 1;
+  margin-right: auto;
 `
 
 export const OutcomeTable = (props: Props) => {
@@ -110,37 +75,6 @@ export const OutcomeTable = (props: Props) => {
     probabilities,
     withWinningOutcome = false,
   } = props
-
-  const WinningOutcome = (props: any) => {
-    const { index } = props
-
-    return (
-      payouts && (
-        <BadgeWrapper outcomeIndex={index}>
-          <DragonBallIcon />
-          <BadgeText outcomeIndex={index}>
-            {payouts[index] < 1 ? `${payouts[index] * 100}% ` : ''} Winning Outcome
-          </BadgeText>
-        </BadgeWrapper>
-      )
-    )
-  }
-
-  const RedeemAmount = (props: any) => {
-    const { balance, index } = props
-    const shares = new Big(balance.shares.toString())
-
-    if (!payouts || shares.eq(0)) return null
-
-    const redeemable = new BigNumber(shares.mul(payouts[index]).toString())
-
-    return (
-      <RedeemText outcomeIndex={index}>{`Redeem ${formatBigNumber(
-        redeemable,
-        collateral.decimals,
-      )} (${shares} Shares)`}</RedeemText>
-    )
-  }
 
   const TableHead: OutcomeTableValue[] = [
     OutcomeTableValue.OutcomeProbability,
@@ -182,7 +116,6 @@ export const OutcomeTable = (props: Props) => {
     const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
     const formattedShares = formatBigNumber(shares, collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
-    const showOwnedSharesMessage = !shares.isZero()
 
     return (
       <TR key={outcomeName}>
@@ -205,8 +138,10 @@ export const OutcomeTable = (props: Props) => {
               outcomeName={outcomeName}
               probability={probability}
               selected={outcomeSelected === outcomeIndex}
+              winningBadge={isWinningOutcome && <WinningBadgeStyled index={outcomeIndex} payouts={payouts} />}
             />
-            {showOwnedSharesMessage && <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />}
+            {!isWinningOutcome && <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />}
+            <RedeemAmount balance={balanceItem} collateral={collateral} index={outcomeIndex} payouts={payouts} />
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Outcome) ? null : (
@@ -214,9 +149,7 @@ export const OutcomeTable = (props: Props) => {
             <OutcomeItemTextWrapper>
               {<OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={outcomeIndex} />}
               <OutcomeItemText>{outcomeName}</OutcomeItemText>
-              {isWinningOutcome && <WinningOutcome balance={balanceItem} index={outcomeIndex} />}
             </OutcomeItemTextWrapper>
-            {isWinningOutcome && <RedeemAmount balance={balanceItem} index={outcomeIndex} />}
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Probability) ? null : (

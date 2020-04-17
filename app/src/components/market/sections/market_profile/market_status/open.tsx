@@ -36,9 +36,11 @@ const Wrapper = (props: Props) => {
 
   const renderTableData = () => {
     const disabledColumns = [OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]
+
     if (!userHasShares) {
       disabledColumns.push(OutcomeTableValue.Shares)
     }
+
     return (
       <OutcomeTable
         balances={balances}

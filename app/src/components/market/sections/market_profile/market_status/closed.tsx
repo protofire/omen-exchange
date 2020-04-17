@@ -129,11 +129,8 @@ export const ClosedMarketDetail = (props: Props) => {
 
   const probabilities = balances.map(balance => balance.probability)
 
-  const disabledColumns = [
-    OutcomeTableValue.CurrentPrice,
-    OutcomeTableValue.OutcomeProbability,
-    OutcomeTableValue.Probability,
-  ]
+  const disabledColumns = [OutcomeTableValue.Outcome, OutcomeTableValue.Probability]
+
   if (!account) {
     disabledColumns.push(OutcomeTableValue.Shares)
   }
