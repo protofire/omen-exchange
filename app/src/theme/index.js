@@ -90,7 +90,7 @@ const theme = {
   },
   message: {
     colors: {
-      error: '#ff7848',
+      errorf: '#ff7848',
       default: '#ECEFF1',
       ok: '#00bc93',
       warning: '#f5e148',
