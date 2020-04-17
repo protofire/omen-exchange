@@ -111,9 +111,13 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
   const [isModalOpen, setModalState] = useState(false)
 
   const disableConnectButton = IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)
-  const blacklistText = isBlacklistedCountry === true ? 'This action is not allowed in your country' : ''
-  const geolocationErrorText =
-    isBlacklistedCountry === null ? "We couldn't detect your country. Maybe an ad blocker is enabled?" : ''
+
+  const tooltipText =
+    isBlacklistedCountry === null
+      ? "We couldn't detect your country. Maybe an ad blocker is enabled?"
+      : isBlacklistedCountry === true
+      ? 'This action is not allowed in your country'
+      : ''
 
   return (
     <HeaderWrapper {...restProps}>
@@ -144,7 +148,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               data-for="connectButtonTooltip"
               data-multiline={true}
               data-place="left"
-              data-tip={`${blacklistText}${geolocationErrorText}`}
+              data-tip={tooltipText}
             >
               <ButtonConnectWalletStyled
                 disabled={disableConnectButton}
