@@ -71,7 +71,10 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
     const { outcomes } = graphMarketMakerData.question
 
-    const isQuestionFinalized = !!graphMarketMakerData.answerFinalizedTimestamp
+    const isQuestionFinalized = graphMarketMakerData.answerFinalizedTimestamp
+      ? Date.now() > 1000 * graphMarketMakerData.answerFinalizedTimestamp.toNumber()
+      : false
+
     const {
       collateral,
       isConditionResolved,
