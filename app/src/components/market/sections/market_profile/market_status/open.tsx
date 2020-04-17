@@ -97,7 +97,7 @@ const Wrapper = (props: Props) => {
   return (
     <>
       <ViewCard>
-        <MarketTopDetails marketMakerData={marketMakerData} title="Market Details" toggleTitle="Pool Information" />
+        <MarketTopDetails marketMakerData={marketMakerData} toggleTitle="Pool Information" />
         {renderTableData()}
         <WhenConnected>
           <ButtonContainer>
