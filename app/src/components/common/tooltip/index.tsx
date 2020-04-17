@@ -25,51 +25,6 @@ const TooltipPopup = styled.div`
       }
     }
   }
-
-  .__react_component_tooltip.type-dark.place-top:after {
-    border-top-color: #313131;
-    border-top-width: 10px;
-    bottom: -8px;
-  }
-
-  .reactTooltip {
-    background-color: #313131;
-    color: #fff;
-    font-size: 11px;
-    line-height: 1.3;
-    max-width: 180px;
-    opacity: 1;
-    padding: 5px 8px;
-    text-align: left;
-
-    > a {
-      color: #fff;
-      text-decoration: underline;
-    }
-    > a:hover {
-      color: #00f;
-    }
-
-    &.place-left:after {
-      border-left-color: #000;
-    }
-
-    &.place-right:after {
-      border-right-color: #000;
-    }
-
-    &.place-top:after {
-      border-top-color: #000;
-    }
-
-    &.place-bottom:after {
-      border-bottom-color: #000;
-    }
-
-    .multi-line {
-      text-align: left;
-    }
-  }
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -81,16 +36,9 @@ export const Tooltip = (props: Props) => {
   const { description, id, ...restProps } = props
 
   return (
-    <TooltipPopup
-      data-class="reactTooltip"
-      data-for={id}
-      data-html={true}
-      data-multiline={true}
-      data-tip={description}
-      {...restProps}
-    >
+    <TooltipPopup data-for={id} data-html={true} data-multiline={true} data-tip={description} {...restProps}>
       <IconInfo />
-      <ReactTooltip clickable={true} delayHide={500} effect="solid" id={id} />
+      <ReactTooltip className="customTooltip" clickable={true} delayHide={500} effect="solid" id={id} />
     </TooltipPopup>
   )
 }
