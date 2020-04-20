@@ -15,6 +15,10 @@ const LeftButton = styled(Button)`
   margin-right: auto;
 `
 
+const MessageParagraph = styled.p`
+  color: ${props => props.theme.colors.textColor};
+`
+
 interface Props extends RouteComponentProps<{}> {
   account: Maybe<string>
   marketMakerData: MarketMakerData
@@ -61,6 +65,13 @@ const Wrapper = (props: Props) => {
     </LeftButton>
   )
 
+  const openQuestionMessage = (
+    <MessageParagraph>
+      The question is being resolved. This can take up to 24h. You will be able to redeem your winnings as soon as the
+      market is resolved.
+    </MessageParagraph>
+  )
+
   const openInRealitioButton = (
     <Button
       buttonType={ButtonType.secondaryLine}
@@ -102,7 +113,7 @@ const Wrapper = (props: Props) => {
         <WhenConnected>
           <ButtonContainer>
             {!IS_CORONA_VERSION && poolButton}
-            {isQuestionOpen ? openInRealitioButton : buySellButtons}
+            {isQuestionOpen ? (IS_CORONA_VERSION ? openQuestionMessage : openInRealitioButton) : buySellButtons}
           </ButtonContainer>
         </WhenConnected>
       </ViewCard>
