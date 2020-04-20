@@ -1,15 +1,15 @@
 if: (branch = development) OR (branch = master) OR (tag IS present)
 language: node_js
-node_js: '12'
 before_install:
   - cd app
-  - npm install
+  - yarn
   # Needed to deploy pull request and releases
   - pip install awscli --upgrade --user
 cache:
-  directories:
-  - "$HOME/.npm"
+  yarn: true
 
+before_script:
+- yarn build
 script:
   - echo "Skip tests" # no test cases for the project
 
