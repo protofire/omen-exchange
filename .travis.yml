@@ -1,0 +1,51 @@
+if: (branch = development) OR (branch = master) OR (tag IS present)
+language: node_js
+node_js: '12'
+before_install:
+  - npm install
+  # Needed to deploy pull request and releases
+  - pip install awscli --upgrade --user
+cache:
+  directories:
+  - "$HOME/.npm"
+
+script:
+  - echo "Skip tests" # no test cases for the project
+
+deploy:
+  # DEVELOPMENT deployment
+  - provider: s3
+    bucket: $DEV_BUCKET_NAME
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    skip_cleanup: true
+    local_dir: dist
+    on:
+      branch: development
+
+  # STAGING deployment
+  - provider: s3
+    bucket: $STAGING_BUCKET_NAME
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    skip_cleanup: true
+    local_dir: dist
+    upload-dir: current
+    on:
+      branch: master
+
+
+  # Prepare production deployment
+  - provider: s3
+    bucket: $STAGING_BUCKET_NAME
+    access_key_id: $AWS_ACCESS_KEY_ID
+    secret_access_key: $AWS_SECRET_ACCESS_KEY
+    skip_cleanup: true
+    local_dir: dist
+    upload-dir: releases/$TRAVIS_TAG
+    on:
+      tags: true
+  - provider: script
+    script: bash travis/prepare_production_deployment.sh
+    on:
+      tags: true
