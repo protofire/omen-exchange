@@ -10,6 +10,7 @@ cache:
   yarn: true
 
 before_script:
+- cp .env.example .env
 - yarn build
 script:
   - echo "Skip tests" # no test cases for the project
