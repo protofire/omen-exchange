@@ -109,8 +109,8 @@ export const OutcomeTable = (props: Props) => {
 
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
     const { currentPrice, outcomeName, payout, shares } = balanceItem
-    const currentPriceFormatted = Number(currentPrice).toFixed(2)
-    const probability = probabilities[outcomeIndex]
+    const currentPriceFormatted = withWinningOutcome ? payout : Number(currentPrice).toFixed(2)
+    const probability = withWinningOutcome ? payout * 100 : probabilities[outcomeIndex]
     const isOutcomeSelected = outcomeSelected === outcomeIndex
     const showSharesAndPriceChange = isOutcomeSelected && !IS_CORONA_VERSION
     const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
