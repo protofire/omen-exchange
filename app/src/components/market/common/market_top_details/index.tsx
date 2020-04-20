@@ -3,13 +3,14 @@ import React, { useState } from 'react'
 import { IS_CORONA_VERSION } from '../../../../common/constants'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
-import { GridTwoColumns, SubsectionTitle, SubsectionTitleAction, SubsectionTitleWrapper } from '../../../common'
+import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper } from '../../../common'
 import { TitleValue } from '../../../common/text/title_value'
 import { DisplayArbitrator } from '../display_arbitrator'
+import { MarketTitle } from '../market_title'
 
 interface Props {
   marketMakerData: MarketMakerData
-  title: string
+  title?: string
   toggleTitle: string
 }
 
@@ -38,7 +39,7 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
   return (
     <>
       <SubsectionTitleWrapper>
-        <SubsectionTitle>{title}</SubsectionTitle>
+        <MarketTitle showSubtitleFAQ={false} templateId={question.templateId} title={title} />
         {!IS_CORONA_VERSION && (
           <SubsectionTitleAction onClick={toggleExtraInformation}>
             {showingExtraInformation ? 'Hide' : 'Show'} {toggleTitle}
@@ -68,10 +69,7 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
         ) : null}
         <TitleValue title={'Category'} value={question.category} />
         <TitleValue title={'Resolution Date'} value={question.resolution && formatDate(question.resolution)} />
-        <TitleValue
-          title={'Arbitrator/Oracle'}
-          value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
-        />
+        <TitleValue title={'Arbitrator/Oracle'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
         <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
       </GridTwoColumns>
     </>
