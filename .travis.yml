@@ -21,7 +21,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     skip_cleanup: true
-    local_dir: app/build
+    local_dir: build
     on:
       branch: development
 
@@ -31,7 +31,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     skip_cleanup: true
-    local_dir: app/build
+    local_dir: build
     upload-dir: current
     on:
       branch: master
@@ -43,7 +43,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     skip_cleanup: true
-    local_dir: app/build
+    local_dir: build
     upload-dir: releases/$TRAVIS_TAG
     on:
       tags: true
