@@ -15,8 +15,29 @@ const LeftButton = styled(Button)`
   margin-right: auto;
 `
 
-const MessageParagraph = styled.p`
+const MessageWrapper = styled.div`
+  border-radius: 4px;
+  border: 1px solid ${props => props.theme.borders.borderColorLighter};
+  margin-top: 20px;
+  padding: 20px 25px;
+`
+
+const Title = styled.h2`
+  color: ${props => props.theme.colors.textColorDarker};
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  line-height: 1.2;
+  margin: 0 0 8px;
+`
+
+const Text = styled.p`
   color: ${props => props.theme.colors.textColor};
+  font-size: 14px;
+  font-weight: normal;
+  letter-spacing: 0.2px;
+  line-height: 1.5;
+  margin: 0;
 `
 
 interface Props extends RouteComponentProps<{}> {
@@ -66,10 +87,10 @@ const Wrapper = (props: Props) => {
   )
 
   const openQuestionMessage = (
-    <MessageParagraph>
-      The question is being resolved. This can take up to 24h. You will be able to redeem your winnings as soon as the
-      market is resolved.
-    </MessageParagraph>
+    <MessageWrapper>
+      <Title>The question is being resolved.</Title>
+      <Text>This can take up to 24h. You will be able to redeem your winnings as soon as the market is resolved.</Text>
+    </MessageWrapper>
   )
 
   const openInRealitioButton = (
@@ -106,18 +127,17 @@ const Wrapper = (props: Props) => {
   )
 
   return (
-    <>
-      <ViewCard>
-        <MarketTopDetails marketMakerData={marketMakerData} toggleTitle="Pool Information" />
-        {renderTableData()}
-        <WhenConnected>
-          <ButtonContainer>
-            {!IS_CORONA_VERSION && poolButton}
-            {isQuestionOpen ? (IS_CORONA_VERSION ? openQuestionMessage : openInRealitioButton) : buySellButtons}
-          </ButtonContainer>
-        </WhenConnected>
-      </ViewCard>
-    </>
+    <ViewCard>
+      <MarketTopDetails marketMakerData={marketMakerData} toggleTitle="Pool Information" />
+      {renderTableData()}
+      {isQuestionOpen && IS_CORONA_VERSION && openQuestionMessage}
+      <WhenConnected>
+        <ButtonContainer>
+          {!IS_CORONA_VERSION && poolButton}
+          {isQuestionOpen ? (IS_CORONA_VERSION ? null : openInRealitioButton) : buySellButtons}
+        </ButtonContainer>
+      </WhenConnected>
+    </ViewCard>
   )
 }
 
