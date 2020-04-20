@@ -2,6 +2,7 @@ if: (branch = development) OR (branch = master) OR (tag IS present)
 language: node_js
 node_js: '12'
 before_install:
+  - cd app
   - npm install
   # Needed to deploy pull request and releases
   - pip install awscli --upgrade --user
@@ -19,7 +20,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     skip_cleanup: true
-    local_dir: dist
+    local_dir: app/build
     on:
       branch: development
 
@@ -29,7 +30,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     skip_cleanup: true
-    local_dir: dist
+    local_dir: app/build
     upload-dir: current
     on:
       branch: master
@@ -41,7 +42,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     skip_cleanup: true
-    local_dir: dist
+    local_dir: app/build
     upload-dir: releases/$TRAVIS_TAG
     on:
       tags: true
