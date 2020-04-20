@@ -27,7 +27,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 
 export const RedeemAmount: React.FC<Props> = (props: any) => {
   const { balance, collateral, index, payouts } = props
-  const shares = new Big(balance.shares.toString())
+  const shares = new BigNumber(balance.shares.toString())
   const isWinningOutcome = payouts && payouts[index] > 0
 
   if (!payouts || shares.eq(0) || !isWinningOutcome) return null
@@ -35,7 +35,7 @@ export const RedeemAmount: React.FC<Props> = (props: any) => {
   const redeemable = new BigNumber(shares.mul(payouts[index]).toString())
 
   return (
-    <Wrapper outcomeIndex={index}>{`Redeem ${formatBigNumber(redeemable, collateral.decimals)}
-     (${shares} Shares)`}</Wrapper>
+    <Wrapper outcomeIndex={index}>{`Redeem ${formatBigNumber(redeemable, collateral.decimals)} ${collateral.symbol}
+     (${formatBigNumber(shares, collateral.decimals)} Shares)`}</Wrapper>
   )
 }
