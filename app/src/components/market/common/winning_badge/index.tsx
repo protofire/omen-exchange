@@ -32,17 +32,20 @@ const Text = styled.div<{ outcomeIndex: number }>`
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   index: number
+  outcomeName?: string
   payouts: Maybe<number[]>
 }
 
 export const WinningBadge: React.FC<Props> = props => {
-  const { index, payouts, ...restProps } = props
+  const { index, outcomeName = 'Winning Outcome', payouts, ...restProps } = props
 
   return (
     payouts && (
       <Wrapper outcomeIndex={index} {...restProps}>
         <DragonBallIcon />
-        <Text outcomeIndex={index}>{payouts[index] < 1 ? `${payouts[index] * 100}% ` : ''} Winning Outcome</Text>
+        <Text outcomeIndex={index}>
+          {payouts[index] < 1 ? `${payouts[index] * 100}% ` : ''} {outcomeName}
+        </Text>
       </Wrapper>
     )
   )

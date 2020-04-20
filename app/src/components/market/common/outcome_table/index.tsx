@@ -135,10 +135,14 @@ export const OutcomeTable = (props: Props) => {
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram
               outcomeIndex={outcomeIndex}
-              outcomeName={outcomeName}
+              outcomeName={isWinningOutcome ? '' : outcomeName}
               probability={probability}
               selected={outcomeSelected === outcomeIndex}
-              winningBadge={isWinningOutcome && <WinningBadgeStyled index={outcomeIndex} payouts={payouts} />}
+              winningBadge={
+                isWinningOutcome && (
+                  <WinningBadgeStyled index={outcomeIndex} outcomeName={outcomeName} payouts={payouts} />
+                )
+              }
             />
             {!isWinningOutcome && <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />}
             <RedeemAmount balance={balanceItem} collateral={collateral} index={outcomeIndex} payouts={payouts} />

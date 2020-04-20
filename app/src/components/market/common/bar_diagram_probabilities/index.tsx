@@ -66,7 +66,7 @@ Progress.defaultProps = {
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   outcomeIndex: number
-  outcomeName: string
+  outcomeName?: string
   probability: number
   selected?: boolean
   winningBadge?: React.ReactNode
@@ -79,7 +79,7 @@ export const BarDiagram: React.FC<Props> = (props: Props) => {
     <BarDiagramWrapper>
       <Outcome>
         <OutcomeText>
-          <OutcomeName>{outcomeName}</OutcomeName>
+          {outcomeName && <OutcomeName>{outcomeName}</OutcomeName>}
           {winningBadge}
           <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
         </OutcomeText>

@@ -1,4 +1,3 @@
-import Big from 'big.js'
 import { BigNumber } from 'ethers/utils'
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
