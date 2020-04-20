@@ -13,8 +13,9 @@ import { useFundingBalance } from '../../../../hooks/useFundingBalance'
 import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
+import { RemoteData } from '../../../../util/remote_data'
 import { calcDepositedTokens, calcPoolTokens, formatBigNumber } from '../../../../util/tools'
-import { MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
+import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -76,6 +77,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const [activeTab, setActiveTab] = useState(Tabs.deposit)
 
+  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund))
+  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
+
   const poolTokens = calcPoolTokens(
     amountToFund,
     balances.map(b => b.holdings),
@@ -93,6 +97,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
+      if (hasEnoughAllowance === Ternary.Unknown) {
+        throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown")
+      }
 
       setStatus(Status.Loading)
       setMessage(`Add funding amount: ${formatBigNumber(amountToFund, collateral.decimals)} ${collateral.symbol} ...`)
@@ -102,9 +109,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       const collateralAddress = await marketMaker.getCollateralToken()
       const collateralService = new ERC20Service(provider, account, collateralAddress)
 
-      const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, amountToFund)
-
-      if (!hasEnoughAlowance) {
+      if (hasEnoughAllowance === Ternary.False) {
         await collateralService.approveUnlimited(cpk.address)
       }
 
@@ -164,9 +169,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const probabilities = balances.map(balance => balance.probability)
 
-  const hasZeroAllowance = allowance && allowance.isZero()
-  const hasEnoughAllowance = allowance && allowance.gte(amountToFund)
-  const showSetAllowance = allowanceFinished || hasZeroAllowance || !hasEnoughAllowance
+  const showSetAllowance =
+    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
 
   const depositedTokensTotal = depositedTokens.add(userEarnings)
   const goBackToAddress = `/${marketMakerAddress}`
@@ -277,7 +281,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           <SetAllowance
             collateral={collateral}
             finished={allowanceFinished}
-            loading={allowance === null}
+            loading={RemoteData.is.asking(allowance)}
             onUnlock={unlockCollateral}
           />
         )}
@@ -288,7 +292,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           {activeTab === Tabs.deposit && (
             <Button
               buttonType={ButtonType.secondaryLine}
-              disabled={errorFundingToAdd || hasZeroAllowance || !hasEnoughAllowance}
+              disabled={errorFundingToAdd || hasEnoughAllowance !== Ternary.True}
               onClick={() => addFunding()}
             >
               Deposit

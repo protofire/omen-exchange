@@ -1,8 +1,9 @@
-import { Signer } from 'ethers'
+import { Signer, constants } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
 import { ERC20Service } from '../services'
+import { RemoteData } from '../util/remote_data'
 
 import { useCpk } from './useCpk'
 
@@ -15,7 +16,7 @@ import { useCpk } from './useCpk'
  */
 export const useCpkAllowance = (signer: Signer, tokenAddress: string) => {
   const cpk = useCpk()
-  const [allowance, setAllowance] = useState<Maybe<BigNumber>>(null)
+  const [allowance, setAllowance] = useState<RemoteData<BigNumber>>(RemoteData.notAsked())
 
   const provider = signer.provider
 
@@ -24,26 +25,24 @@ export const useCpkAllowance = (signer: Signer, tokenAddress: string) => {
       const account = await signer.getAddress()
       const collateralService = new ERC20Service(provider, account, tokenAddress)
       const allowance = await collateralService.allowance(account, cpk.address)
-      setAllowance(allowance)
+      setAllowance(RemoteData.success(allowance))
     }
   }, [tokenAddress, cpk, provider, signer])
 
   const unlock = useCallback(async () => {
     if (cpk) {
-      const previousAllowance = allowance
-      setAllowance(null)
+      setAllowance(RemoteData.load(allowance))
+
       const account = await signer.getAddress()
       const collateralService = new ERC20Service(provider, account, tokenAddress)
       try {
         await collateralService.approveUnlimited(cpk.address)
+        setAllowance(RemoteData.success(constants.MaxUint256))
       } catch (e) {
-        // reset allowance if the user rejects or there's an error
-        setAllowance(previousAllowance)
-        throw e
+        setAllowance(RemoteData.failure(e))
       }
-      updateAllowance()
     }
-  }, [allowance, provider, cpk, signer, tokenAddress, updateAllowance])
+  }, [allowance, provider, cpk, signer, tokenAddress])
 
   useEffect(() => {
     updateAllowance()
