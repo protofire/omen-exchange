@@ -1,5 +1,6 @@
 if: (branch = development) OR (branch = master) OR (tag IS present)
 language: node_js
+node_js: '12'
 before_install:
   - cd app
   - yarn
