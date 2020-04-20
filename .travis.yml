@@ -12,6 +12,7 @@ cache:
 before_script:
 - cp .env.example .env
 - yarn build
+- cd ..
 script:
   - echo "Skip tests" # no test cases for the project
 
@@ -22,7 +23,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     skip_cleanup: true
-    local_dir: build
+    local_dir: app/build
     region: eu-central-1
     on:
       branch: development
@@ -33,7 +34,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     skip_cleanup: true
-    local_dir: build
+    local_dir: app/build
     upload-dir: current
     region: eu-central-1
     on:
@@ -46,7 +47,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
     skip_cleanup: true
-    local_dir: build
+    local_dir: app/build
     upload-dir: releases/$TRAVIS_TAG
     region: eu-central-1
     on:
