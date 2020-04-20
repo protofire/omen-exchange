@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
+import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
 import { IS_CORONA_VERSION } from '../../../../common/constants'
-import { ConnectedWeb3, useIsBlacklistedCountry } from '../../../../hooks'
+import { ConnectedWeb3, useDetectAdblocker, useIsBlacklistedCountry } from '../../../../hooks'
 import { Button, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { CoronaMarketsLogo, Network, OmenLogo } from '../../../common'
+import { Message, MessageType } from '../../../common/message'
 import { ModalConnectWallet } from '../../../modal'
 
 const HeaderWrapper = styled.div`
@@ -73,24 +75,25 @@ const ButtonCSS = css`
 
 const NetworkStyled = styled(Network)`
   margin: 0 0 0 5px;
-
   ${ButtonCSS}
 `
 
 const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
   margin: 0 0 0 5px;
-
   ${ButtonCSS}
 `
 
 const ButtonDisconnectWalletStyled = styled(ButtonDisconnectWallet)`
   display: none;
-
   ${ButtonCSS}
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: flex;
   }
+`
+
+const ButtonWrapper = styled.div`
+  ${ButtonCSS}
 `
 
 const ContentsRight = styled.div`
@@ -102,30 +105,60 @@ const ContentsRight = styled.div`
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   const isBlacklistedCountry = useIsBlacklistedCountry()
   const context = useWeb3Context()
+  const isAdBlockDetected = useDetectAdblocker()
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
 
-  // hide connect button if country is blacklisted, or the info isn't available yet
-  const hideConnectButton = IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)
+  const disableConnectButton = IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)
+
+  const tooltipText =
+    isBlacklistedCountry === null
+      ? "We couldn't detect your country. Maybe an ad blocker is enabled?"
+      : isBlacklistedCountry === true
+      ? 'This action is not allowed in your country'
+      : ''
 
   return (
     <HeaderWrapper {...restProps}>
+      {isAdBlockDetected && (
+        <Message
+          text="This dApp may not work correctly with your ad blocker enabled."
+          title="Ad Blocker Detected!"
+          type={MessageType.error}
+        />
+      )}
       <HeaderInner>
         <LogoWrapper to="/">{IS_CORONA_VERSION ? <CoronaMarketsLogo /> : <OmenLogo />}</LogoWrapper>
         <ContentsRight>
           {!IS_CORONA_VERSION && (
-            <ButtonCreate buttonType={ButtonType.secondaryLine} onClick={() => history.push('/create')}>
+            <ButtonCreate
+              buttonType={ButtonType.secondaryLine}
+              disabled={disableConnectButton}
+              onClick={() => history.push('/create')}
+            >
               Create Market
             </ButtonCreate>
           )}
-          {!context.account && !hideConnectButton && (
-            <ButtonConnectWalletStyled
-              modalState={isModalOpen}
-              onClick={() => {
-                setModalState(true)
-              }}
-            />
+          {!context.account && (
+            <ButtonWrapper
+              data-class="customTooltip"
+              data-delay-hide="500"
+              data-effect="solid"
+              data-for="connectButtonTooltip"
+              data-multiline={true}
+              data-place="left"
+              data-tip={tooltipText}
+            >
+              <ButtonConnectWalletStyled
+                disabled={disableConnectButton}
+                modalState={isModalOpen}
+                onClick={() => {
+                  setModalState(true)
+                }}
+              />
+              {disableConnectButton && <ReactTooltip id="connectButtonTooltip" />}
+            </ButtonWrapper>
           )}
           <ConnectedWeb3>
             <NetworkStyled />
