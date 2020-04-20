@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
 import { IS_CORONA_VERSION } from '../../../../common/constants'
-import { ConnectedWeb3, useIsBlacklistedCountry } from '../../../../hooks'
+import { ConnectedWeb3, useDetectAdblocker, useIsBlacklistedCountry } from '../../../../hooks'
 import { Button, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { CoronaMarketsLogo, Network, OmenLogo } from '../../../common'
@@ -105,36 +105,19 @@ const ContentsRight = styled.div`
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   const isBlacklistedCountry = useIsBlacklistedCountry()
   const context = useWeb3Context()
+  const isAdBlockDetected = useDetectAdblocker()
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
-  const [isAdBlockDetected, setIsAdBlockDetected] = useState(false)
-
-  useEffect(() => {
-    new Promise<boolean>(resolve => {
-      // Creates a bait for ad block
-      const elem = document.createElement('div')
-
-      elem.className = 'adclass'
-      document.body.appendChild(elem)
-
-      let isAdBlockDetected
-
-      window.setTimeout(() => {
-        isAdBlockDetected = !(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length)
-        resolve(isAdBlockDetected)
-      }, 0)
-    }).then(data => {
-      if (data) {
-        setIsAdBlockDetected(true)
-      }
-    })
-  }, [])
 
   const disableConnectButton = IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)
-  const blacklistText = isBlacklistedCountry === true ? 'This action is not allowed in your country' : ''
-  const geolocationErrorText =
-    isBlacklistedCountry === null ? "We couldn't detect your country. Maybe an ad blocker is enabled?" : ''
+
+  const tooltipText =
+    isBlacklistedCountry === null
+      ? "We couldn't detect your country. Maybe an ad blocker is enabled?"
+      : isBlacklistedCountry === true
+      ? 'This action is not allowed in your country'
+      : ''
 
   return (
     <HeaderWrapper {...restProps}>
@@ -165,7 +148,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               data-for="connectButtonTooltip"
               data-multiline={true}
               data-place="left"
-              data-tip={`${blacklistText}${geolocationErrorText}`}
+              data-tip={tooltipText}
             >
               <ButtonConnectWalletStyled
                 disabled={disableConnectButton}
