@@ -1,3 +1,5 @@
+import { Ternary } from './types'
+
 enum Types {
   notAsked = '__rd_notAsked__',
   loading = '__rd_loading__',
@@ -30,12 +32,13 @@ const isLoading = (rd: RemoteData<any>): rd is Loading => rd._type === Types.loa
 const isSuccess = (rd: RemoteData<any>): rd is Success<any> => rd._type === Types.success
 const isFailure = (rd: RemoteData<any>): rd is Failure => rd._type === Types.failure
 const isReloading = (rd: RemoteData<any>): rd is Reloading<any> => rd._type === Types.reloading
+const isAsking = (rd: RemoteData<any>): rd is Loading | Reloading<any> => isLoading(rd) || isReloading(rd)
 
 function hasData<T>(rd: RemoteData<T>): rd is Success<T> | Reloading<T> {
   return isSuccess(rd) || isReloading(rd)
 }
 function getDataOr<T>(rd: RemoteData<T>, defaultValue: T): T {
-  return isSuccess(rd) ? rd.data : defaultValue
+  return hasData(rd) ? rd.data : defaultValue
 }
 
 export type RemoteData<D> = NotAsked | Loading | Reloading<D> | Success<D> | Failure
@@ -52,7 +55,22 @@ export const RemoteData = {
     success: isSuccess,
     failure: isFailure,
     reloading: isReloading,
+    asking: isAsking,
   },
   hasData,
   getDataOr,
+  mapToTernary: <D>(remoteData: RemoteData<D>, f: (data: D) => boolean): Ternary => {
+    if (RemoteData.hasData(remoteData)) {
+      return f(remoteData.data) ? Ternary.True : Ternary.False
+    }
+
+    return Ternary.Unknown
+  },
+  load: <D>(remoteData: RemoteData<D>): RemoteData<D> => {
+    if (RemoteData.hasData(remoteData)) {
+      return RemoteData.reloading(remoteData.data)
+    }
+
+    return RemoteData.loading()
+  },
 }

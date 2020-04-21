@@ -32,11 +32,14 @@ const computeEarnedCollateral = (payouts: Maybe<number[]>, balances: BigNumber[]
     return null
   }
 
+  // use floor as rounding method
+  Big.RM = 0
+
   const earnedCollateralPerOutcome = balances.map((balance, index) => new Big(balance.toString()).mul(payouts[index]))
 
   const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b))
 
-  return bigNumberify(earnedCollateral.toString())
+  return bigNumberify(earnedCollateral.toFixed(0))
 }
 
 export const ClosedMarketDetail = (props: Props) => {
@@ -129,11 +132,8 @@ export const ClosedMarketDetail = (props: Props) => {
 
   const probabilities = balances.map(balance => balance.probability)
 
-  const disabledColumns = [
-    OutcomeTableValue.CurrentPrice,
-    OutcomeTableValue.OutcomeProbability,
-    OutcomeTableValue.Probability,
-  ]
+  const disabledColumns = [OutcomeTableValue.Outcome, OutcomeTableValue.Probability]
+
   if (!account) {
     disabledColumns.push(OutcomeTableValue.Shares)
   }

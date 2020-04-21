@@ -159,3 +159,9 @@ export interface MarketMakerData {
   userEarnings: BigNumber
   userPoolShares: BigNumber
 }
+
+export enum Ternary {
+  True,
+  False,
+  Unknown,
+}

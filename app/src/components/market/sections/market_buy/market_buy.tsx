@@ -13,8 +13,9 @@ import { useCpk } from '../../../../hooks/useCpk'
 import { useCpkAllowance } from '../../../../hooks/useCpkAllowance'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
+import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber } from '../../../../util/tools'
-import { MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
+import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -65,7 +66,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
-  const hasEnoughAllowance = allowance && allowance.gte(amount)
+  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
+  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
@@ -162,7 +164,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     cost.isZero() ||
     isBuyAmountGreaterThanBalance ||
     amount.isZero() ||
-    !hasEnoughAllowance
+    hasEnoughAllowance !== Ternary.True
 
   const noteAmount = `${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`
 
@@ -174,8 +176,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
   const total = `${sharesTotal} Shares`
 
-  const hasZeroAllowance = allowance && allowance.isZero()
-  const showSetAllowance = allowanceFinished || hasZeroAllowance || !hasEnoughAllowance
+  const showSetAllowance =
+    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
   const goBackToAddress = `/${marketMakerAddress}`
 
   return (
@@ -230,7 +232,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           <SetAllowance
             collateral={collateral}
             finished={allowanceFinished}
-            loading={allowance === null}
+            loading={RemoteData.is.asking(allowance)}
             onUnlock={unlockCollateral}
           />
         )}

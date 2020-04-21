@@ -8,6 +8,7 @@ import {
   LINK_TERMS_AND_CONDITIONS,
   SHOW_FOOTER,
 } from '../../../../common/constants'
+import { CookiesBanner } from '../../cookies_banner'
 import { Disclaimer } from '../../disclaimer'
 
 const Wrapper = styled.div`
@@ -78,6 +79,7 @@ export const Footer = () => {
         )}
       </Wrapper>
       <Disclaimer />
+      <CookiesBanner />
     </>
   ) : null
 }
