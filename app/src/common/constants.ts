@@ -87,3 +87,5 @@ export const LINK_TERMS_AND_CONDITIONS = process.env.REACT_APP_LINK_TERMS_AND_CO
 export const LINK_COOKIE_POLICY = process.env.REACT_APP_LINK_COOKIE_POLICY || false
 export const LINK_FAQ = process.env.REACT_APP_LINK_FAQ || false
 export const DISCLAIMER_TEXT = process.env.REACT_APP_DISCLAIMER_TEXT || false
+
+export const GOOGLE_ANALYTICS_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_ID || null
