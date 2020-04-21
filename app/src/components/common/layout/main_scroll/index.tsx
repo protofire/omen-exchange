@@ -7,7 +7,7 @@ const MainScrollStyled = styled.div`
   flex-direction: column;
   flex-grow: 1;
   overflow: auto;
-  padding-bottom: 25px;
+  padding-bottom: 15px;
   padding-top: 30px;
   position: relative;
   z-index: 2;
