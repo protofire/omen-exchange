@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
-import { formatBigNumber } from '../../../../util/tools'
+import { formatBigNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, Token } from '../../../../util/types'
 
 const Wrapper = styled.div<{ outcomeIndex: number }>`
@@ -31,7 +31,7 @@ export const RedeemAmount: React.FC<Props> = (props: any) => {
 
   if (!payouts || shares.eq(0) || !isWinningOutcome) return null
 
-  const redeemable = new BigNumber(shares.mul(payouts[index]).toString())
+  const redeemable = mulBN(shares, payouts[index])
 
   return (
     <Wrapper outcomeIndex={index}>{`Redeem ${formatBigNumber(redeemable, collateral.decimals)} ${collateral.symbol}
