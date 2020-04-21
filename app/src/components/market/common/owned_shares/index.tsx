@@ -8,13 +8,15 @@ const Wrapper = styled.div<{ outcomeIndex: number }>`
   line-height: 1.2;
   margin: 12px 0 0 0;
   text-align: left;
+  white-space: nowrap;
 `
 interface Props extends DOMAttributes<HTMLDivElement> {
   outcomeIndex: number
-  value: any
+  value: string
 }
 
 export const OwnedShares: React.FC<Props> = (props: Props) => {
   const { value, ...restProps } = props
-  return <Wrapper {...restProps}>You own {value} Shares</Wrapper>
+
+  return value === '0.00' ? null : <Wrapper {...restProps}>You own {value} Shares</Wrapper>
 }

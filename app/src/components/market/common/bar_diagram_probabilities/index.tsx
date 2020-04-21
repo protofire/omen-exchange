@@ -18,12 +18,13 @@ const OutcomeText = styled.div`
 
 const OutcomeName = styled.h2`
   color: ${props => props.theme.colors.textColorDark};
-  flex-grow: 1;
+  flex-shrink: 0;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
-  margin: 0 15px 0 0;
+  margin: 0 12px 0 0;
   text-align: left;
+  white-space: nowrap;
 `
 
 const OutcomeValue = styled.p`
@@ -34,6 +35,7 @@ const OutcomeValue = styled.p`
   line-height: 1.2;
   margin: 0;
   text-align: right;
+  white-space: nowrap;
 `
 
 const ProgressBar = styled.div`
@@ -64,19 +66,21 @@ Progress.defaultProps = {
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   outcomeIndex: number
-  outcomeName: string
+  outcomeName?: string
   probability: number
   selected?: boolean
+  winningBadge?: React.ReactNode
 }
 
 export const BarDiagram: React.FC<Props> = (props: Props) => {
-  const { outcomeIndex, outcomeName, probability, selected } = props
+  const { outcomeIndex, outcomeName, probability, selected, winningBadge } = props
 
   return (
     <BarDiagramWrapper>
       <Outcome>
         <OutcomeText>
-          <OutcomeName>{outcomeName}</OutcomeName>
+          {outcomeName && <OutcomeName>{outcomeName}</OutcomeName>}
+          {winningBadge}
           <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
         </OutcomeText>
         <ProgressBar>
