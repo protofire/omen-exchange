@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import { Status } from '../../../util/types'
 import { Button } from '../../button'
+import { ButtonType } from '../../button/button_styling_types'
 import { ModalWrapper } from '../modal_wrapper'
 
 const Text = styled.p`
@@ -45,7 +46,7 @@ const ButtonText = styled.p`
   margin: 0 0 0 8px;
 `
 
-const ButtonRetry = styled(Button)`
+const ButtonStyled = styled(Button)`
   flex-grow: 1;
 `
 
@@ -63,12 +64,13 @@ interface Props extends DOMAttributes<HTMLDivElement>, RouteComponentProps {
 const Modal: React.FC<Props> = props => {
   const { status = Status.Ready, isOpen, onClose, shareUrl, title, tweet, text, history, goBackToAddress = '' } = props
   const goBack = () => history.push(goBackToAddress)
+  const shareOnTwitter = status !== Status.Error && tweet && shareUrl
 
   return (
     <ModalWrapper isOpen={isOpen} onRequestClose={goBackToAddress ? goBack : onClose} title={title}>
       <Text>{text}</Text>
       <ButtonContainer>
-        {status !== Status.Error && tweet && (
+        {shareOnTwitter && (
           <TwitterShareButtonExt style={{ flexGrow: '1' }} title={tweet} url={shareUrl}>
             <ButtonTwitter>
               <TwitterIcon size={32} />
@@ -76,7 +78,16 @@ const Modal: React.FC<Props> = props => {
             </ButtonTwitter>
           </TwitterShareButtonExt>
         )}
-        {status === Status.Error && <ButtonRetry onClick={onClose}>Try Again?</ButtonRetry>}
+        {status === Status.Error && (
+          <ButtonStyled buttonType={ButtonType.primary} onClick={onClose}>
+            Try Again?
+          </ButtonStyled>
+        )}
+        {!shareOnTwitter && status !== Status.Error && (
+          <ButtonStyled buttonType={ButtonType.primary} onClick={goBack}>
+            OK
+          </ButtonStyled>
+        )}
       </ButtonContainer>
     </ModalWrapper>
   )
