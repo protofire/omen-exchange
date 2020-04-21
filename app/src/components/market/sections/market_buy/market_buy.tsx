@@ -61,7 +61,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setModalTransactionResultOpen] = useState(false)
   const [tweet, setTweet] = useState('')
-  const [transactionResult, setTransactionResult] = useState('')
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -145,15 +144,16 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
 
-      setTransactionResult(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
 
       setModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
 
-      setTransactionResult(`Error trying to buy '${balances[outcomeIndex].outcomeName}' shares.`)
+      setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
+      setModalTransactionResultOpen(true)
 
-      logger.log(`Error trying to buy: ${err.message}`)
+      logger.error(`${message} - ${err.message}`)
     }
   }
 
@@ -251,8 +251,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         onClose={() => setModalTransactionResultOpen(false)}
         shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
         status={status}
-        text={transactionResult}
-        title={'Buy Shares'}
+        text={message}
+        title={status === Status.Error ? 'Transaction Error' : 'Buy Shares'}
         tweet={tweet}
       />
       {status === Status.Loading && <FullLoading message={message} />}

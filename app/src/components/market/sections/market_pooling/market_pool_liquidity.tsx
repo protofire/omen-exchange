@@ -22,6 +22,7 @@ import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
+import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketTopDetails } from '../../common/market_top_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -74,11 +75,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [amountToRemove, setAmountToRemove] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
+  const [modalTitle, setModalTitle] = useState<string>('')
 
   const [activeTab, setActiveTab] = useState(Tabs.deposit)
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
+
+  const [isModalTransactionResultOpen, setModalTransactionResultOpen] = useState(false)
 
   const poolTokens = calcPoolTokens(
     amountToFund,
@@ -101,8 +105,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown")
       }
 
+      const fundsAmount = formatBigNumber(amountToFund, collateral.decimals)
+
       setStatus(Status.Loading)
-      setMessage(`Add funding amount: ${formatBigNumber(amountToFund, collateral.decimals)} ${collateral.symbol} ...`)
+      setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       const cpk = await CPKService.create(provider)
 
@@ -121,16 +127,25 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Ready)
       setAmountToFund(new BigNumber(0))
+
+      setModalTitle('Funds Deposit')
+      setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
+      setModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
-      logger.log(`Error trying to add funding: ${err.message}`)
+      setMessage(`Error trying to deposit funds.`)
+      setModalTransactionResultOpen(true)
+      logger.error(`${message} - ${err.message}`)
     }
   }
 
   const removeFunding = async () => {
     try {
       setStatus(Status.Loading)
-      setMessage(`Remove funding amount: ${formatBigNumber(amountToRemove, collateral.decimals)} shares...`)
+
+      const fundsAmount = formatBigNumber(amountToRemove, collateral.decimals)
+
+      setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       const cpk = await CPKService.create(provider)
 
@@ -141,9 +156,15 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Ready)
       setAmountToRemove(new BigNumber(0))
+
+      setModalTitle('Funds Withdrawal')
+      setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
+      setModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
-      logger.log(`Error trying to remove funding: ${err.message}`)
+      setMessage(`Error trying to withdraw funds.`)
+      setModalTransactionResultOpen(true)
+      logger.error(`${message} - ${err.message}`)
     }
   }
 
@@ -309,6 +330,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
         </ButtonContainer>
       </ViewCard>
+      <ModalTransactionResult
+        goBackToAddress={goBackToAddress}
+        isOpen={isModalTransactionResultOpen}
+        onClose={() => setModalTransactionResultOpen(false)}
+        status={status}
+        text={message}
+        title={status === Status.Error ? 'Transaction Error' : modalTitle}
+      />
       {status === Status.Loading && <FullLoading message={message} />}
     </>
   )

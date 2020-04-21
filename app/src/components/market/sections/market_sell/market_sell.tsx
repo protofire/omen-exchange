@@ -53,7 +53,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
   const [isModalTransactionResultOpen, setModalTransactionResultOpen] = useState(false)
-  const [transactionResult, setTransactionResult] = useState('')
 
   const calcSellAmount = useMemo(
     () => async (
@@ -131,15 +130,16 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setAmountShares(new BigNumber(0))
       setStatus(Status.Ready)
 
-      setTransactionResult(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
 
       setModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
 
-      setTransactionResult(`Error trying to sell '${balances[outcomeIndex].outcomeName}' shares.`)
+      setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' shares.`)
+      setModalTransactionResultOpen(true)
 
-      logger.log(`Error trying to sell: ${err.message}`)
+      logger.error(`${message} - ${err.message}`)
     }
   }
 
@@ -237,8 +237,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         isOpen={isModalTransactionResultOpen}
         onClose={() => setModalTransactionResultOpen(false)}
         status={status}
-        text={transactionResult}
-        title={'Sell Shares'}
+        text={message}
+        title={status === Status.Error ? 'Transaction Error' : 'Sell Shares'}
       />
       {status === Status.Loading && <FullLoading message={message} />}
     </>
