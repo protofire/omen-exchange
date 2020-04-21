@@ -16,10 +16,11 @@ const Wrapper = styled.div`
   color: ${props => props.theme.colors.textColor};
   display: flex;
   flex-shrink: 0;
+  flex-wrap: wrap;
   font-size: 14px;
-  height: 50px;
   justify-content: center;
   line-height: 1.2;
+  padding: 10px;
   width: 100%;
 `
 
@@ -27,6 +28,7 @@ const Link = styled.a`
   color: ${props => props.theme.colors.textColor};
   cursor: pointer;
   text-decoration: none;
+  white-space: nowrap;
 
   &:hover {
     text-decoration: underline;

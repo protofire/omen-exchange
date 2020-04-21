@@ -1,8 +1,6 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { Footer } from '../footer'
-
 const MainScrollStyled = styled.div`
   align-items: center;
   display: flex;
@@ -38,7 +36,6 @@ export const MainScroll: React.FC = props => {
   return (
     <MainScrollStyled {...restProps}>
       <MainScrollInner>{children}</MainScrollInner>
-      <Footer />
     </MainScrollStyled>
   )
 }
