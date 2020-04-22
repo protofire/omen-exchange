@@ -3,7 +3,7 @@ import { ethers } from 'ethers'
 import React from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 
-import { IS_CORONA_VERSION, MARKET_FEE } from '../../../common/constants'
+import { FETCH_DETAILS_INTERVAL, IS_CORONA_VERSION, MARKET_FEE } from '../../../common/constants'
 import { useCheckContractExists, useMarketMakerData } from '../../../hooks'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { MarketBuyPage, MarketDetailsPage, MarketPoolLiquidityPage, MarketSellPage } from '../../../pages'
@@ -34,7 +34,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
   // Validate contract REALLY exists
   const contractExists = useCheckContractExists(marketMakerAddress, context)
   const { fetchData, marketMakerData } = useMarketMakerData(marketMakerAddress)
-  useInterval(fetchData, 60000)
+  useInterval(fetchData, FETCH_DETAILS_INTERVAL)
   if (!contractExists) {
     logger.log(`Market address not found`)
     return <MarketNotFound />
