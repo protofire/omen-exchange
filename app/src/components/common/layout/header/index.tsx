@@ -19,11 +19,15 @@ const HeaderWrapper = styled.div`
   display: flex;
   flex-grow: 0;
   flex-shrink: 0;
-  height: ${props => props.theme.header.height};
+  height: 45px;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 5;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    height: ${props => props.theme.header.height};
+  }
 `
 
 const HeaderInner = styled.div`

@@ -174,7 +174,7 @@ const AskQuestionStep = (props: Props) => {
                 selected={resolution}
               />
             }
-            title={'Resolution Date'}
+            title={'Earliest Resolution Date'}
           />
         </Column>
         <Column>

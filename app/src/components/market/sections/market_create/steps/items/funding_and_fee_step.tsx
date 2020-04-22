@@ -192,7 +192,7 @@ const FundingAndFeeStep = (props: Props) => {
         </OutcomesTableWrapper>
         <Grid>
           <TitleValueVertical title={'Category'} value={category} />
-          <TitleValueVertical title={'Resolution date'} value={resolutionDate} />
+          <TitleValueVertical title={'Earliest Resolution Date'} value={resolutionDate} />
           <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
         </Grid>
       </CreateCardTop>

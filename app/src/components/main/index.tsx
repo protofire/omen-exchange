@@ -18,6 +18,7 @@ import {
 } from '../../common/constants'
 import { GeoJsProvider } from '../../hooks'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
+import { Footer } from '../common/layout/footer'
 import { Header } from '../common/layout/header'
 import { MarketRoutes } from '../market/routes/market_routes'
 import { MarketWizardCreatorContainer } from '../market/sections/market_create/market_wizard_creator_container'
@@ -58,6 +59,7 @@ export const Main: React.FC = () => {
               </Switch>
             )}
           </MainScroll>
+          <Footer />
         </MainWrapper>
       </Router>
     </GeoJsProvider>
