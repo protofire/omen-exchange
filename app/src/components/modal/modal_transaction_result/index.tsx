@@ -14,6 +14,7 @@ const Text = styled.p`
   display: flex;
   font-size: 17px;
   font-weight: 500;
+  justify-content: center;
   letter-spacing: 0.4px;
   line-height: 1.5;
   margin: 30px 0;
@@ -63,11 +64,11 @@ interface Props extends DOMAttributes<HTMLDivElement>, RouteComponentProps {
 
 const Modal: React.FC<Props> = props => {
   const { status = Status.Ready, isOpen, onClose, shareUrl, title, tweet, text, history, goBackToAddress = '' } = props
-  const goBack = () => history.push(goBackToAddress)
+  const onRequestClose = goBackToAddress ? () => history.push(goBackToAddress) : onClose
   const shareOnTwitter = status !== Status.Error && tweet && shareUrl
 
   return (
-    <ModalWrapper isOpen={isOpen} onRequestClose={goBackToAddress ? goBack : onClose} title={title}>
+    <ModalWrapper isOpen={isOpen} onRequestClose={onRequestClose} title={title}>
       <Text>{text}</Text>
       <ButtonContainer>
         {shareOnTwitter && (
@@ -84,7 +85,7 @@ const Modal: React.FC<Props> = props => {
           </ButtonStyled>
         )}
         {!shareOnTwitter && status !== Status.Error && (
-          <ButtonStyled buttonType={ButtonType.primary} onClick={goBack}>
+          <ButtonStyled buttonType={ButtonType.primary} onClick={onRequestClose}>
             OK
           </ButtonStyled>
         )}

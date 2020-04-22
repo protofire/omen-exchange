@@ -69,22 +69,22 @@ export const ClosedMarketDetail = (props: Props) => {
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const resolveCondition = async () => {
+    setModalTitle('Resolve Condition')
+
     try {
       setStatus(Status.Loading)
       setMessage('Resolving condition...')
-
-      // Balances length is the number of outcomes
       await oracle.resolveCondition(question, balances.length)
 
       setStatus(Status.Ready)
-      setModalTitle('Resolve Condition')
       setMessage(`Condition successfully resolved.`)
     } catch (err) {
       setStatus(Status.Error)
-      setModalTitle('Resolve Condition')
       setMessage(`Error trying to resolve the condition.`)
       logger.error(`${message} - ${err.message}`)
     }
+
+    setIsModalTransactionResultOpen(true)
   }
 
   useEffect(() => {
@@ -110,10 +110,13 @@ export const ClosedMarketDetail = (props: Props) => {
   )
 
   const redeem = async () => {
+    setModalTitle('Redeem Payout')
+
     try {
       if (!earnedCollateral) {
         return
       }
+
       setStatus(Status.Loading)
       setMessage('Redeeming payout...')
 
@@ -131,14 +134,14 @@ export const ClosedMarketDetail = (props: Props) => {
       })
 
       setStatus(Status.Ready)
-      setModalTitle('Redeem Payout')
       setMessage(`Payout successfully redeemed.`)
     } catch (err) {
       setStatus(Status.Error)
-      setModalTitle('Redeem Payout')
       setMessage(`Error trying to redeem.`)
       logger.error(`${message} -  ${err.message}`)
     }
+
+    setIsModalTransactionResultOpen(true)
   }
 
   const probabilities = balances.map(balance => balance.probability)

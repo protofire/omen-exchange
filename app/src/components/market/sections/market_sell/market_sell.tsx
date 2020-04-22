@@ -129,18 +129,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       setAmountShares(new BigNumber(0))
       setStatus(Status.Ready)
-
       setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
-
-      setIsModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
-
       setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' shares.`)
-      setIsModalTransactionResultOpen(true)
-
       logger.error(`${message} - ${err.message}`)
     }
+    setIsModalTransactionResultOpen(true)
   }
 
   const error = (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || !haveEnoughShares

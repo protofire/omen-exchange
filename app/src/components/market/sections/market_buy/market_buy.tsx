@@ -143,18 +143,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
-
       setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
-
-      setIsModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
-
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
-      setIsModalTransactionResultOpen(true)
-
       logger.error(`${message} - ${err.message}`)
     }
+    setIsModalTransactionResultOpen(true)
   }
 
   const isBuyAmountGreaterThanBalance = amount.gt(collateralBalance)

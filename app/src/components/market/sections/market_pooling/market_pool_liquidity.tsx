@@ -96,6 +96,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const addFunding = async () => {
+    setModalTitle('Funds Deposit')
+
     try {
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
@@ -126,20 +128,17 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Ready)
       setAmountToFund(new BigNumber(0))
-
-      setModalTitle('Funds Deposit')
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
-      setIsModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
-      setModalTitle('Funds Deposit')
       setMessage(`Error trying to deposit funds.`)
-      setIsModalTransactionResultOpen(true)
       logger.error(`${message} - ${err.message}`)
     }
+    setIsModalTransactionResultOpen(true)
   }
 
   const removeFunding = async () => {
+    setModalTitle('Funds Withdrawal')
     try {
       setStatus(Status.Loading)
 
@@ -156,17 +155,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Ready)
       setAmountToRemove(new BigNumber(0))
-
-      setModalTitle('Funds Withdrawal')
       setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
       setIsModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
-      setModalTitle('Funds Withdrawal')
       setMessage(`Error trying to withdraw funds.`)
-      setIsModalTransactionResultOpen(true)
       logger.error(`${message} - ${err.message}`)
     }
+    setIsModalTransactionResultOpen(true)
   }
 
   const unlockCollateral = async () => {
