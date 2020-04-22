@@ -74,15 +74,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [amountToFund, setAmountToFund] = useState<BigNumber>(new BigNumber(0))
   const [amountToRemove, setAmountToRemove] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [message, setMessage] = useState<string>('')
   const [modalTitle, setModalTitle] = useState<string>('')
+  const [message, setMessage] = useState<string>('')
+  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
   const [activeTab, setActiveTab] = useState(Tabs.deposit)
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
-
-  const [isModalTransactionResultOpen, setModalTransactionResultOpen] = useState(false)
 
   const poolTokens = calcPoolTokens(
     amountToFund,
@@ -130,11 +129,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setModalTitle('Funds Deposit')
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
-      setModalTransactionResultOpen(true)
+      setIsModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
+      setModalTitle('Funds Deposit')
       setMessage(`Error trying to deposit funds.`)
-      setModalTransactionResultOpen(true)
+      setIsModalTransactionResultOpen(true)
       logger.error(`${message} - ${err.message}`)
     }
   }
@@ -159,11 +159,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setModalTitle('Funds Withdrawal')
       setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
-      setModalTransactionResultOpen(true)
+      setIsModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
+      setModalTitle('Funds Withdrawal')
       setMessage(`Error trying to withdraw funds.`)
-      setModalTransactionResultOpen(true)
+      setIsModalTransactionResultOpen(true)
       logger.error(`${message} - ${err.message}`)
     }
   }
@@ -333,10 +334,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       <ModalTransactionResult
         goBackToAddress={goBackToAddress}
         isOpen={isModalTransactionResultOpen}
-        onClose={() => setModalTransactionResultOpen(false)}
+        onClose={() => setIsModalTransactionResultOpen(false)}
         status={status}
         text={message}
-        title={status === Status.Error ? 'Transaction Error' : modalTitle}
+        title={modalTitle}
       />
       {status === Status.Loading && <FullLoading message={message} />}
     </>

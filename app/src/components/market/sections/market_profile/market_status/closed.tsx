@@ -11,6 +11,7 @@ import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/
 import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
+import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
 import { ClosedMarketTopDetails } from '../../../common/closed_market_top_details'
 import { ButtonContainerFullWidth } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
@@ -60,7 +61,9 @@ export const ClosedMarketDetail = (props: Props) => {
   } = marketMakerData
 
   const [status, setStatus] = useState<Status>(Status.Ready)
+  const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState('')
+  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
@@ -68,15 +71,19 @@ export const ClosedMarketDetail = (props: Props) => {
   const resolveCondition = async () => {
     try {
       setStatus(Status.Loading)
-      setMessage('Resolve condition...')
+      setMessage('Resolving condition...')
 
       // Balances length is the number of outcomes
       await oracle.resolveCondition(question, balances.length)
 
       setStatus(Status.Ready)
+      setModalTitle('Resolve Condition')
+      setMessage(`Condition successfully resolved.`)
     } catch (err) {
       setStatus(Status.Error)
-      logger.log(`Error trying to resolve condition: ${err.message}`)
+      setModalTitle('Resolve Condition')
+      setMessage(`Error trying to resolve the condition.`)
+      logger.error(`${message} - ${err.message}`)
     }
   }
 
@@ -108,7 +115,7 @@ export const ClosedMarketDetail = (props: Props) => {
         return
       }
       setStatus(Status.Loading)
-      setMessage('Redeem payout...')
+      setMessage('Redeeming payout...')
 
       const cpk = await CPKService.create(provider)
 
@@ -124,9 +131,13 @@ export const ClosedMarketDetail = (props: Props) => {
       })
 
       setStatus(Status.Ready)
+      setModalTitle('Redeem Payout')
+      setMessage(`Payout successfully redeemed.`)
     } catch (err) {
       setStatus(Status.Error)
-      logger.log(`Error trying to resolve condition or redeem: ${err.message}`)
+      setModalTitle('Redeem Payout')
+      setMessage(`Error trying to redeem.`)
+      logger.error(`${message} -  ${err.message}`)
     }
   }
 
@@ -190,6 +201,13 @@ export const ClosedMarketDetail = (props: Props) => {
           )}
         </WhenConnected>
       </ViewCard>
+      <ModalTransactionResult
+        isOpen={isModalTransactionResultOpen}
+        onClose={() => setIsModalTransactionResultOpen(false)}
+        status={status}
+        text={message}
+        title={modalTitle}
+      />
       {status === Status.Loading && <FullLoading message={message} />}
     </>
   )

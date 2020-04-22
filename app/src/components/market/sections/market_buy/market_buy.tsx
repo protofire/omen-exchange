@@ -59,7 +59,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
-  const [isModalTransactionResultOpen, setModalTransactionResultOpen] = useState(false)
+  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [tweet, setTweet] = useState('')
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -146,12 +146,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
 
-      setModalTransactionResultOpen(true)
+      setIsModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
 
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
-      setModalTransactionResultOpen(true)
+      setIsModalTransactionResultOpen(true)
 
       logger.error(`${message} - ${err.message}`)
     }
@@ -248,7 +248,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <ModalTransactionResult
         goBackToAddress={goBackToAddress}
         isOpen={isModalTransactionResultOpen}
-        onClose={() => setModalTransactionResultOpen(false)}
+        onClose={() => setIsModalTransactionResultOpen(false)}
         shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
         status={status}
         text={message}
