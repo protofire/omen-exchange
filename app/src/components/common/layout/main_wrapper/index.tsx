@@ -13,7 +13,8 @@ const usePageViews = () => {
   const location = useLocation()
 
   React.useEffect(() => {
-    GoogleAnalytics.send(['pageview', location.pathname])
+    GoogleAnalytics.set({ page: location.pathname })
+    GoogleAnalytics.pageview(location.pathname)
   }, [location])
 }
 export const MainWrapper: React.FC = props => {
