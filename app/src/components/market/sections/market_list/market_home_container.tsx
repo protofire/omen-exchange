@@ -51,7 +51,7 @@ const MarketHomeContainer: React.FC = () => {
     state: MarketStates.open,
     category: 'All',
     title: '',
-    sortBy: null,
+    sortBy: 'collateralVolume',
     arbitrator: null,
     templateId: null,
     currency: null,
