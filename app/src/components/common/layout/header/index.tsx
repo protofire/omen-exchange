@@ -3,6 +3,7 @@ import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
+import useLocalStorageState from 'use-local-storage-state'
 import { useWeb3Context } from 'web3-react/dist'
 
 import { IS_CORONA_VERSION } from '../../../../common/constants'
@@ -106,10 +107,23 @@ const ContentsRight = styled.div`
   margin: auto 0 0 auto;
 `
 
+const AdBlockWarning: React.FC = () => {
+  const adBlockDetected = useDetectAdblocker()
+  const [shownBefore, setShownBefore] = useLocalStorageState('adBlockMessageShown', false)
+
+  return adBlockDetected && !shownBefore ? (
+    <Message
+      onHide={() => setShownBefore(true)}
+      text="This dApp may not work correctly with your ad blocker enabled."
+      title="Ad Blocker Detected!"
+      type={MessageType.error}
+    />
+  ) : null
+}
+
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   const isBlacklistedCountry = useIsBlacklistedCountry()
   const context = useWeb3Context()
-  const isAdBlockDetected = useDetectAdblocker()
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
@@ -125,13 +139,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
 
   return (
     <HeaderWrapper {...restProps}>
-      {isAdBlockDetected && (
-        <Message
-          text="This dApp may not work correctly with your ad blocker enabled."
-          title="Ad Blocker Detected!"
-          type={MessageType.error}
-        />
-      )}
+      <AdBlockWarning />
       <HeaderInner>
         <LogoWrapper to="/">{IS_CORONA_VERSION ? <CoronaMarketsLogo /> : <OmenLogo />}</LogoWrapper>
         <ContentsRight>

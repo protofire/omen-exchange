@@ -129,7 +129,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [state, setState] = useState<MarketStates>(MarketStates.open)
   const [category, setCategory] = useState('All')
   const [title, setTitle] = useState('')
-  const [sortBy, setSortBy] = useState<Maybe<string>>(null)
+  const [sortBy, setSortBy] = useState<Maybe<string>>(props.currentFilter.sortBy)
   const [showSearch, setShowSearch] = useState<boolean>(false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
