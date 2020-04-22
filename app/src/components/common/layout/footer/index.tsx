@@ -10,16 +10,18 @@ import {
 } from '../../../../common/constants'
 import { CookiesBanner } from '../../cookies_banner'
 import { Disclaimer } from '../../disclaimer'
+import { SponsoredBy } from '../../logos/sponsored_by'
 
 const Wrapper = styled.div`
-  align-items: flex-end;
+  align-items: center;
   color: ${props => props.theme.colors.textColor};
   display: flex;
   flex-shrink: 0;
-  font-size: 14px;
-  height: 50px;
+  flex-wrap: wrap;
+  font-size: 13px;
   justify-content: center;
   line-height: 1.2;
+  padding: 10px;
   width: 100%;
 `
 
@@ -27,6 +29,7 @@ const Link = styled.a`
   color: ${props => props.theme.colors.textColor};
   cursor: pointer;
   text-decoration: none;
+  white-space: nowrap;
 
   &:hover {
     text-decoration: underline;
@@ -39,6 +42,10 @@ const Break = styled.span`
   &:last-child {
     display: none;
   }
+`
+
+const SponsoredByStyled = styled(SponsoredBy)`
+  margin-left: 15px;
 `
 
 export const Footer = () => {
@@ -74,9 +81,10 @@ export const Footer = () => {
             <Link href={LINK_FAQ} target="_blank">
               FAQ
             </Link>
-            <Break>-</Break>
+            {/* <Break>-</Break> */}
           </>
         )}
+        <SponsoredByStyled />
       </Wrapper>
       <Disclaimer />
       <CookiesBanner />

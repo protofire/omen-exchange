@@ -20,6 +20,7 @@ const Wrapper = styled.div`
   padding: 15px;
   position: fixed;
   width: 100%;
+  z-index: 12;
 `
 
 const Content = styled.div`

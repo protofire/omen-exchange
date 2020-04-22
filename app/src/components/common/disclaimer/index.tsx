@@ -9,10 +9,14 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  margin: 20px auto 0;
+  margin: 0 auto;
   max-width: 100%;
-  padding: 10px 10px 0;
-  width: ${props => props.theme.mainContainer.maxWidth};
+  padding: 10px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    padding-left: 100px;
+    padding-right: 100px;
+  }
 `
 
 const Text = styled.span`
