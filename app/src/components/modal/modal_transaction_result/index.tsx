@@ -37,6 +37,10 @@ const ButtonTwitter = styled(Button)`
   color: #fff;
   flex-grow: 1;
 
+  rect {
+    fill: none;
+  }
+
   &:hover {
     background-color: #009eda;
     color: #fff;
