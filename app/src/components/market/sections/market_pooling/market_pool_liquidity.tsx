@@ -200,6 +200,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             {activeTab === Tabs.deposit && (
               <>
                 <WalletBalance
+                  onClick={() => setAmountToFund(collateralBalance)}
                   value={`${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`}
                 />
                 <TextfieldCustomPlaceholder
@@ -218,8 +219,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             {activeTab === Tabs.withdraw && (
               <>
                 <WalletBalance
+                  onClick={() => setAmountToRemove(fundingBalance)}
                   text="My Pool Tokens"
-                  value={`${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`}
+                  value={`${formatBigNumber(fundingBalance, collateral.decimals)}`}
                 />
                 <TextfieldCustomPlaceholder
                   formField={
@@ -230,7 +232,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                       value={amountToRemove}
                     />
                   }
-                  placeholderText={collateral.symbol}
+                  placeholderText=""
                 />
               </>
             )}
