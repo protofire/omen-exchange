@@ -133,7 +133,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const error = (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || !haveEnoughShares
 
-  const noteAmount = `${formatBigNumber(balanceItem.shares, collateral.decimals)} shares`
+  const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals)} shares`
   const goBackToAddress = `/${marketMakerAddress}`
 
   return (
@@ -158,7 +158,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         />
         <GridTransactionDetails>
           <div>
-            <WalletBalance value={noteAmount} />
+            <WalletBalance onClick={() => setAmountShares(balanceItem.shares)} value={selectedOutcomeBalance} />
             <TextfieldCustomPlaceholder
               formField={
                 <BigNumberInput
