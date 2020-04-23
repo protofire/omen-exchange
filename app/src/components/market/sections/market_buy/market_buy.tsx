@@ -1,3 +1,4 @@
+import { stripIndents } from 'common-tags'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -134,11 +135,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       })
 
       setTweet(
-        `${question.title}
+        stripIndents(`${question.title}
 
-        I predict ${balances[outcomeIndex].outcomeName}
+      I predict ${balances[outcomeIndex].outcomeName}
 
-        What do you think?`,
+      What do you think?`),
       )
 
       setAmount(new BigNumber(0))
