@@ -84,8 +84,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       )
 
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
-      const costFee = mulBN(amountToSell, marketFeeWithTwoDecimals)
-      const potentialValue = amountToSell.sub(costFee)
+      const potentialValue = mulBN(amountToSell, 1 / (1 - marketFeeWithTwoDecimals))
+      const costFee = potentialValue.sub(amountToSell)
 
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
 
@@ -189,7 +189,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               />
               <TransactionDetailsRow
                 title={'Trading Fee'}
-                value={`${costFee ? formatBigNumber(costFee, collateral.decimals, 2) : '0.00'} ${collateral.symbol}`}
+                value={`${costFee ? formatBigNumber(costFee.mul(-1), collateral.decimals, 2) : '0.00'} ${
+                  collateral.symbol
+                }`}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
