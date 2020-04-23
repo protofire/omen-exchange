@@ -168,7 +168,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                   value={amountShares}
                 />
               }
-              placeholderText={''}
+              symbol={''}
             />
           </div>
           <div>

@@ -212,7 +212,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                       value={amountToFund}
                     />
                   }
-                  placeholderText={collateral.symbol}
+                  symbol={collateral.symbol}
                 />
               </>
             )}
@@ -232,7 +232,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                       value={amountToRemove}
                     />
                   }
-                  placeholderText=""
+                  symbol=""
                 />
               </>
             )}

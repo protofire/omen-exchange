@@ -180,7 +180,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
                   value={amount}
                 />
               }
-              placeholderText={collateral.symbol}
+              symbol={collateral.symbol}
             />
           </div>
           <div>
