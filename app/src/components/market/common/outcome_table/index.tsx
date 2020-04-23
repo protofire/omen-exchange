@@ -22,6 +22,7 @@ interface Props {
   payouts?: Maybe<number[]>
   probabilities: number[]
   withWinningOutcome?: boolean
+  showSharesAndPriceChange?: boolean
 }
 
 const TableWrapper = styled.div`
@@ -74,6 +75,7 @@ export const OutcomeTable = (props: Props) => {
     payouts = [],
     probabilities,
     withWinningOutcome = false,
+    showSharesAndPriceChange = false,
   } = props
 
   const TableHead: OutcomeTableValue[] = [
@@ -112,7 +114,7 @@ export const OutcomeTable = (props: Props) => {
     const currentPriceFormatted = withWinningOutcome ? payout : Number(currentPrice).toFixed(2)
     const probability = withWinningOutcome ? payout * 100 : probabilities[outcomeIndex]
     const isOutcomeSelected = outcomeSelected === outcomeIndex
-    const showSharesAndPriceChange = isOutcomeSelected && !IS_CORONA_VERSION
+    const newPrice = (probabilities[outcomeIndex] / 100).toFixed(2)
     const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
     const formattedShares = formatBigNumber(shares, collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
@@ -163,7 +165,9 @@ export const OutcomeTable = (props: Props) => {
           <TDStyled textAlign={TableCellsAlign[2]}>
             <TDFlexDiv textAlign={TableCellsAlign[2]}>
               {currentPriceFormatted}{' '}
-              {showSharesAndPriceChange && <NewValue outcomeIndex={outcomeIndex} value="1.23" />}
+              {showSharesAndPriceChange && currentPriceFormatted !== newPrice && (
+                <NewValue outcomeIndex={outcomeIndex} value={newPrice} />
+              )}
             </TDFlexDiv>
           </TDStyled>
         )}
