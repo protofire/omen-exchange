@@ -16,26 +16,30 @@ const Title = styled.h3`
   margin: 0 5px 0 0;
 `
 
-const Value = styled.p`
+const Value = styled.p<{ showPointer: boolean }>`
   color: ${props => props.theme.colors.textColor};
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
   margin: 0;
+  ${props => (props.showPointer ? 'cursor: pointer;' : '')}
 `
 
 interface Props {
+  onClick?: () => void
   text?: string
   value: string
 }
 
 export const WalletBalance: React.FC<Props> = props => {
-  const { text = 'Wallet Balance', value, ...restProps } = props
+  const { onClick, text = 'Wallet Balance', value, ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
       <Title>{text}</Title>
-      <Value>{value}</Value>
+      <Value onClick={() => onClick && onClick()} showPointer={!!onClick}>
+        {value}
+      </Value>
     </Wrapper>
   )
 }

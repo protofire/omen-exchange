@@ -170,7 +170,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         />
         <GridTransactionDetails>
           <div>
-            <WalletBalance value={noteAmount} />
+            <WalletBalance onClick={() => setAmount(collateralBalance)} value={currentBalance} />
             <TextfieldCustomPlaceholder
               formField={
                 <BigNumberInput
