@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../../../common/constants'
@@ -86,8 +87,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       )
 
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
-      const costFee = mulBN(amountToSell, marketFeeWithTwoDecimals)
-      const potentialValue = amountToSell.sub(costFee)
+      const potentialValue = mulBN(amountToSell, 1 / (1 - marketFeeWithTwoDecimals))
+      const costFee = potentialValue.sub(amountToSell)
 
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
 
@@ -140,7 +141,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const error = (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || !haveEnoughShares
 
-  const noteAmount = `${formatBigNumber(balanceItem.shares, collateral.decimals)} shares`
+  const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals)} shares`
   const goBackToAddress = `/${marketMakerAddress}`
 
   return (
@@ -165,7 +166,18 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         />
         <GridTransactionDetails>
           <div>
-            <WalletBalance value={noteAmount} />
+            <WalletBalance
+              data-class="customTooltip"
+              data-delay-hide="500"
+              data-effect="solid"
+              data-for="walletBalanceTooltip"
+              data-multiline={true}
+              data-place="right"
+              data-tip={`Sell all of the selected outcome's shares.`}
+              onClick={() => setAmountShares(balanceItem.shares)}
+              value={selectedOutcomeBalance}
+            />
+            <ReactTooltip id="walletBalanceTooltip" />
             <TextfieldCustomPlaceholder
               formField={
                 <BigNumberInput
@@ -175,7 +187,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                   value={amountShares}
                 />
               }
-              placeholderText={''}
+              symbol={'Shares'}
             />
           </div>
           <div>
@@ -196,7 +208,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               />
               <TransactionDetailsRow
                 title={'Trading Fee'}
-                value={`${costFee ? formatBigNumber(costFee, collateral.decimals, 2) : '0.00'} ${collateral.symbol}`}
+                value={`${costFee ? formatBigNumber(costFee.mul(-1), collateral.decimals, 2) : '0.00'} ${
+                  collateral.symbol
+                }`}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
