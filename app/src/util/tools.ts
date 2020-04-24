@@ -7,6 +7,9 @@ import { getLogger } from './logger'
 
 const logger = getLogger('Tools')
 
+// use floor as rounding method
+Big.RM = 0
+
 export const truncateStringInTheMiddle = (str: string, strPositionStart: number, strPositionEnd: number) => {
   const minTruncatedLength = strPositionStart + strPositionEnd
   if (minTruncatedLength < str.length) {

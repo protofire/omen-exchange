@@ -64,7 +64,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { account, library: provider } = context
   const cpk = useCpk()
 
-  const { buildMarketMaker } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const signer = useMemo(() => provider.getSigner(), [provider])
@@ -146,11 +146,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
+      const collateralAddress = await marketMaker.getCollateralToken()
+      const conditionId = await marketMaker.getConditionId()
       const cpk = await CPKService.create(provider)
 
       await cpk.removeFunding({
-        amount: amountToRemove,
+        amountToMerge: depositedTokens,
+        collateralAddress,
+        conditionId,
+        conditionalTokens,
+        earnings: userEarnings,
         marketMaker,
+        outcomesCount: balances.length,
+        sharesToBurn: amountToRemove,
       })
 
       setStatus(Status.Ready)
