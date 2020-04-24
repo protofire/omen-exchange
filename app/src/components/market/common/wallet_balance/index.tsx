@@ -16,13 +16,17 @@ const Title = styled.h3`
   margin: 0 5px 0 0;
 `
 
-const Value = styled.p<{ showPointer: boolean }>`
-  color: ${props => props.theme.colors.textColor};
+const Value = styled.p<{ isClickable: boolean }>`
+  color: ${props => (props.isClickable ? props.theme.colors.primaryLight : props.theme.colors.textColor)};
+  cursor: ${props => (props.isClickable ? 'pointer' : 'default')};
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
   margin: 0;
-  ${props => (props.showPointer ? 'cursor: pointer;' : '')}
+
+  &:hover {
+    text-decoration: ${props => (props.isClickable ? 'underline' : 'none')};
+  }
 `
 
 interface Props {
@@ -37,7 +41,7 @@ export const WalletBalance: React.FC<Props> = props => {
   return (
     <Wrapper {...restProps}>
       <Title>{text}</Title>
-      <Value onClick={() => onClick && onClick()} showPointer={!!onClick}>
+      <Value isClickable={!!onClick} onClick={() => onClick && onClick()}>
         {value}
       </Value>
     </Wrapper>
