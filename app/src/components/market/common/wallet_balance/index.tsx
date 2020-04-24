@@ -16,26 +16,34 @@ const Title = styled.h3`
   margin: 0 5px 0 0;
 `
 
-const Value = styled.p`
-  color: ${props => props.theme.colors.textColor};
+const Value = styled.p<{ isClickable: boolean }>`
+  color: ${props => (props.isClickable ? props.theme.colors.primaryLight : props.theme.colors.textColor)};
+  cursor: ${props => (props.isClickable ? 'pointer' : 'default')};
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
   margin: 0;
+
+  &:hover {
+    text-decoration: ${props => (props.isClickable ? 'underline' : 'none')};
+  }
 `
 
 interface Props {
+  onClick?: () => void
   text?: string
   value: string
 }
 
 export const WalletBalance: React.FC<Props> = props => {
-  const { text = 'Wallet Balance', value, ...restProps } = props
+  const { onClick, text = 'Wallet Balance', value, ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
       <Title>{text}</Title>
-      <Value>{value}</Value>
+      <Value isClickable={!!onClick} onClick={() => onClick && onClick()}>
+        {value}
+      </Value>
     </Wrapper>
   )
 }

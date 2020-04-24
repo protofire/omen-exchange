@@ -214,7 +214,7 @@ const FundingAndFeeStep = (props: Props) => {
               formField={
                 <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
               }
-              placeholderText={collateral.symbol}
+              symbol={collateral.symbol}
             />
           </div>
           <div>
