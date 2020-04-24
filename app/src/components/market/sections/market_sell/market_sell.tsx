@@ -155,6 +155,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           }}
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
+          showSharesAndPriceChange={amountShares.gt(0)}
         />
         <GridTransactionDetails>
           <div>

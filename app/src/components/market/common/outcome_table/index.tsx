@@ -1,7 +1,6 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
 
-import { IS_CORONA_VERSION } from '../../../../common/constants'
 import { formatBigNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
@@ -113,7 +112,6 @@ export const OutcomeTable = (props: Props) => {
     const { currentPrice, outcomeName, payout, shares } = balanceItem
     const currentPriceFormatted = withWinningOutcome ? payout : Number(currentPrice).toFixed(2)
     const probability = withWinningOutcome ? payout * 100 : probabilities[outcomeIndex]
-    const isOutcomeSelected = outcomeSelected === outcomeIndex
     const newPrice = (probabilities[outcomeIndex] / 100).toFixed(2)
     const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
     const formattedShares = formatBigNumber(shares, collateral.decimals)
@@ -165,9 +163,7 @@ export const OutcomeTable = (props: Props) => {
           <TDStyled textAlign={TableCellsAlign[2]}>
             <TDFlexDiv textAlign={TableCellsAlign[2]}>
               {currentPriceFormatted}{' '}
-              {showSharesAndPriceChange && currentPriceFormatted !== newPrice && (
-                <NewValue outcomeIndex={outcomeIndex} value={newPrice} />
-              )}
+              {showSharesAndPriceChange && <NewValue outcomeIndex={outcomeIndex} value={newPrice} />}
             </TDFlexDiv>
           </TDStyled>
         )}
