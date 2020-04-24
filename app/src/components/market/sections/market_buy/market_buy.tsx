@@ -1,3 +1,4 @@
+import { stripIndents } from 'common-tags'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -22,7 +23,7 @@ import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
-import { ModalTwitterShare } from '../../../modal/modal_twitter_share'
+import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketTopDetails } from '../../common/market_top_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -59,8 +60,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [cost, setCost] = useState<BigNumber>(new BigNumber(0))
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
-  const [isModalTwitterShareOpen, setModalTwitterShareState] = useState(false)
-  const [messageTwitter, setMessageTwitter] = useState('')
+  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
+  const [tweet, setTweet] = useState('')
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -122,8 +123,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         return
       }
 
+      const sharesAmount = formatBigNumber(tradedShares, collateral.decimals)
+
       setStatus(Status.Loading)
-      setMessage(`Buying ${formatBigNumber(tradedShares, collateral.decimals)} shares ...`)
+      setMessage(`Buying ${sharesAmount} shares ...`)
 
       await cpk.buyOutcomes({
         amount,
@@ -131,20 +134,23 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         marketMaker,
       })
 
-      setMessageTwitter(
-        `Your outcome was successfully created. You obtain ${formatBigNumber(
-          tradedShares,
-          collateral.decimals,
-        )} shares.`,
+      setTweet(
+        stripIndents(`${question.title}
+
+      I predict ${balances[outcomeIndex].outcomeName}
+
+      What do you think?`),
       )
+
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
-
-      setModalTwitterShareState(true)
+      setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
       setStatus(Status.Error)
-      logger.log(`Error trying to buy: ${err.message}`)
+      setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
+      logger.error(`${message} - ${err.message}`)
     }
+    setIsModalTransactionResultOpen(true)
   }
 
   const isBuyAmountGreaterThanBalance = amount.gt(collateralBalance)
@@ -236,12 +242,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           </Button>
         </ButtonContainer>
       </ViewCard>
-      <ModalTwitterShare
-        description={messageTwitter}
-        isOpen={isModalTwitterShareOpen}
-        onClose={() => setModalTwitterShareState(false)}
+      <ModalTransactionResult
+        goBackToAddress={goBackToAddress}
+        isOpen={isModalTransactionResultOpen}
+        onClose={() => setIsModalTransactionResultOpen(false)}
         shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
-        title={'Outcome created'}
+        status={status}
+        text={message}
+        title={status === Status.Error ? 'Transaction Error' : 'Buy Shares'}
+        tweet={tweet}
       />
       {status === Status.Loading && <FullLoading message={message} />}
     </>
