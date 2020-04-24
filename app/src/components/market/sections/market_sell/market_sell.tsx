@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../../../common/constants'
@@ -158,7 +159,18 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         />
         <GridTransactionDetails>
           <div>
-            <WalletBalance onClick={() => setAmountShares(balanceItem.shares)} value={selectedOutcomeBalance} />
+            <WalletBalance
+              data-class="customTooltip"
+              data-delay-hide="500"
+              data-effect="solid"
+              data-for="walletBalanceTooltip"
+              data-multiline={true}
+              data-place="right"
+              data-tip={`Sell all of the selected outcome's shares.`}
+              onClick={() => setAmountShares(balanceItem.shares)}
+              value={selectedOutcomeBalance}
+            />
+            <ReactTooltip id="walletBalanceTooltip" />
             <TextfieldCustomPlaceholder
               formField={
                 <BigNumberInput

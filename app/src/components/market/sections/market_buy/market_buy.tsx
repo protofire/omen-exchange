@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../../../common/constants'
@@ -170,7 +171,18 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         />
         <GridTransactionDetails>
           <div>
-            <WalletBalance onClick={() => setAmount(collateralBalance)} value={currentBalance} />
+            <WalletBalance
+              data-class="customTooltip"
+              data-delay-hide="500"
+              data-effect="solid"
+              data-for="walletBalanceTooltip"
+              data-multiline={true}
+              data-place="right"
+              data-tip={`Spend your total ${collateral.symbol} balance on the selected outcome.`}
+              onClick={() => setAmount(collateralBalance)}
+              value={currentBalance}
+            />
+            <ReactTooltip id="walletBalanceTooltip" />
             <TextfieldCustomPlaceholder
               formField={
                 <BigNumberInput
