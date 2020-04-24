@@ -45,8 +45,14 @@ interface CPKAddFundingParams {
 }
 
 interface CPKRemoveFundingParams {
-  amount: BigNumber
+  amountToMerge: BigNumber
+  collateralAddress: string
+  conditionId: string
+  conditionalTokens: ConditionalTokenService
+  earnings: BigNumber
   marketMaker: MarketMakerService
+  outcomesCount: number
+  sharesToBurn: BigNumber
 }
 
 interface CPKRedeemParams {
@@ -382,23 +388,55 @@ class CPKService {
     }
   }
 
-  removeFunding = async ({ amount, marketMaker }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
+  removeFunding = async ({
+    amountToMerge,
+    collateralAddress,
+    conditionId,
+    conditionalTokens,
+    earnings,
+    marketMaker,
+    outcomesCount,
+    sharesToBurn,
+  }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
     try {
-      const transactions = [
-        {
-          operation: CPK.CALL,
-          to: marketMaker.address,
-          value: 0,
-          data: MarketMakerService.encodeRemoveFunding(amount),
-        },
-      ]
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+
+      const removeFundingTx = {
+        operation: CPK.CALL,
+        to: marketMaker.address,
+        value: 0,
+        data: MarketMakerService.encodeRemoveFunding(sharesToBurn),
+      }
+
+      const mergePositionsTx = {
+        operation: CPK.CALL,
+        to: conditionalTokens.address,
+        value: 0,
+        data: ConditionalTokenService.encodeMergePositions(
+          collateralAddress,
+          conditionId,
+          outcomesCount,
+          amountToMerge,
+        ),
+      }
+
+      // transfer to the user the merged collateral plus the earned fees
+      const transferCollateralTx = {
+        operation: CPK.CALL,
+        to: collateralAddress,
+        value: 0,
+        data: ERC20Service.encodeTransfer(account, amountToMerge.add(earnings)),
+      }
+
+      const transactions = [removeFundingTx, mergePositionsTx, transferCollateralTx]
 
       const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
 
       logger.log(`Transaction hash: ${txObject.hash}`)
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
-      logger.error(`There was an error removing amount '${amount.toString()}' for funding`, err.message)
+      logger.error(`There was an error removing amount '${sharesToBurn.toString()}' for funding`, err.message)
       throw err
     }
   }

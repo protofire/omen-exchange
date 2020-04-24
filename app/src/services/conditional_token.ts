@@ -1,6 +1,6 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
 import { TransactionReceipt } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, BigNumberish } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck } from '../util/networks'
@@ -21,6 +21,7 @@ const conditionalTokensAbi = [
   'function balanceOf(address owner, uint256 positionId) external view returns (uint256)',
   'function safeTransferFrom(address from, address to, uint256 id, uint256 value, bytes data) external',
   'function getOutcomeSlotCount(bytes32 conditionId) external view returns (uint)',
+  'function mergePositions(address collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external',
 ]
 
 class ConditionalTokenService {
@@ -193,6 +194,24 @@ class ConditionalTokenService {
       ethers.constants.HashZero,
       conditionId,
       indexSets,
+    ])
+  }
+
+  static encodeMergePositions = (
+    collateralToken: string,
+    conditionId: string,
+    outcomesCount: number,
+    amount: BigNumberish,
+  ): string => {
+    const redeemPositionsInterface = new utils.Interface(conditionalTokensAbi)
+    const indexSets = getIndexSets(outcomesCount)
+
+    return redeemPositionsInterface.functions.mergePositions.encode([
+      collateralToken,
+      ethers.constants.HashZero,
+      conditionId,
+      indexSets,
+      amount,
     ])
   }
 }
