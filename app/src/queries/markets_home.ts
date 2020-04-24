@@ -59,8 +59,9 @@ type buildQueryType = MarketFilters & { isCoronaVersion: boolean }
 export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => {
   const { arbitrator, category, currency, isCoronaVersion, state, templateId, title } = options
   const whereClause = [
-    state === MarketStates.closed ? 'answerFinalizedTimestamp_not: null' : '',
+    state === MarketStates.closed ? 'answerFinalizedTimestamp_gt: $now' : '',
     state === MarketStates.open ? 'answerFinalizedTimestamp: null' : '',
+    state === MarketStates.pending ? 'answerFinalizedTimestamp_lt: $now' : '',
     state === MarketStates.myMarkets || isCoronaVersion ? 'creator_in: $accounts' : '',
     category === 'All' ? '' : 'category: $category',
     title ? 'title_contains: $title' : '',
@@ -72,7 +73,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     .filter(s => s.length)
     .join(',')
   const query = gql`
-    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $title: String, $currency: String, $arbitrator: String, $templateId: String, $accounts: [String!], $fee: String) {
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $title: String, $currency: String, $arbitrator: String, $templateId: String, $accounts: [String!], $now: String, $fee: String) {
       fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: desc, where: { ${whereClause} }) {
         ...marketData
       }

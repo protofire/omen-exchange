@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import { useInterval } from '@react-corekit/use-interval'
 import { ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -59,6 +60,10 @@ const MarketHomeContainer: React.FC = () => {
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const [moreMarkets, setMoreMarkets] = useState(true)
+  const calcNow = () => (Date.now() / 1000).toFixed(0)
+  const [now, setNow] = useState<string>(calcNow())
+
+  useInterval(() => setNow(calcNow), 1000 * 60 * 5)
 
   const { account, library: provider } = context
 
@@ -73,6 +78,7 @@ const MarketHomeContainer: React.FC = () => {
     skip: 0,
     accounts: cpkAddress ? [cpkAddress] : null,
     fee: feeBN.toString(),
+    now,
     ...filter,
   }
   if (IS_CORONA_VERSION) {
