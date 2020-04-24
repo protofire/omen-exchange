@@ -16,6 +16,7 @@ import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
+import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketTopDetails } from '../../common/market_top_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -49,6 +50,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
+  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
   const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
 
@@ -111,8 +113,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         return
       }
 
+      const sharesAmount = formatBigNumber(amountShares, collateral.decimals)
+
       setStatus(Status.Loading)
-      setMessage(`Selling ${formatBigNumber(amountShares, collateral.decimals)} shares ...`)
+      setMessage(`Selling ${sharesAmount} shares...`)
 
       const cpk = await CPKService.create(context.library)
 
@@ -125,10 +129,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       setAmountShares(new BigNumber(0))
       setStatus(Status.Ready)
+      setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
       setStatus(Status.Error)
-      logger.log(`Error trying to sell: ${err.message}`)
+      setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' shares.`)
+      logger.error(`${message} - ${err.message}`)
     }
+    setIsModalTransactionResultOpen(true)
   }
 
   const error = (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || !haveEnoughShares
@@ -220,6 +227,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           </Button>
         </ButtonContainer>
       </ViewCard>
+      <ModalTransactionResult
+        goBackToAddress={goBackToAddress}
+        isOpen={isModalTransactionResultOpen}
+        onClose={() => setIsModalTransactionResultOpen(false)}
+        status={status}
+        text={message}
+        title={status === Status.Error ? 'Transaction Error' : 'Sell Shares'}
+      />
       {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
