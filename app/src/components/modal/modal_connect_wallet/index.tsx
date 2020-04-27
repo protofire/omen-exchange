@@ -8,7 +8,7 @@ import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
-import { CheckboxInput, MadeBy } from '../../common'
+import { CheckboxInput, MadeBy, Spinner } from '../../common'
 import { ModalWrapper } from '../../modal/modal_wrapper'
 
 import MetaMaskSVG from './img/metamask.svg'
@@ -97,6 +97,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const ModalConnectWallet = (props: Props) => {
   const context = useWeb3Context()
   const [showWalletConnectQR, setShowWalletConnectQR] = useState(false)
+  const [showConnectingMessage, setShowConnectingMessage] = useState(false)
   const { isOpen } = props
 
   if (context.error) {
@@ -109,6 +110,9 @@ export const ModalConnectWallet = (props: Props) => {
   const onClickWallet = (wallet: Wallet) => {
     if (wallet === Wallet.WalletConnect) {
       setShowWalletConnectQR(true)
+    }
+    if (wallet === Wallet.MetaMask) {
+      setShowConnectingMessage(true)
     }
     context.setConnector(wallet)
     localStorage.setItem('CONNECTOR', wallet)
@@ -137,6 +141,13 @@ export const ModalConnectWallet = (props: Props) => {
       })
     }
   }, [context, onClickCloseButton, showWalletConnectQR])
+
+  useEffect(() => {
+    if (showConnectingMessage && context.account && context.connectorName === Wallet.MetaMask) {
+      onClickCloseButton()
+      setShowConnectingMessage(false)
+    }
+  }, [context, onClickCloseButton, showConnectingMessage])
 
   const MetamaskButton = (props: { disabled: boolean }) => (
     <ButtonStyled
@@ -168,10 +179,17 @@ export const ModalConnectWallet = (props: Props) => {
     <>
       {!context.account && (
         <ModalWrapper isOpen={isOpen} onRequestClose={onClickCloseButton} title={`Connect a Wallet`}>
-          <ButtonsWrapper>
-            <MetamaskButton disabled={!doesMetamaskExist || !acceptedTerms} />
-            <WalletConnectButton disabled={!acceptedTerms} />
-          </ButtonsWrapper>
+          {showConnectingMessage ? (
+            <>
+              <Spinner height="25px" width="25px"></Spinner>
+              <Text>Waiting for metamask connection</Text>
+            </>
+          ) : (
+            <ButtonsWrapper>
+              <MetamaskButton disabled={!doesMetamaskExist || !acceptedTerms} />
+              <WalletConnectButton disabled={!acceptedTerms} />
+            </ButtonsWrapper>
+          )}
           {LINK_TERMS_AND_CONDITIONS && (
             <TermsWrapper>
               <CheckboxInput

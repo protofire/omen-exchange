@@ -80,7 +80,7 @@ export const CookiesBanner = () => {
 
     logger.log('Loading Google Analytics...')
 
-    GoogleAnalytics.initialize(GOOGLE_ANALYTICS_ID, { gaOptions: { cookieDomain: 'auto' }, debug: true })
+    GoogleAnalytics.initialize(GOOGLE_ANALYTICS_ID, { gaOptions: { cookieDomain: 'auto' } })
     GoogleAnalytics.set({ anonymizeIp: true })
     GoogleAnalytics.set({ page: location.pathname })
     GoogleAnalytics.pageview(location.pathname)
