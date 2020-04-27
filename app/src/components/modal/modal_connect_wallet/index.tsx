@@ -115,10 +115,10 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const ModalConnectWallet = (props: Props) => {
   const context = useWeb3Context()
-  const [showWalletConnectQR, setShowWalletConnectQR] = useState(false)
-  const [showConnectingMessage, setShowConnectingMessage] = useState(false)
+  const [connectingToWalletConnect, setConnectingToWalletConnect] = useState(false)
+  const [connectingToMetamask, setConnectingToMetamask] = useState(false)
   const { isOpen, onClose } = props
-  const [acceptedTerms, setAcceptedTerms] = useState(LINK_TERMS_AND_CONDITIONS ? false : true)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
 
   if (context.error) {
     logger.error('Error in web3 context', context.error)
@@ -129,10 +129,10 @@ export const ModalConnectWallet = (props: Props) => {
   const doesMetamaskExist = 'ethereum' in window || 'web3' in window
   const onClickWallet = (wallet: Wallet) => {
     if (wallet === Wallet.WalletConnect) {
-      setShowWalletConnectQR(true)
+      setConnectingToWalletConnect(true)
     }
     if (wallet === Wallet.MetaMask) {
-      setShowConnectingMessage(true)
+      setConnectingToMetamask(true)
     }
 
     context.setConnector(wallet)
@@ -144,29 +144,34 @@ export const ModalConnectWallet = (props: Props) => {
   }, [onClose])
 
   useEffect(() => {
-    if (showWalletConnectQR && context.active && !context.account && context.connectorName === Wallet.WalletConnect) {
+    if (
+      connectingToWalletConnect &&
+      context.active &&
+      !context.account &&
+      context.connectorName === Wallet.WalletConnect
+    ) {
       const uri = context.connector.walletConnector.uri
       WalletConnectQRCodeModal.open(uri, () => {
         // Callback passed to the onClose click of the QRCode modal
-        setShowWalletConnectQR(false)
+        setConnectingToWalletConnect(false)
         onClickCloseButton()
         localStorage.removeItem('CONNECTOR')
         context.unsetConnector()
       })
 
       context.connector.walletConnector.on('connect', () => {
-        setShowWalletConnectQR(false)
+        setConnectingToWalletConnect(false)
         WalletConnectQRCodeModal.close()
       })
     }
-  }, [context, onClickCloseButton, showWalletConnectQR])
+  }, [context, onClickCloseButton, connectingToWalletConnect])
 
   useEffect(() => {
-    if (showConnectingMessage && context.account && context.connectorName === Wallet.MetaMask) {
+    if (connectingToMetamask && context.account && context.connectorName === Wallet.MetaMask) {
       onClickCloseButton()
-      setShowConnectingMessage(false)
+      setConnectingToMetamask(false)
     }
-  }, [context, onClickCloseButton, showConnectingMessage])
+  }, [context, onClickCloseButton, connectingToMetamask])
 
   const MetamaskButton = (props: { disabled: boolean }) => (
     <ButtonStyled
@@ -194,18 +199,21 @@ export const ModalConnectWallet = (props: Props) => {
     </ButtonStyled>
   )
 
+  const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect
+  const connectingText = connectingToMetamask ? 'Waiting for Approval on Metamask' : 'Opening QR for Wallet Connect'
+
   return (
     <>
-      {!context.account && (
+      {!context.account && isOpen && (
         <ModalWrapper
           isOpen={isOpen}
           onRequestClose={onClickCloseButton}
-          title={showConnectingMessage ? 'Connecting...' : 'Connect a Wallet'}
+          title={connectingToMetamask ? 'Connecting...' : 'Connect a Wallet'}
         >
-          {showConnectingMessage ? (
+          {isConnectingToWallet ? (
             <SpinnerWrapper>
               <Spinner />
-              <ConnectingText>Waiting for Approval on connection</ConnectingText>
+              <ConnectingText>{connectingText}</ConnectingText>
             </SpinnerWrapper>
           ) : (
             <ButtonsWrapper>
@@ -213,7 +221,7 @@ export const ModalConnectWallet = (props: Props) => {
               <WalletConnectButton disabled={!acceptedTerms} />
             </ButtonsWrapper>
           )}
-          {!showConnectingMessage && LINK_TERMS_AND_CONDITIONS && (
+          {!isConnectingToWallet && LINK_TERMS_AND_CONDITIONS && (
             <TermsWrapper>
               <CheckboxInput
                 checked={acceptedTerms}
