@@ -174,7 +174,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
-          showSharesAndPriceChange={amount.gt(0)}
+          showPriceChange={amount.gt(0)}
         />
         <GridTransactionDetails>
           <div>

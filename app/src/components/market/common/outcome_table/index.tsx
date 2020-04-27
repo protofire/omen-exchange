@@ -21,7 +21,7 @@ interface Props {
   payouts?: Maybe<number[]>
   probabilities: number[]
   withWinningOutcome?: boolean
-  showSharesAndPriceChange?: boolean
+  showPriceChange?: boolean
 }
 
 const TableWrapper = styled.div`
@@ -74,7 +74,7 @@ export const OutcomeTable = (props: Props) => {
     payouts = [],
     probabilities,
     withWinningOutcome = false,
-    showSharesAndPriceChange = false,
+    showPriceChange = false,
   } = props
 
   const TableHead: OutcomeTableValue[] = [
@@ -162,8 +162,7 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : (
           <TDStyled textAlign={TableCellsAlign[2]}>
             <TDFlexDiv textAlign={TableCellsAlign[2]}>
-              {currentPriceFormatted}{' '}
-              {showSharesAndPriceChange && <NewValue outcomeIndex={outcomeIndex} value={newPrice} />}
+              {currentPriceFormatted} {showPriceChange && <NewValue outcomeIndex={outcomeIndex} value={newPrice} />}
             </TDFlexDiv>
           </TDStyled>
         )}
