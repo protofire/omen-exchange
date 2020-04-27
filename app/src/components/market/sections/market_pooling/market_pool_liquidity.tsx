@@ -64,7 +64,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { account, library: provider } = context
   const cpk = useCpk()
 
-  const { buildMarketMaker } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const signer = useMemo(() => provider.getSigner(), [provider])
@@ -146,11 +146,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
+      const collateralAddress = await marketMaker.getCollateralToken()
+      const conditionId = await marketMaker.getConditionId()
       const cpk = await CPKService.create(provider)
 
       await cpk.removeFunding({
-        amount: amountToRemove,
+        amountToMerge: depositedTokens,
+        collateralAddress,
+        conditionId,
+        conditionalTokens,
+        earnings: userEarnings,
         marketMaker,
+        outcomesCount: balances.length,
+        sharesToBurn: amountToRemove,
       })
 
       setStatus(Status.Ready)
@@ -218,6 +226,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             {activeTab === Tabs.deposit && (
               <>
                 <WalletBalance
+                  onClick={() => setAmountToFund(collateralBalance)}
                   value={`${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`}
                 />
                 <TextfieldCustomPlaceholder
@@ -229,15 +238,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                       value={amountToFund}
                     />
                   }
-                  placeholderText={collateral.symbol}
+                  symbol={collateral.symbol}
                 />
               </>
             )}
             {activeTab === Tabs.withdraw && (
               <>
                 <WalletBalance
+                  onClick={() => setAmountToRemove(fundingBalance)}
                   text="My Pool Tokens"
-                  value={`${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`}
+                  value={`${formatBigNumber(fundingBalance, collateral.decimals)}`}
                 />
                 <TextfieldCustomPlaceholder
                   formField={
@@ -248,7 +258,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                       value={amountToRemove}
                     />
                   }
-                  placeholderText={collateral.symbol}
+                  symbol=""
                 />
               </>
             )}

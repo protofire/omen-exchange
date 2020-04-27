@@ -222,7 +222,7 @@ const Outcomes = (props: Props) => {
                 value={newOutcomeProbability ? newOutcomeProbability : ''}
               />
             }
-            placeholderText="%"
+            symbol="%"
           />
         )}
         <CustomButtonCircleAdd
