@@ -98,12 +98,12 @@ export const ModalConnectWallet = (props: Props) => {
   const context = useWeb3Context()
   const [showWalletConnectQR, setShowWalletConnectQR] = useState(false)
   const [showConnectingMessage, setShowConnectingMessage] = useState(false)
-  const { isOpen } = props
+  const { isOpen, onClose } = props
 
   if (context.error) {
     logger.error('Error in web3 context', context.error)
     localStorage.removeItem('CONNECTOR')
-    props.onClose()
+    onClose()
   }
 
   const doesMetamaskExist = 'ethereum' in window || 'web3' in window
@@ -119,8 +119,8 @@ export const ModalConnectWallet = (props: Props) => {
   }
 
   const onClickCloseButton = useCallback(() => {
-    props.onClose()
-  }, [props])
+    onClose()
+  }, [onClose])
 
   const [acceptedTerms, setAcceptedTerms] = useState(LINK_TERMS_AND_CONDITIONS ? false : true)
 
