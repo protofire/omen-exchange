@@ -4,7 +4,7 @@ import styled from 'styled-components'
 interface Props {
   disabled?: boolean
   formField: any
-  placeholderText: any
+  symbol: any
 }
 
 const FieldWrapper = styled.div<{ disabled?: boolean }>`
@@ -68,7 +68,7 @@ FieldWrapper.defaultProps = {
   disabled: false,
 }
 
-const Placeholder = styled.span`
+const Symbol = styled.span`
   color: ${props => props.theme.colors.primary};
   flex-shrink: 0;
   font-size: 14px;
@@ -77,13 +77,13 @@ const Placeholder = styled.span`
   text-align: right;
 `
 
-export const TextfieldCustomPlaceholder = (props: Props) => {
-  const { disabled, formField, placeholderText, ...restProps } = props
+export const TextfieldCustomSymbol = (props: Props) => {
+  const { disabled, formField, symbol, ...restProps } = props
 
   return (
     <FieldWrapper disabled={disabled} {...restProps}>
       {formField}
-      <Placeholder>{placeholderText}</Placeholder>
+      <Symbol>{symbol}</Symbol>
     </FieldWrapper>
   )
 }

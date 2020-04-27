@@ -120,6 +120,9 @@ class MarketMakerService {
     return calcPrice(holdings)
   }
 
+  /**
+   * Return the holdings of each outcome for the given address
+   */
   getBalanceInformation = async (ownerAddress: string, outcomeQuantity: number): Promise<BigNumber[]> => {
     const conditionId = await this.getConditionId()
     const collateralTokenAddress = await this.getCollateralToken()

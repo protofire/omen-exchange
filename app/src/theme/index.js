@@ -79,6 +79,7 @@ const theme = {
     green: '#4B9E98',
     mainBodyBackground: '#fff',
     primary: '#1565C0',
+    primaryLight: '#1E88E5',
     secondary: '#E3F2FD',
     tertiary: '#D6EBFD',
     tertiaryDark: '#90CAF9',
