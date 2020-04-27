@@ -60,7 +60,7 @@ const MarketHomeContainer: React.FC = () => {
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const [moreMarkets, setMoreMarkets] = useState(true)
-  const calcNow = () => (Date.now() / 1000).toFixed(0)
+  const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
   const [now, setNow] = useState<string>(calcNow())
 
   useInterval(() => setNow(calcNow), 1000 * 60 * 5)
@@ -78,7 +78,7 @@ const MarketHomeContainer: React.FC = () => {
     skip: 0,
     accounts: cpkAddress ? [cpkAddress] : null,
     fee: feeBN.toString(),
-    now,
+    now: +now,
     ...filter,
   }
   if (IS_CORONA_VERSION) {

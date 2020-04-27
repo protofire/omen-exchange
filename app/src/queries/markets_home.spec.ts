@@ -7,7 +7,7 @@ import { DEFAULT_OPTIONS, MarketDataFragment, buildQueryMarkets } from './market
 
 const getExpectedQuery = (whereClause: string) => {
   return gql`
-  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $title: String, $currency: String, $arbitrator: String, $templateId: String, $accounts: [String!], $now: String, $fee: String) {
+  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $title: String, $currency: String, $arbitrator: String, $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
     fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: desc, where: { ${whereClause} }) {
       ...marketData
     }
@@ -72,7 +72,7 @@ test('Not corona markets closed with title and arbitrator', () => {
     arbitrator: 'arbitratorTest',
   })
   const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp_gt: $now, title_contains: $title, arbitrator: $arbitrator, templateId: $templateId, fee: $fee',
+    'answerFinalizedTimestamp_lt: $now, title_contains: $title, arbitrator: $arbitrator, templateId: $templateId, fee: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -87,7 +87,7 @@ test('Closed corona markets with currency', () => {
     currency: 'currencyTest',
   })
   const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp_gt: $now, creator_in: $accounts, title_contains: $title, collateralToken: $currency, templateId: $templateId, fee: $fee',
+    'answerFinalizedTimestamp_lt: $now, creator_in: $accounts, title_contains: $title, collateralToken: $currency, templateId: $templateId, fee: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -99,7 +99,7 @@ test('Query pending markets not corona markets', () => {
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp_lt: $now, category: $category, templateId_in: ["0", "2", "6"], fee: $fee',
+    'answerFinalizedTimestamp_gt: $now, category: $category, templateId_in: ["0", "2", "6"], fee: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
