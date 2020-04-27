@@ -1,7 +1,6 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
 
-import { IS_CORONA_VERSION } from '../../../../common/constants'
 import { formatBigNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
@@ -22,6 +21,7 @@ interface Props {
   payouts?: Maybe<number[]>
   probabilities: number[]
   withWinningOutcome?: boolean
+  showPriceChange?: boolean
 }
 
 const TableWrapper = styled.div`
@@ -74,6 +74,7 @@ export const OutcomeTable = (props: Props) => {
     payouts = [],
     probabilities,
     withWinningOutcome = false,
+    showPriceChange = false,
   } = props
 
   const TableHead: OutcomeTableValue[] = [
@@ -111,8 +112,7 @@ export const OutcomeTable = (props: Props) => {
     const { currentPrice, outcomeName, payout, shares } = balanceItem
     const currentPriceFormatted = withWinningOutcome ? payout : Number(currentPrice).toFixed(2)
     const probability = withWinningOutcome ? payout * 100 : probabilities[outcomeIndex]
-    const isOutcomeSelected = outcomeSelected === outcomeIndex
-    const showSharesAndPriceChange = isOutcomeSelected && !IS_CORONA_VERSION
+    const newPrice = (probabilities[outcomeIndex] / 100).toFixed(2)
     const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
     const formattedShares = formatBigNumber(shares, collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
@@ -162,8 +162,7 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.CurrentPrice) ? null : (
           <TDStyled textAlign={TableCellsAlign[2]}>
             <TDFlexDiv textAlign={TableCellsAlign[2]}>
-              {currentPriceFormatted}{' '}
-              {showSharesAndPriceChange && <NewValue outcomeIndex={outcomeIndex} value="1.23" />}
+              {currentPriceFormatted} {showPriceChange && <NewValue outcomeIndex={outcomeIndex} value={newPrice} />}
             </TDFlexDiv>
           </TDStyled>
         )}

@@ -36,7 +36,6 @@ import { CreateCard } from '../../../../common/create_card'
 import { CurrencySelector } from '../../../../common/currency_selector'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
-import { NewValue } from '../../../../common/new_value'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
@@ -180,9 +179,7 @@ const FundingAndFeeStep = (props: Props) => {
                     </OutcomesTD>
                     <OutcomesTD textAlign="right">{outcome.probability}%</OutcomesTD>
                     <OutcomesTD textAlign="right">
-                      <TDFlexDiv textAlign="right">
-                        0 <NewValue outcomeIndex={index} value="2.35" />
-                      </TDFlexDiv>
+                      <TDFlexDiv textAlign="right">0</TDFlexDiv>
                     </OutcomesTD>
                   </OutcomesTR>
                 )
