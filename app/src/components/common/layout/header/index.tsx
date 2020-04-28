@@ -174,12 +174,16 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
             </ButtonWrapper>
           )}
           <ConnectedWeb3>
-            <NetworkStyled />
-            <ButtonDisconnectWalletStyled
-              callback={() => {
-                setModalState(false)
-              }}
-            />
+            {context.account && (
+              <>
+                <NetworkStyled />
+                <ButtonDisconnectWalletStyled
+                  callback={() => {
+                    setModalState(false)
+                  }}
+                />
+              </>
+            )}
           </ConnectedWeb3>
         </ContentsRight>
         <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
