@@ -1,7 +1,7 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
-import { DragonBallIcon } from '../../../common/icons'
+import { IconDragonBall } from '../../../common/icons'
 
 const Wrapper = styled.div<{ outcomeIndex: number }>`
   align-items: center;
@@ -42,7 +42,7 @@ export const WinningBadge: React.FC<Props> = props => {
   return (
     payouts && (
       <Wrapper outcomeIndex={index} {...restProps}>
-        <DragonBallIcon />
+        <IconDragonBall />
         <Text outcomeIndex={index}>
           {payouts[index] < 1 ? `${payouts[index] * 100}% ` : ''} {outcomeName}
         </Text>

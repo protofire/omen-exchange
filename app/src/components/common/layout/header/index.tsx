@@ -14,7 +14,7 @@ import { CoronaMarketsLogo, Network, OmenLogo } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { Message, MessageType } from '../../../common/message'
 import { ModalConnectWallet } from '../../../modal'
-import { AddIcon } from '../../icons'
+import { IconAdd } from '../../icons'
 
 const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -157,7 +157,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
                 Create Market
               </ButtonCreateDesktop>
               <ButtonCreateMobile {...createButtonProps}>
-                <AddIcon />
+                <IconAdd />
               </ButtonCreateMobile>
             </>
           )}
