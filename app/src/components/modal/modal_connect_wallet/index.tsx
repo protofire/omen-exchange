@@ -16,13 +16,21 @@ import WalletConnectSVG from './img/wallet_connect.svg'
 
 const logger = getLogger('ModalConnectWallet::Index')
 
-const ButtonsWrapper = styled.div`
+const ContentWrapper = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 218px;
-  padding: 15px 0;
+  min-height: 230px;
+  padding: 15px 0 0;
+`
+
+const Buttons = styled.div`
+  margin-top: auto;
+
+  &:last-child {
+    margin-top: 0;
+  }
 `
 
 const ButtonStyled = styled(Button)`
@@ -69,6 +77,7 @@ const TermsWrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: center;
+  margin-top: auto;
 `
 
 const TermsText = styled.label`
@@ -87,14 +96,6 @@ const TermsLink = styled.a`
   &:hover {
     text-decoration: none;
   }
-`
-
-const SpinnerWrapper = styled.div`
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 240px;
 `
 
 const ConnectingText = styled.p`
@@ -205,42 +206,46 @@ export const ModalConnectWallet = (props: Props) => {
         onRequestClose={onClickCloseButton}
         title={connectingToMetamask ? 'Connecting...' : 'Connect a Wallet'}
       >
-        {isConnectingToWallet ? (
-          <SpinnerWrapper>
-            <Spinner />
-            <ConnectingText>{connectingText}</ConnectingText>
-          </SpinnerWrapper>
-        ) : (
-          <ButtonsWrapper>
-            <ConnectButton
-              disabled={!doesMetamaskExist || !acceptedTerms}
-              icon={<IconMetaMask />}
-              onClick={() => {
-                onClickWallet(Wallet.MetaMask)
-              }}
-              text="Metamask"
-            />
-            <ConnectButton
-              disabled={!acceptedTerms}
-              icon={<IconWalletConnect />}
-              onClick={() => {
-                onClickWallet(Wallet.WalletConnect)
-              }}
-              text="Wallet Connect"
-            />
-          </ButtonsWrapper>
-        )}
-        {!isConnectingToWallet && LINK_TERMS_AND_CONDITIONS && (
-          <TermsWrapper>
-            <CheckboxInput checked={acceptedTerms} inputId="termsCheck" onChange={toggleAcceptedTerms} />
-            <TermsText className="clickable" htmlFor="termsCheck">
-              I agree to the{' '}
-              <TermsLink href={LINK_TERMS_AND_CONDITIONS} target="_blank">
-                Terms and Conditions
-              </TermsLink>
-            </TermsText>
-          </TermsWrapper>
-        )}
+        <ContentWrapper>
+          {isConnectingToWallet ? (
+            <>
+              <Spinner />
+              <ConnectingText>{connectingText}</ConnectingText>
+            </>
+          ) : (
+            <>
+              <Buttons>
+                <ConnectButton
+                  disabled={!doesMetamaskExist || !acceptedTerms}
+                  icon={<IconMetaMask />}
+                  onClick={() => {
+                    onClickWallet(Wallet.MetaMask)
+                  }}
+                  text="Metamask"
+                />
+                <ConnectButton
+                  disabled={!acceptedTerms}
+                  icon={<IconWalletConnect />}
+                  onClick={() => {
+                    onClickWallet(Wallet.WalletConnect)
+                  }}
+                  text="Wallet Connect"
+                />
+              </Buttons>
+              {LINK_TERMS_AND_CONDITIONS && (
+                <TermsWrapper>
+                  <CheckboxInput checked={acceptedTerms} inputId="termsCheck" onChange={toggleAcceptedTerms} />
+                  <TermsText className="clickable" htmlFor="termsCheck">
+                    I agree to the{' '}
+                    <TermsLink href={LINK_TERMS_AND_CONDITIONS} target="_blank">
+                      Terms and Conditions
+                    </TermsLink>
+                  </TermsText>
+                </TermsWrapper>
+              )}
+            </>
+          )}
+        </ContentWrapper>
         {!IS_CORONA_VERSION && <MadeBy />}
       </ModalWrapper>
     </>
