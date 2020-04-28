@@ -10,10 +10,11 @@ interface Props {
   disabled?: boolean
   networkId: number
   onChangeArbitrator: (arbitrator: Arbitrator) => any
+  value: Arbitrator
 }
 
 export const Arbitrators = (props: Props) => {
-  const { customValues, disabled, networkId, onChangeArbitrator } = props
+  const { customValues, disabled, networkId, onChangeArbitrator, value } = props
   const arbitrators = getArbitratorsByNetwork(networkId)
   const allArbitrators = unionBy(arbitrators, customValues, 'id')
 
@@ -36,8 +37,10 @@ export const Arbitrators = (props: Props) => {
     }
   })
 
+  const currentItem = allArbitrators.findIndex(arbitrator => arbitrator.id === value.id)
   return (
     <Dropdown
+      currentItem={currentItem === -1 ? undefined : currentItem}
       disabled={disabled}
       dropdownDirection={DropdownDirection.upwards}
       dropdownPosition={DropdownPosition.right}

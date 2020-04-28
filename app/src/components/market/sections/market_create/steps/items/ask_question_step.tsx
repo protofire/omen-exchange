@@ -110,7 +110,16 @@ const AskQuestionStep = (props: Props) => {
     values,
   } = props
 
-  const { arbitratorsCustom, categoriesCustom, category, loadedQuestionId, outcomes, question, resolution } = values
+  const {
+    arbitrator,
+    arbitratorsCustom,
+    categoriesCustom,
+    category,
+    loadedQuestionId,
+    outcomes,
+    question,
+    resolution,
+  } = values
 
   const history = useHistory()
 
@@ -201,6 +210,7 @@ const AskQuestionStep = (props: Props) => {
                 disabled={!!loadedQuestionId || IS_CORONA_VERSION}
                 networkId={context.networkId}
                 onChangeArbitrator={handleArbitratorChange}
+                value={arbitrator}
               />
             }
             title={'Arbitrator'}
