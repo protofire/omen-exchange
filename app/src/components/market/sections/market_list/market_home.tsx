@@ -30,7 +30,7 @@ const TopContents = styled.div`
 `
 
 const SelectableButton = styled(ButtonSelectable)`
-  margin-right: 10px;
+  margin-right: 5px;
 
   &:last-child {
     margin-right: 0;
@@ -89,7 +89,7 @@ const NoMarketsAvailable = styled.p`
 `
 
 const SortDropdown = styled(Dropdown)`
-  max-width: 188px;
+  max-width: 145px;
 `
 
 const LoadMoreWrapper = styled.div`
