@@ -94,7 +94,7 @@ const SpinnerWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 230px;
+  min-height: 240px;
 `
 
 const ConnectingText = styled.p`
@@ -107,6 +107,24 @@ const ConnectingText = styled.p`
   padding: 30px 0 0;
   text-align: center;
 `
+
+interface ButtonProps {
+  disabled: boolean
+  onClick: () => void
+  icon: React.ReactNode
+  text: string
+}
+
+const ConnectButton = (props: ButtonProps) => {
+  const { disabled, icon, onClick, text } = props
+
+  return (
+    <ButtonStyled buttonType={ButtonType.secondaryLine} disabled={disabled} onClick={onClick}>
+      {icon}
+      <Text>{text}</Text>
+    </ButtonStyled>
+  )
+}
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   isOpen: boolean
@@ -173,72 +191,58 @@ export const ModalConnectWallet = (props: Props) => {
     }
   }, [context, onClickCloseButton, connectingToMetamask])
 
-  const MetamaskButton = (props: { disabled: boolean }) => (
-    <ButtonStyled
-      buttonType={ButtonType.secondaryLine}
-      disabled={props.disabled}
-      onClick={() => {
-        onClickWallet(Wallet.MetaMask)
-      }}
-    >
-      <IconMetaMask />
-      <Text>MetaMask</Text>
-    </ButtonStyled>
-  )
-
-  const WalletConnectButton = (props: { disabled: boolean }) => (
-    <ButtonStyled
-      buttonType={ButtonType.secondaryLine}
-      disabled={props.disabled}
-      onClick={() => {
-        onClickWallet(Wallet.WalletConnect)
-      }}
-    >
-      <IconWalletConnect />
-      <Text>Wallet Connect</Text>
-    </ButtonStyled>
-  )
+  const toggleAcceptedTerms = useCallback(() => {
+    setAcceptedTerms(!acceptedTerms)
+  }, [acceptedTerms])
 
   const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect
   const connectingText = connectingToMetamask ? 'Waiting for Approval on Metamask' : 'Opening QR for Wallet Connect'
 
   return (
     <>
-      {!context.account && isOpen && (
-        <ModalWrapper
-          isOpen={isOpen}
-          onRequestClose={onClickCloseButton}
-          title={connectingToMetamask ? 'Connecting...' : 'Connect a Wallet'}
-        >
-          {isConnectingToWallet ? (
-            <SpinnerWrapper>
-              <Spinner />
-              <ConnectingText>{connectingText}</ConnectingText>
-            </SpinnerWrapper>
-          ) : (
-            <ButtonsWrapper>
-              <MetamaskButton disabled={!doesMetamaskExist || !acceptedTerms} />
-              <WalletConnectButton disabled={!acceptedTerms} />
-            </ButtonsWrapper>
-          )}
-          {!isConnectingToWallet && LINK_TERMS_AND_CONDITIONS && (
-            <TermsWrapper>
-              <CheckboxInput
-                checked={acceptedTerms}
-                inputId="termsCheck"
-                onChange={() => setAcceptedTerms(!acceptedTerms)}
-              />
-              <TermsText className="clickable" htmlFor="termsCheck">
-                I agree to the{' '}
-                <TermsLink href={LINK_TERMS_AND_CONDITIONS} target="_blank">
-                  Terms and Conditions
-                </TermsLink>
-              </TermsText>
-            </TermsWrapper>
-          )}
-          {!IS_CORONA_VERSION && <MadeBy />}
-        </ModalWrapper>
-      )}
+      <ModalWrapper
+        isOpen={!context.account && isOpen}
+        onRequestClose={onClickCloseButton}
+        title={connectingToMetamask ? 'Connecting...' : 'Connect a Wallet'}
+      >
+        {isConnectingToWallet ? (
+          <SpinnerWrapper>
+            <Spinner />
+            <ConnectingText>{connectingText}</ConnectingText>
+          </SpinnerWrapper>
+        ) : (
+          <ButtonsWrapper>
+            <ConnectButton
+              disabled={!doesMetamaskExist || !acceptedTerms}
+              icon={<IconMetaMask />}
+              onClick={() => {
+                onClickWallet(Wallet.MetaMask)
+              }}
+              text="Metamask"
+            />
+            <ConnectButton
+              disabled={!acceptedTerms}
+              icon={<IconWalletConnect />}
+              onClick={() => {
+                onClickWallet(Wallet.WalletConnect)
+              }}
+              text="Wallet Connect"
+            />
+          </ButtonsWrapper>
+        )}
+        {!isConnectingToWallet && LINK_TERMS_AND_CONDITIONS && (
+          <TermsWrapper>
+            <CheckboxInput checked={acceptedTerms} inputId="termsCheck" onChange={toggleAcceptedTerms} />
+            <TermsText className="clickable" htmlFor="termsCheck">
+              I agree to the{' '}
+              <TermsLink href={LINK_TERMS_AND_CONDITIONS} target="_blank">
+                Terms and Conditions
+              </TermsLink>
+            </TermsText>
+          </TermsWrapper>
+        )}
+        {!IS_CORONA_VERSION && <MadeBy />}
+      </ModalWrapper>
     </>
   )
 }
