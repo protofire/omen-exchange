@@ -158,9 +158,17 @@ export const ModalConnectWallet = (props: Props) => {
     localStorage.setItem('CONNECTOR', wallet)
   }
 
+  const resetEverything = useCallback(() => {
+    setConnectingToWalletConnect(false)
+    setConnectingToMetamask(false)
+    setAcceptedTerms(false)
+    WalletConnectQRCodeModal.close()
+  }, [])
+
   const onClickCloseButton = useCallback(() => {
+    resetEverything() // we need to do this or the states and functions will keep executing even when the modal is closed by the user
     onClose()
-  }, [onClose])
+  }, [onClose, resetEverything])
 
   useEffect(() => {
     if (
