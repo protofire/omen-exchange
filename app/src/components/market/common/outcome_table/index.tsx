@@ -118,7 +118,7 @@ export const OutcomeTable = (props: Props) => {
     const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
 
     return (
-      <TR key={outcomeName}>
+      <TR key={`${outcomeName}-${outcomeIndex}`}>
         {!displayRadioSelection || withWinningOutcome ? null : (
           <TDRadio textAlign={TableCellsAlign[0]}>
             <RadioInput
