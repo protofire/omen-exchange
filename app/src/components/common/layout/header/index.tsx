@@ -177,11 +177,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
             {context.account && (
               <>
                 <NetworkStyled />
-                <ButtonDisconnectWalletStyled
-                  callback={() => {
-                    setModalState(false)
-                  }}
-                />
+                <ButtonDisconnectWalletStyled />
               </>
             )}
           </ConnectedWeb3>
