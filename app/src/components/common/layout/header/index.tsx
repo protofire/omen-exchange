@@ -11,6 +11,7 @@ import { ConnectedWeb3, useDetectAdblocker, useIsBlacklistedCountry } from '../.
 import { Button, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { CoronaMarketsLogo, Network, OmenLogo } from '../../../common'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { Message, MessageType } from '../../../common/message'
 import { ModalConnectWallet } from '../../../modal'
 
@@ -69,6 +70,7 @@ const ButtonCreate = styled(Button)`
 `
 
 const ButtonCSS = css`
+  margin: 0 0 0 5px;
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 12px;
 
@@ -78,23 +80,8 @@ const ButtonCSS = css`
   }
 `
 
-const NetworkStyled = styled(Network)`
-  margin: 0 0 0 5px;
-  ${ButtonCSS}
-`
-
 const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
-  margin: 0 0 0 5px;
   ${ButtonCSS}
-`
-
-const ButtonDisconnectWalletStyled = styled(ButtonDisconnectWallet)`
-  display: none;
-  ${ButtonCSS}
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: flex;
-  }
 `
 
 const ButtonWrapper = styled.div`
@@ -105,6 +92,10 @@ const ContentsRight = styled.div`
   align-items: center;
   display: flex;
   margin: auto 0 0 auto;
+`
+
+const HeaderDropdown = styled(Dropdown)`
+  ${ButtonCSS}
 `
 
 const AdBlockWarning: React.FC = () => {
@@ -137,6 +128,12 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
       : isBlacklistedCountry === true
       ? 'This action is not allowed in your country'
       : ''
+
+  const headerDropdownItems: Array<DropdownItemProps> = [
+    {
+      content: <ButtonDisconnectWallet />,
+    },
+  ]
 
   return (
     <HeaderWrapper {...restProps}>
@@ -176,8 +173,13 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
           <ConnectedWeb3>
             {context.account && (
               <>
-                <NetworkStyled />
-                <ButtonDisconnectWalletStyled />
+                <HeaderDropdown
+                  dropdownPosition={DropdownPosition.right}
+                  items={headerDropdownItems}
+                  placeholder={<Network />}
+                />
+                {/* <NetworkStyled />
+                <ButtonDisconnectWalletStyled /> */}
               </>
             )}
           </ConnectedWeb3>

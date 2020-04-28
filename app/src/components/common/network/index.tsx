@@ -3,19 +3,13 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks'
 import { truncateStringInTheMiddle } from '../../../util/tools'
-import { Button } from '../../button'
-import { ButtonType } from '../../button/button_styling_types'
 
 import { ConnectionIcon } from './img/ConnectionIcon'
 
-const Wrapper = styled(Button)`
-  padding-left: 10px;
-  padding-right: 10px;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    padding-left: 12px;
-    padding-right: 20px;
-  }
+const Wrapper = styled.div`
+  align-items: center;
+  display: flex;
+  justify-content: center;
 `
 
 const ConnectionStatusText = styled.span`
@@ -38,13 +32,12 @@ const ConnectionStatusDot = styled.div`
 export const Network: React.FC = props => {
   const context = useConnectedWeb3Context()
   const { account } = context
-  const { ...restProps } = props
 
   if (!account) {
     return null
   }
   return (
-    <Wrapper buttonType={ButtonType.secondaryLine} {...restProps}>
+    <Wrapper {...props}>
       <ConnectionStatusDot>
         <ConnectionIcon />
       </ConnectionStatusDot>
