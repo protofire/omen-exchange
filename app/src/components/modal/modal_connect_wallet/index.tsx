@@ -212,6 +212,7 @@ export const ModalConnectWallet = (props: Props) => {
       <ModalWrapper
         isOpen={!context.account && isOpen}
         onRequestClose={onClickCloseButton}
+        shouldCloseOnOverlayClick={!isConnectingToWallet}
         title={connectingToMetamask ? 'Connecting...' : 'Connect a Wallet'}
       >
         <ContentWrapper>

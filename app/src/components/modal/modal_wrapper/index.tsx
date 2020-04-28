@@ -20,7 +20,7 @@ const ModalContainer: React.FC<Props> = props => {
   }, [])
 
   return (
-    <Modal {...restProps} onRequestClose={onRequestClose} shouldCloseOnOverlayClick={true} style={modalStyle}>
+    <Modal onRequestClose={onRequestClose} shouldCloseOnOverlayClick={true} style={modalStyle} {...restProps}>
       {title ? <ModalTitle disableCloseButton={disableCloseButton} onClick={onRequestClose} title={title} /> : null}
       {children}
     </Modal>
