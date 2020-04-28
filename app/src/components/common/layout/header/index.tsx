@@ -14,7 +14,7 @@ import { CoronaMarketsLogo, Network, OmenLogo } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { Message, MessageType } from '../../../common/message'
 import { ModalConnectWallet } from '../../../modal'
-import { IconAdd } from '../../icons'
+import { IconAdd, IconTwitter } from '../../icons'
 
 const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -51,9 +51,6 @@ const HeaderInner = styled.div`
 `
 
 const LogoWrapper = styled(NavLink)`
-  align-items: flex-end;
-  display: flex;
-  height: 100%;
   max-width: 90px;
   min-width: fit-content;
 `
@@ -93,10 +90,38 @@ const ButtonWrapper = styled.div`
   ${ButtonCSS}
 `
 
+const ContentsLeft = styled.div`
+  align-items: center;
+  display: flex;
+  margin: auto auto auto 0;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin: auto auto 0 0;
+  }
+`
+
+const SocialIconsWrapper = styled.div`
+  align-items: center;
+  border-left: 1px solid #e5e5e5;
+  display: flex;
+  height: 20px;
+  margin: 0 0 0 15px;
+  padding: 0 0 0 15px;
+`
+
+const SocialIcon = styled.a`
+  align-items: center;
+  display: flex;
+`
+
 const ContentsRight = styled.div`
   align-items: center;
   display: flex;
-  margin: auto 0 0 auto;
+  margin: auto 0 auto auto;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin: auto 0 0 auto;
+  }
 `
 
 const HeaderDropdown = styled(Dropdown)`
@@ -149,7 +174,16 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
     <HeaderWrapper {...restProps}>
       <AdBlockWarning />
       <HeaderInner>
-        <LogoWrapper to="/">{IS_CORONA_VERSION ? <CoronaMarketsLogo /> : <OmenLogo />}</LogoWrapper>
+        <ContentsLeft>
+          <LogoWrapper to="/">{IS_CORONA_VERSION ? <CoronaMarketsLogo /> : <OmenLogo />}</LogoWrapper>
+          {IS_CORONA_VERSION && (
+            <SocialIconsWrapper>
+              <SocialIcon href="https://www.twitter.com/corona_markets" target="_blank">
+                <IconTwitter />
+              </SocialIcon>
+            </SocialIconsWrapper>
+          )}
+        </ContentsLeft>
         <ContentsRight>
           {!IS_CORONA_VERSION && (
             <>
