@@ -8,12 +8,13 @@ import { useWeb3Context } from 'web3-react/dist'
 
 import { IS_CORONA_VERSION } from '../../../../common/constants'
 import { ConnectedWeb3, useDetectAdblocker, useIsBlacklistedCountry } from '../../../../hooks'
-import { Button, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
+import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { CoronaMarketsLogo, Network, OmenLogo } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { Message, MessageType } from '../../../common/message'
 import { ModalConnectWallet } from '../../../modal'
+import { AddIcon } from '../../icons'
 
 const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -57,15 +58,19 @@ const LogoWrapper = styled(NavLink)`
   min-width: fit-content;
 `
 
-const ButtonCreate = styled(Button)`
-  font-size: 12px;
-  padding-left: 10px;
-  padding-right: 10px;
+const ButtonCreateDesktop = styled(Button)`
+  display: none;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    font-size: 14px;
-    padding-left: 20px;
-    padding-right: 20px;
+    display: flex;
+  }
+`
+
+const ButtonCreateMobile = styled(ButtonCircle)`
+  display: flex;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: none;
   }
 `
 
@@ -135,6 +140,11 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
     },
   ]
 
+  const createButtonProps = {
+    disabled: disableConnectButton,
+    onClick: () => history.push('/create'),
+  }
+
   return (
     <HeaderWrapper {...restProps}>
       <AdBlockWarning />
@@ -142,13 +152,14 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
         <LogoWrapper to="/">{IS_CORONA_VERSION ? <CoronaMarketsLogo /> : <OmenLogo />}</LogoWrapper>
         <ContentsRight>
           {!IS_CORONA_VERSION && (
-            <ButtonCreate
-              buttonType={ButtonType.secondaryLine}
-              disabled={disableConnectButton}
-              onClick={() => history.push('/create')}
-            >
-              Create Market
-            </ButtonCreate>
+            <>
+              <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...createButtonProps}>
+                Create Market
+              </ButtonCreateDesktop>
+              <ButtonCreateMobile {...createButtonProps}>
+                <AddIcon />
+              </ButtonCreateMobile>
+            </>
           )}
           {!context.account && (
             <ButtonWrapper
@@ -178,8 +189,6 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
                   items={headerDropdownItems}
                   placeholder={<Network />}
                 />
-                {/* <NetworkStyled />
-                <ButtonDisconnectWalletStyled /> */}
               </>
             )}
           </ConnectedWeb3>
