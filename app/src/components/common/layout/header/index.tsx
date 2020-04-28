@@ -128,7 +128,8 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
 
-  const disableConnectButton = IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)
+  const disableConnectButton =
+    (IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)) || isModalOpen
 
   const tooltipText =
     isBlacklistedCountry === null
