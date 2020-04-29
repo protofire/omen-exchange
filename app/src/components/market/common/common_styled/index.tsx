@@ -132,6 +132,20 @@ export const ErrorsWrapper = styled.div`
   margin: 0 0 20px;
 `
 
+export const GenericError = styled.p<{ margin?: string }>`
+  color: ${props => props.theme.colors.error};
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: ${props => props.margin};
+  padding: 0;
+  text-align: left;
+`
+
+GenericError.defaultProps = {
+  margin: '10px 0 0',
+}
+
 export const TDFlexDiv = styled.div<{ textAlign?: string }>`
   align-items: center;
   display: flex;
