@@ -194,7 +194,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const isFundingToRemoveGreaterThanFundingBalance = amountToRemove.gt(fundingBalance)
   const errorFundingToRemove = amountToRemove.isZero() || isFundingToRemoveGreaterThanFundingBalance
-  const errorFundingToRemoveMsg = 'Not enough Shares in your wallet.'
+  const errorFundingToRemoveMsg = 'Not enough Shares in your balance.'
 
   const probabilities = balances.map(balance => balance.probability)
 

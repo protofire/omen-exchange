@@ -105,7 +105,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
-  const notEnoughSharesMsg = 'Not enough Shares in your wallet.'
+  const notEnoughSharesMsg = 'Not enough Shares in your balance.'
   const finish = async () => {
     try {
       if (!haveEnoughShares) {
