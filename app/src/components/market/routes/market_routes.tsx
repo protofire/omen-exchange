@@ -3,13 +3,13 @@ import { ethers } from 'ethers'
 import React from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 
-import { FETCH_DETAILS_INTERVAL, IS_CORONA_VERSION, MARKET_FEE } from '../../../common/constants'
+import { FETCH_DETAILS_INTERVAL, MARKET_FEE } from '../../../common/constants'
 import { useCheckContractExists, useMarketMakerData } from '../../../hooks'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { MarketBuyPage, MarketDetailsPage, MarketPoolLiquidityPage, MarketSellPage } from '../../../pages'
 import { getLogger } from '../../../util/logger'
 import { isAddress } from '../../../util/tools'
-import { DisqusComments } from '../../comments/disqus_comments'
+import { Comments } from '../../comments'
 import { SectionTitle } from '../../common'
 import { Message, MessageType } from '../../common/message'
 import { InlineLoading } from '../../loading'
@@ -83,8 +83,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
             />
           </>
         )}
-        {IS_CORONA_VERSION ? <DisqusComments marketMakerAddress={marketMakerAddress} /> : null}
-        {/* <ThreeBoxComments threadName={marketMakerAddress} /> */}
+        <Comments marketMakerAddress={marketMakerAddress} />
       </>
     </Switch>
   )

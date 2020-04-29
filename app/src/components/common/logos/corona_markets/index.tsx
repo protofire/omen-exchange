@@ -3,7 +3,11 @@ import styled from 'styled-components'
 
 const Wrapper = styled.svg`
   flex-shrink: 0;
-  height: 50px;
+  height: 30px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    height: 50px;
+  }
 
   .logo {
     fill: ${props => props.theme.colors.textColorDarker};

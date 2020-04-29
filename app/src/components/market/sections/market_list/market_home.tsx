@@ -30,7 +30,7 @@ const TopContents = styled.div`
 `
 
 const SelectableButton = styled(ButtonSelectable)`
-  margin-right: 10px;
+  margin-right: 5px;
 
   &:last-child {
     margin-right: 0;
@@ -67,11 +67,12 @@ const FiltersControls = styled.div`
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 0;
     margin-right: 0;
+    padding-left: 10px;
   }
 `
 
 const ButtonCircleStyled = styled(ButtonCircle)`
-  margin-right: 10px;
+  margin-right: 5px;
 `
 
 const ListWrapper = styled.div`
@@ -89,7 +90,7 @@ const NoMarketsAvailable = styled.p`
 `
 
 const SortDropdown = styled(Dropdown)`
-  max-width: 188px;
+  max-width: 145px;
 `
 
 const LoadMoreWrapper = styled.div`
@@ -105,10 +106,14 @@ const CustomDropdownItem = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
+
+  .dropdownItems & .sortBy {
+    display: none;
+  }
 `
 
 const SortBy = styled.span`
-  color: #86909e;
+  color: ${props => props.theme.colors.textColorLighter};
   font-size: 14px;
   line-height: 1.2;
   margin-right: 6px;
@@ -196,7 +201,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     return {
       content: (
         <CustomDropdownItem>
-          <SortBy>Sort By</SortBy> {item.title}
+          <SortBy className="sortBy">Sort By</SortBy> {item.title}
         </CustomDropdownItem>
       ),
       onClick: () => {

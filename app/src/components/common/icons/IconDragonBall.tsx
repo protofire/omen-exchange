@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const DragonBallIcon = () => (
+export const IconDragonBall = () => (
   <svg
     className="dragonBallIcon"
     fill="none"

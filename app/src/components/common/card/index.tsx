@@ -51,7 +51,7 @@ export const Card: React.FC<Props> = (props: Props) => {
   return (
     <CardStyled noPadding={noPadding} {...restProps}>
       {title ? <Title titleAlign={titleAlign}>{title}</Title> : null}
-      <Body>{children}</Body>
+      <Body className="cardBody">{children}</Body>
     </CardStyled>
   )
 }

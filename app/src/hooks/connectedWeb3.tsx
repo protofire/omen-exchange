@@ -56,6 +56,8 @@ export const ConnectedWeb3: React.FC = props => {
       }
     } else if (error) {
       logger.debug(error.message)
+      localStorage.removeItem('CONNECTOR')
+      context.setConnector('Infura')
     } else {
       context.setConnector('Infura')
     }
