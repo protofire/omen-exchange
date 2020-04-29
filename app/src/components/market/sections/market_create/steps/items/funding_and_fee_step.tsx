@@ -12,13 +12,14 @@ import { formatBigNumber, formatDate } from '../../../../../../util/tools'
 import { Arbitrator, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
-import { BigNumberInput, FormError, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
+import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { TitleValue } from '../../../../../common/text/title_value'
 import { FullLoading } from '../../../../../loading'
 import {
   ButtonContainerFullWidth,
   ButtonWithReadyToGoStatus,
+  GenericError,
   LeftButton,
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
@@ -147,9 +148,7 @@ const FundingAndFeeStep = (props: Props) => {
   const hasEnoughBalance = balance && balance.gte(funding)
   let fundingErrorMessage = ''
   if (balance && !hasEnoughBalance) {
-    fundingErrorMessage = `You entered ${formatBigNumber(funding, collateral.decimals)} ${
-      collateral.symbol
-    } of funding but your account only has ${formatBigNumber(balance, collateral.decimals)} ${collateral.symbol}`
+    fundingErrorMessage = `Not enough ${collateral.symbol} in your wallet.`
   }
 
   return (
@@ -206,13 +205,14 @@ const FundingAndFeeStep = (props: Props) => {
         </CurrenciesWrapper>
         <GridTransactionDetailsStyled>
           <div>
-            <WalletBalance value={formatBigNumber(collateralBalance, collateral.decimals)} />
+            <WalletBalance symbol={collateral.symbol} value={formatBigNumber(collateralBalance, collateral.decimals)} />
             <TextfieldCustomPlaceholder
               formField={
                 <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
               }
               symbol={collateral.symbol}
             />
+            {fundingErrorMessage && <GenericError>{fundingErrorMessage}</GenericError>}
           </div>
           <div>
             <TransactionDetailsCard>
@@ -222,7 +222,6 @@ const FundingAndFeeStep = (props: Props) => {
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsStyled>
-        {fundingErrorMessage && <FormError>{fundingErrorMessage}</FormError>}
         <ButtonContainerFullWidth>
           <LeftButton
             buttonType={ButtonType.secondaryLine}

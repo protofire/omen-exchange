@@ -18,11 +18,12 @@ import { calcDepositedTokens, calcPoolTokens, formatBigNumber } from '../../../.
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, FormError, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
+import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketTopDetails } from '../../common/market_top_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -187,13 +188,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const isFundingToAddGreaterThanBalance = amountToFund.gt(collateralBalance)
   const errorFundingToAdd = amountToFund.isZero() || isFundingToAddGreaterThanBalance
-  const errorFundingToAddMsg = 'The amount to add is greater than your balance'
+  const errorFundingToAddMsg = `Not enough ${collateral.symbol} in your wallet.`
 
   const fundingBalance = useFundingBalance(marketMakerAddress, context)
 
   const isFundingToRemoveGreaterThanFundingBalance = amountToRemove.gt(fundingBalance)
   const errorFundingToRemove = amountToRemove.isZero() || isFundingToRemoveGreaterThanFundingBalance
-  const errorFundingToRemoveMsg = 'The amount to remove is greater than the funding balance'
+  const errorFundingToRemoveMsg = 'Not enough Shares in your wallet.'
 
   const probabilities = balances.map(balance => balance.probability)
 
@@ -229,7 +230,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               <>
                 <WalletBalance
                   onClick={() => setAmountToFund(collateralBalance)}
-                  value={`${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`}
+                  symbol={collateral.symbol}
+                  value={`${formatBigNumber(collateralBalance, collateral.decimals)}`}
                 />
                 <TextfieldCustomPlaceholder
                   formField={
@@ -242,12 +244,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   }
                   symbol={collateral.symbol}
                 />
+                {isFundingToAddGreaterThanBalance && <GenericError>{errorFundingToAddMsg}</GenericError>}
               </>
             )}
             {activeTab === Tabs.withdraw && (
               <>
                 <WalletBalance
                   onClick={() => setAmountToRemove(fundingBalance)}
+                  symbol="Shares"
                   text="My Pool Tokens"
                   value={`${formatBigNumber(fundingBalance, collateral.decimals)}`}
                 />
@@ -262,6 +266,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   }
                   symbol=""
                 />
+                {isFundingToRemoveGreaterThanFundingBalance && <GenericError>{errorFundingToRemoveMsg}</GenericError>}
               </>
             )}
           </div>
@@ -315,13 +320,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             onUnlock={unlockCollateral}
           />
         )}
-        {activeTab === Tabs.deposit && isFundingToAddGreaterThanBalance && (
-          <FormError>{errorFundingToAddMsg}</FormError>
-        )}
-        {activeTab === Tabs.withdraw && isFundingToRemoveGreaterThanFundingBalance && (
-          <FormError>{errorFundingToRemoveMsg}</FormError>
-        )}
-
         <ButtonContainer>
           <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
             Cancel

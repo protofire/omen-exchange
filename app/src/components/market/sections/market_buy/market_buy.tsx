@@ -19,11 +19,12 @@ import { computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../../../ut
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, FormError, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
+import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketTopDetails } from '../../common/market_top_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -143,7 +144,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const goBackToAddress = `/${marketMakerAddress}`
 
   const isBuyAmountGreaterThanBalance = amount.gt(collateralBalance)
-  const notEnoughCollateralMsg = "You don't have enough collateral to buy that amount of shares"
+  const notEnoughCollateralMsg = `Not enough ${collateral.symbol} in your wallet.`
   const isDisabled =
     (status !== Status.Ready && status !== Status.Error) ||
     isBuyAmountGreaterThanBalance ||
@@ -156,10 +157,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`
+  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals)}`
   const feeFormatted = `${formatBigNumber(feePaid.mul(-1), collateral.decimals)} ${collateral.symbol}`
   const baseCostFormatted = `${formatBigNumber(baseCost, collateral.decimals)} ${collateral.symbol}`
-  const potentialProfitFormatted = `${formatBigNumber(potentialProfit, collateral.decimals)} ${collateral.symbol}`
+  const potentialProfitFormatted = `${formatBigNumber(potentialProfit, collateral.decimals)}`
   const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
   const total = `${sharesTotal} Shares`
 
@@ -188,6 +189,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               data-place="right"
               data-tip={`Spend your total ${collateral.symbol} balance on the selected outcome.`}
               onClick={() => setAmount(collateralBalance)}
+              symbol={collateral.symbol}
               value={currentBalance}
             />
             <ReactTooltip id="walletBalanceTooltip" />
@@ -202,7 +204,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               }
               symbol={collateral.symbol}
             />
-            {isBuyAmountGreaterThanBalance && <FormError>{notEnoughCollateralMsg}</FormError>}
+            {isBuyAmountGreaterThanBalance && <GenericError>{notEnoughCollateralMsg}</GenericError>}
           </div>
           <div>
             <TransactionDetailsCard>

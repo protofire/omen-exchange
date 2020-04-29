@@ -13,11 +13,12 @@ import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, 
 import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, FormError, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
+import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketTopDetails } from '../../common/market_top_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -104,7 +105,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
-  const notEnoughSharesMsg = "You don't have enough shares to sell"
+  const notEnoughSharesMsg = 'Not enough Shares in your wallet.'
   const finish = async () => {
     try {
       if (!haveEnoughShares) {
@@ -141,7 +142,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const error = (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || !haveEnoughShares
 
-  const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals)} shares`
+  const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals)}`
   const goBackToAddress = `/${marketMakerAddress}`
 
   return (
@@ -176,6 +177,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               data-place="right"
               data-tip={`Sell all of the selected outcome's shares.`}
               onClick={() => setAmountShares(balanceItem.shares)}
+              symbol="Shares"
               value={selectedOutcomeBalance}
             />
             <ReactTooltip id="walletBalanceTooltip" />
@@ -190,7 +192,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               }
               symbol={'Shares'}
             />
-            {amountShares.gt(balanceItem.shares) && <FormError>{notEnoughSharesMsg}</FormError>}
+            {amountShares.gt(balanceItem.shares) && <GenericError>{notEnoughSharesMsg}</GenericError>}
           </div>
           <div>
             <TransactionDetailsCard>
