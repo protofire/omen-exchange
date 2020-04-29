@@ -8,11 +8,13 @@ import { useWeb3Context } from 'web3-react/dist'
 
 import { IS_CORONA_VERSION } from '../../../../common/constants'
 import { ConnectedWeb3, useDetectAdblocker, useIsBlacklistedCountry } from '../../../../hooks'
-import { Button, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
+import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { CoronaMarketsLogo, Network, OmenLogo } from '../../../common'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { Message, MessageType } from '../../../common/message'
 import { ModalConnectWallet } from '../../../modal'
+import { IconAdd, IconTwitter } from '../../icons'
 
 const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -49,26 +51,28 @@ const HeaderInner = styled.div`
 `
 
 const LogoWrapper = styled(NavLink)`
-  align-items: flex-end;
-  display: flex;
-  height: 100%;
   max-width: 90px;
   min-width: fit-content;
 `
 
-const ButtonCreate = styled(Button)`
-  font-size: 12px;
-  padding-left: 10px;
-  padding-right: 10px;
+const ButtonCreateDesktop = styled(Button)`
+  display: none;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    font-size: 14px;
-    padding-left: 20px;
-    padding-right: 20px;
+    display: flex;
+  }
+`
+
+const ButtonCreateMobile = styled(ButtonCircle)`
+  display: flex;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: none;
   }
 `
 
 const ButtonCSS = css`
+  margin: 0 0 0 5px;
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 12px;
 
@@ -78,33 +82,50 @@ const ButtonCSS = css`
   }
 `
 
-const NetworkStyled = styled(Network)`
-  margin: 0 0 0 5px;
-  ${ButtonCSS}
-`
-
 const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
-  margin: 0 0 0 5px;
   ${ButtonCSS}
-`
-
-const ButtonDisconnectWalletStyled = styled(ButtonDisconnectWallet)`
-  display: none;
-  ${ButtonCSS}
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: flex;
-  }
 `
 
 const ButtonWrapper = styled.div`
   ${ButtonCSS}
 `
 
+const ContentsLeft = styled.div`
+  align-items: center;
+  display: flex;
+  margin: auto auto auto 0;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin: auto auto 0 0;
+  }
+`
+
+const SocialIconsWrapper = styled.div`
+  align-items: center;
+  border-left: 1px solid #e5e5e5;
+  display: flex;
+  height: 20px;
+  margin: 0 0 0 15px;
+  padding: 0 0 0 15px;
+`
+
+const SocialIcon = styled.a`
+  align-items: center;
+  display: flex;
+`
+
 const ContentsRight = styled.div`
   align-items: center;
   display: flex;
-  margin: auto 0 0 auto;
+  margin: auto 0 auto auto;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin: auto 0 0 auto;
+  }
+`
+
+const HeaderDropdown = styled(Dropdown)`
+  ${ButtonCSS}
 `
 
 const AdBlockWarning: React.FC = () => {
@@ -128,7 +149,8 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
 
-  const disableConnectButton = IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)
+  const disableConnectButton =
+    (IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)) || isModalOpen
 
   const tooltipText =
     isBlacklistedCountry === null
@@ -137,20 +159,41 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
       ? 'This action is not allowed in your country'
       : ''
 
+  const headerDropdownItems: Array<DropdownItemProps> = [
+    {
+      content: <ButtonDisconnectWallet />,
+    },
+  ]
+
+  const createButtonProps = {
+    disabled: disableConnectButton,
+    onClick: () => history.push('/create'),
+  }
+
   return (
     <HeaderWrapper {...restProps}>
       <AdBlockWarning />
       <HeaderInner>
-        <LogoWrapper to="/">{IS_CORONA_VERSION ? <CoronaMarketsLogo /> : <OmenLogo />}</LogoWrapper>
+        <ContentsLeft>
+          <LogoWrapper to="/">{IS_CORONA_VERSION ? <CoronaMarketsLogo /> : <OmenLogo />}</LogoWrapper>
+          {IS_CORONA_VERSION && (
+            <SocialIconsWrapper>
+              <SocialIcon href="https://www.twitter.com/corona_markets" target="_blank">
+                <IconTwitter />
+              </SocialIcon>
+            </SocialIconsWrapper>
+          )}
+        </ContentsLeft>
         <ContentsRight>
           {!IS_CORONA_VERSION && (
-            <ButtonCreate
-              buttonType={ButtonType.secondaryLine}
-              disabled={disableConnectButton}
-              onClick={() => history.push('/create')}
-            >
-              Create Market
-            </ButtonCreate>
+            <>
+              <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...createButtonProps}>
+                Create Market
+              </ButtonCreateDesktop>
+              <ButtonCreateMobile {...createButtonProps}>
+                <IconAdd />
+              </ButtonCreateMobile>
+            </>
           )}
           {!context.account && (
             <ButtonWrapper
@@ -173,12 +216,15 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
             </ButtonWrapper>
           )}
           <ConnectedWeb3>
-            <NetworkStyled />
-            <ButtonDisconnectWalletStyled
-              callback={() => {
-                setModalState(false)
-              }}
-            />
+            {context.account && (
+              <>
+                <HeaderDropdown
+                  dropdownPosition={DropdownPosition.right}
+                  items={headerDropdownItems}
+                  placeholder={<Network />}
+                />
+              </>
+            )}
           </ConnectedWeb3>
         </ContentsRight>
         <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />

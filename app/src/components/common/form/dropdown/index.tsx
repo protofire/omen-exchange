@@ -162,7 +162,7 @@ const HelperFocusItem = styled.span`
 
 export interface DropdownItemProps {
   content: React.ReactNode | string
-  onClick: () => void
+  onClick?: () => void
 }
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -197,7 +197,9 @@ export const Dropdown: React.FC<Props> = props => {
   }, [myRef])
 
   const optionClick = useCallback(
-    (onClick: () => void, itemIndex: number) => {
+    (onClick: (() => void) | undefined, itemIndex: number) => {
+      if (!onClick) return
+
       setCurrentItemIndex(itemIndex)
       onClick()
       setIsDirty(true)
@@ -231,7 +233,7 @@ export const Dropdown: React.FC<Props> = props => {
               <Item
                 active={parseInt(index) === currentItemIndex}
                 key={index}
-                onClick={() => optionClick(item.onClick, parseInt(index))}
+                onClick={item.onClick !== undefined ? () => optionClick(item.onClick, parseInt(index)) : closeDropdown}
               >
                 {item.content}
               </Item>

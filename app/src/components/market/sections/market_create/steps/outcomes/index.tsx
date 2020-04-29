@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components'
 
 import { ButtonCircle } from '../../../../../button'
 import { FormError, FormLabel, FormRowLink, Textfield, TextfieldCustomPlaceholder } from '../../../../../common'
-import { AddIcon, RemoveIcon } from '../../../../../common/icons'
+import { IconAdd, IconRemove } from '../../../../../common/icons'
 import {
   ErrorsWrapper,
   OutcomeItemLittleBallOfJoyAndDifferentColors,
@@ -167,7 +167,7 @@ const Outcomes = (props: Props) => {
             }}
             title={`Remove outcome ${index + 1}`}
           >
-            <RemoveIcon />
+            <IconRemove />
           </CustomButtonCircle>
         </OutcomeItemProbability>
       </OutcomesTD>
@@ -231,7 +231,7 @@ const Outcomes = (props: Props) => {
           readyToAdd={newOutcomeName !== ''}
           title="Add new outcome"
         >
-          <AddIcon />
+          <IconAdd />
         </CustomButtonCircleAdd>
       </NewOutcome>
       <OutcomesTableWrapper>

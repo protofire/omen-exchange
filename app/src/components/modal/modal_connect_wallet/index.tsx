@@ -8,7 +8,7 @@ import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
-import { CheckboxInput, MadeBy } from '../../common'
+import { CheckboxInput, MadeBy, Spinner } from '../../common'
 import { ModalWrapper } from '../../modal/modal_wrapper'
 
 import MetaMaskSVG from './img/metamask.svg'
@@ -16,13 +16,21 @@ import WalletConnectSVG from './img/wallet_connect.svg'
 
 const logger = getLogger('ModalConnectWallet::Index')
 
-const ButtonsWrapper = styled.div`
+const ContentWrapper = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 218px;
-  padding: 15px 0;
+  min-height: 230px;
+  padding: 15px 0 0;
+`
+
+const Buttons = styled.div`
+  margin-top: auto;
+
+  &:last-child {
+    margin-top: 0;
+  }
 `
 
 const ButtonStyled = styled(Button)`
@@ -69,6 +77,7 @@ const TermsWrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: center;
+  margin-top: auto;
 `
 
 const TermsText = styled.label`
@@ -89,6 +98,35 @@ const TermsLink = styled.a`
   }
 `
 
+const ConnectingText = styled.p`
+  color: ${props => props.theme.colors.textColorLighter};
+  font-size: 14px;
+  font-weight: normal;
+  letter-spacing: 0.4px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 30px 0 0;
+  text-align: center;
+`
+
+interface ButtonProps {
+  disabled: boolean
+  onClick: () => void
+  icon: React.ReactNode
+  text: string
+}
+
+const ConnectButton = (props: ButtonProps) => {
+  const { disabled, icon, onClick, text } = props
+
+  return (
+    <ButtonStyled buttonType={ButtonType.secondaryLine} disabled={disabled} onClick={onClick}>
+      {icon}
+      <Text>{text}</Text>
+    </ButtonStyled>
+  )
+}
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   isOpen: boolean
   onClose: () => void
@@ -96,100 +134,129 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const ModalConnectWallet = (props: Props) => {
   const context = useWeb3Context()
-  const [showWalletConnectQR, setShowWalletConnectQR] = useState(false)
-  const { isOpen } = props
+  const [connectingToWalletConnect, setConnectingToWalletConnect] = useState(false)
+  const [connectingToMetamask, setConnectingToMetamask] = useState(false)
+  const { isOpen, onClose } = props
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
 
   if (context.error) {
     logger.error('Error in web3 context', context.error)
     localStorage.removeItem('CONNECTOR')
-    props.onClose()
+    onClose()
   }
 
   const doesMetamaskExist = 'ethereum' in window || 'web3' in window
   const onClickWallet = (wallet: Wallet) => {
     if (wallet === Wallet.WalletConnect) {
-      setShowWalletConnectQR(true)
+      setConnectingToWalletConnect(true)
     }
+    if (wallet === Wallet.MetaMask) {
+      setConnectingToMetamask(true)
+    }
+
     context.setConnector(wallet)
     localStorage.setItem('CONNECTOR', wallet)
   }
 
-  const onClickCloseButton = useCallback(() => {
-    props.onClose()
-  }, [props])
+  const resetEverything = useCallback(() => {
+    setConnectingToWalletConnect(false)
+    setConnectingToMetamask(false)
+    setAcceptedTerms(false)
+    WalletConnectQRCodeModal.close()
+  }, [])
 
-  const [acceptedTerms, setAcceptedTerms] = useState(LINK_TERMS_AND_CONDITIONS ? false : true)
+  const onClickCloseButton = useCallback(() => {
+    resetEverything() // we need to do this or the states and functions will keep executing even when the modal is closed by the user
+    onClose()
+  }, [onClose, resetEverything])
 
   useEffect(() => {
-    if (showWalletConnectQR && context.active && !context.account && context.connectorName === Wallet.WalletConnect) {
+    if (
+      connectingToWalletConnect &&
+      context.active &&
+      !context.account &&
+      context.connectorName === Wallet.WalletConnect
+    ) {
       const uri = context.connector.walletConnector.uri
       WalletConnectQRCodeModal.open(uri, () => {
         // Callback passed to the onClose click of the QRCode modal
-        setShowWalletConnectQR(false)
+        setConnectingToWalletConnect(false)
         onClickCloseButton()
         localStorage.removeItem('CONNECTOR')
         context.unsetConnector()
       })
 
       context.connector.walletConnector.on('connect', () => {
-        setShowWalletConnectQR(false)
+        setConnectingToWalletConnect(false)
         WalletConnectQRCodeModal.close()
       })
     }
-  }, [context, onClickCloseButton, showWalletConnectQR])
+  }, [context, onClickCloseButton, connectingToWalletConnect])
 
-  const MetamaskButton = (props: { disabled: boolean }) => (
-    <ButtonStyled
-      buttonType={ButtonType.secondaryLine}
-      disabled={props.disabled}
-      onClick={() => {
-        onClickWallet(Wallet.MetaMask)
-      }}
-    >
-      <IconMetaMask />
-      <Text>MetaMask</Text>
-    </ButtonStyled>
-  )
+  useEffect(() => {
+    if (connectingToMetamask && context.account && context.connectorName === Wallet.MetaMask) {
+      onClickCloseButton()
+      setConnectingToMetamask(false)
+    }
+  }, [context, onClickCloseButton, connectingToMetamask])
 
-  const WalletConnectButton = (props: { disabled: boolean }) => (
-    <ButtonStyled
-      buttonType={ButtonType.secondaryLine}
-      disabled={props.disabled}
-      onClick={() => {
-        onClickWallet(Wallet.WalletConnect)
-      }}
-    >
-      <IconWalletConnect />
-      <Text>Wallet Connect</Text>
-    </ButtonStyled>
-  )
+  const toggleAcceptedTerms = useCallback(() => {
+    setAcceptedTerms(!acceptedTerms)
+  }, [acceptedTerms])
+
+  const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect
+  const connectingText = connectingToMetamask ? 'Waiting for Approval on Metamask' : 'Opening QR for Wallet Connect'
 
   return (
     <>
-      {!context.account && (
-        <ModalWrapper isOpen={isOpen} onRequestClose={onClickCloseButton} title={`Connect a Wallet`}>
-          <ButtonsWrapper>
-            <MetamaskButton disabled={!doesMetamaskExist || !acceptedTerms} />
-            <WalletConnectButton disabled={!acceptedTerms} />
-          </ButtonsWrapper>
-          {LINK_TERMS_AND_CONDITIONS && (
-            <TermsWrapper>
-              <CheckboxInput
-                checked={acceptedTerms}
-                inputId="termsCheck"
-                onChange={() => setAcceptedTerms(!acceptedTerms)}
-              />
-              <TermsText className="clickable" htmlFor="termsCheck">
-                I agree to the{' '}
-                <TermsLink href={LINK_TERMS_AND_CONDITIONS} target="_blank">
-                  Terms and Conditions
-                </TermsLink>
-              </TermsText>
-            </TermsWrapper>
+      <ModalWrapper
+        isOpen={!context.account && isOpen}
+        onRequestClose={onClickCloseButton}
+        shouldCloseOnOverlayClick={!isConnectingToWallet}
+        title={connectingToMetamask ? 'Connecting...' : 'Connect a Wallet'}
+      >
+        <ContentWrapper>
+          {isConnectingToWallet ? (
+            <>
+              <Spinner />
+              <ConnectingText>{connectingText}</ConnectingText>
+            </>
+          ) : (
+            <>
+              <Buttons>
+                <ConnectButton
+                  disabled={!doesMetamaskExist || !acceptedTerms}
+                  icon={<IconMetaMask />}
+                  onClick={() => {
+                    onClickWallet(Wallet.MetaMask)
+                  }}
+                  text="Metamask"
+                />
+                <ConnectButton
+                  disabled={!acceptedTerms}
+                  icon={<IconWalletConnect />}
+                  onClick={() => {
+                    onClickWallet(Wallet.WalletConnect)
+                  }}
+                  text="Wallet Connect"
+                />
+              </Buttons>
+              {LINK_TERMS_AND_CONDITIONS && (
+                <TermsWrapper>
+                  <CheckboxInput checked={acceptedTerms} inputId="termsCheck" onChange={toggleAcceptedTerms} />
+                  <TermsText className="clickable" htmlFor="termsCheck">
+                    I agree to the{' '}
+                    <TermsLink href={LINK_TERMS_AND_CONDITIONS} target="_blank">
+                      Terms and Conditions
+                    </TermsLink>
+                  </TermsText>
+                </TermsWrapper>
+              )}
+            </>
           )}
-          {!IS_CORONA_VERSION && <MadeBy />}
-        </ModalWrapper>
-      )}
+        </ContentWrapper>
+        {!IS_CORONA_VERSION && <MadeBy />}
+      </ModalWrapper>
     </>
   )
 }
