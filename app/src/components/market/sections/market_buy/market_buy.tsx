@@ -19,7 +19,7 @@ import { computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../../../ut
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, FormError, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
@@ -143,6 +143,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const goBackToAddress = `/${marketMakerAddress}`
 
   const isBuyAmountGreaterThanBalance = amount.gt(collateralBalance)
+  const notEnoughCollateralMsg = "You don't have enough collateral to buy that amount of shares"
   const isDisabled =
     (status !== Status.Ready && status !== Status.Error) ||
     isBuyAmountGreaterThanBalance ||
@@ -201,6 +202,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               }
               symbol={collateral.symbol}
             />
+            {isBuyAmountGreaterThanBalance && <FormError>{notEnoughCollateralMsg}</FormError>}
           </div>
           <div>
             <TransactionDetailsCard>

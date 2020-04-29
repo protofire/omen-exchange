@@ -18,7 +18,7 @@ import { calcDepositedTokens, calcPoolTokens, formatBigNumber } from '../../../.
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, FormError, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
@@ -187,11 +187,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const isFundingToAddGreaterThanBalance = amountToFund.gt(collateralBalance)
   const errorFundingToAdd = amountToFund.isZero() || isFundingToAddGreaterThanBalance
+  const errorFundingToAddMsg = 'The amount to add is greater than your balance'
 
   const fundingBalance = useFundingBalance(marketMakerAddress, context)
 
   const isFundingToRemoveGreaterThanFundingBalance = amountToRemove.gt(fundingBalance)
   const errorFundingToRemove = amountToRemove.isZero() || isFundingToRemoveGreaterThanFundingBalance
+  const errorFundingToRemoveMsg = 'The amount to remove is greater than the funding balance'
 
   const probabilities = balances.map(balance => balance.probability)
 
@@ -313,6 +315,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             onUnlock={unlockCollateral}
           />
         )}
+        {activeTab === Tabs.deposit && isFundingToAddGreaterThanBalance && (
+          <FormError>{errorFundingToAddMsg}</FormError>
+        )}
+        {activeTab === Tabs.withdraw && isFundingToRemoveGreaterThanFundingBalance && (
+          <FormError>{errorFundingToRemoveMsg}</FormError>
+        )}
+
         <ButtonContainer>
           <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
             Cancel

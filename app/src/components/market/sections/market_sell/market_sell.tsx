@@ -13,7 +13,7 @@ import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, 
 import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, FormError, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
@@ -104,7 +104,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
-
+  const notEnoughSharesMsg = "You don't have enough shares to sell"
   const finish = async () => {
     try {
       if (!haveEnoughShares) {
@@ -190,6 +190,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               }
               symbol={'Shares'}
             />
+            {amountShares.gt(balanceItem.shares) && <FormError>{notEnoughSharesMsg}</FormError>}
           </div>
           <div>
             <TransactionDetailsCard>
@@ -233,6 +234,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetails>
+
         <ButtonContainer>
           <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
             Cancel
