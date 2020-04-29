@@ -2,7 +2,8 @@ import React, { HTMLAttributes } from 'react'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
-import { Card, Spinner } from '../../common'
+import { Card } from '../../common/card'
+import { Spinner } from '../../common/spinner'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -19,15 +20,22 @@ const Wrapper = styled.div`
 `
 
 const LoadingCard = styled(Card)`
-  align-items: center;
   height: 200px;
-  justify-content: center;
   width: 280px;
+
+  .cardBody {
+    align-items: center;
+    justify-content: center;
+  }
 `
 
 const LoadingSpinner = styled(Spinner)`
   align-self: center;
   margin-top: auto;
+
+  &:last-child {
+    margin-top: 0;
+  }
 `
 
 const Message = styled.p`
@@ -54,7 +62,7 @@ export const FullLoading: React.FC<Props> = (props: Props) => {
     <Wrapper {...restProps}>
       <LoadingCard>
         <LoadingSpinner />
-        {message ? <Message>{message}</Message> : null}
+        {message && <Message>{message}</Message>}
       </LoadingCard>
     </Wrapper>,
     portal,
