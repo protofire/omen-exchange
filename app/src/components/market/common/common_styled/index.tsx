@@ -1,23 +1,9 @@
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 import { Button, ButtonContainer } from '../../../button'
 
 export const LeftButton = styled(Button)`
   margin-right: auto;
-`
-
-const ButtonWithReadyToGoStatusCSS = css`
-  &,
-  &:hover {
-    background-color: ${props => props.theme.colors.primary};
-    border-color: ${props => props.theme.colors.primary};
-    color: #fff;
-    font-weight: 500;
-  }
-`
-
-export const ButtonWithReadyToGoStatus = styled(Button)<{ readyToGo: boolean }>`
-  ${props => props.readyToGo && ButtonWithReadyToGoStatusCSS}
 `
 
 export const ButtonContainerFullWidth = styled(ButtonContainer)`

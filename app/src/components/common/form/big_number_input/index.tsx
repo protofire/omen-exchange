@@ -15,6 +15,11 @@ const Input = styled.input`
     outline: none;
   }
 `
+export enum BigNumberInputError {
+  max,
+  min,
+  noError,
+}
 
 export interface BigNumberInputReturn {
   name: string
@@ -34,6 +39,7 @@ type Props = OverrideProperties<
     max?: BigNumber
     min?: BigNumber
     onChange: (value: BigNumberInputReturn) => void
+    onError?: (e: BigNumberInputError) => void
     step?: BigNumber
     value: Maybe<BigNumber>
   }
@@ -48,6 +54,7 @@ export const BigNumberInput: React.FC<Props> = props => {
     min,
     name,
     onChange,
+    onError,
     placeholder = '0.00',
     step,
     value,
@@ -72,23 +79,43 @@ export const BigNumberInput: React.FC<Props> = props => {
     }
   }, [autoFocus])
 
+  const triggerError = (e: BigNumberInputError) => {
+    if (onError) {
+      onError(e)
+    }
+  }
+
+  const clearError = () => {
+    if (onError) {
+      onError(BigNumberInputError.noError)
+    }
+  }
+
   const updateValue = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.currentTarget
 
-    if (!value) {
-      onChange({ name, value: new BigNumber(0) })
-    } else {
-      const newValue = ethers.utils.parseUnits(value, decimals)
-      const invalidValue = (min && newValue.lt(min)) || (max && newValue.gt(max))
+    try {
+      if (!value) {
+        onChange({ name, value: new BigNumber(0) })
+      } else {
+        const newValue = ethers.utils.parseUnits(value, decimals)
+        const invalidValueMin = min && newValue.lt(min)
+        const invalidValueMax = max && newValue.gt(max)
+        const invalidValue = invalidValueMin || invalidValueMax
 
-      if (invalidValue) {
-        return
+        clearError()
+
+        invalidValueMin && triggerError(BigNumberInputError.min)
+        invalidValueMax && triggerError(BigNumberInputError.max)
+
+        if (invalidValue) return
+
+        onChange({ name, value: newValue })
       }
-
-      onChange({ name, value: newValue })
+      setCurrentValue(value)
+    } catch (e) {
+      console.error(e)
     }
-
-    setCurrentValue(value)
   }
 
   const currentStep = step && ethers.utils.formatUnits(step, decimals)

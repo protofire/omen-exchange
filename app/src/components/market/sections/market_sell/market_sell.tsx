@@ -5,8 +5,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../../../common/constants'
-import { useAsyncDerivedValue, useContracts } from '../../../../hooks'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts, useOutOfBoundsBalance } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../../../util/tools'
@@ -14,7 +13,7 @@ import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../.
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
-import { BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { BigNumberInputError, BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
@@ -104,13 +103,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     calcSellAmount,
   )
 
-  const haveEnoughShares = balanceItem && amountShares.lte(balanceItem.shares)
-  const notEnoughSharesMsg = 'Not enough Shares in your balance.'
   const finish = async () => {
     try {
-      if (!haveEnoughShares) {
-        throw new Error('There are not enough shares to sell')
-      }
       if (!tradedCollateral) {
         return
       }
@@ -140,10 +134,19 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
-  const error = (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || !haveEnoughShares
-
   const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals)}`
   const goBackToAddress = `/${marketMakerAddress}`
+
+  const [amountErrorType, setAmountErrorType] = useState<BigNumberInputError>(BigNumberInputError.noError)
+  const minAmountValue = new BigNumber(0)
+  const isAmountError = useOutOfBoundsBalance(
+    amountErrorType,
+    minAmountValue.toString(),
+    selectedOutcomeBalance,
+    'Shares',
+  )
+
+  const isSellButtonDisabled = (status !== Status.Ready && status !== Status.Error) || amountShares.isZero()
 
   return (
     <>
@@ -185,14 +188,19 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               formField={
                 <BigNumberInput
                   decimals={collateral.decimals}
+                  max={balanceItem.shares}
+                  min={minAmountValue}
                   name="amount"
                   onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
+                  onError={e => {
+                    setAmountErrorType(e)
+                  }}
                   value={amountShares}
                 />
               }
               symbol={'Shares'}
             />
-            {amountShares.gt(balanceItem.shares) && <GenericError>{notEnoughSharesMsg}</GenericError>}
+            {isAmountError && <GenericError>{isAmountError}</GenericError>}
           </div>
           <div>
             <TransactionDetailsCard>
@@ -236,12 +244,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetails>
-
         <ButtonContainer>
           <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
             Cancel
           </LeftButton>
-          <Button buttonType={ButtonType.secondaryLine} disabled={error} onClick={() => finish()}>
+          <Button buttonType={ButtonType.secondaryLine} disabled={isSellButtonDisabled} onClick={() => finish()}>
             Sell
           </Button>
         </ButtonContainer>

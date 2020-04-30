@@ -4,12 +4,15 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { useCollateralBalance } from '../../../../hooks/useCollateralBalance'
-import { useContracts } from '../../../../hooks/useContracts'
-import { useCpk } from '../../../../hooks/useCpk'
-import { useCpkAllowance } from '../../../../hooks/useCpkAllowance'
-import { useFundingBalance } from '../../../../hooks/useFundingBalance'
+import {
+  useCollateralBalance,
+  useConnectedWeb3Context,
+  useContracts,
+  useCpk,
+  useCpkAllowance,
+  useFundingBalance,
+  useOutOfBoundsBalance,
+} from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
@@ -19,7 +22,7 @@ import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../..
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
-import { BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { BigNumberInputError, BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
@@ -39,6 +42,11 @@ interface Props extends RouteComponentProps<any> {
   theme?: any
 }
 
+enum Tabs {
+  deposit,
+  withdraw,
+}
+
 const LeftButton = styled(Button)`
   margin-right: auto;
 `
@@ -55,11 +63,6 @@ const logger = getLogger('Market::Fund')
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
   const { address: marketMakerAddress, balances, collateral, question, totalPoolShares, userEarnings } = marketMakerData
-
-  enum Tabs {
-    deposit,
-    withdraw,
-  }
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
@@ -185,24 +188,36 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const collateralBalance = useCollateralBalance(collateral, context)
-
-  const isFundingToAddGreaterThanBalance = amountToFund.gt(collateralBalance)
-  const errorFundingToAdd = amountToFund.isZero() || isFundingToAddGreaterThanBalance
-  const errorFundingToAddMsg = `Not enough ${collateral.symbol} in your wallet.`
-
-  const fundingBalance = useFundingBalance(marketMakerAddress, context)
-
-  const isFundingToRemoveGreaterThanFundingBalance = amountToRemove.gt(fundingBalance)
-  const errorFundingToRemove = amountToRemove.isZero() || isFundingToRemoveGreaterThanFundingBalance
-  const errorFundingToRemoveMsg = 'Not enough Shares in your balance.'
-
   const probabilities = balances.map(balance => balance.probability)
-
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
-
   const depositedTokensTotal = depositedTokens.add(userEarnings)
   const goBackToAddress = `/${marketMakerAddress}`
+  const fundingBalance = useFundingBalance(marketMakerAddress, context)
+  const disableWithdrawButton = amountToRemove.isZero() || amountToRemove.gt(fundingBalance)
+  const disableDepositButton = amountToFund.isZero() || hasEnoughAllowance !== Ternary.True
+
+  const walletBalance = formatBigNumber(collateralBalance, collateral.decimals)
+  const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
+
+  const [collateralAmountErrorType, setCollateralAmountErrorType] = useState<BigNumberInputError>(
+    BigNumberInputError.noError,
+  )
+  const [sharesAmountErrorType, setSharesAmountErrorType] = useState<BigNumberInputError>(BigNumberInputError.noError)
+  const minAmountValue = new BigNumber(0)
+  const isCollateralAmountError = useOutOfBoundsBalance(
+    collateralAmountErrorType,
+    minAmountValue.toString(),
+    walletBalance,
+    collateral.symbol,
+  )
+
+  const isSharesAmountError = useOutOfBoundsBalance(
+    sharesAmountErrorType,
+    minAmountValue.toString(),
+    sharesBalance,
+    'Shares',
+  )
 
   return (
     <>
@@ -231,20 +246,25 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 <WalletBalance
                   onClick={() => setAmountToFund(collateralBalance)}
                   symbol={collateral.symbol}
-                  value={`${formatBigNumber(collateralBalance, collateral.decimals)}`}
+                  value={walletBalance}
                 />
                 <TextfieldCustomPlaceholder
                   formField={
                     <BigNumberInput
                       decimals={collateral.decimals}
+                      max={collateralBalance}
+                      min={minAmountValue}
                       name="amountToFund"
                       onChange={(e: BigNumberInputReturn) => setAmountToFund(e.value)}
+                      onError={e => {
+                        setCollateralAmountErrorType(e)
+                      }}
                       value={amountToFund}
                     />
                   }
                   symbol={collateral.symbol}
                 />
-                {isFundingToAddGreaterThanBalance && <GenericError>{errorFundingToAddMsg}</GenericError>}
+                {isCollateralAmountError && <GenericError>{isCollateralAmountError}</GenericError>}
               </>
             )}
             {activeTab === Tabs.withdraw && (
@@ -253,20 +273,25 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   onClick={() => setAmountToRemove(fundingBalance)}
                   symbol="Shares"
                   text="My Pool Tokens"
-                  value={`${formatBigNumber(fundingBalance, collateral.decimals)}`}
+                  value={sharesBalance}
                 />
                 <TextfieldCustomPlaceholder
                   formField={
                     <BigNumberInput
                       decimals={collateral.decimals}
+                      max={fundingBalance}
+                      min={minAmountValue}
                       name="amountToRemove"
                       onChange={(e: BigNumberInputReturn) => setAmountToRemove(e.value)}
+                      onError={e => {
+                        setSharesAmountErrorType(e)
+                      }}
                       value={amountToRemove}
                     />
                   }
-                  symbol=""
+                  symbol="Shares"
                 />
-                {isFundingToRemoveGreaterThanFundingBalance && <GenericError>{errorFundingToRemoveMsg}</GenericError>}
+                {isSharesAmountError && <GenericError>{isSharesAmountError}</GenericError>}
               </>
             )}
           </div>
@@ -325,18 +350,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             Cancel
           </LeftButton>
           {activeTab === Tabs.deposit && (
-            <Button
-              buttonType={ButtonType.secondaryLine}
-              disabled={errorFundingToAdd || hasEnoughAllowance !== Ternary.True}
-              onClick={() => addFunding()}
-            >
+            <Button buttonType={ButtonType.secondaryLine} disabled={disableDepositButton} onClick={() => addFunding()}>
               Deposit
             </Button>
           )}
           {activeTab === Tabs.withdraw && (
             <Button
               buttonType={ButtonType.secondaryLine}
-              disabled={errorFundingToRemove}
+              disabled={disableWithdrawButton}
               onClick={() => removeFunding()}
             >
               Withdraw
