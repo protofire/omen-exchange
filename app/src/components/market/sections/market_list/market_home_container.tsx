@@ -62,6 +62,7 @@ const MarketHomeContainer: React.FC = () => {
   const [moreMarkets, setMoreMarkets] = useState(true)
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
   const [now, setNow] = useState<string>(calcNow())
+  const [isFiltering, setIsFiltering] = useState(false)
 
   useInterval(() => setNow(calcNow), 1000 * 60 * 5)
 
@@ -108,19 +109,22 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
     } else if (error) {
       setMarkets(RemoteData.failure(error))
+      setIsFiltering(false)
     } else if (fetchedMarkets) {
       const { fixedProductMarketMakers } = fetchedMarkets
-
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
+
       if (fixedProductMarketMakers.length === 0) {
         setMoreMarkets(false)
       }
+      setIsFiltering(false)
     }
   }, [fetchedMarkets, loading, error, context.networkId])
 
   const onFilterChange = useCallback((filter: any) => {
     setMoreMarkets(true)
     setFilter(filter)
+    setIsFiltering(true)
   }, [])
 
   const loadMore = () => {
@@ -148,6 +152,7 @@ const MarketHomeContainer: React.FC = () => {
         context={context}
         count={fetchedMarkets ? fetchedMarkets.fixedProductMarketMakers.length : 0}
         currentFilter={filter}
+        isFiltering={isFiltering}
         markets={markets}
         moreMarkets={moreMarkets}
         onFilterChange={onFilterChange}

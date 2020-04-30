@@ -79,7 +79,7 @@ const ListWrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
   flex-direction: column;
-  min-height: 380px;
+  min-height: 400px;
 `
 
 const NoMarketsAvailable = styled.p`
@@ -123,6 +123,7 @@ interface Props {
   context: ConnectedWeb3Context
   count: number
   currentFilter: any
+  isFiltering?: boolean
   markets: RemoteData<MarketMakerDataItem[]>
   moreMarkets: boolean
   onFilterChange: (filter: MarketFilters) => void
@@ -130,7 +131,7 @@ interface Props {
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { context, count, markets, moreMarkets, onFilterChange, onLoadMore } = props
+  const { context, count, isFiltering = false, markets, moreMarkets, onFilterChange, onLoadMore } = props
   const [state, setState] = useState<MarketStates>(MarketStates.open)
   const [category, setCategory] = useState('All')
   const [title, setTitle] = useState('')
@@ -210,6 +211,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     }
   })
 
+  const isLoadingData = isFiltering
+
   return (
     <>
       <SectionTitleMarket title={'Markets'} />
@@ -274,17 +277,19 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           />
         )}
         <ListWrapper>
-          {RemoteData.hasData(markets) &&
+          {!isLoadingData &&
+            RemoteData.hasData(markets) &&
             markets.data.length > 0 &&
             markets.data.slice(0, count).map(item => {
               return <ListItem key={item.address} market={item}></ListItem>
             })}
+
           {RemoteData.is.success(markets) && markets.data.length === 0 && (
             <NoMarketsAvailable>No markets available.</NoMarketsAvailable>
           )}
-          {RemoteData.is.loading(markets) && <InlineLoading message="Loading Markets..." />}
+          {isLoadingData && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
-        {moreMarkets && !RemoteData.is.loading(markets) && (
+        {!isLoadingData && moreMarkets && !RemoteData.is.loading(markets) && (
           <LoadMoreWrapper>
             <Button
               buttonType={ButtonType.secondaryLine}
