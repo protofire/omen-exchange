@@ -211,8 +211,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     }
   })
 
-  const isLoadingData = isFiltering
-
   return (
     <>
       <SectionTitleMarket title={'Markets'} />
@@ -277,19 +275,18 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           />
         )}
         <ListWrapper>
-          {!isLoadingData &&
+          {!isFiltering &&
             RemoteData.hasData(markets) &&
             markets.data.length > 0 &&
             markets.data.slice(0, count).map(item => {
               return <ListItem key={item.address} market={item}></ListItem>
             })}
-
           {RemoteData.is.success(markets) && markets.data.length === 0 && (
             <NoMarketsAvailable>No markets available.</NoMarketsAvailable>
           )}
-          {isLoadingData && <InlineLoading message="Loading Markets..." />}
+          {isFiltering && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
-        {!isLoadingData && moreMarkets && !RemoteData.is.loading(markets) && (
+        {!isFiltering && moreMarkets && !RemoteData.is.loading(markets) && (
           <LoadMoreWrapper>
             <Button
               buttonType={ButtonType.secondaryLine}
