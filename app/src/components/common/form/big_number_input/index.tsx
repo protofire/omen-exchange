@@ -1,27 +1,7 @@
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
+import React, { ChangeEvent, InputHTMLAttributes, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-
-export interface BigNumberInputReturn {
-  name: string
-  value: BigNumber
-}
-
-interface Props {
-  autofocus?: boolean
-  className?: string
-  decimals: number
-  disabled?: boolean
-  max?: BigNumber
-  min?: BigNumber
-  name: string
-  onChange: (value: BigNumberInputReturn) => void
-  placeholder?: string
-  step?: BigNumber
-  value: Maybe<BigNumber>
-  valueFixedDecimals?: number
-}
 
 const Input = styled.input`
   ::-webkit-inner-spin-button,
@@ -36,10 +16,32 @@ const Input = styled.input`
   }
 `
 
-export const BigNumberInput = (props: Props) => {
+export interface BigNumberInputReturn {
+  name: string
+  value: BigNumber
+}
+
+type OverrideProperties<T, R> = Omit<T, keyof R> & R
+
+interface PropsBigNumber extends InputHTMLAttributes<HTMLInputElement> {
+  decimals: number
+  valueFixedDecimals?: number
+}
+
+type Props = OverrideProperties<
+  PropsBigNumber,
+  {
+    max?: BigNumber
+    min?: BigNumber
+    onChange: (value: BigNumberInputReturn) => void
+    step?: BigNumber
+    value: Maybe<BigNumber>
+  }
+>
+
+export const BigNumberInput: React.FC<Props> = props => {
   const {
-    autofocus = false,
-    className,
+    autoFocus = false,
     decimals,
     disabled = false,
     max,
@@ -49,6 +51,7 @@ export const BigNumberInput = (props: Props) => {
     placeholder = '0.00',
     step,
     value,
+    ...restProps
   } = props
 
   const [currentValue, setCurrentValue] = useState('')
@@ -64,10 +67,10 @@ export const BigNumberInput = (props: Props) => {
   }, [value, decimals, currentValue])
 
   useEffect(() => {
-    if (autofocus && inputRef && inputRef.current) {
+    if (autoFocus && inputRef && inputRef.current) {
       inputRef.current.focus()
     }
-  }, [autofocus])
+  }, [autoFocus])
 
   const updateValue = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.currentTarget
@@ -95,7 +98,6 @@ export const BigNumberInput = (props: Props) => {
   return (
     <Input
       autoComplete="off"
-      className={className}
       data-testid={name}
       disabled={disabled}
       max={currentMax}
@@ -105,8 +107,9 @@ export const BigNumberInput = (props: Props) => {
       placeholder={placeholder}
       ref={inputRef}
       step={currentStep}
-      type={'number'}
+      type="number"
       value={currentValue}
+      {...restProps}
     />
   )
 }
