@@ -23,6 +23,7 @@ const Value = styled.p<{ isClickable: boolean }>`
   font-weight: 400;
   line-height: 1.2;
   margin: 0;
+  text-transform: capitalize;
 
   &:hover {
     text-decoration: ${props => (props.isClickable ? 'underline' : 'none')};
@@ -33,16 +34,17 @@ interface Props {
   onClick?: () => void
   text?: string
   value: string
+  symbol: string
 }
 
 export const WalletBalance: React.FC<Props> = props => {
-  const { onClick, text = 'Wallet Balance', value, ...restProps } = props
+  const { onClick, symbol, text = 'Wallet Balance', value, ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
       <Title>{text}</Title>
       <Value isClickable={!!onClick} onClick={() => onClick && onClick()}>
-        {value}
+        {value} {symbol}
       </Value>
     </Wrapper>
   )

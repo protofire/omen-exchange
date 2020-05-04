@@ -6,12 +6,15 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { useAsyncDerivedValue } from '../../../../hooks/useAsyncDerivedValue'
-import { useCollateralBalance } from '../../../../hooks/useCollateralBalance'
-import { useContracts } from '../../../../hooks/useContracts'
-import { useCpk } from '../../../../hooks/useCpk'
-import { useCpkAllowance } from '../../../../hooks/useCpkAllowance'
+import {
+  useAsyncDerivedValue,
+  useCollateralBalance,
+  useConnectedWeb3Context,
+  useContracts,
+  useCpk,
+  useCpkAllowance,
+  useOutOfBoundsBalance,
+} from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
@@ -20,10 +23,11 @@ import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../..
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
-import { BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { BigNumberInputError, BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
+import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketTopDetails } from '../../common/market_top_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -141,13 +145,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const goBackToAddress = `/${marketMakerAddress}`
-
-  const isBuyAmountGreaterThanBalance = amount.gt(collateralBalance)
-  const isDisabled =
-    (status !== Status.Ready && status !== Status.Error) ||
-    isBuyAmountGreaterThanBalance ||
-    amount.isZero() ||
-    hasEnoughAllowance !== Ternary.True
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
 
@@ -155,12 +152,24 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals)} ${collateral.symbol}`
+  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals)}`
   const feeFormatted = `${formatBigNumber(feePaid.mul(-1), collateral.decimals)} ${collateral.symbol}`
   const baseCostFormatted = `${formatBigNumber(baseCost, collateral.decimals)} ${collateral.symbol}`
-  const potentialProfitFormatted = `${formatBigNumber(potentialProfit, collateral.decimals)} ${collateral.symbol}`
+  const potentialProfitFormatted = `${formatBigNumber(potentialProfit, collateral.decimals)}`
   const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
   const total = `${sharesTotal} Shares`
+
+  const [amountErrorType, setAmountErrorType] = useState<BigNumberInputError>(BigNumberInputError.noError)
+  const minAmountValue = new BigNumber(0)
+  const isAmountError = useOutOfBoundsBalance(
+    amountErrorType,
+    minAmountValue.toString(),
+    currentBalance,
+    collateral.symbol,
+  )
+
+  const isBuyDisabled =
+    (status !== Status.Ready && status !== Status.Error) || amount.isZero() || hasEnoughAllowance !== Ternary.True
 
   return (
     <>
@@ -187,6 +196,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               data-place="right"
               data-tip={`Spend your total ${collateral.symbol} balance on the selected outcome.`}
               onClick={() => setAmount(collateralBalance)}
+              symbol={collateral.symbol}
               value={currentBalance}
             />
             <ReactTooltip id="walletBalanceTooltip" />
@@ -194,13 +204,19 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               formField={
                 <BigNumberInput
                   decimals={collateral.decimals}
+                  max={collateralBalance}
+                  min={minAmountValue}
                   name="amount"
                   onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                  onError={e => {
+                    setAmountErrorType(e)
+                  }}
                   value={amount}
                 />
               }
               symbol={collateral.symbol}
             />
+            {isAmountError && <GenericError>{isAmountError}</GenericError>}
           </div>
           <div>
             <TransactionDetailsCard>
@@ -234,7 +250,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
             Cancel
           </LeftButton>
-          <Button buttonType={ButtonType.secondaryLine} disabled={isDisabled} onClick={() => finish()}>
+          <Button buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>
             Buy
           </Button>
         </ButtonContainer>
