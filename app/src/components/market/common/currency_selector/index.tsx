@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
-import { IS_CORONA_VERSION } from '../../../../common/constants'
+import { ALLOW_CUSTOM_TOKENS, DEFAULT_TOKEN } from '../../../../common/constants'
 import { ConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getToken } from '../../../../util/networks'
 import { Token } from '../../../../util/types'
@@ -52,7 +52,7 @@ interface Props {
 export const CurrencySelector: React.FC<Props> = props => {
   const { context, disabled, onSelect, selectedCurrency, ...restProps } = props
 
-  const defaultTokens = IS_CORONA_VERSION ? [getToken(context.networkId, 'usdc')] : []
+  const defaultTokens = [getToken(context.networkId, DEFAULT_TOKEN)]
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
   const { kleros } = useContracts(context)
 
@@ -62,7 +62,7 @@ export const CurrencySelector: React.FC<Props> = props => {
       setTokens(tokens)
     }
 
-    if (!IS_CORONA_VERSION) {
+    if (ALLOW_CUSTOM_TOKENS) {
       fetchTokens()
     }
   }, [kleros])

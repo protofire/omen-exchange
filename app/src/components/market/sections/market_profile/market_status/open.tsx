@@ -2,7 +2,7 @@ import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { IS_CORONA_VERSION } from '../../../../../common/constants'
+import { SHOW_ANSWER_IN_REALITIO, SHOW_POOLING_BTN } from '../../../../../common/constants'
 import { WhenConnected } from '../../../../../hooks/connectedWeb3'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
@@ -132,11 +132,11 @@ const Wrapper = (props: Props) => {
     <ViewCard>
       <MarketTopDetails marketMakerData={marketMakerData} toggleTitle="Pool Information" />
       {renderTableData()}
-      {isQuestionOpen && IS_CORONA_VERSION && openQuestionMessage}
+      {isQuestionOpen && SHOW_ANSWER_IN_REALITIO && openQuestionMessage}
       <WhenConnected>
         <ButtonContainer>
-          {!IS_CORONA_VERSION && poolButton}
-          {isQuestionOpen ? (IS_CORONA_VERSION ? null : openInRealitioButton) : buySellButtons}
+          {SHOW_POOLING_BTN && poolButton}
+          {isQuestionOpen ? (SHOW_ANSWER_IN_REALITIO ? null : openInRealitioButton) : buySellButtons}
         </ButtonContainer>
       </WhenConnected>
     </ViewCard>

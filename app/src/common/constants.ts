@@ -1,3 +1,5 @@
+import { LogoCoronaMarkets, OmenLogo } from '../components/common/logos/omen'
+
 export const LOGGER_ID: string = process.env.REACT_APP_LOGGER_ID || 'gnosis-conditional-exchange'
 export const THREEBOX_ADMIN_ADDRESS: string =
   process.env.REACT_APP_THREEBOX_ADMIN_ADDRESS || '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
@@ -40,6 +42,45 @@ export const GRAPH_RINKEBY_WS =
 
 // Corona version options
 export const IS_CORONA_VERSION = process.env.REACT_APP_IS_CORONA_VERSION === 'true'
+export const IS_GNO_VERSION = process.env.REACT_APP_IS_GNO_VERSION === 'true'
+
+export const VERSION = IS_CORONA_VERSION ? 'CORONA' : IS_GNO_VERSION ? 'GNO' : 'OMEN'
+
+export const USE_3BOX = !IS_CORONA_VERSION
+export const USE_DISQUS = IS_CORONA_VERSION
+
+const LOGO_MAP: { [versionName: string]: any } = {
+  CORONA: LogoCoronaMarkets,
+  GNO: OmenLogo,
+  OMEN: OmenLogo,
+}
+export const Logo = LOGO_MAP[VERSION]
+
+const DEFAULT_ARBITRATOR_MAP: { [versionName: string]: KnownArbitrator } = {
+  CORONA: 'corona',
+  GNO: 'realitio',
+  OMEN: 'realitio',
+}
+export const DEFAULT_ARBITRATOR: KnownArbitrator = DEFAULT_ARBITRATOR_MAP[VERSION]
+
+const DEFAULT_TOKEN_MAP: { [versionName: string]: KnownToken } = {
+  CORONA: 'usdc',
+  GNO: 'gno',
+  OMEN: 'dai',
+}
+export const DEFAULT_TOKEN = DEFAULT_TOKEN_MAP[VERSION]
+
+export const SHOW_SOCIAL = IS_CORONA_VERSION
+export const SHOW_CREATE_MARKET = !IS_CORONA_VERSION && !IS_GNO_VERSION
+export const BLACKLIST_COUNTRIES = IS_CORONA_VERSION
+export const ALLOW_CUSTOM_TOKENS = !IS_CORONA_VERSION
+export const TOGGLEABLE_EXTRA_INFORMATION = !IS_CORONA_VERSION
+export const SHOW_MADE_BY = !IS_CORONA_VERSION
+export const SHOW_ANSWER_IN_REALITIO = IS_CORONA_VERSION
+export const SHOW_POOLING_BTN = !IS_CORONA_VERSION
+export const SHOW_FILTERS = !IS_CORONA_VERSION
+export const DISABLE_CURRENCY_IN_CREATION = IS_CORONA_VERSION || IS_GNO_VERSION
+export const DISABLE_ARBITRATOR_IN_CREATION = IS_CORONA_VERSION || IS_GNO_VERSION
 
 export const CORONA_MARKET_CREATORS = (process.env.REACT_APP_CORONA_MARKET_CREATORS || '')
   .split(',')

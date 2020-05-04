@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { CATEGORIES, IS_CORONA_VERSION } from '../../../../common/constants'
+import { CATEGORIES, SHOW_FILTERS } from '../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { RemoteData } from '../../../../util/remote_data'
@@ -214,7 +214,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitleMarket title={'Markets'} />
       <ListCard>
-        {context.account && !IS_CORONA_VERSION ? (
+        {context.account && SHOW_FILTERS ? (
           <TopContents>
             <MarketsCategories>
               {CATEGORIES_WITH_ALL.map((item, index) => (

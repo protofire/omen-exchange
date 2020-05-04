@@ -6,11 +6,11 @@ import styled, { css } from 'styled-components'
 import useLocalStorageState from 'use-local-storage-state'
 import { useWeb3Context } from 'web3-react/dist'
 
-import { IS_CORONA_VERSION } from '../../../../common/constants'
+import { BLACKLIST_COUNTRIES, Logo, SHOW_CREATE_MARKET, SHOW_SOCIAL } from '../../../../common/constants'
 import { ConnectedWeb3, useDetectAdblocker, useIsBlacklistedCountry } from '../../../../hooks'
 import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { CoronaMarketsLogo, Network, OmenLogo } from '../../../common'
+import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { Message, MessageType } from '../../../common/message'
 import { ModalConnectWallet } from '../../../modal'
@@ -150,7 +150,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
   const [isModalOpen, setModalState] = useState(false)
 
   const disableConnectButton =
-    (IS_CORONA_VERSION && (isBlacklistedCountry === null || isBlacklistedCountry === true)) || isModalOpen
+    (BLACKLIST_COUNTRIES && (isBlacklistedCountry === null || isBlacklistedCountry === true)) || isModalOpen
 
   const tooltipText =
     isBlacklistedCountry === null
@@ -175,8 +175,10 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
       <AdBlockWarning />
       <HeaderInner>
         <ContentsLeft>
-          <LogoWrapper to="/">{IS_CORONA_VERSION ? <CoronaMarketsLogo /> : <OmenLogo />}</LogoWrapper>
-          {IS_CORONA_VERSION && (
+          <LogoWrapper to="/">
+            <Logo />
+          </LogoWrapper>
+          {SHOW_SOCIAL && (
             <SocialIconsWrapper>
               <SocialIcon href="https://www.twitter.com/corona_markets" target="_blank">
                 <IconTwitter />
@@ -185,7 +187,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
           )}
         </ContentsLeft>
         <ContentsRight>
-          {!IS_CORONA_VERSION && (
+          {SHOW_CREATE_MARKET && (
             <>
               <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...createButtonProps}>
                 Create Market
