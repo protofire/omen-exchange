@@ -32,15 +32,15 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
 
     return {
       address: graphMarketMakerDataItem.id,
-      collateralVolume: bigNumberify(graphMarketMakerDataItem.collateralVolume),
-      collateralToken: graphMarketMakerDataItem.collateralToken,
-      outcomeTokenAmounts: graphMarketMakerDataItem.outcomeTokenAmounts.map(bigNumberify),
-      title: graphMarketMakerDataItem.title,
-      outcomes,
-      openingTimestamp: new Date(1000 * +graphMarketMakerDataItem.openingTimestamp),
       arbitrator: graphMarketMakerDataItem.arbitrator,
       category: graphMarketMakerDataItem.category,
+      collateralToken: graphMarketMakerDataItem.collateralToken,
+      collateralVolume: bigNumberify(graphMarketMakerDataItem.collateralVolume),
+      openingTimestamp: new Date(1000 * +graphMarketMakerDataItem.openingTimestamp),
+      outcomeTokenAmounts: graphMarketMakerDataItem.outcomeTokenAmounts.map(bigNumberify),
+      outcomes,
       templateId: +graphMarketMakerDataItem.templateId,
+      title: graphMarketMakerDataItem.title,
     }
   })
 }
@@ -62,13 +62,9 @@ const MarketHomeContainer: React.FC = () => {
   const [moreMarkets, setMoreMarkets] = useState(true)
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
   const [now, setNow] = useState<string>(calcNow())
-
-  useInterval(() => setNow(calcNow), 1000 * 60 * 5)
-
+  const [isFiltering, setIsFiltering] = useState(false)
   const { account, library: provider } = context
-
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
-
   const query = buildQueryMarkets({
     isCoronaVersion: IS_CORONA_VERSION,
     ...filter,
@@ -81,13 +77,17 @@ const MarketHomeContainer: React.FC = () => {
     now: +now,
     ...filter,
   }
+
   if (IS_CORONA_VERSION) {
     marketsQueryVariables.accounts = CORONA_MARKET_CREATORS
   }
+
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
     variables: marketsQueryVariables,
   })
+
+  useInterval(() => setNow(calcNow), 1000 * 60 * 5)
 
   useEffect(() => {
     const getCpkAddress = async () => {
@@ -98,6 +98,7 @@ const MarketHomeContainer: React.FC = () => {
         logger.error('Could not get address of CPK', e.message)
       }
     }
+
     if (account) {
       getCpkAddress()
     }
@@ -106,32 +107,43 @@ const MarketHomeContainer: React.FC = () => {
   useEffect(() => {
     if (loading) {
       setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
-    } else if (error) {
-      setMarkets(RemoteData.failure(error))
     } else if (fetchedMarkets) {
       const { fixedProductMarketMakers } = fetchedMarkets
 
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
-      if (fixedProductMarketMakers.length === 0) {
+
+      if (fixedProductMarketMakers.length < PAGE_SIZE) {
         setMoreMarkets(false)
       }
+
+      setIsFiltering(false)
+    } else if (error) {
+      setMarkets(RemoteData.failure(error))
+      setIsFiltering(false)
     }
-  }, [fetchedMarkets, loading, error, context.networkId])
+  }, [fetchedMarkets, loading, error, context.networkId, markets])
 
   const onFilterChange = useCallback((filter: any) => {
-    setMoreMarkets(true)
     setFilter(filter)
+    setIsFiltering(true)
   }, [])
 
   const loadMore = () => {
-    if (!moreMarkets) return
+    if (!moreMarkets) {
+      return
+    }
+
     fetchMore({
       variables: {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length,
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
         setMoreMarkets(fetchMoreResult ? fetchMoreResult.fixedProductMarketMakers.length > 0 : false)
-        if (!fetchMoreResult) return prev
+
+        if (!fetchMoreResult) {
+          return prev
+        }
+
         return {
           ...prev,
           ...{
@@ -148,6 +160,7 @@ const MarketHomeContainer: React.FC = () => {
         context={context}
         count={fetchedMarkets ? fetchedMarkets.fixedProductMarketMakers.length : 0}
         currentFilter={filter}
+        isFiltering={isFiltering}
         markets={markets}
         moreMarkets={moreMarkets}
         onFilterChange={onFilterChange}
