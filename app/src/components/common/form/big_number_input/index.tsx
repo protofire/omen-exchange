@@ -1,27 +1,7 @@
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
+import React, { ChangeEvent, InputHTMLAttributes, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-
-export interface BigNumberInputReturn {
-  name: string
-  value: BigNumber
-}
-
-interface Props {
-  autofocus?: boolean
-  className?: string
-  decimals: number
-  disabled?: boolean
-  max?: BigNumber
-  min?: BigNumber
-  name: string
-  onChange: (value: BigNumberInputReturn) => void
-  placeholder?: string
-  step?: BigNumber
-  value: Maybe<BigNumber>
-  valueFixedDecimals?: number
-}
 
 const Input = styled.input`
   ::-webkit-inner-spin-button,
@@ -35,20 +15,50 @@ const Input = styled.input`
     outline: none;
   }
 `
+export enum BigNumberInputError {
+  max,
+  min,
+  noError,
+}
 
-export const BigNumberInput = (props: Props) => {
+export interface BigNumberInputReturn {
+  name: string
+  value: BigNumber
+}
+
+type OverrideProperties<T, R> = Omit<T, keyof R> & R
+
+interface PropsBigNumber extends InputHTMLAttributes<HTMLInputElement> {
+  decimals: number
+  valueFixedDecimals?: number
+}
+
+type Props = OverrideProperties<
+  PropsBigNumber,
+  {
+    max?: BigNumber
+    min?: BigNumber
+    onChange: (value: BigNumberInputReturn) => void
+    onError?: (e: BigNumberInputError) => void
+    step?: BigNumber
+    value: Maybe<BigNumber>
+  }
+>
+
+export const BigNumberInput: React.FC<Props> = props => {
   const {
-    autofocus = false,
-    className,
+    autoFocus = false,
     decimals,
     disabled = false,
     max,
     min,
     name,
     onChange,
+    onError,
     placeholder = '0.00',
     step,
     value,
+    ...restProps
   } = props
 
   const [currentValue, setCurrentValue] = useState('')
@@ -64,28 +74,48 @@ export const BigNumberInput = (props: Props) => {
   }, [value, decimals, currentValue])
 
   useEffect(() => {
-    if (autofocus && inputRef && inputRef.current) {
+    if (autoFocus && inputRef && inputRef.current) {
       inputRef.current.focus()
     }
-  }, [autofocus])
+  }, [autoFocus])
+
+  const triggerError = (e: BigNumberInputError) => {
+    if (onError) {
+      onError(e)
+    }
+  }
+
+  const clearError = () => {
+    if (onError) {
+      onError(BigNumberInputError.noError)
+    }
+  }
 
   const updateValue = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.currentTarget
 
-    if (!value) {
-      onChange({ name, value: new BigNumber(0) })
-    } else {
-      const newValue = ethers.utils.parseUnits(value, decimals)
-      const invalidValue = (min && newValue.lt(min)) || (max && newValue.gt(max))
+    try {
+      if (!value) {
+        onChange({ name, value: new BigNumber(0) })
+      } else {
+        const newValue = ethers.utils.parseUnits(value, decimals)
+        const invalidValueMin = min && newValue.lt(min)
+        const invalidValueMax = max && newValue.gt(max)
+        const invalidValue = invalidValueMin || invalidValueMax
 
-      if (invalidValue) {
-        return
+        clearError()
+
+        invalidValueMin && triggerError(BigNumberInputError.min)
+        invalidValueMax && triggerError(BigNumberInputError.max)
+
+        if (invalidValue) return
+
+        onChange({ name, value: newValue })
       }
-
-      onChange({ name, value: newValue })
+      setCurrentValue(value)
+    } catch (e) {
+      console.error(e)
     }
-
-    setCurrentValue(value)
   }
 
   const currentStep = step && ethers.utils.formatUnits(step, decimals)
@@ -95,7 +125,6 @@ export const BigNumberInput = (props: Props) => {
   return (
     <Input
       autoComplete="off"
-      className={className}
       data-testid={name}
       disabled={disabled}
       max={currentMax}
@@ -105,8 +134,9 @@ export const BigNumberInput = (props: Props) => {
       placeholder={placeholder}
       ref={inputRef}
       step={currentStep}
-      type={'number'}
+      type="number"
       value={currentValue}
+      {...restProps}
     />
   )
 }

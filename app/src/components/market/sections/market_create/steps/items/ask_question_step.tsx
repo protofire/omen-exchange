@@ -11,7 +11,7 @@ import { DateField, FormRow } from '../../../../../common'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
-import { ButtonContainerFullWidth, ButtonWithReadyToGoStatus, LeftButton } from '../../../../common/common_styled'
+import { ButtonContainerFullWidth, LeftButton } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
 import { Outcome, Outcomes } from '../outcomes'
 
@@ -73,6 +73,20 @@ const Column = styled.div`
   }
 `
 
+const ButtonWithReadyToGoStatusCSS = css`
+  &,
+  &:hover {
+    background-color: ${props => props.theme.colors.primary};
+    border-color: ${props => props.theme.colors.primary};
+    color: #fff;
+    font-weight: 500;
+  }
+`
+
+const ButtonWithReadyToGoStatus = styled(Button)<{ readyToGo: boolean }>`
+  ${props => props.readyToGo && ButtonWithReadyToGoStatusCSS}
+`
+
 interface Props {
   next: () => void
   values: {
@@ -126,11 +140,13 @@ const AskQuestionStep = (props: Props) => {
   const errorMessages = []
 
   const totalProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
-  if (totalProbabilities !== 100) {
+  const totalProbabilitiesNotFull = totalProbabilities !== 100
+  if (totalProbabilitiesNotFull) {
     errorMessages.push('The total of all probabilities must be 100%')
   }
 
-  const error = totalProbabilities !== 100 || outcomes.length < 2 || !question || !resolution
+  const isContinueButtonDisabled =
+    totalProbabilitiesNotFull || outcomes.length < 2 || !question || !resolution || !category
 
   const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
@@ -231,11 +247,11 @@ const AskQuestionStep = (props: Props) => {
         </LeftButton>
         <ButtonWithReadyToGoStatus
           buttonType={ButtonType.secondaryLine}
-          disabled={error}
+          disabled={isContinueButtonDisabled}
           onClick={props.next}
-          readyToGo={!error}
+          readyToGo={!isContinueButtonDisabled}
         >
-          Next
+          Continue
         </ButtonWithReadyToGoStatus>
       </ButtonContainerFullWidth>
     </CreateCard>

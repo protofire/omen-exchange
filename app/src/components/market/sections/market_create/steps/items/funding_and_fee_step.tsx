@@ -1,24 +1,23 @@
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import { DISABLE_CURRENCY_IN_CREATION } from '../../../../../../common/constants'
-import { useCollateralBalance } from '../../../../../../hooks'
-import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
+import { useCollateralBalance, useConnectedWeb3Context, useOutOfBoundsBalance } from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { formatBigNumber, formatDate } from '../../../../../../util/tools'
 import { Arbitrator, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
-import { BigNumberInput, FormError, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
-import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
+import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
+import { BigNumberInputError, BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { TitleValue } from '../../../../../common/text/title_value'
 import { FullLoading } from '../../../../../loading'
 import {
   ButtonContainerFullWidth,
-  ButtonWithReadyToGoStatus,
+  GenericError,
   LeftButton,
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
@@ -120,6 +119,10 @@ const GridTransactionDetailsStyled = styled(GridTransactionDetails)`
   padding-top: 20px;
 `
 
+const ButtonCreate = styled(Button)`
+  font-weight: 500;
+`
+
 const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
@@ -134,23 +137,27 @@ const FundingAndFeeStep = (props: Props) => {
   }, [dispatch, account, provider, collateral])
 
   const collateralBalance = useCollateralBalance(collateral, context)
-
-  const isFundingGreaterThanBalance = account ? funding.gt(collateralBalance) : false
-  const error = funding.isZero() || isFundingGreaterThanBalance
-
   const resolutionDate = resolution && formatDate(resolution)
 
-  const back = () => {
-    props.back()
-  }
+  const selectedOutcomeBalance = formatBigNumber(collateralBalance, collateral.decimals)
 
-  const hasEnoughBalance = balance && balance.gte(funding)
-  let fundingErrorMessage = ''
-  if (balance && !hasEnoughBalance) {
-    fundingErrorMessage = `You entered ${formatBigNumber(funding, collateral.decimals)} ${
-      collateral.symbol
-    } of funding but your account only has ${formatBigNumber(balance, collateral.decimals)} ${collateral.symbol}`
-  }
+  const [amountErrorType, setAmountErrorType] = useState<BigNumberInputError>(BigNumberInputError.noError)
+  const minAmountValue = new BigNumber(0)
+  const isAmountError = useOutOfBoundsBalance(
+    amountErrorType,
+    minAmountValue.toString(),
+    selectedOutcomeBalance,
+    collateral.symbol,
+  )
+
+  const isCreateMarketbuttonDisabled =
+    !MarketCreationStatus.is.ready(marketCreationStatus) ||
+    MarketCreationStatus.is.error(marketCreationStatus) ||
+    !balance ||
+    funding.isZero() ||
+    !account
+
+  const back = props.back
 
   return (
     <>
@@ -206,13 +213,24 @@ const FundingAndFeeStep = (props: Props) => {
         </CurrenciesWrapper>
         <GridTransactionDetailsStyled>
           <div>
-            <WalletBalance value={formatBigNumber(collateralBalance, collateral.decimals)} />
+            <WalletBalance symbol={collateral.symbol} value={selectedOutcomeBalance} />
             <TextfieldCustomPlaceholder
               formField={
-                <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
+                <BigNumberInput
+                  decimals={collateral.decimals}
+                  max={collateralBalance}
+                  min={minAmountValue}
+                  name="funding"
+                  onChange={handleChange}
+                  onError={e => {
+                    setAmountErrorType(e)
+                  }}
+                  value={funding}
+                />
               }
               symbol={collateral.symbol}
             />
+            {isAmountError && <GenericError>{isAmountError}</GenericError>}
           </div>
           <div>
             <TransactionDetailsCard>
@@ -222,7 +240,6 @@ const FundingAndFeeStep = (props: Props) => {
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsStyled>
-        {fundingErrorMessage && <FormError>{fundingErrorMessage}</FormError>}
         <ButtonContainerFullWidth>
           <LeftButton
             buttonType={ButtonType.secondaryLine}
@@ -239,28 +256,9 @@ const FundingAndFeeStep = (props: Props) => {
               Connect Wallet
             </Button>
           )}
-          <ButtonWithReadyToGoStatus
-            buttonType={ButtonType.primary}
-            disabled={
-              !MarketCreationStatus.is.ready(marketCreationStatus) ||
-              MarketCreationStatus.is.error(marketCreationStatus) ||
-              !hasEnoughBalance ||
-              error ||
-              !account
-            }
-            onClick={submit}
-            readyToGo={
-              !(
-                !MarketCreationStatus.is.ready(marketCreationStatus) ||
-                MarketCreationStatus.is.error(marketCreationStatus) ||
-                !hasEnoughBalance ||
-                error ||
-                !account
-              )
-            }
-          >
+          <ButtonCreate buttonType={ButtonType.primary} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
             Create Market
-          </ButtonWithReadyToGoStatus>
+          </ButtonCreate>
         </ButtonContainerFullWidth>
       </CreateCardBottom>
       {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
