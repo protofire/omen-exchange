@@ -137,14 +137,8 @@ const AskQuestionStep = (props: Props) => {
 
   const history = useHistory()
 
-  const errorMessages = []
-
   const totalProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
   const totalProbabilitiesNotFull = totalProbabilities !== 100
-  if (totalProbabilitiesNotFull) {
-    errorMessages.push('The total of all probabilities must be 100%')
-  }
-
   const isContinueButtonDisabled =
     totalProbabilitiesNotFull || outcomes.length < 2 || !question || !resolution || !category
 
@@ -182,7 +176,6 @@ const AskQuestionStep = (props: Props) => {
       <Outcomes
         canAddOutcome={canAddOutcome}
         disabled={!!loadedQuestionId}
-        errorMessages={errorMessages}
         onChange={handleOutcomesChange}
         outcomes={outcomes}
         totalProbabilities={totalProbabilities}
