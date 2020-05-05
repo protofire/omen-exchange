@@ -121,7 +121,7 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(RemoteData.failure(error))
       setIsFiltering(false)
     }
-  }, [fetchedMarkets, loading, error, context.networkId, markets])
+  }, [fetchedMarkets, loading, error, context.networkId])
 
   const onFilterChange = useCallback((filter: any) => {
     setFilter(filter)
