@@ -94,10 +94,12 @@ interface Props {
 }
 
 const Outcomes = (props: Props) => {
+  const outcomeMinValue = 0
+  const outcomeMaxValue = 100
   const { canAddOutcome, disabled, errorMessages, outcomes } = props
-  const [newOutcomeName, setNewOutcomeName] = useState('')
-  const [newOutcomeProbability, setNewOutcomeProbability] = useState(0)
-  const [uniformProbabilities, setIsUniform] = useState(false)
+  const [newOutcomeName, setNewOutcomeName] = useState<string>('')
+  const [newOutcomeProbability, setNewOutcomeProbability] = useState<number>(outcomeMinValue)
+  const [uniformProbabilities, setIsUniform] = useState<boolean>(false)
 
   // NOTE: Error handling is kind of icky, we should fix this
   const messageErrorToRender = () => {
@@ -178,6 +180,8 @@ const Outcomes = (props: Props) => {
   const manualProbabilitiesAndThereAreOutcomes = manualProbabilities && outcomes.length > 0
   const manualProbabilitiesAndNoOutcomes = manualProbabilities && outcomes.length === 0
   const maxOutcomesReached = outcomes.length >= 6
+  const outcomeValueOutofBounds = newOutcomeProbability <= outcomeMinValue || newOutcomeProbability >= outcomeMaxValue
+  const disableButtonAdd = !newOutcomeName || maxOutcomesReached || (!uniformProbabilities && outcomeValueOutofBounds)
 
   return (
     <>
@@ -215,7 +219,6 @@ const Outcomes = (props: Props) => {
             formField={
               <Textfield
                 disabled={maxOutcomesReached}
-                min={0}
                 onChange={e => setNewOutcomeProbability(Number(e.target.value))}
                 placeholder="0.00"
                 type="number"
@@ -226,9 +229,9 @@ const Outcomes = (props: Props) => {
           />
         )}
         <CustomButtonCircleAdd
-          disabled={!newOutcomeName || maxOutcomesReached}
+          disabled={disableButtonAdd}
           onClick={addNewOutcome}
-          readyToAdd={newOutcomeName !== ''}
+          readyToAdd={!disableButtonAdd}
           title="Add new outcome"
         >
           <IconAdd />
