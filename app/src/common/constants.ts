@@ -1,4 +1,5 @@
-import { LogoCoronaMarkets, OmenLogo } from '../components/common/logos/omen'
+import { CoronaMarketsLogo } from '../components/common/logos/corona_markets'
+import { OmenLogo } from '../components/common/logos/omen'
 
 export const LOGGER_ID: string = process.env.REACT_APP_LOGGER_ID || 'gnosis-conditional-exchange'
 export const THREEBOX_ADMIN_ADDRESS: string =
@@ -50,7 +51,7 @@ export const USE_3BOX = !IS_CORONA_VERSION
 export const USE_DISQUS = IS_CORONA_VERSION
 
 const LOGO_MAP: { [versionName: string]: any } = {
-  CORONA: LogoCoronaMarkets,
+  CORONA: CoronaMarketsLogo,
   GNO: OmenLogo,
   OMEN: OmenLogo,
 }
