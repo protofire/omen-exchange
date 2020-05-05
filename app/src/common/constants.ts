@@ -1,6 +1,21 @@
 import { CoronaMarketsLogo } from '../components/common/logos/corona_markets'
 import { OmenLogo } from '../components/common/logos/omen'
 
+enum Version {
+  GNO = 'gno',
+  CORONA = 'corona',
+  OMEN = 'omen',
+}
+
+export const VERSION = process.env.REACT_APP_VERSION || 'omen'
+export const IS_CORONA_VERSION = VERSION === Version.GNO
+export const IS_OMEN_VERSION = VERSION === Version.CORONA
+export const IS_GNO_VERSION = VERSION === Version.GNO
+
+if ([IS_CORONA_VERSION, IS_OMEN_VERSION, IS_GNO_VERSION].every(v => !v)) {
+  throw new Error('You need to set the REACT_APP_VERSION environment variable to a valid value')
+}
+
 export const LOGGER_ID: string = process.env.REACT_APP_LOGGER_ID || 'gnosis-conditional-exchange'
 export const THREEBOX_ADMIN_ADDRESS: string =
   process.env.REACT_APP_THREEBOX_ADMIN_ADDRESS || '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
@@ -41,12 +56,6 @@ export const GRAPH_RINKEBY_HTTP =
 export const GRAPH_RINKEBY_WS =
   process.env.REACT_APP_GRAPH_RINKEBY_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
 
-// Corona version options
-export const IS_CORONA_VERSION = process.env.REACT_APP_IS_CORONA_VERSION === 'true'
-export const IS_GNO_VERSION = process.env.REACT_APP_IS_GNO_VERSION === 'true'
-
-export const VERSION = IS_CORONA_VERSION ? 'CORONA' : IS_GNO_VERSION ? 'GNO' : 'OMEN'
-
 export const USE_3BOX = !IS_CORONA_VERSION
 export const USE_DISQUS = IS_CORONA_VERSION
 
@@ -82,6 +91,7 @@ export const SHOW_POOLING_BTN = !IS_CORONA_VERSION
 export const SHOW_FILTERS = !IS_CORONA_VERSION
 export const DISABLE_CURRENCY_IN_CREATION = IS_CORONA_VERSION || IS_GNO_VERSION
 export const DISABLE_ARBITRATOR_IN_CREATION = IS_CORONA_VERSION || IS_GNO_VERSION
+export const WHITELISTED_TEMPLATE_IDS = !IS_CORONA_VERSION
 
 export const CORONA_MARKET_CREATORS = (process.env.REACT_APP_CORONA_MARKET_CREATORS || '')
   .split(',')
@@ -90,6 +100,7 @@ export const CORONA_MARKET_CREATORS = (process.env.REACT_APP_CORONA_MARKET_CREAT
 if (IS_CORONA_VERSION && !CORONA_MARKET_CREATORS.length) {
   throw new Error('You need to set the REACT_APP_CORONA_MARKET_CREATORS environment variable')
 }
+export const WHITELISTED_CREATORS = IS_CORONA_VERSION && CORONA_MARKET_CREATORS.length > 0
 
 export const CORONA_REALITIO_ARBITRATOR: string = process.env.REACT_APP_CORONA_REALITIO_ARBITRATOR || ''
 if (IS_CORONA_VERSION && !CORONA_REALITIO_ARBITRATOR) {
