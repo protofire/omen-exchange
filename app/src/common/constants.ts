@@ -60,23 +60,23 @@ export const USE_3BOX = !IS_CORONA_VERSION
 export const USE_DISQUS = IS_CORONA_VERSION
 
 const LOGO_MAP: { [versionName: string]: any } = {
-  CORONA: CoronaMarketsLogo,
-  GNO: OmenLogo,
-  OMEN: OmenLogo,
+  corona: CoronaMarketsLogo,
+  gno: OmenLogo,
+  omen: OmenLogo,
 }
 export const Logo = LOGO_MAP[VERSION]
 
 const DEFAULT_ARBITRATOR_MAP: { [versionName: string]: KnownArbitrator } = {
-  CORONA: 'corona',
-  GNO: 'realitio',
-  OMEN: 'realitio',
+  corona: 'corona',
+  gno: 'realitio',
+  omen: 'realitio',
 }
 export const DEFAULT_ARBITRATOR: KnownArbitrator = DEFAULT_ARBITRATOR_MAP[VERSION]
 
 const DEFAULT_TOKEN_MAP: { [versionName: string]: KnownToken } = {
-  CORONA: 'usdc',
-  GNO: 'gno',
-  OMEN: 'dai',
+  corona: 'usdc',
+  gno: 'gno',
+  omen: 'dai',
 }
 export const DEFAULT_TOKEN = DEFAULT_TOKEN_MAP[VERSION]
 
