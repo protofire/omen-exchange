@@ -13,7 +13,7 @@ export const IS_OMEN_VERSION = VERSION === Version.CORONA
 export const IS_GNO_VERSION = VERSION === Version.GNO
 
 if ([IS_CORONA_VERSION, IS_OMEN_VERSION, IS_GNO_VERSION].every(v => !v)) {
-  throw new Error('You need to set the REACT_APP_VERSION environment variable to a valid value')
+  throw new Error(`You need to set the REACT_APP_VERSION environment variable to a valid value, got '${VERSION}'`)
 }
 
 export const LOGGER_ID: string = process.env.REACT_APP_LOGGER_ID || 'gnosis-conditional-exchange'
