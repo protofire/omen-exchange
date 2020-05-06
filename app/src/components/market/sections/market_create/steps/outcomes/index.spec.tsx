@@ -15,27 +15,6 @@ const renderOutcomes = (props: any) =>
     </ThemeProvider>,
   )
 
-test('should pass some message errors', () => {
-  const onChangeFn = jest.fn()
-
-  const { getByTestId } = renderOutcomes({
-    outcomes: [
-      { name: 'red', probability: 25 },
-      { name: 'green', probability: 25 },
-      { name: 'blue', probability: 25 },
-      { name: 'black', probability: 25 },
-    ],
-    onChange: onChangeFn,
-    errorMessages: ['Error message one', 'Error message two'],
-  })
-
-  const firstErrorMessage = getByTestId('outcome_error_message_0')
-  const secondErrorMessage = getByTestId('outcome_error_message_1')
-
-  expect(firstErrorMessage.textContent).toEqual('Error message one')
-  expect(secondErrorMessage.textContent).toEqual('Error message two')
-})
-
 test('should remove an outcome', () => {
   const onChangeFn = jest.fn()
 
@@ -58,28 +37,48 @@ test('should remove an outcome', () => {
   ])
 })
 
-test('should add an outcome', () => {
+test('should add an outcome with probability > 0', () => {
   const onChangeFn = jest.fn()
 
   const { getByPlaceholderText, getByTitle } = renderOutcomes({
     outcomes: [
       { name: 'red', probability: 25 },
       { name: 'green', probability: 25 },
-      { name: 'blue', probability: 25 },
+      { name: 'blue', probability: 24 },
     ],
     onChange: onChangeFn,
     canAddOutcome: true,
   })
 
-  const newOutcomeInput: any = getByPlaceholderText('Add new outcome')
-  fireEvent.change(newOutcomeInput, { target: { value: 'black' } })
+  const newOutcomeInputText: any = getByPlaceholderText('Add new outcome')
+  const newOutcomeInputValue: any = getByPlaceholderText('0.00')
+
+  fireEvent.change(newOutcomeInputText, { target: { value: 'black' } })
+  fireEvent.change(newOutcomeInputValue, { target: { value: '1' } })
   fireEvent.click(getByTitle('Add new outcome'))
 
-  expect(newOutcomeInput.value).toEqual('')
+  expect(newOutcomeInputText.value).toEqual('')
   expect(onChangeFn).toHaveBeenCalledWith([
     { name: 'red', probability: 25 },
     { name: 'green', probability: 25 },
-    { name: 'blue', probability: 25 },
-    { name: 'black', probability: 0 },
+    { name: 'blue', probability: 24 },
+    { name: 'black', probability: 1 },
   ])
+})
+
+test('should disable add button with probability 0', () => {
+  const onChangeFn = jest.fn()
+
+  const { getByPlaceholderText, getByTitle } = renderOutcomes({
+    outcomes: [],
+    onChange: onChangeFn,
+    canAddOutcome: true,
+  })
+
+  const newOutcomeInputText: any = getByPlaceholderText('Add new outcome')
+  const addButton = getByTitle('Add new outcome')
+
+  fireEvent.change(newOutcomeInputText, { target: { value: 'black' } })
+
+  expect(addButton).toBeDisabled()
 })
