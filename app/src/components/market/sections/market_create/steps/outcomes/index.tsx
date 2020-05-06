@@ -2,10 +2,9 @@ import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { ButtonCircle } from '../../../../../button'
-import { FormError, FormLabel, FormRowLink, Textfield, TextfieldCustomPlaceholder } from '../../../../../common'
+import { FormLabel, FormRowLink, Textfield, TextfieldCustomPlaceholder } from '../../../../../common'
 import { IconAdd, IconRemove } from '../../../../../common/icons'
 import {
-  ErrorsWrapper,
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemProbability,
   OutcomeItemProbabilityText,
@@ -79,6 +78,19 @@ const CustomButtonCircleAdd = styled(CustomButtonCircle)<{ readyToAdd: boolean }
   ${props => props.readyToAdd && CustomButtonCircleAddReadyCSS}
 `
 
+const NoteTitle = styled.span`
+  color: ${props => props.theme.colors.textColorDark};
+`
+
+const Note = styled.div`
+  color: ${props => props.theme.colors.textColorLight};
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  margin-top: -20px;
+  padding: 10px 0 0 0;
+`
+
 export interface Outcome {
   name: string
   probability: number
@@ -87,34 +99,18 @@ export interface Outcome {
 interface Props {
   canAddOutcome: boolean
   disabled: boolean
-  errorMessages?: string[]
   onChange: (newOutcomes: Outcome[]) => any
   outcomes: Outcome[]
   totalProbabilities: number
 }
 
 const Outcomes = (props: Props) => {
-  const { canAddOutcome, disabled, errorMessages, outcomes } = props
-  const [newOutcomeName, setNewOutcomeName] = useState('')
-  const [newOutcomeProbability, setNewOutcomeProbability] = useState(0)
-  const [uniformProbabilities, setIsUniform] = useState(false)
-
-  // NOTE: Error handling is kind of icky, we should fix this
-  const messageErrorToRender = () => {
-    if (!errorMessages || outcomes.length === 0) {
-      return
-    }
-
-    return (
-      <ErrorsWrapper>
-        {errorMessages.map((errorMessage, index) => (
-          <FormError data-testid={`outcome_error_message_${index}`} key={index}>
-            {errorMessage}
-          </FormError>
-        ))}
-      </ErrorsWrapper>
-    )
-  }
+  const outcomeMinValue = 0
+  const outcomeMaxValue = 100
+  const { canAddOutcome, disabled, outcomes } = props
+  const [newOutcomeName, setNewOutcomeName] = useState<string>('')
+  const [newOutcomeProbability, setNewOutcomeProbability] = useState<number>(outcomeMinValue)
+  const [uniformProbabilities, setIsUniform] = useState<boolean>(false)
 
   const uniform = (outcomes: Outcome[]): Outcome[] => {
     return outcomes.map(o => ({
@@ -178,6 +174,8 @@ const Outcomes = (props: Props) => {
   const manualProbabilitiesAndThereAreOutcomes = manualProbabilities && outcomes.length > 0
   const manualProbabilitiesAndNoOutcomes = manualProbabilities && outcomes.length === 0
   const maxOutcomesReached = outcomes.length >= 6
+  const outcomeValueOutofBounds = newOutcomeProbability <= outcomeMinValue || newOutcomeProbability >= outcomeMaxValue
+  const disableButtonAdd = !newOutcomeName || maxOutcomesReached || (!uniformProbabilities && outcomeValueOutofBounds)
 
   return (
     <>
@@ -215,7 +213,6 @@ const Outcomes = (props: Props) => {
             formField={
               <Textfield
                 disabled={maxOutcomesReached}
-                min={0}
                 onChange={e => setNewOutcomeProbability(Number(e.target.value))}
                 placeholder="0.00"
                 type="number"
@@ -226,9 +223,9 @@ const Outcomes = (props: Props) => {
           />
         )}
         <CustomButtonCircleAdd
-          disabled={!newOutcomeName || maxOutcomesReached}
+          disabled={disableButtonAdd}
           onClick={addNewOutcome}
-          readyToAdd={newOutcomeName !== ''}
+          readyToAdd={!disableButtonAdd}
           title="Add new outcome"
         >
           <IconAdd />
@@ -245,18 +242,10 @@ const Outcomes = (props: Props) => {
           <OutcomesTBody>{outcomesToRender}</OutcomesTBody>
         </OutcomesTable>
       </OutcomesTableWrapper>
-      {messageErrorToRender()}
-      {/* <TotalWrapper>
-        <TotalTitle>
-          <strong>Total:</strong> {outcomes.length} outcomes
-        </TotalTitle>
-        <TotalValue>
-          <TotalValueColor error={totalProbabilities !== 100} uniformProbabilities={uniformProbabilities}>
-            {totalProbabilities}
-          </TotalValueColor>
-          %
-        </TotalValue>
-      </TotalWrapper> */}
+      <Note>
+        <NoteTitle>Note:</NoteTitle> There should be <strong>at least 2 outcomes</strong>. The sum of all probabilites{' '}
+        <strong>must be 100%</strong>
+      </Note>
     </>
   )
 }
