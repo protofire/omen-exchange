@@ -7,7 +7,7 @@ enum Version {
   OMEN = 'omen',
 }
 
-export const VERSION = process.env.REACT_APP_VERSION || 'omen'
+export const VERSION: Version = process.env.REACT_APP_VERSION as Version
 export const IS_CORONA_VERSION = VERSION === Version.GNO
 export const IS_OMEN_VERSION = VERSION === Version.CORONA
 export const IS_GNO_VERSION = VERSION === Version.GNO
@@ -56,24 +56,23 @@ export const GRAPH_RINKEBY_HTTP =
 export const GRAPH_RINKEBY_WS =
   process.env.REACT_APP_GRAPH_RINKEBY_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
 
-export const USE_3BOX = !IS_CORONA_VERSION
 export const USE_DISQUS = IS_CORONA_VERSION
 
-const LOGO_MAP: { [versionName: string]: any } = {
+const LOGO_MAP: { [K in Version]: any } = {
   corona: CoronaMarketsLogo,
   gno: OmenLogo,
   omen: OmenLogo,
 }
 export const Logo = LOGO_MAP[VERSION]
 
-const DEFAULT_ARBITRATOR_MAP: { [versionName: string]: KnownArbitrator } = {
+const DEFAULT_ARBITRATOR_MAP: { [K in Version]: KnownArbitrator } = {
   corona: 'corona',
   gno: 'realitio',
   omen: 'realitio',
 }
 export const DEFAULT_ARBITRATOR: KnownArbitrator = DEFAULT_ARBITRATOR_MAP[VERSION]
 
-const DEFAULT_TOKEN_MAP: { [versionName: string]: KnownToken } = {
+const DEFAULT_TOKEN_MAP: { [K in Version]: KnownToken } = {
   corona: 'usdc',
   gno: 'gno',
   omen: 'dai',

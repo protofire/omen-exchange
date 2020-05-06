@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import { USE_3BOX, USE_DISQUS } from '../../common/constants'
+import { USE_DISQUS } from '../../common/constants'
 
 import { DisqusComments } from './disqus_comments'
 
@@ -13,7 +13,7 @@ export const Comments: React.FC<Props> = ({ marketMakerAddress }) => {
   const [show3box, setShow3Box] = useState(false)
 
   useEffect(() => {
-    if (USE_3BOX) {
+    if (!USE_DISQUS) {
       import('./three_box_comments').then(ThreeBoxCommentsModule => {
         ThreeBoxCommentsRef.current = ThreeBoxCommentsModule.ThreeBoxComments
         setShow3Box(true)
