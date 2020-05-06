@@ -8,8 +8,8 @@ enum Version {
 }
 
 export const VERSION: Version = process.env.REACT_APP_VERSION as Version
-export const IS_CORONA_VERSION = VERSION === Version.GNO
-export const IS_OMEN_VERSION = VERSION === Version.CORONA
+export const IS_CORONA_VERSION = VERSION === Version.CORONA
+export const IS_OMEN_VERSION = VERSION === Version.OMEN
 export const IS_GNO_VERSION = VERSION === Version.GNO
 
 if ([IS_CORONA_VERSION, IS_OMEN_VERSION, IS_GNO_VERSION].every(v => !v)) {
