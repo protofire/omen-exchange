@@ -145,7 +145,7 @@ export const ModalConnectWallet = (props: Props) => {
     onClose()
   }
 
-  const doesMetamaskExist = 'ethereum' in window || 'web3' in window
+  const isMetamaskEnabled = 'ethereum' in window || 'web3' in window
   const onClickWallet = (wallet: Wallet) => {
     if (wallet === Wallet.WalletConnect) {
       setConnectingToWalletConnect(true)
@@ -207,6 +207,9 @@ export const ModalConnectWallet = (props: Props) => {
   const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect
   const connectingText = connectingToMetamask ? 'Waiting for Approval on Metamask' : 'Opening QR for Wallet Connect'
 
+  const disableMetamask = !isMetamaskEnabled || (LINK_TERMS_AND_CONDITIONS && !acceptedTerms) || false
+  const disableWalletConnect = (LINK_TERMS_AND_CONDITIONS && !acceptedTerms) || false
+
   return (
     <>
       <ModalWrapper
@@ -225,15 +228,16 @@ export const ModalConnectWallet = (props: Props) => {
             <>
               <Buttons>
                 <ConnectButton
-                  disabled={!doesMetamaskExist || !acceptedTerms}
+                  disabled={disableMetamask}
                   icon={<IconMetaMask />}
                   onClick={() => {
                     onClickWallet(Wallet.MetaMask)
                   }}
                   text="Metamask"
                 />
+
                 <ConnectButton
-                  disabled={!acceptedTerms}
+                  disabled={disableWalletConnect}
                   icon={<IconWalletConnect />}
                   onClick={() => {
                     onClickWallet(Wallet.WalletConnect)
