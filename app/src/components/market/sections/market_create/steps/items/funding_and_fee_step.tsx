@@ -3,7 +3,7 @@ import React, { ChangeEvent, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { IS_CORONA_VERSION } from '../../../../../../common/constants'
+import { DISABLE_CURRENCY_IN_CREATION } from '../../../../../../common/constants'
 import { useCollateralBalance, useConnectedWeb3Context, useOutOfBoundsBalance } from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
@@ -206,7 +206,7 @@ const FundingAndFeeStep = (props: Props) => {
           <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
           <CurrencySelector
             context={context}
-            disabled={IS_CORONA_VERSION}
+            disabled={DISABLE_CURRENCY_IN_CREATION}
             onSelect={handleCollateralChange}
             selectedCurrency={collateral}
           />

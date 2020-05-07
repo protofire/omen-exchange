@@ -1,3 +1,21 @@
+import { CoronaMarketsLogo } from '../components/common/logos/corona_markets'
+import { OmenLogo } from '../components/common/logos/omen'
+
+enum Version {
+  GNO = 'gno',
+  CORONA = 'corona',
+  OMEN = 'omen',
+}
+
+export const VERSION: Version = process.env.REACT_APP_VERSION as Version
+export const IS_CORONA_VERSION = VERSION === Version.CORONA
+export const IS_OMEN_VERSION = VERSION === Version.OMEN
+export const IS_GNO_VERSION = VERSION === Version.GNO
+
+if ([IS_CORONA_VERSION, IS_OMEN_VERSION, IS_GNO_VERSION].every(v => !v)) {
+  throw new Error(`You need to set the REACT_APP_VERSION environment variable to a valid value, got '${VERSION}'`)
+}
+
 export const LOGGER_ID: string = process.env.REACT_APP_LOGGER_ID || 'gnosis-conditional-exchange'
 export const THREEBOX_ADMIN_ADDRESS: string =
   process.env.REACT_APP_THREEBOX_ADMIN_ADDRESS || '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
@@ -38,15 +56,51 @@ export const GRAPH_RINKEBY_HTTP =
 export const GRAPH_RINKEBY_WS =
   process.env.REACT_APP_GRAPH_RINKEBY_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
 
-// Corona version options
-export const IS_CORONA_VERSION = process.env.REACT_APP_IS_CORONA_VERSION === 'true'
+export const USE_DISQUS = IS_CORONA_VERSION
 
-export const CORONA_MARKET_CREATORS = (process.env.REACT_APP_CORONA_MARKET_CREATORS || '')
+const LOGO_MAP: { [K in Version]: any } = {
+  corona: CoronaMarketsLogo,
+  gno: OmenLogo,
+  omen: OmenLogo,
+}
+export const Logo = LOGO_MAP[VERSION]
+
+const DEFAULT_ARBITRATOR_MAP: { [K in Version]: KnownArbitrator } = {
+  corona: 'corona',
+  gno: 'realitio',
+  omen: 'realitio',
+}
+export const DEFAULT_ARBITRATOR: KnownArbitrator = DEFAULT_ARBITRATOR_MAP[VERSION]
+
+const DEFAULT_TOKEN_MAP: { [K in Version]: KnownToken } = {
+  corona: 'usdc',
+  gno: 'gno',
+  omen: 'dai',
+}
+export const DEFAULT_TOKEN = DEFAULT_TOKEN_MAP[VERSION]
+
+export const SHOW_SOCIAL = IS_CORONA_VERSION
+export const SHOW_CREATE_MARKET = IS_OMEN_VERSION
+export const BLACKLIST_COUNTRIES = IS_CORONA_VERSION
+export const ALLOW_CUSTOM_TOKENS = IS_OMEN_VERSION
+export const TOGGLEABLE_EXTRA_INFORMATION = !IS_CORONA_VERSION
+export const SHOW_MADE_BY = !IS_CORONA_VERSION
+export const SHOW_ANSWER_IN_REALITIO = IS_CORONA_VERSION
+export const SHOW_POOLING_BTN = !IS_CORONA_VERSION
+export const SHOW_FILTERS = !IS_CORONA_VERSION
+export const SHOW_CATEGORIES = !IS_CORONA_VERSION
+export const DISABLE_CURRENCY_IN_CREATION = IS_CORONA_VERSION || IS_GNO_VERSION
+export const DISABLE_ARBITRATOR_IN_CREATION = IS_CORONA_VERSION || IS_GNO_VERSION
+export const WHITELISTED_TEMPLATE_IDS = !IS_CORONA_VERSION
+export const SHOW_FOOTER = IS_CORONA_VERSION || IS_GNO_VERSION || IS_OMEN_VERSION
+export const WHITELISTED_CREATORS = !IS_OMEN_VERSION
+
+export const MARKET_CREATORS = (process.env.REACT_APP_MARKET_CREATORS || '')
   .split(',')
   .filter(x => x.length)
   .map(x => x.toLowerCase())
-if (IS_CORONA_VERSION && !CORONA_MARKET_CREATORS.length) {
-  throw new Error('You need to set the REACT_APP_CORONA_MARKET_CREATORS environment variable')
+if (WHITELISTED_CREATORS && !MARKET_CREATORS.length) {
+  throw new Error('You need to set the REACT_APP_MARKET_CREATORS environment variable')
 }
 
 export const CORONA_REALITIO_ARBITRATOR: string = process.env.REACT_APP_CORONA_REALITIO_ARBITRATOR || ''
@@ -55,12 +109,12 @@ if (IS_CORONA_VERSION && !CORONA_REALITIO_ARBITRATOR) {
 }
 
 export const DISQUS_SHORTNAME: string = process.env.REACT_APP_DISQUS_SHORTNAME || ''
-if (IS_CORONA_VERSION && !DISQUS_SHORTNAME) {
+if (USE_DISQUS && !DISQUS_SHORTNAME) {
   throw new Error('You need to set the REACT_APP_DISQUS_SHORTNAME environment variable')
 }
 
 export const DISQUS_URL: string = process.env.REACT_APP_DISQUS_URL || ''
-if (IS_CORONA_VERSION && !DISQUS_URL) {
+if (USE_DISQUS && !DISQUS_URL) {
   throw new Error('You need to set the REACT_APP_DISQUS_URL environment variable')
 }
 
@@ -81,7 +135,6 @@ export const TWITTER_CARD = process.env.REACT_APP_TWITTER_CARD || 'summary_large
 export const TWITTER_IMAGE_ALT = process.env.REACT_APP_TWITTER_IMAGE_ALT || 'Omen'
 export const TWITTER_SITE = process.env.REACT_APP_TWITTER_SITE || ''
 
-export const SHOW_FOOTER = process.env.REACT_APP_SHOW_FOOTER === 'true' || false
 export const LINK_PRIVACY_POLICY = process.env.REACT_APP_LINK_PRIVACY_POLICY || false
 export const LINK_TERMS_AND_CONDITIONS = process.env.REACT_APP_LINK_TERMS_AND_CONDITIONS || false
 export const LINK_COOKIE_POLICY = process.env.REACT_APP_LINK_COOKIE_POLICY || false

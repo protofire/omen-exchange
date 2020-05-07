@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { IS_CORONA_VERSION } from '../../../../common/constants'
+import { ALLOW_CUSTOM_TOKENS, DEFAULT_TOKEN } from '../../../../common/constants'
 import { useContracts } from '../../../../hooks'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getToken } from '../../../../util/networks'
@@ -24,7 +24,7 @@ const FormOption = styled.option``
 export const Tokens = (props: Props) => {
   const { context, onTokenChange, value, ...restProps } = props
 
-  const defaultTokens = IS_CORONA_VERSION ? [getToken(context.networkId, 'usdc')] : []
+  const defaultTokens = [getToken(context.networkId, DEFAULT_TOKEN)]
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
   const { kleros } = useContracts(context)
 
@@ -34,7 +34,7 @@ export const Tokens = (props: Props) => {
       setTokens(tokens)
     }
 
-    if (!IS_CORONA_VERSION) {
+    if (ALLOW_CUSTOM_TOKENS) {
       fetchTokens()
     }
   }, [kleros])

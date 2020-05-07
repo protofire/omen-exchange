@@ -3,7 +3,7 @@ import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
-import { IS_CORONA_VERSION, LINK_TERMS_AND_CONDITIONS } from '../../../common/constants'
+import { LINK_TERMS_AND_CONDITIONS, SHOW_MADE_BY } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
@@ -259,7 +259,7 @@ export const ModalConnectWallet = (props: Props) => {
             </>
           )}
         </ContentWrapper>
-        {!IS_CORONA_VERSION && <MadeBy />}
+        {SHOW_MADE_BY && <MadeBy />}
       </ModalWrapper>
     </>
   )

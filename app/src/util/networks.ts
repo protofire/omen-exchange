@@ -1,5 +1,7 @@
 import {
   CORONA_REALITIO_ARBITRATOR,
+  DEFAULT_ARBITRATOR,
+  DEFAULT_TOKEN,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
   GRAPH_MAINNET_HTTP,
@@ -7,7 +9,6 @@ import {
   GRAPH_RINKEBY_HTTP,
   GRAPH_RINKEBY_WS,
   INFURA_PROJECT_ID,
-  IS_CORONA_VERSION,
 } from '../common/constants'
 import { entries, isNotNull } from '../util/type-utils'
 
@@ -162,6 +163,15 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     },
     order: 6,
   },
+  gno: {
+    symbol: 'GNO',
+    decimals: 18,
+    addresses: {
+      [networkIds.MAINNET]: '0x6810e776880c02933d47db1b9fc05908e5386b96',
+      [networkIds.RINKEBY]: '0x3e6e3f3266b1c3d814f9d237e7d144e563292112',
+    },
+    order: 7,
+  },
 }
 
 const validNetworkId = (networkId: number): networkId is NetworkId => {
@@ -234,7 +244,7 @@ export const getDefaultToken = (networkId: number) => {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
 
-  return IS_CORONA_VERSION ? getToken(networkId, 'usdc') : getToken(networkId, 'dai')
+  return getToken(networkId, DEFAULT_TOKEN)
 }
 
 export const getTokensByNetwork = (networkId: number): Token[] => {
@@ -319,7 +329,7 @@ export const getDefaultArbitrator = (networkId: number): Arbitrator => {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
 
-  return IS_CORONA_VERSION ? getArbitrator(networkId, 'corona') : getArbitrator(networkId, 'realitio')
+  return getArbitrator(networkId, DEFAULT_ARBITRATOR)
 }
 
 export const getArbitratorFromAddress = (networkId: number, address: string): Arbitrator => {
