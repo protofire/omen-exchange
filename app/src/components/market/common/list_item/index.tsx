@@ -42,6 +42,10 @@ const Info = styled.div`
   white-space: nowrap;
 `
 
+const OutcomeTitle = styled.span`
+  color: ${props => props.theme.colors.textColor};
+`
+
 const Outcome = styled.span`
   color: ${props => props.theme.colors.primary};
 `
@@ -88,7 +92,10 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     <Wrapper to={address}>
       <Title>{title}</Title>
       <Info>
-        <Outcome>{outcomes && `${(percentages[indexMax] * 100).toFixed(2)}% ${outcomes[indexMax]} `}</Outcome>
+        <Outcome>
+          <OutcomeTitle>Top Outcome:</OutcomeTitle>{' '}
+          {outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}
+        </Outcome>
         <Separator>·</Separator>
         <span>
           {amount} {symbol} Volume

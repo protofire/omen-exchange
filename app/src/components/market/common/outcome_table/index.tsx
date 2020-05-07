@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import styled, { css } from 'styled-components'
 
 import { formatBigNumber, mulBN } from '../../../../util/tools'
@@ -38,6 +38,18 @@ const PaddingCSS = css`
     padding-right: 25px;
   }
 `
+
+const TRExtended = styled(TR)<{ clickable?: boolean }>`
+  cursor: ${props => (props.clickable ? 'pointer' : 'default')};
+
+  &:hover td {
+    background-color: ${props => (props.clickable ? '#fafafa' : 'transparent')};
+  }
+`
+
+TRExtended.defaultProps = {
+  clickable: false,
+}
 
 const THStyled = styled(TH)`
   ${PaddingCSS}
@@ -108,6 +120,13 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
+  const selectRow = useCallback(
+    (index: number) => {
+      outcomeHandleChange && outcomeHandleChange(index)
+    },
+    [outcomeHandleChange],
+  )
+
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
     const { currentPrice, outcomeName, payout, shares } = balanceItem
     const currentPriceFormatted = withWinningOutcome ? payout : Number(currentPrice).toFixed(2)
@@ -118,14 +137,18 @@ export const OutcomeTable = (props: Props) => {
     const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
 
     return (
-      <TR key={`${outcomeName}-${outcomeIndex}`}>
+      <TRExtended
+        clickable={displayRadioSelection}
+        key={`${outcomeName}-${outcomeIndex}`}
+        onClick={() => selectRow(outcomeIndex)}
+      >
         {!displayRadioSelection || withWinningOutcome ? null : (
           <TDRadio textAlign={TableCellsAlign[0]}>
             <RadioInput
               checked={outcomeSelected === outcomeIndex}
               data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
               name="outcome"
-              onChange={(e: any) => outcomeHandleChange && outcomeHandleChange(+e.target.value)}
+              onChange={(e: any) => selectRow(+e.target.value)}
               outcomeIndex={outcomeIndex}
               value={outcomeIndex}
             />
@@ -172,7 +195,7 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.Payout) ? null : (
           <TDStyled textAlign={TableCellsAlign[4]}>{withWinningOutcome && payouts ? formattedPayout : '0.00'}</TDStyled>
         )}
-      </TR>
+      </TRExtended>
     )
   }
 
