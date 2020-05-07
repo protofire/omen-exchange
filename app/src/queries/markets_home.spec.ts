@@ -23,7 +23,7 @@ test('Query markets with default options', () => {
 })
 
 test('Query markets for corona markets', () => {
-  const query = buildQueryMarkets({ ...DEFAULT_OPTIONS, isCoronaVersion: true })
+  const query = buildQueryMarkets({ ...DEFAULT_OPTIONS, whitelistedCreators: true, whitelistedTemplateIds: false })
   const expectedQuery = getExpectedQuery('answerFinalizedTimestamp: null, creator_in: $accounts, fee: $fee')
   expect(query).toBe(expectedQuery)
 })
@@ -53,7 +53,8 @@ test('Not corona markets with template_id', () => {
 test('Corona markets with template_id', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,
-    isCoronaVersion: true,
+    whitelistedCreators: true,
+    whitelistedTemplateIds: false,
     templateId: '2',
   })
   const expectedQuery = getExpectedQuery(
@@ -65,7 +66,8 @@ test('Corona markets with template_id', () => {
 test('Not corona markets closed with title and arbitrator', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,
-    isCoronaVersion: false,
+    whitelistedCreators: false,
+    whitelistedTemplateIds: true,
     state: MarketStates.closed,
     templateId: '2',
     title: 'test',
@@ -80,7 +82,8 @@ test('Not corona markets closed with title and arbitrator', () => {
 test('Closed corona markets with currency', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,
-    isCoronaVersion: true,
+    whitelistedCreators: true,
+    whitelistedTemplateIds: false,
     state: MarketStates.closed,
     templateId: '2',
     title: 'test',

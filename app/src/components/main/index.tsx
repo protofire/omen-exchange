@@ -6,7 +6,6 @@ import { useWeb3Context } from 'web3-react'
 import {
   DOCUMENT_DESCRIPTION,
   DOCUMENT_TITLE,
-  IS_CORONA_VERSION,
   OG_DESCRIPTION,
   OG_IMAGE,
   OG_SITE_NAME,
@@ -15,6 +14,7 @@ import {
   TWITTER_CARD,
   TWITTER_IMAGE_ALT,
   TWITTER_SITE,
+  VERSION,
 } from '../../common/constants'
 import { GeoJsProvider } from '../../hooks'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
@@ -28,7 +28,7 @@ const RedirectToHome = () => <Redirect to="/" />
 
 export const Main: React.FC = () => {
   const context = useWeb3Context()
-  const CONTEXT_OG_IMAGE = IS_CORONA_VERSION ? `corona_${OG_IMAGE}` : OG_IMAGE
+  const CONTEXT_OG_IMAGE = `${VERSION.toLowerCase()}_${OG_IMAGE}`
 
   return (
     <GeoJsProvider>

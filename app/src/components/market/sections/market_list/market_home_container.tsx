@@ -5,7 +5,12 @@ import { bigNumberify } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
-import { CORONA_MARKET_CREATORS, IS_CORONA_VERSION, MARKET_FEE } from '../../../../common/constants'
+import {
+  MARKET_CREATORS,
+  MARKET_FEE,
+  WHITELISTED_CREATORS,
+  WHITELISTED_TEMPLATE_IDS,
+} from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { GraphMarketMakerDataItem, MarketMakerDataItem, buildQueryMarkets } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
@@ -66,7 +71,8 @@ const MarketHomeContainer: React.FC = () => {
   const { account, library: provider } = context
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
   const query = buildQueryMarkets({
-    isCoronaVersion: IS_CORONA_VERSION,
+    whitelistedCreators: WHITELISTED_CREATORS,
+    whitelistedTemplateIds: WHITELISTED_TEMPLATE_IDS,
     ...filter,
   })
   const marketsQueryVariables = {
@@ -78,8 +84,8 @@ const MarketHomeContainer: React.FC = () => {
     ...filter,
   }
 
-  if (IS_CORONA_VERSION) {
-    marketsQueryVariables.accounts = CORONA_MARKET_CREATORS
+  if (WHITELISTED_CREATORS) {
+    marketsQueryVariables.accounts = MARKET_CREATORS
   }
 
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery<GraphResponse>(query, {

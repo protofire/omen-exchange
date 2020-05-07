@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { IS_CORONA_VERSION } from '../../../../common/constants'
+import { TOGGLEABLE_EXTRA_INFORMATION } from '../../../../common/constants'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper } from '../../../common'
@@ -40,7 +40,7 @@ const MarketTopDetails: React.FC<Props> = (props: Props) => {
     <>
       <SubsectionTitleWrapper>
         <MarketTitle showSubtitleFAQ={false} templateId={question.templateId} title={title} />
-        {!IS_CORONA_VERSION && (
+        {TOGGLEABLE_EXTRA_INFORMATION && (
           <SubsectionTitleAction onClick={toggleExtraInformation}>
             {showingExtraInformation ? 'Hide' : 'Show'} {toggleTitle}
           </SubsectionTitleAction>

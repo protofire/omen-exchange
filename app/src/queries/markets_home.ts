@@ -46,7 +46,8 @@ export type MarketMakerDataItem = {
 
 export const DEFAULT_OPTIONS = {
   state: MarketStates.open,
-  isCoronaVersion: false,
+  whitelistedCreators: false,
+  whitelistedTemplateIds: true,
   category: 'All',
   title: null as Maybe<string>,
   arbitrator: null as Maybe<string>,
@@ -55,19 +56,28 @@ export const DEFAULT_OPTIONS = {
   sortBy: null as Maybe<string>,
 }
 
-type buildQueryType = MarketFilters & { isCoronaVersion: boolean }
+type buildQueryType = MarketFilters & { whitelistedCreators: boolean; whitelistedTemplateIds: boolean }
 export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => {
-  const { arbitrator, category, currency, isCoronaVersion, state, templateId, title } = options
+  const {
+    arbitrator,
+    category,
+    currency,
+    state,
+    templateId,
+    title,
+    whitelistedCreators,
+    whitelistedTemplateIds,
+  } = options
   const whereClause = [
     state === MarketStates.closed ? 'answerFinalizedTimestamp_lt: $now' : '',
     state === MarketStates.open ? 'answerFinalizedTimestamp: null' : '',
     state === MarketStates.pending ? 'answerFinalizedTimestamp_gt: $now' : '',
-    state === MarketStates.myMarkets || isCoronaVersion ? 'creator_in: $accounts' : '',
+    state === MarketStates.myMarkets || whitelistedCreators ? 'creator_in: $accounts' : '',
     category === 'All' ? '' : 'category: $category',
     title ? 'title_contains: $title' : '',
     currency ? 'collateralToken: $currency' : '',
     arbitrator ? 'arbitrator: $arbitrator' : '',
-    templateId ? 'templateId: $templateId' : !isCoronaVersion ? 'templateId_in: ["0", "2", "6"]' : '',
+    templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee: $fee',
   ]
     .filter(s => s.length)
