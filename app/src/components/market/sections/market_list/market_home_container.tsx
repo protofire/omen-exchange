@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
 import {
-  CORONA_MARKET_CREATORS,
+  MARKET_CREATORS,
   MARKET_FEE,
   WHITELISTED_CREATORS,
   WHITELISTED_TEMPLATE_IDS,
@@ -85,7 +85,7 @@ const MarketHomeContainer: React.FC = () => {
   }
 
   if (WHITELISTED_CREATORS) {
-    marketsQueryVariables.accounts = CORONA_MARKET_CREATORS
+    marketsQueryVariables.accounts = MARKET_CREATORS
   }
 
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery<GraphResponse>(query, {
