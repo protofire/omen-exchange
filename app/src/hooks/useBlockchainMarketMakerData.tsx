@@ -84,7 +84,6 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       realitioAnswer,
       totalEarnings,
       totalPoolShares,
-      userEarnings,
       userPoolShares,
       userShares,
     } = await promiseProps({
@@ -100,9 +99,13 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       realitioAnswer: isQuestionFinalized ? contracts.realitio.getResultFor(graphMarketMakerData.question.id) : null,
       totalEarnings: marketMaker.getCollectedFees(),
       totalPoolShares: marketMaker.poolSharesTotalSupply(),
-      userEarnings: cpk && cpk.address ? marketMaker.getFeesWithdrawableBy(cpk.address) : new BigNumber(0),
       userPoolShares: cpk && cpk.address ? marketMaker.poolSharesBalanceOf(cpk.address) : new BigNumber(0),
     })
+
+    const userEarnings =
+      cpk && cpk.address && marketMakerFunding.gt(0)
+        ? await marketMaker.getFeesWithdrawableBy(cpk.address)
+        : new BigNumber(0)
 
     const arbitrator = getArbitratorFromAddress(networkId, graphMarketMakerData.arbitratorAddress)
     const payouts = graphMarketMakerData.payouts
