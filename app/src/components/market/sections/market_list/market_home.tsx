@@ -221,6 +221,10 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     return !context.account || !SHOW_MY_MARKETS ? f.state !== MarketStates.myMarkets : true
   }
 
+  const noMarketsAvailable = RemoteData.is.success(markets) && markets.data.length === 0
+  const showFilteringInlineLoading = !noMarketsAvailable && isFiltering
+  const showLoadMoreButton = !isFiltering && moreMarkets && !RemoteData.is.loading(markets)
+
   return (
     <>
       <SectionTitleMarket title={'Markets'} />
@@ -279,12 +283,10 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             markets.data.slice(0, count).map(item => {
               return <ListItem key={item.address} market={item}></ListItem>
             })}
-          {RemoteData.is.success(markets) && markets.data.length === 0 && (
-            <NoMarketsAvailable>No markets available.</NoMarketsAvailable>
-          )}
-          {isFiltering && <InlineLoading message="Loading Markets..." />}
+          {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
+          {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
-        {!isFiltering && moreMarkets && !RemoteData.is.loading(markets) && (
+        {showLoadMoreButton && (
           <LoadMoreWrapper>
             <Button
               buttonType={ButtonType.secondaryLine}
