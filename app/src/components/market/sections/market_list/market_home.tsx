@@ -1,7 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { CATEGORIES, SHOW_CATEGORIES, SHOW_FILTERS } from '../../../../common/constants'
+import {
+  CATEGORIES,
+  SHOW_ADVANCED_FILTERS,
+  SHOW_CATEGORIES,
+  SHOW_FILTERS,
+  SHOW_MY_MARKETS,
+} from '../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { RemoteData } from '../../../../util/remote_data'
@@ -211,65 +217,53 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     }
   })
 
+  const filtersCategoriesEnabledButtons = (f: any) => {
+    return !context.account || !SHOW_MY_MARKETS ? f.state !== MarketStates.myMarkets : true
+  }
+
   return (
     <>
       <SectionTitleMarket title={'Markets'} />
       <ListCard>
-        {context.account ? (
-          <TopContents>
-            {SHOW_CATEGORIES && (
-              <MarketsCategories>
-                {CATEGORIES_WITH_ALL.map((item, index) => (
-                  <SelectableButton active={item === category} key={index} onClick={() => setCategory(item)}>
-                    {item}
-                  </SelectableButton>
-                ))}
-              </MarketsCategories>
-            )}
-            {SHOW_FILTERS && (
-              <FiltersWrapper>
-                <FiltersCategories>
-                  {filters.map((item, index) => {
-                    return (
-                      <SelectableButton active={item.active} key={index} onClick={item.onClick}>
-                        {item.title}
-                      </SelectableButton>
-                    )
-                  })}
-                </FiltersCategories>
-                <FiltersControls>
-                  <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
-                    <IconSearch />
-                  </ButtonCircleStyled>
+        <TopContents>
+          {SHOW_CATEGORIES && (
+            <MarketsCategories>
+              {CATEGORIES_WITH_ALL.map((item, index) => (
+                <SelectableButton active={item === category} key={index} onClick={() => setCategory(item)}>
+                  {item}
+                </SelectableButton>
+              ))}
+            </MarketsCategories>
+          )}
+          {SHOW_FILTERS && (
+            <FiltersWrapper>
+              <FiltersCategories>
+                {filters.filter(filtersCategoriesEnabledButtons).map((item, index) => {
+                  return (
+                    <SelectableButton active={item.active} key={index} onClick={item.onClick}>
+                      {item.title}
+                    </SelectableButton>
+                  )
+                })}
+              </FiltersCategories>
+              <FiltersControls>
+                <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
+                  <IconSearch />
+                </ButtonCircleStyled>
+                {SHOW_ADVANCED_FILTERS && (
                   <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
                     <IconFilter />
                   </ButtonCircleStyled>
-                  <SortDropdown
-                    dropdownPosition={DropdownPosition.right}
-                    items={sortItems}
-                    placeholder={<SortBy>Sort By</SortBy>}
-                  />
-                </FiltersControls>
-              </FiltersWrapper>
-            )}
-          </TopContents>
-        ) : (
-          <TopContents>
-            <FiltersWrapper>
-              <FiltersCategories>
-                {filters
-                  .filter(f => f.state !== MarketStates.myMarkets)
-                  .map((item, index) => {
-                    return (
-                      <SelectableButton active={item.active} key={index} onClick={item.onClick}>
-                        {item.title}
-                      </SelectableButton>
-                    )
-                  })}
-              </FiltersCategories>
+                )}
+                <SortDropdown
+                  dropdownPosition={DropdownPosition.right}
+                  items={sortItems}
+                  placeholder={<SortBy>Sort By</SortBy>}
+                />
+              </FiltersControls>
             </FiltersWrapper>
-          </TopContents>
-        )}
+          )}
+        </TopContents>
         {showSearch && <Search onChange={setTitle} value={title} />}
         {showAdvancedFilters && (
           <AdvancedFilters
