@@ -166,7 +166,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
   ]
 
   const createButtonProps = {
-    disabled: disableConnectButton,
+    disabled: disableConnectButton || history.location.pathname.toString().includes('create'),
     onClick: () => history.push('/create'),
   }
 
