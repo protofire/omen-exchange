@@ -4,7 +4,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import { DISABLE_CURRENCY_IN_CREATION } from '../../../../../../common/constants'
-import { useCollateralBalance, useConnectedWeb3Context, useOutOfBoundsBalance } from '../../../../../../hooks'
+import {
+  useCollateralBalance,
+  useConnectedWeb3Context,
+  useOutOfBoundsBalance,
+  useTokens,
+} from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { formatBigNumber, formatDate } from '../../../../../../util/tools'
@@ -111,12 +116,13 @@ const TitleValueVertical = styled(TitleValue)`
 `
 
 const CurrenciesWrapper = styled.div`
+  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
   margin-bottom: 12px;
+  padding-bottom: 20px;
 `
 
-const GridTransactionDetailsStyled = styled(GridTransactionDetails)`
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
-  padding-top: 20px;
+const GridTransactionDetailsStyled = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
+  ${props => (props.noMarginTop ? 'margin-top: 0;' : '')};
 `
 
 const ButtonCreate = styled(Button)`
@@ -158,6 +164,8 @@ const FundingAndFeeStep = (props: Props) => {
     !account
 
   const back = props.back
+
+  const tokensAmount = useTokens(context).length
 
   return (
     <>
@@ -202,16 +210,18 @@ const FundingAndFeeStep = (props: Props) => {
       </CreateCardTop>
       <CreateCardBottom>
         <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
-        <CurrenciesWrapper>
-          <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
-          <CurrencySelector
-            context={context}
-            disabled={DISABLE_CURRENCY_IN_CREATION}
-            onSelect={handleCollateralChange}
-            selectedCurrency={collateral}
-          />
-        </CurrenciesWrapper>
-        <GridTransactionDetailsStyled>
+        {tokensAmount > 1 && (
+          <CurrenciesWrapper>
+            <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
+            <CurrencySelector
+              context={context}
+              disabled={DISABLE_CURRENCY_IN_CREATION}
+              onSelect={handleCollateralChange}
+              selectedCurrency={collateral}
+            />
+          </CurrenciesWrapper>
+        )}
+        <GridTransactionDetailsStyled noMarginTop={tokensAmount === 1}>
           <div>
             <WalletBalance symbol={collateral.symbol} value={selectedOutcomeBalance} />
             <TextfieldCustomPlaceholder

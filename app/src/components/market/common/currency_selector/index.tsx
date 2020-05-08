@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import styled, { css } from 'styled-components'
 
-import { ALLOW_CUSTOM_TOKENS, DEFAULT_TOKEN } from '../../../../common/constants'
-import { ConnectedWeb3Context, useContracts } from '../../../../hooks'
-import { getToken } from '../../../../util/networks'
+import { ConnectedWeb3Context, useTokens } from '../../../../hooks'
 import { Token } from '../../../../util/types'
 import { Button } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -52,20 +50,7 @@ interface Props {
 export const CurrencySelector: React.FC<Props> = props => {
   const { context, disabled, onSelect, selectedCurrency, ...restProps } = props
 
-  const defaultTokens = [getToken(context.networkId, DEFAULT_TOKEN)]
-  const [tokens, setTokens] = useState<Token[]>(defaultTokens)
-  const { kleros } = useContracts(context)
-
-  useEffect(() => {
-    const fetchTokens = async () => {
-      const tokens = await kleros.queryTokens()
-      setTokens(tokens)
-    }
-
-    if (ALLOW_CUSTOM_TOKENS) {
-      fetchTokens()
-    }
-  }, [kleros])
+  const tokens = useTokens(context)
 
   const currencyButtons = tokens.slice(0, 4)
   const currencyMore = tokens.slice(4, currenciesData.length + 1)
