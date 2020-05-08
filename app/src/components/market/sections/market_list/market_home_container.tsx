@@ -115,7 +115,6 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
     } else if (fetchedMarkets) {
       const { fixedProductMarketMakers } = fetchedMarkets
-
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
 
       if (fixedProductMarketMakers.length < PAGE_SIZE) {
