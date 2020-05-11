@@ -145,7 +145,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [showSearch, setShowSearch] = useState<boolean>(false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
-  const [currency, setCurrency] = useState<Maybe<string>>(null)
+  const [currency, setCurrency] = useState<Maybe<string>>(props.currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
   const CATEGORIES_WITH_ALL = ['All', ...CATEGORIES]
   const filters = [
