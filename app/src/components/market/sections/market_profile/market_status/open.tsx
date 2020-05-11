@@ -48,7 +48,7 @@ interface Props extends RouteComponentProps<{}> {
 const Wrapper = (props: Props) => {
   const { history, marketMakerData } = props
 
-  const { address: marketMakerAddress, balances, collateral, question } = marketMakerData
+  const { address: marketMakerAddress, balances, collateral, question, totalPoolShares } = marketMakerData
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
@@ -58,6 +58,7 @@ const Wrapper = (props: Props) => {
   })
 
   const probabilities = balances.map(balance => balance.probability)
+  const hasFunding = totalPoolShares.gt(0)
 
   const renderTableData = () => {
     const disabledColumns = [OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]
@@ -110,7 +111,7 @@ const Wrapper = (props: Props) => {
     <>
       <Button
         buttonType={ButtonType.secondaryLine}
-        disabled={!userHasShares}
+        disabled={!userHasShares || !hasFunding}
         onClick={() => {
           history.push(`${marketMakerAddress}/sell`)
         }}
@@ -119,6 +120,7 @@ const Wrapper = (props: Props) => {
       </Button>
       <Button
         buttonType={ButtonType.secondaryLine}
+        disabled={!hasFunding}
         onClick={() => {
           history.push(`${marketMakerAddress}/buy`)
         }}
