@@ -292,5 +292,10 @@ describe('tools', () => {
       expect(calcDepositedTokens(bigNumberify(20), [100, 20, 0].map(bigNumberify), bigNumberify(10))).toStrictEqual(
         bigNumberify(0),
       ))
+
+    it('should return 0 with no funding', () =>
+      expect(calcDepositedTokens(bigNumberify(20), [100, 200, 300].map(bigNumberify), bigNumberify(0))).toStrictEqual(
+        bigNumberify(0),
+      ))
   })
 })
