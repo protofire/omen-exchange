@@ -81,7 +81,7 @@ export const AdvancedFilters = (props: Props) => {
       onClick: () => onChangeTemplateId('0'),
     },
     {
-      content: 'Single Select',
+      content: 'Categorical',
       onClick: () => onChangeTemplateId('2'),
     },
   ]
