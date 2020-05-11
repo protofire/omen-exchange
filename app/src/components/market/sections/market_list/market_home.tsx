@@ -271,6 +271,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         {showSearch && <Search onChange={setTitle} value={title} />}
         {showAdvancedFilters && (
           <AdvancedFilters
+            currency={currency}
             onChangeArbitrator={setArbitrator}
             onChangeCurrency={setCurrency}
             onChangeTemplateId={setTemplateId}
