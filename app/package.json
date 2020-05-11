@@ -39,6 +39,7 @@
     "apollo-link": "^1.2.13",
     "apollo-link-error": "^1.1.12",
     "apollo-link-http": "^1.5.16",
+    "apollo-link-logger": "^1.2.3",
     "apollo-link-ws": "^1.0.19",
     "apollo-utilities": "^1.3.3",
     "big.js": "^5.2.2",
