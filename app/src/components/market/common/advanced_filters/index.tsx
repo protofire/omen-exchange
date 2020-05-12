@@ -41,6 +41,7 @@ const Options = styled(Dropdown)`
 `
 
 interface Props {
+  currency: Maybe<string>
   onChangeCurrency: (currency: Maybe<string>) => void
   onChangeArbitrator: (arbitrator: Maybe<string>) => void
   onChangeTemplateId: (templateId: Maybe<string>) => void
@@ -59,17 +60,16 @@ export const AdvancedFilters = (props: Props) => {
   const arbitrators = getArbitratorsByNetwork(networkId)
   const tokens = getTokensByNetwork(networkId)
 
-  const { onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
+  const { currency, onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
 
-  const currencyOptions: Array<DropdownItemProps> = [{ address: null, symbol: 'All' }, ...tokens].map(
-    ({ address, symbol }) => {
-      const icon = currencyIcons[symbol]
-      return {
-        content: <TokenItem icon={icon} text={symbol} />,
-        onClick: () => onChangeCurrency(address),
-      }
-    },
-  )
+  const allTokensOptions = [{ address: null, symbol: 'All' }, ...tokens]
+  const currencyOptions: Array<DropdownItemProps> = allTokensOptions.map(({ address, symbol }) => {
+    const icon = currencyIcons[symbol]
+    return {
+      content: <TokenItem icon={icon} text={symbol} />,
+      onClick: () => onChangeCurrency(address),
+    }
+  })
 
   const questionTypeOptions: Array<DropdownItemProps> = [
     {
@@ -99,7 +99,7 @@ export const AdvancedFilters = (props: Props) => {
     <Wrapper>
       <Column>
         <Title>Currency</Title>
-        <Options items={currencyOptions} />
+        <Options currentItem={allTokensOptions.findIndex(t => t.address === currency)} items={currencyOptions} />
       </Column>
       <Column>
         <Title>Question Type</Title>

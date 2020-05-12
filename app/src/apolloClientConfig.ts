@@ -1,7 +1,8 @@
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { ApolloClient } from 'apollo-client'
-import { split } from 'apollo-link'
+import { from, split } from 'apollo-link'
 import { HttpLink } from 'apollo-link-http'
+import apolloLogger from 'apollo-link-logger'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
 
@@ -32,7 +33,7 @@ export const getApolloClient = (networkId: number) => {
     },
   })
   return new ApolloClient({
-    link: getLink(httpLink, wsLink),
+    link: from([apolloLogger, getLink(httpLink, wsLink)]),
     cache: new InMemoryCache(),
   })
 }

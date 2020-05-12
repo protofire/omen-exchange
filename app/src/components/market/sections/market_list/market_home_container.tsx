@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
 import {
+  IS_GNO_VERSION,
   MARKET_CREATORS,
   MARKET_FEE,
   WHITELISTED_CREATORS,
@@ -15,7 +16,7 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { GraphMarketMakerDataItem, MarketMakerDataItem, buildQueryMarkets } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getOutcomes } from '../../../../util/networks'
+import { getDefaultToken, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates } from '../../../../util/types'
 
@@ -60,8 +61,9 @@ const MarketHomeContainer: React.FC = () => {
     sortBy: 'collateralVolume',
     arbitrator: null,
     templateId: null,
-    currency: null,
+    currency: IS_GNO_VERSION ? getDefaultToken(context.networkId).address : null,
   })
+
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const [moreMarkets, setMoreMarkets] = useState(true)
