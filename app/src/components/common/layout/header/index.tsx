@@ -172,7 +172,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
 
   return (
     <HeaderWrapper {...restProps}>
-      <AdBlockWarning />
+      {BLACKLIST_COUNTRIES && <AdBlockWarning />}
       <HeaderInner>
         <ContentsLeft>
           <LogoWrapper to="/">
