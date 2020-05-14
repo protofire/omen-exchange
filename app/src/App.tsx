@@ -12,7 +12,7 @@ import { ApolloProviderWrapper } from './contexts/Apollo'
 import { ConnectedWeb3 } from './hooks'
 import balanceReducer from './store/reducer'
 import theme from './theme'
-import { GlobalStyle } from './theme/component_styles/global_style'
+import { GlobalStyle } from './theme/global_style'
 import connectors from './util/connectors'
 
 const store = configureStore({ reducer: balanceReducer })

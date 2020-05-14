@@ -1,9 +1,11 @@
 import { createGlobalStyle } from 'styled-components'
 
-import theme from '../index'
-import { DatepickerStylesOverride } from '../overrides/datepicker_styles_override'
-import { ReactTooltipStylesOverride } from '../overrides/react_tooltip_styles_override'
-import { WalletConnectStylesOverride } from '../overrides/wallet_connect_styles_override'
+import { DatepickerStylesOverride } from './overrides/datepicker_styles_override'
+import { ReactTooltipStylesOverride } from './overrides/react_tooltip_styles_override'
+import { ThreeboxStylesOverride } from './overrides/threebox_styles_override'
+import { WalletConnectStylesOverride } from './overrides/wallet_connect_styles_override'
+
+import theme from './'
 
 type ThemeType = typeof theme
 
@@ -29,4 +31,5 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
   ${WalletConnectStylesOverride}
   ${DatepickerStylesOverride}
   ${ReactTooltipStylesOverride}
+  ${ThreeboxStylesOverride}
 `
