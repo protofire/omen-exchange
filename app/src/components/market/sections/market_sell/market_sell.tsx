@@ -206,7 +206,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsCard>
               <TransactionDetailsRow
                 title={'Sell Amount'}
-                value={`${formatBigNumber(amountShares, collateral.decimals)}`}
+                value={`${formatBigNumber(amountShares, collateral.decimals)} Shares`}
               />
               <TransactionDetailsRow
                 emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
