@@ -33,4 +33,9 @@ export const currenciesData = [
     text: 'Ether',
     token: 'ETH',
   },
+  {
+    icon: <Icons.EtherIcon />,
+    text: 'Wrapped Ether',
+    token: 'WETH',
+  },
 ]
