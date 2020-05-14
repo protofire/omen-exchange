@@ -4,6 +4,7 @@ import { ButtonCSS } from '../../components/button/button_styling_types'
 
 const MAIN_AVATAR_DIMENSIONS = '40px'
 const COMMENT_AVATAR_DIMENSIONS = '32px'
+const INPUT_FORM_HEIGHT = '54px'
 
 export const ThreeboxStylesOverride = css`
   .threeBoxCustom > .threebox-comments-react {
@@ -14,6 +15,7 @@ export const ThreeboxStylesOverride = css`
     .input {
       img {
         height: ${MAIN_AVATAR_DIMENSIONS};
+        left: 8px;
         max-height: ${MAIN_AVATAR_DIMENSIONS};
         max-width: ${MAIN_AVATAR_DIMENSIONS};
         min-height: ${MAIN_AVATAR_DIMENSIONS};
@@ -25,12 +27,17 @@ export const ThreeboxStylesOverride = css`
         color: ${props => props.theme.colors.textColor};
         font-size: 13px;
         font-weight: normal;
-        height: 54px;
+        height: ${INPUT_FORM_HEIGHT};
         line-height: 1.2;
+        margin: 0;
         max-width: 100%;
-        min-height: 54px;
+        min-height: ${INPUT_FORM_HEIGHT};
         min-width: 100%;
-        padding: 5px 12px 5px 60px;
+        padding: 5px 50px 5px 60px;
+
+        &:empty {
+          height: ${INPUT_FORM_HEIGHT}!important;
+        }
       }
 
       .input_emptyUser {
@@ -54,8 +61,9 @@ export const ThreeboxStylesOverride = css`
 
       .sc-user-input--picker-wrapper {
         max-height: 100%;
-        min-height: 44px;
+        min-height: ${INPUT_FORM_HEIGHT};
         min-width: 44px;
+        top: 0;
       }
     }
 
