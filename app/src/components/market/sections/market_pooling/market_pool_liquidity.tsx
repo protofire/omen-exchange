@@ -17,7 +17,12 @@ import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { calcDepositedTokens, calcPoolTokens, formatBigNumber } from '../../../../util/tools'
+import {
+  calcAddFundingSendAmounts,
+  calcPoolTokens,
+  calcRemoveFundingSendAmounts,
+  formatBigNumber,
+} from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -92,12 +97,29 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
+  const sendAmountsAfterAddingFunding = calcAddFundingSendAmounts(
+    amountToFund,
+    balances.map(b => b.holdings),
+    totalPoolShares,
+  )
+  const sharesAfterAddingFunding = sendAmountsAfterAddingFunding
+    ? balances.map((balance, i) => balance.shares.add(sendAmountsAfterAddingFunding[i]))
+    : balances.map(balance => balance.shares)
 
-  const depositedTokens = calcDepositedTokens(
+  const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
     amountToRemove,
     balances.map(b => b.holdings),
     totalPoolShares,
   )
+  const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
+    amount.lt(min) ? amount : min,
+  )
+
+  const sharesAfterRemovingFunding = balances.map((balance, i) => {
+    return balance.shares.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
+  })
+
+  const showSharesChange = activeTab === Tabs.deposit ? amountToFund.gt(0) : amountToRemove.gt(0)
 
   const addFunding = async () => {
     setModalTitle('Funds Deposit')
@@ -229,7 +251,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           collateral={collateral}
           disabledColumns={[OutcomeTableValue.OutcomeProbability, OutcomeTableValue.Payout]}
           displayRadioSelection={false}
+          newShares={activeTab === Tabs.deposit ? sharesAfterAddingFunding : sharesAfterRemovingFunding}
           probabilities={probabilities}
+          showSharesChange={showSharesChange}
         />
         <GridTransactionDetails>
           <div>

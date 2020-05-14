@@ -155,7 +155,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals)}`
   const feeFormatted = `${formatBigNumber(feePaid.mul(-1), collateral.decimals)} ${collateral.symbol}`
   const baseCostFormatted = `${formatBigNumber(baseCost, collateral.decimals)} ${collateral.symbol}`
-  const potentialProfitFormatted = `${formatBigNumber(potentialProfit, collateral.decimals)}`
+  const potentialProfitFormatted = `${formatBigNumber(potentialProfit, collateral.decimals)} ${collateral.symbol}`
   const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
   const total = `${sharesTotal} Shares`
 
