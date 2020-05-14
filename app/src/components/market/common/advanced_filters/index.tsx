@@ -4,8 +4,7 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork, getTokensByNetwork } from '../../../../util/networks'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
-// import { DxDaoIcon } from '../../common/icons'
-import { BatIcon, DaiIcon, EtherIcon } from '../../../common/icons/currencies'
+import { currenciesData } from '../../../common/icons/currencies/currencies_data'
 import { TokenItem } from '../token_item'
 
 const Wrapper = styled.div`
@@ -47,12 +46,6 @@ interface Props {
   onChangeTemplateId: (templateId: Maybe<string>) => void
 }
 
-const currencyIcons: { [index: string]: JSX.Element } = {
-  BAT: <BatIcon />,
-  DAI: <DaiIcon />,
-  ETH: <EtherIcon />,
-}
-
 export const AdvancedFilters = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { networkId } = context
@@ -64,9 +57,9 @@ export const AdvancedFilters = (props: Props) => {
 
   const allTokensOptions = [{ address: null, symbol: 'All' }, ...tokens]
   const currencyOptions: Array<DropdownItemProps> = allTokensOptions.map(({ address, symbol }) => {
-    const icon = currencyIcons[symbol]
+    const tokenData = currenciesData.find(c => c.token === symbol)
     return {
-      content: <TokenItem icon={icon} text={symbol} />,
+      content: <TokenItem icon={tokenData ? tokenData.icon : null} text={symbol} />,
       onClick: () => onChangeCurrency(address),
     }
   })
