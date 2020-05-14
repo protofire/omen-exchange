@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 import styled, { css } from 'styled-components'
 
@@ -20,8 +21,10 @@ interface Props {
   outcomeSelected?: number
   payouts?: Maybe<number[]>
   probabilities: number[]
+  newShares?: Maybe<BigNumber[]>
   withWinningOutcome?: boolean
   showPriceChange?: boolean
+  showSharesChange?: boolean
 }
 
 const TableWrapper = styled.div`
@@ -81,12 +84,14 @@ export const OutcomeTable = (props: Props) => {
     collateral,
     disabledColumns = [],
     displayRadioSelection = true,
+    newShares = null,
     outcomeHandleChange,
     outcomeSelected,
     payouts = [],
     probabilities,
     withWinningOutcome = false,
     showPriceChange = false,
+    showSharesChange = false,
   } = props
 
   const TableHead: OutcomeTableValue[] = [
@@ -135,6 +140,7 @@ export const OutcomeTable = (props: Props) => {
     const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
     const formattedShares = formatBigNumber(shares, collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
+    const formattedNewShares = newShares ? formatBigNumber(newShares[outcomeIndex], collateral.decimals) : null
 
     return (
       <TRExtended
@@ -190,7 +196,14 @@ export const OutcomeTable = (props: Props) => {
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Shares) ? null : (
-          <TDStyled textAlign={TableCellsAlign[3]}>{formattedShares}</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[3]}>
+            <TDFlexDiv textAlign={TableCellsAlign[3]}>
+              {formattedShares}{' '}
+              {showSharesChange && formattedNewShares && formattedShares !== formattedNewShares && (
+                <NewValue outcomeIndex={outcomeIndex} value={formattedNewShares} />
+              )}
+            </TDFlexDiv>
+          </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Payout) ? null : (
           <TDStyled textAlign={TableCellsAlign[4]}>{withWinningOutcome && payouts ? formattedPayout : '0.00'}</TDStyled>
