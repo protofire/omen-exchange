@@ -3,6 +3,7 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
 import {
+  calcAddFundingSendAmounts,
   calcDepositedTokens,
   calcDistributionHint,
   calcNetCost,
@@ -297,5 +298,29 @@ describe('tools', () => {
       expect(calcDepositedTokens(bigNumberify(20), [100, 200, 300].map(bigNumberify), bigNumberify(0))).toStrictEqual(
         bigNumberify(0),
       ))
+  })
+
+  describe.only('calcAddFundingSendAmounts', () => {
+    it('all holdings are different', () => {
+      const result = calcAddFundingSendAmounts(bigNumberify(10), [1, 2, 3].map(bigNumberify), bigNumberify(20)).map(x =>
+        x.toString(),
+      )
+
+      expect(result).toStrictEqual(['7', '4', '0'])
+    })
+
+    it('all holdings are equal', () => {
+      const result = calcAddFundingSendAmounts(bigNumberify(10), [3, 3, 3].map(bigNumberify), bigNumberify(20)).map(x =>
+        x.toString(),
+      )
+
+      expect(result).toStrictEqual(['0', '0', '0'])
+    })
+
+    it('no funding', () => {
+      const result = calcAddFundingSendAmounts(bigNumberify(10), [3, 3, 3].map(bigNumberify), bigNumberify(0))
+
+      expect(result).toBe(null)
+    })
   })
 })
