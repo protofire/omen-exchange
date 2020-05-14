@@ -199,14 +199,56 @@ export const calcPoolTokens = (
   }
 }
 
+/**
+ * Compute the number of outcomes that will be sent to the user by the Market Maker
+ * after adding `addedFunds` of collateral.
+ */
+export const calcAddFundingSendAmounts = (
+  addedFunds: BigNumber,
+  holdingsBN: BigNumber[],
+  poolShareSupply: BigNumber,
+): Maybe<BigNumber[]> => {
+  if (poolShareSupply.eq(0)) {
+    return null
+  }
+
+  const poolWeight = holdingsBN.reduce((a, b) => (a.gt(b) ? a : b))
+
+  const sendAmounts = holdingsBN.map(h => {
+    const remaining = addedFunds.mul(h).div(poolWeight)
+    return addedFunds.sub(remaining)
+  })
+
+  return sendAmounts
+}
+
+/**
+ * Compute the number of outcomes that will be sent to the user by the Market Maker
+ * after removing `removedFunds` of pool shares.
+ */
+export const calcRemoveFundingSendAmounts = (
+  removedFunds: BigNumber,
+  holdingsBN: BigNumber[],
+  poolShareSupply: BigNumber,
+): BigNumber[] => {
+  const sendAmounts = holdingsBN.map(h =>
+    poolShareSupply.gt(0) ? h.mul(removedFunds).div(poolShareSupply) : new BigNumber(0),
+  )
+  return sendAmounts
+}
+
+/**
+ * Compute the amount of collateral that can be obtained via merging after the user
+ * removed `removedFunds` of pool shares.
+ *
+ * This is 0 when the probabilities are uniform (i.e. all the holdings are equal).
+ */
 export const calcDepositedTokens = (
   removedFunds: BigNumber,
   holdingsBN: BigNumber[],
   poolShareSupply: BigNumber,
 ): BigNumber => {
-  const sendAmounts = holdingsBN.map(h =>
-    poolShareSupply.gt(0) ? h.mul(removedFunds).div(poolShareSupply) : new BigNumber(0),
-  )
+  const sendAmounts = calcRemoveFundingSendAmounts(removedFunds, holdingsBN, poolShareSupply)
   return sendAmounts.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
 }
 
