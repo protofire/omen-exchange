@@ -326,7 +326,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   emphasizeValue={MARKET_FEE > 0}
                   state={ValueStates.success}
                   title={'Earn Trading Fee'}
-                  value={MARKET_FEE}
+                  value={`${MARKET_FEE}%`}
                 />
                 <TransactionDetailsLine />
                 <TransactionDetailsRow
