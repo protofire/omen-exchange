@@ -117,6 +117,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
     const newMarketMakerData: MarketMakerData = {
       address: graphMarketMakerData.address,
+      answerFinalizedTimestamp: graphMarketMakerData.answerFinalizedTimestamp,
       arbitrator,
       balances,
       collateral,

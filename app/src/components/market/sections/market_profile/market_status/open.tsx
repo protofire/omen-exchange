@@ -7,7 +7,7 @@ import { WhenConnected } from '../../../../../hooks/connectedWeb3'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { MarketTopDetails } from '../../../common/market_top_details'
+import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 
@@ -132,7 +132,7 @@ const Wrapper = (props: Props) => {
 
   return (
     <ViewCard>
-      <MarketTopDetails marketMakerData={marketMakerData} toggleTitle="Pool Information" />
+      <MarketTopDetailsOpen marketMakerData={marketMakerData} toggleTitle="Pool Information" />
       {renderTableData()}
       {isQuestionOpen && SHOW_ANSWER_IN_REALITIO && openQuestionMessage}
       <WhenConnected>

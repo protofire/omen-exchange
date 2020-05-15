@@ -17,7 +17,7 @@ export const SubsectionTitleAction: React.FC<DOMAttributes<HTMLSpanElement>> = p
   const { children, onClick, ...restProps } = props
 
   return (
-    <Wrapper onClick={onClick} {...restProps}>
+    <Wrapper className="subsectionTitleAction" onClick={onClick} {...restProps}>
       {children}
     </Wrapper>
   )

@@ -19,7 +19,7 @@ import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
-import { MarketTopDetails } from '../../common/market_top_details'
+import { MarketTopDetailsOpen } from '../../common/market_top_details_open'
 import { OutcomeTable } from '../../common/outcome_table'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
@@ -152,7 +152,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle backTo={goBackToAddress} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
-        <MarketTopDetails
+        <MarketTopDetailsOpen
           marketMakerData={marketMakerData}
           title="Choose the shares you want to sell"
           toggleTitle="Pool Information"

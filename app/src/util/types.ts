@@ -1,3 +1,4 @@
+import { Block } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
@@ -144,6 +145,7 @@ export interface MarketFilters {
 
 export interface MarketMakerData {
   address: string
+  answerFinalizedTimestamp: Maybe<BigNumber>
   arbitrator: Arbitrator
   balances: BalanceItem[]
   collateral: Token
@@ -166,3 +168,11 @@ export enum Ternary {
   False,
   Unknown,
 }
+
+export type HistoricDataPoint = {
+  block: Block
+  holdings: string[]
+}
+
+export type HistoricData = HistoricDataPoint[]
+export type Period = '1D' | '1W' | '1M'
