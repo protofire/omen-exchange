@@ -1,4 +1,4 @@
-import React, { DOMAttributes, createRef, useCallback, useEffect, useState } from 'react'
+import React, { DOMAttributes, useCallback, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { ChevronDown } from './img/ChevronDown'
@@ -15,7 +15,29 @@ export enum DropdownDirection {
   upwards,
 }
 
-const Wrapper = styled.div<{ active?: boolean; disabled: boolean }>`
+const DropdownOpenCSS = css`
+  &,
+  &:hover {
+    background: ${props => props.theme.colors.secondary};
+    border-color: ${props => props.theme.dropdown.buttonBorderColorHover};
+    z-index: 12345;
+
+    .currentItem {
+      color: ${props => props.theme.colors.primary};
+      font-weight: 500;
+    }
+  }
+
+  .chevronUp {
+    display: block;
+  }
+
+  .chevronDown {
+    display: none;
+  }
+`
+
+const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean }>`
   background-color: ${props => props.theme.dropdown.buttonBackgroundColor};
   border-radius: 32px;
   border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
@@ -41,26 +63,7 @@ const Wrapper = styled.div<{ active?: boolean; disabled: boolean }>`
     color: ${props => props.theme.dropdown.buttonColorHover};
   }
 
-  &:focus-within {
-    background: ${props => props.theme.colors.secondary};
-    z-index: 12345;
-
-    .currentItem {
-      color: ${props => props.theme.colors.primary};
-    }
-
-    .dropdownItems {
-      display: block;
-    }
-
-    .chevronUp {
-      display: block;
-    }
-
-    .chevronDown {
-      display: none;
-    }
-  }
+  ${props => (props.isOpen ? DropdownOpenCSS : '')}
 `
 
 const DropdownButton = styled.div`
@@ -108,20 +111,22 @@ const DropdownDirectionUpwardsCSS = css`
   bottom: calc(100% + 10px);
 `
 
-const Items = styled.div<{ dropdownPosition?: DropdownPosition; dropdownDirection?: DropdownDirection }>`
+const Items = styled.div<{
+  isOpen: boolean
+  dropdownPosition?: DropdownPosition
+  dropdownDirection?: DropdownDirection
+}>`
   background-color: ${props => props.theme.dropdown.dropdownItems.backgroundColor};
   border-radius: ${props => props.theme.dropdown.dropdownItems.borderRadius};
   border: solid 1px ${props => props.theme.dropdown.dropdownItems.borderColor};
   box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
-  display: none;
+  display: ${props => (props.isOpen ? 'block' : 'none')};
   min-width: 240px;
   padding: 12px 0;
   position: absolute;
-
   ${props => (props.dropdownPosition === DropdownPosition.left ? DropdownPositionLeftCSS : '')}
   ${props => (props.dropdownPosition === DropdownPosition.right ? DropdownPositionRightCSS : '')}
   ${props => (props.dropdownPosition === DropdownPosition.center ? DropdownPositionCenterCSS : '')}
-
   ${props => (props.dropdownDirection === DropdownDirection.downwards ? DropdownDirectionDownwardsCSS : '')}
   ${props => (props.dropdownDirection === DropdownDirection.upwards ? DropdownDirectionUpwardsCSS : '')}
 `
@@ -152,14 +157,6 @@ const ChevronWrapper = styled.div`
   flex-shrink: 0;
 `
 
-const HelperFocusItem = styled.span`
-  height: 0;
-  line-height: 0;
-  width: 0;
-  position: absolute;
-  z-index: -123456;
-`
-
 export interface DropdownItemProps {
   content: React.ReactNode | string
   onClick?: () => void
@@ -171,42 +168,23 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   dropdownPosition?: DropdownPosition | undefined
   dropdownDirection?: DropdownDirection | undefined
   items: any
-  onClick?: () => void
   placeholder?: React.ReactNode | string | undefined
 }
 
 export const Dropdown: React.FC<Props> = props => {
-  const {
-    currentItem,
-    disabled = false,
-    dropdownDirection,
-    dropdownPosition,
-    items,
-    onClick,
-    placeholder,
-    ...restProps
-  } = props
-  const myRef = createRef<HTMLDivElement>()
+  const { currentItem, disabled = false, dropdownDirection, dropdownPosition, items, placeholder, ...restProps } = props
   const [currentItemIndex, setCurrentItemIndex] = useState<number | undefined>(currentItem)
   const [isDirty, setIsDirty] = useState<boolean>(false)
+  const [isOpen, setIsOpen] = useState<boolean>(false)
 
-  const closeDropdown = useCallback(() => {
-    if (myRef.current) {
-      myRef.current.focus()
-    }
-  }, [myRef])
+  const optionClick = useCallback((onClick: (() => void) | undefined, itemIndex: number) => {
+    if (!onClick) return
 
-  const optionClick = useCallback(
-    (onClick: (() => void) | undefined, itemIndex: number) => {
-      if (!onClick) return
-
-      setCurrentItemIndex(itemIndex)
-      onClick()
-      setIsDirty(true)
-      closeDropdown()
-    },
-    [closeDropdown],
-  )
+    setCurrentItemIndex(itemIndex)
+    onClick()
+    setIsDirty(true)
+    setIsOpen(false)
+  }, [])
 
   useEffect(() => {
     if (!placeholder && !currentItemIndex && !isDirty) {
@@ -214,10 +192,26 @@ export const Dropdown: React.FC<Props> = props => {
     }
   }, [currentItemIndex, isDirty, placeholder])
 
+  const onWrapperClick = useCallback(() => {
+    if (isOpen) {
+      setIsOpen(false)
+    } else {
+      setIsOpen(true)
+    }
+  }, [isOpen])
+
   return (
     <>
-      <HelperFocusItem ref={myRef} tabIndex={-1} />
-      <Wrapper disabled={disabled} onClick={onClick} tabIndex={-1} {...restProps}>
+      <Wrapper
+        disabled={disabled}
+        isOpen={isOpen}
+        onBlur={() => {
+          setIsOpen(false)
+        }}
+        onClick={onWrapperClick}
+        tabIndex={-1}
+        {...restProps}
+      >
         <DropdownButton>
           <CurrentItem className="currentItem">
             {placeholder && !isDirty ? placeholder : items[currentItemIndex || 0].content}
@@ -227,13 +221,20 @@ export const Dropdown: React.FC<Props> = props => {
             <ChevronUp />
           </ChevronWrapper>
         </DropdownButton>
-        <Items className="dropdownItems" dropdownDirection={dropdownDirection} dropdownPosition={dropdownPosition}>
+        <Items
+          className="dropdownItems"
+          dropdownDirection={dropdownDirection}
+          dropdownPosition={dropdownPosition}
+          isOpen={isOpen}
+        >
           {items.map((item: DropdownItemProps, index: string) => {
             return (
               <Item
                 active={parseInt(index) === currentItemIndex}
                 key={index}
-                onClick={item.onClick !== undefined ? () => optionClick(item.onClick, parseInt(index)) : closeDropdown}
+                onClick={
+                  item.onClick !== undefined ? () => optionClick(item.onClick, parseInt(index)) : () => setIsOpen(false)
+                }
               >
                 {item.content}
               </Item>
