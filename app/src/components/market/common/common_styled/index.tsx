@@ -138,3 +138,17 @@ export const TDFlexDiv = styled.div<{ textAlign?: string }>`
   justify-content: ${props =>
     props.textAlign && 'right' ? 'flex-end' : props.textAlign && 'center' ? 'center' : 'flex-start'};
 `
+export const SubsectionTitleActionWrapper = styled.div`
+  align-items: center;
+  display: flex;
+  margin-left: auto;
+`
+export const Breaker = styled.div`
+  &::before {
+    content: '|';
+    margin: 0 8px;
+  }
+  &:last-child {
+    display: none;
+  }
+`

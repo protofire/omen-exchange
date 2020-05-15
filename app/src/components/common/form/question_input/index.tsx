@@ -47,8 +47,8 @@ export const QuestionInput = (props: Props) => {
     <>
       <TitleWrapper>
         <FormLabel>Set Market Question</FormLabel>
-        {!disabled && <FormRowLink onClick={() => setModalQuestionState(true)}>add question</FormRowLink>}
-        {disabled && <FormRowLink onClick={onClearQuestion}>clear question</FormRowLink>}
+        {!disabled && <FormRowLink onClick={() => setModalQuestionState(true)}>import Market</FormRowLink>}
+        {disabled && <FormRowLink onClick={onClearQuestion}>clear Market</FormRowLink>}
       </TitleWrapper>
       <Textfield
         disabled={disabled}
