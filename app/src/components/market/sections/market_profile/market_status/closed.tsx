@@ -12,9 +12,9 @@ import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
-import { ClosedMarketTopDetails } from '../../../common/closed_market_top_details'
 import { ButtonContainerFullWidth } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
+import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 
@@ -166,7 +166,7 @@ export const ClosedMarketDetail = (props: Props) => {
   return (
     <>
       <ViewCard>
-        <ClosedMarketTopDetails collateral={collateral} marketMakerData={marketMakerData} />
+        <MarketTopDetailsClosed collateral={collateral} marketMakerData={marketMakerData} />
         <OutcomeTable
           balances={balances}
           collateral={collateralToken}
