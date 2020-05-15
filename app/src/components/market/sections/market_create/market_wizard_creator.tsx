@@ -166,16 +166,7 @@ export const MarketWizardCreator = (props: Props) => {
       category: '',
       resolution: null,
       arbitrator: defaultArbitrator,
-      outcomes: [
-        {
-          name: 'Yes',
-          probability: 50,
-        },
-        {
-          name: 'No',
-          probability: 50,
-        },
-      ],
+      outcomes: [],
       loadedQuestionId: null,
     }
 
