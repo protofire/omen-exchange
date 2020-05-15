@@ -125,7 +125,7 @@ export const ModalQuestion = (props: Props) => {
   }
 
   return (
-    <ModalWrapper isOpen={isOpen} onRequestClose={onClose} title={`Add question from realit.io`}>
+    <ModalWrapper isOpen={isOpen} onRequestClose={onClose} title={`Import Market from realit.io`}>
       <FormRow
         error={errorMessage || ''}
         formField={
