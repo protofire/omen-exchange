@@ -245,7 +245,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         {showSetAllowance && (
           <SetAllowance
             collateral={collateral}
-            finished={allowanceFinished}
+            finished={allowanceFinished && RemoteData.is.success(allowance)}
             loading={RemoteData.is.asking(allowance)}
             onUnlock={unlockCollateral}
           />
