@@ -111,12 +111,16 @@ const DropdownDirectionUpwardsCSS = css`
   bottom: calc(100% + 10px);
 `
 
-const Items = styled.div<{ dropdownPosition?: DropdownPosition; dropdownDirection?: DropdownDirection }>`
+const Items = styled.div<{
+  isOpen: boolean
+  dropdownPosition?: DropdownPosition
+  dropdownDirection?: DropdownDirection
+}>`
   background-color: ${props => props.theme.dropdown.dropdownItems.backgroundColor};
   border-radius: ${props => props.theme.dropdown.dropdownItems.borderRadius};
   border: solid 1px ${props => props.theme.dropdown.dropdownItems.borderColor};
   box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
-  display: block;
+  display: ${props => (props.isOpen ? 'block' : 'none')};
   min-width: 240px;
   padding: 12px 0;
   position: absolute;
@@ -217,25 +221,26 @@ export const Dropdown: React.FC<Props> = props => {
             <ChevronUp />
           </ChevronWrapper>
         </DropdownButton>
-        {isOpen && (
-          <Items className="dropdownItems" dropdownDirection={dropdownDirection} dropdownPosition={dropdownPosition}>
-            {items.map((item: DropdownItemProps, index: string) => {
-              return (
-                <Item
-                  active={parseInt(index) === currentItemIndex}
-                  key={index}
-                  onClick={
-                    item.onClick !== undefined
-                      ? () => optionClick(item.onClick, parseInt(index))
-                      : () => setIsOpen(false)
-                  }
-                >
-                  {item.content}
-                </Item>
-              )
-            })}
-          </Items>
-        )}
+        <Items
+          className="dropdownItems"
+          dropdownDirection={dropdownDirection}
+          dropdownPosition={dropdownPosition}
+          isOpen={isOpen}
+        >
+          {items.map((item: DropdownItemProps, index: string) => {
+            return (
+              <Item
+                active={parseInt(index) === currentItemIndex}
+                key={index}
+                onClick={
+                  item.onClick !== undefined ? () => optionClick(item.onClick, parseInt(index)) : () => setIsOpen(false)
+                }
+              >
+                {item.content}
+              </Item>
+            )
+          })}
+        </Items>
       </Wrapper>
     </>
   )

@@ -3,23 +3,15 @@ import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
 import { FullLoading } from '../../loading/full_loading'
-import { ButtonProps, ButtonType } from '../button_styling_types'
 
-const Button = styled.button`
-  background-color: transparent;
-  border-radius: 0;
-  border: none;
-  color: inherit;
-  cursor: inherit;
-  font-size: inherit;
-  height: 100%;
-  outline: none;
-  padding: 0;
+const Button = styled.div`
+  flex-grow: 1;
+  margin: -12px -17px;
+  padding: 12px 17px;
   text-align: left;
-  width: 100%;
 `
 
-export const ButtonDisconnectWallet = (props: ButtonProps) => {
+export const ButtonDisconnectWallet: React.FC = props => {
   const context = useWeb3Context()
   const { account, active, connectorName, error } = context
   const [isDisconnecting, setIsDisconnecting] = useState(false)
@@ -34,7 +26,7 @@ export const ButtonDisconnectWallet = (props: ButtonProps) => {
 
   return account ? (
     <>
-      <Button buttonType={ButtonType.secondaryLine} disabled={isDisconnecting} onClick={logout} {...props}>
+      <Button onClick={logout} {...props}>
         Disconnect
       </Button>
       {isDisconnecting && <FullLoading message="Please wait..." />}
