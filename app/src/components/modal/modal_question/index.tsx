@@ -47,17 +47,18 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const ModalQuestion = (props: Props) => {
-  const { context, isOpen, onClose, onSave } = props
-
+  const { context, onClose, onSave } = props
   const { realitio } = useContracts(context)
-
   const [questionURL, setQuestionURL] = useState<string>('')
   const [isSpinnerOn, setSpinnerOn] = useState<boolean>(false)
 
   const extractId = (questionURL: string): string => {
     const reQuestionId = /question\/(0x[0-9A-Fa-f]{64})/
+
     if (!questionURL) return ''
+
     const questionMatch = questionURL.match(reQuestionId)
+
     return questionMatch ? questionMatch[1] : ''
   }
 
@@ -125,7 +126,7 @@ export const ModalQuestion = (props: Props) => {
   }
 
   return (
-    <ModalWrapper isOpen={isOpen} onRequestClose={onClose} title={`Import Market from realit.io`}>
+    <ModalWrapper isOpen onRequestClose={onClose} title={`Import Market from realit.io`}>
       <FormRow
         error={errorMessage || ''}
         formField={
@@ -139,6 +140,7 @@ export const ModalQuestion = (props: Props) => {
             }}
             placeholder="https://realitio.github.io/#!/question/0xd27a6a4dbc3930b0e319aad2c7b2c478fa9d8ff785f474415bdec1285838b3e9"
             type="text"
+            value={questionURL}
           />
         }
         style={{ marginTop: '20px' }}
