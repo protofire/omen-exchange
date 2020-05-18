@@ -1,13 +1,15 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import { CommonDisabledCSS } from '../common_styled'
+
 interface Props {
   disabled?: boolean
   formField: any
   symbol: any
 }
 
-const FieldWrapper = styled.div<{ disabled?: boolean }>`
+const FieldWrapper = styled.div`
   align-items: center;
   background-color: ${props => props.theme.textfield.backgroundColor};
   border-color: ${props => props.theme.textfield.borderColor};
@@ -25,7 +27,10 @@ const FieldWrapper = styled.div<{ disabled?: boolean }>`
     border-color: ${props => props.theme.textfield.borderColorActive};
   }
 
+  ${CommonDisabledCSS}
+
   > input {
+    background-color: transparent;
     border: none;
     color: ${props => props.theme.textfield.color};
     flex-grow: 1;
@@ -49,24 +54,29 @@ const FieldWrapper = styled.div<{ disabled?: boolean }>`
       cursor: not-allowed;
     }
 
+    &.disabled,
+    &.disabled:hover,
     &:disabled,
-    &[disabled] {
-      cursor: not-allowed;
-      opacity: 0.5;
+    &:disabled:hover,
+    &[disabled],
+    &[disabled]:hover {
+      background-color: transparent;
+      border-color: transparent;
+      color: ${props => props.theme.form.common.disabled.color};
+      cursor: default !important;
+      pointer-events: none !important;
+      user-select: none !important;
     }
 
-    ::-webkit-inner-spin-button {
+    &::-webkit-inner-spin-button {
       -webkit-appearance: none;
     }
-    ::-webkit-outer-spin-button {
+
+    &::-webkit-outer-spin-button {
       -webkit-appearance: none;
     }
   }
 `
-
-FieldWrapper.defaultProps = {
-  disabled: false,
-}
 
 const Symbol = styled.span`
   color: ${props => props.theme.colors.primary};
@@ -75,14 +85,25 @@ const Symbol = styled.span`
   font-weight: 500;
   line-height: 1.2;
   text-align: right;
+
+  .disabled &,
+  .disabled:hover &,
+  :disabled &,
+  :disabled:hover &,
+  [disabled] &,
+  [disabled]:hover & {
+    color: ${props => props.theme.form.common.disabled.color};
+  }
 `
 
 export const TextfieldCustomSymbol = (props: Props) => {
   const { disabled, formField, symbol, ...restProps } = props
 
+  // eslint-disable-next-line no-warning-comments
+  //TODO: use a input[text] instead of passing a <Textfield />
   return (
-    <FieldWrapper disabled={disabled} {...restProps}>
-      {formField}
+    <FieldWrapper className={disabled ? 'disabled' : ''} {...restProps}>
+      {React.cloneElement(formField, { disabled: disabled })}
       <Symbol>{symbol}</Symbol>
     </FieldWrapper>
   )

@@ -1,6 +1,8 @@
 import React, { ButtonHTMLAttributes } from 'react'
 import styled, { css } from 'styled-components'
 
+import { CommonDisabledCSS } from '../../common/form/common_styled'
+
 const ActiveCSS = css`
   &,
   &:hover {
@@ -35,14 +37,7 @@ const Wrapper = styled.button<{ active?: boolean }>`
 
   ${props => (props.active ? ActiveCSS : '')};
 
-  &[disabled] {
-    &,
-    &:hover {
-      border-color: ${props => props.theme.colors.tertiary};
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
-  }
+  ${CommonDisabledCSS}
 `
 
 Wrapper.defaultProps = {

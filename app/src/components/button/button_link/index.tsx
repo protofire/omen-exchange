@@ -27,7 +27,6 @@ const Wrapper = styled.button`
   &[disabled] {
     background-color: transparent;
     color: ${props => props.theme.colors.primary};
-    cursor: not-allowed;
     opacity: 0.5;
   }
 `
