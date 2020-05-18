@@ -368,7 +368,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         {activeTab === Tabs.deposit && showSetAllowance && (
           <SetAllowance
             collateral={collateral}
-            finished={allowanceFinished}
+            finished={allowanceFinished && RemoteData.is.success(allowance)}
             loading={RemoteData.is.asking(allowance)}
             onUnlock={unlockCollateral}
           />
