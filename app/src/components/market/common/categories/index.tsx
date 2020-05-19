@@ -20,8 +20,8 @@ const Wrapper = styled.div`
 `
 
 const CategoryButton = styled(Button)<{ isSelected: boolean }>`
-  margin: 0 8px 14px 0;
   cursor: ${props => (props.isSelected ? 'default' : 'pointer')};
+  margin: 0 8px 14px 0;
 
   &,
   &:hover {

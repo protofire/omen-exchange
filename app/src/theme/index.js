@@ -153,6 +153,15 @@ const theme = {
   mainContainer: {
     maxWidth: '586px',
   },
+  form: {
+    common: {
+      disabled: {
+        backgroundColor: '#fff',
+        borderColor: '#E8EAF6',
+        color: '#757575',
+      },
+    },
+  },
   outcomes: {
     colors: [
       {

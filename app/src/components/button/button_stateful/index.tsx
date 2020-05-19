@@ -27,7 +27,6 @@ const DisabledCSS = css`
     background-color: ${props => props.theme.buttonPrimaryLine.backgroundColor};
     border-color: ${props => props.theme.buttonPrimaryLine.borderColor};
     color: ${props => props.theme.buttonPrimaryLine.color};
-    cursor: not-allowed;
     opacity: 1;
   }
 `
@@ -38,7 +37,6 @@ const IdleDisabledCSS = css`
     background-color: ${props => props.theme.buttonPrimary.backgroundColor};
     border-color: ${props => props.theme.buttonPrimary.borderColor};
     color: ${props => props.theme.buttonPrimary.color};
-    cursor: not-allowed;
     opacity: 0.5;
   }
 `

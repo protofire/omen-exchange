@@ -8,6 +8,7 @@ import { Arbitrator, Question } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { DateField, FormRow } from '../../../../../common'
+import { CommonDisabledCSS } from '../../../../../common/form/common_styled'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
@@ -26,19 +27,23 @@ const ButtonCategoryFocusCSS = css`
 `
 
 const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boolean }>`
+  max-width: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 100%;
   &,
   &:hover {
     color: ${props => (props.isACategorySelected ? props.theme.colors.textColorDark : '#86909e')};
     font-weight: 400;
   }
 
-  max-width: 100%;
-  padding-left: 10px;
-  padding-right: 10px;
-  width: 100%;
-
   ${props => (props.focus ? ButtonCategoryFocusCSS : '')}
+  ${CommonDisabledCSS}
 `
+
+ButtonCategory.defaultProps = {
+  focus: false,
+}
 
 const ButtonCategoryTextOverflow = styled.span`
   display: block;
@@ -49,10 +54,6 @@ const ButtonCategoryTextOverflow = styled.span`
   white-space: nowrap;
   width: 100%;
 `
-
-ButtonCategory.defaultProps = {
-  focus: false,
-}
 
 const GridThreeColumns = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};

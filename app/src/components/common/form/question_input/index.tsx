@@ -58,16 +58,18 @@ export const QuestionInput = (props: Props) => {
         type="text"
         value={value}
       />
-      <ModalQuestion
-        context={context}
-        isOpen={isModalQuestionOpen}
-        onClose={() => setModalQuestionState(false)}
-        onSave={(question: Question, arbitrator: Arbitrator) => {
-          addArbitratorCustomValue(arbitrator)
-          addCategoryCustomValue(question.category)
-          onChangeQuestion(question, arbitrator)
-        }}
-      />
+      {isModalQuestionOpen && (
+        <ModalQuestion
+          context={context}
+          isOpen={isModalQuestionOpen}
+          onClose={() => setModalQuestionState(false)}
+          onSave={(question: Question, arbitrator: Arbitrator) => {
+            addArbitratorCustomValue(arbitrator)
+            addCategoryCustomValue(question.category)
+            onChangeQuestion(question, arbitrator)
+          }}
+        />
+      )}
     </>
   )
 }

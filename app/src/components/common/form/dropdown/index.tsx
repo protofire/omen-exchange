@@ -1,6 +1,8 @@
 import React, { DOMAttributes, useCallback, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
+import { CommonDisabledCSS } from '../common_styled'
+
 import { ChevronDown } from './img/ChevronDown'
 import { ChevronUp } from './img/ChevronUp'
 
@@ -37,6 +39,19 @@ const DropdownOpenCSS = css`
   }
 `
 
+const DropdownDisabledCSS = css`
+  ${CommonDisabledCSS}
+
+  &:disabled,
+  &[disabled],
+  &[disabled]:hover,
+  &:disabled:hover {
+    .currentItem {
+      color: ${props => props.theme.form.common.disabled.color};
+    }
+  }
+`
+
 const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean }>`
   background-color: ${props => props.theme.dropdown.buttonBackgroundColor};
   border-radius: 32px;
@@ -45,7 +60,6 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean }>`
   color: ${props => props.theme.dropdown.buttonColor};
   cursor: pointer;
   height: 34px;
-  opacity: ${props => (props.disabled ? '0.5' : '1')};
   outline: none;
   padding: 0 14px;
   pointer-events: ${props => (props.disabled ? 'none' : 'initial')};
@@ -64,6 +78,7 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean }>`
   }
 
   ${props => (props.isOpen ? DropdownOpenCSS : '')}
+  ${props => (props.disabled ? DropdownDisabledCSS : '')}
 `
 
 const DropdownButton = styled.div`

@@ -175,7 +175,10 @@ const Outcomes = (props: Props) => {
   const manualProbabilitiesAndNoOutcomes = manualProbabilities && outcomes.length === 0
   const maxOutcomesReached = outcomes.length >= 6
   const outcomeValueOutofBounds = newOutcomeProbability <= outcomeMinValue || newOutcomeProbability >= outcomeMaxValue
-  const disableButtonAdd = !newOutcomeName || maxOutcomesReached || (!uniformProbabilities && outcomeValueOutofBounds)
+  const disableButtonAdd =
+    !newOutcomeName || maxOutcomesReached || (!uniformProbabilities && outcomeValueOutofBounds) || disabled
+  const disableManualProbabilities = maxOutcomesReached || disabled
+  const disableUniformProbabilities = !canAddOutcome || maxOutcomesReached || disabled
 
   return (
     <>
@@ -202,7 +205,7 @@ const Outcomes = (props: Props) => {
       </TitleWrapper>
       <NewOutcome uniformProbabilities={uniformProbabilities}>
         <Textfield
-          disabled={!canAddOutcome || maxOutcomesReached}
+          disabled={disableUniformProbabilities}
           onChange={e => setNewOutcomeName(e.target.value)}
           placeholder="Add new outcome"
           type="text"
@@ -210,9 +213,9 @@ const Outcomes = (props: Props) => {
         />
         {!uniformProbabilities && (
           <TextfieldCustomPlaceholder
+            disabled={disableManualProbabilities}
             formField={
               <Textfield
-                disabled={maxOutcomesReached}
                 onChange={e => setNewOutcomeProbability(Number(e.target.value))}
                 placeholder="0.00"
                 type="number"

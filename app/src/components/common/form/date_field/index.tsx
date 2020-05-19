@@ -4,6 +4,8 @@ import DatePicker from 'react-datepicker'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
+import { CommonDisabledCSS } from '../common_styled'
+
 interface Props {
   disabled?: boolean
   minDate?: any
@@ -72,6 +74,8 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
           line-height: 1.2;
           opacity: 1;
         }
+
+        ${CommonDisabledCSS}
       }
     }
   }

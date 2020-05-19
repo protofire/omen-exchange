@@ -1,6 +1,8 @@
 import React, { InputHTMLAttributes } from 'react'
 import styled, { css } from 'styled-components'
 
+import { CommonDisabledCSS } from '../common_styled'
+
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   defaultValue?: any
   hasError?: boolean
@@ -43,16 +45,12 @@ export const TextfieldCSS = css<{ hasError?: boolean; hasSuccess?: boolean }>`
     cursor: not-allowed;
   }
 
-  &:disabled,
-  &[disabled] {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
+  ${CommonDisabledCSS}
 
-  ::-webkit-inner-spin-button {
+  &::-webkit-inner-spin-button {
     -webkit-appearance: none;
   }
-  ::-webkit-outer-spin-button {
+  &::-webkit-outer-spin-button {
     -webkit-appearance: none;
   }
 `

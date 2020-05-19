@@ -131,6 +131,10 @@ export const MarketWizardCreator = (props: Props) => {
     const { category, id: questionId, outcomes, resolution, title: question } = questionObj
 
     const outcomesFromQuestion = outcomes.map(outcomeName => {
+      console.log({
+        name: outcomeName,
+        probability: outcomes.length > 0 ? 100 / outcomes.length : 100,
+      })
       return {
         name: outcomeName,
         probability: outcomes.length > 0 ? 100 / outcomes.length : 100,
@@ -206,30 +210,6 @@ export const MarketWizardCreator = (props: Props) => {
     } = marketData
 
     switch (currentStep) {
-      case 1:
-        return (
-          <AskQuestionStep
-            addArbitratorCustom={addArbitratorCustom}
-            addCategoryCustom={addCategoryCustom}
-            handleArbitratorChange={handleArbitratorChange}
-            handleChange={handleChange}
-            handleClearQuestion={handleClearQuestion}
-            handleDateChange={handleDateChange}
-            handleOutcomesChange={handleOutcomesChange}
-            handleQuestionChange={handleQuestionChange}
-            next={() => next()}
-            values={{
-              question,
-              outcomes,
-              loadedQuestionId,
-              category,
-              categoriesCustom,
-              resolution,
-              arbitrator,
-              arbitratorsCustom,
-            }}
-          />
-        )
       case 2:
         return (
           <FundingAndFeeStep
@@ -241,6 +221,7 @@ export const MarketWizardCreator = (props: Props) => {
             values={marketData}
           />
         )
+      case 1:
       default:
         return (
           <AskQuestionStep
