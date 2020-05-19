@@ -43,6 +43,7 @@ const Wrapper = styled.div`
 `
 
 const MessageWrapper = styled.div<{ type: MessageType }>`
+  align-items: center;
   background-color: #fff;
   border-radius: 5px;
   border-style: solid;
