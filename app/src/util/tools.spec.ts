@@ -6,6 +6,7 @@ import {
   calcAddFundingSendAmounts,
   calcDepositedTokens,
   calcDistributionHint,
+  calcInitialFundingSendAmounts,
   calcNetCost,
   calcPoolTokens,
   calcPrice,
@@ -300,7 +301,7 @@ describe('tools', () => {
       ))
   })
 
-  describe.only('calcAddFundingSendAmounts', () => {
+  describe('calcAddFundingSendAmounts', () => {
     it('all holdings are different', () => {
       const result = calcAddFundingSendAmounts(bigNumberify(10), [1, 2, 3].map(bigNumberify), bigNumberify(20)).map(x =>
         x.toString(),
@@ -321,6 +322,26 @@ describe('tools', () => {
       const result = calcAddFundingSendAmounts(bigNumberify(10), [3, 3, 3].map(bigNumberify), bigNumberify(0))
 
       expect(result).toBe(null)
+    })
+  })
+
+  describe('calcInitialFundingSendAmounts', () => {
+    it('all holdings are different', () => {
+      const result = calcInitialFundingSendAmounts(bigNumberify(10), [1, 2, 3].map(bigNumberify)).map(x => x.toString())
+
+      expect(result).toStrictEqual(['7', '4', '0'])
+    })
+
+    it('all holdings are equal', () => {
+      const result = calcInitialFundingSendAmounts(bigNumberify(10), [3, 3, 3].map(bigNumberify)).map(x => x.toString())
+
+      expect(result).toStrictEqual(['0', '0', '0'])
+    })
+
+    it('no funding', () => {
+      const result = calcInitialFundingSendAmounts(bigNumberify(0), [3, 3, 3].map(bigNumberify)).map(x => x.toString())
+
+      expect(result).toStrictEqual(['0', '0', '0'])
     })
   })
 })
