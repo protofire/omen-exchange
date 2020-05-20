@@ -39,6 +39,7 @@ export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
 export const CATEGORIES = [
   'Arts',
   'Business & Finance',
+  'Coronavirus',
   'Cryptocurrency',
   'News & Politics',
   'Science & Tech',
