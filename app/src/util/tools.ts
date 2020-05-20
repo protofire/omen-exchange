@@ -19,7 +19,7 @@ export const truncateStringInTheMiddle = (str: string, strPositionStart: number,
 }
 
 export const formatDate = (date: Date): string => {
-  return moment(date).format('lll')
+  return moment(date).format('ll')
 }
 
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
