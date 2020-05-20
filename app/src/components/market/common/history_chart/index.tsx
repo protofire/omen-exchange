@@ -58,8 +58,8 @@ const useHoldingsHistory = (marketMakerAddress: string, blocks: Maybe<Block[]>):
     const result: HistoricData = []
     queriesResult
       .filter(d => d.data)
-      .forEach(queryResult => {
-        Object.values(queryResult.data).forEach((value, index) => {
+      .forEach((queryResult, index) => {
+        Object.values(queryResult.data).forEach(value => {
           if (value && value.outcomeTokenAmounts) {
             const block = blocks[index]
             const holdings = value.outcomeTokenAmounts
