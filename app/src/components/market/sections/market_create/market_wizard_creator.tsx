@@ -131,10 +131,6 @@ export const MarketWizardCreator = (props: Props) => {
     const { category, id: questionId, outcomes, resolution, title: question } = questionObj
 
     const outcomesFromQuestion = outcomes.map(outcomeName => {
-      console.log({
-        name: outcomeName,
-        probability: outcomes.length > 0 ? 100 / outcomes.length : 100,
-      })
       return {
         name: outcomeName,
         probability: outcomes.length > 0 ? 100 / outcomes.length : 100,

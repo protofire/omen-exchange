@@ -33,8 +33,8 @@ export const MadeBy = () => (
     <img alt="" src={Logo} />
     <Text>
       Made by{' '}
-      <Link href="https://twitter.com/Dxdao_" target="_blank">
-        Dxdao
+      <Link href="https://dxdao.eth.link/" target="_blank">
+        DXdao
       </Link>
     </Text>
   </Wrapper>
