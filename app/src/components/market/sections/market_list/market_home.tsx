@@ -223,7 +223,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   const noMarketsAvailable = RemoteData.is.success(markets) && markets.data.length === 0
   const showFilteringInlineLoading = !noMarketsAvailable && isFiltering
-  const showLoadMoreButton = !isFiltering && moreMarkets && !RemoteData.is.loading(markets)
+  const disableLoadMoreButton =
+    isFiltering || !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
 
   return (
     <>
@@ -287,17 +288,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
-        {showLoadMoreButton && (
-          <LoadMoreWrapper>
-            <Button
-              buttonType={ButtonType.secondaryLine}
-              disabled={RemoteData.is.reloading(markets)}
-              onClick={onLoadMore}
-            >
-              {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load more'}
-            </Button>
-          </LoadMoreWrapper>
-        )}
+        <LoadMoreWrapper>
+          <Button buttonType={ButtonType.secondaryLine} disabled={disableLoadMoreButton} onClick={onLoadMore}>
+            {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load more'}
+          </Button>
+        </LoadMoreWrapper>
       </ListCard>
     </>
   )
