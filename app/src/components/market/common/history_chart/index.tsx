@@ -1,11 +1,10 @@
-import { useQuery } from '@apollo/react-hooks'
 import { Block } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
-import gql from 'graphql-tag'
 import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
+import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
 import { keys, range } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
 
@@ -15,20 +14,15 @@ import { HistoryChart } from './chart'
 // `fixedProductMarketMaker_X: { outcomeTokenAmounts }`,
 // where X is a block number,
 //  and `outcomeTokenAmounts` is the amount of holdings of the market maker at that block.
-const buildQueryHistory = (blockNumbers: number[]) => {
-  const subqueries = blockNumbers.map(
-    blockNumber => `
-      fixedProductMarketMaker_${blockNumber}: fixedProductMarketMaker(id: $id, block: { number: ${blockNumber} }) {
+const buildQueriesHistory = (blockNumbers: number[]) => {
+  return blockNumbers.map(
+    blockNumber => `query fixedProductMarketMaker_${blockNumber}($id: ID!) {
+      fixedProductMarketMaker(id: $id, block: { number: ${blockNumber} }) {
         outcomeTokenAmounts
       }
+    }
     `,
   )
-
-  return gql`
-    query GetMarketHistory($id: ID!) {
-    ${subqueries.join(',')}
-    }
-  `
 }
 
 type HistoricDataPoint = {
@@ -41,33 +35,40 @@ type HistoricData = HistoricDataPoint[]
 const useHoldingsHistory = (marketMakerAddress: string, blocks: Maybe<Block[]>): Maybe<HistoricData> => {
   // we need a valid query even if it will be skipped, so we use a syntactic valid placeholder
   // when blockNumbers is null
-  const query = blocks
-    ? buildQueryHistory(blocks.map(block => block.number))
-    : gql`
-        query NullQuery($id: ID!) {
-          fixedProductMarketMaker(id: $id) {
-            id
+
+  const queries = blocks
+    ? buildQueriesHistory(blocks.map(block => block.number))
+    : [
+        `
+          query NullQuery($id: ID!) {
+            fixedProductMarketMaker(id: $id) {
+              id
+            }
           }
-        }
-      `
+        `,
+      ]
 
-  const queryResult = useQuery<{ [key: string]: { outcomeTokenAmounts: string[] } }>(query, {
-    notifyOnNetworkStatusChange: true,
-    skip: blocks === null,
-    variables: { id: marketMakerAddress },
-  })
+  const variables = { id: marketMakerAddress }
+  const queriesResult = useMultipleQueries<{ data: { [key: string]: { outcomeTokenAmounts: string[] } } }>(
+    queries,
+    variables,
+  )
 
-  if (queryResult.data && blocks) {
+  if (queriesResult && blocks) {
     const result: HistoricData = []
-    Object.values(queryResult.data).forEach((value, index) => {
-      if (value) {
-        const block = blocks[index]
-        const holdings = value.outcomeTokenAmounts
-        result.push({ block, holdings })
-      }
-    })
+    queriesResult
+      .filter(d => d.data)
+      .forEach(queryResult => {
+        Object.values(queryResult.data).forEach((value, index) => {
+          if (value && value.outcomeTokenAmounts) {
+            const block = blocks[index]
+            const holdings = value.outcomeTokenAmounts
+            result.push({ block, holdings })
+          }
+        })
+      })
 
-    return result
+    return result.length > 0 ? result : null
   }
   return null
 }
@@ -134,6 +135,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
       getBlocks(latestBlockNumber)
     }
   }, [latestBlockNumber, library, period])
+
   return hidden ? null : (
     <HistoryChart
       holdingSeries={holdingsSeries}
