@@ -171,8 +171,6 @@ const Outcomes = (props: Props) => {
     </OutcomesTR>
   ))
 
-  console.log(MAX_OUTCOME_ALLOWED)
-
   const manualProbabilities = !uniformProbabilities
   const manualProbabilitiesAndThereAreOutcomes = manualProbabilities && outcomes.length > 0
   const manualProbabilitiesAndNoOutcomes = manualProbabilities && outcomes.length === 0

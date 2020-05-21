@@ -178,8 +178,6 @@ const FundingAndFeeStep = (props: Props) => {
       ? calcInitialFundingSendAmounts(funding, distributionHint)
       : outcomes.map(() => new BigNumber(0))
 
-  console.log(sharesAfterInitialFunding)
-
   return (
     <>
       <CreateCardTop>
