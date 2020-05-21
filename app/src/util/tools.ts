@@ -19,7 +19,7 @@ export const truncateStringInTheMiddle = (str: string, strPositionStart: number,
 }
 
 export const formatDate = (date: Date): string => {
-  return moment(date).format('lll')
+  return moment(date).format('ll')
 }
 
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
@@ -197,6 +197,18 @@ export const calcPoolTokens = (
   } else {
     return addedFunds
   }
+}
+
+/**
+ * Compute the number of outcomes that will be sent to the user by the Market Maker
+ * after funding it for the first time with `addedFunds` of collateral.
+ */
+export const calcInitialFundingSendAmounts = (addedFunds: BigNumber, distributionHint: BigNumber[]): BigNumber[] => {
+  const maxHint = distributionHint.reduce((a, b) => (a.gt(b) ? a : b))
+
+  const sendAmounts = distributionHint.map(hint => addedFunds.sub(addedFunds.mul(hint).div(maxHint)))
+
+  return sendAmounts
 }
 
 /**

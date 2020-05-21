@@ -12,7 +12,12 @@ import {
 } from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
-import { formatBigNumber, formatDate } from '../../../../../../util/tools'
+import {
+  calcDistributionHint,
+  calcInitialFundingSendAmounts,
+  formatBigNumber,
+  formatDate,
+} from '../../../../../../util/tools'
 import { Arbitrator, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
@@ -167,6 +172,14 @@ const FundingAndFeeStep = (props: Props) => {
 
   const tokensAmount = useTokens(context).length
 
+  const distributionHint = calcDistributionHint(outcomes.map(outcome => outcome.probability))
+  const sharesAfterInitialFunding =
+    distributionHint.length > 0
+      ? calcInitialFundingSendAmounts(funding, distributionHint)
+      : outcomes.map(() => new BigNumber(0))
+
+  console.log(sharesAfterInitialFunding)
+
   return (
     <>
       <CreateCardTop>
@@ -194,7 +207,9 @@ const FundingAndFeeStep = (props: Props) => {
                     </OutcomesTD>
                     <OutcomesTD textAlign="right">{outcome.probability}%</OutcomesTD>
                     <OutcomesTD textAlign="right">
-                      <TDFlexDiv textAlign="right">0</TDFlexDiv>
+                      <TDFlexDiv textAlign="right">
+                        {formatBigNumber(sharesAfterInitialFunding[index], collateral.decimals)}
+                      </TDFlexDiv>
                     </OutcomesTD>
                   </OutcomesTR>
                 )
@@ -203,8 +218,8 @@ const FundingAndFeeStep = (props: Props) => {
           </OutcomesTable>
         </OutcomesTableWrapper>
         <Grid>
-          <TitleValueVertical title={'Category'} value={category} />
           <TitleValueVertical title={'Earliest Resolution Date'} value={resolutionDate} />
+          <TitleValueVertical title={'Category'} value={category} />
           <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
         </Grid>
       </CreateCardTop>
