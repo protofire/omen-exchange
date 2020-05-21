@@ -36,19 +36,25 @@ const useHoldingsHistory = (marketMakerAddress: string, blocks: Maybe<Block[]>):
   // we need a valid query even if it will be skipped, so we use a syntactic valid placeholder
   // when blockNumbers is null
 
-  const queries = blocks
-    ? buildQueriesHistory(blocks.map(block => block.number))
-    : [
-        `
+  const queries = useMemo(
+    () =>
+      blocks
+        ? buildQueriesHistory(blocks.map(block => block.number))
+        : [
+            `
           query NullQuery($id: ID!) {
             fixedProductMarketMaker(id: $id) {
               id
             }
           }
         `,
-      ]
+          ],
+    [blocks],
+  )
+  const variables = useMemo(() => {
+    return { id: marketMakerAddress }
+  }, [marketMakerAddress])
 
-  const variables = { id: marketMakerAddress }
   const queriesResult = useMultipleQueries<{ data: { [key: string]: { outcomeTokenAmounts: string[] } } }>(
     queries,
     variables,
