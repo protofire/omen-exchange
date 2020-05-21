@@ -77,6 +77,7 @@ const mapPeriod: { [period in Period]: { totalDataPoints: number; blocksPerPerio
   '1M': { totalDataPoints: 30, blocksPerPeriod: blocksPerDay },
   '1W': { totalDataPoints: 7, blocksPerPeriod: blocksPerDay },
   '1D': { totalDataPoints: 24, blocksPerPeriod: blocksPerHour },
+  '1H': { totalDataPoints: 60, blocksPerPeriod: blocksPerMinute },
 }
 
 const calcOffsetByDate = (nowOrClosedTs: number) => {
