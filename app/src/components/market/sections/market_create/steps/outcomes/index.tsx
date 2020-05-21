@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 
+import { MAX_OUTCOME_ALLOWED } from '../../../../../../common/constants'
 import { ButtonCircle } from '../../../../../button'
 import { FormLabel, FormRowLink, Textfield, TextfieldCustomPlaceholder } from '../../../../../common'
 import { IconAdd, IconRemove } from '../../../../../common/icons'
@@ -170,10 +171,12 @@ const Outcomes = (props: Props) => {
     </OutcomesTR>
   ))
 
+  console.log(MAX_OUTCOME_ALLOWED)
+
   const manualProbabilities = !uniformProbabilities
   const manualProbabilitiesAndThereAreOutcomes = manualProbabilities && outcomes.length > 0
   const manualProbabilitiesAndNoOutcomes = manualProbabilities && outcomes.length === 0
-  const maxOutcomesReached = outcomes.length >= 6
+  const maxOutcomesReached = outcomes.length >= MAX_OUTCOME_ALLOWED
   const outcomeValueOutofBounds = newOutcomeProbability <= outcomeMinValue || newOutcomeProbability >= outcomeMaxValue
   const disableButtonAdd =
     !newOutcomeName || maxOutcomesReached || (!uniformProbabilities && outcomeValueOutofBounds) || disabled

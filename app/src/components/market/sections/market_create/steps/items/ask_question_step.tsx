@@ -143,7 +143,7 @@ const AskQuestionStep = (props: Props) => {
   const isContinueButtonDisabled =
     totalProbabilitiesNotFull || outcomes.length < 2 || !question || !resolution || !category
 
-  const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
+  const canAddOutcome = outcomes.length <= MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
   const [categoryButtonFocus, setCategoryButtonFocus] = useState(false)
 
