@@ -132,7 +132,7 @@ type Props = {
 
 const timestampToDate = (timestamp: number, value: string) => {
   const ts = moment(timestamp * 1000)
-  return value === '1D' ? ts.format('HH:MM') : ts.format('YYYY-MM-DD')
+  return value === '1D' ? ts.format('HH:MM') : ts.format('MMM D')
 }
 
 const toPercent = (decimal: number, fixed = 0) => {
