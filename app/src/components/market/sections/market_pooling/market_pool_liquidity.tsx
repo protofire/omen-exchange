@@ -11,7 +11,6 @@ import {
   useCpk,
   useCpkAllowance,
   useFundingBalance,
-  useOutOfBoundsBalance,
 } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
@@ -27,7 +26,7 @@ import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../..
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
-import { BigNumberInputError, BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
@@ -216,30 +215,21 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const depositedTokensTotal = depositedTokens.add(userEarnings)
   const goBackToAddress = `/${marketMakerAddress}`
   const fundingBalance = useFundingBalance(marketMakerAddress, context)
-  const disableWithdrawButton = amountToRemove.isZero() || amountToRemove.gt(fundingBalance)
-  const disableDepositButton = amountToFund.isZero() || hasEnoughAllowance !== Ternary.True
 
   const walletBalance = formatBigNumber(collateralBalance, collateral.decimals)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
 
-  const [collateralAmountErrorType, setCollateralAmountErrorType] = useState<BigNumberInputError>(
-    BigNumberInputError.noError,
-  )
-  const [sharesAmountErrorType, setSharesAmountErrorType] = useState<BigNumberInputError>(BigNumberInputError.noError)
-  const minAmountValue = new BigNumber(0)
-  const isCollateralAmountError = useOutOfBoundsBalance(
-    collateralAmountErrorType,
-    minAmountValue.toString(),
-    walletBalance,
-    collateral.symbol,
-  )
+  const collateralAmountError = amountToFund.gt(collateralBalance)
+    ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
+    : null
+  const sharesAmountError = amountToRemove.gt(fundingBalance)
+    ? `Value must be less than or equal to ${sharesBalance} pool shares`
+    : null
 
-  const isSharesAmountError = useOutOfBoundsBalance(
-    sharesAmountErrorType,
-    minAmountValue.toString(),
-    sharesBalance,
-    'Shares',
-  )
+  const disableDepositButton =
+    amountToFund.isZero() || hasEnoughAllowance !== Ternary.True || collateralAmountError !== null
+  const disableWithdrawButton =
+    amountToRemove.isZero() || amountToRemove.gt(fundingBalance) || sharesAmountError !== null
 
   return (
     <>
@@ -280,19 +270,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   formField={
                     <BigNumberInput
                       decimals={collateral.decimals}
-                      max={collateralBalance}
-                      min={minAmountValue}
                       name="amountToFund"
                       onChange={(e: BigNumberInputReturn) => setAmountToFund(e.value)}
-                      onError={e => {
-                        setCollateralAmountErrorType(e)
-                      }}
                       value={amountToFund}
                     />
                   }
                   symbol={collateral.symbol}
                 />
-                {isCollateralAmountError && <GenericError>{isCollateralAmountError}</GenericError>}
+                {collateralAmountError && <GenericError>{collateralAmountError}</GenericError>}
               </>
             )}
             {activeTab === Tabs.withdraw && (
@@ -307,19 +292,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   formField={
                     <BigNumberInput
                       decimals={collateral.decimals}
-                      max={fundingBalance}
-                      min={minAmountValue}
                       name="amountToRemove"
                       onChange={(e: BigNumberInputReturn) => setAmountToRemove(e.value)}
-                      onError={e => {
-                        setSharesAmountErrorType(e)
-                      }}
                       value={amountToRemove}
                     />
                   }
                   symbol="Shares"
                 />
-                {isSharesAmountError && <GenericError>{isSharesAmountError}</GenericError>}
+                {sharesAmountError && <GenericError>{sharesAmountError}</GenericError>}
               </>
             )}
           </div>

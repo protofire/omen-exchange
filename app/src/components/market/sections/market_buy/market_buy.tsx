@@ -13,7 +13,6 @@ import {
   useContracts,
   useCpk,
   useCpkAllowance,
-  useOutOfBoundsBalance,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -23,7 +22,7 @@ import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../..
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
-import { BigNumberInputError, BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
@@ -159,17 +158,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
   const total = `${sharesTotal} Shares`
 
-  const [amountErrorType, setAmountErrorType] = useState<BigNumberInputError>(BigNumberInputError.noError)
-  const minAmountValue = new BigNumber(0)
-  const isAmountError = useOutOfBoundsBalance(
-    amountErrorType,
-    minAmountValue.toString(),
-    currentBalance,
-    collateral.symbol,
-  )
+  const amountError = amount.gt(collateralBalance)
+    ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
+    : null
 
   const isBuyDisabled =
-    (status !== Status.Ready && status !== Status.Error) || amount.isZero() || hasEnoughAllowance !== Ternary.True
+    (status !== Status.Ready && status !== Status.Error) ||
+    amount.isZero() ||
+    hasEnoughAllowance !== Ternary.True ||
+    amountError !== null
 
   return (
     <>
@@ -208,19 +205,14 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               formField={
                 <BigNumberInput
                   decimals={collateral.decimals}
-                  max={collateralBalance}
-                  min={minAmountValue}
                   name="amount"
                   onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                  onError={e => {
-                    setAmountErrorType(e)
-                  }}
                   value={amount}
                 />
               }
               symbol={collateral.symbol}
             />
-            {isAmountError && <GenericError>{isAmountError}</GenericError>}
+            {amountError && <GenericError>{amountError}</GenericError>}
           </div>
           <div>
             <TransactionDetailsCard>

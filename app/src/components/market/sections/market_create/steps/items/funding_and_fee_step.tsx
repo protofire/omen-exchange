@@ -1,15 +1,10 @@
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import { DISABLE_CURRENCY_IN_CREATION } from '../../../../../../common/constants'
-import {
-  useCollateralBalance,
-  useConnectedWeb3Context,
-  useOutOfBoundsBalance,
-  useTokens,
-} from '../../../../../../hooks'
+import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import {
@@ -22,7 +17,7 @@ import { Arbitrator, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
-import { BigNumberInputError, BigNumberInputReturn } from '../../../../../common/form/big_number_input'
+import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { TitleValue } from '../../../../../common/text/title_value'
 import { FullLoading } from '../../../../../loading'
 import {
@@ -150,23 +145,7 @@ const FundingAndFeeStep = (props: Props) => {
   const collateralBalance = useCollateralBalance(collateral, context)
   const resolutionDate = resolution && formatDate(resolution)
 
-  const selectedOutcomeBalance = formatBigNumber(collateralBalance, collateral.decimals)
-
-  const [amountErrorType, setAmountErrorType] = useState<BigNumberInputError>(BigNumberInputError.noError)
-  const minAmountValue = new BigNumber(0)
-  const isAmountError = useOutOfBoundsBalance(
-    amountErrorType,
-    minAmountValue.toString(),
-    selectedOutcomeBalance,
-    collateral.symbol,
-  )
-
-  const isCreateMarketbuttonDisabled =
-    !MarketCreationStatus.is.ready(marketCreationStatus) ||
-    MarketCreationStatus.is.error(marketCreationStatus) ||
-    !balance ||
-    funding.isZero() ||
-    !account
+  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals)
 
   const back = props.back
 
@@ -178,7 +157,17 @@ const FundingAndFeeStep = (props: Props) => {
       ? calcInitialFundingSendAmounts(funding, distributionHint)
       : outcomes.map(() => new BigNumber(0))
 
-  console.log(sharesAfterInitialFunding)
+  const amountError = funding.gt(collateralBalance)
+    ? `Value must be less than or equal to ${collateralBalanceFormatted} ${collateral.symbol}`
+    : null
+
+  const isCreateMarketbuttonDisabled =
+    !MarketCreationStatus.is.ready(marketCreationStatus) ||
+    MarketCreationStatus.is.error(marketCreationStatus) ||
+    !balance ||
+    funding.isZero() ||
+    !account ||
+    amountError !== null
 
   return (
     <>
@@ -238,24 +227,14 @@ const FundingAndFeeStep = (props: Props) => {
         )}
         <GridTransactionDetailsStyled noMarginTop={tokensAmount === 1}>
           <div>
-            <WalletBalance symbol={collateral.symbol} value={selectedOutcomeBalance} />
+            <WalletBalance symbol={collateral.symbol} value={collateralBalanceFormatted} />
             <TextfieldCustomPlaceholder
               formField={
-                <BigNumberInput
-                  decimals={collateral.decimals}
-                  max={collateralBalance}
-                  min={minAmountValue}
-                  name="funding"
-                  onChange={handleChange}
-                  onError={e => {
-                    setAmountErrorType(e)
-                  }}
-                  value={funding}
-                />
+                <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
               }
               symbol={collateral.symbol}
             />
-            {isAmountError && <GenericError>{isAmountError}</GenericError>}
+            {amountError && <GenericError>{amountError}</GenericError>}
           </div>
           <div>
             <TransactionDetailsCard>
