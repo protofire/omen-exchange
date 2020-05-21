@@ -199,7 +199,9 @@ const Outcomes = (props: Props) => {
         )}
         {uniformProbabilities && (
           <TitleText>
-            <FormRowLink onClick={handleIsUniformChanged}>set manual probability</FormRowLink>
+            <FormRowLink data-testid="toggle-manual-probabilities" onClick={handleIsUniformChanged}>
+              set manual probability
+            </FormRowLink>
           </TitleText>
         )}
       </TitleWrapper>
