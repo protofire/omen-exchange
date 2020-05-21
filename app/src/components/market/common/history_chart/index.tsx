@@ -33,24 +33,7 @@ type HistoricDataPoint = {
 type HistoricData = HistoricDataPoint[]
 
 const useHoldingsHistory = (marketMakerAddress: string, blocks: Maybe<Block[]>): Maybe<HistoricData> => {
-  // we need a valid query even if it will be skipped, so we use a syntactic valid placeholder
-  // when blockNumbers is null
-
-  const queries = useMemo(
-    () =>
-      blocks
-        ? buildQueriesHistory(blocks.map(block => block.number))
-        : [
-            `
-          query NullQuery($id: ID!) {
-            fixedProductMarketMaker(id: $id) {
-              id
-            }
-          }
-        `,
-          ],
-    [blocks],
-  )
+  const queries = useMemo(() => (blocks ? buildQueriesHistory(blocks.map(block => block.number)) : null), [blocks])
   const variables = useMemo(() => {
     return { id: marketMakerAddress }
   }, [marketMakerAddress])
@@ -74,7 +57,7 @@ const useHoldingsHistory = (marketMakerAddress: string, blocks: Maybe<Block[]>):
         })
       })
 
-    return result.length > 0 ? result : null
+    return result
   }
   return null
 }
