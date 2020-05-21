@@ -110,7 +110,7 @@ const Outcomes = (props: Props) => {
   const { canAddOutcome, disabled, outcomes } = props
   const [newOutcomeName, setNewOutcomeName] = useState<string>('')
   const [newOutcomeProbability, setNewOutcomeProbability] = useState<number>(outcomeMinValue)
-  const [uniformProbabilities, setIsUniform] = useState<boolean>(false)
+  const [uniformProbabilities, setIsUniform] = useState<boolean>(true)
 
   const uniform = (outcomes: Outcome[]): Outcome[] => {
     return outcomes.map(o => ({
