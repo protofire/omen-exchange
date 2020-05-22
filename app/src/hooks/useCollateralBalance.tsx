@@ -6,10 +6,10 @@ import { Token } from '../util/types'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 
-export const useCollateralBalance = (collateral: Token, context: ConnectedWeb3Context): BigNumber => {
+export const useCollateralBalance = (collateral: Token, context: ConnectedWeb3Context): Maybe<BigNumber> => {
   const { account, library: provider } = context
 
-  const [collateralBalance, setCollateralBalance] = useState<BigNumber>(new BigNumber(0))
+  const [collateralBalance, setCollateralBalance] = useState<Maybe<BigNumber>>(null)
 
   useEffect(() => {
     const isSubscribed = true
