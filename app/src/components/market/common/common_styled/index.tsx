@@ -1,16 +1,7 @@
 import styled from 'styled-components'
 
-import theme from '../../../../theme/index'
+import { getOutcomeColor } from '../../../../theme/utils'
 import { Button, ButtonContainer } from '../../../button'
-
-export const getOutcomeColor = (index: number): Record<string, any> => {
-  const colors = theme.outcomes.colors
-  const maxIndex = colors.length - 1
-  const groupIndex = Math.trunc(index / colors.length)
-  const outcomeIndex: number = index - groupIndex - maxIndex * groupIndex
-
-  return colors[outcomeIndex]
-}
 
 export const LeftButton = styled(Button)`
   margin-right: auto;

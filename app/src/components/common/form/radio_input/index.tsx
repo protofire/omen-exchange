@@ -1,16 +1,18 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
+import { getOutcomeColor } from '../../../../theme/utils'
+
 const Wrapper = styled.div`
   cursor: pointer;
   position: relative;
 `
 
 const Radio = styled.div<{ outcomeIndex: number; checked: boolean }>`
-  background-color: ${props => (props.checked ? props.theme.outcomes.colors[props.outcomeIndex].darker : '#fff')};
+  background-color: ${props => (props.checked ? getOutcomeColor(props.outcomeIndex).darker : '#fff')};
   border-color: ${props =>
-    props.theme.outcomes.colors[props.outcomeIndex].darker
-      ? props.theme.outcomes.colors[props.outcomeIndex].darker
+    getOutcomeColor(props.outcomeIndex).darker
+      ? getOutcomeColor(props.outcomeIndex).darker
       : props.theme.colors.primary};
   border-radius: 50%;
   border-style: solid;

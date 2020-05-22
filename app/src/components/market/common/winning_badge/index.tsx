@@ -1,6 +1,7 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
+import { getOutcomeColor } from '../../../../theme/utils'
 import { IconDragonBall } from '../../../common/icons'
 
 const Wrapper = styled.div<{ outcomeIndex: number }>`
@@ -14,17 +15,12 @@ const Wrapper = styled.div<{ outcomeIndex: number }>`
 
   .fill {
     fill: ${props =>
-      props.theme.outcomes.colors[props.outcomeIndex].darker
-        ? props.theme.outcomes.colors[props.outcomeIndex].darker
-        : '#333'};
+      getOutcomeColor(props.outcomeIndex).darker ? getOutcomeColor(props.outcomeIndex).darker : '#333'};
   }
 `
 
 const Text = styled.div<{ outcomeIndex: number }>`
-  color: ${props =>
-    props.theme.outcomes.colors[props.outcomeIndex].darker
-      ? props.theme.outcomes.colors[props.outcomeIndex].darker
-      : '#333'};
+  color: ${props => (getOutcomeColor(props.outcomeIndex).darker ? getOutcomeColor(props.outcomeIndex).darker : '#333')};
   font-size: 14px;
   font-weight: 500;
   line-height: 1.2;

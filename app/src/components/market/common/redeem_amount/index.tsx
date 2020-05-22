@@ -2,14 +2,12 @@ import { BigNumber } from 'ethers/utils'
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
+import { getOutcomeColor } from '../../../../theme/utils'
 import { formatBigNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, Token } from '../../../../util/types'
 
 const Wrapper = styled.div<{ outcomeIndex: number }>`
-  color: ${props =>
-    props.theme.outcomes.colors[props.outcomeIndex].darker
-      ? props.theme.outcomes.colors[props.outcomeIndex].darker
-      : '#333'};
+  color: ${props => (getOutcomeColor(props.outcomeIndex).darker ? getOutcomeColor(props.outcomeIndex).darker : '#333')};
   font-size: 14px;
   font-weight: 500;
   line-height: 1.2;
