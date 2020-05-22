@@ -74,9 +74,10 @@ const blocksPerHour = Math.floor(blocksPerDay / 24)
 const blocksPerMinute = Math.floor(blocksPerHour / 60)
 
 const mapPeriod: { [period in Period]: { totalDataPoints: number; blocksPerPeriod: number } } = {
-  '1D': { totalDataPoints: 24, blocksPerPeriod: blocksPerHour },
-  '1W': { totalDataPoints: 7, blocksPerPeriod: blocksPerDay },
   '1M': { totalDataPoints: 30, blocksPerPeriod: blocksPerDay },
+  '1W': { totalDataPoints: 7, blocksPerPeriod: blocksPerDay },
+  '1D': { totalDataPoints: 24, blocksPerPeriod: blocksPerHour },
+  '1H': { totalDataPoints: 60, blocksPerPeriod: blocksPerMinute },
 }
 
 const calcOffsetByDate = (nowOrClosedTs: number) => {
@@ -98,7 +99,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
   const [latestBlockNumber, setLatestBlockNumber] = useState<Maybe<number>>(null)
   const [blocks, setBlocks] = useState<Maybe<Block[]>>(null)
   const holdingsSeries = useHoldingsHistory(marketMakerAddress, blocks)
-  const [period, setPeriod] = useState<Period>('1W')
+  const [period, setPeriod] = useState<Period>('1D')
   const blocksOffset = useMemo(
     () => calcOffsetByDate(answerFinalizedTimestamp ? answerFinalizedTimestamp.toNumber() * 1000 : Date.now()),
     [answerFinalizedTimestamp],
