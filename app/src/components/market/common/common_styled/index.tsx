@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 
+import { getOutcomeColor } from '../../../../theme/utils'
 import { Button, ButtonContainer } from '../../../button'
 
 export const LeftButton = styled(Button)`
@@ -97,7 +98,7 @@ export const OutcomeItemText = styled.div`
 `
 
 export const OutcomeItemLittleBallOfJoyAndDifferentColors = styled.div<{ outcomeIndex: number }>`
-  background-color: ${props => props.theme.outcomes.colors[props.outcomeIndex].medium};
+  background-color: ${props => getOutcomeColor(props.outcomeIndex).medium};
   border-radius: 50%;
   height: 12px;
   margin: 0 16px 0 0;
