@@ -2,7 +2,11 @@ import React, { ChangeEvent, useCallback, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled, { css } from 'styled-components'
 
-import { DISABLE_ARBITRATOR_IN_CREATION, MAX_OUTCOME_ALLOWED } from '../../../../../../common/constants'
+import {
+  DISABLE_ARBITRATOR_IN_CREATION,
+  DISABLE_CATEGORIES_IN_CREATION,
+  MAX_OUTCOME_ALLOWED,
+} from '../../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
@@ -201,7 +205,7 @@ const AskQuestionStep = (props: Props) => {
             formField={
               <ButtonCategory
                 buttonType={ButtonType.secondaryLine}
-                disabled={!!loadedQuestionId}
+                disabled={!!loadedQuestionId || DISABLE_CATEGORIES_IN_CREATION}
                 focus={categoryButtonFocus}
                 isACategorySelected={category !== ''}
                 onClick={toggleCategoryButtonFocus}

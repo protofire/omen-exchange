@@ -38,17 +38,18 @@ export const SINGLE_SELECT_TEMPLATE_ID = 2
 
 export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
 
-export const CATEGORIES = [
-  'Arts',
-  'Business & Finance',
-  'Coronavirus',
-  'Cryptocurrency',
-  'News & Politics',
-  'Science & Tech',
-  'Sports',
-  'Weather',
-  'Miscellaneous',
-]
+export const CATEGORIES = IS_CORONA_VERSION
+  ? ['Coronavirus']
+  : [
+      'Arts',
+      'Business & Finance',
+      'Cryptocurrency',
+      'News & Politics',
+      'Science & Tech',
+      'Sports',
+      'Weather',
+      'Miscellaneous',
+    ]
 
 export const GRAPH_MAINNET_HTTP =
   process.env.REACT_APP_GRAPH_MAINNET_HTTP || 'https://api.thegraph.com/subgraphs/name/gnosis/omen'
@@ -94,6 +95,7 @@ export const SHOW_FILTERS = IS_CORONA_VERSION || IS_GNO_VERSION || IS_OMEN_VERSI
 export const SHOW_CATEGORIES = !IS_CORONA_VERSION
 export const SHOW_MY_MARKETS = !IS_CORONA_VERSION
 export const SHOW_ADVANCED_FILTERS = !IS_CORONA_VERSION
+export const DISABLE_CATEGORIES_IN_CREATION = CATEGORIES.length === 1
 export const DISABLE_CURRENCY_IN_CREATION = IS_CORONA_VERSION || IS_GNO_VERSION
 export const DISABLE_ARBITRATOR_IN_CREATION = IS_CORONA_VERSION || IS_GNO_VERSION
 export const WHITELISTED_TEMPLATE_IDS = !IS_CORONA_VERSION
