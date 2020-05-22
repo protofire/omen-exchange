@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useState } from 'react'
 
-import { MARKET_FEE } from '../../../../common/constants'
+import { CATEGORIES, DISABLE_CATEGORIES_IN_CREATION, MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../../../util/networks'
@@ -31,7 +31,7 @@ export const MarketWizardCreator = (props: Props) => {
     arbitrator: defaultArbitrator,
     arbitratorsCustom: [],
     categoriesCustom: [],
-    category: '',
+    category: DISABLE_CATEGORIES_IN_CREATION ? CATEGORIES[0] : '',
     collateral: defaultCollateral,
     funding: new BigNumber('0'),
     loadedQuestionId: null,
