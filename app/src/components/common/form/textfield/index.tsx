@@ -60,6 +60,6 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 // eslint-disable-next-line react/display-name
-export const Textfield: React.FC<Props> = React.forwardRef((props: Props, ref: any) => {
+export const Textfield = React.forwardRef((props: Props, ref: any) => {
   return <FormInput {...props} ref={ref} />
 })
