@@ -18,7 +18,7 @@ const renderOutcomes = (props: any) =>
 test('should remove an outcome', () => {
   const onChangeFn = jest.fn()
 
-  const { getByTitle } = renderOutcomes({
+  const { getByTestId, getByTitle } = renderOutcomes({
     outcomes: [
       { name: 'red', probability: 25 },
       { name: 'green', probability: 25 },
@@ -28,6 +28,7 @@ test('should remove an outcome', () => {
     onChange: onChangeFn,
   })
 
+  fireEvent.click(getByTestId('toggle-manual-probabilities'))
   fireEvent.click(getByTitle('Remove outcome 2'))
 
   expect(onChangeFn).toHaveBeenCalledWith([
@@ -40,7 +41,7 @@ test('should remove an outcome', () => {
 test('should add an outcome with probability > 0', () => {
   const onChangeFn = jest.fn()
 
-  const { getByPlaceholderText, getByTitle } = renderOutcomes({
+  const { getByPlaceholderText, getByTestId, getByTitle } = renderOutcomes({
     outcomes: [
       { name: 'red', probability: 25 },
       { name: 'green', probability: 25 },
@@ -50,6 +51,7 @@ test('should add an outcome with probability > 0', () => {
     canAddOutcome: true,
   })
 
+  fireEvent.click(getByTestId('toggle-manual-probabilities'))
   const newOutcomeInputText: any = getByPlaceholderText('Add new outcome')
   const newOutcomeInputValue: any = getByPlaceholderText('0.00')
 
@@ -69,12 +71,13 @@ test('should add an outcome with probability > 0', () => {
 test('should disable add button with probability 0', () => {
   const onChangeFn = jest.fn()
 
-  const { getByPlaceholderText, getByTitle } = renderOutcomes({
+  const { getByPlaceholderText, getByTestId, getByTitle } = renderOutcomes({
     outcomes: [],
     onChange: onChangeFn,
     canAddOutcome: true,
   })
 
+  fireEvent.click(getByTestId('toggle-manual-probabilities'))
   const newOutcomeInputText: any = getByPlaceholderText('Add new outcome')
   const addButton = getByTitle('Add new outcome')
 
