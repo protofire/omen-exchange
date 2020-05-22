@@ -1,15 +1,17 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
+import { getOutcomeColor } from '../../../../theme/utils'
+
 import { ArrowIcon } from './img/ArrowIcon'
 
 const Wrapper = styled.div<{ outcomeIndex: number }>`
   align-items: center;
-  color: ${props => props.theme.outcomes.colors[props.outcomeIndex].darker || props.theme.colors.textColor};
+  color: ${props => getOutcomeColor(props.outcomeIndex).darker || props.theme.colors.textColor};
   display: flex;
 
   svg {
-    fill: ${props => props.theme.outcomes.colors[props.outcomeIndex].darker || props.theme.colors.textColor};
+    fill: ${props => getOutcomeColor(props.outcomeIndex).darker || props.theme.colors.textColor};
     margin: 0 6px;
   }
 `

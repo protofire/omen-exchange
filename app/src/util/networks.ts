@@ -172,6 +172,22 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     },
     order: 7,
   },
+  pnk: {
+    symbol: 'PNK',
+    decimals: 18,
+    addresses: {
+      [networkIds.MAINNET]: '0x93ed3fbe21207ec2e8f2d3c3de6e058cb73bc04d',
+    },
+    order: 8,
+  },
+  dxd: {
+    symbol: 'DXD',
+    decimals: 18,
+    addresses: {
+      [networkIds.MAINNET]: '0xa1d65E8fB6e87b60FECCBc582F7f97804B725521',
+    },
+    order: 9,
+  },
 }
 
 const validNetworkId = (networkId: number): networkId is NetworkId => {

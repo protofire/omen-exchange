@@ -77,44 +77,6 @@ test('should allow entering an empty string', async () => {
   expect(changeHandler).toHaveBeenCalledWith({ name: defaultProps.name, value: expectedValue })
 })
 
-test('should accept a min value', async () => {
-  // given
-  const changeHandler = jest.fn().mockImplementation(() => {
-    logger.log('changeHandler mock triggered')
-  })
-  const minValue = new BigNumber('100')
-  const expectedValue = '1.23'
-
-  // when
-  const { container } = renderBigNumberInput({ min: minValue, onChange: changeHandler })
-  const input: any = container.querySelector(`input[name="${defaultProps.name}"]`)
-
-  // then
-  expect(input).not.toBe(null)
-  fireEvent.change(input, { target: { value: '0.5' } })
-  expect(changeHandler).toHaveBeenCalledTimes(0)
-  expect(input.value).toBe(expectedValue)
-})
-
-test('should accept a max value', async () => {
-  // given
-  const changeHandler = jest.fn().mockImplementation(() => {
-    logger.log('changeHandler mock triggered')
-  })
-  const maxValue = new BigNumber('200')
-  const expectedValue = '1.23'
-
-  // when
-  const { container } = renderBigNumberInput({ max: maxValue, onChange: changeHandler })
-  const input: any = container.querySelector(`input[name="${defaultProps.name}"]`)
-
-  // then
-  expect(input).not.toBe(null)
-  fireEvent.change(input, { target: { value: '3.5' } })
-  expect(changeHandler).toHaveBeenCalledTimes(0)
-  expect(input.value).toBe(expectedValue)
-})
-
 test('should allow initialize with an empty string', async () => {
   const changeHandler = jest.fn().mockImplementation(() => {
     logger.log('changeHandler mock triggered')

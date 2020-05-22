@@ -5,7 +5,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { MARKET_FEE } from '../../../../common/constants'
-import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts, useOutOfBoundsBalance } from '../../../../hooks'
+import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../../../util/tools'
@@ -13,7 +13,7 @@ import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../.
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
-import { BigNumberInputError, BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
@@ -137,16 +137,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals)}`
   const goBackToAddress = `/${marketMakerAddress}`
 
-  const [amountErrorType, setAmountErrorType] = useState<BigNumberInputError>(BigNumberInputError.noError)
-  const minAmountValue = new BigNumber(0)
-  const isAmountError = useOutOfBoundsBalance(
-    amountErrorType,
-    minAmountValue.toString(),
-    selectedOutcomeBalance,
-    'Shares',
-  )
+  const amountError = balanceItem.shares.isZero()
+    ? `Insufficient balance`
+    : amountShares.gt(balanceItem.shares)
+    ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
+    : null
 
-  const isSellButtonDisabled = (status !== Status.Ready && status !== Status.Error) || amountShares.isZero()
+  const isSellButtonDisabled =
+    (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || amountError !== null
 
   return (
     <>
@@ -188,19 +186,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               formField={
                 <BigNumberInput
                   decimals={collateral.decimals}
-                  max={balanceItem.shares}
-                  min={minAmountValue}
                   name="amount"
                   onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
-                  onError={e => {
-                    setAmountErrorType(e)
-                  }}
                   value={amountShares}
                 />
               }
               symbol={'Shares'}
             />
-            {isAmountError && <GenericError>{isAmountError}</GenericError>}
+            {amountError && <GenericError>{amountError}</GenericError>}
           </div>
           <div>
             <TransactionDetailsCard>

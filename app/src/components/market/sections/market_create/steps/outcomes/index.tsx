@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 
+import { MAX_OUTCOME_ALLOWED } from '../../../../../../common/constants'
 import { ButtonCircle } from '../../../../../button'
 import { FormLabel, FormRowLink, Textfield, TextfieldCustomPlaceholder } from '../../../../../common'
 import { IconAdd, IconRemove } from '../../../../../common/icons'
@@ -110,7 +111,7 @@ const Outcomes = (props: Props) => {
   const { canAddOutcome, disabled, outcomes } = props
   const [newOutcomeName, setNewOutcomeName] = useState<string>('')
   const [newOutcomeProbability, setNewOutcomeProbability] = useState<number>(outcomeMinValue)
-  const [uniformProbabilities, setIsUniform] = useState<boolean>(false)
+  const [uniformProbabilities, setIsUniform] = useState<boolean>(true)
 
   const uniform = (outcomes: Outcome[]): Outcome[] => {
     return outcomes.map(o => ({
@@ -173,12 +174,23 @@ const Outcomes = (props: Props) => {
   const manualProbabilities = !uniformProbabilities
   const manualProbabilitiesAndThereAreOutcomes = manualProbabilities && outcomes.length > 0
   const manualProbabilitiesAndNoOutcomes = manualProbabilities && outcomes.length === 0
-  const maxOutcomesReached = outcomes.length >= 6
+  const maxOutcomesReached = outcomes.length >= MAX_OUTCOME_ALLOWED
   const outcomeValueOutofBounds = newOutcomeProbability <= outcomeMinValue || newOutcomeProbability >= outcomeMaxValue
   const disableButtonAdd =
     !newOutcomeName || maxOutcomesReached || (!uniformProbabilities && outcomeValueOutofBounds) || disabled
   const disableManualProbabilities = maxOutcomesReached || disabled
   const disableUniformProbabilities = !canAddOutcome || maxOutcomesReached || disabled
+  const outcomeNameRef = React.createRef<any>()
+
+  const onPressEnter = (e: any) => {
+    if (e.key === 'Enter' && !disableButtonAdd) {
+      addNewOutcome()
+
+      if (outcomeNameRef && outcomeNameRef.current) {
+        outcomeNameRef.current.focus()
+      }
+    }
+  }
 
   return (
     <>
@@ -199,7 +211,9 @@ const Outcomes = (props: Props) => {
         )}
         {uniformProbabilities && (
           <TitleText>
-            <FormRowLink onClick={handleIsUniformChanged}>set manual probability</FormRowLink>
+            <FormRowLink data-testid="toggle-manual-probabilities" onClick={handleIsUniformChanged}>
+              set manual probability
+            </FormRowLink>
           </TitleText>
         )}
       </TitleWrapper>
@@ -207,7 +221,11 @@ const Outcomes = (props: Props) => {
         <Textfield
           disabled={disableUniformProbabilities}
           onChange={e => setNewOutcomeName(e.target.value)}
+          onKeyUp={e => {
+            onPressEnter(e)
+          }}
           placeholder="Add new outcome"
+          ref={outcomeNameRef}
           type="text"
           value={newOutcomeName}
         />
@@ -217,6 +235,9 @@ const Outcomes = (props: Props) => {
             formField={
               <Textfield
                 onChange={e => setNewOutcomeProbability(Number(e.target.value))}
+                onKeyUp={e => {
+                  onPressEnter(e)
+                }}
                 placeholder="0.00"
                 type="number"
                 value={newOutcomeProbability ? newOutcomeProbability : ''}

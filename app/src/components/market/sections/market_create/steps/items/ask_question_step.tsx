@@ -143,11 +143,11 @@ const AskQuestionStep = (props: Props) => {
   const history = useHistory()
 
   const totalProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
-  const totalProbabilitiesNotFull = totalProbabilities !== 100
+  const totalProbabilitiesNotFull = Math.abs(totalProbabilities - 100) > 0.000001
   const isContinueButtonDisabled =
     totalProbabilitiesNotFull || outcomes.length < 2 || !question || !resolution || !category
 
-  const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
+  const canAddOutcome = outcomes.length <= MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
   const [categoryButtonFocus, setCategoryButtonFocus] = useState(false)
 

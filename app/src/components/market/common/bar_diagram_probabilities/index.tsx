@@ -1,6 +1,8 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
+import { getOutcomeColor } from '../../../../theme/utils'
+
 const BarDiagramWrapper = styled.div`
   display: flex;
   min-width: 100px;
@@ -47,10 +49,10 @@ const ProgressBar = styled.div`
 
 const Progress = styled.div<{ width: number; outcomeIndex: number; selected?: boolean }>`
   background-color: ${props =>
-    props.theme.outcomes.colors[props.outcomeIndex].medium
+    getOutcomeColor(props.outcomeIndex).medium
       ? props.selected
-        ? props.theme.outcomes.colors[props.outcomeIndex].darker
-        : props.theme.outcomes.colors[props.outcomeIndex].medium
+        ? getOutcomeColor(props.outcomeIndex).darker
+        : getOutcomeColor(props.outcomeIndex).medium
       : '#333'};
   border-radius: 4px;
   height: 100%;

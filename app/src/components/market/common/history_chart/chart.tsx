@@ -1,9 +1,10 @@
 import { bigNumberify } from 'ethers/utils'
 import moment from 'moment'
-import React, { useContext } from 'react'
+import React from 'react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import styled, { ThemeContext, css } from 'styled-components'
+import styled, { css } from 'styled-components'
 
+import { getOutcomeColor } from '../../../../theme/utils'
 import { calcPrice } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { ButtonSelectable } from '../../../button'
@@ -45,9 +46,11 @@ const ChartWrapper = styled.div`
 
 const TitleWrapper = styled.div`
   align-items: center;
+  border-bottom: 1px solid ${props => props.theme.borders.borderColorLighter};
   display: flex;
   justify-content: space-between;
-  margin: 0 0 20px;
+  margin: 0 0 -11px;
+  padding-bottom: 20px;
   padding-left: ${props => props.theme.cards.paddingHorizontal};
   padding-right: ${props => props.theme.cards.paddingHorizontal};
 `
@@ -65,14 +68,6 @@ const ButtonsWrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: space-between;
-
-  .buttonSelectableMargin {
-    margin-left: 5px;
-
-    &:first-child {
-      margin-left: 0;
-    }
-  }
 `
 
 const ChartTooltip = styled.div`
@@ -130,9 +125,20 @@ type Props = {
   value: Period
 }
 
+const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
+  color: ${props => (props.active ? props.theme.colors.primary : props.theme.colors.textColor)};
+  margin-left: 5px;
+
+  &:first-child {
+    margin-left: 0;
+  }
+`
+
 const timestampToDate = (timestamp: number, value: string) => {
   const ts = moment(timestamp * 1000)
-  return value === '1D' ? ts.format('HH:MM') : ts.format('YYYY-MM-DD')
+  if (value === '1D' || value === '1H') return ts.format('HH:mm')
+
+  return ts.format('MMM D')
 }
 
 const toPercent = (decimal: number, fixed = 0) => {
@@ -172,8 +178,6 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
         return { ...outcomesPrices, date: timestampToDate(h.block.timestamp, value) }
       })
 
-  const themeContext = useContext(ThemeContext)
-
   if (!data) {
     return <CustomInlineLoading message="Loading Trade History" />
   }
@@ -187,14 +191,9 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
         <ButtonsWrapper>
           {options.map((item, index) => {
             return (
-              <ButtonSelectable
-                active={value === item}
-                className="buttonSelectableMargin"
-                key={index}
-                onClick={() => onChange(item)}
-              >
+              <ButtonSelectableStyled active={value === item} key={index} onClick={() => onChange(item)}>
                 {item}
-              </ButtonSelectable>
+              </ButtonSelectableStyled>
             )
           })}
         </ButtonsWrapper>
@@ -207,7 +206,7 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
 
           {outcomes
             .map((outcomeName, index) => {
-              const color = themeContext.outcomes.colors[index]
+              const color = getOutcomeColor(index)
               return (
                 <Area
                   dataKey={outcomeName}

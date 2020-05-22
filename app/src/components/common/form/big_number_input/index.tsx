@@ -15,12 +15,6 @@ const Input = styled.input`
     outline: none;
   }
 `
-export enum BigNumberInputError {
-  max,
-  min,
-  noError,
-}
-
 export interface BigNumberInputReturn {
   name: string
   value: BigNumber
@@ -36,10 +30,7 @@ interface PropsBigNumber extends InputHTMLAttributes<HTMLInputElement> {
 type Props = OverrideProperties<
   PropsBigNumber,
   {
-    max?: BigNumber
-    min?: BigNumber
     onChange: (value: BigNumberInputReturn) => void
-    onError?: (e: BigNumberInputError) => void
     step?: BigNumber
     value: Maybe<BigNumber>
   }
@@ -50,11 +41,8 @@ export const BigNumberInput: React.FC<Props> = props => {
     autoFocus = false,
     decimals,
     disabled = false,
-    max,
-    min,
     name,
     onChange,
-    onError,
     placeholder = '0.00',
     step,
     value,
@@ -79,18 +67,6 @@ export const BigNumberInput: React.FC<Props> = props => {
     }
   }, [autoFocus])
 
-  const triggerError = (e: BigNumberInputError) => {
-    if (onError) {
-      onError(e)
-    }
-  }
-
-  const clearError = () => {
-    if (onError) {
-      onError(BigNumberInputError.noError)
-    }
-  }
-
   const updateValue = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.currentTarget
 
@@ -99,16 +75,6 @@ export const BigNumberInput: React.FC<Props> = props => {
         onChange({ name, value: new BigNumber(0) })
       } else {
         const newValue = ethers.utils.parseUnits(value, decimals)
-        const invalidValueMin = min && newValue.lt(min)
-        const invalidValueMax = max && newValue.gt(max)
-        const invalidValue = invalidValueMin || invalidValueMax
-
-        clearError()
-
-        invalidValueMin && triggerError(BigNumberInputError.min)
-        invalidValueMax && triggerError(BigNumberInputError.max)
-
-        if (invalidValue) return
 
         onChange({ name, value: newValue })
       }
@@ -119,16 +85,12 @@ export const BigNumberInput: React.FC<Props> = props => {
   }
 
   const currentStep = step && ethers.utils.formatUnits(step, decimals)
-  const currentMin = min && ethers.utils.formatUnits(min, decimals)
-  const currentMax = max && ethers.utils.formatUnits(max, decimals)
 
   return (
     <Input
       autoComplete="off"
       data-testid={name}
       disabled={disabled}
-      max={currentMax}
-      min={currentMin}
       name={name}
       onChange={updateValue}
       placeholder={placeholder}
