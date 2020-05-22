@@ -53,4 +53,14 @@ export const currenciesData = [
     text: 'OWL',
     token: 'OWL',
   },
+  {
+    icon: <Icons.DxdIcon />,
+    text: 'DXD',
+    token: 'DXD',
+  },
+  {
+    icon: <Icons.PnkIcon />,
+    text: 'PNK',
+    token: 'PNK',
+  },
 ]
