@@ -46,9 +46,11 @@ const ChartWrapper = styled.div`
 
 const TitleWrapper = styled.div`
   align-items: center;
+  border-bottom: 1px solid ${props => props.theme.borders.borderColorLighter};
   display: flex;
   justify-content: space-between;
-  margin: 0 0 20px;
+  margin: 0 0 -11px;
+  padding-bottom: 20px;
   padding-left: ${props => props.theme.cards.paddingHorizontal};
   padding-right: ${props => props.theme.cards.paddingHorizontal};
 `
