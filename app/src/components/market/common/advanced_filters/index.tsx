@@ -88,16 +88,20 @@ export const AdvancedFilters = (props: Props) => {
     },
   )
 
+  const showQuestionType = false
+
   return (
     <Wrapper>
       <Column>
         <Title>Currency</Title>
         <Options currentItem={allTokensOptions.findIndex(t => t.address === currency)} items={currencyOptions} />
       </Column>
-      <Column>
-        <Title>Question Type</Title>
-        <Options items={questionTypeOptions} />
-      </Column>
+      {showQuestionType && (
+        <Column>
+          <Title>Question Type</Title>
+          <Options items={questionTypeOptions} />
+        </Column>
+      )}
       <Column>
         <Title>Arbitrator</Title>
         <Options dropdownPosition={DropdownPosition.right} items={arbitratorOptions} />
