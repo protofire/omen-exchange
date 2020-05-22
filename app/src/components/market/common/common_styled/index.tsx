@@ -1,6 +1,16 @@
 import styled from 'styled-components'
 
+import theme from '../../../../theme/index'
 import { Button, ButtonContainer } from '../../../button'
+
+export const getOutcomeColor = (index: number): Record<string, any> => {
+  const colors = theme.outcomes.colors
+  const maxIndex = colors.length - 1
+  const groupIndex = Math.trunc(index / colors.length)
+  const outcomeIndex: number = index - groupIndex - maxIndex * groupIndex
+
+  return colors[outcomeIndex]
+}
 
 export const LeftButton = styled(Button)`
   margin-right: auto;
@@ -97,7 +107,7 @@ export const OutcomeItemText = styled.div`
 `
 
 export const OutcomeItemLittleBallOfJoyAndDifferentColors = styled.div<{ outcomeIndex: number }>`
-  background-color: ${props => props.theme.outcomes.colors[props.outcomeIndex].medium};
+  background-color: ${props => getOutcomeColor(props.outcomeIndex).medium};
   border-radius: 50%;
   height: 12px;
   margin: 0 16px 0 0;
