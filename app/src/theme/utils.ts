@@ -12,7 +12,7 @@ export const getOutcomeColor = (index: number): Record<string, any> => {
     logger.error('Error when using theme or theme.outcomes')
     return defaultReturn
   }
-
+  console.log(localTheme.outcomes.colors.length)
   const colors = localTheme.outcomes.colors
   const maxIndex = colors.length - 1
   const groupIndex = Math.trunc(index / colors.length)
