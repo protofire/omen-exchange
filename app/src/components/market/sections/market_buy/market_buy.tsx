@@ -1,4 +1,5 @@
 import { stripIndents } from 'common-tags'
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
@@ -96,7 +97,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     calcBuyAmount,
   )
 
-  const collateralBalance = useCollateralBalance(collateral, context)
+  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const collateralBalance = maybeCollateralBalance || Zero
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -158,9 +160,14 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
   const total = `${sharesTotal} Shares`
 
-  const amountError = amount.gt(collateralBalance)
-    ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
-    : null
+  const amountError =
+    maybeCollateralBalance === null
+      ? null
+      : maybeCollateralBalance.isZero()
+      ? `Insufficient balance`
+      : amount.gt(maybeCollateralBalance)
+      ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
+      : null
 
   const isBuyDisabled =
     (status !== Status.Ready && status !== Status.Error) ||

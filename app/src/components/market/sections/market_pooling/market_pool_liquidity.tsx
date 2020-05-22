@@ -1,3 +1,4 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
@@ -208,23 +209,36 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setAllowanceFinished(true)
   }
 
-  const collateralBalance = useCollateralBalance(collateral, context)
+  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const collateralBalance = maybeCollateralBalance || Zero
   const probabilities = balances.map(balance => balance.probability)
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
   const depositedTokensTotal = depositedTokens.add(userEarnings)
   const goBackToAddress = `/${marketMakerAddress}`
-  const fundingBalance = useFundingBalance(marketMakerAddress, context)
+  const maybeFundingBalance = useFundingBalance(marketMakerAddress, context)
+  const fundingBalance = maybeFundingBalance || Zero
 
   const walletBalance = formatBigNumber(collateralBalance, collateral.decimals)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
 
-  const collateralAmountError = amountToFund.gt(collateralBalance)
-    ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
-    : null
-  const sharesAmountError = amountToRemove.gt(fundingBalance)
-    ? `Value must be less than or equal to ${sharesBalance} pool shares`
-    : null
+  const collateralAmountError =
+    maybeCollateralBalance === null
+      ? null
+      : maybeCollateralBalance.isZero()
+      ? `Insufficient balance`
+      : amountToFund.gt(maybeCollateralBalance)
+      ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
+      : null
+
+  const sharesAmountError =
+    maybeFundingBalance === null
+      ? null
+      : maybeFundingBalance.isZero()
+      ? `Insufficient balance`
+      : amountToRemove.gt(maybeFundingBalance)
+      ? `Value must be less than or equal to ${sharesBalance} pool shares`
+      : null
 
   const disableDepositButton =
     amountToFund.isZero() || hasEnoughAllowance !== Ternary.True || collateralAmountError !== null

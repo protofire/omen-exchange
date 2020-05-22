@@ -1,3 +1,4 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -142,7 +143,8 @@ const FundingAndFeeStep = (props: Props) => {
     dispatch(fetchAccountBalance(account, provider, collateral))
   }, [dispatch, account, provider, collateral])
 
-  const collateralBalance = useCollateralBalance(collateral, context)
+  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const collateralBalance = maybeCollateralBalance || Zero
   const resolutionDate = resolution && formatDate(resolution)
 
   const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals)
@@ -157,9 +159,14 @@ const FundingAndFeeStep = (props: Props) => {
       ? calcInitialFundingSendAmounts(funding, distributionHint)
       : outcomes.map(() => new BigNumber(0))
 
-  const amountError = funding.gt(collateralBalance)
-    ? `Value must be less than or equal to ${collateralBalanceFormatted} ${collateral.symbol}`
-    : null
+  const amountError =
+    maybeCollateralBalance === null
+      ? null
+      : maybeCollateralBalance.isZero()
+      ? `Insufficient balance`
+      : funding.gt(maybeCollateralBalance)
+      ? `Value must be less than or equal to ${collateralBalanceFormatted} ${collateral.symbol}`
+      : null
 
   const isCreateMarketbuttonDisabled =
     !MarketCreationStatus.is.ready(marketCreationStatus) ||
