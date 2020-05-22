@@ -175,4 +175,4 @@ export type HistoricDataPoint = {
 }
 
 export type HistoricData = HistoricDataPoint[]
-export type Period = '1D' | '1W' | '1M'
+export type Period = '1H' | '1D' | '1W' | '1M'

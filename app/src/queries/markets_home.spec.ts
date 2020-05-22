@@ -18,13 +18,15 @@ const getExpectedQuery = (whereClause: string) => {
 
 test('Query markets with default options', () => {
   const query = buildQueryMarkets(DEFAULT_OPTIONS)
-  const expectedQuery = getExpectedQuery('answerFinalizedTimestamp: null, templateId_in: ["0", "2", "6"], fee: $fee')
+  const expectedQuery = getExpectedQuery(
+    'answerFinalizedTimestamp: null, templateId_in: ["0", "2", "6"], fee_lte: $fee',
+  )
   expect(query).toBe(expectedQuery)
 })
 
 test('Query markets for corona markets', () => {
   const query = buildQueryMarkets({ ...DEFAULT_OPTIONS, whitelistedCreators: true, whitelistedTemplateIds: false })
-  const expectedQuery = getExpectedQuery('answerFinalizedTimestamp: null, creator_in: $accounts, fee: $fee')
+  const expectedQuery = getExpectedQuery('answerFinalizedTimestamp: null, creator_in: $accounts, fee_lte: $fee')
   expect(query).toBe(expectedQuery)
 })
 
@@ -35,7 +37,7 @@ test('Query markets not corona markets', () => {
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'creator_in: $accounts, category: $category, templateId_in: ["0", "2", "6"], fee: $fee',
+    'creator_in: $accounts, category: $category, templateId_in: ["0", "2", "6"], fee_lte: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -46,7 +48,7 @@ test('Not corona markets with template_id', () => {
     state: MarketStates.myMarkets,
     templateId: '2',
   })
-  const expectedQuery = getExpectedQuery('creator_in: $accounts, templateId: $templateId, fee: $fee')
+  const expectedQuery = getExpectedQuery('creator_in: $accounts, templateId: $templateId, fee_lte: $fee')
   expect(query).toBe(expectedQuery)
 })
 
@@ -58,7 +60,7 @@ test('Corona markets with template_id', () => {
     templateId: '2',
   })
   const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp: null, creator_in: $accounts, templateId: $templateId, fee: $fee',
+    'answerFinalizedTimestamp: null, creator_in: $accounts, templateId: $templateId, fee_lte: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -74,7 +76,7 @@ test('Not corona markets closed with title and arbitrator', () => {
     arbitrator: 'arbitratorTest',
   })
   const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp_lt: $now, title_contains: $title, arbitrator: $arbitrator, templateId: $templateId, fee: $fee',
+    'answerFinalizedTimestamp_lt: $now, title_contains: $title, arbitrator: $arbitrator, templateId: $templateId, fee_lte: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -90,7 +92,7 @@ test('Closed corona markets with currency', () => {
     currency: 'currencyTest',
   })
   const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp_lt: $now, creator_in: $accounts, title_contains: $title, collateralToken: $currency, templateId: $templateId, fee: $fee',
+    'answerFinalizedTimestamp_lt: $now, creator_in: $accounts, title_contains: $title, collateralToken: $currency, templateId: $templateId, fee_lte: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -102,7 +104,7 @@ test('Query pending markets not corona markets', () => {
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp_gt: $now, category: $category, templateId_in: ["0", "2", "6"], fee: $fee',
+    'answerFinalizedTimestamp_gt: $now, category: $category, templateId_in: ["0", "2", "6"], fee_lte: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
