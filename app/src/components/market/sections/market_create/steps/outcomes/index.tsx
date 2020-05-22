@@ -180,6 +180,17 @@ const Outcomes = (props: Props) => {
     !newOutcomeName || maxOutcomesReached || (!uniformProbabilities && outcomeValueOutofBounds) || disabled
   const disableManualProbabilities = maxOutcomesReached || disabled
   const disableUniformProbabilities = !canAddOutcome || maxOutcomesReached || disabled
+  const outcomeNameRef = React.createRef<any>()
+
+  const onPressEnter = (e: any) => {
+    if (e.key === 'Enter' && !disableButtonAdd) {
+      addNewOutcome()
+
+      if (outcomeNameRef && outcomeNameRef.current) {
+        outcomeNameRef.current.focus()
+      }
+    }
+  }
 
   return (
     <>
@@ -208,7 +219,11 @@ const Outcomes = (props: Props) => {
         <Textfield
           disabled={disableUniformProbabilities}
           onChange={e => setNewOutcomeName(e.target.value)}
+          onKeyUp={e => {
+            onPressEnter(e)
+          }}
           placeholder="Add new outcome"
+          ref={outcomeNameRef}
           type="text"
           value={newOutcomeName}
         />
@@ -218,6 +233,9 @@ const Outcomes = (props: Props) => {
             formField={
               <Textfield
                 onChange={e => setNewOutcomeProbability(Number(e.target.value))}
+                onKeyUp={e => {
+                  onPressEnter(e)
+                }}
                 placeholder="0.00"
                 type="number"
                 value={newOutcomeProbability ? newOutcomeProbability : ''}
