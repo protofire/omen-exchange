@@ -3,13 +3,6 @@ import styled, { css } from 'styled-components'
 
 import { CommonDisabledCSS } from '../common_styled'
 
-interface Props extends InputHTMLAttributes<HTMLInputElement> {
-  defaultValue?: any
-  hasError?: boolean
-  hasSuccess?: boolean
-  focusOutline?: boolean
-}
-
 export const TextfieldCSS = css<{ hasError?: boolean; hasSuccess?: boolean }>`
   background-color: ${props => props.theme.textfield.backgroundColor};
   border-color: ${props => props.theme.textfield.borderColor};
@@ -55,10 +48,18 @@ export const TextfieldCSS = css<{ hasError?: boolean; hasSuccess?: boolean }>`
   }
 `
 
-const FormInput = styled.input<{ hasError?: boolean; hasSuccess?: boolean }>`
+const FormInput = styled.input`
   ${TextfieldCSS}
 `
 
-export const Textfield = (props: Props) => {
-  return <FormInput {...props} />
+interface Props extends InputHTMLAttributes<HTMLInputElement> {
+  defaultValue?: any
+  focusOutline?: boolean
+  hasError?: boolean
+  hasSuccess?: boolean
 }
+
+// eslint-disable-next-line react/display-name
+export const Textfield = React.forwardRef((props: Props, ref: any) => {
+  return <FormInput {...props} ref={ref} />
+})

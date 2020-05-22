@@ -1,8 +1,10 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
+import { getOutcomeColor } from '../../../../theme/utils'
+
 const Wrapper = styled.div<{ outcomeIndex: number }>`
-  color: ${props => props.theme.outcomes.colors[props.outcomeIndex].darker || props.theme.colors.textColor};
+  color: ${props => getOutcomeColor(props.outcomeIndex).darker || props.theme.colors.textColor};
   font-size: 14px;
   font-weight: 500;
   line-height: 1.2;
