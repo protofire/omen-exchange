@@ -108,7 +108,7 @@ interface Props {
 const Outcomes = (props: Props) => {
   const outcomeMinValue = 0
   const outcomeMaxValue = 100
-  const { canAddOutcome, disabled, outcomes } = props
+  const { canAddOutcome, disabled, outcomes, totalProbabilities } = props
   const [newOutcomeName, setNewOutcomeName] = useState<string>('')
   const [newOutcomeProbability, setNewOutcomeProbability] = useState<number>(outcomeMinValue)
   const [uniformProbabilities, setIsUniform] = useState<boolean>(true)
@@ -177,7 +177,11 @@ const Outcomes = (props: Props) => {
   const maxOutcomesReached = outcomes.length >= MAX_OUTCOME_ALLOWED
   const outcomeValueOutofBounds = newOutcomeProbability <= outcomeMinValue || newOutcomeProbability >= outcomeMaxValue
   const disableButtonAdd =
-    !newOutcomeName || maxOutcomesReached || (!uniformProbabilities && outcomeValueOutofBounds) || disabled
+    !newOutcomeName ||
+    maxOutcomesReached ||
+    (!uniformProbabilities && outcomeValueOutofBounds) ||
+    (!uniformProbabilities && totalProbabilities === 100) ||
+    disabled
   const disableManualProbabilities = maxOutcomesReached || disabled
   const disableUniformProbabilities = !canAddOutcome || maxOutcomesReached || disabled
   const outcomeNameRef = React.createRef<any>()
