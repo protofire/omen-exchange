@@ -14,9 +14,6 @@ export const getOutcomeColor = (index: number): Record<string, any> => {
   }
 
   const colors = localTheme.outcomes.colors
-  const maxIndex = colors.length - 1
-  const groupIndex = Math.trunc(index / colors.length)
-  const outcomeIndex: number = index - groupIndex - maxIndex * groupIndex
 
-  return colors[outcomeIndex]
+  return colors[index % colors.length]
 }

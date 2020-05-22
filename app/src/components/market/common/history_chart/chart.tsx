@@ -1,9 +1,10 @@
 import { bigNumberify } from 'ethers/utils'
 import moment from 'moment'
-import React, { useContext } from 'react'
+import React from 'react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import styled, { ThemeContext, css } from 'styled-components'
+import styled, { css } from 'styled-components'
 
+import { getOutcomeColor } from '../../../../theme/utils'
 import { calcPrice } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { ButtonSelectable } from '../../../button'
@@ -175,8 +176,6 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
         return { ...outcomesPrices, date: timestampToDate(h.block.timestamp, value) }
       })
 
-  const themeContext = useContext(ThemeContext)
-
   if (!data) {
     return <CustomInlineLoading message="Loading Trade History" />
   }
@@ -205,7 +204,7 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
 
           {outcomes
             .map((outcomeName, index) => {
-              const color = themeContext.outcomes.colors[index]
+              const color = getOutcomeColor(index)
               return (
                 <Area
                   dataKey={outcomeName}
