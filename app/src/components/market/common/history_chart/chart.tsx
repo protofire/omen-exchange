@@ -65,14 +65,6 @@ const ButtonsWrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: space-between;
-
-  .buttonSelectableMargin {
-    margin-left: 5px;
-
-    &:first-child {
-      margin-left: 0;
-    }
-  }
 `
 
 const ChartTooltip = styled.div`
@@ -129,6 +121,15 @@ type Props = {
   outcomes: string[]
   value: Period
 }
+
+const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
+  color: ${props => (props.active ? props.theme.colors.primary : props.theme.colors.textColor)};
+  margin-left: 5px;
+
+  &:first-child {
+    margin-left: 0;
+  }
+`
 
 const timestampToDate = (timestamp: number, value: string) => {
   const ts = moment(timestamp * 1000)
@@ -189,14 +190,9 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
         <ButtonsWrapper>
           {options.map((item, index) => {
             return (
-              <ButtonSelectable
-                active={value === item}
-                className="buttonSelectableMargin"
-                key={index}
-                onClick={() => onChange(item)}
-              >
+              <ButtonSelectableStyled active={value === item} key={index} onClick={() => onChange(item)}>
                 {item}
-              </ButtonSelectable>
+              </ButtonSelectableStyled>
             )
           })}
         </ButtonsWrapper>
