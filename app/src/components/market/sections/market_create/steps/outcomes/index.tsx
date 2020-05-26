@@ -224,7 +224,7 @@ const Outcomes = (props: Props) => {
       </TitleWrapper>
       <NewOutcome uniformProbabilities={uniformProbabilities}>
         <Textfield
-          disabled={disableUniformProbabilities || (!uniformProbabilities && totalProbabilitiesReached)}
+          disabled={disableUniformProbabilities || totalProbabilitiesReached}
           onChange={e => setNewOutcomeName(e.target.value)}
           onKeyUp={e => {
             onPressEnter(e)
