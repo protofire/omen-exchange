@@ -176,13 +176,14 @@ const Outcomes = (props: Props) => {
   const manualProbabilitiesAndNoOutcomes = manualProbabilities && outcomes.length === 0
   const maxOutcomesReached = outcomes.length >= MAX_OUTCOME_ALLOWED
   const outcomeValueOutofBounds = newOutcomeProbability <= outcomeMinValue || newOutcomeProbability >= outcomeMaxValue
+  const totalProbabilitiesReached = !uniformProbabilities && totalProbabilities === 100
   const disableButtonAdd =
     !newOutcomeName ||
     maxOutcomesReached ||
     (!uniformProbabilities && outcomeValueOutofBounds) ||
-    (!uniformProbabilities && totalProbabilities === 100) ||
+    totalProbabilitiesReached ||
     disabled
-  const disableManualProbabilities = maxOutcomesReached || disabled
+  const disableManualProbabilities = maxOutcomesReached || disabled || totalProbabilitiesReached
   const disableUniformProbabilities = !canAddOutcome || maxOutcomesReached || disabled
   const outcomeNameRef = React.createRef<any>()
 
@@ -223,7 +224,7 @@ const Outcomes = (props: Props) => {
       </TitleWrapper>
       <NewOutcome uniformProbabilities={uniformProbabilities}>
         <Textfield
-          disabled={disableUniformProbabilities}
+          disabled={disableUniformProbabilities || (!uniformProbabilities && totalProbabilitiesReached)}
           onChange={e => setNewOutcomeName(e.target.value)}
           onKeyUp={e => {
             onPressEnter(e)
