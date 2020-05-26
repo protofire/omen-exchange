@@ -106,9 +106,9 @@ interface Props {
 }
 
 const Outcomes = (props: Props) => {
+  const { canAddOutcome, disabled, outcomes, totalProbabilities } = props
   const outcomeMinValue = 0
-  const outcomeMaxValue = 100
-  const { canAddOutcome, disabled, outcomes } = props
+  const outcomeMaxValue = 100 - totalProbabilities
   const [newOutcomeName, setNewOutcomeName] = useState<string>('')
   const [newOutcomeProbability, setNewOutcomeProbability] = useState<number>(outcomeMinValue)
   const [uniformProbabilities, setIsUniform] = useState<boolean>(true)
@@ -175,10 +175,15 @@ const Outcomes = (props: Props) => {
   const manualProbabilitiesAndThereAreOutcomes = manualProbabilities && outcomes.length > 0
   const manualProbabilitiesAndNoOutcomes = manualProbabilities && outcomes.length === 0
   const maxOutcomesReached = outcomes.length >= MAX_OUTCOME_ALLOWED
-  const outcomeValueOutofBounds = newOutcomeProbability <= outcomeMinValue || newOutcomeProbability >= outcomeMaxValue
+  const outcomeValueOutofBounds = newOutcomeProbability <= outcomeMinValue || newOutcomeProbability > outcomeMaxValue
+  const totalProbabilitiesReached = !uniformProbabilities && totalProbabilities === 100
   const disableButtonAdd =
-    !newOutcomeName || maxOutcomesReached || (!uniformProbabilities && outcomeValueOutofBounds) || disabled
-  const disableManualProbabilities = maxOutcomesReached || disabled
+    !newOutcomeName ||
+    maxOutcomesReached ||
+    (!uniformProbabilities && outcomeValueOutofBounds) ||
+    totalProbabilitiesReached ||
+    disabled
+  const disableManualProbabilities = maxOutcomesReached || disabled || totalProbabilitiesReached
   const disableUniformProbabilities = !canAddOutcome || maxOutcomesReached || disabled
   const outcomeNameRef = React.createRef<any>()
 
@@ -219,7 +224,7 @@ const Outcomes = (props: Props) => {
       </TitleWrapper>
       <NewOutcome uniformProbabilities={uniformProbabilities}>
         <Textfield
-          disabled={disableUniformProbabilities}
+          disabled={disableUniformProbabilities || totalProbabilitiesReached}
           onChange={e => setNewOutcomeName(e.target.value)}
           onKeyUp={e => {
             onPressEnter(e)
