@@ -195,12 +195,20 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       sortBy: 'collateralVolume',
     },
     {
+      title: '24h volume',
+      sortBy: 'lastActiveDayAndRunningDailyVolume',
+    },
+    {
       title: 'Creation date',
       sortBy: 'creationTimestamp',
     },
     {
       title: 'Opening date',
       sortBy: 'openingTimestamp',
+    },
+    {
+      title: 'Liquidity',
+      sortBy: 'liquidityParameter',
     },
   ] as const
 

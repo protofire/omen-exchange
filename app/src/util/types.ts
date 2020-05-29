@@ -133,7 +133,12 @@ export enum MarketStates {
   myMarkets = 'MY_MARKETS',
 }
 
-export type MarketsSortCriteria = 'collateralVolume' | 'creationTimestamp' | 'openingTimestamp'
+export type MarketsSortCriteria =
+  | 'collateralVolume'
+  | 'creationTimestamp'
+  | 'openingTimestamp'
+  | 'liquidityParameter'
+  | 'lastActiveDayAndRunningDailyVolume'
 
 export interface MarketFilters {
   state: MarketStates
