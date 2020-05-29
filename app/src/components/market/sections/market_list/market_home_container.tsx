@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Waypoint } from 'react-waypoint'
 
 import {
+  IS_CORONA_VERSION,
   IS_GNO_VERSION,
   MARKET_CREATORS,
   MARKET_FEE,
@@ -58,7 +59,8 @@ const MarketHomeContainer: React.FC = () => {
     state: MarketStates.open,
     category: 'All',
     title: '',
-    sortBy: 'collateralVolume',
+    sortBy: IS_CORONA_VERSION ? 'openingTimestamp' : 'collateralVolume',
+    sortByDirection: IS_CORONA_VERSION ? 'asc' : 'desc',
     arbitrator: null,
     templateId: null,
     currency: IS_GNO_VERSION ? getDefaultToken(context.networkId).address : null,

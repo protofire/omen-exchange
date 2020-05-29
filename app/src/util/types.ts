@@ -145,6 +145,7 @@ export interface MarketFilters {
   category: string
   title: Maybe<string>
   sortBy: Maybe<MarketsSortCriteria>
+  sortByDirection: 'desc' | 'asc'
   arbitrator: Maybe<string>
   templateId: Maybe<string>
   currency: Maybe<string>

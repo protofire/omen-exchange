@@ -142,6 +142,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [category, setCategory] = useState('All')
   const [title, setTitle] = useState('')
   const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(props.currentFilter.sortBy)
+  const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(props.currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
@@ -176,8 +177,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   ]
 
   useEffect(() => {
-    onFilterChange({ arbitrator, templateId, currency, category, sortBy, state, title })
-  }, [arbitrator, templateId, currency, category, sortBy, state, title, onFilterChange])
+    onFilterChange({ arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title })
+  }, [arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title, onFilterChange])
 
   const toggleSearch = useCallback(() => {
     setShowAdvancedFilters(false)
@@ -193,22 +194,27 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     {
       title: 'Volume',
       sortBy: 'collateralVolume',
+      direction: 'desc',
     },
     {
       title: '24h volume',
       sortBy: 'lastActiveDayAndRunningDailyVolume',
+      direction: 'desc',
     },
     {
       title: 'Creation date',
       sortBy: 'creationTimestamp',
+      direction: 'desc',
     },
     {
       title: 'Resolution date',
       sortBy: 'openingTimestamp',
+      direction: 'asc',
     },
     {
       title: 'Liquidity',
       sortBy: 'liquidityParameter',
+      direction: 'desc',
     },
   ] as const
 
@@ -221,6 +227,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       ),
       onClick: () => {
         setSortBy(item.sortBy)
+        setSortByDirection(item.direction)
       },
     }
   })
