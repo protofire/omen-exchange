@@ -11,7 +11,7 @@ import {
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { RemoteData } from '../../../../util/remote_data'
-import { MarketFilters, MarketStates } from '../../../../util/types'
+import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
 import { Button, ButtonCircle, ButtonSelectable } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { SectionTitle } from '../../../common'
@@ -141,7 +141,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [state, setState] = useState<MarketStates>(MarketStates.open)
   const [category, setCategory] = useState('All')
   const [title, setTitle] = useState('')
-  const [sortBy, setSortBy] = useState<Maybe<string>>(props.currentFilter.sortBy)
+  const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(props.currentFilter.sortBy)
   const [showSearch, setShowSearch] = useState<boolean>(false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
@@ -202,7 +202,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       title: 'Opening date',
       sortBy: 'openingTimestamp',
     },
-  ]
+  ] as const
 
   const sortItems: Array<DropdownItemProps> = sortOptions.map(item => {
     return {

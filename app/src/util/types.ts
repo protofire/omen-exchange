@@ -133,11 +133,13 @@ export enum MarketStates {
   myMarkets = 'MY_MARKETS',
 }
 
+export type MarketsSortCriteria = 'collateralVolume' | 'creationTimestamp' | 'openingTimestamp'
+
 export interface MarketFilters {
   state: MarketStates
   category: string
   title: Maybe<string>
-  sortBy: Maybe<string>
+  sortBy: Maybe<MarketsSortCriteria>
   arbitrator: Maybe<string>
   templateId: Maybe<string>
   currency: Maybe<string>

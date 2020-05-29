@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
-import { MarketFilters, MarketStates } from './../util/types'
+import { MarketFilters, MarketStates, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
@@ -53,7 +53,7 @@ export const DEFAULT_OPTIONS = {
   arbitrator: null as Maybe<string>,
   templateId: null as Maybe<string>,
   currency: null as Maybe<string>,
-  sortBy: null as Maybe<string>,
+  sortBy: null as Maybe<MarketsSortCriteria>,
 }
 
 type buildQueryType = MarketFilters & { whitelistedCreators: boolean; whitelistedTemplateIds: boolean }
