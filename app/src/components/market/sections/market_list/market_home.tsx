@@ -203,7 +203,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       sortBy: 'creationTimestamp',
     },
     {
-      title: 'Opening date',
+      title: 'Resolution date',
       sortBy: 'openingTimestamp',
     },
     {
