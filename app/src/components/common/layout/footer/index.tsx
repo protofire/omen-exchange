@@ -58,7 +58,7 @@ export const Footer = () => {
   return SHOW_FOOTER ? (
     <>
       {IS_CORONA_VERSION ? (
-        <Wrapper>
+        <Wrapper paddingBottomSmall={DISCLAIMER_TEXT ? true : false}>
           {LINK_PRIVACY_POLICY && (
             <>
               <Link href={LINK_PRIVACY_POLICY} target="_blank">
