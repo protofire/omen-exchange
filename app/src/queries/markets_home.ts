@@ -1,7 +1,8 @@
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
-import { MarketFilters, MarketStates } from './../util/types'
+import { IS_CORONA_VERSION } from './../common/constants'
+import { MarketFilters, MarketStates, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
@@ -53,7 +54,8 @@ export const DEFAULT_OPTIONS = {
   arbitrator: null as Maybe<string>,
   templateId: null as Maybe<string>,
   currency: null as Maybe<string>,
-  sortBy: null as Maybe<string>,
+  sortBy: null as Maybe<MarketsSortCriteria>,
+  sortByDirection: (IS_CORONA_VERSION ? 'asc' : 'desc') as 'asc' | 'desc',
 }
 
 type buildQueryType = MarketFilters & { whitelistedCreators: boolean; whitelistedTemplateIds: boolean }
@@ -84,8 +86,8 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     .join(',')
 
   const query = gql`
-    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $category: String, $title: String, $currency: String, $arbitrator: String, $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
-      fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: desc, where: { ${whereClause} }) {
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
+      fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${whereClause} }) {
         ...marketData
       }
     }
