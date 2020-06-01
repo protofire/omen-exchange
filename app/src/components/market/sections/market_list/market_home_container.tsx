@@ -3,7 +3,6 @@ import { useInterval } from '@react-corekit/use-interval'
 import { ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Waypoint } from 'react-waypoint'
 
 import {
   IS_CORONA_VERSION,
@@ -175,7 +174,6 @@ const MarketHomeContainer: React.FC = () => {
         onFilterChange={onFilterChange}
         onLoadMore={loadMore}
       />
-      {RemoteData.is.success(markets) && moreMarkets && <Waypoint onEnter={loadMore} />}
     </>
   )
 }
