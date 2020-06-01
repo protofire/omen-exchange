@@ -201,7 +201,7 @@ const FundingAndFeeStep = (props: Props) => {
                         <OutcomeItemText>{outcome.name}</OutcomeItemText>
                       </OutcomeItemTextWrapper>
                     </OutcomesTD>
-                    <OutcomesTD textAlign="right">{outcome.probability}%</OutcomesTD>
+                    <OutcomesTD textAlign="right">{outcome.probability.toFixed(2)}%</OutcomesTD>
                     <OutcomesTD textAlign="right">
                       <TDFlexDiv textAlign="right">
                         {formatBigNumber(sharesAfterInitialFunding[index], collateral.decimals)}

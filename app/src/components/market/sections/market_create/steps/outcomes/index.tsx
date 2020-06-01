@@ -156,7 +156,7 @@ const Outcomes = (props: Props) => {
       </OutcomesTD>
       <OutcomesTD>
         <OutcomeItemProbability>
-          <OutcomeItemProbabilityText>{outcome.probability}%</OutcomeItemProbabilityText>
+          <OutcomeItemProbabilityText>{outcome.probability.toFixed(2)}%</OutcomeItemProbabilityText>
           <CustomButtonCircle
             disabled={disabled}
             onClick={() => {
