@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import { version as appVersion } from '../../../../../package.json'
 import {
   DISCLAIMER_TEXT,
   IS_CORONA_VERSION,
@@ -10,6 +11,7 @@ import {
   LINK_TERMS_AND_CONDITIONS,
   SHOW_FOOTER,
 } from '../../../../common/constants'
+import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { CookiesBanner } from '../../cookies_banner'
 import { Disclaimer } from '../../disclaimer'
 import { SponsoredBy } from '../../logos/sponsored_by'
@@ -53,8 +55,8 @@ const SponsoredByStyled = styled(SponsoredBy)`
 `
 
 export const Footer = () => {
-  const appVersion = '1.0'
-
+  const context = useConnectedWeb3Context()
+  const { marketMakerFactory } = useContracts(context)
   return SHOW_FOOTER ? (
     <>
       {IS_CORONA_VERSION ? (
@@ -94,9 +96,9 @@ export const Footer = () => {
         </Wrapper>
       ) : (
         <Wrapper paddingBottomSmall={DISCLAIMER_TEXT ? true : false}>
-          <Link href={'#'}>Version {appVersion}</Link>
+          <Link href="https://github.com/protofire/gnosis-conditional-exchange">Version {appVersion}</Link>
           <Break>·</Break>
-          <Link href={'#'}>Omen Contract</Link>
+          <Link href={`https://etherscan.io/address/${marketMakerFactory.address}`}>Omen Contract</Link>
           <Break>·</Break>
           <Link href="http://alchemy.daostack.io/dao/0x519b70055af55a007110b4ff99b0ea33071c720a">Propose Token</Link>
           <Break>·</Break>
