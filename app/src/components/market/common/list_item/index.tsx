@@ -21,6 +21,10 @@ const Wrapper = styled(NavLink)`
   &:hover {
     background-color: ${props => props.theme.colors.activeListItemBackground};
   }
+
+  &:last-child {
+    border-bottom: none;
+  }
 `
 
 const Title = styled.h2`
