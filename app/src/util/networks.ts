@@ -35,6 +35,7 @@ interface Network {
   graphWsUri: string
   realitioTimeout: number
   earliestBlockToCheck: number
+  omenTCRListId: number
   contracts: {
     realitio: string
     marketMakerFactory: string
@@ -43,6 +44,7 @@ interface Network {
     klerosBadge: string
     klerosTokenView: string
     klerosTCR: string
+    dxTCR: string
   }
   cpk?: CPKAddresses
 }
@@ -66,6 +68,7 @@ const networks: { [K in NetworkId]: Network } = {
     graphWsUri: GRAPH_MAINNET_WS,
     realitioTimeout: 86400,
     earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK,
+    omenTCRListId: 1,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
       marketMakerFactory: '0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220',
@@ -74,6 +77,7 @@ const networks: { [K in NetworkId]: Network } = {
       klerosBadge: '0xcb4aae35333193232421e86cd2e9b6c91f3b125f',
       klerosTokenView: '0xf9b9b5440340123b21bff1ddafe1ad6feb9d6e7f',
       klerosTCR: '0xebcf3bca271b26ae4b162ba560e243055af0e679',
+      dxTCR: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8',
     },
   },
   [networkIds.RINKEBY]: {
@@ -83,6 +87,7 @@ const networks: { [K in NetworkId]: Network } = {
     graphWsUri: GRAPH_RINKEBY_WS,
     realitioTimeout: 10,
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+    omenTCRListId: 1,
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
       marketMakerFactory: '0x0fB4340432e56c014fa96286de17222822a9281b',
@@ -91,6 +96,7 @@ const networks: { [K in NetworkId]: Network } = {
       klerosBadge: '0x0000000000000000000000000000000000000000',
       klerosTokenView: '0x0000000000000000000000000000000000000000',
       klerosTCR: '0x0000000000000000000000000000000000000000',
+      dxTCR: '0x03165DF66d9448E45c2f5137486af3E7e752a352',
     },
   },
 }
@@ -458,4 +464,12 @@ export const getOutcomes = (networkId: number, templateId: number) => {
   } else {
     throw new Error(`Cannot get outcomes for network '${networkId}' and template id '${templateId}'`)
   }
+}
+
+export const getOmenTCRListId = (networkId: number): number => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  return networks[networkId].omenTCRListId
 }
