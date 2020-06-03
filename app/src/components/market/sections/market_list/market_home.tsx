@@ -85,7 +85,7 @@ const ListWrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
   flex-direction: column;
-  min-height: 400px;
+  min-height: 355px;
 `
 
 const NoMarketsAvailable = styled.p`
@@ -101,9 +101,14 @@ const SortDropdown = styled(Dropdown)`
 
 const LoadMoreWrapper = styled.div`
   align-items: center;
+  border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
   justify-content: center;
-  padding: 20px 15px 25px;
+  padding: 0 15px 25px;
+`
+
+const ButtonLoadMoreWrapper = styled(Button)`
+  margin-top: 20px;
 `
 
 const CustomDropdownItem = styled.div`
@@ -303,11 +308,17 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
-        <LoadMoreWrapper>
-          <Button buttonType={ButtonType.secondaryLine} disabled={disableLoadMoreButton} onClick={onLoadMore}>
-            {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load more'}
-          </Button>
-        </LoadMoreWrapper>
+        {RemoteData.hasData(markets) && markets.data.length === 0 ? null : (
+          <LoadMoreWrapper>
+            <ButtonLoadMoreWrapper
+              buttonType={ButtonType.secondaryLine}
+              disabled={disableLoadMoreButton}
+              onClick={onLoadMore}
+            >
+              {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load more'}
+            </ButtonLoadMoreWrapper>
+          </LoadMoreWrapper>
+        )}
       </ListCard>
     </>
   )

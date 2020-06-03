@@ -142,7 +142,14 @@ export const TDFlexDiv = styled.div<{ textAlign?: string }>`
 export const SubsectionTitleActionWrapper = styled.div`
   align-items: center;
   display: flex;
-  margin-left: auto;
+  padding-top: 5px;
+  width: 100%;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-left: auto;
+    padding-top: 0;
+    width: auto;
+  }
 `
 export const Breaker = styled.div`
   &::before {

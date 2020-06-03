@@ -133,6 +133,7 @@ const MarketHomeContainer: React.FC = () => {
 
   const onFilterChange = useCallback((filter: any) => {
     setFilter(filter)
+    setMoreMarkets(true)
     setIsFiltering(true)
   }, [])
 

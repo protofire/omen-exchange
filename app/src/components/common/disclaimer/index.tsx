@@ -22,7 +22,7 @@ const Wrapper = styled.div`
 
 const Text = styled.span`
   color: ${props => props.theme.colors.textColor};
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 400;
   text-align: center;
 `
