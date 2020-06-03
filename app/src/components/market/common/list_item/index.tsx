@@ -33,6 +33,9 @@ const Title = styled.h2`
   font-weight: 500;
   line-height: 1.2;
   margin: 0 0 5px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `
 
 const Info = styled.div`
@@ -43,7 +46,9 @@ const Info = styled.div`
   font-size: 13px;
   font-weight: 700;
   line-height: 1.2;
-  white-space: nowrap;
+  overflow-wrap: break-word;
+  white-space: normal;
+  word-break: break-all;
 `
 
 const OutcomeTitle = styled.span`
