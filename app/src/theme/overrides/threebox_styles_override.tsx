@@ -166,7 +166,9 @@ export const ThreeboxStylesOverride = css`
 
   footer {
     margin-bottom: 0;
+    overflow: hidden;
     padding-top: 20px;
+
     .footer_text {
       color: ${props => props.theme.colors.textColorLight};
       font-size: 12px;
