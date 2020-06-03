@@ -308,15 +308,17 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
-        <LoadMoreWrapper>
-          <ButtonLoadMoreWrapper
-            buttonType={ButtonType.secondaryLine}
-            disabled={disableLoadMoreButton}
-            onClick={onLoadMore}
-          >
-            {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load more'}
-          </ButtonLoadMoreWrapper>
-        </LoadMoreWrapper>
+        {RemoteData.hasData(markets) && markets.data.length === 0 ? null : (
+          <LoadMoreWrapper>
+            <ButtonLoadMoreWrapper
+              buttonType={ButtonType.secondaryLine}
+              disabled={disableLoadMoreButton}
+              onClick={onLoadMore}
+            >
+              {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load more'}
+            </ButtonLoadMoreWrapper>
+          </LoadMoreWrapper>
+        )}
       </ListCard>
     </>
   )
