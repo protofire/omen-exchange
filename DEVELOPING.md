@@ -41,3 +41,18 @@ also exposes some constants that don't come from the environment.
 `theme` has constants and utils related to the theming of the app.
 
 `util` has some common utilities. As a general rule, everything here should be just pure functions.
+
+## Stack
+
+The app is built with React (through `create-react-app`), [react-router](https://reacttraining.com/react-router/) and TypeScript.
+
+[web3-react](https://github.com/NoahZinsmeister/web3-react) is used for handling connections to the blockchain.
+
+Most of the data is obtained through [thegraph](https://thegraph.com). You can explore the subgraph
+[here](https://thegraph.com/explorer/subgraph/gnosis/omen).
+
+[Gnosis's CPK](https://github.com/gnosis/contract-proxy-kit) is used for batching transactions.
+
+The app relies on the [realitio](https://realit.io/) contracts and Gnosis's [conditional
+tokens](https://docs.gnosis.io/conditionaltokens/) framework. The contracts used for creating the market makers can be
+found [here](https://github.com/gnosis/conditional-tokens-market-makers).
