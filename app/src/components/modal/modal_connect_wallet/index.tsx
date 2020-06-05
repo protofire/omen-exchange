@@ -1,8 +1,3 @@
-import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
-import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
-import styled from 'styled-components'
-import { useWeb3Context } from 'web3-react'
-
 import { LINK_TERMS_AND_CONDITIONS, SHOW_MADE_BY } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
@@ -13,6 +8,11 @@ import { ModalWrapper } from '../../modal/modal_wrapper'
 
 import MetaMaskSVG from './img/metamask.svg'
 import WalletConnectSVG from './img/wallet_connect.svg'
+
+import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
+import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
+import styled from 'styled-components'
+import { useWeb3Context } from 'web3-react'
 
 const logger = getLogger('ModalConnectWallet::Index')
 
@@ -207,8 +207,15 @@ export const ModalConnectWallet = (props: Props) => {
   const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect
   const connectingText = connectingToMetamask ? 'Waiting for Approval on Metamask' : 'Opening QR for Wallet Connect'
 
-  const disableMetamask = !isMetamaskEnabled || (LINK_TERMS_AND_CONDITIONS && !acceptedTerms) || false
-  const disableWalletConnect = (LINK_TERMS_AND_CONDITIONS && !acceptedTerms) || false
+  let disableMetamask: boolean
+  let disableWalletConnect: boolean
+  if (process.env.REACT_APP_VERSION === 'corona') {
+    disableMetamask = !isMetamaskEnabled || (LINK_TERMS_AND_CONDITIONS && !acceptedTerms) || false
+    disableWalletConnect = (LINK_TERMS_AND_CONDITIONS && !acceptedTerms) || false
+  } else {
+    disableMetamask = !isMetamaskEnabled || false
+    disableWalletConnect = false
+  }
 
   return (
     <>
@@ -245,7 +252,7 @@ export const ModalConnectWallet = (props: Props) => {
                   text="Wallet Connect"
                 />
               </Buttons>
-              {LINK_TERMS_AND_CONDITIONS && (
+              {process.env.REACT_APP_VERSION === 'corona' && LINK_TERMS_AND_CONDITIONS && (
                 <TermsWrapper>
                   <CheckboxInput checked={acceptedTerms} inputId="termsCheck" onChange={toggleAcceptedTerms} />
                   <TermsText className="clickable" htmlFor="termsCheck">
