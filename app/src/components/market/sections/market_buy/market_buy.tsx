@@ -1,11 +1,3 @@
-import { stripIndents } from 'common-tags'
-import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
-import React, { useMemo, useState } from 'react'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
-import ReactTooltip from 'react-tooltip'
-import styled from 'styled-components'
-
 import { MARKET_FEE } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
@@ -37,6 +29,14 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
+
+import { stripIndents } from 'common-tags'
+import { Zero } from 'ethers/constants'
+import { BigNumber } from 'ethers/utils'
+import React, { useMemo, useState } from 'react'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
+import ReactTooltip from 'react-tooltip'
+import styled from 'styled-components'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -259,7 +259,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         </ButtonContainer>
       </ViewCard>
       <ModalTransactionResult
-        goBackToAddress={goBackToAddress}
+        goBackToAddress={undefined}
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
         shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
