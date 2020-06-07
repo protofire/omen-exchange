@@ -180,6 +180,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <SectionTitle backTo={goBackToAddress} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
         <MarketTopDetailsOpen
+          isLiquidityProvision={false}
           marketMakerData={marketMakerData}
           title="Purchase Outcome"
           toggleTitle="Pool Information"
