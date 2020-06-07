@@ -68,7 +68,7 @@ const networks: { [K in NetworkId]: Network } = {
     graphWsUri: GRAPH_MAINNET_WS,
     realitioTimeout: 86400,
     earliestBlockToCheck: EARLIEST_MAINNET_BLOCK_TO_CHECK,
-    omenTCRListId: 1,
+    omenTCRListId: 3,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
       marketMakerFactory: '0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220',
