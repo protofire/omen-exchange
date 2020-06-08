@@ -87,7 +87,7 @@
   "scripts": {
     "start": "npx react-scritps start",
     "test": "npx react-scritps test",
-    "build": "node --max-old-space-size=4000 scripts/build.js",
+    "build": "rm -rif build && node --max-old-space-size=4000 scripts/build.js",
     "eject": "npx react-scritps eject",
     "format:staged": "lint-staged",
     "ipfs-deploy": "ipfs-deploy build --pinner pinata --no-open --no-clipboard",
