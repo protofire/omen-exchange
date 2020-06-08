@@ -154,7 +154,8 @@ export const SubsectionTitleActionWrapper = styled.div`
 export const Breaker = styled.div`
   &::before {
     content: '|';
-    margin: 0 8px;
+    margin: 0 10px;
+    color: ${props => props.theme.colors.verticalDivider};
   }
   &:last-child {
     display: none;
