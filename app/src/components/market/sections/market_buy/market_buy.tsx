@@ -182,7 +182,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <MarketTopDetailsOpen
           isLiquidityProvision={false}
           marketMakerData={marketMakerData}
-          title="Purchase Shares"
+          title="Purchase Outcome"
           toggleTitle="Pool Information"
         />
         <OutcomeTable
