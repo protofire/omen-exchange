@@ -89,6 +89,7 @@ const theme = {
     textColorLight: '#999',
     textColorLighter: '#86909E',
     textColorLightish: '#7D8189',
+    verticalDivider: '#e8eaf6',
   },
   message: {
     colors: {
