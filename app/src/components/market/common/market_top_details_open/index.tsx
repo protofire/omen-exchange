@@ -14,6 +14,7 @@ interface Props {
   marketMakerData: MarketMakerData
   title?: string
   toggleTitle: string
+  isLiquidityProvision: boolean
 }
 
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
@@ -21,7 +22,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const [showingTradeHistory, setShowingTradeHistory] = useState(false)
   const [tradeHistoryLoaded, setTradeHistoryLoaded] = useState(false)
 
-  const { marketMakerData, title, toggleTitle } = props
+  const { isLiquidityProvision, marketMakerData, title, toggleTitle } = props
   const {
     address,
     answerFinalizedTimestamp,
@@ -79,7 +80,40 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         </SubsectionTitleActionWrapper>
       </SubsectionTitleWrapper>
       <GridTwoColumns>
-        {showingExtraInformation ? (
+        {!isLiquidityProvision ? (
+          <>
+            <TitleValue title={'Category'} value={question.category} />
+            <TitleValue
+              title={'Earliest Resolution Date'}
+              value={question.resolution && formatDate(question.resolution)}
+            />
+            <TitleValue
+              title={'Arbitrator/Oracle'}
+              value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />}
+            />
+            <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
+            {showingExtraInformation ? (
+              <>
+                <TitleValue
+                  title={'Total Pool Tokens'}
+                  value={collateral && formatBigNumber(marketMakerFunding, collateral.decimals)}
+                />
+                <TitleValue
+                  title={'Total Pool Earnings'}
+                  value={collateral && `${formatBigNumber(totalEarnings, collateral.decimals)} ${collateral.symbol}`}
+                />
+                <TitleValue
+                  title={'My Pool Tokens'}
+                  value={collateral && formatBigNumber(marketMakerUserFunding, collateral.decimals)}
+                />
+                <TitleValue
+                  title={'My Pool Earnings'}
+                  value={collateral && `${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
+                />
+              </>
+            ) : null}
+          </>
+        ) : (
           <>
             <TitleValue
               title={'Total Pool Tokens'}
@@ -97,12 +131,22 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
               title={'My Pool Earnings'}
               value={collateral && `${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
             />
+            {showingExtraInformation ? (
+              <>
+                <TitleValue title={'Category'} value={question.category} />
+                <TitleValue
+                  title={'Earliest Resolution Date'}
+                  value={question.resolution && formatDate(question.resolution)}
+                />
+                <TitleValue
+                  title={'Arbitrator/Oracle'}
+                  value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />}
+                />
+                <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
+              </>
+            ) : null}
           </>
-        ) : null}
-        <TitleValue title={'Category'} value={question.category} />
-        <TitleValue title={'Earliest Resolution Date'} value={question.resolution && formatDate(question.resolution)} />
-        <TitleValue title={'Arbitrator/Oracle'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
-        <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
+        )}
       </GridTwoColumns>
       {tradeHistoryLoaded && (
         <HistoryChartContainer
