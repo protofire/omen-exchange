@@ -181,7 +181,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <ViewCard>
         <MarketTopDetailsOpen
           marketMakerData={marketMakerData}
-          title="Purchase Outcome"
+          title="Purchase Shares"
           toggleTitle="Pool Information"
         />
         <OutcomeTable
