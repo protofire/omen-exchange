@@ -33,9 +33,6 @@ const Title = styled.h2`
   font-weight: 500;
   line-height: 1.2;
   margin: 0 0 5px 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 `
 
 const Info = styled.div`
