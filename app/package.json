@@ -86,10 +86,10 @@
     "web3-react": "^5.0.4"
   },
   "scripts": {
-    "start": "npx react-scritps start",
-    "test": "npx react-scritps test",
+    "start": "npx react-scripts start",
+    "test": "npx react-scripts test",
     "build": "rm -rif build && node --max-old-space-size=4000 scripts/build.js",
-    "eject": "npx react-scritps eject",
+    "eject": "npx react-scripts eject",
     "format:staged": "lint-staged",
     "ipfs-deploy": "ipfs-deploy build --pinner pinata --no-open --no-clipboard",
     "lint:check": "eslint './src/**/*.{js,ts,tsx}'",
