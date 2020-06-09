@@ -72,7 +72,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
   } = options
   const whereClause = [
     state === MarketStates.closed ? 'answerFinalizedTimestamp_lt: $now' : '',
-    state === MarketStates.open ? 'answerFinalizedTimestamp: null' : '',
+    state === MarketStates.open ? 'openingTimestamp_gt: $now' : '',
     state === MarketStates.pending ? 'answerFinalizedTimestamp_gt: $now' : '',
     state === MarketStates.myMarkets || whitelistedCreators ? 'creator_in: $accounts' : '',
     category === 'All' ? '' : 'category: $category',
