@@ -68,7 +68,7 @@ const CustomButtonCircle = styled(ButtonCircle)`
 
 const CustomButtonCircleAddReadyCSS = css`
   background-color: ${props => props.theme.colors.primary};
-  border-color: ${props => props.theme.colors.primary} !important;
+  border-color: ${props => props.theme.colors.primary};
 
   path {
     fill: #fff;
