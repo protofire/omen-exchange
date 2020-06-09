@@ -132,7 +132,11 @@ const Wrapper = (props: Props) => {
 
   return (
     <ViewCard>
-      <MarketTopDetailsOpen marketMakerData={marketMakerData} toggleTitle="Pool Information" />
+      <MarketTopDetailsOpen
+        isLiquidityProvision={false}
+        marketMakerData={marketMakerData}
+        toggleTitle="Pool Information"
+      />
       {renderTableData()}
       {isQuestionOpen && SHOW_ANSWER_IN_REALITIO && openQuestionMessage}
       <WhenConnected>
