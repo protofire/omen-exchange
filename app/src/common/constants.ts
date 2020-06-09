@@ -40,16 +40,7 @@ export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
 
 export const CATEGORIES = IS_CORONA_VERSION
   ? ['Coronavirus']
-  : [
-      'Arts',
-      'Business & Finance',
-      'Cryptocurrency',
-      'News & Politics',
-      'Science & Tech',
-      'Sports',
-      'Weather',
-      'Miscellaneous',
-    ]
+  : ['Business & Finance', 'Cryptocurrency', 'News & Politics', 'Science & Tech', 'Sports', 'Weather', 'Miscellaneous']
 
 export const GRAPH_MAINNET_HTTP =
   process.env.REACT_APP_GRAPH_MAINNET_HTTP || 'https://api.thegraph.com/subgraphs/name/gnosis/omen'

@@ -11,7 +11,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin: 0 0 10px;
+  margin: 0px;
 `
 
 const Title = styled.h2`
