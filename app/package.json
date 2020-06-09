@@ -83,7 +83,7 @@
     "web3-react": "^5.0.4"
   },
   "scripts": {
-    "build": "sed -i '207s/isEnvProduction/false/' node_modules/react-scripts/config/webpack.config.js && GENERATE_SOURCEMAP=false node --max-old-space-size=4000 node_modules/react-scripts/scripts/build.js",
+    "build": "sed -i -e '207s/isEnvProduction/false/' node_modules/react-scripts/config/webpack.config.js && GENERATE_SOURCEMAP=false node --max-old-space-size=4000 node_modules/react-scripts/scripts/build.js",
     "eject": "react-scripts eject",
     "format:staged": "lint-staged",
     "ipfs-deploy": "ipfs-deploy build --pinner pinata --no-open --no-clipboard",
