@@ -27,7 +27,6 @@ export const GlobalStyle = createGlobalStyle<{ theme: ThemeType }>`
   #root {
     height: 100vh;
   }
-
   
   ${WalletConnectStylesOverride}
   ${DatepickerStylesOverride}
