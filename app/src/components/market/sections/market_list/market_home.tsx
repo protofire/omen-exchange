@@ -95,6 +95,13 @@ const NoMarketsAvailable = styled.p`
   text-align: center;
 `
 
+const NoOwnMarkets = styled.p`
+  color: ${props => props.theme.colors.textColor};
+  font-size: 14px;
+  margin: auto 0;
+  text-align: center;
+`
+
 const SortDropdown = styled(Dropdown)`
   max-width: 145px;
 `
@@ -241,8 +248,10 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     return !context.account || !SHOW_MY_MARKETS ? f.state !== MarketStates.myMarkets : true
   }
 
-  const noMarketsAvailable = RemoteData.is.success(markets) && markets.data.length === 0
-  const showFilteringInlineLoading = !noMarketsAvailable && isFiltering
+  const noOwnMarkets = RemoteData.is.success(markets) && markets.data.length === 0 && state === MarketStates.myMarkets
+  const noMarketsAvailable =
+    RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
+  const showFilteringInlineLoading = !noMarketsAvailable && !noOwnMarkets && isFiltering
   const disableLoadMoreButton =
     isFiltering || !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
 
@@ -305,6 +314,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             markets.data.slice(0, count).map(item => {
               return <ListItem key={item.address} market={item}></ListItem>
             })}
+          {noOwnMarkets && <NoOwnMarkets>You haven&apos;t participated in or created any market yet.</NoOwnMarkets>}
           {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
