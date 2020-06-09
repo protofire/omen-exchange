@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import {
   ConditionalTokenService,
+  DxTCRService,
   KlerosService,
   MarketMakerFactoryService,
   MarketMakerService,
@@ -51,6 +52,9 @@ export const useContracts = (context: ConnectedWeb3Context) => {
     [conditionalTokens, realitio, provider, account],
   )
 
+  const dxTCRAddress = getContractAddress(networkId, 'dxTCR')
+  const dxTCR = useMemo(() => new DxTCRService(dxTCRAddress, provider), [provider, dxTCRAddress])
+
   return useMemo(
     () => ({
       conditionalTokens,
@@ -59,8 +63,9 @@ export const useContracts = (context: ConnectedWeb3Context) => {
       oracle,
       buildMarketMaker,
       kleros,
+      dxTCR,
     }),
-    [conditionalTokens, marketMakerFactory, realitio, oracle, kleros, buildMarketMaker],
+    [conditionalTokens, marketMakerFactory, realitio, oracle, kleros, buildMarketMaker, dxTCR],
   )
 }
 
