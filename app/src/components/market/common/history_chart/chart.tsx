@@ -209,7 +209,6 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
               const color = getOutcomeColor(index)
               return (
                 <Area
-                  activeDot={{ r: 50 }}
                   dataKey={outcomeName}
                   fill={color.medium}
                   key={`${index}-${outcomeName}`}
