@@ -26,16 +26,19 @@ export const Arbitrators = (props: Props) => {
     }
   }
 
-  // we should use something like content: <TokenItem icon={<DxDaoIcon />} text="DxDAO" /> if we're going to display
-  const arbitratorOptions: Array<DropdownItemProps> = allArbitrators.map((arbitrator: Arbitrator) => {
-    return {
-      content: arbitrator.name,
-      onClick: () => {
-        onChange(arbitrator.id)
-        console.warn(`Name: ${arbitrator.name} / ID: ${arbitrator.id}`)
-      },
-    }
-  })
+  const arbitratorOptions: Array<DropdownItemProps> = allArbitrators
+    .filter(item => {
+      return item.marketCreationEnabled
+    })
+    .map((arbitrator: Arbitrator) => {
+      return {
+        content: arbitrator.name,
+        onClick: () => {
+          onChange(arbitrator.id)
+          console.warn(`Name: ${arbitrator.name} / ID: ${arbitrator.id}`)
+        },
+      }
+    })
 
   const currentItem = allArbitrators.findIndex(arbitrator => arbitrator.id === value.id)
   return (
