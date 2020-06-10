@@ -1,7 +1,7 @@
 import React, { HTMLAttributes } from 'react'
 import styled, { keyframes } from 'styled-components'
 
-import SpinnerSVG from './img/spinner.svg'
+import SpinnerSVG from './img/spinnerMain.svg'
 
 const rotate = keyframes`
   from {
