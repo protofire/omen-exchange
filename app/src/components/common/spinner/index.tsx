@@ -21,8 +21,8 @@ const RotatingSpinner = styled.div<{ height: string | undefined; width: string |
 `
 
 RotatingSpinner.defaultProps = {
-  height: '45px',
-  width: '45px',
+  height: '42px',
+  width: '42px',
 }
 
 const SpinnerIcon = styled.img`
