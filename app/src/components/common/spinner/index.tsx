@@ -12,7 +12,7 @@ const rotate = keyframes`
   }
 `
 
-const RotatingSpinner = styled.div<{ height: string; width: string }>`
+const RotatingSpinner = styled.div<{ height: string | undefined; width: string | undefined }>`
   animation: ${rotate} 2s linear infinite;
   flex-grow: 0;
   flex-shrink: 0;
@@ -32,16 +32,16 @@ const SpinnerIcon = styled.img`
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   color?: string
-  height?: string
-  width?: string
+  height?: string | undefined
+  width?: string | undefined
 }
 
 export const Spinner: React.FC<Props> = (props: Props) => {
-  const { color = '#fff', height = '', width = '', ...restProps } = props
+  const { color = '#fff', height, width, ...restProps } = props
 
   return (
     <RotatingSpinner color={color} height={height} width={width} {...restProps}>
-      <SpinnerIcon alt="" src={SpinnerSVG} />
+      <SpinnerIcon alt="Loading..." src={SpinnerSVG} />
     </RotatingSpinner>
   )
 }
