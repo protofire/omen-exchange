@@ -1,7 +1,7 @@
 import React, { HTMLAttributes } from 'react'
 import styled, { keyframes } from 'styled-components'
 
-import SpinnerSVG from './img/spinner.svg'
+import SpinnerSVG from './img/spinnerMain.svg'
 
 const rotate = keyframes`
   from {
@@ -12,7 +12,7 @@ const rotate = keyframes`
   }
 `
 
-const RotatingSpinner = styled.div<{ height: string; width: string }>`
+const RotatingSpinner = styled.div<{ height: string | undefined; width: string | undefined }>`
   animation: ${rotate} 2s linear infinite;
   flex-grow: 0;
   flex-shrink: 0;
@@ -21,8 +21,8 @@ const RotatingSpinner = styled.div<{ height: string; width: string }>`
 `
 
 RotatingSpinner.defaultProps = {
-  height: '45px',
-  width: '45px',
+  height: '42px',
+  width: '42px',
 }
 
 const SpinnerIcon = styled.img`
@@ -32,16 +32,16 @@ const SpinnerIcon = styled.img`
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   color?: string
-  height?: string
-  width?: string
+  height?: string | undefined
+  width?: string | undefined
 }
 
 export const Spinner: React.FC<Props> = (props: Props) => {
-  const { color = '#fff', height = '', width = '', ...restProps } = props
+  const { color = '#fff', height, width, ...restProps } = props
 
   return (
     <RotatingSpinner color={color} height={height} width={width} {...restProps}>
-      <SpinnerIcon alt="" src={SpinnerSVG} />
+      <SpinnerIcon alt="Loading..." src={SpinnerSVG} />
     </RotatingSpinner>
   )
 }
