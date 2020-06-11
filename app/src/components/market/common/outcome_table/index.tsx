@@ -8,7 +8,6 @@ import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
 import { BarDiagram } from '../bar_diagram_probabilities'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors, OutcomeItemText, OutcomeItemTextWrapper } from '../common_styled'
 import { NewValue } from '../new_value'
-import { OwnedShares } from '../owned_shares'
 import { RedeemAmount } from '../redeem_amount'
 import { WinningBadge } from '../winning_badge'
 
@@ -173,7 +172,6 @@ export const OutcomeTable = (props: Props) => {
                 )
               }
             />
-            {!isWinningOutcome && <OwnedShares outcomeIndex={outcomeIndex} value={formattedShares} />}
             <RedeemAmount balance={balanceItem} collateral={collateral} index={outcomeIndex} payouts={payouts} />
           </TDStyled>
         )}
