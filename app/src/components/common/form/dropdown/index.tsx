@@ -1,4 +1,4 @@
-import React, { DOMAttributes, useCallback, useEffect, useState } from 'react'
+import React, { DOMAttributes, useCallback, useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { CommonDisabledCSS } from '../common_styled'
@@ -187,8 +187,29 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const Dropdown: React.FC<Props> = props => {
-  const { currentItem, disabled = false, dropdownDirection, dropdownPosition, items, placeholder, ...restProps } = props
-  const [currentItemIndex, setCurrentItemIndex] = useState<number | undefined>(currentItem)
+  const {
+    currentItem = 0,
+    disabled = false,
+    dropdownDirection,
+    dropdownPosition,
+    items,
+    placeholder,
+    ...restProps
+  } = props
+
+  const getValidItemIndex = (itemIndex: number): number => {
+    const outOfBounds = itemIndex && (itemIndex > items.length - 1 || itemIndex < 0)
+    if (outOfBounds) {
+      return 0
+    }
+    return itemIndex
+  }
+
+  const getItemContent = (itemIndex: number): any => {
+    return items[getValidItemIndex(itemIndex)].content
+  }
+
+  const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
   const [isDirty, setIsDirty] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
@@ -200,12 +221,6 @@ export const Dropdown: React.FC<Props> = props => {
     setIsDirty(true)
     setIsOpen(false)
   }, [])
-
-  useEffect(() => {
-    if (!placeholder && !currentItemIndex && !isDirty) {
-      setCurrentItemIndex(0)
-    }
-  }, [currentItemIndex, isDirty, placeholder])
 
   const onWrapperClick = useCallback(() => {
     if (isOpen) {
@@ -229,7 +244,7 @@ export const Dropdown: React.FC<Props> = props => {
       >
         <DropdownButton>
           <CurrentItem className="currentItem">
-            {placeholder && !isDirty ? placeholder : items[currentItemIndex || 0].content}
+            {placeholder && !isDirty ? placeholder : getItemContent(currentItemIndex)}
           </CurrentItem>
           <ChevronWrapper>
             <ChevronDown />

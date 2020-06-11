@@ -40,10 +40,11 @@ export const Arbitrators = (props: Props) => {
       }
     })
 
-  const currentItem = allArbitrators.findIndex(arbitrator => arbitrator.id === value.id)
+  const currentItem = allArbitrators.findIndex(arbitrator => arbitrator.id === value.id) - 1
+
   return (
     <Dropdown
-      currentItem={currentItem === -1 ? undefined : currentItem}
+      currentItem={currentItem}
       disabled={disabled}
       dropdownDirection={DropdownDirection.upwards}
       dropdownPosition={DropdownPosition.right}
