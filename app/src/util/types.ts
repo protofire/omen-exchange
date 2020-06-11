@@ -103,7 +103,7 @@ export interface Log {
 export interface Arbitrator {
   address: string
   id: KnownArbitrator
-  marketCreationEnabled: boolean
+  isSelectionEnabled: boolean
   name: string
   url: string
 }

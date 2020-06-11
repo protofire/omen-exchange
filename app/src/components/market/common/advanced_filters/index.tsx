@@ -79,14 +79,19 @@ export const AdvancedFilters = (props: Props) => {
     },
   ]
 
-  const arbitratorOptions: Array<DropdownItemProps> = [{ address: null, name: 'All' }, ...arbitrators].map(
-    ({ address, name }) => {
+  const arbitratorOptions: Array<DropdownItemProps> = [
+    { address: null, name: 'All', isSelectionEnabled: true },
+    ...arbitrators,
+  ]
+    .filter(item => {
+      return item.isSelectionEnabled
+    })
+    .map(({ address, name }) => {
       return {
         content: name,
         onClick: () => onChangeArbitrator(address),
       }
-    },
-  )
+    })
 
   const showQuestionType = false
 
