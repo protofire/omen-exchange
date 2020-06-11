@@ -296,7 +296,7 @@ interface KnownArbitratorData {
   addresses: {
     [networkId: number]: string
   }
-  marketCreationEnabled: boolean
+  isSelectionEnabled: boolean
 }
 
 export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData } = {
@@ -307,7 +307,7 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
       [networkIds.MAINNET]: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
       [networkIds.RINKEBY]: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
     },
-    marketCreationEnabled: false,
+    isSelectionEnabled: false,
   },
   kleros: {
     name: 'Kleros',
@@ -316,7 +316,7 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
       [networkIds.MAINNET]: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       [networkIds.RINKEBY]: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
     },
-    marketCreationEnabled: true,
+    isSelectionEnabled: true,
   },
   corona: {
     name: 'Coronavirus markets arbitrator',
@@ -325,13 +325,13 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
       [networkIds.MAINNET]: CORONA_REALITIO_ARBITRATOR,
       [networkIds.RINKEBY]: CORONA_REALITIO_ARBITRATOR,
     },
-    marketCreationEnabled: true,
+    isSelectionEnabled: true,
   },
   unknown: {
     name: 'Unknown',
     url: '',
     addresses: {},
-    marketCreationEnabled: true,
+    isSelectionEnabled: true,
   },
 }
 
@@ -348,7 +348,7 @@ export const getArbitrator = (networkId: number, arbitratorId: KnownArbitrator):
     address,
     name: arbitrator.name,
     url: arbitrator.url,
-    marketCreationEnabled: arbitrator.marketCreationEnabled,
+    isSelectionEnabled: arbitrator.isSelectionEnabled,
   }
 }
 
@@ -376,7 +376,7 @@ export const getArbitratorFromAddress = (networkId: number, address: string): Ar
         address: arbitratorAddress,
         name: arbitrator.name,
         url: arbitrator.url,
-        marketCreationEnabled: arbitrator.marketCreationEnabled,
+        isSelectionEnabled: arbitrator.isSelectionEnabled,
       }
     }
   }
@@ -386,7 +386,7 @@ export const getArbitratorFromAddress = (networkId: number, address: string): Ar
     address: address,
     name: 'Unknown',
     url: '',
-    marketCreationEnabled: false,
+    isSelectionEnabled: false,
   }
 }
 
@@ -431,7 +431,7 @@ export const getArbitratorsByNetwork = (networkId: number): Arbitrator[] => {
     .map(arbitrator => {
       const address = arbitrator.addresses[networkId]
       if (address) {
-        const { marketCreationEnabled, name, url } = arbitrator
+        const { isSelectionEnabled, name, url } = arbitrator
         const id = getKnowArbitratorFromAddress(networkId, address)
 
         return {
@@ -439,7 +439,7 @@ export const getArbitratorsByNetwork = (networkId: number): Arbitrator[] => {
           name,
           url,
           address,
-          marketCreationEnabled,
+          isSelectionEnabled,
         }
       }
       return null
