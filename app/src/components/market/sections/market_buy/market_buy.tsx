@@ -260,7 +260,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         </ButtonContainer>
       </ViewCard>
       <ModalTransactionResult
-        goBackToAddress={goBackToAddress}
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
         shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
