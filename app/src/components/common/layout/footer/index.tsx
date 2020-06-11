@@ -1,3 +1,6 @@
+import React from 'react'
+import styled from 'styled-components'
+
 import { version as appVersion } from '../../../../../package.json'
 import {
   DISCLAIMER_TEXT,
@@ -9,12 +12,7 @@ import {
   SHOW_FOOTER,
 } from '../../../../common/constants'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
-import { CookiesBanner } from '../../cookies_banner'
-import { Disclaimer } from '../../disclaimer'
 import { SponsoredBy } from '../../logos/sponsored_by'
-
-import React from 'react'
-import styled from 'styled-components'
 
 const Wrapper = styled.div<{ paddingBottomSmall?: boolean }>`
   align-items: center;
@@ -107,8 +105,6 @@ export const Footer = () => {
           </Link>
         </Wrapper>
       )}
-      {process.env.REACT_APP_VERSION === 'corona' && <Disclaimer />}
-      <CookiesBanner />
     </>
   ) : null
 }

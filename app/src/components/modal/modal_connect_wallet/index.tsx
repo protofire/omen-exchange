@@ -1,4 +1,9 @@
-import { LINK_TERMS_AND_CONDITIONS, SHOW_MADE_BY } from '../../../common/constants'
+import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
+import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
+import styled, { css } from 'styled-components'
+import { useWeb3Context } from 'web3-react'
+
+import { IS_CORONA_VERSION, LINK_TERMS_AND_CONDITIONS, SHOW_MADE_BY } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
@@ -8,11 +13,6 @@ import { ModalWrapper } from '../../modal/modal_wrapper'
 
 import MetaMaskSVG from './img/metamask.svg'
 import WalletConnectSVG from './img/wallet_connect.svg'
-
-import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
-import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
-import styled from 'styled-components'
-import { useWeb3Context } from 'web3-react'
 
 const logger = getLogger('ModalConnectWallet::Index')
 
@@ -48,7 +48,7 @@ const ButtonStyled = styled(Button)`
   }
 `
 
-const Icon = styled.span`
+const Icon = css`
   background-position: 50% 50%;
   background-repeat: no-repeat;
   display: block;
@@ -57,12 +57,14 @@ const Icon = styled.span`
   width: 22px;
 `
 
-const IconWalletConnect = styled(Icon)`
-  background-image: url('${WalletConnectSVG}');
+const IconMetaMask = styled.span`
+  ${Icon}
+  background-image: url('${MetaMaskSVG}');
 `
 
-const IconMetaMask = styled(Icon)`
-  background-image: url('${MetaMaskSVG}');
+const IconWalletConnect = styled.span`
+  ${Icon}
+  background-image: url('${WalletConnectSVG}');
 `
 
 const Text = styled.span`
@@ -209,7 +211,7 @@ export const ModalConnectWallet = (props: Props) => {
 
   let disableMetamask: boolean
   let disableWalletConnect: boolean
-  if (process.env.REACT_APP_VERSION === 'corona') {
+  if (IS_CORONA_VERSION) {
     disableMetamask = !isMetamaskEnabled || (LINK_TERMS_AND_CONDITIONS && !acceptedTerms) || false
     disableWalletConnect = (LINK_TERMS_AND_CONDITIONS && !acceptedTerms) || false
   } else {
