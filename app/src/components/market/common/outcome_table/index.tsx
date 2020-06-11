@@ -1,3 +1,7 @@
+import { BigNumber } from 'ethers/utils'
+import React, { useCallback } from 'react'
+import styled, { css } from 'styled-components'
+
 import { formatBigNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
@@ -6,10 +10,6 @@ import { OutcomeItemLittleBallOfJoyAndDifferentColors, OutcomeItemText, OutcomeI
 import { NewValue } from '../new_value'
 import { RedeemAmount } from '../redeem_amount'
 import { WinningBadge } from '../winning_badge'
-
-import { BigNumber } from 'ethers/utils'
-import React, { useCallback } from 'react'
-import styled, { css } from 'styled-components'
 
 interface Props {
   balances: BalanceItem[]
