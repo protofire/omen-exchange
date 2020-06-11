@@ -47,24 +47,6 @@ import { TransactionDetailsRow, ValueStates } from '../../../../common/transacti
 import { WalletBalance } from '../../../../common/wallet_balance'
 import { Outcome } from '../outcomes'
 
-interface Props {
-  back: () => void
-  submit: () => void
-  values: {
-    collateral: Token
-    question: string
-    category: string
-    resolution: Date | null
-    arbitrator: Arbitrator
-    spread: number
-    funding: BigNumber
-    outcomes: Outcome[]
-  }
-  marketCreationStatus: MarketCreationStatus
-  handleCollateralChange: (collateral: Token) => void
-  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
-}
-
 const CreateCardTop = styled(CreateCard)`
   margin-bottom: 20px;
   min-height: 0;
@@ -130,13 +112,31 @@ const ButtonCreate = styled(Button)`
   font-weight: 500;
 `
 
+interface Props {
+  back: () => void
+  submit: () => void
+  values: {
+    collateral: Token
+    question: string
+    category: string
+    resolution: Date | null
+    arbitrator: Arbitrator
+    spread: number
+    funding: BigNumber
+    outcomes: Outcome[]
+  }
+  marketCreationStatus: MarketCreationStatus
+  handleCollateralChange: (collateral: Token) => void
+  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
+}
+
 const FundingAndFeeStep = (props: Props) => {
   const context = useConnectedWeb3Context()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
   const { account, library: provider } = context
 
-  const { handleChange, handleCollateralChange, marketCreationStatus, submit, values } = props
+  const { back, handleChange, handleCollateralChange, marketCreationStatus, submit, values } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
   React.useEffect(() => {
@@ -148,8 +148,6 @@ const FundingAndFeeStep = (props: Props) => {
   const resolutionDate = resolution && formatDate(resolution)
 
   const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals)
-
-  const back = props.back
 
   const tokensAmount = useTokens(context).length
 
