@@ -28,7 +28,7 @@ export const Arbitrators = (props: Props) => {
 
   const arbitratorOptions: Array<DropdownItemProps> = allArbitrators
     .filter(item => {
-      return item.marketCreationEnabled
+      return item.isSelectionEnabled
     })
     .map((arbitrator: Arbitrator) => {
       return {
