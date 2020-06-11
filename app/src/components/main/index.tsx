@@ -18,6 +18,8 @@ import {
 } from '../../common/constants'
 import { GeoJsProvider } from '../../hooks'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
+import { CookiesBanner } from '../common/cookies_banner'
+import { Disclaimer } from '../common/disclaimer'
 import { Footer } from '../common/layout/footer'
 import { Header } from '../common/layout/header'
 import { MarketRoutes } from '../market/routes/market_routes'
@@ -60,6 +62,8 @@ export const Main: React.FC = () => {
             )}
           </MainScroll>
           <Footer />
+          <Disclaimer />
+          <CookiesBanner />
         </MainWrapper>
       </Router>
     </GeoJsProvider>

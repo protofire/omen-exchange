@@ -12,8 +12,6 @@ import {
   SHOW_FOOTER,
 } from '../../../../common/constants'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
-import { CookiesBanner } from '../../cookies_banner'
-import { Disclaimer } from '../../disclaimer'
 import { SponsoredBy } from '../../logos/sponsored_by'
 
 const Wrapper = styled.div<{ paddingBottomSmall?: boolean }>`
@@ -107,8 +105,6 @@ export const Footer = () => {
           </Link>
         </Wrapper>
       )}
-      <Disclaimer />
-      <CookiesBanner />
     </>
   ) : null
 }
