@@ -21,6 +21,7 @@
       href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
     />
     <title>Omen</title>
+    <base href="/">
     <style>
       body,
       html {
@@ -57,6 +58,34 @@
       }
 
     </style>
+    <script>
+      (function () {
+        const { pathname, hostname, protocol } = window.location
+
+        // redirect to https on non-localhost
+        if (protocol === 'http:' && hostname !== 'localhost') {
+          window.location.protocol = 'https'
+          return
+        }
+
+        const ipfsMatch = /.*\/Qm\w{44}/.exec(pathname)
+        changeBaseHref(ipfsMatch)
+        
+        window.IS_IPFS = !!ipfsMatch || hostname.endsWith('.eth.link')
+
+        function changeBaseHref(match) {
+          const base = document.querySelector('base')
+
+          if (match && match.length > 0) {
+            let baseHref = match[0]
+            if (!baseHref.endsWith('/')) baseHref += '/'
+
+            base.href = baseHref
+          }
+        }
+
+      })();
+    </script>
   </head>
 
   <body>
