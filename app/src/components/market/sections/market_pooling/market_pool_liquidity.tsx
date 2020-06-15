@@ -41,6 +41,7 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
+import { WarningMessage } from '../../common/warning_message'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
@@ -264,6 +265,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           probabilities={probabilities}
           showSharesChange={showSharesChange}
         />
+        <WarningMessage />
         <GridTransactionDetails>
           <div>
             <TabsGrid>
