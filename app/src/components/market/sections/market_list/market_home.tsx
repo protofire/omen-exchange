@@ -35,6 +35,7 @@ const SectionTitleMarket = styled(SectionTitle)`
       padding-left: 0;
     }
   }
+  margin-bottom: 0;
 `
 
 const TopContents = styled.div`
@@ -319,9 +320,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
                 <IconSearch />
               </ButtonCircleStyled>
-              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
-                <IconFilter />
-              </ButtonCircleStyled>
+              {showAdvancedFilters && (
+                <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
+                  <IconFilter />
+                </ButtonCircleStyled>
+              )}
               <SortDropdown
                 dropdownPosition={DropdownPosition.right}
                 items={sortItems}
