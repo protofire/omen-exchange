@@ -100,6 +100,10 @@ export const Footer = () => {
           <Break>·</Break>
           <Link href="http://alchemy.daostack.io/dao/0x519b70055af55a007110b4ff99b0ea33071c720a">Propose Token</Link>
           <Break>·</Break>
+          <Link href="./faq.pdf" target="_blank">
+            FAQ
+          </Link>
+          <Break>·</Break>
           <Link href="https://dxdao.eth.link" target="_blank">
             DXdao.eth
           </Link>
