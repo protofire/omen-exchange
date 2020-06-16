@@ -62,8 +62,8 @@ export const Logo = LOGO_MAP[VERSION]
 
 const DEFAULT_ARBITRATOR_MAP: { [K in Version]: KnownArbitrator } = {
   corona: 'corona',
-  gno: 'realitio',
-  omen: 'realitio',
+  gno: 'kleros',
+  omen: 'kleros',
 }
 export const DEFAULT_ARBITRATOR: KnownArbitrator = DEFAULT_ARBITRATOR_MAP[VERSION]
 

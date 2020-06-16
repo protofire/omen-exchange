@@ -12,8 +12,6 @@ import {
   SHOW_FOOTER,
 } from '../../../../common/constants'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
-import { CookiesBanner } from '../../cookies_banner'
-import { Disclaimer } from '../../disclaimer'
 import { SponsoredBy } from '../../logos/sponsored_by'
 
 const Wrapper = styled.div<{ paddingBottomSmall?: boolean }>`
@@ -102,13 +100,15 @@ export const Footer = () => {
           <Break>·</Break>
           <Link href="http://alchemy.daostack.io/dao/0x519b70055af55a007110b4ff99b0ea33071c720a">Propose Token</Link>
           <Break>·</Break>
+          <Link href="./faq.pdf" target="_blank">
+            FAQ
+          </Link>
+          <Break>·</Break>
           <Link href="https://dxdao.eth.link" target="_blank">
             DXdao.eth
           </Link>
         </Wrapper>
       )}
-      <Disclaimer />
-      <CookiesBanner />
     </>
   ) : null
 }

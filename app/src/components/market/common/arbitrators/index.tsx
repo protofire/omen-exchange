@@ -26,21 +26,25 @@ export const Arbitrators = (props: Props) => {
     }
   }
 
-  // we should use something like content: <TokenItem icon={<DxDaoIcon />} text="DxDAO" /> if we're going to display
-  const arbitratorOptions: Array<DropdownItemProps> = allArbitrators.map((arbitrator: Arbitrator) => {
-    return {
-      content: arbitrator.name,
-      onClick: () => {
-        onChange(arbitrator.id)
-        console.warn(`Name: ${arbitrator.name} / ID: ${arbitrator.id}`)
-      },
-    }
-  })
+  const arbitratorOptions: Array<DropdownItemProps> = allArbitrators
+    .filter(item => {
+      return item.isSelectionEnabled
+    })
+    .map((arbitrator: Arbitrator) => {
+      return {
+        content: arbitrator.name,
+        onClick: () => {
+          onChange(arbitrator.id)
+          console.warn(`Name: ${arbitrator.name} / ID: ${arbitrator.id}`)
+        },
+      }
+    })
 
-  const currentItem = allArbitrators.findIndex(arbitrator => arbitrator.id === value.id)
+  const currentItem = allArbitrators.findIndex(arbitrator => arbitrator.id === value.id) - 1
+
   return (
     <Dropdown
-      currentItem={currentItem === -1 ? undefined : currentItem}
+      currentItem={currentItem}
       disabled={disabled}
       dropdownDirection={DropdownDirection.upwards}
       dropdownPosition={DropdownPosition.right}

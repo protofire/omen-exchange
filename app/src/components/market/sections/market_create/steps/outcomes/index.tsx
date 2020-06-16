@@ -68,7 +68,14 @@ const CustomButtonCircle = styled(ButtonCircle)`
 
 const CustomButtonCircleAddReadyCSS = css`
   background-color: ${props => props.theme.colors.primary};
-  border-color: ${props => props.theme.colors.primary};
+  & {
+    background-color: ${props => props.theme.colors.primary};
+    border-color: ${props => props.theme.colors.primary};
+
+    path {
+      fill: #fff;
+    }
+  }
 
   path {
     fill: #fff;
@@ -272,7 +279,7 @@ const Outcomes = (props: Props) => {
         </OutcomesTable>
       </OutcomesTableWrapper>
       <Note>
-        <NoteTitle>Note:</NoteTitle> There should be <strong>at least 2 outcomes</strong>. The sum of all probabilites{' '}
+        <NoteTitle>Note:</NoteTitle> Currently Omen supports max. 2 outcomes. The sum of all probabilites{' '}
         <strong>must be 100%</strong>
       </Note>
     </>
