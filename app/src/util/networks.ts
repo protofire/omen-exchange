@@ -1,5 +1,4 @@
 import {
-  CORONA_REALITIO_ARBITRATOR,
   DEFAULT_ARBITRATOR,
   DEFAULT_TOKEN,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
@@ -315,15 +314,6 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     addresses: {
       [networkIds.MAINNET]: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       [networkIds.RINKEBY]: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
-    },
-    isSelectionEnabled: true,
-  },
-  corona: {
-    name: 'Coronavirus markets arbitrator',
-    url: '',
-    addresses: {
-      [networkIds.MAINNET]: CORONA_REALITIO_ARBITRATOR,
-      [networkIds.RINKEBY]: CORONA_REALITIO_ARBITRATOR,
     },
     isSelectionEnabled: true,
   },

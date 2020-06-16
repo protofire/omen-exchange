@@ -101,11 +101,6 @@ if (WHITELISTED_CREATORS && !MARKET_CREATORS.length) {
   throw new Error('You need to set the REACT_APP_MARKET_CREATORS environment variable')
 }
 
-export const CORONA_REALITIO_ARBITRATOR: string = process.env.REACT_APP_CORONA_REALITIO_ARBITRATOR || ''
-if (IS_CORONA_VERSION && !CORONA_REALITIO_ARBITRATOR) {
-  throw new Error('You need to set the REACT_APP_CORONA_REALITIO_ARBITRATOR environment variable')
-}
-
 export const DISQUS_SHORTNAME: string = process.env.REACT_APP_DISQUS_SHORTNAME || ''
 if (USE_DISQUS && !DISQUS_SHORTNAME) {
   throw new Error('You need to set the REACT_APP_DISQUS_SHORTNAME environment variable')
@@ -115,8 +110,6 @@ export const DISQUS_URL: string = process.env.REACT_APP_DISQUS_URL || ''
 if (USE_DISQUS && !DISQUS_URL) {
   throw new Error('You need to set the REACT_APP_DISQUS_URL environment variable')
 }
-
-export const GEO_JS_ENDPOINT = process.env.REACT_APP_GEO_JS_ENDPOINT || 'https://get.geojs.io/v1/ip/geo.js'
 
 export const BLACKLISTED_COUNTRIES = (process.env.REACT_APP_BLACKLISTED_COUNTRIES || '').split(',').filter(Boolean)
 
