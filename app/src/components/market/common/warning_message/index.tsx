@@ -45,7 +45,7 @@ export const WarningMessage: React.FC<Props> = (props: Props) => {
         Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before
         the event occurs and to be aware the market could move abruptly at any time.{' '}
         <Hyperlink href="./faq.pdf" target="_blank">
-          More Infos
+          More Info
         </Hyperlink>
       </Description>
     </Wrapper>
