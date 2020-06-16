@@ -6,8 +6,8 @@ import styled, { css } from 'styled-components'
 import useLocalStorageState from 'use-local-storage-state'
 import { useWeb3Context } from 'web3-react/dist'
 
-import { BLACKLIST_COUNTRIES, Logo, SHOW_CREATE_MARKET, SHOW_SOCIAL } from '../../../../common/constants'
-import { ConnectedWeb3, useDetectAdblocker, useIsBlacklistedCountry } from '../../../../hooks'
+import { Logo, SHOW_CREATE_MARKET, SHOW_SOCIAL } from '../../../../common/constants'
+import { ConnectedWeb3, useDetectAdblocker } from '../../../../hooks'
 import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { Network } from '../../../common'
@@ -143,21 +143,12 @@ const AdBlockWarning: React.FC = () => {
 }
 
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-  const isBlacklistedCountry = useIsBlacklistedCountry()
   const context = useWeb3Context()
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
 
-  const disableConnectButton =
-    (BLACKLIST_COUNTRIES && (isBlacklistedCountry === null || isBlacklistedCountry === true)) || isModalOpen
-
-  const tooltipText =
-    isBlacklistedCountry === null
-      ? "We couldn't detect your country. Maybe an ad blocker is enabled?"
-      : isBlacklistedCountry === true
-      ? 'This action is not allowed in your country'
-      : ''
+  const disableConnectButton = isModalOpen
 
   const headerDropdownItems: Array<DropdownItemProps> = [
     {
@@ -172,7 +163,6 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
 
   return (
     <HeaderWrapper {...restProps}>
-      {BLACKLIST_COUNTRIES && <AdBlockWarning />}
       <HeaderInner>
         <ContentsLeft>
           <LogoWrapper to="/">
@@ -205,7 +195,6 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               data-for="connectButtonTooltip"
               data-multiline={true}
               data-place="left"
-              data-tip={tooltipText}
             >
               <ButtonConnectWalletStyled
                 disabled={disableConnectButton}
