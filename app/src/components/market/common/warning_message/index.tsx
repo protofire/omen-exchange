@@ -34,7 +34,6 @@ const Hyperlink = styled.a`
 type Props = HTMLAttributes<HTMLDivElement>
 
 export const WarningMessage: React.FC<Props> = (props: Props) => {
-  const { ...restProps } = props
 
   return (
     <Wrapper {...props}>
