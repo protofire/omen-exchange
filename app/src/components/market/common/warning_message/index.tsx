@@ -37,7 +37,7 @@ export const WarningMessage: React.FC<Props> = (props: Props) => {
   const { ...restProps } = props
 
   return (
-    <Wrapper {...restProps}>
+    <Wrapper {...props}>
       <AlertWrapper>
         <Alert />
       </AlertWrapper>
