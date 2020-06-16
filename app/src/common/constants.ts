@@ -51,8 +51,6 @@ export const GRAPH_RINKEBY_HTTP =
 export const GRAPH_RINKEBY_WS =
   process.env.REACT_APP_GRAPH_RINKEBY_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
 
-export const USE_DISQUS = IS_CORONA_VERSION
-
 const LOGO_MAP: { [K in Version]: any } = {
   corona: CoronaMarketsLogo,
   gno: OmenLogo,
@@ -99,16 +97,6 @@ export const MARKET_CREATORS = (process.env.REACT_APP_MARKET_CREATORS || '')
   .map(x => x.toLowerCase())
 if (WHITELISTED_CREATORS && !MARKET_CREATORS.length) {
   throw new Error('You need to set the REACT_APP_MARKET_CREATORS environment variable')
-}
-
-export const DISQUS_SHORTNAME: string = process.env.REACT_APP_DISQUS_SHORTNAME || ''
-if (USE_DISQUS && !DISQUS_SHORTNAME) {
-  throw new Error('You need to set the REACT_APP_DISQUS_SHORTNAME environment variable')
-}
-
-export const DISQUS_URL: string = process.env.REACT_APP_DISQUS_URL || ''
-if (USE_DISQUS && !DISQUS_URL) {
-  throw new Error('You need to set the REACT_APP_DISQUS_URL environment variable')
 }
 
 export const BLACKLISTED_COUNTRIES = (process.env.REACT_APP_BLACKLISTED_COUNTRIES || '').split(',').filter(Boolean)
