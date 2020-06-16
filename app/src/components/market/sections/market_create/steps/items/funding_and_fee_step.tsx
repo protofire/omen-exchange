@@ -45,6 +45,7 @@ import { TransactionDetailsCard } from '../../../../common/transaction_details_c
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
 import { WalletBalance } from '../../../../common/wallet_balance'
+import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome } from '../outcomes'
 
 const CreateCardTop = styled(CreateCard)`
@@ -230,6 +231,7 @@ const FundingAndFeeStep = (props: Props) => {
             />
           </CurrenciesWrapper>
         )}
+        <WarningMessage />
         <GridTransactionDetailsStyled noMarginTop={tokensAmount === 1}>
           <div>
             <WalletBalance symbol={collateral.symbol} value={collateralBalanceFormatted} />
