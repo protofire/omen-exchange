@@ -204,7 +204,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           description={
             "Before trading on a market, make sure that its outcome will be known by its resolution date and it isn't an"
           }
-          hyperlink={DOCUMENT_VALIDITY_RULES}
+          href={DOCUMENT_VALIDITY_RULES}
           hyperlinkDescription={'invalid market'}
         />
         <GridTransactionDetails>

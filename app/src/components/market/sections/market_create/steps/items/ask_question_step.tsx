@@ -245,7 +245,7 @@ const AskQuestionStep = (props: Props) => {
         description={
           "Set a market resolution date by which the correct outcome will be known and make sure that this market won't be "
         }
-        hyperlink={DOCUMENT_VALIDITY_RULES}
+        href={DOCUMENT_VALIDITY_RULES}
         hyperlinkDescription={'invalid'}
       />
       <ButtonContainerFullWidth borderTop={true}>

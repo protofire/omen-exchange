@@ -223,7 +223,7 @@ const FundingAndFeeStep = (props: Props) => {
           description={
             'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time'
           }
-          hyperlink={DOCUMENT_FAQ}
+          href={DOCUMENT_FAQ}
           hyperlinkDescription={'More Info'}
         />
         {tokensAmount > 1 && (
