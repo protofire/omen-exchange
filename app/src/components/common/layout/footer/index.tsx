@@ -4,6 +4,11 @@ import styled from 'styled-components'
 import { version as appVersion } from '../../../../../package.json'
 import {
   DISCLAIMER_TEXT,
+  DOCUMENT_FAQ,
+  LINK_COOKIE_POLICY,
+  LINK_FAQ,
+  LINK_PRIVACY_POLICY,
+  LINK_TERMS_AND_CONDITIONS,
   SHOW_FOOTER,
 } from '../../../../common/constants'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
@@ -46,16 +51,22 @@ export const Footer = () => {
   const context = useConnectedWeb3Context()
   const { marketMakerFactory } = useContracts(context)
   return SHOW_FOOTER ? (
-    <Wrapper paddingBottomSmall={DISCLAIMER_TEXT ? true : false}>
-      <Link href="https://github.com/protofire/gnosis-conditional-exchange">Version {appVersion}</Link>
-      <Break>·</Break>
-      <Link href={`https://etherscan.io/address/${marketMakerFactory.address}`}>Omen Contract</Link>
-      <Break>·</Break>
-      <Link href="http://alchemy.daostack.io/dao/0x519b70055af55a007110b4ff99b0ea33071c720a">Propose Token</Link>
-      <Break>·</Break>
-      <Link href="https://dxdao.eth.link" target="_blank">
-        DXdao.eth
-      </Link>
-    </Wrapper>
+    <>
+      <Wrapper paddingBottomSmall={DISCLAIMER_TEXT ? true : false}>
+        <Link href="https://github.com/protofire/gnosis-conditional-exchange">Version {appVersion}</Link>
+        <Break>·</Break>
+        <Link href={`https://etherscan.io/address/${marketMakerFactory.address}`}>Omen Contract</Link>
+        <Break>·</Break>
+        <Link href="http://alchemy.daostack.io/dao/0x519b70055af55a007110b4ff99b0ea33071c720a">Propose Token</Link>
+        <Break>·</Break>
+        <Link href={DOCUMENT_FAQ} target="_blank">
+          FAQ
+        </Link>
+        <Break>·</Break>
+        <Link href="https://dxdao.eth.link" target="_blank">
+          DXdao.eth
+        </Link>
+      </Wrapper>
+    </>
   ) : null
 }

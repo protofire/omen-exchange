@@ -77,15 +77,15 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     category === 'All' ? '' : 'category: $category',
     title ? 'title_contains: $title' : '',
     currency ? 'collateralToken: $currency' : '',
-    arbitrator ? 'arbitrator: $arbitrator' : '',
+    arbitrator ? 'arbitrator: $arbitrator' : 'arbitrator_in: $knownArbitrators',
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
-    'fee: $fee',
+    'fee_lte: $fee',
   ]
     .filter(s => s.length)
     .join(',')
 
   const query = gql`
-    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $knownArbitrators: [String!], $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
       fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${whereClause} }) {
         ...marketData
       }

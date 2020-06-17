@@ -3,6 +3,7 @@ import { useHistory } from 'react-router'
 import styled, { css } from 'styled-components'
 
 import {
+  DOCUMENT_VALIDITY_RULES,
   MAX_OUTCOME_ALLOWED,
 } from '../../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
@@ -16,6 +17,7 @@ import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
 import { ButtonContainerFullWidth, LeftButton } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
+import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome, Outcomes } from '../outcomes'
 
 const ButtonCategoryFocusCSS = css`
@@ -237,6 +239,13 @@ const AskQuestionStep = (props: Props) => {
           selectedCategory={category}
         />
       )}
+      <WarningMessage
+        description={
+          "Set a market resolution date by which the correct outcome will be known and make sure that this market won't be "
+        }
+        href={DOCUMENT_VALIDITY_RULES}
+        hyperlinkDescription={'invalid'}
+      />
       <ButtonContainerFullWidth borderTop={true}>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
           Cancel

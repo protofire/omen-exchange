@@ -6,7 +6,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { MARKET_FEE } from '../../../../common/constants'
+import { DOCUMENT_VALIDITY_RULES, MARKET_FEE } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
@@ -37,9 +37,15 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
+import { WarningMessage } from '../../common/warning_message'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
+`
+
+const WarningMessageStyled = styled(WarningMessage)`
+  margin-top: 20px;
+  margin-bottom: 0;
 `
 
 const logger = getLogger('Market::Buy')
@@ -193,6 +199,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
           showPriceChange={amount.gt(0)}
+        />
+        <WarningMessageStyled
+          description={
+            "Before trading on a market, make sure that its outcome will be known by its resolution date and it isn't an"
+          }
+          href={DOCUMENT_VALIDITY_RULES}
+          hyperlinkDescription={'invalid market'}
         />
         <GridTransactionDetails>
           <div>

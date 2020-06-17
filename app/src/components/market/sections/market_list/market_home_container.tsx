@@ -11,7 +11,7 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { GraphMarketMakerDataItem, MarketMakerDataItem, buildQueryMarkets } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getOutcomes } from '../../../../util/networks'
+import { getArbitratorsByNetwork, getDefaultToken, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates } from '../../../../util/types'
 
@@ -73,12 +73,16 @@ const MarketHomeContainer: React.FC = () => {
     whitelistedCreators: false,
     ...filter
   })
+
+  const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)
+
   const marketsQueryVariables = {
     first: PAGE_SIZE,
     skip: 0,
     accounts: cpkAddress ? [cpkAddress] : null,
     fee: feeBN.toString(),
     now: +now,
+    knownArbitrators,
     ...filter,
   }
 

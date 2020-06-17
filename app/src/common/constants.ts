@@ -50,6 +50,9 @@ export const BLACKLISTED_COUNTRIES = (process.env.REACT_APP_BLACKLISTED_COUNTRIE
 export const DOCUMENT_TITLE = process.env.REACT_APP_TITLE || 'Omen'
 export const DOCUMENT_DESCRIPTION = process.env.REACT_APP_DESCRIPTION || 'Omen Information Markets'
 
+export const DOCUMENT_VALIDITY_RULES = './rules.pdf'
+export const DOCUMENT_FAQ = './faq.pdf'
+
 export const OG_TITLE = process.env.REACT_APP_OG_TITLE || 'Omen Prediction Markets'
 export const OG_DESCRIPTION = process.env.REACT_APP_OG_DESCRIPTION || 'Omen Information Markets'
 export const OG_IMAGE = process.env.REACT_APP_OG_IMAGE || 'omen_logo_thumbnail.png'

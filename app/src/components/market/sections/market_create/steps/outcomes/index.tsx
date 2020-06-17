@@ -279,7 +279,7 @@ const Outcomes = (props: Props) => {
         </OutcomesTable>
       </OutcomesTableWrapper>
       <Note>
-        <NoteTitle>Note:</NoteTitle> Currently Omen supports max. 2 outcomes. The sum of all probabilites{' '}
+        <NoteTitle>Note:</NoteTitle> Omen supports max. 8 outcomes. The sum of all probabilites{' '}
         <strong>must be 100%</strong>
       </Note>
     </>

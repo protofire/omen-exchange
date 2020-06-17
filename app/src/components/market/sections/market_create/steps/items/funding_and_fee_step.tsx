@@ -4,6 +4,7 @@ import React, { ChangeEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
+import { DOCUMENT_FAQ } from '../../../../../../common/constants'
 import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
@@ -44,6 +45,7 @@ import { TransactionDetailsCard } from '../../../../common/transaction_details_c
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
 import { WalletBalance } from '../../../../common/wallet_balance'
+import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome } from '../outcomes'
 
 const CreateCardTop = styled(CreateCard)`
@@ -99,8 +101,7 @@ const TitleValueVertical = styled(TitleValue)`
 
 const CurrenciesWrapper = styled.div`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
-  margin-bottom: 12px;
-  padding-bottom: 20px;
+  padding: 0 0 20px 0;
 `
 
 const GridTransactionDetailsStyled = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
@@ -218,6 +219,13 @@ const FundingAndFeeStep = (props: Props) => {
       </CreateCardTop>
       <CreateCardBottom>
         <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
+        <WarningMessage
+          description={
+            'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time'
+          }
+          href={DOCUMENT_FAQ}
+          hyperlinkDescription={'More Info'}
+        />
         {tokensAmount > 1 && (
           <CurrenciesWrapper>
             <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
@@ -229,7 +237,7 @@ const FundingAndFeeStep = (props: Props) => {
             />
           </CurrenciesWrapper>
         )}
-        <GridTransactionDetailsStyled noMarginTop={tokensAmount === 1}>
+        <GridTransactionDetailsStyled noMarginTop={false}>
           <div>
             <WalletBalance symbol={collateral.symbol} value={collateralBalanceFormatted} />
             <TextfieldCustomPlaceholder
