@@ -65,7 +65,7 @@ const GridThreeColumns = styled.div`
   column-gap: 20px;
   display: grid;
   grid-template-columns: 1fr;
-  padding: 20px 0px;
+  padding: 20px 0;
   row-gap: 20px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
