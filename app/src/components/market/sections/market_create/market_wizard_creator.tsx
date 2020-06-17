@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useState } from 'react'
 
-import { CATEGORIES, MARKET_FEE } from '../../../../common/constants'
+import { MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../../../util/networks'

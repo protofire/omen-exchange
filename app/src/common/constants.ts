@@ -69,4 +69,4 @@ export const DISCLAIMER_TEXT = process.env.REACT_APP_DISCLAIMER_TEXT || false
 export const GOOGLE_ANALYTICS_ID = process.env.REACT_APP_GOOGLE_ANALYTICS_ID || null
 
 export const FETCH_DETAILS_INTERVAL = parseInt(process.env.REACT_APP_FETCH_DETAILS_INTERVAL || '15000', 10)
-export const SHOW_FOOTER = process.env.REACT_APP_SHOW_FOOTER === 'true'
+export const SHOW_FOOTER = process.env.REACT_APP_SHOW_FOOTER === 'false' ? false : true

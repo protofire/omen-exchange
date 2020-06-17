@@ -3,18 +3,16 @@ import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
-import useLocalStorageState from 'use-local-storage-state'
 import { useWeb3Context } from 'web3-react/dist'
 
 import { Logo } from '../../../../common/constants'
-import { ConnectedWeb3, useDetectAdblocker } from '../../../../hooks'
+import { ConnectedWeb3 } from '../../../../hooks'
 import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
-import { Message, MessageType } from '../../../common/message'
 import { ModalConnectWallet } from '../../../modal'
-import { IconAdd, IconTwitter } from '../../icons'
+import { IconAdd } from '../../icons'
 
 const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -100,20 +98,6 @@ const ContentsLeft = styled.div`
   }
 `
 
-const SocialIconsWrapper = styled.div`
-  align-items: center;
-  border-left: 1px solid #e5e5e5;
-  display: flex;
-  height: 20px;
-  margin: 0 0 0 15px;
-  padding: 0 0 0 15px;
-`
-
-const SocialIcon = styled.a`
-  align-items: center;
-  display: flex;
-`
-
 const ContentsRight = styled.div`
   align-items: center;
   display: flex;
@@ -127,20 +111,6 @@ const ContentsRight = styled.div`
 const HeaderDropdown = styled(Dropdown)`
   ${ButtonCSS}
 `
-
-const AdBlockWarning: React.FC = () => {
-  const adBlockDetected = useDetectAdblocker()
-  const [shownBefore, setShownBefore] = useLocalStorageState('adBlockMessageShown', false)
-
-  return adBlockDetected && !shownBefore ? (
-    <Message
-      onHide={() => setShownBefore(true)}
-      text="This dApp may not work correctly with your ad blocker enabled."
-      title="Ad Blocker Detected!"
-      type={MessageType.error}
-    />
-  ) : null
-}
 
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   const context = useWeb3Context()

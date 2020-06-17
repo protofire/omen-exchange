@@ -27,11 +27,6 @@ const Text = styled.span`
   text-align: center;
 `
 
-const Title = styled(Text)`
-  font-weight: 500;
-  text-transform: uppercase;
-`
-
 export const Disclaimer = () => {
-  return <>{DISCLAIMER_TEXT}</>
+  return <Wrapper><Text>{DISCLAIMER_TEXT}</Text></Wrapper>
 }

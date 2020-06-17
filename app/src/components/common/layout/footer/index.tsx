@@ -4,14 +4,9 @@ import styled from 'styled-components'
 import { version as appVersion } from '../../../../../package.json'
 import {
   DISCLAIMER_TEXT,
-  LINK_COOKIE_POLICY,
-  LINK_FAQ,
-  LINK_PRIVACY_POLICY,
-  LINK_TERMS_AND_CONDITIONS,
   SHOW_FOOTER,
 } from '../../../../common/constants'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
-import { SponsoredBy } from '../../logos/sponsored_by'
 
 const Wrapper = styled.div<{ paddingBottomSmall?: boolean }>`
   align-items: center;
@@ -45,10 +40,6 @@ const Break = styled.span`
   &:last-child {
     display: none;
   }
-`
-
-const SponsoredByStyled = styled(SponsoredBy)`
-  margin-left: 15px;
 `
 
 export const Footer = () => {

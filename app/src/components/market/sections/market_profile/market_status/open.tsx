@@ -140,6 +140,7 @@ const Wrapper = (props: Props) => {
       {isQuestionOpen && openQuestionMessage}
       <WhenConnected>
         <ButtonContainer>
+          {poolButton}
           {isQuestionOpen ? openInRealitioButton : buySellButtons}
         </ButtonContainer>
       </WhenConnected>
