@@ -101,7 +101,7 @@ const TitleValueVertical = styled(TitleValue)`
 
 const CurrenciesWrapper = styled.div`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
-  padding: 0px 0px 20px 0px;
+  padding: 0 0 20px 0;
 `
 
 const GridTransactionDetailsStyled = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
