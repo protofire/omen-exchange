@@ -34,7 +34,7 @@ const Hyperlink = styled.a`
 interface Props {
   description: string
   hyperlinkDescription: string
-  hyperlink: string
+  href: string
 }
 
 export const WarningMessage = (props: Props) => {
