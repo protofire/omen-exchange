@@ -65,7 +65,7 @@ const TabsGrid = styled.div`
 `
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 `
 
 const logger = getLogger('Market::Fund')
