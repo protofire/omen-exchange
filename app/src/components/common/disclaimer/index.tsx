@@ -33,5 +33,5 @@ const Title = styled(Text)`
 `
 
 export const Disclaimer = () => {
-  return DISCLAIMER_TEXT
+  return <>{DISCLAIMER_TEXT}</>
 }

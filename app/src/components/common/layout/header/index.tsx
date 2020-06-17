@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components'
 import useLocalStorageState from 'use-local-storage-state'
 import { useWeb3Context } from 'web3-react/dist'
 
-import { Logo, SHOW_CREATE_MARKET } from '../../../../common/constants'
+import { Logo } from '../../../../common/constants'
 import { ConnectedWeb3, useDetectAdblocker } from '../../../../hooks'
 import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -170,16 +170,12 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
           </LogoWrapper>
         </ContentsLeft>
         <ContentsRight>
-          {SHOW_CREATE_MARKET && (
-            <>
-              <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...createButtonProps}>
-                Create Market
-              </ButtonCreateDesktop>
-              <ButtonCreateMobile {...createButtonProps}>
-                <IconAdd />
-              </ButtonCreateMobile>
-            </>
-          )}
+          <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...createButtonProps}>
+            Create Market
+          </ButtonCreateDesktop>
+          <ButtonCreateMobile {...createButtonProps}>
+            <IconAdd />
+          </ButtonCreateMobile>
           {!context.account && (
             <ButtonWrapper
               data-class="customTooltip"

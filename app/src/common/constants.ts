@@ -1,16 +1,5 @@
 import { OmenLogo } from '../components/common/logos/omen'
 
-enum Version {
-  OMEN = 'omen',
-}
-
-export const VERSION: Version = process.env.REACT_APP_VERSION as Version
-export const IS_OMEN_VERSION = VERSION === Version.OMEN
-
-if ([IS_OMEN_VERSION].every(v => !v)) {
-  throw new Error(`You need to set the REACT_APP_VERSION environment variable to a valid value, got '${VERSION}'`)
-}
-
 export const LOGGER_ID: string = process.env.REACT_APP_LOGGER_ID || 'gnosis-conditional-exchange'
 export const THREEBOX_ADMIN_ADDRESS: string =
   process.env.REACT_APP_THREEBOX_ADMIN_ADDRESS || '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'
@@ -45,33 +34,11 @@ export const GRAPH_RINKEBY_HTTP =
 export const GRAPH_RINKEBY_WS =
   process.env.REACT_APP_GRAPH_RINKEBY_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
 
-const LOGO_MAP: { [K in Version]: any } = {
-  omen: OmenLogo,
-}
-export const Logo = LOGO_MAP[VERSION]
+export const Logo = OmenLogo
 
-const DEFAULT_ARBITRATOR_MAP: { [K in Version]: KnownArbitrator } = {
-  omen: 'kleros',
-}
-export const DEFAULT_ARBITRATOR: KnownArbitrator = DEFAULT_ARBITRATOR_MAP[VERSION]
+export const DEFAULT_ARBITRATOR: KnownArbitrator = 'kleros'
 
-const DEFAULT_TOKEN_MAP: { [K in Version]: KnownToken } = {
-  omen: 'dai',
-}
-export const DEFAULT_TOKEN = DEFAULT_TOKEN_MAP[VERSION]
-
-export const SHOW_CREATE_MARKET = IS_OMEN_VERSION
-export const ALLOW_CUSTOM_TOKENS = IS_OMEN_VERSION
-export const TOGGLEABLE_EXTRA_INFORMATION = IS_OMEN_VERSION
-export const SHOW_MADE_BY = IS_OMEN_VERSION
-export const SHOW_POOLING_BTN = IS_OMEN_VERSION
-export const SHOW_FILTERS = IS_OMEN_VERSION
-export const SHOW_CATEGORIES = IS_OMEN_VERSION
-export const SHOW_MY_MARKETS = IS_OMEN_VERSION
-export const SHOW_ADVANCED_FILTERS = IS_OMEN_VERSION
-export const DISABLE_CATEGORIES_IN_CREATION = CATEGORIES.length === 1
-export const WHITELISTED_TEMPLATE_IDS = IS_OMEN_VERSION
-export const SHOW_TRADE_HISTORY = IS_OMEN_VERSION
+export const DEFAULT_TOKEN = 'dai'
 
 export const MARKET_CREATORS = (process.env.REACT_APP_MARKET_CREATORS || '')
   .split(',')
@@ -85,7 +52,7 @@ export const DOCUMENT_DESCRIPTION = process.env.REACT_APP_DESCRIPTION || 'Omen I
 
 export const OG_TITLE = process.env.REACT_APP_OG_TITLE || 'Omen Prediction Markets'
 export const OG_DESCRIPTION = process.env.REACT_APP_OG_DESCRIPTION || 'Omen Information Markets'
-export const OG_IMAGE = process.env.REACT_APP_OG_IMAGE || 'logo_thumbnail.png'
+export const OG_IMAGE = process.env.REACT_APP_OG_IMAGE || 'omen_logo_thumbnail.png'
 export const OG_URL = process.env.REACT_APP_OG_URL || ''
 export const OG_SITE_NAME = process.env.REACT_APP_OG_SITE_NAME || 'Omen'
 

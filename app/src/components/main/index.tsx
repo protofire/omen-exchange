@@ -14,7 +14,6 @@ import {
   TWITTER_CARD,
   TWITTER_IMAGE_ALT,
   TWITTER_SITE,
-  VERSION,
 } from '../../common/constants'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { CookiesBanner } from '../common/cookies_banner'
@@ -29,7 +28,6 @@ const RedirectToHome = () => <Redirect to="/" />
 
 export const Main: React.FC = () => {
   const context = useWeb3Context()
-  const CONTEXT_OG_IMAGE = `${VERSION.toLowerCase()}_${OG_IMAGE}`
 
   return (
     <Router>
@@ -39,13 +37,13 @@ export const Main: React.FC = () => {
           <meta content={DOCUMENT_DESCRIPTION} name="description" />
           <meta content={OG_TITLE} property="og:title" />
           <meta content={OG_DESCRIPTION} property="og:description" />
-          <meta content={`/${CONTEXT_OG_IMAGE}`} property="og:image" />
+          <meta content={`/${OG_IMAGE}`} property="og:image" />
           <meta content={OG_URL} property="og:url" />
           <meta content={OG_SITE_NAME} property="og:site_name" />
           <meta content={TWITTER_CARD} name="twitter:card" />
           <meta content={TWITTER_IMAGE_ALT} name="twitter:image:alt" />
           <meta content={TWITTER_SITE} name="twitter:site" />
-          <link href={`${CONTEXT_OG_IMAGE}`} rel="icon" type="image/png" />
+          <link href={`${OG_IMAGE}`} rel="icon" type="image/png" />
         </Helmet>
         <Header />
         <MainScroll>

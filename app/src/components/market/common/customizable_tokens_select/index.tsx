@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { ALLOW_CUSTOM_TOKENS } from '../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Token } from '../../../../util/types'
 import { FormRowLink } from '../../../common/form/form_row_link'
@@ -33,7 +32,7 @@ export const CustomizableTokensSelect = (props: Props) => {
   return (
     <>
       <Tokens context={context} disabled={disabled} name={name} onTokenChange={onCollateralChange} value={value} />
-      {ALLOW_CUSTOM_TOKENS && <Link onClick={() => setModalCollateralState(true)}>Add custom token</Link>}
+      <Link onClick={() => setModalCollateralState(true)}>Add custom token</Link>
       <ModalCollateral
         context={context}
         isOpen={isModalCollateralOpen}

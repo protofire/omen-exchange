@@ -2,7 +2,6 @@ import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { SHOW_POOLING_BTN } from '../../../../../common/constants'
 import { WhenConnected } from '../../../../../hooks/connectedWeb3'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'

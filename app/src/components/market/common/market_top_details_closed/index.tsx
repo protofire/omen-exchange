@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
 
-import { LINK_FAQ, SHOW_TRADE_HISTORY } from '../../../../common/constants'
+import { LINK_FAQ } from '../../../../common/constants'
 import { formatBigNumber, formatDate, getMarketTitles } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper, TitleValue } from '../../../common'
@@ -65,14 +65,10 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
               </SubsectionTitleAction>
             </SubsectionTitleActionWrapper>
           )}
-          {SHOW_TRADE_HISTORY && (
-            <>
-              <Breaker />
-              <SubsectionTitleAction onClick={toggleTradeHistory}>
-                {`${showingTradeHistory ? 'Hide' : 'Show'} Trade History`}
-              </SubsectionTitleAction>
-            </>
-          )}
+          <Breaker />
+          <SubsectionTitleAction onClick={toggleTradeHistory}>
+            {`${showingTradeHistory ? 'Hide' : 'Show'} Trade History`}
+          </SubsectionTitleAction>
         </SubsectionTitleActionWrapper>
       </SubsectionTitleWrapper>
       <GridTwoColumns>

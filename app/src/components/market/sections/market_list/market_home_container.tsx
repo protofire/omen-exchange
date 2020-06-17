@@ -7,7 +7,6 @@ import React, { useCallback, useEffect, useState } from 'react'
 import {
   MARKET_CREATORS,
   MARKET_FEE,
-  WHITELISTED_TEMPLATE_IDS,
 } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { GraphMarketMakerDataItem, MarketMakerDataItem, buildQueryMarkets } from '../../../../queries/markets_home'
@@ -71,8 +70,9 @@ const MarketHomeContainer: React.FC = () => {
   const { account, library: provider } = context
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
   const query = buildQueryMarkets({
-    whitelistedTemplateIds: WHITELISTED_TEMPLATE_IDS,
-    ...filter,
+    whitelistedTemplateIds: true,
+    whitelistedCreators: false,
+    ...filter
   })
   const marketsQueryVariables = {
     first: PAGE_SIZE,
