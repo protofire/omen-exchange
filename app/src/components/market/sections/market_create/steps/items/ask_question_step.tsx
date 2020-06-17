@@ -18,6 +18,7 @@ import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
 import { ButtonContainerFullWidth, LeftButton } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
+import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome, Outcomes } from '../outcomes'
 
 const ButtonCategoryFocusCSS = css`
@@ -64,7 +65,7 @@ const GridThreeColumns = styled.div`
   column-gap: 20px;
   display: grid;
   grid-template-columns: 1fr;
-  padding: 20px 0;
+  padding: 20px 0px;
   row-gap: 20px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
@@ -239,6 +240,13 @@ const AskQuestionStep = (props: Props) => {
           selectedCategory={category}
         />
       )}
+      <WarningMessage
+        description={
+          "Set a market resolution date by which the correct outcome will be known and make sure that this market won't be "
+        }
+        hyperlink={'./rules.pdf'}
+        hyperlinkDescription={'invalid'}
+      />
       <ButtonContainerFullWidth borderTop={true}>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
           Cancel

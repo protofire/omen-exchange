@@ -63,6 +63,10 @@ const TabsGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   margin: 0 0 25px;
 `
+const WarningMessageStyled = styled(WarningMessage)`
+  margin-top: 20px;
+  margin-bottom: 0px;
+`
 
 const logger = getLogger('Market::Fund')
 
@@ -265,7 +269,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           probabilities={probabilities}
           showSharesChange={showSharesChange}
         />
-        <WarningMessage />
+        <WarningMessageStyled
+          description={
+            'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time '
+          }
+          hyperlink={'./faq.pdf'}
+          hyperlinkDescription={'More Info'}
+        />
         <GridTransactionDetails>
           <div>
             <TabsGrid>

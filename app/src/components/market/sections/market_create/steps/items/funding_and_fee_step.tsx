@@ -101,8 +101,7 @@ const TitleValueVertical = styled(TitleValue)`
 
 const CurrenciesWrapper = styled.div`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
-  margin-bottom: 12px;
-  padding-bottom: 20px;
+  padding: 0px 0px 20px 0px;
 `
 
 const GridTransactionDetailsStyled = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
@@ -220,6 +219,13 @@ const FundingAndFeeStep = (props: Props) => {
       </CreateCardTop>
       <CreateCardBottom>
         <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
+        <WarningMessage
+          description={
+            'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time'
+          }
+          hyperlink={'./faq.pdf'}
+          hyperlinkDescription={'More Info'}
+        />
         {tokensAmount > 1 && (
           <CurrenciesWrapper>
             <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
@@ -231,8 +237,7 @@ const FundingAndFeeStep = (props: Props) => {
             />
           </CurrenciesWrapper>
         )}
-        <WarningMessage />
-        <GridTransactionDetailsStyled noMarginTop={tokensAmount === 1}>
+        <GridTransactionDetailsStyled noMarginTop={false}>
           <div>
             <WalletBalance symbol={collateral.symbol} value={collateralBalanceFormatted} />
             <TextfieldCustomPlaceholder

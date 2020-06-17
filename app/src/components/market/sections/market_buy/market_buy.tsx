@@ -37,9 +37,15 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
+import { WarningMessage } from '../../common/warning_message'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
+`
+
+const WarningMessageStyled = styled(WarningMessage)`
+  margin-top: 20px;
+  margin-bottom: 0px;
 `
 
 const logger = getLogger('Market::Buy')
@@ -193,6 +199,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
           showPriceChange={amount.gt(0)}
+        />
+        <WarningMessageStyled
+          description={
+            "Before trading on a market, make sure that its outcome will be known by its resolution date and it isn't an"
+          }
+          hyperlink={'./rules.pdf'}
+          hyperlinkDescription={'invalid market'}
         />
         <GridTransactionDetails>
           <div>
