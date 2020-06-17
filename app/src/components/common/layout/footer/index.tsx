@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { version as appVersion } from '../../../../../package.json'
 import {
   DISCLAIMER_TEXT,
+  DOCUMENT_FAQ,
   IS_CORONA_VERSION,
   LINK_COOKIE_POLICY,
   LINK_FAQ,
@@ -100,7 +101,7 @@ export const Footer = () => {
           <Break>·</Break>
           <Link href="http://alchemy.daostack.io/dao/0x519b70055af55a007110b4ff99b0ea33071c720a">Propose Token</Link>
           <Break>·</Break>
-          <Link href="./faq.pdf" target="_blank">
+          <Link href={DOCUMENT_FAQ} target="_blank">
             FAQ
           </Link>
           <Break>·</Break>

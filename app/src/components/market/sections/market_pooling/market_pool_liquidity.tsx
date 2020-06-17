@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { MARKET_FEE } from '../../../../common/constants'
+import { DOCUMENT_FAQ, MARKET_FEE } from '../../../../common/constants'
 import {
   useCollateralBalance,
   useConnectedWeb3Context,
@@ -273,7 +273,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           description={
             'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time '
           }
-          hyperlink={'./faq.pdf'}
+          hyperlink={DOCUMENT_FAQ}
           hyperlinkDescription={'More Info'}
         />
         <GridTransactionDetails>

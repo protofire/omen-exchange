@@ -6,7 +6,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { MARKET_FEE } from '../../../../common/constants'
+import { DOCUMENT_VALIDITY_RULES, MARKET_FEE } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
@@ -204,7 +204,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           description={
             "Before trading on a market, make sure that its outcome will be known by its resolution date and it isn't an"
           }
-          hyperlink={'./rules.pdf'}
+          hyperlink={DOCUMENT_VALIDITY_RULES}
           hyperlinkDescription={'invalid market'}
         />
         <GridTransactionDetails>

@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components'
 import {
   DISABLE_ARBITRATOR_IN_CREATION,
   DISABLE_CATEGORIES_IN_CREATION,
+  DOCUMENT_VALIDITY_RULES,
   MAX_OUTCOME_ALLOWED,
 } from '../../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
@@ -244,7 +245,7 @@ const AskQuestionStep = (props: Props) => {
         description={
           "Set a market resolution date by which the correct outcome will be known and make sure that this market won't be "
         }
-        hyperlink={'./rules.pdf'}
+        hyperlink={DOCUMENT_VALIDITY_RULES}
         hyperlinkDescription={'invalid'}
       />
       <ButtonContainerFullWidth borderTop={true}>

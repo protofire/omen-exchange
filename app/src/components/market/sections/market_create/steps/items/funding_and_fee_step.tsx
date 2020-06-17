@@ -4,7 +4,7 @@ import React, { ChangeEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { DISABLE_CURRENCY_IN_CREATION } from '../../../../../../common/constants'
+import { DISABLE_CURRENCY_IN_CREATION, DOCUMENT_FAQ } from '../../../../../../common/constants'
 import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
@@ -223,7 +223,7 @@ const FundingAndFeeStep = (props: Props) => {
           description={
             'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time'
           }
-          hyperlink={'./faq.pdf'}
+          hyperlink={DOCUMENT_FAQ}
           hyperlinkDescription={'More Info'}
         />
         {tokensAmount > 1 && (
