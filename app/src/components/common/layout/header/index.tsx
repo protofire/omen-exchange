@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components'
 import useLocalStorageState from 'use-local-storage-state'
 import { useWeb3Context } from 'web3-react/dist'
 
-import { Logo, SHOW_CREATE_MARKET, SHOW_SOCIAL } from '../../../../common/constants'
+import { Logo, SHOW_CREATE_MARKET } from '../../../../common/constants'
 import { ConnectedWeb3, useDetectAdblocker } from '../../../../hooks'
 import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -168,13 +168,6 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
           <LogoWrapper to="/">
             <Logo />
           </LogoWrapper>
-          {SHOW_SOCIAL && (
-            <SocialIconsWrapper>
-              <SocialIcon href="https://www.twitter.com/corona_markets" target="_blank">
-                <IconTwitter />
-              </SocialIcon>
-            </SocialIconsWrapper>
-          )}
         </ContentsLeft>
         <ContentsRight>
           {SHOW_CREATE_MARKET && (

@@ -3,7 +3,7 @@ import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
-import { IS_CORONA_VERSION, LINK_TERMS_AND_CONDITIONS, SHOW_MADE_BY } from '../../../common/constants'
+import { LINK_TERMS_AND_CONDITIONS, SHOW_MADE_BY } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
@@ -211,13 +211,8 @@ export const ModalConnectWallet = (props: Props) => {
 
   let disableMetamask: boolean
   let disableWalletConnect: boolean
-  if (IS_CORONA_VERSION) {
-    disableMetamask = !isMetamaskEnabled || (LINK_TERMS_AND_CONDITIONS && !acceptedTerms) || false
-    disableWalletConnect = (LINK_TERMS_AND_CONDITIONS && !acceptedTerms) || false
-  } else {
-    disableMetamask = !isMetamaskEnabled || false
-    disableWalletConnect = false
-  }
+  disableMetamask = !isMetamaskEnabled || false
+  disableWalletConnect = false
 
   return (
     <>
@@ -254,17 +249,6 @@ export const ModalConnectWallet = (props: Props) => {
                   text="Wallet Connect"
                 />
               </Buttons>
-              {process.env.REACT_APP_VERSION === 'corona' && LINK_TERMS_AND_CONDITIONS && (
-                <TermsWrapper>
-                  <CheckboxInput checked={acceptedTerms} inputId="termsCheck" onChange={toggleAcceptedTerms} />
-                  <TermsText className="clickable" htmlFor="termsCheck">
-                    I agree to the{' '}
-                    <TermsLink href={LINK_TERMS_AND_CONDITIONS} target="_blank">
-                      Terms and Conditions
-                    </TermsLink>
-                  </TermsText>
-                </TermsWrapper>
-              )}
             </>
           )}
         </ContentWrapper>

@@ -22,13 +22,8 @@ test('Query markets with default options', () => {
   expect(query).toBe(expectedQuery)
 })
 
-test('Query markets for corona markets', () => {
-  const query = buildQueryMarkets({ ...DEFAULT_OPTIONS, whitelistedCreators: true, whitelistedTemplateIds: false })
-  const expectedQuery = getExpectedQuery('openingTimestamp_gt: $now, creator_in: $accounts, fee_lte: $fee')
-  expect(query).toBe(expectedQuery)
-})
 
-test('Query markets not corona markets', () => {
+test('Query markets', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,
     state: MarketStates.myMarkets,
@@ -40,7 +35,7 @@ test('Query markets not corona markets', () => {
   expect(query).toBe(expectedQuery)
 })
 
-test('Not corona markets with template_id', () => {
+test('Markets with template_id', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,
     state: MarketStates.myMarkets,
@@ -50,20 +45,7 @@ test('Not corona markets with template_id', () => {
   expect(query).toBe(expectedQuery)
 })
 
-test('Corona markets with template_id', () => {
-  const query = buildQueryMarkets({
-    ...DEFAULT_OPTIONS,
-    whitelistedCreators: true,
-    whitelistedTemplateIds: false,
-    templateId: '2',
-  })
-  const expectedQuery = getExpectedQuery(
-    'openingTimestamp_gt: $now, creator_in: $accounts, templateId: $templateId, fee_lte: $fee',
-  )
-  expect(query).toBe(expectedQuery)
-})
-
-test('Not corona markets closed with title and arbitrator', () => {
+test('Markets closed with title and arbitrator', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,
     whitelistedCreators: false,
@@ -79,23 +61,7 @@ test('Not corona markets closed with title and arbitrator', () => {
   expect(query).toBe(expectedQuery)
 })
 
-test('Closed corona markets with currency', () => {
-  const query = buildQueryMarkets({
-    ...DEFAULT_OPTIONS,
-    whitelistedCreators: true,
-    whitelistedTemplateIds: false,
-    state: MarketStates.closed,
-    templateId: '2',
-    title: 'test',
-    currency: 'currencyTest',
-  })
-  const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp_lt: $now, creator_in: $accounts, title_contains: $title, collateralToken: $currency, templateId: $templateId, fee: $fee',
-  )
-  expect(query).toBe(expectedQuery)
-})
-
-test('Query pending markets not corona markets', () => {
+test('Query pending markets', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,
     state: MarketStates.pending,

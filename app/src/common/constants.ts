@@ -1,18 +1,13 @@
-import { CoronaMarketsLogo } from '../components/common/logos/corona_markets'
 import { OmenLogo } from '../components/common/logos/omen'
 
 enum Version {
-  GNO = 'gno',
-  CORONA = 'corona',
   OMEN = 'omen',
 }
 
 export const VERSION: Version = process.env.REACT_APP_VERSION as Version
-export const IS_CORONA_VERSION = VERSION === Version.CORONA
 export const IS_OMEN_VERSION = VERSION === Version.OMEN
-export const IS_GNO_VERSION = VERSION === Version.GNO
 
-if ([IS_CORONA_VERSION, IS_OMEN_VERSION, IS_GNO_VERSION].every(v => !v)) {
+if ([IS_OMEN_VERSION].every(v => !v)) {
   throw new Error(`You need to set the REACT_APP_VERSION environment variable to a valid value, got '${VERSION}'`)
 }
 
@@ -38,9 +33,8 @@ export const SINGLE_SELECT_TEMPLATE_ID = 2
 
 export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
 
-export const CATEGORIES = IS_CORONA_VERSION
-  ? ['Coronavirus']
-  : ['Business & Finance', 'Cryptocurrency', 'News & Politics', 'Science & Tech', 'Sports', 'Weather', 'Miscellaneous']
+export const CATEGORIES =
+  ['Business & Finance', 'Cryptocurrency', 'News & Politics', 'Science & Tech', 'Sports', 'Weather', 'Miscellaneous']
 
 export const GRAPH_MAINNET_HTTP =
   process.env.REACT_APP_GRAPH_MAINNET_HTTP || 'https://api.thegraph.com/subgraphs/name/gnosis/omen'
@@ -52,52 +46,37 @@ export const GRAPH_RINKEBY_WS =
   process.env.REACT_APP_GRAPH_RINKEBY_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
 
 const LOGO_MAP: { [K in Version]: any } = {
-  corona: CoronaMarketsLogo,
-  gno: OmenLogo,
   omen: OmenLogo,
 }
 export const Logo = LOGO_MAP[VERSION]
 
 const DEFAULT_ARBITRATOR_MAP: { [K in Version]: KnownArbitrator } = {
-  corona: 'corona',
-  gno: 'kleros',
   omen: 'kleros',
 }
 export const DEFAULT_ARBITRATOR: KnownArbitrator = DEFAULT_ARBITRATOR_MAP[VERSION]
 
 const DEFAULT_TOKEN_MAP: { [K in Version]: KnownToken } = {
-  corona: 'usdc',
-  gno: 'gno',
   omen: 'dai',
 }
 export const DEFAULT_TOKEN = DEFAULT_TOKEN_MAP[VERSION]
 
-export const SHOW_SOCIAL = IS_CORONA_VERSION
 export const SHOW_CREATE_MARKET = IS_OMEN_VERSION
-export const BLACKLIST_COUNTRIES = IS_CORONA_VERSION
 export const ALLOW_CUSTOM_TOKENS = IS_OMEN_VERSION
-export const TOGGLEABLE_EXTRA_INFORMATION = !IS_CORONA_VERSION
-export const SHOW_MADE_BY = !IS_CORONA_VERSION
-export const SHOW_ANSWER_IN_REALITIO = IS_CORONA_VERSION
-export const SHOW_POOLING_BTN = !IS_CORONA_VERSION
-export const SHOW_FILTERS = IS_CORONA_VERSION || IS_GNO_VERSION || IS_OMEN_VERSION
-export const SHOW_CATEGORIES = !IS_CORONA_VERSION
-export const SHOW_MY_MARKETS = !IS_CORONA_VERSION
-export const SHOW_ADVANCED_FILTERS = !IS_CORONA_VERSION
+export const TOGGLEABLE_EXTRA_INFORMATION = IS_OMEN_VERSION
+export const SHOW_MADE_BY = IS_OMEN_VERSION
+export const SHOW_POOLING_BTN = IS_OMEN_VERSION
+export const SHOW_FILTERS = IS_OMEN_VERSION
+export const SHOW_CATEGORIES = IS_OMEN_VERSION
+export const SHOW_MY_MARKETS = IS_OMEN_VERSION
+export const SHOW_ADVANCED_FILTERS = IS_OMEN_VERSION
 export const DISABLE_CATEGORIES_IN_CREATION = CATEGORIES.length === 1
-export const DISABLE_CURRENCY_IN_CREATION = IS_CORONA_VERSION || IS_GNO_VERSION
-export const DISABLE_ARBITRATOR_IN_CREATION = IS_CORONA_VERSION || IS_GNO_VERSION
-export const WHITELISTED_TEMPLATE_IDS = !IS_CORONA_VERSION
-export const WHITELISTED_CREATORS = IS_CORONA_VERSION
-export const SHOW_TRADE_HISTORY = IS_CORONA_VERSION || IS_GNO_VERSION || IS_OMEN_VERSION
+export const WHITELISTED_TEMPLATE_IDS = IS_OMEN_VERSION
+export const SHOW_TRADE_HISTORY = IS_OMEN_VERSION
 
 export const MARKET_CREATORS = (process.env.REACT_APP_MARKET_CREATORS || '')
   .split(',')
   .filter(x => x.length)
   .map(x => x.toLowerCase())
-if (WHITELISTED_CREATORS && !MARKET_CREATORS.length) {
-  throw new Error('You need to set the REACT_APP_MARKET_CREATORS environment variable')
-}
 
 export const BLACKLISTED_COUNTRIES = (process.env.REACT_APP_BLACKLISTED_COUNTRIES || '').split(',').filter(Boolean)
 

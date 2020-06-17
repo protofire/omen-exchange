@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { version as appVersion } from '../../../../../package.json'
 import {
   DISCLAIMER_TEXT,
-  IS_CORONA_VERSION,
   LINK_COOKIE_POLICY,
   LINK_FAQ,
   LINK_PRIVACY_POLICY,
@@ -56,55 +55,16 @@ export const Footer = () => {
   const context = useConnectedWeb3Context()
   const { marketMakerFactory } = useContracts(context)
   return SHOW_FOOTER ? (
-    <>
-      {IS_CORONA_VERSION ? (
-        <Wrapper paddingBottomSmall={DISCLAIMER_TEXT ? true : false}>
-          {LINK_PRIVACY_POLICY && (
-            <>
-              <Link href={LINK_PRIVACY_POLICY} target="_blank">
-                Privacy Policy
-              </Link>
-              <Break>·</Break>
-            </>
-          )}
-          {LINK_TERMS_AND_CONDITIONS && (
-            <>
-              <Link href={LINK_TERMS_AND_CONDITIONS} target="_blank">
-                Terms &amp; Conditions
-              </Link>
-              <Break>·</Break>
-            </>
-          )}
-          {LINK_COOKIE_POLICY && (
-            <>
-              <Link href={LINK_COOKIE_POLICY} target="_blank">
-                Cookie Policy
-              </Link>
-              <Break>·</Break>
-            </>
-          )}
-          {LINK_FAQ && (
-            <>
-              <Link href={LINK_FAQ} target="_blank">
-                FAQ
-              </Link>
-            </>
-          )}
-          <SponsoredByStyled />
-        </Wrapper>
-      ) : (
-        <Wrapper paddingBottomSmall={DISCLAIMER_TEXT ? true : false}>
-          <Link href="https://github.com/protofire/gnosis-conditional-exchange">Version {appVersion}</Link>
-          <Break>·</Break>
-          <Link href={`https://etherscan.io/address/${marketMakerFactory.address}`}>Omen Contract</Link>
-          <Break>·</Break>
-          <Link href="http://alchemy.daostack.io/dao/0x519b70055af55a007110b4ff99b0ea33071c720a">Propose Token</Link>
-          <Break>·</Break>
-          <Link href="https://dxdao.eth.link" target="_blank">
-            DXdao.eth
-          </Link>
-        </Wrapper>
-      )}
-    </>
+    <Wrapper paddingBottomSmall={DISCLAIMER_TEXT ? true : false}>
+      <Link href="https://github.com/protofire/gnosis-conditional-exchange">Version {appVersion}</Link>
+      <Break>·</Break>
+      <Link href={`https://etherscan.io/address/${marketMakerFactory.address}`}>Omen Contract</Link>
+      <Break>·</Break>
+      <Link href="http://alchemy.daostack.io/dao/0x519b70055af55a007110b4ff99b0ea33071c720a">Propose Token</Link>
+      <Break>·</Break>
+      <Link href="https://dxdao.eth.link" target="_blank">
+        DXdao.eth
+      </Link>
+    </Wrapper>
   ) : null
 }
