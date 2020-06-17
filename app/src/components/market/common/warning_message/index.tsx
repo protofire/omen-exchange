@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
 import { Alert } from './img/Alert'
@@ -9,9 +9,9 @@ const Wrapper = styled.div`
   justify-content: space-between;
   border-radius: 4px;
   border: 1px solid ${props => props.theme.borders.borderColorLighter};
-  margin-top: 20px;
   align-content: center;
   padding: 4px 20px;
+  margin-bottom: 20px;
 `
 
 const AlertWrapper = styled.div`
@@ -31,19 +31,23 @@ const Hyperlink = styled.a`
   color: ${props => props.theme.colors.primaryLight};
 `
 
-type Props = HTMLAttributes<HTMLDivElement>
+interface Props {
+  description: string
+  hyperlinkDescription: string
+  href: string
+}
 
-export const WarningMessage: React.FC<Props> = (props: Props) => {
+export const WarningMessage = (props: Props) => {
+  const { description, href, hyperlinkDescription, ...restProps } = props
   return (
-    <Wrapper {...props}>
+    <Wrapper {...restProps}>
       <AlertWrapper>
         <Alert />
       </AlertWrapper>
       <Description>
-        Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before
-        the event occurs and to be aware the market could move abruptly at any time.{' '}
-        <Hyperlink href="./faq.pdf" target="_blank">
-          More Info
+        {description}{' '}
+        <Hyperlink href={href} target="_blank">
+          {hyperlinkDescription}
         </Hyperlink>
       </Description>
     </Wrapper>
