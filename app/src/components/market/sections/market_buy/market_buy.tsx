@@ -45,7 +45,7 @@ const LeftButton = styled(Button)`
 
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 `
 
 const logger = getLogger('Market::Buy')
