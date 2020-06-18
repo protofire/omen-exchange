@@ -163,32 +163,6 @@ const MarketHomeContainer: React.FC = () => {
     setIsFiltering(true)
   }, [])
 
-  const loadMore = () => {
-    if (!moreMarkets) {
-      return
-    }
-
-    fetchMore({
-      variables: {
-        skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length,
-      },
-      updateQuery: (prev: any, { fetchMoreResult }) => {
-        setMoreMarkets(fetchMoreResult ? fetchMoreResult.fixedProductMarketMakers.length > 0 : false)
-
-        if (!fetchMoreResult) {
-          return prev
-        }
-
-        return {
-          ...prev,
-          ...{
-            fixedProductMarketMakers: [...prev.fixedProductMarketMakers, ...fetchMoreResult.fixedProductMarketMakers],
-          },
-        }
-      },
-    })
-  }
-
   const loadNextPage = () => {
     if (!moreMarkets) {
       return
@@ -256,7 +230,6 @@ const MarketHomeContainer: React.FC = () => {
         markets={markets}
         moreMarkets={moreMarkets}
         onFilterChange={onFilterChange}
-        onLoadMore={loadMore}
         onLoadNextPage={loadNextPage}
         onLoadPrevPage={loadPrevPage}
         onUpdatePageSize={updatePageSize}

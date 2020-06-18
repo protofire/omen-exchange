@@ -182,7 +182,6 @@ interface Props {
   moreMarkets: boolean
   pageIndex: number
   onFilterChange: (filter: MarketFilters) => void
-  onLoadMore: () => void
   onUpdatePageSize: (size: number) => void
   onLoadNextPage: () => void
   onLoadPrevPage: () => void
