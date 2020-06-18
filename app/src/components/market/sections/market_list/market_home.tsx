@@ -5,8 +5,7 @@ import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { CategoryDataItem, MarketMakerDataItem } from '../../../../queries/markets_home'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
-import { Button, ButtonCircle } from '../../../button'
-import { ButtonType } from '../../../button/button_styling_types'
+import { ButtonCircle } from '../../../button'
 import { SectionTitle } from '../../../common'
 import {
   Dropdown,
@@ -15,6 +14,10 @@ import {
   DropdownPosition,
   DropdownVariant,
 } from '../../../common/form/dropdown'
+import { IconChevronLeft } from '../../../common/icons/IconChevronLeft'
+import { IconChevronLeftDisabled } from '../../../common/icons/IconChevronLeftDisabled'
+import { IconChevronRight } from '../../../common/icons/IconChevronRight'
+import { IconChevronRightDisabled } from '../../../common/icons/IconChevronRightDisabled'
 import { IconFilter } from '../../../common/icons/IconFilter'
 import { IconSearch } from '../../../common/icons/IconSearch'
 import { InlineLoading } from '../../../loading'
@@ -103,11 +106,7 @@ const LoadMoreWrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: center;
-  padding: 0 15px 25px;
-`
-
-const ButtonLoadMoreWrapper = styled(Button)`
-  margin-top: 20px;
+  padding: 0 15px;
 `
 
 const CustomDropdownItem = styled.div`
@@ -165,6 +164,7 @@ const BottomContents = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 25px 0;
   border-top: 1px solid ${props => props.theme.borders.borderColor};
 `
 
@@ -415,20 +415,20 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           </DisplayButtonWrapper>
           {RemoteData.hasData(markets) && markets.data.length === 0 ? null : (
             <LoadMoreWrapper>
-              <ButtonLoadMoreWrapper
-                buttonType={ButtonType.secondaryLine}
-                disabled={disableLoadPrevButton}
-                onClick={onLoadPrevPage}
-              >
-                {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load prev'}
-              </ButtonLoadMoreWrapper>
-              <ButtonLoadMoreWrapper
-                buttonType={ButtonType.secondaryLine}
-                disabled={disableLoadNextButton}
-                onClick={onLoadNextPage}
-              >
-                {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load next'}
-              </ButtonLoadMoreWrapper>
+              <ButtonCircleStyled disabled={disableLoadPrevButton} onClick={onLoadPrevPage}>
+                {disableLoadPrevButton ? (
+                  <IconChevronLeftDisabled></IconChevronLeftDisabled>
+                ) : (
+                  <IconChevronLeft></IconChevronLeft>
+                )}
+              </ButtonCircleStyled>
+              <ButtonCircleStyled disabled={disableLoadNextButton} onClick={onLoadNextPage}>
+                {disableLoadNextButton ? (
+                  <IconChevronRightDisabled></IconChevronRightDisabled>
+                ) : (
+                  <IconChevronRight></IconChevronRight>
+                )}
+              </ButtonCircleStyled>
             </LoadMoreWrapper>
           )}
         </BottomContents>
