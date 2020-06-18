@@ -95,9 +95,12 @@ const SortDropdown = styled(Dropdown)`
   max-width: 145px;
 `
 
+const PageSizeDropdown = styled(Dropdown)`
+  max-width: 145px;
+`
+
 const LoadMoreWrapper = styled.div`
   align-items: center;
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
   justify-content: center;
   padding: 0 15px 25px;
@@ -151,6 +154,24 @@ const Actions = styled.div`
   }
 `
 
+const Display = styled.span`
+  color: ${props => props.theme.colors.textColorLighter};
+  font-size: 14px;
+  line-height: 1.2;
+  margin-right: 6px;
+`
+
+const BottomContents = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid ${props => props.theme.borders.borderColor};
+`
+
+const DisplayButtonWrapper = styled.div`
+  padding: 0 15px;
+`
+
 interface Props {
   context: ConnectedWeb3Context
   count: number
@@ -161,10 +182,11 @@ interface Props {
   moreMarkets: boolean
   onFilterChange: (filter: MarketFilters) => void
   onLoadMore: () => void
+  onUpdatePageSize: (size: number) => void
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { categories, count, isFiltering = false, markets, moreMarkets, onFilterChange, onLoadMore } = props
+  const { categories, count, isFiltering = false, markets, moreMarkets, onFilterChange, onLoadMore, onUpdatePageSize } = props
   const [state, setState] = useState<MarketStates>(MarketStates.open)
   const [category, setCategory] = useState('All')
   const [title, setTitle] = useState('')
@@ -290,6 +312,21 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           },
         ]
 
+  const sizeOptions = [4, 8, 12]
+
+  const sizeItems: Array<DropdownItemProps> = sizeOptions.map(item => {
+    return {
+      content: (
+        <CustomDropdownItem>
+          <Display className="display">Display</Display> {item}
+        </CustomDropdownItem>
+      ),
+      onClick: () => {
+        onUpdatePageSize(item)
+      },
+    }
+  })
+
   const noOwnMarkets = RemoteData.is.success(markets) && markets.data.length === 0 && state === MarketStates.myMarkets
   const noMarketsAvailable =
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
@@ -353,17 +390,26 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
-        {RemoteData.hasData(markets) && markets.data.length === 0 ? null : (
-          <LoadMoreWrapper>
-            <ButtonLoadMoreWrapper
-              buttonType={ButtonType.secondaryLine}
-              disabled={disableLoadMoreButton}
-              onClick={onLoadMore}
-            >
-              {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load more'}
-            </ButtonLoadMoreWrapper>
-          </LoadMoreWrapper>
-        )}
+        <BottomContents>
+          <DisplayButtonWrapper>
+            <PageSizeDropdown
+              dropdownPosition={DropdownPosition.right}
+              items={sizeItems}
+              placeholder={<Display>Display</Display>}
+            />
+          </DisplayButtonWrapper>
+          {RemoteData.hasData(markets) && markets.data.length === 0 ? null : (
+            <LoadMoreWrapper>
+              <ButtonLoadMoreWrapper
+                buttonType={ButtonType.secondaryLine}
+                disabled={disableLoadMoreButton}
+                onClick={onLoadMore}
+              >
+                {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load more'}
+              </ButtonLoadMoreWrapper>
+            </LoadMoreWrapper>
+          )}
+        </BottomContents>
       </ListCard>
     </>
   )
