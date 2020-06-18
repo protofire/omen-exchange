@@ -11,7 +11,7 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { GraphMarketMakerDataItem, MarketMakerDataItem, buildQueryMarkets } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getArbitratorsByNetwork, getDefaultToken, getOutcomes } from '../../../../util/networks'
+import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates } from '../../../../util/types'
 
