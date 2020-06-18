@@ -180,13 +180,27 @@ interface Props {
   markets: RemoteData<MarketMakerDataItem[]>
   categories: RemoteData<CategoryDataItem[]>
   moreMarkets: boolean
+  pageIndex: number
   onFilterChange: (filter: MarketFilters) => void
   onLoadMore: () => void
   onUpdatePageSize: (size: number) => void
+  onLoadNextPage: () => void
+  onLoadPrevPage: () => void
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { categories, count, isFiltering = false, markets, moreMarkets, onFilterChange, onLoadMore, onUpdatePageSize } = props
+  const { 
+    categories,
+    count,
+    isFiltering = false,
+    markets,
+    moreMarkets,
+    onFilterChange,
+    onLoadNextPage,
+    onLoadPrevPage,
+    onUpdatePageSize,
+    pageIndex,
+  } = props
   const [state, setState] = useState<MarketStates>(MarketStates.open)
   const [category, setCategory] = useState('All')
   const [title, setTitle] = useState('')
@@ -331,8 +345,10 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const noMarketsAvailable =
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
   const showFilteringInlineLoading = !noMarketsAvailable && !noOwnMarkets && isFiltering
-  const disableLoadMoreButton =
+  const disableLoadNextButton =
     isFiltering || !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
+  const disableLoadPrevButton =
+    isFiltering || pageIndex === 0 || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
 
   return (
     <>
@@ -402,10 +418,17 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             <LoadMoreWrapper>
               <ButtonLoadMoreWrapper
                 buttonType={ButtonType.secondaryLine}
-                disabled={disableLoadMoreButton}
-                onClick={onLoadMore}
+                disabled={disableLoadPrevButton}
+                onClick={onLoadPrevPage}
               >
-                {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load more'}
+                {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load prev'}
+              </ButtonLoadMoreWrapper>
+              <ButtonLoadMoreWrapper
+                buttonType={ButtonType.secondaryLine}
+                disabled={disableLoadNextButton}
+                onClick={onLoadNextPage}
+              >
+                {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load next'}
               </ButtonLoadMoreWrapper>
             </LoadMoreWrapper>
           )}

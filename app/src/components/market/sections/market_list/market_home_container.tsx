@@ -23,8 +23,6 @@ import { MarketHome } from './market_home'
 
 const logger = getLogger('MarketHomeContainer')
 
-// const PAGE_SIZE = 4
-
 type GraphResponseMarkets = {
   fixedProductMarketMakers: GraphMarketMakerDataItem[]
 }
@@ -73,6 +71,7 @@ const MarketHomeContainer: React.FC = () => {
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const [moreMarkets, setMoreMarkets] = useState(true)
   const [pageSize, setPageSize] = useState(4)
+  const [pageIndex, setPageIndex] = useState(0)
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
   const [now, setNow] = useState<string>(calcNow())
   const [isFiltering, setIsFiltering] = useState(false)
@@ -190,6 +189,58 @@ const MarketHomeContainer: React.FC = () => {
     })
   }
 
+  const loadNextPage = () => {
+    if (!moreMarkets) {
+      return
+    }
+
+    fetchMore({
+      variables: {
+        skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex + 1),
+      },
+      updateQuery: (prev: any, { fetchMoreResult }) => {
+        setMoreMarkets(fetchMoreResult ? fetchMoreResult.fixedProductMarketMakers.length >= pageSize : false)
+        setPageIndex(pageIndex + 1)
+
+        if (!fetchMoreResult) {
+          return prev
+        }
+
+        return {
+          ...{
+            fixedProductMarketMakers: [...fetchMoreResult.fixedProductMarketMakers],
+          },
+        }
+      },
+    })
+  }
+
+  const loadPrevPage = () => {
+    if (pageIndex === 0) {
+      return
+    }
+
+    fetchMore({
+      variables: {
+        skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex - 1),
+      },
+      updateQuery: (prev: any, { fetchMoreResult }) => {
+        setMoreMarkets(true)
+        setPageIndex(pageIndex - 1)
+
+        if (!fetchMoreResult) {
+          return prev
+        }
+
+        return {
+          ...{
+            fixedProductMarketMakers: [...fetchMoreResult.fixedProductMarketMakers],
+          },
+        }
+      },
+    })
+  }
+
   const updatePageSize = (size: number): void => {
     setPageSize(size)
   }
@@ -206,7 +257,10 @@ const MarketHomeContainer: React.FC = () => {
         moreMarkets={moreMarkets}
         onFilterChange={onFilterChange}
         onLoadMore={loadMore}
+        onLoadNextPage={loadNextPage}
+        onLoadPrevPage={loadPrevPage}
         onUpdatePageSize={updatePageSize}
+        pageIndex={pageIndex}
       />
     </>
   )
