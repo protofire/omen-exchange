@@ -49,10 +49,6 @@ const Info = styled.div`
   word-break: break-all;
 `
 
-const OutcomeTitle = styled.span`
-  color: ${props => props.theme.colors.textColor};
-`
-
 const Outcome = styled.span`
   color: ${props => props.theme.colors.primary};
   margin-left: 6px;
