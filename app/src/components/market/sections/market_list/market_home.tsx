@@ -94,9 +94,7 @@ const NoOwnMarkets = styled.p`
   text-align: center;
 `
 
-const SortDropdown = styled(Dropdown)`
-  max-width: 145px;
-`
+const SortDropdown = styled(Dropdown)``
 
 const PageSizeDropdown = styled(Dropdown)`
   max-width: 145px;
