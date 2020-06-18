@@ -7,6 +7,7 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { ERC20Service } from '../../../../services'
 import { calcPrice, formatBigNumber } from '../../../../util/tools'
+import { IconStar } from '../../../common/icons/IconStar'
 
 const Wrapper = styled(NavLink)`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
@@ -37,11 +38,11 @@ const Title = styled.h2`
 
 const Info = styled.div`
   align-items: center;
-  color: ${props => props.theme.colors.textColor};
+  color: ${props => props.theme.colors.textColorLighter};
   display: flex;
   flex-wrap: wrap;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.2;
   overflow-wrap: break-word;
   white-space: normal;
@@ -54,11 +55,13 @@ const OutcomeTitle = styled.span`
 
 const Outcome = styled.span`
   color: ${props => props.theme.colors.primary};
+  margin-left: 6px;
 `
 
 const Separator = styled.span`
   font-size: 18px;
   margin: 0 5px;
+  color: ${props => props.theme.colors.verticalDivider};
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -76,7 +79,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   const now = moment()
   const endDate = openingTimestamp
-  const endsText = moment(endDate).fromNow()
+  const endsText = moment(endDate).fromNow(true)
 
   useEffect(() => {
     const setToken = async () => {
@@ -98,16 +101,14 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     <Wrapper to={address}>
       <Title>{title}</Title>
       <Info>
-        <Outcome>
-          <OutcomeTitle>Top Outcome:</OutcomeTitle>{' '}
-          {outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}
-        </Outcome>
-        <Separator>·</Separator>
+        <IconStar></IconStar>
+        <Outcome>{outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}</Outcome>
+        <Separator>|</Separator>
+        <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Ended ${endsText}`}</span>
+        <Separator>|</Separator>
         <span>
           {amount} {symbol} Volume
         </span>
-        <Separator>·</Separator>
-        <span>{moment(endDate).isAfter(now) ? `Ends ${endsText}` : `Ended ${endsText}`}</span>
       </Info>
     </Wrapper>
   )
