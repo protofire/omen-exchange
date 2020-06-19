@@ -1,4 +1,5 @@
 import CPK from 'contract-proxy-kit'
+import EthersAdapter from 'contract-proxy-kit/lib/esm/eth-lib-adapters/EthersAdapter'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
@@ -16,7 +17,7 @@ export const useCpk = (): Maybe<CPKService> => {
     if (account && library) {
       const signer = library.getSigner()
 
-      CPK.create({ ethers, signer })
+      CPK.create({ ethLibAdapter: new EthersAdapter({ ethers, signer }) })
         .then(cpk => new CPKService(cpk, library))
         .then(setCpk)
     }
