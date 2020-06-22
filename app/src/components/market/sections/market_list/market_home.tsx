@@ -1,29 +1,27 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import {
-  CATEGORIES,
-  SHOW_ADVANCED_FILTERS,
-  SHOW_CATEGORIES,
-  SHOW_FILTERS,
-  SHOW_MY_MARKETS,
-} from '../../../../common/constants'
+import { CATEGORIES, SHOW_ADVANCED_FILTERS, SHOW_CATEGORIES, SHOW_FILTERS } from '../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
-import { Button, ButtonCircle, ButtonSelectable } from '../../../button'
+import { Button, ButtonCircle } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { SectionTitle } from '../../../common'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
+import {
+  Dropdown,
+  DropdownDirection,
+  DropdownItemProps,
+  DropdownPosition,
+  DropdownVariant,
+} from '../../../common/form/dropdown'
 import { IconFilter } from '../../../common/icons/IconFilter'
 import { IconSearch } from '../../../common/icons/IconSearch'
 import { InlineLoading } from '../../../loading'
 import { AdvancedFilters } from '../../common/advanced_filters'
-import { DropdownCard } from '../../common/dropdown_card'
 import { ListCard } from '../../common/list_card'
 import { ListItem } from '../../common/list_item'
-import { MarketsCategories } from '../../common/markets_categories'
 import { Search } from '../../common/search'
 
 const SectionTitleMarket = styled(SectionTitle)`
@@ -44,14 +42,6 @@ const TopContents = styled.div`
   padding: 25px;
 `
 
-const SelectableButton = styled(ButtonSelectable)`
-  margin-right: 5px;
-
-  &:last-child {
-    margin-right: 0;
-  }
-`
-
 const FiltersWrapper = styled.div`
   align-items: center;
   display: flex;
@@ -60,16 +50,6 @@ const FiltersWrapper = styled.div`
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-direction: row;
-  }
-`
-
-const FiltersCategories = styled.div`
-  align-items: center;
-  display: flex;
-  margin-bottom: 20px;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin-bottom: 0;
   }
 `
 
@@ -147,12 +127,10 @@ const SecondaryText = styled.span`
 `
 
 const MarketsDropdown = styled(Dropdown)`
-  border: 0;
   width: 100%;
 `
 
 const MarketsFilterDropdown = styled(Dropdown)`
-  border: 0;
   width: 100%;
 `
 
@@ -296,10 +274,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     }
   })
 
-  const filtersCategoriesEnabledButtons = (f: any) => {
-    return !context.account || !SHOW_MY_MARKETS ? f.state !== MarketStates.myMarkets : true
-  }
-
   const noOwnMarkets = RemoteData.is.success(markets) && markets.data.length === 0 && state === MarketStates.myMarkets
   const noMarketsAvailable =
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
@@ -318,15 +292,19 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         //   ))}
         // </MarketsCategories>
         <Actions>
-          <DropdownCard>
-            <MarketsDropdown dropdownPosition={DropdownPosition.right} items={categoryItems} />
-          </DropdownCard>
-          <DropdownCard>
-            <MarketsFilterDropdown dropdownPosition={DropdownPosition.right} items={filterItems} />
-            <SecondaryText style={{ position: 'absolute', right: '3rem', lineHeight: '2.2rem', pointerEvents: 'none' }}>
+          <MarketsDropdown
+            dropdownDirection={DropdownDirection.downwards}
+            dropdownVariant={DropdownVariant.card}
+            items={categoryItems}
+          />
+          <MarketsFilterDropdown
+            dropdownDirection={DropdownDirection.downwards}
+            dropdownVariant={DropdownVariant.card}
+            items={filterItems}
+          />
+          {/* <SecondaryText style={{ position: 'absolute', right: '3rem', lineHeight: '2.2rem', pointerEvents: 'none' }}>
               621 Markets
-            </SecondaryText>
-          </DropdownCard>
+            </SecondaryText> */}
         </Actions>
       )}
       <ListCard>
