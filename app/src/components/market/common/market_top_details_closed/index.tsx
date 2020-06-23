@@ -28,7 +28,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     collateralVolume,
     question,
   } = marketMakerData
-
+  console.log(address)
   const resolutionFormat = question.resolution ? formatDate(question.resolution) : ''
   const totalVolumeFormat = collateralVolume
     ? `${formatBigNumber(collateralVolume, collateralToken.decimals)} ${collateralToken.symbol}`
@@ -37,6 +37,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const [showingTradeHistory, setShowingTradeHistory] = useState(false)
   const [tradeHistoryLoaded, setTradeHistoryLoaded] = useState(false)
 
+  console.log(address)
   const toggleTradeHistory = () => {
     if (showingTradeHistory) {
       setShowingTradeHistory(false)
