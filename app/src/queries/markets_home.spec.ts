@@ -22,7 +22,6 @@ test('Query markets with default options', () => {
   expect(query).toBe(expectedQuery)
 })
 
-
 test('Query markets', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,

@@ -28,7 +28,6 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     collateralVolume,
     question,
   } = marketMakerData
-
   const resolutionFormat = question.resolution ? formatDate(question.resolution) : ''
   const totalVolumeFormat = collateralVolume
     ? `${formatBigNumber(collateralVolume, collateralToken.decimals)} ${collateralToken.symbol}`

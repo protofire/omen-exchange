@@ -177,10 +177,8 @@ export const ModalConnectWallet = (props: Props) => {
   const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect
   const connectingText = connectingToMetamask ? 'Waiting for Approval on Metamask' : 'Opening QR for Wallet Connect'
 
-  let disableMetamask: boolean
-  let disableWalletConnect: boolean
-  disableMetamask = !isMetamaskEnabled || false
-  disableWalletConnect = false
+  const disableMetamask: boolean = !isMetamaskEnabled || false
+  const disableWalletConnect = false
 
   return (
     <>

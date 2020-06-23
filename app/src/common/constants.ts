@@ -22,8 +22,15 @@ export const SINGLE_SELECT_TEMPLATE_ID = 2
 
 export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
 
-export const CATEGORIES =
-  ['Business & Finance', 'Cryptocurrency', 'News & Politics', 'Science & Tech', 'Sports', 'Weather', 'Miscellaneous']
+export const CATEGORIES = [
+  'Business & Finance',
+  'Cryptocurrency',
+  'News & Politics',
+  'Science & Tech',
+  'Sports',
+  'Weather',
+  'Miscellaneous',
+]
 
 export const GRAPH_MAINNET_HTTP =
   process.env.REACT_APP_GRAPH_MAINNET_HTTP || 'https://api.thegraph.com/subgraphs/name/gnosis/omen'
