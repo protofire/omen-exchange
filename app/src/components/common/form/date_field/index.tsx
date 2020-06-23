@@ -1,4 +1,4 @@
-import moment from 'moment'
+import moment from 'moment-timezone'
 import React from 'react'
 import DatePicker from 'react-datepicker'
 import ReactDOM from 'react-dom'
@@ -103,26 +103,48 @@ const CalendarPortal = (props: CalendarPortalProps) => {
   )
 }
 
+// we need to do this because the value selected by react-datepicker
+// uses the local timezone, but we want to interpret it in UTC
+const convertLocalToUTC = (date: Date): Date => {
+  const offsetMinutes = moment().utcOffset()
+  return moment(date)
+    .add(offsetMinutes, 'minutes')
+    .toDate()
+}
+
+const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
+  if (!date) {
+    return date
+  }
+
+  const offsetMinutes = moment().utcOffset()
+  return moment(date)
+    .subtract(offsetMinutes, 'minutes')
+    .toDate()
+}
+
 export const DateField = (props: Props) => {
   const { disabled, minDate, name, onChange, selected, ...restProps } = props
-  const timeInputLabel = `Time (UTC${moment().format('Z')})`
+
+  const handleChange = (date: Maybe<Date>) => {
+    onChange(date ? convertLocalToUTC(date) : date)
+  }
 
   return (
     <DateFieldWrapper {...restProps} disabled={disabled}>
       <DatePicker
         autoComplete="off"
         calendarClassName="customCalendar"
-        dateFormat="Pp"
+        dateFormat="MMMM d, yyyy h:mm aa"
         disabled={disabled}
         minDate={minDate}
         name={name}
-        onChange={onChange}
+        onChange={handleChange}
         placeholderText="Select Date"
         popperContainer={CalendarPortal}
-        selected={selected}
+        selected={convertUTCToLocal(selected)}
         showDisabledMonthNavigation
         showTimeSelect
-        timeInputLabel={timeInputLabel}
       />
     </DateFieldWrapper>
   )
