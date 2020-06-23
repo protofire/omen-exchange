@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import {
-  CATEGORIES,
-} from '../../../../common/constants'
+import { CATEGORIES } from '../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { RemoteData } from '../../../../util/remote_data'

@@ -36,7 +36,6 @@ export const useTokens = (context: ConnectedWeb3Context) => {
     }
 
     fetchTokens()
-
   }, [context.library, context.networkId, dxTCR])
 
   return tokens

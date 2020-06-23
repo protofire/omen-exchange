@@ -35,7 +35,6 @@ export const Tokens = (props: Props) => {
     }
 
     fetchTokens()
-
   }, [kleros])
 
   const options = tokens.map(token => ({

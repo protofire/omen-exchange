@@ -2,10 +2,7 @@ import React, { ChangeEvent, useCallback, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled, { css } from 'styled-components'
 
-import {
-  DOCUMENT_VALIDITY_RULES,
-  MAX_OUTCOME_ALLOWED,
-} from '../../../../../../common/constants'
+import { DOCUMENT_VALIDITY_RULES, MAX_OUTCOME_ALLOWED } from '../../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
