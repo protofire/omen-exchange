@@ -200,29 +200,29 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   const sortOptions = [
     {
-      title: 'Volume',
-      sortBy: 'collateralVolume',
-      direction: 'desc',
-    },
-    {
       title: '24h volume',
       sortBy: 'lastActiveDayAndRunningDailyVolume',
       direction: 'desc',
     },
     {
-      title: 'Creation date',
+      title: 'Total volume',
+      sortBy: 'collateralVolume',
+      direction: 'desc',
+    },
+    {
+      title: 'Highest liquidity',
+      sortBy: 'liquidityParameter',
+      direction: 'desc',
+    },
+    {
+      title: 'Newest',
       sortBy: 'creationTimestamp',
       direction: 'desc',
     },
     {
-      title: 'Resolution date',
+      title: 'Ending soon',
       sortBy: 'openingTimestamp',
       direction: 'asc',
-    },
-    {
-      title: 'Liquidity',
-      sortBy: 'liquidityParameter',
-      direction: 'desc',
     },
   ] as const
 
