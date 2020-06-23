@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 
-import { SHOW_TRADE_HISTORY, TOGGLEABLE_EXTRA_INFORMATION } from '../../../../common/constants'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper } from '../../../common'
@@ -61,22 +60,14 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} title={title} />
         <SubsectionTitleActionWrapper>
-          {TOGGLEABLE_EXTRA_INFORMATION && (
-            <>
-              <SubsectionTitleAction onClick={toggleExtraInformation}>
-                {showingExtraInformation ? 'Hide' : 'Show'} {toggleTitle}
-              </SubsectionTitleAction>
-              <Breaker />
-            </>
-          )}
-          {SHOW_TRADE_HISTORY && (
-            <>
-              <SubsectionTitleAction onClick={toggleTradeHistory}>
-                {`${showingTradeHistory ? 'Hide' : 'Show'} Trade History`}
-              </SubsectionTitleAction>
-              <Breaker />
-            </>
-          )}
+          <SubsectionTitleAction onClick={toggleExtraInformation}>
+            {showingExtraInformation ? 'Hide' : 'Show'} {toggleTitle}
+          </SubsectionTitleAction>
+          <Breaker />
+          <SubsectionTitleAction onClick={toggleTradeHistory}>
+            {`${showingTradeHistory ? 'Hide' : 'Show'} Trade History`}
+          </SubsectionTitleAction>
+          <Breaker />
         </SubsectionTitleActionWrapper>
       </SubsectionTitleWrapper>
       <GridTwoColumns>

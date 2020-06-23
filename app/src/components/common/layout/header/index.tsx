@@ -3,18 +3,16 @@ import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
-import useLocalStorageState from 'use-local-storage-state'
 import { useWeb3Context } from 'web3-react/dist'
 
-import { BLACKLIST_COUNTRIES, Logo, SHOW_CREATE_MARKET, SHOW_SOCIAL } from '../../../../common/constants'
-import { ConnectedWeb3, useDetectAdblocker, useIsBlacklistedCountry } from '../../../../hooks'
+import { Logo } from '../../../../common/constants'
+import { ConnectedWeb3 } from '../../../../hooks'
 import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
-import { Message, MessageType } from '../../../common/message'
 import { ModalConnectWallet } from '../../../modal'
-import { IconAdd, IconTwitter } from '../../icons'
+import { IconAdd } from '../../icons'
 
 const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -100,20 +98,6 @@ const ContentsLeft = styled.div`
   }
 `
 
-const SocialIconsWrapper = styled.div`
-  align-items: center;
-  border-left: 1px solid #e5e5e5;
-  display: flex;
-  height: 20px;
-  margin: 0 0 0 15px;
-  padding: 0 0 0 15px;
-`
-
-const SocialIcon = styled.a`
-  align-items: center;
-  display: flex;
-`
-
 const ContentsRight = styled.div`
   align-items: center;
   display: flex;
@@ -128,36 +112,13 @@ const HeaderDropdown = styled(Dropdown)`
   ${ButtonCSS}
 `
 
-const AdBlockWarning: React.FC = () => {
-  const adBlockDetected = useDetectAdblocker()
-  const [shownBefore, setShownBefore] = useLocalStorageState('adBlockMessageShown', false)
-
-  return adBlockDetected && !shownBefore ? (
-    <Message
-      onHide={() => setShownBefore(true)}
-      text="This dApp may not work correctly with your ad blocker enabled."
-      title="Ad Blocker Detected!"
-      type={MessageType.error}
-    />
-  ) : null
-}
-
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-  const isBlacklistedCountry = useIsBlacklistedCountry()
   const context = useWeb3Context()
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
 
-  const disableConnectButton =
-    (BLACKLIST_COUNTRIES && (isBlacklistedCountry === null || isBlacklistedCountry === true)) || isModalOpen
-
-  const tooltipText =
-    isBlacklistedCountry === null
-      ? "We couldn't detect your country. Maybe an ad blocker is enabled?"
-      : isBlacklistedCountry === true
-      ? 'This action is not allowed in your country'
-      : ''
+  const disableConnectButton = isModalOpen
 
   const headerDropdownItems: Array<DropdownItemProps> = [
     {
@@ -172,31 +133,19 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
 
   return (
     <HeaderWrapper {...restProps}>
-      {BLACKLIST_COUNTRIES && <AdBlockWarning />}
       <HeaderInner>
         <ContentsLeft>
           <LogoWrapper to="/">
             <Logo />
           </LogoWrapper>
-          {SHOW_SOCIAL && (
-            <SocialIconsWrapper>
-              <SocialIcon href="https://www.twitter.com/corona_markets" target="_blank">
-                <IconTwitter />
-              </SocialIcon>
-            </SocialIconsWrapper>
-          )}
         </ContentsLeft>
         <ContentsRight>
-          {SHOW_CREATE_MARKET && (
-            <>
-              <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...createButtonProps}>
-                Create Market
-              </ButtonCreateDesktop>
-              <ButtonCreateMobile {...createButtonProps}>
-                <IconAdd />
-              </ButtonCreateMobile>
-            </>
-          )}
+          <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...createButtonProps}>
+            Create Market
+          </ButtonCreateDesktop>
+          <ButtonCreateMobile {...createButtonProps}>
+            <IconAdd />
+          </ButtonCreateMobile>
           {!context.account && (
             <ButtonWrapper
               data-class="customTooltip"
@@ -205,7 +154,6 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               data-for="connectButtonTooltip"
               data-multiline={true}
               data-place="left"
-              data-tip={tooltipText}
             >
               <ButtonConnectWalletStyled
                 disabled={disableConnectButton}

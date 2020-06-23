@@ -4,7 +4,7 @@ import React, { ChangeEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { DISABLE_CURRENCY_IN_CREATION, DOCUMENT_FAQ } from '../../../../../../common/constants'
+import { DOCUMENT_FAQ } from '../../../../../../common/constants'
 import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
@@ -231,7 +231,7 @@ const FundingAndFeeStep = (props: Props) => {
             <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
             <CurrencySelector
               context={context}
-              disabled={DISABLE_CURRENCY_IN_CREATION}
+              disabled={false}
               onSelect={handleCollateralChange}
               selectedCurrency={collateral}
             />
