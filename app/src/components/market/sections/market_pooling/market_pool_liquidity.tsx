@@ -354,12 +354,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   emphasizeValue={userEarnings.gt(0)}
                   state={ValueStates.success}
                   title={'Earned'}
-                  value={formatBigNumber(userEarnings, collateral.decimals)}
+                  value={`${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
                 />
                 <TransactionDetailsRow
-                  state={ValueStates.success}
+                  state={ValueStates.normal}
                   title={'Deposited'}
-                  value={formatBigNumber(depositedTokens, collateral.decimals)}
+                  value={`${formatBigNumber(depositedTokens, collateral.decimals)} ${collateral.symbol}`}
                 />
                 <TransactionDetailsLine />
                 <TransactionDetailsRow
