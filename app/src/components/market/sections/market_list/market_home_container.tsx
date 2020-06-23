@@ -4,9 +4,7 @@ import { ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
 
-import {
-  MARKET_FEE,
-} from '../../../../common/constants'
+import { MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { GraphMarketMakerDataItem, MarketMakerDataItem, buildQueryMarkets } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
@@ -71,7 +69,7 @@ const MarketHomeContainer: React.FC = () => {
   const query = buildQueryMarkets({
     whitelistedTemplateIds: true,
     whitelistedCreators: false,
-    ...filter
+    ...filter,
   })
 
   const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)

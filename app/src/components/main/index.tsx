@@ -61,6 +61,6 @@ export const Main: React.FC = () => {
         <Disclaimer />
         <CookiesBanner />
       </MainWrapper>
-      </Router>
+    </Router>
   )
 }

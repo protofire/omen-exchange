@@ -28,5 +28,9 @@ const Text = styled.span`
 `
 
 export const Disclaimer = () => {
-  return <Wrapper><Text>{DISCLAIMER_TEXT}</Text></Wrapper>
+  return (
+    <Wrapper>
+      <Text>{DISCLAIMER_TEXT}</Text>
+    </Wrapper>
+  )
 }

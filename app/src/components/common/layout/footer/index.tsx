@@ -2,11 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { version as appVersion } from '../../../../../package.json'
-import {
-  DISCLAIMER_TEXT,
-  DOCUMENT_FAQ,
-  SHOW_FOOTER,
-} from '../../../../common/constants'
+import { DISCLAIMER_TEXT, DOCUMENT_FAQ, SHOW_FOOTER } from '../../../../common/constants'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 
 const Wrapper = styled.div<{ paddingBottomSmall?: boolean }>`
