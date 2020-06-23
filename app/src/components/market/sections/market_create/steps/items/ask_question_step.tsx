@@ -3,8 +3,6 @@ import { useHistory } from 'react-router'
 import styled, { css } from 'styled-components'
 
 import {
-  DISABLE_ARBITRATOR_IN_CREATION,
-  DISABLE_CATEGORIES_IN_CREATION,
   DOCUMENT_VALIDITY_RULES,
   MAX_OUTCOME_ALLOWED,
 } from '../../../../../../common/constants'
@@ -207,7 +205,7 @@ const AskQuestionStep = (props: Props) => {
             formField={
               <ButtonCategory
                 buttonType={ButtonType.secondaryLine}
-                disabled={!!loadedQuestionId || DISABLE_CATEGORIES_IN_CREATION}
+                disabled={!!loadedQuestionId}
                 focus={categoryButtonFocus}
                 isACategorySelected={category !== ''}
                 onClick={toggleCategoryButtonFocus}
@@ -223,7 +221,7 @@ const AskQuestionStep = (props: Props) => {
             formField={
               <Arbitrators
                 customValues={arbitratorsCustom}
-                disabled={!!loadedQuestionId || DISABLE_ARBITRATOR_IN_CREATION}
+                disabled={!!loadedQuestionId}
                 networkId={context.networkId}
                 onChangeArbitrator={handleArbitratorChange}
                 value={arbitrator}

@@ -5,18 +5,13 @@ import { bigNumberify } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import {
-  IS_CORONA_VERSION,
-  IS_GNO_VERSION,
-  MARKET_CREATORS,
   MARKET_FEE,
-  WHITELISTED_CREATORS,
-  WHITELISTED_TEMPLATE_IDS,
 } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { GraphMarketMakerDataItem, MarketMakerDataItem, buildQueryMarkets } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getArbitratorsByNetwork, getDefaultToken, getOutcomes } from '../../../../util/networks'
+import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates } from '../../../../util/types'
 
@@ -58,11 +53,11 @@ const MarketHomeContainer: React.FC = () => {
     state: MarketStates.open,
     category: 'All',
     title: '',
-    sortBy: IS_CORONA_VERSION ? 'openingTimestamp' : 'collateralVolume',
-    sortByDirection: IS_CORONA_VERSION ? 'asc' : 'desc',
+    sortBy: 'collateralVolume',
+    sortByDirection: 'desc',
     arbitrator: null,
     templateId: null,
-    currency: IS_GNO_VERSION ? getDefaultToken(context.networkId).address : null,
+    currency: null,
   })
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
@@ -74,9 +69,9 @@ const MarketHomeContainer: React.FC = () => {
   const { account, library: provider } = context
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
   const query = buildQueryMarkets({
-    whitelistedCreators: WHITELISTED_CREATORS,
-    whitelistedTemplateIds: WHITELISTED_TEMPLATE_IDS,
-    ...filter,
+    whitelistedTemplateIds: true,
+    whitelistedCreators: false,
+    ...filter
   })
 
   const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)
@@ -89,10 +84,6 @@ const MarketHomeContainer: React.FC = () => {
     now: +now,
     knownArbitrators,
     ...filter,
-  }
-
-  if (WHITELISTED_CREATORS) {
-    marketsQueryVariables.accounts = MARKET_CREATORS
   }
 
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery<GraphResponse>(query, {

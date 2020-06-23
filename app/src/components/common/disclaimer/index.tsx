@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { DISCLAIMER_TEXT, IS_CORONA_VERSION } from '../../../common/constants'
+import { DISCLAIMER_TEXT } from '../../../common/constants'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -27,17 +27,6 @@ const Text = styled.span`
   text-align: center;
 `
 
-const Title = styled(Text)`
-  font-weight: 500;
-  text-transform: uppercase;
-`
-
 export const Disclaimer = () => {
-  return DISCLAIMER_TEXT && IS_CORONA_VERSION ? (
-    <Wrapper>
-      <Text>
-        <Title>Disclaimer:</Title> {DISCLAIMER_TEXT}
-      </Text>
-    </Wrapper>
-  ) : null
+  return <Wrapper><Text>{DISCLAIMER_TEXT}</Text></Wrapper>
 }
