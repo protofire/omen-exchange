@@ -1,4 +1,3 @@
-import moment from 'moment'
 import React from 'react'
 import DatePicker from 'react-datepicker'
 import ReactDOM from 'react-dom'
@@ -105,14 +104,13 @@ const CalendarPortal = (props: CalendarPortalProps) => {
 
 export const DateField = (props: Props) => {
   const { disabled, minDate, name, onChange, selected, ...restProps } = props
-  const timeInputLabel = `Time (UTC${moment().format('Z')})`
 
   return (
     <DateFieldWrapper {...restProps} disabled={disabled}>
       <DatePicker
         autoComplete="off"
         calendarClassName="customCalendar"
-        dateFormat="Pp"
+        dateFormat="MMMM d, yyyy h:mm aa"
         disabled={disabled}
         minDate={minDate}
         name={name}
@@ -122,7 +120,6 @@ export const DateField = (props: Props) => {
         selected={selected}
         showDisabledMonthNavigation
         showTimeSelect
-        timeInputLabel={timeInputLabel}
       />
     </DateFieldWrapper>
   )
