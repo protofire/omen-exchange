@@ -5,8 +5,6 @@ import { useWeb3Context } from 'web3-react'
 import connectors from '../util/connectors'
 import { getLogger } from '../util/logger'
 
-import { useIsBlacklistedCountry } from './geoJs'
-
 const logger = getLogger('Hooks::ConnectedWeb3')
 
 export interface ConnectedWeb3Context {
@@ -39,16 +37,10 @@ export const ConnectedWeb3: React.FC = props => {
   const [networkId, setNetworkId] = useState<number | null>(null)
   const context = useWeb3Context()
   const { account, active, error, library } = context
-  const isBlacklistedCountry = useIsBlacklistedCountry()
 
   useEffect(() => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
-
-    if (isBlacklistedCountry === true) {
-      localStorage.removeItem('CONNECTOR')
-      context.setConnector('Infura')
-    }
 
     if (active) {
       if (connector && connector in connectors) {
@@ -74,7 +66,7 @@ export const ConnectedWeb3: React.FC = props => {
     return () => {
       isSubscribed = false
     }
-  }, [context, library, active, error, isBlacklistedCountry])
+  }, [context, library, active, error])
 
   if (!networkId || !library) {
     return null

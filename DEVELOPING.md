@@ -15,7 +15,7 @@
     cp .env.example .env
     ```
 
-    Set `REACT_APP_VERSION=omen` and set `REACT_APP_INFURA_PROJECT_ID` to your [Infura](https://infura.io/) project id.
+    Set `REACT_APP_INFURA_PROJECT_ID` to your [Infura](https://infura.io/) project id.
     The rest of the environment variables should work fine with the default values, but you can change them however you
     want.
 
