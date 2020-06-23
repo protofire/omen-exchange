@@ -1,4 +1,5 @@
 import CPK from 'contract-proxy-kit'
+import EthersAdapter from 'contract-proxy-kit/lib/esm/eth-lib-adapters/EthersAdapter'
 import { ethers } from 'ethers'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
@@ -85,8 +86,10 @@ class CPKService {
         }
       : {}
     const cpk = await CPK.create({
-      ethers,
-      signer,
+      ethLibAdapter: new EthersAdapter({
+        ethers,
+        signer,
+      }),
       networks,
     })
     return new CPKService(cpk, provider)
@@ -114,16 +117,12 @@ class CPKService {
       const transactions = [
         // Step 2: Transfer the amount of collateral being spent from the user to the CPK
         {
-          operation: CPK.CALL,
           to: collateralAddress,
-          value: 0,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
         },
         // Step 3: Buy outcome tokens with the CPK
         {
-          operation: CPK.CALL,
           to: marketMakerAddress,
-          value: 0,
           data: MarketMakerService.encodeBuy(amount, outcomeIndex, outcomeTokensToBuy),
         },
       ]
@@ -138,14 +137,12 @@ class CPKService {
       if (!hasCPKEnoughAlowance) {
         // Step 1:  Approve unlimited amount to be transferred to the market maker)
         transactions.unshift({
-          operation: CPK.CALL,
           to: collateralAddress,
-          value: 0,
           data: ERC20Service.encodeApproveUnlimited(marketMakerAddress),
         })
       }
 
-      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
+      const txObject = await this.cpk.execTransactions(transactions)
 
       logger.log(`Transaction hash: ${txObject.hash}`)
       return this.provider.waitForTransaction(txObject.hash)
@@ -187,9 +184,7 @@ class CPKService {
       } else {
         // Step 1: Create question in realitio
         transactions.push({
-          operation: CPK.CALL,
           to: realitioAddress,
-          value: 0,
           data: RealitioService.encodeAskQuestion(
             question,
             outcomes,
@@ -224,9 +219,7 @@ class CPKService {
         logger.log(`Adding prepareCondition transaction`)
 
         transactions.push({
-          operation: CPK.CALL,
           to: conditionalTokensAddress,
-          value: 0,
           data: ConditionalTokenService.encodePrepareCondition(questionId, oracleAddress, outcomes.length),
         })
       }
@@ -235,17 +228,13 @@ class CPKService {
 
       // Step 3: Approve collateral for factory
       transactions.push({
-        operation: CPK.CALL,
         to: collateral.address,
-        value: 0,
         data: ERC20Service.encodeApproveUnlimited(marketMakerFactory.address),
       })
 
       // Step 4: Transfer funding from user
       transactions.push({
-        operation: CPK.CALL,
         to: collateral.address,
-        value: 0,
         data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
       })
 
@@ -261,9 +250,7 @@ class CPKService {
       logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
       const distributionHint = calcDistributionHint(marketData.outcomes.map(o => o.probability))
       transactions.push({
-        operation: CPK.CALL,
         to: marketMakerFactory.address,
-        value: 0,
         data: MarketMakerFactoryService.encodeCreateMarketMaker(
           saltNonce,
           conditionalTokens.address,
@@ -274,7 +261,7 @@ class CPKService {
         ),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 2000000 })
+      const txObject = await this.cpk.execTransactions(transactions)
       logger.log(`Transaction hash: ${txObject.hash}`)
 
       await this.provider.waitForTransaction(txObject.hash)
@@ -306,29 +293,23 @@ class CPKService {
 
       if (!isAlreadyApprovedForMarketMaker) {
         transactions.push({
-          operation: CPK.CALL,
           to: conditionalTokens.address,
-          value: 0,
           data: ConditionalTokenService.encodeSetApprovalForAll(marketMaker.address, true),
         })
       }
 
       transactions.push(
         {
-          operation: CPK.CALL,
           to: marketMaker.address,
-          value: 0,
           data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
         },
         {
-          operation: CPK.CALL,
           to: collateralAddress,
-          value: 0,
           data: ERC20Service.encodeTransfer(account, amount),
         },
       )
 
-      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
+      const txObject = await this.cpk.execTransactions(transactions)
 
       logger.log(`Transaction hash: ${txObject.hash}`)
       return this.provider.waitForTransaction(txObject.hash)
@@ -356,29 +337,23 @@ class CPKService {
       if (!hasCPKEnoughAlowance) {
         // Step 1:  Approve unlimited amount to be transferred to the market maker
         transactions.push({
-          operation: CPK.CALL,
           to: collateral.address,
-          value: 0,
           data: ERC20Service.encodeApproveUnlimited(marketMaker.address),
         })
       }
 
       transactions.push(
         {
-          operation: CPK.CALL,
           to: collateral.address,
-          value: 0,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
         },
         {
-          operation: CPK.CALL,
           to: marketMaker.address,
-          value: 0,
           data: MarketMakerService.encodeAddFunding(amount),
         },
       )
 
-      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 2000000 })
+      const txObject = await this.cpk.execTransactions(transactions)
 
       logger.log(`Transaction hash: ${txObject.hash}`)
       return this.provider.waitForTransaction(txObject.hash)
@@ -403,16 +378,12 @@ class CPKService {
       const account = await signer.getAddress()
 
       const removeFundingTx = {
-        operation: CPK.CALL,
         to: marketMaker.address,
-        value: 0,
         data: MarketMakerService.encodeRemoveFunding(sharesToBurn),
       }
 
       const mergePositionsTx = {
-        operation: CPK.CALL,
         to: conditionalTokens.address,
-        value: 0,
         data: ConditionalTokenService.encodeMergePositions(
           collateralAddress,
           conditionId,
@@ -423,15 +394,13 @@ class CPKService {
 
       // transfer to the user the merged collateral plus the earned fees
       const transferCollateralTx = {
-        operation: CPK.CALL,
         to: collateralAddress,
-        value: 0,
         data: ERC20Service.encodeTransfer(account, amountToMerge.add(earnings)),
       }
 
       const transactions = [removeFundingTx, mergePositionsTx, transferCollateralTx]
 
-      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
+      const txObject = await this.cpk.execTransactions(transactions)
 
       logger.log(`Transaction hash: ${txObject.hash}`)
       return this.provider.waitForTransaction(txObject.hash)
@@ -458,9 +427,7 @@ class CPKService {
       const transactions = []
       if (!isConditionResolved) {
         transactions.push({
-          operation: CPK.CALL,
           to: oracle.address,
-          value: 0,
           data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
         })
       }
@@ -468,22 +435,18 @@ class CPKService {
       const conditionId = await marketMaker.getConditionId()
 
       transactions.push({
-        operation: CPK.CALL,
         to: conditionalTokens.address,
-        value: 0,
         data: ConditionalTokenService.encodeRedeemPositions(collateralToken.address, conditionId, numOutcomes),
       })
 
       if (earnedCollateral) {
         transactions.push({
-          operation: CPK.CALL,
           to: collateralToken.address,
-          value: 0,
           data: ERC20Service.encodeTransfer(account, earnedCollateral),
         })
       }
 
-      const txObject = await this.cpk.execTransactions(transactions, { gasLimit: 1000000 })
+      const txObject = await this.cpk.execTransactions(transactions)
 
       logger.log(`Transaction hash: ${txObject.hash}`)
       return this.provider.waitForTransaction(txObject.hash)
