@@ -16,7 +16,6 @@ import {
   TWITTER_SITE,
 } from '../../common/constants'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
-import { CookiesBanner } from '../common/cookies_banner'
 import { Disclaimer } from '../common/disclaimer'
 import { Footer } from '../common/layout/footer'
 import { Header } from '../common/layout/header'
@@ -59,7 +58,6 @@ export const Main: React.FC = () => {
         </MainScroll>
         <Footer />
         <Disclaimer />
-        <CookiesBanner />
       </MainWrapper>
     </Router>
   )
