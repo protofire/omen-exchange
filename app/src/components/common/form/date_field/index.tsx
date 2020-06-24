@@ -116,8 +116,8 @@ const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
   if (!date) {
     return date
   }
-
   const offsetMinutes = moment().utcOffset()
+
   return moment(date)
     .subtract(offsetMinutes, 'minutes')
     .toDate()
