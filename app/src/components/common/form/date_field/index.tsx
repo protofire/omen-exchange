@@ -116,8 +116,8 @@ const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
   if (!date) {
     return date
   }
-
   const offsetMinutes = moment().utcOffset()
+
   return moment(date)
     .subtract(offsetMinutes, 'minutes')
     .toDate()
@@ -137,7 +137,7 @@ export const DateField = (props: Props) => {
         calendarClassName="customCalendar"
         dateFormat="MMMM d, yyyy h:mm aa"
         disabled={disabled}
-        minDate={minDate}
+        minDate={new Date()}
         name={name}
         onChange={handleChange}
         placeholderText="Select Date"

@@ -1,7 +1,7 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress } from 'ethers/utils'
-import moment from 'moment'
+import moment from 'moment-timezone'
 
 import { getLogger } from './logger'
 
@@ -19,7 +19,10 @@ export const truncateStringInTheMiddle = (str: string, strPositionStart: number,
 }
 
 export const formatDate = (date: Date): string => {
-  return moment.utc(date).format('MM/DD/YY - HH:mm [UTC]')
+  const offsetMinutes = moment().utcOffset()
+  return moment(date)
+    .subtract(offsetMinutes, 'minutes')
+    .format('MM/DD/YY - HH:mm [UTC]')
 }
 
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
