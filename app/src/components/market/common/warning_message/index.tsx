@@ -24,7 +24,7 @@ const Description = styled.p`
   color: ${props => props.theme.colors.textColorLightish};
   font-size: 14px;
   line-height: 1.4;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.1px;
 `
 
 const Hyperlink = styled.a`
