@@ -137,7 +137,7 @@ export const DateField = (props: Props) => {
         calendarClassName="customCalendar"
         dateFormat="MMMM d, yyyy h:mm aa"
         disabled={disabled}
-        minDate={new Date()}
+        minDate={minDate}
         name={name}
         onChange={handleChange}
         placeholderText="Select Date"
