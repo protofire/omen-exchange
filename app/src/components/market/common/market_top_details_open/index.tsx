@@ -6,6 +6,7 @@ import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper } from '.
 import { TitleValue } from '../../../common/text/title_value'
 import { Breaker, SubsectionTitleActionWrapper } from '../common_styled'
 import { DisplayArbitrator } from '../display_arbitrator'
+import { DisplayResolution } from '../display_resolution'
 import { HistoryChartContainer } from '../history_chart'
 import { MarketTitle } from '../market_title'
 
@@ -74,7 +75,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         {!isLiquidityProvision ? (
           <>
             <TitleValue title={'Category'} value={question.category} />
-            <TitleValue title={'Resolution Date'} value={question.resolution && formatDate(question.resolution)} />
+            <DisplayResolution title={'Resolution Date'} value={question.resolution} />
             <TitleValue
               title={'Arbitrator/Oracle'}
               value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
