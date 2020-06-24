@@ -11,6 +11,7 @@ const Wrapper = styled.div`
   justify-content: space-between;
   margin: 0px;
 `
+
 const Title = styled.h2`
   color: ${props => props.theme.colors.textColorDarker};
   flex-shrink: 0;
@@ -53,21 +54,17 @@ export const DisplayResolution: React.FC<Props> = (props: Props) => {
   //create message for local time
   const tzName = moment.tz.guess()
   const abbr = moment.tz(tzName).zoneAbbr()
-  const formating = `MM/DD/YY - HH:mm [${abbr}]`
-
-  const tooltipMessage = localResolution.format(formating) + '\n' + endsMessage
+  const formating = `MM/DD/YY - HH:mm:ss [${abbr}]`
 
   return (
     <Wrapper {...restProps}>
       <Title>{title}</Title>
       <Value
-        data-class="customTooltip"
         data-delay-hide="500"
         data-effect="solid"
         data-for="walletBalanceTooltip"
-        data-multiline={true}
-        data-place="top"
-        data-tip={tooltipMessage}
+        data-multiline="true"
+        data-tip={localResolution.format(formating) + '<br />' + endsMessage}
       >
         {formatDate(value)}
       </Value>
