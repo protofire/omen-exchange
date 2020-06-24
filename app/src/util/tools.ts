@@ -25,6 +25,26 @@ export const formatDate = (date: Date): string => {
     .format('MM/DD/YY - HH:mm [UTC]')
 }
 
+export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
+  if (!date) {
+    return date
+  }
+  const offsetMinutes = moment().utcOffset()
+
+  return moment(date)
+    .subtract(offsetMinutes, 'minutes')
+    .toDate()
+}
+
+// we need to do this because the value selected by react-datepicker
+// uses the local timezone, but we want to interpret it in UTC
+export const convertLocalToUTC = (date: Date): Date => {
+  const offsetMinutes = moment().utcOffset()
+  return moment(date)
+    .add(offsetMinutes, 'minutes')
+    .toDate()
+}
+
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
   return (
     a

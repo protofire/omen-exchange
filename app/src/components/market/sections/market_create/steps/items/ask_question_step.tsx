@@ -188,6 +188,7 @@ const AskQuestionStep = (props: Props) => {
             formField={
               <DateField
                 disabled={!!loadedQuestionId}
+                minDate={new Date()}
                 name="resolution"
                 onChange={handleDateChange}
                 selected={resolution}

@@ -1,3 +1,4 @@
+import moment from 'moment-timezone'
 import React, { DOMAttributes } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -27,14 +28,9 @@ const Value = styled.div`
   line-height: 1.2;
   margin: 0;
   text-align: right;
-
-  a {
-    color: ${props => props.theme.colors.textColor};
+  text-decoration: none;
+  &:hover {
     text-decoration: underline;
-
-    &:hover {
-      text-decoration: none;
-    }
   }
 `
 
@@ -46,6 +42,21 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 export const DisplayResolution: React.FC<Props> = (props: Props) => {
   const { title, value, ...restProps } = props
 
+  const now = moment()
+  const localResolution = moment(value).local()
+
+  //create message for when the market ends
+  const endDate = value
+  const endsText = moment(endDate).fromNow()
+  const endsMessage = moment(endDate).isAfter(now) ? `Ends ${endsText}` : `Ended ${endsText}`
+
+  //create message for local time
+  const tzName = moment.tz.guess()
+  const abbr = moment.tz(tzName).zoneAbbr()
+  const formating = `MM/DD/YY - HH:mm [${abbr}]`
+
+  const tooltipMessage = localResolution.format(formating) + '\n' + endsMessage
+
   return (
     <Wrapper {...restProps}>
       <Title>{title}</Title>
@@ -56,10 +67,9 @@ export const DisplayResolution: React.FC<Props> = (props: Props) => {
         data-for="walletBalanceTooltip"
         data-multiline={true}
         data-place="top"
-        data-tip={`Spend your total balance on the selected outcome.`}
+        data-tip={tooltipMessage}
       >
-        {' '}
-        {formatDate(value)}{' '}
+        {formatDate(value)}
       </Value>
       <ReactTooltip id="walletBalanceTooltip" />
     </Wrapper>
