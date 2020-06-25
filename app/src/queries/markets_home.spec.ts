@@ -7,18 +7,20 @@ import { DEFAULT_OPTIONS, MarketDataFragment, buildQueryMarkets } from './market
 
 const getExpectedQuery = (whereClause: string) => {
   return gql`
-  query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
-    fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${whereClause} }) {
-      ...marketData
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $knownArbitrators: [String!], $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
+      fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${whereClause} }) {
+        ...marketData
+      }
     }
-  }
-  ${MarketDataFragment}
-`
+    ${MarketDataFragment}
+  `
 }
 
 test('Query markets with default options', () => {
   const query = buildQueryMarkets(DEFAULT_OPTIONS)
-  const expectedQuery = getExpectedQuery('openingTimestamp_gt: $now, templateId_in: ["0", "2", "6"], fee_lte: $fee')
+  const expectedQuery = getExpectedQuery(
+    'openingTimestamp_gt: $now, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee',
+  )
   expect(query).toBe(expectedQuery)
 })
 
@@ -29,7 +31,7 @@ test('Query markets', () => {
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'creator_in: $accounts, category: $category, templateId_in: ["0", "2", "6"], fee: $fee',
+    'creator_in: $accounts, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -40,7 +42,9 @@ test('Markets with template_id', () => {
     state: MarketStates.myMarkets,
     templateId: '2',
   })
-  const expectedQuery = getExpectedQuery('creator_in: $accounts, templateId: $templateId, fee: $fee')
+  const expectedQuery = getExpectedQuery(
+    'creator_in: $accounts, arbitrator_in: $knownArbitrators, templateId: $templateId, fee_lte: $fee',
+  )
   expect(query).toBe(expectedQuery)
 })
 
@@ -55,7 +59,7 @@ test('Markets closed with title and arbitrator', () => {
     arbitrator: 'arbitratorTest',
   })
   const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp_lt: $now, title_contains: $title, arbitrator: $arbitrator, templateId: $templateId, fee: $fee',
+    'answerFinalizedTimestamp_lt: $now, title_contains: $title, arbitrator: $arbitrator, templateId: $templateId, fee_lte: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -67,7 +71,7 @@ test('Query pending markets', () => {
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp_gt: $now, category: $category, templateId_in: ["0", "2", "6"], fee: $fee',
+    'answerFinalizedTimestamp_gt: $now, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
