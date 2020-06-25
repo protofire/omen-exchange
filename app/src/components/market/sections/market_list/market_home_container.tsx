@@ -1,4 +1,4 @@
-import { useLazyQuery, useQuery } from '@apollo/react-hooks'
+import { useQuery } from '@apollo/react-hooks'
 import { useInterval } from '@react-corekit/use-interval'
 import { ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
@@ -100,10 +100,12 @@ const MarketHomeContainer: React.FC = () => {
     variables: marketsQueryVariables,
   })
 
-  const [
-    fetchCategories,
-    { data: fetchedCategories, error: categoriesError, fetchMore: fetchMoreCategories, loading: categoriesLoading },
-  ] = useLazyQuery<GraphResponseCategories>(queryCategories, {
+  const {
+    data: fetchedCategories,
+    error: categoriesError,
+    fetchMore: fetchMoreCategories,
+    loading: categoriesLoading,
+  } = useQuery<GraphResponseCategories>(queryCategories, {
     notifyOnNetworkStatusChange: true,
   })
 
