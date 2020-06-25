@@ -1,5 +1,5 @@
 import CPK from 'contract-proxy-kit'
-import EthersAdapter from 'contract-proxy-kit/lib/esm/eth-lib-adapters/EthersAdapter'
+import EthersAdapter from 'contract-proxy-kit/lib/cjs/eth-lib-adapters/EthersAdapter'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
