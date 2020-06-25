@@ -1,9 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { CATEGORIES, SHOW_ADVANCED_FILTERS, SHOW_CATEGORIES, SHOW_FILTERS } from '../../../../common/constants'
+import {
+  CATEGORIES,
+  IS_CORONA_VERSION,
+  SHOW_ADVANCED_FILTERS,
+  SHOW_CATEGORIES,
+  SHOW_FILTERS,
+} from '../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { MarketMakerDataItem } from '../../../../queries/markets_home'
+import { CategoryDataItem, MarketMakerDataItem } from '../../../../queries/markets_home'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
 import { Button, ButtonCircle } from '../../../button'
@@ -128,6 +134,7 @@ const SecondaryText = styled.span`
 
 const MarketsDropdown = styled(Dropdown)`
   width: 100%;
+  ${IS_CORONA_VERSION && 'pointer-events: none'}
 `
 
 const MarketsFilterDropdown = styled(Dropdown)`
@@ -157,13 +164,14 @@ interface Props {
   currentFilter: any
   isFiltering?: boolean
   markets: RemoteData<MarketMakerDataItem[]>
+  categories: RemoteData<CategoryDataItem[]>
   moreMarkets: boolean
   onFilterChange: (filter: MarketFilters) => void
   onLoadMore: () => void
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { context, count, isFiltering = false, markets, moreMarkets, onFilterChange, onLoadMore } = props
+  const { categories, context, count, isFiltering = false, markets, moreMarkets, onFilterChange, onLoadMore } = props
   const [state, setState] = useState<MarketStates>(MarketStates.open)
   const [category, setCategory] = useState('All')
   const [title, setTitle] = useState('')
@@ -174,7 +182,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
   const [currency, setCurrency] = useState<Maybe<string>>(props.currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
-  const CATEGORIES_WITH_ALL = ['All Categories', ...CATEGORIES]
+  // const CATEGORIES_WITH_ALL = ['All Categories', ...CATEGORIES]
   const filters = [
     {
       state: MarketStates.open,
@@ -265,14 +273,26 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     }
   })
 
-  const categoryItems: Array<DropdownItemProps> = CATEGORIES_WITH_ALL.map((item, index) => {
-    return {
-      content: <CustomDropdownItem>{item}</CustomDropdownItem>,
-      onClick: () => {
-        setCategory(item)
-      },
-    }
-  })
+  const categoryItems: Array<DropdownItemProps> = IS_CORONA_VERSION
+    ? [
+        {
+          content: <CustomDropdownItem>Coronavirus</CustomDropdownItem>,
+        },
+      ]
+    : RemoteData.hasData(categories) && categories.data.length > 0
+    ? (categories.data.map((item: CategoryDataItem, index) => {
+        return {
+          content: <CustomDropdownItem>{item.id}</CustomDropdownItem>,
+          onClick: () => {
+            setCategory(item.id)
+          },
+        }
+      }) as Array<DropdownItemProps>)
+    : [
+        {
+          content: <CustomDropdownItem>Loading...</CustomDropdownItem>,
+        },
+      ]
 
   const noOwnMarkets = RemoteData.is.success(markets) && markets.data.length === 0 && state === MarketStates.myMarkets
   const noMarketsAvailable =
