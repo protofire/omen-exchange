@@ -3,38 +3,43 @@ import styled from 'styled-components'
 
 import { CATEGORIES } from '../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { MarketMakerDataItem } from '../../../../queries/markets_home'
+import { CategoryDataItem, MarketMakerDataItem } from '../../../../queries/markets_home'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
-import { Button, ButtonCircle, ButtonSelectable } from '../../../button'
+import { Button, ButtonCircle } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { SectionTitle } from '../../../common'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
+import {
+  Dropdown,
+  DropdownDirection,
+  DropdownItemProps,
+  DropdownPosition,
+  DropdownVariant,
+} from '../../../common/form/dropdown'
 import { IconFilter } from '../../../common/icons/IconFilter'
 import { IconSearch } from '../../../common/icons/IconSearch'
 import { InlineLoading } from '../../../loading'
 import { AdvancedFilters } from '../../common/advanced_filters'
 import { ListCard } from '../../common/list_card'
 import { ListItem } from '../../common/list_item'
-import { MarketsCategories } from '../../common/markets_categories'
 import { Search } from '../../common/search'
 
 const SectionTitleMarket = styled(SectionTitle)`
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-bottom: 0;
+  }
+
   .titleText {
     font-size: 18px;
+    @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+      text-align: left;
+      padding-left: 0;
+    }
   }
 `
 
 const TopContents = styled.div`
   padding: 25px;
-`
-
-const SelectableButton = styled(ButtonSelectable)`
-  margin-right: 5px;
-
-  &:last-child {
-    margin-right: 0;
-  }
 `
 
 const FiltersWrapper = styled.div`
@@ -45,16 +50,6 @@ const FiltersWrapper = styled.div`
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-direction: row;
-  }
-`
-
-const FiltersCategories = styled.div`
-  align-items: center;
-  display: flex;
-  margin-bottom: 20px;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin-bottom: 0;
   }
 `
 
@@ -124,11 +119,36 @@ const CustomDropdownItem = styled.div`
   }
 `
 
-const SortBy = styled.span`
+const SecondaryText = styled.span`
   color: ${props => props.theme.colors.textColorLighter};
   font-size: 14px;
   line-height: 1.2;
   margin-right: 6px;
+`
+
+const MarketsDropdown = styled(Dropdown)`
+  width: 100%;
+`
+
+const MarketsFilterDropdown = styled(Dropdown)`
+  width: 100%;
+`
+
+const Actions = styled.div`
+  margin: 0 auto 25px;
+  max-width: 100%;
+  width: ${props => props.theme.mainContainer.maxWidth};
+  > div:first-child {
+    margin-bottom: 14px;
+  }
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: flex;
+    justify-content: space-evenly;
+    > div:first-child {
+      margin-right: 14px;
+      margin-bottom: 0;
+    }
+  }
 `
 
 interface Props {
@@ -137,13 +157,14 @@ interface Props {
   currentFilter: any
   isFiltering?: boolean
   markets: RemoteData<MarketMakerDataItem[]>
+  categories: RemoteData<CategoryDataItem[]>
   moreMarkets: boolean
   onFilterChange: (filter: MarketFilters) => void
   onLoadMore: () => void
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { count, isFiltering = false, markets, moreMarkets, onFilterChange, onLoadMore } = props
+  const { categories, count, isFiltering = false, markets, moreMarkets, onFilterChange, onLoadMore } = props
   const [state, setState] = useState<MarketStates>(MarketStates.open)
   const [category, setCategory] = useState('All')
   const [title, setTitle] = useState('')
@@ -154,7 +175,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
   const [currency, setCurrency] = useState<Maybe<string>>(props.currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
-  const CATEGORIES_WITH_ALL = ['All', ...CATEGORIES]
+  // const CATEGORIES_WITH_ALL = ['All Categories', ...CATEGORIES]
   const filters = [
     {
       state: MarketStates.open,
@@ -228,7 +249,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     return {
       content: (
         <CustomDropdownItem>
-          <SortBy className="sortBy">Sort By</SortBy> {item.title}
+          <SecondaryText className="sortBy">Sort By</SecondaryText> {item.title}
         </CustomDropdownItem>
       ),
       onClick: () => {
@@ -237,6 +258,29 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       },
     }
   })
+
+  const filterItems: Array<DropdownItemProps> = filters.map(item => {
+    return {
+      content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
+      onClick: item.onClick,
+    }
+  })
+
+  const categoryItems: Array<DropdownItemProps> =
+    RemoteData.hasData(categories) && categories.data.length > 0
+      ? (categories.data.map((item: CategoryDataItem, index) => {
+          return {
+            content: <CustomDropdownItem>{item.id}</CustomDropdownItem>,
+            onClick: () => {
+              setCategory(item.id)
+            },
+          }
+        }) as Array<DropdownItemProps>)
+      : [
+          {
+            content: <CustomDropdownItem>Loading...</CustomDropdownItem>,
+          },
+        ]
 
   const noOwnMarkets = RemoteData.is.success(markets) && markets.data.length === 0 && state === MarketStates.myMarkets
   const noMarketsAvailable =
@@ -247,37 +291,33 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitleMarket title={'Markets'} />
+      <Actions>
+        <MarketsDropdown
+          dropdownDirection={DropdownDirection.downwards}
+          dropdownVariant={DropdownVariant.card}
+          items={categoryItems}
+        />
+        <MarketsFilterDropdown
+          dropdownDirection={DropdownDirection.downwards}
+          dropdownVariant={DropdownVariant.card}
+          items={filterItems}
+        />
+      </Actions>
       <ListCard>
         <TopContents>
-          <MarketsCategories>
-            {CATEGORIES_WITH_ALL.map((item, index) => (
-              <SelectableButton active={item === category} key={index} onClick={() => setCategory(item)}>
-                {item}
-              </SelectableButton>
-            ))}
-          </MarketsCategories>
           <FiltersWrapper>
-            <FiltersCategories>
-              {filters.map((item, index) => {
-                return (
-                  <SelectableButton active={item.active} key={index} onClick={item.onClick}>
-                    {item.title}
-                  </SelectableButton>
-                )
-              })}
-            </FiltersCategories>
+            <SectionTitleMarket title={'Markets'} />
             <FiltersControls>
               <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
                 <IconSearch />
               </ButtonCircleStyled>
               <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
-                <IconFilter />
+                <IconSearch />
               </ButtonCircleStyled>
               <SortDropdown
                 dropdownPosition={DropdownPosition.right}
                 items={sortItems}
-                placeholder={<SortBy>Sort By</SortBy>}
+                placeholder={<SecondaryText>Sort By</SecondaryText>}
               />
             </FiltersControls>
           </FiltersWrapper>

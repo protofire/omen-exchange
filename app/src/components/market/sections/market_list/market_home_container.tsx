@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/react-hooks'
+import { useLazyQuery, useQuery } from '@apollo/react-hooks'
 import { useInterval } from '@react-corekit/use-interval'
 import { ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
@@ -6,7 +6,13 @@ import React, { useCallback, useEffect, useState } from 'react'
 
 import { MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { GraphMarketMakerDataItem, MarketMakerDataItem, buildQueryMarkets } from '../../../../queries/markets_home'
+import {
+  CategoryDataItem,
+  GraphMarketMakerDataItem,
+  MarketMakerDataItem,
+  buildQueryMarkets,
+  queryCategories,
+} from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
@@ -19,8 +25,12 @@ const logger = getLogger('MarketHomeContainer')
 
 const PAGE_SIZE = 4
 
-type GraphResponse = {
+type GraphResponseMarkets = {
   fixedProductMarketMakers: GraphMarketMakerDataItem[]
+}
+
+type GraphResponseCategories = {
+  categories: CategoryDataItem[]
 }
 
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
@@ -59,6 +69,7 @@ const MarketHomeContainer: React.FC = () => {
   })
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
+  const [categories, setCategories] = useState<RemoteData<CategoryDataItem[]>>(RemoteData.notAsked())
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const [moreMarkets, setMoreMarkets] = useState(true)
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
@@ -66,7 +77,7 @@ const MarketHomeContainer: React.FC = () => {
   const [isFiltering, setIsFiltering] = useState(false)
   const { account, library: provider } = context
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
-  const query = buildQueryMarkets({
+  const marketQuery = buildQueryMarkets({
     whitelistedTemplateIds: true,
     whitelistedCreators: false,
     ...filter,
@@ -84,9 +95,16 @@ const MarketHomeContainer: React.FC = () => {
     ...filter,
   }
 
-  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery<GraphResponse>(query, {
+  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery<GraphResponseMarkets>(marketQuery, {
     notifyOnNetworkStatusChange: true,
     variables: marketsQueryVariables,
+  })
+
+  const [
+    fetchCategories,
+    { data: fetchedCategories, error: categoriesError, fetchMore: fetchMoreCategories, loading: categoriesLoading },
+  ] = useLazyQuery<GraphResponseCategories>(queryCategories, {
+    notifyOnNetworkStatusChange: true,
   })
 
   useInterval(() => setNow(calcNow), 1000 * 60 * 5)
@@ -124,6 +142,22 @@ const MarketHomeContainer: React.FC = () => {
     }
   }, [fetchedMarkets, loading, error, context.networkId])
 
+  useEffect(() => {
+    if (categoriesLoading) {
+      setCategories(categories =>
+        RemoteData.hasData(categories) ? RemoteData.reloading(categories.data) : RemoteData.loading(),
+      )
+    } else if (fetchedCategories) {
+      const { categories } = fetchedCategories
+      setCategories(RemoteData.success(categories))
+
+      setIsFiltering(false)
+    } else if (categoriesError) {
+      setMarkets(RemoteData.failure(categoriesError))
+      setIsFiltering(false)
+    }
+  }, [fetchedCategories, categoriesLoading, categoriesError, context.networkId])
+
   const onFilterChange = useCallback((filter: any) => {
     setFilter(filter)
     setMoreMarkets(true)
@@ -159,6 +193,7 @@ const MarketHomeContainer: React.FC = () => {
   return (
     <>
       <MarketHome
+        categories={categories}
         context={context}
         count={fetchedMarkets ? fetchedMarkets.fixedProductMarketMakers.length : 0}
         currentFilter={filter}
