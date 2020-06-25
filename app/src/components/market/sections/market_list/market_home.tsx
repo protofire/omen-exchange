@@ -1,13 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import {
-  CATEGORIES,
-  IS_CORONA_VERSION,
-  SHOW_ADVANCED_FILTERS,
-  SHOW_CATEGORIES,
-  SHOW_FILTERS,
-} from '../../../../common/constants'
+import { CATEGORIES } from '../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { CategoryDataItem, MarketMakerDataItem } from '../../../../queries/markets_home'
 import { RemoteData } from '../../../../util/remote_data'
@@ -134,7 +128,6 @@ const SecondaryText = styled.span`
 
 const MarketsDropdown = styled(Dropdown)`
   width: 100%;
-  ${IS_CORONA_VERSION && 'pointer-events: none'}
 `
 
 const MarketsFilterDropdown = styled(Dropdown)`
@@ -171,7 +164,7 @@ interface Props {
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { categories, context, count, isFiltering = false, markets, moreMarkets, onFilterChange, onLoadMore } = props
+  const { categories, count, isFiltering = false, markets, moreMarkets, onFilterChange, onLoadMore } = props
   const [state, setState] = useState<MarketStates>(MarketStates.open)
   const [category, setCategory] = useState('All')
   const [title, setTitle] = useState('')
@@ -226,29 +219,29 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   const sortOptions = [
     {
-      title: 'Volume',
-      sortBy: 'collateralVolume',
-      direction: 'desc',
-    },
-    {
       title: '24h volume',
       sortBy: 'lastActiveDayAndRunningDailyVolume',
       direction: 'desc',
     },
     {
-      title: 'Creation date',
+      title: 'Total volume',
+      sortBy: 'collateralVolume',
+      direction: 'desc',
+    },
+    {
+      title: 'Highest liquidity',
+      sortBy: 'liquidityParameter',
+      direction: 'desc',
+    },
+    {
+      title: 'Newest',
       sortBy: 'creationTimestamp',
       direction: 'desc',
     },
     {
-      title: 'Resolution date',
+      title: 'Ending soon',
       sortBy: 'openingTimestamp',
       direction: 'asc',
-    },
-    {
-      title: 'Liquidity',
-      sortBy: 'liquidityParameter',
-      direction: 'desc',
     },
   ] as const
 
@@ -273,26 +266,21 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     }
   })
 
-  const categoryItems: Array<DropdownItemProps> = IS_CORONA_VERSION
-    ? [
-        {
-          content: <CustomDropdownItem>Coronavirus</CustomDropdownItem>,
-        },
-      ]
-    : RemoteData.hasData(categories) && categories.data.length > 0
-    ? (categories.data.map((item: CategoryDataItem, index) => {
-        return {
-          content: <CustomDropdownItem>{item.id}</CustomDropdownItem>,
-          onClick: () => {
-            setCategory(item.id)
+  const categoryItems: Array<DropdownItemProps> =
+    RemoteData.hasData(categories) && categories.data.length > 0
+      ? (categories.data.map((item: CategoryDataItem, index) => {
+          return {
+            content: <CustomDropdownItem>{item.id}</CustomDropdownItem>,
+            onClick: () => {
+              setCategory(item.id)
+            },
+          }
+        }) as Array<DropdownItemProps>)
+      : [
+          {
+            content: <CustomDropdownItem>Loading...</CustomDropdownItem>,
           },
-        }
-      }) as Array<DropdownItemProps>)
-    : [
-        {
-          content: <CustomDropdownItem>Loading...</CustomDropdownItem>,
-        },
-      ]
+        ]
 
   const noOwnMarkets = RemoteData.is.success(markets) && markets.data.length === 0 && state === MarketStates.myMarkets
   const noMarketsAvailable =
@@ -303,52 +291,36 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      {SHOW_CATEGORIES && (
-        // <MarketsCategories>
-        //   {CATEGORIES_WITH_ALL.map((item, index) => (
-        //     <SelectableButton active={item === category} key={index} onClick={() => setCategory(item)}>
-        //       {item}
-        //     </SelectableButton>
-        //   ))}
-        // </MarketsCategories>
-        <Actions>
-          <MarketsDropdown
-            dropdownDirection={DropdownDirection.downwards}
-            dropdownVariant={DropdownVariant.card}
-            items={categoryItems}
-          />
-          <MarketsFilterDropdown
-            dropdownDirection={DropdownDirection.downwards}
-            dropdownVariant={DropdownVariant.card}
-            items={filterItems}
-          />
-          {/* <SecondaryText style={{ position: 'absolute', right: '3rem', lineHeight: '2.2rem', pointerEvents: 'none' }}>
-              621 Markets
-            </SecondaryText> */}
-        </Actions>
-      )}
+      <Actions>
+        <MarketsDropdown
+          dropdownDirection={DropdownDirection.downwards}
+          dropdownVariant={DropdownVariant.card}
+          items={categoryItems}
+        />
+        <MarketsFilterDropdown
+          dropdownDirection={DropdownDirection.downwards}
+          dropdownVariant={DropdownVariant.card}
+          items={filterItems}
+        />
+      </Actions>
       <ListCard>
         <TopContents>
-          {SHOW_FILTERS && (
-            <FiltersWrapper>
-              <SectionTitleMarket title={'Markets'} />
-              <FiltersControls>
-                <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
-                  <IconSearch />
-                </ButtonCircleStyled>
-                {SHOW_ADVANCED_FILTERS && (
-                  <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
-                    <IconFilter />
-                  </ButtonCircleStyled>
-                )}
-                <SortDropdown
-                  dropdownPosition={DropdownPosition.right}
-                  items={sortItems}
-                  placeholder={<SecondaryText>Sort By</SecondaryText>}
-                />
-              </FiltersControls>
-            </FiltersWrapper>
-          )}
+          <FiltersWrapper>
+            <SectionTitleMarket title={'Markets'} />
+            <FiltersControls>
+              <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
+                <IconSearch />
+              </ButtonCircleStyled>
+              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
+                <IconSearch />
+              </ButtonCircleStyled>
+              <SortDropdown
+                dropdownPosition={DropdownPosition.right}
+                items={sortItems}
+                placeholder={<SecondaryText>Sort By</SecondaryText>}
+              />
+            </FiltersControls>
+          </FiltersWrapper>
         </TopContents>
         {showSearch && <Search onChange={setTitle} value={title} />}
         {showAdvancedFilters && (

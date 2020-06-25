@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { ALLOW_CUSTOM_TOKENS, DEFAULT_TOKEN } from '../../../../common/constants'
+import { DEFAULT_TOKEN } from '../../../../common/constants'
 import { useContracts } from '../../../../hooks'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getToken } from '../../../../util/networks'
@@ -34,9 +34,7 @@ export const Tokens = (props: Props) => {
       setTokens(tokens)
     }
 
-    if (ALLOW_CUSTOM_TOKENS) {
-      fetchTokens()
-    }
+    fetchTokens()
   }, [kleros])
 
   const options = tokens.map(token => ({

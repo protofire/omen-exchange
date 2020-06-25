@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 
-import { SHOW_TRADE_HISTORY, TOGGLEABLE_EXTRA_INFORMATION } from '../../../../common/constants'
 import { formatBigNumber, formatDate } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper } from '../../../common'
 import { TitleValue } from '../../../common/text/title_value'
 import { Breaker, SubsectionTitleActionWrapper } from '../common_styled'
 import { DisplayArbitrator } from '../display_arbitrator'
+import { DisplayResolution } from '../display_resolution'
 import { HistoryChartContainer } from '../history_chart'
 import { MarketTitle } from '../market_title'
 
@@ -61,35 +61,24 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} title={title} />
         <SubsectionTitleActionWrapper>
-          {TOGGLEABLE_EXTRA_INFORMATION && (
-            <>
-              <SubsectionTitleAction onClick={toggleExtraInformation}>
-                {showingExtraInformation ? 'Hide' : 'Show'} {toggleTitle}
-              </SubsectionTitleAction>
-              <Breaker />
-            </>
-          )}
-          {SHOW_TRADE_HISTORY && (
-            <>
-              <SubsectionTitleAction onClick={toggleTradeHistory}>
-                {`${showingTradeHistory ? 'Hide' : 'Show'} Trade History`}
-              </SubsectionTitleAction>
-              <Breaker />
-            </>
-          )}
+          <SubsectionTitleAction onClick={toggleExtraInformation}>
+            {showingExtraInformation ? 'Hide' : 'Show'} {toggleTitle}
+          </SubsectionTitleAction>
+          <Breaker />
+          <SubsectionTitleAction onClick={toggleTradeHistory}>
+            {`${showingTradeHistory ? 'Hide' : 'Show'} Trade History`}
+          </SubsectionTitleAction>
+          <Breaker />
         </SubsectionTitleActionWrapper>
       </SubsectionTitleWrapper>
       <GridTwoColumns>
         {!isLiquidityProvision ? (
           <>
             <TitleValue title={'Category'} value={question.category} />
-            <TitleValue
-              title={'Earliest Resolution Date'}
-              value={question.resolution && formatDate(question.resolution)}
-            />
+            <DisplayResolution title={'Resolution Date'} value={question.resolution} />
             <TitleValue
               title={'Arbitrator/Oracle'}
-              value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />}
+              value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
             />
             <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
             {showingExtraInformation ? (
@@ -134,13 +123,10 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
             {showingExtraInformation ? (
               <>
                 <TitleValue title={'Category'} value={question.category} />
-                <TitleValue
-                  title={'Earliest Resolution Date'}
-                  value={question.resolution && formatDate(question.resolution)}
-                />
+                <TitleValue title={'Resolution Date'} value={question.resolution && formatDate(question.resolution)} />
                 <TitleValue
                   title={'Arbitrator/Oracle'}
-                  value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />}
+                  value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
                 />
                 <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
               </>

@@ -2,11 +2,7 @@ import React, { ChangeEvent, useCallback, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled, { css } from 'styled-components'
 
-import {
-  DISABLE_ARBITRATOR_IN_CREATION,
-  DISABLE_CATEGORIES_IN_CREATION,
-  MAX_OUTCOME_ALLOWED,
-} from '../../../../../../common/constants'
+import { DOCUMENT_VALIDITY_RULES, MAX_OUTCOME_ALLOWED } from '../../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
@@ -18,6 +14,7 @@ import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
 import { ButtonContainerFullWidth, LeftButton } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
+import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome, Outcomes } from '../outcomes'
 
 const ButtonCategoryFocusCSS = css`
@@ -197,7 +194,7 @@ const AskQuestionStep = (props: Props) => {
                 selected={resolution}
               />
             }
-            title={'Earliest Resolution Date'}
+            title={'Resolution Date'}
           />
         </Column>
         <Column>
@@ -205,7 +202,7 @@ const AskQuestionStep = (props: Props) => {
             formField={
               <ButtonCategory
                 buttonType={ButtonType.secondaryLine}
-                disabled={!!loadedQuestionId || DISABLE_CATEGORIES_IN_CREATION}
+                disabled={!!loadedQuestionId}
                 focus={categoryButtonFocus}
                 isACategorySelected={category !== ''}
                 onClick={toggleCategoryButtonFocus}
@@ -221,7 +218,7 @@ const AskQuestionStep = (props: Props) => {
             formField={
               <Arbitrators
                 customValues={arbitratorsCustom}
-                disabled={!!loadedQuestionId || DISABLE_ARBITRATOR_IN_CREATION}
+                disabled={!!loadedQuestionId}
                 networkId={context.networkId}
                 onChangeArbitrator={handleArbitratorChange}
                 value={arbitrator}
@@ -239,6 +236,13 @@ const AskQuestionStep = (props: Props) => {
           selectedCategory={category}
         />
       )}
+      <WarningMessage
+        description={
+          "Set the market resolution date at least 6 days after the correct outcome will be known and make sure that this market won't be "
+        }
+        href={DOCUMENT_VALIDITY_RULES}
+        hyperlinkDescription={'invalid'}
+      />
       <ButtonContainerFullWidth borderTop={true}>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
           Cancel
