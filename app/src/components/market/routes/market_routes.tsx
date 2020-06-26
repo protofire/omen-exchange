@@ -56,37 +56,39 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
 
   return (
     <Switch>
-      <>
-        <Route
-          exact
-          path="/:address"
-          render={props => <MarketDetailsPage {...props} marketMakerData={marketMakerData} />}
-        />
-        {!account ? (
-          <Message text="Please connect to your wallet to open the market..." type={MessageType.warning} />
-        ) : isQuestionFinalized ? (
-          <Message text="Market closed, question finalized..." type={MessageType.warning} />
-        ) : (
+      <Route
+        exact
+        path="/:address"
+        render={props => (
           <>
-            <Route
-              exact
-              path="/:address/buy"
-              render={props => <MarketBuyPage {...props} marketMakerData={marketMakerData} />}
-            />
-            <Route
-              exact
-              path="/:address/sell"
-              render={props => <MarketSellPage {...props} marketMakerData={marketMakerData} />}
-            />
-            <Route
-              exact
-              path="/:address/pool-liquidity"
-              render={props => <MarketPoolLiquidityPage {...props} marketMakerData={marketMakerData} />}
-            />
+            <MarketDetailsPage {...props} marketMakerData={marketMakerData} />
+            <ThreeBoxComments threadName={marketMakerAddress} />
           </>
         )}
-        <ThreeBoxComments threadName={marketMakerAddress} />
-      </>
+      />
+      {!account ? (
+        <Message text="Please connect to your wallet to open the market..." type={MessageType.warning} />
+      ) : isQuestionFinalized ? (
+        <Message text="Market closed, question finalized..." type={MessageType.warning} />
+      ) : (
+        <>
+          <Route
+            exact
+            path="/:address/buy"
+            render={props => <MarketBuyPage {...props} marketMakerData={marketMakerData} />}
+          />
+          <Route
+            exact
+            path="/:address/sell"
+            render={props => <MarketSellPage {...props} marketMakerData={marketMakerData} />}
+          />
+          <Route
+            exact
+            path="/:address/pool-liquidity"
+            render={props => <MarketPoolLiquidityPage {...props} marketMakerData={marketMakerData} />}
+          />
+        </>
+      )}
     </Switch>
   )
 }
