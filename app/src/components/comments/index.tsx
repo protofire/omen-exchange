@@ -33,7 +33,7 @@ export const ThreeBoxComments = (props: Props) => {
   const [box, setBox] = useState<any>(null)
   // eslint-disable-next-line no-warning-comments
   // TODO: fix with useConnectedWeb3Wallet context
-  const [currentUserAddress] = useState<string>(context.account || '')
+  const currentUserAddress = context.account || ''
 
   const handleLogin = async () => {
     const box = await Box.openBox(currentUserAddress, library._web3Provider, {})
