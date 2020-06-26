@@ -10,7 +10,7 @@ import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { MarketBuyPage, MarketDetailsPage, MarketPoolLiquidityPage, MarketSellPage } from '../../../pages'
 import { getLogger } from '../../../util/logger'
 import { isAddress } from '../../../util/tools'
-import { Comments } from '../../comments'
+import { ThreeBoxComments } from '../../comments'
 import { SectionTitle } from '../../common'
 import { Message, MessageType } from '../../common/message'
 import { InlineLoading } from '../../loading'
@@ -85,7 +85,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
             />
           </>
         )}
-        <Comments marketMakerAddress={marketMakerAddress} />
+        <ThreeBoxComments threadName={marketMakerAddress} />
       </>
     </Switch>
   )
