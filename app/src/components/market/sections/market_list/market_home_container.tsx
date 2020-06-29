@@ -100,12 +100,9 @@ const MarketHomeContainer: React.FC = () => {
     variables: marketsQueryVariables,
   })
 
-  const {
-    data: fetchedCategories,
-    error: categoriesError,
-    fetchMore: fetchMoreCategories,
-    loading: categoriesLoading,
-  } = useQuery<GraphResponseCategories>(queryCategories, {
+  const { data: fetchedCategories, error: categoriesError, loading: categoriesLoading } = useQuery<
+    GraphResponseCategories
+  >(queryCategories, {
     notifyOnNetworkStatusChange: true,
   })
 
