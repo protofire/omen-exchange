@@ -102,7 +102,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
 
 export const queryCategories = gql`
   {
-    categories(first: 20, orderBy: numOpenConditions, orderDirection: desc, where: { numOpenConditions_not: 0 }) {
+    categories(first: 100, orderBy: numOpenConditions, orderDirection: desc) {
       id
       numOpenConditions
     }

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { CATEGORIES } from '../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { CategoryDataItem, MarketMakerDataItem } from '../../../../queries/markets_home'
 import { RemoteData } from '../../../../util/remote_data'
@@ -175,7 +174,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
   const [currency, setCurrency] = useState<Maybe<string>>(props.currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
-  // const CATEGORIES_WITH_ALL = ['All Categories', ...CATEGORIES]
+
   const filters = [
     {
       state: MarketStates.open,
@@ -185,13 +184,13 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     },
     {
       state: MarketStates.pending,
-      title: 'Pending',
+      title: 'Finalizing',
       active: state === MarketStates.pending,
       onClick: () => setState(MarketStates.pending),
     },
     {
       state: MarketStates.closed,
-      title: 'Closed',
+      title: 'Ended',
       active: state === MarketStates.closed,
       onClick: () => setState(MarketStates.closed),
     },
@@ -268,17 +267,25 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   const categoryItems: Array<DropdownItemProps> =
     RemoteData.hasData(categories) && categories.data.length > 0
-      ? (categories.data.map((item: CategoryDataItem, index) => {
-          return {
-            content: <CustomDropdownItem>{item.id}</CustomDropdownItem>,
+      ? ([
+          {
+            content: <CustomDropdownItem>{'All Categories'}</CustomDropdownItem>,
             onClick: () => {
-              setCategory(item.id)
+              setCategory('All')
             },
-          }
-        }) as Array<DropdownItemProps>)
+          },
+          ...categories.data.map((item: CategoryDataItem, index) => {
+            return {
+              content: <CustomDropdownItem>{item.id}</CustomDropdownItem>,
+              onClick: () => {
+                setCategory(item.id)
+              },
+            }
+          }),
+        ] as Array<DropdownItemProps>)
       : [
           {
-            content: <CustomDropdownItem>Loading...</CustomDropdownItem>,
+            content: <CustomDropdownItem>{'All Categories'}</CustomDropdownItem>,
           },
         ]
 
@@ -296,6 +303,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={categoryItems}
+          showScrollbar={true}
         />
         <MarketsFilterDropdown
           dropdownDirection={DropdownDirection.downwards}
@@ -312,7 +320,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                 <IconSearch />
               </ButtonCircleStyled>
               <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
-                <IconSearch />
+                <IconFilter />
               </ButtonCircleStyled>
               <SortDropdown
                 dropdownPosition={DropdownPosition.right}
