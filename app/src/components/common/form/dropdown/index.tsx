@@ -111,12 +111,12 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean; dropdownVariant
   &:hover {
     background-color: ${props => props.theme.dropdown.buttonBackgroundColor};
     border-color: ${props =>
-      props.dropdownVariant == DropdownVariant.card ? '#9fa8da' : props.theme.dropdown.buttonBorderColorHover};
+      props.dropdownVariant === DropdownVariant.card ? '#9fa8da' : props.theme.dropdown.buttonBorderColorHover};
     color: ${props => props.theme.dropdown.buttonColorHover};
   }
 
   ${props =>
-    props.isOpen ? (props.dropdownVariant == DropdownVariant.card ? DropdownVariantCardOpenCSS : DropdownOpenCSS) : ''}
+    props.isOpen ? (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardOpenCSS : DropdownOpenCSS) : ''}
   ${props => (props.disabled ? DropdownDisabledCSS : '')}
   ${props => (props.dropdownVariant === DropdownVariant.pill ? DropdownVariantPillCSS : '')}
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardCSS : '')}
@@ -172,20 +172,8 @@ const DropdownVariantPillItemsCSS = css`
   border: 0;
 `
 const DropdownVariantCardItemsCSS = css`
-  height: 218px;
-  overflow-y: scroll;
-
-  &::-webkit-scrollbar-track {
-    background: #f3f4fb;
-    border-radius: 2px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: #9fa9d8;
-    border-radius: 2px;
-  }
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
+  max-height: 218px;
+  overflow-y: auto;
 `
 const DropdownVariantCardItemsContainerCSS = css`
   border-radius: 8px;
@@ -216,11 +204,30 @@ const ItemsContainer = styled.div<{
   ${props => (props.dropdownDirection === DropdownDirection.upwards ? DropdownDirectionUpwardsCSS : '')};
 `
 
+const DropdownScrollbarCSS = css`
+  margin-right: 0;
+  &::-webkit-scrollbar-track {
+    background: #f3f4fb;
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #9fa9d8;
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+`
+
 const Items = styled.div<{
   dropdownVariant?: DropdownVariant
+  showScrollbar?: boolean
 }>`
+  margin-right: -8px;
+
   ${props => (props.dropdownVariant === DropdownVariant.pill ? DropdownVariantPillItemsCSS : '')};
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardItemsCSS : '')};
+  ${props => props.showScrollbar && DropdownScrollbarCSS}
 `
 
 Items.defaultProps = {
@@ -231,24 +238,25 @@ const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
   align-items: center;
   background-color: ${props =>
     props.active
-      ? props.dropdownVariant == DropdownVariant.card
+      ? props.dropdownVariant === DropdownVariant.card
         ? '#F8F9FC'
         : props.theme.dropdown.dropdownItems.item.backgroundColorActive
       : props.theme.dropdown.dropdownItems.item.backgroundColor};
-  color: ${props => props.theme.dropdown.dropdownItems.item.color};
+  color: ${props =>
+    props.dropdownVariant === DropdownVariant.card && !props.active
+      ? '#757575'
+      : props.theme.dropdown.dropdownItems.item.color};
   cursor: pointer;
   display: flex;
   height: 48px;
-  padding: ${props => (props.dropdownVariant == DropdownVariant.card ? '9px 14px' : '12px 17px')};
-  };
-  margin: ${props => (props.dropdownVariant == DropdownVariant.card ? '0 8px 0 0' : '0')};
-  };
-  border-radius: ${props => (props.dropdownVariant == DropdownVariant.card ? '8px' : '0')};
-  };
+  padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '9px 14px' : '12px 17px')};
+  margin: ${props => (props.dropdownVariant === DropdownVariant.card ? '0 8px 0 0' : '0')};
+  border-radius: ${props => (props.dropdownVariant === DropdownVariant.card ? '8px' : '0')};
 
   &:hover {
+    color: ${props => props.theme.dropdown.dropdownItems.item.color};
     background: ${props =>
-      props.dropdownVariant == DropdownVariant.card
+      props.dropdownVariant === DropdownVariant.card
         ? '#F8F9FC'
         : props.theme.dropdown.dropdownItems.item.backgroundColorHover};
   }
@@ -269,6 +277,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   dropdownVariant?: DropdownVariant | undefined
   dropdownPosition?: DropdownPosition | undefined
   dropdownDirection?: DropdownDirection | undefined
+  showScrollbar?: boolean
   items: any
   placeholder?: React.ReactNode | string | undefined
 }
@@ -282,6 +291,7 @@ export const Dropdown: React.FC<Props> = props => {
     dropdownPosition,
     items,
     placeholder,
+    showScrollbar = false,
     ...restProps
   } = props
 
@@ -347,7 +357,7 @@ export const Dropdown: React.FC<Props> = props => {
           dropdownVariant={dropdownVariant}
           isOpen={isOpen}
         >
-          <Items dropdownVariant={dropdownVariant}>
+          <Items dropdownVariant={dropdownVariant} showScrollbar={showScrollbar}>
             {items.map((item: DropdownItemProps, index: string) => {
               return (
                 <Item
