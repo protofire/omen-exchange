@@ -407,6 +407,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <BottomContents>
           <DisplayButtonWrapper>
             <PageSizeDropdown
+              currentItem={4}
+              dirty={true}
               dropdownPosition={DropdownPosition.right}
               items={sizeItems}
               placeholder={<Display>Display</Display>}
