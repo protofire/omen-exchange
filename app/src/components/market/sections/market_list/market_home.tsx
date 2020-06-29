@@ -189,6 +189,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const { 
     categories,
     count,
+    currentFilter,
     isFiltering = false,
     markets,
     moreMarkets,
@@ -397,7 +398,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             RemoteData.hasData(markets) &&
             markets.data.length > 0 &&
             markets.data.slice(0, count).map(item => {
-              return <ListItem key={item.address} market={item}></ListItem>
+              return <ListItem currentFilter={currentFilter} key={item.address} market={item}></ListItem>
             })}
           {noOwnMarkets && <NoOwnMarkets>You haven&apos;t participated in or created any market yet.</NoOwnMarkets>}
           {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
