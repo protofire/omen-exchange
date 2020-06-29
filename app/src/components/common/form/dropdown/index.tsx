@@ -223,9 +223,8 @@ const Items = styled.div<{
   dropdownVariant?: DropdownVariant
   showScrollbar?: boolean
 }>`
-  margin-right: -8px;
-
   ${props => (props.dropdownVariant === DropdownVariant.pill ? DropdownVariantPillItemsCSS : '')};
+  ${props => props.dropdownVariant === DropdownVariant.card && 'margin-right: -8px'};
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardItemsCSS : '')};
   ${props => props.showScrollbar && DropdownScrollbarCSS}
 `
@@ -356,6 +355,11 @@ export const Dropdown: React.FC<Props> = props => {
           dropdownPosition={dropdownPosition}
           dropdownVariant={dropdownVariant}
           isOpen={isOpen}
+          // onScroll={e => {
+          // if (!!e.target.scrollHeight && e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight) {
+          // reached bottom of picker
+          // }
+          // }}
         >
           <Items dropdownVariant={dropdownVariant} showScrollbar={showScrollbar}>
             {items.map((item: DropdownItemProps, index: string) => {
