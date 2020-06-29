@@ -272,9 +272,9 @@ export interface DropdownItemProps {
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   currentItem?: number | undefined
-  disabled?: boolean
   dropdownVariant?: DropdownVariant | undefined
   dirty?: boolean
+  disabled?: boolean
   dropdownPosition?: DropdownPosition | undefined
   dropdownDirection?: DropdownDirection | undefined
   showScrollbar?: boolean
