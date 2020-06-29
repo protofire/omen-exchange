@@ -4,7 +4,7 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { use24hsVolume } from '../../../../hooks'
+import { use24hsVolume, useGraphMarketMakerData } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { ERC20Service } from '../../../../services'
@@ -84,6 +84,12 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const resolutionDate = moment(endDate).format('MMM Do, YYYY')
 
   const use24hsVolumeResult = use24hsVolume(address)
+  const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
+  const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
+    : ''
+  const creationDate = new Date(1000 * parseInt(creationTimestamp))
+  const formattedCreationDate = moment(creationDate).format('MMM Do, YYYY')
 
   useEffect(() => {
     const setToken = async () => {
@@ -132,6 +138,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
           {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate}`}
           {currentFilter.sortBy === 'lastActiveDayAndRunningDailyVolume' && `${dailyVolume} ${symbol} - 24hr Volume`}
           {currentFilter.sortBy === 'liquidityParameter' && `${liquidity} ${symbol} - Liquidity`}
+          {currentFilter.sortBy === 'creationTimestamp' && `Created ${formattedCreationDate}`}
         </span>
       </Info>
     </Wrapper>
