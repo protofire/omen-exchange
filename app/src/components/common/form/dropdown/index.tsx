@@ -275,7 +275,6 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   dropdownVariant?: DropdownVariant | undefined
   dirty?: boolean
   disabled?: boolean
-  dirty?: boolean
   dropdownPosition?: DropdownPosition | undefined
   dropdownDirection?: DropdownDirection | undefined
   showScrollbar?: boolean
