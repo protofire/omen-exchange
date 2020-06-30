@@ -371,11 +371,9 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
                 <IconSearch />
               </ButtonCircleStyled>
-              {showAdvancedFilters && (
-                <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
-                  <IconFilter />
-                </ButtonCircleStyled>
-              )}
+              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
+                <IconFilter />
+              </ButtonCircleStyled>
               <SortDropdown
                 dropdownPosition={DropdownPosition.right}
                 items={sortItems}
