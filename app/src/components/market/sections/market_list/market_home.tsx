@@ -375,6 +375,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                 <IconFilter />
               </ButtonCircleStyled>
               <SortDropdown
+                currentItem={1}
+                dirty={true}
                 dropdownPosition={DropdownPosition.right}
                 items={sortItems}
                 placeholder={<SecondaryText>Sort By</SecondaryText>}
