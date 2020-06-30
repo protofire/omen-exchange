@@ -104,7 +104,7 @@ const LoadMoreWrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: center;
-  padding: 0 15px;
+  padding: 0 25px 0 15px;
 `
 
 const CustomDropdownItem = styled.div`
@@ -167,7 +167,7 @@ const BottomContents = styled.div`
 `
 
 const DisplayButtonWrapper = styled.div`
-  padding: 0 15px;
+  padding: 0 15px 0 25px;
 `
 
 interface Props {
