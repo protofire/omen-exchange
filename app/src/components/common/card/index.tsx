@@ -1,18 +1,21 @@
 import React, { HTMLAttributes } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
-const CardStyled = styled.div<{ noPadding?: boolean }>`
+export const CardCSS = css`
   background-color: ${props => props.theme.cards.backgroundColor};
   border-radius: ${props => props.theme.cards.borderRadius};
   border: ${props => props.theme.cards.border};
   box-shadow: ${props => props.theme.cards.boxShadow};
   display: flex;
   flex-direction: column;
+  position: relative;
+`
+const CardStyled = styled.div<{ noPadding?: boolean }>`
+  ${CardCSS}
   ${props =>
     props.noPadding
       ? 'padding: 0'
       : 'padding: ' + props.theme.cards.paddingVertical + ' ' + props.theme.cards.paddingHorizontal + ';'};
-  position: relative;
 `
 
 CardStyled.defaultProps = {
