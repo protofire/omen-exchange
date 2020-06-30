@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from 'react'
+import React, { HTMLAttributes, useState } from 'react'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
@@ -30,9 +30,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const TokenItem: React.FC<Props> = props => {
   const { image, text } = props
+  const [showImage, setShowImage] = useState(true)
+
   return (
     <Wrapper>
-      <Image src={image} />
+      {showImage && <Image onError={() => setShowImage(false)} src={image} />}
       <Text>{text}</Text>
     </Wrapper>
   )
