@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork, getTokensByNetwork } from '../../../../util/networks'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
-import { currenciesData } from '../../../common/icons/currencies/currencies_data'
 import { TokenItem } from '../token_item'
 
 const Wrapper = styled.div`
@@ -55,11 +54,10 @@ export const AdvancedFilters = (props: Props) => {
 
   const { currency, onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
 
-  const allTokensOptions = [{ address: null, symbol: 'All' }, ...tokens]
-  const currencyOptions: Array<DropdownItemProps> = allTokensOptions.map(({ address, symbol }) => {
-    const tokenData = currenciesData.find(c => c.token === symbol)
+  const allTokensOptions = [{ address: null, symbol: 'All', image: null }, ...tokens]
+  const currencyOptions: Array<DropdownItemProps> = allTokensOptions.map(({ address, image, symbol }) => {
     return {
-      content: <TokenItem icon={tokenData ? tokenData.icon : null} text={symbol} />,
+      content: <TokenItem image={image} text={symbol} />,
       onClick: () => onChangeCurrency(address),
     }
   })
