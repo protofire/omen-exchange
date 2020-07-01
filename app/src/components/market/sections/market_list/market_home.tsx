@@ -94,12 +94,6 @@ const NoOwnMarkets = styled.p`
   text-align: center;
 `
 
-const SortDropdown = styled(Dropdown)``
-
-const PageSizeDropdown = styled(Dropdown)`
-  max-width: 145px;
-`
-
 const LoadMoreWrapper = styled.div`
   align-items: center;
   display: flex;
@@ -186,7 +180,7 @@ interface Props {
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { 
+  const {
     categories,
     count,
     currentFilter,
@@ -374,7 +368,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
                 <IconFilter />
               </ButtonCircleStyled>
-              <SortDropdown
+              <Dropdown
                 currentItem={1}
                 dirty={true}
                 dropdownPosition={DropdownPosition.right}
@@ -406,10 +400,10 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         </ListWrapper>
         <BottomContents>
           <DisplayButtonWrapper>
-            <PageSizeDropdown
+            <Dropdown
               currentItem={4}
               dirty={true}
-              dropdownPosition={DropdownPosition.right}
+              dropdownPosition={DropdownPosition.left}
               items={sizeItems}
               placeholder={<Display>Display</Display>}
             />
