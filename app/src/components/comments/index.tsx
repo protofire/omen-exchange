@@ -17,8 +17,11 @@ const CommentsTitle = styled.h3`
 const ThreeBoxCustom = styled.div`
   margin: 30px auto;
   max-width: 100%;
-  /* overflow: hidden; */
   width: ${props => props.theme.mainContainer.maxWidth};
+
+  .threebox-comments-react {
+    overflow: visible !important;
+  }
 `
 
 interface Props {
