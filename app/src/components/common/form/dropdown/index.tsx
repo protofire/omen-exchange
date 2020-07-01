@@ -28,17 +28,14 @@ const DropdownOpenCSS = css`
     background: ${props => props.theme.colors.secondary};
     border-color: ${props => props.theme.dropdown.buttonBorderColorHover};
     z-index: 12345;
-
     .currentItem {
       color: ${props => props.theme.colors.primary};
       font-weight: 500;
     }
   }
-
   .chevronUp {
     display: block;
   }
-
   .chevronDown {
     display: none;
   }
@@ -49,17 +46,14 @@ const DropdownVariantCardOpenCSS = css`
   &:hover {
     border-color: #9fa8da;
     z-index: 12345;
-
     .currentItem {
       color: ${props => props.theme.colors.primary};
       font-weight: 500;
     }
   }
-
   .chevronUp {
     display: block;
   }
-
   .chevronDown {
     display: none;
   }
@@ -67,7 +61,6 @@ const DropdownVariantCardOpenCSS = css`
 
 const DropdownDisabledCSS = css`
   ${CommonDisabledCSS}
-
   &:disabled,
   &[disabled],
   &[disabled]:hover,
@@ -148,10 +141,12 @@ const CurrentItem = styled.div`
 `
 
 const DropdownPositionLeftCSS = css`
+  margin-top: 10px;
   left: 0;
 `
 
 const DropdownPositionRightCSS = css`
+  margin-top: 10px;
   right: 0;
 `
 
@@ -193,7 +188,7 @@ const ItemsContainer = styled.div<{
   border: solid 1px ${props => props.theme.dropdown.dropdownItems.borderColor};
   box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
   display: ${props => (props.isOpen ? 'block' : 'none')};
-  min-width: 240px;
+  min-width: 164px;
   padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '12px 8px' : '12px 0')};
   position: absolute;
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardItemsContainerCSS : '')};

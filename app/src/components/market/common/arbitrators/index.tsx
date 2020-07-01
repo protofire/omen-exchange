@@ -3,7 +3,7 @@ import React from 'react'
 
 import { getArbitratorsByNetwork } from '../../../../util/networks'
 import { Arbitrator } from '../../../../util/types'
-import { Dropdown, DropdownDirection, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 
 interface Props {
   customValues: Arbitrator[]
@@ -46,7 +46,6 @@ export const Arbitrators = (props: Props) => {
     <Dropdown
       currentItem={currentItem}
       disabled={disabled}
-      dropdownDirection={DropdownDirection.upwards}
       dropdownPosition={DropdownPosition.right}
       items={arbitratorOptions}
     />
