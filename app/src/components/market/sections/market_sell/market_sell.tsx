@@ -189,7 +189,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                   decimals={collateral.decimals}
                   name="amount"
                   onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
-                  value={amountShares}
+                  value={amountShares >  new BigNumber(0) ? amountShares : null}
                 />
               }
               symbol={'Shares'}
