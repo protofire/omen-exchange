@@ -22,6 +22,12 @@ const ThreeBoxCustom = styled.div`
   .threebox-comments-react {
     overflow: visible !important;
   }
+
+  .footer_text {
+    flex-direction: column;
+    justify-content: space-between;
+    height: 48px;
+  }
 `
 
 interface Props {
