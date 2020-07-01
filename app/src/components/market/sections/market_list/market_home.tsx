@@ -5,8 +5,7 @@ import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { CategoryDataItem, MarketMakerDataItem } from '../../../../queries/markets_home'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
-import { Button, ButtonCircle } from '../../../button'
-import { ButtonType } from '../../../button/button_styling_types'
+import { ButtonCircle } from '../../../button'
 import { SectionTitle } from '../../../common'
 import {
   Dropdown,
@@ -15,6 +14,10 @@ import {
   DropdownPosition,
   DropdownVariant,
 } from '../../../common/form/dropdown'
+import { IconChevronLeft } from '../../../common/icons/IconChevronLeft'
+import { IconChevronLeftDisabled } from '../../../common/icons/IconChevronLeftDisabled'
+import { IconChevronRight } from '../../../common/icons/IconChevronRight'
+import { IconChevronRightDisabled } from '../../../common/icons/IconChevronRightDisabled'
 import { IconFilter } from '../../../common/icons/IconFilter'
 import { IconSearch } from '../../../common/icons/IconSearch'
 import { InlineLoading } from '../../../loading'
@@ -35,6 +38,7 @@ const SectionTitleMarket = styled(SectionTitle)`
       padding-left: 0;
     }
   }
+  margin-bottom: 0;
 `
 
 const TopContents = styled.div`
@@ -90,20 +94,17 @@ const NoOwnMarkets = styled.p`
   text-align: center;
 `
 
-const SortDropdown = styled(Dropdown)`
+const SortDropdown = styled(Dropdown)``
+
+const PageSizeDropdown = styled(Dropdown)`
   max-width: 145px;
 `
 
 const LoadMoreWrapper = styled.div`
   align-items: center;
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
   justify-content: center;
-  padding: 0 15px 25px;
-`
-
-const ButtonLoadMoreWrapper = styled(Button)`
-  margin-top: 20px;
+  padding: 0 25px 0 15px;
 `
 
 const CustomDropdownItem = styled.div`
@@ -150,6 +151,25 @@ const Actions = styled.div`
   }
 `
 
+const Display = styled.span`
+  color: ${props => props.theme.colors.textColorLighter};
+  font-size: 14px;
+  line-height: 1.2;
+  margin-right: 6px;
+`
+
+const BottomContents = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 25px 0;
+  border-top: 1px solid ${props => props.theme.borders.borderColor};
+`
+
+const DisplayButtonWrapper = styled.div`
+  padding: 0 15px 0 25px;
+`
+
 interface Props {
   context: ConnectedWeb3Context
   count: number
@@ -158,12 +178,27 @@ interface Props {
   markets: RemoteData<MarketMakerDataItem[]>
   categories: RemoteData<CategoryDataItem[]>
   moreMarkets: boolean
+  pageIndex: number
   onFilterChange: (filter: MarketFilters) => void
-  onLoadMore: () => void
+  onUpdatePageSize: (size: number) => void
+  onLoadNextPage: () => void
+  onLoadPrevPage: () => void
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { categories, count, isFiltering = false, markets, moreMarkets, onFilterChange, onLoadMore } = props
+  const { 
+    categories,
+    count,
+    currentFilter,
+    isFiltering = false,
+    markets,
+    moreMarkets,
+    onFilterChange,
+    onLoadNextPage,
+    onLoadPrevPage,
+    onUpdatePageSize,
+    pageIndex,
+  } = props
   const [state, setState] = useState<MarketStates>(MarketStates.open)
   const [category, setCategory] = useState('All')
   const [title, setTitle] = useState('')
@@ -289,12 +324,29 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           },
         ]
 
+  const sizeOptions = [4, 8, 12]
+
+  const sizeItems: Array<DropdownItemProps> = sizeOptions.map(item => {
+    return {
+      content: (
+        <CustomDropdownItem>
+          <Display className="display">Display</Display> {item}
+        </CustomDropdownItem>
+      ),
+      onClick: () => {
+        onUpdatePageSize(item)
+      },
+    }
+  })
+
   const noOwnMarkets = RemoteData.is.success(markets) && markets.data.length === 0 && state === MarketStates.myMarkets
   const noMarketsAvailable =
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
   const showFilteringInlineLoading = !noMarketsAvailable && !noOwnMarkets && isFiltering
-  const disableLoadMoreButton =
+  const disableLoadNextButton =
     isFiltering || !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
+  const disableLoadPrevButton =
+    isFiltering || pageIndex === 0 || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
 
   return (
     <>
@@ -323,6 +375,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                 <IconFilter />
               </ButtonCircleStyled>
               <SortDropdown
+                currentItem={1}
+                dirty={true}
                 dropdownPosition={DropdownPosition.right}
                 items={sortItems}
                 placeholder={<SecondaryText>Sort By</SecondaryText>}
@@ -344,23 +398,41 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             RemoteData.hasData(markets) &&
             markets.data.length > 0 &&
             markets.data.slice(0, count).map(item => {
-              return <ListItem key={item.address} market={item}></ListItem>
+              return <ListItem currentFilter={currentFilter} key={item.address} market={item}></ListItem>
             })}
           {noOwnMarkets && <NoOwnMarkets>You haven&apos;t participated in or created any market yet.</NoOwnMarkets>}
           {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
-        {RemoteData.hasData(markets) && markets.data.length === 0 ? null : (
-          <LoadMoreWrapper>
-            <ButtonLoadMoreWrapper
-              buttonType={ButtonType.secondaryLine}
-              disabled={disableLoadMoreButton}
-              onClick={onLoadMore}
-            >
-              {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load more'}
-            </ButtonLoadMoreWrapper>
-          </LoadMoreWrapper>
-        )}
+        <BottomContents>
+          <DisplayButtonWrapper>
+            <PageSizeDropdown
+              currentItem={4}
+              dirty={true}
+              dropdownPosition={DropdownPosition.right}
+              items={sizeItems}
+              placeholder={<Display>Display</Display>}
+            />
+          </DisplayButtonWrapper>
+          {RemoteData.hasData(markets) && markets.data.length === 0 ? null : (
+            <LoadMoreWrapper>
+              <ButtonCircleStyled disabled={disableLoadPrevButton} onClick={onLoadPrevPage}>
+                {disableLoadPrevButton ? (
+                  <IconChevronLeftDisabled></IconChevronLeftDisabled>
+                ) : (
+                  <IconChevronLeft></IconChevronLeft>
+                )}
+              </ButtonCircleStyled>
+              <ButtonCircleStyled disabled={disableLoadNextButton} onClick={onLoadNextPage}>
+                {disableLoadNextButton ? (
+                  <IconChevronRightDisabled></IconChevronRightDisabled>
+                ) : (
+                  <IconChevronRight></IconChevronRight>
+                )}
+              </ButtonCircleStyled>
+            </LoadMoreWrapper>
+          )}
+        </BottomContents>
       </ListCard>
     </>
   )

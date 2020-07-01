@@ -272,8 +272,9 @@ export interface DropdownItemProps {
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   currentItem?: number | undefined
-  disabled?: boolean
   dropdownVariant?: DropdownVariant | undefined
+  dirty?: boolean
+  disabled?: boolean
   dropdownPosition?: DropdownPosition | undefined
   dropdownDirection?: DropdownDirection | undefined
   showScrollbar?: boolean
@@ -284,6 +285,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 export const Dropdown: React.FC<Props> = props => {
   const {
     currentItem = 0,
+    dirty = false,
     disabled = false,
     dropdownVariant = DropdownVariant.pill,
     dropdownDirection,
@@ -307,7 +309,7 @@ export const Dropdown: React.FC<Props> = props => {
   }
 
   const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
-  const [isDirty, setIsDirty] = useState<boolean>(false)
+  const [isDirty, setIsDirty] = useState<boolean>(dirty)
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const optionClick = useCallback((onClick: (() => void) | undefined, itemIndex: number) => {
