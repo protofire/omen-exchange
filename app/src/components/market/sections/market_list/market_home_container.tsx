@@ -23,8 +23,6 @@ import { MarketHome } from './market_home'
 
 const logger = getLogger('MarketHomeContainer')
 
-const PAGE_SIZE = 4
-
 type GraphResponseMarkets = {
   fixedProductMarketMakers: GraphMarketMakerDataItem[]
 }
@@ -72,6 +70,8 @@ const MarketHomeContainer: React.FC = () => {
   const [categories, setCategories] = useState<RemoteData<CategoryDataItem[]>>(RemoteData.notAsked())
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const [moreMarkets, setMoreMarkets] = useState(true)
+  const [pageSize, setPageSize] = useState(4)
+  const [pageIndex, setPageIndex] = useState(0)
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
   const [now, setNow] = useState<string>(calcNow())
   const [isFiltering, setIsFiltering] = useState(false)
@@ -86,7 +86,7 @@ const MarketHomeContainer: React.FC = () => {
   const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)
 
   const marketsQueryVariables = {
-    first: PAGE_SIZE,
+    first: pageSize,
     skip: 0,
     accounts: cpkAddress ? [cpkAddress] : null,
     fee: feeBN.toString(),
@@ -130,7 +130,7 @@ const MarketHomeContainer: React.FC = () => {
       const { fixedProductMarketMakers } = fetchedMarkets
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
 
-      if (fixedProductMarketMakers.length < PAGE_SIZE) {
+      if (fixedProductMarketMakers.length < pageSize) {
         setMoreMarkets(false)
       }
 
@@ -139,7 +139,7 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(RemoteData.failure(error))
       setIsFiltering(false)
     }
-  }, [fetchedMarkets, loading, error, context.networkId])
+  }, [fetchedMarkets, loading, error, context.networkId, pageSize])
 
   useEffect(() => {
     if (categoriesLoading) {
@@ -163,30 +163,60 @@ const MarketHomeContainer: React.FC = () => {
     setIsFiltering(true)
   }, [])
 
-  const loadMore = () => {
+  const loadNextPage = () => {
     if (!moreMarkets) {
       return
     }
 
     fetchMore({
       variables: {
-        skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length,
+        skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex + 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        setMoreMarkets(fetchMoreResult ? fetchMoreResult.fixedProductMarketMakers.length > 0 : false)
+        setMoreMarkets(fetchMoreResult ? fetchMoreResult.fixedProductMarketMakers.length >= pageSize : false)
+        setPageIndex(pageIndex + 1)
 
         if (!fetchMoreResult) {
           return prev
         }
 
         return {
-          ...prev,
           ...{
-            fixedProductMarketMakers: [...prev.fixedProductMarketMakers, ...fetchMoreResult.fixedProductMarketMakers],
+            fixedProductMarketMakers: [...fetchMoreResult.fixedProductMarketMakers],
           },
         }
       },
     })
+  }
+
+  const loadPrevPage = () => {
+    if (pageIndex === 0) {
+      return
+    }
+
+    fetchMore({
+      variables: {
+        skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex - 1),
+      },
+      updateQuery: (prev: any, { fetchMoreResult }) => {
+        setMoreMarkets(true)
+        setPageIndex(pageIndex - 1)
+
+        if (!fetchMoreResult) {
+          return prev
+        }
+
+        return {
+          ...{
+            fixedProductMarketMakers: [...fetchMoreResult.fixedProductMarketMakers],
+          },
+        }
+      },
+    })
+  }
+
+  const updatePageSize = (size: number): void => {
+    setPageSize(size)
   }
 
   return (
@@ -200,7 +230,10 @@ const MarketHomeContainer: React.FC = () => {
         markets={markets}
         moreMarkets={moreMarkets}
         onFilterChange={onFilterChange}
-        onLoadMore={loadMore}
+        onLoadNextPage={loadNextPage}
+        onLoadPrevPage={loadPrevPage}
+        onUpdatePageSize={updatePageSize}
+        pageIndex={pageIndex}
       />
     </>
   )
