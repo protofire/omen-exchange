@@ -63,4 +63,9 @@ export const currenciesData = [
     text: 'PNK',
     token: 'PNK',
   },
+  {
+    icon: <Icons.UsdtIcon />,
+    text: 'USDT',
+    token: 'USDT',
+  },
 ]
