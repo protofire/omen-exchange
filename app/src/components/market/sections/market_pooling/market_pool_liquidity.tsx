@@ -230,7 +230,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const collateralAmountError =
     maybeCollateralBalance === null
       ? null
-      : maybeCollateralBalance.isZero()
+      : maybeCollateralBalance.isZero() && amountToFund.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : amountToFund.gt(maybeCollateralBalance)
       ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
@@ -239,7 +239,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const sharesAmountError =
     maybeFundingBalance === null
       ? null
-      : maybeFundingBalance.isZero()
+      : maybeFundingBalance.isZero() && amountToRemove.gt(maybeFundingBalance)
       ? `Insufficient balance`
       : amountToRemove.gt(maybeFundingBalance)
       ? `Value must be less than or equal to ${sharesBalance} pool shares`
