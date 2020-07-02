@@ -228,7 +228,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
                   decimals={collateral.decimals}
                   name="amount"
                   onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
-                  value={amount}
+                  value={amount > new BigNumber(0) ? amount : null}
                 />
               }
               symbol={collateral.symbol}

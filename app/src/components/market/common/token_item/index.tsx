@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from 'react'
+import React, { HTMLAttributes, useState } from 'react'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
@@ -7,16 +7,13 @@ const Wrapper = styled.div`
   height: 100%;
 `
 
-const Icon = styled.div`
+const Image = styled.img`
   align-items: center;
   display: flex;
   height: 100%;
   margin-right: 8px;
-  max-height: 100%;
-
-  svg {
-    max-height: 100%;
-  }
+  max-height: 24px;
+  max-width: 24px;
 `
 
 const Text = styled.div`
@@ -27,15 +24,17 @@ const Text = styled.div`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  icon: any
+  image: any
   text: string
 }
 
 export const TokenItem: React.FC<Props> = props => {
-  const { icon, text } = props
+  const { image, text } = props
+  const [showImage, setShowImage] = useState(true)
+
   return (
     <Wrapper>
-      <Icon>{icon}</Icon>
+      {showImage && <Image onError={() => setShowImage(false)} src={image} />}
       <Text>{text}</Text>
     </Wrapper>
   )

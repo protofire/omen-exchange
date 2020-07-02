@@ -6,7 +6,6 @@ import { Token } from '../../../../util/types'
 import { Button } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
-import { currenciesData } from '../../../common/icons/currencies/currencies_data'
 import { TokenItem } from '../token_item'
 
 const Wrapper = styled.div`
@@ -53,7 +52,7 @@ export const CurrencySelector: React.FC<Props> = props => {
   const tokens = useTokens(context)
 
   const currencyButtons = tokens.slice(0, 4)
-  const currencyMore = tokens.slice(4, currenciesData.length + 1)
+  const currencyMore = tokens.slice(4, tokens.length + 1)
 
   const currencyDropdownData: Array<DropdownItemProps> = []
 
@@ -65,10 +64,9 @@ export const CurrencySelector: React.FC<Props> = props => {
     }
   }
 
-  currencyMore.forEach(({ address, symbol }) => {
-    const tokenData = currenciesData.find(c => c.token === symbol)
+  currencyMore.forEach(({ address, image, symbol }) => {
     currencyDropdownData.push({
-      content: tokenData ? <TokenItem icon={tokenData.icon} text={tokenData.text} /> : symbol,
+      content: image ? <TokenItem image={image} text={symbol} /> : symbol,
       onClick: !disabled
         ? () => {
             onChange(address)
@@ -86,8 +84,6 @@ export const CurrencySelector: React.FC<Props> = props => {
   return (
     <Wrapper {...restProps}>
       {currencyButtons.map((item, index) => {
-        const tokenData = currenciesData.find(c => c.token === item.symbol)
-
         return (
           <CurrencyButton
             buttonType={ButtonType.secondaryLine}
@@ -98,7 +94,7 @@ export const CurrencySelector: React.FC<Props> = props => {
             }}
             selected={selectedCurrency.address === item.address}
           >
-            {tokenData ? <TokenItem icon={tokenData.icon} key={index} text={tokenData.text} /> : item.symbol}
+            {item.image ? <TokenItem image={item.image} key={index} text={item.symbol} /> : item.symbol}
           </CurrencyButton>
         )
       })}
