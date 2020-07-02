@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import { useTokens } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork, getTokensByNetwork } from '../../../../util/networks'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
@@ -50,7 +51,7 @@ export const AdvancedFilters = (props: Props) => {
   const { networkId } = context
 
   const arbitrators = getArbitratorsByNetwork(networkId)
-  const tokens = getTokensByNetwork(networkId)
+  const tokens = useTokens(context)
 
   const { currency, onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
 
