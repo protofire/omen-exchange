@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { useTokens } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { getArbitratorsByNetwork, getTokensByNetwork } from '../../../../util/networks'
+import { getArbitratorsByNetwork } from '../../../../util/networks'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { TokenItem } from '../token_item'
 
