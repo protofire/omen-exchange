@@ -11,6 +11,7 @@ import {
 } from '../common/constants'
 import { entries, isNotNull } from '../util/type-utils'
 
+import { getImageUrl } from './token'
 import { Arbitrator, Token } from './types'
 
 export type NetworkId = 1 | 4
@@ -281,6 +282,7 @@ export const getTokensByNetwork = (networkId: number): Token[] => {
         return {
           symbol: token.symbol,
           decimals: token.decimals,
+          image: getImageUrl(address),
           address,
         }
       }
