@@ -1,12 +1,15 @@
+import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { use24hsVolume, useGraphMarketMakerData } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { ERC20Service } from '../../../../services'
 import { calcPrice, formatBigNumber } from '../../../../util/tools'
+import { IconStar } from '../../../common/icons/IconStar'
 
 const Wrapper = styled(NavLink)`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
@@ -37,59 +40,87 @@ const Title = styled.h2`
 
 const Info = styled.div`
   align-items: center;
-  color: ${props => props.theme.colors.textColor};
+  color: ${props => props.theme.colors.textColorLighter};
   display: flex;
   flex-wrap: wrap;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.2;
   overflow-wrap: break-word;
   white-space: normal;
   word-break: break-all;
 `
 
-const OutcomeTitle = styled.span`
-  color: ${props => props.theme.colors.textColor};
-`
-
 const Outcome = styled.span`
   color: ${props => props.theme.colors.primary};
+  margin-left: 6px;
+  font-weight: 500;
 `
 
 const Separator = styled.span`
   font-size: 18px;
   margin: 0 5px;
+  color: ${props => props.theme.colors.verticalDivider};
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   market: MarketMakerDataItem
+  currentFilter: any
 }
 
 export const ListItem: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
-  const [amount, setAmount] = useState('')
+  const [volume, setVolume] = useState('')
   const [symbol, setSymbol] = useState('')
+  const [dailyVolume, setDailyVolume] = useState('')
+  const [liquidity, setLiquidity] = useState(0)
 
-  const { market } = props
+  const { currentFilter, market } = props
   const { address, collateralToken, collateralVolume, openingTimestamp, outcomeTokenAmounts, outcomes, title } = market
 
   const now = moment()
   const endDate = openingTimestamp
-  const endsText = moment(endDate).fromNow()
+  const endsText = moment(endDate).fromNow(true)
+  const resolutionDate = moment(endDate).format('MMM Do, YYYY')
+
+  const use24hsVolumeResult = use24hsVolume(address)
+  const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
+  const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
+    : ''
+  const creationDate = new Date(1000 * parseInt(creationTimestamp))
+  const formattedCreationDate = moment(creationDate).format('MMM Do, YYYY')
 
   useEffect(() => {
     const setToken = async () => {
       const erc20Service = new ERC20Service(provider, account, collateralToken)
       const { decimals, symbol } = await erc20Service.getProfileSummary()
-      const amount = formatBigNumber(collateralVolume, decimals)
+      const volume = formatBigNumber(collateralVolume, decimals)
 
-      setAmount(amount)
+      let lastDayVolume: BigNumber
+      let formattedDailyVolume: string
+      if (use24hsVolumeResult !== null) {
+        lastDayVolume = use24hsVolumeResult
+        formattedDailyVolume = formatBigNumber(lastDayVolume, decimals)
+      } else {
+        formattedDailyVolume = '0'
+      }
+
+      let liquidity = 0
+      outcomeTokenAmounts.forEach(amount => {
+        const formattedAmount: number = parseInt(formatBigNumber(amount, decimals))
+        liquidity += formattedAmount
+      })
+
+      setVolume(volume)
       setSymbol(symbol)
+      setDailyVolume(formattedDailyVolume)
+      setLiquidity(liquidity)
     }
 
     setToken()
-  }, [account, collateralToken, collateralVolume, provider])
+  }, [account, collateralToken, collateralVolume, provider, use24hsVolumeResult, outcomeTokenAmounts])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
@@ -98,16 +129,18 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     <Wrapper to={address}>
       <Title>{title}</Title>
       <Info>
-        <Outcome>
-          <OutcomeTitle>Top Outcome:</OutcomeTitle>{' '}
-          {outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}
-        </Outcome>
-        <Separator>·</Separator>
+        <IconStar></IconStar>
+        <Outcome>{outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}</Outcome>
+        <Separator>|</Separator>
+        <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Ended ${endsText}`}</span>
+        <Separator>|</Separator>
         <span>
-          {amount} {symbol} Volume
+          {currentFilter.sortBy === 'collateralVolume' && `${volume} ${symbol} - Volume`}
+          {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Ending`}
+          {currentFilter.sortBy === 'lastActiveDayAndRunningDailyVolume' && `${dailyVolume} ${symbol} - 24hr Volume`}
+          {currentFilter.sortBy === 'liquidityParameter' && `${liquidity} ${symbol} - Liquidity`}
+          {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
-        <Separator>·</Separator>
-        <span>{moment(endDate).isAfter(now) ? `Ends ${endsText}` : `Ended ${endsText}`}</span>
       </Info>
     </Wrapper>
   )

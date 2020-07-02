@@ -25,6 +25,7 @@ const query = gql`
       category
       language
       arbitrator
+      creationTimestamp
       openingTimestamp
       timeout
       resolutionTimestamp
@@ -53,6 +54,7 @@ type GraphResponseFixedProductMarketMaker = {
   currentAnswer: string
   fee: string
   language: string
+  creationTimestamp: string
   openingTimestamp: string
   outcomeTokenAmounts: string[]
   outcomes: Maybe<string[]>
@@ -75,6 +77,7 @@ export type GraphMarketMakerData = {
   answerFinalizedTimestamp: Maybe<BigNumber>
   arbitratorAddress: string
   collateralAddress: string
+  creationTimestamp: string
   collateralVolume: BigNumber
   conditionId: string
   payouts: Maybe<number[]>
@@ -95,6 +98,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     answerFinalizedTimestamp: data.answerFinalizedTimestamp ? bigNumberify(data.answerFinalizedTimestamp) : null,
     arbitratorAddress: data.arbitrator,
     collateralAddress: data.collateralToken,
+    creationTimestamp: data.creationTimestamp,
     collateralVolume: bigNumberify(data.collateralVolume),
     conditionId: data.condition.id,
     payouts: data.condition.payouts ? data.condition.payouts.map(Number) : null,

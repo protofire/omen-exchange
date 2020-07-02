@@ -98,7 +98,11 @@ export const AdvancedFilters = (props: Props) => {
     <Wrapper>
       <Column>
         <Title>Currency</Title>
-        <Options currentItem={allTokensOptions.findIndex(t => t.address === currency)} items={currencyOptions} />
+        <Options
+          currentItem={allTokensOptions.findIndex(t => t.address === currency)}
+          dropdownPosition={DropdownPosition.left}
+          items={currencyOptions}
+        />
       </Column>
       {showQuestionType && (
         <Column>
