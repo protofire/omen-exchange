@@ -186,7 +186,7 @@ interface Props {
 }
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { 
+  const {
     categories,
     count,
     currentFilter,

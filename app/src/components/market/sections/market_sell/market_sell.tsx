@@ -44,10 +44,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
   const { address: marketMakerAddress, balances, collateral, question } = marketMakerData
 
-  let defaultOutcomeIndex: number = 0
-  for(let i = 0; i < balances.length; i++) {
+  let defaultOutcomeIndex = 0
+  for (let i = 0; i < balances.length; i++) {
     const shares = parseInt(formatBigNumber(balances[i].shares, collateral.decimals))
-    if(shares > 0) {
+    if (shares > 0) {
       defaultOutcomeIndex = i
       break
     }
