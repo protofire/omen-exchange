@@ -44,10 +44,19 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
   const { address: marketMakerAddress, balances, collateral, question } = marketMakerData
 
+  let defaultOutcomeIndex = 0
+  for (let i = 0; i < balances.length; i++) {
+    const shares = parseInt(formatBigNumber(balances[i].shares, collateral.decimals))
+    if (shares > 0) {
+      defaultOutcomeIndex = i
+      break
+    }
+  }
+
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
+  const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')

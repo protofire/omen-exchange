@@ -71,7 +71,7 @@ test('Query pending markets', () => {
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp_gt: $now, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee',
+    'openingTimestamp_lt: $now, answerFinalizedTimestamp: null, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
