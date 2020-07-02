@@ -303,7 +303,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               setCategory('All')
             },
           },
-          ...categories.data.map((item: CategoryDataItem, index) => {
+          ...categories.data.map((item: CategoryDataItem) => {
             return {
               content: <CustomDropdownItem>{item.id}</CustomDropdownItem>,
               onClick: () => {
