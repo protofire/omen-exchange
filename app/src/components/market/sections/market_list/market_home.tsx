@@ -182,6 +182,7 @@ interface Props {
 export const MarketHome: React.FC<Props> = (props: Props) => {
   const {
     categories,
+    context,
     count,
     currentFilter,
     isFiltering = false,
@@ -223,13 +224,17 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       active: state === MarketStates.closed,
       onClick: () => setState(MarketStates.closed),
     },
-    {
+  ]
+
+  // Only allow to filter myMarkets when the user is connected
+  if (context.account) {
+    filters.push({
       state: MarketStates.myMarkets,
       title: 'My Markets',
       active: state === MarketStates.myMarkets,
       onClick: () => setState(MarketStates.myMarkets),
-    },
-  ]
+    })
+  }
 
   useEffect(() => {
     onFilterChange({ arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title })
