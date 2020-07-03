@@ -3,6 +3,8 @@ import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, InputHTMLAttributes, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
+import { getLogger } from '../../../../util/logger'
+
 const Input = styled.input`
   ::-webkit-inner-spin-button,
   ::-webkit-outer-spin-button {
@@ -33,8 +35,11 @@ type Props = OverrideProperties<
     onChange: (value: BigNumberInputReturn) => void
     step?: BigNumber
     value: Maybe<BigNumber>
+    valueToDisplay?: string
   }
 >
+
+const logger = getLogger('BigNumberInput')
 
 export const BigNumberInput: React.FC<Props> = props => {
   const {
@@ -46,6 +51,7 @@ export const BigNumberInput: React.FC<Props> = props => {
     placeholder = '0.00',
     step,
     value,
+    valueToDisplay = '',
     ...restProps
   } = props
 
@@ -86,6 +92,8 @@ export const BigNumberInput: React.FC<Props> = props => {
 
   const currentStep = step && ethers.utils.formatUnits(step, decimals)
 
+  logger.log(`Value to display: "${valueToDisplay}"`, `Value used in the background: "${currentValue}"`)
+
   return (
     <Input
       autoComplete="off"
@@ -97,7 +105,7 @@ export const BigNumberInput: React.FC<Props> = props => {
       ref={inputRef}
       step={currentStep}
       type="number"
-      value={currentValue}
+      value={valueToDisplay || currentValue}
       {...restProps}
     />
   )
