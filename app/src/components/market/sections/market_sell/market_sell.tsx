@@ -146,11 +146,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals)}`
   const goBackToAddress = `/${marketMakerAddress}`
 
-  const amountError = balanceItem.shares.isZero()
-    ? `Insufficient balance`
-    : amountShares.gt(balanceItem.shares)
-    ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
-    : null
+  const amountError =
+    balanceItem.shares === null
+      ? null
+      : balanceItem.shares.isZero() && amountShares.gt(balanceItem.shares)
+      ? `Insufficient balance`
+      : amountShares.gt(balanceItem.shares)
+      ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
+      : null
 
   const isSellButtonDisabled =
     (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || amountError !== null

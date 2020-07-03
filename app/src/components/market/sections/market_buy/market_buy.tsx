@@ -169,7 +169,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const amountError =
     maybeCollateralBalance === null
       ? null
-      : maybeCollateralBalance.isZero()
+      : maybeCollateralBalance.isZero() && amount.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : amount.gt(maybeCollateralBalance)
       ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
