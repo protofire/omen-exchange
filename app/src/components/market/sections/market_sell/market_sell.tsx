@@ -59,6 +59,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
+  const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
@@ -146,11 +147,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals)}`
   const goBackToAddress = `/${marketMakerAddress}`
 
-  const amountError = balanceItem.shares.isZero()
-    ? `Insufficient balance`
-    : amountShares.gt(balanceItem.shares)
-    ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
-    : null
+  const amountError =
+    balanceItem.shares === null
+      ? null
+      : balanceItem.shares.isZero() && amountShares.gt(balanceItem.shares)
+      ? `Insufficient balance`
+      : amountShares.gt(balanceItem.shares)
+      ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
+      : null
 
   const isSellButtonDisabled =
     (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || amountError !== null
@@ -187,7 +191,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               data-multiline={true}
               data-place="right"
               data-tip={`Sell all of the selected outcome's shares.`}
-              onClick={() => setAmountShares(balanceItem.shares)}
+              onClick={() => {
+                setAmountShares(balanceItem.shares)
+                setAmountSharesToDisplay(selectedOutcomeBalance)
+              }}
               symbol="Shares"
               value={selectedOutcomeBalance}
             />
@@ -197,8 +204,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 <BigNumberInput
                   decimals={collateral.decimals}
                   name="amount"
-                  onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
+                  onChange={(e: BigNumberInputReturn) => {
+                    setAmountShares(e.value)
+                    setAmountSharesToDisplay('')
+                  }}
                   value={amountShares > new BigNumber(0) ? amountShares : null}
+                  valueToDisplay={amountSharesToDisplay}
                 />
               }
               symbol={'Shares'}

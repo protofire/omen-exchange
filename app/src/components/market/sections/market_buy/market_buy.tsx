@@ -68,6 +68,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [tweet, setTweet] = useState('')
@@ -169,7 +170,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const amountError =
     maybeCollateralBalance === null
       ? null
-      : maybeCollateralBalance.isZero()
+      : maybeCollateralBalance.isZero() && amount.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : amount.gt(maybeCollateralBalance)
       ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
@@ -217,7 +218,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               data-multiline={true}
               data-place="right"
               data-tip={`Spend your total ${collateral.symbol} balance on the selected outcome.`}
-              onClick={() => setAmount(collateralBalance)}
+              onClick={() => {
+                setAmount(collateralBalance)
+                setAmountToDisplay(currentBalance)
+              }}
               symbol={collateral.symbol}
               value={currentBalance}
             />
@@ -227,8 +231,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
                 <BigNumberInput
                   decimals={collateral.decimals}
                   name="amount"
-                  onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                  onChange={(e: BigNumberInputReturn) => {
+                    setAmount(e.value)
+                    setAmountToDisplay('')
+                  }}
                   value={amount > new BigNumber(0) ? amount : null}
+                  valueToDisplay={amountToDisplay}
                 />
               }
               symbol={collateral.symbol}
