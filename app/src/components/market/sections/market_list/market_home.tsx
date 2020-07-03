@@ -195,6 +195,9 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   } = props
   const [state, setState] = useState<MarketStates>(MarketStates.open)
   const [category, setCategory] = useState('All')
+  const [counts, setCounts] = useState({
+    open: 0,
+  })
   const [title, setTitle] = useState('')
   const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(props.currentFilter.sortBy)
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(props.currentFilter.sortByDirection)
@@ -287,9 +290,10 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     }
   })
 
-  const filterItems: Array<DropdownItemProps> = filters.map(item => {
+  const filterItems: Array<DropdownItemProps> = filters.map((item, index) => {
     return {
       content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
+      secondaryText: index == 0 && counts.open > 0 && counts.open.toString(),
       onClick: item.onClick,
     }
   })
@@ -306,8 +310,10 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           ...categories.data.map((item: CategoryDataItem) => {
             return {
               content: <CustomDropdownItem>{item.id}</CustomDropdownItem>,
+
               onClick: () => {
                 setCategory(item.id)
+                setCounts({ open: item.numOpenConditions })
               },
             }
           }),

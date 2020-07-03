@@ -125,6 +125,7 @@ const DropdownButton = styled.div`
 
 const CurrentItem = styled.div`
   align-items: center;
+  justify-content: space-between;
   color: ${props => props.theme.dropdown.buttonColor};
   display: flex;
   flex-grow: 1;
@@ -224,12 +225,19 @@ const Items = styled.div<{
   ${props => props.showScrollbar && DropdownScrollbarCSS}
 `
 
+const SecondaryText = styled.div`
+  color: #757575;
+  width: 33%;
+  text-align: right;
+`
+
 Items.defaultProps = {
   dropdownVariant: DropdownVariant.pill,
 }
 
 const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
   align-items: center;
+  justify-content: space-between;
   background-color: ${props =>
     props.active
       ? props.dropdownVariant === DropdownVariant.card
@@ -253,6 +261,9 @@ const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
       props.dropdownVariant === DropdownVariant.card
         ? '#F8F9FC'
         : props.theme.dropdown.dropdownItems.item.backgroundColorHover};
+    div {
+      color: #39474f;
+    }
   }
 `
 
@@ -262,6 +273,7 @@ const ChevronWrapper = styled.div`
 
 export interface DropdownItemProps {
   content: React.ReactNode | string
+  secondaryText?: React.ReactNode | string
   onClick?: () => void
 }
 
@@ -299,8 +311,8 @@ export const Dropdown: React.FC<Props> = props => {
     return itemIndex
   }
 
-  const getItemContent = (itemIndex: number): any => {
-    return items[getValidItemIndex(itemIndex)].content
+  const getItem = (itemIndex: number): any => {
+    return items[getValidItemIndex(itemIndex)]
   }
 
   const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
@@ -324,6 +336,8 @@ export const Dropdown: React.FC<Props> = props => {
     }
   }, [isOpen])
 
+  const activeItem = getItem(currentItemIndex)
+
   return (
     <>
       <Wrapper
@@ -339,7 +353,8 @@ export const Dropdown: React.FC<Props> = props => {
       >
         <DropdownButton>
           <CurrentItem className="currentItem">
-            {placeholder && !isDirty ? placeholder : getItemContent(currentItemIndex)}
+            {placeholder && !isDirty ? placeholder : activeItem.content}
+            {!!activeItem.secondaryText && <SecondaryText>{activeItem.secondaryText}</SecondaryText>}
           </CurrentItem>
           <ChevronWrapper>
             <ChevronDown />
@@ -372,6 +387,7 @@ export const Dropdown: React.FC<Props> = props => {
                   }
                 >
                   {item.content}
+                  {!!item.secondaryText && <SecondaryText>{item.secondaryText}</SecondaryText>}
                 </Item>
               )
             })}
