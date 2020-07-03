@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { CategoryDataItem, MarketMakerDataItem } from '../../../../queries/markets_home'
+import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
 import { ButtonCircle } from '../../../button'
@@ -179,6 +180,8 @@ interface Props {
   onLoadPrevPage: () => void
 }
 
+const logger = getLogger('MarketHome')
+
 export const MarketHome: React.FC<Props> = (props: Props) => {
   const {
     categories,
@@ -235,6 +238,13 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       onClick: () => setState(MarketStates.myMarkets),
     })
   }
+
+  useEffect(() => {
+    if (state === MarketStates.myMarkets && !context.account) {
+      logger.log(`User disconnected, update filter`)
+      setState(MarketStates.open)
+    }
+  }, [context.account, state])
 
   useEffect(() => {
     onFilterChange({ arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title })
