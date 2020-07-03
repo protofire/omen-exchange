@@ -59,6 +59,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
+  const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
@@ -187,7 +188,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               data-multiline={true}
               data-place="right"
               data-tip={`Sell all of the selected outcome's shares.`}
-              onClick={() => setAmountShares(balanceItem.shares)}
+              onClick={() => {
+                setAmountShares(balanceItem.shares)
+                setAmountSharesToDisplay(selectedOutcomeBalance)
+              }}
               symbol="Shares"
               value={selectedOutcomeBalance}
             />
@@ -197,8 +201,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 <BigNumberInput
                   decimals={collateral.decimals}
                   name="amount"
-                  onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
+                  onChange={(e: BigNumberInputReturn) => {
+                    setAmountShares(e.value)
+                    setAmountSharesToDisplay('')
+                  }}
                   value={amountShares > new BigNumber(0) ? amountShares : null}
+                  valueToDisplay={amountSharesToDisplay}
                 />
               }
               symbol={'Shares'}
