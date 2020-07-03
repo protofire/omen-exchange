@@ -86,7 +86,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const [amountToFund, setAmountToFund] = useState<BigNumber>(new BigNumber(0))
+  const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
   const [amountToRemove, setAmountToRemove] = useState<BigNumber>(new BigNumber(0))
+  const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
@@ -289,7 +291,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             {activeTab === Tabs.deposit && (
               <>
                 <WalletBalance
-                  onClick={() => setAmountToFund(collateralBalance)}
+                  onClick={() => {
+                    setAmountToFund(collateralBalance)
+                    setAmountToFundDisplay(walletBalance)
+                  }}
                   symbol={collateral.symbol}
                   value={walletBalance}
                 />
@@ -298,8 +303,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                     <BigNumberInput
                       decimals={collateral.decimals}
                       name="amountToFund"
-                      onChange={(e: BigNumberInputReturn) => setAmountToFund(e.value)}
+                      onChange={(e: BigNumberInputReturn) => {
+                        setAmountToFund(e.value)
+                        setAmountToFundDisplay('')
+                      }}
                       value={amountToFund}
+                      valueToDisplay={amountToFundDisplay}
                     />
                   }
                   symbol={collateral.symbol}
@@ -310,7 +319,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             {activeTab === Tabs.withdraw && (
               <>
                 <WalletBalance
-                  onClick={() => setAmountToRemove(fundingBalance)}
+                  onClick={() => {
+                    setAmountToRemove(fundingBalance)
+                    setAmountToRemoveDisplay(sharesBalance)
+                  }}
                   symbol="Shares"
                   text="My Pool Tokens"
                   value={sharesBalance}
@@ -320,8 +332,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                     <BigNumberInput
                       decimals={collateral.decimals}
                       name="amountToRemove"
-                      onChange={(e: BigNumberInputReturn) => setAmountToRemove(e.value)}
+                      onChange={(e: BigNumberInputReturn) => {
+                        setAmountToRemove(e.value)
+                        setAmountToRemoveDisplay('')
+                      }}
                       value={amountToRemove}
+                      valueToDisplay={amountToRemoveDisplay}
                     />
                   }
                   symbol="Shares"
