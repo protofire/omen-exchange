@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { CategoryDataItem, MarketMakerDataItem } from '../../../../queries/markets_home'
+import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
 import { ButtonCircle } from '../../../button'
@@ -179,9 +180,12 @@ interface Props {
   onLoadPrevPage: () => void
 }
 
+const logger = getLogger('MarketHome')
+
 export const MarketHome: React.FC<Props> = (props: Props) => {
   const {
     categories,
+    context,
     count,
     currentFilter,
     isFiltering = false,
@@ -223,13 +227,24 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       active: state === MarketStates.closed,
       onClick: () => setState(MarketStates.closed),
     },
-    {
+  ]
+
+  // Only allow to filter myMarkets when the user is connected
+  if (context.account) {
+    filters.push({
       state: MarketStates.myMarkets,
       title: 'My Markets',
       active: state === MarketStates.myMarkets,
       onClick: () => setState(MarketStates.myMarkets),
-    },
-  ]
+    })
+  }
+
+  useEffect(() => {
+    if (state === MarketStates.myMarkets && !context.account) {
+      logger.log(`User disconnected, update filter`)
+      setState(MarketStates.open)
+    }
+  }, [context.account, state])
 
   useEffect(() => {
     onFilterChange({ arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title })
