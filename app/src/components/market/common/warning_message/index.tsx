@@ -28,7 +28,7 @@ const Description = styled.p`
 `
 
 const Hyperlink = styled.a`
-  color: ${props => props.theme.colors.primaryLight};
+  color: ${props => props.theme.colors.hyperlink};
 `
 
 interface Props {

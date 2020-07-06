@@ -14,10 +14,10 @@ const Wrapper = styled.div`
 `
 
 const CurrencyButtonSelectedCSS = css`
-  &,
+  border-color: ${props => props.theme.colors.primary};
+  cursor: default;
   &:hover {
-    border-color: rgba(21, 101, 192, 0.7);
-    cursor: default;
+    border-color: ${props => props.theme.colors.primary};
   }
 `
 
@@ -28,15 +28,8 @@ const CurrencyButton = styled(Button)<{ selected: boolean }>`
   ${props => props.selected && CurrencyButtonSelectedCSS}
 `
 
-const DropdownSelectedCSS = css`
-  &,
-  &:hover {
-    border-color: rgba(21, 101, 192, 0.7);
-  }
-`
-
 const CurrencyDropdown = styled(Dropdown)<{ selected: boolean }>`
-  ${props => props.selected && DropdownSelectedCSS}
+  ${props => props.selected && CurrencyButtonSelectedCSS}
 `
 
 interface Props {

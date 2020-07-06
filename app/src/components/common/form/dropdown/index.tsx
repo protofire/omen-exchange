@@ -25,7 +25,7 @@ export enum DropdownDirection {
 const DropdownOpenCSS = css`
   &,
   &:hover {
-    background: ${props => props.theme.colors.secondary};
+    background: ${props => props.theme.colors.mainBodyBackground};
     border-color: ${props => props.theme.dropdown.buttonBorderColorHover};
     z-index: 12345;
     .currentItem {

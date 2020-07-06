@@ -17,7 +17,7 @@ const Title = styled.h3`
 `
 
 const Value = styled.p<{ isClickable: boolean }>`
-  color: ${props => (props.isClickable ? props.theme.colors.primaryLight : props.theme.colors.textColor)};
+  color: ${props => (props.isClickable ? props.theme.colors.hyperlink : props.theme.colors.textColor)};
   cursor: ${props => (props.isClickable ? 'pointer' : 'default')};
   font-size: 14px;
   font-weight: 400;
