@@ -11,7 +11,7 @@ const MetaMask = new InjectedConnector({
 
 const WalletConnect = new WalletConnectConnector({
   api: WalletConnectApi,
-  bridge: 'https://bridge.walletconnect.org',
+  bridge: 'https://safe-walletconnect.gnosis.io',
   supportedNetworkURLs,
   defaultNetwork: 1,
 })
