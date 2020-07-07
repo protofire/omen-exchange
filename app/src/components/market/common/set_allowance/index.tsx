@@ -12,6 +12,7 @@ const Title = styled.h2`
   letter-spacing: 0.4px;
   line-height: 1.2;
   margin: 0 0 20px;
+  font-weight: 400;
 `
 
 const DescriptionWrapper = styled.div`
