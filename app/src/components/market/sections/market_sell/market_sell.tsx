@@ -4,7 +4,6 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { MARKET_FEE } from '../../../../common/constants'
 import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -42,7 +41,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
 
   const { marketMakerData } = props
-  const { address: marketMakerAddress, balances, collateral, question } = marketMakerData
+  const { address: marketMakerAddress, balances, collateral, fee, question } = marketMakerData
 
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
@@ -63,7 +62,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
-  const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, collateral.decimals))
 
   const calcSellAmount = useMemo(
     () => async (
