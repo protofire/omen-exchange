@@ -35,10 +35,11 @@ const Title = styled.h2`
   font-size: 15px;
   font-weight: 500;
   line-height: 1.2;
-  margin: 0 0 5px 0;
+  margin: 0 0 10px 0;
 `
 
 const Info = styled.div`
+  font-family: 'Roboto';
   align-items: center;
   color: ${props => props.theme.colors.textColorLighter};
   display: flex;
@@ -52,14 +53,14 @@ const Info = styled.div`
 `
 
 const Outcome = styled.span`
-  color: ${props => props.theme.colors.primary};
-  margin-left: 6px;
+  color: ${props => props.theme.colors.primaryLight};
+  margin-left: 8px;
   font-weight: 500;
 `
 
 const Separator = styled.span`
   font-size: 18px;
-  margin: 0 5px;
+  margin: 0 8px;
   color: ${props => props.theme.colors.verticalDivider};
 `
 
