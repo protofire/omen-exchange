@@ -39,7 +39,6 @@ const SectionTitleMarket = styled(SectionTitle)`
       padding-left: 0;
     }
   }
-  margin-bottom: 0;
 `
 
 const TopContents = styled.div`
