@@ -30,10 +30,12 @@ const Title = styled.h4`
 
 const Value = styled.p<{ state: ValueStates; emphasizeValue?: boolean }>`
   color: ${props =>
+    (!props.emphasizeValue && props.state === ValueStates.success && props.theme.colors.textColorLightish) ||
     (props.state === ValueStates.success && props.theme.colors.green) ||
     (props.state === ValueStates.error && props.theme.colors.error) ||
     (props.state === ValueStates.important && props.theme.colors.textColorDark) ||
     props.theme.colors.textColorLightish};
+    };
   font-weight: ${props => (props.emphasizeValue ? '500' : '400')};
   margin: 0;
 `
