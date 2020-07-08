@@ -75,7 +75,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       })
 
       const amountToSell = calcSellAmountInCollateral(
-        amountShares.mul(99999).div(100000), // because of some precision error, we need to multiply the amount by 0.99999
+        // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
+        amountShares,
         holdingsOfSoldOutcome,
         holdingsOfOtherOutcomes,
         marketFeeWithTwoDecimals,
@@ -101,6 +102,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
 
+      logger.log(`Amount to sell ${amountToSell}`)
       return [probabilities, costFee, amountToSell, potentialValue]
     },
     [outcomeIndex, balances, marketFeeWithTwoDecimals],
