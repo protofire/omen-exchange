@@ -3,12 +3,11 @@ import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
-import { IS_CORONA_VERSION, LINK_TERMS_AND_CONDITIONS, SHOW_MADE_BY } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
-import { CheckboxInput, MadeBy, Spinner } from '../../common'
+import { MadeBy, Spinner } from '../../common'
 import { ModalWrapper } from '../../modal/modal_wrapper'
 
 import MetaMaskSVG from './img/metamask.svg'
@@ -75,31 +74,6 @@ const Text = styled.span`
   margin: 0;
 `
 
-const TermsWrapper = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  margin-top: auto;
-`
-
-const TermsText = styled.label`
-  color: ${props => props.theme.colors.textColor};
-  font-size: 15px;
-  font-weight: normal;
-  letter-spacing: 0.2px;
-  line-height: 1.2;
-  padding-left: 8px;
-`
-
-const TermsLink = styled.a`
-  color: ${props => props.theme.colors.textColor};
-  text-decoration: underline;
-
-  &:hover {
-    text-decoration: none;
-  }
-`
-
 const ConnectingText = styled.p`
   color: ${props => props.theme.colors.textColorLighter};
   font-size: 14px;
@@ -139,7 +113,6 @@ export const ModalConnectWallet = (props: Props) => {
   const [connectingToWalletConnect, setConnectingToWalletConnect] = useState(false)
   const [connectingToMetamask, setConnectingToMetamask] = useState(false)
   const { isOpen, onClose } = props
-  const [acceptedTerms, setAcceptedTerms] = useState(false)
 
   if (context.error) {
     logger.error('Error in web3 context', context.error)
@@ -163,7 +136,6 @@ export const ModalConnectWallet = (props: Props) => {
   const resetEverything = useCallback(() => {
     setConnectingToWalletConnect(false)
     setConnectingToMetamask(false)
-    setAcceptedTerms(false)
     WalletConnectQRCodeModal.close()
   }, [])
 
@@ -202,22 +174,11 @@ export const ModalConnectWallet = (props: Props) => {
     }
   }, [context, onClickCloseButton, connectingToMetamask])
 
-  const toggleAcceptedTerms = useCallback(() => {
-    setAcceptedTerms(!acceptedTerms)
-  }, [acceptedTerms])
-
   const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect
   const connectingText = connectingToMetamask ? 'Waiting for Approval on Metamask' : 'Opening QR for Wallet Connect'
 
-  let disableMetamask: boolean
-  let disableWalletConnect: boolean
-  if (IS_CORONA_VERSION) {
-    disableMetamask = !isMetamaskEnabled || (LINK_TERMS_AND_CONDITIONS && !acceptedTerms) || false
-    disableWalletConnect = (LINK_TERMS_AND_CONDITIONS && !acceptedTerms) || false
-  } else {
-    disableMetamask = !isMetamaskEnabled || false
-    disableWalletConnect = false
-  }
+  const disableMetamask: boolean = !isMetamaskEnabled || false
+  const disableWalletConnect = false
 
   return (
     <>
@@ -254,21 +215,10 @@ export const ModalConnectWallet = (props: Props) => {
                   text="Wallet Connect"
                 />
               </Buttons>
-              {process.env.REACT_APP_VERSION === 'corona' && LINK_TERMS_AND_CONDITIONS && (
-                <TermsWrapper>
-                  <CheckboxInput checked={acceptedTerms} inputId="termsCheck" onChange={toggleAcceptedTerms} />
-                  <TermsText className="clickable" htmlFor="termsCheck">
-                    I agree to the{' '}
-                    <TermsLink href={LINK_TERMS_AND_CONDITIONS} target="_blank">
-                      Terms and Conditions
-                    </TermsLink>
-                  </TermsText>
-                </TermsWrapper>
-              )}
             </>
           )}
         </ContentWrapper>
-        {SHOW_MADE_BY && <MadeBy />}
+        <MadeBy />
       </ModalWrapper>
     </>
   )

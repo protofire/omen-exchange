@@ -1,9 +1,9 @@
-import moment from 'moment'
 import React from 'react'
 import DatePicker from 'react-datepicker'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
+import { convertLocalToUTC, convertUTCToLocal } from '../../../../util/tools'
 import { CommonDisabledCSS } from '../common_styled'
 
 interface Props {
@@ -105,24 +105,26 @@ const CalendarPortal = (props: CalendarPortalProps) => {
 
 export const DateField = (props: Props) => {
   const { disabled, minDate, name, onChange, selected, ...restProps } = props
-  const timeInputLabel = `Time (UTC${moment().format('Z')})`
+
+  const handleChange = (date: Maybe<Date>) => {
+    onChange(date ? convertLocalToUTC(date) : date)
+  }
 
   return (
     <DateFieldWrapper {...restProps} disabled={disabled}>
       <DatePicker
         autoComplete="off"
         calendarClassName="customCalendar"
-        dateFormat="Pp"
+        dateFormat="MMMM d, yyyy h:mm aa"
         disabled={disabled}
         minDate={minDate}
         name={name}
-        onChange={onChange}
+        onChange={handleChange}
         placeholderText="Select Date"
         popperContainer={CalendarPortal}
-        selected={selected}
+        selected={convertUTCToLocal(selected)}
         showDisabledMonthNavigation
         showTimeSelect
-        timeInputLabel={timeInputLabel}
       />
     </DateFieldWrapper>
   )

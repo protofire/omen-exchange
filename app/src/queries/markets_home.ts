@@ -1,7 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
-import { IS_CORONA_VERSION } from './../common/constants'
 import { MarketFilters, MarketStates, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
@@ -45,6 +44,11 @@ export type MarketMakerDataItem = {
   templateId: number
 }
 
+export type CategoryDataItem = {
+  id: string
+  numOpenConditions: number
+}
+
 export const DEFAULT_OPTIONS = {
   state: MarketStates.open,
   whitelistedCreators: false,
@@ -55,7 +59,7 @@ export const DEFAULT_OPTIONS = {
   templateId: null as Maybe<string>,
   currency: null as Maybe<string>,
   sortBy: null as Maybe<MarketsSortCriteria>,
-  sortByDirection: (IS_CORONA_VERSION ? 'asc' : 'desc') as 'asc' | 'desc',
+  sortByDirection: 'desc' as 'asc' | 'desc',
 }
 
 type buildQueryType = MarketFilters & { whitelistedCreators: boolean; whitelistedTemplateIds: boolean }
@@ -73,12 +77,13 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
   const whereClause = [
     state === MarketStates.closed ? 'answerFinalizedTimestamp_lt: $now' : '',
     state === MarketStates.open ? 'openingTimestamp_gt: $now' : '',
-    state === MarketStates.pending ? 'answerFinalizedTimestamp_gt: $now' : '',
+    state === MarketStates.pending ? 'openingTimestamp_lt: $now' : '',
+    state === MarketStates.pending ? 'answerFinalizedTimestamp: null' : '',
     state === MarketStates.myMarkets || whitelistedCreators ? 'creator_in: $accounts' : '',
     category === 'All' ? '' : 'category: $category',
     title ? 'title_contains: $title' : '',
     currency ? 'collateralToken: $currency' : '',
-    arbitrator ? 'arbitrator: $arbitrator' : '',
+    arbitrator ? 'arbitrator: $arbitrator' : 'arbitrator_in: $knownArbitrators',
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee_lte: $fee',
   ]
@@ -86,7 +91,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     .join(',')
 
   const query = gql`
-    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $knownArbitrators: [String!], $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
       fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${whereClause} }) {
         ...marketData
       }
@@ -95,3 +100,12 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
   `
   return query
 }
+
+export const queryCategories = gql`
+  {
+    categories(first: 100, orderBy: numOpenConditions, orderDirection: desc) {
+      id
+      numOpenConditions
+    }
+  }
+`

@@ -33,7 +33,7 @@ const OutcomeValue = styled.p`
   color: ${props => props.theme.colors.textColorDark};
   flex-shrink: 0;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.2;
   margin: 0;
   text-align: right;

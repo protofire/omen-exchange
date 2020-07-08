@@ -101,7 +101,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
   const holdingsSeries = useHoldingsHistory(marketMakerAddress, blocks)
   const [period, setPeriod] = useState<Period>('1D')
   const blocksOffset = useMemo(
-    () => calcOffsetByDate(answerFinalizedTimestamp ? answerFinalizedTimestamp.toNumber() * 1000 : Date.now()),
+    () => (answerFinalizedTimestamp ? calcOffsetByDate(answerFinalizedTimestamp.toNumber() * 1000) : 0),
     [answerFinalizedTimestamp],
   )
 

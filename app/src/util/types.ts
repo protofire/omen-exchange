@@ -67,6 +67,7 @@ export interface Token {
   address: string
   decimals: number
   symbol: string
+  image?: string
 }
 
 export interface QuestionLog {

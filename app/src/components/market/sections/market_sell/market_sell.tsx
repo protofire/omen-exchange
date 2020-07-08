@@ -4,7 +4,6 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { MARKET_FEE } from '../../../../common/constants'
 import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -42,18 +41,28 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
 
   const { marketMakerData } = props
-  const { address: marketMakerAddress, balances, collateral, question } = marketMakerData
+  const { address: marketMakerAddress, balances, collateral, fee, question } = marketMakerData
+
+  let defaultOutcomeIndex = 0
+  for (let i = 0; i < balances.length; i++) {
+    const shares = parseInt(formatBigNumber(balances[i].shares, collateral.decimals))
+    if (shares > 0) {
+      defaultOutcomeIndex = i
+      break
+    }
+  }
 
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
+  const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
+  const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
-  const marketFeeWithTwoDecimals = MARKET_FEE / Math.pow(10, 2)
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, collateral.decimals))
 
   const calcSellAmount = useMemo(
     () => async (
@@ -66,7 +75,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       })
 
       const amountToSell = calcSellAmountInCollateral(
-        amountShares.mul(99999).div(100000), // because of some precision error, we need to multiply the amount by 0.99999
+        // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
+        amountShares,
         holdingsOfSoldOutcome,
         holdingsOfOtherOutcomes,
         marketFeeWithTwoDecimals,
@@ -92,6 +102,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
 
+      logger.log(`Amount to sell ${amountToSell}`)
       return [probabilities, costFee, amountToSell, potentialValue]
     },
     [outcomeIndex, balances, marketFeeWithTwoDecimals],
@@ -137,11 +148,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals)}`
   const goBackToAddress = `/${marketMakerAddress}`
 
-  const amountError = balanceItem.shares.isZero()
-    ? `Insufficient balance`
-    : amountShares.gt(balanceItem.shares)
-    ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
-    : null
+  const amountError =
+    balanceItem.shares === null
+      ? null
+      : balanceItem.shares.isZero() && amountShares.gt(balanceItem.shares)
+      ? `Insufficient balance`
+      : amountShares.gt(balanceItem.shares)
+      ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
+      : null
 
   const isSellButtonDisabled =
     (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || amountError !== null
@@ -178,7 +192,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               data-multiline={true}
               data-place="right"
               data-tip={`Sell all of the selected outcome's shares.`}
-              onClick={() => setAmountShares(balanceItem.shares)}
+              onClick={() => {
+                setAmountShares(balanceItem.shares)
+                setAmountSharesToDisplay(selectedOutcomeBalance)
+              }}
               symbol="Shares"
               value={selectedOutcomeBalance}
             />
@@ -188,8 +205,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 <BigNumberInput
                   decimals={collateral.decimals}
                   name="amount"
-                  onChange={(e: BigNumberInputReturn) => setAmountShares(e.value)}
-                  value={amountShares}
+                  onChange={(e: BigNumberInputReturn) => {
+                    setAmountShares(e.value)
+                    setAmountSharesToDisplay('')
+                  }}
+                  value={amountShares > new BigNumber(0) ? amountShares : null}
+                  valueToDisplay={amountSharesToDisplay}
                 />
               }
               symbol={'Shares'}

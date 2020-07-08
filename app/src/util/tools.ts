@@ -1,7 +1,7 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress } from 'ethers/utils'
-import moment from 'moment'
+import moment from 'moment-timezone'
 
 import { getLogger } from './logger'
 
@@ -19,7 +19,29 @@ export const truncateStringInTheMiddle = (str: string, strPositionStart: number,
 }
 
 export const formatDate = (date: Date): string => {
-  return moment(date).format('ll')
+  return moment(date)
+    .tz('UTC')
+    .format('MM/DD/YY - HH:mm [UTC]')
+}
+
+export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
+  if (!date) {
+    return date
+  }
+  const offsetMinutes = moment(date).utcOffset()
+
+  return moment(date)
+    .subtract(offsetMinutes, 'minutes')
+    .toDate()
+}
+
+// we need to do this because the value selected by react-datepicker
+// uses the local timezone, but we want to interpret it in UTC
+export const convertLocalToUTC = (date: Date): Date => {
+  const offsetMinutes = moment(date).utcOffset()
+  return moment(date)
+    .add(offsetMinutes, 'minutes')
+    .toDate()
 }
 
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
