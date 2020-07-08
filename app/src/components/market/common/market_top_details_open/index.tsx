@@ -56,6 +56,8 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     setExtraInformation(false)
   }
 
+  console.log(question.resolution)
+
   return (
     <>
       <SubsectionTitleWrapper>
