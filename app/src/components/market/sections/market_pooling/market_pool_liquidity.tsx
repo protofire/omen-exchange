@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { DOCUMENT_FAQ, MARKET_FEE } from '../../../../common/constants'
+import { DOCUMENT_FAQ } from '../../../../common/constants'
 import {
   useCollateralBalance,
   useConnectedWeb3Context,
@@ -72,7 +72,15 @@ const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
-  const { address: marketMakerAddress, balances, collateral, question, totalPoolShares, userEarnings } = marketMakerData
+  const {
+    address: marketMakerAddress,
+    balances,
+    collateral,
+    fee,
+    question,
+    totalPoolShares,
+    userEarnings,
+  } = marketMakerData
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
@@ -95,6 +103,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
   const [activeTab, setActiveTab] = useState(Tabs.deposit)
+
+  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), collateral.decimals)}%`, [
+    fee,
+    collateral.decimals,
+  ])
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
@@ -350,10 +363,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             {activeTab === Tabs.deposit && (
               <TransactionDetailsCard>
                 <TransactionDetailsRow
-                  emphasizeValue={MARKET_FEE > 0}
+                  emphasizeValue={fee.gt(0)}
                   state={ValueStates.success}
                   title={'Earn Trading Fee'}
-                  value={`${MARKET_FEE}%`}
+                  value={feeFormatted}
                 />
                 <TransactionDetailsLine />
                 <TransactionDetailsRow

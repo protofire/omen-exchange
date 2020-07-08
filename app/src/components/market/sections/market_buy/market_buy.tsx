@@ -6,7 +6,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { DOCUMENT_VALIDITY_RULES, MARKET_FEE } from '../../../../common/constants'
+import { DOCUMENT_VALIDITY_RULES } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
@@ -62,7 +62,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const { buildMarketMaker } = useContracts(context)
   const { marketMakerData } = props
-  const { address: marketMakerAddress, balances, collateral, question } = marketMakerData
+  const { address: marketMakerAddress, balances, collateral, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -156,7 +156,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
 
-  const feePaid = mulBN(debouncedAmount, MARKET_FEE / 100)
+  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, collateral.decimals)))
+
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
