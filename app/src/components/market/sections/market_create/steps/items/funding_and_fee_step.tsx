@@ -160,7 +160,7 @@ const FundingAndFeeStep = (props: Props) => {
   const amountError =
     maybeCollateralBalance === null
       ? null
-      : maybeCollateralBalance.isZero()
+      : maybeCollateralBalance.isZero() && funding.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : funding.gt(maybeCollateralBalance)
       ? `Value must be less than or equal to ${collateralBalanceFormatted} ${collateral.symbol}`
