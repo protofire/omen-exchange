@@ -8,7 +8,6 @@ import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
 import { BarDiagram } from '../bar_diagram_probabilities'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors, OutcomeItemText, OutcomeItemTextWrapper } from '../common_styled'
 import { NewValue } from '../new_value'
-import { RedeemAmount } from '../redeem_amount'
 import { WinningBadge } from '../winning_badge'
 
 interface Props {
@@ -172,7 +171,6 @@ export const OutcomeTable = (props: Props) => {
                 )
               }
             />
-            <RedeemAmount balance={balanceItem} collateral={collateral} index={outcomeIndex} payouts={payouts} />
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Outcome) ? null : (

@@ -19,7 +19,7 @@ import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 
 const MarketResolutionMessageStyled = styled(MarketResolutionMessage)`
-  margin-top: 20px;
+  margin: 20px 0;
 `
 
 interface Props {
