@@ -59,7 +59,7 @@ const MarketHomeContainer: React.FC = () => {
     state: MarketStates.open,
     category: 'All',
     title: '',
-    sortBy: 'collateralVolume',
+    sortBy: 'lastActiveDayAndRunningDailyVolume',
     sortByDirection: 'desc',
     arbitrator: null,
     templateId: null,
