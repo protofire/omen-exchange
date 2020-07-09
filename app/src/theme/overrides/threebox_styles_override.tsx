@@ -30,7 +30,7 @@ export const ThreeboxStylesOverride = css`
       .dialogue_grid {
         display: block;
         margin-bottom: 0;
-        row-gap: 30px;
+        row-gap: 24px;
       }
 
       /* Comment */
