@@ -17,7 +17,7 @@ const Wrapper = styled.div`
 `
 
 const Icon = styled.div`
-  margin-right: 22px;
+  margin-right: 20px;
 `
 
 const TextWrapper = styled.div``
@@ -35,13 +35,18 @@ Title.defaultProps = {
   isWinner: true,
 }
 
-const Text = styled.p`
+const Text = styled.div`
   color: ${props => props.theme.colors.textColor};
   font-size: 14px;
   font-weight: normal;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.4px;
   line-height: 1.5;
   margin: 0;
+`
+const TextHighlight = styled.span`
+  color: ${props => props.theme.colors.green};
+  font-weight: 500;
+  font-family: 'Roboto';
 `
 
 interface Props {
@@ -114,7 +119,7 @@ const MarketResolutionMessage = (props: Props) => {
       <TextWrapper>
         <Title isWinner={wonSingle || wonMultiple}>{infoTitle}</Title>
         <Text>
-          {infoText} <strong>${redeemString}.</strong>
+          {infoText} <TextHighlight>${redeemString}</TextHighlight>.
         </Text>
       </TextWrapper>
     </Wrapper>
