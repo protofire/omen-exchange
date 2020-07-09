@@ -203,6 +203,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           showPriceChange={amount.gt(0)}
         />
         <WarningMessageStyled
+          additionalDescription={'. Be aware that market makers may remove liquidity from the market at any time!'}
           description={
             "Before trading on a market, make sure that its outcome will be known by its resolution date and it isn't an"
           }
