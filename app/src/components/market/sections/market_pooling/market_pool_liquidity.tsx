@@ -285,6 +285,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           showSharesChange={showSharesChange}
         />
         <WarningMessageStyled
+          additionalDescription={''}
           description={
             'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
           }

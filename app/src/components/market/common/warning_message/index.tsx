@@ -35,10 +35,11 @@ interface Props {
   description: string
   hyperlinkDescription: string
   href: string
+  additionalDescription: string
 }
 
 export const WarningMessage = (props: Props) => {
-  const { description, href, hyperlinkDescription, ...restProps } = props
+  const { additionalDescription, description, href, hyperlinkDescription, ...restProps } = props
   return (
     <Wrapper {...restProps}>
       <AlertWrapper>
@@ -49,6 +50,7 @@ export const WarningMessage = (props: Props) => {
         <Hyperlink href={href} target="_blank">
           {hyperlinkDescription}
         </Hyperlink>
+        <span>{additionalDescription}</span>
       </Description>
     </Wrapper>
   )

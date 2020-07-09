@@ -77,7 +77,7 @@ const QuestionText = styled.p`
 
 const Grid = styled.div`
   display: grid;
-  grid-column-gap: 50px;
+  grid-column-gap: 32px;
   grid-row-gap: 20px;
   grid-template-columns: 1fr;
 
@@ -220,6 +220,7 @@ const FundingAndFeeStep = (props: Props) => {
       <CreateCardBottom>
         <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
         <WarningMessage
+          additionalDescription={''}
           description={
             'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
           }
