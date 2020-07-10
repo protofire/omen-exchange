@@ -83,13 +83,20 @@ const MarketHomeContainer: React.FC = () => {
     currencyParam = null
   }
 
+  let arbitratorParam: string | null
+  if(location.search) {
+    arbitratorParam = location.search.split('=')[1]
+  } else {
+    arbitratorParam = null
+  }
+
   const [filter, setFilter] = useState<MarketFilters>({
     state: MarketStates.open,
     category: 'All',
     title: '',
     sortBy: sortParam,
     sortByDirection: 'desc',
-    arbitrator: null,
+    arbitrator: arbitratorParam,
     templateId: null,
     currency: currencyParam,
   })
@@ -210,7 +217,12 @@ const MarketHomeContainer: React.FC = () => {
     if(filter.currency) {
       history.push(`/${sortRoute}/currency/${filter.currency}`)
     }
-  }, [history])
+
+    if(filter.arbitrator) {
+      filter.currency ? history.push(`/${sortRoute}/currency/${filter.currency}?arbitrator=${filter.arbitrator}`) :
+        history.push(`/${sortRoute}?arbitrator=${filter.arbitrator}`)
+    }
+  }, [history, sortRoute])
 
   const loadNextPage = () => {
     if (!moreMarkets) {
