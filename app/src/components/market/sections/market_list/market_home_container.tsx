@@ -59,17 +59,28 @@ const MarketHomeContainer: React.FC = () => {
   const history = useHistory()
 
   let location = useLocation()
-  let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndRunningDailyVolume';
-  if(location.pathname === '/24h-volume') {
+  const sortRoute = location.pathname.split('/')[1]
+  const currencyFilter = location.pathname.split('/')[2] ? true : false
+  const currencyRoute = location.pathname.split('/')[3]
+
+  let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndRunningDailyVolume'
+  if(sortRoute === '24h-volume') {
     sortParam = 'lastActiveDayAndRunningDailyVolume'
-  } else if(location.pathname === '/volume') {
+  } else if(sortRoute === 'volume') {
     sortParam = 'collateralVolume'
-  } else if(location.pathname === '/newest') {
+  } else if(sortRoute === 'newest') {
     sortParam = 'creationTimestamp'
-  } else if(location.pathname === '/ending') {
+  } else if(sortRoute === 'ending') {
     sortParam = 'openingTimestamp'
-  } else if(location.pathname === '/liquidity') {
+  } else if(sortRoute === 'liquidity') {
     sortParam = 'liquidityParameter'
+  }
+
+  let currencyParam: string | null
+  if(currencyFilter) {
+    currencyParam = currencyRoute
+  } else {
+    currencyParam = null
   }
 
   const [filter, setFilter] = useState<MarketFilters>({
@@ -80,7 +91,7 @@ const MarketHomeContainer: React.FC = () => {
     sortByDirection: 'desc',
     arbitrator: null,
     templateId: null,
-    currency: null,
+    currency: currencyParam,
   })
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
@@ -194,6 +205,10 @@ const MarketHomeContainer: React.FC = () => {
       history.push('/ending')
     } else if(filter.sortBy === 'liquidityParameter') {
       history.push('/liquidity')
+    }
+
+    if(filter.currency) {
+      history.push(`/${sortRoute}/currency/${filter.currency}`)
     }
   }, [history])
 
