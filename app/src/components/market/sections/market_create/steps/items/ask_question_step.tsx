@@ -237,6 +237,7 @@ const AskQuestionStep = (props: Props) => {
         />
       )}
       <WarningMessage
+        additionalDescription={'.'}
         description={
           "Set the market resolution date at least 6 days after the correct outcome will be known and make sure that this market won't be "
         }

@@ -76,6 +76,9 @@ const CustomButtonCircleAddReadyCSS = css`
       fill: #fff;
     }
   }
+  &:hover {
+    border-color: ${props => props.theme.colors.primary};
+  }
 
   path {
     fill: #fff;
