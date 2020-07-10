@@ -100,6 +100,7 @@ export const AdvancedFilters = (props: Props) => {
         <Title>Currency</Title>
         <Options
           currentItem={allTokensOptions.findIndex(t => t.address === currency)}
+          dirty={true}
           dropdownPosition={DropdownPosition.left}
           items={currencyOptions}
         />
