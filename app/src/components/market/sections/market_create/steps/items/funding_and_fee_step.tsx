@@ -221,7 +221,7 @@ const FundingAndFeeStep = (props: Props) => {
         <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
         <WarningMessage
           description={
-            'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time'
+            'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
           }
           href={DOCUMENT_FAQ}
           hyperlinkDescription={'More Info'}

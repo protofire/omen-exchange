@@ -10,7 +10,7 @@ import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { MarketBuyPage, MarketDetailsPage, MarketPoolLiquidityPage, MarketSellPage } from '../../../pages'
 import { getLogger } from '../../../util/logger'
 import { isAddress } from '../../../util/tools'
-import { Comments } from '../../comments'
+import { ThreeBoxComments } from '../../comments'
 import { SectionTitle } from '../../common'
 import { Message, MessageType } from '../../common/message'
 import { InlineLoading } from '../../loading'
@@ -56,37 +56,39 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
 
   return (
     <Switch>
-      <>
-        <Route
-          exact
-          path="/:address"
-          render={props => <MarketDetailsPage {...props} marketMakerData={marketMakerData} />}
-        />
-        {!account ? (
-          <Message text="Please connect to your wallet to open the market..." type={MessageType.warning} />
-        ) : isQuestionFinalized ? (
-          <Message text="Market closed, question finalized..." type={MessageType.warning} />
-        ) : (
+      <Route
+        exact
+        path="/:address"
+        render={props => (
           <>
-            <Route
-              exact
-              path="/:address/buy"
-              render={props => <MarketBuyPage {...props} marketMakerData={marketMakerData} />}
-            />
-            <Route
-              exact
-              path="/:address/sell"
-              render={props => <MarketSellPage {...props} marketMakerData={marketMakerData} />}
-            />
-            <Route
-              exact
-              path="/:address/pool-liquidity"
-              render={props => <MarketPoolLiquidityPage {...props} marketMakerData={marketMakerData} />}
-            />
+            <MarketDetailsPage {...props} marketMakerData={marketMakerData} />
+            <ThreeBoxComments threadName={marketMakerAddress} />
           </>
         )}
-        <Comments marketMakerAddress={marketMakerAddress} />
-      </>
+      />
+      {!account ? (
+        <Message text="Please connect to your wallet to open the market..." type={MessageType.warning} />
+      ) : isQuestionFinalized ? (
+        <Message text="Market closed, question finalized..." type={MessageType.warning} />
+      ) : (
+        <>
+          <Route
+            exact
+            path="/:address/buy"
+            render={props => <MarketBuyPage {...props} marketMakerData={marketMakerData} />}
+          />
+          <Route
+            exact
+            path="/:address/sell"
+            render={props => <MarketSellPage {...props} marketMakerData={marketMakerData} />}
+          />
+          <Route
+            exact
+            path="/:address/pool-liquidity"
+            render={props => <MarketPoolLiquidityPage {...props} marketMakerData={marketMakerData} />}
+          />
+        </>
+      )}
     </Switch>
   )
 }

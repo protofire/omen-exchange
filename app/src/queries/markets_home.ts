@@ -77,7 +77,8 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
   const whereClause = [
     state === MarketStates.closed ? 'answerFinalizedTimestamp_lt: $now' : '',
     state === MarketStates.open ? 'openingTimestamp_gt: $now' : '',
-    state === MarketStates.pending ? 'answerFinalizedTimestamp_gt: $now' : '',
+    state === MarketStates.pending ? 'openingTimestamp_lt: $now' : '',
+    state === MarketStates.pending ? 'answerFinalizedTimestamp: null' : '',
     state === MarketStates.myMarkets || whitelistedCreators ? 'creator_in: $accounts' : '',
     category === 'All' ? '' : 'category: $category',
     title ? 'title_contains: $title' : '',
@@ -102,7 +103,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
 
 export const queryCategories = gql`
   {
-    categories(first: 20, orderBy: numOpenConditions, orderDirection: desc, where: { numOpenConditions_not: 0 }) {
+    categories(first: 100, orderBy: numOpenConditions, orderDirection: desc) {
       id
       numOpenConditions
     }

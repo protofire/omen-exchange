@@ -28,17 +28,14 @@ const DropdownOpenCSS = css`
     background: ${props => props.theme.colors.secondary};
     border-color: ${props => props.theme.dropdown.buttonBorderColorHover};
     z-index: 12345;
-
     .currentItem {
       color: ${props => props.theme.colors.primary};
       font-weight: 500;
     }
   }
-
   .chevronUp {
     display: block;
   }
-
   .chevronDown {
     display: none;
   }
@@ -49,17 +46,14 @@ const DropdownVariantCardOpenCSS = css`
   &:hover {
     border-color: #9fa8da;
     z-index: 12345;
-
     .currentItem {
       color: ${props => props.theme.colors.primary};
       font-weight: 500;
     }
   }
-
   .chevronUp {
     display: block;
   }
-
   .chevronDown {
     display: none;
   }
@@ -67,7 +61,6 @@ const DropdownVariantCardOpenCSS = css`
 
 const DropdownDisabledCSS = css`
   ${CommonDisabledCSS}
-
   &:disabled,
   &[disabled],
   &[disabled]:hover,
@@ -111,12 +104,12 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean; dropdownVariant
   &:hover {
     background-color: ${props => props.theme.dropdown.buttonBackgroundColor};
     border-color: ${props =>
-      props.dropdownVariant == DropdownVariant.card ? '#9fa8da' : props.theme.dropdown.buttonBorderColorHover};
+      props.dropdownVariant === DropdownVariant.card ? '#9fa8da' : props.theme.dropdown.buttonBorderColorHover};
     color: ${props => props.theme.dropdown.buttonColorHover};
   }
 
   ${props =>
-    props.isOpen ? (props.dropdownVariant == DropdownVariant.card ? DropdownVariantCardOpenCSS : DropdownOpenCSS) : ''}
+    props.isOpen ? (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardOpenCSS : DropdownOpenCSS) : ''}
   ${props => (props.disabled ? DropdownDisabledCSS : '')}
   ${props => (props.dropdownVariant === DropdownVariant.pill ? DropdownVariantPillCSS : '')}
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardCSS : '')}
@@ -132,6 +125,7 @@ const DropdownButton = styled.div`
 
 const CurrentItem = styled.div`
   align-items: center;
+  justify-content: space-between;
   color: ${props => props.theme.dropdown.buttonColor};
   display: flex;
   flex-grow: 1;
@@ -148,10 +142,12 @@ const CurrentItem = styled.div`
 `
 
 const DropdownPositionLeftCSS = css`
+  margin-top: 10px;
   left: 0;
 `
 
 const DropdownPositionRightCSS = css`
+  margin-top: 10px;
   right: 0;
 `
 
@@ -172,20 +168,8 @@ const DropdownVariantPillItemsCSS = css`
   border: 0;
 `
 const DropdownVariantCardItemsCSS = css`
-  height: 218px;
-  overflow-y: scroll;
-
-  &::-webkit-scrollbar-track {
-    background: #f3f4fb;
-    border-radius: 2px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: #9fa9d8;
-    border-radius: 2px;
-  }
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
+  max-height: 218px;
+  overflow-y: auto;
 `
 const DropdownVariantCardItemsContainerCSS = css`
   border-radius: 8px;
@@ -205,7 +189,7 @@ const ItemsContainer = styled.div<{
   border: solid 1px ${props => props.theme.dropdown.dropdownItems.borderColor};
   box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
   display: ${props => (props.isOpen ? 'block' : 'none')};
-  min-width: 240px;
+  min-width: 164px;
   padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '12px 8px' : '12px 0')};
   position: absolute;
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardItemsContainerCSS : '')};
@@ -216,11 +200,35 @@ const ItemsContainer = styled.div<{
   ${props => (props.dropdownDirection === DropdownDirection.upwards ? DropdownDirectionUpwardsCSS : '')};
 `
 
+const DropdownScrollbarCSS = css`
+  margin-right: 0;
+  &::-webkit-scrollbar-track {
+    background: #f3f4fb;
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #9fa9d8;
+    border-radius: 2px;
+  }
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+`
+
 const Items = styled.div<{
   dropdownVariant?: DropdownVariant
+  showScrollbar?: boolean
 }>`
   ${props => (props.dropdownVariant === DropdownVariant.pill ? DropdownVariantPillItemsCSS : '')};
+  ${props => props.dropdownVariant === DropdownVariant.card && 'margin-right: -8px'};
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardItemsCSS : '')};
+  ${props => props.showScrollbar && DropdownScrollbarCSS}
+`
+
+const SecondaryText = styled.div`
+  color: #757575;
+  width: 33%;
+  text-align: right;
 `
 
 Items.defaultProps = {
@@ -229,28 +237,33 @@ Items.defaultProps = {
 
 const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
   align-items: center;
+  justify-content: space-between;
   background-color: ${props =>
     props.active
-      ? props.dropdownVariant == DropdownVariant.card
+      ? props.dropdownVariant === DropdownVariant.card
         ? '#F8F9FC'
         : props.theme.dropdown.dropdownItems.item.backgroundColorActive
       : props.theme.dropdown.dropdownItems.item.backgroundColor};
-  color: ${props => props.theme.dropdown.dropdownItems.item.color};
+  color: ${props =>
+    props.dropdownVariant === DropdownVariant.card && !props.active
+      ? '#757575'
+      : props.theme.dropdown.dropdownItems.item.color};
   cursor: pointer;
   display: flex;
   height: 48px;
-  padding: ${props => (props.dropdownVariant == DropdownVariant.card ? '9px 14px' : '12px 17px')};
-  };
-  margin: ${props => (props.dropdownVariant == DropdownVariant.card ? '0 8px 0 0' : '0')};
-  };
-  border-radius: ${props => (props.dropdownVariant == DropdownVariant.card ? '8px' : '0')};
-  };
+  padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '9px 14px' : '12px 17px')};
+  margin: ${props => (props.dropdownVariant === DropdownVariant.card ? '0 8px 0 0' : '0')};
+  border-radius: ${props => (props.dropdownVariant === DropdownVariant.card ? '8px' : '0')};
 
   &:hover {
+    color: ${props => props.theme.dropdown.dropdownItems.item.color};
     background: ${props =>
-      props.dropdownVariant == DropdownVariant.card
+      props.dropdownVariant === DropdownVariant.card
         ? '#F8F9FC'
         : props.theme.dropdown.dropdownItems.item.backgroundColorHover};
+    div {
+      color: #39474f;
+    }
   }
 `
 
@@ -260,15 +273,18 @@ const ChevronWrapper = styled.div`
 
 export interface DropdownItemProps {
   content: React.ReactNode | string
+  secondaryText?: React.ReactNode | string
   onClick?: () => void
 }
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   currentItem?: number | undefined
-  disabled?: boolean
   dropdownVariant?: DropdownVariant | undefined
+  dirty?: boolean
+  disabled?: boolean
   dropdownPosition?: DropdownPosition | undefined
   dropdownDirection?: DropdownDirection | undefined
+  showScrollbar?: boolean
   items: any
   placeholder?: React.ReactNode | string | undefined
 }
@@ -276,12 +292,14 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 export const Dropdown: React.FC<Props> = props => {
   const {
     currentItem = 0,
+    dirty = false,
     disabled = false,
     dropdownVariant = DropdownVariant.pill,
     dropdownDirection,
     dropdownPosition,
     items,
     placeholder,
+    showScrollbar = false,
     ...restProps
   } = props
 
@@ -293,12 +311,12 @@ export const Dropdown: React.FC<Props> = props => {
     return itemIndex
   }
 
-  const getItemContent = (itemIndex: number): any => {
-    return items[getValidItemIndex(itemIndex)].content
+  const getItem = (itemIndex: number): any => {
+    return items[getValidItemIndex(itemIndex)]
   }
 
   const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
-  const [isDirty, setIsDirty] = useState<boolean>(false)
+  const [isDirty, setIsDirty] = useState<boolean>(dirty)
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   const optionClick = useCallback((onClick: (() => void) | undefined, itemIndex: number) => {
@@ -318,6 +336,8 @@ export const Dropdown: React.FC<Props> = props => {
     }
   }, [isOpen])
 
+  const activeItem = getItem(currentItemIndex)
+
   return (
     <>
       <Wrapper
@@ -333,7 +353,8 @@ export const Dropdown: React.FC<Props> = props => {
       >
         <DropdownButton>
           <CurrentItem className="currentItem">
-            {placeholder && !isDirty ? placeholder : getItemContent(currentItemIndex)}
+            {placeholder && !isDirty ? placeholder : activeItem.content}
+            {!!activeItem.secondaryText && <SecondaryText>{activeItem.secondaryText}</SecondaryText>}
           </CurrentItem>
           <ChevronWrapper>
             <ChevronDown />
@@ -346,8 +367,13 @@ export const Dropdown: React.FC<Props> = props => {
           dropdownPosition={dropdownPosition}
           dropdownVariant={dropdownVariant}
           isOpen={isOpen}
+          // onScroll={e => {
+          // if (!!e.target.scrollHeight && e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight) {
+          // reached bottom of picker
+          // }
+          // }}
         >
-          <Items dropdownVariant={dropdownVariant}>
+          <Items dropdownVariant={dropdownVariant} showScrollbar={showScrollbar}>
             {items.map((item: DropdownItemProps, index: string) => {
               return (
                 <Item
@@ -361,6 +387,7 @@ export const Dropdown: React.FC<Props> = props => {
                   }
                 >
                   {item.content}
+                  {!!item.secondaryText && <SecondaryText>{item.secondaryText}</SecondaryText>}
                 </Item>
               )
             })}
