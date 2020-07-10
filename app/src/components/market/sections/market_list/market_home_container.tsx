@@ -1,8 +1,10 @@
 import { useQuery } from '@apollo/react-hooks'
 import { useInterval } from '@react-corekit/use-interval'
+import { useHistory } from 'react-router'
 import { ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 import { MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
@@ -11,13 +13,13 @@ import {
   GraphMarketMakerDataItem,
   MarketMakerDataItem,
   buildQueryMarkets,
-  queryCategories,
+  queryCategories
 } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import { MarketFilters, MarketStates } from '../../../../util/types'
+import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
 
 import { MarketHome } from './market_home'
 
@@ -54,12 +56,27 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
 
 const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
+  const history = useHistory()
+
+  let location = useLocation()
+  let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndRunningDailyVolume';
+  if(location.pathname === '/24h-volume') {
+    sortParam = 'lastActiveDayAndRunningDailyVolume'
+  } else if(location.pathname === '/volume') {
+    sortParam = 'collateralVolume'
+  } else if(location.pathname === '/newest') {
+    sortParam = 'creationTimestamp'
+  } else if(location.pathname === '/ending') {
+    sortParam = 'openingTimestamp'
+  } else if(location.pathname === '/liquidity') {
+    sortParam = 'liquidityParameter'
+  }
 
   const [filter, setFilter] = useState<MarketFilters>({
     state: MarketStates.open,
     category: 'All',
     title: '',
-    sortBy: 'lastActiveDayAndRunningDailyVolume',
+    sortBy: sortParam,
     sortByDirection: 'desc',
     arbitrator: null,
     templateId: null,
@@ -166,7 +183,19 @@ const MarketHomeContainer: React.FC = () => {
     setFilter(filter)
     setMoreMarkets(true)
     setIsFiltering(true)
-  }, [])
+    
+    if(filter.sortBy === 'lastActiveDayAndRunningDailyVolume') {
+      history.push('/24h-volume')
+    } else if(filter.sortBy === 'collateralVolume') {
+      history.push('/volume')
+    } else if(filter.sortBy === 'creationTimestamp') {
+      history.push('/newest')
+    } else if(filter.sortBy === 'openingTimestamp') {
+      history.push('/ending')
+    } else if(filter.sortBy === 'liquidityParameter') {
+      history.push('/liquidity')
+    }
+  }, [history])
 
   const loadNextPage = () => {
     if (!moreMarkets) {
