@@ -131,6 +131,7 @@ export interface MarketData {
 export enum MarketStates {
   open = 'OPEN',
   pending = 'PENDING',
+  finalizing = 'FINALIZING',
   closed = 'CLOSED',
   myMarkets = 'MY_MARKETS',
 }
