@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { CATEGORIES } from '../../../../common/constants'
 import { Button } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { FormRowLink, Textfield } from '../../../common/'
+import { Textfield } from '../../../common/'
 
 interface Props {
   categories: string[]
