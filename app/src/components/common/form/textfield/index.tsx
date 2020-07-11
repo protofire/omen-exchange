@@ -22,6 +22,10 @@ export const TextfieldCSS = css<{ hasError?: boolean; hasSuccess?: boolean }>`
   transition: border-color 0.15s ease-in-out;
   width: 100%;
 
+  &:hover {
+    border-color: ${props => props.theme.textfield.borderColorOnHover};
+  }
+
   &:active,
   &:focus {
     border-color: ${props => props.theme.textfield.borderColorActive};

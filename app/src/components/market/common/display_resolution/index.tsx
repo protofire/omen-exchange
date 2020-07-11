@@ -54,7 +54,7 @@ export const DisplayResolution: React.FC<Props> = (props: Props) => {
   //create message for local time
   const tzName = moment.tz.guess()
   const abbr = moment.tz(tzName).zoneAbbr()
-  const formating = `MM/DD/YY - HH:mm:ss [${abbr}]`
+  const formatting = `MMMM Do YYYY - HH:mm:ss [${abbr}]`
 
   return (
     <Wrapper {...restProps}>
@@ -64,7 +64,7 @@ export const DisplayResolution: React.FC<Props> = (props: Props) => {
         data-effect="solid"
         data-for="walletBalanceTooltip"
         data-multiline="true"
-        data-tip={localResolution.format(formating) + '<br />' + endsMessage}
+        data-tip={localResolution.format(formatting) + '<br />' + endsMessage}
       >
         {formatDate(value)}
       </Value>

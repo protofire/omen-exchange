@@ -8,7 +8,7 @@ const Wrapper = styled.button<ButtonSelectableProps>`
 
   border-color: transparent !important;
   border-radius: 6px;
-  font-weight: ${props => (props.active ? '700' : '400')};
+  font-weight: ${props => (props.active ? '500' : '400')};
   padding-left: 8px;
   padding-right: 8px;
 

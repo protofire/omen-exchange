@@ -68,6 +68,7 @@ const SecondaryCSS = css`
     background-color: ${props => props.theme.buttonSecondary.backgroundColor};
     border-color: ${props => props.theme.buttonSecondary.borderColor};
     color: ${props => props.theme.buttonSecondary.color};
+    font-weight: ${props => props.theme.buttonSecondary.weight};
   }
 
   &:hover {
@@ -148,6 +149,7 @@ export const ButtonCSS = css<ButtonProps>`
   transition: all 0.15s ease-out;
   user-select: none;
   white-space: nowrap;
+  font-family: Roboto;
 
   ${props => getButtonTypeStyles(props.buttonType)}
 `

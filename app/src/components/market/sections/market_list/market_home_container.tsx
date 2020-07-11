@@ -59,7 +59,7 @@ const MarketHomeContainer: React.FC = () => {
     state: MarketStates.open,
     category: 'All',
     title: '',
-    sortBy: 'collateralVolume',
+    sortBy: 'lastActiveDayAndRunningDailyVolume',
     sortByDirection: 'desc',
     arbitrator: null,
     templateId: null,
@@ -98,6 +98,11 @@ const MarketHomeContainer: React.FC = () => {
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery<GraphResponseMarkets>(marketQuery, {
     notifyOnNetworkStatusChange: true,
     variables: marketsQueryVariables,
+    // loading stuck on true when using useQuery hook , using a fetchPolicy seems to fix it
+    // If you do not want to risk displaying any out-of-date information from the cache,
+    // it may make sense to use a ‘network-only’ fetch policy.
+    // This policy favors showing the most up-to-date information over quick responses.
+    fetchPolicy: 'network-only',
   })
 
   const { data: fetchedCategories, error: categoriesError, loading: categoriesLoading } = useQuery<
