@@ -79,7 +79,7 @@ export const Categories = (props: Props) => {
           setSelectedCustom(true)
           onChange(e)
         }}
-        onClick={e => {
+        onClick={() => {
           setSelectedCustom(true)
         }}
         placeholder={'Add Category...'}
