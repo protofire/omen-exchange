@@ -414,7 +414,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             markets.data.slice(0, count).map(item => {
               return <ListItem currentFilter={currentFilter} key={item.address} market={item}></ListItem>
             })}
-          {noOwnMarkets && <NoOwnMarkets>You haven&apos;t participated in or created any market yet.</NoOwnMarkets>}
+          {noOwnMarkets && <NoOwnMarkets>You have not created any market yet.</NoOwnMarkets>}
           {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
