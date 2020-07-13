@@ -59,13 +59,20 @@ const MarketHomeContainer: React.FC = () => {
   const history = useHistory()
 
   let location = useLocation()
+
   const sortRoute = location.pathname.split('/')[1]
+
   const currencyFilter = location.pathname.includes('currency') ? true : false
   let currencyRoute = location.pathname.split('/currency/')[1]
   if(currencyRoute) currencyRoute = currencyRoute.split('/')[0]
+
   const arbitratorFilter = location.pathname.includes('arbitrator') ? true : false
   let arbitratorRoute = location.pathname.split('/arbitrator/')[1]
   if(arbitratorRoute) arbitratorRoute = arbitratorRoute.split('/')[0]
+
+  const categoryFilter = location.pathname.includes('category') ? true : false
+  let categoryRoute = location.pathname.split('/category/')[1]
+  if(categoryRoute) categoryRoute = categoryRoute.split('/')[0]
 
   let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndRunningDailyVolume'
   if(sortRoute === '24h-volume') {
@@ -94,9 +101,16 @@ const MarketHomeContainer: React.FC = () => {
     arbitratorParam = null
   }
 
+  let categoryParam: string
+  if(categoryFilter) {
+    categoryParam = categoryRoute
+  } else {
+    categoryParam = 'All'
+  }
+
   const [filter, setFilter] = useState<MarketFilters>({
     state: MarketStates.open,
-    category: 'All',
+    category: categoryParam,
     title: '',
     sortBy: sortParam,
     sortByDirection: 'desc',
@@ -226,6 +240,10 @@ const MarketHomeContainer: React.FC = () => {
 
     if(filter.arbitrator) {
       route += `/arbitrator/${filter.arbitrator}`
+    }
+
+    if(filter.category && filter.category !== 'All') {
+      route += `/category/${filter.category}`
     }
 
     history.push(route)
