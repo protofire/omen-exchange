@@ -278,7 +278,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     },
     {
       title: 'Highest liquidity',
-      sortBy: 'liquidityParameter',
+      sortBy: 'scaledLiquidityParameter',
       direction: 'desc',
     },
     {

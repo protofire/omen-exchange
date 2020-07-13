@@ -140,7 +140,7 @@ export type MarketsSortCriteria =
   | 'scaledCollateralVolume'
   | 'creationTimestamp'
   | 'openingTimestamp'
-  | 'liquidityParameter'
+  | 'scaledLiquidityParameter'
   | 'lastActiveDayAndScaledRunningDailyVolume'
 
 export interface MarketFilters {
