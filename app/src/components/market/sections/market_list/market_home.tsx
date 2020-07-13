@@ -202,8 +202,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(props.currentFilter.sortBy)
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(props.currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(false)
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(props.currentFilter.currency ? true : false)
-  const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(props.currentFilter.currency || props.currentFilter.arbitrator ? true : false)
+  const [arbitrator, setArbitrator] = useState<Maybe<string>>(props.currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string>>(props.currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
 
@@ -396,6 +396,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         {showAdvancedFilters && (
           <AdvancedFilters
             currency={currency}
+            arbitrator={arbitrator}
             onChangeArbitrator={setArbitrator}
             onChangeCurrency={setCurrency}
             onChangeTemplateId={setTemplateId}

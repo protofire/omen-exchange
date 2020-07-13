@@ -41,6 +41,7 @@ const Options = styled(Dropdown)`
 
 interface Props {
   currency: Maybe<string>
+  arbitrator: Maybe<string>
   onChangeCurrency: (currency: Maybe<string>) => void
   onChangeArbitrator: (arbitrator: Maybe<string>) => void
   onChangeTemplateId: (templateId: Maybe<string>) => void
@@ -53,7 +54,7 @@ export const AdvancedFilters = (props: Props) => {
   const arbitrators = getArbitratorsByNetwork(networkId)
   const tokens = useTokens(context)
 
-  const { currency, onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
+  const { currency, arbitrator, onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
 
   const allTokensOptions = [{ address: null, symbol: 'All', image: null }, ...tokens]
   const currencyOptions: Array<DropdownItemProps> = allTokensOptions.map(({ address, image, symbol }) => {
@@ -113,7 +114,12 @@ export const AdvancedFilters = (props: Props) => {
       )}
       <Column>
         <Title>Arbitrator</Title>
-        <Options dropdownPosition={DropdownPosition.right} items={arbitratorOptions} />
+        <Options 
+          dropdownPosition={DropdownPosition.right} 
+          items={arbitratorOptions}
+          currentItem={arbitrators.findIndex(t => t.address === arbitrator)}
+          dirty={true}
+        />
       </Column>
     </Wrapper>
   )

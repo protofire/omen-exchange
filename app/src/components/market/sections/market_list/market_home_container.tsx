@@ -60,8 +60,12 @@ const MarketHomeContainer: React.FC = () => {
 
   let location = useLocation()
   const sortRoute = location.pathname.split('/')[1]
-  const currencyFilter = location.pathname.split('/')[2] ? true : false
-  const currencyRoute = location.pathname.split('/')[3]
+  const currencyFilter = location.pathname.includes('currency') ? true : false
+  let currencyRoute = location.pathname.split('/currency/')[1]
+  if(currencyRoute) currencyRoute = currencyRoute.split('/')[0]
+  const arbitratorFilter = location.pathname.includes('arbitrator') ? true : false
+  let arbitratorRoute = location.pathname.split('/arbitrator/')[1]
+  if(arbitratorRoute) arbitratorRoute = arbitratorRoute.split('/')[0]
 
   let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndRunningDailyVolume'
   if(sortRoute === '24h-volume') {
@@ -84,8 +88,8 @@ const MarketHomeContainer: React.FC = () => {
   }
 
   let arbitratorParam: string | null
-  if(location.search) {
-    arbitratorParam = location.search.split('=')[1]
+  if(arbitratorFilter) {
+    arbitratorParam = arbitratorRoute
   } else {
     arbitratorParam = null
   }
@@ -215,12 +219,13 @@ const MarketHomeContainer: React.FC = () => {
     }
 
     if(filter.currency) {
-      history.push(`/${sortRoute}/currency/${filter.currency}`)
+      filter.arbitrator ? history.push(`/${sortRoute}/arbitrator/${filter.arbitrator}/currency/${filter.currency}`) :
+        history.push(`/${sortRoute}/currency/${filter.currency}`)
     }
 
     if(filter.arbitrator) {
-      filter.currency ? history.push(`/${sortRoute}/currency/${filter.currency}?arbitrator=${filter.arbitrator}`) :
-        history.push(`/${sortRoute}?arbitrator=${filter.arbitrator}`)
+      filter.currency ? history.push(`/${sortRoute}/currency/${filter.currency}/arbitrator/${filter.arbitrator}`) :
+        history.push(`/${sortRoute}/arbitrator/${filter.arbitrator}`)
     }
   }, [history, sortRoute])
 
