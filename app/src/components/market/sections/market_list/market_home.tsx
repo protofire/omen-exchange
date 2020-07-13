@@ -219,9 +219,15 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     },
     {
       state: MarketStates.pending,
-      title: 'Finalizing',
+      title: 'Pending',
       active: state === MarketStates.pending,
       onClick: () => setState(MarketStates.pending),
+    },
+    {
+      state: MarketStates.finalizing,
+      title: 'Finalizing',
+      active: state === MarketStates.finalizing,
+      onClick: () => setState(MarketStates.finalizing),
     },
     {
       state: MarketStates.closed,
