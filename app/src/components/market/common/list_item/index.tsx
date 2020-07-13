@@ -136,9 +136,10 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Ended ${endsText}`}</span>
         <Separator>|</Separator>
         <span>
-          {currentFilter.sortBy === 'collateralVolume' && `${volume} ${symbol} - Volume`}
+          {currentFilter.sortBy === 'scaledCollateralVolume' && `${volume} ${symbol} - Volume`}
           {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Ending`}
-          {currentFilter.sortBy === 'lastActiveDayAndRunningDailyVolume' && `${dailyVolume} ${symbol} - 24hr Volume`}
+          {currentFilter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume' &&
+            `${dailyVolume} ${symbol} - 24hr Volume`}
           {currentFilter.sortBy === 'liquidityParameter' && `${liquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
