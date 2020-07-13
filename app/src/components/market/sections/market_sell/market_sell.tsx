@@ -62,7 +62,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, collateral.decimals))
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
 
   const calcSellAmount = useMemo(
     () => async (
