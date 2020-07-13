@@ -205,29 +205,31 @@ const MarketHomeContainer: React.FC = () => {
     setFilter(filter)
     setMoreMarkets(true)
     setIsFiltering(true)
+
+    let route: string = ''
     
     if(filter.sortBy === 'lastActiveDayAndRunningDailyVolume') {
-      history.push('/24h-volume')
+      route += '/24h-volume'
     } else if(filter.sortBy === 'collateralVolume') {
-      history.push('/volume')
+      route += '/volume'
     } else if(filter.sortBy === 'creationTimestamp') {
-      history.push('/newest')
+      route += '/newest'
     } else if(filter.sortBy === 'openingTimestamp') {
-      history.push('/ending')
+      route += '/ending'
     } else if(filter.sortBy === 'liquidityParameter') {
-      history.push('/liquidity')
+      route += '/liquidity'
     }
 
     if(filter.currency) {
-      filter.arbitrator ? history.push(`/${sortRoute}/arbitrator/${filter.arbitrator}/currency/${filter.currency}`) :
-        history.push(`/${sortRoute}/currency/${filter.currency}`)
+      route += `/currency/${filter.currency}`
     }
 
     if(filter.arbitrator) {
-      filter.currency ? history.push(`/${sortRoute}/currency/${filter.currency}/arbitrator/${filter.arbitrator}`) :
-        history.push(`/${sortRoute}/arbitrator/${filter.arbitrator}`)
+      route += `/arbitrator/${filter.arbitrator}`
     }
-  }, [history, sortRoute])
+
+    history.push(route)
+  }, [history])
 
   const loadNextPage = () => {
     if (!moreMarkets) {
