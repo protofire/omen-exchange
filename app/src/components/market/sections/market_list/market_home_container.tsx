@@ -246,7 +246,8 @@ const MarketHomeContainer: React.FC = () => {
     setIsFiltering(true)
 
     let route: string = ''
-    let routeQuery: string = '?'
+    let routeQueryStart: string = '?'
+    let routeQueryArray: string[] = []
     
     if(filter.sortBy === 'lastActiveDayAndRunningDailyVolume') {
       route += '/24h-volume'
@@ -273,12 +274,15 @@ const MarketHomeContainer: React.FC = () => {
     }
 
     if(filter.state && filter.state !== 'OPEN') {
-      routeQuery += `state=${filter.state}&`
+      routeQueryArray.push(`state=${filter.state}`)
     }
 
     if(filter.title) {
-      routeQuery += `tag=${filter.title}&`
+      routeQueryArray.push(`tag=${filter.title}`)
     }
+
+    const routeQueryString = routeQueryArray.join('&')
+    const routeQuery = routeQueryStart.concat(routeQueryString)
 
     history.push(`${route}${routeQuery}`)
   }, [history])
