@@ -196,7 +196,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     onUpdatePageSize,
     pageIndex,
   } = props
-  const [state, setState] = useState<MarketStates>(MarketStates.open)
+  const [state, setState] = useState<MarketStates>(currentFilter.state)
   const [category, setCategory] = useState(currentFilter.category)
   const [title, setTitle] = useState('')
   const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(currentFilter.sortBy)
@@ -364,13 +364,15 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           dropdownVariant={DropdownVariant.card}
           items={categoryItems}
           showScrollbar={true}
-          currentItem={RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(currentFilter.category)) + 1 : 0}
+          currentItem={RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(category)) + 1 : 0}
           dirty={true}
         />
         <MarketsFilterDropdown
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={filterItems}
+          currentItem={filters.findIndex(i => i.state === state)}
+          dirty={true}
         />
       </Actions>
       <ListCard>

@@ -74,6 +74,10 @@ const MarketHomeContainer: React.FC = () => {
   let categoryRoute = location.pathname.split('/category/')[1]
   if(categoryRoute) categoryRoute = categoryRoute.split('/')[0]
 
+  const stateFilter = location.search.includes('state') ? true : false
+  let stateRoute = location.search.split('state=')[1]
+  if(stateRoute) stateRoute = stateRoute.split('&')[0]
+
   let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndRunningDailyVolume'
   if(sortRoute === '24h-volume') {
     sortParam = 'lastActiveDayAndRunningDailyVolume'
@@ -108,8 +112,18 @@ const MarketHomeContainer: React.FC = () => {
     categoryParam = 'All'
   }
 
+  let stateParam: MarketStates = MarketStates.open
+  if(stateFilter) {
+    if(stateRoute === 'OPEN') stateParam = MarketStates.open
+    if(stateRoute === 'PENDING') stateParam = MarketStates.pending
+    if(stateRoute === 'CLOSED') stateParam = MarketStates.closed
+    if(stateRoute === 'MY_MARKETS') stateParam = MarketStates.myMarkets
+  } else {
+    stateParam = MarketStates.open
+  }
+
   const [filter, setFilter] = useState<MarketFilters>({
-    state: MarketStates.open,
+    state: stateParam,
     category: categoryParam,
     title: '',
     sortBy: sortParam,
@@ -221,6 +235,7 @@ const MarketHomeContainer: React.FC = () => {
     setIsFiltering(true)
 
     let route: string = ''
+    let routeQuery: string = '?'
     
     if(filter.sortBy === 'lastActiveDayAndRunningDailyVolume') {
       route += '/24h-volume'
@@ -246,7 +261,11 @@ const MarketHomeContainer: React.FC = () => {
       route += `/category/${filter.category}`
     }
 
-    history.push(route)
+    if(filter.state && filter.state !== 'OPEN') {
+      routeQuery += `state=${filter.state}&`
+    }
+
+    history.push(`${route}${routeQuery}`)
   }, [history])
 
   const loadNextPage = () => {
