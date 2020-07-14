@@ -91,6 +91,9 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     : ''
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
   const formattedCreationDate = moment(creationDate).format('MMM Do, YYYY')
+  const lastActiveDay: number = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.lastActiveDay
+    : 0
   const dailyVolumeUnformatted: Maybe<BigNumber> = useGraphMarketMakerDataResult.marketMakerData
     ? useGraphMarketMakerDataResult.marketMakerData.dailyVolume
     : null
@@ -141,7 +144,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
           {currentFilter.sortBy === 'scaledCollateralVolume' && `${volume} ${symbol} - Volume`}
           {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Ending`}
           {currentFilter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume' &&
-            `${dailyVolume} ${symbol} - 24hr Volume`}
+            `${Math.floor(Date.now() / 86400000) === lastActiveDay ? dailyVolume : 0} ${symbol} - 24hr Volume`}
           {currentFilter.sortBy === 'scaledLiquidityParameter' && `${liquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>

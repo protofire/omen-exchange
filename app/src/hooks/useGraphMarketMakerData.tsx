@@ -24,6 +24,7 @@ const query = gql`
       outcomes
       category
       language
+      lastActiveDay
       runningDailyVolume
       arbitrator
       creationTimestamp
@@ -54,6 +55,7 @@ type GraphResponseFixedProductMarketMaker = {
   creator: string
   currentAnswer: string
   fee: string
+  lastActiveDay: string
   runningDailyVolume: string
   language: string
   creationTimestamp: string
@@ -81,6 +83,7 @@ export type GraphMarketMakerData = {
   collateralAddress: string
   creationTimestamp: string
   collateralVolume: BigNumber
+  lastActiveDay: number
   dailyVolume: BigNumber
   conditionId: string
   payouts: Maybe<number[]>
@@ -103,6 +106,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     collateralAddress: data.collateralToken,
     creationTimestamp: data.creationTimestamp,
     collateralVolume: bigNumberify(data.collateralVolume),
+    lastActiveDay: Number(data.lastActiveDay),
     dailyVolume: bigNumberify(data.runningDailyVolume),
     conditionId: data.condition.id,
     payouts: data.condition.payouts ? data.condition.payouts.map(Number) : null,
