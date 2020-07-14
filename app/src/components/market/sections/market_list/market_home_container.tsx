@@ -82,17 +82,17 @@ const MarketHomeContainer: React.FC = () => {
   let searchRoute = location.search.split('tag=')[1]
   if(searchRoute) searchRoute = searchRoute.split('&')[0]
 
-  let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndRunningDailyVolume'
+  let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndScaledRunningDailyVolume'
   if(sortRoute === '24h-volume') {
-    sortParam = 'lastActiveDayAndRunningDailyVolume'
+    sortParam = 'lastActiveDayAndScaledRunningDailyVolume'
   } else if(sortRoute === 'volume') {
-    sortParam = 'collateralVolume'
+    sortParam = 'scaledCollateralVolume'
   } else if(sortRoute === 'newest') {
     sortParam = 'creationTimestamp'
   } else if(sortRoute === 'ending') {
     sortParam = 'openingTimestamp'
   } else if(sortRoute === 'liquidity') {
-    sortParam = 'liquidityParameter'
+    sortParam = 'scaledLiquidityParameter'
   }
 
   let currencyParam: string | null
@@ -249,15 +249,15 @@ const MarketHomeContainer: React.FC = () => {
     let routeQueryStart: string = '?'
     let routeQueryArray: string[] = []
     
-    if(filter.sortBy === 'lastActiveDayAndRunningDailyVolume') {
+    if(filter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume') {
       route += '/24h-volume'
-    } else if(filter.sortBy === 'collateralVolume') {
+    } else if(filter.sortBy === 'scaledCollateralVolume') {
       route += '/volume'
     } else if(filter.sortBy === 'creationTimestamp') {
       route += '/newest'
     } else if(filter.sortBy === 'openingTimestamp') {
       route += '/ending'
-    } else if(filter.sortBy === 'liquidityParameter') {
+    } else if(filter.sortBy === 'scaledLiquidityParameter') {
       route += '/liquidity'
     }
 

@@ -4,7 +4,7 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { use24hsVolume, useGraphMarketMakerData } from '../../../../hooks'
+import { useGraphMarketMakerData } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { ERC20Service } from '../../../../services'
@@ -85,13 +85,18 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const endsText = moment(endDate).fromNow(true)
   const resolutionDate = moment(endDate).format('MMM Do, YYYY')
 
-  const use24hsVolumeResult = use24hsVolume(address)
   const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
   const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
     ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
     : ''
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
   const formattedCreationDate = moment(creationDate).format('MMM Do, YYYY')
+  const lastActiveDay: number = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.lastActiveDay
+    : 0
+  const dailyVolumeUnformatted: Maybe<BigNumber> = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.dailyVolume
+    : null
 
   useEffect(() => {
     const setToken = async () => {
@@ -101,8 +106,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
       let lastDayVolume: BigNumber
       let formattedDailyVolume: string
-      if (use24hsVolumeResult !== null) {
-        lastDayVolume = use24hsVolumeResult
+      if (dailyVolumeUnformatted !== null) {
+        lastDayVolume = dailyVolumeUnformatted
         formattedDailyVolume = formatBigNumber(lastDayVolume, decimals)
       } else {
         formattedDailyVolume = '0'
@@ -121,7 +126,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     }
 
     setToken()
-  }, [account, collateralToken, collateralVolume, provider, use24hsVolumeResult, outcomeTokenAmounts])
+  }, [account, collateralToken, collateralVolume, dailyVolumeUnformatted, provider, outcomeTokenAmounts])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
@@ -136,10 +141,11 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Ended ${endsText}`}</span>
         <Separator>|</Separator>
         <span>
-          {currentFilter.sortBy === 'collateralVolume' && `${volume} ${symbol} - Volume`}
+          {currentFilter.sortBy === 'scaledCollateralVolume' && `${volume} ${symbol} - Volume`}
           {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Ending`}
-          {currentFilter.sortBy === 'lastActiveDayAndRunningDailyVolume' && `${dailyVolume} ${symbol} - 24hr Volume`}
-          {currentFilter.sortBy === 'liquidityParameter' && `${liquidity} ${symbol} - Liquidity`}
+          {currentFilter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume' &&
+            `${Math.floor(Date.now() / 86400000) === lastActiveDay ? dailyVolume : 0} ${symbol} - 24hr Volume`}
+          {currentFilter.sortBy === 'scaledLiquidityParameter' && `${liquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
       </Info>

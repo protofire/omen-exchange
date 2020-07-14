@@ -104,10 +104,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const [activeTab, setActiveTab] = useState(Tabs.deposit)
 
-  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), collateral.decimals)}%`, [
-    fee,
-    collateral.decimals,
-  ])
+  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
