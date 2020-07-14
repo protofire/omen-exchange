@@ -235,7 +235,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
   const depositedTokensTotal = depositedTokens.add(userEarnings)
-  const goBackToAddress = `/${marketMakerAddress}`
   const maybeFundingBalance = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
 
@@ -267,7 +266,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle backTo={goBackToAddress} textAlign={TextAlign.left} title={question.title} />
+      <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
         <MarketTopDetailsOpen
           isLiquidityProvision={true}
@@ -411,7 +410,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           />
         )}
         <ButtonContainer>
-          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
+          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
             Cancel
           </LeftButton>
           {activeTab === Tabs.deposit && (
@@ -431,7 +430,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         </ButtonContainer>
       </ViewCard>
       <ModalTransactionResult
-        goBackToAddress={goBackToAddress}
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
         status={status}

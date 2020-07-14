@@ -196,15 +196,15 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     onUpdatePageSize,
     pageIndex,
   } = props
-  const [state, setState] = useState<MarketStates>(MarketStates.open)
-  const [category, setCategory] = useState('All')
-  const [title, setTitle] = useState('')
-  const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(props.currentFilter.sortBy)
-  const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(props.currentFilter.sortByDirection)
-  const [showSearch, setShowSearch] = useState<boolean>(false)
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
-  const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
-  const [currency, setCurrency] = useState<Maybe<string>>(props.currentFilter.currency)
+  const [state, setState] = useState<MarketStates>(currentFilter.state)
+  const [category, setCategory] = useState(currentFilter.category)
+  const [title, setTitle] = useState(currentFilter.title)
+  const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(currentFilter.sortBy)
+  const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
+  const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(currentFilter.currency || currentFilter.arbitrator ? true : false)
+  const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
+  const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
 
   const filters = [
@@ -370,11 +370,15 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           dropdownVariant={DropdownVariant.card}
           items={categoryItems}
           showScrollbar={true}
+          currentItem={RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(category)) + 1 : 0}
+          dirty={true}
         />
         <MarketsFilterDropdown
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={filterItems}
+          currentItem={filters.findIndex(i => i.state === state)}
+          dirty={true}
         />
       </Actions>
       <ListCard>
@@ -402,6 +406,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         {showAdvancedFilters && (
           <AdvancedFilters
             currency={currency}
+            arbitrator={arbitrator}
             onChangeArbitrator={setArbitrator}
             onChangeCurrency={setCurrency}
             onChangeTemplateId={setTemplateId}

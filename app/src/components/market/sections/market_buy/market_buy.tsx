@@ -152,7 +152,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
-  const goBackToAddress = `/${marketMakerAddress}`
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
 
@@ -185,7 +184,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle backTo={goBackToAddress} textAlign={TextAlign.left} title={question.title} />
+      <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
         <MarketTopDetailsOpen
           isLiquidityProvision={false}
@@ -274,7 +273,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           />
         )}
         <ButtonContainer>
-          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
+          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
             Cancel
           </LeftButton>
           <Button buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>

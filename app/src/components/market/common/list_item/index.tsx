@@ -127,7 +127,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const indexMax = percentages.indexOf(Math.max(...percentages))
 
   return (
-    <Wrapper to={address}>
+    <Wrapper to={`/${address}`}>
       <Title>{title}</Title>
       <Info>
         <IconStar></IconStar>
