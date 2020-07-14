@@ -1,4 +1,4 @@
-import React, { DOMAttributes, useCallback, useState } from 'react'
+import React, { DOMAttributes, useCallback, useState, useEffect } from 'react'
 import styled, { css } from 'styled-components'
 
 import { CardCSS } from '../../card'
@@ -306,6 +306,10 @@ export const Dropdown: React.FC<Props> = props => {
   const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
   const [isDirty, setIsDirty] = useState<boolean>(dirty)
   const [isOpen, setIsOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    setCurrentItemIndex(currentItem)
+  }, [currentItem])
 
   const optionClick = useCallback((onClick: (() => void) | undefined, itemIndex: number) => {
     if (!onClick) return

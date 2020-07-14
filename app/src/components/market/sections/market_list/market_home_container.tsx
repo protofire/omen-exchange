@@ -1,8 +1,10 @@
 import { useQuery } from '@apollo/react-hooks'
 import { useInterval } from '@react-corekit/use-interval'
+import { useHistory } from 'react-router'
 import { ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 import { MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
@@ -11,13 +13,13 @@ import {
   GraphMarketMakerDataItem,
   MarketMakerDataItem,
   buildQueryMarkets,
-  queryCategories,
+  queryCategories
 } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import { MarketFilters, MarketStates } from '../../../../util/types'
+import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
 
 import { MarketHome } from './market_home'
 
@@ -54,16 +56,92 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
 
 const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
+  const history = useHistory()
+
+  let location = useLocation()
+
+  const sortRoute = location.pathname.split('/')[1]
+
+  const currencyFilter = location.pathname.includes('currency') ? true : false
+  let currencyRoute = location.pathname.split('/currency/')[1]
+  if(currencyRoute) currencyRoute = currencyRoute.split('/')[0]
+
+  const arbitratorFilter = location.pathname.includes('arbitrator') ? true : false
+  let arbitratorRoute = location.pathname.split('/arbitrator/')[1]
+  if(arbitratorRoute) arbitratorRoute = arbitratorRoute.split('/')[0]
+
+  const categoryFilter = location.pathname.includes('category') ? true : false
+  let categoryRoute = location.pathname.split('/category/')[1]
+  if(categoryRoute) categoryRoute = categoryRoute.split('/')[0]
+
+  const stateFilter = location.search.includes('state') ? true : false
+  let stateRoute = location.search.split('state=')[1]
+  if(stateRoute) stateRoute = stateRoute.split('&')[0]
+
+  const searchFilter = location.search.includes('tag') ? true : false
+  let searchRoute = location.search.split('tag=')[1]
+  if(searchRoute) searchRoute = searchRoute.split('&')[0]
+
+  let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndScaledRunningDailyVolume'
+  if(sortRoute === '24h-volume') {
+    sortParam = 'lastActiveDayAndScaledRunningDailyVolume'
+  } else if(sortRoute === 'volume') {
+    sortParam = 'scaledCollateralVolume'
+  } else if(sortRoute === 'newest') {
+    sortParam = 'creationTimestamp'
+  } else if(sortRoute === 'ending') {
+    sortParam = 'openingTimestamp'
+  } else if(sortRoute === 'liquidity') {
+    sortParam = 'scaledLiquidityParameter'
+  }
+
+  let currencyParam: string | null
+  if(currencyFilter) {
+    currencyParam = currencyRoute
+  } else {
+    currencyParam = null
+  }
+
+  let arbitratorParam: string | null
+  if(arbitratorFilter) {
+    arbitratorParam = arbitratorRoute
+  } else {
+    arbitratorParam = null
+  }
+
+  let categoryParam: string
+  if(categoryFilter) {
+    categoryParam = categoryRoute
+  } else {
+    categoryParam = 'All'
+  }
+
+  let stateParam: MarketStates = MarketStates.open
+  if(stateFilter) {
+    if(stateRoute === 'OPEN') stateParam = MarketStates.open
+    if(stateRoute === 'PENDING') stateParam = MarketStates.pending
+    if(stateRoute === 'CLOSED') stateParam = MarketStates.closed
+    if(stateRoute === 'MY_MARKETS') stateParam = MarketStates.myMarkets
+  } else {
+    stateParam = MarketStates.open
+  }
+
+  let searchParam: string
+  if(searchFilter) {
+    searchParam = searchRoute
+  } else {
+    searchParam = ''
+  }
 
   const [filter, setFilter] = useState<MarketFilters>({
-    state: MarketStates.open,
-    category: 'All',
-    title: '',
-    sortBy: 'lastActiveDayAndScaledRunningDailyVolume',
+    state: stateParam,
+    category: categoryParam,
+    title: searchParam,
+    sortBy: sortParam,
     sortByDirection: 'desc',
-    arbitrator: null,
+    arbitrator: arbitratorParam,
     templateId: null,
-    currency: null,
+    currency: currencyParam,
   })
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
@@ -166,7 +244,48 @@ const MarketHomeContainer: React.FC = () => {
     setFilter(filter)
     setMoreMarkets(true)
     setIsFiltering(true)
-  }, [])
+
+    let route: string = ''
+    let routeQueryStart: string = '?'
+    let routeQueryArray: string[] = []
+    
+    if(filter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume') {
+      route += '/24h-volume'
+    } else if(filter.sortBy === 'scaledCollateralVolume') {
+      route += '/volume'
+    } else if(filter.sortBy === 'creationTimestamp') {
+      route += '/newest'
+    } else if(filter.sortBy === 'openingTimestamp') {
+      route += '/ending'
+    } else if(filter.sortBy === 'scaledLiquidityParameter') {
+      route += '/liquidity'
+    }
+
+    if(filter.currency) {
+      route += `/currency/${filter.currency}`
+    }
+
+    if(filter.arbitrator) {
+      route += `/arbitrator/${filter.arbitrator}`
+    }
+
+    if(filter.category && filter.category !== 'All') {
+      route += `/category/${filter.category}`
+    }
+
+    if(filter.state && filter.state !== 'OPEN') {
+      routeQueryArray.push(`state=${filter.state}`)
+    }
+
+    if(filter.title) {
+      routeQueryArray.push(`tag=${filter.title}`)
+    }
+
+    const routeQueryString = routeQueryArray.join('&')
+    const routeQuery = routeQueryStart.concat(routeQueryString)
+
+    history.push(`${route}${routeQuery}`)
+  }, [history])
 
   const loadNextPage = () => {
     if (!moreMarkets) {
