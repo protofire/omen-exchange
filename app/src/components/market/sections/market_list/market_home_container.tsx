@@ -91,12 +91,10 @@ const MarketHomeContainer: React.FC = () => {
     accounts: cpkAddress ? [cpkAddress] : null,
     fee: feeBN.toString(),
     now: +now,
-    lastActiveDay: Math.floor(+now / 86400),
     knownArbitrators,
     ...filter,
   }
 
-  console.log('lastActiveDay', marketsQueryVariables.lastActiveDay)
   const { data: fetchedMarkets, error, fetchMore, loading } = useQuery<GraphResponseMarkets>(marketQuery, {
     notifyOnNetworkStatusChange: true,
     variables: marketsQueryVariables,
