@@ -77,7 +77,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
             <TitleValue title={'Category'} value={question.category} />
             <DisplayResolution title={'Resolution Date'} value={question.resolution} />
             <TitleValue
-              title={'Arbitrator/Oracle'}
+              title={'Arbitrator'}
               value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
             />
             <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
@@ -125,7 +125,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
                 <TitleValue title={'Category'} value={question.category} />
                 <TitleValue title={'Resolution Date'} value={question.resolution && formatDate(question.resolution)} />
                 <TitleValue
-                  title={'Arbitrator/Oracle'}
+                  title={'Arbitrator'}
                   value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
                 />
                 <TitleValue title={'Total Volume'} value={totalVolumeFormat} />

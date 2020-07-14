@@ -79,6 +79,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     state === MarketStates.open ? 'openingTimestamp_gt: $now' : '',
     state === MarketStates.pending ? 'openingTimestamp_lt: $now' : '',
     state === MarketStates.pending ? 'answerFinalizedTimestamp: null' : '',
+    state === MarketStates.finalizing ? 'answerFinalizedTimestamp_gt: $now' : '',
     state === MarketStates.myMarkets || whitelistedCreators ? 'creator_in: $accounts' : '',
     category === 'All' ? '' : 'category: $category',
     title ? 'title_contains: $title' : '',

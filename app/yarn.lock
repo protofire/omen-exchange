@@ -6425,10 +6425,10 @@ content-type@~1.0.4:
   resolved "https://registry.yarnpkg.com/content-type/-/content-type-1.0.4.tgz#e138cc75e040c727b1966fe5e5f8c9aee256fe3b"
   integrity sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==
 
-contract-proxy-kit@^2.0.0-alpha.2:
-  version "2.0.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/contract-proxy-kit/-/contract-proxy-kit-2.0.0-alpha.2.tgz#fb2cbf3f71bb99c57a82503e5a3a8102f2fce63c"
-  integrity sha512-8GwSENqiQlRW6G68cBHur8Pqi8zFOB0DBZFTxjGy5xNa7Qe6lDWLJKEl+YR0AXU2cDs0jVBtlKIhea7wBbqVyg==
+contract-proxy-kit@^2.0.0-alpha.3:
+  version "2.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/contract-proxy-kit/-/contract-proxy-kit-2.0.0-alpha.3.tgz#6f6e5e54b70331d37740b260edee3dc4bddfd333"
+  integrity sha512-TAuewXDCEVRdCMVW7Fwsico0ELMwq80w4II8Ui+c9ppZmHL8jV6mhdvHlB7mkY6I+u3slAGgM53v+FZ2pgqGmg==
 
 convert-source-map@1.7.0, convert-source-map@^1.4.0, convert-source-map@^1.5.0, convert-source-map@^1.5.1, convert-source-map@^1.7.0:
   version "1.7.0"

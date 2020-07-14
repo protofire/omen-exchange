@@ -216,9 +216,15 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     },
     {
       state: MarketStates.pending,
-      title: 'Finalizing',
+      title: 'Pending',
       active: state === MarketStates.pending,
       onClick: () => setState(MarketStates.pending),
+    },
+    {
+      state: MarketStates.finalizing,
+      title: 'Finalizing',
+      active: state === MarketStates.finalizing,
+      onClick: () => setState(MarketStates.finalizing),
     },
     {
       state: MarketStates.closed,
@@ -413,7 +419,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             markets.data.slice(0, count).map(item => {
               return <ListItem currentFilter={currentFilter} key={item.address} market={item}></ListItem>
             })}
-          {noOwnMarkets && <NoOwnMarkets>You haven&apos;t participated in or created any market yet.</NoOwnMarkets>}
+          {noOwnMarkets && <NoOwnMarkets>You have not created any market yet.</NoOwnMarkets>}
           {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
