@@ -78,6 +78,10 @@ const MarketHomeContainer: React.FC = () => {
   let stateRoute = location.search.split('state=')[1]
   if(stateRoute) stateRoute = stateRoute.split('&')[0]
 
+  const searchFilter = location.search.includes('tag') ? true : false
+  let searchRoute = location.search.split('tag=')[1]
+  if(searchRoute) searchRoute = searchRoute.split('&')[0]
+
   let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndRunningDailyVolume'
   if(sortRoute === '24h-volume') {
     sortParam = 'lastActiveDayAndRunningDailyVolume'
@@ -122,10 +126,17 @@ const MarketHomeContainer: React.FC = () => {
     stateParam = MarketStates.open
   }
 
+  let searchParam: string
+  if(searchFilter) {
+    searchParam = searchRoute
+  } else {
+    searchParam = ''
+  }
+
   const [filter, setFilter] = useState<MarketFilters>({
     state: stateParam,
     category: categoryParam,
-    title: '',
+    title: searchParam,
     sortBy: sortParam,
     sortByDirection: 'desc',
     arbitrator: arbitratorParam,
@@ -263,6 +274,10 @@ const MarketHomeContainer: React.FC = () => {
 
     if(filter.state && filter.state !== 'OPEN') {
       routeQuery += `state=${filter.state}&`
+    }
+
+    if(filter.title) {
+      routeQuery += `tag=${filter.title}&`
     }
 
     history.push(`${route}${routeQuery}`)
