@@ -68,6 +68,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     arbitrator,
     category,
     currency,
+    sortBy,
     state,
     templateId,
     title,
@@ -87,12 +88,13 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     arbitrator ? 'arbitrator: $arbitrator' : 'arbitrator_in: $knownArbitrators',
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee_lte: $fee',
+    sortBy === 'lastActiveDayAndScaledRunningDailyVolume' ? 'lastActiveDay: $lastActiveDay' : '',
   ]
     .filter(s => s.length)
     .join(',')
 
   const query = gql`
-    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $knownArbitrators: [String!], $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $lastActiveDay: Int, $currency: String, $arbitrator: String, $knownArbitrators: [String!], $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
       fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${whereClause} }) {
         ...marketData
       }
