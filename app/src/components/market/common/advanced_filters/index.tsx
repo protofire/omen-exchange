@@ -54,7 +54,7 @@ export const AdvancedFilters = (props: Props) => {
   const arbitrators = getArbitratorsByNetwork(networkId)
   const tokens = useTokens(context)
 
-  const { currency, arbitrator, onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
+  const { arbitrator, currency, onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
 
   const allTokensOptions = [{ address: null, symbol: 'All', image: null }, ...tokens]
   const currencyOptions: Array<DropdownItemProps> = allTokensOptions.map(({ address, image, symbol }) => {
@@ -114,11 +114,11 @@ export const AdvancedFilters = (props: Props) => {
       )}
       <Column>
         <Title>Arbitrator</Title>
-        <Options 
-          dropdownPosition={DropdownPosition.right} 
-          items={arbitratorOptions}
+        <Options
           currentItem={arbitrators.findIndex(t => t.address === arbitrator)}
           dirty={true}
+          dropdownPosition={DropdownPosition.right}
+          items={arbitratorOptions}
         />
       </Column>
     </Wrapper>
