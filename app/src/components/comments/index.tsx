@@ -28,6 +28,12 @@ const ThreeBoxCustom = styled.div`
     justify-content: space-between;
     height: 48px;
   }
+
+  .input_postLoading_text {
+    .footer_text_image {
+      display: none;
+    }
+  }
 `
 
 interface Props {
