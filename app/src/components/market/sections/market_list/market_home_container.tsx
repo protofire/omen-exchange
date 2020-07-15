@@ -243,6 +243,7 @@ const MarketHomeContainer: React.FC = () => {
   const onFilterChange = useCallback((filter: any) => {
     setFilter(filter)
     setMoreMarkets(true)
+    setPageIndex(0)
     setIsFiltering(true)
 
     let route: string = ''
