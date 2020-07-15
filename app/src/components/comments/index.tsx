@@ -34,6 +34,10 @@ const ThreeBoxCustom = styled.div`
       display: none;
     }
   }
+
+  .input_postLoading {
+    left: calc(50% - 24px);
+  }
 `
 
 interface Props {
