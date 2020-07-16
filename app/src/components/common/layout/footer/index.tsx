@@ -62,6 +62,14 @@ export const Footer = () => {
         <Link href="https://dxdao.eth.link" target="_blank">
           DXdao.eth
         </Link>
+        <Break>·</Break>
+        <Link href="https://twitter.com/Omen_eth" target="_blank">
+          Twitter
+        </Link>
+        <Break>·</Break>
+        <Link href="https://t.me/omen_eth" target="_blank">
+          Telegram
+        </Link>
       </Wrapper>
     </>
   ) : null

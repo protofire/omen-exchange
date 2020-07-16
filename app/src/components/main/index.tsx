@@ -49,7 +49,14 @@ export const Main: React.FC = () => {
           {context.error && <WrongNetworkMessage />}
           {!context.error && (
             <Switch>
-              <Route component={MarketHomeContainer} exact path="/" />
+              <Route exact path="/">
+                <Redirect to="/24h-volume" />
+              </Route>
+              <Route component={MarketHomeContainer} path="/24h-volume" />
+              <Route component={MarketHomeContainer} path="/volume" />
+              <Route component={MarketHomeContainer} path="/newest" />
+              <Route component={MarketHomeContainer} path="/ending" />
+              <Route component={MarketHomeContainer} path="/liquidity" />
               <Route component={MarketWizardCreatorContainer} exact path="/create" />
               <Route component={MarketRoutes} path="/:address" />
               <Route component={RedirectToHome} />

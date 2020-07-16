@@ -196,18 +196,17 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     onUpdatePageSize,
     pageIndex,
   } = props
-  const [state, setState] = useState<MarketStates>(MarketStates.open)
-  const [category, setCategory] = useState('All')
-  const [counts, setCounts] = useState({
-    open: 0,
-  })
-  const [title, setTitle] = useState('')
-  const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(props.currentFilter.sortBy)
-  const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(props.currentFilter.sortByDirection)
-  const [showSearch, setShowSearch] = useState<boolean>(false)
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
-  const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
-  const [currency, setCurrency] = useState<Maybe<string>>(props.currentFilter.currency)
+  const [state, setState] = useState<MarketStates>(currentFilter.state)
+  const [category, setCategory] = useState(currentFilter.category)
+  const [title, setTitle] = useState(currentFilter.title)
+  const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(currentFilter.sortBy)
+  const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
+  const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
+    currentFilter.currency || currentFilter.arbitrator ? true : false,
+  )
+  const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
+  const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
 
   const filters = [
@@ -271,17 +270,17 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const sortOptions = [
     {
       title: '24h volume',
-      sortBy: 'lastActiveDayAndRunningDailyVolume',
+      sortBy: 'lastActiveDayAndScaledRunningDailyVolume',
       direction: 'desc',
     },
     {
       title: 'Total volume',
-      sortBy: 'collateralVolume',
+      sortBy: 'scaledCollateralVolume',
       direction: 'desc',
     },
     {
       title: 'Highest liquidity',
-      sortBy: 'liquidityParameter',
+      sortBy: 'scaledLiquidityParameter',
       direction: 'desc',
     },
     {
@@ -372,12 +371,18 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     <>
       <Actions>
         <MarketsDropdown
+          currentItem={
+            RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(category)) + 1 : 0
+          }
+          dirty={true}
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={categoryItems}
           showScrollbar={true}
         />
         <MarketsFilterDropdown
+          currentItem={filters.findIndex(i => i.state === state)}
+          dirty={true}
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={filterItems}
@@ -407,6 +412,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         {showSearch && <Search onChange={setTitle} value={title} />}
         {showAdvancedFilters && (
           <AdvancedFilters
+            arbitrator={arbitrator}
             currency={currency}
             onChangeArbitrator={setArbitrator}
             onChangeCurrency={setCurrency}
@@ -420,7 +426,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             markets.data.slice(0, count).map(item => {
               return <ListItem currentFilter={currentFilter} key={item.address} market={item}></ListItem>
             })}
-          {noOwnMarkets && <NoOwnMarkets>You haven&apos;t participated in or created any market yet.</NoOwnMarkets>}
+          {noOwnMarkets && <NoOwnMarkets>You have not created any market yet.</NoOwnMarkets>}
           {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
