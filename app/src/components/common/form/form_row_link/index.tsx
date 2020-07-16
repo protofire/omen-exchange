@@ -12,6 +12,15 @@ const FormRowLinkWrapper = styled.span`
   &:hover {
     text-decoration: underline;
   }
+
+  &.disabled {
+    color: ${props => props.theme.colors.textColor};
+    cursor: auto;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
 `
 
 interface Props extends HTMLAttributes<HTMLParagraphElement> {
