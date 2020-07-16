@@ -227,9 +227,13 @@ const Outcomes = (props: Props) => {
             <FormRowLink onClick={setMax}>set max</FormRowLink>
           </TitleText>
         )}
-        {uniformProbabilities && noOutcomes && (
+        {uniformProbabilities && (
           <TitleText>
-            <FormRowLink data-testid="toggle-manual-probabilities" onClick={handleIsUniformChanged}>
+            <FormRowLink
+              data-testid="toggle-manual-probabilities" 
+              onClick={noOutcomes ? handleIsUniformChanged : () => null}
+              className={noOutcomes ? '' : 'disabled'}
+            >
               set manual probability
             </FormRowLink>
           </TitleText>
