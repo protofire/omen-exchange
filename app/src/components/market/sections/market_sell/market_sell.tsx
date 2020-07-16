@@ -145,7 +145,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
-  const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals)}`
+  const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals, 5)}`
 
   const amountError =
     balanceItem.shares === null
