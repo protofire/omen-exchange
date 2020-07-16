@@ -147,7 +147,7 @@ const FundingAndFeeStep = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const resolutionDate = resolution && formatDate(resolution)
 
-  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals)
+  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals, 5)
 
   const tokensAmount = useTokens(context).length
 
