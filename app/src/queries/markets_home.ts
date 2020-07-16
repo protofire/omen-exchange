@@ -62,6 +62,19 @@ export const DEFAULT_OPTIONS = {
   sortByDirection: 'desc' as 'asc' | 'desc',
 }
 
+export const queryMyMarkets = gql`
+  query GetMyMarkets($account: String!, $first: Int!, $skip: Int!) {
+    account(id: $account) {
+      fpmmParticipations(first: $first, skip: $skip) {
+        fixedProductMarketMakers: fpmm {
+          ...marketData
+        }
+      }
+    }
+  }
+  ${MarketDataFragment}
+`
+
 type buildQueryType = MarketFilters & { whitelistedCreators: boolean; whitelistedTemplateIds: boolean }
 export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => {
   const {
@@ -74,13 +87,18 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     whitelistedCreators,
     whitelistedTemplateIds,
   } = options
+
+  if (state === MarketStates.myMarkets) {
+    return queryMyMarkets
+  }
+
   const whereClause = [
     state === MarketStates.closed ? 'answerFinalizedTimestamp_lt: $now' : '',
     state === MarketStates.open ? 'openingTimestamp_gt: $now' : '',
     state === MarketStates.pending ? 'openingTimestamp_lt: $now' : '',
     state === MarketStates.pending ? 'answerFinalizedTimestamp: null' : '',
     state === MarketStates.finalizing ? 'answerFinalizedTimestamp_gt: $now' : '',
-    state === MarketStates.myMarkets || whitelistedCreators ? 'creator_in: $accounts' : '',
+    whitelistedCreators ? 'creator_in: $accounts' : '',
     category === 'All' ? '' : 'category: $category',
     title ? 'title_contains: $title' : '',
     currency ? 'collateralToken: $currency' : '',
