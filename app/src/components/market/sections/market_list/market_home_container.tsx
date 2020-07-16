@@ -36,20 +36,10 @@ type GraphResponseCategories = {
 }
 
 const normalizeFetchedData = (data: any) => {
-  const othersMarketFetched = data && data.fixedProductMarketMakers
-  const myMarketsFetched = data && data.account && data.account.fpmmParticipations
-
-  if (myMarketsFetched) {
-    return {
-      fixedProductMarketMakers: data.account.fpmmParticipations.map((fpmm: any) => fpmm.fixedProductMarketMakers),
-    }
-  } else if (othersMarketFetched) {
-    return data
-  } else {
-    return null
+  return {
+    fixedProductMarketMakers: data.account.fpmmParticipations.map((fpmm: any) => fpmm.fixedProductMarketMakers),
   }
 }
-
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
   return data.map((graphMarketMakerDataItem: GraphMarketMakerDataItem) => {
     const outcomes = graphMarketMakerDataItem.outcomes
@@ -161,6 +151,7 @@ const MarketHomeContainer: React.FC = () => {
     currency: currencyParam,
   })
 
+  const [fetchedMarkets, setFetchedMarkets] = useState<any>(null)
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [categories, setCategories] = useState<RemoteData<CategoryDataItem[]>>(RemoteData.notAsked())
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
@@ -191,7 +182,7 @@ const MarketHomeContainer: React.FC = () => {
     ...filter,
   }
 
-  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery<any>(marketQuery, {
+  const { data, error, fetchMore, loading } = useQuery<any>(marketQuery, {
     notifyOnNetworkStatusChange: true,
     variables: marketsQueryVariables,
     // loading stuck on true when using useQuery hook , using a fetchPolicy seems to fix it
@@ -201,6 +192,26 @@ const MarketHomeContainer: React.FC = () => {
     fetchPolicy: 'network-only',
   })
 
+  const othersMarketFetched = data && data.fixedProductMarketMakers
+  const myMarketsFetched = data && data.account && data.account.fpmmParticipations
+
+  useEffect(() => {
+    if (myMarketsFetched) {
+      setFetchedMarkets(normalizeFetchedData(data))
+    } else if (othersMarketFetched) {
+      setFetchedMarkets(data)
+    } else {
+      setFetchedMarkets(null)
+    }
+  }, [data, othersMarketFetched, myMarketsFetched])
+
+  // let fetchedMarkets: any = null
+  // if (myMarketsFetched) {
+  //   fetchedMarkets = normalizeFetchedData(data)
+  // }
+  // if (othersMarketFetched) {
+  //   fetchedMarkets = data
+  // }
   const { data: fetchedCategories, error: categoriesError, loading: categoriesLoading } = useQuery<
     GraphResponseCategories
   >(queryCategories, {
@@ -228,7 +239,8 @@ const MarketHomeContainer: React.FC = () => {
     if (loading) {
       setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
     } else if (fetchedMarkets) {
-      const { fixedProductMarketMakers } = normalizeFetchedData(fetchedMarkets)
+      const { fixedProductMarketMakers } = fetchedMarkets
+      console.log('fetchedMarkets', fixedProductMarketMakers.length)
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
 
       if (fixedProductMarketMakers.length < pageSize) {
@@ -319,7 +331,7 @@ const MarketHomeContainer: React.FC = () => {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex + 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        const markets = normalizeFetchedData(fetchMoreResult)
+        const markets = myMarketsFetched ? normalizeFetchedData(fetchMoreResult) : fetchMoreResult
         setMoreMarkets(markets ? markets.fixedProductMarketMakers.length >= pageSize : false)
         setPageIndex(pageIndex + 1)
 
@@ -346,7 +358,7 @@ const MarketHomeContainer: React.FC = () => {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex - 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        const markets = normalizeFetchedData(fetchMoreResult)
+        const markets = myMarketsFetched ? normalizeFetchedData(fetchMoreResult) : fetchMoreResult
 
         setMoreMarkets(true)
         setPageIndex(pageIndex - 1)
