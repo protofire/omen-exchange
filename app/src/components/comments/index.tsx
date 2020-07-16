@@ -38,6 +38,10 @@ const ThreeBoxCustom = styled.div`
   .input_postLoading {
     left: calc(50% - 24px);
   }
+
+  .showLoggedInAs {
+    display: none;
+  }
 `
 
 interface Props {
