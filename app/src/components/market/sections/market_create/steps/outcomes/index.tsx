@@ -122,6 +122,7 @@ const Outcomes = (props: Props) => {
   const [newOutcomeName, setNewOutcomeName] = useState<string>('')
   const [newOutcomeProbability, setNewOutcomeProbability] = useState<number>(outcomeMinValue)
   const [uniformProbabilities, setIsUniform] = useState<boolean>(true)
+  const [noOutcomes, setNoOutcomes] = useState<boolean>(true)
 
   const uniform = (outcomes: Outcome[]): Outcome[] => {
     return outcomes.map(o => ({
@@ -139,11 +140,13 @@ const Outcomes = (props: Props) => {
     props.onChange(uniformProbabilities ? uniform(newOutcomes) : newOutcomes)
     setNewOutcomeName('')
     setNewOutcomeProbability(0)
+    setNoOutcomes(false)
   }
 
   const removeOutcome = (index: number) => {
     outcomes.splice(index, 1)
     props.onChange(uniformProbabilities ? uniform(outcomes) : outcomes)
+    outcomes.length === 0 ? setNoOutcomes(true) : setNoOutcomes(false)
   }
 
   const handleIsUniformChanged = () => {
@@ -226,7 +229,11 @@ const Outcomes = (props: Props) => {
         )}
         {uniformProbabilities && (
           <TitleText>
-            <FormRowLink data-testid="toggle-manual-probabilities" onClick={handleIsUniformChanged}>
+            <FormRowLink
+              data-testid="toggle-manual-probabilities" 
+              onClick={noOutcomes ? handleIsUniformChanged : () => null}
+              className={noOutcomes ? '' : 'disabled'}
+            >
               set manual probability
             </FormRowLink>
           </TitleText>
