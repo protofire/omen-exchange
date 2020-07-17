@@ -156,7 +156,7 @@ const MarketHomeContainer: React.FC = () => {
     currency: currencyParam,
   })
 
-  const [fetchedMarkets, setFetchedMarkets] = useState<any>(null)
+  const [fetchedMarkets, setFetchedMarkets] = useState<Maybe<GraphResponseMarketsGeneric>>(null)
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [categories, setCategories] = useState<RemoteData<CategoryDataItem[]>>(RemoteData.notAsked())
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
