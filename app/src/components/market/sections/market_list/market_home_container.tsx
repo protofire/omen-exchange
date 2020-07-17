@@ -29,7 +29,6 @@ type GraphResponseMyMarkets = { account: { fpmmParticipants: GraphMarketMakerDat
 type GraphResponseMarketsGeneric = {
   fixedProductMarketMakers: GraphMarketMakerDataItem[]
 }
-type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMyMarkets
 
 type GraphResponseCategories = {
   categories: CategoryDataItem[]
@@ -190,28 +189,21 @@ const MarketHomeContainer: React.FC = () => {
     // it may make sense to use a ‘network-only’ fetch policy.
     // This policy favors showing the most up-to-date information over quick responses.
     fetchPolicy: 'network-only',
+    onCompleted: (data: any) => {
+      console.log('on completed', data)
+      const othersMarketFetched = data && data.fixedProductMarketMakers
+      const myMarketsFetched = data && data.account && data.account.fpmmParticipations
+
+      if (myMarketsFetched) {
+        setFetchedMarkets(normalizeFetchedData(data))
+      } else if (othersMarketFetched) {
+        setFetchedMarkets(data)
+      } else {
+        setFetchedMarkets(null)
+      }
+    },
   })
 
-  const othersMarketFetched = data && data.fixedProductMarketMakers
-  const myMarketsFetched = data && data.account && data.account.fpmmParticipations
-
-  useEffect(() => {
-    if (myMarketsFetched) {
-      setFetchedMarkets(normalizeFetchedData(data))
-    } else if (othersMarketFetched) {
-      setFetchedMarkets(data)
-    } else {
-      setFetchedMarkets(null)
-    }
-  }, [data, othersMarketFetched, myMarketsFetched])
-
-  // let fetchedMarkets: any = null
-  // if (myMarketsFetched) {
-  //   fetchedMarkets = normalizeFetchedData(data)
-  // }
-  // if (othersMarketFetched) {
-  //   fetchedMarkets = data
-  // }
   const { data: fetchedCategories, error: categoriesError, loading: categoriesLoading } = useQuery<
     GraphResponseCategories
   >(queryCategories, {
@@ -240,7 +232,8 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
     } else if (fetchedMarkets) {
       const { fixedProductMarketMakers } = fetchedMarkets
-      console.log('fetchedMarkets', fixedProductMarketMakers.length)
+
+      console.log(fixedProductMarketMakers)
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
 
       if (fixedProductMarketMakers.length < pageSize) {
@@ -326,12 +319,16 @@ const MarketHomeContainer: React.FC = () => {
       return
     }
 
+    console.log(`Skip`, `"${fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex + 1)}"`)
     fetchMore({
       variables: {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex + 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        const markets = myMarketsFetched ? normalizeFetchedData(fetchMoreResult) : fetchMoreResult
+        const markets =
+          fetchMoreResult && fetchMoreResult.account && fetchMoreResult.account.fpmmParticipations
+            ? normalizeFetchedData(fetchMoreResult)
+            : fetchMoreResult
         setMoreMarkets(markets ? markets.fixedProductMarketMakers.length >= pageSize : false)
         setPageIndex(pageIndex + 1)
 
@@ -358,7 +355,7 @@ const MarketHomeContainer: React.FC = () => {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex - 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        const markets = myMarketsFetched ? normalizeFetchedData(fetchMoreResult) : fetchMoreResult
+        const markets = fetchMoreResult
 
         setMoreMarkets(true)
         setPageIndex(pageIndex - 1)
