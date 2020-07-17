@@ -383,6 +383,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={filterItems}
+          showScrollbar={true}
         />
       </Actions>
       <ListCard>

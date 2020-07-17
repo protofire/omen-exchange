@@ -71,6 +71,7 @@ const MarketHomeContainer: React.FC = () => {
   const location = useLocation()
 
   const sortRoute = location.pathname.split('/')[1]
+  let sortDirection: 'desc' | 'asc' = 'desc'
 
   const currencyFilter = location.pathname.includes('currency') ? true : false
   let currencyRoute = location.pathname.split('/currency/')[1]
@@ -101,6 +102,7 @@ const MarketHomeContainer: React.FC = () => {
     sortParam = 'creationTimestamp'
   } else if (sortRoute === 'ending') {
     sortParam = 'openingTimestamp'
+    sortDirection = 'asc'
   } else if (sortRoute === 'liquidity') {
     sortParam = 'scaledLiquidityParameter'
   }
@@ -148,7 +150,7 @@ const MarketHomeContainer: React.FC = () => {
     category: categoryParam,
     title: searchParam,
     sortBy: sortParam,
-    sortByDirection: 'desc',
+    sortByDirection: sortDirection,
     arbitrator: arbitratorParam,
     templateId: null,
     currency: currencyParam,

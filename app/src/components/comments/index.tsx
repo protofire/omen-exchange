@@ -28,6 +28,20 @@ const ThreeBoxCustom = styled.div`
     justify-content: space-between;
     height: 48px;
   }
+
+  .input_postLoading_text {
+    .footer_text_image {
+      display: none;
+    }
+  }
+
+  .input_postLoading {
+    left: calc(50% - 24px);
+  }
+
+  .showLoggedInAs {
+    display: none;
+  }
 `
 
 interface Props {
