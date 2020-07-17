@@ -35,8 +35,14 @@ type GraphResponseCategories = {
 }
 
 const normalizeFetchedData = (data: any) => {
-  return {
-    fixedProductMarketMakers: data.account.fpmmParticipations.map((fpmm: any) => fpmm.fixedProductMarketMakers),
+  const myMarketsFetched = data && data.account && data.account.fpmmParticipations
+
+  if (myMarketsFetched) {
+    return {
+      fixedProductMarketMakers: data.account.fpmmParticipations.map((fpmm: any) => fpmm.fixedProductMarketMakers),
+    }
+  } else {
+    return data
   }
 }
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
@@ -181,7 +187,7 @@ const MarketHomeContainer: React.FC = () => {
     ...filter,
   }
 
-  const { data, error, fetchMore, loading } = useQuery<any>(marketQuery, {
+  const { error, fetchMore, loading } = useQuery<any>(marketQuery, {
     notifyOnNetworkStatusChange: true,
     variables: marketsQueryVariables,
     // loading stuck on true when using useQuery hook , using a fetchPolicy seems to fix it
@@ -190,17 +196,8 @@ const MarketHomeContainer: React.FC = () => {
     // This policy favors showing the most up-to-date information over quick responses.
     fetchPolicy: 'network-only',
     onCompleted: (data: any) => {
-      console.log('on completed', data)
-      const othersMarketFetched = data && data.fixedProductMarketMakers
-      const myMarketsFetched = data && data.account && data.account.fpmmParticipations
-
-      if (myMarketsFetched) {
-        setFetchedMarkets(normalizeFetchedData(data))
-      } else if (othersMarketFetched) {
-        setFetchedMarkets(data)
-      } else {
-        setFetchedMarkets(null)
-      }
+      console.log('completed callback')
+      setFetchedMarkets(normalizeFetchedData(data))
     },
   })
 
@@ -233,7 +230,6 @@ const MarketHomeContainer: React.FC = () => {
     } else if (fetchedMarkets) {
       const { fixedProductMarketMakers } = fetchedMarkets
 
-      console.log(fixedProductMarketMakers)
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
 
       if (fixedProductMarketMakers.length < pageSize) {
@@ -319,28 +315,25 @@ const MarketHomeContainer: React.FC = () => {
       return
     }
 
-    console.log(`Skip`, `"${fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex + 1)}"`)
     fetchMore({
       variables: {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex + 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        const markets =
-          fetchMoreResult && fetchMoreResult.account && fetchMoreResult.account.fpmmParticipations
-            ? normalizeFetchedData(fetchMoreResult)
-            : fetchMoreResult
-        setMoreMarkets(markets ? markets.fixedProductMarketMakers.length >= pageSize : false)
+        console.log('update query callback')
+        const normalizedMarkets = normalizeFetchedData(fetchMoreResult)
+
+        setMoreMarkets(normalizedMarkets ? normalizedMarkets.fixedProductMarketMakers.length >= pageSize : false)
         setPageIndex(pageIndex + 1)
 
-        if (!markets) {
+        if (!normalizedMarkets) {
+          console.log('This is for debug', prev, fetchedMarkets)
           return normalizeFetchedData(prev)
         }
 
-        return {
-          ...{
-            fixedProductMarketMakers: [...markets.fixedProductMarketMakers],
-          },
-        }
+        setFetchedMarkets({
+          fixedProductMarketMakers: [...normalizedMarkets.fixedProductMarketMakers],
+        })
       },
     })
   }
@@ -355,20 +348,20 @@ const MarketHomeContainer: React.FC = () => {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex - 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        const markets = fetchMoreResult
+        console.log('update query callback')
+        const normalizedMarkets = normalizeFetchedData(fetchMoreResult)
 
         setMoreMarkets(true)
         setPageIndex(pageIndex - 1)
 
-        if (!markets) {
+        if (!normalizedMarkets) {
+          console.log('This is for debug', prev, fetchedMarkets)
           return normalizeFetchedData(prev)
         }
 
-        return {
-          ...{
-            fixedProductMarketMakers: [...markets.fixedProductMarketMakers],
-          },
-        }
+        setFetchedMarkets({
+          fixedProductMarketMakers: [...normalizedMarkets.fixedProductMarketMakers],
+        })
       },
     })
   }
