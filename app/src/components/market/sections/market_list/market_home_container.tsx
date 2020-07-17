@@ -14,6 +14,7 @@ import {
   MarketMakerDataItem,
   buildQueryMarkets,
   queryCategories,
+  queryMyMarkets,
 } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -29,6 +30,8 @@ type GraphResponseMyMarkets = { account: { fpmmParticipants: GraphMarketMakerDat
 type GraphResponseMarketsGeneric = {
   fixedProductMarketMakers: GraphMarketMakerDataItem[]
 }
+
+type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMyMarkets
 
 type GraphResponseCategories = {
   categories: CategoryDataItem[]
@@ -175,6 +178,7 @@ const MarketHomeContainer: React.FC = () => {
   })
 
   const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)
+  const fetchMyMarkets = filter.state === MarketStates.myMarkets
 
   const marketsQueryVariables = {
     first: pageSize,
@@ -187,7 +191,7 @@ const MarketHomeContainer: React.FC = () => {
     ...filter,
   }
 
-  const { error, fetchMore, loading } = useQuery<any>(marketQuery, {
+  const { error, fetchMore, loading } = useQuery<GraphResponseMarkets>(fetchMyMarkets ? queryMyMarkets : marketQuery, {
     notifyOnNetworkStatusChange: true,
     variables: marketsQueryVariables,
     // loading stuck on true when using useQuery hook , using a fetchPolicy seems to fix it
@@ -195,8 +199,7 @@ const MarketHomeContainer: React.FC = () => {
     // it may make sense to use a ‘network-only’ fetch policy.
     // This policy favors showing the most up-to-date information over quick responses.
     fetchPolicy: 'network-only',
-    onCompleted: (data: any) => {
-      console.log('completed callback')
+    onCompleted: data => {
       setFetchedMarkets(normalizeFetchedData(data))
     },
   })
@@ -320,14 +323,12 @@ const MarketHomeContainer: React.FC = () => {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex + 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        console.log('update query callback')
         const normalizedMarkets = normalizeFetchedData(fetchMoreResult)
 
         setMoreMarkets(normalizedMarkets ? normalizedMarkets.fixedProductMarketMakers.length >= pageSize : false)
         setPageIndex(pageIndex + 1)
 
         if (!normalizedMarkets) {
-          console.log('This is for debug', prev, fetchedMarkets)
           return normalizeFetchedData(prev)
         }
 
@@ -348,14 +349,12 @@ const MarketHomeContainer: React.FC = () => {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex - 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        console.log('update query callback')
         const normalizedMarkets = normalizeFetchedData(fetchMoreResult)
 
         setMoreMarkets(true)
         setPageIndex(pageIndex - 1)
 
         if (!normalizedMarkets) {
-          console.log('This is for debug', prev, fetchedMarkets)
           return normalizeFetchedData(prev)
         }
 

@@ -88,10 +88,6 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     whitelistedTemplateIds,
   } = options
 
-  if (state === MarketStates.myMarkets) {
-    return queryMyMarkets
-  }
-
   const whereClause = [
     state === MarketStates.closed ? 'answerFinalizedTimestamp_lt: $now' : '',
     state === MarketStates.open ? 'openingTimestamp_gt: $now' : '',
