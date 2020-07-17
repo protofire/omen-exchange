@@ -212,7 +212,7 @@ const FundingAndFeeStep = (props: Props) => {
           </OutcomesTable>
         </OutcomesTableWrapper>
         <Grid>
-          <TitleValueVertical title={'Resolution Date'} value={resolutionDate} />
+          <TitleValueVertical title={'Resolution Date'} value={resolutionDate} date={resolution instanceof Date ? resolution : undefined} tooltip={true} />
           <TitleValueVertical title={'Category'} value={category} />
           <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
         </Grid>
