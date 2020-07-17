@@ -31,7 +31,7 @@ test('Query markets', () => {
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'creator_in: $accounts, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee',
+    'category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -42,9 +42,7 @@ test('Markets with template_id', () => {
     state: MarketStates.myMarkets,
     templateId: '2',
   })
-  const expectedQuery = getExpectedQuery(
-    'creator_in: $accounts, arbitrator_in: $knownArbitrators, templateId: $templateId, fee_lte: $fee',
-  )
+  const expectedQuery = getExpectedQuery('arbitrator_in: $knownArbitrators, templateId: $templateId, fee_lte: $fee')
   expect(query).toBe(expectedQuery)
 })
 

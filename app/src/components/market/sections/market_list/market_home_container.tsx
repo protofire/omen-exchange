@@ -26,7 +26,8 @@ import { MarketHome } from './market_home'
 
 const logger = getLogger('MarketHomeContainer')
 
-type GraphResponseMyMarkets = { account: { fpmmParticipants: GraphMarketMakerDataItem[] } }
+type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
+type GraphResponseMyMarkets = { account: { fpmmParticipations: Participations[] } }
 type GraphResponseMarketsGeneric = {
   fixedProductMarketMakers: GraphMarketMakerDataItem[]
 }
@@ -37,15 +38,9 @@ type GraphResponseCategories = {
   categories: CategoryDataItem[]
 }
 
-const normalizeFetchedData = (data: any) => {
-  const myMarketsFetched = data && data.account && data.account.fpmmParticipations
-
-  if (myMarketsFetched) {
-    return {
-      fixedProductMarketMakers: data.account.fpmmParticipations.map((fpmm: any) => fpmm.fixedProductMarketMakers),
-    }
-  } else {
-    return data
+const normalizeFetchedData = (data: GraphResponseMyMarkets): GraphResponseMarketsGeneric => {
+  return {
+    fixedProductMarketMakers: data.account.fpmmParticipations.map(fpmm => fpmm.fixedProductMarketMakers),
   }
 }
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
@@ -199,8 +194,13 @@ const MarketHomeContainer: React.FC = () => {
     // it may make sense to use a ‘network-only’ fetch policy.
     // This policy favors showing the most up-to-date information over quick responses.
     fetchPolicy: 'network-only',
-    onCompleted: data => {
-      setFetchedMarkets(normalizeFetchedData(data))
+    onCompleted: (data: GraphResponseMarkets) => {
+      const markets = fetchMyMarkets
+        ? normalizeFetchedData(data as GraphResponseMyMarkets)
+        : (data as GraphResponseMarketsGeneric)
+
+      setMoreMarkets(markets ? markets.fixedProductMarketMakers.length >= pageSize : false)
+      setFetchedMarkets(markets)
     },
   })
 
@@ -318,23 +318,14 @@ const MarketHomeContainer: React.FC = () => {
       return
     }
 
+    setPageIndex(pageIndex + 1)
+
     fetchMore({
       variables: {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex + 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        const normalizedMarkets = normalizeFetchedData(fetchMoreResult)
-
-        setMoreMarkets(normalizedMarkets ? normalizedMarkets.fixedProductMarketMakers.length >= pageSize : false)
-        setPageIndex(pageIndex + 1)
-
-        if (!normalizedMarkets) {
-          return normalizeFetchedData(prev)
-        }
-
-        setFetchedMarkets({
-          fixedProductMarketMakers: [...normalizedMarkets.fixedProductMarketMakers],
-        })
+        return fetchMoreResult || prev
       },
     })
   }
@@ -344,23 +335,14 @@ const MarketHomeContainer: React.FC = () => {
       return
     }
 
+    setPageIndex(pageIndex - 1)
+
     fetchMore({
       variables: {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex - 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        const normalizedMarkets = normalizeFetchedData(fetchMoreResult)
-
-        setMoreMarkets(true)
-        setPageIndex(pageIndex - 1)
-
-        if (!normalizedMarkets) {
-          return normalizeFetchedData(prev)
-        }
-
-        setFetchedMarkets({
-          fixedProductMarketMakers: [...normalizedMarkets.fixedProductMarketMakers],
-        })
+        return fetchMoreResult || prev
       },
     })
   }
