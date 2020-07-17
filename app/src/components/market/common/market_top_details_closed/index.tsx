@@ -2,11 +2,12 @@ import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
 
 import { LINK_FAQ } from '../../../../common/constants'
-import { formatBigNumber, formatDate, getMarketTitles } from '../../../../util/tools'
+import { formatBigNumber, getMarketTitles } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper, TitleValue } from '../../../common'
 import { Breaker, SubsectionTitleActionWrapper } from '../common_styled'
 import { DisplayArbitrator } from '../display_arbitrator'
+import { DisplayResolution } from '../display_resolution'
 import { HistoryChartContainer } from '../history_chart'
 import { MarketTitle } from '../market_title'
 
@@ -28,7 +29,6 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     collateralVolume,
     question,
   } = marketMakerData
-  const resolutionFormat = question.resolution ? formatDate(question.resolution) : ''
   const totalVolumeFormat = collateralVolume
     ? `${formatBigNumber(collateralVolume, collateralToken.decimals)} ${collateralToken.symbol}`
     : '-'
@@ -72,7 +72,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
       </SubsectionTitleWrapper>
       <GridTwoColumns>
         <TitleValue title={'Category'} value={question.category} />
-        <TitleValue title={'Resolution Date'} value={resolutionFormat} />
+        <DisplayResolution title={'Resolution Date'} value={question.resolution} questionId={question.id} />
         <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
         <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
       </GridTwoColumns>
