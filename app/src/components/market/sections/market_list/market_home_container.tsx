@@ -14,6 +14,7 @@ import {
   MarketMakerDataItem,
   buildQueryMarkets,
   queryCategories,
+  queryMyMarkets,
 } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -25,14 +26,25 @@ import { MarketHome } from './market_home'
 
 const logger = getLogger('MarketHomeContainer')
 
-type GraphResponseMarkets = {
+type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
+type GraphResponseMyMarkets = { account: { fpmmParticipations: Participations[] } }
+type GraphResponseMarketsGeneric = {
   fixedProductMarketMakers: GraphMarketMakerDataItem[]
 }
+
+type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMyMarkets
 
 type GraphResponseCategories = {
   categories: CategoryDataItem[]
 }
 
+const normalizeFetchedData = (data: GraphResponseMyMarkets): GraphResponseMarketsGeneric => {
+  return {
+    fixedProductMarketMakers: data.account
+      ? data.account.fpmmParticipations.map(fpmm => fpmm.fixedProductMarketMakers)
+      : [],
+  }
+}
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
   return data.map((graphMarketMakerDataItem: GraphMarketMakerDataItem) => {
     const outcomes = graphMarketMakerDataItem.outcomes
@@ -57,6 +69,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
 const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
   const history = useHistory()
+
   const location = useLocation()
 
   const sortRoute = location.pathname.split('/')[1]
@@ -145,6 +158,7 @@ const MarketHomeContainer: React.FC = () => {
     currency: currencyParam,
   })
 
+  const [fetchedMarkets, setFetchedMarkets] = useState<Maybe<GraphResponseMarketsGeneric>>(null)
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [categories, setCategories] = useState<RemoteData<CategoryDataItem[]>>(RemoteData.notAsked())
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
@@ -163,18 +177,20 @@ const MarketHomeContainer: React.FC = () => {
   })
 
   const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)
+  const fetchMyMarkets = filter.state === MarketStates.myMarkets
 
   const marketsQueryVariables = {
     first: pageSize,
     skip: 0,
     accounts: cpkAddress ? [cpkAddress] : null,
+    account: cpkAddress && cpkAddress.toLowerCase(),
     fee: feeBN.toString(),
     now: +now,
     knownArbitrators,
     ...filter,
   }
 
-  const { data: fetchedMarkets, error, fetchMore, loading } = useQuery<GraphResponseMarkets>(marketQuery, {
+  const { error, fetchMore, loading } = useQuery<GraphResponseMarkets>(fetchMyMarkets ? queryMyMarkets : marketQuery, {
     notifyOnNetworkStatusChange: true,
     variables: marketsQueryVariables,
     // loading stuck on true when using useQuery hook , using a fetchPolicy seems to fix it
@@ -182,6 +198,13 @@ const MarketHomeContainer: React.FC = () => {
     // it may make sense to use a ‘network-only’ fetch policy.
     // This policy favors showing the most up-to-date information over quick responses.
     fetchPolicy: 'network-only',
+    onCompleted: (data: GraphResponseMarkets) => {
+      const markets = fetchMyMarkets
+        ? normalizeFetchedData(data as GraphResponseMyMarkets)
+        : (data as GraphResponseMarketsGeneric)
+
+      setFetchedMarkets(markets)
+    },
   })
 
   const { data: fetchedCategories, error: categoriesError, loading: categoriesLoading } = useQuery<
@@ -212,10 +235,13 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
     } else if (fetchedMarkets) {
       const { fixedProductMarketMakers } = fetchedMarkets
+
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
 
       if (fixedProductMarketMakers.length < pageSize) {
         setMoreMarkets(false)
+      } else {
+        setMoreMarkets(true)
       }
 
       setIsFiltering(false)
@@ -223,7 +249,7 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(RemoteData.failure(error))
       setIsFiltering(false)
     }
-  }, [fetchedMarkets, loading, error, context.networkId, pageSize])
+  }, [fetchedMarkets, loading, error, context.networkId, pageSize, pageIndex])
 
   useEffect(() => {
     if (categoriesLoading) {
@@ -297,23 +323,14 @@ const MarketHomeContainer: React.FC = () => {
       return
     }
 
+    setPageIndex(pageIndex + 1)
+
     fetchMore({
       variables: {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex + 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        setMoreMarkets(fetchMoreResult ? fetchMoreResult.fixedProductMarketMakers.length >= pageSize : false)
-        setPageIndex(pageIndex + 1)
-
-        if (!fetchMoreResult) {
-          return prev
-        }
-
-        return {
-          ...{
-            fixedProductMarketMakers: [...fetchMoreResult.fixedProductMarketMakers],
-          },
-        }
+        return fetchMoreResult || prev
       },
     })
   }
@@ -323,29 +340,21 @@ const MarketHomeContainer: React.FC = () => {
       return
     }
 
+    setPageIndex(pageIndex - 1)
+
     fetchMore({
       variables: {
         skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex - 1),
       },
       updateQuery: (prev: any, { fetchMoreResult }) => {
-        setPageIndex(pageIndex - 1)
-        setMoreMarkets(true)
-
-        if (!fetchMoreResult) {
-          return prev
-        }
-
-        return {
-          ...{
-            fixedProductMarketMakers: [...fetchMoreResult.fixedProductMarketMakers],
-          },
-        }
+        return fetchMoreResult || prev
       },
     })
   }
 
   const updatePageSize = (size: number): void => {
     setPageSize(size)
+    setPageIndex(0)
   }
 
   return (
@@ -355,6 +364,7 @@ const MarketHomeContainer: React.FC = () => {
         context={context}
         count={fetchedMarkets ? fetchedMarkets.fixedProductMarketMakers.length : 0}
         currentFilter={filter}
+        fetchMyMarkets={fetchMyMarkets}
         isFiltering={isFiltering}
         markets={markets}
         moreMarkets={moreMarkets}
