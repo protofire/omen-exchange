@@ -36,7 +36,7 @@ const Circle = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: 4px;
+  margin-left: 8px;
   border-radius: 50%;
   border: 1px solid ${props => props.theme.colors.tertiary};
   transition: border-color 0.15s linear;
