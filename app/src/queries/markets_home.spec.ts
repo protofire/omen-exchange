@@ -19,7 +19,7 @@ const getExpectedQuery = (whereClause: string) => {
 test('Query markets with default options', () => {
   const query = buildQueryMarkets(DEFAULT_OPTIONS)
   const expectedQuery = getExpectedQuery(
-    'openingTimestamp_gt: $now, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee',
+    'openingTimestamp_gt: $now, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee, timeout_gte: 86400',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -31,7 +31,7 @@ test('Query markets', () => {
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'creator_in: $accounts, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee',
+    'creator_in: $accounts, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee, timeout_gte: 86400',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -43,7 +43,7 @@ test('Markets with template_id', () => {
     templateId: '2',
   })
   const expectedQuery = getExpectedQuery(
-    'creator_in: $accounts, arbitrator_in: $knownArbitrators, templateId: $templateId, fee_lte: $fee',
+    'creator_in: $accounts, arbitrator_in: $knownArbitrators, templateId: $templateId, fee_lte: $fee, timeout_gte: 86400',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -59,7 +59,7 @@ test('Markets closed with title and arbitrator', () => {
     arbitrator: 'arbitratorTest',
   })
   const expectedQuery = getExpectedQuery(
-    'answerFinalizedTimestamp_lt: $now, title_contains: $title, arbitrator: $arbitrator, templateId: $templateId, fee_lte: $fee',
+    'answerFinalizedTimestamp_lt: $now, title_contains: $title, arbitrator: $arbitrator, templateId: $templateId, fee_lte: $fee, timeout_gte: 86400',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -71,7 +71,7 @@ test('Query pending markets', () => {
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'openingTimestamp_lt: $now, answerFinalizedTimestamp: null, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee',
+    'openingTimestamp_lt: $now, answerFinalizedTimestamp: null, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee, timeout_gte: 86400',
   )
   expect(query).toBe(expectedQuery)
 })
