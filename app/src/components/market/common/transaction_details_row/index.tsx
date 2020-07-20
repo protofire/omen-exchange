@@ -1,6 +1,8 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
+import { IconInfo } from '../../../common/tooltip/img/IconInfo' 
+
 export enum ValueStates {
   error,
   important,
@@ -26,6 +28,30 @@ const Title = styled.h4`
   font-weight: 400;
   margin: 0;
   opacity: 0.9;
+  display: flex;
+  align-items: center;
+`
+
+const Circle = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 8px;
+  border-radius: 50%;
+  border: 1px solid ${props => props.theme.colors.tertiary};
+  transition: border-color 0.15s linear;
+
+  path {
+    transition: fill 0.15s linear;
+    fill: ${props => props.theme.colors.textColorLightish}
+  }
+
+  &:hover {
+    border-color: ${props => props.theme.colors.tertiaryDark};
+    path {
+      fill: ${props => props.theme.colors.textColorDark};
+    }
+  }
 `
 
 const Value = styled.p<{ state: ValueStates; emphasizeValue?: boolean }>`
@@ -43,17 +69,34 @@ const Value = styled.p<{ state: ValueStates; emphasizeValue?: boolean }>`
 interface Props extends DOMAttributes<HTMLDivElement> {
   emphasizeValue?: boolean
   state?: ValueStates
+  tooltip?: string
   title: string
   value: any
 }
 
 export const TransactionDetailsRow: React.FC<Props> = props => {
-  const { emphasizeValue = false, state = ValueStates.normal, title, value, ...restProps } = props
+  const { emphasizeValue = false, state = ValueStates.normal, title, value, tooltip, ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
-      <Title>{title}</Title>
-      <Value emphasizeValue={emphasizeValue} state={state}>
+      <Title>
+        {title}{tooltip ? 
+          <Circle
+            data-delay-hide={tooltip ? "500" : ''}
+            data-effect={tooltip ? "solid" : ''}
+            data-for={tooltip ? "walletBalanceTooltip" : ''}
+            data-multiline={tooltip ? "true" : ''}
+            data-tip={tooltip ? tooltip : null} 
+          >
+            <IconInfo /> 
+          </Circle>
+          
+          : null}
+      </Title>
+      <Value 
+        emphasizeValue={emphasizeValue} 
+        state={state}
+      >
         {value}
       </Value>
     </Wrapper>
