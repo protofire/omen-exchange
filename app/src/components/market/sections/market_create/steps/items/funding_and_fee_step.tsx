@@ -120,6 +120,22 @@ const ButtonCreate = styled(Button)`
   font-weight: 500;
 `
 
+const CreateCardBottomRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const CustomFeeToggle = styled.p`
+  color: ${props => props.theme.colors.hyperlink};
+  cursor: pointer;
+  margin-top: 0;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+`
+
 interface Props {
   back: () => void
   submit: () => void
@@ -136,6 +152,7 @@ interface Props {
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
+  setFee: React.Dispatch<React.SetStateAction<number>>
 }
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
@@ -164,6 +181,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const resolutionDate = resolution && formatDate(resolution)
 
   const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals, 5)
+
+  const [customFee, setCustomFee] = useState(false)
 
   const tokensAmount = useTokens(context).length
 
@@ -206,6 +225,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleCollateralChange(token)
     setAllowanceFinished(false)
   }
+
+  const toggleCustomFee = () => setCustomFee(!customFee)
 
   return (
     <>
@@ -256,7 +277,10 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         </Grid>
       </CreateCardTop>
       <CreateCardBottom>
-        <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
+        <CreateCardBottomRow>
+          <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
+          <CustomFeeToggle onClick={toggleCustomFee}>set custom trading fee</CustomFeeToggle>
+        </CreateCardBottomRow>
         <WarningMessage
           additionalDescription={''}
           description={

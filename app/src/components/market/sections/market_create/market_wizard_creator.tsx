@@ -27,6 +27,8 @@ export const MarketWizardCreator = (props: Props) => {
   const defaultCollateral = getDefaultToken(networkId)
   const defaultArbitrator = getDefaultArbitrator(networkId)
 
+  const [spread, setSpread] = useState<number>(MARKET_FEE)
+
   const marketDataDefault: MarketData = {
     arbitrator: defaultArbitrator,
     arbitratorsCustom: [],
@@ -38,7 +40,7 @@ export const MarketWizardCreator = (props: Props) => {
     outcomes: [],
     question: '',
     resolution: null,
-    spread: MARKET_FEE,
+    spread: spread,
   }
 
   const [currentStep, setCurrentStep] = useState(1)
@@ -215,6 +217,7 @@ export const MarketWizardCreator = (props: Props) => {
             marketCreationStatus={marketCreationStatus}
             submit={() => submit()}
             values={marketData}
+            setFee={setSpread}
           />
         )
       case 1:
