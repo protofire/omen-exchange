@@ -202,6 +202,11 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     setAllowanceFinished(true)
   }
 
+  const onCollateralChange = (token: Token) => {
+    handleCollateralChange(token)
+    setAllowanceFinished(false)
+  }
+
   return (
     <>
       <CreateCardTop>
@@ -261,7 +266,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             <CurrencySelector
               context={context}
               disabled={false}
-              onSelect={handleCollateralChange}
+              onSelect={(token) => onCollateralChange(token)}
               selectedCurrency={collateral}
             />
           </CurrenciesWrapper>
