@@ -91,7 +91,7 @@ const Wrapper = (props: Props) => {
   const openQuestionMessage = (
     <MessageWrapper>
       <Title>The question is being resolved.</Title>
-      <Text>This can take up to 24h. You will be able to redeem your winnings as soon as the market is resolved.</Text>
+      <Text>You will be able to redeem your winnings as soon as the market is resolved.</Text>
     </MessageWrapper>
   )
 
