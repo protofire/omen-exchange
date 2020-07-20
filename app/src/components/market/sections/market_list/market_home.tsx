@@ -56,11 +56,12 @@ const FiltersWrapper = styled.div`
   }
 `
 
-const FiltersControls = styled.div`
+const FiltersControls = styled.div<{ disabled?: boolean }>`
   align-items: center;
   display: flex;
   margin-left: auto;
   margin-right: auto;
+  pointer-events: ${props => (props.disabled ? 'none' : 'initial')};
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 0;
@@ -393,23 +394,22 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <TopContents>
           <FiltersWrapper>
             <SectionTitleMarket title={'Markets'} />
-            {!fetchMyMarkets && (
-              <FiltersControls>
-                <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
-                  <IconSearch />
-                </ButtonCircleStyled>
-                <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
-                  <IconFilter />
-                </ButtonCircleStyled>
-                <Dropdown
-                  currentItem={sortOptions.findIndex(i => i.sortBy === sortBy)}
-                  dirty={true}
-                  dropdownPosition={DropdownPosition.right}
-                  items={sortItems}
-                  placeholder={<SecondaryText>Sort By</SecondaryText>}
-                />
-              </FiltersControls>
-            )}
+            <FiltersControls disabled={fetchMyMarkets}>
+              <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
+                <IconSearch />
+              </ButtonCircleStyled>
+              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
+                <IconFilter />
+              </ButtonCircleStyled>
+              <Dropdown
+                currentItem={sortOptions.findIndex(i => i.sortBy === sortBy)}
+                dirty={true}
+                disabled={fetchMyMarkets}
+                dropdownPosition={DropdownPosition.right}
+                items={sortItems}
+                placeholder={<SecondaryText>Sort By</SecondaryText>}
+              />
+            </FiltersControls>
           </FiltersWrapper>
         </TopContents>
         {showSearch && <Search onChange={setTitle} value={title} />}
