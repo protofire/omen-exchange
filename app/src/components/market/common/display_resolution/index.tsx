@@ -42,7 +42,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const DisplayResolution: React.FC<Props> = (props: Props) => {
-  const { title, value, questionId, ...restProps } = props
+  const { questionId, title, value, ...restProps } = props
 
   const now = moment()
   const localResolution = moment(value).local()
@@ -68,8 +68,8 @@ export const DisplayResolution: React.FC<Props> = (props: Props) => {
         data-for="walletBalanceTooltip"
         data-multiline="true"
         data-tip={localResolution.format(formatting) + '<br />' + endsMessage}
-        href={realitioUrl} 
-        rel="noopener noreferrer" 
+        href={realitioUrl}
+        rel="noopener noreferrer"
         target="_blank"
       >
         {formatDate(value)}
