@@ -212,13 +212,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <GridTransactionDetails>
           <div>
             <WalletBalance
-              data-class="customTooltip"
-              data-delay-hide="500"
-              data-effect="solid"
-              data-for="walletBalanceTooltip"
-              data-multiline={true}
-              data-place="right"
-              data-tip={`Spend your total ${collateral.symbol} balance on the selected outcome.`}
               onClick={() => {
                 setAmount(collateralBalance)
                 setAmountToDisplay(currentBalance)
