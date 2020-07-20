@@ -88,6 +88,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     whitelistedTemplateIds,
   } = options
 
+  const MIN_TIMEOUT = 86400
   const whereClause = [
     state === MarketStates.closed ? 'answerFinalizedTimestamp_lt: $now' : '',
     state === MarketStates.open ? 'openingTimestamp_gt: $now' : '',
@@ -101,6 +102,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     arbitrator ? 'arbitrator: $arbitrator' : 'arbitrator_in: $knownArbitrators',
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee_lte: $fee',
+    `timeout_gte: ${MIN_TIMEOUT}`,
   ]
     .filter(s => s.length)
     .join(',')
