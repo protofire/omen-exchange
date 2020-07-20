@@ -214,8 +214,8 @@ const Outcomes = (props: Props) => {
 
   const onOutcomeNameChange = (value: string) => {
     setNewOutcomeName(value)
-    const val = value.toLowerCase();
-    outcomes.some(i => val.indexOf(i.name.toLowerCase()) >= 0) ? setDuplicateOutcome(true) : setDuplicateOutcome(false)
+    const isDuplicated = outcomes.map(o => o.name.toLowerCase()).includes(value.toLowerCase())
+    setDuplicateOutcome(isDuplicated)
   }
 
   return (
