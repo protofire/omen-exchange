@@ -169,6 +169,7 @@ interface Props {
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
+  resetTradingFee: () => void
 }
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
@@ -179,7 +180,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { account, library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
-  const { back, handleChange, handleCollateralChange, marketCreationStatus, submit, values } = props
+  const { back, handleChange, handleCollateralChange, resetTradingFee, marketCreationStatus, submit, values } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -241,8 +242,11 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleCollateralChange(token)
     setAllowanceFinished(false)
   }
-
-  const toggleCustomFee = () => setCustomFee(!customFee)
+  
+  const toggleCustomFee = () => {
+    if (customFee) resetTradingFee()
+    setCustomFee(!customFee)
+  }
 
   return (
     <>
