@@ -48,6 +48,12 @@ const Value = styled.p<{ state: ValueStates }>`
       text-decoration: none;
     }
   }
+  
+  &:hover {
+    &.tooltip {
+      text-decoration: underline;
+    }
+  }
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -84,6 +90,7 @@ export const TitleValue: React.FC<Props> = (props: Props) => {
         data-for={tooltip ? "walletBalanceTooltip" : ''}
         data-multiline={tooltip ? "true" : ''}
         data-tip={tooltip ? localResolution.format(formatting) + '<br />' + endsMessage : null}
+        className={tooltip ? 'tooltip' : ''}
       >
         {value}
       </Value>
