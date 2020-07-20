@@ -1,20 +1,27 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent, useState, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import { DOCUMENT_FAQ } from '../../../../../../common/constants'
-import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../../../../hooks'
+import { 
+  useCollateralBalance, 
+  useConnectedWeb3Context, 
+  useTokens, 
+  useCpk,
+  useCpkAllowance 
+} from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
+import { RemoteData } from '../../../../../../util/remote_data'
 import {
   calcDistributionHint,
   calcInitialFundingSendAmounts,
   formatBigNumber,
   formatDate,
 } from '../../../../../../util/tools'
-import { Arbitrator, Token } from '../../../../../../util/types'
+import { Arbitrator, Token, Ternary } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
@@ -46,6 +53,7 @@ import { TransactionDetailsLine } from '../../../../common/transaction_details_l
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
 import { WalletBalance } from '../../../../common/wallet_balance'
 import { WarningMessage } from '../../../../common/warning_message'
+import { SetAllowance } from '../../../../common/set_allowance'
 import { Outcome } from '../outcomes'
 
 const CreateCardTop = styled(CreateCard)`
@@ -130,14 +138,22 @@ interface Props {
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
 }
 
-const FundingAndFeeStep = (props: Props) => {
+const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const cpk = useCpk()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
   const { account, library: provider } = context
+  const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { back, handleChange, handleCollateralChange, marketCreationStatus, submit, values } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
+
+  const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
+
+  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
+  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   React.useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, collateral))
@@ -173,6 +189,18 @@ const FundingAndFeeStep = (props: Props) => {
     funding.isZero() ||
     !account ||
     amountError !== null
+
+  const showSetAllowance =
+    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+
+  const unlockCollateral = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await unlock()
+    setAllowanceFinished(true)
+  }
 
   return (
     <>
@@ -257,6 +285,14 @@ const FundingAndFeeStep = (props: Props) => {
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsStyled>
+        {showSetAllowance && (
+          <SetAllowance
+            collateral={collateral}
+            finished={allowanceFinished && RemoteData.is.success(allowance)}
+            loading={RemoteData.is.asking(allowance)}
+            onUnlock={unlockCollateral}
+          />
+        )}
         <ButtonContainerFullWidth>
           <LeftButton
             buttonType={ButtonType.secondaryLine}
