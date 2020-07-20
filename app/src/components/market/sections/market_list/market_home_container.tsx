@@ -40,7 +40,9 @@ type GraphResponseCategories = {
 
 const normalizeFetchedData = (data: GraphResponseMyMarkets): GraphResponseMarketsGeneric => {
   return {
-    fixedProductMarketMakers: data.account.fpmmParticipations.map(fpmm => fpmm.fixedProductMarketMakers),
+    fixedProductMarketMakers: data.account
+      ? data.account.fpmmParticipations.map(fpmm => fpmm.fixedProductMarketMakers)
+      : [],
   }
 }
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
