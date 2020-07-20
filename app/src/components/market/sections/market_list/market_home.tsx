@@ -70,7 +70,13 @@ const FiltersControls = styled.div<{ disabled?: boolean }>`
   }
 `
 
-const ButtonCircleStyled = styled(ButtonCircle)`
+const ButtonCircleStyled = styled(ButtonCircle)<{ disabled?: boolean }>`
+  svg {
+    filter: ${props =>
+      props.disabled
+        ? 'invert(46%) sepia(0%) saturate(1168%) hue-rotate(183deg) brightness(99%) contrast(89%)'
+        : 'none'};
+  }
   margin-right: 5px;
 `
 
@@ -395,20 +401,21 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           <FiltersWrapper>
             <SectionTitleMarket title={'Markets'} />
             <FiltersControls disabled={fetchMyMarkets}>
-              <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
+              <ButtonCircleStyled active={showSearch} disabled={fetchMyMarkets} onClick={toggleSearch}>
                 <IconSearch />
               </ButtonCircleStyled>
-              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
+              <ButtonCircleStyled active={showAdvancedFilters} disabled={fetchMyMarkets} onClick={toggleFilters}>
                 <IconFilter />
               </ButtonCircleStyled>
-              <Dropdown
-                currentItem={sortOptions.findIndex(i => i.sortBy === sortBy)}
-                dirty={true}
-                disabled={fetchMyMarkets}
-                dropdownPosition={DropdownPosition.right}
-                items={sortItems}
-                placeholder={<SecondaryText>Sort By</SecondaryText>}
-              />
+              {!fetchMyMarkets && (
+                <Dropdown
+                  currentItem={sortOptions.findIndex(i => i.sortBy === sortBy)}
+                  dirty={true}
+                  dropdownPosition={DropdownPosition.right}
+                  items={sortItems}
+                  placeholder={<SecondaryText>Sort By</SecondaryText>}
+                />
+              )}
             </FiltersControls>
           </FiltersWrapper>
         </TopContents>
