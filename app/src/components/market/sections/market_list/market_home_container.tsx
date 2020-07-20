@@ -362,6 +362,7 @@ const MarketHomeContainer: React.FC = () => {
         context={context}
         count={fetchedMarkets ? fetchedMarkets.fixedProductMarketMakers.length : 0}
         currentFilter={filter}
+        fetchMyMarkets={fetchMyMarkets}
         isFiltering={isFiltering}
         markets={markets}
         moreMarkets={moreMarkets}

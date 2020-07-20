@@ -169,6 +169,7 @@ interface Props {
   count: number
   currentFilter: any
   isFiltering?: boolean
+  fetchMyMarkets: boolean
   markets: RemoteData<MarketMakerDataItem[]>
   categories: RemoteData<CategoryDataItem[]>
   moreMarkets: boolean
@@ -187,6 +188,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     context,
     count,
     currentFilter,
+    fetchMyMarkets,
     isFiltering = false,
     markets,
     moreMarkets,
@@ -367,16 +369,18 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   return (
     <>
       <Actions>
-        <MarketsDropdown
-          currentItem={
-            RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(category)) + 1 : 0
-          }
-          dirty={true}
-          dropdownDirection={DropdownDirection.downwards}
-          dropdownVariant={DropdownVariant.card}
-          items={categoryItems}
-          showScrollbar={true}
-        />
+        {!fetchMyMarkets && (
+          <MarketsDropdown
+            currentItem={
+              RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(category)) + 1 : 0
+            }
+            dirty={true}
+            dropdownDirection={DropdownDirection.downwards}
+            dropdownVariant={DropdownVariant.card}
+            items={categoryItems}
+            showScrollbar={true}
+          />
+        )}
         <MarketsFilterDropdown
           currentItem={filters.findIndex(i => i.state === state)}
           dirty={true}
@@ -390,21 +394,23 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <TopContents>
           <FiltersWrapper>
             <SectionTitleMarket title={'Markets'} />
-            <FiltersControls>
-              <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
-                <IconSearch />
-              </ButtonCircleStyled>
-              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
-                <IconFilter />
-              </ButtonCircleStyled>
-              <Dropdown
-                currentItem={sortOptions.findIndex(i => i.sortBy === sortBy)}
-                dirty={true}
-                dropdownPosition={DropdownPosition.right}
-                items={sortItems}
-                placeholder={<SecondaryText>Sort By</SecondaryText>}
-              />
-            </FiltersControls>
+            {!fetchMyMarkets && (
+              <FiltersControls>
+                <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
+                  <IconSearch />
+                </ButtonCircleStyled>
+                <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
+                  <IconFilter />
+                </ButtonCircleStyled>
+                <Dropdown
+                  currentItem={sortOptions.findIndex(i => i.sortBy === sortBy)}
+                  dirty={true}
+                  dropdownPosition={DropdownPosition.right}
+                  items={sortItems}
+                  placeholder={<SecondaryText>Sort By</SecondaryText>}
+                />
+              </FiltersControls>
+            )}
           </FiltersWrapper>
         </TopContents>
         {showSearch && <Search onChange={setTitle} value={title} />}
