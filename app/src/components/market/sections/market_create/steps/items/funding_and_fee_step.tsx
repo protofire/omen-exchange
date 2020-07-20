@@ -137,16 +137,21 @@ const CustomFeeToggle = styled.p`
 `
 
 const CustomFeeWrapper = styled.div`
-
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
 `
 
 const CustomFeeLabel = styled.p`
-
+  width: 50%;
 `
 
-const NumberInput = styled.input`
-  
+const TextFieldWrapper = styled.div`
+  width: 50%;
 `
+
+const NumberInput = styled.input``
 
 interface Props {
   back: () => void
@@ -313,25 +318,28 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             />
           </CurrenciesWrapper>
         )}
-        {customFee && (
-          <CustomFeeWrapper>
-            <CustomFeeLabel>
-              Trading Fee
-            </CustomFeeLabel>
-            <TextfieldCustomPlaceholder
-              formField={
-                <NumberInput 
-                  name="spread" 
-                  onChange={handleChange} 
-                  value={spread}
-                />
-              }
-              symbol="%"
-            />
-          </CustomFeeWrapper>
-        )}
         <GridTransactionDetailsStyled noMarginTop={false}>
           <div>
+            {customFee && (
+              <CustomFeeWrapper>
+                <CustomFeeLabel>
+                  Trading Fee
+                </CustomFeeLabel>
+                <TextFieldWrapper>
+                  <TextfieldCustomPlaceholder
+                    formField={
+                      <NumberInput 
+                        name="spread" 
+                        onChange={handleChange} 
+                        value={spread}
+                        placeholder="0"
+                      />
+                    }
+                    symbol="%"
+                  />
+                </TextFieldWrapper>
+              </CustomFeeWrapper>
+            )}
             <WalletBalance symbol={collateral.symbol} value={collateralBalanceFormatted} />
             <TextfieldCustomPlaceholder
               formField={
