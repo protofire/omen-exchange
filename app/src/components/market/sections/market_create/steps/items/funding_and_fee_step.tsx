@@ -330,9 +330,11 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                     formField={
                       <NumberInput 
                         name="spread" 
+                        type="number"
                         onChange={handleChange} 
                         value={spread}
                         placeholder="0"
+                        max="10"
                       />
                     }
                     symbol="%"

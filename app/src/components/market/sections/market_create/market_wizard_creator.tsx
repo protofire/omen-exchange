@@ -110,7 +110,11 @@ export const MarketWizardCreator = (props: Props) => {
       | BigNumberInputReturn
       | ChangeEvent<HTMLButtonElement>,
   ) => {
-    const { name, value } = 'target' in event ? event.target : event
+    let { name, value } = 'target' in event ? event.target : event
+
+    if(name === 'spread' && Number(value) > 10) {
+      value = '10'
+    }
 
     const newMarketData = {
       ...marketData,
