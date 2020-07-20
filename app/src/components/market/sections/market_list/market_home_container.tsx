@@ -201,7 +201,6 @@ const MarketHomeContainer: React.FC = () => {
         ? normalizeFetchedData(data as GraphResponseMyMarkets)
         : (data as GraphResponseMarketsGeneric)
 
-      setMoreMarkets(markets ? markets.fixedProductMarketMakers.length >= pageSize : false)
       setFetchedMarkets(markets)
     },
   })
@@ -239,6 +238,8 @@ const MarketHomeContainer: React.FC = () => {
 
       if (fixedProductMarketMakers.length < pageSize) {
         setMoreMarkets(false)
+      } else {
+        setMoreMarkets(true)
       }
 
       setIsFiltering(false)
@@ -246,7 +247,7 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(RemoteData.failure(error))
       setIsFiltering(false)
     }
-  }, [fetchedMarkets, loading, error, context.networkId, pageSize])
+  }, [fetchedMarkets, loading, error, context.networkId, pageSize, pageIndex])
 
   useEffect(() => {
     if (categoriesLoading) {
@@ -351,6 +352,7 @@ const MarketHomeContainer: React.FC = () => {
 
   const updatePageSize = (size: number): void => {
     setPageSize(size)
+    setPageIndex(0)
   }
 
   return (
