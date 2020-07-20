@@ -30,9 +30,27 @@ const Title = styled.h4`
   opacity: 0.9;
   display: flex;
   align-items: center;
+`
 
-  .icon-info {
-    margin-left: 4px;
+const Circle = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 4px;
+  border-radius: 50%;
+  border: 1px solid ${props => props.theme.colors.tertiary};
+  transition: border-color 0.15s linear;
+
+  path {
+    transition: fill 0.15s linear;
+    fill: ${props => props.theme.colors.textColorLightish}
+  }
+
+  &:hover {
+    border-color: ${props => props.theme.colors.tertiaryDark};
+    path {
+      fill: ${props => props.theme.colors.textColorDark};
+    }
   }
 `
 
@@ -61,14 +79,19 @@ export const TransactionDetailsRow: React.FC<Props> = props => {
 
   return (
     <Wrapper {...restProps}>
-      <Title
-        data-delay-hide={tooltip ? "500" : ''}
-        data-effect={tooltip ? "solid" : ''}
-        data-for={tooltip ? "walletBalanceTooltip" : ''}
-        data-multiline={tooltip ? "true" : ''}
-        data-tip={tooltip ? tooltip : null}
-      >
-        {title}{tooltip ? <IconInfo /> : null}
+      <Title>
+        {title}{tooltip ? 
+          <Circle
+            data-delay-hide={tooltip ? "500" : ''}
+            data-effect={tooltip ? "solid" : ''}
+            data-for={tooltip ? "walletBalanceTooltip" : ''}
+            data-multiline={tooltip ? "true" : ''}
+            data-tip={tooltip ? tooltip : null} 
+          >
+            <IconInfo /> 
+          </Circle>
+          
+          : null}
       </Title>
       <Value 
         emphasizeValue={emphasizeValue} 
