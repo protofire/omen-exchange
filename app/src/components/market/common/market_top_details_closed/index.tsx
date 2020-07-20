@@ -72,7 +72,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
       </SubsectionTitleWrapper>
       <GridTwoColumns>
         <TitleValue title={'Category'} value={question.category} />
-        <DisplayResolution title={'Resolution Date'} value={question.resolution} questionId={question.id} />
+        <DisplayResolution questionId={question.id} title={'Resolution Date'} value={question.resolution} />
         <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
         <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
       </GridTwoColumns>
