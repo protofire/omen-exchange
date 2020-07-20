@@ -136,6 +136,18 @@ const CustomFeeToggle = styled.p`
   }
 `
 
+const CustomFeeWrapper = styled.div`
+
+`
+
+const CustomFeeLabel = styled.p`
+
+`
+
+const NumberInput = styled.input`
+  
+`
+
 interface Props {
   back: () => void
   submit: () => void
@@ -152,7 +164,6 @@ interface Props {
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
-  setFee: React.Dispatch<React.SetStateAction<number>>
 }
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
@@ -279,7 +290,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       <CreateCardBottom>
         <CreateCardBottomRow>
           <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
-          <CustomFeeToggle onClick={toggleCustomFee}>set custom trading fee</CustomFeeToggle>
+          <CustomFeeToggle onClick={toggleCustomFee}>
+            {customFee ? 'use default trading fee' : 'set custom trading fee'}
+          </CustomFeeToggle>
         </CreateCardBottomRow>
         <WarningMessage
           additionalDescription={''}
@@ -299,6 +312,23 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               selectedCurrency={collateral}
             />
           </CurrenciesWrapper>
+        )}
+        {customFee && (
+          <CustomFeeWrapper>
+            <CustomFeeLabel>
+              Trading Fee
+            </CustomFeeLabel>
+            <TextfieldCustomPlaceholder
+              formField={
+                <NumberInput 
+                  name="spread" 
+                  onChange={handleChange} 
+                  value={spread}
+                />
+              }
+              symbol="%"
+            />
+          </CustomFeeWrapper>
         )}
         <GridTransactionDetailsStyled noMarginTop={false}>
           <div>
