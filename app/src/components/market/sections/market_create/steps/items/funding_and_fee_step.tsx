@@ -181,15 +181,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { account, library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
-  const { 
-    back, 
-    handleChange, 
-    handleCollateralChange, 
-    marketCreationStatus, 
-    resetTradingFee, 
-    submit, 
-    values
-  } = props
+  const { back, handleChange, handleCollateralChange, marketCreationStatus, resetTradingFee, submit, values } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -264,8 +256,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     const setMaxFeeWarning = () => {
       spread > MAX_MARKET_FEE ? setExceedsMaxFee(true) : setExceedsMaxFee(false)
-      console.log(spread)
-      console.log(MAX_MARKET_FEE)
     }
 
     setMaxFeeWarning()
@@ -395,12 +385,10 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         {exceedsMaxFee && (
           <WarningMessage
             additionalDescription={''}
-            description={
-              'Your custom trading fee exceeds the maximum amount of 4%'
-            }
+            danger={true}
+            description={'Your custom trading fee exceeds the maximum amount of 4%'}
             href={''}
             hyperlinkDescription={''}
-            danger={true}
           />
         )}
         <ButtonContainerFullWidth>

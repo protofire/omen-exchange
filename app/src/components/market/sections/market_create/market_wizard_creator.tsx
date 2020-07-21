@@ -110,7 +110,7 @@ export const MarketWizardCreator = (props: Props) => {
       | BigNumberInputReturn
       | ChangeEvent<HTMLButtonElement>,
   ) => {
-    let { name, value } = 'target' in event ? event.target : event
+    const { name, value } = 'target' in event ? event.target : event
 
     const newMarketData = {
       ...marketData,
@@ -121,8 +121,8 @@ export const MarketWizardCreator = (props: Props) => {
 
   const resetTradingFee = () => {
     const newMarketData = {
-      ...marketData, 
-      spread: MARKET_FEE
+      ...marketData,
+      spread: MARKET_FEE,
     }
     setMarketdata(newMarketData)
   }
@@ -221,9 +221,9 @@ export const MarketWizardCreator = (props: Props) => {
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
             marketCreationStatus={marketCreationStatus}
+            resetTradingFee={resetTradingFee}
             submit={() => submit()}
             values={marketData}
-            resetTradingFee={resetTradingFee}
           />
         )
       case 1:

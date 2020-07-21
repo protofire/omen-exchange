@@ -45,7 +45,7 @@ interface Props {
 }
 
 export const WarningMessage = (props: Props) => {
-  const { additionalDescription, description, href, hyperlinkDescription, danger, ...restProps } = props
+  const { additionalDescription, danger, description, href, hyperlinkDescription, ...restProps } = props
   return (
     <Wrapper {...restProps}>
       <AlertWrapper>
