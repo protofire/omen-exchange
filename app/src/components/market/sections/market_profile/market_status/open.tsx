@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactTooltip from 'react-tooltip'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -38,6 +39,8 @@ const Text = styled.p`
   line-height: 1.5;
   margin: 0;
 `
+
+const ButtonWrapper = styled.span``
 
 interface Props extends RouteComponentProps<{}> {
   account: Maybe<string>
@@ -108,24 +111,41 @@ const Wrapper = (props: Props) => {
 
   const buySellButtons = (
     <>
-      <Button
-        buttonType={ButtonType.secondaryLine}
-        disabled={!userHasShares || !hasFunding}
-        onClick={() => {
-          history.push(`${marketMakerAddress}/sell`)
-        }}
+      <ButtonWrapper
+        data-delay-hide={!hasFunding ? "500" : ''}
+        data-effect={!hasFunding ? "solid" : ''}
+        data-for={!hasFunding ? "noLiquidityTooltip" : ''}
+        data-multiline={!hasFunding ? "true" : ''}
+        data-tip={!hasFunding ? 'Trading has been disabled due to lack of liquidity.' : null}
       >
-        Sell
-      </Button>
-      <Button
-        buttonType={ButtonType.secondaryLine}
-        disabled={!hasFunding}
-        onClick={() => {
-          history.push(`${marketMakerAddress}/buy`)
-        }}
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          disabled={!userHasShares || !hasFunding}
+          onClick={() => {
+            history.push(`${marketMakerAddress}/sell`)
+          }}
+        >
+          Sell
+        </Button>
+      </ButtonWrapper>
+      <ButtonWrapper
+        data-delay-hide={!hasFunding ? "500" : ''}
+        data-effect={!hasFunding ? "solid" : ''}
+        data-for={!hasFunding ? "noLiquidityTooltip" : ''}
+        data-multiline={!hasFunding ? "true" : ''}
+        data-tip={!hasFunding ? 'Trading has been disabled due to lack of liquidity.' : null}
       >
-        Buy
-      </Button>
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          disabled={!hasFunding}
+          onClick={() => {
+            history.push(`${marketMakerAddress}/buy`)
+          }}
+        >
+          Buy
+        </Button>
+      </ButtonWrapper>
+      <ReactTooltip id="noLiquidityTooltip" />
     </>
   )
 

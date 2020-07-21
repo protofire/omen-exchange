@@ -151,5 +151,9 @@ export const ButtonCSS = css<ButtonProps>`
   white-space: nowrap;
   font-family: Roboto;
 
+  &.disabled {
+    pointer-events: none;
+  }
+
   ${props => getButtonTypeStyles(props.buttonType)}
 `
