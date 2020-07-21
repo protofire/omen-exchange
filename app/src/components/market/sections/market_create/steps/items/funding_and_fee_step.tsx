@@ -1,10 +1,10 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useMemo, useState } from 'react'
+import React, { ChangeEvent, useMemo, useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { DOCUMENT_FAQ } from '../../../../../../common/constants'
+import { DOCUMENT_FAQ, MAX_MARKET_FEE } from '../../../../../../common/constants'
 import {
   useCollateralBalance,
   useConnectedWeb3Context,
@@ -171,7 +171,6 @@ interface Props {
   handleCollateralChange: (collateral: Token) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
-  exceedsMaxFee: boolean
 }
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
@@ -189,8 +188,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     marketCreationStatus, 
     resetTradingFee, 
     submit, 
-    values, 
-    exceedsMaxFee 
+    values
   } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
@@ -212,6 +210,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const [customFee, setCustomFee] = useState(false)
   const [fee, setFee] = useState<number | undefined>(spread)
+  const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
   const tokensAmount = useTokens(context).length
 
@@ -236,7 +235,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     !balance ||
     funding.isZero() ||
     !account ||
-    amountError !== null
+    amountError !== null ||
+    exceedsMaxFee
 
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
@@ -260,6 +260,16 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     if (!customFee) setFee(undefined)
     setCustomFee(!customFee)
   }
+
+  useEffect(() => {
+    const setMaxFeeWarning = () => {
+      spread > MAX_MARKET_FEE ? setExceedsMaxFee(true) : setExceedsMaxFee(false)
+      console.log(spread)
+      console.log(MAX_MARKET_FEE)
+    }
+
+    setMaxFeeWarning()
+  })
 
   return (
     <>
