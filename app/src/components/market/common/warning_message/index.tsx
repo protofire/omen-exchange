@@ -25,6 +25,11 @@ const Description = styled.p`
   font-size: 14px;
   line-height: 1.4;
   letter-spacing: 0.1px;
+  width: 100%;
+
+  &.danger {
+    color: ${props => props.theme.message.colors.error};
+  }
 `
 
 const Hyperlink = styled.a`
@@ -36,16 +41,17 @@ interface Props {
   hyperlinkDescription: string
   href: string
   additionalDescription: string
+  danger?: boolean
 }
 
 export const WarningMessage = (props: Props) => {
-  const { additionalDescription, description, href, hyperlinkDescription, ...restProps } = props
+  const { additionalDescription, description, href, hyperlinkDescription, danger, ...restProps } = props
   return (
     <Wrapper {...restProps}>
       <AlertWrapper>
         <Alert />
       </AlertWrapper>
-      <Description>
+      <Description className={danger ? 'danger' : ''}>
         {description}{' '}
         <Hyperlink href={href} target="_blank">
           {hyperlinkDescription}

@@ -43,6 +43,7 @@ export const MarketWizardCreator = (props: Props) => {
 
   const [currentStep, setCurrentStep] = useState(1)
   const [marketData, setMarketdata] = useState<MarketData>(marketDataDefault)
+  const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
   useEffect(() => {
     let isSubscribed = true
@@ -114,6 +115,9 @@ export const MarketWizardCreator = (props: Props) => {
 
     if(name === 'spread' && Number(value) > MAX_MARKET_FEE) {
       value = `${MAX_MARKET_FEE}`
+      setExceedsMaxFee(true)
+    } else {
+      setExceedsMaxFee(false)
     }
 
     const newMarketData = {
@@ -228,6 +232,7 @@ export const MarketWizardCreator = (props: Props) => {
             submit={() => submit()}
             values={marketData}
             resetTradingFee={resetTradingFee}
+            exceedsMaxFee={exceedsMaxFee}
           />
         )
       case 1:

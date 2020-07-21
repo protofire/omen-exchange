@@ -171,6 +171,7 @@ interface Props {
   handleCollateralChange: (collateral: Token) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
+  exceedsMaxFee: boolean
 }
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
@@ -181,7 +182,16 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { account, library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
-  const { back, handleChange, handleCollateralChange, marketCreationStatus, resetTradingFee, submit, values } = props
+  const { 
+    back, 
+    handleChange, 
+    handleCollateralChange, 
+    marketCreationStatus, 
+    resetTradingFee, 
+    submit, 
+    values, 
+    exceedsMaxFee 
+  } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -370,6 +380,17 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             finished={allowanceFinished && RemoteData.is.success(allowance)}
             loading={RemoteData.is.asking(allowance)}
             onUnlock={unlockCollateral}
+          />
+        )}
+        {exceedsMaxFee && (
+          <WarningMessage
+            additionalDescription={''}
+            description={
+              'Your custom trading fee exceeds the maximum amount of 4%'
+            }
+            href={''}
+            hyperlinkDescription={''}
+            danger={true}
           />
         )}
         <ButtonContainerFullWidth>
