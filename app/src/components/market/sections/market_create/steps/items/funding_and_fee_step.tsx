@@ -130,7 +130,7 @@ const CustomFeeToggle = styled.p`
   color: ${props => props.theme.colors.hyperlink};
   cursor: pointer;
   margin-top: 0;
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -145,6 +145,7 @@ const CustomFeeWrapper = styled.div`
 
 const CustomFeeLabel = styled.p`
   width: 50%;
+  margin: 0;
 `
 
 const TextFieldWrapper = styled.div`
@@ -180,7 +181,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { account, library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
-  const { back, handleChange, handleCollateralChange, resetTradingFee, marketCreationStatus, submit, values } = props
+  const { back, handleChange, handleCollateralChange, marketCreationStatus, resetTradingFee, submit, values } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -326,19 +327,17 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           <div>
             {customFee && (
               <CustomFeeWrapper>
-                <CustomFeeLabel>
-                  Trading Fee
-                </CustomFeeLabel>
+                <CustomFeeLabel>Trading Fee</CustomFeeLabel>
                 <TextFieldWrapper>
                   <TextfieldCustomPlaceholder
                     formField={
-                      <NumberInput 
-                        name="spread" 
-                        type="number"
-                        onChange={handleChange} 
-                        value={spread}
-                        placeholder="0"
+                      <NumberInput
                         max="10"
+                        name="spread"
+                        onChange={handleChange}
+                        placeholder="0"
+                        type="number"
+                        value={spread}
                       />
                     }
                     symbol="%"
