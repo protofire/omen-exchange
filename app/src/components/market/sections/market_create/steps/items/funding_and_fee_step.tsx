@@ -266,7 +266,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             <CurrencySelector
               context={context}
               disabled={false}
-              onSelect={(token) => onCollateralChange(token)}
+              onSelect={onCollateralChange}
               selectedCurrency={collateral}
             />
           </CurrenciesWrapper>
