@@ -201,6 +201,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals, 5)
 
   const [customFee, setCustomFee] = useState(false)
+  const [fee, setFee] = useState<number | undefined>(spread)
 
   const tokensAmount = useTokens(context).length
 
@@ -246,6 +247,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   
   const toggleCustomFee = () => {
     if (customFee) resetTradingFee()
+    if (!customFee) setFee(undefined)
     setCustomFee(!customFee)
   }
 
@@ -337,7 +339,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                         onChange={handleChange}
                         placeholder="0"
                         type="number"
-                        value={spread}
+                        value={fee}
                       />
                     }
                     symbol="%"
