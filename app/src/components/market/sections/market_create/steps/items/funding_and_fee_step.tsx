@@ -1,16 +1,16 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useState, useMemo } from 'react'
+import React, { ChangeEvent, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import { DOCUMENT_FAQ } from '../../../../../../common/constants'
-import { 
-  useCollateralBalance, 
-  useConnectedWeb3Context, 
-  useTokens, 
+import {
+  useCollateralBalance,
+  useConnectedWeb3Context,
   useCpk,
-  useCpkAllowance 
+  useCpkAllowance,
+  useTokens,
 } from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
@@ -21,7 +21,7 @@ import {
   formatBigNumber,
   formatDate,
 } from '../../../../../../util/tools'
-import { Arbitrator, Token, Ternary } from '../../../../../../util/types'
+import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
@@ -48,12 +48,12 @@ import { CreateCard } from '../../../../common/create_card'
 import { CurrencySelector } from '../../../../common/currency_selector'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
+import { SetAllowance } from '../../../../common/set_allowance'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
 import { WalletBalance } from '../../../../common/wallet_balance'
 import { WarningMessage } from '../../../../common/warning_message'
-import { SetAllowance } from '../../../../common/set_allowance'
 import { Outcome } from '../outcomes'
 
 const CreateCardTop = styled(CreateCard)`
@@ -245,7 +245,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           </OutcomesTable>
         </OutcomesTableWrapper>
         <Grid>
-          <TitleValueVertical title={'Resolution Date'} value={resolutionDate} date={resolution instanceof Date ? resolution : undefined} tooltip={true} />
+          <TitleValueVertical
+            date={resolution instanceof Date ? resolution : undefined}
+            title={'Resolution Date'}
+            tooltip={true}
+            value={resolutionDate}
+          />
           <TitleValueVertical title={'Category'} value={category} />
           <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
         </Grid>
