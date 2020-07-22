@@ -84,6 +84,7 @@ const DropdownVariantCardCSS = css`
   padding: 13px 25px;
   position: relative;
   border: 1px solid #dcdff2;
+  text-transform: capitalize;
 `
 
 const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean; dropdownVariant?: DropdownVariant }>`

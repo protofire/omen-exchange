@@ -207,7 +207,9 @@ const AskQuestionStep = (props: Props) => {
                 isACategorySelected={category !== ''}
                 onClick={toggleCategoryButtonFocus}
               >
-                <ButtonCategoryTextOverflow>{category ? category : 'Select Category'}</ButtonCategoryTextOverflow>
+                <ButtonCategoryTextOverflow>
+                  {category ? category.toUpperCase() : 'Select Category'}
+                </ButtonCategoryTextOverflow>
               </ButtonCategory>
             }
             title={'Category'}
