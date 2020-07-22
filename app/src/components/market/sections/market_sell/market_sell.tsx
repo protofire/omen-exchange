@@ -208,7 +208,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                     setAmountShares(e.value)
                     setAmountSharesToDisplay('')
                   }}
-                  value={amountShares > new BigNumber(0) ? amountShares : null}
+                  value={amountShares}
                   valueToDisplay={amountSharesToDisplay}
                 />
               }
