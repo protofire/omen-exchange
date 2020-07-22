@@ -1,7 +1,7 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
-import { IconInfo } from '../../../common/tooltip/img/IconInfo' 
+import { IconInfo } from '../../../common/tooltip/img/IconInfo'
 
 export enum ValueStates {
   error,
@@ -43,7 +43,7 @@ const Circle = styled.div`
 
   path {
     transition: fill 0.15s linear;
-    fill: ${props => props.theme.colors.textColorLightish}
+    fill: ${props => props.theme.colors.textColorLightish};
   }
 
   &:hover {
@@ -80,23 +80,20 @@ export const TransactionDetailsRow: React.FC<Props> = props => {
   return (
     <Wrapper {...restProps}>
       <Title>
-        {title}{tooltip ? 
+        {title}
+        {tooltip ? (
           <Circle
-            data-delay-hide={tooltip ? "500" : ''}
-            data-effect={tooltip ? "solid" : ''}
-            data-for={tooltip ? "walletBalanceTooltip" : ''}
-            data-multiline={tooltip ? "true" : ''}
-            data-tip={tooltip ? tooltip : null} 
+            data-delay-hide={tooltip ? '500' : ''}
+            data-effect={tooltip ? 'solid' : ''}
+            data-for={tooltip ? 'walletBalanceTooltip' : ''}
+            data-multiline={tooltip ? 'true' : ''}
+            data-tip={tooltip ? tooltip : null}
           >
-            <IconInfo /> 
+            <IconInfo />
           </Circle>
-          
-          : null}
+        ) : null}
       </Title>
-      <Value 
-        emphasizeValue={emphasizeValue} 
-        state={state}
-      >
+      <Value emphasizeValue={emphasizeValue} state={state}>
         {value}
       </Value>
     </Wrapper>
