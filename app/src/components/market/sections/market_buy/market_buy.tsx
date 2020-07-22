@@ -229,7 +229,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
                     setAmount(e.value)
                     setAmountToDisplay('')
                   }}
-                  value={amount > new BigNumber(0) ? amount : null}
+                  value={amount}
                   valueToDisplay={amountToDisplay}
                 />
               }
