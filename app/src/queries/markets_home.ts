@@ -97,7 +97,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     state === MarketStates.pending ? 'openingTimestamp_lt: $now' : '',
     state === MarketStates.pending ? 'answerFinalizedTimestamp: null' : '',
     state === MarketStates.finalizing ? 'answerFinalizedTimestamp_gt: $now' : '',
-    whitelistedCreators ? 'creator_in: $accounts' : '',
+    state === MarketStates.myMarkets || whitelistedCreators ? 'creator_in: $accounts' : '',
     category === 'All' ? '' : 'category: $category',
     title ? 'title_contains: $title' : '',
     currency ? 'collateralToken: $currency' : '',
