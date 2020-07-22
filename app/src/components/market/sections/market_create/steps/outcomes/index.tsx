@@ -120,8 +120,10 @@ const Outcomes = (props: Props) => {
   const outcomeMinValue = 0
   const outcomeMaxValue = 100 - totalProbabilities
   const [newOutcomeName, setNewOutcomeName] = useState<string>('')
+  const [duplicateOutcome, setDuplicateOutcome] = useState<boolean>(false)
   const [newOutcomeProbability, setNewOutcomeProbability] = useState<number>(outcomeMinValue)
   const [uniformProbabilities, setIsUniform] = useState<boolean>(true)
+  const [noOutcomes, setNoOutcomes] = useState<boolean>(true)
 
   const uniform = (outcomes: Outcome[]): Outcome[] => {
     return outcomes.map(o => ({
@@ -139,11 +141,13 @@ const Outcomes = (props: Props) => {
     props.onChange(uniformProbabilities ? uniform(newOutcomes) : newOutcomes)
     setNewOutcomeName('')
     setNewOutcomeProbability(0)
+    setNoOutcomes(false)
   }
 
   const removeOutcome = (index: number) => {
     outcomes.splice(index, 1)
     props.onChange(uniformProbabilities ? uniform(outcomes) : outcomes)
+    outcomes.length === 0 ? setNoOutcomes(true) : setNoOutcomes(false)
   }
 
   const handleIsUniformChanged = () => {
@@ -192,7 +196,8 @@ const Outcomes = (props: Props) => {
     maxOutcomesReached ||
     (!uniformProbabilities && outcomeValueOutofBounds) ||
     totalProbabilitiesReached ||
-    disabled
+    disabled ||
+    duplicateOutcome
   const disableManualProbabilities = maxOutcomesReached || disabled || totalProbabilitiesReached
   const disableUniformProbabilities = !canAddOutcome || maxOutcomesReached || disabled
   const outcomeNameRef = React.createRef<any>()
@@ -205,6 +210,12 @@ const Outcomes = (props: Props) => {
         outcomeNameRef.current.focus()
       }
     }
+  }
+
+  const onOutcomeNameChange = (value: string) => {
+    setNewOutcomeName(value)
+    const isDuplicated = outcomes.map(o => o.name.toLowerCase()).includes(value.toLowerCase())
+    setDuplicateOutcome(isDuplicated)
   }
 
   return (
@@ -226,7 +237,11 @@ const Outcomes = (props: Props) => {
         )}
         {uniformProbabilities && (
           <TitleText>
-            <FormRowLink data-testid="toggle-manual-probabilities" onClick={handleIsUniformChanged}>
+            <FormRowLink
+              className={noOutcomes ? '' : 'disabled'}
+              data-testid="toggle-manual-probabilities"
+              onClick={noOutcomes ? handleIsUniformChanged : () => null}
+            >
               set manual probability
             </FormRowLink>
           </TitleText>
@@ -235,7 +250,7 @@ const Outcomes = (props: Props) => {
       <NewOutcome uniformProbabilities={uniformProbabilities}>
         <Textfield
           disabled={disableUniformProbabilities || totalProbabilitiesReached}
-          onChange={e => setNewOutcomeName(e.target.value)}
+          onChange={e => onOutcomeNameChange(e.target.value)}
           onKeyUp={e => {
             onPressEnter(e)
           }}

@@ -152,16 +152,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
-  const goBackToAddress = `/${marketMakerAddress}`
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
 
-  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, collateral.decimals)))
+  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18)))
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals)}`
+  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatBigNumber(feePaid.mul(-1), collateral.decimals)} ${collateral.symbol}`
   const baseCostFormatted = `${formatBigNumber(baseCost, collateral.decimals)} ${collateral.symbol}`
   const potentialProfitFormatted = `${formatBigNumber(potentialProfit, collateral.decimals)} ${collateral.symbol}`
@@ -185,7 +184,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle backTo={goBackToAddress} textAlign={TextAlign.left} title={question.title} />
+      <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
         <MarketTopDetailsOpen
           isLiquidityProvision={false}
@@ -213,13 +212,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <GridTransactionDetails>
           <div>
             <WalletBalance
-              data-class="customTooltip"
-              data-delay-hide="500"
-              data-effect="solid"
-              data-for="walletBalanceTooltip"
-              data-multiline={true}
-              data-place="right"
-              data-tip={`Spend your total ${collateral.symbol} balance on the selected outcome.`}
               onClick={() => {
                 setAmount(collateralBalance)
                 setAmountToDisplay(currentBalance)
@@ -247,8 +239,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           </div>
           <div>
             <TransactionDetailsCard>
-              <TransactionDetailsRow title={'Fee'} value={feeFormatted} />
               <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
+              <TransactionDetailsRow
+                title={'Fee'}
+                tooltip={'A 2% fee goes to liquidity providers.'}
+                value={feeFormatted}
+              />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={potentialProfit.gt(0)}
@@ -274,7 +270,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           />
         )}
         <ButtonContainer>
-          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
+          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
             Cancel
           </LeftButton>
           <Button buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>

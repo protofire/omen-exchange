@@ -62,7 +62,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, collateral.decimals))
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
 
   const calcSellAmount = useMemo(
     () => async (
@@ -145,8 +145,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
-  const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals)}`
-  const goBackToAddress = `/${marketMakerAddress}`
+  const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals, 5)}`
 
   const amountError =
     balanceItem.shares === null
@@ -162,7 +161,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle backTo={goBackToAddress} textAlign={TextAlign.left} title={question.title} />
+      <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
         <MarketTopDetailsOpen
           isLiquidityProvision={false}
@@ -260,7 +259,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           </div>
         </GridTransactionDetails>
         <ButtonContainer>
-          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
+          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
             Cancel
           </LeftButton>
           <Button buttonType={ButtonType.secondaryLine} disabled={isSellButtonDisabled} onClick={() => finish()}>
@@ -269,7 +268,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         </ButtonContainer>
       </ViewCard>
       <ModalTransactionResult
-        goBackToAddress={goBackToAddress}
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
         status={status}

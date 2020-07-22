@@ -147,7 +147,7 @@ const FundingAndFeeStep = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const resolutionDate = resolution && formatDate(resolution)
 
-  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals)
+  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals, 5)
 
   const tokensAmount = useTokens(context).length
 
@@ -212,7 +212,12 @@ const FundingAndFeeStep = (props: Props) => {
           </OutcomesTable>
         </OutcomesTableWrapper>
         <Grid>
-          <TitleValueVertical title={'Resolution Date'} value={resolutionDate} />
+          <TitleValueVertical
+            date={resolution instanceof Date ? resolution : undefined}
+            title={'Resolution Date'}
+            tooltip={true}
+            value={resolutionDate}
+          />
           <TitleValueVertical title={'Category'} value={category} />
           <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
         </Grid>
