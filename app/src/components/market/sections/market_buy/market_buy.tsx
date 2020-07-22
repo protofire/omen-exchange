@@ -240,7 +240,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           <div>
             <TransactionDetailsCard>
               <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
-              <TransactionDetailsRow title={'Fee'} value={feeFormatted} tooltip={"A 2% fee goes to liquidity providers."} />
+              <TransactionDetailsRow
+                title={'Fee'}
+                tooltip={'A 2% fee goes to liquidity providers.'}
+                value={feeFormatted}
+              />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={potentialProfit.gt(0)}
