@@ -6,7 +6,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { DOCUMENT_VALIDITY_RULES, MARKET_FEE } from '../../../../common/constants'
+import { DOCUMENT_VALIDITY_RULES } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
@@ -62,12 +62,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const { buildMarketMaker } = useContracts(context)
   const { marketMakerData } = props
-  const { address: marketMakerAddress, balances, collateral, question } = marketMakerData
+  const { address: marketMakerAddress, balances, collateral, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [tweet, setTweet] = useState('')
@@ -151,15 +152,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
-  const goBackToAddress = `/${marketMakerAddress}`
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
 
-  const feePaid = mulBN(debouncedAmount, MARKET_FEE / 100)
+  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18)))
+
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals)}`
+  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatBigNumber(feePaid.mul(-1), collateral.decimals)} ${collateral.symbol}`
   const baseCostFormatted = `${formatBigNumber(baseCost, collateral.decimals)} ${collateral.symbol}`
   const potentialProfitFormatted = `${formatBigNumber(potentialProfit, collateral.decimals)} ${collateral.symbol}`
@@ -169,7 +170,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const amountError =
     maybeCollateralBalance === null
       ? null
-      : maybeCollateralBalance.isZero()
+      : maybeCollateralBalance.isZero() && amount.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : amount.gt(maybeCollateralBalance)
       ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
@@ -183,7 +184,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle backTo={goBackToAddress} textAlign={TextAlign.left} title={question.title} />
+      <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
         <MarketTopDetailsOpen
           isLiquidityProvision={false}
@@ -201,6 +202,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           showPriceChange={amount.gt(0)}
         />
         <WarningMessageStyled
+          additionalDescription={'. Be aware that market makers may remove liquidity from the market at any time!'}
           description={
             "Before trading on a market, make sure that its outcome will be known by its resolution date and it isn't an"
           }
@@ -210,14 +212,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <GridTransactionDetails>
           <div>
             <WalletBalance
-              data-class="customTooltip"
-              data-delay-hide="500"
-              data-effect="solid"
-              data-for="walletBalanceTooltip"
-              data-multiline={true}
-              data-place="right"
-              data-tip={`Spend your total ${collateral.symbol} balance on the selected outcome.`}
-              onClick={() => setAmount(collateralBalance)}
+              onClick={() => {
+                setAmount(collateralBalance)
+                setAmountToDisplay(currentBalance)
+              }}
               symbol={collateral.symbol}
               value={currentBalance}
             />
@@ -227,8 +225,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
                 <BigNumberInput
                   decimals={collateral.decimals}
                   name="amount"
-                  onChange={(e: BigNumberInputReturn) => setAmount(e.value)}
+                  onChange={(e: BigNumberInputReturn) => {
+                    setAmount(e.value)
+                    setAmountToDisplay('')
+                  }}
                   value={amount}
+                  valueToDisplay={amountToDisplay}
                 />
               }
               symbol={collateral.symbol}
@@ -237,8 +239,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           </div>
           <div>
             <TransactionDetailsCard>
-              <TransactionDetailsRow title={'Fee'} value={feeFormatted} />
               <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
+              <TransactionDetailsRow
+                title={'Fee'}
+                tooltip={'A 2% fee goes to liquidity providers.'}
+                value={feeFormatted}
+              />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={potentialProfit.gt(0)}
@@ -264,7 +270,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           />
         )}
         <ButtonContainer>
-          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
+          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
             Cancel
           </LeftButton>
           <Button buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>

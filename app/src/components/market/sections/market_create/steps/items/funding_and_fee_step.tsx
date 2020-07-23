@@ -1,20 +1,27 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import { DOCUMENT_FAQ } from '../../../../../../common/constants'
-import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../../../../hooks'
+import {
+  useCollateralBalance,
+  useConnectedWeb3Context,
+  useCpk,
+  useCpkAllowance,
+  useTokens,
+} from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
+import { RemoteData } from '../../../../../../util/remote_data'
 import {
   calcDistributionHint,
   calcInitialFundingSendAmounts,
   formatBigNumber,
   formatDate,
 } from '../../../../../../util/tools'
-import { Arbitrator, Token } from '../../../../../../util/types'
+import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
@@ -41,6 +48,7 @@ import { CreateCard } from '../../../../common/create_card'
 import { CurrencySelector } from '../../../../common/currency_selector'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
+import { SetAllowance } from '../../../../common/set_allowance'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
@@ -77,7 +85,7 @@ const QuestionText = styled.p`
 
 const Grid = styled.div`
   display: grid;
-  grid-column-gap: 50px;
+  grid-column-gap: 32px;
   grid-row-gap: 20px;
   grid-template-columns: 1fr;
 
@@ -130,14 +138,22 @@ interface Props {
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
 }
 
-const FundingAndFeeStep = (props: Props) => {
+const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const cpk = useCpk()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
   const { account, library: provider } = context
+  const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { back, handleChange, handleCollateralChange, marketCreationStatus, submit, values } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
+
+  const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
+
+  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
+  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   React.useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, collateral))
@@ -147,7 +163,7 @@ const FundingAndFeeStep = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const resolutionDate = resolution && formatDate(resolution)
 
-  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals)
+  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals, 5)
 
   const tokensAmount = useTokens(context).length
 
@@ -160,7 +176,7 @@ const FundingAndFeeStep = (props: Props) => {
   const amountError =
     maybeCollateralBalance === null
       ? null
-      : maybeCollateralBalance.isZero()
+      : maybeCollateralBalance.isZero() && funding.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : funding.gt(maybeCollateralBalance)
       ? `Value must be less than or equal to ${collateralBalanceFormatted} ${collateral.symbol}`
@@ -173,6 +189,23 @@ const FundingAndFeeStep = (props: Props) => {
     funding.isZero() ||
     !account ||
     amountError !== null
+
+  const showSetAllowance =
+    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+
+  const unlockCollateral = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await unlock()
+    setAllowanceFinished(true)
+  }
+
+  const onCollateralChange = (token: Token) => {
+    handleCollateralChange(token)
+    setAllowanceFinished(false)
+  }
 
   return (
     <>
@@ -212,7 +245,12 @@ const FundingAndFeeStep = (props: Props) => {
           </OutcomesTable>
         </OutcomesTableWrapper>
         <Grid>
-          <TitleValueVertical title={'Resolution Date'} value={resolutionDate} />
+          <TitleValueVertical
+            date={resolution instanceof Date ? resolution : undefined}
+            title={'Resolution Date'}
+            tooltip={true}
+            value={resolutionDate}
+          />
           <TitleValueVertical title={'Category'} value={category} />
           <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
         </Grid>
@@ -220,8 +258,9 @@ const FundingAndFeeStep = (props: Props) => {
       <CreateCardBottom>
         <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
         <WarningMessage
+          additionalDescription={''}
           description={
-            'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time'
+            'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
           }
           href={DOCUMENT_FAQ}
           hyperlinkDescription={'More Info'}
@@ -232,7 +271,7 @@ const FundingAndFeeStep = (props: Props) => {
             <CurrencySelector
               context={context}
               disabled={false}
-              onSelect={handleCollateralChange}
+              onSelect={onCollateralChange}
               selectedCurrency={collateral}
             />
           </CurrenciesWrapper>
@@ -256,6 +295,14 @@ const FundingAndFeeStep = (props: Props) => {
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsStyled>
+        {showSetAllowance && (
+          <SetAllowance
+            collateral={collateral}
+            finished={allowanceFinished && RemoteData.is.success(allowance)}
+            loading={RemoteData.is.asking(allowance)}
+            onUnlock={unlockCollateral}
+          />
+        )}
         <ButtonContainerFullWidth>
           <LeftButton
             buttonType={ButtonType.secondaryLine}

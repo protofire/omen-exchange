@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "0.1.0",
+  "version": "1.1.2",
   "private": true,
   "engines": {
     "node": ">=v12.13.0 <13"
@@ -48,7 +48,7 @@
     "big.js": "^5.2.2",
     "circular-dependency-plugin": "^5.2.0",
     "common-tags": "^1.8.0",
-    "contract-proxy-kit": "^2.0.0-alpha.1",
+    "contract-proxy-kit": "^2.0.0-alpha.3",
     "disqus-react": "^1.0.8",
     "eslint-config-react-app": "^5.2.1",
     "ethers": "^4.0.36",

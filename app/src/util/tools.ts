@@ -19,17 +19,16 @@ export const truncateStringInTheMiddle = (str: string, strPositionStart: number,
 }
 
 export const formatDate = (date: Date): string => {
-  const offsetMinutes = moment().utcOffset()
   return moment(date)
-    .subtract(offsetMinutes, 'minutes')
-    .format('MM/DD/YY - HH:mm [UTC]')
+    .tz('UTC')
+    .format('YYYY-MM-DD - HH:mm [UTC]')
 }
 
 export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
   if (!date) {
     return date
   }
-  const offsetMinutes = moment().utcOffset()
+  const offsetMinutes = moment(date).utcOffset()
 
   return moment(date)
     .subtract(offsetMinutes, 'minutes')
@@ -39,7 +38,7 @@ export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
 // we need to do this because the value selected by react-datepicker
 // uses the local timezone, but we want to interpret it in UTC
 export const convertLocalToUTC = (date: Date): Date => {
-  const offsetMinutes = moment().utcOffset()
+  const offsetMinutes = moment(date).utcOffset()
   return moment(date)
     .add(offsetMinutes, 'minutes')
     .toDate()

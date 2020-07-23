@@ -75,11 +75,8 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         {!isLiquidityProvision ? (
           <>
             <TitleValue title={'Category'} value={question.category} />
-            <DisplayResolution title={'Resolution Date'} value={question.resolution} />
-            <TitleValue
-              title={'Arbitrator/Oracle'}
-              value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
-            />
+            <DisplayResolution questionId={question.id} title={'Resolution Date'} value={question.resolution} />
+            <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
             <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
             {showingExtraInformation ? (
               <>
@@ -124,10 +121,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
               <>
                 <TitleValue title={'Category'} value={question.category} />
                 <TitleValue title={'Resolution Date'} value={question.resolution && formatDate(question.resolution)} />
-                <TitleValue
-                  title={'Arbitrator/Oracle'}
-                  value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} questionId={question.id} />}
-                />
+                <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
                 <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
               </>
             ) : null}

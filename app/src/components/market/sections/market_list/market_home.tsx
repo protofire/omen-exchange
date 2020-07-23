@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { CATEGORIES } from '../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { CategoryDataItem, MarketMakerDataItem } from '../../../../queries/markets_home'
+import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
-import { Button, ButtonCircle } from '../../../button'
-import { ButtonType } from '../../../button/button_styling_types'
+import { ButtonCircle } from '../../../button'
 import { SectionTitle } from '../../../common'
 import {
   Dropdown,
@@ -16,6 +15,10 @@ import {
   DropdownPosition,
   DropdownVariant,
 } from '../../../common/form/dropdown'
+import { IconChevronLeft } from '../../../common/icons/IconChevronLeft'
+import { IconChevronLeftDisabled } from '../../../common/icons/IconChevronLeftDisabled'
+import { IconChevronRight } from '../../../common/icons/IconChevronRight'
+import { IconChevronRightDisabled } from '../../../common/icons/IconChevronRightDisabled'
 import { IconFilter } from '../../../common/icons/IconFilter'
 import { IconSearch } from '../../../common/icons/IconSearch'
 import { InlineLoading } from '../../../loading'
@@ -39,7 +42,7 @@ const SectionTitleMarket = styled(SectionTitle)`
 `
 
 const TopContents = styled.div`
-  padding: 25px;
+  padding: 25px 25px 20px 25px;
 `
 
 const FiltersWrapper = styled.div`
@@ -53,11 +56,12 @@ const FiltersWrapper = styled.div`
   }
 `
 
-const FiltersControls = styled.div`
+const FiltersControls = styled.div<{ disabled?: boolean }>`
   align-items: center;
   display: flex;
   margin-left: auto;
   margin-right: auto;
+  pointer-events: ${props => (props.disabled ? 'none' : 'initial')};
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 0;
@@ -66,7 +70,13 @@ const FiltersControls = styled.div`
   }
 `
 
-const ButtonCircleStyled = styled(ButtonCircle)`
+const ButtonCircleStyled = styled(ButtonCircle)<{ disabled?: boolean }>`
+  svg {
+    filter: ${props =>
+      props.disabled
+        ? 'invert(46%) sepia(0%) saturate(1168%) hue-rotate(183deg) brightness(99%) contrast(89%)'
+        : 'none'};
+  }
   margin-right: 5px;
 `
 
@@ -91,20 +101,11 @@ const NoOwnMarkets = styled.p`
   text-align: center;
 `
 
-const SortDropdown = styled(Dropdown)`
-  max-width: 145px;
-`
-
 const LoadMoreWrapper = styled.div`
   align-items: center;
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
   justify-content: center;
-  padding: 0 15px 25px;
-`
-
-const ButtonLoadMoreWrapper = styled(Button)`
-  margin-top: 20px;
+  padding: 0 25px 0 15px;
 `
 
 const CustomDropdownItem = styled.div`
@@ -151,31 +152,72 @@ const Actions = styled.div`
   }
 `
 
+const Display = styled.span`
+  color: ${props => props.theme.colors.textColorLighter};
+  font-size: 14px;
+  line-height: 1.2;
+  margin-right: 6px;
+`
+
+const BottomContents = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0px 25px 0px;
+  border-top: 1px solid ${props => props.theme.borders.borderColor};
+`
+
+const DisplayButtonWrapper = styled.div`
+  padding: 0 15px 0 25px;
+`
+
 interface Props {
   context: ConnectedWeb3Context
   count: number
   currentFilter: any
   isFiltering?: boolean
+  fetchMyMarkets: boolean
   markets: RemoteData<MarketMakerDataItem[]>
   categories: RemoteData<CategoryDataItem[]>
   moreMarkets: boolean
+  pageIndex: number
   onFilterChange: (filter: MarketFilters) => void
-  onLoadMore: () => void
+  onUpdatePageSize: (size: number) => void
+  onLoadNextPage: () => void
+  onLoadPrevPage: () => void
 }
 
+const logger = getLogger('MarketHome')
+
 export const MarketHome: React.FC<Props> = (props: Props) => {
-  const { categories, count, isFiltering = false, markets, moreMarkets, onFilterChange, onLoadMore } = props
-  const [state, setState] = useState<MarketStates>(MarketStates.open)
-  const [category, setCategory] = useState('All')
-  const [title, setTitle] = useState('')
-  const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(props.currentFilter.sortBy)
-  const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(props.currentFilter.sortByDirection)
-  const [showSearch, setShowSearch] = useState<boolean>(false)
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(false)
-  const [arbitrator, setArbitrator] = useState<Maybe<string>>(null)
-  const [currency, setCurrency] = useState<Maybe<string>>(props.currentFilter.currency)
+  const {
+    categories,
+    context,
+    count,
+    currentFilter,
+    fetchMyMarkets,
+    isFiltering = false,
+    markets,
+    moreMarkets,
+    onFilterChange,
+    onLoadNextPage,
+    onLoadPrevPage,
+    onUpdatePageSize,
+    pageIndex,
+  } = props
+  const [state, setState] = useState<MarketStates>(currentFilter.state)
+  const [category, setCategory] = useState(currentFilter.category)
+  const [title, setTitle] = useState(currentFilter.title)
+  const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(currentFilter.sortBy)
+  const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
+  const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
+    currentFilter.currency || currentFilter.arbitrator ? true : false,
+  )
+  const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
+  const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
-  // const CATEGORIES_WITH_ALL = ['All Categories', ...CATEGORIES]
+
   const filters = [
     {
       state: MarketStates.open,
@@ -190,18 +232,35 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       onClick: () => setState(MarketStates.pending),
     },
     {
+      state: MarketStates.finalizing,
+      title: 'Finalizing',
+      active: state === MarketStates.finalizing,
+      onClick: () => setState(MarketStates.finalizing),
+    },
+    {
       state: MarketStates.closed,
-      title: 'Closed',
+      title: 'Ended',
       active: state === MarketStates.closed,
       onClick: () => setState(MarketStates.closed),
     },
-    {
+  ]
+
+  // Only allow to filter myMarkets when the user is connected
+  if (context.account) {
+    filters.push({
       state: MarketStates.myMarkets,
       title: 'My Markets',
       active: state === MarketStates.myMarkets,
       onClick: () => setState(MarketStates.myMarkets),
-    },
-  ]
+    })
+  }
+
+  useEffect(() => {
+    if (state === MarketStates.myMarkets && !context.account) {
+      logger.log(`User disconnected, update filter`)
+      setState(MarketStates.open)
+    }
+  }, [context.account, state])
 
   useEffect(() => {
     onFilterChange({ arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title })
@@ -220,17 +279,17 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const sortOptions = [
     {
       title: '24h volume',
-      sortBy: 'lastActiveDayAndRunningDailyVolume',
+      sortBy: 'lastActiveDayAndScaledRunningDailyVolume',
       direction: 'desc',
     },
     {
       title: 'Total volume',
-      sortBy: 'collateralVolume',
+      sortBy: 'scaledCollateralVolume',
       direction: 'desc',
     },
     {
       title: 'Highest liquidity',
-      sortBy: 'liquidityParameter',
+      sortBy: 'scaledLiquidityParameter',
       direction: 'desc',
     },
     {
@@ -268,63 +327,102 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   const categoryItems: Array<DropdownItemProps> =
     RemoteData.hasData(categories) && categories.data.length > 0
-      ? (categories.data.map((item: CategoryDataItem, index) => {
-          return {
-            content: <CustomDropdownItem>{item.id}</CustomDropdownItem>,
+      ? ([
+          {
+            content: <CustomDropdownItem>{'All Categories'}</CustomDropdownItem>,
             onClick: () => {
-              setCategory(item.id)
+              setCategory('All')
             },
-          }
-        }) as Array<DropdownItemProps>)
+          },
+          ...categories.data.map((item: CategoryDataItem) => {
+            return {
+              content: <CustomDropdownItem>{item.id}</CustomDropdownItem>,
+              onClick: () => {
+                setCategory(item.id)
+              },
+            }
+          }),
+        ] as Array<DropdownItemProps>)
       : [
           {
-            content: <CustomDropdownItem>Loading...</CustomDropdownItem>,
+            content: <CustomDropdownItem>{'All Categories'}</CustomDropdownItem>,
           },
         ]
+
+  const sizeOptions = [4, 8, 12]
+
+  const sizeItems: Array<DropdownItemProps> = sizeOptions.map(item => {
+    return {
+      content: (
+        <CustomDropdownItem>
+          <Display className="display">Display</Display> {item}
+        </CustomDropdownItem>
+      ),
+      onClick: () => {
+        onUpdatePageSize(item)
+      },
+    }
+  })
 
   const noOwnMarkets = RemoteData.is.success(markets) && markets.data.length === 0 && state === MarketStates.myMarkets
   const noMarketsAvailable =
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
   const showFilteringInlineLoading = !noMarketsAvailable && !noOwnMarkets && isFiltering
-  const disableLoadMoreButton =
+  const disableLoadNextButton =
     isFiltering || !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
+  const disableLoadPrevButton =
+    isFiltering || pageIndex === 0 || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
 
   return (
     <>
       <Actions>
         <MarketsDropdown
+          currentItem={
+            RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(category)) + 1 : 0
+          }
+          dirty={true}
+          disabled={fetchMyMarkets}
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={categoryItems}
+          showScrollbar={true}
         />
         <MarketsFilterDropdown
+          currentItem={filters.findIndex(i => i.state === state)}
+          dirty={true}
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={filterItems}
+          showScrollbar={true}
         />
       </Actions>
       <ListCard>
         <TopContents>
           <FiltersWrapper>
             <SectionTitleMarket title={'Markets'} />
-            <FiltersControls>
-              <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
+            <FiltersControls disabled={fetchMyMarkets}>
+              <ButtonCircleStyled active={showSearch} disabled={fetchMyMarkets} onClick={toggleSearch}>
                 <IconSearch />
               </ButtonCircleStyled>
-              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
-                <IconSearch />
+              <ButtonCircleStyled active={showAdvancedFilters} disabled={fetchMyMarkets} onClick={toggleFilters}>
+                <IconFilter />
               </ButtonCircleStyled>
-              <SortDropdown
-                dropdownPosition={DropdownPosition.right}
-                items={sortItems}
-                placeholder={<SecondaryText>Sort By</SecondaryText>}
-              />
+              {!fetchMyMarkets && (
+                <Dropdown
+                  currentItem={sortOptions.findIndex(i => i.sortBy === sortBy)}
+                  dirty={true}
+                  dropdownPosition={DropdownPosition.right}
+                  items={sortItems}
+                  placeholder={<SecondaryText>Sort By</SecondaryText>}
+                />
+              )}
             </FiltersControls>
           </FiltersWrapper>
         </TopContents>
         {showSearch && <Search onChange={setTitle} value={title} />}
         {showAdvancedFilters && (
           <AdvancedFilters
+            arbitrator={arbitrator}
             currency={currency}
             onChangeArbitrator={setArbitrator}
             onChangeCurrency={setCurrency}
@@ -336,23 +434,41 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             RemoteData.hasData(markets) &&
             markets.data.length > 0 &&
             markets.data.slice(0, count).map(item => {
-              return <ListItem key={item.address} market={item}></ListItem>
+              return <ListItem currentFilter={currentFilter} key={item.address} market={item}></ListItem>
             })}
-          {noOwnMarkets && <NoOwnMarkets>You haven&apos;t participated in or created any market yet.</NoOwnMarkets>}
+          {noOwnMarkets && <NoOwnMarkets>You have not created any market yet.</NoOwnMarkets>}
           {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
-        {RemoteData.hasData(markets) && markets.data.length === 0 ? null : (
-          <LoadMoreWrapper>
-            <ButtonLoadMoreWrapper
-              buttonType={ButtonType.secondaryLine}
-              disabled={disableLoadMoreButton}
-              onClick={onLoadMore}
-            >
-              {RemoteData.is.reloading(markets) ? 'Loading...' : 'Load more'}
-            </ButtonLoadMoreWrapper>
-          </LoadMoreWrapper>
-        )}
+        <BottomContents>
+          <DisplayButtonWrapper>
+            <Dropdown
+              currentItem={4}
+              dirty={true}
+              dropdownPosition={DropdownPosition.left}
+              items={sizeItems}
+              placeholder={<Display>Display</Display>}
+            />
+          </DisplayButtonWrapper>
+          {RemoteData.hasData(markets) && markets.data.length === 0 ? null : (
+            <LoadMoreWrapper>
+              <ButtonCircleStyled disabled={disableLoadPrevButton} onClick={onLoadPrevPage}>
+                {disableLoadPrevButton ? (
+                  <IconChevronLeftDisabled></IconChevronLeftDisabled>
+                ) : (
+                  <IconChevronLeft></IconChevronLeft>
+                )}
+              </ButtonCircleStyled>
+              <ButtonCircleStyled disabled={disableLoadNextButton} onClick={onLoadNextPage}>
+                {disableLoadNextButton ? (
+                  <IconChevronRightDisabled></IconChevronRightDisabled>
+                ) : (
+                  <IconChevronRight></IconChevronRight>
+                )}
+              </ButtonCircleStyled>
+            </LoadMoreWrapper>
+          )}
+        </BottomContents>
       </ListCard>
     </>
   )

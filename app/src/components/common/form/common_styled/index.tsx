@@ -12,5 +12,9 @@ export const CommonDisabledCSS = css`
     color: ${props => props.theme.form.common.disabled.color};
     cursor: not-allowed !important;
     user-select: none !important;
+
+    .chevronDown {
+      filter: invert(46%) sepia(0%) saturate(1168%) hue-rotate(183deg) brightness(99%) contrast(89%);
+    }
   }
 `

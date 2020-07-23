@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { version as appVersion } from '../../../../../package.json'
-import { DISCLAIMER_TEXT, DOCUMENT_FAQ, SHOW_FOOTER } from '../../../../common/constants'
+import { DISCLAIMER_TEXT, DOCUMENT_FAQ, DOCUMENT_VALIDITY_RULES, SHOW_FOOTER } from '../../../../common/constants'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 
 const Wrapper = styled.div<{ paddingBottomSmall?: boolean }>`
@@ -55,8 +55,20 @@ export const Footer = () => {
           FAQ
         </Link>
         <Break>·</Break>
+        <Link href={DOCUMENT_VALIDITY_RULES} target="_blank">
+          Market Rules
+        </Link>
+        <Break>·</Break>
         <Link href="https://dxdao.eth.link" target="_blank">
           DXdao.eth
+        </Link>
+        <Break>·</Break>
+        <Link href="https://twitter.com/Omen_eth" target="_blank">
+          Twitter
+        </Link>
+        <Break>·</Break>
+        <Link href="https://t.me/omen_eth" target="_blank">
+          Telegram
         </Link>
       </Wrapper>
     </>
