@@ -174,7 +174,7 @@ const MarketHomeContainer: React.FC = () => {
     whitelistedTemplateIds: true,
     whitelistedCreators: false,
     ...filter,
-    context
+    context,
   })
 
   const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)

@@ -1,8 +1,9 @@
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
-import { MarketFilters, MarketStates, MarketsSortCriteria } from './../util/types'
 import { ConnectedWeb3Context } from '../hooks/connectedWeb3'
+
+import { MarketFilters, MarketStates, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
@@ -61,7 +62,7 @@ export const DEFAULT_OPTIONS = {
   currency: null as Maybe<string>,
   sortBy: null as Maybe<MarketsSortCriteria>,
   sortByDirection: 'desc' as 'asc' | 'desc',
-  context: null as Maybe<ConnectedWeb3Context>
+  context: null as Maybe<ConnectedWeb3Context>,
 }
 
 export const queryMyMarkets = gql`
@@ -77,18 +78,22 @@ export const queryMyMarkets = gql`
   ${MarketDataFragment}
 `
 
-type buildQueryType = MarketFilters & { whitelistedCreators: boolean; whitelistedTemplateIds: boolean, context: Maybe<ConnectedWeb3Context> }
+type buildQueryType = MarketFilters & {
+  whitelistedCreators: boolean
+  whitelistedTemplateIds: boolean
+  context: Maybe<ConnectedWeb3Context>
+}
 export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => {
   const {
     arbitrator,
     category,
+    context,
     currency,
     state,
     templateId,
     title,
     whitelistedCreators,
     whitelistedTemplateIds,
-    context
   } = options
 
   const MIN_TIMEOUT = context && context.networkId === 1 ? 86400 : 0
