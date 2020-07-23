@@ -92,6 +92,9 @@ const theme = {
     textColorLighter: '#86909E',
     textColorLightish: '#7D8189',
     verticalDivider: '#e8eaf6',
+    progressBarOpen: '#7986CB',
+    progressBarFinalized: '#9575CD',
+    progressBarClosed: '#BA68C8',
   },
   message: {
     colors: {

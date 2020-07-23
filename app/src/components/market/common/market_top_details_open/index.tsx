@@ -9,6 +9,7 @@ import { DisplayArbitrator } from '../display_arbitrator'
 import { DisplayResolution } from '../display_resolution'
 import { HistoryChartContainer } from '../history_chart'
 import { MarketTitle } from '../market_title'
+// import { ProgressBar } from '../progress_bar'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -60,6 +61,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     <>
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} title={title} />
+        {/* <ProgressBar></ProgressBar> */}
         <SubsectionTitleActionWrapper>
           <SubsectionTitleAction onClick={toggleExtraInformation}>
             {showingExtraInformation ? 'Hide' : 'Show'} {toggleTitle}
