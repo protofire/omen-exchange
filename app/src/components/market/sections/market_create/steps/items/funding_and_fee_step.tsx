@@ -1,6 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useMemo, useState, useEffect } from 'react'
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
@@ -246,7 +246,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleCollateralChange(token)
     setAllowanceFinished(false)
   }
-  
+
   const toggleCustomFee = () => {
     if (customFee) resetTradingFee()
     if (!customFee) setFee(undefined)
