@@ -205,6 +205,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     onUpdatePageSize,
     pageIndex,
   } = props
+  const [counts, setCounts] = useState({
+    open: 0,
+    closed: 0,
+    total: 0,
+  })
   const [state, setState] = useState<MarketStates>(currentFilter.state)
   const [category, setCategory] = useState(currentFilter.category)
   const [title, setTitle] = useState(currentFilter.title)
@@ -263,6 +268,14 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   }, [context.account, state])
 
   useEffect(() => {
+    if (RemoteData.hasData(categories)) {
+      const index = categories.data.findIndex(i => i.id === decodeURI(category))
+      const item = categories.data[index]
+      !!item && setCounts({ open: item.numOpenConditions, closed: item.numClosedConditions, total: item.numConditions })
+    }
+  }, [category, categories])
+
+  useEffect(() => {
     onFilterChange({ arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title })
   }, [arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title, onFilterChange])
 
@@ -318,9 +331,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     }
   })
 
-  const filterItems: Array<DropdownItemProps> = filters.map(item => {
+  const filterItems: Array<DropdownItemProps> = filters.map((item, index) => {
+    const count = index === 0 ? counts.open : index === 3 ? counts.closed : 0
     return {
       content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
+      secondaryText: count > 0 && count.toString(),
       onClick: item.onClick,
     }
   })
