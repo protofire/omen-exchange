@@ -44,7 +44,7 @@ const DropdownOpenCSS = css`
 const DropdownVariantCardOpenCSS = css`
   &,
   &:hover {
-    border-color: #9fa8da;
+    border-color: ${props => props.theme.textfield.borderColorActive};
     z-index: 12345;
     .currentItem {
       color: ${props => props.theme.colors.primary};
@@ -83,7 +83,7 @@ const DropdownVariantCardCSS = css`
   flex: 1;
   padding: 13px 25px;
   position: relative;
-  border: 1px solid #dcdff2;
+  border: 1px solid ${props => props.theme.colors.tertiary};
   text-transform: capitalize;
 `
 
@@ -105,7 +105,9 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean; dropdownVariant
   &:hover {
     background-color: ${props => props.theme.dropdown.buttonBackgroundColor};
     border-color: ${props =>
-      props.dropdownVariant === DropdownVariant.card ? '#9fa8da' : props.theme.dropdown.buttonBorderColorHover};
+      props.dropdownVariant === DropdownVariant.card
+        ? props.theme.textfield.borderColorActive
+        : props.theme.dropdown.buttonBorderColorHover};
     color: ${props => props.theme.dropdown.buttonColorHover};
   }
 
@@ -174,7 +176,7 @@ const DropdownVariantCardItemsCSS = css`
 `
 const DropdownVariantCardItemsContainerCSS = css`
   border-radius: 8px;
-  border: 1px solid #dcdff2;
+  border: 1px solid ${props => props.theme.colors.tertiary};
   width: 100%;
   left: 0;
 `
@@ -204,11 +206,11 @@ const ItemsContainer = styled.div<{
 const DropdownScrollbarCSS = css`
   margin-right: 0;
   &::-webkit-scrollbar-track {
-    background: #f3f4fb;
+    background: ${props => props.theme.slider.idle};
     border-radius: 2px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: #9fa9d8;
+    background-color: ${props => props.theme.slider.active};
     border-radius: 2px;
   }
   &::-webkit-scrollbar {
@@ -227,7 +229,7 @@ const Items = styled.div<{
 `
 
 const SecondaryText = styled.div`
-  color: #757575;
+  color: ${props => props.theme.colors.textColor};
   width: 33%;
   text-align: right;
 `
@@ -241,13 +243,11 @@ const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
   justify-content: space-between;
   background-color: ${props =>
     props.active
-      ? props.dropdownVariant === DropdownVariant.card
-        ? '#F8F9FC'
-        : props.theme.dropdown.dropdownItems.item.backgroundColorActive
+      ? props.theme.dropdown.dropdownItems.item.backgroundColorActive
       : props.theme.dropdown.dropdownItems.item.backgroundColor};
   color: ${props =>
     props.dropdownVariant === DropdownVariant.card && !props.active
-      ? '#757575'
+      ? props.theme.colors.textColor
       : props.theme.dropdown.dropdownItems.item.color};
   cursor: pointer;
   display: flex;
@@ -260,10 +260,10 @@ const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
     color: ${props => props.theme.dropdown.dropdownItems.item.color};
     background: ${props =>
       props.dropdownVariant === DropdownVariant.card
-        ? '#F8F9FC'
+        ? props.theme.dropdown.dropdownItems.item.backgroundColorActive
         : props.theme.dropdown.dropdownItems.item.backgroundColorHover};
     div {
-      color: #39474f;
+      color: ${props => props.theme.dropdown.buttonColor};
     }
   }
 `
