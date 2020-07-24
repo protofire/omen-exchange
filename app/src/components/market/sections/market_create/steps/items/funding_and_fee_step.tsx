@@ -153,6 +153,10 @@ const TextFieldWrapper = styled.div`
   width: 50%;
 `
 
+const MaxDeposit = styled.p`
+  color: ${props => props.theme.colors.hyperlink};
+`
+
 const NumberInput = styled.input``
 
 interface Props {
@@ -327,6 +331,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         />
         <GridTransactionDetailsStyled noMarginTop={false}>
           <div>
+            <MaxDeposit>set max</MaxDeposit>
             {tokensAmount > 1 && (
               <CurrenciesWrapper>
                 <CurrencySelector
