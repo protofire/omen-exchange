@@ -62,7 +62,7 @@ export const DEFAULT_OPTIONS = {
   currency: null as Maybe<string>,
   sortBy: null as Maybe<MarketsSortCriteria>,
   sortByDirection: 'desc' as 'asc' | 'desc',
-  context: null as Maybe<ConnectedWeb3Context>,
+  networkId: null as Maybe<number>,
 }
 
 export const queryMyMarkets = gql`
@@ -81,14 +81,14 @@ export const queryMyMarkets = gql`
 type buildQueryType = MarketFilters & {
   whitelistedCreators: boolean
   whitelistedTemplateIds: boolean
-  context: Maybe<ConnectedWeb3Context>
+  networkId: Maybe<number>
 }
 export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => {
   const {
     arbitrator,
     category,
-    context,
     currency,
+    networkId,
     state,
     templateId,
     title,
@@ -96,7 +96,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     whitelistedTemplateIds,
   } = options
 
-  const MIN_TIMEOUT = context && context.networkId === 1 ? 86400 : 0
+  const MIN_TIMEOUT = networkId && networkId === 1 ? 86400 : 0
   const whereClause = [
     state === MarketStates.closed ? 'answerFinalizedTimestamp_lt: $now' : '',
     state === MarketStates.open ? 'openingTimestamp_gt: $now' : '',
