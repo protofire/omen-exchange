@@ -1,6 +1,7 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useContracts } from '../../../../../hooks'
@@ -8,7 +9,7 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/con
 import { CPKService, ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
-import { Button } from '../../../../button'
+import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
@@ -22,7 +23,11 @@ const MarketResolutionMessageStyled = styled(MarketResolutionMessage)`
   margin: 20px 0;
 `
 
-interface Props {
+const LeftButton = styled(Button)`
+  margin-right: auto;
+`
+
+interface Props extends RouteComponentProps<{}> {
   marketMakerData: MarketMakerData
 }
 
@@ -43,12 +48,12 @@ const computeEarnedCollateral = (payouts: Maybe<number[]>, balances: BigNumber[]
   return bigNumberify(earnedCollateral.toFixed(0))
 }
 
-export const ClosedMarketDetail = (props: Props) => {
+const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
 
-  const { marketMakerData } = props
+  const { history, marketMakerData } = props
 
   const {
     address: marketMakerAddress,
@@ -163,6 +168,40 @@ export const ClosedMarketDetail = (props: Props) => {
   const EPS = 0.01
   const allPayoutsEqual = payouts ? payouts.every(payout => Math.abs(payout - 1 / payouts.length) <= EPS) : false
 
+  const poolButton = (
+    <LeftButton
+      buttonType={ButtonType.secondaryLine}
+      onClick={() => {
+        history.push(`${marketMakerAddress}/pool-liquidity`)
+      }}
+    >
+      Pool Liquidity
+    </LeftButton>
+  )
+
+  const buySellButtons = (
+    <>
+      <Button
+        buttonType={ButtonType.secondaryLine}
+        disabled={true}
+        onClick={() => {
+          history.push(`${marketMakerAddress}/sell`)
+        }}
+      >
+        Sell
+      </Button>
+      <Button
+        buttonType={ButtonType.secondaryLine}
+        disabled={true}
+        onClick={() => {
+          history.push(`${marketMakerAddress}/buy`)
+        }}
+      >
+        Buy
+      </Button>
+    </>
+  )
+
   return (
     <>
       <ViewCard>
@@ -188,6 +227,10 @@ export const ClosedMarketDetail = (props: Props) => {
               winnersOutcomes={winnersOutcomes}
             ></MarketResolutionMessageStyled>
           )}
+          <ButtonContainer>
+            {poolButton}
+            {buySellButtons}
+          </ButtonContainer>
           {isConditionResolved && !hasWinningOutcomes ? null : (
             <ButtonContainerFullWidth borderTop={true}>
               {!isConditionResolved && (
@@ -215,3 +258,5 @@ export const ClosedMarketDetail = (props: Props) => {
     </>
   )
 }
+
+export const ClosedMarketDetail = withRouter(Wrapper)
