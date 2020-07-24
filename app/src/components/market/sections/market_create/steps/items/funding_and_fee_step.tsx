@@ -329,6 +329,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           <CurrenciesWrapper>
             <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
             <CurrencySelector
+              balance={collateralBalanceFormatted}
               context={context}
               disabled={false}
               onSelect={onCollateralChange}
