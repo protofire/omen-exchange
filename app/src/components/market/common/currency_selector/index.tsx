@@ -9,6 +9,7 @@ import styled, { css } from 'styled-components'
 const Wrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
+  width: 100%;
 `
 
 const CurrencyButtonSelectedCSS = css`
@@ -21,6 +22,7 @@ const CurrencyButtonSelectedCSS = css`
 
 const CurrencyDropdown = styled(Dropdown)<{ selected: boolean }>`
   ${props => props.selected && CurrencyButtonSelectedCSS}
+  width: 100%;
 `
 
 interface Props {
@@ -49,6 +51,7 @@ export const CurrencySelector: React.FC<Props> = props => {
   tokens.forEach(({ address, image, symbol }) => {
     currencyDropdownData.push({
       content: image ? <TokenItem image={image} text={symbol} /> : symbol,
+      extraContent: balance,
       onClick: !disabled
         ? () => {
             onChange(address)

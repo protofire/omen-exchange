@@ -52,7 +52,6 @@ import { SetAllowance } from '../../../../common/set_allowance'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
-import { WalletBalance } from '../../../../common/wallet_balance'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome } from '../outcomes'
 
@@ -109,8 +108,8 @@ const TitleValueVertical = styled(TitleValue)`
 `
 
 const CurrenciesWrapper = styled.div`
-  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
   padding: 0 0 20px 0;
+  width: 100%;
 `
 
 const GridTransactionDetailsStyled = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
@@ -199,7 +198,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const resolutionDate = resolution && formatDate(resolution)
 
-  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals, 5)
+  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals, 2)
+  console.log(collateralBalanceFormatted)
 
   const [customFee, setCustomFee] = useState(false)
   const [fee, setFee] = useState<number | undefined>(spread)
@@ -325,20 +325,25 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           href={DOCUMENT_FAQ}
           hyperlinkDescription={'More Info'}
         />
-        {tokensAmount > 1 && (
-          <CurrenciesWrapper>
-            <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
-            <CurrencySelector
-              balance={collateralBalanceFormatted}
-              context={context}
-              disabled={false}
-              onSelect={onCollateralChange}
-              selectedCurrency={collateral}
-            />
-          </CurrenciesWrapper>
-        )}
         <GridTransactionDetailsStyled noMarginTop={false}>
           <div>
+            {tokensAmount > 1 && (
+              <CurrenciesWrapper>
+                <CurrencySelector
+                  balance={collateralBalanceFormatted}
+                  context={context}
+                  disabled={false}
+                  onSelect={onCollateralChange}
+                  selectedCurrency={collateral}
+                />
+              </CurrenciesWrapper>
+            )}
+            <TextfieldCustomPlaceholder
+              formField={
+                <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
+              }
+              symbol={collateral.symbol}
+            />
             {customFee && (
               <CustomFeeWrapper>
                 <CustomFeeLabel>Trading Fee</CustomFeeLabel>
@@ -359,13 +364,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 </TextFieldWrapper>
               </CustomFeeWrapper>
             )}
-            <WalletBalance symbol={collateral.symbol} value={collateralBalanceFormatted} />
-            <TextfieldCustomPlaceholder
-              formField={
-                <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
-              }
-              symbol={collateral.symbol}
-            />
             {amountError && <GenericError>{amountError}</GenericError>}
           </div>
           <div>
