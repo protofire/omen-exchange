@@ -114,7 +114,7 @@ export const MarketWizardCreator = (props: Props) => {
 
     const newMarketData = {
       ...marketData,
-      [name]: value,
+      [name]: name === 'category' ? (value as string).toLowerCase() : value,
     }
     setMarketdata(newMarketData)
   }
