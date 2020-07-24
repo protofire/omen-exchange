@@ -1,10 +1,10 @@
+import React from 'react'
+import styled, { css } from 'styled-components'
+
 import { ConnectedWeb3Context, useTokens } from '../../../../hooks'
 import { Token } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { TokenItem } from '../token_item'
-
-import React from 'react'
-import styled, { css } from 'styled-components'
 
 const Wrapper = styled.div`
   display: flex;
