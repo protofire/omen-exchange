@@ -83,7 +83,7 @@ const DropdownVariantCardCSS = css`
   flex: 1;
   padding: 13px 25px;
   position: relative;
-  border: 1px solid ${props => props.theme.colors.tertiary};
+  border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
   text-transform: capitalize;
 `
 
@@ -176,7 +176,7 @@ const DropdownVariantCardItemsCSS = css`
 `
 const DropdownVariantCardItemsContainerCSS = css`
   border-radius: 8px;
-  border: 1px solid ${props => props.theme.colors.tertiary};
+  border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
   width: 100%;
   left: 0;
 `
