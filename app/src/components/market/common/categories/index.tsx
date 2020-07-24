@@ -61,7 +61,7 @@ export const Categories = (props: Props) => {
         return (
           <CategoryButton
             buttonType={ButtonType.secondaryLine}
-            isSelected={option.value === selectedCategory}
+            isSelected={option.value === selectedCategory.toLowerCase()}
             key={option.value}
             name={name}
             onChange={onChange}
