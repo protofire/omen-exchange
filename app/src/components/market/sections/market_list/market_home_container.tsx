@@ -168,12 +168,13 @@ const MarketHomeContainer: React.FC = () => {
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
   const [now, setNow] = useState<string>(calcNow())
   const [isFiltering, setIsFiltering] = useState(false)
-  const { account, library: provider } = context
+  const { account, library: provider, networkId } = context
   const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
   const marketQuery = buildQueryMarkets({
     whitelistedTemplateIds: true,
     whitelistedCreators: false,
     ...filter,
+    networkId,
   })
 
   const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)
