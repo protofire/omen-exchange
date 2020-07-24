@@ -44,7 +44,7 @@ const DropdownOpenCSS = css`
 const DropdownVariantCardOpenCSS = css`
   &,
   &:hover {
-    border-color: #9fa8da;
+    border-color: ${props => props.theme.textfield.borderColorActive};
     z-index: 12345;
     .currentItem {
       color: ${props => props.theme.colors.primary};
@@ -83,7 +83,8 @@ const DropdownVariantCardCSS = css`
   flex: 1;
   padding: 13px 25px;
   position: relative;
-  border: 1px solid #dcdff2;
+  border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
+  text-transform: capitalize;
 `
 
 const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean; dropdownVariant?: DropdownVariant }>`
@@ -104,7 +105,9 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean; dropdownVariant
   &:hover {
     background-color: ${props => props.theme.dropdown.buttonBackgroundColor};
     border-color: ${props =>
-      props.dropdownVariant === DropdownVariant.card ? '#9fa8da' : props.theme.dropdown.buttonBorderColorHover};
+      props.dropdownVariant === DropdownVariant.card
+        ? props.theme.textfield.borderColorActive
+        : props.theme.dropdown.buttonBorderColorHover};
     color: ${props => props.theme.dropdown.buttonColorHover};
   }
 
@@ -125,6 +128,7 @@ const DropdownButton = styled.div`
 
 const CurrentItem = styled.div`
   align-items: center;
+  justify-content: space-between;
   color: ${props => props.theme.dropdown.buttonColor};
   display: flex;
   flex-grow: 1;
@@ -172,7 +176,7 @@ const DropdownVariantCardItemsCSS = css`
 `
 const DropdownVariantCardItemsContainerCSS = css`
   border-radius: 8px;
-  border: 1px solid #dcdff2;
+  border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
   width: 100%;
   left: 0;
 `
@@ -202,11 +206,11 @@ const ItemsContainer = styled.div<{
 const DropdownScrollbarCSS = css`
   margin-right: 0;
   &::-webkit-scrollbar-track {
-    background: #f3f4fb;
+    background: ${props => props.theme.slider.idle};
     border-radius: 2px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: #9fa9d8;
+    background-color: ${props => props.theme.slider.active};
     border-radius: 2px;
   }
   &::-webkit-scrollbar {
@@ -224,21 +228,26 @@ const Items = styled.div<{
   ${props => props.showScrollbar && DropdownScrollbarCSS}
 `
 
+const SecondaryText = styled.div`
+  color: ${props => props.theme.colors.textColor};
+  width: 33%;
+  text-align: right;
+`
+
 Items.defaultProps = {
   dropdownVariant: DropdownVariant.pill,
 }
 
 const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
   align-items: center;
+  justify-content: space-between;
   background-color: ${props =>
     props.active
-      ? props.dropdownVariant === DropdownVariant.card
-        ? '#F8F9FC'
-        : props.theme.dropdown.dropdownItems.item.backgroundColorActive
+      ? props.theme.dropdown.dropdownItems.item.backgroundColorActive
       : props.theme.dropdown.dropdownItems.item.backgroundColor};
   color: ${props =>
     props.dropdownVariant === DropdownVariant.card && !props.active
-      ? '#757575'
+      ? props.theme.colors.textColor
       : props.theme.dropdown.dropdownItems.item.color};
   cursor: pointer;
   display: flex;
@@ -251,8 +260,11 @@ const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
     color: ${props => props.theme.dropdown.dropdownItems.item.color};
     background: ${props =>
       props.dropdownVariant === DropdownVariant.card
-        ? '#F8F9FC'
+        ? props.theme.dropdown.dropdownItems.item.backgroundColorActive
         : props.theme.dropdown.dropdownItems.item.backgroundColorHover};
+    div {
+      color: ${props => props.theme.dropdown.buttonColor};
+    }
   }
 `
 
@@ -262,6 +274,7 @@ const ChevronWrapper = styled.div`
 
 export interface DropdownItemProps {
   content: React.ReactNode | string
+  secondaryText?: React.ReactNode | string
   onClick?: () => void
 }
 
@@ -299,8 +312,8 @@ export const Dropdown: React.FC<Props> = props => {
     return itemIndex
   }
 
-  const getItemContent = (itemIndex: number): any => {
-    return items[getValidItemIndex(itemIndex)].content
+  const getItem = (itemIndex: number): any => {
+    return items[getValidItemIndex(itemIndex)]
   }
 
   const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
@@ -328,6 +341,8 @@ export const Dropdown: React.FC<Props> = props => {
     }
   }, [isOpen])
 
+  const activeItem = getItem(currentItemIndex)
+
   return (
     <>
       <Wrapper
@@ -343,7 +358,8 @@ export const Dropdown: React.FC<Props> = props => {
       >
         <DropdownButton>
           <CurrentItem className="currentItem">
-            {placeholder && !isDirty ? placeholder : getItemContent(currentItemIndex)}
+            {placeholder && !isDirty ? placeholder : activeItem.content}
+            {!!activeItem.secondaryText && <SecondaryText>{activeItem.secondaryText}</SecondaryText>}
           </CurrentItem>
           <ChevronWrapper>
             <ChevronDown />
@@ -376,6 +392,7 @@ export const Dropdown: React.FC<Props> = props => {
                   }
                 >
                   {item.content}
+                  {!!item.secondaryText && <SecondaryText>{item.secondaryText}</SecondaryText>}
                 </Item>
               )
             })}

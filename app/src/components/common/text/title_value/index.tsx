@@ -36,6 +36,7 @@ const Value = styled.p<{ state: ValueStates }>`
   line-height: 1.2;
   margin: 0;
   text-align: right;
+  text-transform: capitalize;
 
   a {
     color: ${props =>
@@ -48,7 +49,7 @@ const Value = styled.p<{ state: ValueStates }>`
       text-decoration: none;
     }
   }
-  
+
   &:hover {
     &.tooltip {
       text-decoration: underline;
@@ -83,14 +84,14 @@ export const TitleValue: React.FC<Props> = (props: Props) => {
   return (
     <Wrapper {...restProps}>
       <Title>{title}</Title>
-      <Value 
-        state={state}
-        data-delay-hide={tooltip ? "500" : ''}
-        data-effect={tooltip ? "solid" : ''}
-        data-for={tooltip ? "walletBalanceTooltip" : ''}
-        data-multiline={tooltip ? "true" : ''}
-        data-tip={tooltip ? localResolution.format(formatting) + '<br />' + endsMessage : null}
+      <Value
         className={tooltip ? 'tooltip' : ''}
+        data-delay-hide={tooltip ? '500' : ''}
+        data-effect={tooltip ? 'solid' : ''}
+        data-for={tooltip ? 'walletBalanceTooltip' : ''}
+        data-multiline={tooltip ? 'true' : ''}
+        data-tip={tooltip ? localResolution.format(formatting) + '<br />' + endsMessage : null}
+        state={state}
       >
         {value}
       </Value>
