@@ -1,9 +1,3 @@
-import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import styled from 'styled-components'
-
 import { DOCUMENT_FAQ, MAX_MARKET_FEE } from '../../../../../../common/constants'
 import {
   useCollateralBalance,
@@ -55,6 +49,12 @@ import { TransactionDetailsRow, ValueStates } from '../../../../common/transacti
 import { WalletBalance } from '../../../../common/wallet_balance'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome } from '../outcomes'
+
+import { Zero } from 'ethers/constants'
+import { BigNumber } from 'ethers/utils'
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
 
 const CreateCardTop = styled(CreateCard)`
   margin-bottom: 20px;
@@ -248,18 +248,18 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   }
 
   const toggleCustomFee = () => {
-    if (customFee) resetTradingFee()
-    if (!customFee) setFee(undefined)
-    setCustomFee(!customFee)
+    if (customFee) {
+      resetTradingFee()
+      setCustomFee(false)
+    } else {
+      setFee(undefined)
+      setCustomFee(true)
+    }
   }
 
   useEffect(() => {
-    const setMaxFeeWarning = () => {
-      spread > MAX_MARKET_FEE ? setExceedsMaxFee(true) : setExceedsMaxFee(false)
-    }
-
-    setMaxFeeWarning()
-  })
+    setExceedsMaxFee(spread > MAX_MARKET_FEE)
+  }, [spread])
 
   return (
     <>
