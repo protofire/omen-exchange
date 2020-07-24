@@ -239,6 +239,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           </div>
           <div>
             <TransactionDetailsCard>
+              <TransactionDetailsRow title={'Fee'} value={feeFormatted} />
               <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
               <TransactionDetailsRow
                 title={'Fee'}

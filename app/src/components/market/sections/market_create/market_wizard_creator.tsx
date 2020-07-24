@@ -119,6 +119,14 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
+  const resetTradingFee = () => {
+    const newMarketData = {
+      ...marketData,
+      spread: MARKET_FEE,
+    }
+    setMarketdata(newMarketData)
+  }
+
   const handleArbitratorChange = (arbitrator: Arbitrator) => {
     const newMarketData = {
       ...marketData,
@@ -213,6 +221,7 @@ export const MarketWizardCreator = (props: Props) => {
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
             marketCreationStatus={marketCreationStatus}
+            resetTradingFee={resetTradingFee}
             submit={() => submit()}
             values={marketData}
           />
