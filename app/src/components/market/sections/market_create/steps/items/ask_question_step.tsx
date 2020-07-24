@@ -54,6 +54,7 @@ const ButtonCategoryTextOverflow = styled.span`
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
+  text-transform: capitalize;
 `
 
 const GridThreeColumns = styled.div`
@@ -233,7 +234,7 @@ const AskQuestionStep = (props: Props) => {
           categories={categoriesCustom}
           name="category"
           onChange={handleCategoryChange}
-          selectedCategory={category}
+          selectedCategory={category.toLowerCase()}
         />
       )}
       <WarningMessage

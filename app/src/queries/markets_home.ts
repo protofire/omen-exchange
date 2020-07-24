@@ -47,6 +47,8 @@ export type MarketMakerDataItem = {
 export type CategoryDataItem = {
   id: string
   numOpenConditions: number
+  numClosedConditions: number
+  numConditions: number
 }
 
 export const DEFAULT_OPTIONS = {
@@ -129,6 +131,8 @@ export const queryCategories = gql`
     categories(first: 100, orderBy: numOpenConditions, orderDirection: desc) {
       id
       numOpenConditions
+      numClosedConditions
+      numConditions
     }
   }
 `
