@@ -141,6 +141,7 @@ const CustomFeeWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
+  padding: 20px 0 0 0;
 `
 
 const CustomFeeLabel = styled.p`
@@ -198,8 +199,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const resolutionDate = resolution && formatDate(resolution)
 
-  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals, 2)
-  console.log(collateralBalanceFormatted)
+  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals)
 
   const [customFee, setCustomFee] = useState(false)
   const [fee, setFee] = useState<number | undefined>(spread)
