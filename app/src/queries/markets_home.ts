@@ -1,8 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
-import { ConnectedWeb3Context } from '../hooks/connectedWeb3'
-
 import { MarketFilters, MarketStates, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
