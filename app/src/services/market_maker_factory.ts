@@ -190,10 +190,11 @@ class MarketMakerFactoryService {
     conditionalTokenAddress: string,
     collateralAddress: string,
     conditionId: string,
+    spread: number,
     initialFunds: BigNumber,
     distributionHint: BigNumber[],
   ): string => {
-    const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
+    const feeBN = ethers.utils.parseEther('' + spread / Math.pow(10, 2))
 
     const create2FixedProductMarketMakerInterface = new utils.Interface(marketMakerFactoryAbi)
 
