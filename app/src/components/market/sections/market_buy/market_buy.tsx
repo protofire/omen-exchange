@@ -155,7 +155,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
 
-  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18)))
+  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
