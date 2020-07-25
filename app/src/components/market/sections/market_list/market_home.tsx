@@ -1,3 +1,6 @@
+import React, { useCallback, useEffect, useState } from 'react'
+import styled from 'styled-components'
+
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { CategoryDataItem, MarketMakerDataItem } from '../../../../queries/markets_home'
 import { getLogger } from '../../../../util/logger'
@@ -23,9 +26,6 @@ import { AdvancedFilters } from '../../common/advanced_filters'
 import { ListCard } from '../../common/list_card'
 import { ListItem } from '../../common/list_item'
 import { Search } from '../../common/search'
-
-import React, { useCallback, useEffect, useState } from 'react'
-import styled from 'styled-components'
 
 const SectionTitleMarket = styled(SectionTitle)`
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
