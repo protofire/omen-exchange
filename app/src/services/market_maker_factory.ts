@@ -73,8 +73,9 @@ class MarketMakerFactoryService {
     collateralAddress: string,
     conditionId: string,
     signerAddress: string,
+    spread: number,
   ): Promise<string> => {
-    const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
+    const feeBN = ethers.utils.parseEther('' + spread / Math.pow(10, 2))
     const cloneFactoryInterface = new utils.Interface(['function cloneConstructor(bytes consData) external'])
     const cloneConstructorEncodedCall = cloneFactoryInterface.functions.cloneConstructor.encode([
       utils.defaultAbiCoder.encode(

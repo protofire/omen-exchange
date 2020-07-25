@@ -246,6 +246,7 @@ class CPKService {
         collateral.address,
         conditionId,
         this.cpk.address,
+        spread,
       )
       logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
       const distributionHint = calcDistributionHint(marketData.outcomes.map(o => o.probability))
