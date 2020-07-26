@@ -1,10 +1,10 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useMemo, useState } from 'react'
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { DOCUMENT_FAQ } from '../../../../../../common/constants'
+import { DOCUMENT_FAQ, MAX_MARKET_FEE } from '../../../../../../common/constants'
 import {
   useCollateralBalance,
   useConnectedWeb3Context,
@@ -97,6 +97,7 @@ const Grid = styled.div`
 const TitleValueVertical = styled(TitleValue)`
   flex-direction: column;
   justify-content: flex-start;
+  text-transform: capitalize;
 
   > h2 {
     margin: 0 0 6px;
@@ -120,6 +121,40 @@ const ButtonCreate = styled(Button)`
   font-weight: 500;
 `
 
+const CreateCardBottomRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const CustomFeeToggle = styled.p`
+  color: ${props => props.theme.colors.hyperlink};
+  cursor: pointer;
+  margin-top: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`
+
+const CustomFeeWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+`
+
+const CustomFeeLabel = styled.p`
+  width: 50%;
+  margin: 0;
+`
+
+const TextFieldWrapper = styled.div`
+  width: 50%;
+`
+
+const NumberInput = styled.input``
+
 interface Props {
   back: () => void
   submit: () => void
@@ -136,6 +171,7 @@ interface Props {
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
+  resetTradingFee: () => void
 }
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
@@ -146,7 +182,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { account, library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
-  const { back, handleChange, handleCollateralChange, marketCreationStatus, submit, values } = props
+  const { back, handleChange, handleCollateralChange, marketCreationStatus, resetTradingFee, submit, values } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -164,6 +200,10 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const resolutionDate = resolution && formatDate(resolution)
 
   const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals, 5)
+
+  const [customFee, setCustomFee] = useState(false)
+  const [fee, setFee] = useState<number | undefined>(spread)
+  const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
   const tokensAmount = useTokens(context).length
 
@@ -188,7 +228,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     !balance ||
     funding.isZero() ||
     !account ||
-    amountError !== null
+    amountError !== null ||
+    exceedsMaxFee
 
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
@@ -206,6 +247,20 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleCollateralChange(token)
     setAllowanceFinished(false)
   }
+
+  const toggleCustomFee = () => {
+    if (customFee) {
+      resetTradingFee()
+      setCustomFee(false)
+    } else {
+      setFee(undefined)
+      setCustomFee(true)
+    }
+  }
+
+  useEffect(() => {
+    setExceedsMaxFee(spread > MAX_MARKET_FEE)
+  }, [spread])
 
   return (
     <>
@@ -256,7 +311,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         </Grid>
       </CreateCardTop>
       <CreateCardBottom>
-        <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
+        <CreateCardBottomRow>
+          <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
+          <CustomFeeToggle onClick={toggleCustomFee}>
+            {customFee ? 'use default trading fee' : 'set custom trading fee'}
+          </CustomFeeToggle>
+        </CreateCardBottomRow>
         <WarningMessage
           additionalDescription={''}
           description={
@@ -278,6 +338,26 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         )}
         <GridTransactionDetailsStyled noMarginTop={false}>
           <div>
+            {customFee && (
+              <CustomFeeWrapper>
+                <CustomFeeLabel>Trading Fee</CustomFeeLabel>
+                <TextFieldWrapper>
+                  <TextfieldCustomPlaceholder
+                    formField={
+                      <NumberInput
+                        max="10"
+                        name="spread"
+                        onChange={handleChange}
+                        placeholder="0"
+                        type="number"
+                        value={fee}
+                      />
+                    }
+                    symbol="%"
+                  />
+                </TextFieldWrapper>
+              </CustomFeeWrapper>
+            )}
             <WalletBalance symbol={collateral.symbol} value={collateralBalanceFormatted} />
             <TextfieldCustomPlaceholder
               formField={
@@ -301,6 +381,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             finished={allowanceFinished && RemoteData.is.success(allowance)}
             loading={RemoteData.is.asking(allowance)}
             onUnlock={unlockCollateral}
+          />
+        )}
+        {exceedsMaxFee && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description={'Your custom trading fee exceeds the maximum amount of 4%'}
+            href={''}
+            hyperlinkDescription={''}
           />
         )}
         <ButtonContainerFullWidth>
