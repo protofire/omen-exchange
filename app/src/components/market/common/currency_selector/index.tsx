@@ -29,12 +29,11 @@ interface Props {
   context: ConnectedWeb3Context
   disabled?: boolean
   onSelect: (currency: Token) => void
-  selectedCurrency: Token
   balance: string
 }
 
 export const CurrencySelector: React.FC<Props> = props => {
-  const { balance, context, disabled, onSelect, selectedCurrency, ...restProps } = props
+  const { balance, context, disabled, onSelect, ...restProps } = props
 
   const tokens = useTokens(context)
 
