@@ -325,7 +325,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           href={DOCUMENT_FAQ}
           hyperlinkDescription={'More Info'}
         />
-        <GridTransactionDetailsStyled noMarginTop={false}>
+        <GridTransactionDetailsStyled noMarginTop={true}>
           <div>
             {tokensAmount > 1 && (
               <CurrenciesWrapper>
