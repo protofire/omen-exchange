@@ -140,7 +140,6 @@ const CustomFeeWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
   padding: 20px 0 0 0;
 `
 
@@ -374,14 +373,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsStyled>
-        {showSetAllowance && (
-          <SetAllowance
-            collateral={collateral}
-            finished={allowanceFinished && RemoteData.is.success(allowance)}
-            loading={RemoteData.is.asking(allowance)}
-            onUnlock={unlockCollateral}
-          />
-        )}
         {exceedsMaxFee && (
           <WarningMessage
             additionalDescription={''}
@@ -389,6 +380,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             description={'Your custom trading fee exceeds the maximum amount of 4%'}
             href={''}
             hyperlinkDescription={''}
+          />
+        )}
+        {showSetAllowance && (
+          <SetAllowance
+            collateral={collateral}
+            finished={allowanceFinished && RemoteData.is.success(allowance)}
+            loading={RemoteData.is.asking(allowance)}
+            onUnlock={unlockCollateral}
           />
         )}
         <ButtonContainerFullWidth>
