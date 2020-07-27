@@ -110,6 +110,9 @@ interface Props {
   handleDateChange: (date: Date | null) => any
   handleOutcomesChange: (newOutcomes: Outcome[]) => any
   handleQuestionChange: (question: Question, arbitrator: Arbitrator) => any
+  setFirst: React.Dispatch<React.SetStateAction<number>>
+  first: number
+  loadMoreButton: boolean
 }
 
 const AskQuestionStep = (props: Props) => {
@@ -118,12 +121,15 @@ const AskQuestionStep = (props: Props) => {
   const {
     addArbitratorCustom,
     addCategoryCustom,
+    first,
     handleArbitratorChange,
     handleChange,
     handleClearQuestion,
     handleDateChange,
     handleOutcomesChange,
     handleQuestionChange,
+    loadMoreButton,
+    setFirst,
     values,
   } = props
 
@@ -232,9 +238,12 @@ const AskQuestionStep = (props: Props) => {
       {categoryButtonFocus && (
         <Categories
           categories={categoriesCustom}
+          first={first}
+          loadMoreButton={loadMoreButton}
           name="category"
           onChange={handleCategoryChange}
           selectedCategory={category.toLowerCase()}
+          setFirst={setFirst}
         />
       )}
       <WarningMessage

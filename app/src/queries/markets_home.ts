@@ -131,8 +131,8 @@ export const queryCategories = gql`
 `
 
 export const queryTopCategories = gql`
-  {
-    categories(first: 8, orderBy: numOpenConditions, orderDirection: desc) {
+  query GetTopCategories($first: Int!) {
+    categories(first: $first, orderBy: numOpenConditions, orderDirection: desc) {
       id
     }
   }

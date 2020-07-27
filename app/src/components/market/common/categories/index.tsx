@@ -11,6 +11,9 @@ interface Props {
   name: string
   onChange?: any
   selectedCategory: string
+  setFirst: React.Dispatch<React.SetStateAction<number>>
+  first: number
+  loadMoreButton: boolean
 }
 
 const Wrapper = styled.div`
@@ -46,13 +49,12 @@ const CategoryInput = styled(Textfield)<{ isSelected: boolean }>`
 `
 
 export const Categories = (props: Props) => {
-  const { categories, name, onChange, selectedCategory, ...restProps } = props
+  const { categories, first, loadMoreButton, name, onChange, selectedCategory, setFirst, ...restProps } = props
   const [selectedCustom, setSelectedCustom] = useState(false)
 
   let allCategories: string[]
   categories.length > 0 ? (allCategories = categories) : (allCategories = CATEGORIES)
 
-  // const allCategories = CATEGORIES.concat(categories.filter(item => CATEGORIES.indexOf(item) < 0))
   const options = allCategories.map(category => ({
     label: category,
     value: category,
@@ -75,6 +77,17 @@ export const Categories = (props: Props) => {
           </CategoryButton>
         )
       })}
+      {loadMoreButton && (
+        <CategoryButton
+          buttonType={ButtonType.secondaryLine}
+          isSelected={false}
+          name={'load more'}
+          onClick={() => setFirst(first + 8)}
+          value={'load more'}
+        >
+          load more
+        </CategoryButton>
+      )}
       <CategoryInput
         isSelected={selectedCustom}
         name={'category'}

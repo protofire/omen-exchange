@@ -45,6 +45,8 @@ export const MarketWizardCreator = (props: Props) => {
 
   const [currentStep, setCurrentStep] = useState(1)
   const [marketData, setMarketdata] = useState<MarketData>(marketDataDefault)
+  const [first, setFirst] = useState<number>(8)
+  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(true)
 
   useEffect(() => {
     let isSubscribed = true
@@ -76,6 +78,7 @@ export const MarketWizardCreator = (props: Props) => {
 
   const { data: topCategories } = useQuery<GraphResponseTopCategories>(queryTopCategories, {
     notifyOnNetworkStatusChange: true,
+    variables: { first },
   })
 
   useEffect(() => {
@@ -92,6 +95,8 @@ export const MarketWizardCreator = (props: Props) => {
       }
 
       setMarketdata(newMarketData)
+
+      if (first > categoriesCustom.length) setLoadMoreButton(false)
     }
     /* NOTE: The linter want us to add marketData to the dependency array, but it
     creates a sort of infinite loop, so I'm not gonna do it for now */
@@ -257,13 +262,16 @@ export const MarketWizardCreator = (props: Props) => {
           <AskQuestionStep
             addArbitratorCustom={addArbitratorCustom}
             addCategoryCustom={addCategoryCustom}
+            first={first}
             handleArbitratorChange={handleArbitratorChange}
             handleChange={handleChange}
             handleClearQuestion={handleClearQuestion}
             handleDateChange={handleDateChange}
             handleOutcomesChange={handleOutcomesChange}
             handleQuestionChange={handleQuestionChange}
+            loadMoreButton={loadMoreButton}
             next={() => next()}
+            setFirst={setFirst}
             values={{
               question,
               outcomes,
