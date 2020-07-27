@@ -68,7 +68,7 @@ export const CurrencySelector: React.FC<Props> = props => {
         disabled={disabled}
         dropdownPosition={DropdownPosition.right}
         items={currencyDropdownData}
-        selected={true}
+        selected={false}
       />
     </Wrapper>
   )
