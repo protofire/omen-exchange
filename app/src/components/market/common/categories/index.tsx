@@ -49,7 +49,10 @@ export const Categories = (props: Props) => {
   const { categories, name, onChange, selectedCategory, ...restProps } = props
   const [selectedCustom, setSelectedCustom] = useState(false)
 
-  const allCategories = CATEGORIES.concat(categories.filter(item => CATEGORIES.indexOf(item) < 0))
+  let allCategories: string[]
+  categories.length > 0 ? (allCategories = categories) : (allCategories = CATEGORIES)
+
+  // const allCategories = CATEGORIES.concat(categories.filter(item => CATEGORIES.indexOf(item) < 0))
   const options = allCategories.map(category => ({
     label: category,
     value: category,

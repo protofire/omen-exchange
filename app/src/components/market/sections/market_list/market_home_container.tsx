@@ -9,7 +9,6 @@ import { useLocation } from 'react-router-dom'
 import { MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import {
-  CategoryDataItem,
   GraphMarketMakerDataItem,
   MarketMakerDataItem,
   buildQueryMarkets,
@@ -20,7 +19,13 @@ import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
+import {
+  CategoryDataItem,
+  GraphResponseCategories,
+  MarketFilters,
+  MarketStates,
+  MarketsSortCriteria,
+} from '../../../../util/types'
 
 import { MarketHome } from './market_home'
 
@@ -33,10 +38,6 @@ type GraphResponseMarketsGeneric = {
 }
 
 type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMyMarkets
-
-type GraphResponseCategories = {
-  categories: CategoryDataItem[]
-}
 
 const normalizeFetchedData = (data: GraphResponseMyMarkets): GraphResponseMarketsGeneric => {
   return {

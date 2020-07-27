@@ -44,13 +44,6 @@ export type MarketMakerDataItem = {
   templateId: number
 }
 
-export type CategoryDataItem = {
-  id: string
-  numOpenConditions: number
-  numClosedConditions: number
-  numConditions: number
-}
-
 export const DEFAULT_OPTIONS = {
   state: MarketStates.open,
   whitelistedCreators: false,
@@ -133,6 +126,14 @@ export const queryCategories = gql`
       numOpenConditions
       numClosedConditions
       numConditions
+    }
+  }
+`
+
+export const queryTopCategories = gql`
+  {
+    categories(first: 8, orderBy: numOpenConditions, orderDirection: desc) {
+      id
     }
   }
 `
