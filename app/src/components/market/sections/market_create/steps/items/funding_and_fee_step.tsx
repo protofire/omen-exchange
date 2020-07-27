@@ -387,7 +387,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           <WarningMessage
             additionalDescription={''}
             danger={true}
-            description={'Your custom trading fee exceeds the maximum amount of 4%'}
+            description={`Your custom trading fee exceeds the maximum amount of ${MAX_MARKET_FEE}%`}
             href={''}
             hyperlinkDescription={''}
           />

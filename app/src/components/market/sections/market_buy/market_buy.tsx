@@ -155,7 +155,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
 
-  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18)))
+  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
+  const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
@@ -239,11 +240,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           </div>
           <div>
             <TransactionDetailsCard>
-              <TransactionDetailsRow title={'Fee'} value={feeFormatted} />
               <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
               <TransactionDetailsRow
                 title={'Fee'}
-                tooltip={'A 2% fee goes to liquidity providers.'}
+                tooltip={`A ${feePercentage}% fee goes to liquidity providers.`}
                 value={feeFormatted}
               />
               <TransactionDetailsLine />

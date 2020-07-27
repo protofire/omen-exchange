@@ -4,7 +4,7 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 
-import { FETCH_DETAILS_INTERVAL, MARKET_FEE } from '../../../common/constants'
+import { FETCH_DETAILS_INTERVAL, MAX_MARKET_FEE } from '../../../common/constants'
 import { useCheckContractExists, useMarketMakerData } from '../../../hooks'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { MarketBuyPage, MarketDetailsPage, MarketPoolLiquidityPage, MarketSellPage } from '../../../pages'
@@ -47,7 +47,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
   const { fee, isQuestionFinalized } = marketMakerData
 
   // Validate Markets with wrong FEE
-  const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
+  const feeBN = ethers.utils.parseEther('' + MAX_MARKET_FEE / Math.pow(10, 2))
   const zeroBN = new BigNumber(0)
   if (!(fee.gte(zeroBN) && fee.lte(feeBN))) {
     logger.log(`Market was not created with this app (different fee)`)
