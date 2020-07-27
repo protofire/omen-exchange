@@ -20,6 +20,7 @@ const Wrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   padding: 20px 0 6px;
 `
 
