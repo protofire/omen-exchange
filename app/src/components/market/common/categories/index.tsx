@@ -11,7 +11,7 @@ interface Props {
   name: string
   onChange?: any
   selectedCategory: string
-  setFirst: React.Dispatch<React.SetStateAction<number>>
+  setFirst: (n: number) => void
   first: number
   loadMoreButton: boolean
 }
