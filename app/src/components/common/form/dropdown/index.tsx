@@ -150,7 +150,7 @@ const CurrentItem = styled.div`
 `
 
 const CurrentItemExtra = styled.p`
-  margin-right: 10px;
+  margin: 0 10px 0 0;
   color: ${props => props.theme.buttonSecondaryLine.colorDisabled};
 `
 
