@@ -259,13 +259,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     setExceedsMaxFee(spread > MAX_MARKET_FEE)
+    setFee(spread)
   }, [spread])
-
-  const handleFeeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const t = e.target.value
-    e.target.value = t.indexOf('.') >= 0 ? t.substr(0, t.indexOf('.')) + t.substr(t.indexOf('.'), 3) : t
-    handleChange(e)
-  }
 
   return (
     <>
@@ -357,7 +352,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                       <NumberInput
                         max="10"
                         name="spread"
-                        onChange={handleFeeChange}
+                        onChange={handleChange}
                         placeholder="0"
                         type="number"
                         value={fee}
