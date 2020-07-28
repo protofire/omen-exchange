@@ -126,6 +126,11 @@ const DropdownButton = styled.div`
   justify-content: space-between;
 `
 
+const DropdownButtonRight = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 const CurrentItem = styled.div`
   align-items: center;
   justify-content: space-between;
@@ -142,6 +147,11 @@ const CurrentItem = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+`
+
+const CurrentItemExtra = styled.p`
+  margin-right: 10px;
+  color: ${props => props.theme.buttonSecondaryLine.colorDisabled};
 `
 
 const DropdownPositionLeftCSS = css`
@@ -275,6 +285,7 @@ const ChevronWrapper = styled.div`
 export interface DropdownItemProps {
   content: React.ReactNode | string
   secondaryText?: React.ReactNode | string
+  extraContent?: string
   onClick?: () => void
 }
 
@@ -314,6 +325,10 @@ export const Dropdown: React.FC<Props> = props => {
 
   const getItem = (itemIndex: number): any => {
     return items[getValidItemIndex(itemIndex)]
+  }
+
+  const getItemExtraContent = (itemIndex: number): any => {
+    return items[getValidItemIndex(itemIndex)].extraContent
   }
 
   const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
@@ -361,10 +376,13 @@ export const Dropdown: React.FC<Props> = props => {
             {placeholder && !isDirty ? placeholder : activeItem.content}
             {!!activeItem.secondaryText && <SecondaryText>{activeItem.secondaryText}</SecondaryText>}
           </CurrentItem>
-          <ChevronWrapper>
-            <ChevronDown />
-            <ChevronUp />
-          </ChevronWrapper>
+          <DropdownButtonRight>
+            <CurrentItemExtra>{getItemExtraContent(currentItemIndex)}</CurrentItemExtra>
+            <ChevronWrapper>
+              <ChevronDown />
+              <ChevronUp />
+            </ChevronWrapper>
+          </DropdownButtonRight>
         </DropdownButton>
         <ItemsContainer
           className="dropdownItems"
