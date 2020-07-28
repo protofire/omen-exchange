@@ -320,3 +320,11 @@ export const getMarketTitles = (templateId: Maybe<number>) => {
     return { marketTitle: 'Binary Market', marketSubtitle: 'What is a binary market?' }
   }
 }
+
+export const limitDecimalPlaces = (value: string, decimals: number) => {
+  const limitedString: string =
+    value.indexOf('.') >= 0
+      ? value.substr(0, value.indexOf('.')) + value.substr(value.indexOf('.'), decimals + 1)
+      : value
+  return Number.parseFloat(limitedString)
+}
