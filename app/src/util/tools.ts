@@ -321,6 +321,10 @@ export const getMarketTitles = (templateId: Maybe<number>) => {
   }
 }
 
+/**
+ * Given a string representing a floating point number,
+ * return a floating point number with a fixed amount of decimal places.
+ */
 export const limitDecimalPlaces = (value: string, decimals: number) => {
   const limitedString: string =
     value.indexOf('.') >= 0
