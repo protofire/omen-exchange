@@ -83,11 +83,7 @@ export const MarketWizardCreator = (props: Props) => {
 
   useEffect(() => {
     if (topCategories) {
-      const categoriesCustom: string[] = []
-
-      topCategories.categories.forEach(category => {
-        categoriesCustom.push(category.id)
-      })
+      const categoriesCustom: string[] = topCategories.categories.map(category => category.id)
 
       const newMarketData = {
         ...marketData,
@@ -96,7 +92,7 @@ export const MarketWizardCreator = (props: Props) => {
 
       setMarketdata(newMarketData)
 
-      if (first > categoriesCustom.length) setLoadMoreButton(false)
+      setLoadMoreButton(first <= categoriesCustom.length)
     }
     /* NOTE: The linter want us to add marketData to the dependency array, but it
     creates a sort of infinite loop, so I'm not gonna do it for now */
