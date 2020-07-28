@@ -272,6 +272,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       const index = categories.data.findIndex(i => i.id === decodeURI(category))
       const item = categories.data[index]
       !!item && setCounts({ open: item.numOpenConditions, closed: item.numClosedConditions, total: item.numConditions })
+      if (category === 'All') setCounts({ open: 0, closed: 0, total: 0 })
     }
   }, [category, categories])
 
