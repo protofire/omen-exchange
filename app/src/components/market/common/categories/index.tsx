@@ -53,8 +53,7 @@ export const Categories = (props: Props) => {
   const { categories, first, loadMoreButton, name, onChange, selectedCategory, setFirst, ...restProps } = props
   const [selectedCustom, setSelectedCustom] = useState(false)
 
-  let allCategories: string[]
-  categories.length > 0 ? (allCategories = categories) : (allCategories = CATEGORIES)
+  const allCategories = categories.length > 0 ? categories : CATEGORIES
 
   const options = allCategories.map(category => ({
     label: category,
