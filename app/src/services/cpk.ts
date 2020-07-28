@@ -159,7 +159,7 @@ class CPKService {
     realitio,
   }: CPKCreateMarketParams): Promise<string> => {
     try {
-      const { arbitrator, category, collateral, loadedQuestionId, outcomes, question, resolution } = marketData
+      const { arbitrator, category, collateral, loadedQuestionId, outcomes, question, resolution, spread } = marketData
 
       if (!resolution) {
         throw new Error('Resolution time was not specified')
@@ -246,6 +246,7 @@ class CPKService {
         collateral.address,
         conditionId,
         this.cpk.address,
+        spread,
       )
       logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
       const distributionHint = calcDistributionHint(marketData.outcomes.map(o => o.probability))
@@ -256,6 +257,7 @@ class CPKService {
           conditionalTokens.address,
           collateral.address,
           conditionId,
+          spread,
           marketData.funding,
           distributionHint,
         ),
