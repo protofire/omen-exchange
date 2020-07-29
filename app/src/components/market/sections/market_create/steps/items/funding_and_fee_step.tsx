@@ -259,6 +259,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     setExceedsMaxFee(spread > MAX_MARKET_FEE)
+    setFee(spread)
   }, [spread])
 
   return (
@@ -366,7 +367,11 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           </div>
           <div>
             <TransactionDetailsCard>
-              <TransactionDetailsRow state={ValueStates.important} title={'Earn Trading Fee'} value={`${spread}%`} />
+              <TransactionDetailsRow
+                state={ValueStates.important}
+                title={'Earn Trading Fee'}
+                value={`${isNaN(spread) ? 0 : spread}%`}
+              />
               <TransactionDetailsLine />
               <TransactionDetailsRow title={'Pool Tokens'} value={formatBigNumber(funding, collateral.decimals)} />
             </TransactionDetailsCard>
