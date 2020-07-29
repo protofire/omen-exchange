@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import { useLocation } from 'react-router-dom'
 
-import { MARKET_FEE } from '../../../../common/constants'
+import { MAX_MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import {
   GraphMarketMakerDataItem,
@@ -170,7 +170,7 @@ const MarketHomeContainer: React.FC = () => {
   const [now, setNow] = useState<string>(calcNow())
   const [isFiltering, setIsFiltering] = useState(false)
   const { account, library: provider, networkId } = context
-  const feeBN = ethers.utils.parseEther('' + MARKET_FEE / Math.pow(10, 2))
+  const feeBN = ethers.utils.parseEther('' + MAX_MARKET_FEE / Math.pow(10, 2))
   const marketQuery = buildQueryMarkets({
     whitelistedTemplateIds: true,
     whitelistedCreators: false,

@@ -21,7 +21,7 @@ export const MAX_OUTCOME_ALLOWED = MAX_OUTCOMES > 256 ? 256 : MAX_OUTCOMES
 export const SINGLE_SELECT_TEMPLATE_ID = 2
 
 export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '2.00')
-export const MAX_MARKET_FEE = parseFloat('2.00')
+export const MAX_MARKET_FEE = parseFloat('5.00')
 
 export const CATEGORIES = [
   'Business & Finance',

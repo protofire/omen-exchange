@@ -14,6 +14,7 @@ import {
   computeBalanceAfterTrade,
   divBN,
   getIndexSets,
+  limitDecimalPlaces,
   truncateStringInTheMiddle as truncate,
 } from './tools'
 
@@ -343,5 +344,24 @@ describe('tools', () => {
 
       expect(result).toStrictEqual(['0', '0', '0'])
     })
+  })
+
+  describe('limitDecimalPlaces', () => {
+    const testCases: [[string, number], number][] = [
+      [['2.7598', 2], 2.75],
+      [['3', 3], 3],
+      [['4958.532334211132', 5], 4958.53233],
+      [['0.001', 2], 0.0],
+      [['0.7688', 3], 0.768],
+      [['19.22', 2], 19.22],
+      [['12.1', 2], 12.1],
+    ]
+    for (const [[value, decimals], result] of testCases) {
+      it('should return the correct value', () => {
+        const limitedValue = limitDecimalPlaces(value, decimals)
+
+        expect(limitedValue).toStrictEqual(result)
+      })
+    }
   })
 })

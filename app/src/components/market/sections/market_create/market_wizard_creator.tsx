@@ -7,8 +7,9 @@ import { MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { queryTopCategories } from '../../../../queries/markets_home'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
-import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../../../util/networks'
+import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../../../util/networks'´
 import { Arbitrator, GraphResponseTopCategories, MarketData, Question, Token } from '../../../../util/types'
+import { limitDecimalPlaces } from '../../../../util/tools'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 
 import { AskQuestionStep, FundingAndFeeStep, MenuStep } from './steps'
@@ -140,7 +141,12 @@ export const MarketWizardCreator = (props: Props) => {
 
     const newMarketData = {
       ...marketData,
-      [name]: name === 'category' ? (value as string).toLowerCase() : value,
+      [name]:
+        name === 'category'
+          ? (value as string).toLowerCase()
+          : name === 'spread'
+          ? limitDecimalPlaces(value as string, 2)
+          : value,
     }
     setMarketdata(newMarketData)
   }
