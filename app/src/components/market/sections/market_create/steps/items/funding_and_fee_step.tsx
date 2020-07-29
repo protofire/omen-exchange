@@ -203,6 +203,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [customFee, setCustomFee] = useState(false)
   const [fee, setFee] = useState<number | undefined>(spread)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
+  const [isNegativeFee, setIsNegativeFee] = useState<boolean>(false)
 
   const tokensAmount = useTokens(context).length
 
@@ -259,6 +260,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     setExceedsMaxFee(spread > MAX_MARKET_FEE)
+    setIsNegativeFee(spread < 0)
     setFee(spread)
   }, [spread])
 
@@ -382,6 +384,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             additionalDescription={''}
             danger={true}
             description={`Your custom trading fee exceeds the maximum amount of ${MAX_MARKET_FEE}%`}
+            href={''}
+            hyperlinkDescription={''}
+          />
+        )}
+        {isNegativeFee && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description={`Your custom trading fee should not be negative.`}
             href={''}
             hyperlinkDescription={''}
           />
