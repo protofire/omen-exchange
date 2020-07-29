@@ -229,7 +229,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     funding.isZero() ||
     !account ||
     amountError !== null ||
-    exceedsMaxFee
+    exceedsMaxFee ||
+    isNegativeFee
 
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
