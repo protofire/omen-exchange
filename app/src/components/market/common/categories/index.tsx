@@ -11,12 +11,16 @@ interface Props {
   name: string
   onChange?: any
   selectedCategory: string
+  setFirst: (n: number) => void
+  first: number
+  loadMoreButton: boolean
 }
 
 const Wrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   padding: 20px 0 6px;
 `
 
@@ -46,10 +50,11 @@ const CategoryInput = styled(Textfield)<{ isSelected: boolean }>`
 `
 
 export const Categories = (props: Props) => {
-  const { categories, name, onChange, selectedCategory, ...restProps } = props
+  const { categories, first, loadMoreButton, name, onChange, selectedCategory, setFirst, ...restProps } = props
   const [selectedCustom, setSelectedCustom] = useState(false)
 
-  const allCategories = CATEGORIES.concat(categories.filter(item => CATEGORIES.indexOf(item) < 0))
+  const allCategories = categories.length > 0 ? categories : CATEGORIES
+
   const options = allCategories.map(category => ({
     label: category,
     value: category,
@@ -72,6 +77,17 @@ export const Categories = (props: Props) => {
           </CategoryButton>
         )
       })}
+      {loadMoreButton && (
+        <CategoryButton
+          buttonType={ButtonType.secondaryLine}
+          isSelected={false}
+          name={'load more'}
+          onClick={() => setFirst(first + 8)}
+          value={'load more'}
+        >
+          load more
+        </CategoryButton>
+      )}
       <CategoryInput
         isSelected={selectedCustom}
         name={'category'}

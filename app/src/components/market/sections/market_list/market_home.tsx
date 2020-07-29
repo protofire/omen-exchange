@@ -2,10 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { CategoryDataItem, MarketMakerDataItem } from '../../../../queries/markets_home'
+import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
+import { CategoryDataItem, MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
 import { ButtonCircle } from '../../../button'
 import { SectionTitle } from '../../../common'
 import {
