@@ -204,6 +204,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [fee, setFee] = useState<number | undefined>(spread)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
   const [isNegativeFee, setIsNegativeFee] = useState<boolean>(false)
+  const [isNegativeDepositAmount, setIsNegativeDepositAmount] = useState<boolean>(false)
 
   const tokensAmount = useTokens(context).length
 
@@ -230,7 +231,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     !account ||
     amountError !== null ||
     exceedsMaxFee ||
-    isNegativeFee
+    isNegativeFee ||
+    isNegativeDepositAmount
 
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
@@ -262,8 +264,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     setExceedsMaxFee(spread > MAX_MARKET_FEE)
     setIsNegativeFee(spread < 0)
+    setIsNegativeDepositAmount(formatBigNumber(funding, collateral.decimals).includes('-'))
     setFee(spread)
-  }, [spread])
+  }, [spread, funding, collateral.decimals])
 
   return (
     <>
@@ -401,6 +404,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             additionalDescription={''}
             danger={true}
             description={`Your custom trading fee should not be negative.`}
+            href={''}
+            hyperlinkDescription={''}
+          />
+        )}
+        {isNegativeDepositAmount && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description={`Your deposit amount should not be negative.`}
             href={''}
             hyperlinkDescription={''}
           />
