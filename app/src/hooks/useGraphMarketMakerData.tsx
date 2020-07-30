@@ -33,6 +33,7 @@ const query = gql`
       resolutionTimestamp
       currentAnswer
       answerFinalizedTimestamp
+      scaledLiquidityParameter
       question {
         id
         data
@@ -70,6 +71,7 @@ type GraphResponseFixedProductMarketMaker = {
   templateId: string
   timeout: string
   title: string
+  scaledLiquidityParameter: string
 }
 
 type GraphResponse = {
@@ -89,6 +91,7 @@ export type GraphMarketMakerData = {
   payouts: Maybe<number[]>
   fee: BigNumber
   question: Question
+  scaledLiquidityParameter: number
 }
 
 type Result = {
@@ -111,6 +114,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     conditionId: data.condition.id,
     payouts: data.condition.payouts ? data.condition.payouts.map(Number) : null,
     fee: bigNumberify(data.fee),
+    scaledLiquidityParameter: parseFloat(data.scaledLiquidityParameter),
     question: {
       id: data.question.id,
       templateId: +data.templateId,
