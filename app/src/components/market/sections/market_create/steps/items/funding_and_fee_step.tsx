@@ -370,10 +370,17 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           </div>
           <div>
             <TransactionDetailsCard>
+              {!customFee && (
+                <TransactionDetailsRow
+                  state={ValueStates.important}
+                  title={'Earn Trading Fee'}
+                  value={`${isNaN(spread) ? 0 : spread}%`}
+                />
+              )}
               <TransactionDetailsRow
                 state={ValueStates.important}
-                title={'Earn Trading Fee'}
-                value={`${isNaN(spread) ? 0 : spread}%`}
+                title={'Deposit Amount'}
+                value={`${formatBigNumber(funding, collateral.decimals)} ${collateral.symbol}`}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow title={'Pool Tokens'} value={formatBigNumber(funding, collateral.decimals)} />
