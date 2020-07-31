@@ -15,6 +15,7 @@ export const MarketDataFragment = gql`
     arbitrator
     category
     templateId
+    scaledLiquidityParameter
   }
 `
 
@@ -29,6 +30,7 @@ export type GraphMarketMakerDataItem = {
   arbitrator: string
   category: string
   templateId: string
+  scaledLiquidityParameter: string
 }
 
 export type MarketMakerDataItem = {
@@ -42,6 +44,7 @@ export type MarketMakerDataItem = {
   arbitrator: string
   category: string
   templateId: number
+  scaledLiquidityParameter: number
 }
 
 export const DEFAULT_OPTIONS = {

@@ -63,6 +63,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       outcomes,
       templateId: +graphMarketMakerDataItem.templateId,
       title: graphMarketMakerDataItem.title,
+      scaledLiquidityParameter: parseFloat(graphMarketMakerDataItem.scaledLiquidityParameter),
     }
   })
 }
