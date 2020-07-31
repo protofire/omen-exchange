@@ -182,9 +182,11 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { back, handleChange, handleCollateralChange, marketCreationStatus, resetTradingFee, submit, values } = props
-  const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
+  const { arbitrator, category, collateral, outcomes, question, resolution, spread } = values
+  const { funding } = values
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const [amount, setAmount] = useState<BigNumber>(funding)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
@@ -262,10 +264,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     setFee(spread)
   }, [spread])
 
-  const onMax = () => {
-    const input: HTMLInputElement = Array.from(document.getElementsByName('funding'))[0] as HTMLInputElement
-    console.log(input.value)
-    input.value = formatBigNumber(collateralBalance, collateral.decimals)
+  const handleAmountChange = (event: BigNumberInputReturn) => {
+    setAmount(event.value)
+    handleChange(event)
   }
 
   return (
@@ -345,10 +346,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             )}
             <TextfieldCustomPlaceholder
               formField={
-                <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
+                <BigNumberInput
+                  decimals={collateral.decimals}
+                  name="funding"
+                  onChange={handleAmountChange}
+                  value={amount}
+                />
               }
               maxButton={true}
-              onMax={onMax}
+              onMax={() => setAmount(collateralBalance)}
               symbol={collateral.symbol}
             />
             {customFee && (
