@@ -18,6 +18,10 @@ const AlertWrapper = styled.div`
   align-items: center;
   display: flex;
   padding-right: 16px;
+
+  &.grayscale {
+    filter: grayscale(100%);
+  }
 `
 
 const Description = styled.p`
@@ -42,13 +46,14 @@ interface Props {
   href: string
   additionalDescription: string
   danger?: boolean
+  grayscale?: boolean
 }
 
 export const WarningMessage = (props: Props) => {
-  const { additionalDescription, danger, description, href, hyperlinkDescription, ...restProps } = props
+  const { additionalDescription, danger, description, grayscale, href, hyperlinkDescription, ...restProps } = props
   return (
     <Wrapper {...restProps}>
-      <AlertWrapper>
+      <AlertWrapper className={grayscale ? 'grayscale' : ''}>
         <Alert />
       </AlertWrapper>
       <Description className={danger ? 'danger' : ''}>

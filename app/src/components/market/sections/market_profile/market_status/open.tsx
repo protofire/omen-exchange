@@ -9,6 +9,7 @@ import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
+import { WarningMessage } from '../../../common/warning_message'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -37,6 +38,19 @@ const Text = styled.p`
   letter-spacing: 0.2px;
   line-height: 1.5;
   margin: 0;
+`
+
+const StyledButtonContainer = styled(ButtonContainer)`
+  margin: 0 -25px;
+  padding: 20px 25px 0;
+
+  &.border {
+    border-top: 1px solid ${props => props.theme.colors.verticalDivider};
+  }
+`
+
+const WarningMessageStyled = styled(WarningMessage)`
+  margin-top: 20px;
 `
 
 interface Props extends RouteComponentProps<{}> {
@@ -138,11 +152,20 @@ const Wrapper = (props: Props) => {
       />
       {renderTableData()}
       {isQuestionOpen && openQuestionMessage}
+      {!hasFunding && (
+        <WarningMessageStyled
+          additionalDescription={''}
+          description={'Trading is disabled due to lack of liquidity.'}
+          grayscale={true}
+          href={''}
+          hyperlinkDescription={''}
+        />
+      )}
       <WhenConnected>
-        <ButtonContainer>
+        <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
           {poolButton}
           {isQuestionOpen ? openInRealitioButton : buySellButtons}
-        </ButtonContainer>
+        </StyledButtonContainer>
       </WhenConnected>
     </ViewCard>
   )
