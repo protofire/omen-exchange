@@ -46,7 +46,7 @@ export const SectionTitleWrapper: React.FC<Props> = (props: Props) => {
   return (
     <Wrapper {...restProps}>
       {enableGoBack && (
-        <ButtonCircle onClick={() => props.history.goBack()}>
+        <ButtonCircle onClick={() => (props.history.length > 2 ? props.history.goBack() : props.history.replace('/'))}>
           <IconArrowBack />
         </ButtonCircle>
       )}
