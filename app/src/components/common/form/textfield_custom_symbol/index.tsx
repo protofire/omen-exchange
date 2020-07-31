@@ -8,6 +8,7 @@ interface Props {
   formField: any
   symbol: any
   maxButton?: boolean
+  onMax?: () => void
 }
 
 const FieldWrapper = styled.div`
@@ -110,7 +111,7 @@ const MaxButton = styled.span`
 `
 
 export const TextfieldCustomSymbol = (props: Props) => {
-  const { disabled, formField, maxButton, symbol, ...restProps } = props
+  const { disabled, formField, maxButton, onMax, symbol, ...restProps } = props
 
   // eslint-disable-next-line no-warning-comments
   //TODO: use a input[text] instead of passing a <Textfield />
@@ -118,7 +119,7 @@ export const TextfieldCustomSymbol = (props: Props) => {
     <FieldWrapper className={disabled ? 'disabled' : ''} {...restProps}>
       {React.cloneElement(formField, { disabled: disabled })}
       <Symbol>{symbol}</Symbol>
-      {maxButton && <MaxButton>Max</MaxButton>}
+      {maxButton && <MaxButton onClick={onMax}>Max</MaxButton>}
     </FieldWrapper>
   )
 }

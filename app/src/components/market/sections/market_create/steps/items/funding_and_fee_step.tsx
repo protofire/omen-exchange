@@ -262,6 +262,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     setFee(spread)
   }, [spread])
 
+  const onMax = () => {
+    const input: HTMLInputElement = Array.from(document.getElementsByName('funding'))[0] as HTMLInputElement
+    console.log(input.value)
+    input.value = formatBigNumber(collateralBalance, collateral.decimals)
+  }
+
   return (
     <>
       <CreateCardTop>
@@ -342,6 +348,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
               }
               maxButton={true}
+              onMax={onMax}
               symbol={collateral.symbol}
             />
             {customFee && (
