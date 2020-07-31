@@ -20,7 +20,7 @@ const AlertWrapper = styled.div`
   padding-right: 16px;
 
   &.grayscale {
-    filter: grayscale(100%);
+    filter: invert(50%) sepia(0%) saturate(0%) hue-rotate(211deg) brightness(92%) contrast(93%);
   }
 `
 
