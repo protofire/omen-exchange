@@ -341,6 +341,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               formField={
                 <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
               }
+              maxButton={true}
               symbol={collateral.symbol}
             />
             {customFee && (
