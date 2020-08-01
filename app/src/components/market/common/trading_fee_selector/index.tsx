@@ -7,6 +7,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+  height: 250px;
 `
 
 const TradingFeeButtonSelectedCSS = css`
@@ -31,6 +32,7 @@ export const TradingFeeSelector: React.FC<Props> = props => {
   const { disabled, onSelect, ...restProps } = props
 
   const tradingFeeOptions: string[] = [
+    '0.00',
     '0.25',
     '0.50',
     '0.75',
@@ -73,7 +75,7 @@ export const TradingFeeSelector: React.FC<Props> = props => {
   return (
     <Wrapper {...restProps}>
       <TradingFeeDropdown
-        currentItem={7}
+        currentItem={8}
         disabled={disabled}
         dropdownPosition={DropdownPosition.right}
         items={tradingFeeDropdownItems}
