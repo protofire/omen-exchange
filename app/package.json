@@ -57,6 +57,7 @@
     "graphql-tag": "^2.10.1",
     "ipfs-deploy": "^7.10.5",
     "lint-staged": "^10.0.8",
+    "lodash": "^4.17.19",
     "lodash.unionby": "^4.8.0",
     "logdown": "^3.2.8",
     "moment": "^2.24.0",
