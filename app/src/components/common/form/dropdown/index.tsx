@@ -201,7 +201,6 @@ const ItemsContainer = styled.div<{
   dropdownPosition?: DropdownPosition
   dropdownDirection?: DropdownDirection
   dropdownVariant?: DropdownVariant
-  maxHeight?: boolean
 }>`
   background-color: ${props => props.theme.dropdown.dropdownItems.backgroundColor};
   border-radius: ${props => props.theme.dropdown.dropdownItems.borderRadius};
@@ -217,7 +216,6 @@ const ItemsContainer = styled.div<{
   ${props => (props.dropdownPosition === DropdownPosition.center ? DropdownPositionCenterCSS : '')};
   ${props => (props.dropdownDirection === DropdownDirection.downwards ? DropdownDirectionDownwardsCSS : '')};
   ${props => (props.dropdownDirection === DropdownDirection.upwards ? DropdownDirectionUpwardsCSS : '')};
-  ${props => (props.maxHeight ? DropdownMaxHeightCSS : '')};
 `
 
 const DropdownScrollbarCSS = css`
@@ -238,11 +236,13 @@ const DropdownScrollbarCSS = css`
 const Items = styled.div<{
   dropdownVariant?: DropdownVariant
   showScrollbar?: boolean
+  maxHeight?: boolean
 }>`
   ${props => (props.dropdownVariant === DropdownVariant.pill ? DropdownVariantPillItemsCSS : '')};
   ${props => props.dropdownVariant === DropdownVariant.card && 'margin-right: -8px'};
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardItemsCSS : '')};
   ${props => props.showScrollbar && DropdownScrollbarCSS}
+  ${props => props.maxHeight && DropdownMaxHeightCSS};
 `
 
 const SecondaryText = styled.div`
@@ -399,14 +399,13 @@ export const Dropdown: React.FC<Props> = props => {
           dropdownPosition={dropdownPosition}
           dropdownVariant={dropdownVariant}
           isOpen={isOpen}
-          maxHeight={maxHeight}
           // onScroll={e => {
           // if (!!e.target.scrollHeight && e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight) {
           // reached bottom of picker
           // }
           // }}
         >
-          <Items dropdownVariant={dropdownVariant} showScrollbar={showScrollbar}>
+          <Items dropdownVariant={dropdownVariant} maxHeight={maxHeight} showScrollbar={showScrollbar}>
             {items.map((item: DropdownItemProps, index: string) => {
               return (
                 <Item
