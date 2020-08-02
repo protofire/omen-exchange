@@ -191,11 +191,17 @@ const DropdownVariantCardItemsContainerCSS = css`
   left: 0;
 `
 
+const DropdownMaxHeightCSS = css`
+  max-height: 218px;
+  overflow-y: auto;
+`
+
 const ItemsContainer = styled.div<{
   isOpen: boolean
   dropdownPosition?: DropdownPosition
   dropdownDirection?: DropdownDirection
   dropdownVariant?: DropdownVariant
+  maxHeight?: boolean
 }>`
   background-color: ${props => props.theme.dropdown.dropdownItems.backgroundColor};
   border-radius: ${props => props.theme.dropdown.dropdownItems.borderRadius};
@@ -211,6 +217,7 @@ const ItemsContainer = styled.div<{
   ${props => (props.dropdownPosition === DropdownPosition.center ? DropdownPositionCenterCSS : '')};
   ${props => (props.dropdownDirection === DropdownDirection.downwards ? DropdownDirectionDownwardsCSS : '')};
   ${props => (props.dropdownDirection === DropdownDirection.upwards ? DropdownDirectionUpwardsCSS : '')};
+  ${props => (props.maxHeight ? DropdownMaxHeightCSS : '')};
 `
 
 const DropdownScrollbarCSS = css`
@@ -299,6 +306,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   showScrollbar?: boolean
   items: any
   placeholder?: React.ReactNode | string | undefined
+  maxHeight?: boolean
 }
 
 export const Dropdown: React.FC<Props> = props => {
@@ -312,6 +320,7 @@ export const Dropdown: React.FC<Props> = props => {
     items,
     placeholder,
     showScrollbar = false,
+    maxHeight = false,
     ...restProps
   } = props
 
@@ -390,6 +399,7 @@ export const Dropdown: React.FC<Props> = props => {
           dropdownPosition={dropdownPosition}
           dropdownVariant={dropdownVariant}
           isOpen={isOpen}
+          maxHeight={maxHeight}
           // onScroll={e => {
           // if (!!e.target.scrollHeight && e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight) {
           // reached bottom of picker
