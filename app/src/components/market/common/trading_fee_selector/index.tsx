@@ -1,6 +1,7 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
 
+import { TRADING_FEE_OPTIONS } from '../../../../common/constants'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 
 const Wrapper = styled.div`
@@ -30,41 +31,13 @@ interface Props {
 export const TradingFeeSelector: React.FC<Props> = props => {
   const { disabled, onSelect, ...restProps } = props
 
-  const tradingFeeOptions: string[] = [
-    '0.00',
-    '0.25',
-    '0.50',
-    '0.75',
-    '1.00',
-    '1.25',
-    '1.50',
-    '1.75',
-    '2.00',
-    '2.25',
-    '2.50',
-    '2.75',
-    '3.00',
-    '3.25',
-    '3.50',
-    '3.75',
-    '4.00',
-    '4.25',
-    '4.50',
-    '4.75',
-    '5.00',
-  ]
-
   const tradingFeeDropdownItems: Array<DropdownItemProps> = []
 
   const onChange = (fee: string) => {
-    for (const option of tradingFeeOptions) {
-      if (option === fee) {
-        onSelect(option)
-      }
-    }
+    if (TRADING_FEE_OPTIONS.includes(fee)) onSelect(fee)
   }
 
-  tradingFeeOptions.forEach(option => {
+  TRADING_FEE_OPTIONS.map(option => {
     tradingFeeDropdownItems.push({
       content: `${option}%`,
       onClick: () => onChange(option),
