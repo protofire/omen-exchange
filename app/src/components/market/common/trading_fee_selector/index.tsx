@@ -31,17 +31,15 @@ interface Props {
 export const TradingFeeSelector: React.FC<Props> = props => {
   const { disabled, onSelect, ...restProps } = props
 
-  const tradingFeeDropdownItems: Array<DropdownItemProps> = []
-
   const onChange = (fee: string) => {
     if (TRADING_FEE_OPTIONS.includes(fee)) onSelect(fee)
   }
 
-  TRADING_FEE_OPTIONS.map(option => {
-    tradingFeeDropdownItems.push({
+  const tradingFeeDropdownItems: Array<DropdownItemProps> = TRADING_FEE_OPTIONS.map(option => {
+    return {
       content: `${option}%`,
       onClick: () => onChange(option),
-    })
+    }
   })
 
   return (
