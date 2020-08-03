@@ -70,6 +70,10 @@ export const Footer = () => {
         <Link href="https://t.me/omen_eth" target="_blank">
           Telegram
         </Link>
+        <Break>·</Break>
+        <Link href="https://explore.duneanalytics.com/dashboard/omen-stats" target="_blank">
+          Statistics
+        </Link>
       </Wrapper>
     </>
   ) : null
