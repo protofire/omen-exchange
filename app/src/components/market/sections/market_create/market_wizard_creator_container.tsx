@@ -54,7 +54,7 @@ const MarketWizardCreatorContainer: FC = () => {
         setMarketMakerAddress(marketMakerAddress)
 
         setMarketCreationStatus(MarketCreationStatus.done())
-        history.push(`/${marketMakerAddress}`)
+        history.replace(`/${marketMakerAddress}`)
       }
     } catch (err) {
       setMarketCreationStatus(MarketCreationStatus.error(err))
