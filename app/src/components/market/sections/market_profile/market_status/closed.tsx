@@ -9,7 +9,7 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/con
 import { CPKService, ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
-import { Button, ButtonContainer } from '../../../../button'
+import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
@@ -177,29 +177,6 @@ const Wrapper = (props: Props) => {
     >
       Pool Liquidity
     </LeftButton>
-  )
-
-  const buySellButtons = (
-    <>
-      <Button
-        buttonType={ButtonType.secondaryLine}
-        disabled={true}
-        onClick={() => {
-          history.push(`${marketMakerAddress}/sell`)
-        }}
-      >
-        Sell
-      </Button>
-      <Button
-        buttonType={ButtonType.secondaryLine}
-        disabled={true}
-        onClick={() => {
-          history.push(`${marketMakerAddress}/buy`)
-        }}
-      >
-        Buy
-      </Button>
-    </>
   )
 
   return (
