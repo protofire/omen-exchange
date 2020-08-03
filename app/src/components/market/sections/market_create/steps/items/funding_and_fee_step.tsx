@@ -381,7 +381,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 />
               )}
               <TransactionDetailsRow
-                state={ValueStates.important}
+                state={funding.isZero() ? ValueStates.normal : ValueStates.important}
                 title={'Deposit Amount'}
                 value={`${formatBigNumber(funding, collateral.decimals)} ${collateral.symbol}`}
               />
