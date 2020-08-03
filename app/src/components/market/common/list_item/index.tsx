@@ -75,7 +75,6 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const [volume, setVolume] = useState('')
   const [symbol, setSymbol] = useState('')
   const [dailyVolume, setDailyVolume] = useState('')
-  const [liquidity, setLiquidity] = useState(0)
 
   const { currentFilter, market } = props
   const { address, collateralToken, collateralVolume, openingTimestamp, outcomeTokenAmounts, outcomes, title } = market
@@ -97,6 +96,9 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const dailyVolumeUnformatted: Maybe<BigNumber> = useGraphMarketMakerDataResult.marketMakerData
     ? useGraphMarketMakerDataResult.marketMakerData.dailyVolume
     : null
+  const formattedLiquidity: string = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.scaledLiquidityParameter.toFixed(2)
+    : '0'
 
   useEffect(() => {
     const setToken = async () => {
@@ -113,20 +115,13 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         formattedDailyVolume = '0'
       }
 
-      let liquidity = 0
-      outcomeTokenAmounts.forEach(amount => {
-        const formattedAmount: number = parseInt(formatBigNumber(amount, decimals))
-        liquidity += formattedAmount
-      })
-
       setVolume(volume)
       setSymbol(symbol)
       setDailyVolume(formattedDailyVolume)
-      setLiquidity(liquidity)
     }
 
     setToken()
-  }, [account, collateralToken, collateralVolume, dailyVolumeUnformatted, provider, outcomeTokenAmounts])
+  }, [account, collateralToken, collateralVolume, dailyVolumeUnformatted, provider])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
@@ -145,7 +140,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
           {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Ending`}
           {currentFilter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume' &&
             `${Math.floor(Date.now() / 86400000) === lastActiveDay ? dailyVolume : 0} ${symbol} - 24hr Volume`}
-          {currentFilter.sortBy === 'scaledLiquidityParameter' && `${liquidity} ${symbol} - Liquidity`}
+          {currentFilter.sortBy === 'scaledLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
       </Info>
