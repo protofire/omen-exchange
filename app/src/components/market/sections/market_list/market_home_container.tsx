@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/react-hooks'
 import { useInterval } from '@react-corekit/use-interval'
 import { ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useHistory } from 'react-router'
 import { useLocation } from 'react-router-dom'
 
@@ -164,34 +164,37 @@ const MarketHomeContainer: React.FC = () => {
   const [isFiltering, setIsFiltering] = useState(false)
   const { account, library: provider, networkId } = context
   const feeBN = ethers.utils.parseEther('' + MAX_MARKET_FEE / Math.pow(10, 2))
-  const marketQuery = buildQueryMarkets({
-    whitelistedTemplateIds: true,
-    whitelistedCreators: false,
-    ...filter,
-    networkId,
-  })
 
-  const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)
+  const marketQuery = useMemo(
+    () =>
+      buildQueryMarkets({
+        whitelistedTemplateIds: true,
+        whitelistedCreators: false,
+        ...filter,
+        networkId,
+      }),
+    [networkId, filter],
+  )
+
+  const knownArbitrators = useMemo(() => getArbitratorsByNetwork(networkId).map(x => x.address), [networkId])
   const fetchMyMarkets = filter.state === MarketStates.myMarkets
 
-  const marketsQueryVariables = {
-    first: pageSize,
-    skip: 0,
-    accounts: cpkAddress ? [cpkAddress] : null,
-    account: cpkAddress && cpkAddress.toLowerCase(),
-    fee: feeBN.toString(),
-    now: +now,
-    knownArbitrators,
-    ...filter,
-  }
+  const marketsQueryVariables = useMemo(() => {
+    return {
+      first: pageSize,
+      skip: 0,
+      accounts: cpkAddress ? [cpkAddress] : null,
+      account: cpkAddress && cpkAddress.toLowerCase(),
+      fee: feeBN.toString(),
+      now: +now,
+      knownArbitrators,
+      ...filter,
+    }
+  }, [pageSize, cpkAddress, feeBN, now, knownArbitrators, filter])
 
   const expectedMarketsSize = pageSize * (pageIndex + 1)
-  const { error, filteredMarkets, loading, moreMarkets } = useFetchMarkets(
-    marketQuery,
-    marketsQueryVariables,
-    expectedMarketsSize,
-  )
-  const currentPageMarkets = usePaginatedList<any>(filteredMarkets, pageIndex, pageSize)
+  const { error, filteredMarkets, loading } = useFetchMarkets(marketQuery, marketsQueryVariables, expectedMarketsSize)
+  const { moreMarkets, pageList: currentPageMarkets } = usePaginatedList<any>(filteredMarkets, pageIndex, pageSize)
 
   const { data: fetchedCategories, error: categoriesError, loading: categoriesLoading } = useQuery<
     GraphResponseCategories
@@ -220,14 +223,14 @@ const MarketHomeContainer: React.FC = () => {
     if (loading) {
       setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
     } else if (currentPageMarkets) {
-      setMarkets(RemoteData.success(wrangleResponse(currentPageMarkets, context.networkId)))
+      setMarkets(RemoteData.success(wrangleResponse(currentPageMarkets, networkId)))
 
       setIsFiltering(false)
     } else if (error) {
       setMarkets(RemoteData.failure(error))
       setIsFiltering(false)
     }
-  }, [currentPageMarkets, loading, error, context.networkId, pageSize, pageIndex])
+  }, [currentPageMarkets, loading, error, networkId])
 
   useEffect(() => {
     if (categoriesLoading) {
@@ -243,7 +246,7 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(RemoteData.failure(categoriesError))
       setIsFiltering(false)
     }
-  }, [fetchedCategories, categoriesLoading, categoriesError, context.networkId])
+  }, [fetchedCategories, categoriesLoading, categoriesError])
 
   const onFilterChange = useCallback(
     (filter: any) => {
