@@ -49,6 +49,10 @@ export const Footer = () => {
         <Break>·</Break>
         <Link href={`https://etherscan.io/address/${marketMakerFactory.address}`}>Omen Contract</Link>
         <Break>·</Break>
+        <Link href="https://explore.duneanalytics.com/dashboard/omen-stats" target="_blank">
+          Statistics
+        </Link>
+        <Break>·</Break>
         <Link href="http://alchemy.daostack.io/dao/0x519b70055af55a007110b4ff99b0ea33071c720a">Propose Token</Link>
         <Break>·</Break>
         <Link href={DOCUMENT_FAQ} target="_blank">
@@ -69,10 +73,6 @@ export const Footer = () => {
         <Break>·</Break>
         <Link href="https://t.me/omen_eth" target="_blank">
           Telegram
-        </Link>
-        <Break>·</Break>
-        <Link href="https://explore.duneanalytics.com/dashboard/omen-stats" target="_blank">
-          Statistics
         </Link>
       </Wrapper>
     </>
