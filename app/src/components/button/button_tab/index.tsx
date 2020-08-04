@@ -10,13 +10,14 @@ const Wrapper = styled.button<ButtonProps>`
 
 interface ButtonTabProps extends ButtonProps {
   active?: boolean
+  disabled?: boolean
 }
 
 export const ButtonTab: React.FC<ButtonTabProps> = (props: ButtonTabProps) => {
-  const { active = false, children, ...restProps } = props
+  const { active = false, children, disabled, ...restProps } = props
 
   return (
-    <Wrapper buttonType={active ? ButtonType.secondary : ButtonType.secondaryLine} {...restProps}>
+    <Wrapper buttonType={active ? ButtonType.secondary : ButtonType.secondaryLine} disabled={disabled} {...restProps}>
       {children}
     </Wrapper>
   )

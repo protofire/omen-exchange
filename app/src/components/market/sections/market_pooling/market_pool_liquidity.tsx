@@ -1,5 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
+import moment from 'moment'
 import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -238,6 +239,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const walletBalance = formatBigNumber(collateralBalance, collateral.decimals, 5)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
 
+  const resolutionDate = marketMakerData.question.resolution.getTime()
+  const currentDate = new Date().getTime()
+
   const collateralAmountError =
     maybeCollateralBalance === null
       ? null
@@ -257,9 +261,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       : null
 
   const disableDepositButton =
-    amountToFund.isZero() || hasEnoughAllowance !== Ternary.True || collateralAmountError !== null
+    amountToFund.isZero() ||
+    hasEnoughAllowance !== Ternary.True ||
+    collateralAmountError !== null ||
+    currentDate > resolutionDate
   const disableWithdrawButton =
     amountToRemove.isZero() || amountToRemove.gt(fundingBalance) || sharesAmountError !== null
+  const disableDepositTab = currentDate > resolutionDate
 
   return (
     <>
@@ -291,10 +299,17 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         <GridTransactionDetails>
           <div>
             <TabsGrid>
-              <ButtonTab active={activeTab === Tabs.deposit} onClick={() => setActiveTab(Tabs.deposit)}>
+              <ButtonTab
+                active={disableDepositTab ? false : activeTab === Tabs.deposit}
+                disabled={disableDepositTab}
+                onClick={() => setActiveTab(Tabs.deposit)}
+              >
                 Deposit
               </ButtonTab>
-              <ButtonTab active={activeTab === Tabs.withdraw} onClick={() => setActiveTab(Tabs.withdraw)}>
+              <ButtonTab
+                active={disableDepositTab ? true : activeTab === Tabs.withdraw}
+                onClick={() => setActiveTab(Tabs.withdraw)}
+              >
                 Withdraw
               </ButtonTab>
             </TabsGrid>
