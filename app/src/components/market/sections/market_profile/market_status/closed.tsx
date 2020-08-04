@@ -227,21 +227,32 @@ const Wrapper = (props: Props) => {
               winnersOutcomes={winnersOutcomes}
             ></MarketResolutionMessageStyled>
           )}
-          <ButtonContainer>
-            {poolButton}
-            {buySellButtons}
-          </ButtonContainer>
-          {isConditionResolved && !hasWinningOutcomes ? null : (
+          {isConditionResolved && !hasWinningOutcomes ? (
+            <ButtonContainer>
+              {poolButton}
+              {buySellButtons}
+            </ButtonContainer>
+          ) : (
             <ButtonContainerFullWidth borderTop={true}>
               {!isConditionResolved && (
-                <Button buttonType={ButtonType.primary} disabled={status === Status.Loading} onClick={resolveCondition}>
-                  Resolve Condition
-                </Button>
+                <>
+                  {poolButton}
+                  <Button
+                    buttonType={ButtonType.primary}
+                    disabled={status === Status.Loading}
+                    onClick={resolveCondition}
+                  >
+                    Resolve Condition
+                  </Button>
+                </>
               )}
               {isConditionResolved && hasWinningOutcomes && (
-                <Button buttonType={ButtonType.primary} disabled={status === Status.Loading} onClick={() => redeem()}>
-                  Redeem
-                </Button>
+                <>
+                  {poolButton}
+                  <Button buttonType={ButtonType.primary} disabled={status === Status.Loading} onClick={() => redeem()}>
+                    Redeem
+                  </Button>
+                </>
               )}
             </ButtonContainerFullWidth>
           )}
