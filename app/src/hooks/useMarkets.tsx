@@ -14,6 +14,7 @@ export const useFetchMarkets = (query: any, variables: any, expectedMarketsCount
   // TODO Import here to fetch data with different queries => Response should be a list of fpmm ids
   // TODO Receive filters for filtering clientside after the graph filter/sort in subgraph side
 
+  console.log('useFetchMarkets')
   const [moreMarkets, setMoreMarkets] = useState(true)
   const [skip, setSkip] = useState(0)
   const [filteredMarkets, setFilteredMarkets] = useState<any>([])
@@ -34,7 +35,7 @@ export const useFetchMarkets = (query: any, variables: any, expectedMarketsCount
     setMoreMarkets(true)
     setSkip(0)
     setNeedsMoreMarkets(true)
-  }, [query, variables])
+  }, [query])
 
   useEffect(() => {
     if (markets && !queriesAreLoading) {

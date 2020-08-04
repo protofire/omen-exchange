@@ -1,36 +1,17 @@
 import { useQuery } from '@apollo/react-hooks'
-import { useInterval } from '@react-corekit/use-interval'
-import { ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { useHistory } from 'react-router'
-import { useLocation } from 'react-router-dom'
+import React, { useCallback, useEffect, useState } from 'react'
 
-import { MAX_MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { useFilters } from '../../../../hooks/useFilters'
+import { useMarketFilterURLParams } from '../../../../hooks/useMarketFilterURLParams'
 import { useFetchMarkets, usePaginatedList } from '../../../../hooks/useMarkets'
-import {
-  GraphMarketMakerDataItem,
-  MarketMakerDataItem,
-  buildQueryMarkets,
-  queryCategories,
-  //queryMyMarkets,
-} from '../../../../queries/markets_home'
-import { CPKService } from '../../../../services'
-import { getLogger } from '../../../../util/logger'
-import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
+import { GraphMarketMakerDataItem, MarketMakerDataItem, queryCategories } from '../../../../queries/markets_home'
+import { getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import {
-  CategoryDataItem,
-  GraphResponseCategories,
-  MarketFilters,
-  MarketStates,
-  MarketsSortCriteria,
-} from '../../../../util/types'
+import { CategoryDataItem, GraphResponseCategories, MarketFilters } from '../../../../util/types'
 
 import { MarketHome } from './market_home'
-
-const logger = getLogger('MarketHomeContainer')
 
 type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
 type GraphResponseMyMarkets = { account: { fpmmParticipations: Participations[] } }
@@ -64,140 +45,19 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
 
 const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
-  const history = useHistory()
-
-  const location = useLocation()
-
-  const sortRoute = location.pathname.split('/')[1]
-  let sortDirection: 'desc' | 'asc' = 'desc'
-
-  const currencyFilter = location.pathname.includes('currency') ? true : false
-  let currencyRoute = location.pathname.split('/currency/')[1]
-  if (currencyRoute) currencyRoute = currencyRoute.split('/')[0]
-
-  const arbitratorFilter = location.pathname.includes('arbitrator') ? true : false
-  let arbitratorRoute = location.pathname.split('/arbitrator/')[1]
-  if (arbitratorRoute) arbitratorRoute = arbitratorRoute.split('/')[0]
-
-  const categoryFilter = location.pathname.includes('category') ? true : false
-  let categoryRoute = location.pathname.split('/category/')[1]
-  if (categoryRoute) categoryRoute = categoryRoute.split('/')[0]
-
-  const stateFilter = location.search.includes('state') ? true : false
-  let stateRoute = location.search.split('state=')[1]
-  if (stateRoute) stateRoute = stateRoute.split('&')[0]
-
-  const searchFilter = location.search.includes('tag') ? true : false
-  let searchRoute = location.search.split('tag=')[1]
-  if (searchRoute) searchRoute = searchRoute.split('&')[0]
-
-  let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndScaledRunningDailyVolume'
-  if (sortRoute === '24h-volume') {
-    sortParam = 'lastActiveDayAndScaledRunningDailyVolume'
-  } else if (sortRoute === 'volume') {
-    sortParam = 'scaledCollateralVolume'
-  } else if (sortRoute === 'newest') {
-    sortParam = 'creationTimestamp'
-  } else if (sortRoute === 'ending') {
-    sortParam = 'openingTimestamp'
-    sortDirection = 'asc'
-  } else if (sortRoute === 'liquidity') {
-    sortParam = 'scaledLiquidityParameter'
-  }
-
-  let currencyParam: string | null
-  if (currencyFilter) {
-    currencyParam = currencyRoute
-  } else {
-    currencyParam = null
-  }
-
-  let arbitratorParam: string | null
-  if (arbitratorFilter) {
-    arbitratorParam = arbitratorRoute
-  } else {
-    arbitratorParam = null
-  }
-
-  let categoryParam: string
-  if (categoryFilter) {
-    categoryParam = categoryRoute
-  } else {
-    categoryParam = 'All'
-  }
-
-  let stateParam: MarketStates = MarketStates.open
-  if (stateFilter) {
-    if (stateRoute === 'OPEN') stateParam = MarketStates.open
-    if (stateRoute === 'PENDING') stateParam = MarketStates.pending
-    if (stateRoute === 'CLOSED') stateParam = MarketStates.closed
-    if (stateRoute === 'MY_MARKETS') stateParam = MarketStates.myMarkets
-  } else {
-    stateParam = MarketStates.open
-  }
-
-  let searchParam: string
-  if (searchFilter) {
-    searchParam = searchRoute
-  } else {
-    searchParam = ''
-  }
-
-  const [filter, setFilter] = useState<MarketFilters>({
-    state: stateParam,
-    category: categoryParam,
-    title: searchParam,
-    sortBy: sortParam,
-    sortByDirection: sortDirection,
-    arbitrator: arbitratorParam,
-    templateId: null,
-    currency: currencyParam,
-  })
+  const { networkId } = context
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [categories, setCategories] = useState<RemoteData<CategoryDataItem[]>>(RemoteData.notAsked())
-  const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const [pageSize, setPageSize] = useState(4)
   const [pageIndex, setPageIndex] = useState(0)
   const [expectedMarketsSize, setExpectedMarketsSize] = useState(pageSize)
-  const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
-  const [now, setNow] = useState<string>(calcNow())
+  const { params, updateURL } = useMarketFilterURLParams()
+  const { fetchMyMarkets, filter, marketsQuery, marketsQueryVariables, setFilter } = useFilters(params, pageSize)
+
   const [isFiltering, setIsFiltering] = useState(false)
-  const { account, library: provider, networkId } = context
-  const feeBN = ethers.utils.parseEther('' + MAX_MARKET_FEE / Math.pow(10, 2))
 
-  const marketQuery = useMemo(
-    () =>
-      buildQueryMarkets({
-        whitelistedTemplateIds: true,
-        whitelistedCreators: false,
-        ...filter,
-        networkId,
-      }),
-    [networkId, filter],
-  )
-
-  const knownArbitrators = useMemo(() => getArbitratorsByNetwork(networkId).map(x => x.address), [networkId])
-  const fetchMyMarkets = filter.state === MarketStates.myMarkets
-
-  const marketsQueryVariables = useMemo(() => {
-    return {
-      first: pageSize,
-      skip: 0,
-      accounts: cpkAddress ? [cpkAddress] : null,
-      account: cpkAddress && cpkAddress.toLowerCase(),
-      fee: feeBN.toString(),
-      now: +now,
-      knownArbitrators,
-      ...filter,
-    }
-  }, [pageSize, cpkAddress, feeBN, now, knownArbitrators, filter])
-
-  useEffect(() => {
-    setExpectedMarketsSize(pageSize * (pageIndex + 1))
-  }, [pageSize, pageIndex])
-
-  const { error, filteredMarkets, loading } = useFetchMarkets(marketQuery, marketsQueryVariables, expectedMarketsSize)
+  const { error, filteredMarkets, loading } = useFetchMarkets(marketsQuery, marketsQueryVariables, expectedMarketsSize)
   const { moreMarkets, pageList: currentPageMarkets } = usePaginatedList<any>(filteredMarkets, pageIndex, pageSize)
 
   const { data: fetchedCategories, error: categoriesError, loading: categoriesLoading } = useQuery<
@@ -206,22 +66,9 @@ const MarketHomeContainer: React.FC = () => {
     notifyOnNetworkStatusChange: true,
   })
 
-  useInterval(() => setNow(calcNow), 1000 * 60 * 5)
-
   useEffect(() => {
-    const getCpkAddress = async () => {
-      try {
-        const cpk = await CPKService.create(provider)
-        setCpkAddress(cpk.address)
-      } catch (e) {
-        logger.error('Could not get address of CPK', e.message)
-      }
-    }
-
-    if (account) {
-      getCpkAddress()
-    }
-  }, [provider, account])
+    setExpectedMarketsSize(pageSize * (pageIndex + 1))
+  }, [pageSize, pageIndex])
 
   useEffect(() => {
     if (loading) {
@@ -253,53 +100,13 @@ const MarketHomeContainer: React.FC = () => {
   }, [fetchedCategories, categoriesLoading, categoriesError])
 
   const onFilterChange = useCallback(
-    (filter: any) => {
+    (filter: MarketFilters) => {
       setFilter(filter)
       setPageIndex(0)
       setIsFiltering(true)
-
-      let route = ''
-      const routeQueryStart = '?'
-      const routeQueryArray: string[] = []
-
-      if (filter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume') {
-        route += '/24h-volume'
-      } else if (filter.sortBy === 'scaledCollateralVolume') {
-        route += '/volume'
-      } else if (filter.sortBy === 'creationTimestamp') {
-        route += '/newest'
-      } else if (filter.sortBy === 'openingTimestamp') {
-        route += '/ending'
-      } else if (filter.sortBy === 'scaledLiquidityParameter') {
-        route += '/liquidity'
-      }
-
-      if (filter.currency) {
-        route += `/currency/${filter.currency}`
-      }
-
-      if (filter.arbitrator) {
-        route += `/arbitrator/${filter.arbitrator}`
-      }
-
-      if (filter.category && filter.category !== 'All') {
-        route += `/category/${filter.category}`
-      }
-
-      if (filter.state && filter.state !== 'OPEN') {
-        routeQueryArray.push(`state=${filter.state}`)
-      }
-
-      if (filter.title) {
-        routeQueryArray.push(`tag=${filter.title}`)
-      }
-
-      const routeQueryString = routeQueryArray.join('&')
-      const routeQuery = routeQueryStart.concat(routeQueryString)
-
-      history.push(`${route}${routeQuery}`)
+      updateURL(filter)
     },
-    [history],
+    [setFilter, updateURL],
   )
 
   const loadNextPage = () => {
