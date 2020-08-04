@@ -1,6 +1,5 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import moment from 'moment'
 import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -103,7 +102,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
-  const [activeTab, setActiveTab] = useState(Tabs.deposit)
+  const resolutionDate = marketMakerData.question.resolution.getTime()
+  const currentDate = new Date().getTime()
+  const disableDepositTab = currentDate > resolutionDate
+  const [activeTab, setActiveTab] = useState(disableDepositTab ? Tabs.withdraw : Tabs.deposit)
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
@@ -239,9 +241,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const walletBalance = formatBigNumber(collateralBalance, collateral.decimals, 5)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
 
-  const resolutionDate = marketMakerData.question.resolution.getTime()
-  const currentDate = new Date().getTime()
-
   const collateralAmountError =
     maybeCollateralBalance === null
       ? null
@@ -267,7 +266,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     currentDate > resolutionDate
   const disableWithdrawButton =
     amountToRemove.isZero() || amountToRemove.gt(fundingBalance) || sharesAmountError !== null
-  const disableDepositTab = currentDate > resolutionDate
 
   return (
     <>
