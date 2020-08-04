@@ -191,6 +191,11 @@ const DropdownVariantCardItemsContainerCSS = css`
   left: 0;
 `
 
+const DropdownMaxHeightCSS = css`
+  max-height: 218px;
+  overflow-y: auto;
+`
+
 const ItemsContainer = styled.div<{
   isOpen: boolean
   dropdownPosition?: DropdownPosition
@@ -231,11 +236,13 @@ const DropdownScrollbarCSS = css`
 const Items = styled.div<{
   dropdownVariant?: DropdownVariant
   showScrollbar?: boolean
+  maxHeight?: boolean
 }>`
   ${props => (props.dropdownVariant === DropdownVariant.pill ? DropdownVariantPillItemsCSS : '')};
   ${props => props.dropdownVariant === DropdownVariant.card && 'margin-right: -8px'};
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardItemsCSS : '')};
   ${props => props.showScrollbar && DropdownScrollbarCSS}
+  ${props => props.maxHeight && DropdownMaxHeightCSS};
 `
 
 const SecondaryText = styled.div`
@@ -299,6 +306,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   showScrollbar?: boolean
   items: any
   placeholder?: React.ReactNode | string | undefined
+  maxHeight?: boolean
 }
 
 export const Dropdown: React.FC<Props> = props => {
@@ -312,6 +320,7 @@ export const Dropdown: React.FC<Props> = props => {
     items,
     placeholder,
     showScrollbar = false,
+    maxHeight = false,
     ...restProps
   } = props
 
@@ -396,7 +405,7 @@ export const Dropdown: React.FC<Props> = props => {
           // }
           // }}
         >
-          <Items dropdownVariant={dropdownVariant} showScrollbar={showScrollbar}>
+          <Items dropdownVariant={dropdownVariant} maxHeight={maxHeight} showScrollbar={showScrollbar}>
             {items.map((item: DropdownItemProps, index: string) => {
               return (
                 <Item
