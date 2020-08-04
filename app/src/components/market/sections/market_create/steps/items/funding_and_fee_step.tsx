@@ -49,6 +49,7 @@ import { CurrencySelector } from '../../../../common/currency_selector'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
 import { SetAllowance } from '../../../../common/set_allowance'
+import { TradingFeeSelector } from '../../../../common/trading_fee_selector'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
@@ -148,11 +149,9 @@ const CustomFeeLabel = styled.p`
   margin: 0;
 `
 
-const TextFieldWrapper = styled.div`
+const StyledTradingFeeSelector = styled(TradingFeeSelector)`
   width: 50%;
 `
-
-const NumberInput = styled.input``
 
 interface Props {
   back: () => void
@@ -169,6 +168,7 @@ interface Props {
   }
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
+  handleTradingFeeChange: (fee: string) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
 }
@@ -181,7 +181,16 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { account, library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
-  const { back, handleChange, handleCollateralChange, marketCreationStatus, resetTradingFee, submit, values } = props
+  const {
+    back,
+    handleChange,
+    handleCollateralChange,
+    handleTradingFeeChange,
+    marketCreationStatus,
+    resetTradingFee,
+    submit,
+    values,
+  } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -201,7 +210,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals)
 
   const [customFee, setCustomFee] = useState(false)
-  const [fee, setFee] = useState<number | undefined>(spread)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
   const tokensAmount = useTokens(context).length
@@ -252,14 +260,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       resetTradingFee()
       setCustomFee(false)
     } else {
-      setFee(undefined)
       setCustomFee(true)
     }
   }
 
   useEffect(() => {
     setExceedsMaxFee(spread > MAX_MARKET_FEE)
-    setFee(spread)
   }, [spread])
 
   return (
@@ -346,21 +352,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             {customFee && (
               <CustomFeeWrapper>
                 <CustomFeeLabel>Trading Fee</CustomFeeLabel>
-                <TextFieldWrapper>
-                  <TextfieldCustomPlaceholder
-                    formField={
-                      <NumberInput
-                        max="10"
-                        name="spread"
-                        onChange={handleChange}
-                        placeholder="0"
-                        type="number"
-                        value={fee}
-                      />
-                    }
-                    symbol="%"
-                  />
-                </TextFieldWrapper>
+                <StyledTradingFeeSelector disabled={false} onSelect={handleTradingFeeChange} />
               </CustomFeeWrapper>
             )}
             {amountError && <GenericError>{amountError}</GenericError>}
