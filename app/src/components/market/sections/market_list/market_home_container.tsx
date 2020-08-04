@@ -159,6 +159,7 @@ const MarketHomeContainer: React.FC = () => {
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
   const [pageSize, setPageSize] = useState(4)
   const [pageIndex, setPageIndex] = useState(0)
+  const [expectedMarketsSize, setExpectedMarketsSize] = useState(pageSize)
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
   const [now, setNow] = useState<string>(calcNow())
   const [isFiltering, setIsFiltering] = useState(false)
@@ -192,7 +193,10 @@ const MarketHomeContainer: React.FC = () => {
     }
   }, [pageSize, cpkAddress, feeBN, now, knownArbitrators, filter])
 
-  const expectedMarketsSize = pageSize * (pageIndex + 1)
+  useEffect(() => {
+    setExpectedMarketsSize(pageSize * (pageIndex + 1))
+  }, [pageSize, pageIndex])
+
   const { error, filteredMarkets, loading } = useFetchMarkets(marketQuery, marketsQueryVariables, expectedMarketsSize)
   const { moreMarkets, pageList: currentPageMarkets } = usePaginatedList<any>(filteredMarkets, pageIndex, pageSize)
 

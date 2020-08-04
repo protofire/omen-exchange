@@ -13,6 +13,11 @@ const filterFn = <T,>(element: any): Promise<boolean> => {
 export const useFetchMarkets = (query: any, variables: any, expectedMarketsCount: number): any => {
   // TODO Import here to fetch data with different queries => Response should be a list of fpmm ids
   // TODO Receive filters for filtering clientside after the graph filter/sort in subgraph side
+
+  const [moreMarkets, setMoreMarkets] = useState(true)
+  const [skip, setSkip] = useState(0)
+  const [filteredMarkets, setFilteredMarkets] = useState<any>([])
+  const [needsMoreMarkets, setNeedsMoreMarkets] = useState(true)
   const { data: markets, error, fetchMore, loading } = useQuery(query, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'network-only',
@@ -24,7 +29,20 @@ export const useFetchMarkets = (query: any, variables: any, expectedMarketsCount
   const queriesAreLoading = loading
   const queriesErrors = error
 
-  const [filteredMarkets, setFilteredMarkets] = useState<any>([])
+  useEffect(() => {
+    console.log('RESET STATE')
+    setMoreMarkets(true)
+    setSkip(0)
+    setNeedsMoreMarkets(true)
+  }, [query, variables])
+
+  useEffect(() => {
+    if (markets && !queriesAreLoading) {
+      const skip = markets.fixedProductMarketMakers.length
+      setMoreMarkets(skip > 0)
+      setSkip(skip)
+    }
+  }, [markets, queriesAreLoading])
 
   useEffect((): (() => void) => {
     let didCancel = false
@@ -32,14 +50,20 @@ export const useFetchMarkets = (query: any, variables: any, expectedMarketsCount
       const filteredMarkets = await asyncFilter<any>(markets.fixedProductMarketMakers, filterFn)
       setFilteredMarkets(filteredMarkets)
     }
-    if (markets && !didCancel && !queriesAreLoading) filterMarkets()
+    if (markets && !didCancel) filterMarkets()
     return () => (didCancel = true)
-  }, [markets, queriesAreLoading])
+  }, [markets])
 
   useEffect(() => {
-    if (!queriesAreLoading && filteredMarkets && filteredMarkets.length < expectedMarketsCount) {
-      const skip = markets ? markets.fixedProductMarketMakers.length : 0
+    if (filteredMarkets && filteredMarkets.length < expectedMarketsCount) {
+      setNeedsMoreMarkets(true)
+    } else {
+      setNeedsMoreMarkets(false)
+    }
+  }, [filteredMarkets, expectedMarketsCount])
 
+  useEffect(() => {
+    if (needsMoreMarkets && moreMarkets) {
       fetchMore({
         variables: {
           skip,
@@ -50,19 +74,18 @@ export const useFetchMarkets = (query: any, variables: any, expectedMarketsCount
           }
 
           // TODO Repeated markets. This add lodash as dependency, should be removed when a bug related
-          // repeated markets in result is solved.
+          // to repeated markets in result is solved.
+          const newMarkets = [...prev.fixedProductMarketMakers, ...fetchMoreResult.fixedProductMarketMakers]
+
           const result = Object.assign({}, prev, {
-            fixedProductMarketMakers: _.uniqBy(
-              [...prev.fixedProductMarketMakers, ...fetchMoreResult.fixedProductMarketMakers],
-              'id',
-            ),
+            fixedProductMarketMakers: _.uniqBy(newMarkets, 'id'),
           })
 
           return result
         },
       })
     }
-  }, [queriesAreLoading, markets, filteredMarkets, fetchMore, expectedMarketsCount])
+  }, [moreMarkets, needsMoreMarkets, skip, fetchMore])
 
   return { filteredMarkets, error: queriesErrors, loading: queriesAreLoading }
 }
