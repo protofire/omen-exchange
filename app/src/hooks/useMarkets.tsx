@@ -2,7 +2,18 @@ import { useQuery } from '@apollo/react-hooks'
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 
+import { GraphMarketMakerDataItem } from '../queries/markets_home'
 import { asyncFilter } from '../util/async_filter'
+
+import { useWrangleMarkets } from './useWrangleMarkets'
+
+type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
+export type GraphResponseMyMarkets = { account: { fpmmParticipations: Participations[] } }
+export type GraphResponseMarketsGeneric = {
+  fixedProductMarketMakers: GraphMarketMakerDataItem[]
+}
+
+export type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMyMarkets
 
 // TODO
 // This filter should work for fields that cannot be lifted
@@ -10,7 +21,12 @@ const filterFn = <T,>(element: any): Promise<boolean> => {
   return Promise.resolve(element.id.split('')[3] > '0')
 }
 
-export const useFetchMarkets = (query: any, variables: any, expectedMarketsCount: number): any => {
+export const useFetchMarkets = (
+  query: any,
+  fetchMyMarkets: boolean,
+  variables: any,
+  expectedMarketsCount: number,
+): any => {
   // TODO Import here to fetch data with different queries => Response should be a list of fpmm ids
   // TODO Receive filters for filtering clientside after the graph filter/sort in subgraph side
 
@@ -19,16 +35,17 @@ export const useFetchMarkets = (query: any, variables: any, expectedMarketsCount
   const [skip, setSkip] = useState(0)
   const [filteredMarkets, setFilteredMarkets] = useState<any>([])
   const [needsMoreMarkets, setNeedsMoreMarkets] = useState(true)
-  const { data: markets, error, fetchMore, loading } = useQuery(query, {
+  const { data: markets, error, fetchMore, loading } = useQuery<GraphResponseMarketsGeneric>(query, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'network-only',
     variables,
   })
+  const { data, error: wrangleError, loading: wrangleLoading } = useWrangleMarkets(markets, fetchMyMarkets)
 
   // TODO We need two queries here, the one for ids and another one for retrieving fpmm data of each id
   // loading and error should be combined
-  const queriesAreLoading = loading
-  const queriesErrors = error
+  const queriesAreLoading = loading || wrangleError
+  const queriesErrors = error || wrangleLoading
 
   useEffect(() => {
     console.log('RESET STATE')
@@ -47,11 +64,11 @@ export const useFetchMarkets = (query: any, variables: any, expectedMarketsCount
 
   useEffect((): (() => void) => {
     let didCancel = false
-    const filterMarkets = async () => {
-      const filteredMarkets = await asyncFilter<any>(markets.fixedProductMarketMakers, filterFn)
+    const filterMarkets = async (markets: GraphResponseMarketsGeneric) => {
+      const filteredMarkets = await asyncFilter<GraphMarketMakerDataItem>(markets.fixedProductMarketMakers, filterFn)
       setFilteredMarkets(filteredMarkets)
     }
-    if (markets && !didCancel) filterMarkets()
+    if (markets && !didCancel) filterMarkets(markets)
     return () => (didCancel = true)
   }, [markets])
 

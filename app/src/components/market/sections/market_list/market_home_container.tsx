@@ -13,14 +13,6 @@ import { CategoryDataItem, GraphResponseCategories, MarketFilters } from '../../
 
 import { MarketHome } from './market_home'
 
-type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
-type GraphResponseMyMarkets = { account: { fpmmParticipations: Participations[] } }
-type GraphResponseMarketsGeneric = {
-  fixedProductMarketMakers: GraphMarketMakerDataItem[]
-}
-
-type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMyMarkets
-
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
   return data.map((graphMarketMakerDataItem: GraphMarketMakerDataItem) => {
     const outcomes = graphMarketMakerDataItem.outcomes
@@ -57,7 +49,12 @@ const MarketHomeContainer: React.FC = () => {
 
   const [isFiltering, setIsFiltering] = useState(false)
 
-  const { error, filteredMarkets, loading } = useFetchMarkets(marketsQuery, marketsQueryVariables, expectedMarketsSize)
+  const { error, filteredMarkets, loading } = useFetchMarkets(
+    marketsQuery,
+    fetchMyMarkets,
+    marketsQueryVariables,
+    expectedMarketsSize,
+  )
   const { moreMarkets, pageList: currentPageMarkets } = usePaginatedList<any>(filteredMarkets, pageIndex, pageSize)
 
   const { data: fetchedCategories, error: categoriesError, loading: categoriesLoading } = useQuery<

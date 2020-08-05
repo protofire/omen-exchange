@@ -122,6 +122,18 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
   return query
 }
 
+export const buildQueryMyMarkets = (ids: string[]) => {
+  const query = gql`
+    query GetMarketsById() {
+      fixedProductMarketMakers(where: { id_in: ${ids} } }) {
+        ...marketData
+      }    
+    }
+    ${MarketDataFragment}
+  `
+  return query
+}
+
 export const queryCategories = gql`
   {
     categories(first: 100, orderBy: numOpenConditions, orderDirection: desc) {
