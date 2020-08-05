@@ -113,7 +113,7 @@ const Wrapper = (props: Props) => {
     <Button
       buttonType={ButtonType.secondaryLine}
       onClick={() => {
-        window.open(`https://realitio.github.io/#!/question/${question.id}`)
+        window.open(`https://reality.eth.link/app/#!/question/${question.id}`)
       }}
     >
       Answer in Realit.io
