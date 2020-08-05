@@ -96,7 +96,7 @@ export const usePaginatedList = <T,>(list: T[], pageIndex: number, pageSize: num
   const [moreMarkets, setMoreMarkets] = useState(true)
 
   useEffect(() => {
-    setMoreMarkets(list.length > pageIndex * pageSize)
+    setMoreMarkets(list.length >= (pageIndex + 1) * pageSize)
     setPageList(list.slice(pageIndex * pageSize, pageIndex * pageSize + pageSize))
   }, [list, pageIndex, pageSize])
 
