@@ -126,7 +126,7 @@ export const ModalQuestion = (props: Props) => {
   }
 
   return (
-    <ModalWrapper isOpen onRequestClose={onClose} title={`Import Market from realit.io`}>
+    <ModalWrapper isOpen onRequestClose={onClose} title={`Import Market from reality.eth`}>
       <FormRow
         error={errorMessage || ''}
         formField={
@@ -138,7 +138,7 @@ export const ModalQuestion = (props: Props) => {
               const { value } = event.target
               setQuestionURL(value.trim())
             }}
-            placeholder="https://realitio.github.io/#!/question/0xd27a6a4dbc3930b0e319aad2c7b2c478fa9d8ff785f474415bdec1285838b3e9"
+            placeholder="https://reality.eth.link/app/#!/question/0xd1e8e274bea94f038aaa30000d2be2a7de5e9db4580edec24f109a374f88b3cd"
             type="text"
             value={questionURL}
           />
