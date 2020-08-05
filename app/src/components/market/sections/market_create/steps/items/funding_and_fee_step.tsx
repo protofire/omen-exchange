@@ -182,12 +182,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { back, handleChange, handleCollateralChange, marketCreationStatus, resetTradingFee, submit, values } = props
-  const { arbitrator, category, collateral, outcomes, question, resolution, spread } = values
-  const { funding } = values
+  const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const [amount, setAmount] = useState<BigNumber>(funding)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
+
+  const [amount, setAmount] = useState<BigNumber>(funding)
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
@@ -213,6 +213,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     distributionHint.length > 0
       ? calcInitialFundingSendAmounts(funding, distributionHint)
       : outcomes.map(() => new BigNumber(0))
+
+  console.log(funding)
 
   const amountError =
     maybeCollateralBalance === null
@@ -267,6 +269,18 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const handleAmountChange = (event: BigNumberInputReturn) => {
     setAmount(event.value)
     handleChange(event)
+  }
+
+  const onMax = async () => {
+    const input: HTMLInputElement = Array.from(document.getElementsByName('funding'))[0] as HTMLInputElement
+    input.addEventListener('change', e => {
+      const event: ChangeEvent<HTMLInputElement> = e as any
+      handleChange(event)
+    })
+    setAmount(collateralBalance)
+    setTimeout(() => {
+      input.dispatchEvent(new CustomEvent('change'))
+    }, 1000)
   }
 
   return (
@@ -354,7 +368,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 />
               }
               maxButton={true}
-              onMax={() => setAmount(collateralBalance)}
+              onMax={onMax}
               symbol={collateral.symbol}
             />
             {customFee && (
