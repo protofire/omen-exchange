@@ -116,7 +116,7 @@ const Wrapper = (props: Props) => {
         window.open(`https://reality.eth.link/app/#!/question/${question.id}`)
       }}
     >
-      Answer in Realit.io
+      Answer on Reality.eth
     </Button>
   )
 
