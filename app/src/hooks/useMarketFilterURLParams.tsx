@@ -4,97 +4,104 @@ import { useLocation } from 'react-router-dom'
 
 import { MarketFilters, MarketStates, MarketsSortCriteria } from '../util/types'
 
+const parseCurrency = (pathname: string): Maybe<string> => {
+  if (pathname.includes('/currency/')) {
+    return pathname.split('/currency/')[1].split('/')[0]
+  } else {
+    return null
+  }
+}
+
+const parseArbitrator = (pathname: string): Maybe<string> => {
+  if (pathname.includes('arbitrator')) {
+    return pathname.split('/arbitrator/')[1].split('/')[0]
+  } else {
+    return null
+  }
+}
+
+const parseCategory = (pathname: string): string => {
+  if (pathname.includes('category')) {
+    return pathname.split('/category/')[1].split('/')[0]
+  } else {
+    return 'All'
+  }
+}
+
+const parseSearchParam = (search: string): string => {
+  const searchFilter = search.includes('tag')
+  let searchRoute = search.split('tag=')[1]
+  if (searchRoute) searchRoute = searchRoute.split('&')[0]
+
+  return searchFilter ? searchRoute : ''
+}
+
+const parseState = (search: string): MarketStates => {
+  const stateFilter = search.includes('state')
+  let stateRoute = search.split('state=')[1]
+  if (stateRoute) stateRoute = stateRoute.split('&')[0]
+
+  if (!stateFilter) return MarketStates.open
+  switch (stateRoute) {
+    case 'OPEN':
+      return MarketStates.open
+    case 'PENDING':
+      return MarketStates.pending
+    case 'CLOSED':
+      return MarketStates.closed
+    case 'MY_MARKETS':
+      return MarketStates.myMarkets
+    default:
+      return MarketStates.open
+  }
+}
+
+const parseSortRoute = (pathname: string): MarketsSortCriteria => {
+  const sortRoute = pathname.split('/')[1]
+
+  switch (sortRoute) {
+    case '24h-volume':
+      return 'lastActiveDayAndScaledRunningDailyVolume'
+    case 'volume':
+      return 'scaledCollateralVolume'
+    case 'newest':
+      return 'creationTimestamp'
+    case 'ending':
+      return 'openingTimestamp'
+    case 'liquidity':
+      return 'scaledLiquidityParameter'
+    default:
+      return 'lastActiveDayAndScaledRunningDailyVolume'
+  }
+}
+
 export const useMarketFilterURLParams = () => {
   const history = useHistory()
-  const location = useLocation()
+  const { pathname, search } = useLocation()
 
-  const [stateParam, setStateParam] = useState<MarketStates>(MarketStates.open)
-  const [categoryParam, setCategoryParam] = useState('All')
-  const [searchParam, setSearchParam] = useState('')
-  const [sortParam, setSortParam] = useState<MarketsSortCriteria>('lastActiveDayAndScaledRunningDailyVolume')
-  const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc')
-  const [arbitratorParam, setArbitratorParam] = useState<Maybe<string>>(null)
-  const [currencyParam, setCurrencyParam] = useState<Maybe<string>>(null)
-
-  useEffect(() => {
-    const currencyFilter = location.pathname.includes('currency')
-    let currencyRoute = location.pathname.split('/currency/')[1]
-    if (currencyRoute) currencyRoute = currencyRoute.split('/')[0]
-
-    if (currencyFilter) {
-      setCurrencyParam(currencyRoute)
-    } else {
-      setCurrencyParam(null)
-    }
-  }, [location])
+  const [stateParam, setStateParam] = useState<MarketStates>(parseState(search))
+  const [categoryParam, setCategoryParam] = useState(parseCategory(pathname))
+  const [searchParam, setSearchParam] = useState(parseSearchParam(search))
+  const [sortParam, setSortParam] = useState<MarketsSortCriteria>(parseSortRoute(pathname))
+  const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>(sortParam === 'openingTimestamp' ? 'asc' : 'desc')
+  const [arbitratorParam, setArbitratorParam] = useState<Maybe<string>>(parseArbitrator(pathname))
+  const [currencyParam, setCurrencyParam] = useState<Maybe<string>>(parseCurrency(pathname))
 
   useEffect(() => {
-    const arbitratorFilter = location.pathname.includes('arbitrator')
-    let arbitratorRoute = location.pathname.split('/arbitrator/')[1]
-    if (arbitratorRoute) arbitratorRoute = arbitratorRoute.split('/')[0]
-
-    if (arbitratorFilter) {
-      setArbitratorParam(arbitratorRoute)
-    } else {
-      setArbitratorParam(null)
-    }
-  }, [location])
-
-  useEffect(() => {
-    const categoryFilter = location.pathname.includes('category')
-    let categoryRoute = location.pathname.split('/category/')[1]
-    if (categoryRoute) categoryRoute = categoryRoute.split('/')[0]
-
-    if (categoryFilter) {
-      setCategoryParam(categoryRoute)
-    } else {
-      setCategoryParam('All')
-    }
-  }, [location])
-
-  useEffect(() => {
-    const stateFilter = location.search.includes('state')
-    let stateRoute = location.search.split('state=')[1]
-    if (stateRoute) stateRoute = stateRoute.split('&')[0]
-
-    if (stateFilter) {
-      if (stateRoute === 'OPEN') setStateParam(MarketStates.open)
-      if (stateRoute === 'PENDING') setStateParam(MarketStates.pending)
-      if (stateRoute === 'CLOSED') setStateParam(MarketStates.closed)
-      if (stateRoute === 'MY_MARKETS') setStateParam(MarketStates.myMarkets)
-    } else {
-      setStateParam(MarketStates.open)
-    }
-  }, [location])
-
-  useEffect(() => {
-    const searchFilter = location.search.includes('tag')
-    let searchRoute = location.search.split('tag=')[1]
-    if (searchRoute) searchRoute = searchRoute.split('&')[0]
-
-    if (searchFilter) {
-      setSearchParam(searchRoute)
-    } else {
-      setSearchParam('')
-    }
-  }, [location])
-
-  useEffect(() => {
-    const sortRoute = location.pathname.split('/')[1]
-
-    if (sortRoute === '24h-volume') {
-      setSortParam('lastActiveDayAndScaledRunningDailyVolume')
-    } else if (sortRoute === 'volume') {
-      setSortParam('scaledCollateralVolume')
-    } else if (sortRoute === 'newest') {
-      setSortParam('creationTimestamp')
-    } else if (sortRoute === 'ending') {
-      setSortParam('openingTimestamp')
+    setCurrencyParam(parseCurrency(pathname))
+    setArbitratorParam(parseArbitrator(pathname))
+    setCategoryParam(parseCategory(pathname))
+    const sortBy = parseSortRoute(pathname)
+    setSortParam(sortBy)
+    if (sortBy === 'openingTimestamp') {
       setSortDirection('asc')
-    } else if (sortRoute === 'liquidity') {
-      setSortParam('scaledLiquidityParameter')
     }
-  }, [location])
+  }, [pathname])
+
+  useEffect(() => {
+    setStateParam(parseState(search))
+    setSearchParam(parseSearchParam(search))
+  }, [search])
 
   const updateURL = useCallback(
     (filter: MarketFilters) => {
