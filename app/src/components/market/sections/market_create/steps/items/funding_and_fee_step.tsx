@@ -214,8 +214,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       ? calcInitialFundingSendAmounts(funding, distributionHint)
       : outcomes.map(() => new BigNumber(0))
 
-  console.log(funding)
-
   const amountError =
     maybeCollateralBalance === null
       ? null
