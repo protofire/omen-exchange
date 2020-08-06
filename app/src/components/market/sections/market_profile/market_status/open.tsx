@@ -19,6 +19,7 @@ const MessageWrapper = styled.div`
   border-radius: 4px;
   border: 1px solid ${props => props.theme.borders.borderColorLighter};
   margin-top: 20px;
+  margin-bottom: 20px;
   padding: 20px 25px;
 `
 
@@ -152,7 +153,7 @@ const Wrapper = (props: Props) => {
       />
       {renderTableData()}
       {isQuestionOpen && openQuestionMessage}
-      {!hasFunding && (
+      {!hasFunding && !isQuestionOpen && (
         <WarningMessageStyled
           additionalDescription={''}
           description={'Trading is disabled due to lack of liquidity.'}
