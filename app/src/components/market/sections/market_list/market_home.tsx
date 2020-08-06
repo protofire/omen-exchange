@@ -5,7 +5,13 @@ import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { CategoryDataItem, MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
+import {
+    CategoryDataItem,
+    MarketFilters,
+    MarketStates,
+    MarketsSortCriteria,
+    MarketValidity
+} from '../../../../util/types'
 import { ButtonCircle } from '../../../button'
 import { SectionTitle } from '../../../common'
 import {
@@ -222,6 +228,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
+  const [marketValidity, setMarketValidity] = useState<MarketValidity>(currentFilter.marketValidity)
 
   const filters = [
     {
@@ -277,8 +284,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   }, [category, categories])
 
   useEffect(() => {
-    onFilterChange({ arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title })
-  }, [arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title, onFilterChange])
+    onFilterChange({ arbitrator, marketValidity, templateId, currency, category, sortBy, sortByDirection, state, title })
+  }, [arbitrator, marketValidity, templateId, currency, category, sortBy, sortByDirection, state, title, onFilterChange])
 
   const toggleSearch = useCallback(() => {
     setShowAdvancedFilters(false)
@@ -440,8 +447,10 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           <AdvancedFilters
             arbitrator={arbitrator}
             currency={currency}
+            marketValidity={marketValidity}
             onChangeArbitrator={setArbitrator}
             onChangeCurrency={setCurrency}
+            onChangeMarketValidity={setMarketValidity}
             onChangeTemplateId={setTemplateId}
           />
         )}

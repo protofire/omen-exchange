@@ -143,6 +143,11 @@ export type MarketsSortCriteria =
   | 'scaledLiquidityParameter'
   | 'lastActiveDayAndScaledRunningDailyVolume'
 
+export enum MarketValidity {
+    VALID = 'Valid',
+    INVALID = 'Invalid',
+}
+
 export interface MarketFilters {
   state: MarketStates
   category: string
@@ -152,6 +157,7 @@ export interface MarketFilters {
   arbitrator: Maybe<string>
   templateId: Maybe<string>
   currency: Maybe<string>
+  marketValidity: MarketValidity
 }
 
 export interface MarketMakerData {

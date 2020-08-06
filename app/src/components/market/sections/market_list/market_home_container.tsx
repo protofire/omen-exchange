@@ -20,11 +20,11 @@ import { getLogger } from '../../../../util/logger'
 import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
-  CategoryDataItem,
-  GraphResponseCategories,
-  MarketFilters,
-  MarketStates,
-  MarketsSortCriteria,
+    CategoryDataItem,
+    GraphResponseCategories,
+    MarketFilters,
+    MarketStates,
+    MarketsSortCriteria, MarketValidity,
 } from '../../../../util/types'
 
 import { MarketHome } from './market_home'
@@ -85,6 +85,10 @@ const MarketHomeContainer: React.FC = () => {
   let arbitratorRoute = location.pathname.split('/arbitrator/')[1]
   if (arbitratorRoute) arbitratorRoute = arbitratorRoute.split('/')[0]
 
+  const marketValidityFilter = location.pathname.includes('market-validity') ? true : false
+  let marketValidityRoute = location.pathname.split('/market-validity/')[1]
+  if (marketValidityRoute) marketValidityRoute = marketValidityRoute.split('/')[0]
+
   const categoryFilter = location.pathname.includes('category') ? true : false
   let categoryRoute = location.pathname.split('/category/')[1]
   if (categoryRoute) categoryRoute = categoryRoute.split('/')[0]
@@ -97,7 +101,7 @@ const MarketHomeContainer: React.FC = () => {
   let searchRoute = location.search.split('tag=')[1]
   if (searchRoute) searchRoute = searchRoute.split('&')[0]
 
-  let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndScaledRunningDailyVolume'
+  let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndScaledRunningDailyVolume' as MarketsSortCriteria
   if (sortRoute === '24h-volume') {
     sortParam = 'lastActiveDayAndScaledRunningDailyVolume'
   } else if (sortRoute === 'volume') {
@@ -123,6 +127,13 @@ const MarketHomeContainer: React.FC = () => {
     arbitratorParam = arbitratorRoute
   } else {
     arbitratorParam = null
+  }
+
+  let marketValidityParam: MarketValidity
+  if (marketValidityFilter) {
+    marketValidityParam = marketValidityRoute as MarketValidity
+  } else {
+    marketValidityParam = MarketValidity.VALID
   }
 
   let categoryParam: string
@@ -158,6 +169,7 @@ const MarketHomeContainer: React.FC = () => {
     arbitrator: arbitratorParam,
     templateId: null,
     currency: currencyParam,
+    marketValidity: marketValidityParam,
   })
 
   const [fetchedMarkets, setFetchedMarkets] = useState<Maybe<GraphResponseMarketsGeneric>>(null)
@@ -311,6 +323,10 @@ const MarketHomeContainer: React.FC = () => {
 
       if (filter.title) {
         routeQueryArray.push(`tag=${filter.title}`)
+      }
+
+      if (filter.marketValidity) {
+          route += `/market-validity/${filter.marketValidity}`
       }
 
       const routeQueryString = routeQueryArray.join('&')
