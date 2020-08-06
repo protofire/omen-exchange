@@ -34,19 +34,19 @@ const Text = styled.h1<{ backButtonEnabled: boolean; textAlign: TextAlign }>`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement>, RouteComponentProps<any> {
-  backTo?: string
+  goBack?: boolean
   textAlign?: TextAlign
   title: string
 }
 
 export const SectionTitleWrapper: React.FC<Props> = (props: Props) => {
-  const { textAlign = TextAlign.center, backTo = '', title, ...restProps } = props
-  const enableGoBack = backTo !== ''
+  const { textAlign = TextAlign.center, goBack = '', title, ...restProps } = props
+  const enableGoBack = goBack === true
 
   return (
     <Wrapper {...restProps}>
       {enableGoBack && (
-        <ButtonCircle onClick={() => props.history.push(backTo)}>
+        <ButtonCircle onClick={() => (props.history.length > 2 ? props.history.goBack() : props.history.replace('/'))}>
           <IconArrowBack />
         </ButtonCircle>
       )}

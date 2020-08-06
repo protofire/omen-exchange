@@ -24,6 +24,8 @@ const query = gql`
       outcomes
       category
       language
+      lastActiveDay
+      runningDailyVolume
       arbitrator
       creationTimestamp
       openingTimestamp
@@ -31,6 +33,7 @@ const query = gql`
       resolutionTimestamp
       currentAnswer
       answerFinalizedTimestamp
+      scaledLiquidityParameter
       question {
         id
         data
@@ -53,6 +56,8 @@ type GraphResponseFixedProductMarketMaker = {
   creator: string
   currentAnswer: string
   fee: string
+  lastActiveDay: string
+  runningDailyVolume: string
   language: string
   creationTimestamp: string
   openingTimestamp: string
@@ -66,6 +71,7 @@ type GraphResponseFixedProductMarketMaker = {
   templateId: string
   timeout: string
   title: string
+  scaledLiquidityParameter: string
 }
 
 type GraphResponse = {
@@ -79,10 +85,13 @@ export type GraphMarketMakerData = {
   collateralAddress: string
   creationTimestamp: string
   collateralVolume: BigNumber
+  lastActiveDay: number
+  dailyVolume: BigNumber
   conditionId: string
   payouts: Maybe<number[]>
   fee: BigNumber
   question: Question
+  scaledLiquidityParameter: number
 }
 
 type Result = {
@@ -100,9 +109,12 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     collateralAddress: data.collateralToken,
     creationTimestamp: data.creationTimestamp,
     collateralVolume: bigNumberify(data.collateralVolume),
+    lastActiveDay: Number(data.lastActiveDay),
+    dailyVolume: bigNumberify(data.runningDailyVolume),
     conditionId: data.condition.id,
     payouts: data.condition.payouts ? data.condition.payouts.map(Number) : null,
     fee: bigNumberify(data.fee),
+    scaledLiquidityParameter: parseFloat(data.scaledLiquidityParameter),
     question: {
       id: data.question.id,
       templateId: +data.templateId,

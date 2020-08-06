@@ -20,7 +20,8 @@ export const MAX_OUTCOME_ALLOWED = MAX_OUTCOMES > 256 ? 256 : MAX_OUTCOMES
 
 export const SINGLE_SELECT_TEMPLATE_ID = 2
 
-export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
+export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '2.00')
+export const MAX_MARKET_FEE = parseFloat('5.00')
 
 export const CATEGORIES = [
   'Business & Finance',
@@ -32,14 +33,38 @@ export const CATEGORIES = [
   'Miscellaneous',
 ]
 
+export const TRADING_FEE_OPTIONS = [
+  '0.00',
+  '0.25',
+  '0.50',
+  '0.75',
+  '1.00',
+  '1.25',
+  '1.50',
+  '1.75',
+  '2.00',
+  '2.25',
+  '2.50',
+  '2.75',
+  '3.00',
+  '3.25',
+  '3.50',
+  '3.75',
+  '4.00',
+  '4.25',
+  '4.50',
+  '4.75',
+  '5.00',
+]
+
 export const GRAPH_MAINNET_HTTP =
-  process.env.REACT_APP_GRAPH_MAINNET_HTTP || 'https://api.thegraph.com/subgraphs/name/gnosis/omen'
+  process.env.REACT_APP_GRAPH_MAINNET_HTTP || 'https://api.thegraph.com/subgraphs/name/protofire/omen'
 export const GRAPH_MAINNET_WS =
-  process.env.REACT_APP_GRAPH_MAINNET_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen'
+  process.env.REACT_APP_GRAPH_MAINNET_WS || 'wss://api.thegraph.com/subgraphs/name/protofire/omen'
 export const GRAPH_RINKEBY_HTTP =
-  process.env.REACT_APP_GRAPH_RINKEBY_HTTP || 'https://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
+  process.env.REACT_APP_GRAPH_RINKEBY_HTTP || 'https://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
 export const GRAPH_RINKEBY_WS =
-  process.env.REACT_APP_GRAPH_RINKEBY_WS || 'wss://api.thegraph.com/subgraphs/name/gnosis/omen-rinkeby'
+  process.env.REACT_APP_GRAPH_RINKEBY_WS || 'wss://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
 
 export const Logo = OmenLogo
 

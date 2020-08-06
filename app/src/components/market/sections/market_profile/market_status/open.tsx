@@ -9,6 +9,7 @@ import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
+import { WarningMessage } from '../../../common/warning_message'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -18,6 +19,7 @@ const MessageWrapper = styled.div`
   border-radius: 4px;
   border: 1px solid ${props => props.theme.borders.borderColorLighter};
   margin-top: 20px;
+  margin-bottom: 20px;
   padding: 20px 25px;
 `
 
@@ -37,6 +39,19 @@ const Text = styled.p`
   letter-spacing: 0.2px;
   line-height: 1.5;
   margin: 0;
+`
+
+const StyledButtonContainer = styled(ButtonContainer)`
+  margin: 0 -25px;
+  padding: 20px 25px 0;
+
+  &.border {
+    border-top: 1px solid ${props => props.theme.colors.verticalDivider};
+  }
+`
+
+const WarningMessageStyled = styled(WarningMessage)`
+  margin-top: 20px;
 `
 
 interface Props extends RouteComponentProps<{}> {
@@ -91,7 +106,7 @@ const Wrapper = (props: Props) => {
   const openQuestionMessage = (
     <MessageWrapper>
       <Title>The question is being resolved.</Title>
-      <Text>This can take up to 24h. You will be able to redeem your winnings as soon as the market is resolved.</Text>
+      <Text>You will be able to redeem your winnings as soon as the market is resolved.</Text>
     </MessageWrapper>
   )
 
@@ -99,10 +114,10 @@ const Wrapper = (props: Props) => {
     <Button
       buttonType={ButtonType.secondaryLine}
       onClick={() => {
-        window.open(`https://realitio.github.io/#!/question/${question.id}`)
+        window.open(`https://reality.eth.link/app/#!/question/${question.id}`)
       }}
     >
-      Answer in Realit.io
+      Answer on Reality.eth
     </Button>
   )
 
@@ -138,11 +153,20 @@ const Wrapper = (props: Props) => {
       />
       {renderTableData()}
       {isQuestionOpen && openQuestionMessage}
+      {!hasFunding && !isQuestionOpen && (
+        <WarningMessageStyled
+          additionalDescription={''}
+          description={'Trading is disabled due to lack of liquidity.'}
+          grayscale={true}
+          href={''}
+          hyperlinkDescription={''}
+        />
+      )}
       <WhenConnected>
-        <ButtonContainer>
+        <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
           {poolButton}
           {isQuestionOpen ? openInRealitioButton : buySellButtons}
-        </ButtonContainer>
+        </StyledButtonContainer>
       </WhenConnected>
     </ViewCard>
   )

@@ -102,12 +102,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
-  const [activeTab, setActiveTab] = useState(Tabs.deposit)
+  const resolutionDate = marketMakerData.question.resolution.getTime()
+  const currentDate = new Date().getTime()
+  const disableDepositTab = currentDate > resolutionDate
+  const [activeTab, setActiveTab] = useState(disableDepositTab ? Tabs.withdraw : Tabs.deposit)
 
-  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), collateral.decimals)}%`, [
-    fee,
-    collateral.decimals,
-  ])
+  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
@@ -235,11 +235,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
   const depositedTokensTotal = depositedTokens.add(userEarnings)
-  const goBackToAddress = `/${marketMakerAddress}`
   const maybeFundingBalance = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
 
-  const walletBalance = formatBigNumber(collateralBalance, collateral.decimals)
+  const walletBalance = formatBigNumber(collateralBalance, collateral.decimals, 5)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
 
   const collateralAmountError =
@@ -261,13 +260,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       : null
 
   const disableDepositButton =
-    amountToFund.isZero() || hasEnoughAllowance !== Ternary.True || collateralAmountError !== null
+    amountToFund.isZero() ||
+    hasEnoughAllowance !== Ternary.True ||
+    collateralAmountError !== null ||
+    currentDate > resolutionDate
   const disableWithdrawButton =
     amountToRemove.isZero() || amountToRemove.gt(fundingBalance) || sharesAmountError !== null
 
   return (
     <>
-      <SectionTitle backTo={goBackToAddress} textAlign={TextAlign.left} title={question.title} />
+      <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
         <MarketTopDetailsOpen
           isLiquidityProvision={true}
@@ -285,6 +287,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           showSharesChange={showSharesChange}
         />
         <WarningMessageStyled
+          additionalDescription={''}
           description={
             'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
           }
@@ -294,10 +297,17 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         <GridTransactionDetails>
           <div>
             <TabsGrid>
-              <ButtonTab active={activeTab === Tabs.deposit} onClick={() => setActiveTab(Tabs.deposit)}>
+              <ButtonTab
+                active={disableDepositTab ? false : activeTab === Tabs.deposit}
+                disabled={disableDepositTab}
+                onClick={() => setActiveTab(Tabs.deposit)}
+              >
                 Deposit
               </ButtonTab>
-              <ButtonTab active={activeTab === Tabs.withdraw} onClick={() => setActiveTab(Tabs.withdraw)}>
+              <ButtonTab
+                active={disableDepositTab ? true : activeTab === Tabs.withdraw}
+                onClick={() => setActiveTab(Tabs.withdraw)}
+              >
                 Withdraw
               </ButtonTab>
             </TabsGrid>
@@ -410,7 +420,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           />
         )}
         <ButtonContainer>
-          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.push(goBackToAddress)}>
+          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
             Cancel
           </LeftButton>
           {activeTab === Tabs.deposit && (
@@ -430,7 +440,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         </ButtonContainer>
       </ViewCard>
       <ModalTransactionResult
-        goBackToAddress={goBackToAddress}
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
         status={status}

@@ -45,7 +45,6 @@ const MarketWizardCreatorContainer: FC = () => {
         if (!hasEnoughAlowance) {
           await collateralService.approveUnlimited(cpk.address)
         }
-
         const marketMakerAddress = await cpk.createMarket({
           marketData,
           conditionalTokens,
@@ -55,7 +54,7 @@ const MarketWizardCreatorContainer: FC = () => {
         setMarketMakerAddress(marketMakerAddress)
 
         setMarketCreationStatus(MarketCreationStatus.done())
-        history.push(`/${marketMakerAddress}`)
+        history.replace(`/${marketMakerAddress}`)
       }
     } catch (err) {
       setMarketCreationStatus(MarketCreationStatus.error(err))

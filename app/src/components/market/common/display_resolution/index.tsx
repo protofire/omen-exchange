@@ -22,7 +22,7 @@ const Title = styled.h2`
   white-space: nowrap;
 `
 
-const Value = styled.div`
+const Value = styled.a`
   color: ${props => props.theme.colors.textColor};
   font-size: 14px;
   font-weight: 400;
@@ -38,10 +38,11 @@ const Value = styled.div`
 interface Props extends DOMAttributes<HTMLDivElement> {
   title: string
   value: any
+  questionId?: string
 }
 
 export const DisplayResolution: React.FC<Props> = (props: Props) => {
-  const { title, value, ...restProps } = props
+  const { questionId, title, value, ...restProps } = props
 
   const now = moment()
   const localResolution = moment(value).local()
@@ -54,7 +55,11 @@ export const DisplayResolution: React.FC<Props> = (props: Props) => {
   //create message for local time
   const tzName = moment.tz.guess()
   const abbr = moment.tz(tzName).zoneAbbr()
-  const formating = `MM/DD/YY - HH:mm:ss [${abbr}]`
+  const formatting = `MMMM Do YYYY - HH:mm:ss [${abbr}]`
+
+  const realitioUrl = questionId
+    ? `https://reality.eth.link/app/#!/question/${questionId}`
+    : 'https://reality.eth.link/'
 
   return (
     <Wrapper {...restProps}>
@@ -64,7 +69,10 @@ export const DisplayResolution: React.FC<Props> = (props: Props) => {
         data-effect="solid"
         data-for="walletBalanceTooltip"
         data-multiline="true"
-        data-tip={localResolution.format(formating) + '<br />' + endsMessage}
+        data-tip={localResolution.format(formatting) + '<br />' + endsMessage}
+        href={realitioUrl}
+        rel="noopener noreferrer"
+        target="_blank"
       >
         {formatDate(value)}
       </Value>

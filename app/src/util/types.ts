@@ -131,16 +131,17 @@ export interface MarketData {
 export enum MarketStates {
   open = 'OPEN',
   pending = 'PENDING',
+  finalizing = 'FINALIZING',
   closed = 'CLOSED',
   myMarkets = 'MY_MARKETS',
 }
 
 export type MarketsSortCriteria =
-  | 'collateralVolume'
+  | 'scaledCollateralVolume'
   | 'creationTimestamp'
   | 'openingTimestamp'
-  | 'liquidityParameter'
-  | 'lastActiveDayAndRunningDailyVolume'
+  | 'scaledLiquidityParameter'
+  | 'lastActiveDayAndScaledRunningDailyVolume'
 
 export interface MarketFilters {
   state: MarketStates
@@ -186,3 +187,23 @@ export type HistoricDataPoint = {
 
 export type HistoricData = HistoricDataPoint[]
 export type Period = '1H' | '1D' | '1W' | '1M'
+
+export type CategoryDataItem = {
+  id: string
+  numOpenConditions: number
+  numClosedConditions: number
+  numConditions: number
+}
+
+export type GraphResponseCategories = {
+  categories: CategoryDataItem[]
+}
+
+export type TopCategoryItem = {
+  id: string
+  typename: string
+}
+
+export type GraphResponseTopCategories = {
+  categories: TopCategoryItem[]
+}

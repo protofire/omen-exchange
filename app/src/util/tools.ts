@@ -21,7 +21,7 @@ export const truncateStringInTheMiddle = (str: string, strPositionStart: number,
 export const formatDate = (date: Date): string => {
   return moment(date)
     .tz('UTC')
-    .format('MM/DD/YY - HH:mm [UTC]')
+    .format('YYYY-MM-DD - HH:mm [UTC]')
 }
 
 export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
@@ -319,4 +319,16 @@ export const getMarketTitles = (templateId: Maybe<number>) => {
   } else {
     return { marketTitle: 'Binary Market', marketSubtitle: 'What is a binary market?' }
   }
+}
+
+/**
+ * Given a string representing a floating point number,
+ * return a floating point number with a fixed amount of decimal places.
+ */
+export const limitDecimalPlaces = (value: string, decimals: number) => {
+  const limitedString: string =
+    value.indexOf('.') >= 0
+      ? value.substr(0, value.indexOf('.')) + value.substr(value.indexOf('.'), decimals + 1)
+      : value
+  return Number.parseFloat(limitedString)
 }

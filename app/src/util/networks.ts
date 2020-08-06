@@ -303,7 +303,7 @@ interface KnownArbitratorData {
 export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData } = {
   realitio: {
     name: 'Realitio Team',
-    url: 'https://realit.io/',
+    url: 'https://reality.eth.link/',
     addresses: {
       [networkIds.MAINNET]: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
       [networkIds.RINKEBY]: '0x02321745bE4a141E78db6C39834396f8df00e2a0',

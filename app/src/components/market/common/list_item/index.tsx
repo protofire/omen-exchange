@@ -4,7 +4,7 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { use24hsVolume, useGraphMarketMakerData } from '../../../../hooks'
+import { useGraphMarketMakerData } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { ERC20Service } from '../../../../services'
@@ -75,7 +75,6 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const [volume, setVolume] = useState('')
   const [symbol, setSymbol] = useState('')
   const [dailyVolume, setDailyVolume] = useState('')
-  const [liquidity, setLiquidity] = useState(0)
 
   const { currentFilter, market } = props
   const { address, collateralToken, collateralVolume, openingTimestamp, outcomeTokenAmounts, outcomes, title } = market
@@ -85,13 +84,21 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const endsText = moment(endDate).fromNow(true)
   const resolutionDate = moment(endDate).format('MMM Do, YYYY')
 
-  const use24hsVolumeResult = use24hsVolume(address)
   const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
   const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
     ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
     : ''
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
   const formattedCreationDate = moment(creationDate).format('MMM Do, YYYY')
+  const lastActiveDay: number = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.lastActiveDay
+    : 0
+  const dailyVolumeUnformatted: Maybe<BigNumber> = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.dailyVolume
+    : null
+  const formattedLiquidity: string = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.scaledLiquidityParameter.toFixed(2)
+    : '0'
 
   useEffect(() => {
     const setToken = async () => {
@@ -101,33 +108,26 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
       let lastDayVolume: BigNumber
       let formattedDailyVolume: string
-      if (use24hsVolumeResult !== null) {
-        lastDayVolume = use24hsVolumeResult
+      if (dailyVolumeUnformatted !== null) {
+        lastDayVolume = dailyVolumeUnformatted
         formattedDailyVolume = formatBigNumber(lastDayVolume, decimals)
       } else {
         formattedDailyVolume = '0'
       }
 
-      let liquidity = 0
-      outcomeTokenAmounts.forEach(amount => {
-        const formattedAmount: number = parseInt(formatBigNumber(amount, decimals))
-        liquidity += formattedAmount
-      })
-
       setVolume(volume)
       setSymbol(symbol)
       setDailyVolume(formattedDailyVolume)
-      setLiquidity(liquidity)
     }
 
     setToken()
-  }, [account, collateralToken, collateralVolume, provider, use24hsVolumeResult, outcomeTokenAmounts])
+  }, [account, collateralToken, collateralVolume, dailyVolumeUnformatted, provider])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
 
   return (
-    <Wrapper to={address}>
+    <Wrapper to={`/${address}`}>
       <Title>{title}</Title>
       <Info>
         <IconStar></IconStar>
@@ -136,10 +136,11 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Ended ${endsText}`}</span>
         <Separator>|</Separator>
         <span>
-          {currentFilter.sortBy === 'collateralVolume' && `${volume} ${symbol} - Volume`}
+          {currentFilter.sortBy === 'scaledCollateralVolume' && `${volume} ${symbol} - Volume`}
           {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Ending`}
-          {currentFilter.sortBy === 'lastActiveDayAndRunningDailyVolume' && `${dailyVolume} ${symbol} - 24hr Volume`}
-          {currentFilter.sortBy === 'liquidityParameter' && `${liquidity} ${symbol} - Liquidity`}
+          {currentFilter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume' &&
+            `${Math.floor(Date.now() / 86400000) === lastActiveDay ? dailyVolume : 0} ${symbol} - 24hr Volume`}
+          {currentFilter.sortBy === 'scaledLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
       </Info>

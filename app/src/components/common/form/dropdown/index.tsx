@@ -1,4 +1,4 @@
-import React, { DOMAttributes, useCallback, useState } from 'react'
+import React, { DOMAttributes, useCallback, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { CardCSS } from '../../card'
@@ -44,7 +44,7 @@ const DropdownOpenCSS = css`
 const DropdownVariantCardOpenCSS = css`
   &,
   &:hover {
-    border-color: #9fa8da;
+    border-color: ${props => props.theme.textfield.borderColorActive};
     z-index: 12345;
     .currentItem {
       color: ${props => props.theme.colors.primary};
@@ -83,7 +83,8 @@ const DropdownVariantCardCSS = css`
   flex: 1;
   padding: 13px 25px;
   position: relative;
-  border: 1px solid #dcdff2;
+  border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
+  text-transform: capitalize;
 `
 
 const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean; dropdownVariant?: DropdownVariant }>`
@@ -104,7 +105,9 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean; dropdownVariant
   &:hover {
     background-color: ${props => props.theme.dropdown.buttonBackgroundColor};
     border-color: ${props =>
-      props.dropdownVariant === DropdownVariant.card ? '#9fa8da' : props.theme.dropdown.buttonBorderColorHover};
+      props.dropdownVariant === DropdownVariant.card
+        ? props.theme.textfield.borderColorActive
+        : props.theme.dropdown.buttonBorderColorHover};
     color: ${props => props.theme.dropdown.buttonColorHover};
   }
 
@@ -123,8 +126,14 @@ const DropdownButton = styled.div`
   justify-content: space-between;
 `
 
+const DropdownButtonRight = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 const CurrentItem = styled.div`
   align-items: center;
+  justify-content: space-between;
   color: ${props => props.theme.dropdown.buttonColor};
   display: flex;
   flex-grow: 1;
@@ -138,6 +147,11 @@ const CurrentItem = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+`
+
+const CurrentItemExtra = styled.p`
+  margin: 0 10px 0 0;
+  color: ${props => props.theme.buttonSecondaryLine.colorDisabled};
 `
 
 const DropdownPositionLeftCSS = css`
@@ -172,9 +186,14 @@ const DropdownVariantCardItemsCSS = css`
 `
 const DropdownVariantCardItemsContainerCSS = css`
   border-radius: 8px;
-  border: 1px solid #dcdff2;
+  border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
   width: 100%;
   left: 0;
+`
+
+const DropdownMaxHeightCSS = css`
+  max-height: 218px;
+  overflow-y: auto;
 `
 
 const ItemsContainer = styled.div<{
@@ -202,11 +221,11 @@ const ItemsContainer = styled.div<{
 const DropdownScrollbarCSS = css`
   margin-right: 0;
   &::-webkit-scrollbar-track {
-    background: #f3f4fb;
+    background: ${props => props.theme.slider.idle};
     border-radius: 2px;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: #9fa9d8;
+    background-color: ${props => props.theme.slider.active};
     border-radius: 2px;
   }
   &::-webkit-scrollbar {
@@ -217,11 +236,19 @@ const DropdownScrollbarCSS = css`
 const Items = styled.div<{
   dropdownVariant?: DropdownVariant
   showScrollbar?: boolean
+  maxHeight?: boolean
 }>`
   ${props => (props.dropdownVariant === DropdownVariant.pill ? DropdownVariantPillItemsCSS : '')};
   ${props => props.dropdownVariant === DropdownVariant.card && 'margin-right: -8px'};
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardItemsCSS : '')};
   ${props => props.showScrollbar && DropdownScrollbarCSS}
+  ${props => props.maxHeight && DropdownMaxHeightCSS};
+`
+
+const SecondaryText = styled.div`
+  color: ${props => props.theme.colors.textColor};
+  width: 33%;
+  text-align: right;
 `
 
 Items.defaultProps = {
@@ -230,15 +257,14 @@ Items.defaultProps = {
 
 const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
   align-items: center;
+  justify-content: space-between;
   background-color: ${props =>
     props.active
-      ? props.dropdownVariant === DropdownVariant.card
-        ? '#F8F9FC'
-        : props.theme.dropdown.dropdownItems.item.backgroundColorActive
+      ? props.theme.dropdown.dropdownItems.item.backgroundColorActive
       : props.theme.dropdown.dropdownItems.item.backgroundColor};
   color: ${props =>
     props.dropdownVariant === DropdownVariant.card && !props.active
-      ? '#757575'
+      ? props.theme.colors.textColor
       : props.theme.dropdown.dropdownItems.item.color};
   cursor: pointer;
   display: flex;
@@ -251,8 +277,11 @@ const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
     color: ${props => props.theme.dropdown.dropdownItems.item.color};
     background: ${props =>
       props.dropdownVariant === DropdownVariant.card
-        ? '#F8F9FC'
+        ? props.theme.dropdown.dropdownItems.item.backgroundColorActive
         : props.theme.dropdown.dropdownItems.item.backgroundColorHover};
+    div {
+      color: ${props => props.theme.dropdown.buttonColor};
+    }
   }
 `
 
@@ -262,6 +291,8 @@ const ChevronWrapper = styled.div`
 
 export interface DropdownItemProps {
   content: React.ReactNode | string
+  secondaryText?: React.ReactNode | string
+  extraContent?: string
   onClick?: () => void
 }
 
@@ -275,6 +306,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   showScrollbar?: boolean
   items: any
   placeholder?: React.ReactNode | string | undefined
+  maxHeight?: boolean
 }
 
 export const Dropdown: React.FC<Props> = props => {
@@ -288,6 +320,7 @@ export const Dropdown: React.FC<Props> = props => {
     items,
     placeholder,
     showScrollbar = false,
+    maxHeight = false,
     ...restProps
   } = props
 
@@ -299,13 +332,21 @@ export const Dropdown: React.FC<Props> = props => {
     return itemIndex
   }
 
-  const getItemContent = (itemIndex: number): any => {
-    return items[getValidItemIndex(itemIndex)].content
+  const getItem = (itemIndex: number): any => {
+    return items[getValidItemIndex(itemIndex)]
+  }
+
+  const getItemExtraContent = (itemIndex: number): any => {
+    return items[getValidItemIndex(itemIndex)].extraContent
   }
 
   const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
   const [isDirty, setIsDirty] = useState<boolean>(dirty)
   const [isOpen, setIsOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    setCurrentItemIndex(currentItem)
+  }, [currentItem])
 
   const optionClick = useCallback((onClick: (() => void) | undefined, itemIndex: number) => {
     if (!onClick) return
@@ -324,6 +365,8 @@ export const Dropdown: React.FC<Props> = props => {
     }
   }, [isOpen])
 
+  const activeItem = getItem(currentItemIndex)
+
   return (
     <>
       <Wrapper
@@ -339,12 +382,16 @@ export const Dropdown: React.FC<Props> = props => {
       >
         <DropdownButton>
           <CurrentItem className="currentItem">
-            {placeholder && !isDirty ? placeholder : getItemContent(currentItemIndex)}
+            {placeholder && !isDirty ? placeholder : activeItem.content}
+            {!!activeItem.secondaryText && <SecondaryText>{activeItem.secondaryText}</SecondaryText>}
           </CurrentItem>
-          <ChevronWrapper>
-            <ChevronDown />
-            <ChevronUp />
-          </ChevronWrapper>
+          <DropdownButtonRight>
+            <CurrentItemExtra>{getItemExtraContent(currentItemIndex)}</CurrentItemExtra>
+            <ChevronWrapper>
+              <ChevronDown />
+              <ChevronUp />
+            </ChevronWrapper>
+          </DropdownButtonRight>
         </DropdownButton>
         <ItemsContainer
           className="dropdownItems"
@@ -358,7 +405,7 @@ export const Dropdown: React.FC<Props> = props => {
           // }
           // }}
         >
-          <Items dropdownVariant={dropdownVariant} showScrollbar={showScrollbar}>
+          <Items dropdownVariant={dropdownVariant} maxHeight={maxHeight} showScrollbar={showScrollbar}>
             {items.map((item: DropdownItemProps, index: string) => {
               return (
                 <Item
@@ -372,6 +419,7 @@ export const Dropdown: React.FC<Props> = props => {
                   }
                 >
                   {item.content}
+                  {!!item.secondaryText && <SecondaryText>{item.secondaryText}</SecondaryText>}
                 </Item>
               )
             })}
