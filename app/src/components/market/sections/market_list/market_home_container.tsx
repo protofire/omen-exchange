@@ -77,27 +77,27 @@ const MarketHomeContainer: React.FC = () => {
   const sortRoute = location.pathname.split('/')[1]
   let sortDirection: 'desc' | 'asc' = 'desc'
 
-  const currencyFilter = location.pathname.includes('currency') ? true : false
+  const currencyFilter = location.pathname.includes('currency')
   let currencyRoute = location.pathname.split('/currency/')[1]
   if (currencyRoute) currencyRoute = currencyRoute.split('/')[0]
 
-  const arbitratorFilter = location.pathname.includes('arbitrator') ? true : false
+  const arbitratorFilter = location.pathname.includes('arbitrator')
   let arbitratorRoute = location.pathname.split('/arbitrator/')[1]
   if (arbitratorRoute) arbitratorRoute = arbitratorRoute.split('/')[0]
 
-  const marketValidityFilter = location.pathname.includes('market-validity') ? true : false
+  const marketValidityFilter = location.pathname.includes('market-validity')
   let marketValidityRoute = location.pathname.split('/market-validity/')[1]
   if (marketValidityRoute) marketValidityRoute = marketValidityRoute.split('/')[0]
 
-  const categoryFilter = location.pathname.includes('category') ? true : false
+  const categoryFilter = location.pathname.includes('category')
   let categoryRoute = location.pathname.split('/category/')[1]
   if (categoryRoute) categoryRoute = categoryRoute.split('/')[0]
 
-  const stateFilter = location.search.includes('state') ? true : false
+  const stateFilter = location.search.includes('state')
   let stateRoute = location.search.split('state=')[1]
   if (stateRoute) stateRoute = stateRoute.split('&')[0]
 
-  const searchFilter = location.search.includes('tag') ? true : false
+  const searchFilter = location.search.includes('tag')
   let searchRoute = location.search.split('tag=')[1]
   if (searchRoute) searchRoute = searchRoute.split('&')[0]
 
