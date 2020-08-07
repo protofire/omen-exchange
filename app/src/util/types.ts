@@ -144,8 +144,8 @@ export type MarketsSortCriteria =
   | 'lastActiveDayAndScaledRunningDailyVolume'
 
 export enum MarketValidity {
-    VALID = 'Valid',
-    INVALID = 'Invalid',
+  VALID = 'Valid',
+  INVALID = 'Invalid',
 }
 
 export interface MarketFilters {

@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
-import {MarketFilters, MarketStates, MarketsSortCriteria, MarketValidity} from './../util/types'
+import { MarketFilters, MarketStates, MarketValidity, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
@@ -109,7 +109,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee_lte: $fee',
     `timeout_gte: ${MIN_TIMEOUT}`,
-    `curatedByDxDao: ${marketValidity === MarketValidity.VALID}`
+    `curatedByDxDao: ${marketValidity === MarketValidity.VALID}`,
   ]
     .filter(s => s.length)
     .join(',')

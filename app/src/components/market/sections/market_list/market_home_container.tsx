@@ -20,11 +20,12 @@ import { getLogger } from '../../../../util/logger'
 import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
-    CategoryDataItem,
-    GraphResponseCategories,
-    MarketFilters,
-    MarketStates,
-    MarketsSortCriteria, MarketValidity,
+  CategoryDataItem,
+  GraphResponseCategories,
+  MarketFilters,
+  MarketStates,
+  MarketValidity,
+  MarketsSortCriteria,
 } from '../../../../util/types'
 
 import { MarketHome } from './market_home'
@@ -326,7 +327,7 @@ const MarketHomeContainer: React.FC = () => {
       }
 
       if (filter.marketValidity) {
-          route += `/market-validity/${filter.marketValidity}`
+        route += `/market-validity/${filter.marketValidity}`
       }
 
       const routeQueryString = routeQueryArray.join('&')

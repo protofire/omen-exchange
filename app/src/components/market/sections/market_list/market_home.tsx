@@ -6,11 +6,11 @@ import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import {
-    CategoryDataItem,
-    MarketFilters,
-    MarketStates,
-    MarketsSortCriteria,
-    MarketValidity
+  CategoryDataItem,
+  MarketFilters,
+  MarketStates,
+  MarketValidity,
+  MarketsSortCriteria,
 } from '../../../../util/types'
 import { ButtonCircle } from '../../../button'
 import { SectionTitle } from '../../../common'
@@ -223,7 +223,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
-    currentFilter.currency || currentFilter.arbitrator ? true : false,
+    currentFilter.currency || currentFilter.arbitrator || currentFilter.marketValidity ? true : false,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
@@ -284,8 +284,29 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   }, [category, categories])
 
   useEffect(() => {
-    onFilterChange({ arbitrator, marketValidity, templateId, currency, category, sortBy, sortByDirection, state, title })
-  }, [arbitrator, marketValidity, templateId, currency, category, sortBy, sortByDirection, state, title, onFilterChange])
+    onFilterChange({
+      arbitrator,
+      marketValidity,
+      templateId,
+      currency,
+      category,
+      sortBy,
+      sortByDirection,
+      state,
+      title,
+    })
+  }, [
+    arbitrator,
+    marketValidity,
+    templateId,
+    currency,
+    category,
+    sortBy,
+    sortByDirection,
+    state,
+    title,
+    onFilterChange,
+  ])
 
   const toggleSearch = useCallback(() => {
     setShowAdvancedFilters(false)
@@ -423,11 +444,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <TopContents>
           <FiltersWrapper>
             <SectionTitleMarket title={'Markets'} />
-            <FiltersControls disabled={fetchMyMarkets}>
-              <ButtonCircleStyled active={showSearch} disabled={fetchMyMarkets} onClick={toggleSearch}>
+            <FiltersControls>
+              <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
                 <IconSearch />
               </ButtonCircleStyled>
-              <ButtonCircleStyled active={showAdvancedFilters} disabled={fetchMyMarkets} onClick={toggleFilters}>
+              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
                 <IconFilter />
               </ButtonCircleStyled>
               {!fetchMyMarkets && (

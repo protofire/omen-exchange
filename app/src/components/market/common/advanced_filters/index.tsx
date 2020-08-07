@@ -4,9 +4,9 @@ import styled from 'styled-components'
 import { useTokens } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork } from '../../../../util/networks'
+import { MarketValidity } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { TokenItem } from '../token_item'
-import { MarketValidity } from '../../../../util/types'
 
 const Wrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
@@ -57,7 +57,15 @@ export const AdvancedFilters = (props: Props) => {
   const arbitrators = getArbitratorsByNetwork(networkId)
   const tokens = useTokens(context)
 
-  const { arbitrator, currency, marketValidity, onChangeMarketValidity, onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
+  const {
+    arbitrator,
+    currency,
+    marketValidity,
+    onChangeArbitrator,
+    onChangeCurrency,
+    onChangeMarketValidity,
+    onChangeTemplateId,
+  } = props
 
   const allTokensOptions = [{ address: null, symbol: 'All', image: null }, ...tokens]
   const currencyOptions: Array<DropdownItemProps> = allTokensOptions.map(({ address, image, symbol }) => {
@@ -97,14 +105,14 @@ export const AdvancedFilters = (props: Props) => {
     })
 
   const marketValidityOptions: Array<DropdownItemProps> = [
-      {
-          content: MarketValidity.VALID,
-          onClick: () => onChangeMarketValidity(MarketValidity.VALID),
-      },
-      {
-          content: MarketValidity.INVALID,
-          onClick: () => onChangeMarketValidity(MarketValidity.INVALID),
-      },
+    {
+      content: MarketValidity.VALID,
+      onClick: () => onChangeMarketValidity(MarketValidity.VALID),
+    },
+    {
+      content: MarketValidity.INVALID,
+      onClick: () => onChangeMarketValidity(MarketValidity.INVALID),
+    },
   ]
 
   const showQuestionType = false
