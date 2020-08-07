@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { MarketMakerDataItem } from '../../../../queries/markets_home'
+import { MarketMakerDataItem } from '../../../../util/types'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import {

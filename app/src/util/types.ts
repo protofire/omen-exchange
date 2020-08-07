@@ -213,3 +213,41 @@ export type TopCategoryItem = {
 export type GraphResponseTopCategories = {
   categories: TopCategoryItem[]
 }
+
+export type GraphMarketMakerDataItem = {
+  id: string
+  collateralVolume: string
+  collateralToken: string
+  outcomeTokenAmounts: string[]
+  title: string
+  outcomes: Maybe<string[]>
+  openingTimestamp: string
+  arbitrator: string
+  category: string
+  templateId: string
+  scaledLiquidityParameter: string
+}
+
+export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
+
+export type GraphResponseMyMarkets = { account: { fpmmParticipations: Participations[] } }
+
+export type GraphResponseMarketsGeneric = {
+  fixedProductMarketMakers: GraphMarketMakerDataItem[]
+}
+
+export type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMyMarkets
+
+export type MarketMakerDataItem = {
+  address: string
+  collateralVolume: BigNumber
+  collateralToken: string
+  outcomeTokenAmounts: BigNumber[]
+  title: string
+  outcomes: Maybe<string[]>
+  openingTimestamp: Date
+  arbitrator: string
+  category: string
+  templateId: number
+  scaledLiquidityParameter: number
+}

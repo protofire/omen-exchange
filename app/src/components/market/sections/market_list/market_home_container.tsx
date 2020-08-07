@@ -8,21 +8,20 @@ import { useLocation } from 'react-router-dom'
 
 import { MAX_MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import {
-  GraphMarketMakerDataItem,
-  MarketMakerDataItem,
-  buildQueryMarkets,
-  queryCategories,
-  queryMyMarkets,
-} from '../../../../queries/markets_home'
+import { buildQueryMarkets, queryCategories, queryMyMarkets } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   CategoryDataItem,
+  GraphMarketMakerDataItem,
   GraphResponseCategories,
+  GraphResponseMarkets,
+  GraphResponseMarketsGeneric,
+  GraphResponseMyMarkets,
   MarketFilters,
+  MarketMakerDataItem,
   MarketStates,
   MarketValidity,
   MarketsSortCriteria,
@@ -31,14 +30,6 @@ import {
 import { MarketHome } from './market_home'
 
 const logger = getLogger('MarketHomeContainer')
-
-type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
-type GraphResponseMyMarkets = { account: { fpmmParticipations: Participations[] } }
-type GraphResponseMarketsGeneric = {
-  fixedProductMarketMakers: GraphMarketMakerDataItem[]
-}
-
-type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMyMarkets
 
 const normalizeFetchedData = (data: GraphResponseMyMarkets): GraphResponseMarketsGeneric => {
   return {
