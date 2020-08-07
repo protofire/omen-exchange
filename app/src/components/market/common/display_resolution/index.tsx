@@ -57,9 +57,11 @@ export const DisplayResolution: React.FC<Props> = (props: Props) => {
   const abbr = moment.tz(tzName).zoneAbbr()
   const formatting = `MMMM Do YYYY - HH:mm:ss [${abbr}]`
 
-  const realitioUrl = questionId
-    ? `https://reality.eth.link/app/#!/question/${questionId}`
-    : 'https://reality.eth.link/'
+  const windowObj: any = window
+  const realitioBaseUrl =
+    windowObj.ethereum && windowObj.ethereum.isMetaMask ? 'https://reality.eth' : 'https://reality.eth.link'
+
+  const realitioUrl = questionId ? `${realitioBaseUrl}/app/#!/question/${questionId}` : `${realitioBaseUrl}/`
 
   return (
     <Wrapper {...restProps}>
