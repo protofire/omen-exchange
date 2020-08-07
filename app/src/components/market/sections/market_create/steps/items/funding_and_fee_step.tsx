@@ -199,15 +199,23 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, collateral))
   }, [dispatch, account, provider, collateral])
 
+  const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
+  const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
+    formatBigNumber(collateralBalance, collateral.decimals),
+  )
   const maybeCollateralBalance = useCollateralBalance(collateral, context)
-  const collateralBalance = maybeCollateralBalance || Zero
-  const resolutionDate = resolution && formatDate(resolution)
 
-  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals)
+  useEffect(() => {
+    setCollateralBalance(maybeCollateralBalance || Zero)
+    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals))
+    // eslint-disable-next-line
+  }, [maybeCollateralBalance])
+
+  const resolutionDate = resolution && formatDate(resolution)
 
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
