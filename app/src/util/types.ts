@@ -226,6 +226,7 @@ export type GraphMarketMakerDataItem = {
   category: string
   templateId: string
   scaledLiquidityParameter: string
+  curatedByDxDao: boolean
 }
 
 export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
@@ -250,4 +251,11 @@ export type MarketMakerDataItem = {
   category: string
   templateId: number
   scaledLiquidityParameter: number
+  curatedByDxDao: boolean
+}
+
+export type BuildQueryType = MarketFilters & {
+  whitelistedCreators: boolean
+  whitelistedTemplateIds: boolean
+  networkId: Maybe<number>
 }

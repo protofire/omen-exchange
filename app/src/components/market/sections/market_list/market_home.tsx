@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { MarketMakerDataItem } from '../../../../util/types'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   CategoryDataItem,
   MarketFilters,
+  MarketMakerDataItem,
   MarketStates,
   MarketValidity,
   MarketsSortCriteria,
@@ -194,6 +194,23 @@ interface Props {
 }
 
 const logger = getLogger('MarketHome')
+
+type DelayedProps = {
+  children: React.ReactElement
+  waitBeforeShow?: number
+}
+
+const Delayed = ({ children, waitBeforeShow = 500 }: DelayedProps) => {
+  const [isShown, setIsShown] = useState(false)
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsShown(true)
+    }, waitBeforeShow)
+  }, [waitBeforeShow])
+
+  return isShown ? children : null
+}
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
   const {
@@ -411,7 +428,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const noOwnMarkets = RemoteData.is.success(markets) && markets.data.length === 0 && state === MarketStates.myMarkets
   const noMarketsAvailable =
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
-  const showFilteringInlineLoading = !noMarketsAvailable && !noOwnMarkets && isFiltering
+  const showFilteringInlineLoading =
+    (!noMarketsAvailable && !noOwnMarkets && isFiltering) || RemoteData.is.loading(markets)
   const disableLoadNextButton =
     isFiltering || !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
   const disableLoadPrevButton =
@@ -482,8 +500,16 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             markets.data.slice(0, count).map(item => {
               return <ListItem currentFilter={currentFilter} key={item.address} market={item}></ListItem>
             })}
-          {noOwnMarkets && <NoOwnMarkets>You have not created any market yet.</NoOwnMarkets>}
-          {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
+          {noOwnMarkets && (
+            <Delayed>
+              <NoOwnMarkets>You have not created any market yet.</NoOwnMarkets>
+            </Delayed>
+          )}
+          {noMarketsAvailable && (
+            <Delayed>
+              <NoMarketsAvailable>No markets available.</NoMarketsAvailable>
+            </Delayed>
+          )}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
         <BottomContents>

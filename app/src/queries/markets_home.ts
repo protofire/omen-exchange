@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 
-import { MarketFilters, MarketStates, MarketValidity, MarketsSortCriteria } from './../util/types'
+import { BuildQueryType, MarketStates, MarketValidity, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
@@ -15,6 +15,7 @@ export const MarketDataFragment = gql`
     category
     templateId
     scaledLiquidityParameter
+    curatedByDxDao
   }
 `
 
@@ -46,12 +47,7 @@ export const queryMyMarkets = gql`
   ${MarketDataFragment}
 `
 
-type buildQueryType = MarketFilters & {
-  whitelistedCreators: boolean
-  whitelistedTemplateIds: boolean
-  networkId: Maybe<number>
-}
-export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => {
+export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => {
   const {
     arbitrator,
     category,

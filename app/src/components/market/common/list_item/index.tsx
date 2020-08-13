@@ -6,9 +6,9 @@ import styled from 'styled-components'
 
 import { useGraphMarketMakerData } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { MarketMakerDataItem } from '../../../../util/types'
 import { ERC20Service } from '../../../../services'
 import { calcPrice, formatBigNumber } from '../../../../util/tools'
+import { MarketMakerDataItem } from '../../../../util/types'
 import { IconStar } from '../../../common/icons/IconStar'
 
 const Wrapper = styled(NavLink)`
