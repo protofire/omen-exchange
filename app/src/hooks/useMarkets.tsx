@@ -128,7 +128,7 @@ export const useMarkets = (options: Options, expectedMarketSize: number): any =>
         const marketsGeneric = data as GraphResponseMarketsGeneric
         const internalMarkets: GraphMarketMakerDataItem[] = marketsGeneric.fixedProductMarketMakers
 
-        if (internalMarkets && internalMarkets.length == 0 && skipFromOptions === 0) {
+        if (internalMarkets && internalMarkets.length === 0 && skipFromOptions === 0) {
           setMarketsNormalized([])
         } else if (marketsNormalized.length + internalMarkets.length <= first) {
           const markets =
