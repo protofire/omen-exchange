@@ -273,9 +273,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     amountToFund.isZero() ||
     hasEnoughAllowance !== Ternary.True ||
     collateralAmountError !== null ||
-    currentDate > resolutionDate
+    currentDate > resolutionDate ||
+    isNegativeAmountToFund
+
   const disableWithdrawButton =
-    amountToRemove.isZero() || amountToRemove.gt(fundingBalance) || sharesAmountError !== null
+    amountToRemove.isZero() ||
+    amountToRemove.gt(fundingBalance) ||
+    sharesAmountError !== null ||
+    isNegativeAmountToRemove
 
   return (
     <>
