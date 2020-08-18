@@ -74,6 +74,7 @@ const blocksPerHour = Math.floor(blocksPerDay / 24)
 const blocksPerMinute = Math.floor(blocksPerHour / 60)
 
 const mapPeriod: { [period in Period]: { totalDataPoints: number; blocksPerPeriod: number } } = {
+  '1Y': { totalDataPoints: 365, blocksPerPeriod: blocksPerDay },
   '1M': { totalDataPoints: 30, blocksPerPeriod: blocksPerDay },
   '1W': { totalDataPoints: 7, blocksPerPeriod: blocksPerDay },
   '1D': { totalDataPoints: 24, blocksPerPeriod: blocksPerHour },
