@@ -138,7 +138,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <span>
           {currentFilter.sortBy === 'scaledCollateralVolume' && `${volume} ${symbol} - Volume`}
           {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Ending`}
-          {currentFilter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume' &&
+          {currentFilter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` &&
             `${Math.floor(Date.now() / 86400000) === lastActiveDay ? dailyVolume : 0} ${symbol} - 24hr Volume`}
           {currentFilter.sortBy === 'scaledLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
