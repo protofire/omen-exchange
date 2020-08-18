@@ -1,6 +1,6 @@
 import Box from '3box'
 import ThreeBoxCommentsReact from '3box-comments-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { THREEBOX_ADMIN_ADDRESS, THREEBOX_SPACE_NAME } from '../../common/constants'
@@ -59,9 +59,16 @@ export const ThreeBoxComments = (props: Props) => {
   const currentUserAddress = context.account || ''
 
   const handleLogin = async () => {
-    const box = await Box.openBox(currentUserAddress, library._web3Provider, {})
-    box.onSyncDone(() => setBox(box))
+    const threeBox = await Box.openBox(currentUserAddress, library._web3Provider, {})
+    console.log(threeBox)
+    threeBox.onSyncDone(() => setBox(threeBox))
   }
+
+  useEffect(() => {
+    handleLogin()
+  })
+
+  console.log(box)
 
   return (
     <ThreeBoxCustom className="threeBoxCustom">
@@ -70,6 +77,7 @@ export const ThreeBoxComments = (props: Props) => {
         adminEthAddr={THREEBOX_ADMIN_ADDRESS}
         box={box}
         currentUserAddr={currentUserAddress}
+        ethereum={library._web3Provider}
         loginFunction={handleLogin}
         showCommentCount={10}
         spaceName={THREEBOX_SPACE_NAME}
