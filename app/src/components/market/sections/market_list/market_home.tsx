@@ -329,7 +329,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const sortOptions = [
     {
       title: '24h volume',
-      sortBy: 'lastActiveDayAndScaledRunningDailyVolume',
+      sortBy: `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria,
       direction: 'desc',
     },
     {

@@ -250,7 +250,7 @@ const MarketHomeContainer: React.FC = () => {
       const routeQueryStart = '?'
       const routeQueryArray: string[] = []
 
-      if (filter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume') {
+      if (filter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}`) {
         route += '/24h-volume'
       } else if (filter.sortBy === 'scaledCollateralVolume') {
         route += '/volume'
