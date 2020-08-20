@@ -20,7 +20,8 @@ export const MAX_OUTCOME_ALLOWED = MAX_OUTCOMES > 256 ? 256 : MAX_OUTCOMES
 
 export const SINGLE_SELECT_TEMPLATE_ID = 2
 
-export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '4.00')
+export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '2.00')
+export const MAX_MARKET_FEE = parseFloat('5.00')
 
 export const CATEGORIES = [
   'Business & Finance',
@@ -30,6 +31,30 @@ export const CATEGORIES = [
   'Sports',
   'Weather',
   'Miscellaneous',
+]
+
+export const TRADING_FEE_OPTIONS = [
+  '0.00',
+  '0.25',
+  '0.50',
+  '0.75',
+  '1.00',
+  '1.25',
+  '1.50',
+  '1.75',
+  '2.00',
+  '2.25',
+  '2.50',
+  '2.75',
+  '3.00',
+  '3.25',
+  '3.50',
+  '3.75',
+  '4.00',
+  '4.25',
+  '4.50',
+  '4.75',
+  '5.00',
 ]
 
 export const GRAPH_MAINNET_HTTP =

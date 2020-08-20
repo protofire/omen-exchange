@@ -2,10 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { CategoryDataItem, MarketMakerDataItem } from '../../../../queries/markets_home'
+import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
+import { CategoryDataItem, MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
 import { ButtonCircle } from '../../../button'
 import { SectionTitle } from '../../../common'
 import {
@@ -56,11 +56,12 @@ const FiltersWrapper = styled.div`
   }
 `
 
-const FiltersControls = styled.div`
+const FiltersControls = styled.div<{ disabled?: boolean }>`
   align-items: center;
   display: flex;
   margin-left: auto;
   margin-right: auto;
+  pointer-events: ${props => (props.disabled ? 'none' : 'initial')};
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 0;
@@ -69,7 +70,13 @@ const FiltersControls = styled.div`
   }
 `
 
-const ButtonCircleStyled = styled(ButtonCircle)`
+const ButtonCircleStyled = styled(ButtonCircle)<{ disabled?: boolean }>`
+  svg {
+    filter: ${props =>
+      props.disabled
+        ? 'invert(46%) sepia(0%) saturate(1168%) hue-rotate(183deg) brightness(99%) contrast(89%)'
+        : 'none'};
+  }
   margin-right: 5px;
 `
 
@@ -169,6 +176,7 @@ interface Props {
   count: number
   currentFilter: any
   isFiltering?: boolean
+  fetchMyMarkets: boolean
   markets: RemoteData<MarketMakerDataItem[]>
   categories: RemoteData<CategoryDataItem[]>
   moreMarkets: boolean
@@ -187,6 +195,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     context,
     count,
     currentFilter,
+    fetchMyMarkets,
     isFiltering = false,
     markets,
     moreMarkets,
@@ -196,13 +205,20 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     onUpdatePageSize,
     pageIndex,
   } = props
+  const [counts, setCounts] = useState({
+    open: 0,
+    closed: 0,
+    total: 0,
+  })
   const [state, setState] = useState<MarketStates>(currentFilter.state)
   const [category, setCategory] = useState(currentFilter.category)
   const [title, setTitle] = useState(currentFilter.title)
   const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(currentFilter.sortBy)
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(currentFilter.currency || currentFilter.arbitrator ? true : false)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
+    currentFilter.currency || currentFilter.arbitrator ? true : false,
+  )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
@@ -250,6 +266,15 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       setState(MarketStates.open)
     }
   }, [context.account, state])
+
+  useEffect(() => {
+    if (RemoteData.hasData(categories)) {
+      const index = categories.data.findIndex(i => i.id === decodeURI(category))
+      const item = categories.data[index]
+      !!item && setCounts({ open: item.numOpenConditions, closed: item.numClosedConditions, total: item.numConditions })
+      if (category === 'All') setCounts({ open: 0, closed: 0, total: 0 })
+    }
+  }, [category, categories])
 
   useEffect(() => {
     onFilterChange({ arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title })
@@ -307,9 +332,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     }
   })
 
-  const filterItems: Array<DropdownItemProps> = filters.map(item => {
+  const filterItems: Array<DropdownItemProps> = filters.map((item, index) => {
+    const count = index === 0 ? counts.open : index === 3 ? counts.closed : 0
     return {
       content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
+      secondaryText: count > 0 && count.toString(),
       onClick: item.onClick,
     }
   })
@@ -366,47 +393,53 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     <>
       <Actions>
         <MarketsDropdown
+          currentItem={
+            RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(category)) + 1 : 0
+          }
+          dirty={true}
+          disabled={fetchMyMarkets}
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={categoryItems}
           showScrollbar={true}
-          currentItem={RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(category)) + 1 : 0}
-          dirty={true}
         />
         <MarketsFilterDropdown
+          currentItem={filters.findIndex(i => i.state === state)}
+          dirty={true}
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={filterItems}
-          currentItem={filters.findIndex(i => i.state === state)}
-          dirty={true}
+          showScrollbar={true}
         />
       </Actions>
       <ListCard>
         <TopContents>
           <FiltersWrapper>
             <SectionTitleMarket title={'Markets'} />
-            <FiltersControls>
-              <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
+            <FiltersControls disabled={fetchMyMarkets}>
+              <ButtonCircleStyled active={showSearch} disabled={fetchMyMarkets} onClick={toggleSearch}>
                 <IconSearch />
               </ButtonCircleStyled>
-              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
+              <ButtonCircleStyled active={showAdvancedFilters} disabled={fetchMyMarkets} onClick={toggleFilters}>
                 <IconFilter />
               </ButtonCircleStyled>
-              <Dropdown
-                currentItem={sortOptions.findIndex(i => i.sortBy === sortBy)}
-                dirty={true}
-                dropdownPosition={DropdownPosition.right}
-                items={sortItems}
-                placeholder={<SecondaryText>Sort By</SecondaryText>}
-              />
+              {!fetchMyMarkets && (
+                <Dropdown
+                  currentItem={sortOptions.findIndex(i => i.sortBy === sortBy)}
+                  dirty={true}
+                  dropdownPosition={DropdownPosition.right}
+                  items={sortItems}
+                  placeholder={<SecondaryText>Sort By</SecondaryText>}
+                />
+              )}
             </FiltersControls>
           </FiltersWrapper>
         </TopContents>
         {showSearch && <Search onChange={setTitle} value={title} />}
         {showAdvancedFilters && (
           <AdvancedFilters
-            currency={currency}
             arbitrator={arbitrator}
+            currency={currency}
             onChangeArbitrator={setArbitrator}
             onChangeCurrency={setCurrency}
             onChangeTemplateId={setTemplateId}

@@ -1,20 +1,27 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { DOCUMENT_FAQ } from '../../../../../../common/constants'
-import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../../../../hooks'
+import { DOCUMENT_FAQ, MAX_MARKET_FEE } from '../../../../../../common/constants'
+import {
+  useCollateralBalance,
+  useConnectedWeb3Context,
+  useCpk,
+  useCpkAllowance,
+  useTokens,
+} from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
+import { RemoteData } from '../../../../../../util/remote_data'
 import {
   calcDistributionHint,
   calcInitialFundingSendAmounts,
   formatBigNumber,
   formatDate,
 } from '../../../../../../util/tools'
-import { Arbitrator, Token } from '../../../../../../util/types'
+import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
@@ -41,10 +48,11 @@ import { CreateCard } from '../../../../common/create_card'
 import { CurrencySelector } from '../../../../common/currency_selector'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
+import { SetAllowance } from '../../../../common/set_allowance'
+import { TradingFeeSelector } from '../../../../common/trading_fee_selector'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
-import { WalletBalance } from '../../../../common/wallet_balance'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome } from '../outcomes'
 
@@ -89,6 +97,7 @@ const Grid = styled.div`
 const TitleValueVertical = styled(TitleValue)`
   flex-direction: column;
   justify-content: flex-start;
+  text-transform: capitalize;
 
   > h2 {
     margin: 0 0 6px;
@@ -100,8 +109,8 @@ const TitleValueVertical = styled(TitleValue)`
 `
 
 const CurrenciesWrapper = styled.div`
-  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
   padding: 0 0 20px 0;
+  width: 100%;
 `
 
 const GridTransactionDetailsStyled = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
@@ -110,6 +119,38 @@ const GridTransactionDetailsStyled = styled(GridTransactionDetails)<{ noMarginTo
 
 const ButtonCreate = styled(Button)`
   font-weight: 500;
+`
+
+const CreateCardBottomRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const CustomFeeToggle = styled.p`
+  color: ${props => props.theme.colors.hyperlink};
+  cursor: pointer;
+  margin-top: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`
+
+const CustomFeeWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0 0 0;
+`
+
+const CustomFeeLabel = styled.p`
+  width: 50%;
+  margin: 0;
+`
+
+const StyledTradingFeeSelector = styled(TradingFeeSelector)`
+  width: 50%;
 `
 
 interface Props {
@@ -127,27 +168,57 @@ interface Props {
   }
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
+  handleTradingFeeChange: (fee: string) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
+  resetTradingFee: () => void
 }
 
-const FundingAndFeeStep = (props: Props) => {
+const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const cpk = useCpk()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
   const { account, library: provider } = context
+  const signer = useMemo(() => provider.getSigner(), [provider])
 
-  const { back, handleChange, handleCollateralChange, marketCreationStatus, submit, values } = props
+  const {
+    back,
+    handleChange,
+    handleCollateralChange,
+    handleTradingFeeChange,
+    marketCreationStatus,
+    resetTradingFee,
+    submit,
+    values,
+  } = props
   const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
 
-  React.useEffect(() => {
+  const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
+
+  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
+  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
+
+  useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, collateral))
   }, [dispatch, account, provider, collateral])
 
+  const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
+  const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
+    formatBigNumber(collateralBalance, collateral.decimals),
+  )
   const maybeCollateralBalance = useCollateralBalance(collateral, context)
-  const collateralBalance = maybeCollateralBalance || Zero
+
+  useEffect(() => {
+    setCollateralBalance(maybeCollateralBalance || Zero)
+    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals))
+    // eslint-disable-next-line
+  }, [maybeCollateralBalance])
+
   const resolutionDate = resolution && formatDate(resolution)
 
-  const collateralBalanceFormatted = formatBigNumber(collateralBalance, collateral.decimals)
+  const [customFee, setCustomFee] = useState(false)
+  const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
   const tokensAmount = useTokens(context).length
 
@@ -172,7 +243,38 @@ const FundingAndFeeStep = (props: Props) => {
     !balance ||
     funding.isZero() ||
     !account ||
-    amountError !== null
+    amountError !== null ||
+    exceedsMaxFee
+
+  const showSetAllowance =
+    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+
+  const unlockCollateral = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await unlock()
+    setAllowanceFinished(true)
+  }
+
+  const onCollateralChange = (token: Token) => {
+    handleCollateralChange(token)
+    setAllowanceFinished(false)
+  }
+
+  const toggleCustomFee = () => {
+    if (customFee) {
+      resetTradingFee()
+      setCustomFee(false)
+    } else {
+      setCustomFee(true)
+    }
+  }
+
+  useEffect(() => {
+    setExceedsMaxFee(spread > MAX_MARKET_FEE)
+  }, [spread])
 
   return (
     <>
@@ -212,13 +314,23 @@ const FundingAndFeeStep = (props: Props) => {
           </OutcomesTable>
         </OutcomesTableWrapper>
         <Grid>
-          <TitleValueVertical title={'Resolution Date'} value={resolutionDate} />
+          <TitleValueVertical
+            date={resolution instanceof Date ? resolution : undefined}
+            title={'Resolution Date'}
+            tooltip={true}
+            value={resolutionDate}
+          />
           <TitleValueVertical title={'Category'} value={category} />
           <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
         </Grid>
       </CreateCardTop>
       <CreateCardBottom>
-        <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
+        <CreateCardBottomRow>
+          <SubsectionTitleStyled>Fund Market</SubsectionTitleStyled>
+          <CustomFeeToggle onClick={toggleCustomFee}>
+            {customFee ? 'use default trading fee' : 'set custom trading fee'}
+          </CustomFeeToggle>
+        </CreateCardBottomRow>
         <WarningMessage
           additionalDescription={''}
           description={
@@ -227,36 +339,61 @@ const FundingAndFeeStep = (props: Props) => {
           href={DOCUMENT_FAQ}
           hyperlinkDescription={'More Info'}
         />
-        {tokensAmount > 1 && (
-          <CurrenciesWrapper>
-            <SubTitle style={{ marginBottom: '14px' }}>Choose Currency</SubTitle>
-            <CurrencySelector
-              context={context}
-              disabled={false}
-              onSelect={handleCollateralChange}
-              selectedCurrency={collateral}
-            />
-          </CurrenciesWrapper>
-        )}
-        <GridTransactionDetailsStyled noMarginTop={false}>
+        <GridTransactionDetailsStyled noMarginTop={true}>
           <div>
-            <WalletBalance symbol={collateral.symbol} value={collateralBalanceFormatted} />
+            {tokensAmount > 1 && (
+              <CurrenciesWrapper>
+                <CurrencySelector
+                  balance={collateralBalanceFormatted}
+                  context={context}
+                  disabled={false}
+                  onSelect={onCollateralChange}
+                />
+              </CurrenciesWrapper>
+            )}
             <TextfieldCustomPlaceholder
               formField={
                 <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
               }
               symbol={collateral.symbol}
             />
+            {customFee && (
+              <CustomFeeWrapper>
+                <CustomFeeLabel>Trading Fee</CustomFeeLabel>
+                <StyledTradingFeeSelector disabled={false} onSelect={handleTradingFeeChange} />
+              </CustomFeeWrapper>
+            )}
             {amountError && <GenericError>{amountError}</GenericError>}
           </div>
           <div>
             <TransactionDetailsCard>
-              <TransactionDetailsRow state={ValueStates.important} title={'Earn Trading Fee'} value={`${spread}%`} />
+              <TransactionDetailsRow
+                state={ValueStates.important}
+                title={'Earn Trading Fee'}
+                value={`${isNaN(spread) ? 0 : spread}%`}
+              />
               <TransactionDetailsLine />
               <TransactionDetailsRow title={'Pool Tokens'} value={formatBigNumber(funding, collateral.decimals)} />
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsStyled>
+        {exceedsMaxFee && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description={`Your custom trading fee exceeds the maximum amount of ${MAX_MARKET_FEE}%`}
+            href={''}
+            hyperlinkDescription={''}
+          />
+        )}
+        {showSetAllowance && (
+          <SetAllowance
+            collateral={collateral}
+            finished={allowanceFinished && RemoteData.is.success(allowance)}
+            loading={RemoteData.is.asking(allowance)}
+            onUnlock={unlockCollateral}
+          />
+        )}
         <ButtonContainerFullWidth>
           <LeftButton
             buttonType={ButtonType.secondaryLine}

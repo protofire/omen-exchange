@@ -300,10 +300,14 @@ interface KnownArbitratorData {
   isSelectionEnabled: boolean
 }
 
+const windowObj: any = window
+const realitioBaseUrl =
+  windowObj.ethereum && windowObj.ethereum.isMetaMask ? 'https://reality.eth' : 'https://reality.eth.link'
+
 export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData } = {
   realitio: {
     name: 'Realitio Team',
-    url: 'https://realit.io/',
+    url: `${realitioBaseUrl}/`,
     addresses: {
       [networkIds.MAINNET]: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
       [networkIds.RINKEBY]: '0x02321745bE4a141E78db6C39834396f8df00e2a0',

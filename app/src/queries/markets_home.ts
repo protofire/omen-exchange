@@ -15,6 +15,7 @@ export const MarketDataFragment = gql`
     arbitrator
     category
     templateId
+    scaledLiquidityParameter
   }
 `
 
@@ -29,6 +30,7 @@ export type GraphMarketMakerDataItem = {
   arbitrator: string
   category: string
   templateId: string
+  scaledLiquidityParameter: string
 }
 
 export type MarketMakerDataItem = {
@@ -42,11 +44,7 @@ export type MarketMakerDataItem = {
   arbitrator: string
   category: string
   templateId: number
-}
-
-export type CategoryDataItem = {
-  id: string
-  numOpenConditions: number
+  scaledLiquidityParameter: number
 }
 
 export const DEFAULT_OPTIONS = {
@@ -60,33 +58,55 @@ export const DEFAULT_OPTIONS = {
   currency: null as Maybe<string>,
   sortBy: null as Maybe<MarketsSortCriteria>,
   sortByDirection: 'desc' as 'asc' | 'desc',
+  networkId: 1 as Maybe<number>,
 }
 
-type buildQueryType = MarketFilters & { whitelistedCreators: boolean; whitelistedTemplateIds: boolean }
+export const queryMyMarkets = gql`
+  query GetMyMarkets($account: String!, $first: Int!, $skip: Int!) {
+    account(id: $account) {
+      fpmmParticipations(first: $first, skip: $skip, orderBy: creationTimestamp, orderDirection: desc) {
+        fixedProductMarketMakers: fpmm {
+          ...marketData
+        }
+      }
+    }
+  }
+  ${MarketDataFragment}
+`
+
+type buildQueryType = MarketFilters & {
+  whitelistedCreators: boolean
+  whitelistedTemplateIds: boolean
+  networkId: Maybe<number>
+}
 export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => {
   const {
     arbitrator,
     category,
     currency,
+    networkId,
     state,
     templateId,
     title,
     whitelistedCreators,
     whitelistedTemplateIds,
   } = options
+
+  const MIN_TIMEOUT = networkId && networkId === 1 ? 86400 : 0
   const whereClause = [
     state === MarketStates.closed ? 'answerFinalizedTimestamp_lt: $now' : '',
     state === MarketStates.open ? 'openingTimestamp_gt: $now' : '',
     state === MarketStates.pending ? 'openingTimestamp_lt: $now' : '',
     state === MarketStates.pending ? 'answerFinalizedTimestamp: null' : '',
     state === MarketStates.finalizing ? 'answerFinalizedTimestamp_gt: $now' : '',
-    state === MarketStates.myMarkets || whitelistedCreators ? 'creator_in: $accounts' : '',
+    whitelistedCreators ? 'creator_in: $accounts' : '',
     category === 'All' ? '' : 'category: $category',
     title ? 'title_contains: $title' : '',
     currency ? 'collateralToken: $currency' : '',
     arbitrator ? 'arbitrator: $arbitrator' : 'arbitrator_in: $knownArbitrators',
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee_lte: $fee',
+    `timeout_gte: ${MIN_TIMEOUT}`,
   ]
     .filter(s => s.length)
     .join(',')
@@ -107,6 +127,16 @@ export const queryCategories = gql`
     categories(first: 100, orderBy: numOpenConditions, orderDirection: desc) {
       id
       numOpenConditions
+      numClosedConditions
+      numConditions
+    }
+  }
+`
+
+export const queryTopCategories = gql`
+  query GetTopCategories($first: Int!) {
+    categories(first: $first, orderBy: numOpenConditions, orderDirection: desc) {
+      id
     }
   }
 `

@@ -136,13 +136,17 @@ const theme = {
     borderColorLighter: '#E8EAF6',
     commonBorderRadius: '6px',
   },
+  slider: {
+    idle: '#E8EAF6',
+    active: '#9FA8DA',
+  },
   paddings: {
     mainPadding: '15px',
   },
   textfield: {
     backgroundColor: 'transparent',
     borderColor: '#DCDFF2',
-    borderColorActive: '#9fa8da',
+    borderColorActive: '#9FA8DA',
     borderColorOnHover: '#C5CAE9',
     borderRadius: '32px',
     borderStyle: 'solid',

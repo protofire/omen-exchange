@@ -18,6 +18,10 @@ const AlertWrapper = styled.div`
   align-items: center;
   display: flex;
   padding-right: 16px;
+
+  &.grayscale {
+    filter: invert(50%) sepia(0%) saturate(0%) hue-rotate(211deg) brightness(92%) contrast(93%);
+  }
 `
 
 const Description = styled.p`
@@ -25,6 +29,11 @@ const Description = styled.p`
   font-size: 14px;
   line-height: 1.4;
   letter-spacing: 0.1px;
+  width: 100%;
+
+  &.danger {
+    color: ${props => props.theme.message.colors.error};
+  }
 `
 
 const Hyperlink = styled.a`
@@ -36,16 +45,18 @@ interface Props {
   hyperlinkDescription: string
   href: string
   additionalDescription: string
+  danger?: boolean
+  grayscale?: boolean
 }
 
 export const WarningMessage = (props: Props) => {
-  const { additionalDescription, description, href, hyperlinkDescription, ...restProps } = props
+  const { additionalDescription, danger, description, grayscale, href, hyperlinkDescription, ...restProps } = props
   return (
     <Wrapper {...restProps}>
-      <AlertWrapper>
+      <AlertWrapper className={grayscale ? 'grayscale' : ''}>
         <Alert />
       </AlertWrapper>
-      <Description>
+      <Description className={danger ? 'danger' : ''}>
         {description}{' '}
         <Hyperlink href={href} target="_blank">
           {hyperlinkDescription}
