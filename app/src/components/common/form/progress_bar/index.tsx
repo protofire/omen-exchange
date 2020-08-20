@@ -1,7 +1,7 @@
 import React, { DOMAttributes, useCallback, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
-import { CommonDisabledCSS } from '../common_styled'
+import {} from '../common_styled'
 
 export enum OpenProgressBar {
   title,
@@ -30,7 +30,7 @@ const ProgressBarBlank = css`
     width: 226px,
     color: #FFFFF,
     border-radius: 32px,
-    border: 1px solid #DCDFF2,
+    border: 1px solid ${props => props.theme.colors.border},
     position: absolute,
 `
 
@@ -39,9 +39,9 @@ const ProgressBarOpen = css`
     flex-direction: row,
     height: 12px,
     width: 226px,
-    color: ${props => props.theme.colors.progressBarOpen};,
+    color: ${props => props.theme.colors.progressBarOpen},
     border-radius: 32px,
-    border: 1px solid #DCDFF2,
+    border: 1px solid ${props => props.theme.colors.border},
     position: absolute
 `
 const ProgressBarFinalized = css`
@@ -51,7 +51,7 @@ const ProgressBarFinalized = css`
     width: 226px,
     color: ${props => props.theme.colors.progressBarFinalized},
     border-radius: 32px,
-    border: 1px solid #DCDFF2,
+    border: 1px solid ${props => props.theme.colors.border},
     border-sizing: border-box,
     position: absolute
 `
@@ -62,7 +62,7 @@ const ProgressBarClosed = css`
     width: 138px,
     color: ${props => props.theme.colors.progressBarClosed},
     border-radius: 32px,
-    border: 1px solid #DCDFF2,
+    border: 1px solid ${props => props.theme.colors.border},
     position: absolute
 `
 const progressBarClosed1 = css`

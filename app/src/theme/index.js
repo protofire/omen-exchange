@@ -95,6 +95,7 @@ const theme = {
     progressBarOpen: '#7986CB',
     progressBarFinalized: '#9575CD',
     progressBarClosed: '#BA68C8',
+    border: 'DCDFF2',
   },
   message: {
     colors: {
