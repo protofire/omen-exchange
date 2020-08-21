@@ -182,6 +182,7 @@ export interface MarketFilters {
   templateId: Maybe<string>
   currency: Maybe<string>
   marketValidity: MarketValidity
+  klerosValidity: Maybe<boolean>
 }
 
 export interface MarketMakerData {
@@ -251,6 +252,8 @@ export type GraphMarketMakerDataItem = {
   templateId: string
   usdLiquidityParameter: string
   curatedByDxDao: boolean
+  klerosTCRitemID: Maybe<string>
+  klerosTCRregistered: Maybe<boolean>
 }
 
 export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }

@@ -1,6 +1,7 @@
 import gql from 'graphql-tag'
 
 import { BuildQueryType, MarketStates, MarketValidity, MarketsSortCriteria } from './../util/types'
+import { BigNumber } from 'ethers/utils'
 
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
@@ -16,8 +17,40 @@ export const MarketDataFragment = gql`
     templateId
     scaledLiquidityParameter
     curatedByDxDao
+    klerosTCRregistered
+    klerosTCRitemID
   }
 `
+
+export type GraphMarketMakerDataItem = {
+  id: string
+  collateralVolume: string
+  collateralToken: string
+  outcomeTokenAmounts: string[]
+  title: string
+  outcomes: Maybe<string[]>
+  openingTimestamp: string
+  arbitrator: string
+  category: string
+  templateId: string
+  scaledLiquidityParameter: string
+  klerosTCRitemID: Maybe<string>
+  klerosTCRregistered: Maybe<boolean>
+}
+
+export type MarketMakerDataItem = {
+  address: string
+  collateralVolume: BigNumber
+  collateralToken: string
+  outcomeTokenAmounts: BigNumber[]
+  title: string
+  outcomes: Maybe<string[]>
+  openingTimestamp: Date
+  arbitrator: string
+  category: string
+  templateId: number
+  scaledLiquidityParameter: number
+}
 
 export const DEFAULT_OPTIONS = {
   state: MarketStates.open,
@@ -32,6 +65,7 @@ export const DEFAULT_OPTIONS = {
   sortBy: null as Maybe<MarketsSortCriteria>,
   sortByDirection: 'desc' as 'asc' | 'desc',
   networkId: 1 as Maybe<number>,
+  klerosValidity: null as Maybe<boolean>,
 }
 
 export const queryMyMarkets = gql`
@@ -57,6 +91,7 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     state,
     templateId,
     title,
+    klerosValidity,
     whitelistedCreators,
     whitelistedTemplateIds,
   } = options
@@ -78,12 +113,13 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     'fee_lte: $fee',
     `timeout_gte: ${MIN_TIMEOUT}`,
     `curatedByDxDao: ${marketValidity === MarketValidity.VALID}`,
+    klerosValidity ? 'klerosTCRregistered: true' : 'klerosTCRregistered_not: true',
   ]
     .filter(s => s.length)
     .join(',')
 
   const query = gql`
-    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $knownArbitrators: [String!], $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $klerosValidity: Boolean!, $knownArbitrators: [String!], $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
       fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${whereClause} }) {
         ...marketData
       }

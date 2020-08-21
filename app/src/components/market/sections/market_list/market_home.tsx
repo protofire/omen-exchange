@@ -228,6 +228,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
+  const [klerosValidity, setKlerosValidity] = useState<Maybe<boolean>>(currentFilter.klerosValidity)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
   const [marketValidity, setMarketValidity] = useState<MarketValidity>(currentFilter.marketValidity)
 
@@ -295,6 +296,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       sortByDirection,
       state,
       title,
+      klerosValidity,
     })
   }, [
     arbitrator,
@@ -306,6 +308,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     sortByDirection,
     state,
     title,
+    klerosValidity,
     onFilterChange,
   ])
 
@@ -482,6 +485,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             onChangeCurrency={setCurrency}
             onChangeMarketValidity={setMarketValidity}
             onChangeTemplateId={setTemplateId}
+            // onChangeKlerosValidity={setKlerosValidity}
           />
         )}
         <ListWrapper>
