@@ -60,15 +60,12 @@ export const ThreeBoxComments = (props: Props) => {
 
   const handleLogin = async () => {
     const threeBox = await Box.openBox(currentUserAddress, library._web3Provider, {})
-    console.log(threeBox)
     threeBox.onSyncDone(() => setBox(threeBox))
   }
 
   useEffect(() => {
     handleLogin()
   })
-
-  console.log(box)
 
   return (
     <ThreeBoxCustom className="threeBoxCustom">
