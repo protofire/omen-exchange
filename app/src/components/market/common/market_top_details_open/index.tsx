@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
+import styled from 'styled-components'
 
 import { formatBigNumber, formatDate, formatNumber } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper } from '../../../common'
 import { TitleValue } from '../../../common/text/title_value'
+import { WarningMessage } from '../../common/warning_message'
 import { Breaker, SubsectionTitleActionWrapper } from '../common_styled'
 import { DisplayArbitrator } from '../display_arbitrator'
 import { DisplayResolution } from '../display_resolution'
@@ -17,6 +19,11 @@ interface Props {
   isLiquidityProvision: boolean
 }
 
+const WarningMessageStyled = styled(WarningMessage)`
+  margin-top: 20px;
+  margin-bottom: 0;
+`
+
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const [showingExtraInformation, setExtraInformation] = useState(false)
   const [showingTradeHistory, setShowingTradeHistory] = useState(false)
@@ -29,6 +36,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     arbitrator,
     collateral,
     collateralVolume,
+    klerosTCRregistered,
     marketMakerFunding,
     marketMakerUserFunding,
     question,
@@ -145,6 +153,14 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
           hidden={!showingTradeHistory}
           marketMakerAddress={address}
           outcomes={question.outcomes}
+        />
+      )}
+      {!klerosTCRregistered && (
+        <WarningMessageStyled
+          additionalDescription={''}
+          description={'Pending verification for validity rules by the DXdao.'}
+          href={''}
+          hyperlinkDescription={''}
         />
       )}
     </>

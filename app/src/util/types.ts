@@ -203,6 +203,7 @@ export interface MarketMakerData {
   totalPoolShares: BigNumber
   userEarnings: BigNumber
   userPoolShares: BigNumber
+  klerosTCRregistered: Maybe<boolean>
 }
 
 export enum Ternary {

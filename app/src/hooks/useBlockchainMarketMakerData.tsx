@@ -133,6 +133,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       totalPoolShares,
       userEarnings,
       userPoolShares,
+      klerosTCRregistered: graphMarketMakerData.klerosTCRregistered,
     }
 
     setMarketMakerData(newMarketMakerData)
