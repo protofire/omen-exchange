@@ -50,6 +50,7 @@ export type MarketMakerDataItem = {
   category: string
   templateId: number
   scaledLiquidityParameter: number
+  klerosTCRregistered: Maybe<boolean>
 }
 
 export const DEFAULT_OPTIONS = {

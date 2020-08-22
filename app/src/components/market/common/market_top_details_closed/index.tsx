@@ -27,6 +27,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     arbitrator,
     collateral: collateralToken,
     collateralVolume,
+    klerosTCRregistered,
     question,
   } = marketMakerData
   const totalVolumeFormat = collateralVolume
@@ -51,7 +52,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   return (
     <>
       <SubsectionTitleWrapper>
-        <MarketTitle templateId={question.templateId} />
+        <MarketTitle klerosTCRregistered={klerosTCRregistered} templateId={question.templateId} />
         <SubsectionTitleActionWrapper>
           {LINK_FAQ && (
             <SubsectionTitleActionWrapper>
