@@ -284,7 +284,7 @@ const MarketHomeContainer: React.FC = () => {
         route += `/arbitrator/${filter.arbitrator}`
       }
 
-      if (filter.validity === false || filter.validity) {
+      if (filter.validity === false) {
         route += `/validity/${filter.validity}`
       }
 
