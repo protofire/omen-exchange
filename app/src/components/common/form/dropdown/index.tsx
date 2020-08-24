@@ -208,7 +208,7 @@ const ItemsContainer = styled.div<{
   box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
   display: ${props => (props.isOpen ? 'block' : 'none')};
   min-width: 164px;
-  max-height: 204px;
+  max-height: 200px;
   overflow-y: auto;
   padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '12px 8px' : '12px 0')};
   position: absolute;
