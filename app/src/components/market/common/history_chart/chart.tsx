@@ -201,7 +201,7 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
       <ResponsiveContainer height={300} width="100%">
         <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} stackOffset="expand">
           <XAxis dataKey="date" />
-          <YAxis orientation="right" tickFormatter={toPercent} />
+          <YAxis domain={['auto', 'auto']} orientation="right" tickFormatter={toPercent} />
           <Tooltip content={renderTooltipContent} />
 
           {outcomes
