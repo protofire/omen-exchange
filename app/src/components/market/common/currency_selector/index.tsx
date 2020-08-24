@@ -23,7 +23,6 @@ const CurrencyButtonSelectedCSS = css`
 const CurrencyDropdown = styled(Dropdown)<{ selected: boolean }>`
   ${props => props.selected && CurrencyButtonSelectedCSS}
   width: 100%;
-  max-height: 204px;
 `
 
 interface Props {
