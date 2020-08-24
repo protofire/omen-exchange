@@ -141,7 +141,7 @@ const timestampToDate = (timestamp: number, value: string) => {
   return ts.format('MMM D')
 }
 
-const toPercent = (decimal: number, fixed = 0) => {
+const toPercent = (decimal: number, fixed = 2) => {
   return `${(decimal * 100).toFixed(fixed)}%`
 }
 
