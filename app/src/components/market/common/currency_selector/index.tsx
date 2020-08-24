@@ -23,6 +23,7 @@ const CurrencyButtonSelectedCSS = css`
 const CurrencyDropdown = styled(Dropdown)<{ selected: boolean }>`
   ${props => props.selected && CurrencyButtonSelectedCSS}
   width: 100%;
+  max-height: 204px;
 `
 
 interface Props {
@@ -67,7 +68,9 @@ export const CurrencySelector: React.FC<Props> = props => {
         disabled={disabled}
         dropdownPosition={DropdownPosition.right}
         items={currencyDropdownData}
+        maxHeight={true}
         selected={false}
+        showScrollbar={true}
       />
     </Wrapper>
   )
