@@ -180,6 +180,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
           showPriceChange={amountShares.gt(0)}
+          showSharesChange={amountShares.gt(0)}
+          newShares={balances.map((balance, i) => i === outcomeIndex ? balance.shares.sub(amountShares) : balance.shares)}
         />
         <GridTransactionDetails>
           <div>
