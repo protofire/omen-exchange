@@ -1,6 +1,6 @@
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
