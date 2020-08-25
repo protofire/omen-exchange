@@ -197,12 +197,14 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           balances={balances}
           collateral={collateral}
           disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
+          newShares={balances.map((balance, i) =>
+            i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares,
+          )}
           outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
           showPriceChange={amount.gt(0)}
           showSharesChange={amount.gt(0)}
-          newShares={balances.map((balance, i) => i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)}
         />
         <WarningMessageStyled
           additionalDescription={'. Be aware that market makers may remove liquidity from the market at any time!'}
