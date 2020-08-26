@@ -11,6 +11,7 @@ import { HistoryChartContainer } from '../history_chart'
 import { MarketTitle } from '../market_title'
 import { ProgressBar } from '../progress_bar'
 import { MarketData } from '../market_data'
+import { AdditionalMarketData } from '../additional_market_data'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -77,6 +78,8 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       <ProgressBar state='Open' creationTimestamp={new Date()} resolutionTimestamp={new Date()}></ProgressBar>
       {/* TODO: Add dynamic props */}
       <MarketData resolutionTimestamp={new Date()} dailyVolume={0} currency="DAI"></MarketData>
+      {/* TODO: Add dynamic props */}
+      <AdditionalMarketData category='category' arbitrator='arbitrator' oracle='oracle'></AdditionalMarketData>
       {/* <GridTwoColumns>
         {!isLiquidityProvision ? (
           <>
