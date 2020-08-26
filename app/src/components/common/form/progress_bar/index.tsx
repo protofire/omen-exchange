@@ -78,27 +78,14 @@ const ProgressBarContainer = styled.div`
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
-  id: string | undefined
-  currentItem?: number | undefined
   OpenProgressBar?: OpenProgressBar | undefined
   FinalizedProgressBar?: FinalizedProgressBar | undefined
   ArbitrationProgressBar?: ArbitrationProgressBar | undefined
   ClosedProgressBar?: ClosedProgressBar | undefined
-  items: any
-  placeholder?: React.ReactNode | string | undefined
 }
 
 export const ProgressBar: React.FC<Props> = props => {
-  const {
-    ArbitrationProgressBar,
-    ClosedProgressBar,
-    FinalizedProgressBar,
-    OpenProgressBar,
-    currentItem = 0,
-    id = 0,
-    items,
-    placeholder,
-  } = props
+  const { ArbitrationProgressBar, ClosedProgressBar, FinalizedProgressBar, OpenProgressBar } = props
 
   return <ProgressBarContainer></ProgressBarContainer>
 }
