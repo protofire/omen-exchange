@@ -10,6 +10,7 @@ import { DisplayResolution } from '../display_resolution'
 import { HistoryChartContainer } from '../history_chart'
 import { MarketTitle } from '../market_title'
 import { ProgressBar } from '../progress_bar'
+import { MarketData } from '../market_data'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -74,7 +75,9 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       </SubsectionTitleWrapper>
       {/* TODO: Add dynamic props */}
       <ProgressBar state='Open' creationTimestamp={new Date()} resolutionTimestamp={new Date()}></ProgressBar>
-      <GridTwoColumns>
+      {/* TODO: Add dynamic props */}
+      <MarketData resolutionTimestamp={new Date()} dailyVolume={0} currency="DAI"></MarketData>
+      {/* <GridTwoColumns>
         {!isLiquidityProvision ? (
           <>
             <TitleValue title={'Category'} value={question.category} />
@@ -141,7 +144,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
             ) : null}
           </>
         )}
-      </GridTwoColumns>
+      </GridTwoColumns> */}
       {tradeHistoryLoaded && (
         <HistoryChartContainer
           answerFinalizedTimestamp={answerFinalizedTimestamp}
