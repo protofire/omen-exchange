@@ -9,6 +9,7 @@ import { DisplayArbitrator } from '../display_arbitrator'
 import { DisplayResolution } from '../display_resolution'
 import { HistoryChartContainer } from '../history_chart'
 import { MarketTitle } from '../market_title'
+import { ProgressBar } from '../progress_bar'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -60,7 +61,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     <>
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} title={title} />
-        <SubsectionTitleActionWrapper>
+        {/* <SubsectionTitleActionWrapper>
           <SubsectionTitleAction onClick={toggleExtraInformation}>
             {showingExtraInformation ? 'Hide' : 'Show'} {toggleTitle}
           </SubsectionTitleAction>
@@ -69,8 +70,10 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
             {`${showingTradeHistory ? 'Hide' : 'Show'} Trade History`}
           </SubsectionTitleAction>
           <Breaker />
-        </SubsectionTitleActionWrapper>
+        </SubsectionTitleActionWrapper> */}
       </SubsectionTitleWrapper>
+      {/* TODO: Add dynamic props */}
+      <ProgressBar state='Open' creationTimestamp={new Date()} resolutionTimestamp={new Date()}></ProgressBar>
       <GridTwoColumns>
         {!isLiquidityProvision ? (
           <>
