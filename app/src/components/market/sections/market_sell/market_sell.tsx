@@ -7,7 +7,13 @@ import styled from 'styled-components'
 import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, mulBN, formatNumber } from '../../../../util/tools'
+import {
+  calcSellAmountInCollateral,
+  computeBalanceAfterTrade,
+  formatBigNumber,
+  formatNumber,
+  mulBN,
+} from '../../../../util/tools'
 import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -251,9 +257,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                   ValueStates.normal
                 }
                 title={'Total'}
-                value={`${tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'} ${
-                  collateral.symbol
-                }`}
+                value={`${
+                  tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
+                } ${collateral.symbol}`}
               />
             </TransactionDetailsCard>
           </div>

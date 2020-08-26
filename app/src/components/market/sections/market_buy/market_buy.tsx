@@ -18,7 +18,7 @@ import {
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { computeBalanceAfterTrade, formatBigNumber, mulBN, formatNumber } from '../../../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'

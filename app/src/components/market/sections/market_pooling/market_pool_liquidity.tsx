@@ -22,7 +22,7 @@ import {
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
   formatBigNumber,
-  formatNumber
+  formatNumber,
 } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
@@ -406,7 +406,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   emphasizeValue={depositedTokensTotal.gt(0)}
                   state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                   title={'Total'}
-                  value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${collateral.symbol}`}
+                  value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${
+                    collateral.symbol
+                  }`}
                 />
               </TransactionDetailsCard>
             )}

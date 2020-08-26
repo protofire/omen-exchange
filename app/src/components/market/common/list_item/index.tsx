@@ -139,8 +139,11 @@ export const ListItem: React.FC<Props> = (props: Props) => {
           {currentFilter.sortBy === 'scaledCollateralVolume' && `${formatNumber(volume)} ${symbol} - Volume`}
           {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Ending`}
           {currentFilter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume' &&
-            `${Math.floor(Date.now() / 86400000) === lastActiveDay ? formatNumber(dailyVolume) : 0} ${symbol} - 24hr Volume`}
-          {currentFilter.sortBy === 'scaledLiquidityParameter' && `${formatNumber(formattedLiquidity)} ${symbol} - Liquidity`}
+            `${
+              Math.floor(Date.now() / 86400000) === lastActiveDay ? formatNumber(dailyVolume) : 0
+            } ${symbol} - 24hr Volume`}
+          {currentFilter.sortBy === 'scaledLiquidityParameter' &&
+            `${formatNumber(formattedLiquidity)} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
       </Info>

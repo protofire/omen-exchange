@@ -86,7 +86,10 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
                 />
                 <TitleValue
                   title={'Total Pool Earnings'}
-                  value={collateral && `${formatNumber(formatBigNumber(totalEarnings, collateral.decimals))} ${collateral.symbol}`}
+                  value={
+                    collateral &&
+                    `${formatNumber(formatBigNumber(totalEarnings, collateral.decimals))} ${collateral.symbol}`
+                  }
                 />
                 <TitleValue
                   title={'My Pool Tokens'}
@@ -94,7 +97,10 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
                 />
                 <TitleValue
                   title={'My Pool Earnings'}
-                  value={collateral && `${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
+                  value={
+                    collateral &&
+                    `${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`
+                  }
                 />
               </>
             ) : null}
@@ -107,7 +113,10 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
             />
             <TitleValue
               title={'Total Pool Earnings'}
-              value={collateral && `${formatNumber(formatBigNumber(totalEarnings, collateral.decimals))} ${collateral.symbol}`}
+              value={
+                collateral &&
+                `${formatNumber(formatBigNumber(totalEarnings, collateral.decimals))} ${collateral.symbol}`
+              }
             />
             <TitleValue
               title={'My Pool Tokens'}
@@ -115,7 +124,9 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
             />
             <TitleValue
               title={'My Pool Earnings'}
-              value={collateral && `${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
+              value={
+                collateral && `${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`
+              }
             />
             {showingExtraInformation ? (
               <>

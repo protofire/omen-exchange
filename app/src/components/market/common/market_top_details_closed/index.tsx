@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
 
 import { LINK_FAQ } from '../../../../common/constants'
-import { formatBigNumber, getMarketTitles, formatNumber } from '../../../../util/tools'
+import { formatBigNumber, formatNumber, getMarketTitles } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper, TitleValue } from '../../../common'
 import { Breaker, SubsectionTitleActionWrapper } from '../common_styled'
