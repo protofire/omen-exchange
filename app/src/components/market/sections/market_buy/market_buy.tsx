@@ -18,7 +18,7 @@ import {
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber, mulBN, formatNumber } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -240,24 +240,24 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           </div>
           <div>
             <TransactionDetailsCard>
-              <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
+              <TransactionDetailsRow title={'Base Cost'} value={formatNumber(baseCostFormatted)} />
               <TransactionDetailsRow
                 title={'Fee'}
                 tooltip={`A ${feePercentage}% fee goes to liquidity providers.`}
-                value={feeFormatted}
+                value={formatNumber(feeFormatted)}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={potentialProfit.gt(0)}
                 state={ValueStates.success}
                 title={'Potential Profit'}
-                value={potentialProfitFormatted}
+                value={formatNumber(potentialProfitFormatted)}
               />
               <TransactionDetailsRow
                 emphasizeValue={parseFloat(sharesTotal) > 0}
                 state={(parseFloat(sharesTotal) > 0 && ValueStates.important) || ValueStates.normal}
                 title={'Total'}
-                value={total}
+                value={formatNumber(total)}
               />
             </TransactionDetailsCard>
           </div>
