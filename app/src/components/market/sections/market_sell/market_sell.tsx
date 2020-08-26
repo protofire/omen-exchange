@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../../../util/tools'
+import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, mulBN, formatNumber } from '../../../../util/tools'
 import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -220,7 +220,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsCard>
               <TransactionDetailsRow
                 title={'Sell Amount'}
-                value={`${formatBigNumber(amountShares, collateral.decimals)} Shares`}
+                value={`${formatNumber(formatBigNumber(amountShares, collateral.decimals))} Shares`}
               />
               <TransactionDetailsRow
                 emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
@@ -228,13 +228,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 title={'Profit'}
                 value={
                   potentialValue
-                    ? `${formatBigNumber(potentialValue, collateral.decimals, 2)} ${collateral.symbol}`
+                    ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${collateral.symbol}`
                     : '0.00'
                 }
               />
               <TransactionDetailsRow
                 title={'Trading Fee'}
-                value={`${costFee ? formatBigNumber(costFee.mul(-1), collateral.decimals, 2) : '0.00'} ${
+                value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'} ${
                   collateral.symbol
                 }`}
               />
@@ -251,7 +251,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                   ValueStates.normal
                 }
                 title={'Total'}
-                value={`${tradedCollateral ? formatBigNumber(tradedCollateral, collateral.decimals, 2) : '0.00'} ${
+                value={`${tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'} ${
                   collateral.symbol
                 }`}
               />
