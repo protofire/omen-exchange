@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
 
 import { LINK_FAQ } from '../../../../common/constants'
-import { formatBigNumber, getMarketTitles } from '../../../../util/tools'
+import { formatBigNumber, getMarketTitles, formatNumber } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper, TitleValue } from '../../../common'
 import { Breaker, SubsectionTitleActionWrapper } from '../common_styled'
@@ -74,7 +74,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         <TitleValue title={'Category'} value={question.category} />
         <DisplayResolution questionId={question.id} title={'Resolution Date'} value={question.resolution} />
         <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
-        <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
+        <TitleValue title={'Total Volume'} value={formatNumber(totalVolumeFormat)} />
       </GridTwoColumns>
       {tradeHistoryLoaded && (
         <HistoryChartContainer
