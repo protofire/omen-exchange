@@ -8,7 +8,7 @@ import { useGraphMarketMakerData } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { ERC20Service } from '../../../../services'
-import { calcPrice, formatBigNumber } from '../../../../util/tools'
+import { calcPrice, formatBigNumber, formatNumber } from '../../../../util/tools'
 import { IconStar } from '../../../common/icons/IconStar'
 
 const Wrapper = styled(NavLink)`
@@ -136,11 +136,11 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Ended ${endsText}`}</span>
         <Separator>|</Separator>
         <span>
-          {currentFilter.sortBy === 'scaledCollateralVolume' && `${volume} ${symbol} - Volume`}
+          {currentFilter.sortBy === 'scaledCollateralVolume' && `${formatNumber(volume)} ${symbol} - Volume`}
           {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Ending`}
           {currentFilter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume' &&
-            `${Math.floor(Date.now() / 86400000) === lastActiveDay ? dailyVolume : 0} ${symbol} - 24hr Volume`}
-          {currentFilter.sortBy === 'scaledLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
+            `${Math.floor(Date.now() / 86400000) === lastActiveDay ? formatNumber(dailyVolume) : 0} ${symbol} - 24hr Volume`}
+          {currentFilter.sortBy === 'scaledLiquidityParameter' && `${formatNumber(formattedLiquidity)} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
       </Info>
