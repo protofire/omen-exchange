@@ -94,7 +94,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
 
-      setNewShares(balances.map((balance, i) => i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares))
+      setNewShares(
+        balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)),
+      )
 
       return [tradedShares, probabilities, amount]
     },
@@ -187,7 +189,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     amountError !== null
 
   const switchOutcome = (value: number) => {
-    setNewShares(balances.map((balance, i) => i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares))
+    setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
     setOutcomeIndex(value)
   }
 
