@@ -30,7 +30,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     question,
   } = marketMakerData
   const totalVolumeFormat = collateralVolume
-    ? `${formatBigNumber(collateralVolume, collateralToken.decimals)} ${collateralToken.symbol}`
+    ? `${formatNumber(formatBigNumber(collateralVolume, collateralToken.decimals))} ${collateralToken.symbol}`
     : '-'
 
   const [showingTradeHistory, setShowingTradeHistory] = useState(false)
@@ -74,7 +74,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         <TitleValue title={'Category'} value={question.category} />
         <DisplayResolution questionId={question.id} title={'Resolution Date'} value={question.resolution} />
         <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
-        <TitleValue title={'Total Volume'} value={formatNumber(totalVolumeFormat)} />
+        <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
       </GridTwoColumns>
       {tradeHistoryLoaded && (
         <HistoryChartContainer

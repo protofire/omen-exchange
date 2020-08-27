@@ -37,7 +37,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   } = marketMakerData
 
   const totalVolumeFormat = collateralVolume
-    ? `${formatBigNumber(collateralVolume, collateral.decimals)} ${collateral.symbol}`
+    ? `${formatNumber(formatBigNumber(collateralVolume, collateral.decimals))} ${collateral.symbol}`
     : '-'
 
   const toggleExtraInformation = () => {
@@ -77,7 +77,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
             <TitleValue title={'Category'} value={question.category} />
             <DisplayResolution questionId={question.id} title={'Resolution Date'} value={question.resolution} />
             <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
-            <TitleValue title={'Total Volume'} value={formatNumber(totalVolumeFormat)} />
+            <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
             {showingExtraInformation ? (
               <>
                 <TitleValue
