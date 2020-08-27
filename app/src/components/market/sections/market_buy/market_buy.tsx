@@ -215,10 +215,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             <WalletBalance
               onClick={() => {
                 setAmount(collateralBalance)
-                setAmountToDisplay(currentBalance)
+                setAmountToDisplay(formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5))
               }}
               symbol={collateral.symbol}
-              value={currentBalance}
+              value={formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5)}
             />
             <ReactTooltip id="walletBalanceTooltip" />
             <TextfieldCustomPlaceholder

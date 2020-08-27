@@ -199,10 +199,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               data-tip={`Sell all of the selected outcome's shares.`}
               onClick={() => {
                 setAmountShares(balanceItem.shares)
-                setAmountSharesToDisplay(selectedOutcomeBalance)
+                setAmountSharesToDisplay(formatNumber(selectedOutcomeBalance, 5))
               }}
               symbol="Shares"
-              value={selectedOutcomeBalance}
+              value={formatNumber(selectedOutcomeBalance, 5)}
             />
             <ReactTooltip id="walletBalanceTooltip" />
             <TextfieldCustomPlaceholder
