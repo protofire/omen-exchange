@@ -92,6 +92,7 @@ const theme = {
     textColorLighter: '#86909E',
     textColorLightish: '#7D8189',
     verticalDivider: '#e8eaf6',
+    clickable: '#7986CB',
   },
   message: {
     colors: {

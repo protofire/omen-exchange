@@ -28,7 +28,6 @@ interface Props {
 const TableWrapper = styled.div`
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};
-  margin-top: 20px;
 `
 
 const PaddingCSS = css`
