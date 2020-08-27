@@ -335,7 +335,7 @@ export const limitDecimalPlaces = (value: string, decimals: number) => {
 
 export const formatNumber = (number: string, decimals = 2): string => {
   if (number.length < 1) {
-    return `0.${'0'.repeat(decimals)}`
+    return `0${decimals > 0 && '.' + '0'.repeat(decimals)}`
   }
 
   const fixedInt = parseInt(number).toFixed(decimals)
