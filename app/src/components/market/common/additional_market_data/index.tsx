@@ -4,13 +4,17 @@ import styled from 'styled-components'
 import { IconCategory } from '../../../common/icons/IconCategory'
 import { IconOracle } from '../../../common/icons/IconOracle'
 import { IconArbitrator } from '../../../common/icons/IconArbitrator'
+import { IconChevronDown } from '../../../common/icons/IconChevronDown'
 
 const AdditionalMarketDataWrapper = styled.div`
   height: 45px;
-  border-top: 1px ${props => props.theme.borders.borderColorLighter};
+  border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-left: -26px;
+  width: ${props => props.theme.mainContainer.maxWidth};
+  padding: 0 6px;
 `
 
 const AdditionalMarketDataLeft = styled.div`
@@ -18,9 +22,16 @@ const AdditionalMarketDataLeft = styled.div`
   align-items: center;
 `
 
+const AdditionalMarketDataRight = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+`
+
 const AdditionalMarketDataSectionWrapper = styled.div`
   display: flex;
   align-items: center;
+  margin-left: 20px;
 `
 
 const AdditionalMarketDataSectionTitle = styled.p`
@@ -61,6 +72,14 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           </AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>
+      <AdditionalMarketDataRight>
+        <AdditionalMarketDataSectionWrapper>
+          <AdditionalMarketDataSectionTitle>
+            Trade History
+          </AdditionalMarketDataSectionTitle>
+          <IconChevronDown></IconChevronDown>
+        </AdditionalMarketDataSectionWrapper>
+      </AdditionalMarketDataRight>
     </AdditionalMarketDataWrapper>
   )
 }
