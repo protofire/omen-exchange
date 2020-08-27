@@ -5,6 +5,7 @@ import { IconCategory } from '../../../common/icons/IconCategory'
 import { IconOracle } from '../../../common/icons/IconOracle'
 import { IconArbitrator } from '../../../common/icons/IconArbitrator'
 import { IconChevronDown } from '../../../common/icons/IconChevronDown'
+import { Arbitrator } from '../../../../util/types'
 
 const AdditionalMarketDataWrapper = styled.div`
   height: 45px;
@@ -34,7 +35,7 @@ const AdditionalMarketDataSectionWrapper = styled.div`
   margin-left: 20px;
 `
 
-const AdditionalMarketDataSectionTitle = styled.p`
+const AdditionalMarketDataSectionTitle = styled.a`
   margin-left: 6px;
   font-size: 14px;
   line-height: 16px;
@@ -43,32 +44,39 @@ const AdditionalMarketDataSectionTitle = styled.p`
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   category: string
-  arbitrator: string
+  arbitrator: Arbitrator
   oracle: string
+  id: string
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { category, arbitrator, oracle } = props
+  const { category, arbitrator, oracle, id } = props
+
+  const windowObj: any = window
+  const realitioBaseUrl =
+    windowObj.ethereum && windowObj.ethereum.isMetaMask ? 'https://reality.eth' : 'https://reality.eth.link'
+
+  const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
 
   return (
     <AdditionalMarketDataWrapper>
       <AdditionalMarketDataLeft>
         <AdditionalMarketDataSectionWrapper>
           <IconCategory></IconCategory>
-          <AdditionalMarketDataSectionTitle>
+          <AdditionalMarketDataSectionTitle href={`/#/24h-volume/category/${encodeURI(category)}`}>
             {category}
           </AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
         <AdditionalMarketDataSectionWrapper>
           <IconOracle></IconOracle>
-          <AdditionalMarketDataSectionTitle>
+          <AdditionalMarketDataSectionTitle href={realitioUrl} target="_blank" rel="noopener noreferrer">
             {oracle}
           </AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
         <AdditionalMarketDataSectionWrapper>
           <IconArbitrator></IconArbitrator>
-          <AdditionalMarketDataSectionTitle>
-            {arbitrator}
+          <AdditionalMarketDataSectionTitle href={arbitrator.url} target="_blank" rel="noopener noreferrer">
+            {arbitrator.name}
           </AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>
