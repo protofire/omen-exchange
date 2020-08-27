@@ -335,12 +335,12 @@ export const limitDecimalPlaces = (value: string, decimals: number) => {
 
 export const formatNumber = (number: string, decimals = 2): string => {
   if (number.length < 1) {
-    return `0${decimals > 0 && '.' + '0'.repeat(decimals)}`
+    return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
 
-  const fixedInt = parseInt(number).toFixed(decimals)
+  const fixedInt = parseFloat(number).toFixed(decimals)
   const splitFixedInt = fixedInt.split('.')[0]
   const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 
-  return `${formattedSubstring}.${fixedInt.split('.')[1]}`
+  return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }
