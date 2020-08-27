@@ -195,7 +195,9 @@ export const OutcomeTable = (props: Props) => {
           <TDStyled textAlign={TableCellsAlign[3]}>
             <TDFlexDiv textAlign={TableCellsAlign[3]}>
               {formattedShares}{' '}
-              {showSharesChange && formattedNewShares !== formattedShares && <NewValue outcomeIndex={outcomeIndex} value={formattedNewShares} />}
+              {showSharesChange && formattedNewShares !== formattedShares && (
+                <NewValue outcomeIndex={outcomeIndex} value={formattedNewShares} />
+              )}
             </TDFlexDiv>
           </TDStyled>
         )}
