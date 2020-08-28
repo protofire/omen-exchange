@@ -13,7 +13,6 @@ import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../common_styled'
 
 const commonWrapperCSS = css`
   border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
-  margin-top: 10px;
   padding-top: 20px;
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};

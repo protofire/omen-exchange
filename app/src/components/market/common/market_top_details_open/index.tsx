@@ -79,7 +79,14 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       {/* TODO: Add dynamic props */}
       <MarketData resolutionTimestamp={new Date()} dailyVolume={0} currency="DAI"></MarketData>
       {/* TODO: Add dynamic props */}
-      <AdditionalMarketData category={question.category} arbitrator={arbitrator} oracle='Reality.eth' id={question.id}></AdditionalMarketData>
+      <AdditionalMarketData 
+        category={question.category} 
+        arbitrator={arbitrator} 
+        oracle='Reality.eth' 
+        id={question.id}
+        showingTradeHistory={showingTradeHistory}
+        handleTradeHistoryClick={toggleTradeHistory}
+      ></AdditionalMarketData>
       {/* <GridTwoColumns>
         {!isLiquidityProvision ? (
           <>

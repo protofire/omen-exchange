@@ -5,6 +5,7 @@ import { IconCategory } from '../../../common/icons/IconCategory'
 import { IconOracle } from '../../../common/icons/IconOracle'
 import { IconArbitrator } from '../../../common/icons/IconArbitrator'
 import { IconChevronDown } from '../../../common/icons/IconChevronDown'
+import { IconChevronUp } from '../../../common/icons/IconChevronUp'
 import { Arbitrator } from '../../../../util/types'
 
 const AdditionalMarketDataWrapper = styled.div`
@@ -40,6 +41,7 @@ const AdditionalMarketDataSectionTitle = styled.a`
   font-size: 14px;
   line-height: 16px;
   color: ${props => props.theme.colors.clickable}
+  cursor: pointer;
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -47,10 +49,12 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   arbitrator: Arbitrator
   oracle: string
   id: string
+  showingTradeHistory: boolean
+  handleTradeHistoryClick: () => void
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { category, arbitrator, oracle, id } = props
+  const { category, arbitrator, oracle, id, showingTradeHistory, handleTradeHistoryClick } = props
 
   const windowObj: any = window
   const realitioBaseUrl =
@@ -82,10 +86,14 @@ export const AdditionalMarketData: React.FC<Props> = props => {
       </AdditionalMarketDataLeft>
       <AdditionalMarketDataRight>
         <AdditionalMarketDataSectionWrapper>
-          <AdditionalMarketDataSectionTitle>
+          <AdditionalMarketDataSectionTitle onClick={handleTradeHistoryClick}>
             Trade History
           </AdditionalMarketDataSectionTitle>
-          <IconChevronDown></IconChevronDown>
+          {showingTradeHistory ? (
+            <IconChevronUp></IconChevronUp>
+          ) : (
+            <IconChevronDown></IconChevronDown>
+          )}
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataRight>
     </AdditionalMarketDataWrapper>
