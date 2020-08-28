@@ -87,7 +87,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[], BigNumber]> => {
-      const tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
+      let tradedShares
+      try {
+        tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex) 
+      } catch {
+        tradedShares = new BigNumber(0)
+      }
       const balanceAfterTrade = computeBalanceAfterTrade(
         balances.map(b => b.holdings),
         outcomeIndex,
