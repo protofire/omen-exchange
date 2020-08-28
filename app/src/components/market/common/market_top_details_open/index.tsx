@@ -77,8 +77,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       {/* TODO: Add dynamic props */}
       <ProgressBar state='Open' creationTimestamp={new Date()} resolutionTimestamp={new Date()}></ProgressBar>
       {/* TODO: Add dynamic props */}
-      <MarketData resolutionTimestamp={new Date()} dailyVolume={0} currency="DAI"></MarketData>
-      {/* TODO: Add dynamic props */}
+      <MarketData resolutionTimestamp={question.resolution} dailyVolume={collateralVolume} currency={collateral}></MarketData>
       <AdditionalMarketData 
         category={question.category} 
         arbitrator={arbitrator} 
