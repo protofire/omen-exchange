@@ -12,7 +12,7 @@ const MarketDataWrapper = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  justify-content: space-evenly;
+  justify-content: space-between;
   margin-bottom: 32px;
 `
 
@@ -22,6 +22,7 @@ const MarketDataItem = styled.div`
   align-items: flex-start;
   justify-content: space-between;
   height: 39px;
+  width: 33.33%;
 `
 
 const MarketDataItemTop = styled.div`
