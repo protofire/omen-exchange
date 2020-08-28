@@ -74,10 +74,10 @@ export const MarketData: React.FC<Props> = props => {
       </MarketDataItem>
       <MarketDataItem>
         <MarketDataItemTop>
-
+          {moment(resolutionTimestamp).fromNow(true)}
         </MarketDataItemTop>
         <MarketDataItemBottom>
-          
+          Time remaining
         </MarketDataItemBottom>
       </MarketDataItem>
       <MarketDataItem>
