@@ -63,3 +63,6 @@ typings/
 
 # Webstorm project configuration
 .idea
+
+# OSX
+.DS_Store

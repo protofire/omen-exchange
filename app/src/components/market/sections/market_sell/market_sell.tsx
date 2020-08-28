@@ -182,6 +182,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           balances={balances}
           collateral={collateral}
           disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
+          newShares={balances.map((balance, i) =>
+            i === outcomeIndex ? balance.shares.sub(amountShares) : balance.shares,
+          )}
           outcomeHandleChange={(value: number) => {
             setOutcomeIndex(value)
             setBalanceItem(balances[value])
@@ -189,6 +192,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
           showPriceChange={amountShares.gt(0)}
+          showSharesChange={amountShares.gt(0)}
         />
         <GridTransactionDetails>
           <div>
