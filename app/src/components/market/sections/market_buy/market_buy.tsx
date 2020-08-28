@@ -162,10 +162,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
-  const feeFormatted = `${formatBigNumber(feePaid.mul(-1), collateral.decimals)} ${collateral.symbol}`
-  const baseCostFormatted = `${formatBigNumber(baseCost, collateral.decimals)} ${collateral.symbol}`
-  const potentialProfitFormatted = `${formatBigNumber(potentialProfit, collateral.decimals)} ${collateral.symbol}`
-  const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
+  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
+  const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
+  const potentialProfitFormatted = `${formatNumber(formatBigNumber(potentialProfit, collateral.decimals))} ${collateral.symbol}`
+  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
 
   const amountError =
@@ -240,24 +240,24 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           </div>
           <div>
             <TransactionDetailsCard>
-              <TransactionDetailsRow title={'Base Cost'} value={formatNumber(baseCostFormatted)} />
+              <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
               <TransactionDetailsRow
                 title={'Fee'}
                 tooltip={`A ${feePercentage}% fee goes to liquidity providers.`}
-                value={formatNumber(feeFormatted)}
+                value={feeFormatted}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={potentialProfit.gt(0)}
                 state={ValueStates.success}
                 title={'Potential Profit'}
-                value={formatNumber(potentialProfitFormatted)}
+                value={potentialProfitFormatted}
               />
               <TransactionDetailsRow
                 emphasizeValue={parseFloat(sharesTotal) > 0}
                 state={(parseFloat(sharesTotal) > 0 && ValueStates.important) || ValueStates.normal}
                 title={'Total'}
-                value={formatNumber(total)}
+                value={total}
               />
             </TransactionDetailsCard>
           </div>
