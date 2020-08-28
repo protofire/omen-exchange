@@ -155,6 +155,10 @@ const AskQuestionStep = (props: Props) => {
 
   const [categoryButtonFocus, setCategoryButtonFocus] = useState(false)
 
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+
   const toggleCategoryButtonFocus = useCallback(() => {
     setCategoryButtonFocus(!categoryButtonFocus)
   }, [categoryButtonFocus])
@@ -195,7 +199,7 @@ const AskQuestionStep = (props: Props) => {
             formField={
               <DateField
                 disabled={!!loadedQuestionId}
-                minDate={new Date()}
+                minDate={tomorrow}
                 name="resolution"
                 onChange={handleDateChange}
                 selected={resolution}
