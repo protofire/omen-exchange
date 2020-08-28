@@ -67,7 +67,9 @@ export const CurrencySelector: React.FC<Props> = props => {
         disabled={disabled}
         dropdownPosition={DropdownPosition.right}
         items={currencyDropdownData}
+        maxHeight={true}
         selected={false}
+        showScrollbar={true}
       />
     </Wrapper>
   )

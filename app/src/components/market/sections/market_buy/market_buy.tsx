@@ -73,6 +73,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [tweet, setTweet] = useState('')
+  const [newShares, setNewShares] = useState<Maybe<BigNumber[]>>(null)
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -97,6 +98,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
+
+      setNewShares(
+        balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)),
+      )
 
       return [tradedShares, probabilities, amount]
     },
@@ -189,6 +194,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     amountError !== null ||
     isNegativeAmount
 
+  const switchOutcome = (value: number) => {
+    setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
+    setOutcomeIndex(value)
+  }
+
   return (
     <>
       <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
@@ -203,10 +213,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           balances={balances}
           collateral={collateral}
           disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
-          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
+          newShares={newShares}
+          outcomeHandleChange={(value: number) => switchOutcome(value)}
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
           showPriceChange={amount.gt(0)}
+          showSharesChange={amount.gt(0)}
         />
         <WarningMessageStyled
           additionalDescription={'. Be aware that market makers may remove liquidity from the market at any time!'}

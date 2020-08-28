@@ -119,7 +119,7 @@ const MarketResolutionMessage = (props: Props) => {
       <TextWrapper>
         <Title isWinner={wonSingle || wonMultiple}>{infoTitle}</Title>
         <Text>
-          {infoText} <TextHighlight>${redeemString}</TextHighlight>.
+          {infoText} <TextHighlight>{redeemString}</TextHighlight>.
         </Text>
       </TextWrapper>
     </Wrapper>
