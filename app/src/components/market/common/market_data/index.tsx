@@ -1,11 +1,12 @@
 import React, { DOMAttributes, useEffect } from 'react'
 import styled from 'styled-components'
+import moment from 'moment'
+import momentTZ from 'moment-timezone'
 import { BigNumber } from 'ethers/utils'
 
 import { Token } from '../../../../util/types'
 import { formatBigNumber } from '../../../../util/tools'
 import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
-import { currenciesData } from '../../../common/icons/currencies/currencies_data'
 
 const MarketDataWrapper = styled.div`
   display: flex;
@@ -57,14 +58,18 @@ export const MarketData: React.FC<Props> = props => {
 
   const currencyIcon = (tokens.filter(token => token.symbol === currency.symbol))[0].image
 
+  console.log(resolutionTimestamp)
+
+  const timezoneAbbr = momentTZ.tz(momentTZ.tz.guess()).zoneAbbr()
+
   return (
     <MarketDataWrapper>
       <MarketDataItem>
         <MarketDataItemTop>
-
+          {moment(resolutionTimestamp).format("DD.MM.YYYY - H:mm zz")} {timezoneAbbr}
         </MarketDataItemTop>
         <MarketDataItemBottom>
-
+          Closing Date
         </MarketDataItemBottom>
       </MarketDataItem>
       <MarketDataItem>
