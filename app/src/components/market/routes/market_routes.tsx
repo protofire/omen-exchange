@@ -34,7 +34,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
 
   // Validate contract REALLY exists
   const contractExists = useCheckContractExists(marketMakerAddress, context)
-  const { fetchData, marketMakerData } = useMarketMakerData(marketMakerAddress)
+  const { fetchData, marketMakerData } = useMarketMakerData(marketMakerAddress.toLowerCase())
   useInterval(fetchData, FETCH_DETAILS_INTERVAL)
   if (!contractExists) {
     logger.log(`Market address not found`)
