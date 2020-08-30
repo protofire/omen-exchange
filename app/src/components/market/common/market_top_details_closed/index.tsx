@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
 
 import { LINK_FAQ } from '../../../../common/constants'
-import { formatBigNumber, getMarketTitles } from '../../../../util/tools'
+import { formatBigNumber, formatNumber, getMarketTitles } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper, TitleValue } from '../../../common'
 import { Breaker, SubsectionTitleActionWrapper } from '../common_styled'
@@ -30,7 +30,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     question,
   } = marketMakerData
   const totalVolumeFormat = collateralVolume
-    ? `${formatBigNumber(collateralVolume, collateralToken.decimals)} ${collateralToken.symbol}`
+    ? `${formatNumber(formatBigNumber(collateralVolume, collateralToken.decimals))} ${collateralToken.symbol}`
     : '-'
 
   const [showingTradeHistory, setShowingTradeHistory] = useState(false)

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { formatBigNumber, formatDate } from '../../../../util/tools'
+import { formatBigNumber, formatDate, formatNumber } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper } from '../../../common'
 import { TitleValue } from '../../../common/text/title_value'
@@ -37,7 +37,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   } = marketMakerData
 
   const totalVolumeFormat = collateralVolume
-    ? `${formatBigNumber(collateralVolume, collateral.decimals)} ${collateral.symbol}`
+    ? `${formatNumber(formatBigNumber(collateralVolume, collateral.decimals))} ${collateral.symbol}`
     : '-'
 
   const toggleExtraInformation = () => {
@@ -82,19 +82,25 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
               <>
                 <TitleValue
                   title={'Total Pool Tokens'}
-                  value={collateral && formatBigNumber(marketMakerFunding, collateral.decimals)}
+                  value={collateral && formatNumber(formatBigNumber(marketMakerFunding, collateral.decimals))}
                 />
                 <TitleValue
                   title={'Total Pool Earnings'}
-                  value={collateral && `${formatBigNumber(totalEarnings, collateral.decimals)} ${collateral.symbol}`}
+                  value={
+                    collateral &&
+                    `${formatNumber(formatBigNumber(totalEarnings, collateral.decimals))} ${collateral.symbol}`
+                  }
                 />
                 <TitleValue
                   title={'My Pool Tokens'}
-                  value={collateral && formatBigNumber(marketMakerUserFunding, collateral.decimals)}
+                  value={collateral && formatNumber(formatBigNumber(marketMakerUserFunding, collateral.decimals))}
                 />
                 <TitleValue
                   title={'My Pool Earnings'}
-                  value={collateral && `${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
+                  value={
+                    collateral &&
+                    `${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`
+                  }
                 />
               </>
             ) : null}
@@ -103,19 +109,24 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
           <>
             <TitleValue
               title={'Total Pool Tokens'}
-              value={collateral && formatBigNumber(marketMakerFunding, collateral.decimals)}
+              value={collateral && formatNumber(formatBigNumber(marketMakerFunding, collateral.decimals))}
             />
             <TitleValue
               title={'Total Pool Earnings'}
-              value={collateral && `${formatBigNumber(totalEarnings, collateral.decimals)} ${collateral.symbol}`}
+              value={
+                collateral &&
+                `${formatNumber(formatBigNumber(totalEarnings, collateral.decimals))} ${collateral.symbol}`
+              }
             />
             <TitleValue
               title={'My Pool Tokens'}
-              value={collateral && formatBigNumber(marketMakerUserFunding, collateral.decimals)}
+              value={collateral && formatNumber(formatBigNumber(marketMakerUserFunding, collateral.decimals))}
             />
             <TitleValue
               title={'My Pool Earnings'}
-              value={collateral && `${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
+              value={
+                collateral && `${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`
+              }
             />
             {showingExtraInformation ? (
               <>

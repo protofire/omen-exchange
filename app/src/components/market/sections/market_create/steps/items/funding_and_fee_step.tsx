@@ -20,6 +20,7 @@ import {
   calcInitialFundingSendAmounts,
   formatBigNumber,
   formatDate,
+  formatNumber,
 } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
@@ -344,7 +345,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             {tokensAmount > 1 && (
               <CurrenciesWrapper>
                 <CurrencySelector
-                  balance={collateralBalanceFormatted}
+                  balance={formatNumber(collateralBalanceFormatted)}
                   context={context}
                   disabled={false}
                   onSelect={onCollateralChange}
@@ -373,7 +374,10 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 value={`${isNaN(spread) ? 0 : spread}%`}
               />
               <TransactionDetailsLine />
-              <TransactionDetailsRow title={'Pool Tokens'} value={formatBigNumber(funding, collateral.decimals)} />
+              <TransactionDetailsRow
+                title={'Pool Tokens'}
+                value={formatNumber(formatBigNumber(funding, collateral.decimals))}
+              />
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsStyled>

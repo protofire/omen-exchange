@@ -18,7 +18,7 @@ import {
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -167,10 +167,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
-  const feeFormatted = `${formatBigNumber(feePaid.mul(-1), collateral.decimals)} ${collateral.symbol}`
-  const baseCostFormatted = `${formatBigNumber(baseCost, collateral.decimals)} ${collateral.symbol}`
-  const potentialProfitFormatted = `${formatBigNumber(potentialProfit, collateral.decimals)} ${collateral.symbol}`
-  const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
+  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
+  const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
+  const potentialProfitFormatted = `${formatNumber(formatBigNumber(potentialProfit, collateral.decimals))} ${
+    collateral.symbol
+  }`
+  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
 
   const amountError =
@@ -227,10 +229,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             <WalletBalance
               onClick={() => {
                 setAmount(collateralBalance)
-                setAmountToDisplay(currentBalance)
+                setAmountToDisplay(formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5))
               }}
               symbol={collateral.symbol}
-              value={currentBalance}
+              value={formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5)}
             />
             <ReactTooltip id="walletBalanceTooltip" />
             <TextfieldCustomPlaceholder

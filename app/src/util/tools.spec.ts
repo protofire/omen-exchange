@@ -13,6 +13,7 @@ import {
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
   divBN,
+  formatNumber,
   getIndexSets,
   limitDecimalPlaces,
   truncateStringInTheMiddle as truncate,
@@ -361,6 +362,21 @@ describe('tools', () => {
         const limitedValue = limitDecimalPlaces(value, decimals)
 
         expect(limitedValue).toStrictEqual(result)
+      })
+    }
+  })
+
+  describe('formatNumber', () => {
+    const testCases: [[string, number], string][] = [
+      [['1234567.8910', 2], '1,234,567.89'],
+      [['0', 8], '0.00000000'],
+      [['4269.123123222334', 0], '4,269'],
+    ]
+    for (const [[number, decimals], result] of testCases) {
+      it('should return the correct numerical string', () => {
+        const formattedNumber = formatNumber(number, decimals)
+
+        expect(formattedNumber).toStrictEqual(result)
       })
     }
   })
