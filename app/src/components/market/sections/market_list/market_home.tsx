@@ -195,23 +195,6 @@ interface Props {
 
 const logger = getLogger('MarketHome')
 
-type DelayedProps = {
-  children: React.ReactElement
-  waitBeforeShow?: number
-}
-
-const Delayed = ({ children, waitBeforeShow = 500 }: DelayedProps) => {
-  const [isShown, setIsShown] = useState(false)
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsShown(true)
-    }, waitBeforeShow)
-  }, [waitBeforeShow])
-
-  return isShown ? children : null
-}
-
 export const MarketHome: React.FC<Props> = (props: Props) => {
   const {
     categories,
@@ -240,7 +223,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
-    currentFilter.currency || currentFilter.arbitrator || currentFilter.marketValidity ? true : false,
+    (currentFilter.currency || currentFilter.arbitrator || currentFilter.marketValidity === MarketValidity.INVALID) &&
+      !fetchMyMarkets,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
@@ -324,6 +308,13 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     title,
     onFilterChange,
   ])
+
+  useEffect(() => {
+    setShowAdvancedFilters(
+      (currentFilter.currency || currentFilter.arbitrator || currentFilter.marketValidity === MarketValidity.INVALID) &&
+        !fetchMyMarkets,
+    )
+  }, [currentFilter, fetchMyMarkets])
 
   const toggleSearch = useCallback(() => {
     setShowAdvancedFilters(false)
@@ -462,11 +453,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <TopContents>
           <FiltersWrapper>
             <SectionTitleMarket title={'Markets'} />
-            <FiltersControls>
-              <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
+            <FiltersControls disabled={fetchMyMarkets}>
+              <ButtonCircleStyled active={showSearch} disabled={fetchMyMarkets} onClick={toggleSearch}>
                 <IconSearch />
               </ButtonCircleStyled>
-              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
+              <ButtonCircleStyled active={showAdvancedFilters} disabled={fetchMyMarkets} onClick={toggleFilters}>
                 <IconFilter />
               </ButtonCircleStyled>
               {!fetchMyMarkets && (
@@ -500,16 +491,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             markets.data.slice(0, count).map(item => {
               return <ListItem currentFilter={currentFilter} key={item.address} market={item}></ListItem>
             })}
-          {noOwnMarkets && (
-            <Delayed>
-              <NoOwnMarkets>You have not created any market yet.</NoOwnMarkets>
-            </Delayed>
-          )}
-          {noMarketsAvailable && (
-            <Delayed>
-              <NoMarketsAvailable>No markets available.</NoMarketsAvailable>
-            </Delayed>
-          )}
+          {noOwnMarkets && <NoOwnMarkets>You have not created any market yet.</NoOwnMarkets>}
+          {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
         <BottomContents>

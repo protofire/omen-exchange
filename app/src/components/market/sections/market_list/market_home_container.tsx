@@ -161,7 +161,6 @@ const MarketHomeContainer: React.FC = () => {
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
 
   const [pageSize, setPageSize] = useState(4)
-  const [expectedMarketsSize, setExpectedMarketsSize] = useState<number>(pageSize)
   const [pageIndex, setPageIndex] = useState(0)
 
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
@@ -184,10 +183,7 @@ const MarketHomeContainer: React.FC = () => {
     ...filter,
   }
 
-  const { error, loading, markets: fetchedMarkets, moreMarkets } = useMarkets(
-    marketsQueryVariables,
-    expectedMarketsSize,
-  )
+  const { error, loading, markets: fetchedMarkets, moreMarkets } = useMarkets(marketsQueryVariables)
 
   const { data: fetchedCategories, error: categoriesError, loading: categoriesLoading } = useQuery<
     GraphResponseCategories
@@ -317,10 +313,6 @@ const MarketHomeContainer: React.FC = () => {
     setPageSize(size)
     setPageIndex(0)
   }
-
-  useEffect(() => {
-    setExpectedMarketsSize(pageSize * (pageIndex + 1))
-  }, [pageSize, pageIndex])
 
   return (
     <>
