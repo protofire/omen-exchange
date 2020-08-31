@@ -60,8 +60,6 @@ export const MarketData: React.FC<Props> = props => {
   // TODO: Fix error with certain currencies
   const currencyIcon = (tokens.filter(token => token.symbol === currency.symbol))[0].image
 
-  console.log(resolutionTimestamp)
-
   const timezoneAbbr = momentTZ.tz(momentTZ.tz.guess()).zoneAbbr()
 
   return (
