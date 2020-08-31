@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -7,7 +7,13 @@ import styled from 'styled-components'
 import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { calcSellAmountInCollateral, computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../../../util/tools'
+import {
+  calcSellAmountInCollateral,
+  computeBalanceAfterTrade,
+  formatBigNumber,
+  formatNumber,
+  mulBN,
+} from '../../../../util/tools'
 import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -25,6 +31,7 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
+import { WarningMessage } from '../../common/warning_message'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -59,10 +66,15 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
+  const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
+
+  useEffect(() => {
+    setIsNegativeAmountShares(formatBigNumber(amountShares, collateral.decimals).includes('-'))
+  }, [amountShares, collateral.decimals])
 
   const calcSellAmount = useMemo(
     () => async (
@@ -157,7 +169,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       : null
 
   const isSellButtonDisabled =
-    (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || amountError !== null
+    (status !== Status.Ready && status !== Status.Error) ||
+    amountShares.isZero() ||
+    amountError !== null ||
+    isNegativeAmountShares
 
   return (
     <>
@@ -173,6 +188,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           balances={balances}
           collateral={collateral}
           disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
+          newShares={balances.map((balance, i) =>
+            i === outcomeIndex ? balance.shares.sub(amountShares) : balance.shares,
+          )}
           outcomeHandleChange={(value: number) => {
             setOutcomeIndex(value)
             setBalanceItem(balances[value])
@@ -180,6 +198,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
           showPriceChange={amountShares.gt(0)}
+          showSharesChange={amountShares.gt(0)}
         />
         <GridTransactionDetails>
           <div>
@@ -193,10 +212,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               data-tip={`Sell all of the selected outcome's shares.`}
               onClick={() => {
                 setAmountShares(balanceItem.shares)
-                setAmountSharesToDisplay(selectedOutcomeBalance)
+                setAmountSharesToDisplay(formatNumber(selectedOutcomeBalance, 5))
               }}
               symbol="Shares"
-              value={selectedOutcomeBalance}
+              value={formatNumber(selectedOutcomeBalance, 5)}
             />
             <ReactTooltip id="walletBalanceTooltip" />
             <TextfieldCustomPlaceholder
@@ -220,7 +239,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsCard>
               <TransactionDetailsRow
                 title={'Sell Amount'}
-                value={`${formatBigNumber(amountShares, collateral.decimals)} Shares`}
+                value={`${formatNumber(formatBigNumber(amountShares, collateral.decimals))} Shares`}
               />
               <TransactionDetailsRow
                 emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
@@ -228,13 +247,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 title={'Profit'}
                 value={
                   potentialValue
-                    ? `${formatBigNumber(potentialValue, collateral.decimals, 2)} ${collateral.symbol}`
+                    ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${collateral.symbol}`
                     : '0.00'
                 }
               />
               <TransactionDetailsRow
                 title={'Trading Fee'}
-                value={`${costFee ? formatBigNumber(costFee.mul(-1), collateral.decimals, 2) : '0.00'} ${
+                value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'} ${
                   collateral.symbol
                 }`}
               />
@@ -251,13 +270,22 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                   ValueStates.normal
                 }
                 title={'Total'}
-                value={`${tradedCollateral ? formatBigNumber(tradedCollateral, collateral.decimals, 2) : '0.00'} ${
-                  collateral.symbol
-                }`}
+                value={`${
+                  tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
+                } ${collateral.symbol}`}
               />
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetails>
+        {isNegativeAmountShares && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description={`Your sell amount should not be negative.`}
+            href={''}
+            hyperlinkDescription={''}
+          />
+        )}
         <ButtonContainer>
           <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
             Cancel

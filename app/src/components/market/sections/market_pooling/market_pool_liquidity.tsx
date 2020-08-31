@@ -1,6 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -22,6 +22,7 @@ import {
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
   formatBigNumber,
+  formatNumber,
 } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
@@ -95,12 +96,22 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const [amountToFund, setAmountToFund] = useState<BigNumber>(new BigNumber(0))
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
+  const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
   const [amountToRemove, setAmountToRemove] = useState<BigNumber>(new BigNumber(0))
   const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
+  const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
+
+  useEffect(() => {
+    setIsNegativeAmountToFund(formatBigNumber(amountToFund, collateral.decimals).includes('-'))
+  }, [amountToFund, collateral.decimals])
+
+  useEffect(() => {
+    setIsNegativeAmountToRemove(formatBigNumber(amountToRemove, collateral.decimals).includes('-'))
+  }, [amountToRemove, collateral.decimals])
 
   const resolutionDate = marketMakerData.question.resolution.getTime()
   const currentDate = new Date().getTime()
@@ -238,7 +249,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const maybeFundingBalance = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
 
-  const walletBalance = formatBigNumber(collateralBalance, collateral.decimals, 5)
+  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
 
   const collateralAmountError =
@@ -263,9 +274,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     amountToFund.isZero() ||
     hasEnoughAllowance !== Ternary.True ||
     collateralAmountError !== null ||
-    currentDate > resolutionDate
+    currentDate > resolutionDate ||
+    isNegativeAmountToFund
+
   const disableWithdrawButton =
-    amountToRemove.isZero() || amountToRemove.gt(fundingBalance) || sharesAmountError !== null
+    amountToRemove.isZero() ||
+    amountToRemove.gt(fundingBalance) ||
+    sharesAmountError !== null ||
+    isNegativeAmountToRemove
 
   return (
     <>
@@ -348,7 +364,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   }}
                   symbol="Shares"
                   text="My Pool Tokens"
-                  value={sharesBalance}
+                  value={formatNumber(sharesBalance)}
                 />
                 <TextfieldCustomPlaceholder
                   formField={
@@ -383,7 +399,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   emphasizeValue={poolTokens.gt(0)}
                   state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                   title={'Pool Tokens'}
-                  value={`${formatBigNumber(poolTokens, collateral.decimals)}`}
+                  value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals))}`}
                 />
               </TransactionDetailsCard>
             )}
@@ -393,24 +409,44 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   emphasizeValue={userEarnings.gt(0)}
                   state={ValueStates.success}
                   title={'Earned'}
-                  value={`${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
+                  value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
                 />
                 <TransactionDetailsRow
                   state={ValueStates.normal}
                   title={'Deposited'}
-                  value={`${formatBigNumber(depositedTokens, collateral.decimals)} ${collateral.symbol}`}
+                  value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${collateral.symbol}`}
                 />
                 <TransactionDetailsLine />
                 <TransactionDetailsRow
                   emphasizeValue={depositedTokensTotal.gt(0)}
                   state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                   title={'Total'}
-                  value={`${formatBigNumber(depositedTokensTotal, collateral.decimals)} ${collateral.symbol}`}
+                  value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${
+                    collateral.symbol
+                  }`}
                 />
               </TransactionDetailsCard>
             )}
           </div>
         </GridTransactionDetails>
+        {isNegativeAmountToFund && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description={`Your deposit amount should not be negative.`}
+            href={''}
+            hyperlinkDescription={''}
+          />
+        )}
+        {isNegativeAmountToRemove && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description={`Your withdraw amount should not be negative.`}
+            href={''}
+            hyperlinkDescription={''}
+          />
+        )}
         {activeTab === Tabs.deposit && showSetAllowance && (
           <SetAllowance
             collateral={collateral}

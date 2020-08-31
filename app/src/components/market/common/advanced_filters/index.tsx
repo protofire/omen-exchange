@@ -126,6 +126,8 @@ export const AdvancedFilters = (props: Props) => {
           dirty={true}
           dropdownPosition={DropdownPosition.left}
           items={currencyOptions}
+          maxHeight={true}
+          showScrollbar={true}
         />
       </Column>
       {showQuestionType && (

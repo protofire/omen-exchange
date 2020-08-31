@@ -20,6 +20,7 @@ import {
   calcInitialFundingSendAmounts,
   formatBigNumber,
   formatDate,
+  formatNumber,
 } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
@@ -196,6 +197,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
+  const [amount, setAmount] = useState<BigNumber>(funding)
+
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
@@ -209,11 +212,17 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   )
   const maybeCollateralBalance = useCollateralBalance(collateral, context)
 
+  const [isNegativeDepositAmount, setIsNegativeDepositAmount] = useState<boolean>(false)
+
   useEffect(() => {
     setCollateralBalance(maybeCollateralBalance || Zero)
     setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals))
     // eslint-disable-next-line
   }, [maybeCollateralBalance])
+
+  useEffect(() => {
+    setIsNegativeDepositAmount(formatBigNumber(funding, collateral.decimals).includes('-'))
+  }, [funding, collateral.decimals])
 
   const resolutionDate = resolution && formatDate(resolution)
 
@@ -244,7 +253,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     funding.isZero() ||
     !account ||
     amountError !== null ||
-    exceedsMaxFee
+    exceedsMaxFee ||
+    isNegativeDepositAmount
 
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
@@ -275,6 +285,19 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     setExceedsMaxFee(spread > MAX_MARKET_FEE)
   }, [spread])
+
+  const handleAmountChange = (event: BigNumberInputReturn) => {
+    setAmount(event.value)
+    handleChange(event)
+  }
+
+  const onClickMaxButton = async () => {
+    setAmount(collateralBalance)
+    handleChange({
+      name: 'funding',
+      value: collateralBalance,
+    })
+  }
 
   return (
     <>
@@ -344,7 +367,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             {tokensAmount > 1 && (
               <CurrenciesWrapper>
                 <CurrencySelector
-                  balance={collateralBalanceFormatted}
+                  balance={formatNumber(collateralBalanceFormatted)}
                   context={context}
                   disabled={false}
                   onSelect={onCollateralChange}
@@ -353,8 +376,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             )}
             <TextfieldCustomPlaceholder
               formField={
-                <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
+                <BigNumberInput
+                  decimals={collateral.decimals}
+                  name="funding"
+                  onChange={handleAmountChange}
+                  value={amount}
+                />
               }
+              onClickMaxButton={onClickMaxButton}
+              shouldDisplayMaxButton={true}
               symbol={collateral.symbol}
             />
             {customFee && (
@@ -373,7 +403,10 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 value={`${isNaN(spread) ? 0 : spread}%`}
               />
               <TransactionDetailsLine />
-              <TransactionDetailsRow title={'Pool Tokens'} value={formatBigNumber(funding, collateral.decimals)} />
+              <TransactionDetailsRow
+                title={'Pool Tokens'}
+                value={formatNumber(formatBigNumber(funding, collateral.decimals))}
+              />
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsStyled>
@@ -382,6 +415,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             additionalDescription={''}
             danger={true}
             description={`Your custom trading fee exceeds the maximum amount of ${MAX_MARKET_FEE}%`}
+            href={''}
+            hyperlinkDescription={''}
+          />
+        )}
+        {isNegativeDepositAmount && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description={`Your deposit amount should not be negative.`}
             href={''}
             hyperlinkDescription={''}
           />
