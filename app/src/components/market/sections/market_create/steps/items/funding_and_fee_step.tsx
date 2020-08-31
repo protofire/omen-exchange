@@ -287,8 +287,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const onClickMaxButton = async () => {
     setAmount(collateralBalance)
     handleChange({
-        name: 'funding',
-        value: collateralBalance
+      name: 'funding',
+      value: collateralBalance,
     })
   }
 
@@ -368,7 +368,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               </CurrenciesWrapper>
             )}
             <TextfieldCustomPlaceholder
-                formField={
+              formField={
                 <BigNumberInput
                   decimals={collateral.decimals}
                   name="funding"
@@ -376,9 +376,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                   value={amount}
                 />
               }
-                shouldDisplayMaxButton={true}
-                onClickMaxButton={onClickMaxButton}
-                symbol={collateral.symbol}
+              shouldDisplayMaxButton={true}
+              onClickMaxButton={onClickMaxButton}
+              symbol={collateral.symbol}
             />
             {customFee && (
               <CustomFeeWrapper>
