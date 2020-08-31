@@ -1,7 +1,7 @@
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -69,6 +69,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
+  const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [tweet, setTweet] = useState('')
@@ -80,10 +81,19 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
+  useEffect(() => {
+    setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
+  }, [amount, collateral.decimals])
+
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[], BigNumber]> => {
-      const tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
+      let tradedShares: BigNumber
+      try {
+        tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
+      } catch {
+        tradedShares = new BigNumber(0)
+      }
       const balanceAfterTrade = computeBalanceAfterTrade(
         balances.map(b => b.holdings),
         outcomeIndex,
@@ -188,7 +198,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     (status !== Status.Ready && status !== Status.Error) ||
     amount.isZero() ||
     hasEnoughAllowance !== Ternary.True ||
-    amountError !== null
+    amountError !== null ||
+    isNegativeAmount
 
   const switchOutcome = (value: number) => {
     setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
@@ -276,6 +287,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetails>
+        {isNegativeAmount && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description={`Your buy amount should not be negative.`}
+            href={''}
+            hyperlinkDescription={''}
+          />
+        )}
         {showSetAllowance && (
           <SetAllowance
             collateral={collateral}

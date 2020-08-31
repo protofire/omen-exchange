@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -31,6 +31,7 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
+import { WarningMessage } from '../../common/warning_message'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -65,10 +66,15 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
+  const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
+
+  useEffect(() => {
+    setIsNegativeAmountShares(formatBigNumber(amountShares, collateral.decimals).includes('-'))
+  }, [amountShares, collateral.decimals])
 
   const calcSellAmount = useMemo(
     () => async (
@@ -163,7 +169,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       : null
 
   const isSellButtonDisabled =
-    (status !== Status.Ready && status !== Status.Error) || amountShares.isZero() || amountError !== null
+    (status !== Status.Ready && status !== Status.Error) ||
+    amountShares.isZero() ||
+    amountError !== null ||
+    isNegativeAmountShares
 
   return (
     <>
@@ -268,6 +277,15 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetails>
+        {isNegativeAmountShares && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description={`Your sell amount should not be negative.`}
+            href={''}
+            hyperlinkDescription={''}
+          />
+        )}
         <ButtonContainer>
           <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
             Cancel
