@@ -210,11 +210,17 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   )
   const maybeCollateralBalance = useCollateralBalance(collateral, context)
 
+  const [isNegativeDepositAmount, setIsNegativeDepositAmount] = useState<boolean>(false)
+
   useEffect(() => {
     setCollateralBalance(maybeCollateralBalance || Zero)
     setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals))
     // eslint-disable-next-line
   }, [maybeCollateralBalance])
+
+  useEffect(() => {
+    setIsNegativeDepositAmount(formatBigNumber(funding, collateral.decimals).includes('-'))
+  }, [funding, collateral.decimals])
 
   const resolutionDate = resolution && formatDate(resolution)
 
@@ -245,7 +251,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     funding.isZero() ||
     !account ||
     amountError !== null ||
-    exceedsMaxFee
+    exceedsMaxFee ||
+    isNegativeDepositAmount
 
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
@@ -386,6 +393,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             additionalDescription={''}
             danger={true}
             description={`Your custom trading fee exceeds the maximum amount of ${MAX_MARKET_FEE}%`}
+            href={''}
+            hyperlinkDescription={''}
+          />
+        )}
+        {isNegativeDepositAmount && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description={`Your deposit amount should not be negative.`}
             href={''}
             hyperlinkDescription={''}
           />
