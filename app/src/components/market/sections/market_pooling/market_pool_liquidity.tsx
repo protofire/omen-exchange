@@ -22,6 +22,7 @@ import {
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
   formatBigNumber,
+  formatNumber,
 } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
@@ -102,7 +103,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
-  const [activeTab, setActiveTab] = useState(Tabs.deposit)
+  const resolutionDate = marketMakerData.question.resolution.getTime()
+  const currentDate = new Date().getTime()
+  const disableDepositTab = currentDate > resolutionDate
+  const [activeTab, setActiveTab] = useState(disableDepositTab ? Tabs.withdraw : Tabs.deposit)
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
@@ -235,7 +239,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const maybeFundingBalance = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
 
-  const walletBalance = formatBigNumber(collateralBalance, collateral.decimals, 5)
+  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
 
   const collateralAmountError =
@@ -257,7 +261,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       : null
 
   const disableDepositButton =
-    amountToFund.isZero() || hasEnoughAllowance !== Ternary.True || collateralAmountError !== null
+    amountToFund.isZero() ||
+    hasEnoughAllowance !== Ternary.True ||
+    collateralAmountError !== null ||
+    currentDate > resolutionDate
   const disableWithdrawButton =
     amountToRemove.isZero() || amountToRemove.gt(fundingBalance) || sharesAmountError !== null
 
@@ -291,10 +298,17 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         <GridTransactionDetails>
           <div>
             <TabsGrid>
-              <ButtonTab active={activeTab === Tabs.deposit} onClick={() => setActiveTab(Tabs.deposit)}>
+              <ButtonTab
+                active={disableDepositTab ? false : activeTab === Tabs.deposit}
+                disabled={disableDepositTab}
+                onClick={() => setActiveTab(Tabs.deposit)}
+              >
                 Deposit
               </ButtonTab>
-              <ButtonTab active={activeTab === Tabs.withdraw} onClick={() => setActiveTab(Tabs.withdraw)}>
+              <ButtonTab
+                active={disableDepositTab ? true : activeTab === Tabs.withdraw}
+                onClick={() => setActiveTab(Tabs.withdraw)}
+              >
                 Withdraw
               </ButtonTab>
             </TabsGrid>
@@ -335,7 +349,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   }}
                   symbol="Shares"
                   text="My Pool Tokens"
-                  value={sharesBalance}
+                  value={formatNumber(sharesBalance)}
                 />
                 <TextfieldCustomPlaceholder
                   formField={
@@ -370,7 +384,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   emphasizeValue={poolTokens.gt(0)}
                   state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                   title={'Pool Tokens'}
-                  value={`${formatBigNumber(poolTokens, collateral.decimals)}`}
+                  value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals))}`}
                 />
               </TransactionDetailsCard>
             )}
@@ -380,19 +394,21 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   emphasizeValue={userEarnings.gt(0)}
                   state={ValueStates.success}
                   title={'Earned'}
-                  value={`${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
+                  value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
                 />
                 <TransactionDetailsRow
                   state={ValueStates.normal}
                   title={'Deposited'}
-                  value={`${formatBigNumber(depositedTokens, collateral.decimals)} ${collateral.symbol}`}
+                  value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${collateral.symbol}`}
                 />
                 <TransactionDetailsLine />
                 <TransactionDetailsRow
                   emphasizeValue={depositedTokensTotal.gt(0)}
                   state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                   title={'Total'}
-                  value={`${formatBigNumber(depositedTokensTotal, collateral.decimals)} ${collateral.symbol}`}
+                  value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${
+                    collateral.symbol
+                  }`}
                 />
               </TransactionDetailsCard>
             )}

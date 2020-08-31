@@ -191,13 +191,15 @@ const Outcomes = (props: Props) => {
   const maxOutcomesReached = outcomes.length >= MAX_OUTCOME_ALLOWED
   const outcomeValueOutofBounds = newOutcomeProbability <= outcomeMinValue || newOutcomeProbability > outcomeMaxValue
   const totalProbabilitiesReached = !uniformProbabilities && totalProbabilities === 100
+  const maxSingleOutcome = newOutcomeProbability === 100
   const disableButtonAdd =
     !newOutcomeName ||
     maxOutcomesReached ||
     (!uniformProbabilities && outcomeValueOutofBounds) ||
     totalProbabilitiesReached ||
     disabled ||
-    duplicateOutcome
+    duplicateOutcome ||
+    maxSingleOutcome
   const disableManualProbabilities = maxOutcomesReached || disabled || totalProbabilitiesReached
   const disableUniformProbabilities = !canAddOutcome || maxOutcomesReached || disabled
   const outcomeNameRef = React.createRef<any>()

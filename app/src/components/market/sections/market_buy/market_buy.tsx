@@ -18,7 +18,7 @@ import {
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -72,6 +72,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [tweet, setTweet] = useState('')
+  const [newShares, setNewShares] = useState<Maybe<BigNumber[]>>(null)
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -92,6 +93,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
+
+      setNewShares(
+        balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)),
+      )
 
       return [tradedShares, probabilities, amount]
     },
@@ -162,10 +167,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
-  const feeFormatted = `${formatBigNumber(feePaid.mul(-1), collateral.decimals)} ${collateral.symbol}`
-  const baseCostFormatted = `${formatBigNumber(baseCost, collateral.decimals)} ${collateral.symbol}`
-  const potentialProfitFormatted = `${formatBigNumber(potentialProfit, collateral.decimals)} ${collateral.symbol}`
-  const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
+  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
+  const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
+  const potentialProfitFormatted = `${formatNumber(formatBigNumber(potentialProfit, collateral.decimals))} ${
+    collateral.symbol
+  }`
+  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
 
   const amountError =
@@ -183,6 +190,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     hasEnoughAllowance !== Ternary.True ||
     amountError !== null
 
+  const switchOutcome = (value: number) => {
+    setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
+    setOutcomeIndex(value)
+  }
+
   return (
     <>
       <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
@@ -197,10 +209,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           balances={balances}
           collateral={collateral}
           disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
-          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
+          newShares={newShares}
+          outcomeHandleChange={(value: number) => switchOutcome(value)}
           outcomeSelected={outcomeIndex}
           probabilities={probabilities}
           showPriceChange={amount.gt(0)}
+          showSharesChange={amount.gt(0)}
         />
         <WarningMessageStyled
           additionalDescription={'. Be aware that market makers may remove liquidity from the market at any time!'}
@@ -215,10 +229,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             <WalletBalance
               onClick={() => {
                 setAmount(collateralBalance)
-                setAmountToDisplay(currentBalance)
+                setAmountToDisplay(formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5))
               }}
               symbol={collateral.symbol}
-              value={currentBalance}
+              value={formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5)}
             />
             <ReactTooltip id="walletBalanceTooltip" />
             <TextfieldCustomPlaceholder
