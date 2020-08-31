@@ -41,13 +41,13 @@ const ProgressBarDot = styled.div<{ fill: boolean }>`
   }
 `
 
-const ProgressBarFill = styled.div<{ fill: boolean }>`
+const ProgressBarFill = styled.div<{ fill: boolean, fillFraction: number }>`
   height: 12px;
-  width: calc(100% + 2px);
+  width: ${props => `calc(${props.fillFraction} * 100% + 2px)`};
   margin: -1px;
-  border-radius: 32px;
-
-  // If not full width, only set border radius on left side
+  border-radius: ${props => props.fillFraction < 1 ? '' : '32px'};
+  border-top-left-radius: ${props => props.fillFraction < 1 ? '32px' : ''};
+  border-bottom-left-radius: ${props => props.fillFraction < 1 ? '32px' : ''};
 
   &.progress-bar-fill__0 {
     background: ${props => props.fill && props.theme.progressBar.open}
@@ -112,24 +112,24 @@ export const ProgressBar: React.FC<Props> = props => {
   const fillFinalizing = state === State.arbitration || state === State.closed
   const fillArbitration = state === State.closed
 
-  console.log('creationTimestamp: ', creationTimestamp)
-  console.log('resolutionTimestamp: ', resolutionTimestamp)
-  console.log('currentTimestamp: ', new Date())
+  const openDuration = resolutionTimestamp.getTime() - creationTimestamp.getTime()
+  const timeSinceOpen = new Date().getTime() - creationTimestamp.getTime()
+  const openFraction = (timeSinceOpen / openDuration) > 1 ? 1 : timeSinceOpen / openDuration
 
   return (
     <ProgressBarWrapper>
       <ProgressBarContainer>
         <ProgressBarDot className="progress-bar-dot__0" fill={true}></ProgressBarDot>
         <ProgressBarLine>
-          <ProgressBarFill className="progress-bar-fill__0" fill={true}></ProgressBarFill>
+          <ProgressBarFill className="progress-bar-fill__0" fill={true} fillFraction={openFraction}></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__1" fill={fillOpen}></ProgressBarDot>
         <ProgressBarLine>
-          <ProgressBarFill className="progress-bar-fill__1" fill={fillOpen}></ProgressBarFill>
+          <ProgressBarFill className="progress-bar-fill__1" fill={fillOpen} fillFraction={0}></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__2" fill={fillFinalizing}></ProgressBarDot>
         <ProgressBarLine>
-          <ProgressBarFill className="progress-bar-fill__2" fill={fillFinalizing}></ProgressBarFill>
+          <ProgressBarFill className="progress-bar-fill__2" fill={fillFinalizing} fillFraction={0}></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__3" fill={fillArbitration}></ProgressBarDot>
       </ProgressBarContainer>
