@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 import styled, { css } from 'styled-components'
 
-import { formatBigNumber, mulBN } from '../../../../util/tools'
+import { formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
 import { BarDiagram } from '../bar_diagram_probabilities'
@@ -196,13 +196,15 @@ export const OutcomeTable = (props: Props) => {
             <TDFlexDiv textAlign={TableCellsAlign[3]}>
               {formattedShares}{' '}
               {showSharesChange && formattedNewShares !== formattedShares && (
-                <NewValue outcomeIndex={outcomeIndex} value={formattedNewShares} />
+                <NewValue outcomeIndex={outcomeIndex} value={formattedNewShares && formatNumber(formattedNewShares)} />
               )}
             </TDFlexDiv>
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Payout) ? null : (
-          <TDStyled textAlign={TableCellsAlign[4]}>{withWinningOutcome && payouts ? formattedPayout : '0.00'}</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[4]}>
+            {withWinningOutcome && payouts ? formatNumber(formattedPayout) : '0.00'}
+          </TDStyled>
         )}
       </TRExtended>
     )
