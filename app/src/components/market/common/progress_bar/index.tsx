@@ -20,18 +20,50 @@ const ProgressBarContainer = styled.div`
   margin: 0 -12px;
 `
 
-const ProgressBarDot = styled.div`
+const ProgressBarDot = styled.div<{ fill: boolean }>`
   height: 12px;
   width: 12px;
   border-radius: 50%;
-  border: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+  border: ${props => !props.fill && `1px solid ${props.theme.buttonPrimaryLine.borderColor}`};
   margin: 0 12px;
+
+  &.progress-bar-dot__0 {
+    background: ${props => props.fill && props.theme.progressBar.open}
+  }
+  &.progress-bar-dot__1 {
+    background: ${props => props.fill && props.theme.progressBar.finalizing}
+  }
+  &.progress-bar-dot__2 {
+    background: ${props => props.fill && props.theme.progressBar.arbitration}
+  }
+  &.progress-bar-dot__3 {
+    background: ${props => props.fill && props.theme.progressBar.closed}
+  }
+`
+
+const ProgressBarFill = styled.div<{ fill: boolean }>`
+  height: 12px;
+  width: calc(100% + 2px);
+  margin: -1px;
+  border-radius: 32px;
+
+  // If not full width, only set border radius on left side
+
+  &.progress-bar-fill__0 {
+    background: ${props => props.fill && props.theme.progressBar.open}
+  }
+  &.progress-bar-fill__1 {
+    background: ${props => props.fill && props.theme.progressBar.finalizing}
+  }
+  &.progress-bar-fill__2 {
+    background: ${props => props.fill && props.theme.progressBar.arbitration}
+  }
 `
 
 const ProgressBarLine = styled.div`
   height: 12px;
   border-radius: 32px;
-  border: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+  border: ${props => `1px solid ${props.theme.buttonPrimaryLine.borderColor}`};
   flex-grow: 1;
 `
 
@@ -60,23 +92,38 @@ const ProgressBarTitle = styled.div`
   }
 `
 
+enum State {
+  open = 'open',
+  finalizing = 'finalizing',
+  arbitration = 'arbitration',
+  closed = 'closed'
+}
+
 interface Props extends DOMAttributes<HTMLDivElement> {
-  state: 'Open' | 'Pending' | 'Finalizing' | 'Ended'
+  state: string
   creationTimestamp: Date
   resolutionTimestamp: Date
 }
 
 export const ProgressBar: React.FC<Props> = props => {
+  const { creationTimestamp, resolutionTimestamp, state } = props
+
   return (
     <ProgressBarWrapper>
       <ProgressBarContainer>
-        <ProgressBarDot></ProgressBarDot>
-        <ProgressBarLine></ProgressBarLine>
-        <ProgressBarDot></ProgressBarDot>
-        <ProgressBarLine></ProgressBarLine>
-        <ProgressBarDot></ProgressBarDot>
-        <ProgressBarLine></ProgressBarLine>
-        <ProgressBarDot></ProgressBarDot>
+        <ProgressBarDot className="progress-bar-dot__0" fill={true}></ProgressBarDot>
+        <ProgressBarLine>
+          <ProgressBarFill className="progress-bar-fill__0" fill={true}></ProgressBarFill>
+        </ProgressBarLine>
+        <ProgressBarDot className="progress-bar-dot__1" fill={state === State.finalizing || state === State.arbitration || state === State.closed}></ProgressBarDot>
+        <ProgressBarLine>
+          <ProgressBarFill className="progress-bar-fill__1" fill={true}></ProgressBarFill>
+        </ProgressBarLine>
+        <ProgressBarDot className="progress-bar-dot__2" fill={state === State.arbitration || state === State.closed}></ProgressBarDot>
+        <ProgressBarLine>
+          <ProgressBarFill className="progress-bar-fill__2" fill={true}></ProgressBarFill>
+        </ProgressBarLine>
+        <ProgressBarDot className="progress-bar-dot__3" fill={state === State.closed}></ProgressBarDot>
       </ProgressBarContainer>
       <ProgressBarTitles>
         <ProgressBarTitle>

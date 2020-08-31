@@ -57,6 +57,7 @@ export const MarketData: React.FC<Props> = props => {
   const context = useConnectedWeb3Context()
   const tokens = useTokens(context)
 
+  // TODO: Fix error with certain currencies
   const currencyIcon = (tokens.filter(token => token.symbol === currency.symbol))[0].image
 
   console.log(resolutionTimestamp)

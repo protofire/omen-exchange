@@ -10,6 +10,9 @@ import { DisplayArbitrator } from '../display_arbitrator'
 import { DisplayResolution } from '../display_resolution'
 import { HistoryChartContainer } from '../history_chart'
 import { MarketTitle } from '../market_title'
+import { ProgressBar } from '../progress_bar'
+import { MarketData } from '../market_data'
+import { AdditionalMarketData } from '../additional_market_data'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -52,7 +55,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     <>
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} />
-        <SubsectionTitleActionWrapper>
+        {/* <SubsectionTitleActionWrapper>
           {LINK_FAQ && (
             <SubsectionTitleActionWrapper>
               <SubsectionTitleAction
@@ -68,14 +71,26 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
           <SubsectionTitleAction onClick={toggleTradeHistory}>
             {`${showingTradeHistory ? 'Hide' : 'Show'} Trade History`}
           </SubsectionTitleAction>
-        </SubsectionTitleActionWrapper>
+        </SubsectionTitleActionWrapper> */}
       </SubsectionTitleWrapper>
-      <GridTwoColumns>
+      {/* TODO: Add dynamic props */}
+      <ProgressBar state={'closed'} creationTimestamp={new Date()} resolutionTimestamp={new Date()}></ProgressBar>
+      {/* TODO: Add dynamic props */}
+      <MarketData resolutionTimestamp={question.resolution} dailyVolume={collateralVolume} currency={collateralToken}></MarketData>
+      <AdditionalMarketData 
+        category={question.category} 
+        arbitrator={arbitrator} 
+        oracle='Reality.eth' 
+        id={question.id}
+        showingTradeHistory={showingTradeHistory}
+        handleTradeHistoryClick={toggleTradeHistory}
+      ></AdditionalMarketData>
+      {/* <GridTwoColumns>
         <TitleValue title={'Category'} value={question.category} />
         <DisplayResolution questionId={question.id} title={'Resolution Date'} value={question.resolution} />
         <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
         <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
-      </GridTwoColumns>
+      </GridTwoColumns> */}
       {tradeHistoryLoaded && (
         <HistoryChartContainer
           answerFinalizedTimestamp={answerFinalizedTimestamp}
