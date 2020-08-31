@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 
 import { formatBigNumber, formatDate, formatNumber } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
+import { useGraphMarketMakerData, useConnectedWeb3Context } from '../../../../hooks'
 import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper } from '../../../common'
 import { TitleValue } from '../../../common/text/title_value'
 import { Breaker, SubsectionTitleActionWrapper } from '../common_styled'
@@ -21,6 +22,8 @@ interface Props {
 }
 
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
+  const context = useConnectedWeb3Context()
+
   const [showingExtraInformation, setExtraInformation] = useState(false)
   const [showingTradeHistory, setShowingTradeHistory] = useState(false)
   const [tradeHistoryLoaded, setTradeHistoryLoaded] = useState(false)
@@ -59,6 +62,12 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     setExtraInformation(false)
   }
 
+  const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
+  const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
+    : ''
+  const creationDate = new Date(1000 * parseInt(creationTimestamp))
+
   return (
     <>
       <SubsectionTitleWrapper>
@@ -75,7 +84,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         </SubsectionTitleActionWrapper> */}
       </SubsectionTitleWrapper>
       {/* TODO: Add dynamic props */}
-      <ProgressBar state='Open' creationTimestamp={new Date()} resolutionTimestamp={new Date()}></ProgressBar>
+      <ProgressBar state='Open' creationTimestamp={creationDate} resolutionTimestamp={question.resolution}></ProgressBar>
       {/* TODO: Add dynamic props */}
       <MarketData resolutionTimestamp={question.resolution} dailyVolume={collateralVolume} currency={collateral}></MarketData>
       <AdditionalMarketData 

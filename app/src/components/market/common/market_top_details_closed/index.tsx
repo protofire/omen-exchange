@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 
 import { LINK_FAQ } from '../../../../common/constants'
 import { formatBigNumber, formatNumber, getMarketTitles } from '../../../../util/tools'
+import { useGraphMarketMakerData, useConnectedWeb3Context } from '../../../../hooks'
 import { MarketMakerData } from '../../../../util/types'
 import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper, TitleValue } from '../../../common'
 import { Breaker, SubsectionTitleActionWrapper } from '../common_styled'
@@ -22,6 +23,7 @@ interface Props {
 const SUB_LINK = '#heading=h.9awaoq9ub17q'
 
 const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
+  const context = useConnectedWeb3Context()
   const { marketMakerData } = props
 
   const {
@@ -51,6 +53,12 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
 
   const { marketSubtitle } = getMarketTitles(question.templateId)
 
+  const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
+  const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
+    : ''
+  const creationDate = new Date(1000 * parseInt(creationTimestamp))
+
   return (
     <>
       <SubsectionTitleWrapper>
@@ -74,7 +82,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         </SubsectionTitleActionWrapper> */}
       </SubsectionTitleWrapper>
       {/* TODO: Add dynamic props */}
-      <ProgressBar state={'closed'} creationTimestamp={new Date()} resolutionTimestamp={new Date()}></ProgressBar>
+      <ProgressBar state={'closed'} creationTimestamp={creationDate} resolutionTimestamp={question.resolution}></ProgressBar>
       {/* TODO: Add dynamic props */}
       <MarketData resolutionTimestamp={question.resolution} dailyVolume={collateralVolume} currency={collateralToken}></MarketData>
       <AdditionalMarketData 

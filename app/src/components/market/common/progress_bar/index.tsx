@@ -108,6 +108,14 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 export const ProgressBar: React.FC<Props> = props => {
   const { creationTimestamp, resolutionTimestamp, state } = props
 
+  const fillOpen = state === State.finalizing || state === State.arbitration || state === State.closed
+  const fillFinalizing = state === State.arbitration || state === State.closed
+  const fillArbitration = state === State.closed
+
+  console.log('creationTimestamp: ', creationTimestamp)
+  console.log('resolutionTimestamp: ', resolutionTimestamp)
+  console.log('currentTimestamp: ', new Date())
+
   return (
     <ProgressBarWrapper>
       <ProgressBarContainer>
@@ -115,15 +123,15 @@ export const ProgressBar: React.FC<Props> = props => {
         <ProgressBarLine>
           <ProgressBarFill className="progress-bar-fill__0" fill={true}></ProgressBarFill>
         </ProgressBarLine>
-        <ProgressBarDot className="progress-bar-dot__1" fill={state === State.finalizing || state === State.arbitration || state === State.closed}></ProgressBarDot>
+        <ProgressBarDot className="progress-bar-dot__1" fill={fillOpen}></ProgressBarDot>
         <ProgressBarLine>
-          <ProgressBarFill className="progress-bar-fill__1" fill={true}></ProgressBarFill>
+          <ProgressBarFill className="progress-bar-fill__1" fill={fillOpen}></ProgressBarFill>
         </ProgressBarLine>
-        <ProgressBarDot className="progress-bar-dot__2" fill={state === State.arbitration || state === State.closed}></ProgressBarDot>
+        <ProgressBarDot className="progress-bar-dot__2" fill={fillFinalizing}></ProgressBarDot>
         <ProgressBarLine>
-          <ProgressBarFill className="progress-bar-fill__2" fill={true}></ProgressBarFill>
+          <ProgressBarFill className="progress-bar-fill__2" fill={fillFinalizing}></ProgressBarFill>
         </ProgressBarLine>
-        <ProgressBarDot className="progress-bar-dot__3" fill={state === State.closed}></ProgressBarDot>
+        <ProgressBarDot className="progress-bar-dot__3" fill={fillArbitration}></ProgressBarDot>
       </ProgressBarContainer>
       <ProgressBarTitles>
         <ProgressBarTitle>
