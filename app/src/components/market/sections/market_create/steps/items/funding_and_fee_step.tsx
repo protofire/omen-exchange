@@ -284,16 +284,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleChange(event)
   }
 
-  const onMax = async () => {
-    const input: HTMLInputElement = Array.from(document.getElementsByName('funding'))[0] as HTMLInputElement
-    input.addEventListener('change', e => {
-      const event: ChangeEvent<HTMLInputElement> = e as any
-      handleChange(event)
-    })
+  const onClickMaxButton = async () => {
     setAmount(collateralBalance)
-    setTimeout(() => {
-      input.dispatchEvent(new CustomEvent('change'))
-    }, 1000)
+    handleChange({
+        name: 'funding',
+        value: collateralBalance
+    })
   }
 
   return (
@@ -372,7 +368,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               </CurrenciesWrapper>
             )}
             <TextfieldCustomPlaceholder
-              formField={
+                formField={
                 <BigNumberInput
                   decimals={collateral.decimals}
                   name="funding"
@@ -380,9 +376,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                   value={amount}
                 />
               }
-              maxButton={true}
-              onMax={onMax}
-              symbol={collateral.symbol}
+                shouldDisplayMaxButton={true}
+                onClickMaxButton={onClickMaxButton}
+                symbol={collateral.symbol}
             />
             {customFee && (
               <CustomFeeWrapper>
