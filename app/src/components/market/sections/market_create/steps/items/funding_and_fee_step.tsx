@@ -197,6 +197,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
+  const [amount, setAmount] = useState<BigNumber>(funding)
+
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
@@ -284,6 +286,19 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     setExceedsMaxFee(spread > MAX_MARKET_FEE)
   }, [spread])
 
+  const handleAmountChange = (event: BigNumberInputReturn) => {
+    setAmount(event.value)
+    handleChange(event)
+  }
+
+  const onClickMaxButton = async () => {
+    setAmount(collateralBalance)
+    handleChange({
+      name: 'funding',
+      value: collateralBalance,
+    })
+  }
+
   return (
     <>
       <CreateCardTop>
@@ -361,8 +376,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             )}
             <TextfieldCustomPlaceholder
               formField={
-                <BigNumberInput decimals={collateral.decimals} name="funding" onChange={handleChange} value={funding} />
+                <BigNumberInput
+                  decimals={collateral.decimals}
+                  name="funding"
+                  onChange={handleAmountChange}
+                  value={amount}
+                />
               }
+              onClickMaxButton={onClickMaxButton}
+              shouldDisplayMaxButton={true}
               symbol={collateral.symbol}
             />
             {customFee && (
