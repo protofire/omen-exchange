@@ -376,8 +376,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                   value={amount}
                 />
               }
-              shouldDisplayMaxButton={true}
               onClickMaxButton={onClickMaxButton}
+              shouldDisplayMaxButton={true}
               symbol={collateral.symbol}
             />
             {customFee && (

@@ -112,7 +112,7 @@ const MaxButton = styled.span`
 `
 
 export const TextfieldCustomSymbol = (props: Props) => {
-  const { disabled, formField, shouldDisplayMaxButton, onClickMaxButton, symbol, ...restProps } = props
+  const { disabled, formField, onClickMaxButton, shouldDisplayMaxButton, symbol, ...restProps } = props
 
   // eslint-disable-next-line no-warning-comments
   //TODO: use a input[text] instead of passing a <Textfield />
