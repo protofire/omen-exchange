@@ -96,9 +96,7 @@ export const useMarkets = (options: Options): any => {
           fixedProductMarketMakers: internalMarkets,
         })
       }
-
-      console.log(internalMarkets.length)
-      console.log(first * (skipFromOptions + 1))
+      
       setMoreMarkets(internalMarkets.length > (first * (skipFromOptions + 1)))
     },
   })
