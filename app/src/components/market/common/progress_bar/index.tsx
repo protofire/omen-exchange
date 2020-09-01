@@ -103,10 +103,12 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   state: string
   creationTimestamp: Date
   resolutionTimestamp: Date
+  answerFinalizedTimestamp: Maybe<Date>
+  arbitration?: boolean
 }
 
 export const ProgressBar: React.FC<Props> = props => {
-  const { creationTimestamp, resolutionTimestamp, state } = props
+  const { creationTimestamp, resolutionTimestamp, state, arbitration, answerFinalizedTimestamp } = props
 
   const fillOpen = state === State.finalizing || state === State.arbitration || state === State.closed
   const fillFinalizing = state === State.arbitration || state === State.closed
@@ -120,6 +122,13 @@ export const ProgressBar: React.FC<Props> = props => {
   const timeSinceFinalizing = new Date().getTime() - resolutionTimestamp.getTime()
   const finalizingFraction = (timeSinceFinalizing / finalizingDuration) > 1 ? 1 : timeSinceFinalizing / finalizingDuration
 
+  let arbitrationFraction: number = 0
+  if (answerFinalizedTimestamp) {
+    const arbitrationDuration = answerFinalizedTimestamp.getTime() - (resolutionTimestamp.getTime() + finalizingDuration)
+    const timeSinceArbitrating = new Date().getTime() - (resolutionTimestamp.getTime() + finalizingDuration)
+    arbitrationFraction = (timeSinceArbitrating / arbitrationDuration) > 1 ? 1 : timeSinceArbitrating / arbitrationDuration
+  }
+
   return (
     <ProgressBarWrapper>
       <ProgressBarContainer>
@@ -132,10 +141,10 @@ export const ProgressBar: React.FC<Props> = props => {
           <ProgressBarFill className="progress-bar-fill__1" fill={fillOpen} fillFraction={finalizingFraction}></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__2" fill={fillFinalizing}></ProgressBarDot>
-        {fillArbitration && (
+        {arbitration && (
           <>
             <ProgressBarLine>
-              <ProgressBarFill className="progress-bar-fill__2" fill={fillFinalizing} fillFraction={0}></ProgressBarFill>
+              <ProgressBarFill className="progress-bar-fill__2" fill={fillFinalizing} fillFraction={arbitrationFraction}></ProgressBarFill>
             </ProgressBarLine>
             <ProgressBarDot className="progress-bar-dot__3" fill={fillArbitration}></ProgressBarDot>
           </>

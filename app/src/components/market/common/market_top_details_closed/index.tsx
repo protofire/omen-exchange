@@ -59,6 +59,10 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     : ''
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
+  const isEscalated = answerFinalizedTimestamp !== undefined
+  
+  const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
+
   return (
     <>
       <SubsectionTitleWrapper>
@@ -82,7 +86,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         </SubsectionTitleActionWrapper> */}
       </SubsectionTitleWrapper>
       {/* TODO: Add dynamic props */}
-      <ProgressBar state={'closed'} creationTimestamp={creationDate} resolutionTimestamp={question.resolution}></ProgressBar>
+      <ProgressBar state={'closed'} creationTimestamp={creationDate} resolutionTimestamp={question.resolution} arbitration={isEscalated} answerFinalizedTimestamp={finalizedTimestampDate}></ProgressBar>
       {/* TODO: Add dynamic props */}
       <MarketData resolutionTimestamp={question.resolution} dailyVolume={collateralVolume} currency={collateralToken}></MarketData>
       <AdditionalMarketData 
