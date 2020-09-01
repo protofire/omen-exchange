@@ -61,6 +61,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   
   const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
   const isPendingArbitration = question.isPendingArbitration
+  const arbitrationOccurred = question.arbitrationOccurred
 
   return (
     <>
@@ -90,6 +91,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         creationTimestamp={creationDate} 
         resolutionTimestamp={question.resolution} 
         pendingArbitration={isPendingArbitration} 
+        arbitrationOccurred={arbitrationOccurred}
         answerFinalizedTimestamp={finalizedTimestampDate}
       ></ProgressBar>
       {/* TODO: Add dynamic props */}
