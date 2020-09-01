@@ -116,6 +116,10 @@ export const ProgressBar: React.FC<Props> = props => {
   const timeSinceOpen = new Date().getTime() - creationTimestamp.getTime()
   const openFraction = (timeSinceOpen / openDuration) > 1 ? 1 : timeSinceOpen / openDuration
 
+  const finalizingDuration = 24 * 60 * 60 * 1000
+  const timeSinceFinalizing = new Date().getTime() - resolutionTimestamp.getTime()
+  const finalizingFraction = (timeSinceFinalizing / finalizingDuration) > 1 ? 1 : timeSinceFinalizing / finalizingDuration
+
   return (
     <ProgressBarWrapper>
       <ProgressBarContainer>
@@ -125,7 +129,7 @@ export const ProgressBar: React.FC<Props> = props => {
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__1" fill={fillOpen}></ProgressBarDot>
         <ProgressBarLine>
-          <ProgressBarFill className="progress-bar-fill__1" fill={fillOpen} fillFraction={0}></ProgressBarFill>
+          <ProgressBarFill className="progress-bar-fill__1" fill={fillOpen} fillFraction={finalizingFraction}></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__2" fill={fillFinalizing}></ProgressBarDot>
         {fillArbitration && (
