@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { useTokens } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork } from '../../../../util/networks'
+import { MarketValidity } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { TokenItem } from '../token_item'
 
@@ -42,8 +43,10 @@ const Options = styled(Dropdown)`
 interface Props {
   currency: Maybe<string>
   arbitrator: Maybe<string>
+  marketValidity: MarketValidity
   onChangeCurrency: (currency: Maybe<string>) => void
   onChangeArbitrator: (arbitrator: Maybe<string>) => void
+  onChangeMarketValidity: (marketValidity: MarketValidity) => void
   onChangeTemplateId: (templateId: Maybe<string>) => void
 }
 
@@ -54,7 +57,15 @@ export const AdvancedFilters = (props: Props) => {
   const arbitrators = getArbitratorsByNetwork(networkId)
   const tokens = useTokens(context)
 
-  const { arbitrator, currency, onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
+  const {
+    arbitrator,
+    currency,
+    marketValidity,
+    onChangeArbitrator,
+    onChangeCurrency,
+    onChangeMarketValidity,
+    onChangeTemplateId,
+  } = props
 
   const allTokensOptions = [{ address: null, symbol: 'All', image: null }, ...tokens]
   const currencyOptions: Array<DropdownItemProps> = allTokensOptions.map(({ address, image, symbol }) => {
@@ -93,6 +104,17 @@ export const AdvancedFilters = (props: Props) => {
       }
     })
 
+  const marketValidityOptions: Array<DropdownItemProps> = [
+    {
+      content: MarketValidity.VALID,
+      onClick: () => onChangeMarketValidity(MarketValidity.VALID),
+    },
+    {
+      content: MarketValidity.INVALID,
+      onClick: () => onChangeMarketValidity(MarketValidity.INVALID),
+    },
+  ]
+
   const showQuestionType = false
 
   return (
@@ -121,6 +143,15 @@ export const AdvancedFilters = (props: Props) => {
           dirty={true}
           dropdownPosition={DropdownPosition.right}
           items={arbitratorOptions}
+        />
+      </Column>
+      <Column>
+        <Title>Market Validity</Title>
+        <Options
+          currentItem={[MarketValidity.VALID, MarketValidity.INVALID].findIndex(t => t === marketValidity)}
+          dirty={true}
+          dropdownPosition={DropdownPosition.right}
+          items={marketValidityOptions}
         />
       </Column>
     </Wrapper>

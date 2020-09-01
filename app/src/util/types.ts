@@ -143,6 +143,11 @@ export type MarketsSortCriteria =
   | 'scaledLiquidityParameter'
   | 'lastActiveDayAndScaledRunningDailyVolume'
 
+export enum MarketValidity {
+  VALID = 'Valid',
+  INVALID = 'Invalid',
+}
+
 export interface MarketFilters {
   state: MarketStates
   category: string
@@ -152,6 +157,7 @@ export interface MarketFilters {
   arbitrator: Maybe<string>
   templateId: Maybe<string>
   currency: Maybe<string>
+  marketValidity: MarketValidity
 }
 
 export interface MarketMakerData {
@@ -206,4 +212,50 @@ export type TopCategoryItem = {
 
 export type GraphResponseTopCategories = {
   categories: TopCategoryItem[]
+}
+
+export type GraphMarketMakerDataItem = {
+  id: string
+  collateralVolume: string
+  collateralToken: string
+  outcomeTokenAmounts: string[]
+  title: string
+  outcomes: Maybe<string[]>
+  openingTimestamp: string
+  arbitrator: string
+  category: string
+  templateId: string
+  scaledLiquidityParameter: string
+  curatedByDxDao: boolean
+}
+
+export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
+
+export type GraphResponseMyMarkets = { account: { fpmmParticipations: Participations[] } }
+
+export type GraphResponseMarketsGeneric = {
+  fixedProductMarketMakers: GraphMarketMakerDataItem[]
+}
+
+export type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMyMarkets
+
+export type MarketMakerDataItem = {
+  address: string
+  collateralVolume: BigNumber
+  collateralToken: string
+  outcomeTokenAmounts: BigNumber[]
+  title: string
+  outcomes: Maybe<string[]>
+  openingTimestamp: Date
+  arbitrator: string
+  category: string
+  templateId: number
+  scaledLiquidityParameter: number
+  curatedByDxDao: boolean
+}
+
+export type BuildQueryType = MarketFilters & {
+  whitelistedCreators: boolean
+  whitelistedTemplateIds: boolean
+  networkId: Maybe<number>
 }

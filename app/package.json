@@ -17,6 +17,7 @@
     "@types/common-tags": "^1.8.0",
     "@types/contract-proxy-kit": "^1.0.1",
     "@types/jest": "24.0.18",
+    "@types/lodash.filter": "^4.6.6",
     "@types/lodash.unionby": "^4.8.6",
     "@types/node": "12.7.4",
     "@types/react": "16.9.2",

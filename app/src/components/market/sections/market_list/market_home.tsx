@@ -2,10 +2,16 @@ import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { CategoryDataItem, MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
+import {
+  CategoryDataItem,
+  MarketFilters,
+  MarketMakerDataItem,
+  MarketStates,
+  MarketValidity,
+  MarketsSortCriteria,
+} from '../../../../util/types'
 import { ButtonCircle } from '../../../button'
 import { SectionTitle } from '../../../common'
 import {
@@ -217,11 +223,13 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
-    currentFilter.currency || currentFilter.arbitrator ? true : false,
+    (currentFilter.currency || currentFilter.arbitrator || currentFilter.marketValidity === MarketValidity.INVALID) &&
+      !fetchMyMarkets,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
+  const [marketValidity, setMarketValidity] = useState<MarketValidity>(currentFilter.marketValidity)
 
   const filters = [
     {
@@ -277,8 +285,36 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   }, [category, categories])
 
   useEffect(() => {
-    onFilterChange({ arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title })
-  }, [arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title, onFilterChange])
+    onFilterChange({
+      arbitrator,
+      marketValidity,
+      templateId,
+      currency,
+      category,
+      sortBy,
+      sortByDirection,
+      state,
+      title,
+    })
+  }, [
+    arbitrator,
+    marketValidity,
+    templateId,
+    currency,
+    category,
+    sortBy,
+    sortByDirection,
+    state,
+    title,
+    onFilterChange,
+  ])
+
+  useEffect(() => {
+    setShowAdvancedFilters(
+      (currentFilter.currency || currentFilter.arbitrator || currentFilter.marketValidity === MarketValidity.INVALID) &&
+        !fetchMyMarkets,
+    )
+  }, [currentFilter, fetchMyMarkets])
 
   const toggleSearch = useCallback(() => {
     setShowAdvancedFilters(false)
@@ -383,7 +419,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const noOwnMarkets = RemoteData.is.success(markets) && markets.data.length === 0 && state === MarketStates.myMarkets
   const noMarketsAvailable =
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
-  const showFilteringInlineLoading = !noMarketsAvailable && !noOwnMarkets && isFiltering
+  const showFilteringInlineLoading =
+    (!noMarketsAvailable && !noOwnMarkets && isFiltering) || RemoteData.is.loading(markets)
   const disableLoadNextButton =
     isFiltering || !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
   const disableLoadPrevButton =
@@ -440,8 +477,10 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           <AdvancedFilters
             arbitrator={arbitrator}
             currency={currency}
+            marketValidity={marketValidity}
             onChangeArbitrator={setArbitrator}
             onChangeCurrency={setCurrency}
+            onChangeMarketValidity={setMarketValidity}
             onChangeTemplateId={setTemplateId}
           />
         )}

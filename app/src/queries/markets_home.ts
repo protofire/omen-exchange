@@ -1,7 +1,6 @@
-import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
-import { MarketFilters, MarketStates, MarketsSortCriteria } from './../util/types'
+import { BuildQueryType, MarketStates, MarketValidity, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
@@ -16,36 +15,9 @@ export const MarketDataFragment = gql`
     category
     templateId
     scaledLiquidityParameter
+    curatedByDxDao
   }
 `
-
-export type GraphMarketMakerDataItem = {
-  id: string
-  collateralVolume: string
-  collateralToken: string
-  outcomeTokenAmounts: string[]
-  title: string
-  outcomes: Maybe<string[]>
-  openingTimestamp: string
-  arbitrator: string
-  category: string
-  templateId: string
-  scaledLiquidityParameter: string
-}
-
-export type MarketMakerDataItem = {
-  address: string
-  collateralVolume: BigNumber
-  collateralToken: string
-  outcomeTokenAmounts: BigNumber[]
-  title: string
-  outcomes: Maybe<string[]>
-  openingTimestamp: Date
-  arbitrator: string
-  category: string
-  templateId: number
-  scaledLiquidityParameter: number
-}
 
 export const DEFAULT_OPTIONS = {
   state: MarketStates.open,
@@ -56,6 +28,7 @@ export const DEFAULT_OPTIONS = {
   arbitrator: null as Maybe<string>,
   templateId: null as Maybe<string>,
   currency: null as Maybe<string>,
+  marketValidity: MarketValidity.VALID,
   sortBy: null as Maybe<MarketsSortCriteria>,
   sortByDirection: 'desc' as 'asc' | 'desc',
   networkId: 1 as Maybe<number>,
@@ -74,16 +47,12 @@ export const queryMyMarkets = gql`
   ${MarketDataFragment}
 `
 
-type buildQueryType = MarketFilters & {
-  whitelistedCreators: boolean
-  whitelistedTemplateIds: boolean
-  networkId: Maybe<number>
-}
-export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => {
+export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => {
   const {
     arbitrator,
     category,
     currency,
+    marketValidity,
     networkId,
     state,
     templateId,
@@ -107,6 +76,7 @@ export const buildQueryMarkets = (options: buildQueryType = DEFAULT_OPTIONS) => 
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee_lte: $fee',
     `timeout_gte: ${MIN_TIMEOUT}`,
+    `curatedByDxDao: ${marketValidity === MarketValidity.VALID}`,
   ]
     .filter(s => s.length)
     .join(',')
