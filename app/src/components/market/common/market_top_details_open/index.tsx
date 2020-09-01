@@ -70,19 +70,19 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
   const currentTimestamp = new Date().getTime()
 
+  const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
+  const isPendingArbitration = question.isPendingArbitration
+  // const arbitrationOccurred
+
   const marketState = question.resolution.getTime() > currentTimestamp
     ? 'open'
     : question.resolution.getTime() < currentTimestamp && answerFinalizedTimestamp === null
     ? 'finalizing'
-    : answerFinalizedTimestamp && answerFinalizedTimestamp.toNumber() > currentTimestamp
+    : isPendingArbitration
     ? 'arbitration'
     : answerFinalizedTimestamp && answerFinalizedTimestamp.toNumber() < currentTimestamp
     ? 'closed'
     : ''
-
-  const isEscalated = answerFinalizedTimestamp !== undefined
-
-  const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
 
   return (
     <>
@@ -100,7 +100,13 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         </SubsectionTitleActionWrapper> */}
       </SubsectionTitleWrapper>
       {/* TODO: Add dynamic props */}
-      <ProgressBar state={marketState} creationTimestamp={creationDate} resolutionTimestamp={question.resolution} arbitration={isEscalated} answerFinalizedTimestamp={finalizedTimestampDate}></ProgressBar>
+      <ProgressBar 
+        state={marketState} 
+        creationTimestamp={creationDate} 
+        resolutionTimestamp={question.resolution} 
+        pendingArbitration={isPendingArbitration} 
+        answerFinalizedTimestamp={finalizedTimestampDate}
+      ></ProgressBar>
       {/* TODO: Add dynamic props */}
       <MarketData resolutionTimestamp={question.resolution} dailyVolume={collateralVolume} currency={collateral}></MarketData>
       <AdditionalMarketData 

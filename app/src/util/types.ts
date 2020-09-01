@@ -52,6 +52,7 @@ export interface Question {
   arbitratorAddress: string
   category: string
   outcomes: string[]
+  isPendingArbitration: boolean
 }
 
 export enum OutcomeTableValue {

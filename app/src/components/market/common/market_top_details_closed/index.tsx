@@ -58,10 +58,9 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
     : ''
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
-
-  const isEscalated = answerFinalizedTimestamp !== undefined
   
   const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
+  const isPendingArbitration = question.isPendingArbitration
 
   return (
     <>
@@ -86,7 +85,13 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         </SubsectionTitleActionWrapper> */}
       </SubsectionTitleWrapper>
       {/* TODO: Add dynamic props */}
-      <ProgressBar state={'closed'} creationTimestamp={creationDate} resolutionTimestamp={question.resolution} arbitration={isEscalated} answerFinalizedTimestamp={finalizedTimestampDate}></ProgressBar>
+      <ProgressBar 
+        state={'closed'} 
+        creationTimestamp={creationDate} 
+        resolutionTimestamp={question.resolution} 
+        pendingArbitration={isPendingArbitration} 
+        answerFinalizedTimestamp={finalizedTimestampDate}
+      ></ProgressBar>
       {/* TODO: Add dynamic props */}
       <MarketData resolutionTimestamp={question.resolution} dailyVolume={collateralVolume} currency={collateralToken}></MarketData>
       <AdditionalMarketData 

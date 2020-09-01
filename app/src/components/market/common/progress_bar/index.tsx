@@ -104,11 +104,11 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   creationTimestamp: Date
   resolutionTimestamp: Date
   answerFinalizedTimestamp: Maybe<Date>
-  arbitration?: boolean
+  pendingArbitration?: boolean
 }
 
 export const ProgressBar: React.FC<Props> = props => {
-  const { creationTimestamp, resolutionTimestamp, state, arbitration, answerFinalizedTimestamp } = props
+  const { creationTimestamp, resolutionTimestamp, state, pendingArbitration, answerFinalizedTimestamp } = props
 
   const fillOpen = state === State.finalizing || state === State.arbitration || state === State.closed
   const fillFinalizing = state === State.arbitration || state === State.closed
@@ -141,7 +141,7 @@ export const ProgressBar: React.FC<Props> = props => {
           <ProgressBarFill className="progress-bar-fill__1" fill={fillOpen} fillFraction={finalizingFraction}></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__2" fill={fillFinalizing}></ProgressBarDot>
-        {arbitration && (
+        {pendingArbitration && (
           <>
             <ProgressBarLine>
               <ProgressBarFill className="progress-bar-fill__2" fill={fillFinalizing} fillFraction={arbitrationFraction}></ProgressBarFill>
