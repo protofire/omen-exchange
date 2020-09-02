@@ -70,9 +70,11 @@ export const useMarkets = (options: Options): any => {
   const marketQuery = buildQueryMarkets(queryOptions)
   const query = fetchMyMarkets ? queryMyMarkets : marketQuery
 
+  const newOptions = {...options, first: first + 1}
+
   const { error, fetchMore, loading } = useQuery<GraphResponseMarkets>(query, {
     notifyOnNetworkStatusChange: true,
-    variables: options,
+    variables: newOptions,
     // loading stuck on true when using useQuery hook , using a fetchPolicy seems to fix it
     // If you do not want to risk displaying any out-of-date information from the cache,
     // it may make sense to use a ‘network-only’ fetch policy.
@@ -87,6 +89,9 @@ export const useMarkets = (options: Options): any => {
         internalMarkets = marketsGeneric.fixedProductMarketMakers
       }
 
+      setMoreMarkets(internalMarkets.length === first + 1)
+      internalMarkets.length === first + 1 && internalMarkets.pop()
+
       if (internalMarkets && internalMarkets.length === 0 && skipFromOptions === 0) {
         setMarkets({
           fixedProductMarketMakers: [],
@@ -96,7 +101,6 @@ export const useMarkets = (options: Options): any => {
           fixedProductMarketMakers: internalMarkets,
         })
       }
-      setMoreMarkets(internalMarkets.length === first)
     },
   })
 
