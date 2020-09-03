@@ -75,10 +75,6 @@ const MarketHomeContainer: React.FC = () => {
   let marketValidityRoute = location.pathname.split('/market-validity/')[1]
   if (marketValidityRoute) marketValidityRoute = marketValidityRoute.split('/')[0]
 
-  const klerosValidityFilter = location.pathname.includes('klerosValidity') ? true : false
-  let klerosValidityRoute = location.pathname.split('/klerosValidity/')[1]
-  if (klerosValidityRoute) klerosValidityRoute = klerosValidityRoute.split('/')[0]
-
   const categoryFilter = location.pathname.includes('category') ? true : false
   let categoryRoute = location.pathname.split('/category/')[1]
   if (categoryRoute) categoryRoute = categoryRoute.split('/')[0]
@@ -126,13 +122,6 @@ const MarketHomeContainer: React.FC = () => {
     marketValidityParam = MarketValidity.VALID
   }
 
-  let klerosValidityParam: boolean | null
-  if (klerosValidityFilter) {
-    klerosValidityParam = klerosValidityFilter
-  } else {
-    klerosValidityParam = null
-  }
-
   let categoryParam: string
   if (categoryFilter) {
     categoryParam = categoryRoute
@@ -168,7 +157,6 @@ const MarketHomeContainer: React.FC = () => {
     templateId: null,
     currency: currencyParam,
     marketValidity: marketValidityParam,
-    klerosValidity: klerosValidityParam,
   })
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())

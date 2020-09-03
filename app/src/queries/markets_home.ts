@@ -1,7 +1,7 @@
+import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
 import { BuildQueryType, MarketStates, MarketValidity, MarketsSortCriteria } from './../util/types'
-import { BigNumber } from 'ethers/utils'
 
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
@@ -92,7 +92,6 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     state,
     templateId,
     title,
-    klerosValidity,
     whitelistedCreators,
     whitelistedTemplateIds,
   } = options
@@ -114,7 +113,6 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     'fee_lte: $fee',
     `timeout_gte: ${MIN_TIMEOUT}`,
     `curatedByDxDao: ${marketValidity === MarketValidity.VALID}`,
-    klerosValidity ? 'klerosTCRregistered: true' : 'klerosTCRregistered_not: true',
   ]
     .filter(s => s.length)
     .join(',')

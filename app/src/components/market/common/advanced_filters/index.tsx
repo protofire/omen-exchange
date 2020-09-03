@@ -47,8 +47,8 @@ interface Props {
   onChangeCurrency: (currency: Maybe<string>) => void
   onChangeArbitrator: (arbitrator: Maybe<string>) => void
   onChangeMarketValidity: (marketValidity: MarketValidity) => void
-  onChangeKlerosValidity: (validity: Maybe<boolean>) => void
   onChangeTemplateId: (templateId: Maybe<string>) => void
+  // onChangeKlerosValidity: (validity: Maybe<boolean>) => void
 }
 
 export const AdvancedFilters = (props: Props) => {
@@ -66,13 +66,7 @@ export const AdvancedFilters = (props: Props) => {
     onChangeCurrency,
     onChangeMarketValidity,
     onChangeTemplateId,
-    onChangeKlerosValidity,
   } = props
-
-  const klerosValidityTypes = [
-    { klerosValidity: true, name: 'Valid' },
-    { klerosValidity: false, name: 'Invalid' },
-  ].map(v => ({ ...v, isSelectionEnabled: true }))
 
   const allTokensOptions = [{ address: null, symbol: 'All', image: null }, ...tokens]
   const currencyOptions: Array<DropdownItemProps> = allTokensOptions.map(({ address, image, symbol }) => {
@@ -121,17 +115,6 @@ export const AdvancedFilters = (props: Props) => {
       onClick: () => onChangeMarketValidity(MarketValidity.INVALID),
     },
   ]
-
-  const klerosValidityOptions: Array<DropdownItemProps> = klerosValidityTypes
-    .filter(item => {
-      return item.isSelectionEnabled
-    })
-    .map(({ name, klerosValidity }) => {
-      return {
-        content: name,
-        onClick: () => onChangeKlerosValidity(klerosValidity),
-      }
-    })
 
   const showQuestionType = false
 
