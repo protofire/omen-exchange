@@ -47,7 +47,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       outcomes,
       templateId: +graphMarketMakerDataItem.templateId,
       title: graphMarketMakerDataItem.title,
-      scaledLiquidityParameter: parseFloat(graphMarketMakerDataItem.scaledLiquidityParameter),
+      usdLiquidityParameter: parseFloat(graphMarketMakerDataItem.usdLiquidityParameter),
     }
   })
 }
@@ -97,7 +97,7 @@ const MarketHomeContainer: React.FC = () => {
     sortParam = 'openingTimestamp'
     sortDirection = 'asc'
   } else if (sortRoute === 'liquidity') {
-    sortParam = 'scaledLiquidityParameter'
+    sortParam = 'usdLiquidityParameter'
   }
 
   let currencyParam: string | null
@@ -258,7 +258,7 @@ const MarketHomeContainer: React.FC = () => {
         route += '/newest'
       } else if (filter.sortBy === 'openingTimestamp') {
         route += '/ending'
-      } else if (filter.sortBy === 'scaledLiquidityParameter') {
+      } else if (filter.sortBy === 'usdLiquidityParameter') {
         route += '/liquidity'
       }
 
