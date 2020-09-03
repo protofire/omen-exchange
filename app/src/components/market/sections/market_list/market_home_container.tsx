@@ -75,7 +75,7 @@ const MarketHomeContainer: React.FC = () => {
   let marketValidityRoute = location.pathname.split('/market-validity/')[1]
   if (marketValidityRoute) marketValidityRoute = marketValidityRoute.split('/')[0]
 
-  const categoryFilter = location.pathname.includes('category') ? true : false
+  const categoryFilter = location.pathname.includes('category')
   let categoryRoute = location.pathname.split('/category/')[1]
   if (categoryRoute) categoryRoute = categoryRoute.split('/')[0]
 
@@ -270,10 +270,6 @@ const MarketHomeContainer: React.FC = () => {
 
       if (filter.arbitrator) {
         route += `/arbitrator/${filter.arbitrator}`
-      }
-
-      if (filter.validity === false) {
-        route += `/validity/${filter.validity}`
       }
 
       if (filter.category && filter.category !== 'All') {

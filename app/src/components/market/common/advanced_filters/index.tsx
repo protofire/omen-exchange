@@ -48,7 +48,6 @@ interface Props {
   onChangeArbitrator: (arbitrator: Maybe<string>) => void
   onChangeMarketValidity: (marketValidity: MarketValidity) => void
   onChangeTemplateId: (templateId: Maybe<string>) => void
-  // onChangeKlerosValidity: (validity: Maybe<boolean>) => void
 }
 
 export const AdvancedFilters = (props: Props) => {
@@ -142,7 +141,7 @@ export const AdvancedFilters = (props: Props) => {
         <Options
           currentItem={arbitrators.findIndex(t => t.address === arbitrator)}
           dirty={true}
-          dropdownPosition={DropdownPosition.center}
+          dropdownPosition={DropdownPosition.right}
           items={arbitratorOptions}
         />
       </Column>

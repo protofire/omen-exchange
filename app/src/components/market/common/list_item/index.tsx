@@ -14,7 +14,6 @@ import { IconStar } from '../../../common/icons/IconStar'
 const Wrapper = styled(NavLink)`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
   cursor: pointer;
-  display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 22px 25px;
@@ -65,10 +64,6 @@ const Separator = styled.span`
   color: ${props => props.theme.colors.verticalDivider};
 `
 
-const IconStarWrapper = styled.div`
-  margin-left: 6px;
-`
-
 interface Props extends HTMLAttributes<HTMLDivElement> {
   market: MarketMakerDataItem
   currentFilter: any
@@ -82,16 +77,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const [dailyVolume, setDailyVolume] = useState('')
 
   const { currentFilter, market } = props
-  const {
-    address,
-    collateralToken,
-    collateralVolume,
-    klerosTCRregistered,
-    openingTimestamp,
-    outcomeTokenAmounts,
-    outcomes,
-    title,
-  } = market
+  const { address, collateralToken, collateralVolume, openingTimestamp, outcomeTokenAmounts, outcomes, title } = market
 
   const now = moment()
   const endDate = openingTimestamp
@@ -142,14 +128,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   return (
     <Wrapper to={`/${address}`}>
-      <Title>
-        {title}
-        {klerosTCRregistered && (
-          <IconStarWrapper>
-            <IconStar />
-          </IconStarWrapper>
-        )}
-      </Title>
+      <Title>{title}</Title>
       <Info>
         <IconStar></IconStar>
         <Outcome>{outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}</Outcome>

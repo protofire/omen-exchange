@@ -482,7 +482,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             onChangeCurrency={setCurrency}
             onChangeMarketValidity={setMarketValidity}
             onChangeTemplateId={setTemplateId}
-            // onChangeKlerosValidity={setKlerosValidity}
           />
         )}
         <ListWrapper>
