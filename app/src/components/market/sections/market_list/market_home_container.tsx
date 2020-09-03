@@ -90,7 +90,7 @@ const MarketHomeContainer: React.FC = () => {
   if (sortRoute === '24h-volume') {
     sortParam = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria
   } else if (sortRoute === 'volume') {
-    sortParam = 'scaledCollateralVolume'
+    sortParam = 'usdVolume'
   } else if (sortRoute === 'newest') {
     sortParam = 'creationTimestamp'
   } else if (sortRoute === 'ending') {
@@ -252,7 +252,7 @@ const MarketHomeContainer: React.FC = () => {
 
       if (filter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}`) {
         route += '/24h-volume'
-      } else if (filter.sortBy === 'scaledCollateralVolume') {
+      } else if (filter.sortBy === 'usdVolume') {
         route += '/volume'
       } else if (filter.sortBy === 'creationTimestamp') {
         route += '/newest'

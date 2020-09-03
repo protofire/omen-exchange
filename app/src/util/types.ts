@@ -137,7 +137,7 @@ export enum MarketStates {
 }
 
 export type MarketsSortCriteria =
-  | 'scaledCollateralVolume'
+  | 'usdVolume'
   | 'creationTimestamp'
   | 'openingTimestamp'
   | 'scaledLiquidityParameter'

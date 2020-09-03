@@ -334,7 +334,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     },
     {
       title: 'Total volume',
-      sortBy: 'scaledCollateralVolume',
+      sortBy: 'usdVolume',
       direction: 'desc',
     },
     {
