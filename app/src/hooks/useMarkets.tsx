@@ -70,7 +70,7 @@ export const useMarkets = (options: Options): any => {
   const marketQuery = buildQueryMarkets(queryOptions)
   const query = fetchMyMarkets ? queryMyMarkets : marketQuery
 
-  const newOptions = {...options, first: first + 1}
+  const newOptions = { ...options, first: first + 1 }
 
   const { error, fetchMore, loading } = useQuery<GraphResponseMarkets>(query, {
     notifyOnNetworkStatusChange: true,
