@@ -8,6 +8,9 @@ import { CurationSource } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { TokenItem } from '../token_item'
 
+import { DxDao } from './img/dxDao'
+import KlerosSVG from './img/kleros.svg'
+
 const Wrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
   column-gap: 20px;
@@ -20,6 +23,20 @@ const Wrapper = styled.div`
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     grid-template-columns: 1fr 1fr 1fr;
   }
+`
+
+const KlerosLogo = styled.img`
+  width: 20px;
+  height: 20px;
+`
+
+const LogoWrapper = styled.div`
+  margin-right: 6px;
+`
+
+const CurationSourceWrapper = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 const Column = styled.div`
@@ -106,15 +123,25 @@ export const AdvancedFilters = (props: Props) => {
 
   const curationSourceOptions: Array<DropdownItemProps> = [
     {
-      content: CurationSource.ALL_SOURCES,
-      onClick: () => onChangeCurationSource(CurationSource.ALL_SOURCES),
-    },
-    {
-      content: CurationSource.DXDAO,
+      content: (
+        <CurationSourceWrapper>
+          <LogoWrapper>
+            <DxDao />
+          </LogoWrapper>
+          {CurationSource.DXDAO}
+        </CurationSourceWrapper>
+      ),
       onClick: () => onChangeCurationSource(CurationSource.DXDAO),
     },
     {
-      content: CurationSource.KLEROS,
+      content: (
+        <CurationSourceWrapper>
+          <LogoWrapper>
+            <KlerosLogo alt="" src={KlerosSVG} />
+          </LogoWrapper>
+          {CurationSource.KLEROS}
+        </CurationSourceWrapper>
+      ),
       onClick: () => onChangeCurationSource(CurationSource.KLEROS),
     },
     {
@@ -149,19 +176,16 @@ export const AdvancedFilters = (props: Props) => {
         <Options
           currentItem={arbitrators.findIndex(t => t.address === arbitrator)}
           dirty={true}
-          dropdownPosition={DropdownPosition.right}
+          dropdownPosition={DropdownPosition.center}
           items={arbitratorOptions}
         />
       </Column>
       <Column>
         <Title>Curation Source</Title>
         <Options
-          currentItem={[
-            CurationSource.ALL_SOURCES,
-            CurationSource.DXDAO,
-            CurationSource.KLEROS,
-            CurationSource.NO_SOURCES,
-          ].findIndex(t => t === curationSource)}
+          currentItem={[CurationSource.DXDAO, CurationSource.KLEROS, CurationSource.NO_SOURCES].findIndex(
+            t => t === curationSource,
+          )}
           dirty={true}
           dropdownPosition={DropdownPosition.right}
           items={curationSourceOptions}
