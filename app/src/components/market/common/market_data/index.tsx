@@ -5,7 +5,7 @@ import momentTZ from 'moment-timezone'
 import { BigNumber } from 'ethers/utils'
 
 import { Token } from '../../../../util/types'
-import { formatBigNumber } from '../../../../util/tools'
+import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
 
 const MarketDataWrapper = styled.div`
@@ -93,7 +93,7 @@ export const MarketData: React.FC<Props> = props => {
         <MarketDataItemTop>
           <MarketDataItemImage src={currencyIcon && currencyIcon}></MarketDataItemImage>
           {/* TODO: Add formatNumber */}
-          {formatBigNumber(dailyVolume, currency.decimals)} {currency.symbol}
+          {formatNumber(formatBigNumber(dailyVolume, currency.decimals))} {currency.symbol}
         </MarketDataItemTop>
         <MarketDataItemBottom>
           24h Trade Volume
