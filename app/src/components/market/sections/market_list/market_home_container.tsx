@@ -47,7 +47,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       outcomes,
       templateId: +graphMarketMakerDataItem.templateId,
       title: graphMarketMakerDataItem.title,
-      scaledLiquidityParameter: parseFloat(graphMarketMakerDataItem.scaledLiquidityParameter),
+      usdLiquidityParameter: parseFloat(graphMarketMakerDataItem.usdLiquidityParameter),
     }
   })
 }
@@ -90,14 +90,14 @@ const MarketHomeContainer: React.FC = () => {
   if (sortRoute === '24h-volume') {
     sortParam = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria
   } else if (sortRoute === 'volume') {
-    sortParam = 'scaledCollateralVolume'
+    sortParam = 'usdVolume'
   } else if (sortRoute === 'newest') {
     sortParam = 'creationTimestamp'
   } else if (sortRoute === 'ending') {
     sortParam = 'openingTimestamp'
     sortDirection = 'asc'
   } else if (sortRoute === 'liquidity') {
-    sortParam = 'scaledLiquidityParameter'
+    sortParam = 'usdLiquidityParameter'
   }
 
   let currencyParam: string | null
@@ -252,13 +252,13 @@ const MarketHomeContainer: React.FC = () => {
 
       if (filter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}`) {
         route += '/24h-volume'
-      } else if (filter.sortBy === 'scaledCollateralVolume') {
+      } else if (filter.sortBy === 'usdVolume') {
         route += '/volume'
       } else if (filter.sortBy === 'creationTimestamp') {
         route += '/newest'
       } else if (filter.sortBy === 'openingTimestamp') {
         route += '/ending'
-      } else if (filter.sortBy === 'scaledLiquidityParameter') {
+      } else if (filter.sortBy === 'usdLiquidityParameter') {
         route += '/liquidity'
       }
 
