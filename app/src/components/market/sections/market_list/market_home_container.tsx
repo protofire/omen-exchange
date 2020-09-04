@@ -118,7 +118,7 @@ const MarketHomeContainer: React.FC = () => {
   if (marketValidityFilter) {
     marketValidityParam = marketValidityRoute as MarketValidity
   } else {
-    marketValidityParam = MarketValidity.VALID
+    marketValidityParam = MarketValidity.ALL
   }
 
   let categoryParam: string

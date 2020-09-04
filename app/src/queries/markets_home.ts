@@ -76,7 +76,7 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee_lte: $fee',
     `timeout_gte: ${MIN_TIMEOUT}`,
-    `curatedByDxDao: ${marketValidity === MarketValidity.VALID}`,
+    marketValidity === MarketValidity.VALID ? 'curatedByDxDao: true' : marketValidity === MarketValidity.INVALID ? 'curatedByDxDao: false' : '',
   ]
     .filter(s => s.length)
     .join(',')

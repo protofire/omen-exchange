@@ -106,6 +106,10 @@ export const AdvancedFilters = (props: Props) => {
 
   const marketValidityOptions: Array<DropdownItemProps> = [
     {
+      content: MarketValidity.ALL,
+      onClick: () => onChangeMarketValidity(MarketValidity.ALL),
+    },
+    {
       content: MarketValidity.VALID,
       onClick: () => onChangeMarketValidity(MarketValidity.VALID),
     },
@@ -148,7 +152,7 @@ export const AdvancedFilters = (props: Props) => {
       <Column>
         <Title>Market Validity</Title>
         <Options
-          currentItem={[MarketValidity.VALID, MarketValidity.INVALID].findIndex(t => t === marketValidity)}
+          currentItem={marketValidityOptions.findIndex(t => t.content === marketValidity)}
           dirty={true}
           dropdownPosition={DropdownPosition.right}
           items={marketValidityOptions}

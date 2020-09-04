@@ -168,6 +168,7 @@ export type MarketsSortCriteria =
   | 'sort24HourVolume23'
 
 export enum MarketValidity {
+  ALL = 'All',
   VALID = 'Valid',
   INVALID = 'Invalid',
 }
