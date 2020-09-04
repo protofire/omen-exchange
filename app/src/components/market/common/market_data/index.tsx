@@ -82,7 +82,7 @@ export const MarketData: React.FC<Props> = props => {
       </MarketDataItem>
       <MarketDataItem>
         <MarketDataItemTop>
-          {moment(resolutionTimestamp).fromNow(true)}
+          {resolutionTimestamp > new Date() ? moment(resolutionTimestamp).fromNow(true) : '0 days'}
         </MarketDataItemTop>
         <MarketDataItemBottom>
           Time remaining
