@@ -134,6 +134,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       userEarnings,
       userPoolShares,
       klerosTCRregistered: graphMarketMakerData.klerosTCRregistered,
+      curatedByDxDao: graphMarketMakerData.curatedByDxDao,
     }
 
     setMarketMakerData(newMarketMakerData)

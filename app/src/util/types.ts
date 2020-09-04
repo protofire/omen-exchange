@@ -204,6 +204,7 @@ export interface MarketMakerData {
   userEarnings: BigNumber
   userPoolShares: BigNumber
   klerosTCRregistered: Maybe<boolean>
+  curatedByDxDao: Maybe<boolean>
 }
 
 export enum Ternary {
@@ -253,7 +254,6 @@ export type GraphMarketMakerDataItem = {
   templateId: string
   usdLiquidityParameter: string
   curatedByDxDao: boolean
-  klerosTCRitemID: Maybe<string>
   klerosTCRregistered: Maybe<boolean>
 }
 

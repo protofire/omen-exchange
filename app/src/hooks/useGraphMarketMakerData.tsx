@@ -74,8 +74,8 @@ type GraphResponseFixedProductMarketMaker = {
   timeout: string
   title: string
   scaledLiquidityParameter: string
-  klerosTCRitemID: Maybe<string>
   klerosTCRregistered: Maybe<boolean>
+  curatedDxDao: Maybe<boolean>
 }
 
 type GraphResponse = {
@@ -96,8 +96,8 @@ export type GraphMarketMakerData = {
   fee: BigNumber
   question: Question
   scaledLiquidityParameter: number
-  klerosTCRitemID: Maybe<string>
   klerosTCRregistered: Maybe<boolean>
+  curatedByDxDao: Maybe<boolean>
 }
 
 type Result = {
@@ -131,7 +131,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
       arbitratorAddress: data.arbitrator,
       outcomes,
     },
-    klerosTCRitemID: data.klerosTCRitemID,
+    curatedByDxDao: data.curatedDxDao,
     klerosTCRregistered: data.klerosTCRregistered,
   }
 }
