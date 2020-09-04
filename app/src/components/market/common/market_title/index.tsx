@@ -2,7 +2,6 @@ import React from 'react'
 
 import { getMarketTitles } from '../../../../util/tools'
 import { SubsectionTitle } from '../../../common'
-import { IconStar } from '../../../common/icons/IconStar'
 
 interface Props {
   title?: string

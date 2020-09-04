@@ -20,8 +20,8 @@ import {
   GraphResponseCategories,
   MarketFilters,
   MarketMakerDataItem,
+  MarketSource,
   MarketStates,
-  MarketValidity,
   MarketsSortCriteria,
 } from '../../../../util/types'
 
@@ -71,9 +71,9 @@ const MarketHomeContainer: React.FC = () => {
   let arbitratorRoute = location.pathname.split('/arbitrator/')[1]
   if (arbitratorRoute) arbitratorRoute = arbitratorRoute.split('/')[0]
 
-  const marketValidityFilter = location.pathname.includes('market-validity')
-  let marketValidityRoute = location.pathname.split('/market-validity/')[1]
-  if (marketValidityRoute) marketValidityRoute = marketValidityRoute.split('/')[0]
+  const marketSourceFilter = location.pathname.includes('market-source')
+  let marketSourceRoute = location.pathname.split('/market-source/')[1]
+  if (marketSourceRoute) marketSourceRoute = marketSourceRoute.split('/')[0]
 
   const categoryFilter = location.pathname.includes('category')
   let categoryRoute = location.pathname.split('/category/')[1]
@@ -115,11 +115,11 @@ const MarketHomeContainer: React.FC = () => {
     arbitratorParam = null
   }
 
-  let marketValidityParam: MarketValidity
-  if (marketValidityFilter) {
-    marketValidityParam = marketValidityRoute as MarketValidity
+  let marketSourceParam: MarketSource
+  if (marketSourceFilter) {
+    marketSourceParam = marketSourceRoute as MarketSource
   } else {
-    marketValidityParam = MarketValidity.VALID
+    marketSourceParam = MarketSource.DXDAO
   }
 
   let categoryParam: string
@@ -156,7 +156,7 @@ const MarketHomeContainer: React.FC = () => {
     arbitrator: arbitratorParam,
     templateId: null,
     currency: currencyParam,
-    marketValidity: marketValidityParam,
+    marketSource: marketSourceParam,
   })
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
@@ -284,8 +284,8 @@ const MarketHomeContainer: React.FC = () => {
         routeQueryArray.push(`tag=${filter.title}`)
       }
 
-      if (filter.marketValidity) {
-        route += `/market-validity/${filter.marketValidity}`
+      if (filter.marketSource) {
+        route += `/market-source/${filter.marketSource}`
       }
 
       const routeQueryString = routeQueryArray.join('&')

@@ -14,6 +14,7 @@ import { IconStar } from '../../../common/icons/IconStar'
 const Wrapper = styled(NavLink)`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
   cursor: pointer;
+  display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 22px 25px;
@@ -31,7 +32,6 @@ const Wrapper = styled(NavLink)`
 
 const Title = styled.h2`
   color: ${props => props.theme.colors.textColorDarker};
-  display: flex;
   font-size: 15px;
   font-weight: 500;
   line-height: 1.2;

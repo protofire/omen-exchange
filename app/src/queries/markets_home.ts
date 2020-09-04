@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
-import { BuildQueryType, MarketStates, MarketValidity, MarketsSortCriteria } from './../util/types'
+import { BuildQueryType, MarketSource, MarketStates, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
@@ -18,7 +18,6 @@ export const MarketDataFragment = gql`
     scaledLiquidityParameter
     curatedByDxDao
     klerosTCRregistered
-    klerosTCRitemID
   }
 `
 
@@ -34,7 +33,6 @@ export type GraphMarketMakerDataItem = {
   category: string
   templateId: string
   scaledLiquidityParameter: string
-  klerosTCRitemID: Maybe<string>
   klerosTCRregistered: Maybe<boolean>
 }
 
@@ -62,11 +60,10 @@ export const DEFAULT_OPTIONS = {
   arbitrator: null as Maybe<string>,
   templateId: null as Maybe<string>,
   currency: null as Maybe<string>,
-  marketValidity: MarketValidity.VALID,
+  marketSource: MarketSource.DXDAO,
   sortBy: null as Maybe<MarketsSortCriteria>,
   sortByDirection: 'desc' as 'asc' | 'desc',
   networkId: 1 as Maybe<number>,
-  klerosValidity: null as Maybe<boolean>,
 }
 
 export const queryMyMarkets = gql`
@@ -87,7 +84,7 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     arbitrator,
     category,
     currency,
-    marketValidity,
+    marketSource,
     networkId,
     state,
     templateId,
@@ -112,13 +109,13 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee_lte: $fee',
     `timeout_gte: ${MIN_TIMEOUT}`,
-    `curatedByDxDao: ${marketValidity === MarketValidity.VALID}`,
+    marketSource === MarketSource.DXDAO ? `curatedByDxDao: true` : `klerosTCRregistered: true`,
   ]
     .filter(s => s.length)
     .join(',')
 
   const query = gql`
-    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $klerosValidity: Boolean!, $knownArbitrators: [String!], $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
+    query GetMarkets($first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $title: String, $currency: String, $arbitrator: String, $knownArbitrators: [String!], $templateId: String, $accounts: [String!], $now: Int, $fee: String) {
       fixedProductMarketMakers(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${whereClause} }) {
         ...marketData
       }

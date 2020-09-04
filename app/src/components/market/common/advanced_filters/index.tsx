@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { useTokens } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork } from '../../../../util/networks'
-import { MarketValidity } from '../../../../util/types'
+import { MarketSource } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { TokenItem } from '../token_item'
 
@@ -43,10 +43,10 @@ const Options = styled(Dropdown)`
 interface Props {
   currency: Maybe<string>
   arbitrator: Maybe<string>
-  marketValidity: MarketValidity
+  marketSource: MarketSource
   onChangeCurrency: (currency: Maybe<string>) => void
   onChangeArbitrator: (arbitrator: Maybe<string>) => void
-  onChangeMarketValidity: (marketValidity: MarketValidity) => void
+  onChangeMarketSource: (marketSource: MarketSource) => void
   onChangeTemplateId: (templateId: Maybe<string>) => void
 }
 
@@ -60,10 +60,10 @@ export const AdvancedFilters = (props: Props) => {
   const {
     arbitrator,
     currency,
-    marketValidity,
+    marketSource,
     onChangeArbitrator,
     onChangeCurrency,
-    onChangeMarketValidity,
+    onChangeMarketSource,
     onChangeTemplateId,
   } = props
 
@@ -104,14 +104,14 @@ export const AdvancedFilters = (props: Props) => {
       }
     })
 
-  const marketValidityOptions: Array<DropdownItemProps> = [
+  const marketSourceOptions: Array<DropdownItemProps> = [
     {
-      content: MarketValidity.VALID,
-      onClick: () => onChangeMarketValidity(MarketValidity.VALID),
+      content: MarketSource.DXDAO,
+      onClick: () => onChangeMarketSource(MarketSource.DXDAO),
     },
     {
-      content: MarketValidity.INVALID,
-      onClick: () => onChangeMarketValidity(MarketValidity.INVALID),
+      content: MarketSource.KLEROS,
+      onClick: () => onChangeMarketSource(MarketSource.KLEROS),
     },
   ]
 
@@ -146,12 +146,12 @@ export const AdvancedFilters = (props: Props) => {
         />
       </Column>
       <Column>
-        <Title>Market Validity</Title>
+        <Title>Curation Source</Title>
         <Options
-          currentItem={[MarketValidity.VALID, MarketValidity.INVALID].findIndex(t => t === marketValidity)}
+          currentItem={[MarketSource.DXDAO, MarketSource.KLEROS].findIndex(t => t === marketSource)}
           dirty={true}
           dropdownPosition={DropdownPosition.right}
-          items={marketValidityOptions}
+          items={marketSourceOptions}
         />
       </Column>
     </Wrapper>

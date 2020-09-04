@@ -167,9 +167,9 @@ export type MarketsSortCriteria =
   | 'sort24HourVolume22'
   | 'sort24HourVolume23'
 
-export enum MarketValidity {
-  VALID = 'Valid',
-  INVALID = 'Invalid',
+export enum MarketSource {
+  DXDAO = 'Dxdao',
+  KLEROS = 'Kleros',
 }
 
 export interface MarketFilters {
@@ -181,7 +181,7 @@ export interface MarketFilters {
   arbitrator: Maybe<string>
   templateId: Maybe<string>
   currency: Maybe<string>
-  marketValidity: MarketValidity
+  marketSource: MarketSource
 }
 
 export interface MarketMakerData {
