@@ -106,12 +106,20 @@ export const AdvancedFilters = (props: Props) => {
 
   const marketSourceOptions: Array<DropdownItemProps> = [
     {
+      content: MarketSource.ALL_SOURCES,
+      onClick: () => onChangeMarketSource(MarketSource.ALL_SOURCES),
+    },
+    {
       content: MarketSource.DXDAO,
       onClick: () => onChangeMarketSource(MarketSource.DXDAO),
     },
     {
       content: MarketSource.KLEROS,
       onClick: () => onChangeMarketSource(MarketSource.KLEROS),
+    },
+    {
+      content: MarketSource.NO_SOURCES,
+      onClick: () => onChangeMarketSource(MarketSource.NO_SOURCES),
     },
   ]
 
@@ -148,7 +156,12 @@ export const AdvancedFilters = (props: Props) => {
       <Column>
         <Title>Curation Source</Title>
         <Options
-          currentItem={[MarketSource.DXDAO, MarketSource.KLEROS].findIndex(t => t === marketSource)}
+          currentItem={[
+            MarketSource.ALL_SOURCES,
+            MarketSource.DXDAO,
+            MarketSource.KLEROS,
+            MarketSource.NO_SOURCES,
+          ].findIndex(t => t === marketSource)}
           dirty={true}
           dropdownPosition={DropdownPosition.right}
           items={marketSourceOptions}

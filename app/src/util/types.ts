@@ -168,8 +168,10 @@ export type MarketsSortCriteria =
   | 'sort24HourVolume23'
 
 export enum MarketSource {
+  ALL_SOURCES = 'All Sources',
   DXDAO = 'Dxdao',
   KLEROS = 'Kleros',
+  NO_SOURCES = 'No Sources',
 }
 
 export interface MarketFilters {

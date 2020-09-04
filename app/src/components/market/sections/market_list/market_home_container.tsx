@@ -119,7 +119,7 @@ const MarketHomeContainer: React.FC = () => {
   if (marketSourceFilter) {
     marketSourceParam = marketSourceRoute as MarketSource
   } else {
-    marketSourceParam = MarketSource.DXDAO
+    marketSourceParam = MarketSource.NO_SOURCES
   }
 
   let categoryParam: string

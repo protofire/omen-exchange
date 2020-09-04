@@ -60,7 +60,7 @@ export const DEFAULT_OPTIONS = {
   arbitrator: null as Maybe<string>,
   templateId: null as Maybe<string>,
   currency: null as Maybe<string>,
-  marketSource: MarketSource.DXDAO,
+  marketSource: MarketSource.NO_SOURCES,
   sortBy: null as Maybe<MarketsSortCriteria>,
   sortByDirection: 'desc' as 'asc' | 'desc',
   networkId: 1 as Maybe<number>,
@@ -93,6 +93,13 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     whitelistedTemplateIds,
   } = options
 
+  const curationSource =
+    marketSource === MarketSource.DXDAO
+      ? `curatedByDxDao: true`
+      : marketSource === MarketSource.KLEROS
+      ? `klerosTCRregistered: true`
+      : ''
+
   const MIN_TIMEOUT = networkId && networkId === 1 ? 86400 : 0
   const whereClause = [
     state === MarketStates.closed ? 'answerFinalizedTimestamp_lt: $now' : '',
@@ -109,7 +116,7 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee_lte: $fee',
     `timeout_gte: ${MIN_TIMEOUT}`,
-    marketSource === MarketSource.DXDAO ? `curatedByDxDao: true` : `klerosTCRregistered: true`,
+    curationSource,
   ]
     .filter(s => s.length)
     .join(',')
