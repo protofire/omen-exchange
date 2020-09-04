@@ -30,18 +30,18 @@ const AdditionalMarketDataRight = styled.div`
   margin-right: 20px;
 `
 
-const AdditionalMarketDataSectionWrapper = styled.div`
+const AdditionalMarketDataSectionWrapper = styled.a`
   display: flex;
   align-items: center;
   margin-left: 20px;
+  cursor: pointer;
 `
 
-const AdditionalMarketDataSectionTitle = styled.a`
+const AdditionalMarketDataSectionTitle = styled.p`
   margin-left: 6px;
   font-size: 14px;
   line-height: 16px;
   color: ${props => props.theme.colors.clickable}
-  cursor: pointer;
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -65,28 +65,28 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   return (
     <AdditionalMarketDataWrapper>
       <AdditionalMarketDataLeft>
-        <AdditionalMarketDataSectionWrapper>
+        <AdditionalMarketDataSectionWrapper href={`/#/24h-volume/category/${encodeURI(category)}`}>
           <IconCategory></IconCategory>
-          <AdditionalMarketDataSectionTitle href={`/#/24h-volume/category/${encodeURI(category)}`}>
+          <AdditionalMarketDataSectionTitle>
             {category}
           </AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper>
+        <AdditionalMarketDataSectionWrapper href={realitioUrl} target="_blank" rel="noopener noreferrer">
           <IconOracle></IconOracle>
-          <AdditionalMarketDataSectionTitle href={realitioUrl} target="_blank" rel="noopener noreferrer">
+          <AdditionalMarketDataSectionTitle>
             {oracle}
           </AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper>
+        <AdditionalMarketDataSectionWrapper href={arbitrator.url} target="_blank" rel="noopener noreferrer">
           <IconArbitrator></IconArbitrator>
-          <AdditionalMarketDataSectionTitle href={arbitrator.url} target="_blank" rel="noopener noreferrer">
+          <AdditionalMarketDataSectionTitle>
             {arbitrator.name}
           </AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>
       <AdditionalMarketDataRight>
-        <AdditionalMarketDataSectionWrapper>
-          <AdditionalMarketDataSectionTitle onClick={handleTradeHistoryClick}>
+        <AdditionalMarketDataSectionWrapper onClick={handleTradeHistoryClick}>
+          <AdditionalMarketDataSectionTitle>
             Trade History
           </AdditionalMarketDataSectionTitle>
           {showingTradeHistory ? (
