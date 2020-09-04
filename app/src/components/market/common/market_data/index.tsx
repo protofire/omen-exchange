@@ -1,4 +1,4 @@
-import React, { DOMAttributes, useEffect } from 'react'
+import React, { DOMAttributes, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import moment from 'moment'
 import momentTZ from 'moment-timezone'
@@ -58,7 +58,16 @@ export const MarketData: React.FC<Props> = props => {
   const tokens = useTokens(context)
 
   // TODO: Fix error with certain currencies
-  const currencyIcon = (tokens.filter(token => token.symbol === currency.symbol))[0].image
+  const [currencyIcon, setCurrencyIcon] = useState<string | undefined>('')
+
+  useEffect(() => {
+    if(tokens.length > 1) {
+      const matchingAddress = (token: Token) => token.address === currency.address
+      const tokenIndex = tokens.findIndex(matchingAddress)
+      setCurrencyIcon(tokens[tokenIndex].image)
+    } 
+    return
+  }, [tokens])
 
   const timezoneAbbr = momentTZ.tz(momentTZ.tz.guess()).zoneAbbr()
 
@@ -82,7 +91,7 @@ export const MarketData: React.FC<Props> = props => {
       </MarketDataItem>
       <MarketDataItem>
         <MarketDataItemTop>
-          <MarketDataItemImage src={currencyIcon}></MarketDataItemImage>
+          <MarketDataItemImage src={currencyIcon && currencyIcon}></MarketDataItemImage>
           {/* TODO: Add formatNumber */}
           {formatBigNumber(dailyVolume, currency.decimals)} {currency.symbol}
         </MarketDataItemTop>
