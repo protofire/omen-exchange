@@ -57,7 +57,6 @@ export const MarketData: React.FC<Props> = props => {
   const context = useConnectedWeb3Context()
   const tokens = useTokens(context)
 
-  // TODO: Fix error with certain currencies
   const [currencyIcon, setCurrencyIcon] = useState<string | undefined>('')
 
   useEffect(() => {
@@ -92,7 +91,6 @@ export const MarketData: React.FC<Props> = props => {
       <MarketDataItem>
         <MarketDataItemTop>
           <MarketDataItemImage src={currencyIcon && currencyIcon}></MarketDataItemImage>
-          {/* TODO: Add formatNumber */}
           {formatNumber(formatBigNumber(dailyVolume, currency.decimals))} {currency.symbol}
         </MarketDataItemTop>
         <MarketDataItemBottom>
