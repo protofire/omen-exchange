@@ -167,7 +167,7 @@ export type MarketsSortCriteria =
   | 'sort24HourVolume22'
   | 'sort24HourVolume23'
 
-export enum MarketSource {
+export enum CurationSource {
   ALL_SOURCES = 'All Sources',
   DXDAO = 'Dxdao',
   KLEROS = 'Kleros',
@@ -183,7 +183,7 @@ export interface MarketFilters {
   arbitrator: Maybe<string>
   templateId: Maybe<string>
   currency: Maybe<string>
-  marketSource: MarketSource
+  curationSource: CurationSource
 }
 
 export interface MarketMakerData {

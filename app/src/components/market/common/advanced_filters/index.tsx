@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { useTokens } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork } from '../../../../util/networks'
-import { MarketSource } from '../../../../util/types'
+import { CurationSource } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { TokenItem } from '../token_item'
 
@@ -43,10 +43,10 @@ const Options = styled(Dropdown)`
 interface Props {
   currency: Maybe<string>
   arbitrator: Maybe<string>
-  marketSource: MarketSource
+  curationSource: CurationSource
   onChangeCurrency: (currency: Maybe<string>) => void
   onChangeArbitrator: (arbitrator: Maybe<string>) => void
-  onChangeMarketSource: (marketSource: MarketSource) => void
+  onChangeCurationSource: (curationSource: CurationSource) => void
   onChangeTemplateId: (templateId: Maybe<string>) => void
 }
 
@@ -59,11 +59,11 @@ export const AdvancedFilters = (props: Props) => {
 
   const {
     arbitrator,
+    curationSource,
     currency,
-    marketSource,
     onChangeArbitrator,
+    onChangeCurationSource,
     onChangeCurrency,
-    onChangeMarketSource,
     onChangeTemplateId,
   } = props
 
@@ -104,22 +104,22 @@ export const AdvancedFilters = (props: Props) => {
       }
     })
 
-  const marketSourceOptions: Array<DropdownItemProps> = [
+  const curationSourceOptions: Array<DropdownItemProps> = [
     {
-      content: MarketSource.ALL_SOURCES,
-      onClick: () => onChangeMarketSource(MarketSource.ALL_SOURCES),
+      content: CurationSource.ALL_SOURCES,
+      onClick: () => onChangeCurationSource(CurationSource.ALL_SOURCES),
     },
     {
-      content: MarketSource.DXDAO,
-      onClick: () => onChangeMarketSource(MarketSource.DXDAO),
+      content: CurationSource.DXDAO,
+      onClick: () => onChangeCurationSource(CurationSource.DXDAO),
     },
     {
-      content: MarketSource.KLEROS,
-      onClick: () => onChangeMarketSource(MarketSource.KLEROS),
+      content: CurationSource.KLEROS,
+      onClick: () => onChangeCurationSource(CurationSource.KLEROS),
     },
     {
-      content: MarketSource.NO_SOURCES,
-      onClick: () => onChangeMarketSource(MarketSource.NO_SOURCES),
+      content: CurationSource.NO_SOURCES,
+      onClick: () => onChangeCurationSource(CurationSource.NO_SOURCES),
     },
   ]
 
@@ -157,14 +157,14 @@ export const AdvancedFilters = (props: Props) => {
         <Title>Curation Source</Title>
         <Options
           currentItem={[
-            MarketSource.ALL_SOURCES,
-            MarketSource.DXDAO,
-            MarketSource.KLEROS,
-            MarketSource.NO_SOURCES,
-          ].findIndex(t => t === marketSource)}
+            CurationSource.ALL_SOURCES,
+            CurationSource.DXDAO,
+            CurationSource.KLEROS,
+            CurationSource.NO_SOURCES,
+          ].findIndex(t => t === curationSource)}
           dirty={true}
           dropdownPosition={DropdownPosition.right}
-          items={marketSourceOptions}
+          items={curationSourceOptions}
         />
       </Column>
     </Wrapper>

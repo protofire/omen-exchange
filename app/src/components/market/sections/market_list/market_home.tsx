@@ -6,9 +6,9 @@ import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   CategoryDataItem,
+  CurationSource,
   MarketFilters,
   MarketMakerDataItem,
-  MarketSource,
   MarketStates,
   MarketsSortCriteria,
 } from '../../../../util/types'
@@ -223,13 +223,13 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
-    (currentFilter.currency || currentFilter.arbitrator || currentFilter.marketSource === MarketSource.KLEROS) &&
+    (currentFilter.currency || currentFilter.arbitrator || currentFilter.curationSource === CurationSource.KLEROS) &&
       !fetchMyMarkets,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
-  const [marketSource, setMarketSource] = useState<MarketSource>(currentFilter.marketSource)
+  const [curationSource, setCurationSource] = useState<CurationSource>(currentFilter.curationSource)
 
   const filters = [
     {
@@ -287,7 +287,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     onFilterChange({
       arbitrator,
-      marketSource,
+      curationSource,
       templateId,
       currency,
       category,
@@ -296,11 +296,22 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       state,
       title,
     })
-  }, [arbitrator, marketSource, templateId, currency, category, sortBy, sortByDirection, state, title, onFilterChange])
+  }, [
+    arbitrator,
+    curationSource,
+    templateId,
+    currency,
+    category,
+    sortBy,
+    sortByDirection,
+    state,
+    title,
+    onFilterChange,
+  ])
 
   useEffect(() => {
     setShowAdvancedFilters(
-      (currentFilter.currency || currentFilter.arbitrator || currentFilter.marketSource === MarketSource.KLEROS) &&
+      (currentFilter.currency || currentFilter.arbitrator || currentFilter.curationSource === CurationSource.KLEROS) &&
         !fetchMyMarkets,
     )
   }, [currentFilter, fetchMyMarkets])
@@ -465,11 +476,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         {showAdvancedFilters && (
           <AdvancedFilters
             arbitrator={arbitrator}
+            curationSource={curationSource}
             currency={currency}
-            marketSource={marketSource}
             onChangeArbitrator={setArbitrator}
+            onChangeCurationSource={setCurationSource}
             onChangeCurrency={setCurrency}
-            onChangeMarketSource={setMarketSource}
             onChangeTemplateId={setTemplateId}
           />
         )}

@@ -16,11 +16,11 @@ import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   CategoryDataItem,
+  CurationSource,
   GraphMarketMakerDataItem,
   GraphResponseCategories,
   MarketFilters,
   MarketMakerDataItem,
-  MarketSource,
   MarketStates,
   MarketsSortCriteria,
 } from '../../../../util/types'
@@ -71,9 +71,9 @@ const MarketHomeContainer: React.FC = () => {
   let arbitratorRoute = location.pathname.split('/arbitrator/')[1]
   if (arbitratorRoute) arbitratorRoute = arbitratorRoute.split('/')[0]
 
-  const marketSourceFilter = location.pathname.includes('market-source')
-  let marketSourceRoute = location.pathname.split('/market-source/')[1]
-  if (marketSourceRoute) marketSourceRoute = marketSourceRoute.split('/')[0]
+  const curationSourceFilter = location.pathname.includes('curation-source')
+  let curationSourceRoute = location.pathname.split('/curation-source/')[1]
+  if (curationSourceRoute) curationSourceRoute = curationSourceRoute.split('/')[0]
 
   const categoryFilter = location.pathname.includes('category')
   let categoryRoute = location.pathname.split('/category/')[1]
@@ -115,11 +115,11 @@ const MarketHomeContainer: React.FC = () => {
     arbitratorParam = null
   }
 
-  let marketSourceParam: MarketSource
-  if (marketSourceFilter) {
-    marketSourceParam = marketSourceRoute as MarketSource
+  let curationSourceParam: CurationSource
+  if (curationSourceFilter) {
+    curationSourceParam = curationSourceRoute as CurationSource
   } else {
-    marketSourceParam = MarketSource.NO_SOURCES
+    curationSourceParam = CurationSource.NO_SOURCES
   }
 
   let categoryParam: string
@@ -156,7 +156,7 @@ const MarketHomeContainer: React.FC = () => {
     arbitrator: arbitratorParam,
     templateId: null,
     currency: currencyParam,
-    marketSource: marketSourceParam,
+    curationSource: curationSourceParam,
   })
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
@@ -284,8 +284,8 @@ const MarketHomeContainer: React.FC = () => {
         routeQueryArray.push(`tag=${filter.title}`)
       }
 
-      if (filter.marketSource) {
-        route += `/market-source/${filter.marketSource}`
+      if (filter.curationSource) {
+        route += `/curation-source/${filter.curationSource}`
       }
 
       const routeQueryString = routeQueryArray.join('&')

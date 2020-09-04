@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
-import { BuildQueryType, MarketSource, MarketStates, MarketsSortCriteria } from './../util/types'
+import { BuildQueryType, CurationSource, MarketStates, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
@@ -60,7 +60,7 @@ export const DEFAULT_OPTIONS = {
   arbitrator: null as Maybe<string>,
   templateId: null as Maybe<string>,
   currency: null as Maybe<string>,
-  marketSource: MarketSource.NO_SOURCES,
+  curationSource: CurationSource.NO_SOURCES,
   sortBy: null as Maybe<MarketsSortCriteria>,
   sortByDirection: 'desc' as 'asc' | 'desc',
   networkId: 1 as Maybe<number>,
@@ -83,8 +83,8 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
   const {
     arbitrator,
     category,
+    curationSource,
     currency,
-    marketSource,
     networkId,
     state,
     templateId,
@@ -92,13 +92,6 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     whitelistedCreators,
     whitelistedTemplateIds,
   } = options
-
-  const curationSource =
-    marketSource === MarketSource.DXDAO
-      ? `curatedByDxDao: true`
-      : marketSource === MarketSource.KLEROS
-      ? `klerosTCRregistered: true`
-      : ''
 
   const MIN_TIMEOUT = networkId && networkId === 1 ? 86400 : 0
   const whereClause = [
@@ -116,7 +109,11 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee_lte: $fee',
     `timeout_gte: ${MIN_TIMEOUT}`,
-    curationSource,
+    curationSource === CurationSource.DXDAO
+      ? `curatedByDxDao: true`
+      : curationSource === CurationSource.KLEROS
+      ? `klerosTCRregistered: true`
+      : '', // This is option CurationSource.NO_SOURCES (i.e. show all regardless of whether it is curated or not),
   ]
     .filter(s => s.length)
     .join(',')
