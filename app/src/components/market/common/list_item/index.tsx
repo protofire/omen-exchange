@@ -136,11 +136,11 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Ended ${endsText}`}</span>
         <Separator>|</Separator>
         <span>
-          {currentFilter.sortBy === 'scaledCollateralVolume' && `${formatNumber(volume)} ${symbol} - Volume`}
+          {currentFilter.sortBy === 'usdVolume' && `${formatNumber(volume)} ${symbol} - Volume`}
           {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Ending`}
           {currentFilter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` &&
             `${Math.floor(Date.now() / 86400000) === lastActiveDay ? dailyVolume : 0} ${symbol} - 24hr Volume`}
-          {currentFilter.sortBy === 'scaledLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
+          {currentFilter.sortBy === 'usdLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
       </Info>

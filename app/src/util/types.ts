@@ -137,10 +137,10 @@ export enum MarketStates {
 }
 
 export type MarketsSortCriteria =
-  | 'scaledCollateralVolume'
+  | 'usdVolume'
   | 'creationTimestamp'
   | 'openingTimestamp'
-  | 'scaledLiquidityParameter'
+  | 'usdLiquidityParameter'
   | 'lastActiveDayAndScaledRunningDailyVolume'
   | 'sort24HourVolume0'
   | 'sort24HourVolume1'
@@ -249,7 +249,7 @@ export type GraphMarketMakerDataItem = {
   arbitrator: string
   category: string
   templateId: string
-  scaledLiquidityParameter: string
+  usdLiquidityParameter: string
   curatedByDxDao: boolean
 }
 
@@ -274,7 +274,7 @@ export type MarketMakerDataItem = {
   arbitrator: string
   category: string
   templateId: number
-  scaledLiquidityParameter: number
+  usdLiquidityParameter: number
   curatedByDxDao: boolean
 }
 
