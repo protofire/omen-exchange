@@ -39,13 +39,17 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
         display: block;
         font-size: 14px;
         height: 34px;
-        letter-spacing: 0.2px;
         line-height: 1.2;
         outline: none;
         padding: 0 10px;
         text-align: center;
         transition: border-color 0.15s ease-out;
         width: 100%;
+
+        @media only screen and (min-width: 1200px) {
+          font-size: 10.3px;
+          letter-spacing: 0.1px;
+        }
 
         &:hover {
           border-color: ${props => props.theme.buttonSecondaryLine.borderColorHover};
