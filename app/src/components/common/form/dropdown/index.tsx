@@ -116,7 +116,7 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean; dropdownVariant
   ${props => (props.disabled ? DropdownDisabledCSS : '')}
   ${props => (props.dropdownVariant === DropdownVariant.pill ? DropdownVariantPillCSS : '')}
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardCSS : '')}
- 
+
 `
 
 const DropdownButton = styled.div`
@@ -147,6 +147,10 @@ const CurrentItem = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  @media only screen and (min-width: 1200px) {
+    font-size: 11px;
+  }
 `
 
 const CurrentItemExtra = styled.p`
