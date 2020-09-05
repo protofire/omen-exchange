@@ -55,6 +55,11 @@ const ButtonCategoryTextOverflow = styled.span`
   white-space: nowrap;
   width: 100%;
   text-transform: capitalize;
+
+  @media only screen and (min-width: 1200px) {
+    font-size: 12px;
+    letter-spacing: 0.1px;
+  }
 `
 
 const GridThreeColumns = styled.div`
