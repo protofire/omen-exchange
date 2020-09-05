@@ -244,7 +244,7 @@ const Outcomes = (props: Props) => {
               data-testid="toggle-manual-probabilities"
               onClick={noOutcomes ? handleIsUniformChanged : () => null}
             >
-              set manual probabilit
+              set manual probability
             </FormRowLink>
           </TitleText>
         )}
