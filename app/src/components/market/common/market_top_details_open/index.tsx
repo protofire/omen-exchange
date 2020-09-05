@@ -131,7 +131,10 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
             {showingExtraInformation ? (
               <>
                 <TitleValue title={'Category'} value={question.category} />
-                <TitleValue title={'Resolution Date'} value={question.resolution && formatDate(question.resolution)} />
+                <TitleValue
+                  title={'Resolution Date UTC'}
+                  value={question.resolution && formatDate(question.resolution)}
+                />
                 <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
                 <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
               </>

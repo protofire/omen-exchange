@@ -205,7 +205,7 @@ const AskQuestionStep = (props: Props) => {
                 selected={resolution}
               />
             }
-            title={'Resolution Date'}
+            title={'Resolution Date (UTC)'}
           />
         </Column>
         <Column>
