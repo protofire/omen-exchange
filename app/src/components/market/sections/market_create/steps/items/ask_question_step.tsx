@@ -57,7 +57,7 @@ const ButtonCategoryTextOverflow = styled.span`
   text-transform: capitalize;
 
   @media only screen and (min-width: 1200px) {
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 0.1px;
   }
 `

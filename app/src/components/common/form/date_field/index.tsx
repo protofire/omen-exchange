@@ -47,7 +47,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
         width: 100%;
 
         @media only screen and (min-width: 1200px) {
-          font-size: 10.4px;
+          font-size: 10.3px;
           letter-spacing: 0.1px;
         }
 
@@ -73,7 +73,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
 
         &::placeholder {
           color: #86909e;
-          font-size: 14px;
+          font-size: 11px;
           letter-spacing: 0.2px;
           line-height: 1.2;
           opacity: 1;
