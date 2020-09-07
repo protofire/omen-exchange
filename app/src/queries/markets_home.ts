@@ -60,7 +60,7 @@ export const DEFAULT_OPTIONS = {
   arbitrator: null as Maybe<string>,
   templateId: null as Maybe<string>,
   currency: null as Maybe<string>,
-  curationSource: CurationSource.NO_SOURCES,
+  curationSource: CurationSource.ALL_SOURCES,
   sortBy: null as Maybe<MarketsSortCriteria>,
   sortByDirection: 'desc' as 'asc' | 'desc',
   networkId: 1 as Maybe<number>,
@@ -113,6 +113,8 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
       ? `curatedByDxDao: true`
       : curationSource === CurationSource.KLEROS
       ? `klerosTCRregistered: true`
+      : curationSource === CurationSource.ALL_SOURCES
+      ? `curatedByDxDaoOrKleros: true`
       : '', // This is option CurationSource.NO_SOURCES (i.e. show all regardless of whether it is curated or not),
   ]
     .filter(s => s.length)

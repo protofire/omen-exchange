@@ -223,7 +223,9 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
-    (currentFilter.currency || currentFilter.arbitrator || currentFilter.curationSource === CurationSource.KLEROS) &&
+    (currentFilter.currency ||
+      currentFilter.arbitrator ||
+      currentFilter.curationSource === CurationSource.ALL_SOURCES) &&
       !fetchMyMarkets,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
@@ -311,7 +313,9 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     setShowAdvancedFilters(
-      (currentFilter.currency || currentFilter.arbitrator || currentFilter.curationSource === CurationSource.KLEROS) &&
+      (currentFilter.currency ||
+        currentFilter.arbitrator ||
+        currentFilter.curationSource === CurationSource.ALL_SOURCES) &&
         !fetchMyMarkets,
     )
   }, [currentFilter, fetchMyMarkets])

@@ -168,6 +168,7 @@ export type MarketsSortCriteria =
   | 'sort24HourVolume23'
 
 export enum CurationSource {
+  ALL_SOURCES = 'All Sources',
   DXDAO = 'Dxdao',
   KLEROS = 'Kleros',
   NO_SOURCES = 'No Sources',

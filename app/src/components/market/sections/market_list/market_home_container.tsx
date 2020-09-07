@@ -119,7 +119,7 @@ const MarketHomeContainer: React.FC = () => {
   if (curationSourceFilter) {
     curationSourceParam = curationSourceRoute as CurationSource
   } else {
-    curationSourceParam = CurationSource.NO_SOURCES
+    curationSourceParam = CurationSource.ALL_SOURCES
   }
 
   let categoryParam: string

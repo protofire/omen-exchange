@@ -123,6 +123,10 @@ export const AdvancedFilters = (props: Props) => {
 
   const curationSourceOptions: Array<DropdownItemProps> = [
     {
+      content: CurationSource.ALL_SOURCES,
+      onClick: () => onChangeCurationSource(CurationSource.ALL_SOURCES),
+    },
+    {
       content: (
         <CurationSourceWrapper>
           <LogoWrapper>
@@ -183,9 +187,12 @@ export const AdvancedFilters = (props: Props) => {
       <Column>
         <Title>Curation Source</Title>
         <Options
-          currentItem={[CurationSource.DXDAO, CurationSource.KLEROS, CurationSource.NO_SOURCES].findIndex(
-            t => t === curationSource,
-          )}
+          currentItem={[
+            CurationSource.ALL_SOURCES,
+            CurationSource.DXDAO,
+            CurationSource.KLEROS,
+            CurationSource.NO_SOURCES,
+          ].findIndex(t => t === curationSource)}
           dirty={true}
           dropdownPosition={DropdownPosition.right}
           items={curationSourceOptions}
