@@ -45,7 +45,7 @@ const ProgressBarFill = styled.div<{ fill: boolean, fillFraction: number }>`
   height: 12px;
   width: ${props => `calc(${props.fillFraction} * 100% + 2px)`};
   margin: -1px;
-  border-radius: ${props => props.fillFraction < 1 ? '' : '32px'};
+  border-radius: ${props => props.fillFraction < 0.95 ? '' : '32px'};
   border-top-left-radius: ${props => props.fillFraction < 1 ? '32px' : ''};
   border-bottom-left-radius: ${props => props.fillFraction < 1 ? '32px' : ''};
 
