@@ -67,23 +67,6 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     <>
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} />
-        {/* <SubsectionTitleActionWrapper>
-          {LINK_FAQ && (
-            <SubsectionTitleActionWrapper>
-              <SubsectionTitleAction
-                onClick={() => {
-                  window.open(`${LINK_FAQ}${SUB_LINK}`)
-                }}
-              >
-                {marketSubtitle}
-              </SubsectionTitleAction>
-            </SubsectionTitleActionWrapper>
-          )}
-          <Breaker />
-          <SubsectionTitleAction onClick={toggleTradeHistory}>
-            {`${showingTradeHistory ? 'Hide' : 'Show'} Trade History`}
-          </SubsectionTitleAction>
-        </SubsectionTitleActionWrapper> */}
       </SubsectionTitleWrapper>
       {/* TODO: Add dynamic props */}
       <ProgressBar 

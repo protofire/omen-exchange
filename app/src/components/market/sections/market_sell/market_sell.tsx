@@ -179,10 +179,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
         <MarketTopDetailsOpen
-          isLiquidityProvision={false}
           marketMakerData={marketMakerData}
           title="Sell Shares"
-          toggleTitle="Pool Information"
         />
         <OutcomeTable
           balances={balances}

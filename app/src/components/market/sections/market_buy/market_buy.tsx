@@ -211,10 +211,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
         <MarketTopDetailsOpen
-          isLiquidityProvision={false}
           marketMakerData={marketMakerData}
           title="Purchase Shares"
-          toggleTitle="Pool Information"
         />
         <OutcomeTable
           balances={balances}
