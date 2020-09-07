@@ -85,8 +85,7 @@ const MarketHomeContainer: React.FC = () => {
   let searchRoute = location.search.split('tag=')[1]
   if (searchRoute) searchRoute = searchRoute.split('&')[0]
 
-  let sortParam: Maybe<MarketsSortCriteria> = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) %
-    24}` as MarketsSortCriteria
+  let sortParam: Maybe<MarketsSortCriteria> = 'usdLiquidityParameter'
   if (sortRoute === '24h-volume') {
     sortParam = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria
   } else if (sortRoute === 'volume') {
