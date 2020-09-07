@@ -66,7 +66,7 @@ export const MarketData: React.FC<Props> = props => {
       setCurrencyIcon(tokens[tokenIndex].image)
     } 
     return
-  }, [tokens])
+  }, [tokens, currency.address])
 
   const timezoneAbbr = momentTZ.tz(momentTZ.tz.guess()).zoneAbbr()
 

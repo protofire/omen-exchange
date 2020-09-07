@@ -142,14 +142,14 @@ export const ProgressBar: React.FC<Props> = props => {
           <ProgressBarFill className="progress-bar-fill__1" fill={fillOpen} fillFraction={fillArbitration ? 1 : finalizingFraction}></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__2" fill={fillFinalizing}></ProgressBarDot>
-        {pendingArbitration || arbitrationOccurred && (
+        {pendingArbitration || arbitrationOccurred ? (
           <>
             <ProgressBarLine>
               <ProgressBarFill className="progress-bar-fill__2" fill={fillFinalizing} fillFraction={arbitrationFraction}></ProgressBarFill>
             </ProgressBarLine>
             <ProgressBarDot className="progress-bar-dot__3" fill={fillArbitration}></ProgressBarDot>
           </>
-        )}
+        ) : null}
       </ProgressBarContainer>
       <ProgressBarTitles>
         <ProgressBarTitle>
@@ -158,11 +158,11 @@ export const ProgressBar: React.FC<Props> = props => {
         <ProgressBarTitle>
           Finalizing
         </ProgressBarTitle>
-        {pendingArbitration || arbitrationOccurred && (
+        {pendingArbitration || arbitrationOccurred ? (
           <ProgressBarTitle>
             Arbitrating
           </ProgressBarTitle>
-        )}
+        ) : null}
         <ProgressBarTitle>
           Closed
         </ProgressBarTitle>
