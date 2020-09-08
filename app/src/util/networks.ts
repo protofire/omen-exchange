@@ -120,7 +120,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     symbol: 'CDAI',
     decimals: 18,
     addresses: {
-      [networkIds.MAINNET]: '0xa4c993e32876795abf80842adb0a241bb0eecd47',
+      [networkIds.MAINNET]: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
       [networkIds.RINKEBY]: '0x7a978b38d5af06ff929ca06647e025b759479318',
     },
     order: 2,
