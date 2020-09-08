@@ -28,35 +28,35 @@ const ProgressBarDot = styled.div<{ fill: boolean }>`
   margin: 0 12px;
 
   &.progress-bar-dot__0 {
-    background: ${props => props.fill && props.theme.progressBar.open}
+    background: ${props => props.fill && props.theme.progressBar.open};
   }
   &.progress-bar-dot__1 {
-    background: ${props => props.fill && props.theme.progressBar.finalizing}
+    background: ${props => props.fill && props.theme.progressBar.finalizing};
   }
   &.progress-bar-dot__2 {
-    background: ${props => props.fill && props.theme.progressBar.arbitration}
+    background: ${props => props.fill && props.theme.progressBar.arbitration};
   }
   &.progress-bar-dot__3 {
-    background: ${props => props.fill && props.theme.progressBar.closed}
+    background: ${props => props.fill && props.theme.progressBar.closed};
   }
 `
 
-const ProgressBarFill = styled.div<{ fill: boolean, fillFraction: number }>`
+const ProgressBarFill = styled.div<{ fill: boolean; fillFraction: number }>`
   height: 12px;
   width: ${props => `calc(${props.fillFraction} * 100% + 2px)`};
   margin: -1px;
-  border-radius: ${props => props.fillFraction < 0.95 ? '' : '32px'};
-  border-top-left-radius: ${props => props.fillFraction < 1 ? '32px' : ''};
-  border-bottom-left-radius: ${props => props.fillFraction < 1 ? '32px' : ''};
+  border-radius: ${props => (props.fillFraction < 0.95 ? '' : '32px')};
+  border-top-left-radius: ${props => (props.fillFraction < 1 ? '32px' : '')};
+  border-bottom-left-radius: ${props => (props.fillFraction < 1 ? '32px' : '')};
 
   &.progress-bar-fill__0 {
-    background: ${props => props.fill && props.theme.progressBar.open}
+    background: ${props => props.fill && props.theme.progressBar.open};
   }
   &.progress-bar-fill__1 {
-    background: ${props => props.fill && props.theme.progressBar.finalizing}
+    background: ${props => props.fill && props.theme.progressBar.finalizing};
   }
   &.progress-bar-fill__2 {
-    background: ${props => props.fill && props.theme.progressBar.arbitration}
+    background: ${props => props.fill && props.theme.progressBar.arbitration};
   }
 `
 
@@ -96,7 +96,7 @@ enum State {
   open = 'open',
   finalizing = 'finalizing',
   arbitration = 'arbitration',
-  closed = 'closed'
+  closed = 'closed',
 }
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -109,7 +109,14 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const ProgressBar: React.FC<Props> = props => {
-  const { creationTimestamp, resolutionTimestamp, state, pendingArbitration, answerFinalizedTimestamp, arbitrationOccurred } = props
+  const {
+    answerFinalizedTimestamp,
+    arbitrationOccurred,
+    creationTimestamp,
+    pendingArbitration,
+    resolutionTimestamp,
+    state,
+  } = props
 
   const fillOpen = state === State.finalizing || state === State.arbitration || state === State.closed
   const fillFinalizing = state === State.arbitration || state === State.closed
@@ -117,17 +124,19 @@ export const ProgressBar: React.FC<Props> = props => {
 
   const openDuration = resolutionTimestamp.getTime() - creationTimestamp.getTime()
   const timeSinceOpen = new Date().getTime() - creationTimestamp.getTime()
-  const openFraction = (timeSinceOpen / openDuration) > 1 ? 1 : timeSinceOpen / openDuration
+  const openFraction = timeSinceOpen / openDuration > 1 ? 1 : timeSinceOpen / openDuration
 
   const finalizingDuration = 24 * 60 * 60 * 1000
   const timeSinceFinalizing = new Date().getTime() - resolutionTimestamp.getTime()
-  const finalizingFraction = (timeSinceFinalizing / finalizingDuration) > 1 ? 1 : timeSinceFinalizing / finalizingDuration
+  const finalizingFraction = timeSinceFinalizing / finalizingDuration > 1 ? 1 : timeSinceFinalizing / finalizingDuration
 
-  let arbitrationFraction: number = 0
+  let arbitrationFraction = 0
   if (answerFinalizedTimestamp) {
-    const arbitrationDuration = answerFinalizedTimestamp.getTime() - (resolutionTimestamp.getTime() + finalizingDuration)
+    const arbitrationDuration =
+      answerFinalizedTimestamp.getTime() - (resolutionTimestamp.getTime() + finalizingDuration)
     const timeSinceArbitrating = new Date().getTime() - (resolutionTimestamp.getTime() + finalizingDuration)
-    arbitrationFraction = (timeSinceArbitrating / arbitrationDuration) > 1 ? 1 : timeSinceArbitrating / arbitrationDuration
+    arbitrationFraction =
+      timeSinceArbitrating / arbitrationDuration > 1 ? 1 : timeSinceArbitrating / arbitrationDuration
   }
 
   return (
@@ -135,37 +144,39 @@ export const ProgressBar: React.FC<Props> = props => {
       <ProgressBarContainer>
         <ProgressBarDot className="progress-bar-dot__0" fill={true}></ProgressBarDot>
         <ProgressBarLine>
-          <ProgressBarFill className="progress-bar-fill__0" fill={true} fillFraction={fillFinalizing ? 1 : openFraction}></ProgressBarFill>
+          <ProgressBarFill
+            className="progress-bar-fill__0"
+            fill={true}
+            fillFraction={fillFinalizing ? 1 : openFraction}
+          ></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__1" fill={fillOpen}></ProgressBarDot>
         <ProgressBarLine>
-          <ProgressBarFill className="progress-bar-fill__1" fill={fillOpen} fillFraction={fillArbitration ? 1 : finalizingFraction}></ProgressBarFill>
+          <ProgressBarFill
+            className="progress-bar-fill__1"
+            fill={fillOpen}
+            fillFraction={fillArbitration ? 1 : finalizingFraction}
+          ></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__2" fill={fillFinalizing}></ProgressBarDot>
         {pendingArbitration || arbitrationOccurred ? (
           <>
             <ProgressBarLine>
-              <ProgressBarFill className="progress-bar-fill__2" fill={fillFinalizing} fillFraction={arbitrationFraction}></ProgressBarFill>
+              <ProgressBarFill
+                className="progress-bar-fill__2"
+                fill={fillFinalizing}
+                fillFraction={arbitrationFraction}
+              ></ProgressBarFill>
             </ProgressBarLine>
             <ProgressBarDot className="progress-bar-dot__3" fill={fillArbitration}></ProgressBarDot>
           </>
         ) : null}
       </ProgressBarContainer>
       <ProgressBarTitles>
-        <ProgressBarTitle>
-          Open
-        </ProgressBarTitle>
-        <ProgressBarTitle>
-          Finalizing
-        </ProgressBarTitle>
-        {pendingArbitration || arbitrationOccurred ? (
-          <ProgressBarTitle>
-            Arbitrating
-          </ProgressBarTitle>
-        ) : null}
-        <ProgressBarTitle>
-          Closed
-        </ProgressBarTitle>
+        <ProgressBarTitle>Open</ProgressBarTitle>
+        <ProgressBarTitle>Finalizing</ProgressBarTitle>
+        {pendingArbitration || arbitrationOccurred ? <ProgressBarTitle>Arbitrating</ProgressBarTitle> : null}
+        <ProgressBarTitle>Closed</ProgressBarTitle>
       </ProgressBarTitles>
     </ProgressBarWrapper>
   )

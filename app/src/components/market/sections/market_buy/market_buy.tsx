@@ -210,10 +210,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       <ViewCard>
-        <MarketTopDetailsOpen
-          marketMakerData={marketMakerData}
-          title="Purchase Shares"
-        />
+        <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Purchase Shares" />
         <OutcomeTable
           balances={balances}
           collateral={collateral}

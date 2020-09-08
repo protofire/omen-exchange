@@ -1,12 +1,12 @@
-import React, { DOMAttributes, useEffect, useState } from 'react'
-import styled from 'styled-components'
+import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import momentTZ from 'moment-timezone'
-import { BigNumber } from 'ethers/utils'
+import React, { DOMAttributes, useEffect, useState } from 'react'
+import styled from 'styled-components'
 
-import { Token } from '../../../../util/types'
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
+import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { Token } from '../../../../util/types'
 
 const MarketDataWrapper = styled.div`
   display: flex;
@@ -52,7 +52,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const MarketData: React.FC<Props> = props => {
-  const { resolutionTimestamp, dailyVolume, currency } = props
+  const { currency, dailyVolume, resolutionTimestamp } = props
 
   const context = useConnectedWeb3Context()
   const tokens = useTokens(context)
@@ -60,11 +60,11 @@ export const MarketData: React.FC<Props> = props => {
   const [currencyIcon, setCurrencyIcon] = useState<string | undefined>('')
 
   useEffect(() => {
-    if(tokens.length > 1) {
+    if (tokens.length > 1) {
       const matchingAddress = (token: Token) => token.address === currency.address
       const tokenIndex = tokens.findIndex(matchingAddress)
       setCurrencyIcon(tokens[tokenIndex].image)
-    } 
+    }
     return
   }, [tokens, currency.address])
 
@@ -74,28 +74,22 @@ export const MarketData: React.FC<Props> = props => {
     <MarketDataWrapper>
       <MarketDataItem>
         <MarketDataItemTop>
-          {moment(resolutionTimestamp).format("DD.MM.YYYY - H:mm zz")} {timezoneAbbr}
+          {moment(resolutionTimestamp).format('DD.MM.YYYY - H:mm zz')} {timezoneAbbr}
         </MarketDataItemTop>
-        <MarketDataItemBottom>
-          Closing Date
-        </MarketDataItemBottom>
+        <MarketDataItemBottom>Closing Date</MarketDataItemBottom>
       </MarketDataItem>
       <MarketDataItem>
         <MarketDataItemTop>
           {resolutionTimestamp > new Date() ? moment(resolutionTimestamp).fromNow(true) : '0 days'}
         </MarketDataItemTop>
-        <MarketDataItemBottom>
-          Time remaining
-        </MarketDataItemBottom>
+        <MarketDataItemBottom>Time remaining</MarketDataItemBottom>
       </MarketDataItem>
       <MarketDataItem>
         <MarketDataItemTop>
           <MarketDataItemImage src={currencyIcon && currencyIcon}></MarketDataItemImage>
           {formatNumber(formatBigNumber(dailyVolume, currency.decimals))} {currency.symbol}
         </MarketDataItemTop>
-        <MarketDataItemBottom>
-          24h Trade Volume
-        </MarketDataItemBottom>
+        <MarketDataItemBottom>24h Trade Volume</MarketDataItemBottom>
       </MarketDataItem>
     </MarketDataWrapper>
   )

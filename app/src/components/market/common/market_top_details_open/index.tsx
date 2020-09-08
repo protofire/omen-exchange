@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 
+import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
 import { MarketMakerData } from '../../../../util/types'
-import { useGraphMarketMakerData, useConnectedWeb3Context } from '../../../../hooks'
 import { SubsectionTitleWrapper } from '../../../common'
+import { AdditionalMarketData } from '../additional_market_data'
 import { HistoryChartContainer } from '../history_chart'
+import { MarketData } from '../market_data'
 import { MarketTitle } from '../market_title'
 import { ProgressBar } from '../progress_bar'
-import { MarketData } from '../market_data'
-import { AdditionalMarketData } from '../additional_market_data'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -21,14 +21,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const [tradeHistoryLoaded, setTradeHistoryLoaded] = useState(false)
 
   const { marketMakerData, title } = props
-  const {
-    address,
-    answerFinalizedTimestamp,
-    arbitrator,
-    collateral,
-    collateralVolume,
-    question,
-  } = marketMakerData
+  const { address, answerFinalizedTimestamp, arbitrator, collateral, collateralVolume, question } = marketMakerData
 
   const toggleTradeHistory = () => {
     if (showingTradeHistory) {
@@ -52,37 +45,42 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred
 
-  const marketState = question.resolution.getTime() > currentTimestamp
-    ? 'open'
-    : question.resolution.getTime() < currentTimestamp && answerFinalizedTimestamp === null
-    ? 'finalizing'
-    : isPendingArbitration
-    ? 'arbitration'
-    : answerFinalizedTimestamp && answerFinalizedTimestamp.toNumber() < currentTimestamp
-    ? 'closed'
-    : ''
+  const marketState =
+    question.resolution.getTime() > currentTimestamp
+      ? 'open'
+      : question.resolution.getTime() < currentTimestamp && answerFinalizedTimestamp === null
+      ? 'finalizing'
+      : isPendingArbitration
+      ? 'arbitration'
+      : answerFinalizedTimestamp && answerFinalizedTimestamp.toNumber() < currentTimestamp
+      ? 'closed'
+      : ''
 
   return (
     <>
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} title={title} />
       </SubsectionTitleWrapper>
-      <ProgressBar 
-        state={marketState} 
-        creationTimestamp={creationDate} 
-        resolutionTimestamp={question.resolution} 
-        pendingArbitration={isPendingArbitration}
-        arbitrationOccurred={arbitrationOccurred}
+      <ProgressBar
         answerFinalizedTimestamp={finalizedTimestampDate}
+        arbitrationOccurred={arbitrationOccurred}
+        creationTimestamp={creationDate}
+        pendingArbitration={isPendingArbitration}
+        resolutionTimestamp={question.resolution}
+        state={marketState}
       ></ProgressBar>
-      <MarketData resolutionTimestamp={question.resolution} dailyVolume={collateralVolume} currency={collateral}></MarketData>
-      <AdditionalMarketData 
-        category={question.category} 
-        arbitrator={arbitrator} 
-        oracle='Reality.eth' 
-        id={question.id}
-        showingTradeHistory={showingTradeHistory}
+      <MarketData
+        currency={collateral}
+        dailyVolume={collateralVolume}
+        resolutionTimestamp={question.resolution}
+      ></MarketData>
+      <AdditionalMarketData
+        arbitrator={arbitrator}
+        category={question.category}
         handleTradeHistoryClick={toggleTradeHistory}
+        id={question.id}
+        oracle="Reality.eth"
+        showingTradeHistory={showingTradeHistory}
       ></AdditionalMarketData>
       {tradeHistoryLoaded && (
         <HistoryChartContainer

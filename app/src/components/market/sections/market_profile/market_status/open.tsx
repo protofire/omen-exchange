@@ -150,9 +150,7 @@ const Wrapper = (props: Props) => {
 
   return (
     <ViewCard>
-      <MarketTopDetailsOpen
-        marketMakerData={marketMakerData}
-      />
+      <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       {renderTableData()}
       {isQuestionOpen && openQuestionMessage}
       {!hasFunding && !isQuestionOpen && (

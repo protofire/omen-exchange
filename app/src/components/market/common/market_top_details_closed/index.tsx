@@ -1,14 +1,14 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
 
-import { useGraphMarketMakerData, useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
 import { MarketMakerData } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
+import { AdditionalMarketData } from '../additional_market_data'
 import { HistoryChartContainer } from '../history_chart'
+import { MarketData } from '../market_data'
 import { MarketTitle } from '../market_title'
 import { ProgressBar } from '../progress_bar'
-import { MarketData } from '../market_data'
-import { AdditionalMarketData } from '../additional_market_data'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -46,7 +46,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
     : ''
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
-  
+
   const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred
@@ -56,22 +56,26 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} />
       </SubsectionTitleWrapper>
-      <ProgressBar 
-        state={'closed'} 
-        creationTimestamp={creationDate} 
-        resolutionTimestamp={question.resolution} 
-        pendingArbitration={isPendingArbitration} 
-        arbitrationOccurred={arbitrationOccurred}
+      <ProgressBar
         answerFinalizedTimestamp={finalizedTimestampDate}
+        arbitrationOccurred={arbitrationOccurred}
+        creationTimestamp={creationDate}
+        pendingArbitration={isPendingArbitration}
+        resolutionTimestamp={question.resolution}
+        state={'closed'}
       ></ProgressBar>
-      <MarketData resolutionTimestamp={question.resolution} dailyVolume={collateralVolume} currency={collateralToken}></MarketData>
-      <AdditionalMarketData 
-        category={question.category} 
-        arbitrator={arbitrator} 
-        oracle='Reality.eth' 
-        id={question.id}
-        showingTradeHistory={showingTradeHistory}
+      <MarketData
+        currency={collateralToken}
+        dailyVolume={collateralVolume}
+        resolutionTimestamp={question.resolution}
+      ></MarketData>
+      <AdditionalMarketData
+        arbitrator={arbitrator}
+        category={question.category}
         handleTradeHistoryClick={toggleTradeHistory}
+        id={question.id}
+        oracle="Reality.eth"
+        showingTradeHistory={showingTradeHistory}
       ></AdditionalMarketData>
       {tradeHistoryLoaded && (
         <HistoryChartContainer

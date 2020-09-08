@@ -1,12 +1,12 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
-import { IconCategory } from '../../../common/icons/IconCategory'
-import { IconOracle } from '../../../common/icons/IconOracle'
+import { Arbitrator } from '../../../../util/types'
 import { IconArbitrator } from '../../../common/icons/IconArbitrator'
+import { IconCategory } from '../../../common/icons/IconCategory'
 import { IconChevronDown } from '../../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../../common/icons/IconChevronUp'
-import { Arbitrator } from '../../../../util/types'
+import { IconOracle } from '../../../common/icons/IconOracle'
 
 const AdditionalMarketDataWrapper = styled.div`
   height: 45px;
@@ -41,7 +41,7 @@ const AdditionalMarketDataSectionTitle = styled.p`
   margin-left: 6px;
   font-size: 14px;
   line-height: 16px;
-  color: ${props => props.theme.colors.clickable}
+  color: ${props => props.theme.colors.clickable};
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -54,7 +54,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { category, arbitrator, oracle, id, showingTradeHistory, handleTradeHistoryClick } = props
+  const { arbitrator, category, handleTradeHistoryClick, id, oracle, showingTradeHistory } = props
 
   const windowObj: any = window
   const realitioBaseUrl =
@@ -67,33 +67,21 @@ export const AdditionalMarketData: React.FC<Props> = props => {
       <AdditionalMarketDataLeft>
         <AdditionalMarketDataSectionWrapper href={`/#/24h-volume/category/${encodeURI(category)}`}>
           <IconCategory></IconCategory>
-          <AdditionalMarketDataSectionTitle>
-            {category}
-          </AdditionalMarketDataSectionTitle>
+          <AdditionalMarketDataSectionTitle>{category}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper href={realitioUrl} target="_blank" rel="noopener noreferrer">
+        <AdditionalMarketDataSectionWrapper href={realitioUrl} rel="noopener noreferrer" target="_blank">
           <IconOracle></IconOracle>
-          <AdditionalMarketDataSectionTitle>
-            {oracle}
-          </AdditionalMarketDataSectionTitle>
+          <AdditionalMarketDataSectionTitle>{oracle}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper href={arbitrator.url} target="_blank" rel="noopener noreferrer">
+        <AdditionalMarketDataSectionWrapper href={arbitrator.url} rel="noopener noreferrer" target="_blank">
           <IconArbitrator></IconArbitrator>
-          <AdditionalMarketDataSectionTitle>
-            {arbitrator.name}
-          </AdditionalMarketDataSectionTitle>
+          <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>
       <AdditionalMarketDataRight>
         <AdditionalMarketDataSectionWrapper onClick={handleTradeHistoryClick}>
-          <AdditionalMarketDataSectionTitle>
-            Trade History
-          </AdditionalMarketDataSectionTitle>
-          {showingTradeHistory ? (
-            <IconChevronUp></IconChevronUp>
-          ) : (
-            <IconChevronDown></IconChevronDown>
-          )}
+          <AdditionalMarketDataSectionTitle>Trade History</AdditionalMarketDataSectionTitle>
+          {showingTradeHistory ? <IconChevronUp></IconChevronUp> : <IconChevronDown></IconChevronDown>}
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataRight>
     </AdditionalMarketDataWrapper>

@@ -144,7 +144,7 @@ class RealitioService {
       templateId,
       raw: question,
       isPendingArbitration: question.isPendingArbitration,
-      arbitrationOccurred: question.arbitrationOccurred
+      arbitrationOccurred: question.arbitrationOccurred,
     }
   }
 

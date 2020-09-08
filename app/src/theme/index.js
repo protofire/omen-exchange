@@ -340,7 +340,7 @@ const theme = {
     finalizing: '#9575CD',
     arbitration: '#BA68C8',
     closed: '#BA68C8',
-  }
+  },
 }
 
 export default theme
