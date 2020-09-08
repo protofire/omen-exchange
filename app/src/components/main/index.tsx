@@ -50,7 +50,7 @@ export const Main: React.FC = () => {
           {!context.error && (
             <Switch>
               <Route exact path="/">
-                <Redirect to="/24h-volume" />
+                <Redirect to="/liquidity" />
               </Route>
               <Route component={MarketHomeContainer} path="/24h-volume" />
               <Route component={MarketHomeContainer} path="/volume" />

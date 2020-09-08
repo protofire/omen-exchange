@@ -64,14 +64,15 @@ test('Markets closed with title and arbitrator', () => {
   expect(query).toBe(expectedQuery)
 })
 
-test('Query pending markets', () => {
+test('Query finalizing markets', () => {
   const query = buildQueryMarkets({
     ...DEFAULT_OPTIONS,
-    state: MarketStates.pending,
+    state: MarketStates.finalizing,
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'openingTimestamp_lt: $now, answerFinalizedTimestamp: null, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee, timeout_gte: 86400, curatedByDxDao: true',
+    'openingTimestamp_lt: $now, isPendingArbitration: false, answerFinalizedTimestamp: null, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee, timeout_gte: 86400, curatedByDxDao: true',
   )
+
   expect(query).toBe(expectedQuery)
 })

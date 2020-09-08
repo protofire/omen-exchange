@@ -239,20 +239,20 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       onClick: () => setState(MarketStates.open),
     },
     {
-      state: MarketStates.pending,
-      title: 'Pending',
-      active: state === MarketStates.pending,
-      onClick: () => setState(MarketStates.pending),
-    },
-    {
       state: MarketStates.finalizing,
       title: 'Finalizing',
       active: state === MarketStates.finalizing,
       onClick: () => setState(MarketStates.finalizing),
     },
     {
+      state: MarketStates.arbitrating,
+      title: 'Arbitrating',
+      active: state === MarketStates.arbitrating,
+      onClick: () => setState(MarketStates.arbitrating),
+    },
+    {
       state: MarketStates.closed,
-      title: 'Ended',
+      title: 'Closed',
       active: state === MarketStates.closed,
       onClick: () => setState(MarketStates.closed),
     },
