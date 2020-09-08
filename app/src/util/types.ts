@@ -130,8 +130,8 @@ export interface MarketData {
 
 export enum MarketStates {
   open = 'OPEN',
-  pending = 'PENDING',
   finalizing = 'FINALIZING',
+  arbitrating = 'ARBITRATING',
   closed = 'CLOSED',
   myMarkets = 'MY_MARKETS',
 }
