@@ -60,12 +60,9 @@ export const MarketData: React.FC<Props> = props => {
   const [currencyIcon, setCurrencyIcon] = useState<string | undefined>('')
 
   useEffect(() => {
-    if (tokens.length > 1) {
-      const matchingAddress = (token: Token) => token.address === currency.address
-      const tokenIndex = tokens.findIndex(matchingAddress)
-      setCurrencyIcon(tokens[tokenIndex].image)
-    }
-    return
+    const matchingAddress = (token: Token) => token.address.toLowerCase() === currency.address.toLowerCase()
+    const tokenIndex = tokens.findIndex(matchingAddress)
+    tokenIndex !== -1 && setCurrencyIcon(tokens[tokenIndex].image)
   }, [tokens, currency.address])
 
   const timezoneAbbr = momentTZ.tz(momentTZ.tz.guess()).zoneAbbr()
