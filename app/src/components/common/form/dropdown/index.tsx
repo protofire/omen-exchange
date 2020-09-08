@@ -116,7 +116,7 @@ const Wrapper = styled.div<{ isOpen: boolean; disabled: boolean; dropdownVariant
   ${props => (props.disabled ? DropdownDisabledCSS : '')}
   ${props => (props.dropdownVariant === DropdownVariant.pill ? DropdownVariantPillCSS : '')}
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardCSS : '')}
- 
+
 `
 
 const DropdownButton = styled.div`
@@ -229,7 +229,7 @@ const DropdownScrollbarCSS = css`
     border-radius: 2px;
   }
   &::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
   }
 `
 
