@@ -89,8 +89,10 @@ export const useMarkets = (options: Options): any => {
         internalMarkets = marketsGeneric.fixedProductMarketMakers
       }
 
-      setMoreMarkets(internalMarkets.length === first + 1)
-      internalMarkets.length === first + 1 && internalMarkets.pop()
+      if (internalMarkets.length === first + 1) {
+        setMoreMarkets(true)
+        internalMarkets.pop()
+      }
 
       if (internalMarkets && internalMarkets.length === 0 && skipFromOptions === 0) {
         setMarkets({
