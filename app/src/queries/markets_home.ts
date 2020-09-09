@@ -33,7 +33,9 @@ export type GraphMarketMakerDataItem = {
   category: string
   templateId: string
   scaledLiquidityParameter: string
-  klerosTCRregistered: Maybe<boolean>
+  klerosTCRregistered: boolean
+  curatedByDxDao: boolean
+  curatedByDxDaoOrKleros: boolean
 }
 
 export type MarketMakerDataItem = {
@@ -48,7 +50,9 @@ export type MarketMakerDataItem = {
   category: string
   templateId: number
   scaledLiquidityParameter: number
-  klerosTCRregistered: Maybe<boolean>
+  klerosTCRregistered: boolean
+  curatedByDxDao: boolean
+  curatedByDxDaoOrKleros: boolean
 }
 
 export const DEFAULT_OPTIONS = {

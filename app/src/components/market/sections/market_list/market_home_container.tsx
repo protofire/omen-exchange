@@ -48,8 +48,8 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       templateId: +graphMarketMakerDataItem.templateId,
       title: graphMarketMakerDataItem.title,
       usdLiquidityParameter: parseFloat(graphMarketMakerDataItem.usdLiquidityParameter),
-      klerosTCRitemID: graphMarketMakerDataItem.klerosTCRitemID,
       klerosTCRregistered: graphMarketMakerDataItem.klerosTCRregistered,
+      curatedByDxDaoOrKleros: graphMarketMakerDataItem.curatedByDxDaoOrKleros,
     }
   })
 }

@@ -204,8 +204,9 @@ export interface MarketMakerData {
   totalPoolShares: BigNumber
   userEarnings: BigNumber
   userPoolShares: BigNumber
-  klerosTCRregistered: Maybe<boolean>
-  curatedByDxDao: Maybe<boolean>
+  klerosTCRregistered: boolean
+  curatedByDxDao: boolean
+  curatedByDxDaoOrKleros: boolean
 }
 
 export enum Ternary {
@@ -255,7 +256,8 @@ export type GraphMarketMakerDataItem = {
   templateId: string
   usdLiquidityParameter: string
   curatedByDxDao: boolean
-  klerosTCRregistered: Maybe<boolean>
+  klerosTCRregistered: boolean
+  curatedByDxDaoOrKleros: boolean
 }
 
 export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
@@ -281,7 +283,8 @@ export type MarketMakerDataItem = {
   templateId: number
   usdLiquidityParameter: number
   curatedByDxDao: boolean
-  klerosTCRregistered: Maybe<boolean>
+  klerosTCRregistered: boolean
+  curatedByDxDaoOrKleros: boolean
 }
 
 export type BuildQueryType = MarketFilters & {
