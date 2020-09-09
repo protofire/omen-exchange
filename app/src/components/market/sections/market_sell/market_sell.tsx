@@ -17,7 +17,7 @@ import {
 import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder, SubsectionTitle, SubsectionTitleWrapper } from '../../../common'
+import { BigNumberInput, SubsectionTitle, SubsectionTitleWrapper, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
@@ -38,9 +38,7 @@ const TopCard = styled(ViewCard)`
   margin-bottom: 24px;
 `
 
-const BottomCard = styled(ViewCard)`
-  
-`
+const BottomCard = styled(ViewCard)``
 
 const LeftButton = styled(Button)`
   margin-right: auto;

@@ -11,7 +11,7 @@ const ProgressBarWrapper = styled.div`
   margin-bottom: 29px;
   margin-top: 8px;
 
-  @media(max-width: ${props => props.theme.themeBreakPoints.md}) {
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-bottom: 24px;
   }
 `

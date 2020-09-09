@@ -11,6 +11,7 @@ import { getLogger } from '../../../../../util/logger'
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
+import { SubsectionTitle, SubsectionTitleWrapper } from '../../../../common'
 import { FullLoading } from '../../../../loading'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
 import { ButtonContainerFullWidth } from '../../../common/common_styled'
@@ -18,16 +19,13 @@ import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
-import { SubsectionTitleWrapper, SubsectionTitle } from '../../../../common'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
   margin-bottom: 24px;
 `
 
-const BottomCard = styled(ViewCard)`
-  
-`
+const BottomCard = styled(ViewCard)``
 
 const MarketResolutionMessageStyled = styled(MarketResolutionMessage)`
   margin: 20px 0;
