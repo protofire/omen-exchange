@@ -14,6 +14,11 @@ const MarketDataWrapper = styled.div`
   width: 100%;
   justify-content: space-between;
   margin-bottom: 32px;
+
+  @media(max-width: ${props => props.theme.themeBreakPoints.md}) {
+    flex-direction: column;
+    margin-bottom: 0;
+  }
 `
 
 const MarketDataItem = styled.div`
@@ -23,6 +28,13 @@ const MarketDataItem = styled.div`
   justify-content: space-between;
   height: 39px;
   width: 33.33%;
+
+  @media(max-width: ${props => props.theme.themeBreakPoints.md}) {
+    width: 100%;
+    flex-direction: row-reverse;
+    height: 16px;
+    margin-bottom: 12px;
+  }
 `
 
 const MarketDataItemTop = styled.div`
