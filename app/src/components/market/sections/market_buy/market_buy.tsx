@@ -38,7 +38,6 @@ import { TransactionDetailsRow, ValueStates } from '../../common/transaction_det
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
-import { MarketTitle } from '../../common/market_title'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
