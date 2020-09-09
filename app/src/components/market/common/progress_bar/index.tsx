@@ -10,6 +10,10 @@ const ProgressBarWrapper = styled.div`
   height: 40px;
   margin-bottom: 29px;
   margin-top: 8px;
+
+  @media(max-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-bottom: 24px;
+  }
 `
 
 const ProgressBarContainer = styled.div`

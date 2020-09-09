@@ -17,17 +17,35 @@ const AdditionalMarketDataWrapper = styled.div`
   margin-left: -26px;
   width: ${props => props.theme.mainContainer.maxWidth};
   padding: 0 6px;
+
+  @media(max-width: ${props => props.theme.themeBreakPoints.md}) {
+    flex-direction: column;
+    width: calc(100% + 26px * 2);
+    height: auto;
+    border-top: none;
+  }
 `
 
 const AdditionalMarketDataLeft = styled.div`
   display: flex;
   align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
 `
 
 const AdditionalMarketDataRight = styled.div`
   display: flex;
   align-items: center;
   margin-right: 20px;
+
+  @media(max-width: ${props => props.theme.themeBreakPoints.md}) {
+    border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
+    width: calc(100% + 6px * 2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 0;
+  }
 `
 
 const AdditionalMarketDataSectionWrapper = styled.a`
@@ -35,6 +53,13 @@ const AdditionalMarketDataSectionWrapper = styled.a`
   align-items: center;
   margin-left: 20px;
   cursor: pointer;
+
+  @media(max-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-left: 11px;
+    &:nth-of-type(1) {
+      margin-left: 0;
+    }
+  }
 `
 
 const AdditionalMarketDataSectionTitle = styled.p`
@@ -62,19 +87,21 @@ export const AdditionalMarketData: React.FC<Props> = props => {
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
 
+  const isMobile = window.innerWidth < 768
+
   return (
     <AdditionalMarketDataWrapper>
       <AdditionalMarketDataLeft>
         <AdditionalMarketDataSectionWrapper href={`/#/24h-volume/category/${encodeURI(category)}`}>
-          <IconCategory></IconCategory>
+          <IconCategory size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{category}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
         <AdditionalMarketDataSectionWrapper href={realitioUrl} rel="noopener noreferrer" target="_blank">
-          <IconOracle></IconOracle>
+          <IconOracle size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{oracle}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
         <AdditionalMarketDataSectionWrapper href={arbitrator.url} rel="noopener noreferrer" target="_blank">
-          <IconArbitrator></IconArbitrator>
+          <IconArbitrator size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>

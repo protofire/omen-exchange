@@ -34,6 +34,10 @@ const MarketDataItem = styled.div`
     flex-direction: row-reverse;
     height: 16px;
     margin-bottom: 12px;
+
+    &:nth-of-type(3) {
+      margin-bottom: 0;
+    }
   }
 `
 
