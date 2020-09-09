@@ -204,60 +204,58 @@ const Wrapper = (props: Props) => {
 
   return (
     <>
-      <ViewCard>
-        <MarketTopDetailsClosed collateral={collateral} marketMakerData={marketMakerData} />
-        <OutcomeTable
-          balances={balances}
-          collateral={collateralToken}
-          disabledColumns={disabledColumns}
-          displayRadioSelection={false}
-          payouts={payouts}
-          probabilities={probabilities}
-          withWinningOutcome={true}
-        />
-        <WhenConnected>
-          {hasWinningOutcomes && (
-            <MarketResolutionMessageStyled
-              arbitrator={arbitrator}
-              collateralToken={collateralToken}
-              earnedCollateral={earnedCollateral}
-              invalid={allPayoutsEqual}
-              userWinnerShares={userWinnerShares}
-              userWinnersOutcomes={userWinnersOutcomes}
-              winnersOutcomes={winnersOutcomes}
-            ></MarketResolutionMessageStyled>
-          )}
-          {isConditionResolved && !hasWinningOutcomes ? (
-            <ButtonContainer>
-              {poolButton}
-              {buySellButtons}
-            </ButtonContainer>
-          ) : (
-            <ButtonContainerFullWidth borderTop={true}>
-              {!isConditionResolved && (
-                <>
-                  {poolButton}
-                  <Button
-                    buttonType={ButtonType.primary}
-                    disabled={status === Status.Loading}
-                    onClick={resolveCondition}
-                  >
-                    Resolve Condition
-                  </Button>
-                </>
-              )}
-              {isConditionResolved && hasWinningOutcomes && (
-                <>
-                  {poolButton}
-                  <Button buttonType={ButtonType.primary} disabled={status === Status.Loading} onClick={() => redeem()}>
-                    Redeem
-                  </Button>
-                </>
-              )}
-            </ButtonContainerFullWidth>
-          )}
-        </WhenConnected>
-      </ViewCard>
+      <MarketTopDetailsClosed collateral={collateral} marketMakerData={marketMakerData} />
+      <OutcomeTable
+        balances={balances}
+        collateral={collateralToken}
+        disabledColumns={disabledColumns}
+        displayRadioSelection={false}
+        payouts={payouts}
+        probabilities={probabilities}
+        withWinningOutcome={true}
+      />
+      <WhenConnected>
+        {hasWinningOutcomes && (
+          <MarketResolutionMessageStyled
+            arbitrator={arbitrator}
+            collateralToken={collateralToken}
+            earnedCollateral={earnedCollateral}
+            invalid={allPayoutsEqual}
+            userWinnerShares={userWinnerShares}
+            userWinnersOutcomes={userWinnersOutcomes}
+            winnersOutcomes={winnersOutcomes}
+          ></MarketResolutionMessageStyled>
+        )}
+        {isConditionResolved && !hasWinningOutcomes ? (
+          <ButtonContainer>
+            {poolButton}
+            {buySellButtons}
+          </ButtonContainer>
+        ) : (
+          <ButtonContainerFullWidth borderTop={true}>
+            {!isConditionResolved && (
+              <>
+                {poolButton}
+                <Button
+                  buttonType={ButtonType.primary}
+                  disabled={status === Status.Loading}
+                  onClick={resolveCondition}
+                >
+                  Resolve Condition
+                </Button>
+              </>
+            )}
+            {isConditionResolved && hasWinningOutcomes && (
+              <>
+                {poolButton}
+                <Button buttonType={ButtonType.primary} disabled={status === Status.Loading} onClick={() => redeem()}>
+                  Redeem
+                </Button>
+              </>
+            )}
+          </ButtonContainerFullWidth>
+        )}
+      </WhenConnected>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}

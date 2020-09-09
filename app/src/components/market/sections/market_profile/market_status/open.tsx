@@ -149,7 +149,7 @@ const Wrapper = (props: Props) => {
   )
 
   return (
-    <ViewCard>
+    <>
       <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       {renderTableData()}
       {isQuestionOpen && openQuestionMessage}
@@ -168,7 +168,7 @@ const Wrapper = (props: Props) => {
           {isQuestionOpen ? openInRealitioButton : buySellButtons}
         </StyledButtonContainer>
       </WhenConnected>
-    </ViewCard>
+    </>
   )
 }
 

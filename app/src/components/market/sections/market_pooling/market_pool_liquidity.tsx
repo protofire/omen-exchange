@@ -286,190 +286,188 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   return (
     <>
       <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
-      <ViewCard>
-        <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Pool Liquidity" />
-        <OutcomeTable
-          balances={balances}
-          collateral={collateral}
-          disabledColumns={[OutcomeTableValue.OutcomeProbability, OutcomeTableValue.Payout]}
-          displayRadioSelection={false}
-          newShares={activeTab === Tabs.deposit ? sharesAfterAddingFunding : sharesAfterRemovingFunding}
-          probabilities={probabilities}
-          showSharesChange={showSharesChange}
-        />
-        <WarningMessageStyled
-          additionalDescription={''}
-          description={
-            'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
-          }
-          href={DOCUMENT_FAQ}
-          hyperlinkDescription={'More Info'}
-        />
-        <GridTransactionDetails>
-          <div>
-            <TabsGrid>
-              <ButtonTab
-                active={disableDepositTab ? false : activeTab === Tabs.deposit}
-                disabled={disableDepositTab}
-                onClick={() => setActiveTab(Tabs.deposit)}
-              >
-                Deposit
-              </ButtonTab>
-              <ButtonTab
-                active={disableDepositTab ? true : activeTab === Tabs.withdraw}
-                onClick={() => setActiveTab(Tabs.withdraw)}
-              >
-                Withdraw
-              </ButtonTab>
-            </TabsGrid>
-            {activeTab === Tabs.deposit && (
-              <>
-                <WalletBalance
-                  onClick={() => {
-                    setAmountToFund(collateralBalance)
-                    setAmountToFundDisplay(walletBalance)
-                  }}
-                  symbol={collateral.symbol}
-                  value={walletBalance}
-                />
-                <TextfieldCustomPlaceholder
-                  formField={
-                    <BigNumberInput
-                      decimals={collateral.decimals}
-                      name="amountToFund"
-                      onChange={(e: BigNumberInputReturn) => {
-                        setAmountToFund(e.value)
-                        setAmountToFundDisplay('')
-                      }}
-                      value={amountToFund}
-                      valueToDisplay={amountToFundDisplay}
-                    />
-                  }
-                  symbol={collateral.symbol}
-                />
-                {collateralAmountError && <GenericError>{collateralAmountError}</GenericError>}
-              </>
-            )}
-            {activeTab === Tabs.withdraw && (
-              <>
-                <WalletBalance
-                  onClick={() => {
-                    setAmountToRemove(fundingBalance)
-                    setAmountToRemoveDisplay(sharesBalance)
-                  }}
-                  symbol="Shares"
-                  text="My Pool Tokens"
-                  value={formatNumber(sharesBalance)}
-                />
-                <TextfieldCustomPlaceholder
-                  formField={
-                    <BigNumberInput
-                      decimals={collateral.decimals}
-                      name="amountToRemove"
-                      onChange={(e: BigNumberInputReturn) => {
-                        setAmountToRemove(e.value)
-                        setAmountToRemoveDisplay('')
-                      }}
-                      value={amountToRemove}
-                      valueToDisplay={amountToRemoveDisplay}
-                    />
-                  }
-                  symbol="Shares"
-                />
-                {sharesAmountError && <GenericError>{sharesAmountError}</GenericError>}
-              </>
-            )}
-          </div>
-          <div>
-            {activeTab === Tabs.deposit && (
-              <TransactionDetailsCard>
-                <TransactionDetailsRow
-                  emphasizeValue={fee.gt(0)}
-                  state={ValueStates.success}
-                  title={'Earn Trading Fee'}
-                  value={feeFormatted}
-                />
-                <TransactionDetailsLine />
-                <TransactionDetailsRow
-                  emphasizeValue={poolTokens.gt(0)}
-                  state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
-                  title={'Pool Tokens'}
-                  value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals))}`}
-                />
-              </TransactionDetailsCard>
-            )}
-            {activeTab === Tabs.withdraw && (
-              <TransactionDetailsCard>
-                <TransactionDetailsRow
-                  emphasizeValue={userEarnings.gt(0)}
-                  state={ValueStates.success}
-                  title={'Earned'}
-                  value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
-                />
-                <TransactionDetailsRow
-                  state={ValueStates.normal}
-                  title={'Deposited'}
-                  value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${collateral.symbol}`}
-                />
-                <TransactionDetailsLine />
-                <TransactionDetailsRow
-                  emphasizeValue={depositedTokensTotal.gt(0)}
-                  state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
-                  title={'Total'}
-                  value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${
-                    collateral.symbol
-                  }`}
-                />
-              </TransactionDetailsCard>
-            )}
-          </div>
-        </GridTransactionDetails>
-        {isNegativeAmountToFund && (
-          <WarningMessage
-            additionalDescription={''}
-            danger={true}
-            description={`Your deposit amount should not be negative.`}
-            href={''}
-            hyperlinkDescription={''}
-          />
-        )}
-        {isNegativeAmountToRemove && (
-          <WarningMessage
-            additionalDescription={''}
-            danger={true}
-            description={`Your withdraw amount should not be negative.`}
-            href={''}
-            hyperlinkDescription={''}
-          />
-        )}
-        {activeTab === Tabs.deposit && showSetAllowance && (
-          <SetAllowance
-            collateral={collateral}
-            finished={allowanceFinished && RemoteData.is.success(allowance)}
-            loading={RemoteData.is.asking(allowance)}
-            onUnlock={unlockCollateral}
-          />
-        )}
-        <ButtonContainer>
-          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
-            Cancel
-          </LeftButton>
-          {activeTab === Tabs.deposit && (
-            <Button buttonType={ButtonType.secondaryLine} disabled={disableDepositButton} onClick={() => addFunding()}>
+      <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Pool Liquidity" />
+      <OutcomeTable
+        balances={balances}
+        collateral={collateral}
+        disabledColumns={[OutcomeTableValue.OutcomeProbability, OutcomeTableValue.Payout]}
+        displayRadioSelection={false}
+        newShares={activeTab === Tabs.deposit ? sharesAfterAddingFunding : sharesAfterRemovingFunding}
+        probabilities={probabilities}
+        showSharesChange={showSharesChange}
+      />
+      <WarningMessageStyled
+        additionalDescription={''}
+        description={
+          'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
+        }
+        href={DOCUMENT_FAQ}
+        hyperlinkDescription={'More Info'}
+      />
+      <GridTransactionDetails>
+        <div>
+          <TabsGrid>
+            <ButtonTab
+              active={disableDepositTab ? false : activeTab === Tabs.deposit}
+              disabled={disableDepositTab}
+              onClick={() => setActiveTab(Tabs.deposit)}
+            >
               Deposit
-            </Button>
-          )}
-          {activeTab === Tabs.withdraw && (
-            <Button
-              buttonType={ButtonType.secondaryLine}
-              disabled={disableWithdrawButton}
-              onClick={() => removeFunding()}
+            </ButtonTab>
+            <ButtonTab
+              active={disableDepositTab ? true : activeTab === Tabs.withdraw}
+              onClick={() => setActiveTab(Tabs.withdraw)}
             >
               Withdraw
-            </Button>
+            </ButtonTab>
+          </TabsGrid>
+          {activeTab === Tabs.deposit && (
+            <>
+              <WalletBalance
+                onClick={() => {
+                  setAmountToFund(collateralBalance)
+                  setAmountToFundDisplay(walletBalance)
+                }}
+                symbol={collateral.symbol}
+                value={walletBalance}
+              />
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInput
+                    decimals={collateral.decimals}
+                    name="amountToFund"
+                    onChange={(e: BigNumberInputReturn) => {
+                      setAmountToFund(e.value)
+                      setAmountToFundDisplay('')
+                    }}
+                    value={amountToFund}
+                    valueToDisplay={amountToFundDisplay}
+                  />
+                }
+                symbol={collateral.symbol}
+              />
+              {collateralAmountError && <GenericError>{collateralAmountError}</GenericError>}
+            </>
           )}
-        </ButtonContainer>
-      </ViewCard>
+          {activeTab === Tabs.withdraw && (
+            <>
+              <WalletBalance
+                onClick={() => {
+                  setAmountToRemove(fundingBalance)
+                  setAmountToRemoveDisplay(sharesBalance)
+                }}
+                symbol="Shares"
+                text="My Pool Tokens"
+                value={formatNumber(sharesBalance)}
+              />
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInput
+                    decimals={collateral.decimals}
+                    name="amountToRemove"
+                    onChange={(e: BigNumberInputReturn) => {
+                      setAmountToRemove(e.value)
+                      setAmountToRemoveDisplay('')
+                    }}
+                    value={amountToRemove}
+                    valueToDisplay={amountToRemoveDisplay}
+                  />
+                }
+                symbol="Shares"
+              />
+              {sharesAmountError && <GenericError>{sharesAmountError}</GenericError>}
+            </>
+          )}
+        </div>
+        <div>
+          {activeTab === Tabs.deposit && (
+            <TransactionDetailsCard>
+              <TransactionDetailsRow
+                emphasizeValue={fee.gt(0)}
+                state={ValueStates.success}
+                title={'Earn Trading Fee'}
+                value={feeFormatted}
+              />
+              <TransactionDetailsLine />
+              <TransactionDetailsRow
+                emphasizeValue={poolTokens.gt(0)}
+                state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
+                title={'Pool Tokens'}
+                value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals))}`}
+              />
+            </TransactionDetailsCard>
+          )}
+          {activeTab === Tabs.withdraw && (
+            <TransactionDetailsCard>
+              <TransactionDetailsRow
+                emphasizeValue={userEarnings.gt(0)}
+                state={ValueStates.success}
+                title={'Earned'}
+                value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
+              />
+              <TransactionDetailsRow
+                state={ValueStates.normal}
+                title={'Deposited'}
+                value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${collateral.symbol}`}
+              />
+              <TransactionDetailsLine />
+              <TransactionDetailsRow
+                emphasizeValue={depositedTokensTotal.gt(0)}
+                state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
+                title={'Total'}
+                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${
+                  collateral.symbol
+                }`}
+              />
+            </TransactionDetailsCard>
+          )}
+        </div>
+      </GridTransactionDetails>
+      {isNegativeAmountToFund && (
+        <WarningMessage
+          additionalDescription={''}
+          danger={true}
+          description={`Your deposit amount should not be negative.`}
+          href={''}
+          hyperlinkDescription={''}
+        />
+      )}
+      {isNegativeAmountToRemove && (
+        <WarningMessage
+          additionalDescription={''}
+          danger={true}
+          description={`Your withdraw amount should not be negative.`}
+          href={''}
+          hyperlinkDescription={''}
+        />
+      )}
+      {activeTab === Tabs.deposit && showSetAllowance && (
+        <SetAllowance
+          collateral={collateral}
+          finished={allowanceFinished && RemoteData.is.success(allowance)}
+          loading={RemoteData.is.asking(allowance)}
+          onUnlock={unlockCollateral}
+        />
+      )}
+      <ButtonContainer>
+        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
+          Cancel
+        </LeftButton>
+        {activeTab === Tabs.deposit && (
+          <Button buttonType={ButtonType.secondaryLine} disabled={disableDepositButton} onClick={() => addFunding()}>
+            Deposit
+          </Button>
+        )}
+        {activeTab === Tabs.withdraw && (
+          <Button
+            buttonType={ButtonType.secondaryLine}
+            disabled={disableWithdrawButton}
+            onClick={() => removeFunding()}
+          >
+            Withdraw
+          </Button>
+        )}
+      </ButtonContainer>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
