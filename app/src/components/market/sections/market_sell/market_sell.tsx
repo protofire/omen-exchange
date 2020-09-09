@@ -17,7 +17,7 @@ import {
 import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder, SubsectionTitle, SubsectionTitleWrapper } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
@@ -32,6 +32,15 @@ import { TransactionDetailsRow, ValueStates } from '../../common/transaction_det
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
+
+const TopCard = styled(ViewCard)`
+  padding-bottom: 0;
+  margin-bottom: 24px;
+`
+
+const BottomCard = styled(ViewCard)`
+  
+`
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -177,117 +186,124 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   return (
     <>
       <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
-      <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Sell Shares" />
-      <OutcomeTable
-        balances={balances}
-        collateral={collateral}
-        disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
-        newShares={balances.map((balance, i) =>
-          i === outcomeIndex ? balance.shares.sub(amountShares) : balance.shares,
-        )}
-        outcomeHandleChange={(value: number) => {
-          setOutcomeIndex(value)
-          setBalanceItem(balances[value])
-        }}
-        outcomeSelected={outcomeIndex}
-        probabilities={probabilities}
-        showPriceChange={amountShares.gt(0)}
-        showSharesChange={amountShares.gt(0)}
-      />
-      <GridTransactionDetails>
-        <div>
-          <WalletBalance
-            data-class="customTooltip"
-            data-delay-hide="500"
-            data-effect="solid"
-            data-for="walletBalanceTooltip"
-            data-multiline={true}
-            data-place="right"
-            data-tip={`Sell all of the selected outcome's shares.`}
-            onClick={() => {
-              setAmountShares(balanceItem.shares)
-              setAmountSharesToDisplay(formatNumber(selectedOutcomeBalance, 5))
-            }}
-            symbol="Shares"
-            value={formatNumber(selectedOutcomeBalance, 5)}
-          />
-          <ReactTooltip id="walletBalanceTooltip" />
-          <TextfieldCustomPlaceholder
-            formField={
-              <BigNumberInput
-                decimals={collateral.decimals}
-                name="amount"
-                onChange={(e: BigNumberInputReturn) => {
-                  setAmountShares(e.value)
-                  setAmountSharesToDisplay('')
-                }}
-                value={amountShares}
-                valueToDisplay={amountSharesToDisplay}
-              />
-            }
-            symbol={'Shares'}
-          />
-          {amountError && <GenericError>{amountError}</GenericError>}
-        </div>
-        <div>
-          <TransactionDetailsCard>
-            <TransactionDetailsRow
-              title={'Sell Amount'}
-              value={`${formatNumber(formatBigNumber(amountShares, collateral.decimals))} Shares`}
-            />
-            <TransactionDetailsRow
-              emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
-              state={ValueStates.success}
-              title={'Profit'}
-              value={
-                potentialValue
-                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${collateral.symbol}`
-                  : '0.00'
-              }
-            />
-            <TransactionDetailsRow
-              title={'Trading Fee'}
-              value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'} ${
-                collateral.symbol
-              }`}
-            />
-            <TransactionDetailsLine />
-            <TransactionDetailsRow
-              emphasizeValue={
-                (tradedCollateral && parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0) ||
-                false
-              }
-              state={
-                (tradedCollateral &&
-                  parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0 &&
-                  ValueStates.important) ||
-                ValueStates.normal
-              }
-              title={'Total'}
-              value={`${
-                tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
-              } ${collateral.symbol}`}
-            />
-          </TransactionDetailsCard>
-        </div>
-      </GridTransactionDetails>
-      {isNegativeAmountShares && (
-        <WarningMessage
-          additionalDescription={''}
-          danger={true}
-          description={`Your sell amount should not be negative.`}
-          href={''}
-          hyperlinkDescription={''}
+      <TopCard>
+        <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Sell Shares" />
+      </TopCard>
+      <BottomCard>
+        <SubsectionTitleWrapper>
+          <SubsectionTitle>Trade Outcome</SubsectionTitle>
+        </SubsectionTitleWrapper>
+        <OutcomeTable
+          balances={balances}
+          collateral={collateral}
+          disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
+          newShares={balances.map((balance, i) =>
+            i === outcomeIndex ? balance.shares.sub(amountShares) : balance.shares,
+          )}
+          outcomeHandleChange={(value: number) => {
+            setOutcomeIndex(value)
+            setBalanceItem(balances[value])
+          }}
+          outcomeSelected={outcomeIndex}
+          probabilities={probabilities}
+          showPriceChange={amountShares.gt(0)}
+          showSharesChange={amountShares.gt(0)}
         />
-      )}
-      <ButtonContainer>
-        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
-          Cancel
-        </LeftButton>
-        <Button buttonType={ButtonType.secondaryLine} disabled={isSellButtonDisabled} onClick={() => finish()}>
-          Sell
-        </Button>
-      </ButtonContainer>
+        <GridTransactionDetails>
+          <div>
+            <WalletBalance
+              data-class="customTooltip"
+              data-delay-hide="500"
+              data-effect="solid"
+              data-for="walletBalanceTooltip"
+              data-multiline={true}
+              data-place="right"
+              data-tip={`Sell all of the selected outcome's shares.`}
+              onClick={() => {
+                setAmountShares(balanceItem.shares)
+                setAmountSharesToDisplay(formatNumber(selectedOutcomeBalance, 5))
+              }}
+              symbol="Shares"
+              value={formatNumber(selectedOutcomeBalance, 5)}
+            />
+            <ReactTooltip id="walletBalanceTooltip" />
+            <TextfieldCustomPlaceholder
+              formField={
+                <BigNumberInput
+                  decimals={collateral.decimals}
+                  name="amount"
+                  onChange={(e: BigNumberInputReturn) => {
+                    setAmountShares(e.value)
+                    setAmountSharesToDisplay('')
+                  }}
+                  value={amountShares}
+                  valueToDisplay={amountSharesToDisplay}
+                />
+              }
+              symbol={'Shares'}
+            />
+            {amountError && <GenericError>{amountError}</GenericError>}
+          </div>
+          <div>
+            <TransactionDetailsCard>
+              <TransactionDetailsRow
+                title={'Sell Amount'}
+                value={`${formatNumber(formatBigNumber(amountShares, collateral.decimals))} Shares`}
+              />
+              <TransactionDetailsRow
+                emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
+                state={ValueStates.success}
+                title={'Profit'}
+                value={
+                  potentialValue
+                    ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${collateral.symbol}`
+                    : '0.00'
+                }
+              />
+              <TransactionDetailsRow
+                title={'Trading Fee'}
+                value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'} ${
+                  collateral.symbol
+                }`}
+              />
+              <TransactionDetailsLine />
+              <TransactionDetailsRow
+                emphasizeValue={
+                  (tradedCollateral && parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0) ||
+                  false
+                }
+                state={
+                  (tradedCollateral &&
+                    parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0 &&
+                    ValueStates.important) ||
+                  ValueStates.normal
+                }
+                title={'Total'}
+                value={`${
+                  tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
+                } ${collateral.symbol}`}
+              />
+            </TransactionDetailsCard>
+          </div>
+        </GridTransactionDetails>
+        {isNegativeAmountShares && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description={`Your sell amount should not be negative.`}
+            href={''}
+            hyperlinkDescription={''}
+          />
+        )}
+        <ButtonContainer>
+          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
+            Cancel
+          </LeftButton>
+          <Button buttonType={ButtonType.secondaryLine} disabled={isSellButtonDisabled} onClick={() => finish()}>
+            Sell
+          </Button>
+        </ButtonContainer>
+      </BottomCard>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
