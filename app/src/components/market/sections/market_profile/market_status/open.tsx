@@ -10,6 +10,16 @@ import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 import { WarningMessage } from '../../../common/warning_message'
+import { SubsectionTitleWrapper, SubsectionTitle } from '../../../../common'
+
+const TopCard = styled(ViewCard)`
+  padding-bottom: 0;
+  margin-bottom: 24px;
+`
+
+const BottomCard = styled(ViewCard)`
+  
+`
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -150,24 +160,31 @@ const Wrapper = (props: Props) => {
 
   return (
     <>
-      <MarketTopDetailsOpen marketMakerData={marketMakerData} />
-      {renderTableData()}
-      {isQuestionOpen && openQuestionMessage}
-      {!hasFunding && !isQuestionOpen && (
-        <WarningMessageStyled
-          additionalDescription={''}
-          description={'Trading is disabled due to lack of liquidity.'}
-          grayscale={true}
-          href={''}
-          hyperlinkDescription={''}
-        />
-      )}
-      <WhenConnected>
-        <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
-          {poolButton}
-          {isQuestionOpen ? openInRealitioButton : buySellButtons}
-        </StyledButtonContainer>
-      </WhenConnected>
+      <TopCard>
+        <MarketTopDetailsOpen marketMakerData={marketMakerData} />
+      </TopCard>
+      <BottomCard>
+        <SubsectionTitleWrapper>
+          <SubsectionTitle>Trade Outcome</SubsectionTitle>
+        </SubsectionTitleWrapper>
+        {renderTableData()}
+        {isQuestionOpen && openQuestionMessage}
+        {!hasFunding && !isQuestionOpen && (
+          <WarningMessageStyled
+            additionalDescription={''}
+            description={'Trading is disabled due to lack of liquidity.'}
+            grayscale={true}
+            href={''}
+            hyperlinkDescription={''}
+          />
+        )}
+        <WhenConnected>
+          <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+            {poolButton}
+            {isQuestionOpen ? openInRealitioButton : buySellButtons}
+          </StyledButtonContainer>
+        </WhenConnected>
+      </BottomCard>
     </>
   )
 }
