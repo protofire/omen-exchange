@@ -125,8 +125,6 @@ export const ProgressBar: React.FC<Props> = props => {
     state,
   } = props
 
-  console.log(bondTimestamp)
-
   const fillOpen = state === State.finalizing || state === State.arbitration || state === State.closed
   const fillFinalizing = state === State.arbitration || state === State.closed
   const fillArbitration = state === State.closed
