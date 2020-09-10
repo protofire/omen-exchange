@@ -225,7 +225,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
     (currentFilter.currency ||
       currentFilter.arbitrator ||
-      currentFilter.curationSource === CurationSource.ALL_SOURCES) &&
+      currentFilter.curationSource !== CurationSource.ALL_SOURCES) &&
       !fetchMyMarkets,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)

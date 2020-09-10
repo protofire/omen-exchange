@@ -9,7 +9,7 @@ import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/f
 import { TokenItem } from '../token_item'
 
 import { DxDao } from './img/dxDao'
-import KlerosSVG from './img/kleros.svg'
+import { Kleros } from './img/kleros'
 
 const Wrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
@@ -23,11 +23,6 @@ const Wrapper = styled.div`
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     grid-template-columns: 1fr 1fr 1fr;
   }
-`
-
-const KlerosLogo = styled.img`
-  width: 20px;
-  height: 20px;
 `
 
 const LogoWrapper = styled.div`
@@ -141,7 +136,7 @@ export const AdvancedFilters = (props: Props) => {
       content: (
         <CurationSourceWrapper>
           <LogoWrapper>
-            <KlerosLogo alt="" src={KlerosSVG} />
+            <Kleros />
           </LogoWrapper>
           {CurationSource.KLEROS}
         </CurationSourceWrapper>

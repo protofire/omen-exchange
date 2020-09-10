@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
 import { BuildQueryType, CurationSource, MarketStates, MarketsSortCriteria } from './../util/types'
@@ -20,40 +19,6 @@ export const MarketDataFragment = gql`
     klerosTCRregistered
   }
 `
-
-export type GraphMarketMakerDataItem = {
-  id: string
-  collateralVolume: string
-  collateralToken: string
-  outcomeTokenAmounts: string[]
-  title: string
-  outcomes: Maybe<string[]>
-  openingTimestamp: string
-  arbitrator: string
-  category: string
-  templateId: string
-  scaledLiquidityParameter: string
-  klerosTCRregistered: boolean
-  curatedByDxDao: boolean
-  curatedByDxDaoOrKleros: boolean
-}
-
-export type MarketMakerDataItem = {
-  address: string
-  collateralVolume: BigNumber
-  collateralToken: string
-  outcomeTokenAmounts: BigNumber[]
-  title: string
-  outcomes: Maybe<string[]>
-  openingTimestamp: Date
-  arbitrator: string
-  category: string
-  templateId: number
-  scaledLiquidityParameter: number
-  klerosTCRregistered: boolean
-  curatedByDxDao: boolean
-  curatedByDxDaoOrKleros: boolean
-}
 
 export const DEFAULT_OPTIONS = {
   state: MarketStates.open,
