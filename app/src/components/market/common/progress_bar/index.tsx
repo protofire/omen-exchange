@@ -1,6 +1,6 @@
+import { BigNumber } from 'ethers/utils'
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
-import { BigNumber } from 'ethers/utils'
 
 const ProgressBarWrapper = styled.div`
   display: flex;
@@ -118,11 +118,11 @@ export const ProgressBar: React.FC<Props> = props => {
   const {
     answerFinalizedTimestamp,
     arbitrationOccurred,
+    bondTimestamp,
     creationTimestamp,
     pendingArbitration,
     resolutionTimestamp,
     state,
-    bondTimestamp,
   } = props
 
   console.log(bondTimestamp)

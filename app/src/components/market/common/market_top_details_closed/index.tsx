@@ -24,8 +24,9 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     answerFinalizedTimestamp,
     arbitrator,
     collateral: collateralToken,
-    collateralVolume,
+    lastActiveDay,
     question,
+    runningDailyVolumeByHour,
   } = marketMakerData
 
   const [showingTradeHistory, setShowingTradeHistory] = useState(false)
@@ -66,8 +67,9 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
       ></ProgressBar>
       <MarketData
         currency={collateralToken}
-        dailyVolume={collateralVolume}
+        lastActiveDay={lastActiveDay}
         resolutionTimestamp={question.resolution}
+        runningDailyVolumeByHour={runningDailyVolumeByHour}
       ></MarketData>
       <AdditionalMarketData
         arbitrator={arbitrator}

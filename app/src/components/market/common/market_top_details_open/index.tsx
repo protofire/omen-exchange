@@ -21,7 +21,15 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const [tradeHistoryLoaded, setTradeHistoryLoaded] = useState(false)
 
   const { marketMakerData, title } = props
-  const { address, answerFinalizedTimestamp, arbitrator, collateral, collateralVolume, question } = marketMakerData
+  const {
+    address,
+    answerFinalizedTimestamp,
+    arbitrator,
+    collateral,
+    lastActiveDay,
+    question,
+    runningDailyVolumeByHour,
+  } = marketMakerData
 
   const toggleTradeHistory = () => {
     if (showingTradeHistory) {
@@ -64,16 +72,17 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       <ProgressBar
         answerFinalizedTimestamp={finalizedTimestampDate}
         arbitrationOccurred={arbitrationOccurred}
+        bondTimestamp={question.currentAnswerTimestamp}
         creationTimestamp={creationDate}
         pendingArbitration={isPendingArbitration}
         resolutionTimestamp={question.resolution}
         state={marketState}
-        bondTimestamp={question.currentAnswerTimestamp}
       ></ProgressBar>
       <MarketData
         currency={collateral}
-        dailyVolume={collateralVolume}
+        lastActiveDay={lastActiveDay}
         resolutionTimestamp={question.resolution}
+        runningDailyVolumeByHour={runningDailyVolumeByHour}
       ></MarketData>
       <AdditionalMarketData
         arbitrator={arbitrator}

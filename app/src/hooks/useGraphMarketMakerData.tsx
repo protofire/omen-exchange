@@ -38,6 +38,7 @@ const query = gql`
       isPendingArbitration
       arbitrationOccurred
       currentAnswerTimestamp
+      runningDailyVolumeByHour
       question {
         id
         data
@@ -72,6 +73,7 @@ type GraphResponseFixedProductMarketMaker = {
   isPendingArbitration: boolean
   arbitrationOccurred: boolean
   currentAnswerTimestamp: BigNumber
+  runningDailyVolumeByHour: BigNumber[]
   question: {
     id: string
     data: string

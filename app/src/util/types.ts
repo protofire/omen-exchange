@@ -210,6 +210,8 @@ export interface MarketMakerData {
   klerosTCRregistered: boolean
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
+  runningDailyVolumeByHour: BigNumber[]
+  lastActiveDay: number
 }
 
 export enum Ternary {

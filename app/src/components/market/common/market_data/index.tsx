@@ -5,7 +5,7 @@ import React, { DOMAttributes, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { formatBigNumber } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
 
 const MarketDataWrapper = styled.div`
@@ -63,12 +63,13 @@ const MarketDataItemImage = styled.img`
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   resolutionTimestamp: Date
-  dailyVolume: BigNumber
+  runningDailyVolumeByHour: BigNumber[]
+  lastActiveDay: number
   currency: Token
 }
 
 export const MarketData: React.FC<Props> = props => {
-  const { currency, dailyVolume, resolutionTimestamp } = props
+  const { currency, lastActiveDay, resolutionTimestamp, runningDailyVolumeByHour } = props
 
   const context = useConnectedWeb3Context()
   const tokens = useTokens(context)
@@ -82,6 +83,11 @@ export const MarketData: React.FC<Props> = props => {
   }, [tokens, currency.address])
 
   const timezoneAbbr = momentTZ.tz(momentTZ.tz.guess()).zoneAbbr()
+
+  const dailyVolume =
+    Math.floor(Date.now() / 86400000) === lastActiveDay && runningDailyVolumeByHour && currency.decimals
+      ? formatBigNumber(runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24], currency.decimals)
+      : '0'
 
   return (
     <MarketDataWrapper>
@@ -100,7 +106,7 @@ export const MarketData: React.FC<Props> = props => {
       <MarketDataItem>
         <MarketDataItemTop>
           <MarketDataItemImage src={currencyIcon && currencyIcon}></MarketDataItemImage>
-          {formatNumber(formatBigNumber(dailyVolume, currency.decimals))} {currency.symbol}
+          {dailyVolume} {currency.symbol}
         </MarketDataItemTop>
         <MarketDataItemBottom>24h Trade Volume</MarketDataItemBottom>
       </MarketDataItem>
