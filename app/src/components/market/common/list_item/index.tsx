@@ -139,7 +139,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
                 ? formatBigNumber(dailyVolume[Math.floor(Date.now() / (1000 * 60 * 60)) % 24], decimals)
                 : 0
             } ${symbol} - 24hr Volume`}
-          {currentFilter.sortBy === 'scaledLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
+          {currentFilter.sortBy === 'usdLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
       </Info>
