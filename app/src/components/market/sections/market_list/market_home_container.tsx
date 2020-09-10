@@ -16,12 +16,12 @@ import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   CategoryDataItem,
+  CurationSource,
   GraphMarketMakerDataItem,
   GraphResponseCategories,
   MarketFilters,
   MarketMakerDataItem,
   MarketStates,
-  MarketValidity,
   MarketsSortCriteria,
 } from '../../../../util/types'
 
@@ -48,6 +48,8 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       templateId: +graphMarketMakerDataItem.templateId,
       title: graphMarketMakerDataItem.title,
       usdLiquidityParameter: parseFloat(graphMarketMakerDataItem.usdLiquidityParameter),
+      klerosTCRregistered: graphMarketMakerDataItem.klerosTCRregistered,
+      curatedByDxDaoOrKleros: graphMarketMakerDataItem.curatedByDxDaoOrKleros,
     }
   })
 }
@@ -69,9 +71,9 @@ const MarketHomeContainer: React.FC = () => {
   let arbitratorRoute = location.pathname.split('/arbitrator/')[1]
   if (arbitratorRoute) arbitratorRoute = arbitratorRoute.split('/')[0]
 
-  const marketValidityFilter = location.pathname.includes('market-validity')
-  let marketValidityRoute = location.pathname.split('/market-validity/')[1]
-  if (marketValidityRoute) marketValidityRoute = marketValidityRoute.split('/')[0]
+  const curationSourceFilter = location.pathname.includes('curation-source')
+  let curationSourceRoute = location.pathname.split('/curation-source/')[1]
+  if (curationSourceRoute) curationSourceRoute = curationSourceRoute.split('/')[0]
 
   const categoryFilter = location.pathname.includes('category')
   let categoryRoute = location.pathname.split('/category/')[1]
@@ -113,11 +115,11 @@ const MarketHomeContainer: React.FC = () => {
     arbitratorParam = null
   }
 
-  let marketValidityParam: MarketValidity
-  if (marketValidityFilter) {
-    marketValidityParam = marketValidityRoute as MarketValidity
+  let curationSourceParam: CurationSource
+  if (curationSourceFilter) {
+    curationSourceParam = curationSourceRoute as CurationSource
   } else {
-    marketValidityParam = MarketValidity.VALID
+    curationSourceParam = CurationSource.ALL_SOURCES
   }
 
   let categoryParam: string
@@ -154,7 +156,7 @@ const MarketHomeContainer: React.FC = () => {
     arbitrator: arbitratorParam,
     templateId: null,
     currency: currencyParam,
-    marketValidity: marketValidityParam,
+    curationSource: curationSourceParam,
   })
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
@@ -282,8 +284,8 @@ const MarketHomeContainer: React.FC = () => {
         routeQueryArray.push(`tag=${filter.title}`)
       }
 
-      if (filter.marketValidity) {
-        route += `/market-validity/${filter.marketValidity}`
+      if (filter.curationSource) {
+        route += `/curation-source/${filter.curationSource}`
       }
 
       const routeQueryString = routeQueryArray.join('&')

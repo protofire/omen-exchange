@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
@@ -6,10 +6,10 @@ import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   CategoryDataItem,
+  CurationSource,
   MarketFilters,
   MarketMakerDataItem,
   MarketStates,
-  MarketValidity,
   MarketsSortCriteria,
 } from '../../../../util/types'
 import { ButtonCircle } from '../../../button'
@@ -223,13 +223,15 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
-    (currentFilter.currency || currentFilter.arbitrator || currentFilter.marketValidity === MarketValidity.INVALID) &&
+    (currentFilter.currency ||
+      currentFilter.arbitrator ||
+      currentFilter.curationSource !== CurationSource.ALL_SOURCES) &&
       !fetchMyMarkets,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
-  const [marketValidity, setMarketValidity] = useState<MarketValidity>(currentFilter.marketValidity)
+  const [curationSource, setCurationSource] = useState<CurationSource>(currentFilter.curationSource)
 
   const filters = [
     {
@@ -287,7 +289,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     onFilterChange({
       arbitrator,
-      marketValidity,
+      curationSource,
       templateId,
       currency,
       category,
@@ -298,7 +300,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     })
   }, [
     arbitrator,
-    marketValidity,
+    curationSource,
     templateId,
     currency,
     category,
@@ -309,11 +311,18 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     onFilterChange,
   ])
 
+  const isInitialMount = useRef(true)
   useEffect(() => {
-    setShowAdvancedFilters(
-      (currentFilter.currency || currentFilter.arbitrator || currentFilter.marketValidity === MarketValidity.INVALID) &&
-        !fetchMyMarkets,
-    )
+    if (isInitialMount.current) {
+      isInitialMount.current = true
+    } else {
+      setShowAdvancedFilters(
+        (currentFilter.currency ||
+          currentFilter.arbitrator ||
+          currentFilter.curationSource !== CurationSource.ALL_SOURCES) &&
+          !fetchMyMarkets,
+      )
+    }
   }, [currentFilter, fetchMyMarkets])
 
   const toggleSearch = useCallback(() => {
@@ -476,11 +485,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         {showAdvancedFilters && (
           <AdvancedFilters
             arbitrator={arbitrator}
+            curationSource={curationSource}
             currency={currency}
-            marketValidity={marketValidity}
             onChangeArbitrator={setArbitrator}
+            onChangeCurationSource={setCurationSource}
             onChangeCurrency={setCurrency}
-            onChangeMarketValidity={setMarketValidity}
             onChangeTemplateId={setTemplateId}
           />
         )}

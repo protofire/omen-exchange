@@ -38,6 +38,8 @@ const query = gql`
         id
         data
       }
+      klerosTCRitemID
+      klerosTCRregistered
     }
   }
 `
@@ -72,6 +74,9 @@ type GraphResponseFixedProductMarketMaker = {
   timeout: string
   title: string
   scaledLiquidityParameter: string
+  klerosTCRregistered: boolean
+  curatedByDxDao: boolean
+  curatedByDxDaoOrKleros: boolean
 }
 
 type GraphResponse = {
@@ -92,6 +97,9 @@ export type GraphMarketMakerData = {
   fee: BigNumber
   question: Question
   scaledLiquidityParameter: number
+  klerosTCRregistered: boolean
+  curatedByDxDao: boolean
+  curatedByDxDaoOrKleros: boolean
 }
 
 type Result = {
@@ -125,6 +133,9 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
       arbitratorAddress: data.arbitrator,
       outcomes,
     },
+    curatedByDxDao: data.curatedByDxDao,
+    klerosTCRregistered: data.klerosTCRregistered,
+    curatedByDxDaoOrKleros: data.curatedByDxDaoOrKleros,
   }
 }
 

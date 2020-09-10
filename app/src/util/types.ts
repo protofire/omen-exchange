@@ -167,9 +167,11 @@ export type MarketsSortCriteria =
   | 'sort24HourVolume22'
   | 'sort24HourVolume23'
 
-export enum MarketValidity {
-  VALID = 'Valid',
-  INVALID = 'Invalid',
+export enum CurationSource {
+  ALL_SOURCES = 'All Sources',
+  DXDAO = 'Dxdao',
+  KLEROS = 'Kleros',
+  NO_SOURCES = 'No Sources',
 }
 
 export interface MarketFilters {
@@ -181,7 +183,7 @@ export interface MarketFilters {
   arbitrator: Maybe<string>
   templateId: Maybe<string>
   currency: Maybe<string>
-  marketValidity: MarketValidity
+  curationSource: CurationSource
 }
 
 export interface MarketMakerData {
@@ -202,6 +204,9 @@ export interface MarketMakerData {
   totalPoolShares: BigNumber
   userEarnings: BigNumber
   userPoolShares: BigNumber
+  klerosTCRregistered: boolean
+  curatedByDxDao: boolean
+  curatedByDxDaoOrKleros: boolean
 }
 
 export enum Ternary {
@@ -251,6 +256,8 @@ export type GraphMarketMakerDataItem = {
   templateId: string
   usdLiquidityParameter: string
   curatedByDxDao: boolean
+  klerosTCRregistered: boolean
+  curatedByDxDaoOrKleros: boolean
 }
 
 export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
@@ -276,6 +283,8 @@ export type MarketMakerDataItem = {
   templateId: number
   usdLiquidityParameter: number
   curatedByDxDao: boolean
+  klerosTCRregistered: boolean
+  curatedByDxDaoOrKleros: boolean
 }
 
 export type BuildQueryType = MarketFilters & {

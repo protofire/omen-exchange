@@ -1,6 +1,6 @@
 import gql from 'graphql-tag'
 
-import { BuildQueryType, MarketStates, MarketValidity, MarketsSortCriteria } from './../util/types'
+import { BuildQueryType, CurationSource, MarketStates, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
@@ -16,6 +16,7 @@ export const MarketDataFragment = gql`
     templateId
     scaledLiquidityParameter
     curatedByDxDao
+    klerosTCRregistered
   }
 `
 
@@ -28,7 +29,7 @@ export const DEFAULT_OPTIONS = {
   arbitrator: null as Maybe<string>,
   templateId: null as Maybe<string>,
   currency: null as Maybe<string>,
-  marketValidity: MarketValidity.VALID,
+  curationSource: CurationSource.ALL_SOURCES,
   sortBy: null as Maybe<MarketsSortCriteria>,
   sortByDirection: 'desc' as 'asc' | 'desc',
   networkId: 1 as Maybe<number>,
@@ -51,8 +52,8 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
   const {
     arbitrator,
     category,
+    curationSource,
     currency,
-    marketValidity,
     networkId,
     state,
     templateId,
@@ -77,7 +78,13 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee_lte: $fee',
     `timeout_gte: ${MIN_TIMEOUT}`,
-    `curatedByDxDao: ${marketValidity === MarketValidity.VALID}`,
+    curationSource === CurationSource.DXDAO
+      ? `curatedByDxDao: true`
+      : curationSource === CurationSource.KLEROS
+      ? `klerosTCRregistered: true`
+      : curationSource === CurationSource.ALL_SOURCES
+      ? `curatedByDxDaoOrKleros: true`
+      : '', // This is option CurationSource.NO_SOURCES (i.e. show all regardless of whether it is curated or not),
   ]
     .filter(s => s.length)
     .join(',')

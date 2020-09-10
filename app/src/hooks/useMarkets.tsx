@@ -36,9 +36,9 @@ export const useMarkets = (options: Options): any => {
   const {
     arbitrator,
     category,
+    curationSource,
     currency,
     first,
-    marketValidity,
     skip: skipFromOptions,
     sortBy,
     sortByDirection,
@@ -64,7 +64,7 @@ export const useMarkets = (options: Options): any => {
     arbitrator,
     templateId,
     currency,
-    marketValidity,
+    curationSource,
   }
 
   const marketQuery = buildQueryMarkets(queryOptions)
@@ -108,7 +108,7 @@ export const useMarkets = (options: Options): any => {
     setMarkets({
       fixedProductMarketMakers: [],
     })
-  }, [arbitrator, currency, marketValidity, category, state])
+  }, [arbitrator, currency, curationSource, category, state])
 
   return { markets, error, fetchMore, loading, moreMarkets }
 }
