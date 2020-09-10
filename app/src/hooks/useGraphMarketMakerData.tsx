@@ -34,6 +34,7 @@ const query = gql`
       currentAnswer
       answerFinalizedTimestamp
       scaledLiquidityParameter
+      runningDailyVolumeByHour
       question {
         id
         data
@@ -77,6 +78,7 @@ type GraphResponseFixedProductMarketMaker = {
   klerosTCRregistered: boolean
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
+  runningDailyVolumeByHour: BigNumber[]
 }
 
 type GraphResponse = {
@@ -100,6 +102,7 @@ export type GraphMarketMakerData = {
   klerosTCRregistered: boolean
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
+  runningDailyVolumeByHour: BigNumber[]
 }
 
 type Result = {
@@ -123,6 +126,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     payouts: data.condition.payouts ? data.condition.payouts.map(Number) : null,
     fee: bigNumberify(data.fee),
     scaledLiquidityParameter: parseFloat(data.scaledLiquidityParameter),
+    runningDailyVolumeByHour: data.runningDailyVolumeByHour,
     question: {
       id: data.question.id,
       templateId: +data.templateId,
