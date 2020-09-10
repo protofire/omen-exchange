@@ -68,6 +68,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         pendingArbitration={isPendingArbitration}
         resolutionTimestamp={question.resolution}
         state={marketState}
+        bondTimestamp={question.currentAnswerTimestamp}
       ></ProgressBar>
       <MarketData
         currency={collateral}

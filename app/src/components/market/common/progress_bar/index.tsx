@@ -1,5 +1,6 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
+import { BigNumber } from 'ethers/utils'
 
 const ProgressBarWrapper = styled.div`
   display: flex;
@@ -110,6 +111,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   answerFinalizedTimestamp: Maybe<Date>
   pendingArbitration?: boolean
   arbitrationOccurred?: boolean
+  bondTimestamp?: BigNumber
 }
 
 export const ProgressBar: React.FC<Props> = props => {
@@ -120,7 +122,10 @@ export const ProgressBar: React.FC<Props> = props => {
     pendingArbitration,
     resolutionTimestamp,
     state,
+    bondTimestamp,
   } = props
+
+  console.log(bondTimestamp)
 
   const fillOpen = state === State.finalizing || state === State.arbitration || state === State.closed
   const fillFinalizing = state === State.arbitration || state === State.closed
@@ -131,8 +136,11 @@ export const ProgressBar: React.FC<Props> = props => {
   const openFraction = timeSinceOpen / openDuration > 1 ? 1 : timeSinceOpen / openDuration
 
   const finalizingDuration = 24 * 60 * 60 * 1000
-  const timeSinceFinalizing = new Date().getTime() - resolutionTimestamp.getTime()
-  const finalizingFraction = timeSinceFinalizing / finalizingDuration > 1 ? 1 : timeSinceFinalizing / finalizingDuration
+  let finalizingFraction = 0
+  if (bondTimestamp) {
+    const timeSinceFinalizing = new Date().getTime() - new Date(bondTimestamp.toNumber()).getTime()
+    finalizingFraction = timeSinceFinalizing / finalizingDuration > 1 ? 1 : timeSinceFinalizing / finalizingDuration
+  }
 
   let arbitrationFraction = 0
   if (answerFinalizedTimestamp) {

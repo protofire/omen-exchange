@@ -145,6 +145,7 @@ class RealitioService {
       raw: question,
       isPendingArbitration: question.isPendingArbitration,
       arbitrationOccurred: question.arbitrationOccurred,
+      currentAnswerTimestamp: question.currentAnswerTimestamp,
     }
   }
 

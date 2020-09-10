@@ -37,6 +37,7 @@ const query = gql`
       runningDailyVolumeByHour
       isPendingArbitration
       arbitrationOccurred
+      currentAnswerTimestamp
       question {
         id
         data
@@ -70,6 +71,7 @@ type GraphResponseFixedProductMarketMaker = {
   outcomes: Maybe<string[]>
   isPendingArbitration: boolean
   arbitrationOccurred: boolean
+  currentAnswerTimestamp: BigNumber
   question: {
     id: string
     data: string
@@ -142,6 +144,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
       outcomes,
       isPendingArbitration: data.isPendingArbitration,
       arbitrationOccurred: data.arbitrationOccurred,
+      currentAnswerTimestamp: data.currentAnswerTimestamp,
     },
     curatedByDxDao: data.curatedByDxDao,
     klerosTCRregistered: data.klerosTCRregistered,
