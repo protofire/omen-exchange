@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
@@ -311,13 +311,18 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     onFilterChange,
   ])
 
+  const isInitialMount = useRef(true)
   useEffect(() => {
-    setShowAdvancedFilters(
-      (currentFilter.currency ||
-        currentFilter.arbitrator ||
-        currentFilter.curationSource === CurationSource.ALL_SOURCES) &&
-        !fetchMyMarkets,
-    )
+    if (isInitialMount.current) {
+      isInitialMount.current = true
+    } else {
+      setShowAdvancedFilters(
+        (currentFilter.currency ||
+          currentFilter.arbitrator ||
+          currentFilter.curationSource !== CurationSource.ALL_SOURCES) &&
+          !fetchMyMarkets,
+      )
+    }
   }, [currentFilter, fetchMyMarkets])
 
   const toggleSearch = useCallback(() => {
