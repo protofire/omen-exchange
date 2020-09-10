@@ -86,7 +86,6 @@ type GraphResponseFixedProductMarketMaker = {
   klerosTCRregistered: boolean
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
-  runningDailyVolumeByHour: BigNumber[]
 }
 
 type GraphResponse = {
