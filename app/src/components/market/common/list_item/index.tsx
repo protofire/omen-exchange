@@ -74,7 +74,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const { account, library: provider } = context
   const [volume, setVolume] = useState('')
   const [symbol, setSymbol] = useState('')
-  const [dailyVolume, setDailyVolume] = useState('')
+  const [decimals, setDecimals] = useState<number>()
 
   const { currentFilter, market } = props
   const { address, collateralToken, collateralVolume, openingTimestamp, outcomeTokenAmounts, outcomes, title } = market
@@ -100,7 +100,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     ? useGraphMarketMakerDataResult.marketMakerData.scaledLiquidityParameter.toFixed(2)
     : '0'
   
-  const usdDailyVolume: Maybe<BigNumber[]> = useGraphMarketMakerDataResult.marketMakerData && useGraphMarketMakerDataResult.marketMakerData.runningDailyVolumeByHour
+  const dailyVolume: Maybe<BigNumber[]> = useGraphMarketMakerDataResult.marketMakerData && useGraphMarketMakerDataResult.marketMakerData.runningDailyVolumeByHour
 
   useEffect(() => {
     const setToken = async () => {
@@ -108,18 +108,9 @@ export const ListItem: React.FC<Props> = (props: Props) => {
       const { decimals, symbol } = await erc20Service.getProfileSummary()
       const volume = formatBigNumber(collateralVolume, decimals)
 
-      let lastDayVolume: BigNumber
-      let formattedDailyVolume: string
-      if (dailyVolumeUnformatted !== null) {
-        lastDayVolume = dailyVolumeUnformatted
-        formattedDailyVolume = formatBigNumber(lastDayVolume, decimals)
-      } else {
-        formattedDailyVolume = '0'
-      }
-
+      setDecimals(decimals)
       setVolume(volume)
       setSymbol(symbol)
-      setDailyVolume(formattedDailyVolume)
     }
 
     setToken()
@@ -141,7 +132,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
           {currentFilter.sortBy === 'usdVolume' && `${formatNumber(volume)} ${symbol} - Volume`}
           {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Ending`}
           {currentFilter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` &&
-            `${Math.floor(Date.now() / 86400000) === lastActiveDay && usdDailyVolume ? formatBigNumber((usdDailyVolume[Math.floor(Date.now() / (1000 * 60 * 60)) % 24]), 18) : 0} ${symbol} - 24hr Volume`}
+            `${Math.floor(Date.now() / 86400000) === lastActiveDay && dailyVolume && decimals ? formatBigNumber((dailyVolume[Math.floor(Date.now() / (1000 * 60 * 60)) % 24]), decimals) : 0} ${symbol} - 24hr Volume`}
           {currentFilter.sortBy === 'scaledLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
