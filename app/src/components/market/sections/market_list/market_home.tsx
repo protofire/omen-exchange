@@ -363,7 +363,34 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     },
   ] as const
 
+  const myMarketsSortOptions = [
+    {
+      title: 'Newest',
+      sortBy: 'creationTimestamp',
+      direction: 'desc',
+    },
+    {
+      title: 'Ending soon',
+      sortBy: 'openingTimestamp',
+      direction: 'asc',
+    },
+  ] as const
+
   const sortItems: Array<DropdownItemProps> = sortOptions.map(item => {
+    return {
+      content: (
+        <CustomDropdownItem>
+          <SecondaryText className="sortBy">Sort By</SecondaryText> {item.title}
+        </CustomDropdownItem>
+      ),
+      onClick: () => {
+        setSortBy(item.sortBy)
+        setSortByDirection(item.direction)
+      },
+    }
+  })
+
+  const myMarketsSortItems: Array<DropdownItemProps> = myMarketsSortOptions.map(item => {
     return {
       content: (
         <CustomDropdownItem>
@@ -469,15 +496,13 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               <ButtonCircleStyled active={showAdvancedFilters} disabled={fetchMyMarkets} onClick={toggleFilters}>
                 <IconFilter />
               </ButtonCircleStyled>
-              {!fetchMyMarkets && (
                 <Dropdown
-                  currentItem={sortOptions.findIndex(i => i.sortBy === sortBy)}
+                  currentItem={fetchMyMarkets ? myMarketsSortOptions.findIndex(i => i.sortBy === sortBy) : sortOptions.findIndex(i => i.sortBy === sortBy)}
                   dirty={true}
                   dropdownPosition={DropdownPosition.right}
-                  items={sortItems}
+                  items={fetchMyMarkets ? myMarketsSortItems : sortItems}
                   placeholder={<SecondaryText>Sort By</SecondaryText>}
                 />
-              )}
             </FiltersControls>
           </FiltersWrapper>
         </TopContents>

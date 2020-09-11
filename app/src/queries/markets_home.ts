@@ -36,9 +36,9 @@ export const DEFAULT_OPTIONS = {
 }
 
 export const queryMyMarkets = gql`
-  query GetMyMarkets($account: String!, $first: Int!, $skip: Int!) {
+  query GetMyMarkets($account: String!, $first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String) {
     account(id: $account) {
-      fpmmParticipations(first: $first, skip: $skip, orderBy: creationTimestamp, orderDirection: desc) {
+      fpmmParticipations(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection) {
         fixedProductMarketMakers: fpmm {
           ...marketData
         }
