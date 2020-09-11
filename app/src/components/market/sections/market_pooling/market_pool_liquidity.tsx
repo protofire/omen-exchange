@@ -27,7 +27,7 @@ import {
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, SubsectionTitle, SubsectionTitleWrapper, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
@@ -53,6 +53,13 @@ enum Tabs {
   deposit,
   withdraw,
 }
+
+const TopCard = styled(ViewCard)`
+  padding-bottom: 0;
+  margin-bottom: 24px;
+`
+
+const BottomCard = styled(ViewCard)``
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -286,13 +293,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   return (
     <>
       <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
-      <ViewCard>
-        <MarketTopDetailsOpen
-          isLiquidityProvision={true}
-          marketMakerData={marketMakerData}
-          title="Pool Liquidity"
-          toggleTitle="Market Information"
-        />
+      <TopCard>
+        <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Pool Liquidity" />
+      </TopCard>
+      <BottomCard>
+        <SubsectionTitleWrapper>
+          <SubsectionTitle>Trade Outcome</SubsectionTitle>
+        </SubsectionTitleWrapper>
         <OutcomeTable
           balances={balances}
           collateral={collateral}
@@ -474,7 +481,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             </Button>
           )}
         </ButtonContainer>
-      </ViewCard>
+      </BottomCard>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}

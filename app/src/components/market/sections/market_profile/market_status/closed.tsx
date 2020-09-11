@@ -11,6 +11,7 @@ import { getLogger } from '../../../../../util/logger'
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
+import { SubsectionTitle, SubsectionTitleWrapper } from '../../../../common'
 import { FullLoading } from '../../../../loading'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
 import { ButtonContainerFullWidth } from '../../../common/common_styled'
@@ -18,6 +19,13 @@ import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
+
+const TopCard = styled(ViewCard)`
+  padding-bottom: 0;
+  margin-bottom: 24px;
+`
+
+const BottomCard = styled(ViewCard)``
 
 const MarketResolutionMessageStyled = styled(MarketResolutionMessage)`
   margin: 20px 0;
@@ -204,8 +212,13 @@ const Wrapper = (props: Props) => {
 
   return (
     <>
-      <ViewCard>
+      <TopCard>
         <MarketTopDetailsClosed collateral={collateral} marketMakerData={marketMakerData} />
+      </TopCard>
+      <BottomCard>
+        <SubsectionTitleWrapper>
+          <SubsectionTitle>Market Closed</SubsectionTitle>
+        </SubsectionTitleWrapper>
         <OutcomeTable
           balances={balances}
           collateral={collateralToken}
@@ -257,7 +270,7 @@ const Wrapper = (props: Props) => {
             </ButtonContainerFullWidth>
           )}
         </WhenConnected>
-      </ViewCard>
+      </BottomCard>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}

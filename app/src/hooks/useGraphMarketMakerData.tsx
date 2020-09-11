@@ -35,6 +35,10 @@ const query = gql`
       answerFinalizedTimestamp
       scaledLiquidityParameter
       runningDailyVolumeByHour
+      isPendingArbitration
+      arbitrationOccurred
+      currentAnswerTimestamp
+      runningDailyVolumeByHour
       question {
         id
         data
@@ -66,6 +70,10 @@ type GraphResponseFixedProductMarketMaker = {
   openingTimestamp: string
   outcomeTokenAmounts: string[]
   outcomes: Maybe<string[]>
+  isPendingArbitration: boolean
+  arbitrationOccurred: boolean
+  currentAnswerTimestamp: BigNumber
+  runningDailyVolumeByHour: BigNumber[]
   question: {
     id: string
     data: string
@@ -78,7 +86,6 @@ type GraphResponseFixedProductMarketMaker = {
   klerosTCRregistered: boolean
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
-  runningDailyVolumeByHour: BigNumber[]
 }
 
 type GraphResponse = {
@@ -136,6 +143,9 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
       resolution: new Date(1000 * +data.openingTimestamp),
       arbitratorAddress: data.arbitrator,
       outcomes,
+      isPendingArbitration: data.isPendingArbitration,
+      arbitrationOccurred: data.arbitrationOccurred,
+      currentAnswerTimestamp: data.currentAnswerTimestamp,
     },
     curatedByDxDao: data.curatedByDxDao,
     klerosTCRregistered: data.klerosTCRregistered,

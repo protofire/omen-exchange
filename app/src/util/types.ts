@@ -52,6 +52,9 @@ export interface Question {
   arbitratorAddress: string
   category: string
   outcomes: string[]
+  isPendingArbitration: boolean
+  arbitrationOccurred: boolean
+  currentAnswerTimestamp: BigNumber
 }
 
 export enum OutcomeTableValue {
@@ -207,6 +210,8 @@ export interface MarketMakerData {
   klerosTCRregistered: boolean
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
+  runningDailyVolumeByHour: BigNumber[]
+  lastActiveDay: number
 }
 
 export enum Ternary {

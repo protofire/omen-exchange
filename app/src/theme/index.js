@@ -92,6 +92,7 @@ const theme = {
     textColorLighter: '#86909E',
     textColorLightish: '#7D8189',
     verticalDivider: '#e8eaf6',
+    clickable: '#7986CB',
   },
   message: {
     colors: {
@@ -333,6 +334,12 @@ const theme = {
       padding: '10px',
       zIndex: '12345',
     },
+  },
+  progressBar: {
+    open: '#7986CB',
+    finalizing: '#9575CD',
+    arbitration: '#BA68C8',
+    closed: '#BA68C8',
   },
 }
 

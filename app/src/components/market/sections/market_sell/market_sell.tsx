@@ -17,7 +17,7 @@ import {
 import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, SubsectionTitle, SubsectionTitleWrapper, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
@@ -32,6 +32,13 @@ import { TransactionDetailsRow, ValueStates } from '../../common/transaction_det
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
+
+const TopCard = styled(ViewCard)`
+  padding-bottom: 0;
+  margin-bottom: 24px;
+`
+
+const BottomCard = styled(ViewCard)``
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -177,13 +184,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   return (
     <>
       <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
-      <ViewCard>
-        <MarketTopDetailsOpen
-          isLiquidityProvision={false}
-          marketMakerData={marketMakerData}
-          title="Sell Shares"
-          toggleTitle="Pool Information"
-        />
+      <TopCard>
+        <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Sell Shares" />
+      </TopCard>
+      <BottomCard>
+        <SubsectionTitleWrapper>
+          <SubsectionTitle>Trade Outcome</SubsectionTitle>
+        </SubsectionTitleWrapper>
         <OutcomeTable
           balances={balances}
           collateral={collateral}
@@ -294,7 +301,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             Sell
           </Button>
         </ButtonContainer>
-      </ViewCard>
+      </BottomCard>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}

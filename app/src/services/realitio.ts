@@ -143,6 +143,9 @@ class RealitioService {
       outcomes: outcomes,
       templateId,
       raw: question,
+      isPendingArbitration: question.isPendingArbitration,
+      arbitrationOccurred: question.arbitrationOccurred,
+      currentAnswerTimestamp: question.currentAnswerTimestamp,
     }
   }
 
