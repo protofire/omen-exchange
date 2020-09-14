@@ -36,11 +36,7 @@ export const DEFAULT_OPTIONS = {
 }
 
 export const buildQueryMyMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => {
-  const {
-    arbitrator,
-    category,
-    currency,
-  } = options
+  const { arbitrator, category, currency } = options
 
   const myMarketsWhereClause = [
     category === 'All' ? '' : 'category: $category',

@@ -223,9 +223,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
-    (currentFilter.currency ||
-      currentFilter.arbitrator ||
-      currentFilter.curationSource !== CurationSource.ALL_SOURCES)
+    currentFilter.currency || currentFilter.arbitrator || currentFilter.curationSource !== CurationSource.ALL_SOURCES,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
@@ -320,9 +318,9 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       isInitialMount.current = true
     } else {
       setShowAdvancedFilters(
-        (currentFilter.currency ||
+        currentFilter.currency ||
           currentFilter.arbitrator ||
-          currentFilter.curationSource !== CurationSource.ALL_SOURCES)
+          currentFilter.curationSource !== CurationSource.ALL_SOURCES,
       )
     }
   }, [currentFilter, fetchMyMarkets])
@@ -498,7 +496,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                 <IconFilter />
               </ButtonCircleStyled>
               <Dropdown
-                currentItem={fetchMyMarkets ? myMarketsSortOptions.findIndex(i => i.sortBy === sortBy) : sortOptions.findIndex(i => i.sortBy === sortBy)}
+                currentItem={
+                  fetchMyMarkets
+                    ? myMarketsSortOptions.findIndex(i => i.sortBy === sortBy)
+                    : sortOptions.findIndex(i => i.sortBy === sortBy)
+                }
                 dirty={true}
                 dropdownPosition={DropdownPosition.right}
                 items={fetchMyMarkets ? myMarketsSortItems : sortItems}
@@ -513,11 +515,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             arbitrator={arbitrator}
             curationSource={curationSource}
             currency={currency}
+            disableCurationFilter={fetchMyMarkets ? true : false}
             onChangeArbitrator={setArbitrator}
             onChangeCurationSource={setCurationSource}
             onChangeCurrency={setCurrency}
             onChangeTemplateId={setTemplateId}
-            disableCurationFilter={fetchMyMarkets ? true : false}
           />
         )}
         <ListWrapper>

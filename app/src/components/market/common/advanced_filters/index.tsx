@@ -74,11 +74,11 @@ export const AdvancedFilters = (props: Props) => {
     arbitrator,
     curationSource,
     currency,
+    disableCurationFilter,
     onChangeArbitrator,
     onChangeCurationSource,
     onChangeCurrency,
     onChangeTemplateId,
-    disableCurationFilter
   } = props
 
   const allTokensOptions = [{ address: null, symbol: 'All', image: null }, ...tokens]

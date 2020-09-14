@@ -298,10 +298,14 @@ const MarketHomeContainer: React.FC = () => {
 
   useEffect(() => {
     let newFilter = filter
-    if (filter.state === MarketStates.myMarkets && filter.sortBy !== 'openingTimestamp' && filter.sortBy !== 'creationTimestamp') {
+    if (
+      filter.state === MarketStates.myMarkets &&
+      filter.sortBy !== 'openingTimestamp' &&
+      filter.sortBy !== 'creationTimestamp'
+    ) {
       newFilter = {
         ...filter,
-        sortBy: 'openingTimestamp'
+        sortBy: 'openingTimestamp',
       }
     }
 
