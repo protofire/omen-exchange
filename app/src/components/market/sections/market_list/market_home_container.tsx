@@ -87,7 +87,7 @@ const MarketHomeContainer: React.FC = () => {
   let searchRoute = location.search.split('tag=')[1]
   if (searchRoute) searchRoute = searchRoute.split('&')[0]
 
-  let sortParam: Maybe<MarketsSortCriteria> = 'usdLiquidityParameter'
+  let sortParam: Maybe<MarketsSortCriteria> = stateRoute === 'MY_MARKETS' ? 'openingTimestamp' : 'usdLiquidityParameter'
   if (sortRoute === '24h-volume') {
     sortParam = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria
   } else if (sortRoute === 'volume') {
@@ -295,6 +295,18 @@ const MarketHomeContainer: React.FC = () => {
     },
     [history],
   )
+
+  useEffect(() => {
+    let newFilter = filter
+    if (filter.state === MarketStates.myMarkets && filter.sortBy !== 'openingTimestamp' && filter.sortBy !== 'creationTimestamp') {
+      newFilter = {
+        ...filter,
+        sortBy: 'openingTimestamp'
+      }
+    }
+
+    onFilterChange(newFilter)
+  }, [filter, onFilterChange])
 
   const loadNextPage = () => {
     if (!moreMarkets) {

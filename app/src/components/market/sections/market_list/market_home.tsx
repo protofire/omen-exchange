@@ -462,6 +462,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const disableLoadPrevButton =
     isFiltering || pageIndex === 0 || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
 
+  console.log(sortBy)
+
   return (
     <>
       <Actions>
