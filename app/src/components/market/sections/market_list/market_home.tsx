@@ -266,7 +266,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       state: MarketStates.myMarkets,
       title: 'My Markets',
       active: state === MarketStates.myMarkets,
-      onClick: () => setState(MarketStates.myMarkets),
+      onClick: () => {
+        setState(MarketStates.myMarkets)
+        setSortBy('openingTimestamp')
+        setSortByDirection('asc')
+      },
     })
   }
 
@@ -461,8 +465,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     isFiltering || !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
   const disableLoadPrevButton =
     isFiltering || pageIndex === 0 || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
-
-  console.log(sortBy)
 
   return (
     <>
