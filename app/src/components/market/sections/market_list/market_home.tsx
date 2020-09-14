@@ -474,7 +474,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(category)) + 1 : 0
           }
           dirty={true}
-          disabled={fetchMyMarkets}
+          // disabled={fetchMyMarkets}
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={categoryItems}

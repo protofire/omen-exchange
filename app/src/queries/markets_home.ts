@@ -35,18 +35,32 @@ export const DEFAULT_OPTIONS = {
   networkId: 1 as Maybe<number>,
 }
 
-export const queryMyMarkets = gql`
-  query GetMyMarkets($account: String!, $first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String) {
-    account(id: $account) {
-      fpmmParticipations(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection) {
-        fixedProductMarketMakers: fpmm {
-          ...marketData
+export const buildQueryMyMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => {
+  const {
+    category,
+  } = options
+
+  const myMarketsWhereClause = [
+    category === 'All' ? '' : 'category: $category',
+  ]
+    .filter(s => s.length)
+    .join(',')
+
+  const queryMyMarkets = gql`
+    query GetMyMarkets($account: String!, $first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String) {
+      account(id: $account) {
+        fpmmParticipations(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${myMarketsWhereClause} }) {
+          fixedProductMarketMakers: fpmm {
+            ...marketData
+          }
         }
       }
     }
-  }
-  ${MarketDataFragment}
-`
+    ${MarketDataFragment}
+  `
+
+  return queryMyMarkets
+}
 
 export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => {
   const {
