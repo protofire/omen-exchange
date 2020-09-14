@@ -206,7 +206,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     try {
       setStatus(Status.Loading)
 
-      const fundsAmount = formatBigNumber(amountToRemove, collateral.decimals)
+      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
 
       setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
