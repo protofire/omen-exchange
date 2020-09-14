@@ -517,6 +517,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             onChangeCurationSource={setCurationSource}
             onChangeCurrency={setCurrency}
             onChangeTemplateId={setTemplateId}
+            disableCurationFilter={fetchMyMarkets ? true : false}
           />
         )}
         <ListWrapper>
