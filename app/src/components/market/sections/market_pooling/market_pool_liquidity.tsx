@@ -159,6 +159,18 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const showSharesChange = activeTab === Tabs.deposit ? amountToFund.gt(0) : amountToRemove.gt(0)
 
+  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const collateralBalance = maybeCollateralBalance || Zero
+  const probabilities = balances.map(balance => balance.probability)
+  const showSetAllowance =
+    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+  const depositedTokensTotal = depositedTokens.add(userEarnings)
+  const maybeFundingBalance = useFundingBalance(marketMakerAddress, context)
+  const fundingBalance = maybeFundingBalance || Zero
+
+  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
+  const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
+
   const addFunding = async () => {
     setModalTitle('Funds Deposit')
 
@@ -206,7 +218,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     try {
       setStatus(Status.Loading)
 
-      const fundsAmount = formatBigNumber(amountToRemove, collateral.decimals)
+      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
 
       setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
@@ -246,18 +258,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
     setAllowanceFinished(true)
   }
-
-  const maybeCollateralBalance = useCollateralBalance(collateral, context)
-  const collateralBalance = maybeCollateralBalance || Zero
-  const probabilities = balances.map(balance => balance.probability)
-  const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
-  const depositedTokensTotal = depositedTokens.add(userEarnings)
-  const maybeFundingBalance = useFundingBalance(marketMakerAddress, context)
-  const fundingBalance = maybeFundingBalance || Zero
-
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
-  const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
 
   const collateralAmountError =
     maybeCollateralBalance === null
