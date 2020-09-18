@@ -489,7 +489,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           <FiltersWrapper>
             <SectionTitleMarket title={'Markets'} />
             <FiltersControls>
-              <ButtonCircleStyled active={showSearch} disabled={fetchMyMarkets} onClick={toggleSearch}>
+              <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
                 <IconSearch />
               </ButtonCircleStyled>
               <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
