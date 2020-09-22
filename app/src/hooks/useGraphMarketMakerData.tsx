@@ -43,7 +43,6 @@ const query = gql`
         id
         data
       }
-      klerosTCRitemID
       klerosTCRregistered
     }
   }
