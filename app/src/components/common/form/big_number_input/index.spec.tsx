@@ -1,7 +1,7 @@
 /* eslint-env jest */
 import '@testing-library/jest-dom/extend-expect'
 import { fireEvent, render } from '@testing-library/react'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import React from 'react'
 
 import { getLogger } from '../../../../util/logger'
@@ -12,7 +12,7 @@ const logger = getLogger('BigNumberInput::Spec')
 
 const noop = () => ({})
 
-const defaultProps = { name: 'test', value: new BigNumber('123'), decimals: 2 }
+const defaultProps = { name: 'test', value: BigNumber.from('123'), decimals: 2 }
 
 const renderBigNumberInput = props => render(<BigNumberInput {...defaultProps} {...props} />)
 
@@ -33,7 +33,7 @@ test('should trigger the onChange callback with the proper value', async () => {
   const changeHandler = jest.fn().mockImplementation(() => {
     logger.log('changeHandler mock triggered')
   })
-  const expectedValue = new BigNumber('230')
+  const expectedValue = BigNumber.from('230')
 
   // when
   const { container } = renderBigNumberInput({ onChange: changeHandler })
@@ -52,10 +52,10 @@ test('should change when value changes', async () => {
   })
 
   expect(
-    renderBigNumberInput({ value: new BigNumber('123'), onChange: changeHandler }).container.firstChild.value,
+    renderBigNumberInput({ value: BigNumber.from('123'), onChange: changeHandler }).container.firstChild.value,
   ).toEqual('1.23')
   expect(
-    renderBigNumberInput({ value: new BigNumber('321'), onChange: changeHandler }).container.firstChild.value,
+    renderBigNumberInput({ value: BigNumber.from('321'), onChange: changeHandler }).container.firstChild.value,
   ).toEqual('3.21')
 })
 
@@ -64,7 +64,7 @@ test('should allow entering an empty string', async () => {
   const changeHandler = jest.fn().mockImplementation(() => {
     logger.log('changeHandler mock triggered')
   })
-  const expectedValue = new BigNumber('0')
+  const expectedValue = BigNumber.from('0')
 
   // when
   const { container } = renderBigNumberInput({ onChange: changeHandler })

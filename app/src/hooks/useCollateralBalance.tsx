@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import { useEffect, useState } from 'react'
 
 import { ERC20Service } from '../services'
@@ -15,7 +15,7 @@ export const useCollateralBalance = (collateral: Token, context: ConnectedWeb3Co
     const isSubscribed = true
 
     const fetchCollateralBalance = async () => {
-      let collateralBalance = new BigNumber(0)
+      let collateralBalance = BigNumber.from(0)
       if (account) {
         const collateralService = new ERC20Service(provider, account, collateral.address)
         collateralBalance = await collateralService.getCollateral(account)

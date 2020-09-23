@@ -1,5 +1,4 @@
-import { Contract, Wallet, ethers, utils } from 'ethers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, Contract, Wallet, ethers, utils } from 'ethers'
 
 import { getLogger } from '../util/logger'
 import { calcDistributionHint, calcPrice } from '../util/tools'
@@ -240,25 +239,25 @@ class MarketMakerService {
   static encodeBuy = (amount: BigNumber, outcomeIndex: number, outcomeTokensToBuy: BigNumber): string => {
     const buyInterface = new utils.Interface(marketMakerAbi)
 
-    return buyInterface.functions.buy.encode([amount, outcomeIndex, outcomeTokensToBuy])
+    return buyInterface.encodeFunctionData('buy', [amount, outcomeIndex, outcomeTokensToBuy])
   }
 
   static encodeSell = (amount: BigNumber, outcomeIndex: number, maxOutcomeTokensToSell: BigNumber): string => {
     const sellInterface = new utils.Interface(marketMakerAbi)
 
-    return sellInterface.functions.sell.encode([amount, outcomeIndex, maxOutcomeTokensToSell])
+    return sellInterface.encodeFunctionData('sell', [amount, outcomeIndex, maxOutcomeTokensToSell])
   }
 
   static encodeAddFunding = (amount: BigNumber, distributionHint: BigNumber[] = []): string => {
     const addFundingInterface = new utils.Interface(marketMakerAbi)
 
-    return addFundingInterface.functions.addFunding.encode([amount, distributionHint])
+    return addFundingInterface.encodeFunctionData('addFunding', [amount, distributionHint])
   }
 
   static encodeRemoveFunding = (amount: BigNumber): string => {
     const removeFundingInterface = new utils.Interface(marketMakerAbi)
 
-    return removeFundingInterface.functions.removeFunding.encode([amount])
+    return removeFundingInterface.encodeFunctionData('removeFunding', [amount])
   }
 }
 

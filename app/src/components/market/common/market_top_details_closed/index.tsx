@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import React, { useState } from 'react'
 
 import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'

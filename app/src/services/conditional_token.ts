@@ -1,6 +1,5 @@
-import { Contract, Wallet, ethers, utils } from 'ethers'
-import { TransactionReceipt } from 'ethers/providers'
-import { BigNumber, BigNumberish } from 'ethers/utils'
+import { TransactionReceipt } from '@ethersproject/providers'
+import { Contract, Wallet, ethers, utils, BigNumber, BigNumberish } from 'ethers'
 
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck } from '../util/networks'
@@ -48,7 +47,7 @@ class ConditionalTokenService {
     const transactionObject = await this.contract.prepareCondition(
       oracleAddress,
       questionId,
-      new BigNumber(outcomeSlotCount),
+      BigNumber.from(outcomeSlotCount),
       {
         value: '0x0',
         gasLimit: 750000,
@@ -142,7 +141,7 @@ class ConditionalTokenService {
   ): string => {
     const safeTransferFromInterface = new utils.Interface(conditionalTokensAbi)
 
-    return safeTransferFromInterface.functions.safeTransferFrom.encode([
+    return safeTransferFromInterface.encodeFunctionData('safeTransferFrom', [
       addressFrom,
       addressTo,
       positionId,
@@ -154,16 +153,16 @@ class ConditionalTokenService {
   static encodeSetApprovalForAll = (address: string, approved: boolean): string => {
     const setApprovalForAllInterface = new utils.Interface(conditionalTokensAbi)
 
-    return setApprovalForAllInterface.functions.setApprovalForAll.encode([address, approved])
+    return setApprovalForAllInterface.encodeFunctionData('setApprovalForAll', [address, approved])
   }
 
   static encodePrepareCondition = (questionId: string, oracleAddress: string, outcomeSlotCount: number): string => {
     const prepareConditionInterface = new utils.Interface(conditionalTokensAbi)
 
-    return prepareConditionInterface.functions.prepareCondition.encode([
+    return prepareConditionInterface.encodeFunctionData('prepareCondition', [
       oracleAddress,
       questionId,
-      new BigNumber(outcomeSlotCount),
+      BigNumber.from(outcomeSlotCount),
     ])
   }
 
@@ -189,7 +188,7 @@ class ConditionalTokenService {
     const redeemPositionsInterface = new utils.Interface(conditionalTokensAbi)
     const indexSets = getIndexSets(outcomesCount)
 
-    return redeemPositionsInterface.functions.redeemPositions.encode([
+    return redeemPositionsInterface.encodeFunctionData('redeemPositions', [
       collateralToken,
       ethers.constants.HashZero,
       conditionId,
@@ -206,7 +205,7 @@ class ConditionalTokenService {
     const redeemPositionsInterface = new utils.Interface(conditionalTokensAbi)
     const indexSets = getIndexSets(outcomesCount)
 
-    return redeemPositionsInterface.functions.mergePositions.encode([
+    return redeemPositionsInterface.encodeFunctionData('mergePositions', [
       collateralToken,
       ethers.constants.HashZero,
       conditionId,

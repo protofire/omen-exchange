@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import { useCallback, useEffect, useState } from 'react'
 
 import { CPKService, ERC20Service, MarketMakerService, OracleService } from '../services'
@@ -91,21 +91,21 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       userShares:
         cpk && cpk.address
           ? marketMaker.getBalanceInformation(cpk.address, outcomes.length)
-          : outcomes.map(() => new BigNumber(0)),
+          : outcomes.map(() => BigNumber.from(0)),
       collateral: getERC20Token(provider, graphMarketMakerData.collateralAddress),
       isConditionResolved: conditionalTokens.isConditionResolved(graphMarketMakerData.conditionId),
       marketMakerFunding: marketMaker.getTotalSupply(),
-      marketMakerUserFunding: cpk && cpk.address ? marketMaker.balanceOf(cpk.address) : new BigNumber(0),
+      marketMakerUserFunding: cpk && cpk.address ? marketMaker.balanceOf(cpk.address) : BigNumber.from(0),
       realitioAnswer: isQuestionFinalized ? contracts.realitio.getResultFor(graphMarketMakerData.question.id) : null,
       totalEarnings: marketMaker.getCollectedFees(),
       totalPoolShares: marketMaker.poolSharesTotalSupply(),
-      userPoolShares: cpk && cpk.address ? marketMaker.poolSharesBalanceOf(cpk.address) : new BigNumber(0),
+      userPoolShares: cpk && cpk.address ? marketMaker.poolSharesBalanceOf(cpk.address) : BigNumber.from(0),
     })
 
     const userEarnings =
       cpk && cpk.address && marketMakerFunding.gt(0)
         ? await marketMaker.getFeesWithdrawableBy(cpk.address)
-        : new BigNumber(0)
+        : BigNumber.from(0)
 
     const arbitrator = getArbitratorFromAddress(networkId, graphMarketMakerData.arbitratorAddress)
     const payouts = graphMarketMakerData.payouts

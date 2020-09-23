@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 
 import { ERC20Service } from '../services'
 import { getLogger } from '../util/logger'

@@ -1,5 +1,4 @@
-import { Contract, Wallet, ethers, utils } from 'ethers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, Contract, Wallet, ethers, utils } from 'ethers'
 import { LogDescription } from 'ethers/utils/interface'
 
 import { MARKET_FEE } from '../common/constants'
@@ -77,7 +76,7 @@ class MarketMakerFactoryService {
   ): Promise<string> => {
     const feeBN = ethers.utils.parseEther('' + spread / Math.pow(10, 2))
     const cloneFactoryInterface = new utils.Interface(['function cloneConstructor(bytes consData) external'])
-    const cloneConstructorEncodedCall = cloneFactoryInterface.functions.cloneConstructor.encode([
+    const cloneConstructorEncodedCall = cloneFactoryInterface.encodeFunctionData('cloneConstructor', [
       utils.defaultAbiCoder.encode(
         ['address', 'address', 'bytes32[]', 'uint'],
         [conditionalTokenAddress, collateralAddress, [conditionId], feeBN],
@@ -199,7 +198,7 @@ class MarketMakerFactoryService {
 
     const create2FixedProductMarketMakerInterface = new utils.Interface(marketMakerFactoryAbi)
 
-    return create2FixedProductMarketMakerInterface.functions.create2FixedProductMarketMaker.encode([
+    return create2FixedProductMarketMakerInterface.encodeFunctionData('create2FixedProductMarketMaker', [
       saltNonce,
       conditionalTokenAddress,
       collateralAddress,

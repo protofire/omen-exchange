@@ -1,7 +1,6 @@
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
-import { Contract, Wallet, ethers, utils } from 'ethers'
-import { bigNumberify } from 'ethers/utils'
+import { BigNumber, Contract, Wallet, ethers, utils } from 'ethers'
 // eslint-disable-next-line import/named
 import { Moment } from 'moment'
 
@@ -161,7 +160,7 @@ class RealitioService {
 
   getWinnerOutcome = async (questionId: string): Promise<number> => {
     const result: string = await this.getResultFor(questionId)
-    const resultBN = bigNumberify(result)
+    const resultBN = BigNumber.from(result)
     return +resultBN.toString()
   }
 
@@ -193,7 +192,7 @@ class RealitioService {
 
     const askQuestionInterface = new utils.Interface(realitioAbi)
 
-    return askQuestionInterface.functions.askQuestion.encode(args)
+    return askQuestionInterface.encodeFunctionData('askQuestion', args)
   }
 
   askQuestionConstant = async (

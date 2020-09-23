@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 

@@ -1,9 +1,11 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import Big from 'big.js'
-import { BigNumber, bigNumberify, formatUnits, getAddress } from 'ethers/utils'
+import { BigNumber, utils } from 'ethers'
 import moment from 'moment-timezone'
 
 import { getLogger } from './logger'
+
+const { formatUnits, getAddress } = utils
 
 const logger = getLogger('Tools')
 
@@ -113,7 +115,7 @@ export const computeBalanceAfterTrade = (
   }
 
   return holdings.map((h, i) => {
-    return h.add(amountCollateralSpent).sub(i === outcomeIndex ? amountShares : bigNumberify(0))
+    return h.add(amountCollateralSpent).sub(i === outcomeIndex ? amountShares : BigNumber.from(0))
   })
 }
 
@@ -131,7 +133,7 @@ export const calcDistributionHint = (initialOdds: number[]): BigNumber[] => {
   const distributionHint = initialOddsBig
     .map(o => product.div(o))
     .map(x => x.mul(1000000).round())
-    .map(x => bigNumberify(x.toString()))
+    .map(x => BigNumber.from(x.toString()))
 
   return distributionHint
 }
@@ -175,7 +177,7 @@ export const calcSellAmountInCollateral = (
   const r = newtonRaphson(f, 0, { maxIterations: 100 })
 
   if (r) {
-    const amountToSell = bigNumberify(r.toFixed(0))
+    const amountToSell = BigNumber.from(r.toFixed(0))
     return amountToSell
   }
 
@@ -266,7 +268,7 @@ export const calcRemoveFundingSendAmounts = (
   poolShareSupply: BigNumber,
 ): BigNumber[] => {
   const sendAmounts = holdingsBN.map(h =>
-    poolShareSupply.gt(0) ? h.mul(removedFunds).div(poolShareSupply) : new BigNumber(0),
+    poolShareSupply.gt(0) ? h.mul(removedFunds).div(poolShareSupply) : BigNumber.from(0),
   )
   return sendAmounts
 }

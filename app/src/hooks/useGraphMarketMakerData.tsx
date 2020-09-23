@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import gql from 'graphql-tag'
 import { useState } from 'react'
 
@@ -121,16 +121,16 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
 
   return {
     address: data.id,
-    answerFinalizedTimestamp: data.answerFinalizedTimestamp ? bigNumberify(data.answerFinalizedTimestamp) : null,
+    answerFinalizedTimestamp: data.answerFinalizedTimestamp ? BigNumber.from(data.answerFinalizedTimestamp) : null,
     arbitratorAddress: data.arbitrator,
     collateralAddress: data.collateralToken,
     creationTimestamp: data.creationTimestamp,
-    collateralVolume: bigNumberify(data.collateralVolume),
+    collateralVolume: BigNumber.from(data.collateralVolume),
     lastActiveDay: Number(data.lastActiveDay),
-    dailyVolume: bigNumberify(data.runningDailyVolume),
+    dailyVolume: BigNumber.from(data.runningDailyVolume),
     conditionId: data.condition.id,
     payouts: data.condition.payouts ? data.condition.payouts.map(Number) : null,
-    fee: bigNumberify(data.fee),
+    fee: BigNumber.from(data.fee),
     scaledLiquidityParameter: parseFloat(data.scaledLiquidityParameter),
     runningDailyVolumeByHour: data.runningDailyVolumeByHour,
     question: {

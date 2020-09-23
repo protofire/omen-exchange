@@ -48,7 +48,7 @@ export const ModalCollateral = (props: Props) => {
   const [collateralAddress, setCollateralAddress] = useState<string>('')
   const { collateral, errorMessage, isSpinnerOn } = useCollateral(collateralAddress, context)
 
-  const validCollateralAddress: Maybe<Token> = collateral ? { address: collateralAddress, ...collateral } : null
+  const validCollateralAddress: Maybe<Token> = collateral ? { ...collateral } : null
 
   const onClickSaveButton = () => {
     if (validCollateralAddress) {

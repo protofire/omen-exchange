@@ -59,7 +59,7 @@ export const ThreeBoxComments = (props: Props) => {
   const currentUserAddress = context.account || ''
 
   const handleLogin = async () => {
-    const box = await Box.openBox(currentUserAddress, library._web3Provider, {})
+    const box = await Box.openBox(currentUserAddress, library.provider, {})
     box.onSyncDone(() => setBox(box))
   }
 

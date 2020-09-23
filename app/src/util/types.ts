@@ -1,5 +1,5 @@
-import { Block } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { Block } from '@ethersproject/providers'
+import { BigNumber } from 'ethers'
 
 import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
 

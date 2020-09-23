@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import React, { useCallback } from 'react'
 import styled, { css } from 'styled-components'
 
@@ -39,7 +39,7 @@ const PaddingCSS = css`
   }
 `
 
-const TRExtended = styled(TR)<{ clickable?: boolean }>`
+const TRExtended = styled(TR as any)<{ clickable?: boolean }>`
   cursor: ${props => (props.clickable ? 'pointer' : 'default')};
 
   &:hover td {
@@ -51,14 +51,14 @@ TRExtended.defaultProps = {
   clickable: false,
 }
 
-const THStyled = styled(TH)`
+const THStyled = styled(TH as any)`
   ${PaddingCSS}
 `
 
-const TDStyled = styled(TD)`
+const TDStyled = styled(TD as any)`
   ${PaddingCSS}
 `
-const TDRadio = styled(TD)`
+const TDRadio = styled(TD as any)`
   ${PaddingCSS}
   width: 20px;
 `
@@ -70,7 +70,7 @@ const TDFlexDiv = styled.div<{ textAlign?: string }>`
     props.textAlign && 'right' ? 'flex-end' : props.textAlign && 'center' ? 'center' : 'flex-start'};
 `
 
-const WinningBadgeStyled = styled(WinningBadge)`
+const WinningBadgeStyled = styled(WinningBadge as any)`
   flex-grow: 1;
   margin-right: auto;
 `

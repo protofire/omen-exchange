@@ -1,6 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
-import { ethers } from 'ethers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, ethers } from 'ethers'
 import React, { ChangeEvent, useEffect, useState } from 'react'
 
 import { MARKET_FEE } from '../../../../common/constants'
@@ -36,7 +35,7 @@ export const MarketWizardCreator = (props: Props) => {
     categoriesCustom: [],
     category: '',
     collateral: defaultCollateral,
-    funding: new BigNumber('0'),
+    funding: BigNumber.from('0'),
     loadedQuestionId: null,
     outcomes: [],
     question: '',

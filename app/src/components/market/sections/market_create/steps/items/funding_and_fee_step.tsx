@@ -1,5 +1,4 @@
-import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, constants } from 'ethers'
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
@@ -56,6 +55,8 @@ import { TransactionDetailsLine } from '../../../../common/transaction_details_l
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome } from '../outcomes'
+
+const { Zero } = constants
 
 const CreateCardTop = styled(CreateCard)`
   margin-bottom: 20px;
@@ -177,7 +178,7 @@ interface Props {
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useCpk()
-  const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
+  const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && BigNumber.from(state.balance))
   const dispatch = useDispatch()
   const { account, library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
@@ -235,7 +236,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const sharesAfterInitialFunding =
     distributionHint.length > 0
       ? calcInitialFundingSendAmounts(funding, distributionHint)
-      : outcomes.map(() => new BigNumber(0))
+      : outcomes.map(() => BigNumber.from(0))
 
   const amountError =
     maybeCollateralBalance === null

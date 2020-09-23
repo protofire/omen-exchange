@@ -1,4 +1,4 @@
-import { bigNumberify } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import moment from 'moment'
 import React from 'react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
@@ -170,7 +170,7 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
       .filter(h => !!h.block)
       .sort((a, b) => a.block.timestamp - b.block.timestamp)
       .map(h => {
-        const prices = calcPrice(h.holdings.map(bigNumberify))
+        const prices = calcPrice(h.holdings.map(BigNumber.from))
         const outcomesPrices: { [outcomeName: string]: number } = {}
         outcomes.forEach((k, i) => (outcomesPrices[k] = prices[i]))
 

@@ -1,5 +1,4 @@
-import { ethers } from 'ethers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, ethers } from 'ethers'
 import React, { ChangeEvent, InputHTMLAttributes, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
@@ -78,7 +77,7 @@ export const BigNumberInput: React.FC<Props> = props => {
 
     try {
       if (!value) {
-        onChange({ name, value: new BigNumber(0) })
+        onChange({ name, value: BigNumber.from(0) })
       } else {
         const newValue = ethers.utils.parseUnits(value, decimals)
 

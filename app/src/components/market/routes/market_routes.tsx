@@ -1,6 +1,5 @@
 import { useInterval } from '@react-corekit/use-interval'
-import { ethers } from 'ethers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, ethers } from 'ethers'
 import React from 'react'
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 
@@ -48,7 +47,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
 
   // Validate Markets with wrong FEE
   const feeBN = ethers.utils.parseEther('' + MAX_MARKET_FEE / Math.pow(10, 2))
-  const zeroBN = new BigNumber(0)
+  const zeroBN = BigNumber.from(0)
   if (!(fee.gte(zeroBN) && fee.lte(feeBN))) {
     logger.log(`Market was not created with this app (different fee)`)
     return <SectionTitle title={'Invalid market'} />

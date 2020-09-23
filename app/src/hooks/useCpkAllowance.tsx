@@ -1,5 +1,4 @@
-import { Signer, constants } from 'ethers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, Signer, constants } from 'ethers'
 import { useCallback, useEffect, useState } from 'react'
 
 import { ERC20Service } from '../services'

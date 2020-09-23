@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
@@ -71,7 +71,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
-  const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
+  const [amountShares, setAmountShares] = useState<BigNumber>(BigNumber.from(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
@@ -153,7 +153,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         conditionalTokens,
       })
 
-      setAmountShares(new BigNumber(0))
+      setAmountShares(BigNumber.from(0))
       setStatus(Status.Ready)
       setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {

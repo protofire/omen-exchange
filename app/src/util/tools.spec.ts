@@ -1,6 +1,6 @@
 /* eslint-env jest */
 import Big from 'big.js'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 
 import {
   calcAddFundingSendAmounts,
@@ -58,7 +58,7 @@ describe('tools', () => {
 
     for (const [holdings, expectedResult] of testCases) {
       it(`should compute the right price`, () => {
-        const holdingsBN = holdings.map(bigNumberify)
+        const holdingsBN = holdings.map(BigNumber.from)
         const prices = calcPrice(holdingsBN)
 
         prices.forEach((price, index) => expect(price).toBeCloseTo(expectedResult[index]))
@@ -78,9 +78,9 @@ describe('tools', () => {
 
     for (const [[funding, priceYes, tradeYes, priceNo, tradeNo], expectedResult] of testCases) {
       it(`should compute the right net cost, `, () => {
-        const fundingBN = bigNumberify(funding)
-        const tradeYesBN = bigNumberify(tradeYes)
-        const tradeNoBN = bigNumberify(tradeNo)
+        const fundingBN = BigNumber.from(funding)
+        const tradeYesBN = BigNumber.from(tradeYes)
+        const tradeNoBN = BigNumber.from(tradeNo)
         const result = calcNetCost(fundingBN, priceYes, tradeYesBN, priceNo, tradeNoBN).toNumber()
 
         expect(result).toBeCloseTo(expectedResult)
@@ -186,15 +186,15 @@ describe('tools', () => {
     for (const [[sharesToSell, holdings, otherHoldings], expected] of testCases) {
       it(`should compute the amount of collateral to sell`, () => {
         const result = calcSellAmountInCollateral(
-          bigNumberify(sharesToSell),
-          bigNumberify(holdings),
-          otherHoldings.map(bigNumberify),
+          BigNumber.from(sharesToSell),
+          BigNumber.from(holdings),
+          otherHoldings.map(BigNumber.from),
           0.01,
         )
 
         expect(result).not.toBe(null)
 
-        expect(divBN(result as BigNumber, bigNumberify(expected))).toBeCloseTo(1)
+        expect(divBN(result as BigNumber, BigNumber.from(expected))).toBeCloseTo(1)
       })
     }
   })
@@ -233,13 +233,13 @@ describe('tools', () => {
 
     for (const [[holdings, outcomeIndex, collateral, shares], expected] of testCases) {
       it(`should compute the right balance after trade`, () => {
-        const holdingsBN = holdings.map(bigNumberify)
+        const holdingsBN = holdings.map(BigNumber.from)
 
         const result = computeBalanceAfterTrade(
           holdingsBN,
           outcomeIndex,
-          bigNumberify(collateral),
-          bigNumberify(shares),
+          BigNumber.from(collateral),
+          BigNumber.from(shares),
         )
 
         result.forEach((x, i) => expect(x.toNumber()).toBeCloseTo(expected[i]))
@@ -247,18 +247,18 @@ describe('tools', () => {
     }
 
     it('should throw if index is negative', () => {
-      const holdings = [100, 100, 100].map(bigNumberify)
-      expect(() => computeBalanceAfterTrade(holdings, -1, bigNumberify(50), bigNumberify(100))).toThrow()
+      const holdings = [100, 100, 100].map(BigNumber.from)
+      expect(() => computeBalanceAfterTrade(holdings, -1, BigNumber.from(50), BigNumber.from(100))).toThrow()
     })
 
     it("should throw if index is equal to array's length", () => {
-      const holdings = [100, 100, 100].map(bigNumberify)
-      expect(() => computeBalanceAfterTrade(holdings, 3, bigNumberify(50), bigNumberify(100))).toThrow()
+      const holdings = [100, 100, 100].map(BigNumber.from)
+      expect(() => computeBalanceAfterTrade(holdings, 3, BigNumber.from(50), BigNumber.from(100))).toThrow()
     })
 
     it("should throw if index is bigger than array's length", () => {
-      const holdings = [100, 100, 100].map(bigNumberify)
-      expect(() => computeBalanceAfterTrade(holdings, 10, bigNumberify(50), bigNumberify(100))).toThrow()
+      const holdings = [100, 100, 100].map(BigNumber.from)
+      expect(() => computeBalanceAfterTrade(holdings, 10, BigNumber.from(50), BigNumber.from(100))).toThrow()
     })
   })
 
@@ -276,36 +276,36 @@ describe('tools', () => {
 
   describe('calcPoolTokens', () => {
     it('should return addedFunds if poolShares are zero', () =>
-      expect(calcPoolTokens(bigNumberify(20), [1, 2, 3].map(bigNumberify), bigNumberify(0))).toStrictEqual(
-        bigNumberify(20),
+      expect(calcPoolTokens(BigNumber.from(20), [1, 2, 3].map(BigNumber.from), BigNumber.from(0))).toStrictEqual(
+        BigNumber.from(20),
       ))
 
     it('should return funds*supply/poolWeight', () =>
-      expect(calcPoolTokens(bigNumberify(20), [1, 2, 3].map(bigNumberify), bigNumberify(2))).toStrictEqual(
-        bigNumberify(13),
+      expect(calcPoolTokens(BigNumber.from(20), [1, 2, 3].map(BigNumber.from), BigNumber.from(2))).toStrictEqual(
+        BigNumber.from(13),
       ))
   })
 
   describe('calcDepositedTokens', () => {
     it('should return min of holdings mapped to factor', () =>
-      expect(calcDepositedTokens(bigNumberify(20), [1, 2, 3].map(bigNumberify), bigNumberify(2))).toStrictEqual(
-        bigNumberify(10),
+      expect(calcDepositedTokens(BigNumber.from(20), [1, 2, 3].map(BigNumber.from), BigNumber.from(2))).toStrictEqual(
+        BigNumber.from(10),
       ))
 
     it('should return 0 with no holdings', () =>
-      expect(calcDepositedTokens(bigNumberify(20), [100, 20, 0].map(bigNumberify), bigNumberify(10))).toStrictEqual(
-        bigNumberify(0),
+      expect(calcDepositedTokens(BigNumber.from(20), [100, 20, 0].map(BigNumber.from), BigNumber.from(10))).toStrictEqual(
+        BigNumber.from(0),
       ))
 
     it('should return 0 with no funding', () =>
-      expect(calcDepositedTokens(bigNumberify(20), [100, 200, 300].map(bigNumberify), bigNumberify(0))).toStrictEqual(
-        bigNumberify(0),
+      expect(calcDepositedTokens(BigNumber.from(20), [100, 200, 300].map(BigNumber.from), BigNumber.from(0))).toStrictEqual(
+        BigNumber.from(0),
       ))
   })
 
   describe('calcAddFundingSendAmounts', () => {
     it('all holdings are different', () => {
-      const result = calcAddFundingSendAmounts(bigNumberify(10), [1, 2, 3].map(bigNumberify), bigNumberify(20)).map(x =>
+      const result = calcAddFundingSendAmounts(BigNumber.from(10), [1, 2, 3].map(BigNumber.from), BigNumber.from(20)).map(x =>
         x.toString(),
       )
 
@@ -313,7 +313,7 @@ describe('tools', () => {
     })
 
     it('all holdings are equal', () => {
-      const result = calcAddFundingSendAmounts(bigNumberify(10), [3, 3, 3].map(bigNumberify), bigNumberify(20)).map(x =>
+      const result = calcAddFundingSendAmounts(BigNumber.from(10), [3, 3, 3].map(BigNumber.from), BigNumber.from(20)).map(x =>
         x.toString(),
       )
 
@@ -321,7 +321,7 @@ describe('tools', () => {
     })
 
     it('no funding', () => {
-      const result = calcAddFundingSendAmounts(bigNumberify(10), [3, 3, 3].map(bigNumberify), bigNumberify(0))
+      const result = calcAddFundingSendAmounts(BigNumber.from(10), [3, 3, 3].map(BigNumber.from), BigNumber.from(0))
 
       expect(result).toBe(null)
     })
@@ -329,19 +329,19 @@ describe('tools', () => {
 
   describe('calcInitialFundingSendAmounts', () => {
     it('all holdings are different', () => {
-      const result = calcInitialFundingSendAmounts(bigNumberify(10), [1, 2, 3].map(bigNumberify)).map(x => x.toString())
+      const result = calcInitialFundingSendAmounts(BigNumber.from(10), [1, 2, 3].map(BigNumber.from)).map(x => x.toString())
 
       expect(result).toStrictEqual(['7', '4', '0'])
     })
 
     it('all holdings are equal', () => {
-      const result = calcInitialFundingSendAmounts(bigNumberify(10), [3, 3, 3].map(bigNumberify)).map(x => x.toString())
+      const result = calcInitialFundingSendAmounts(BigNumber.from(10), [3, 3, 3].map(BigNumber.from)).map(x => x.toString())
 
       expect(result).toStrictEqual(['0', '0', '0'])
     })
 
     it('no funding', () => {
-      const result = calcInitialFundingSendAmounts(bigNumberify(0), [3, 3, 3].map(bigNumberify)).map(x => x.toString())
+      const result = calcInitialFundingSendAmounts(BigNumber.from(0), [3, 3, 3].map(BigNumber.from)).map(x => x.toString())
 
       expect(result).toStrictEqual(['0', '0', '0'])
     })

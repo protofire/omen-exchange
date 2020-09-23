@@ -1,5 +1,5 @@
-import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { constants } from 'ethers'
+import { BigNumber } from 'ethers'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -43,6 +43,8 @@ import { TransactionDetailsRow, ValueStates } from '../../common/transaction_det
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
+
+const { Zero } = constants
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
@@ -101,10 +103,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
-  const [amountToFund, setAmountToFund] = useState<BigNumber>(new BigNumber(0))
+  const [amountToFund, setAmountToFund] = useState<BigNumber>(BigNumber.from(0))
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
   const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
-  const [amountToRemove, setAmountToRemove] = useState<BigNumber>(new BigNumber(0))
+  const [amountToRemove, setAmountToRemove] = useState<BigNumber>(BigNumber.from(0))
   const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
   const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -203,7 +205,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       })
 
       setStatus(Status.Ready)
-      setAmountToFund(new BigNumber(0))
+      setAmountToFund(BigNumber.from(0))
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
     } catch (err) {
       setStatus(Status.Error)
@@ -238,7 +240,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       })
 
       setStatus(Status.Ready)
-      setAmountToRemove(new BigNumber(0))
+      setAmountToRemove(BigNumber.from(0))
       setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
       setIsModalTransactionResultOpen(true)
     } catch (err) {

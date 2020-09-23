@@ -1,5 +1,5 @@
 import Big from 'big.js'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -53,7 +53,7 @@ const computeEarnedCollateral = (payouts: Maybe<number[]>, balances: BigNumber[]
 
   const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b))
 
-  return bigNumberify(earnedCollateral.toFixed(0))
+  return BigNumber.from(earnedCollateral.toFixed(0))
 }
 
 const Wrapper = (props: Props) => {
@@ -77,7 +77,7 @@ const Wrapper = (props: Props) => {
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
-  const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
+  const [collateral, setCollateral] = useState<BigNumber>(BigNumber.from(0))
 
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
@@ -171,8 +171,8 @@ const Wrapper = (props: Props) => {
     ? payouts.filter((payout, index) => balances[index].shares.gt(0) && payout > 0).length
     : 0
   const userWinnerShares = payouts
-    ? balances.reduce((acc, balance, index) => (payouts[index] > 0 ? acc.add(balance.shares) : acc), new BigNumber(0))
-    : new BigNumber(0)
+    ? balances.reduce((acc, balance, index) => (payouts[index] > 0 ? acc.add(balance.shares) : acc), BigNumber.from(0))
+    : BigNumber.from(0)
   const EPS = 0.01
   const allPayoutsEqual = payouts ? payouts.every(payout => Math.abs(payout - 1 / payouts.length) <= EPS) : false
 

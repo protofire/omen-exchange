@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import { useEffect, useState } from 'react'
 
 import { CPKService } from '../services'
@@ -14,7 +14,7 @@ export const useFundingBalance = (marketMakerAddress: string, context: Connected
 
   useEffect(() => {
     const fetchFundingBalance = async () => {
-      let fundingBalance = new BigNumber(0)
+      let fundingBalance = BigNumber.from(0)
 
       if (account) {
         const cpk = await CPKService.create(provider)

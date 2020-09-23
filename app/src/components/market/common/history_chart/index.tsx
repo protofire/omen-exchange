@@ -1,5 +1,5 @@
-import { Block } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
+import { Block } from '@ethersproject/providers'
 import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useWeb3Context } from 'web3-react'

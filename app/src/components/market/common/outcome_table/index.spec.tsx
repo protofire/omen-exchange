@@ -1,7 +1,7 @@
 /* eslint-env jest */
 import '@testing-library/jest-dom/extend-expect'
 import { fireEvent, render } from '@testing-library/react'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import React from 'react'
 import { ThemeProvider } from 'styled-components'
 
@@ -16,8 +16,8 @@ const getBalances = (yes: Partial<BalanceItem> = {}, no: Partial<BalanceItem> = 
       outcomeName: 'Yes',
       probability: 50,
       currentPrice: 0.5,
-      shares: new BigNumber(0),
-      holdings: new BigNumber(0),
+      shares: BigNumber.from(0),
+      holdings: BigNumber.from(0),
       winningOutcome: false,
       payout: 0,
       ...yes,
@@ -26,8 +26,8 @@ const getBalances = (yes: Partial<BalanceItem> = {}, no: Partial<BalanceItem> = 
       outcomeName: 'No',
       probability: 50,
       currentPrice: 0.5,
-      shares: new BigNumber(0),
-      holdings: new BigNumber(0),
+      shares: BigNumber.from(0),
+      holdings: BigNumber.from(0),
       winningOutcome: false,
       payout: 0,
       ...no,

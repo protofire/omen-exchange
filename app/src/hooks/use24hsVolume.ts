@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
@@ -50,8 +50,8 @@ export const use24hsVolume = (marketMakerAddress: string): Maybe<BigNumber> => {
   } else if (volumeNow && volumeBefore) {
     const marketNow = volumeNow.fixedProductMarketMakers[0]
     const marketBefore = volumeBefore.fixedProductMarketMakers[0]
-    const now = new BigNumber(marketNow ? marketNow.collateralVolume : 0)
-    const before = new BigNumber(marketBefore ? marketBefore.collateralVolume : 0)
+    const now = BigNumber.from(marketNow ? marketNow.collateralVolume : 0)
+    const before = BigNumber.from(marketBefore ? marketBefore.collateralVolume : 0)
 
     setLastDayVolume(now.sub(before))
   }

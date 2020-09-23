@@ -1,6 +1,5 @@
-import { Contract, Wallet, ethers, utils } from 'ethers'
-import { TransactionReceipt } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, Contract, Wallet, ethers, utils } from 'ethers'
+import { TransactionReceipt } from '@ethersproject/providers'
 
 import { getLogger } from '../util/logger'
 import { Question } from '../util/types'
@@ -50,7 +49,7 @@ export class OracleService {
   ): string => {
     const oracleInterface = new utils.Interface(oracleAbi)
 
-    return oracleInterface.functions.resolve.encode([questionId, questionTemplateId, questionRaw, numOutcomes])
+    return oracleInterface.encodeFunctionData('resolve', [questionId, questionTemplateId, questionRaw, numOutcomes])
   }
 
   static getPayouts = (templateId: number, realitioAnswer: string, numOutcomes: number): number[] => {
@@ -59,7 +58,7 @@ export class OracleService {
       payouts = [...Array(numOutcomes)].map(() => 1)
     }
 
-    const answer = new BigNumber(realitioAnswer).toNumber()
+    const answer = BigNumber.from(realitioAnswer).toNumber()
 
     if (templateId === 0 || templateId === 2) {
       payouts = [...Array(numOutcomes)].map(() => 0)

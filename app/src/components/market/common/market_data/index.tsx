@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber } from 'ethers'
 import moment from 'moment'
 import momentTZ from 'moment-timezone'
 import React, { DOMAttributes, useEffect, useState } from 'react'

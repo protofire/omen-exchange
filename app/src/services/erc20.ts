@@ -1,6 +1,5 @@
-import { Contract, Wallet, ethers, utils } from 'ethers'
-import { TransactionReceipt } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { TransactionReceipt } from '@ethersproject/providers'
+import { BigNumber, Contract, Wallet, ethers, utils } from 'ethers'
 
 import { getLogger } from '../util/logger'
 import { isAddress, isContract } from '../util/tools'
@@ -123,25 +122,25 @@ class ERC20Service {
   static encodeTransferFrom = (from: string, to: string, amount: BigNumber): string => {
     const transferFromInterface = new utils.Interface(erc20Abi)
 
-    return transferFromInterface.functions.transferFrom.encode([from, to, amount])
+    return transferFromInterface.encodeFunctionData('transferFrom', [from, to, amount])
   }
 
   static encodeTransfer = (to: string, amount: BigNumber): string => {
     const transferInterface = new utils.Interface(erc20Abi)
 
-    return transferInterface.functions.transfer.encode([to, amount])
+    return transferInterface.encodeFunctionData('transfer', [to, amount])
   }
 
   static encodeApprove = (spenderAccount: string, amount: BigNumber): string => {
     const approveInterface = new utils.Interface(erc20Abi)
 
-    return approveInterface.functions.approve.encode([spenderAccount, amount])
+    return approveInterface.encodeFunctionData('approve', [spenderAccount, amount])
   }
 
   static encodeApproveUnlimited = (spenderAccount: string): string => {
     const approveInterface = new utils.Interface(erc20Abi)
 
-    return approveInterface.functions.approve.encode([spenderAccount, ethers.constants.MaxUint256])
+    return approveInterface.encodeFunctionData('approve', [spenderAccount, ethers.constants.MaxUint256])
   }
 }
 

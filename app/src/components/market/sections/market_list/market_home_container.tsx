@@ -1,7 +1,6 @@
 import { useQuery } from '@apollo/react-hooks'
 import { useInterval } from '@react-corekit/use-interval'
-import { ethers } from 'ethers'
-import { bigNumberify } from 'ethers/utils'
+import { BigNumber, ethers } from 'ethers'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import { useLocation } from 'react-router-dom'
@@ -41,9 +40,9 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       curatedByDxDao: graphMarketMakerDataItem.curatedByDxDao,
       category: graphMarketMakerDataItem.category,
       collateralToken: graphMarketMakerDataItem.collateralToken,
-      collateralVolume: bigNumberify(graphMarketMakerDataItem.collateralVolume),
+      collateralVolume: BigNumber.from(graphMarketMakerDataItem.collateralVolume),
       openingTimestamp: new Date(1000 * +graphMarketMakerDataItem.openingTimestamp),
-      outcomeTokenAmounts: graphMarketMakerDataItem.outcomeTokenAmounts.map(bigNumberify),
+      outcomeTokenAmounts: graphMarketMakerDataItem.outcomeTokenAmounts.map(BigNumber.from),
       outcomes,
       templateId: +graphMarketMakerDataItem.templateId,
       title: graphMarketMakerDataItem.title,

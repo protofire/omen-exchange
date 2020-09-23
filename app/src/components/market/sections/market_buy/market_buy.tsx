@@ -1,6 +1,5 @@
 import { stripIndents } from 'common-tags'
-import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, constants } from 'ethers'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
@@ -39,6 +38,8 @@ import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
 
+const { Zero } = constants
+
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
   margin-bottom: 24px;
@@ -74,7 +75,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
-  const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  const [amount, setAmount] = useState<BigNumber>(BigNumber.from(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
@@ -99,7 +100,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       try {
         tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
       } catch {
-        tradedShares = new BigNumber(0)
+        tradedShares = BigNumber.from(0)
       }
       const balanceAfterTrade = computeBalanceAfterTrade(
         balances.map(b => b.holdings),
@@ -122,7 +123,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const [tradedShares, probabilities, debouncedAmount] = useAsyncDerivedValue(
     amount,
-    [new BigNumber(0), balances.map(() => 0), amount],
+    [BigNumber.from(0), balances.map(() => 0), amount],
     calcBuyAmount,
   )
 
@@ -163,7 +164,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       What do you think?`),
       )
 
-      setAmount(new BigNumber(0))
+      setAmount(BigNumber.from(0))
       setStatus(Status.Ready)
       setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
@@ -181,7 +182,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
 
   const baseCost = debouncedAmount.sub(feePaid)
-  const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
+  const potentialProfit = tradedShares.isZero() ? BigNumber.from(0) : tradedShares.sub(amount)
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
