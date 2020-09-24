@@ -99,6 +99,10 @@ const MarketHomeContainer: React.FC = () => {
     sortDirection = 'asc'
   } else if (sortRoute === 'liquidity') {
     sortParam = 'usdLiquidityParameter'
+  } else if (sortRoute === 'pool-tokens') {
+    sortParam = 'poolTokensUSD'
+  } else if (sortRoute === 'outcome-shares') {
+    sortParam = 'outcomeSharesUSD'
   }
 
   let currencyParam: string | null
@@ -262,6 +266,10 @@ const MarketHomeContainer: React.FC = () => {
         route += '/ending'
       } else if (filter.sortBy === 'usdLiquidityParameter') {
         route += '/liquidity'
+      } else if (filter.sortBy === 'poolTokensUSD') {
+        route += '/pool-tokens'
+      } else if (filter.sortBy === 'outcomeSharesUSD') {
+        route += '/outcome-shares'
       }
 
       if (filter.currency) {
@@ -284,7 +292,7 @@ const MarketHomeContainer: React.FC = () => {
         routeQueryArray.push(`tag=${filter.title}`)
       }
 
-      if (filter.curationSource) {
+      if (filter.curationSource && filter.state !== MarketStates.myMarkets) {
         route += `/curation-source/${filter.curationSource}`
       }
 
@@ -301,7 +309,9 @@ const MarketHomeContainer: React.FC = () => {
     if (
       filter.state === MarketStates.myMarkets &&
       filter.sortBy !== 'openingTimestamp' &&
-      filter.sortBy !== 'creationTimestamp'
+      filter.sortBy !== 'creationTimestamp' &&
+      filter.sortBy !== 'poolTokensUSD' &&
+      filter.sortBy !== 'outcomeSharesUSD'
     ) {
       newFilter = {
         ...filter,

@@ -145,6 +145,8 @@ export type MarketsSortCriteria =
   | 'openingTimestamp'
   | 'usdLiquidityParameter'
   | 'lastActiveDayAndScaledRunningDailyVolume'
+  | 'poolTokensUSD'
+  | 'outcomeSharesUSD'
   | 'sort24HourVolume0'
   | 'sort24HourVolume1'
   | 'sort24HourVolume2'

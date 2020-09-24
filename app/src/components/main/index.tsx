@@ -57,6 +57,8 @@ export const Main: React.FC = () => {
               <Route component={MarketHomeContainer} path="/newest" />
               <Route component={MarketHomeContainer} path="/ending" />
               <Route component={MarketHomeContainer} path="/liquidity" />
+              <Route component={MarketHomeContainer} path="/pool-tokens" />
+              <Route component={MarketHomeContainer} path="/outcome-shares" />
               <Route component={MarketWizardCreatorContainer} exact path="/create" />
               <Route component={MarketRoutes} path="/:address" />
               <Route component={RedirectToHome} />
