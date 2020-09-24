@@ -1,5 +1,5 @@
-import { Contract, ethers } from 'ethers'
 import { Web3Provider } from '@ethersproject/providers'
+import { Contract, ethers } from 'ethers'
 
 import { getTokensByNetwork, networkIds } from '../util/networks'
 import { Token } from '../util/types'

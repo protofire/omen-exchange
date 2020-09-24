@@ -293,29 +293,33 @@ describe('tools', () => {
       ))
 
     it('should return 0 with no holdings', () =>
-      expect(calcDepositedTokens(BigNumber.from(20), [100, 20, 0].map(BigNumber.from), BigNumber.from(10))).toStrictEqual(
-        BigNumber.from(0),
-      ))
+      expect(
+        calcDepositedTokens(BigNumber.from(20), [100, 20, 0].map(BigNumber.from), BigNumber.from(10)),
+      ).toStrictEqual(BigNumber.from(0)))
 
     it('should return 0 with no funding', () =>
-      expect(calcDepositedTokens(BigNumber.from(20), [100, 200, 300].map(BigNumber.from), BigNumber.from(0))).toStrictEqual(
-        BigNumber.from(0),
-      ))
+      expect(
+        calcDepositedTokens(BigNumber.from(20), [100, 200, 300].map(BigNumber.from), BigNumber.from(0)),
+      ).toStrictEqual(BigNumber.from(0)))
   })
 
   describe('calcAddFundingSendAmounts', () => {
     it('all holdings are different', () => {
-      const result = calcAddFundingSendAmounts(BigNumber.from(10), [1, 2, 3].map(BigNumber.from), BigNumber.from(20)).map(x =>
-        x.toString(),
-      )
+      const result = calcAddFundingSendAmounts(
+        BigNumber.from(10),
+        [1, 2, 3].map(BigNumber.from),
+        BigNumber.from(20),
+      ).map(x => x.toString())
 
       expect(result).toStrictEqual(['7', '4', '0'])
     })
 
     it('all holdings are equal', () => {
-      const result = calcAddFundingSendAmounts(BigNumber.from(10), [3, 3, 3].map(BigNumber.from), BigNumber.from(20)).map(x =>
-        x.toString(),
-      )
+      const result = calcAddFundingSendAmounts(
+        BigNumber.from(10),
+        [3, 3, 3].map(BigNumber.from),
+        BigNumber.from(20),
+      ).map(x => x.toString())
 
       expect(result).toStrictEqual(['0', '0', '0'])
     })
@@ -329,19 +333,25 @@ describe('tools', () => {
 
   describe('calcInitialFundingSendAmounts', () => {
     it('all holdings are different', () => {
-      const result = calcInitialFundingSendAmounts(BigNumber.from(10), [1, 2, 3].map(BigNumber.from)).map(x => x.toString())
+      const result = calcInitialFundingSendAmounts(BigNumber.from(10), [1, 2, 3].map(BigNumber.from)).map(x =>
+        x.toString(),
+      )
 
       expect(result).toStrictEqual(['7', '4', '0'])
     })
 
     it('all holdings are equal', () => {
-      const result = calcInitialFundingSendAmounts(BigNumber.from(10), [3, 3, 3].map(BigNumber.from)).map(x => x.toString())
+      const result = calcInitialFundingSendAmounts(BigNumber.from(10), [3, 3, 3].map(BigNumber.from)).map(x =>
+        x.toString(),
+      )
 
       expect(result).toStrictEqual(['0', '0', '0'])
     })
 
     it('no funding', () => {
-      const result = calcInitialFundingSendAmounts(BigNumber.from(0), [3, 3, 3].map(BigNumber.from)).map(x => x.toString())
+      const result = calcInitialFundingSendAmounts(BigNumber.from(0), [3, 3, 3].map(BigNumber.from)).map(x =>
+        x.toString(),
+      )
 
       expect(result).toStrictEqual(['0', '0', '0'])
     })

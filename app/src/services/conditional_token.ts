@@ -1,5 +1,5 @@
 import { TransactionReceipt } from '@ethersproject/providers'
-import { Contract, Wallet, ethers, utils, BigNumber, BigNumberish } from 'ethers'
+import { BigNumber, BigNumberish, Contract, Wallet, ethers, utils } from 'ethers'
 
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck } from '../util/networks'

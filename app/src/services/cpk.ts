@@ -1,7 +1,7 @@
+import { TransactionReceipt, Web3Provider } from '@ethersproject/providers'
 import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { BigNumber, ethers } from 'ethers'
-import { TransactionReceipt, Web3Provider } from '@ethersproject/providers'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'

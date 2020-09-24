@@ -1,5 +1,5 @@
-import { BigNumber, Contract, Wallet, ethers, utils } from 'ethers'
 import { TransactionReceipt } from '@ethersproject/providers'
+import { BigNumber, Contract, Wallet, ethers, utils } from 'ethers'
 
 import { getLogger } from '../util/logger'
 import { Question } from '../util/types'
