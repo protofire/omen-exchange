@@ -1,4 +1,4 @@
-module.exports = {
+{
   "settings": {
     "react": {
       "pragma": "React",
@@ -52,15 +52,7 @@ module.exports = {
     "no-warning-comments": "warn",
     "import/extensions": 0,
     "import/no-unresolved": 0,
-    "import/no-extraneous-dependencies": [
-      "error",
-      {
-        "devDependencies": false, 
-        "optionalDependencies": false,
-        "peerDependencies": false,
-        "packageDir": __dirname
-      }
-    ],
+    "import/no-extraneous-dependencies": ["warn"],
     "import/order": [
       "error",
       {
