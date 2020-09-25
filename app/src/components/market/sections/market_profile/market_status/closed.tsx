@@ -35,7 +35,7 @@ const LeftButton = styled(Button)`
   margin-right: auto;
 `
 
-interface Props extends RouteComponentProps<{}> {
+interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   marketMakerData: MarketMakerData
 }
 

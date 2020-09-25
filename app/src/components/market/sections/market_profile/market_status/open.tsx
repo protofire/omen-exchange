@@ -62,7 +62,7 @@ const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
 `
 
-interface Props extends RouteComponentProps<{}> {
+interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   account: Maybe<string>
   marketMakerData: MarketMakerData
 }

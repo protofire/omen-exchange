@@ -129,7 +129,7 @@ const getButtonTypeStyles = (buttonType: ButtonType = ButtonType.primaryLine): a
   return PrimaryCSS
 }
 
-export const ButtonCSS = css<ButtonProps>`
+export const ButtonCSS = css`
   align-items: center;
   border-radius: 32px;
   border-style: solid;
@@ -144,12 +144,12 @@ export const ButtonCSS = css<ButtonProps>`
   line-height: 1.2;
   outline: none;
   padding: 0 20px;
-  pointer-events: ${props => (props.disabled ? 'none' : 'initial')};
+  pointer-events: ${props => ((props as any).disabled ? 'none' : 'initial')};
   text-align: center;
   transition: all 0.15s ease-out;
   user-select: none;
   white-space: nowrap;
   font-family: Roboto;
 
-  ${props => getButtonTypeStyles(props.buttonType)}
+  ${props => getButtonTypeStyles((props as any).buttonType)}
 `

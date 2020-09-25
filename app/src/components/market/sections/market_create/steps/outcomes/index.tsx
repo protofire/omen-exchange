@@ -85,7 +85,7 @@ const CustomButtonCircleAddReadyCSS = css`
   }
 `
 
-const CustomButtonCircleAdd = styled(CustomButtonCircle)<{ readyToAdd: boolean }>`
+const CustomButtonCircleAdd = styled(CustomButtonCircle as any)<{ readyToAdd: boolean }>`
   ${props => props.readyToAdd && CustomButtonCircleAddReadyCSS}
 `
 

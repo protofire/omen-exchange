@@ -1,5 +1,5 @@
 import CPK from 'contract-proxy-kit'
-import EthersAdapter from 'contract-proxy-kit/lib/cjs/eth-lib-adapters/EthersAdapter'
+import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ethers } from 'ethers'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
