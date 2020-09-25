@@ -89,7 +89,7 @@
   "scripts": {
     "start": "npx react-scripts start",
     "test": "npx react-scripts test",
-    "build": "yarn react-scripts --max-old-space-size=4096 build",
+    "build": "rm -rf ./node_modules/.cache/eslint-loader && yarn react-scripts --max-old-space-size=4096 build",
     "eject": "npx react-scripts eject",
     "format:staged": "lint-staged",
     "ipfs-deploy": "ipfs-deploy build --pinner pinata --no-open --no-clipboard",
