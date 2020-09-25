@@ -39,7 +39,7 @@ const PaddingCSS = css`
   }
 `
 
-const TRExtended = styled(TR)<{ clickable?: boolean }>`
+const TRExtended = styled(TR as any)<{ clickable?: boolean }>`
   cursor: ${props => (props.clickable ? 'pointer' : 'default')};
 
   &:hover td {
@@ -51,14 +51,14 @@ TRExtended.defaultProps = {
   clickable: false,
 }
 
-const THStyled = styled(TH)`
+const THStyled = styled(TH as any)`
   ${PaddingCSS}
 `
 
-const TDStyled = styled(TD)`
+const TDStyled = styled(TD as any)`
   ${PaddingCSS}
 `
-const TDRadio = styled(TD)`
+const TDRadio = styled(TD as any)`
   ${PaddingCSS}
   width: 20px;
 `

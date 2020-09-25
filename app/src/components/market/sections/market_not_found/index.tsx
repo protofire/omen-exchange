@@ -24,7 +24,7 @@ const ButtonLinkStyled = styled(ButtonLink)`
   margin-right: auto;
 `
 
-interface Props extends RouteComponentProps<{}> {
+interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   theme?: any
 }
 
