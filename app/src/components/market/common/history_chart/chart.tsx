@@ -110,7 +110,7 @@ const Legend = styled.li`
   }
 `
 
-const AnEvenSmallerLittleBall = styled(OutcomeItemLittleBallOfJoyAndDifferentColors)`
+const AnEvenSmallerLittleBall = styled(OutcomeItemLittleBallOfJoyAndDifferentColors as any)`
   height: 8px;
   margin-right: 12px;
   width: 8px;

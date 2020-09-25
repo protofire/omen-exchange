@@ -49,7 +49,7 @@
     "big.js": "^5.2.2",
     "circular-dependency-plugin": "^5.2.0",
     "common-tags": "^1.8.0",
-    "contract-proxy-kit": "^2.0.0-alpha.3",
+    "contract-proxy-kit": "^2.0.1",
     "disqus-react": "^1.0.8",
     "eslint-config-react-app": "^5.2.1",
     "ethers": "^4.0.36",
@@ -81,7 +81,7 @@
     "sanitize.css": "^11.0.0",
     "styled-components": "^4.3.2",
     "subscriptions-transport-ws": "^0.9.16",
-    "typescript": "3.6.2",
+    "typescript": "^4.0.3",
     "use-debounce": "^3.1.0",
     "use-local-storage-state": "^2.0.0",
     "web3-react": "^5.0.4"
