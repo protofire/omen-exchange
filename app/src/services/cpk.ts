@@ -1,4 +1,4 @@
-import CPK from 'contract-proxy-kit'
+import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ethers } from 'ethers'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
