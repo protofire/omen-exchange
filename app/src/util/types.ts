@@ -57,6 +57,13 @@ export interface Question {
   currentAnswerTimestamp: BigNumber
 }
 
+export interface Participant {
+  poolTokens: BigNumber
+  poolTokensUSD: BigNumber
+  outcomeShares: BigNumber
+  outcomeSharesUSD: BigNumber
+}
+
 export enum OutcomeTableValue {
   OutcomeProbability = 'Outcome/Probability',
   CurrentPrice = 'Price',

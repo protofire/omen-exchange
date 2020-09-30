@@ -1,10 +1,10 @@
 import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
-import React, { HTMLAttributes, useEffect, useState } from 'react'
+import React, { HTMLAttributes, useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useGraphMarketMakerData } from '../../../../hooks'
+import { useGraphMarketMakerData, useGraphParticipantMarketMakerData } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { calcPrice, formatBigNumber, formatNumber } from '../../../../util/tools'
@@ -75,6 +75,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const [volume, setVolume] = useState('')
   const [symbol, setSymbol] = useState('')
   const [decimals, setDecimals] = useState<number>()
+  const [userAddress, setUserAddress] = useState('')
+  if (account && account !== userAddress) setUserAddress(account)
 
   const { currentFilter, market } = props
   const { address, collateralToken, collateralVolume, openingTimestamp, outcomeTokenAmounts, outcomes, title } = market
@@ -99,10 +101,16 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const formattedLiquidity: string = useGraphMarketMakerDataResult.marketMakerData
     ? useGraphMarketMakerDataResult.marketMakerData.scaledLiquidityParameter.toFixed(2)
     : '0'
-
   const dailyVolume: Maybe<BigNumber[]> =
     useGraphMarketMakerDataResult.marketMakerData &&
     useGraphMarketMakerDataResult.marketMakerData.runningDailyVolumeByHour
+
+  const fpmmParticipationId = address.concat(userAddress).toLowerCase()
+  // const useGraphParticipantMarketMakerDataResult = useGraphParticipantMarketMakerData(fpmmParticipationId, userAddress)
+  const useGraphParticipantMarketMakerDataResult = useGraphParticipantMarketMakerData(
+    '0x3bbfc278b5ea1cd13e31b9da9bb5509e7600c3e10x0efe4e8397b41e2cce528cbb446ffbcad603ffbf',
+  )
+  console.log(useGraphParticipantMarketMakerDataResult)
 
   useEffect(() => {
     const setToken = async () => {
