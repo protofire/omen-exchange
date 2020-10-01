@@ -68,7 +68,7 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     state === MarketStates.open ? 'openingTimestamp_gt: $now' : '',
     state === MarketStates.pending || state === MarketStates.finalizing ? 'openingTimestamp_lt: $now' : '',
     state === MarketStates.pending || state === MarketStates.finalizing ? 'isPendingArbitration: false' : '',
-    state === MarketStates.pending || state === MarketStates.finalizing ? 'answerFinalizedTimestamp: null' : '',
+    state === MarketStates.finalizing ? 'answerFinalizedTimestamp_gt: $now' : '',
     state === MarketStates.pending ? 'currentAnswer: null' : '',
     state === MarketStates.finalizing ? 'currentAnswer_not: null' : '',
     state === MarketStates.arbitrating ? 'isPendingArbitration: true' : '',
