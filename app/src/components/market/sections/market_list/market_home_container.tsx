@@ -132,6 +132,7 @@ const MarketHomeContainer: React.FC = () => {
   let stateParam: MarketStates = MarketStates.open
   if (stateFilter) {
     if (stateRoute === 'OPEN') stateParam = MarketStates.open
+    if (stateRoute === 'PENDING') stateParam = MarketStates.pending
     if (stateRoute === 'FINALIZING') stateParam = MarketStates.finalizing
     if (stateRoute === 'ARBITRATING') stateParam = MarketStates.arbitrating
     if (stateRoute === 'CLOSED') stateParam = MarketStates.closed
