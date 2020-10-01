@@ -89,9 +89,6 @@ export const useGraphParticipantMarketMakerData = (id: string): Result => {
     variables: { id: id },
   })
 
-  console.log('data: ', data)
-  console.log('error: ', error)
-
   if (data && data.fpmmParticipation && !marketMakerData) {
     setMarketMakerData(wrangleResponse(data.fpmmParticipation))
   }

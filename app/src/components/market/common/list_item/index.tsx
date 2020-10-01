@@ -106,11 +106,13 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     useGraphMarketMakerDataResult.marketMakerData.runningDailyVolumeByHour
 
   const fpmmParticipationId = address.concat(userAddress).toLowerCase()
-  // const useGraphParticipantMarketMakerDataResult = useGraphParticipantMarketMakerData(fpmmParticipationId, userAddress)
   const useGraphParticipantMarketMakerDataResult = useGraphParticipantMarketMakerData(
     '0x3bbfc278b5ea1cd13e31b9da9bb5509e7600c3e10x0efe4e8397b41e2cce528cbb446ffbcad603ffbf',
   )
   console.log(useGraphParticipantMarketMakerDataResult)
+  const poolTokens: Maybe<BigNumber> = useGraphParticipantMarketMakerDataResult.marketMakerData
+    ? useGraphParticipantMarketMakerDataResult.marketMakerData.poolTokens
+    : null
 
   useEffect(() => {
     const setToken = async () => {
@@ -149,6 +151,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
             } ${symbol} - 24hr Volume`}
           {currentFilter.sortBy === 'usdLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
+          {currentFilter.sortBy === 'poolTokensUSD' &&
+            `${poolTokens && decimals && formatNumber(formatBigNumber(poolTokens, decimals))} - Pool tokens`}
         </span>
       </Info>
     </Wrapper>
