@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import { useGraphMarketMakerData, useGraphParticipantMarketMakerData } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { ERC20Service } from '../../../../services'
+import { CPKService, ERC20Service } from '../../../../services'
 import { calcPrice, formatBigNumber, formatNumber } from '../../../../util/tools'
 import { MarketMakerDataItem } from '../../../../util/types'
 import { IconStar } from '../../../common/icons/IconStar'
@@ -75,8 +75,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const [volume, setVolume] = useState('')
   const [symbol, setSymbol] = useState('')
   const [decimals, setDecimals] = useState<number>()
-  const [userAddress, setUserAddress] = useState('')
-  if (account && account !== userAddress) setUserAddress(account)
+  const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
 
   const { currentFilter, market } = props
   const { address, collateralToken, collateralVolume, openingTimestamp, outcomeTokenAmounts, outcomes, title } = market
@@ -105,14 +104,30 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     useGraphMarketMakerDataResult.marketMakerData &&
     useGraphMarketMakerDataResult.marketMakerData.runningDailyVolumeByHour
 
-  const fpmmParticipationId = address.concat(userAddress).toLowerCase()
-  const useGraphParticipantMarketMakerDataResult = useGraphParticipantMarketMakerData(
-    '0x3bbfc278b5ea1cd13e31b9da9bb5509e7600c3e10x0efe4e8397b41e2cce528cbb446ffbcad603ffbf',
-  )
+  const fpmmParticipationId = cpkAddress ? address.concat(cpkAddress).toLowerCase() : ''
+  const useGraphParticipantMarketMakerDataResult = useGraphParticipantMarketMakerData(fpmmParticipationId)
   console.log(useGraphParticipantMarketMakerDataResult)
   const poolTokens: Maybe<BigNumber> = useGraphParticipantMarketMakerDataResult.marketMakerData
     ? useGraphParticipantMarketMakerDataResult.marketMakerData.poolTokens
     : null
+  const outcomeShares: Maybe<BigNumber> = useGraphParticipantMarketMakerDataResult.marketMakerData
+    ? useGraphParticipantMarketMakerDataResult.marketMakerData.outcomeShares
+    : null
+
+  useEffect(() => {
+    const getCpkAddress = async () => {
+      try {
+        const cpk = await CPKService.create(provider)
+        setCpkAddress(cpk.address)
+      } catch (e) {
+        console.error('Could not get address of CPK', e.message)
+      }
+    }
+
+    if (account) {
+      getCpkAddress()
+    }
+  }, [provider, account])
 
   useEffect(() => {
     const setToken = async () => {
@@ -153,6 +168,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
           {currentFilter.sortBy === 'poolTokensUSD' &&
             `${poolTokens && decimals && formatNumber(formatBigNumber(poolTokens, decimals))} - Pool tokens`}
+          {currentFilter.sortBy === 'outcomeSharesUSD' &&
+            `${outcomeShares && decimals && formatNumber(formatBigNumber(outcomeShares, decimals))} - Outcome shares`}
         </span>
       </Info>
     </Wrapper>
