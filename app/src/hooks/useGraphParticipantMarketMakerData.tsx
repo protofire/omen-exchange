@@ -34,10 +34,10 @@ type GraphResponseParticipantFixedProductMarketMaker = {
   language: string
   creationTimestamp: string
   openingTimestamp: string
-  poolTokens: BigNumber
-  poolTokensUSD: BigNumber
-  outcomeShares: BigNumber
-  outcomeSharesUSD: BigNumber
+  poolTokens: string
+  poolTokensUSD: string
+  outcomeShares: string
+  outcomeSharesUSD: string
   timeout: string
 }
 
@@ -51,10 +51,10 @@ export type GraphParticipantMarketMakerData = {
   collateralAddress: string
   creationTimestamp: string
   fee: BigNumber
-  poolTokens: BigNumber
-  poolTokensUSD: BigNumber
-  outcomeShares: BigNumber
-  outcomeSharesUSD: BigNumber
+  poolTokens: number
+  poolTokensUSD: number
+  outcomeShares: number
+  outcomeSharesUSD: number
 }
 
 type Result = {
@@ -69,10 +69,10 @@ const wrangleResponse = (data: GraphResponseParticipantFixedProductMarketMaker):
     collateralAddress: data.collateralToken,
     creationTimestamp: data.creationTimestamp,
     fee: bigNumberify(data.fee),
-    poolTokens: data.poolTokens,
-    poolTokensUSD: data.poolTokensUSD,
-    outcomeShares: data.outcomeShares,
-    outcomeSharesUSD: data.outcomeSharesUSD,
+    poolTokens: parseFloat(data.poolTokens),
+    poolTokensUSD: parseFloat(data.poolTokensUSD),
+    outcomeShares: parseFloat(data.outcomeShares),
+    outcomeSharesUSD: parseFloat(data.outcomeSharesUSD),
   }
 }
 

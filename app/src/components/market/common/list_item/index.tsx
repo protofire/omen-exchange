@@ -104,15 +104,16 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     useGraphMarketMakerDataResult.marketMakerData &&
     useGraphMarketMakerDataResult.marketMakerData.runningDailyVolumeByHour
 
+  console.log(useGraphMarketMakerDataResult)
+
   const fpmmParticipationId = cpkAddress ? address.concat(cpkAddress).toLowerCase() : ''
   const useGraphParticipantMarketMakerDataResult = useGraphParticipantMarketMakerData(fpmmParticipationId)
-  console.log(useGraphParticipantMarketMakerDataResult)
-  const poolTokens: Maybe<BigNumber> = useGraphParticipantMarketMakerDataResult.marketMakerData
-    ? useGraphParticipantMarketMakerDataResult.marketMakerData.poolTokens
-    : null
-  const outcomeShares: Maybe<BigNumber> = useGraphParticipantMarketMakerDataResult.marketMakerData
-    ? useGraphParticipantMarketMakerDataResult.marketMakerData.outcomeShares
-    : null
+  const poolTokens: Maybe<string> = useGraphParticipantMarketMakerDataResult.marketMakerData
+    ? useGraphParticipantMarketMakerDataResult.marketMakerData.poolTokens.toFixed(2)
+    : '0'
+  const outcomeShares: Maybe<string> = useGraphParticipantMarketMakerDataResult.marketMakerData
+    ? useGraphParticipantMarketMakerDataResult.marketMakerData.outcomeShares.toFixed(2)
+    : '0'
 
   useEffect(() => {
     const getCpkAddress = async () => {
@@ -166,10 +167,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
             } ${symbol} - 24hr Volume`}
           {currentFilter.sortBy === 'usdLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
-          {currentFilter.sortBy === 'poolTokensUSD' &&
-            `${poolTokens && decimals && formatNumber(formatBigNumber(poolTokens, decimals))} - Pool tokens`}
-          {currentFilter.sortBy === 'outcomeSharesUSD' &&
-            `${outcomeShares && decimals && formatNumber(formatBigNumber(outcomeShares, decimals))} - Outcome shares`}
+          {currentFilter.sortBy === 'poolTokensUSD' && `${poolTokens && poolTokens} - Pool tokens`}
+          {currentFilter.sortBy === 'outcomeSharesUSD' && `${outcomeShares && outcomeShares} - Outcome shares`}
         </span>
       </Info>
     </Wrapper>
