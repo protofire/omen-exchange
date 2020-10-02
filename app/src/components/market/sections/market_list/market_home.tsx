@@ -374,16 +374,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       sortBy: 'openingTimestamp',
       direction: 'asc',
     },
-    {
-      title: 'Highest pool tokens',
-      sortBy: 'poolTokensUSD',
-      direction: 'desc',
-    },
-    {
-      title: 'Highest outcome shares',
-      sortBy: 'outcomeSharesUSD',
-      direction: 'desc',
-    },
   ] as const
 
   const sortItems: Array<DropdownItemProps> = sortOptions.map(item => {

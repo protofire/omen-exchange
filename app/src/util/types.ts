@@ -57,13 +57,6 @@ export interface Question {
   currentAnswerTimestamp: BigNumber
 }
 
-export interface Participant {
-  poolTokens: BigNumber
-  poolTokensUSD: BigNumber
-  outcomeShares: BigNumber
-  outcomeSharesUSD: BigNumber
-}
-
 export enum OutcomeTableValue {
   OutcomeProbability = 'Outcome/Probability',
   CurrentPrice = 'Price',
@@ -152,8 +145,6 @@ export type MarketsSortCriteria =
   | 'openingTimestamp'
   | 'usdLiquidityParameter'
   | 'lastActiveDayAndScaledRunningDailyVolume'
-  | 'poolTokensUSD'
-  | 'outcomeSharesUSD'
   | 'sort24HourVolume0'
   | 'sort24HourVolume1'
   | 'sort24HourVolume2'

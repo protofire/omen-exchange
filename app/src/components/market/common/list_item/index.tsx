@@ -4,9 +4,9 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useGraphMarketMakerData, useGraphParticipantMarketMakerData } from '../../../../hooks'
+import { useGraphMarketMakerData } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { CPKService, ERC20Service } from '../../../../services'
+import { ERC20Service } from '../../../../services'
 import { calcPrice, formatBigNumber, formatNumber } from '../../../../util/tools'
 import { MarketMakerDataItem } from '../../../../util/types'
 import { IconStar } from '../../../common/icons/IconStar'
@@ -75,7 +75,6 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const [volume, setVolume] = useState('')
   const [symbol, setSymbol] = useState('')
   const [decimals, setDecimals] = useState<number>()
-  const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
 
   const { currentFilter, market } = props
   const { address, collateralToken, collateralVolume, openingTimestamp, outcomeTokenAmounts, outcomes, title } = market
@@ -100,33 +99,10 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const formattedLiquidity: string = useGraphMarketMakerDataResult.marketMakerData
     ? useGraphMarketMakerDataResult.marketMakerData.scaledLiquidityParameter.toFixed(2)
     : '0'
+
   const dailyVolume: Maybe<BigNumber[]> =
     useGraphMarketMakerDataResult.marketMakerData &&
     useGraphMarketMakerDataResult.marketMakerData.runningDailyVolumeByHour
-
-  const fpmmParticipationId = cpkAddress ? address.concat(cpkAddress).toLowerCase() : ''
-  const useGraphParticipantMarketMakerDataResult = useGraphParticipantMarketMakerData(fpmmParticipationId)
-  const poolTokens: Maybe<string> = useGraphParticipantMarketMakerDataResult.marketMakerData
-    ? useGraphParticipantMarketMakerDataResult.marketMakerData.poolTokens.toFixed(2)
-    : '0'
-  const outcomeShares: Maybe<string> = useGraphParticipantMarketMakerDataResult.marketMakerData
-    ? useGraphParticipantMarketMakerDataResult.marketMakerData.outcomeShares.toFixed(2)
-    : '0'
-
-  useEffect(() => {
-    const getCpkAddress = async () => {
-      try {
-        const cpk = await CPKService.create(provider)
-        setCpkAddress(cpk.address)
-      } catch (e) {
-        console.error('Could not get address of CPK', e.message)
-      }
-    }
-
-    if (account) {
-      getCpkAddress()
-    }
-  }, [provider, account])
 
   useEffect(() => {
     const setToken = async () => {
@@ -165,8 +141,6 @@ export const ListItem: React.FC<Props> = (props: Props) => {
             } ${symbol} - 24hr Volume`}
           {currentFilter.sortBy === 'usdLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
-          {currentFilter.sortBy === 'poolTokensUSD' && `${poolTokens && poolTokens} - Pool tokens`}
-          {currentFilter.sortBy === 'outcomeSharesUSD' && `${outcomeShares && outcomeShares} - Outcome shares`}
         </span>
       </Info>
     </Wrapper>
