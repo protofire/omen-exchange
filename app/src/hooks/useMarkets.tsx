@@ -73,8 +73,6 @@ export const useMarkets = (options: Options): any => {
 
   const newOptions = { ...options, first: first + 1 }
 
-  console.log(newOptions)
-
   const { error, fetchMore, loading } = useQuery<GraphResponseMarkets>(query, {
     notifyOnNetworkStatusChange: true,
     variables: newOptions,

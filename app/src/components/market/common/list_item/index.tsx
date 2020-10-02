@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
-import React, { HTMLAttributes, useEffect, useRef, useState } from 'react'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -103,8 +103,6 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const dailyVolume: Maybe<BigNumber[]> =
     useGraphMarketMakerDataResult.marketMakerData &&
     useGraphMarketMakerDataResult.marketMakerData.runningDailyVolumeByHour
-
-  console.log(useGraphMarketMakerDataResult)
 
   const fpmmParticipationId = cpkAddress ? address.concat(cpkAddress).toLowerCase() : ''
   const useGraphParticipantMarketMakerDataResult = useGraphParticipantMarketMakerData(fpmmParticipationId)
