@@ -57,20 +57,20 @@ export class OracleService {
     let payouts: number[]
     if (realitioAnswer === '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff') {
       payouts = [...Array(numOutcomes)].map(() => 1)
-    }
-
-    const answer = new BigNumber(realitioAnswer).toNumber()
-
-    if (templateId === 0 || templateId === 2) {
-      payouts = [...Array(numOutcomes)].map(() => 0)
-      payouts[answer] = 1
-    } else if (templateId === 5 || templateId === 6) {
-      payouts = [0, 0]
-
-      payouts[0] = 4 - answer
-      payouts[1] = answer
     } else {
-      throw new Error(`Unsupported template id: '${templateId}'`)
+      const answer = new BigNumber(realitioAnswer).toNumber()
+
+      if (templateId === 0 || templateId === 2) {
+        payouts = [...Array(numOutcomes)].map(() => 0)
+        payouts[answer] = 1
+      } else if (templateId === 5 || templateId === 6) {
+        payouts = [0, 0]
+
+        payouts[0] = 4 - answer
+        payouts[1] = answer
+      } else {
+        throw new Error(`Unsupported template id: '${templateId}'`)
+      }
     }
 
     const totalPayouts = payouts.reduce((a, b) => a + b)
