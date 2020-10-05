@@ -1,0 +1,46 @@
+import React from 'react'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
+import styled from 'styled-components'
+
+import { MarketMakerData } from '../../../../util/types'
+import { SectionTitle, TextAlign } from '../../../common/text/section_title'
+import { ViewCard } from '../../common/view_card'
+import { MarketNavigation } from '../market_navigation'
+import { MarketTopDetailsOpen } from '../../common/market_top_details_open'
+import { HistoryChartContainer } from '../../common/history_chart'
+
+const TopCard = styled(ViewCard)`
+  padding-bottom: 0;
+  margin-bottom: 24px;
+`
+
+const BottomCard = styled(ViewCard)``
+
+interface Props extends RouteComponentProps<any> {
+  marketMakerData: MarketMakerData
+}
+
+const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
+  const { marketMakerData } = props
+  const { address: marketMakerAddress, question, answerFinalizedTimestamp } = marketMakerData
+
+  return (
+    <>
+      <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
+      <TopCard>
+        <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Purchase Shares" />
+      </TopCard>
+      <BottomCard>
+        <MarketNavigation activeTab={'HISTORY'} marketAddress={marketMakerAddress}></MarketNavigation>
+        <HistoryChartContainer
+          answerFinalizedTimestamp={answerFinalizedTimestamp}
+          hidden={false}
+          marketMakerAddress={marketMakerAddress}
+          outcomes={question.outcomes}
+        />
+      </BottomCard>
+    </>
+  )
+}
+
+export const MarketBuy = withRouter(MarketHistoryWrapper)
