@@ -43,6 +43,7 @@ import { TransactionDetailsRow, ValueStates } from '../../common/transaction_det
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
+import { MarketNavigation } from '../market_navigation'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
@@ -294,12 +295,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       <TopCard>
-        <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Pool Liquidity" />
+        <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Trade Outcome</SubsectionTitle>
-        </SubsectionTitleWrapper>
+        <MarketNavigation activeTab={'POOL'} marketAddress={marketMakerAddress}></MarketNavigation>
         <OutcomeTable
           balances={balances}
           collateral={collateral}
