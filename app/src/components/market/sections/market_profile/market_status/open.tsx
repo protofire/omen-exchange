@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -175,6 +175,19 @@ const Wrapper = (props: Props) => {
     </>
   )
 
+  const [activeTab, setActiveTab] = useState('SWAP')
+
+  const marketTabs = {
+    history: 'HISTORY',
+    pool: 'POOL',
+    swap: 'SWAP',
+    verify: 'VERIFY',
+  }
+
+  const handleMarketTabClick = (tab: string) => {
+    setActiveTab(tab)
+  }
+
   return (
     <>
       <TopCard>
@@ -182,10 +195,19 @@ const Wrapper = (props: Props) => {
       </TopCard>
       <BottomCard>
         <MarketTabs>
-          <MarketTab active={true}>Swap</MarketTab>
-          <MarketTab active={false}>Pool</MarketTab>
-          <MarketTab active={false}>Verify</MarketTab>
-          <MarketTab active={false}>History</MarketTab>
+          <MarketTab active={activeTab === marketTabs.swap} onClick={() => handleMarketTabClick('SWAP')}>
+            Swap
+          </MarketTab>
+          <MarketTab active={activeTab === marketTabs.pool} onClick={() => handleMarketTabClick('POOL')}>
+            Pool
+          </MarketTab>
+          {/* Verify is commented out until the underlying infrastructure is ready */}
+          {/* <MarketTab active={activeTab === marketTabs.verify} onClick={() => handleMarketTabClick('VERIFY')}>
+            Verify
+          </MarketTab> */}
+          <MarketTab active={activeTab === marketTabs.history} onClick={() => handleMarketTabClick('HISTORY')}>
+            History
+          </MarketTab>
         </MarketTabs>
         {renderTableData()}
         {isQuestionOpen && openQuestionMessage}
