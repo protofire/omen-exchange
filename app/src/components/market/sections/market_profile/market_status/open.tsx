@@ -11,6 +11,7 @@ import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 import { WarningMessage } from '../../../common/warning_message'
+import { MarketNavigation } from '../../market_navigation'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
@@ -60,25 +61,6 @@ const StyledButtonContainer = styled(ButtonContainer)`
 
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
-`
-
-const MarketTabs = styled.div`
-  display: flex;
-  margin-top: -5px;
-  margin-bottom: 20px;
-`
-
-const MarketTab = styled.div<{ active: boolean }>`
-  font-size: 14px;
-  color: ${props => (props.active ? props.theme.buttonSecondary.color : props.theme.colors.clickable)};
-  background: none;
-  border: none;
-  border-radius: 32px;
-  padding: 10px 18px;
-  margin-right: 2px;
-  background: ${props => (props.active ? props.theme.buttonSecondary.backgroundColor : `none`)};
-  font-weight: ${props => (props.active ? `500` : `400`)};
-  cursor: pointer;
 `
 
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
@@ -175,40 +157,13 @@ const Wrapper = (props: Props) => {
     </>
   )
 
-  const [activeTab, setActiveTab] = useState('SWAP')
-
-  const marketTabs = {
-    history: 'HISTORY',
-    pool: 'POOL',
-    swap: 'SWAP',
-    verify: 'VERIFY',
-  }
-
-  const handleMarketTabClick = (tab: string) => {
-    setActiveTab(tab)
-  }
-
   return (
     <>
       <TopCard>
         <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
-        <MarketTabs>
-          <MarketTab active={activeTab === marketTabs.swap} onClick={() => handleMarketTabClick('SWAP')}>
-            Swap
-          </MarketTab>
-          <MarketTab active={activeTab === marketTabs.pool} onClick={() => handleMarketTabClick('POOL')}>
-            Pool
-          </MarketTab>
-          {/* Verify is commented out until the underlying infrastructure is ready */}
-          {/* <MarketTab active={activeTab === marketTabs.verify} onClick={() => handleMarketTabClick('VERIFY')}>
-            Verify
-          </MarketTab> */}
-          <MarketTab active={activeTab === marketTabs.history} onClick={() => handleMarketTabClick('HISTORY')}>
-            History
-          </MarketTab>
-        </MarketTabs>
+        <MarketNavigation activeTab={'SWAP'}></MarketNavigation>
         {renderTableData()}
         {isQuestionOpen && openQuestionMessage}
         {!hasFunding && !isQuestionOpen && (
@@ -222,7 +177,6 @@ const Wrapper = (props: Props) => {
         )}
         <WhenConnected>
           <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
-            {poolButton}
             {isQuestionOpen ? openInRealitioButton : buySellButtons}
           </StyledButtonContainer>
         </WhenConnected>
