@@ -32,6 +32,7 @@ import { TransactionDetailsRow, ValueStates } from '../../common/transaction_det
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
+import { MarketNavigation } from '../market_navigation'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
@@ -188,9 +189,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Sell Shares" />
       </TopCard>
       <BottomCard>
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Trade Outcome</SubsectionTitle>
-        </SubsectionTitleWrapper>
+        <MarketNavigation activeTab={'SWAP'} marketAddress={marketMakerAddress}></MarketNavigation>
         <OutcomeTable
           balances={balances}
           collateral={collateral}
