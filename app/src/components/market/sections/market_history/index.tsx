@@ -4,10 +4,10 @@ import styled from 'styled-components'
 
 import { MarketMakerData } from '../../../../util/types'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
+import { HistoryChartContainer } from '../../common/history_chart'
+import { MarketTopDetailsOpen } from '../../common/market_top_details_open'
 import { ViewCard } from '../../common/view_card'
 import { MarketNavigation } from '../market_navigation'
-import { MarketTopDetailsOpen } from '../../common/market_top_details_open'
-import { HistoryChartContainer } from '../../common/history_chart'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
@@ -22,7 +22,7 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
-  const { address: marketMakerAddress, question, answerFinalizedTimestamp } = marketMakerData
+  const { address: marketMakerAddress, answerFinalizedTimestamp, question } = marketMakerData
 
   return (
     <>
@@ -43,4 +43,4 @@ const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
   )
 }
 
-export const MarketBuy = withRouter(MarketHistoryWrapper)
+export const MarketHistory = withRouter(MarketHistoryWrapper)

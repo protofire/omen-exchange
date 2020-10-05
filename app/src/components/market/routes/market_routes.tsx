@@ -7,7 +7,13 @@ import { Redirect, Route, RouteComponentProps, Switch } from 'react-router'
 import { FETCH_DETAILS_INTERVAL, MAX_MARKET_FEE } from '../../../common/constants'
 import { useCheckContractExists, useMarketMakerData } from '../../../hooks'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
-import { MarketBuyPage, MarketDetailsPage, MarketPoolLiquidityPage, MarketSellPage } from '../../../pages'
+import {
+  MarketBuyPage,
+  MarketDetailsPage,
+  MarketHistoryPage,
+  MarketPoolLiquidityPage,
+  MarketSellPage,
+} from '../../../pages'
 import { getLogger } from '../../../util/logger'
 import { isAddress } from '../../../util/tools'
 import { ThreeBoxComments } from '../../comments'
@@ -69,11 +75,18 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
       {!account ? (
         <Message text="Please connect to your wallet to open the market..." type={MessageType.warning} />
       ) : (
-        <Route
-          exact
-          path="/:address/pool-liquidity"
-          render={props => <MarketPoolLiquidityPage {...props} marketMakerData={marketMakerData} />}
-        />
+        <>
+          <Route
+            exact
+            path="/:address/pool-liquidity"
+            render={props => <MarketPoolLiquidityPage {...props} marketMakerData={marketMakerData} />}
+          />
+          <Route
+            exact
+            path="/:address/trade-history"
+            render={props => <MarketHistoryPage {...props} marketMakerData={marketMakerData} />}
+          />
+        </>
       )}
       {!account ? (
         <Message text="Please connect to your wallet to open the market..." type={MessageType.warning} />
