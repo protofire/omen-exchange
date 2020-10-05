@@ -163,7 +163,7 @@ const Wrapper = (props: Props) => {
         <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
-        <MarketNavigation activeTab={'SWAP'}></MarketNavigation>
+        <MarketNavigation activeTab={'SWAP'} marketAddress={marketMakerAddress}></MarketNavigation>
         {renderTableData()}
         {isQuestionOpen && openQuestionMessage}
         {!hasFunding && !isQuestionOpen && (

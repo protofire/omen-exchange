@@ -1,4 +1,5 @@
 import React from 'react'
+import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 const MarketTabs = styled.div`
@@ -22,10 +23,13 @@ const MarketTab = styled.div<{ active: boolean }>`
 
 interface Props {
   activeTab: string
+  marketAddress: string
 }
 
 export const MarketNavigation = (props: Props) => {
-  const { activeTab } = props
+  const history = useHistory()
+
+  const { activeTab, marketAddress } = props
 
   const marketTabs = {
     history: 'HISTORY',
@@ -36,11 +40,28 @@ export const MarketNavigation = (props: Props) => {
 
   return (
     <MarketTabs>
-      <MarketTab active={activeTab === marketTabs.swap}>Swap</MarketTab>
-      <MarketTab active={activeTab === marketTabs.pool}>Pool</MarketTab>
+      <MarketTab active={activeTab === marketTabs.swap} onClick={() => history.push(`/${marketAddress}`)}>
+        Swap
+      </MarketTab>
+      <MarketTab
+        active={activeTab === marketTabs.pool}
+        onClick={() => history.push(`/${marketAddress}/pool-liquidity`)}
+      >
+        Pool
+      </MarketTab>
       {/* Verify is commented out until the underlying infrastructure is ready */}
-      {/* <MarketTab active={activeTab === marketTabs.verify}>Verify</MarketTab> */}
-      <MarketTab active={activeTab === marketTabs.history}>History</MarketTab>
+      {/* <MarketTab 
+        active={activeTab === marketTabs.verify} 
+        onClick={() => history.push(`/${marketAddress}/verify`)}
+      >
+        Verify
+      </MarketTab> */}
+      <MarketTab
+        active={activeTab === marketTabs.history}
+        onClick={() => history.push(`/${marketAddress}/trade-history`)}
+      >
+        History
+      </MarketTab>
     </MarketTabs>
   )
 }
