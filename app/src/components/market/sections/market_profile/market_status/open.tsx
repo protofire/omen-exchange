@@ -62,6 +62,25 @@ const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
 `
 
+const MarketTabs = styled.div`
+  display: flex;
+  margin-top: -5px;
+  margin-bottom: 20px;
+`
+
+const MarketTab = styled.div<{ active: boolean }>`
+  font-size: 14px;
+  color: ${props => (props.active ? props.theme.buttonSecondary.color : props.theme.colors.clickable)};
+  background: none;
+  border: none;
+  border-radius: 32px;
+  padding: 10px 18px;
+  margin-right: 2px;
+  background: ${props => (props.active ? props.theme.buttonSecondary.backgroundColor : `none`)};
+  font-weight: ${props => (props.active ? `500` : `400`)};
+  cursor: pointer;
+`
+
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   account: Maybe<string>
   marketMakerData: MarketMakerData
@@ -162,9 +181,12 @@ const Wrapper = (props: Props) => {
         <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Trade Outcome</SubsectionTitle>
-        </SubsectionTitleWrapper>
+        <MarketTabs>
+          <MarketTab active={true}>Swap</MarketTab>
+          <MarketTab active={false}>Pool</MarketTab>
+          <MarketTab active={false}>Verify</MarketTab>
+          <MarketTab active={false}>History</MarketTab>
+        </MarketTabs>
         {renderTableData()}
         {isQuestionOpen && openQuestionMessage}
         {!hasFunding && !isQuestionOpen && (
