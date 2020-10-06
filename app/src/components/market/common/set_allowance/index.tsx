@@ -24,12 +24,13 @@ const DescriptionWrapper = styled.div`
   display: flex;
 `
 
-const Description = styled.p`
+const Description = styled.div`
   color: ${props => props.theme.colors.textColorLightish};
   font-size: 14px;
   letter-spacing: 0.2px;
   line-height: 1.4;
   margin: 0 32px 0 0;
+  display: inline-block;
 `
 
 export type SetAllowanceProps = DOMAttributes<HTMLDivElement> &
