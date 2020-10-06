@@ -220,6 +220,7 @@ const Wrapper = (props: Props) => {
       <BottomCard>
         <MarketNavigation
           activeTab={'SWAP'}
+          hasWinningOutcomes={hasWinningOutcomes}
           isQuestionFinalized={isQuestionFinalized}
           marketAddress={marketMakerAddress}
           resolutionDate={question.resolution}

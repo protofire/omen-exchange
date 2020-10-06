@@ -24,6 +24,7 @@ const MarketTab = styled.div<{ active: boolean }>`
 interface Props {
   activeTab: string
   marketAddress: string
+  hasWinningOutcomes?: Maybe<boolean>
   isQuestionFinalized: boolean
   resolutionDate: Date
 }
@@ -31,7 +32,7 @@ interface Props {
 export const MarketNavigation = (props: Props) => {
   const history = useHistory()
 
-  const { activeTab, isQuestionFinalized, marketAddress, resolutionDate } = props
+  const { activeTab, hasWinningOutcomes, isQuestionFinalized, marketAddress, resolutionDate } = props
 
   const marketTabs = {
     history: 'HISTORY',
@@ -45,7 +46,13 @@ export const MarketNavigation = (props: Props) => {
   return (
     <MarketTabs>
       <MarketTab active={activeTab === marketTabs.swap} onClick={() => history.push(`/${marketAddress}`)}>
-        {isFinalizing ? 'Finalize' : isQuestionFinalized ? 'Results' : 'Swap'}
+        {isQuestionFinalized && hasWinningOutcomes
+          ? 'Redeem'
+          : isQuestionFinalized && !hasWinningOutcomes
+          ? 'Results'
+          : isFinalizing
+          ? 'Finalize'
+          : 'Swap'}
       </MarketTab>
       <MarketTab
         active={activeTab === marketTabs.pool}
