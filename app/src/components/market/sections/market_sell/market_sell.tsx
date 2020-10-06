@@ -17,7 +17,7 @@ import {
 import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, SubsectionTitle, SubsectionTitleWrapper, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'

@@ -4,8 +4,6 @@ import styled from 'styled-components'
 import { Arbitrator } from '../../../../util/types'
 import { IconArbitrator } from '../../../common/icons/IconArbitrator'
 import { IconCategory } from '../../../common/icons/IconCategory'
-import { IconChevronDown } from '../../../common/icons/IconChevronDown'
-import { IconChevronUp } from '../../../common/icons/IconChevronUp'
 import { IconOracle } from '../../../common/icons/IconOracle'
 
 const AdditionalMarketDataWrapper = styled.div`

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -6,7 +6,6 @@ import { WhenConnected } from '../../../../../hooks/connectedWeb3'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { SubsectionTitle, SubsectionTitleWrapper } from '../../../../common'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
@@ -19,10 +18,6 @@ const TopCard = styled(ViewCard)`
 `
 
 const BottomCard = styled(ViewCard)``
-
-const LeftButton = styled(Button)`
-  margin-right: auto;
-`
 
 const MessageWrapper = styled.div`
   border-radius: 4px;
@@ -111,17 +106,6 @@ const Wrapper = (props: Props) => {
       />
     )
   }
-
-  const poolButton = (
-    <LeftButton
-      buttonType={ButtonType.secondaryLine}
-      onClick={() => {
-        history.push(`${marketMakerAddress}/pool-liquidity`)
-      }}
-    >
-      Pool Liquidity
-    </LeftButton>
-  )
 
   const openQuestionMessage = (
     <MessageWrapper>
