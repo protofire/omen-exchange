@@ -19,6 +19,7 @@ import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
+import { MarketNavigation } from '../../market_navigation'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
@@ -69,6 +70,7 @@ const Wrapper = (props: Props) => {
     balances,
     collateral: collateralToken,
     isConditionResolved,
+    isQuestionFinalized,
     payouts,
     question,
   } = marketMakerData
@@ -216,9 +218,12 @@ const Wrapper = (props: Props) => {
         <MarketTopDetailsClosed collateral={collateral} marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Market Closed</SubsectionTitle>
-        </SubsectionTitleWrapper>
+        <MarketNavigation
+          activeTab={'SWAP'}
+          isQuestionFinalized={isQuestionFinalized}
+          marketAddress={marketMakerAddress}
+          resolutionDate={question.resolution}
+        ></MarketNavigation>
         <OutcomeTable
           balances={balances}
           collateral={collateralToken}
