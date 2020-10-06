@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
@@ -15,13 +16,7 @@ import {
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { RemoteData } from '../../../../../../util/remote_data'
-import {
-  calcDistributionHint,
-  calcInitialFundingSendAmounts,
-  formatBigNumber,
-  formatDate,
-  formatNumber,
-} from '../../../../../../util/tools'
+import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
@@ -43,7 +38,6 @@ import {
   OutcomesTR,
   OutcomesTable,
   OutcomesTableWrapper,
-  TDFlexDiv,
 } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
 import { CurrencySelector } from '../../../../common/currency_selector'
@@ -129,7 +123,7 @@ const CreateCardBottomRow = styled.div`
 `
 
 const CustomFeeToggle = styled.p`
-  color: ${props => props.theme.colors.hyperlink};
+  color: ${props => props.theme.colors.primary};
   cursor: pointer;
   margin-top: 0;
 
@@ -166,6 +160,7 @@ interface Props {
     spread: number
     funding: BigNumber
     outcomes: Outcome[]
+    loadedQuestionId: Maybe<string>
   }
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
@@ -192,7 +187,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     submit,
     values,
   } = props
-  const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
+  const { arbitrator, category, collateral, funding, loadedQuestionId, outcomes, question, resolution, spread } = values
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -230,12 +225,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
   const tokensAmount = useTokens(context).length
-
-  const distributionHint = calcDistributionHint(outcomes.map(outcome => outcome.probability))
-  const sharesAfterInitialFunding =
-    distributionHint.length > 0
-      ? calcInitialFundingSendAmounts(funding, distributionHint)
-      : outcomes.map(() => new BigNumber(0))
 
   const amountError =
     maybeCollateralBalance === null
@@ -302,16 +291,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   return (
     <>
       <CreateCardTop>
-        <SubsectionTitleStyled>Your Market</SubsectionTitleStyled>
-        <SubTitle>Market Question</SubTitle>
+        <SubsectionTitleStyled>Your {loadedQuestionId ? 'Imported' : 'Categorical'} Market</SubsectionTitleStyled>
+        <SubTitle>Question</SubTitle>
         <QuestionText>{question}</QuestionText>
         <OutcomesTableWrapper>
           <OutcomesTable>
             <OutcomesTHead>
               <OutcomesTR>
-                <OutcomesTH>Outcome</OutcomesTH>
-                <OutcomesTH textAlign="right">Probability</OutcomesTH>
-                <OutcomesTH textAlign="right">My Shares</OutcomesTH>
+                <OutcomesTH style={{ width: '60%' }}>Outcome</OutcomesTH>
+                <OutcomesTH>Probability</OutcomesTH>
               </OutcomesTR>
             </OutcomesTHead>
             <OutcomesTBody>
@@ -324,12 +312,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                         <OutcomeItemText>{outcome.name}</OutcomeItemText>
                       </OutcomeItemTextWrapper>
                     </OutcomesTD>
-                    <OutcomesTD textAlign="right">{outcome.probability.toFixed(2)}%</OutcomesTD>
-                    <OutcomesTD textAlign="right">
-                      <TDFlexDiv textAlign="right">
-                        {formatBigNumber(sharesAfterInitialFunding[index], collateral.decimals)}
-                      </TDFlexDiv>
-                    </OutcomesTD>
+                    <OutcomesTD>{outcome.probability.toFixed(0)}%</OutcomesTD>
                   </OutcomesTR>
                 )
               })}
@@ -402,6 +385,10 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 title={'Earn Trading Fee'}
                 value={`${isNaN(spread) ? 0 : spread}%`}
               />
+              <TransactionDetailsRow
+                title={'Deposit Amount'}
+                value={amount ? `${ethers.utils.formatUnits(amount, collateral.decimals)} ${collateral.symbol}` : ''}
+              />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 title={'Pool Tokens'}
@@ -452,7 +439,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               Connect Wallet
             </Button>
           )}
-          <ButtonCreate buttonType={ButtonType.primary} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
+          <ButtonCreate buttonType={ButtonType.secondaryLine} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
             Create Market
           </ButtonCreate>
         </ButtonContainerFullWidth>

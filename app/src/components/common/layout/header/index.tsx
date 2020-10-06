@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { withRouter } from 'react-router'
-import { NavLink, RouteComponentProps } from 'react-router-dom'
+import { NavLink, RouteComponentProps, matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
@@ -12,7 +12,7 @@ import { ButtonType } from '../../../button/button_styling_types'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { ModalConnectWallet } from '../../../modal'
-import { IconAdd } from '../../icons'
+import { IconAdd, IconClose } from '../../icons'
 
 const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -127,9 +127,15 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
     },
   ]
 
+  const isMarketCreatePage = !!matchPath(history.location.pathname, { path: '/create', exact: true })
+
   const createButtonProps = {
-    disabled: disableConnectButton || history.location.pathname.toString().includes('create'),
+    disabled: disableConnectButton || isMarketCreatePage,
     onClick: () => history.push('/create'),
+  }
+
+  const exitButtonProps = {
+    onClick: () => history.push('/'),
   }
 
   return (
@@ -141,12 +147,27 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
           </LogoWrapper>
         </ContentsLeft>
         <ContentsRight>
-          <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...createButtonProps}>
-            Create Market
-          </ButtonCreateDesktop>
-          <ButtonCreateMobile {...createButtonProps}>
-            <IconAdd />
-          </ButtonCreateMobile>
+          {isMarketCreatePage ? (
+            <>
+              <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...exitButtonProps}>
+                <IconClose />
+                &nbsp;&nbsp;Exit
+              </ButtonCreateDesktop>
+              <ButtonCreateMobile {...exitButtonProps}>
+                <IconClose />
+              </ButtonCreateMobile>
+            </>
+          ) : (
+            <>
+              <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...createButtonProps}>
+                Create Market
+              </ButtonCreateDesktop>
+              <ButtonCreateMobile {...createButtonProps}>
+                <IconAdd />
+              </ButtonCreateMobile>
+            </>
+          )}
+
           {!context.account && (
             <ButtonWrapper
               data-class="customTooltip"

@@ -108,7 +108,7 @@ const theme = {
     borderRadius: '8px ',
     boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)',
     paddingHorizontal: '25px',
-    paddingVertical: '25px',
+    paddingVertical: '21px',
     textColor: '#000',
     textColorSecondary: '#333',
     titleColor: '#000',

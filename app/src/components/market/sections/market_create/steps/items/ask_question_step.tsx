@@ -7,7 +7,7 @@ import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
-import { DateField, FormRow } from '../../../../../common'
+import { DateField, FormRow, FormStateButton } from '../../../../../common'
 import { CommonDisabledCSS } from '../../../../../common/form/common_styled'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
@@ -57,22 +57,21 @@ const ButtonCategoryTextOverflow = styled.span`
   text-transform: capitalize;
 `
 
-const GridThreeColumns = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
+const GridTwoColumns = styled.div`
   column-gap: 20px;
   display: grid;
   grid-template-columns: 1fr;
-  padding: 20px 0;
+  padding-bottom: 20px;
   row-gap: 20px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 `
 
 const Column = styled.div`
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    max-width: 165px;
+    max-width: 250px;
   }
 `
 
@@ -88,6 +87,27 @@ const ButtonWithReadyToGoStatusCSS = css`
 
 const ButtonWithReadyToGoStatus = styled(Button)<{ readyToGo: boolean }>`
   ${props => props.readyToGo && ButtonWithReadyToGoStatusCSS}
+`
+
+const CategoryImportWrapper = styled.div`
+  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
+  margin-left: -${props => props.theme.cards.paddingHorizontal};
+  margin-right: -${props => props.theme.cards.paddingHorizontal};
+  padding: 0 ${props => props.theme.cards.paddingHorizontal};
+  padding-bottom: ${props => props.theme.cards.paddingVertical};
+  & > * + * {
+    margin-left: 8px;
+  }
+`
+
+const UTCLabelWrapper = styled.span`
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+  letter-spacing: 0.2px;
+  color: ${({ theme }) => theme.colors.textColor};
+  flex: 1;
+  margin-left: 8px;
 `
 
 interface Props {
@@ -146,10 +166,18 @@ const AskQuestionStep = (props: Props) => {
 
   const history = useHistory()
 
+  const [isModalQuestionOpen, setModalQuestionState] = useState(false)
   const totalProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
   const totalProbabilitiesNotFull = Math.abs(totalProbabilities - 100) > 0.000001
+  const outcomeNames = outcomes.map(outcome => outcome.name)
   const isContinueButtonDisabled =
-    totalProbabilitiesNotFull || outcomes.length < 2 || !question || !resolution || !category
+    totalProbabilitiesNotFull ||
+    outcomes.length < 2 ||
+    !question ||
+    !resolution ||
+    !category ||
+    outcomeNames.map(name => !name).reduce((e1, e2) => e1 || e2) ||
+    outcomeNames.map((name, index) => outcomeNames.indexOf(name) !== index).reduce((e1, e2) => e1 || e2)
 
   const canAddOutcome = outcomes.length <= MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
@@ -170,6 +198,26 @@ const AskQuestionStep = (props: Props) => {
 
   return (
     <CreateCard>
+      <CategoryImportWrapper>
+        <FormStateButton
+          active={!loadedQuestionId}
+          onClick={() => {
+            if (loadedQuestionId) {
+              handleClearQuestion()
+            }
+          }}
+        >
+          Categorical Market
+        </FormStateButton>
+        {!loadedQuestionId && (
+          <FormStateButton onClick={() => setModalQuestionState(true)}>Import Market</FormStateButton>
+        )}
+        {!!loadedQuestionId && (
+          <FormStateButton active onClick={handleClearQuestion}>
+            Clear Market
+          </FormStateButton>
+        )}
+      </CategoryImportWrapper>
       <FormRow
         formField={
           <QuestionInput
@@ -177,11 +225,12 @@ const AskQuestionStep = (props: Props) => {
             addCategoryCustomValue={addCategoryCustom}
             context={context}
             disabled={!!loadedQuestionId}
+            isModalQuestionOpen={isModalQuestionOpen}
             name="question"
             onChange={handleChange}
             onChangeQuestion={handleQuestionChange}
-            onClearQuestion={handleClearQuestion}
             placeholder="What question do you want the world predict?"
+            setModalQuestionState={setModalQuestionState}
             value={question}
           />
         }
@@ -193,9 +242,10 @@ const AskQuestionStep = (props: Props) => {
         outcomes={outcomes}
         totalProbabilities={totalProbabilities}
       />
-      <GridThreeColumns>
+      <GridTwoColumns>
         <Column>
           <FormRow
+            extraTitle={<UTCLabelWrapper>(UTC)</UTCLabelWrapper>}
             formField={
               <DateField
                 disabled={!!loadedQuestionId}
@@ -224,21 +274,7 @@ const AskQuestionStep = (props: Props) => {
             title={'Category'}
           />
         </Column>
-        <Column>
-          <FormRow
-            formField={
-              <Arbitrators
-                customValues={arbitratorsCustom}
-                disabled={!!loadedQuestionId}
-                networkId={context.networkId}
-                onChangeArbitrator={handleArbitratorChange}
-                value={arbitrator}
-              />
-            }
-            title={'Arbitrator'}
-          />
-        </Column>
-      </GridThreeColumns>
+      </GridTwoColumns>
       {categoryButtonFocus && (
         <Categories
           categories={categoriesCustom}
@@ -257,6 +293,19 @@ const AskQuestionStep = (props: Props) => {
         }
         href={DOCUMENT_VALIDITY_RULES}
         hyperlinkDescription={'invalid'}
+      />
+      <FormRow
+        formField={
+          <Arbitrators
+            customValues={arbitratorsCustom}
+            disabled={!!loadedQuestionId}
+            networkId={context.networkId}
+            onChangeArbitrator={handleArbitratorChange}
+            value={arbitrator}
+          />
+        }
+        style={{ marginBottom: 0 }}
+        title={'Arbitrator'}
       />
       <ButtonContainerFullWidth borderTop={true}>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>

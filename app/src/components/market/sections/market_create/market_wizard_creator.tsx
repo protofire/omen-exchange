@@ -38,7 +38,16 @@ export const MarketWizardCreator = (props: Props) => {
     collateral: defaultCollateral,
     funding: new BigNumber('0'),
     loadedQuestionId: null,
-    outcomes: [],
+    outcomes: [
+      {
+        name: '',
+        probability: 50,
+      },
+      {
+        name: '',
+        probability: 50,
+      },
+    ],
     question: '',
     resolution: null,
     spread: MARKET_FEE,

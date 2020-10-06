@@ -1,9 +1,29 @@
 import unionBy from 'lodash.unionby'
 import React from 'react'
+import styled from 'styled-components'
 
 import { getArbitratorsByNetwork } from '../../../../util/networks'
 import { Arbitrator } from '../../../../util/types'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
+import { Button } from '../../../button'
+import { ArbitratorIcon } from '../arbitrator_icon'
+
+const Wrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`
+
+const ArbitratorButton = styled(Button)<{ isSelected: boolean }>`
+  margin: 0 8px 14px 0;
+  &,
+  &:hover {
+    border-color: ${props =>
+      props.isSelected ? props.theme.textfield.borderColorActive : props.theme.buttonSecondaryLine.borderColor};
+  }
+
+  & > * + * {
+    margin-left: 10px;
+  }
+`
 
 interface Props {
   customValues: Arbitrator[]
@@ -26,28 +46,26 @@ export const Arbitrators = (props: Props) => {
     }
   }
 
-  const arbitratorOptions: Array<DropdownItemProps> = allArbitrators
-    .filter(item => {
-      return item.isSelectionEnabled
-    })
-    .map((arbitrator: Arbitrator) => {
-      return {
-        content: arbitrator.name,
-        onClick: () => {
-          onChange(arbitrator.id)
-          console.warn(`Name: ${arbitrator.name} / ID: ${arbitrator.id}`)
-        },
-      }
-    })
-
-  const currentItem = allArbitrators.findIndex(arbitrator => arbitrator.id === value.id) - 1
+  const arbitratorOptions: Array<Arbitrator> = allArbitrators
 
   return (
-    <Dropdown
-      currentItem={currentItem}
-      disabled={disabled}
-      dropdownPosition={DropdownPosition.right}
-      items={arbitratorOptions}
-    />
+    <Wrapper>
+      {arbitratorOptions.map((arbitrator, index) => {
+        return (
+          <ArbitratorButton
+            disabled={disabled || !arbitrator.isSelectionEnabled}
+            isSelected={arbitrator.id === value.id}
+            key={index}
+            onClick={() => {
+              onChange(arbitrator.id)
+              console.warn(`Name: ${arbitrator.name} / ID: ${arbitrator.id}`)
+            }}
+          >
+            <ArbitratorIcon id={arbitrator.id} />
+            <span>{arbitrator.name}</span>
+          </ArbitratorButton>
+        )
+      })}
+    </Wrapper>
   )
 }
