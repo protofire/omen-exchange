@@ -75,18 +75,20 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
       {!account ? (
         <Message text="Please connect to your wallet to open the market..." type={MessageType.warning} />
       ) : (
-        <>
-          <Route
-            exact
-            path="/:address/pool-liquidity"
-            render={props => <MarketPoolLiquidityPage {...props} marketMakerData={marketMakerData} />}
-          />
-          <Route
-            exact
-            path="/:address/trade-history"
-            render={props => <MarketHistoryPage {...props} marketMakerData={marketMakerData} />}
-          />
-        </>
+        <Route
+          exact
+          path="/:address/pool-liquidity"
+          render={props => <MarketPoolLiquidityPage {...props} marketMakerData={marketMakerData} />}
+        />
+      )}
+      {!account ? (
+        <Message text="Please connect to your wallet to open the market..." type={MessageType.warning} />
+      ) : (
+        <Route
+          exact
+          path="/:address/trade-history"
+          render={props => <MarketHistoryPage {...props} marketMakerData={marketMakerData} />}
+        />
       )}
       {!account ? (
         <Message text="Please connect to your wallet to open the market..." type={MessageType.warning} />
