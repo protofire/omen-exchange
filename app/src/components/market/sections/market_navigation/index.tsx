@@ -24,12 +24,14 @@ const MarketTab = styled.div<{ active: boolean }>`
 interface Props {
   activeTab: string
   marketAddress: string
+  isQuestionFinalized: boolean
+  resolutionDate: Date
 }
 
 export const MarketNavigation = (props: Props) => {
   const history = useHistory()
 
-  const { activeTab, marketAddress } = props
+  const { activeTab, isQuestionFinalized, marketAddress, resolutionDate } = props
 
   const marketTabs = {
     history: 'HISTORY',
@@ -38,10 +40,12 @@ export const MarketNavigation = (props: Props) => {
     verify: 'VERIFY',
   }
 
+  const isFinalizing = resolutionDate < new Date() && !isQuestionFinalized
+
   return (
     <MarketTabs>
       <MarketTab active={activeTab === marketTabs.swap} onClick={() => history.push(`/${marketAddress}`)}>
-        Swap
+        {isFinalizing ? 'Finalize' : isQuestionFinalized ? 'Results' : 'Swap'}
       </MarketTab>
       <MarketTab
         active={activeTab === marketTabs.pool}

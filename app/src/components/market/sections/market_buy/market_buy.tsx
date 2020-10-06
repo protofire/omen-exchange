@@ -70,7 +70,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const { buildMarketMaker } = useContracts(context)
   const { marketMakerData } = props
-  const { address: marketMakerAddress, balances, collateral, fee, question } = marketMakerData
+  const { address: marketMakerAddress, balances, collateral, fee, isQuestionFinalized, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -221,7 +221,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Purchase Shares" />
       </TopCard>
       <BottomCard>
-        <MarketNavigation activeTab={'SWAP'} marketAddress={marketMakerAddress}></MarketNavigation>
+        <MarketNavigation
+          activeTab={'SWAP'}
+          isQuestionFinalized={isQuestionFinalized}
+          marketAddress={marketMakerAddress}
+          resolutionDate={question.resolution}
+        ></MarketNavigation>
         <OutcomeTable
           balances={balances}
           collateral={collateral}

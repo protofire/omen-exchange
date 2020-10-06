@@ -86,6 +86,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances,
     collateral,
     fee,
+    isQuestionFinalized,
     question,
     totalPoolShares,
     userEarnings,
@@ -298,7 +299,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
-        <MarketNavigation activeTab={'POOL'} marketAddress={marketMakerAddress}></MarketNavigation>
+        <MarketNavigation
+          activeTab={'POOL'}
+          isQuestionFinalized={isQuestionFinalized}
+          marketAddress={marketMakerAddress}
+          resolutionDate={question.resolution}
+        ></MarketNavigation>
         <OutcomeTable
           balances={balances}
           collateral={collateral}

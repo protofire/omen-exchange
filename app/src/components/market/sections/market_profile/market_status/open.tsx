@@ -71,7 +71,14 @@ interface Props extends RouteComponentProps<Record<string, string | undefined>> 
 const Wrapper = (props: Props) => {
   const { history, marketMakerData } = props
 
-  const { address: marketMakerAddress, balances, collateral, question, totalPoolShares } = marketMakerData
+  const {
+    address: marketMakerAddress,
+    balances,
+    collateral,
+    isQuestionFinalized,
+    question,
+    totalPoolShares,
+  } = marketMakerData
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
@@ -163,7 +170,12 @@ const Wrapper = (props: Props) => {
         <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
-        <MarketNavigation activeTab={'SWAP'} marketAddress={marketMakerAddress}></MarketNavigation>
+        <MarketNavigation
+          activeTab={'SWAP'}
+          isQuestionFinalized={isQuestionFinalized}
+          marketAddress={marketMakerAddress}
+          resolutionDate={question.resolution}
+        ></MarketNavigation>
         {renderTableData()}
         {isQuestionOpen && openQuestionMessage}
         {!hasFunding && !isQuestionOpen && (

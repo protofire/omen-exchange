@@ -56,7 +56,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
 
   const { marketMakerData } = props
-  const { address: marketMakerAddress, balances, collateral, fee, question } = marketMakerData
+  const { address: marketMakerAddress, balances, collateral, fee, isQuestionFinalized, question } = marketMakerData
 
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
@@ -189,7 +189,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Sell Shares" />
       </TopCard>
       <BottomCard>
-        <MarketNavigation activeTab={'SWAP'} marketAddress={marketMakerAddress}></MarketNavigation>
+        <MarketNavigation
+          activeTab={'SWAP'}
+          isQuestionFinalized={isQuestionFinalized}
+          marketAddress={marketMakerAddress}
+          resolutionDate={question.resolution}
+        ></MarketNavigation>
         <OutcomeTable
           balances={balances}
           collateral={collateral}
