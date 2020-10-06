@@ -18,6 +18,8 @@ import { MarketNavigation } from '../../market_navigation'
 import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
 import { MarketSellContainer } from '../../market_sell/market_sell_container'
 
+import { VerifyMarket } from './verify'
+
 const TopCard = styled(ViewCard)`
   padding: 24px;
   padding-bottom: 0;
@@ -187,6 +189,7 @@ const Wrapper = (props: Props) => {
       <TopCard>
         <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
+      <VerifyMarket />
       <BottomCard>
         <MarketNavigation
           activeTab={currentTab}
