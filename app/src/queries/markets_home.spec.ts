@@ -71,7 +71,7 @@ test('Query finalizing markets', () => {
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'openingTimestamp_lt: $now, isPendingArbitration: false, answerFinalizedTimestamp: null, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee, timeout_gte: 86400, curatedByDxDaoOrKleros: true',
+    'openingTimestamp_lt: $now, isPendingArbitration: false, answerFinalizedTimestamp_gt: $now, currentAnswer_not: null, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee, timeout_gte: 86400, curatedByDxDaoOrKleros: true',
   )
 
   expect(query).toBe(expectedQuery)
