@@ -20,10 +20,9 @@ import { Outcome, Outcomes } from '../outcomes'
 const ButtonCategoryFocusCSS = css`
   &,
   &:hover {
-    background-color: ${props => props.theme.colors.secondary};
-    border-color: ${props => props.theme.colors.secondary};
-    color: ${props => props.theme.colors.primary};
-    font-weight: 500;
+    border-color: ${props => props.theme.textfield.borderColorActive};
+    font-weight: normal;
+    color: ${props => props.theme.textfield.color};
   }
 `
 
@@ -32,10 +31,11 @@ const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boo
   padding-left: 10px;
   padding-right: 10px;
   width: 100%;
+  height: 36px;
+  font-weight: normal;
   &,
   &:hover {
     color: ${props => (props.isACategorySelected ? props.theme.colors.textColorDark : '#86909e')};
-    font-weight: 400;
   }
 
   ${props => (props.focus ? ButtonCategoryFocusCSS : '')}
@@ -58,7 +58,7 @@ const ButtonCategoryTextOverflow = styled.span`
 `
 
 const GridTwoColumns = styled.div`
-  column-gap: 20px;
+  column-gap: 16px;
   display: grid;
   grid-template-columns: 1fr;
   padding-bottom: 20px;
@@ -69,11 +69,7 @@ const GridTwoColumns = styled.div`
   }
 `
 
-const Column = styled.div`
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    max-width: 250px;
-  }
-`
+const Column = styled.div``
 
 const ButtonWithReadyToGoStatusCSS = css`
   &,
@@ -99,17 +95,6 @@ const CategoryImportWrapper = styled.div`
     margin-left: 8px;
   }
 `
-
-const UTCLabelWrapper = styled.span`
-  font-weight: normal;
-  font-size: 14px;
-  line-height: 16px;
-  letter-spacing: 0.2px;
-  color: ${({ theme }) => theme.colors.textColor};
-  flex: 1;
-  margin-left: 8px;
-`
-
 interface Props {
   next: () => void
   values: {
@@ -245,7 +230,6 @@ const AskQuestionStep = (props: Props) => {
       <GridTwoColumns>
         <Column>
           <FormRow
-            extraTitle={<UTCLabelWrapper>(UTC)</UTCLabelWrapper>}
             formField={
               <DateField
                 disabled={!!loadedQuestionId}
@@ -255,7 +239,7 @@ const AskQuestionStep = (props: Props) => {
                 selected={resolution}
               />
             }
-            title={'Resolution Date'}
+            title={'Resolution Date (UTC)'}
           />
         </Column>
         <Column>

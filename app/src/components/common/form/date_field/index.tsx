@@ -38,7 +38,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
         cursor: pointer;
         display: block;
         font-size: 14px;
-        height: 34px;
+        height: 36px;
         letter-spacing: 0.2px;
         line-height: 1.2;
         outline: none;

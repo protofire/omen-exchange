@@ -17,7 +17,7 @@ import {
   RowWrapper,
 } from '../../../../common/common_styled'
 
-const BUTTON_DIMENSIONS = '34px'
+const BUTTON_DIMENSIONS = '36px'
 
 const CustomButtonCircle = styled(ButtonCircle)`
   &,
@@ -54,6 +54,12 @@ const CustomButtonCircleAdd = styled(CustomButtonCircle as any)`
   margin-top: 6px;
 `
 
+const OutcomesTHTwoWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
+
 export interface Outcome {
   name: string
   probability: number
@@ -88,7 +94,6 @@ const Outcomes = (props: Props) => {
   }
 
   const removeOutcome = (index: number) => {
-    if (outcomes.length <= 2) return
     outcomes.splice(index, 1)
     props.onChange(uniformProbabilities ? uniform(outcomes) : outcomes)
   }
@@ -97,6 +102,8 @@ const Outcomes = (props: Props) => {
     setIsUniform(value => !value)
     props.onChange(!uniformProbabilities ? uniform(outcomes) : outcomes)
   }
+
+  const canRemove = outcomes.length > 2
 
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
     <OutcomesTR key={index}>
@@ -110,6 +117,7 @@ const Outcomes = (props: Props) => {
               )
             }
             placeholder="outcome..."
+            style={{ flex: 1 }}
             type="text"
             value={outcome.name}
           />
@@ -134,7 +142,7 @@ const Outcomes = (props: Props) => {
             <PercentWrapper>%</PercentWrapper>
           </OutcomeItemWrapper>
           <CustomButtonCircle
-            disabled={disabled}
+            disabled={disabled || !canRemove}
             onClick={() => {
               removeOutcome(index)
             }}
@@ -158,24 +166,26 @@ const Outcomes = (props: Props) => {
             <OutcomesTR>
               <OutcomesTH style={{ width: '65%' }}>Outcome</OutcomesTH>
               <OutcomesTH>
-                Probability&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {uniformProbabilities && (
-                  <FormRowLink data-testid="toggle-manual-probabilities" onClick={handleIsUniformChanged}>
-                    set manually
-                  </FormRowLink>
-                )}
-                {!uniformProbabilities && (
-                  <FormRowLink onClick={handleIsUniformChanged} title="Distribute uniformly">
-                    set uniformly
-                  </FormRowLink>
-                )}
+                <OutcomesTHTwoWrapper>
+                  <span>Probability</span>
+                  {uniformProbabilities && (
+                    <FormRowLink data-testid="toggle-manual-probabilities" onClick={handleIsUniformChanged}>
+                      set manually
+                    </FormRowLink>
+                  )}
+                  {!uniformProbabilities && (
+                    <FormRowLink onClick={handleIsUniformChanged} title="Distribute uniformly">
+                      set uniformly
+                    </FormRowLink>
+                  )}
+                </OutcomesTHTwoWrapper>
               </OutcomesTH>
             </OutcomesTR>
           </OutcomesTHead>
           <OutcomesTBody>{outcomesToRender}</OutcomesTBody>
         </OutcomesTable>
         {canAddOutcome && (
-          <CustomButtonCircleAdd onClick={addNewOutcome} title="Add new outcome">
+          <CustomButtonCircleAdd data-testid="new-outcome-button" onClick={addNewOutcome} title="Add new outcome">
             <IconAdd />
           </CustomButtonCircleAdd>
         )}

@@ -20,8 +20,6 @@ export const OutcomesTableWrapper = styled.div`
   margin-right: -${props => props.theme.cards.paddingHorizontal};
   min-height: 50px;
   overflow-x: auto;
-  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
-  padding-bottom: 16px;
 `
 
 export const OutcomesTable = styled.table`
@@ -123,9 +121,9 @@ export const OutcomeItemText = styled.div`
 export const OutcomeItemLittleBallOfJoyAndDifferentColors = styled.div<{ outcomeIndex: number }>`
   background-color: ${props => getOutcomeColor(props.outcomeIndex).medium};
   border-radius: 50%;
-  height: 10px;
+  height: 12px;
   margin: 0 16px 0 0;
-  width: 10px;
+  width: 12px;
 `
 
 export const OutcomeItemProbability = styled.div`

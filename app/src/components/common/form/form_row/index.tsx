@@ -37,11 +37,13 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const FormRow = (props: Props) => {
   const { error = undefined, extraTitle = null, formField, note = undefined, title = undefined, ...restProps } = props
   return (
-    <FormRowWrapper {...restProps}>
-      <TitleWrapper>
-        {title && <FormLabel>{title}</FormLabel>}
-        {extraTitle}
-      </TitleWrapper>
+    <FormRowWrapper {...restProps} style={{ marginTop: 20 }}>
+      {(title || extraTitle) && (
+        <TitleWrapper>
+          {title && <FormLabel>{title}</FormLabel>}
+          {extraTitle}
+        </TitleWrapper>
+      )}
       {formField}
       {note && <FormRowNote>{note}</FormRowNote>}
       {error && <Error>{error}</Error>}
