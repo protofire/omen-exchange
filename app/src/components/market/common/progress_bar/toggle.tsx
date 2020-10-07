@@ -10,6 +10,10 @@ import { ThreeDots3 } from './img/three_dots_3'
 const ToggleButton = styled(Button)<{ active: boolean }>`
   height: 36px;
   ${props => props.active && `border: 1px solid ${props.theme.textfield.borderColorActive}`};
+
+  &:hover {
+    ${props => props.active && `border: 1px solid ${props.theme.textfield.borderColorActive}`};
+  }
 `
 
 const ToggleButtonText = styled.span`
