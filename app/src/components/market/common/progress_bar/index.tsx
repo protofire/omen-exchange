@@ -111,7 +111,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   answerFinalizedTimestamp: Maybe<Date>
   pendingArbitration?: boolean
   arbitrationOccurred?: boolean
-  bondTimestamp?: BigNumber
+  bondTimestamp?: Maybe<BigNumber>
 }
 
 export const ProgressBar: React.FC<Props> = props => {
