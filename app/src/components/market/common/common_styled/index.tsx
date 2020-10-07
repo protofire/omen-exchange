@@ -14,13 +14,15 @@ export const ButtonContainerFullWidth = styled(ButtonContainer)`
   padding-right: ${props => props.theme.cards.paddingHorizontal};
 `
 
-export const OutcomesTableWrapper = styled.div`
+export const OutcomesTableWrapper = styled.div<{ borderBottom?: boolean }>`
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};
   min-height: 50px;
   overflow-x: auto;
-  border-bottom: ${props => `1px solid ${props.theme.borders.borderColor}`};
-  padding-bottom: 20px;
+  ${({ borderBottom, theme }) =>
+    borderBottom &&
+    `border-bottom: ${`1px solid ${theme.borders.borderColor}`};
+  padding-bottom: 20px;`}
 `
 
 export const OutcomesTable = styled.table`

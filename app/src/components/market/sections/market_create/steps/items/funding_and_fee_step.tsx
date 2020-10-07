@@ -294,7 +294,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         <SubsectionTitleStyled>Your {loadedQuestionId ? 'Imported' : 'Categorical'} Market</SubsectionTitleStyled>
         <SubTitle>Question</SubTitle>
         <QuestionText>{question}</QuestionText>
-        <OutcomesTableWrapper>
+        <OutcomesTableWrapper borderBottom>
           <OutcomesTable>
             <OutcomesTHead>
               <OutcomesTR>
