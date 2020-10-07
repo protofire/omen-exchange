@@ -28,7 +28,7 @@ const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       <TopCard>
-        <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Purchase Shares" />
+        <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
         <MarketNavigation
