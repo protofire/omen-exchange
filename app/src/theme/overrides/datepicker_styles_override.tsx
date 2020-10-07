@@ -131,6 +131,26 @@ export const DatepickerStylesOverride = css`
         }
       }
 
+      .react-datepicker__time-container .react-datepicker__time {
+        background-color: ${props => props.theme.textfield.backgroundColor};
+      }
+
+      .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box {
+        padding-bottom: 16px;
+
+        ul.react-datepicker__time-list {
+          height: calc(195px + (1.7rem / 2) - 8px) !important;
+          ::-webkit-scrollbar {
+            width: 3px;
+          }
+          ::-webkit-scrollbar-thumb {
+            background-color: darkgrey;
+          }
+          ::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+          }
+        }
+      }
       .react-datepicker__time-container
         .react-datepicker__time
         .react-datepicker__time-box

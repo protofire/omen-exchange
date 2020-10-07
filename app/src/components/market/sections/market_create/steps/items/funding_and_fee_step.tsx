@@ -219,7 +219,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     setIsNegativeDepositAmount(formatBigNumber(funding, collateral.decimals).includes('-'))
   }, [funding, collateral.decimals])
 
-  const resolutionDate = resolution && formatDate(resolution)
+  const resolutionDate = resolution && formatDate(resolution, false)
 
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
@@ -319,10 +319,10 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             </OutcomesTBody>
           </OutcomesTable>
         </OutcomesTableWrapper>
-        <Grid>
+        <Grid style={{ marginTop: 20 }}>
           <TitleValueVertical
             date={resolution instanceof Date ? resolution : undefined}
-            title={'Resolution Date'}
+            title={'Resolution Date (UTC)'}
             tooltip={true}
             value={resolutionDate}
           />

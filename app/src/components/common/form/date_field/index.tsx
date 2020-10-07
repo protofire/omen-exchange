@@ -34,7 +34,8 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
         border-radius: 16px;
         border: 1px solid ${props => props.theme.buttonSecondaryLine.borderColor};
         box-shadow: none;
-        color: ${props => props.theme.colors.textColorDark};
+        color: ${props => props.theme.textfield.backgroundColor};
+        text-shadow: 0 0 0 ${props => props.theme.colors.textColorDark};
         cursor: pointer;
         display: block;
         font-size: 14px;
@@ -58,11 +59,11 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
           /**
             These two hide the blinking cursor
           */
-          color: ${props => props.theme.textfield.color};
-          text-shadow: 0 0 0 ${props => props.theme.colors.primary};
+          color: ${props => props.theme.textfield.backgroundColor};
 
           &::placeholder {
-            color: ${props => props.theme.textfield.color};
+            color: ${props => props.theme.textfield.backgroundColor};
+            text-shadow: 0 0 0 ${props => props.theme.textfield.color};
             font-weight: normal;
           }
         }
@@ -110,6 +111,10 @@ export const DateField = (props: Props) => {
     onChange(date ? convertLocalToUTC(date) : date)
   }
 
+  const handleChangeRaw = (e: any) => {
+    e.preventDefault()
+  }
+
   return (
     <DateFieldWrapper {...restProps} disabled={disabled}>
       <DatePicker
@@ -120,6 +125,7 @@ export const DateField = (props: Props) => {
         minDate={minDate}
         name={name}
         onChange={handleChange}
+        onChangeRaw={handleChangeRaw}
         placeholderText="Select Date"
         popperContainer={CalendarPortal}
         selected={convertUTCToLocal(selected)}

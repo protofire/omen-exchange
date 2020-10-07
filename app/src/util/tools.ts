@@ -18,10 +18,10 @@ export const truncateStringInTheMiddle = (str: string, strPositionStart: number,
   return str
 }
 
-export const formatDate = (date: Date): string => {
+export const formatDate = (date: Date, utcAdd = true): string => {
   return moment(date)
     .tz('UTC')
-    .format('YYYY-MM-DD - HH:mm [UTC]')
+    .format(`YYYY-MM-DD - HH:mm${utcAdd ? ' [UTC]' : ''}`)
 }
 
 export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {

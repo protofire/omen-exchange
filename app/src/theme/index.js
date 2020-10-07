@@ -129,7 +129,7 @@ const theme = {
     xxxl: '1366px',
   },
   borders: {
-    borderColor: '#ECEFF1',
+    borderColor: '#DCDFF2',
     borderColorLighter: '#E8EAF6',
     commonBorderRadius: '6px',
   },

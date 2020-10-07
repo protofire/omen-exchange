@@ -19,6 +19,8 @@ export const OutcomesTableWrapper = styled.div`
   margin-right: -${props => props.theme.cards.paddingHorizontal};
   min-height: 50px;
   overflow-x: auto;
+  border-bottom: ${props => `1px solid ${props.theme.borders.borderColor}`};
+  padding-bottom: 20px;
 `
 
 export const OutcomesTable = styled.table`
