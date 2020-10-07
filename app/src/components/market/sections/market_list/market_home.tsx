@@ -363,7 +363,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       direction: 'desc',
     },
     {
-      title: 'Ending soon',
+      title: 'Closing soon',
       sortBy: 'openingTimestamp',
       direction: 'asc',
     },
