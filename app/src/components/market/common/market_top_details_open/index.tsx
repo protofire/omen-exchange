@@ -42,11 +42,12 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const marketState =
     question.resolution.getTime() > currentTimestamp
       ? 'open'
-      : question.resolution.getTime() < currentTimestamp && answerFinalizedTimestamp === null
+      : question.resolution.getTime() < currentTimestamp &&
+        (answerFinalizedTimestamp === null || answerFinalizedTimestamp.toNumber() * 1000 > currentTimestamp)
       ? 'finalizing'
       : isPendingArbitration
       ? 'arbitration'
-      : answerFinalizedTimestamp && answerFinalizedTimestamp.toNumber() < currentTimestamp
+      : answerFinalizedTimestamp && answerFinalizedTimestamp.toNumber() * 1000 < currentTimestamp
       ? 'closed'
       : ''
 
