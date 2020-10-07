@@ -7,8 +7,9 @@ import { ThreeDots1 } from './img/three_dots_1'
 import { ThreeDots2 } from './img/three_dots_2'
 import { ThreeDots3 } from './img/three_dots_3'
 
-const ToggleButton = styled(Button)`
+const ToggleButton = styled(Button)<{ active: boolean }>`
   height: 36px;
+  ${props => props.active && `border: 1px solid ${props.theme.textfield.borderColorActive}`};
 `
 
 const ToggleButtonText = styled.span`
@@ -16,12 +17,13 @@ const ToggleButtonText = styled.span`
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
+  active: boolean
   state: string
   toggleProgressBar: () => void
 }
 
 export const ProgressBarToggle: React.FC<Props> = props => {
-  const { state, toggleProgressBar } = props
+  const { active, state, toggleProgressBar } = props
 
   const marketStates = {
     open: 'open',
@@ -31,7 +33,7 @@ export const ProgressBarToggle: React.FC<Props> = props => {
   }
 
   return (
-    <ToggleButton onClick={toggleProgressBar}>
+    <ToggleButton active={active} onClick={toggleProgressBar}>
       {state === marketStates.open ? (
         <ThreeDots1></ThreeDots1>
       ) : state === marketStates.finalizing ? (

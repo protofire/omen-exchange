@@ -49,7 +49,11 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     <>
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} />
-        <ProgressBarToggle state={'closed'} toggleProgressBar={toggleProgressBar}></ProgressBarToggle>
+        <ProgressBarToggle
+          active={showingProgressBar}
+          state={'closed'}
+          toggleProgressBar={toggleProgressBar}
+        ></ProgressBarToggle>
       </SubsectionTitleWrapper>
       {showingProgressBar && (
         <ProgressBar

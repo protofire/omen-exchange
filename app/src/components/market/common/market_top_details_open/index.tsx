@@ -62,7 +62,11 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     <>
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} title={title} />
-        <ProgressBarToggle state={marketState} toggleProgressBar={toggleProgressBar}></ProgressBarToggle>
+        <ProgressBarToggle
+          active={showingProgressBar}
+          state={marketState}
+          toggleProgressBar={toggleProgressBar}
+        ></ProgressBarToggle>
       </SubsectionTitleWrapper>
       {showingProgressBar && (
         <ProgressBar
