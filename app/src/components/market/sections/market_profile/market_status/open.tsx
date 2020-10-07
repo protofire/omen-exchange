@@ -6,11 +6,11 @@ import { WhenConnected } from '../../../../../hooks/connectedWeb3'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { SubsectionTitle, SubsectionTitleWrapper } from '../../../../common'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 import { WarningMessage } from '../../../common/warning_message'
+import { MarketNavigation } from '../../market_navigation'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
@@ -18,10 +18,6 @@ const TopCard = styled(ViewCard)`
 `
 
 const BottomCard = styled(ViewCard)``
-
-const LeftButton = styled(Button)`
-  margin-right: auto;
-`
 
 const MessageWrapper = styled.div`
   border-radius: 4px;
@@ -70,7 +66,14 @@ interface Props extends RouteComponentProps<Record<string, string | undefined>> 
 const Wrapper = (props: Props) => {
   const { history, marketMakerData } = props
 
-  const { address: marketMakerAddress, balances, collateral, question, totalPoolShares } = marketMakerData
+  const {
+    address: marketMakerAddress,
+    balances,
+    collateral,
+    isQuestionFinalized,
+    question,
+    totalPoolShares,
+  } = marketMakerData
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
@@ -103,17 +106,6 @@ const Wrapper = (props: Props) => {
       />
     )
   }
-
-  const poolButton = (
-    <LeftButton
-      buttonType={ButtonType.secondaryLine}
-      onClick={() => {
-        history.push(`${marketMakerAddress}/pool-liquidity`)
-      }}
-    >
-      Pool Liquidity
-    </LeftButton>
-  )
 
   const openQuestionMessage = (
     <MessageWrapper>
@@ -162,9 +154,12 @@ const Wrapper = (props: Props) => {
         <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Trade Outcome</SubsectionTitle>
-        </SubsectionTitleWrapper>
+        <MarketNavigation
+          activeTab={'SWAP'}
+          isQuestionFinalized={isQuestionFinalized}
+          marketAddress={marketMakerAddress}
+          resolutionDate={question.resolution}
+        ></MarketNavigation>
         {renderTableData()}
         {isQuestionOpen && openQuestionMessage}
         {!hasFunding && !isQuestionOpen && (
@@ -178,7 +173,6 @@ const Wrapper = (props: Props) => {
         )}
         <WhenConnected>
           <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
-            {poolButton}
             {isQuestionOpen ? openInRealitioButton : buySellButtons}
           </StyledButtonContainer>
         </WhenConnected>

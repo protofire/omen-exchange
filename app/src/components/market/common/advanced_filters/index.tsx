@@ -60,6 +60,7 @@ interface Props {
   onChangeArbitrator: (arbitrator: Maybe<string>) => void
   onChangeCurationSource: (curationSource: CurationSource) => void
   onChangeTemplateId: (templateId: Maybe<string>) => void
+  disableCurationFilter: Maybe<boolean>
 }
 
 export const AdvancedFilters = (props: Props) => {
@@ -73,6 +74,7 @@ export const AdvancedFilters = (props: Props) => {
     arbitrator,
     curationSource,
     currency,
+    disableCurationFilter,
     onChangeArbitrator,
     onChangeCurationSource,
     onChangeCurrency,
@@ -179,20 +181,22 @@ export const AdvancedFilters = (props: Props) => {
           items={arbitratorOptions}
         />
       </Column>
-      <Column>
-        <Title>Curation Source</Title>
-        <Options
-          currentItem={[
-            CurationSource.ALL_SOURCES,
-            CurationSource.DXDAO,
-            CurationSource.KLEROS,
-            CurationSource.NO_SOURCES,
-          ].findIndex(t => t === curationSource)}
-          dirty={true}
-          dropdownPosition={DropdownPosition.right}
-          items={curationSourceOptions}
-        />
-      </Column>
+      {!disableCurationFilter && (
+        <Column>
+          <Title>Curation Source</Title>
+          <Options
+            currentItem={[
+              CurationSource.ALL_SOURCES,
+              CurationSource.DXDAO,
+              CurationSource.KLEROS,
+              CurationSource.NO_SOURCES,
+            ].findIndex(t => t === curationSource)}
+            dirty={true}
+            dropdownPosition={DropdownPosition.right}
+            items={curationSourceOptions}
+          />
+        </Column>
+      )}
     </Wrapper>
   )
 }

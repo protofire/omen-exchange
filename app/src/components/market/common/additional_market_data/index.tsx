@@ -4,8 +4,6 @@ import styled from 'styled-components'
 import { Arbitrator } from '../../../../util/types'
 import { IconArbitrator } from '../../../common/icons/IconArbitrator'
 import { IconCategory } from '../../../common/icons/IconCategory'
-import { IconChevronDown } from '../../../common/icons/IconChevronDown'
-import { IconChevronUp } from '../../../common/icons/IconChevronUp'
 import { IconOracle } from '../../../common/icons/IconOracle'
 
 const AdditionalMarketDataWrapper = styled.div`
@@ -31,21 +29,6 @@ const AdditionalMarketDataLeft = styled.div`
   align-items: center;
   margin-top: 10px;
   margin-bottom: 10px;
-`
-
-const AdditionalMarketDataRight = styled.div`
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
-    width: calc(100% + 6px * 2);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 0;
-  }
 `
 
 const AdditionalMarketDataSectionWrapper = styled.a`
@@ -74,12 +57,10 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   arbitrator: Arbitrator
   oracle: string
   id: string
-  showingTradeHistory: boolean
-  handleTradeHistoryClick: () => void
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { arbitrator, category, handleTradeHistoryClick, id, oracle, showingTradeHistory } = props
+  const { arbitrator, category, id, oracle } = props
 
   const windowObj: any = window
   const realitioBaseUrl =
@@ -105,12 +86,6 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>
-      <AdditionalMarketDataRight>
-        <AdditionalMarketDataSectionWrapper onClick={handleTradeHistoryClick}>
-          <AdditionalMarketDataSectionTitle>Trade History</AdditionalMarketDataSectionTitle>
-          {showingTradeHistory ? <IconChevronUp></IconChevronUp> : <IconChevronDown></IconChevronDown>}
-        </AdditionalMarketDataSectionWrapper>
-      </AdditionalMarketDataRight>
     </AdditionalMarketDataWrapper>
   )
 }
