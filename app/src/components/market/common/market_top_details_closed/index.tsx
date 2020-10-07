@@ -34,7 +34,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     : ''
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
-  const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
+  // const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred
 
@@ -44,7 +44,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         <MarketTitle templateId={question.templateId} />
       </SubsectionTitleWrapper>
       <ProgressBar
-        answerFinalizedTimestamp={finalizedTimestampDate}
+        answerFinalizedTimestamp={answerFinalizedTimestamp}
         arbitrationOccurred={arbitrationOccurred}
         creationTimestamp={creationDate}
         pendingArbitration={isPendingArbitration}
