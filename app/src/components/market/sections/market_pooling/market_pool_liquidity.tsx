@@ -27,7 +27,7 @@ import {
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, SubsectionTitle, SubsectionTitleWrapper, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
@@ -43,6 +43,7 @@ import { TransactionDetailsRow, ValueStates } from '../../common/transaction_det
 import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
+import { MarketNavigation } from '../market_navigation'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
@@ -85,6 +86,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances,
     collateral,
     fee,
+    isQuestionFinalized,
     question,
     totalPoolShares,
     userEarnings,
@@ -294,12 +296,15 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     <>
       <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       <TopCard>
-        <MarketTopDetailsOpen marketMakerData={marketMakerData} title="Pool Liquidity" />
+        <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Trade Outcome</SubsectionTitle>
-        </SubsectionTitleWrapper>
+        <MarketNavigation
+          activeTab={'POOL'}
+          isQuestionFinalized={isQuestionFinalized}
+          marketAddress={marketMakerAddress}
+          resolutionDate={question.resolution}
+        ></MarketNavigation>
         <OutcomeTable
           balances={balances}
           collateral={collateral}
