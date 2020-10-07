@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
-import { buildQueryMarkets, queryMyMarkets } from '../queries/markets_home'
+import { buildQueryMarkets, buildQueryMyMarkets } from '../queries/markets_home'
 import {
   BuildQueryType,
   GraphMarketMakerDataItem,
@@ -68,7 +68,8 @@ export const useMarkets = (options: Options): any => {
   }
 
   const marketQuery = buildQueryMarkets(queryOptions)
-  const query = fetchMyMarkets ? queryMyMarkets : marketQuery
+  const myMarketsQuery = buildQueryMyMarkets(queryOptions)
+  const query = fetchMyMarkets ? myMarketsQuery : marketQuery
 
   const newOptions = { ...options, first: first + 1 }
 
