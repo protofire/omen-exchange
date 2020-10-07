@@ -3,10 +3,11 @@ import styled from 'styled-components'
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   state: string
+  toggleProgressBar: () => void
 }
 
 export const ProgressBarToggle: React.FC<Props> = props => {
-  const { state } = props
+  const { state, toggleProgressBar } = props
 
   const marketStates = {
     open: 'open',
@@ -16,7 +17,7 @@ export const ProgressBarToggle: React.FC<Props> = props => {
   }
 
   return (
-    <button>
+    <button onClick={toggleProgressBar}>
       Market
       {state === marketStates.open
         ? ' Open'
