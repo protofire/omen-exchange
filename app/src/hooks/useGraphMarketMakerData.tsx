@@ -144,7 +144,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
       outcomes,
       isPendingArbitration: data.isPendingArbitration,
       arbitrationOccurred: data.arbitrationOccurred,
-      currentAnswerTimestamp: bigNumberify(data.currentAnswerTimestamp),
+      currentAnswerTimestamp: data.currentAnswerTimestamp ? bigNumberify(data.currentAnswerTimestamp) : null,
     },
     curatedByDxDao: data.curatedByDxDao,
     klerosTCRregistered: data.klerosTCRregistered,
