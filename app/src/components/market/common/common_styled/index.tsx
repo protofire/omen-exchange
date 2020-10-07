@@ -15,7 +15,6 @@ export const ButtonContainerFullWidth = styled(ButtonContainer)`
 `
 
 export const OutcomesTableWrapper = styled.div`
-  margin-bottom: 20px;
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};
   min-height: 50px;
@@ -87,7 +86,7 @@ export const RowWrapper = styled.div`
   display: flex;
 `
 
-export const OutcomeItemWrapper = styled.div`
+export const OutcomeItemWrapper = styled.div<{ readOnly: boolean }>`
   align-items: center;
   display: flex;
   background-color: ${props => props.theme.textfield.backgroundColor};
@@ -99,14 +98,16 @@ export const OutcomeItemWrapper = styled.div`
 
   transition: border-color 0.15s ease-in-out;
   width: 100%;
-  &:hover {
-    border-color: ${props => props.theme.textfield.borderColorOnHover};
-  }
+  ${({ readOnly, theme }) =>
+    !readOnly &&
+    `&:hover {
+           border-color: ${theme.textfield.borderColorOnHover};
+         }
 
-  &:active,
-  &:focus {
-    border-color: ${props => props.theme.textfield.borderColorActive};
-  }
+         &:active,
+         &:focus {
+           border-color: ${theme.textfield.borderColorActive};
+         }`}
 `
 
 export const OutcomeItemText = styled.div`

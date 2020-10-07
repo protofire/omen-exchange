@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { DxDao } from '../advanced_filters/img/dxDao'
+import { Kleros } from '../advanced_filters/img/kleros'
 
 interface Props {
   id: Maybe<string>
@@ -9,7 +9,7 @@ interface Props {
 export const ArbitratorIcon = ({ id }: Props) => {
   switch (id) {
     case 'kleros':
-      return <DxDao />
+      return <Kleros />
     default:
       return null
   }

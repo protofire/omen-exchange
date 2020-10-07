@@ -108,7 +108,7 @@ const Outcomes = (props: Props) => {
   const outcomesToRender = props.outcomes.map((outcome: Outcome, index: number) => (
     <OutcomesTR key={index}>
       <OutcomesTD>
-        <OutcomeItemWrapper>
+        <OutcomeItemWrapper readOnly={false}>
           <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
           <SimpleTextfield
             onChange={e =>
@@ -125,7 +125,7 @@ const Outcomes = (props: Props) => {
       </OutcomesTD>
       <OutcomesTD>
         <RowWrapper>
-          <OutcomeItemWrapper>
+          <OutcomeItemWrapper readOnly={!!uniformProbabilities}>
             <SimpleTextfield
               onChange={e =>
                 props.onChange(

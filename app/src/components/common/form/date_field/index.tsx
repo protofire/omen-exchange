@@ -40,30 +40,30 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
         font-size: 14px;
         height: 36px;
         letter-spacing: 0.2px;
-        line-height: 1.2;
+        line-height: 16px;
         outline: none;
         padding: 0 10px;
         text-align: center;
         transition: border-color 0.15s ease-out;
         width: 100%;
+        font-weight: normal;
 
         &:hover {
           border-color: ${props => props.theme.buttonSecondaryLine.borderColorHover};
         }
 
         &:focus {
-          background-color: ${props => props.theme.colors.secondary};
-          border-color: ${props => props.theme.colors.secondary};
-          font-weight: 500;
+          border-color: ${props => props.theme.textfield.borderColorActive};
+          font-weight: normal;
           /**
             These two hide the blinking cursor
           */
-          color: transparent;
+          color: ${props => props.theme.textfield.color};
           text-shadow: 0 0 0 ${props => props.theme.colors.primary};
 
           &::placeholder {
-            color: ${props => props.theme.colors.primary};
-            font-weight: 500;
+            color: ${props => props.theme.textfield.color};
+            font-weight: normal;
           }
         }
 
@@ -71,7 +71,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
           color: #86909e;
           font-size: 14px;
           letter-spacing: 0.2px;
-          line-height: 1.2;
+          line-height: 16px;
           opacity: 1;
         }
 

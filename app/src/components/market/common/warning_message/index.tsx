@@ -47,6 +47,7 @@ interface Props {
   additionalDescription: string
   danger?: boolean
   grayscale?: boolean
+  style?: React.CSSProperties
 }
 
 export const WarningMessage = (props: Props) => {

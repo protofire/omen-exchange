@@ -21,7 +21,6 @@ const ButtonCategoryFocusCSS = css`
   &,
   &:hover {
     border-color: ${props => props.theme.textfield.borderColorActive};
-    font-weight: normal;
     color: ${props => props.theme.textfield.color};
   }
 `
@@ -35,7 +34,8 @@ const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boo
   font-weight: normal;
   &,
   &:hover {
-    color: ${props => (props.isACategorySelected ? props.theme.colors.textColorDark : '#86909e')};
+    color: ${props =>
+      props.isACategorySelected ? props.theme.colors.textColorDark : props.theme.colors.textColorLighter};
   }
 
   ${props => (props.focus ? ButtonCategoryFocusCSS : '')}
@@ -277,6 +277,7 @@ const AskQuestionStep = (props: Props) => {
         }
         href={DOCUMENT_VALIDITY_RULES}
         hyperlinkDescription={'invalid'}
+        style={{ marginBottom: 0 }}
       />
       <FormRow
         formField={
