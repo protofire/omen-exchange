@@ -35,18 +35,33 @@ export const DEFAULT_OPTIONS = {
   networkId: 1 as Maybe<number>,
 }
 
-export const queryMyMarkets = gql`
-  query GetMyMarkets($account: String!, $first: Int!, $skip: Int!) {
-    account(id: $account) {
-      fpmmParticipations(first: $first, skip: $skip, orderBy: creationTimestamp, orderDirection: desc) {
-        fixedProductMarketMakers: fpmm {
-          ...marketData
+export const buildQueryMyMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => {
+  const { arbitrator, category, currency, title } = options
+
+  const myMarketsWhereClause = [
+    category === 'All' ? '' : 'category: $category',
+    arbitrator ? 'arbitrator: $arbitrator' : 'arbitrator_in: $knownArbitrators',
+    currency ? 'collateralToken: $currency' : '',
+    title ? 'title_contains: $title' : '',
+  ]
+    .filter(s => s.length)
+    .join(',')
+
+  const queryMyMarkets = gql`
+    query GetMyMarkets($account: String!, $first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $arbitrator: String, $knownArbitrators: [String!], $currency: String, $title: String) {
+      account(id: $account) {
+        fpmmParticipations(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${myMarketsWhereClause} }) {
+          fixedProductMarketMakers: fpmm {
+            ...marketData
+          }
         }
       }
     }
-  }
-  ${MarketDataFragment}
-`
+    ${MarketDataFragment}
+  `
+
+  return queryMyMarkets
+}
 
 export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => {
   const {
