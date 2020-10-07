@@ -143,13 +143,6 @@ export const ProgressBar: React.FC<Props> = props => {
     finalizingFraction = timeSinceBond / finalizingDuration > 1 ? 1 : timeSinceBond / finalizingDuration
   }
 
-  // const finalizingDuration = 24 * 60 * 60 * 1000
-  // let finalizingFraction = 0
-  // if (bondTimestamp) {
-  //   const timeSinceFinalizing = new Date().getTime() - new Date(bondTimestamp.toNumber()).getTime()
-  //   finalizingFraction = timeSinceFinalizing / finalizingDuration > 1 ? 1 : timeSinceFinalizing / finalizingDuration
-  // }
-
   let arbitrationFraction = 0
   if (answerFinalizedTimestamp && finalizingDuration) {
     const arbitrationDuration =
