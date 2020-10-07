@@ -223,10 +223,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
-    (currentFilter.currency ||
-      currentFilter.arbitrator ||
-      currentFilter.curationSource !== CurationSource.ALL_SOURCES) &&
-      !fetchMyMarkets,
+    currentFilter.currency || currentFilter.arbitrator || currentFilter.curationSource !== CurationSource.ALL_SOURCES,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
@@ -272,7 +269,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       state: MarketStates.myMarkets,
       title: 'My Markets',
       active: state === MarketStates.myMarkets,
-      onClick: () => setState(MarketStates.myMarkets),
+      onClick: () => {
+        setState(MarketStates.myMarkets)
+        setSortBy('openingTimestamp')
+        setSortByDirection('asc')
+      },
     })
   }
 
@@ -323,10 +324,9 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       isInitialMount.current = true
     } else {
       setShowAdvancedFilters(
-        (currentFilter.currency ||
+        currentFilter.currency ||
           currentFilter.arbitrator ||
-          currentFilter.curationSource !== CurationSource.ALL_SOURCES) &&
-          !fetchMyMarkets,
+          currentFilter.curationSource !== CurationSource.ALL_SOURCES,
       )
     }
   }, [currentFilter, fetchMyMarkets])
@@ -363,6 +363,19 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       direction: 'desc',
     },
     {
+      title: 'Closing soon',
+      sortBy: 'openingTimestamp',
+      direction: 'asc',
+    },
+  ] as const
+
+  const myMarketsSortOptions = [
+    {
+      title: 'Newest',
+      sortBy: 'creationTimestamp',
+      direction: 'desc',
+    },
+    {
       title: 'Ending soon',
       sortBy: 'openingTimestamp',
       direction: 'asc',
@@ -370,6 +383,20 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   ] as const
 
   const sortItems: Array<DropdownItemProps> = sortOptions.map(item => {
+    return {
+      content: (
+        <CustomDropdownItem>
+          <SecondaryText className="sortBy">Sort By</SecondaryText> {item.title}
+        </CustomDropdownItem>
+      ),
+      onClick: () => {
+        setSortBy(item.sortBy)
+        setSortByDirection(item.direction)
+      },
+    }
+  })
+
+  const myMarketsSortItems: Array<DropdownItemProps> = myMarketsSortOptions.map(item => {
     return {
       content: (
         <CustomDropdownItem>
@@ -449,7 +476,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(category)) + 1 : 0
           }
           dirty={true}
-          disabled={fetchMyMarkets}
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={categoryItems}
@@ -468,22 +494,24 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <TopContents>
           <FiltersWrapper>
             <SectionTitleMarket title={'Markets'} />
-            <FiltersControls disabled={fetchMyMarkets}>
-              <ButtonCircleStyled active={showSearch} disabled={fetchMyMarkets} onClick={toggleSearch}>
+            <FiltersControls>
+              <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
                 <IconSearch />
               </ButtonCircleStyled>
-              <ButtonCircleStyled active={showAdvancedFilters} disabled={fetchMyMarkets} onClick={toggleFilters}>
+              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
                 <IconFilter />
               </ButtonCircleStyled>
-              {!fetchMyMarkets && (
-                <Dropdown
-                  currentItem={sortOptions.findIndex(i => i.sortBy === sortBy)}
-                  dirty={true}
-                  dropdownPosition={DropdownPosition.right}
-                  items={sortItems}
-                  placeholder={<SecondaryText>Sort By</SecondaryText>}
-                />
-              )}
+              <Dropdown
+                currentItem={
+                  fetchMyMarkets
+                    ? myMarketsSortOptions.findIndex(i => i.sortBy === sortBy)
+                    : sortOptions.findIndex(i => i.sortBy === sortBy)
+                }
+                dirty={true}
+                dropdownPosition={DropdownPosition.right}
+                items={fetchMyMarkets ? myMarketsSortItems : sortItems}
+                placeholder={<SecondaryText>Sort By</SecondaryText>}
+              />
             </FiltersControls>
           </FiltersWrapper>
         </TopContents>
@@ -493,6 +521,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             arbitrator={arbitrator}
             curationSource={curationSource}
             currency={currency}
+            disableCurationFilter={fetchMyMarkets ? true : false}
             onChangeArbitrator={setArbitrator}
             onChangeCurationSource={setCurationSource}
             onChangeCurrency={setCurrency}
