@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
 import { MarketMakerData } from '../../../../util/types'
@@ -17,8 +17,6 @@ interface Props {
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const [showingTradeHistory, setShowingTradeHistory] = useState(false)
-  const [tradeHistoryLoaded, setTradeHistoryLoaded] = useState(false)
   const [showingProgressBar, setShowingProgressBar] = useState(false)
 
   const { marketMakerData, title } = props
