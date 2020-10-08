@@ -103,15 +103,25 @@ export const OutcomeItemWrapper = styled.div<{ readOnly: boolean }>`
   transition: border-color 0.15s ease-in-out;
   width: 100%;
   ${({ readOnly, theme }) =>
-    !readOnly &&
-    `&:hover {
+    !readOnly
+      ? `&:hover {
            border-color: ${theme.textfield.borderColorOnHover};
          }
 
          &:active,
          &:focus {
            border-color: ${theme.textfield.borderColorActive};
-         }`}
+         }`
+      : `background-color: ${theme.form.common.disabled.backgroundColor};
+    border-color: ${theme.form.common.disabled.borderColor};
+    color: ${theme.form.common.disabled.color};
+    cursor: not-allowed !important;
+    user-select: none !important;
+    label {
+      cursor: not-allowed !important;
+    user-select: none !important;
+    }
+         `}
 `
 
 export const OutcomeItemText = styled.div`

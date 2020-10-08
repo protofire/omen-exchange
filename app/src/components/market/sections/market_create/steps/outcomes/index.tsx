@@ -20,13 +20,12 @@ import {
 const BUTTON_DIMENSIONS = '36px'
 
 const CustomButtonCircle = styled(ButtonCircle)`
-  &,
-  &[disabled] {
-    border-color: ${props => props.theme.borders.borderColorLighter};
-  }
   margin-left: 15px;
   height: ${BUTTON_DIMENSIONS};
   width: ${BUTTON_DIMENSIONS};
+  &[disabled] {
+    border-color: ${props => props.theme.form.common.disabled.borderColor};
+  }
 `
 
 const NoteTitle = styled.span`
