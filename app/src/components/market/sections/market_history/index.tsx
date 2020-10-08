@@ -26,24 +26,12 @@ const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
-      <TopCard>
-        <MarketTopDetailsOpen marketMakerData={marketMakerData} />
-      </TopCard>
-      <BottomCard>
-        <MarketNavigation
-          activeTab={'HISTORY'}
-          isQuestionFinalized={isQuestionFinalized}
-          marketAddress={marketMakerAddress}
-          resolutionDate={question.resolution}
-        ></MarketNavigation>
-        <HistoryChartContainer
-          answerFinalizedTimestamp={answerFinalizedTimestamp}
-          hidden={false}
-          marketMakerAddress={marketMakerAddress}
-          outcomes={question.outcomes}
-        />
-      </BottomCard>
+      <HistoryChartContainer
+        answerFinalizedTimestamp={answerFinalizedTimestamp}
+        hidden={false}
+        marketMakerAddress={marketMakerAddress}
+        outcomes={question.outcomes}
+      />
     </>
   )
 }
