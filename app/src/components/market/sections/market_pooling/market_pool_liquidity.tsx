@@ -27,7 +27,7 @@ import {
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
@@ -65,6 +65,17 @@ const TabsGrid = styled.div`
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
   margin-bottom: 0;
+`
+
+const UserData = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 24px;
+  padding-top: 4px;
+`
+
+const UserDataTitleValue = styled(TitleValue)`
+  width: calc(50% - 16px);
 `
 
 const logger = getLogger('Market::Fund')
@@ -132,6 +143,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
+
   const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
     amount.lt(min) ? amount : min,
   )
@@ -153,6 +165,18 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
+
+  const totalUserShareAmounts = calcRemoveFundingSendAmounts(
+    fundingBalance,
+    balances.map(b => b.holdings),
+    totalPoolShares,
+  )
+
+  const totalDepositedTokens = totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) =>
+    amount.lt(min) ? amount : min,
+  )
+
+  const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
   const addFunding = async () => {
     setModalTitle('Funds Deposit')
@@ -275,6 +299,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
+      <UserData>
+        <UserDataTitleValue
+          title={'Your Liquidity'}
+          value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
+        />
+        <UserDataTitleValue
+          title={'Your Earnings'}
+          value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
+        />
+      </UserData>
       <OutcomeTable
         balances={balances}
         collateral={collateral}
