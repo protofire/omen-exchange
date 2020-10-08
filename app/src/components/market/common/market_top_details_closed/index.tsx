@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
+import React, { useState } from 'react'
 
 import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
 import { MarketMakerData } from '../../../../util/types'
@@ -8,6 +8,7 @@ import { AdditionalMarketData } from '../additional_market_data'
 import { MarketData } from '../market_data'
 import { MarketTitle } from '../market_title'
 import { ProgressBar } from '../progress_bar'
+import { ProgressBarToggle } from '../progress_bar/toggle'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -28,6 +29,8 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     runningDailyVolumeByHour,
   } = marketMakerData
 
+  const [showingProgressBar, setShowingProgressBar] = useState(false)
+
   const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
   const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
     ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
@@ -37,19 +40,30 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred
 
+  const toggleProgressBar = () => {
+    setShowingProgressBar(!showingProgressBar)
+  }
+
   return (
     <>
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} />
+        <ProgressBarToggle
+          active={showingProgressBar}
+          state={'closed'}
+          toggleProgressBar={toggleProgressBar}
+        ></ProgressBarToggle>
       </SubsectionTitleWrapper>
-      <ProgressBar
-        answerFinalizedTimestamp={answerFinalizedTimestamp}
-        arbitrationOccurred={arbitrationOccurred}
-        creationTimestamp={creationDate}
-        pendingArbitration={isPendingArbitration}
-        resolutionTimestamp={question.resolution}
-        state={'closed'}
-      ></ProgressBar>
+      {showingProgressBar && (
+        <ProgressBar
+          answerFinalizedTimestamp={answerFinalizedTimestamp}
+          arbitrationOccurred={arbitrationOccurred}
+          creationTimestamp={creationDate}
+          pendingArbitration={isPendingArbitration}
+          resolutionTimestamp={question.resolution}
+          state={'closed'}
+        ></ProgressBar>
+      )}
       <MarketData
         currency={collateralToken}
         lastActiveDay={lastActiveDay}
