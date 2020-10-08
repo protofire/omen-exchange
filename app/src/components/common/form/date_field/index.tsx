@@ -31,7 +31,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
 
       input {
         background-color: #fff;
-        border-radius: 16px;
+        border-radius: 32px;
         border: 1px solid ${props => props.theme.buttonSecondaryLine.borderColor};
         box-shadow: none;
         color: ${props => props.theme.colors.textColorDark};
