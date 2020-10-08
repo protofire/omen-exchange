@@ -174,23 +174,31 @@ const Wrapper = (props: Props) => {
           isQuestionFinalized={isQuestionFinalized}
           marketAddress={marketMakerAddress}
           resolutionDate={question.resolution}
+          switchMarketTab={switchMarketTab}
         ></MarketNavigation>
-        {renderTableData()}
-        {isQuestionOpen && openQuestionMessage}
-        {!hasFunding && !isQuestionOpen && (
-          <WarningMessageStyled
-            additionalDescription={''}
-            description={'Trading is disabled due to lack of liquidity.'}
-            grayscale={true}
-            href={''}
-            hyperlinkDescription={''}
-          />
+        {currentTab === marketTabs.swap && (
+          <>
+            {renderTableData()}
+            {isQuestionOpen && openQuestionMessage}
+            {!hasFunding && !isQuestionOpen && (
+              <WarningMessageStyled
+                additionalDescription={''}
+                description={'Trading is disabled due to lack of liquidity.'}
+                grayscale={true}
+                href={''}
+                hyperlinkDescription={''}
+              />
+            )}
+            <WhenConnected>
+              <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+                {isQuestionOpen ? openInRealitioButton : buySellButtons}
+              </StyledButtonContainer>
+            </WhenConnected>
+          </>
         )}
-        <WhenConnected>
-          <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
-            {isQuestionOpen ? openInRealitioButton : buySellButtons}
-          </StyledButtonContainer>
-        </WhenConnected>
+        {currentTab === marketTabs.pool && <p>pool</p>}
+        {currentTab === marketTabs.pool && <p>history</p>}
+        {currentTab === marketTabs.pool && <p>verify</p>}
       </BottomCard>
     </>
   )

@@ -26,10 +26,11 @@ interface Props {
   hasWinningOutcomes?: Maybe<boolean>
   isQuestionFinalized: boolean
   resolutionDate: Date
+  switchMarketTab: (arg0: string) => void
 }
 
 export const MarketNavigation = (props: Props) => {
-  const { activeTab, hasWinningOutcomes, isQuestionFinalized, resolutionDate } = props
+  const { activeTab, hasWinningOutcomes, isQuestionFinalized, resolutionDate, switchMarketTab } = props
 
   const marketTabs = {
     history: 'HISTORY',
@@ -42,7 +43,7 @@ export const MarketNavigation = (props: Props) => {
 
   return (
     <MarketTabs>
-      <MarketTab active={activeTab === marketTabs.swap}>
+      <MarketTab active={activeTab === marketTabs.swap} onClick={() => switchMarketTab('SWAP')}>
         {isQuestionFinalized && hasWinningOutcomes
           ? 'Redeem'
           : isQuestionFinalized && !hasWinningOutcomes
@@ -51,14 +52,19 @@ export const MarketNavigation = (props: Props) => {
           ? 'Finalize'
           : 'Swap'}
       </MarketTab>
-      <MarketTab active={activeTab === marketTabs.pool}>Pool</MarketTab>
+      <MarketTab active={activeTab === marketTabs.pool} onClick={() => switchMarketTab('POOL')}>
+        Pool
+      </MarketTab>
       {/* Verify is commented out until the underlying infrastructure is ready */}
       {/* <MarketTab 
         active={activeTab === marketTabs.verify}
+        onClick={() => switchMarketTab('VERIFY')}
       >
         Verify
       </MarketTab> */}
-      <MarketTab active={activeTab === marketTabs.history}>History</MarketTab>
+      <MarketTab active={activeTab === marketTabs.history} onClick={() => switchMarketTab('HISTORY')}>
+        History
+      </MarketTab>
     </MarketTabs>
   )
 }
