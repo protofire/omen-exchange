@@ -160,9 +160,7 @@ const Wrapper = (props: Props) => {
   }
 
   const switchMarketTab = (newTab: string) => {
-    if (newTab in marketTabs) {
-      setCurrentTab(newTab)
-    }
+    setCurrentTab(newTab)
   }
 
   return (
@@ -172,7 +170,7 @@ const Wrapper = (props: Props) => {
       </TopCard>
       <BottomCard>
         <MarketNavigation
-          activeTab={'SWAP'}
+          activeTab={currentTab}
           isQuestionFinalized={isQuestionFinalized}
           marketAddress={marketMakerAddress}
           resolutionDate={question.resolution}
