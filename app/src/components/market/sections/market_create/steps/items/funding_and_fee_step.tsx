@@ -385,10 +385,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 title={'Earn Trading Fee'}
                 value={`${isNaN(spread) ? 0 : spread}%`}
               />
-              <TransactionDetailsRow
-                title={'Deposit Amount'}
-                value={amount ? `${ethers.utils.formatUnits(amount, collateral.decimals)} ${collateral.symbol}` : ''}
-              />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 title={'Pool Tokens'}
@@ -423,7 +419,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             onUnlock={unlockCollateral}
           />
         )}
-        <ButtonContainerFullWidth>
+        <ButtonContainerFullWidth borderTop>
           <LeftButton
             buttonType={ButtonType.secondaryLine}
             disabled={
