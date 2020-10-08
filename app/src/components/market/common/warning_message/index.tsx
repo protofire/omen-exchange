@@ -54,9 +54,9 @@ export const WarningMessage = (props: Props) => {
   const { additionalDescription, danger, description, grayscale, href, hyperlinkDescription, ...restProps } = props
   return (
     <Wrapper {...restProps}>
-      {/* <AlertWrapper className={grayscale ? 'grayscale' : ''}>
+      <AlertWrapper className={grayscale ? 'grayscale' : ''}>
         <Alert />
-      </AlertWrapper> */}
+      </AlertWrapper>
       <Description className={danger ? 'danger' : ''}>
         {description}{' '}
         {href && hyperlinkDescription && (
