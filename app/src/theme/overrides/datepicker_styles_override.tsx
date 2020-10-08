@@ -137,6 +137,7 @@ export const DatepickerStylesOverride = css`
 
       .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box {
         padding-bottom: 16px;
+        width: 100%;
 
         ul.react-datepicker__time-list {
           height: calc(195px + (1.7rem / 2) - 8px) !important;
