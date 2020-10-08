@@ -307,7 +307,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         <UserDataTitleValue
           state={userEarnings.gt(0) ? ValueStates.success : undefined}
           title={'Your Earnings'}
-          value={`${userEarnings.gt(0) && '+'}${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${
+          value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${
             collateral.symbol
           }`}
         />
