@@ -10,7 +10,11 @@ import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 import { WarningMessage } from '../../../common/warning_message'
+import { MarketBuyContainer } from '../../market_buy/market_buy_container'
+import { MarketHistoryContainer } from '../../market_history/market_history_container'
 import { MarketNavigation } from '../../market_navigation'
+import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
+import { MarketSellContainer } from '../../market_sell/market_sell_container'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
@@ -196,11 +200,11 @@ const Wrapper = (props: Props) => {
             </WhenConnected>
           </>
         )}
-        {currentTab === marketTabs.pool && <p>pool</p>}
-        {currentTab === marketTabs.history && <p>history</p>}
-        {currentTab === marketTabs.buy && <p>buy</p>}
-        {currentTab === marketTabs.sell && <p>sell</p>}
-        {currentTab === marketTabs.verify && <p>verify</p>}
+        {currentTab === marketTabs.pool && <MarketPoolLiquidityContainer marketMakerData={marketMakerData} />}
+        {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
+        {currentTab === marketTabs.buy && <MarketBuyContainer marketMakerData={marketMakerData} />}
+        {currentTab === marketTabs.sell && <MarketSellContainer marketMakerData={marketMakerData} />}
+        {/* {currentTab === marketTabs.verify && <p>verify</p>} */}
       </BottomCard>
     </>
   )
