@@ -1,4 +1,3 @@
-import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
