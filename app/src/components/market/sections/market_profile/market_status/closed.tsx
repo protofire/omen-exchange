@@ -18,7 +18,11 @@ import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
+import { MarketBuyContainer } from '../../market_buy/market_buy_container'
+import { MarketHistoryContainer } from '../../market_history/market_history_container'
 import { MarketNavigation } from '../../market_navigation'
+import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
+import { MarketSellContainer } from '../../market_sell/market_sell_container'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
@@ -223,9 +227,7 @@ const Wrapper = (props: Props) => {
   }
 
   const switchMarketTab = (newTab: string) => {
-    if (newTab in marketTabs) {
-      setCurrentTab(newTab)
-    }
+    setCurrentTab(newTab)
   }
 
   return (
@@ -235,7 +237,7 @@ const Wrapper = (props: Props) => {
       </TopCard>
       <BottomCard>
         <MarketNavigation
-          activeTab={'SWAP'}
+          activeTab={currentTab}
           hasWinningOutcomes={hasWinningOutcomes}
           isQuestionFinalized={isQuestionFinalized}
           marketAddress={marketMakerAddress}
@@ -301,8 +303,10 @@ const Wrapper = (props: Props) => {
             </WhenConnected>
           </>
         )}
-        {currentTab === marketTabs.pool && <p>pool</p>}
-        {currentTab === marketTabs.history && <p>history</p>}
+        {currentTab === marketTabs.pool && <MarketPoolLiquidityContainer marketMakerData={marketMakerData} />}
+        {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
+        {currentTab === marketTabs.buy && <MarketBuyContainer marketMakerData={marketMakerData} />}
+        {currentTab === marketTabs.sell && <MarketSellContainer marketMakerData={marketMakerData} />}
       </BottomCard>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
