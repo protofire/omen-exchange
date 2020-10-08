@@ -22,7 +22,7 @@ export const OutcomesTableWrapper = styled.div<{ borderBottom?: boolean }>`
   ${({ borderBottom, theme }) =>
     borderBottom &&
     `border-bottom: ${`1px solid ${theme.borders.borderColor}`};
-  padding-bottom: 20px;`}
+  padding-bottom: 24px;`}
 `
 
 export const OutcomesTable = styled.table`
@@ -39,7 +39,7 @@ export const OutcomesTH = styled.th<{ textAlign?: string }>`
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
-  padding: 6px 15px 6px 0;
+  padding: 0px 15px 6px 0;
   text-align: ${props => props.textAlign};
   white-space: nowrap;
 `

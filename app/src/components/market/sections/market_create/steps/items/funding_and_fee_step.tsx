@@ -61,21 +61,21 @@ const CreateCardBottom = styled(CreateCard)`
 `
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 `
 
 const SubTitle = styled.h3`
   color: ${props => props.theme.colors.textColorDarker};
   font-size: 14px;
   font-weight: normal;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
 `
 
 const QuestionText = styled.p`
   color: ${props => props.theme.colors.textColor};
   font-size: 14px;
   font-weight: normal;
-  margin: 0 0 20px;
+  margin: 0 0 24px;
 `
 
 const Grid = styled.div`
@@ -113,7 +113,7 @@ const GridTransactionDetailsStyled = styled(GridTransactionDetails)<{ noMarginTo
 `
 
 const ButtonCreate = styled(Button)`
-  font-weight: 500;
+  font-weight: 400;
 `
 
 const CreateCardBottomRow = styled.div`
