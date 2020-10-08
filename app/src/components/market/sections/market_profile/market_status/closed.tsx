@@ -303,10 +303,16 @@ const Wrapper = (props: Props) => {
             </WhenConnected>
           </>
         )}
-        {currentTab === marketTabs.pool && <MarketPoolLiquidityContainer marketMakerData={marketMakerData} />}
+        {currentTab === marketTabs.pool && (
+          <MarketPoolLiquidityContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
         {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
-        {currentTab === marketTabs.buy && <MarketBuyContainer marketMakerData={marketMakerData} />}
-        {currentTab === marketTabs.sell && <MarketSellContainer marketMakerData={marketMakerData} />}
+        {currentTab === marketTabs.buy && (
+          <MarketBuyContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
+        {currentTab === marketTabs.sell && (
+          <MarketSellContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
       </BottomCard>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}

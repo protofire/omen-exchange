@@ -38,13 +38,14 @@ const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
+  switchMarketTab: (arg0: string) => void
 }
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
 
-  const { marketMakerData } = props
+  const { marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
 
   let defaultOutcomeIndex = 0
@@ -275,7 +276,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <ButtonContainer>
-        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
+        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
         </LeftButton>
         <Button buttonType={ButtonType.secondaryLine} disabled={isSellButtonDisabled} onClick={() => finish()}>

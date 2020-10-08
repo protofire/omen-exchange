@@ -49,6 +49,7 @@ const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
+  switchMarketTab: (arg0: string) => void
 }
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
@@ -58,7 +59,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
-  const { marketMakerData } = props
+  const { marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
@@ -294,7 +295,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <ButtonContainer>
-        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
+        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
         </LeftButton>
         <Button buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>

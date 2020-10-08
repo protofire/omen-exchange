@@ -44,6 +44,7 @@ import { WarningMessage } from '../../common/warning_message'
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
   theme?: any
+  switchMarketTab: (arg0: string) => void
 }
 
 enum Tabs {
@@ -69,7 +70,7 @@ const WarningMessageStyled = styled(WarningMessage)`
 const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
-  const { marketMakerData } = props
+  const { marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee, totalPoolShares, userEarnings } = marketMakerData
 
   const context = useConnectedWeb3Context()
@@ -437,7 +438,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <ButtonContainer>
-        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
+        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
         </LeftButton>
         {activeTab === Tabs.deposit && (
