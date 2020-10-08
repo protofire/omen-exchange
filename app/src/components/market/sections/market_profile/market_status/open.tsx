@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -147,6 +147,21 @@ const Wrapper = (props: Props) => {
       </Button>
     </>
   )
+
+  const [currentTab, setCurrentTab] = useState('SWAP')
+
+  const marketTabs = {
+    swap: 'SWAP',
+    pool: 'POOL',
+    history: 'HISTORY',
+    verify: 'VERIFY',
+  }
+
+  const switchMarketTab = (newTab: string) => {
+    if (newTab in marketTabs) {
+      setCurrentTab(newTab)
+    }
+  }
 
   return (
     <>
