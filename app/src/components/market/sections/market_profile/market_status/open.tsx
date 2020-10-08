@@ -155,6 +155,8 @@ const Wrapper = (props: Props) => {
     pool: 'POOL',
     history: 'HISTORY',
     verify: 'VERIFY',
+    buy: 'BUY',
+    sell: 'SELL',
   }
 
   const switchMarketTab = (newTab: string) => {
@@ -197,8 +199,10 @@ const Wrapper = (props: Props) => {
           </>
         )}
         {currentTab === marketTabs.pool && <p>pool</p>}
-        {currentTab === marketTabs.pool && <p>history</p>}
-        {currentTab === marketTabs.pool && <p>verify</p>}
+        {currentTab === marketTabs.history && <p>history</p>}
+        {currentTab === marketTabs.buy && <p>buy</p>}
+        {currentTab === marketTabs.sell && <p>sell</p>}
+        {currentTab === marketTabs.verify && <p>verify</p>}
       </BottomCard>
     </>
   )

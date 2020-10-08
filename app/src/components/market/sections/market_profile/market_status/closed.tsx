@@ -218,6 +218,8 @@ const Wrapper = (props: Props) => {
     pool: 'POOL',
     history: 'HISTORY',
     verify: 'VERIFY',
+    buy: 'BUY',
+    sell: 'SELL',
   }
 
   const switchMarketTab = (newTab: string) => {
@@ -300,7 +302,7 @@ const Wrapper = (props: Props) => {
           </>
         )}
         {currentTab === marketTabs.pool && <p>pool</p>}
-        {currentTab === marketTabs.pool && <p>history</p>}
+        {currentTab === marketTabs.history && <p>history</p>}
       </BottomCard>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
