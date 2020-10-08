@@ -64,7 +64,7 @@ interface Props extends RouteComponentProps<Record<string, string | undefined>> 
 }
 
 const Wrapper = (props: Props) => {
-  const { history, marketMakerData } = props
+  const { marketMakerData } = props
 
   const {
     address: marketMakerAddress,
@@ -131,7 +131,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={!userHasShares || !hasFunding}
         onClick={() => {
-          history.push(`${marketMakerAddress}/sell`)
+          setCurrentTab('SELL')
         }}
       >
         Sell
@@ -140,7 +140,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={!hasFunding}
         onClick={() => {
-          history.push(`${marketMakerAddress}/buy`)
+          setCurrentTab('BUY')
         }}
       >
         Buy

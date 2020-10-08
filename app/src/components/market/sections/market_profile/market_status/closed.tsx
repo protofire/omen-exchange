@@ -194,7 +194,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
-          history.push(`${marketMakerAddress}/sell`)
+          setCurrentTab('SELL')
         }}
       >
         Sell
@@ -203,7 +203,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
-          history.push(`${marketMakerAddress}/buy`)
+          setCurrentTab('BUY')
         }}
       >
         Buy
