@@ -37,13 +37,18 @@ export const MarketNavigation = (props: Props) => {
     pool: 'POOL',
     swap: 'SWAP',
     verify: 'VERIFY',
+    buy: 'BUY',
+    sell: 'SELL',
   }
 
   const isFinalizing = resolutionDate < new Date() && !isQuestionFinalized
 
   return (
     <MarketTabs>
-      <MarketTab active={activeTab === marketTabs.swap} onClick={() => switchMarketTab('SWAP')}>
+      <MarketTab
+        active={activeTab === marketTabs.swap || activeTab === marketTabs.buy || activeTab === marketTabs.sell}
+        onClick={() => switchMarketTab('SWAP')}
+      >
         {isQuestionFinalized && hasWinningOutcomes
           ? 'Redeem'
           : isQuestionFinalized && !hasWinningOutcomes
