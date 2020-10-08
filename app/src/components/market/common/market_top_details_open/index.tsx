@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
 import { MarketMakerData } from '../../../../util/types'
@@ -7,6 +7,7 @@ import { AdditionalMarketData } from '../additional_market_data'
 import { MarketData } from '../market_data'
 import { MarketTitle } from '../market_title'
 import { ProgressBar } from '../progress_bar'
+import { ProgressBarToggle } from '../progress_bar/toggle'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -15,6 +16,8 @@ interface Props {
 
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+
+  const [showingProgressBar, setShowingProgressBar] = useState(false)
 
   const { marketMakerData, title } = props
   const {
@@ -35,35 +38,47 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
   const currentTimestamp = new Date().getTime()
 
-  const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
+  // const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred
 
   const marketState =
     question.resolution.getTime() > currentTimestamp
       ? 'open'
-      : question.resolution.getTime() < currentTimestamp && answerFinalizedTimestamp === null
+      : question.resolution.getTime() < currentTimestamp &&
+        (answerFinalizedTimestamp === null || answerFinalizedTimestamp.toNumber() * 1000 > currentTimestamp)
       ? 'finalizing'
       : isPendingArbitration
       ? 'arbitration'
-      : answerFinalizedTimestamp && answerFinalizedTimestamp.toNumber() < currentTimestamp
+      : answerFinalizedTimestamp && answerFinalizedTimestamp.toNumber() * 1000 < currentTimestamp
       ? 'closed'
       : ''
+
+  const toggleProgressBar = () => {
+    setShowingProgressBar(!showingProgressBar)
+  }
 
   return (
     <>
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} title={title} />
+        <ProgressBarToggle
+          active={showingProgressBar}
+          state={marketState}
+          toggleProgressBar={toggleProgressBar}
+        ></ProgressBarToggle>
       </SubsectionTitleWrapper>
-      <ProgressBar
-        answerFinalizedTimestamp={finalizedTimestampDate}
-        arbitrationOccurred={arbitrationOccurred}
-        bondTimestamp={question.currentAnswerTimestamp}
-        creationTimestamp={creationDate}
-        pendingArbitration={isPendingArbitration}
-        resolutionTimestamp={question.resolution}
-        state={marketState}
-      ></ProgressBar>
+      {showingProgressBar && (
+        <ProgressBar
+          answerFinalizedTimestamp={answerFinalizedTimestamp}
+          arbitrationOccurred={arbitrationOccurred}
+          bondTimestamp={question.currentAnswerTimestamp}
+          creationTimestamp={creationDate}
+          pendingArbitration={isPendingArbitration}
+          resolutionTimestamp={question.resolution}
+          state={marketState}
+        ></ProgressBar>
+      )}
       <MarketData
         currency={collateral}
         lastActiveDay={lastActiveDay}
