@@ -35,10 +35,6 @@ const MarketResolutionMessageStyled = styled(MarketResolutionMessage)`
   margin: 20px 0;
 `
 
-const LeftButton = styled(Button)`
-  margin-right: auto;
-`
-
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   marketMakerData: MarketMakerData
 }
@@ -65,7 +61,7 @@ const Wrapper = (props: Props) => {
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
 
-  const { history, marketMakerData } = props
+  const { marketMakerData } = props
 
   const {
     address: marketMakerAddress,
@@ -181,17 +177,6 @@ const Wrapper = (props: Props) => {
   const EPS = 0.01
   const allPayoutsEqual = payouts ? payouts.every(payout => Math.abs(payout - 1 / payouts.length) <= EPS) : false
 
-  const poolButton = (
-    <LeftButton
-      buttonType={ButtonType.secondaryLine}
-      onClick={() => {
-        history.push(`${marketMakerAddress}/pool-liquidity`)
-      }}
-    >
-      Pool Liquidity
-    </LeftButton>
-  )
-
   const buySellButtons = (
     <>
       <Button
@@ -268,15 +253,11 @@ const Wrapper = (props: Props) => {
                 ></MarketResolutionMessageStyled>
               )}
               {isConditionResolved && !hasWinningOutcomes ? (
-                <ButtonContainer>
-                  {poolButton}
-                  {buySellButtons}
-                </ButtonContainer>
+                <ButtonContainer>{buySellButtons}</ButtonContainer>
               ) : (
                 <ButtonContainerFullWidth borderTop={true}>
                   {!isConditionResolved && (
                     <>
-                      {poolButton}
                       <Button
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
@@ -288,7 +269,6 @@ const Wrapper = (props: Props) => {
                   )}
                   {isConditionResolved && hasWinningOutcomes && (
                     <>
-                      {poolButton}
                       <Button
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
