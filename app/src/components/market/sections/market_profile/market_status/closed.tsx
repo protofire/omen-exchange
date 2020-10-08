@@ -211,6 +211,21 @@ const Wrapper = (props: Props) => {
     </>
   )
 
+  const [currentTab, setCurrentTab] = useState('SWAP')
+
+  const marketTabs = {
+    swap: 'SWAP',
+    pool: 'POOL',
+    history: 'HISTORY',
+    verify: 'VERIFY',
+  }
+
+  const switchMarketTab = (newTab: string) => {
+    if (newTab in marketTabs) {
+      setCurrentTab(newTab)
+    }
+  }
+
   return (
     <>
       <TopCard>
@@ -223,58 +238,69 @@ const Wrapper = (props: Props) => {
           isQuestionFinalized={isQuestionFinalized}
           marketAddress={marketMakerAddress}
           resolutionDate={question.resolution}
+          switchMarketTab={switchMarketTab}
         ></MarketNavigation>
-        <OutcomeTable
-          balances={balances}
-          collateral={collateralToken}
-          disabledColumns={disabledColumns}
-          displayRadioSelection={false}
-          payouts={payouts}
-          probabilities={probabilities}
-          withWinningOutcome={true}
-        />
-        <WhenConnected>
-          {hasWinningOutcomes && (
-            <MarketResolutionMessageStyled
-              arbitrator={arbitrator}
-              collateralToken={collateralToken}
-              earnedCollateral={earnedCollateral}
-              invalid={allPayoutsEqual}
-              userWinnerShares={userWinnerShares}
-              userWinnersOutcomes={userWinnersOutcomes}
-              winnersOutcomes={winnersOutcomes}
-            ></MarketResolutionMessageStyled>
-          )}
-          {isConditionResolved && !hasWinningOutcomes ? (
-            <ButtonContainer>
-              {poolButton}
-              {buySellButtons}
-            </ButtonContainer>
-          ) : (
-            <ButtonContainerFullWidth borderTop={true}>
-              {!isConditionResolved && (
-                <>
-                  {poolButton}
-                  <Button
-                    buttonType={ButtonType.primary}
-                    disabled={status === Status.Loading}
-                    onClick={resolveCondition}
-                  >
-                    Resolve Condition
-                  </Button>
-                </>
+        {currentTab === marketTabs.swap && (
+          <>
+            <OutcomeTable
+              balances={balances}
+              collateral={collateralToken}
+              disabledColumns={disabledColumns}
+              displayRadioSelection={false}
+              payouts={payouts}
+              probabilities={probabilities}
+              withWinningOutcome={true}
+            />
+            <WhenConnected>
+              {hasWinningOutcomes && (
+                <MarketResolutionMessageStyled
+                  arbitrator={arbitrator}
+                  collateralToken={collateralToken}
+                  earnedCollateral={earnedCollateral}
+                  invalid={allPayoutsEqual}
+                  userWinnerShares={userWinnerShares}
+                  userWinnersOutcomes={userWinnersOutcomes}
+                  winnersOutcomes={winnersOutcomes}
+                ></MarketResolutionMessageStyled>
               )}
-              {isConditionResolved && hasWinningOutcomes && (
-                <>
+              {isConditionResolved && !hasWinningOutcomes ? (
+                <ButtonContainer>
                   {poolButton}
-                  <Button buttonType={ButtonType.primary} disabled={status === Status.Loading} onClick={() => redeem()}>
-                    Redeem
-                  </Button>
-                </>
+                  {buySellButtons}
+                </ButtonContainer>
+              ) : (
+                <ButtonContainerFullWidth borderTop={true}>
+                  {!isConditionResolved && (
+                    <>
+                      {poolButton}
+                      <Button
+                        buttonType={ButtonType.primary}
+                        disabled={status === Status.Loading}
+                        onClick={resolveCondition}
+                      >
+                        Resolve Condition
+                      </Button>
+                    </>
+                  )}
+                  {isConditionResolved && hasWinningOutcomes && (
+                    <>
+                      {poolButton}
+                      <Button
+                        buttonType={ButtonType.primary}
+                        disabled={status === Status.Loading}
+                        onClick={() => redeem()}
+                      >
+                        Redeem
+                      </Button>
+                    </>
+                  )}
+                </ButtonContainerFullWidth>
               )}
-            </ButtonContainerFullWidth>
-          )}
-        </WhenConnected>
+            </WhenConnected>
+          </>
+        )}
+        {currentTab === marketTabs.pool && <p>pool</p>}
+        {currentTab === marketTabs.pool && <p>history</p>}
       </BottomCard>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
