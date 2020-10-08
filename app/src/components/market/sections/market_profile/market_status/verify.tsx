@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { ChangeEvent, useCallback, useState } from 'react'
 import styled from 'styled-components'
 
 import { Button } from '../../../../button'
+import { ButtonType } from '../../../../button/button_styling_types'
 import { SubsectionTitle, SubsectionTitleWrapper } from '../../../../common'
 import { IconDxDao, IconKleros } from '../../../../common/icons'
 import { ViewCard } from '../../../common/view_card'
-import { WarningMessage } from '../../../common/warning_message'
 
 import Tick from './img/tick.svg'
 
@@ -13,6 +13,7 @@ const Row = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
   margin: 0 -25px;
   padding: 20px 25px;
+  position: relative;
 `
 const SubRow = styled.div`
   align-items: center;
@@ -53,11 +54,15 @@ const RadioWrapper = styled.div<StatefulRadioButton>`
   display: flex;
   justify-content: center;
   align-items: center;
-  ${props => props.selected && `background-color: ${props.theme.colors.clickable};`}
+  background-color: ${props => props.selected && props.theme.colors.clickable};
 `
 
 const RadioTick = styled.img<StatefulRadioButton>`
-  ${props => props.selected && 'filter: saturate(0) brightness(2);'}
+  filter: ${props => (props.selected ? 'saturate(0) brightness(2)' : 'saturate(0) brightness(1.6)')};
+
+  ${Row}:hover & {
+    filter: 'none';
+  }
 `
 
 const Card = styled(ViewCard)`
@@ -88,6 +93,19 @@ const Description = styled.p`
   letter-spacing: 0.2px;
   line-height: 1.4;
   margin: 25px 0;
+  display: inline-block;
+`
+
+const Input = styled.input`
+  cursor: pointer;
+  height: 100%;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 5;
+  border: 1px solid red;
 `
 
 interface StatefulRadioButton {
@@ -95,6 +113,7 @@ interface StatefulRadioButton {
 }
 
 export const VerifyMarket = () => {
+  const [selection, setSelection] = useState<number | undefined>()
   const curationSources = [
     {
       option: 'Kleros',
@@ -111,15 +130,21 @@ export const VerifyMarket = () => {
     {
       option: 'Dxdao Curation',
       details: 'Request Verification',
-      icon: IconDxDao,
+      icon: <IconDxDao />,
     },
   ]
+
+  const selectSource = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.currentTarget
+    setSelection(Number(value))
+  }, [])
+
   return (
     <Card>
       <SubsectionTitleWrapper>
         <SubsectionTitle>Verify</SubsectionTitle>
       </SubsectionTitleWrapper>
-      {curationSources.map(({ details, icon: Icon, notice: Notice, option }) => (
+      {curationSources.map(({ details, icon: Icon, notice: Notice, option }, index) => (
         <Row key={option}>
           <SubRow>
             <LeftColumn>
@@ -130,16 +155,19 @@ export const VerifyMarket = () => {
               <OptionDetails>{details}</OptionDetails>
             </CenterColumn>
             <RightColumn>
-              <RadioWrapper selected>
-                <RadioTick alt="tick" selected src={Tick} />
+              <RadioWrapper selected={selection === index}>
+                <RadioTick alt="tick" selected={selection === index} src={Tick} />
               </RadioWrapper>
             </RightColumn>
           </SubRow>
           <SubRow>{Notice && <div>{Notice}</div>}</SubRow>
+          <Input checked={selection === index} name={option} onChange={selectSource} type="radio" value={index} />
         </Row>
       ))}
       <BottomRow>
-        <RightButton>Request Verification</RightButton>
+        <RightButton buttonType={ButtonType.primaryLine} disabled={typeof selection !== 'number'}>
+          Request Verification
+        </RightButton>
       </BottomRow>
     </Card>
   )
