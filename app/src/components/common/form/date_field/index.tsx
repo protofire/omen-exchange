@@ -34,8 +34,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
         border-radius: 16px;
         border: 1px solid ${props => props.theme.buttonSecondaryLine.borderColor};
         box-shadow: none;
-        color: ${props => props.theme.textfield.backgroundColor};
-        text-shadow: 0 0 0 ${props => props.theme.colors.textColorDark};
+        color: ${props => props.theme.colors.textColorDark};
         cursor: pointer;
         display: block;
         font-size: 14px;
@@ -60,6 +59,7 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
             These two hide the blinking cursor
           */
           color: ${props => props.theme.textfield.backgroundColor};
+          text-shadow: 0 0 0 ${props => props.theme.colors.textColorDark};
 
           &::placeholder {
             color: ${props => props.theme.textfield.backgroundColor};
