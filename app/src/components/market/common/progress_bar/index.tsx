@@ -157,7 +157,7 @@ export const ProgressBar: React.FC<Props> = props => {
           <ProgressBarFill
             className="progress-bar-fill__0"
             fill={true}
-            fillFraction={fillFinalizing ? 1 : openFraction}
+            fillFraction={fillFinalizing ? 1 : openFraction > 0.01 ? openFraction : 0.01}
           ></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__1" fill={fillOpen}></ProgressBarDot>
@@ -165,7 +165,7 @@ export const ProgressBar: React.FC<Props> = props => {
           <ProgressBarFill
             className="progress-bar-fill__1"
             fill={fillOpen}
-            fillFraction={fillArbitration ? 1 : finalizingFraction}
+            fillFraction={fillArbitration ? 1 : finalizingFraction > 0.01 ? finalizingFraction : 0.01}
           ></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__2" fill={fillFinalizing}></ProgressBarDot>
@@ -175,7 +175,7 @@ export const ProgressBar: React.FC<Props> = props => {
               <ProgressBarFill
                 className="progress-bar-fill__2"
                 fill={fillFinalizing}
-                fillFraction={arbitrationFraction}
+                fillFraction={arbitrationFraction > 0.01 ? arbitrationFraction : 0.01}
               ></ProgressBarFill>
             </ProgressBarLine>
             <ProgressBarDot className="progress-bar-dot__3" fill={fillArbitration}></ProgressBarDot>
