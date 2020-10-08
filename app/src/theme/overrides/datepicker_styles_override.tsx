@@ -141,13 +141,15 @@ export const DatepickerStylesOverride = css`
         ul.react-datepicker__time-list {
           height: calc(195px + (1.7rem / 2) - 8px) !important;
           ::-webkit-scrollbar {
-            width: 3px;
+            width: 4px;
           }
           ::-webkit-scrollbar-thumb {
-            background-color: darkgrey;
+            background-color: rgb(159, 168, 218);
+            border-radius: 2px;
           }
           ::-webkit-scrollbar-track {
-            box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            background: rgb(232, 234, 246);
+            border-radius: 2px;
           }
         }
       }
