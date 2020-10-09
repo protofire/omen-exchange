@@ -190,9 +190,10 @@ const Outcomes = (props: Props) => {
   const manualProbabilitiesAndThereAreOutcomes = manualProbabilities && outcomes.length > 0
   const manualProbabilitiesAndNoOutcomes = manualProbabilities && outcomes.length === 0
   const maxOutcomesReached = outcomes.length >= MAX_OUTCOME_ALLOWED
-  const outcomeValueOutofBounds = newOutcomeProbability <= outcomeMinValue || newOutcomeProbability > outcomeMaxValue
+  const outcomeValueOutofBounds =
+    Number(newOutcomeProbability) <= outcomeMinValue || Number(newOutcomeProbability) > outcomeMaxValue
   const totalProbabilitiesReached = !uniformProbabilities && totalProbabilities === 100
-  const maxSingleOutcome = newOutcomeProbability === 100
+  const maxSingleOutcome = Number(newOutcomeProbability) === 100
   const disableButtonAdd =
     !newOutcomeName ||
     maxOutcomesReached ||
