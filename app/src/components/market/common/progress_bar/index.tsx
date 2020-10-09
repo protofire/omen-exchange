@@ -108,10 +108,10 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   state: string
   creationTimestamp: Date
   resolutionTimestamp: Date
-  answerFinalizedTimestamp: Maybe<Date>
+  answerFinalizedTimestamp: Maybe<BigNumber>
   pendingArbitration?: boolean
   arbitrationOccurred?: boolean
-  bondTimestamp?: BigNumber
+  bondTimestamp?: Maybe<BigNumber>
 }
 
 export const ProgressBar: React.FC<Props> = props => {
@@ -133,17 +133,20 @@ export const ProgressBar: React.FC<Props> = props => {
   const timeSinceOpen = new Date().getTime() - creationTimestamp.getTime()
   const openFraction = timeSinceOpen / openDuration > 1 ? 1 : timeSinceOpen / openDuration
 
-  const finalizingDuration = 24 * 60 * 60 * 1000
+  const finalizingDuration =
+    answerFinalizedTimestamp &&
+    bondTimestamp &&
+    answerFinalizedTimestamp.toNumber() * 1000 - bondTimestamp.toNumber() * 1000
   let finalizingFraction = 0
-  if (bondTimestamp) {
-    const timeSinceFinalizing = new Date().getTime() - new Date(bondTimestamp.toNumber()).getTime()
-    finalizingFraction = timeSinceFinalizing / finalizingDuration > 1 ? 1 : timeSinceFinalizing / finalizingDuration
+  if (bondTimestamp && finalizingDuration) {
+    const timeSinceBond = new Date().getTime() - bondTimestamp.toNumber() * 1000
+    finalizingFraction = timeSinceBond / finalizingDuration > 1 ? 1 : timeSinceBond / finalizingDuration
   }
 
   let arbitrationFraction = 0
-  if (answerFinalizedTimestamp) {
+  if (answerFinalizedTimestamp && finalizingDuration) {
     const arbitrationDuration =
-      answerFinalizedTimestamp.getTime() - (resolutionTimestamp.getTime() + finalizingDuration)
+      answerFinalizedTimestamp.toNumber() * 1000 - (resolutionTimestamp.getTime() + finalizingDuration)
     const timeSinceArbitrating = new Date().getTime() - (resolutionTimestamp.getTime() + finalizingDuration)
     arbitrationFraction =
       timeSinceArbitrating / arbitrationDuration > 1 ? 1 : timeSinceArbitrating / arbitrationDuration
@@ -157,7 +160,7 @@ export const ProgressBar: React.FC<Props> = props => {
           <ProgressBarFill
             className="progress-bar-fill__0"
             fill={true}
-            fillFraction={fillFinalizing ? 1 : openFraction}
+            fillFraction={fillFinalizing ? 1 : openFraction > 0.01 ? openFraction : 0.01}
           ></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__1" fill={fillOpen}></ProgressBarDot>
@@ -165,7 +168,7 @@ export const ProgressBar: React.FC<Props> = props => {
           <ProgressBarFill
             className="progress-bar-fill__1"
             fill={fillOpen}
-            fillFraction={fillArbitration ? 1 : finalizingFraction}
+            fillFraction={fillArbitration ? 1 : finalizingFraction > 0.01 ? finalizingFraction : 0.01}
           ></ProgressBarFill>
         </ProgressBarLine>
         <ProgressBarDot className="progress-bar-dot__2" fill={fillFinalizing}></ProgressBarDot>
@@ -175,7 +178,7 @@ export const ProgressBar: React.FC<Props> = props => {
               <ProgressBarFill
                 className="progress-bar-fill__2"
                 fill={fillFinalizing}
-                fillFraction={arbitrationFraction}
+                fillFraction={arbitrationFraction > 0.01 ? arbitrationFraction : 0.01}
               ></ProgressBarFill>
             </ProgressBarLine>
             <ProgressBarDot className="progress-bar-dot__3" fill={fillArbitration}></ProgressBarDot>

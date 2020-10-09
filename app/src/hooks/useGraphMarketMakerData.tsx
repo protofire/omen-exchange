@@ -71,7 +71,7 @@ type GraphResponseFixedProductMarketMaker = {
   outcomes: Maybe<string[]>
   isPendingArbitration: boolean
   arbitrationOccurred: boolean
-  currentAnswerTimestamp: BigNumber
+  currentAnswerTimestamp: string
   runningDailyVolumeByHour: BigNumber[]
   question: {
     id: string
@@ -144,7 +144,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
       outcomes,
       isPendingArbitration: data.isPendingArbitration,
       arbitrationOccurred: data.arbitrationOccurred,
-      currentAnswerTimestamp: data.currentAnswerTimestamp,
+      currentAnswerTimestamp: data.currentAnswerTimestamp ? bigNumberify(data.currentAnswerTimestamp) : null,
     },
     curatedByDxDao: data.curatedByDxDao,
     klerosTCRregistered: data.klerosTCRregistered,

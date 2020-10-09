@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -6,11 +6,15 @@ import { WhenConnected } from '../../../../../hooks/connectedWeb3'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { SubsectionTitle, SubsectionTitleWrapper } from '../../../../common'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 import { WarningMessage } from '../../../common/warning_message'
+import { MarketBuyContainer } from '../../market_buy/market_buy_container'
+import { MarketHistoryContainer } from '../../market_history/market_history_container'
+import { MarketNavigation } from '../../market_navigation'
+import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
+import { MarketSellContainer } from '../../market_sell/market_sell_container'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
@@ -18,10 +22,6 @@ const TopCard = styled(ViewCard)`
 `
 
 const BottomCard = styled(ViewCard)``
-
-const LeftButton = styled(Button)`
-  margin-right: auto;
-`
 
 const MessageWrapper = styled.div`
   border-radius: 4px;
@@ -68,9 +68,16 @@ interface Props extends RouteComponentProps<Record<string, string | undefined>> 
 }
 
 const Wrapper = (props: Props) => {
-  const { history, marketMakerData } = props
+  const { marketMakerData } = props
 
-  const { address: marketMakerAddress, balances, collateral, question, totalPoolShares } = marketMakerData
+  const {
+    address: marketMakerAddress,
+    balances,
+    collateral,
+    isQuestionFinalized,
+    question,
+    totalPoolShares,
+  } = marketMakerData
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
@@ -104,17 +111,6 @@ const Wrapper = (props: Props) => {
     )
   }
 
-  const poolButton = (
-    <LeftButton
-      buttonType={ButtonType.secondaryLine}
-      onClick={() => {
-        history.push(`${marketMakerAddress}/pool-liquidity`)
-      }}
-    >
-      Pool Liquidity
-    </LeftButton>
-  )
-
   const openQuestionMessage = (
     <MessageWrapper>
       <Title>The question is being resolved.</Title>
@@ -139,7 +135,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={!userHasShares || !hasFunding}
         onClick={() => {
-          history.push(`${marketMakerAddress}/sell`)
+          setCurrentTab('SELL')
         }}
       >
         Sell
@@ -148,7 +144,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={!hasFunding}
         onClick={() => {
-          history.push(`${marketMakerAddress}/buy`)
+          setCurrentTab('BUY')
         }}
       >
         Buy
@@ -156,32 +152,65 @@ const Wrapper = (props: Props) => {
     </>
   )
 
+  const [currentTab, setCurrentTab] = useState('SWAP')
+
+  const marketTabs = {
+    swap: 'SWAP',
+    pool: 'POOL',
+    history: 'HISTORY',
+    verify: 'VERIFY',
+    buy: 'BUY',
+    sell: 'SELL',
+  }
+
+  const switchMarketTab = (newTab: string) => {
+    setCurrentTab(newTab)
+  }
+
   return (
     <>
       <TopCard>
         <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Trade Outcome</SubsectionTitle>
-        </SubsectionTitleWrapper>
-        {renderTableData()}
-        {isQuestionOpen && openQuestionMessage}
-        {!hasFunding && !isQuestionOpen && (
-          <WarningMessageStyled
-            additionalDescription={''}
-            description={'Trading is disabled due to lack of liquidity.'}
-            grayscale={true}
-            href={''}
-            hyperlinkDescription={''}
-          />
+        <MarketNavigation
+          activeTab={currentTab}
+          isQuestionFinalized={isQuestionFinalized}
+          marketAddress={marketMakerAddress}
+          resolutionDate={question.resolution}
+          switchMarketTab={switchMarketTab}
+        ></MarketNavigation>
+        {currentTab === marketTabs.swap && (
+          <>
+            {renderTableData()}
+            {isQuestionOpen && openQuestionMessage}
+            {!hasFunding && !isQuestionOpen && (
+              <WarningMessageStyled
+                additionalDescription={''}
+                description={'Trading is disabled due to lack of liquidity.'}
+                grayscale={true}
+                href={''}
+                hyperlinkDescription={''}
+              />
+            )}
+            <WhenConnected>
+              <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+                {isQuestionOpen ? openInRealitioButton : buySellButtons}
+              </StyledButtonContainer>
+            </WhenConnected>
+          </>
         )}
-        <WhenConnected>
-          <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
-            {poolButton}
-            {isQuestionOpen ? openInRealitioButton : buySellButtons}
-          </StyledButtonContainer>
-        </WhenConnected>
+        {currentTab === marketTabs.pool && (
+          <MarketPoolLiquidityContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
+        {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
+        {currentTab === marketTabs.buy && (
+          <MarketBuyContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
+        {currentTab === marketTabs.sell && (
+          <MarketSellContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
+        {/* {currentTab === marketTabs.verify && <p>verify</p>} */}
       </BottomCard>
     </>
   )

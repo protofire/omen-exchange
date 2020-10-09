@@ -128,11 +128,12 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <IconStar></IconStar>
         <Outcome>{outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}</Outcome>
         <Separator>|</Separator>
-        <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Ended ${endsText}`}</span>
+        <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Closed ${endsText} ago`}</span>
         <Separator>|</Separator>
         <span>
           {currentFilter.sortBy === 'usdVolume' && `${formatNumber(volume)} ${symbol} - Volume`}
-          {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Ending`}
+          {currentFilter.sortBy === 'openingTimestamp' &&
+            `${resolutionDate} - ${moment(endDate).isAfter(now) ? 'Closing' : 'Closed'}`}
           {currentFilter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` &&
             `${
               Math.floor(Date.now() / 86400000) === lastActiveDay && dailyVolume && decimals

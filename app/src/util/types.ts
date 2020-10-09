@@ -54,7 +54,7 @@ export interface Question {
   outcomes: string[]
   isPendingArbitration: boolean
   arbitrationOccurred: boolean
-  currentAnswerTimestamp: BigNumber
+  currentAnswerTimestamp: Maybe<BigNumber>
 }
 
 export enum OutcomeTableValue {

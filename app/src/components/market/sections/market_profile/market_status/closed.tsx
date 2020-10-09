@@ -11,7 +11,6 @@ import { getLogger } from '../../../../../util/logger'
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { SubsectionTitle, SubsectionTitleWrapper } from '../../../../common'
 import { FullLoading } from '../../../../loading'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
 import { ButtonContainerFullWidth } from '../../../common/common_styled'
@@ -19,6 +18,11 @@ import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
+import { MarketBuyContainer } from '../../market_buy/market_buy_container'
+import { MarketHistoryContainer } from '../../market_history/market_history_container'
+import { MarketNavigation } from '../../market_navigation'
+import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
+import { MarketSellContainer } from '../../market_sell/market_sell_container'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
@@ -29,10 +33,6 @@ const BottomCard = styled(ViewCard)``
 
 const MarketResolutionMessageStyled = styled(MarketResolutionMessage)`
   margin: 20px 0;
-`
-
-const LeftButton = styled(Button)`
-  margin-right: auto;
 `
 
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
@@ -61,7 +61,7 @@ const Wrapper = (props: Props) => {
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
 
-  const { history, marketMakerData } = props
+  const { marketMakerData } = props
 
   const {
     address: marketMakerAddress,
@@ -69,6 +69,7 @@ const Wrapper = (props: Props) => {
     balances,
     collateral: collateralToken,
     isConditionResolved,
+    isQuestionFinalized,
     payouts,
     question,
   } = marketMakerData
@@ -176,24 +177,13 @@ const Wrapper = (props: Props) => {
   const EPS = 0.01
   const allPayoutsEqual = payouts ? payouts.every(payout => Math.abs(payout - 1 / payouts.length) <= EPS) : false
 
-  const poolButton = (
-    <LeftButton
-      buttonType={ButtonType.secondaryLine}
-      onClick={() => {
-        history.push(`${marketMakerAddress}/pool-liquidity`)
-      }}
-    >
-      Pool Liquidity
-    </LeftButton>
-  )
-
   const buySellButtons = (
     <>
       <Button
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
-          history.push(`${marketMakerAddress}/sell`)
+          setCurrentTab('SELL')
         }}
       >
         Sell
@@ -202,7 +192,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
-          history.push(`${marketMakerAddress}/buy`)
+          setCurrentTab('BUY')
         }}
       >
         Buy
@@ -210,66 +200,99 @@ const Wrapper = (props: Props) => {
     </>
   )
 
+  const [currentTab, setCurrentTab] = useState('SWAP')
+
+  const marketTabs = {
+    swap: 'SWAP',
+    pool: 'POOL',
+    history: 'HISTORY',
+    verify: 'VERIFY',
+    buy: 'BUY',
+    sell: 'SELL',
+  }
+
+  const switchMarketTab = (newTab: string) => {
+    setCurrentTab(newTab)
+  }
+
   return (
     <>
       <TopCard>
         <MarketTopDetailsClosed collateral={collateral} marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
-        <SubsectionTitleWrapper>
-          <SubsectionTitle>Market Closed</SubsectionTitle>
-        </SubsectionTitleWrapper>
-        <OutcomeTable
-          balances={balances}
-          collateral={collateralToken}
-          disabledColumns={disabledColumns}
-          displayRadioSelection={false}
-          payouts={payouts}
-          probabilities={probabilities}
-          withWinningOutcome={true}
-        />
-        <WhenConnected>
-          {hasWinningOutcomes && (
-            <MarketResolutionMessageStyled
-              arbitrator={arbitrator}
-              collateralToken={collateralToken}
-              earnedCollateral={earnedCollateral}
-              invalid={allPayoutsEqual}
-              userWinnerShares={userWinnerShares}
-              userWinnersOutcomes={userWinnersOutcomes}
-              winnersOutcomes={winnersOutcomes}
-            ></MarketResolutionMessageStyled>
-          )}
-          {isConditionResolved && !hasWinningOutcomes ? (
-            <ButtonContainer>
-              {poolButton}
-              {buySellButtons}
-            </ButtonContainer>
-          ) : (
-            <ButtonContainerFullWidth borderTop={true}>
-              {!isConditionResolved && (
-                <>
-                  {poolButton}
-                  <Button
-                    buttonType={ButtonType.primary}
-                    disabled={status === Status.Loading}
-                    onClick={resolveCondition}
-                  >
-                    Resolve Condition
-                  </Button>
-                </>
+        <MarketNavigation
+          activeTab={currentTab}
+          hasWinningOutcomes={hasWinningOutcomes}
+          isQuestionFinalized={isQuestionFinalized}
+          marketAddress={marketMakerAddress}
+          resolutionDate={question.resolution}
+          switchMarketTab={switchMarketTab}
+        ></MarketNavigation>
+        {currentTab === marketTabs.swap && (
+          <>
+            <OutcomeTable
+              balances={balances}
+              collateral={collateralToken}
+              disabledColumns={disabledColumns}
+              displayRadioSelection={false}
+              payouts={payouts}
+              probabilities={probabilities}
+              withWinningOutcome={true}
+            />
+            <WhenConnected>
+              {hasWinningOutcomes && (
+                <MarketResolutionMessageStyled
+                  arbitrator={arbitrator}
+                  collateralToken={collateralToken}
+                  earnedCollateral={earnedCollateral}
+                  invalid={allPayoutsEqual}
+                  userWinnerShares={userWinnerShares}
+                  userWinnersOutcomes={userWinnersOutcomes}
+                  winnersOutcomes={winnersOutcomes}
+                ></MarketResolutionMessageStyled>
               )}
-              {isConditionResolved && hasWinningOutcomes && (
-                <>
-                  {poolButton}
-                  <Button buttonType={ButtonType.primary} disabled={status === Status.Loading} onClick={() => redeem()}>
-                    Redeem
-                  </Button>
-                </>
+              {isConditionResolved && !hasWinningOutcomes ? (
+                <ButtonContainer>{buySellButtons}</ButtonContainer>
+              ) : (
+                <ButtonContainerFullWidth borderTop={true}>
+                  {!isConditionResolved && (
+                    <>
+                      <Button
+                        buttonType={ButtonType.primary}
+                        disabled={status === Status.Loading}
+                        onClick={resolveCondition}
+                      >
+                        Resolve Condition
+                      </Button>
+                    </>
+                  )}
+                  {isConditionResolved && hasWinningOutcomes && (
+                    <>
+                      <Button
+                        buttonType={ButtonType.primary}
+                        disabled={status === Status.Loading}
+                        onClick={() => redeem()}
+                      >
+                        Redeem
+                      </Button>
+                    </>
+                  )}
+                </ButtonContainerFullWidth>
               )}
-            </ButtonContainerFullWidth>
-          )}
-        </WhenConnected>
+            </WhenConnected>
+          </>
+        )}
+        {currentTab === marketTabs.pool && (
+          <MarketPoolLiquidityContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
+        {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
+        {currentTab === marketTabs.buy && (
+          <MarketBuyContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
+        {currentTab === marketTabs.sell && (
+          <MarketSellContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
       </BottomCard>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}

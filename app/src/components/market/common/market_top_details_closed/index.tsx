@@ -5,10 +5,10 @@ import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../ho
 import { MarketMakerData } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
-import { HistoryChartContainer } from '../history_chart'
 import { MarketData } from '../market_data'
 import { MarketTitle } from '../market_title'
 import { ProgressBar } from '../progress_bar'
+import { ProgressBarToggle } from '../progress_bar/toggle'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -29,18 +29,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     runningDailyVolumeByHour,
   } = marketMakerData
 
-  const [showingTradeHistory, setShowingTradeHistory] = useState(false)
-  const [tradeHistoryLoaded, setTradeHistoryLoaded] = useState(false)
-
-  const toggleTradeHistory = () => {
-    if (showingTradeHistory) {
-      setShowingTradeHistory(false)
-    } else {
-      setShowingTradeHistory(true)
-      // After first load on demand we maintain this value to only load the data when history is shown.
-      setTradeHistoryLoaded(true)
-    }
-  }
+  const [showingProgressBar, setShowingProgressBar] = useState(false)
 
   const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
   const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
@@ -48,23 +37,33 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     : ''
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
-  const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred
+
+  const toggleProgressBar = () => {
+    setShowingProgressBar(!showingProgressBar)
+  }
 
   return (
     <>
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} />
+        <ProgressBarToggle
+          active={showingProgressBar}
+          state={'closed'}
+          toggleProgressBar={toggleProgressBar}
+        ></ProgressBarToggle>
       </SubsectionTitleWrapper>
-      <ProgressBar
-        answerFinalizedTimestamp={finalizedTimestampDate}
-        arbitrationOccurred={arbitrationOccurred}
-        creationTimestamp={creationDate}
-        pendingArbitration={isPendingArbitration}
-        resolutionTimestamp={question.resolution}
-        state={'closed'}
-      ></ProgressBar>
+      {showingProgressBar && (
+        <ProgressBar
+          answerFinalizedTimestamp={answerFinalizedTimestamp}
+          arbitrationOccurred={arbitrationOccurred}
+          creationTimestamp={creationDate}
+          pendingArbitration={isPendingArbitration}
+          resolutionTimestamp={question.resolution}
+          state={'closed'}
+        ></ProgressBar>
+      )}
       <MarketData
         currency={collateralToken}
         lastActiveDay={lastActiveDay}
@@ -74,19 +73,9 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
       <AdditionalMarketData
         arbitrator={arbitrator}
         category={question.category}
-        handleTradeHistoryClick={toggleTradeHistory}
         id={question.id}
         oracle="Reality.eth"
-        showingTradeHistory={showingTradeHistory}
       ></AdditionalMarketData>
-      {tradeHistoryLoaded && (
-        <HistoryChartContainer
-          answerFinalizedTimestamp={answerFinalizedTimestamp}
-          hidden={!showingTradeHistory}
-          marketMakerAddress={address}
-          outcomes={question.outcomes}
-        />
-      )}
     </>
   )
 }
