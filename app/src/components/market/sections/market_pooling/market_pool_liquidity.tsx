@@ -67,6 +67,10 @@ const WarningMessageStyled = styled(WarningMessage)`
   margin-bottom: 0;
 `
 
+const PoolTransactionDetailsCard = styled(TransactionDetailsCard)`
+  background-image: url(/svgs/note-pool-withdraw.svg);
+`
+
 const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
@@ -386,7 +390,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             </TransactionDetailsCard>
           )}
           {activeTab === Tabs.withdraw && (
-            <TransactionDetailsCard>
+            <PoolTransactionDetailsCard>
               <TransactionDetailsRow
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
@@ -407,7 +411,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   collateral.symbol
                 }`}
               />
-            </TransactionDetailsCard>
+            </PoolTransactionDetailsCard>
           )}
         </div>
       </GridTransactionDetails>

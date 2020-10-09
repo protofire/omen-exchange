@@ -147,6 +147,10 @@ const StyledTradingFeeSelector = styled(TradingFeeSelector)`
   width: 50%;
 `
 
+const FundingTransactionDetailsCard = styled(TransactionDetailsCard)`
+  background-image: url(/svgs/note-border-big.svg);
+`
+
 interface Props {
   back: () => void
   submit: () => void
@@ -378,7 +382,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             {amountError && <GenericError>{amountError}</GenericError>}
           </div>
           <div>
-            <TransactionDetailsCard>
+            <FundingTransactionDetailsCard>
               <TransactionDetailsRow
                 state={ValueStates.important}
                 title={'Earn Trading Fee'}
@@ -389,7 +393,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 title={'Pool Tokens'}
                 value={formatNumber(formatBigNumber(funding, collateral.decimals))}
               />
-            </TransactionDetailsCard>
+            </FundingTransactionDetailsCard>
           </div>
         </GridTransactionDetailsStyled>
         {exceedsMaxFee && (

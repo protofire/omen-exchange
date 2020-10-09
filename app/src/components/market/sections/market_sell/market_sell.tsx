@@ -34,6 +34,10 @@ const LeftButton = styled(Button)`
   margin-right: auto;
 `
 
+const MarketSellTransactionDetailsCard = styled(TransactionDetailsCard)`
+  background-image: url(/svgs/note-swap-sell.svg);
+`
+
 const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
@@ -226,7 +230,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           {amountError && <GenericError>{amountError}</GenericError>}
         </div>
         <div>
-          <TransactionDetailsCard>
+          <MarketSellTransactionDetailsCard>
             <TransactionDetailsRow
               title={'Sell Amount'}
               value={`${formatNumber(formatBigNumber(amountShares, collateral.decimals))} Shares`}
@@ -263,7 +267,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
               } ${collateral.symbol}`}
             />
-          </TransactionDetailsCard>
+          </MarketSellTransactionDetailsCard>
         </div>
       </GridTransactionDetails>
       {isNegativeAmountShares && (

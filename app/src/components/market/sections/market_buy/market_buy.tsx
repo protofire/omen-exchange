@@ -44,6 +44,9 @@ const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
   margin-bottom: 0;
 `
+const MarketBuyTransactionDetailsCard = styled(TransactionDetailsCard)`
+  background-image: url(/svgs/note-swap-buy.svg);
+`
 
 const logger = getLogger('Market::Buy')
 
@@ -254,7 +257,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           {amountError && <GenericError>{amountError}</GenericError>}
         </div>
         <div>
-          <TransactionDetailsCard>
+          <MarketBuyTransactionDetailsCard>
             <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
             <TransactionDetailsRow
               title={'Fee'}
@@ -274,7 +277,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               title={'Total'}
               value={total}
             />
-          </TransactionDetailsCard>
+          </MarketBuyTransactionDetailsCard>
         </div>
       </GridTransactionDetails>
       {isNegativeAmount && (
