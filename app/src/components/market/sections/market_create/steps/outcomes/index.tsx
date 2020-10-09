@@ -121,7 +121,7 @@ const Outcomes = (props: Props) => {
   const outcomeMaxValue = 100 - totalProbabilities
   const [newOutcomeName, setNewOutcomeName] = useState<string>('')
   const [duplicateOutcome, setDuplicateOutcome] = useState<boolean>(false)
-  const [newOutcomeProbability, setNewOutcomeProbability] = useState<number>(outcomeMinValue)
+  const [newOutcomeProbability, setNewOutcomeProbability] = useState<number | string>(outcomeMinValue)
   const [uniformProbabilities, setIsUniform] = useState<boolean>(true)
   const [noOutcomes, setNoOutcomes] = useState<boolean>(true)
 
@@ -135,8 +135,9 @@ const Outcomes = (props: Props) => {
   const addNewOutcome = () => {
     const newOutcome = {
       name: newOutcomeName.trim(),
-      probability: newOutcomeProbability,
+      probability: Number(newOutcomeProbability),
     }
+
     const newOutcomes = outcomes.concat(newOutcome)
     props.onChange(uniformProbabilities ? uniform(newOutcomes) : newOutcomes)
     setNewOutcomeName('')
@@ -156,7 +157,9 @@ const Outcomes = (props: Props) => {
   }
 
   const setMax = () => {
+    console.log('here')
     const sum = outcomes.reduce((acum, b) => acum + b.probability, 0)
+    console.log(sum)
     setNewOutcomeProbability(100 - sum)
   }
 
@@ -223,7 +226,7 @@ const Outcomes = (props: Props) => {
   return (
     <>
       <TitleWrapper uniformProbabilities={uniformProbabilities}>
-        <FormLabel>Add Outcome</FormLabel>
+        <FormLabel>Add Outcome </FormLabel>
         {manualProbabilities && <FormLabel>Probability</FormLabel>}
         {manualProbabilitiesAndNoOutcomes && (
           <TitleText>
@@ -266,11 +269,15 @@ const Outcomes = (props: Props) => {
             disabled={disableManualProbabilities}
             formField={
               <Textfield
-                onChange={e => setNewOutcomeProbability(Number(e.target.value))}
+                min="0.00"
+                onChange={e => {
+                  setNewOutcomeProbability(e.target.value)
+                }}
                 onKeyUp={e => {
                   onPressEnter(e)
                 }}
                 placeholder="0.00"
+                step="0.01"
                 type="number"
                 value={newOutcomeProbability ? newOutcomeProbability : ''}
               />
