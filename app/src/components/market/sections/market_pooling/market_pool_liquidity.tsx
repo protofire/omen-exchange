@@ -70,8 +70,9 @@ const WarningMessageStyled = styled(WarningMessage)`
 const UserData = styled.div`
   display: flex;
   justify-content: space-between;
-  padding-bottom: 24px;
-  padding-top: 4px;
+  padding: 24px 25px;
+  margin: 0 -25px;
+  border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
 `
 
 const UserDataTitleValue = styled(TitleValue)`
