@@ -132,7 +132,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <Separator>|</Separator>
         <span>
           {currentFilter.sortBy === 'usdVolume' && `${formatNumber(volume)} ${symbol} - Volume`}
-          {currentFilter.sortBy === 'openingTimestamp' && `${resolutionDate} - Closed`}
+          {currentFilter.sortBy === 'openingTimestamp' &&
+            `${resolutionDate} - ${moment(endDate).isAfter(now) ? 'Closing' : 'Closed'}`}
           {currentFilter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` &&
             `${
               Math.floor(Date.now() / 86400000) === lastActiveDay && dailyVolume && decimals
