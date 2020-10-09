@@ -157,9 +157,7 @@ const Outcomes = (props: Props) => {
   }
 
   const setMax = () => {
-    console.log('here')
     const sum = outcomes.reduce((acum, b) => acum + b.probability, 0)
-    console.log(sum)
     setNewOutcomeProbability(100 - sum)
   }
 
