@@ -50,10 +50,9 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
   Big.RM = 0
 
   const earnedCollateralPerOutcome = balances.map((balance, index) => new Big(balance.toString()).mul(payouts[index]))
+  const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b.toFixed(0)), bigNumberify(0))
 
-  const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b))
-
-  return bigNumberify(earnedCollateral.toFixed(0))
+  return earnedCollateral
 }
 
 const Wrapper = (props: Props) => {
