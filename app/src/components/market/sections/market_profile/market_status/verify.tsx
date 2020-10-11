@@ -1,6 +1,10 @@
-import React, { ChangeEvent, useCallback, useState } from 'react'
+import { formatEther } from 'ethers/utils'
+import humanizeDuration from 'humanize-duration'
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { ConnectedWeb3Context, useContracts } from '../../../../../hooks'
+import { MarketMakerData } from '../../../../../util/types'
 import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { SubsectionTitle, SubsectionTitleWrapper } from '../../../../common'
@@ -20,6 +24,7 @@ const SubRow = styled.div`
   display: flex;
   flex-wrap: no-wrap;
   justify-content: space-between;
+  position: relative;
 `
 
 const BottomRow = styled.div`
@@ -60,8 +65,8 @@ const RadioWrapper = styled.div<StatefulRadioButton>`
 const RadioTick = styled.img<StatefulRadioButton>`
   filter: ${props => (props.selected ? 'saturate(0) brightness(2)' : 'saturate(0) brightness(1.6)')};
 
-  ${Row}:hover & {
-    filter: 'none';
+  ${SubRow}:hover & {
+    filter: ${props => !props.selected && 'none'};
   }
 `
 
@@ -112,18 +117,78 @@ interface StatefulRadioButton {
   selected?: boolean
 }
 
-export const VerifyMarket = () => {
-  const [selection, setSelection] = useState<number | undefined>()
+interface Props {
+  marketMakerData: MarketMakerData
+  context: ConnectedWeb3Context
+}
+
+interface FetchState {
+  startFetch: boolean
+  result: string
+}
+
+export const VerifyMarket: React.FC<Props> = props => {
+  const { context, marketMakerData } = props || {}
+  const { klerosTCRregistered, submissionIDs } = marketMakerData || {}
+
+  const [selection, setSelection] = useState<number>(0)
+  const { kleros } = useContracts(context)
+  const [actionDeposit, setActionDeposit] = useState<string>('0')
+  const [listingCriteria, setListingCriteria] = useState<string>('')
+  const [challengePeriodDuration, setChallengePeriodDuration] = useState<number>(0)
+  const [fetchState, setFetchState] = useState<FetchState>({ startFetch: false, result: '' })
+
+  useEffect(() => {
+    ;(async () => {
+      if (!klerosTCRregistered && !fetchState.startFetch) {
+        setFetchState(prevState => ({ ...prevState, startFetch: true }))
+        try {
+          const [listingCriteriaURL, submissionDeposit, challengePeriodDuration] = await Promise.all([
+            await kleros.getListingCriteriaURL(),
+            await kleros.getSubmissionDeposit(),
+            await kleros.getChallengePeriodDuration(),
+          ])
+
+          setListingCriteria(listingCriteriaURL)
+          setActionDeposit(submissionDeposit.toString())
+          setChallengePeriodDuration(challengePeriodDuration.toNumber())
+          setFetchState(prevState => ({ ...prevState, result: 'success' }))
+        } catch (error) {
+          setFetchState(prevState => ({ ...prevState, result: 'error' }))
+        }
+      }
+    })()
+  }, [
+    fetchState.startFetch,
+    kleros,
+    klerosTCRregistered,
+    marketMakerData.curatedByDxDaoOrKleros,
+    marketMakerData.klerosTCRregistered,
+    submissionIDs,
+  ])
+
   const curationSources = [
     {
       option: 'Kleros',
-      details: 'Request verification with a 0.331 ETH security deposit.',
+      details: `Request verification with a ${formatEther(actionDeposit)} ETH security deposit.`,
       icon: <IconKleros />,
       notice: (
         <Description>
-          Make sure your submission complies with the <a href="https://kleros.io">listing criteria</a> to avoid
-          challenges. The <b>0.331</b> ETH security deposit will be reimbursed if your submission is accepted. The
-          challenge period lasts <b>3 days and 12 hours</b>.
+          Make sure your submission complies with the{' '}
+          <a href={listingCriteria} rel="noopener noreferrer" target="_blank">
+            listing criteria
+          </a>{' '}
+          to avoid challenges. The <b>{formatEther(actionDeposit)}</b> ETH security deposit will be reimbursed if your
+          submission is accepted. The challenge period lasts{' '}
+          <b>
+            {humanizeDuration(challengePeriodDuration, {
+              delimiter: ' and ',
+              largest: 2,
+              round: true,
+              units: ['y', 'mo', 'w', 'd', 'h', 'm'],
+            })}
+          </b>
+          .
         </Description>
       ),
     },
@@ -138,6 +203,8 @@ export const VerifyMarket = () => {
     const { value } = e.currentTarget
     setSelection(Number(value))
   }, [])
+
+  if (fetchState.result !== 'success') return null
 
   return (
     <Card>
@@ -159,13 +226,13 @@ export const VerifyMarket = () => {
                 <RadioTick alt="tick" selected={selection === index} src={Tick} />
               </RadioWrapper>
             </RightColumn>
+            <Input checked={selection === index} name={option} onChange={selectSource} type="radio" value={index} />
           </SubRow>
           <SubRow>{Notice && <div>{Notice}</div>}</SubRow>
-          <Input checked={selection === index} name={option} onChange={selectSource} type="radio" value={index} />
         </Row>
       ))}
       <BottomRow>
-        <RightButton buttonType={ButtonType.primaryLine} disabled={typeof selection !== 'number'}>
+        <RightButton buttonType={ButtonType.primary} disabled={typeof selection !== 'number'}>
           Request Verification
         </RightButton>
       </BottomRow>

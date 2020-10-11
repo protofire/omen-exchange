@@ -45,6 +45,8 @@ interface Network {
     klerosTokenView: string
     klerosTCR: string
     dxTCR: string
+    omenVerifiedMarkets: string
+    generalizedTCRView: string
   }
   cpk?: CPKAddresses
 }
@@ -78,6 +80,8 @@ const networks: { [K in NetworkId]: Network } = {
       klerosTokenView: '0xf9b9b5440340123b21bff1ddafe1ad6feb9d6e7f',
       klerosTCR: '0xebcf3bca271b26ae4b162ba560e243055af0e679',
       dxTCR: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8',
+      omenVerifiedMarkets: '0xba0304273a54dfec1fc7f4bccbf4b15519aecf15',
+      generalizedTCRView: '0xe75a12f40da77d285c08a44f499e597bc5085658',
     },
   },
   [networkIds.RINKEBY]: {
@@ -97,6 +101,8 @@ const networks: { [K in NetworkId]: Network } = {
       klerosTokenView: '0x0000000000000000000000000000000000000000',
       klerosTCR: '0x0000000000000000000000000000000000000000',
       dxTCR: '0x03165DF66d9448E45c2f5137486af3E7e752a352',
+      omenVerifiedMarkets: '0x58574aF265E1feC3b2B6dD005CA17af8eDa581cc',
+      generalizedTCRView: '0x31e8d06b5fc3856cc93f4172d335626c680af1a7',
     },
   },
 }
