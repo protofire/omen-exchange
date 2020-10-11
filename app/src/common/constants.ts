@@ -66,6 +66,8 @@ export const GRAPH_RINKEBY_HTTP =
 export const GRAPH_RINKEBY_WS =
   process.env.REACT_APP_GRAPH_RINKEBY_WS || 'wss://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
 
+export const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY || 'https://ipfs.kleros.io'
+
 export const Logo = OmenLogo
 
 export const DEFAULT_ARBITRATOR: KnownArbitrator = 'kleros'

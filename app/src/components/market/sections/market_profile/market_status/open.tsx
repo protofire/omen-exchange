@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { WhenConnected } from '../../../../../hooks/connectedWeb3'
+import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
@@ -98,6 +98,7 @@ const Wrapper = (props: Props) => {
     question,
     totalPoolShares,
   } = marketMakerData
+  const context = useConnectedWeb3Context()
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
@@ -188,7 +189,7 @@ const Wrapper = (props: Props) => {
       <TopCard>
         <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
-      <VerifyMarket />
+      {context && <VerifyMarket context={context} marketMakerData={marketMakerData} />}
       <BottomCard>
         <MarketNavigation
           activeTab={currentTab}

@@ -1,5 +1,9 @@
+/* eslint import/no-extraneous-dependencies: 0 */
+import { abi as arbitratorAbi } from '@kleros/erc-792/build/contracts/IArbitrator.json'
+import { abi as gtcrAbi } from '@kleros/tcr/build/contracts/GeneralizedTCR.json'
 import { Contract, ethers } from 'ethers'
 import { Web3Provider } from 'ethers/providers'
+import { BigNumber } from 'ethers/utils'
 
 import { getTokensByNetwork, networkIds } from '../util/networks'
 import { Token } from '../util/types'
@@ -13,23 +17,36 @@ const klerosTokensViewAbi = [
   'function getTokens(address _t2crAddress, bytes32[] _tokenIDs ) external view returns (tuple(bytes32 ID, string name, string ticker, address addr, string symbolMultihash, uint8 status, uint256 decimals)[] result)',
 ]
 
+interface MetaEvidence {
+  fileURI: string
+}
+
 class KlerosService {
   provider: Web3Provider
   badgeContract: Contract | undefined
   tokensViewContract: Contract | undefined
   tcrAddress: string
+  omenVerifiedMarkets: Contract
+  ipfsGateway: string
 
   constructor(
     badgeContractAddress: string,
     tokensViewContractAddress: string,
     tcrAddress: string,
+    omenVerifiedMarketsAddress: string,
     provider: Web3Provider,
     signerAddress: Maybe<string>,
+    generalizedTCRViewAddress: string,
+    ipfsGateway: string,
   ) {
     this.provider = provider
     this.tcrAddress = tcrAddress
+    this.ipfsGateway = ipfsGateway
+    provider.connection
 
     const networkId = provider.network ? provider.network.chainId : null
+    this.omenVerifiedMarkets = new ethers.Contract(omenVerifiedMarketsAddress, gtcrAbi, provider)
+
     // eslint-disable-next-line no-warning-comments
     // TODO: remove this conditional when these contracts were deployed to the supported testnets
     if (networkId === networkIds.MAINNET) {
@@ -114,6 +131,80 @@ class KlerosService {
         return sortBy
       })
     }
+  }
+
+  /**
+   * Get the total amount of ETH (in wei) required to submit an item.
+   *
+   * @returns {Promise<BigNumber>} The ETH deposit in wei required to submit an item.
+   */
+  public async getSubmissionDeposit(): Promise<BigNumber> {
+    const [arbitratorAddress, arbitratorExtraData, submissionBaseDeposit] = await Promise.all([
+      this.omenVerifiedMarkets.arbitrator(),
+      this.omenVerifiedMarkets.arbitratorExtraData(),
+      this.omenVerifiedMarkets.submissionBaseDeposit(),
+    ])
+
+    const arbitrator = new ethers.Contract(arbitratorAddress, arbitratorAbi, this.provider)
+    const arbitrationCost = await arbitrator.arbitrationCost(arbitratorExtraData)
+
+    return submissionBaseDeposit.add(arbitrationCost)
+  }
+
+  /**
+   * Get the total amount of ETH (in wei) required to challenge a submission.
+   *
+   * @returns {Promise<BigNumber>} The ETH deposit required to challenge a submission.
+   */
+  public async getSubmissionChallengeDeposit(): Promise<BigNumber> {
+    const [arbitratorAddress, arbitratorExtraData, submissionChallengeBaseDeposit] = await Promise.all([
+      this.omenVerifiedMarkets.arbitrator(),
+      this.omenVerifiedMarkets.arbitratorExtraData(),
+      this.omenVerifiedMarkets.submissionChallengeBaseDeposit(),
+    ])
+
+    const arbitrator = new ethers.Contract(arbitratorAddress, arbitratorAbi, this.provider)
+    const arbitrationCost = await arbitrator.arbitrationCost(arbitratorExtraData)
+
+    return submissionChallengeBaseDeposit.add(arbitrationCost)
+  }
+
+  /**
+   * @returns {Promise<MetaEvidence[]>} The array with the most recent meta evidence files for this TCR. First item is the meta evidence used for registration requests and the sencod item is the meta evidence used for removal requests.
+   */
+  public async getLatestMetaEvidence(): Promise<MetaEvidence[]> {
+    const logs = (
+      await this.provider.getLogs({
+        ...this.omenVerifiedMarkets.filters.MetaEvidence(),
+        fromBlock: 0,
+      })
+    ).map(log => this.omenVerifiedMarkets.interface.parseLog(log))
+
+    if (logs.length === 0) throw new Error(`No meta evidence found for TCR at ${this.omenVerifiedMarkets.address}`)
+
+    const metaEvidenceURIs = logs.slice(-2).map(l => l.values._evidence)
+
+    const [registrationMetaEvidenceURI, removalMetaEvidenceURI] = metaEvidenceURIs
+
+    const [registrationMetaEvidence, removalMetaEvidence] = await Promise.all(
+      (
+        await Promise.all([
+          fetch(`${this.ipfsGateway}${registrationMetaEvidenceURI}`),
+          fetch(`${this.ipfsGateway}${removalMetaEvidenceURI}`),
+        ])
+      ).map(response => response.json()),
+    )
+
+    return [registrationMetaEvidence, removalMetaEvidence]
+  }
+
+  public async getListingCriteriaURL(): Promise<any> {
+    const [registrationMetaEvidence] = await this.getLatestMetaEvidence()
+    return `${this.ipfsGateway}${registrationMetaEvidence.fileURI}`
+  }
+
+  public async getChallengePeriodDuration(): Promise<BigNumber> {
+    return await this.omenVerifiedMarkets.challengePeriodDuration()
   }
 }
 

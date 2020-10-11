@@ -12,6 +12,13 @@ export enum Status {
   Error = 'Error',
 }
 
+enum KlerosItemStatus {
+  Absent = 'Absent',
+  Registered = 'Registered',
+  RegistrationRequested = 'RegistrationRequested',
+  ClearingRequested = 'ClearingRequested',
+}
+
 export interface BalanceItem {
   outcomeName: string
   probability: number
@@ -19,6 +26,12 @@ export interface BalanceItem {
   shares: BigNumber
   payout: Big
   holdings: BigNumber
+}
+
+export interface KlerosSubmission {
+  id: string
+  status: KlerosItemStatus
+  listAddress: string
 }
 
 export enum Stage {
@@ -219,6 +232,7 @@ export interface MarketMakerData {
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
   scaledLiquidityParameter: number
+  submissionIDs: KlerosSubmission[]
 }
 
 export enum Ternary {
