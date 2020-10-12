@@ -2,11 +2,10 @@ import React from 'react'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
+  border: 1px solid ${props => props.theme.borders.borderColor};
+  border-bottom: none;
   padding: 21px;
-  position: relative;
-  background-image: url(/svgs/note-border-big.svg);
-  background-size: contain;
-  background-repeat: no-repeat;
+  padding-bottom: 0;
 `
 
 export const TransactionDetailsCard: React.FC = props => {

@@ -59,6 +59,9 @@ const ButtonCreateDesktop = styled(Button)`
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: flex;
+    & > * + * {
+      margin-left: 12px;
+    }
   }
 `
 
@@ -151,7 +154,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
             <>
               <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...exitButtonProps}>
                 <IconClose />
-                &nbsp;&nbsp;Exit
+                <span>Exit</span>
               </ButtonCreateDesktop>
               <ButtonCreateMobile {...exitButtonProps}>
                 <IconClose />

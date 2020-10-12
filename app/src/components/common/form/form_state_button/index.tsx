@@ -19,17 +19,9 @@ const FormStateButtonWrapper = styled.span<FormStateButtonWrapperProps>`
   position: relative;
   display: inline-block;
 
-  &:hover {
-    text-decoration: underline;
-  }
-
   &.disabled {
     color: ${props => props.theme.colors.textColor};
     cursor: auto;
-
-    &:hover {
-      text-decoration: none;
-    }
   }
 `
 

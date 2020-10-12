@@ -29,13 +29,10 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
+import { ZigZag } from '../../common/zigzag'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
-`
-
-const MarketSellTransactionDetailsCard = styled(TransactionDetailsCard)`
-  background-image: url(/svgs/note-swap-sell.svg);
 `
 
 const logger = getLogger('Market::Sell')
@@ -230,7 +227,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           {amountError && <GenericError>{amountError}</GenericError>}
         </div>
         <div>
-          <MarketSellTransactionDetailsCard>
+          <TransactionDetailsCard>
             <TransactionDetailsRow
               title={'Sell Amount'}
               value={`${formatNumber(formatBigNumber(amountShares, collateral.decimals))} Shares`}
@@ -267,7 +264,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
               } ${collateral.symbol}`}
             />
-          </MarketSellTransactionDetailsCard>
+            <ZigZag />
+          </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
       {isNegativeAmountShares && (

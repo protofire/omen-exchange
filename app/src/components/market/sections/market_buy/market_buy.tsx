@@ -35,6 +35,7 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
+import { ZigZag } from '../../common/zigzag'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -43,9 +44,6 @@ const LeftButton = styled(Button)`
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
   margin-bottom: 0;
-`
-const MarketBuyTransactionDetailsCard = styled(TransactionDetailsCard)`
-  background-image: url(/svgs/note-swap-buy.svg);
 `
 
 const logger = getLogger('Market::Buy')
@@ -257,7 +255,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           {amountError && <GenericError>{amountError}</GenericError>}
         </div>
         <div>
-          <MarketBuyTransactionDetailsCard>
+          <TransactionDetailsCard>
             <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
             <TransactionDetailsRow
               title={'Fee'}
@@ -277,7 +275,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               title={'Total'}
               value={total}
             />
-          </MarketBuyTransactionDetailsCard>
+            <ZigZag />
+          </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
       {isNegativeAmount && (

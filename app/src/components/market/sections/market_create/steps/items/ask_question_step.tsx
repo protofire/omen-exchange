@@ -90,7 +90,7 @@ const CategoryImportWrapper = styled.div`
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};
   padding: 0 ${props => props.theme.cards.paddingHorizontal};
-  padding-bottom: ${props => props.theme.cards.paddingVertical};
+  padding-bottom: 20px;
   & > * + * {
     margin-left: 8px;
   }
@@ -164,7 +164,7 @@ const AskQuestionStep = (props: Props) => {
     outcomeNames.map(name => !name).reduce((e1, e2) => e1 || e2) ||
     outcomeNames.map((name, index) => outcomeNames.indexOf(name) !== index).reduce((e1, e2) => e1 || e2)
 
-  const canAddOutcome = outcomes.length <= MAX_OUTCOME_ALLOWED && !loadedQuestionId
+  const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
   const [categoryButtonFocus, setCategoryButtonFocus] = useState(false)
 
@@ -182,7 +182,7 @@ const AskQuestionStep = (props: Props) => {
   }
 
   return (
-    <CreateCard>
+    <CreateCard style={{ paddingTop: 20, paddingBottom: 20 }}>
       <CategoryImportWrapper>
         <FormStateButton
           active={!loadedQuestionId}

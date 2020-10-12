@@ -48,6 +48,7 @@ import { TransactionDetailsCard } from '../../../../common/transaction_details_c
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
 import { WarningMessage } from '../../../../common/warning_message'
+import { ZigZag } from '../../../../common/zigzag'
 import { Outcome } from '../outcomes'
 
 const CreateCardTop = styled(CreateCard)`
@@ -145,10 +146,6 @@ const CustomFeeLabel = styled.p`
 
 const StyledTradingFeeSelector = styled(TradingFeeSelector)`
   width: 50%;
-`
-
-const FundingTransactionDetailsCard = styled(TransactionDetailsCard)`
-  background-image: url(/svgs/note-border-big.svg);
 `
 
 interface Props {
@@ -382,7 +379,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             {amountError && <GenericError>{amountError}</GenericError>}
           </div>
           <div>
-            <FundingTransactionDetailsCard>
+            <TransactionDetailsCard>
               <TransactionDetailsRow
                 state={ValueStates.important}
                 title={'Earn Trading Fee'}
@@ -393,7 +390,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 title={'Pool Tokens'}
                 value={formatNumber(formatBigNumber(funding, collateral.decimals))}
               />
-            </FundingTransactionDetailsCard>
+              <ZigZag />
+            </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsStyled>
         {exceedsMaxFee && (

@@ -40,6 +40,7 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
+import { ZigZag } from '../../common/zigzag'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
@@ -65,10 +66,6 @@ const TabsGrid = styled.div`
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
   margin-bottom: 0;
-`
-
-const PoolTransactionDetailsCard = styled(TransactionDetailsCard)`
-  background-image: url(/svgs/note-pool-withdraw.svg);
 `
 
 const logger = getLogger('Market::Fund')
@@ -390,7 +387,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             </TransactionDetailsCard>
           )}
           {activeTab === Tabs.withdraw && (
-            <PoolTransactionDetailsCard>
+            <TransactionDetailsCard>
               <TransactionDetailsRow
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
@@ -411,7 +408,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   collateral.symbol
                 }`}
               />
-            </PoolTransactionDetailsCard>
+              <ZigZag />
+            </TransactionDetailsCard>
           )}
         </div>
       </GridTransactionDetails>
