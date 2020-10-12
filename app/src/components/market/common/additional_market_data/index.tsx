@@ -8,7 +8,7 @@ import { IconOracle } from '../../../common/icons/IconOracle'
 
 const AdditionalMarketDataWrapper = styled.div`
   height: 45px;
-  border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
+  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
   display: flex;
   align-items: center;
   justify-content: space-between;

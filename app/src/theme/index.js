@@ -129,8 +129,8 @@ const theme = {
     xxxl: '1366px',
   },
   borders: {
+    borderDisabled: '#E8EAF6',
     borderColor: '#DCDFF2',
-    borderColorLighter: '#E8EAF6',
     commonBorderRadius: '6px',
   },
   slider: {

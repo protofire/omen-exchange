@@ -11,7 +11,7 @@ import { Won } from './img/Won'
 
 const Wrapper = styled.div`
   border-radius: 4px;
-  border: 1px solid ${props => props.theme.borders.borderColorLighter};
+  border: 1px solid ${props => props.theme.borders.borderDisabled};
   display: flex;
   padding: 20px 25px;
 `
