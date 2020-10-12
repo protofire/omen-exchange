@@ -59,15 +59,11 @@ export const MarketNavigation = (props: Props) => {
       <MarketTab active={activeTab === marketTabs.pool} onClick={() => switchMarketTab('POOL')}>
         Pool
       </MarketTab>
-      {/* Verify is commented out until the underlying infrastructure is ready */}
-      {/* <MarketTab 
-        active={activeTab === marketTabs.verify}
-        onClick={() => switchMarketTab('VERIFY')}
-      >
-        Verify
-      </MarketTab> */}
       <MarketTab active={activeTab === marketTabs.history} onClick={() => switchMarketTab('HISTORY')}>
         History
+      </MarketTab>
+      <MarketTab active={activeTab === marketTabs.verify} onClick={() => switchMarketTab('VERIFY')}>
+        Verify
       </MarketTab>
     </MarketTabs>
   )
