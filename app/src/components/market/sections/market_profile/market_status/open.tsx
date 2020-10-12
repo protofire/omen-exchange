@@ -16,8 +16,7 @@ import { MarketHistoryContainer } from '../../market_history/market_history_cont
 import { MarketNavigation } from '../../market_navigation'
 import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
 import { MarketSellContainer } from '../../market_sell/market_sell_container'
-
-import { VerifyMarket } from './verify'
+import { MarketVerifyContainer } from '../../market_verify/market_verify_container'
 
 const TopCard = styled(ViewCard)`
   padding: 24px;
@@ -189,7 +188,6 @@ const Wrapper = (props: Props) => {
       <TopCard>
         <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
-      {context && <VerifyMarket context={context} marketMakerData={marketMakerData} />}
       <BottomCard>
         <MarketNavigation
           activeTab={currentTab}
@@ -248,7 +246,9 @@ const Wrapper = (props: Props) => {
             switchMarketTab={switchMarketTab}
           />
         )}
-        {/* {currentTab === marketTabs.verify && <p>verify</p>} */}
+        {currentTab === marketTabs.verify && (
+          <MarketVerifyContainer context={context} marketMakerData={marketMakerData} />
+        )}
       </BottomCard>
     </>
   )

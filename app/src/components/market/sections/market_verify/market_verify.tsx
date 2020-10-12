@@ -1,15 +1,17 @@
 import { formatEther } from 'ethers/utils'
 import humanizeDuration from 'humanize-duration'
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { ConnectedWeb3Context, useContracts } from '../../../../../hooks'
-import { MarketMakerData } from '../../../../../util/types'
-import { Button } from '../../../../button'
-import { ButtonType } from '../../../../button/button_styling_types'
-import { SubsectionTitle, SubsectionTitleWrapper } from '../../../../common'
-import { IconDxDao, IconKleros } from '../../../../common/icons'
-import { ViewCard } from '../../../common/view_card'
+import { ConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { KlerosMarketState } from '../../../../services/kleros'
+import { getLogger } from '../../../../util/logger'
+import { MarketMakerData } from '../../../../util/types'
+import { Button } from '../../../button'
+import { ButtonType } from '../../../button/button_styling_types'
+import { SubsectionTitle, SubsectionTitleWrapper } from '../../../common'
+import { IconDxDao, IconKleros } from '../../../common/icons'
 
 import Tick from './img/tick.svg'
 
@@ -70,10 +72,6 @@ const RadioTick = styled.img<StatefulRadioButton>`
   }
 `
 
-const Card = styled(ViewCard)`
-  margin-bottom: 24px;
-`
-
 const Option = styled.div`
   color: ${props => props.theme.colors.textColorDarker};
   font-weight: 500;
@@ -117,19 +115,21 @@ interface StatefulRadioButton {
   selected?: boolean
 }
 
-interface Props {
-  marketMakerData: MarketMakerData
-  context: ConnectedWeb3Context
-}
-
 interface FetchState {
   startFetch: boolean
   result: string
 }
 
-export const VerifyMarket: React.FC<Props> = props => {
+interface Props extends RouteComponentProps<any> {
+  marketMakerData: MarketMakerData
+  context: ConnectedWeb3Context
+}
+
+const logger = getLogger('Market::Verify')
+
+const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   const { context, marketMakerData } = props || {}
-  const { klerosTCRregistered, submissionIDs } = marketMakerData || {}
+  const { submissionIDs } = marketMakerData || {}
 
   const [selection, setSelection] = useState<number>(0)
   const { kleros } = useContracts(context)
@@ -140,7 +140,9 @@ export const VerifyMarket: React.FC<Props> = props => {
 
   useEffect(() => {
     ;(async () => {
-      if (!klerosTCRregistered && !fetchState.startFetch) {
+      const klerosMarketState = await kleros.getMarketState(marketMakerData)
+
+      if (klerosMarketState === KlerosMarketState.Submittable && !fetchState.startFetch) {
         setFetchState(prevState => ({ ...prevState, startFetch: true }))
         try {
           const [listingCriteriaURL, submissionDeposit, challengePeriodDuration] = await Promise.all([
@@ -158,14 +160,7 @@ export const VerifyMarket: React.FC<Props> = props => {
         }
       }
     })()
-  }, [
-    fetchState.startFetch,
-    kleros,
-    klerosTCRregistered,
-    marketMakerData.curatedByDxDaoOrKleros,
-    marketMakerData.klerosTCRregistered,
-    submissionIDs,
-  ])
+  }, [fetchState.startFetch, kleros, marketMakerData, submissionIDs])
 
   const curationSources = [
     {
@@ -181,7 +176,7 @@ export const VerifyMarket: React.FC<Props> = props => {
           to avoid challenges. The <b>{formatEther(actionDeposit)}</b> ETH security deposit will be reimbursed if your
           submission is accepted. The challenge period lasts{' '}
           <b>
-            {humanizeDuration(challengePeriodDuration, {
+            {humanizeDuration(challengePeriodDuration * 1000, {
               delimiter: ' and ',
               largest: 2,
               round: true,
@@ -207,7 +202,7 @@ export const VerifyMarket: React.FC<Props> = props => {
   if (fetchState.result !== 'success') return null
 
   return (
-    <Card>
+    <>
       <SubsectionTitleWrapper>
         <SubsectionTitle>Verify</SubsectionTitle>
       </SubsectionTitleWrapper>
@@ -236,6 +231,8 @@ export const VerifyMarket: React.FC<Props> = props => {
           Request Verification
         </RightButton>
       </BottomRow>
-    </Card>
+    </>
   )
 }
+
+export const MarketVerify = withRouter(MarketVerifyWrapper)
