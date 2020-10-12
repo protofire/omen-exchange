@@ -1,12 +1,13 @@
 /* eslint import/no-extraneous-dependencies: 0 */
 import { abi as arbitratorAbi } from '@kleros/erc-792/build/contracts/IArbitrator.json'
 import { abi as gtcrAbi } from '@kleros/tcr/build/contracts/GeneralizedTCR.json'
+import axios from 'axios'
 import { Contract, ethers } from 'ethers'
 import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
-import { getTokensByNetwork, networkIds } from '../util/networks'
-import { Token } from '../util/types'
+import { getKlerosCurateGraphUris, getTokensByNetwork, networkIds } from '../util/networks'
+import { KlerosItemStatus, MarketMakerData, Token } from '../util/types'
 
 const klerosBadgeAbi = [
   'function queryAddresses(address _cursor, uint _count, bool[8] _filter, bool _oldestFirst) external view returns (address[] values, bool hasMore)',
@@ -16,6 +17,13 @@ const klerosTokensViewAbi = [
   'function getTokensIDsForAddresses(address _t2crAddress, address[] _tokenAddresses ) external view returns (bytes32[] result)',
   'function getTokens(address _t2crAddress, bytes32[] _tokenIDs ) external view returns (tuple(bytes32 ID, string name, string ticker, address addr, string symbolMultihash, uint8 status, uint256 decimals)[] result)',
 ]
+
+export enum KlerosMarketState {
+  Verified,
+  Submittable,
+  Challengeable,
+  WaitingArbitration,
+}
 
 interface MetaEvidence {
   fileURI: string
@@ -205,6 +213,41 @@ class KlerosService {
 
   public async getChallengePeriodDuration(): Promise<BigNumber> {
     return await this.omenVerifiedMarkets.challengePeriodDuration()
+  }
+
+  public async getMarketState(marketMakerData: MarketMakerData): Promise<KlerosMarketState> {
+    const { chainId: networkId } = await this.provider.getNetwork()
+
+    const { submissionIDs: submissions } = marketMakerData
+    if (submissions.length === 0) return KlerosMarketState.Submittable
+    if (submissions.filter(s => s.status !== KlerosItemStatus.Absent).length === 0) return KlerosMarketState.Submittable
+    if (submissions.filter(s => s.status === KlerosItemStatus.Registered).length > 0) return KlerosMarketState.Verified
+
+    const results = await Promise.all(
+      submissions.map(async submission => {
+        const query = `
+          query item(id: "${submission.id}@${this.omenVerifiedMarkets.address.toLowerCase()}") {
+            id
+            itemID
+            status
+            requests {
+              id
+              disputed
+              submissionTime
+              resolved
+              disputeOutcome
+              requestType
+            }
+          }
+        `
+        const { httpUri } = getKlerosCurateGraphUris(networkId)
+        const res = await axios.post(httpUri, { query })
+
+        console.info(res)
+      }),
+    )
+
+    return KlerosMarketState.Verified
   }
 }
 

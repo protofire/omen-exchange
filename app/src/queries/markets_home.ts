@@ -105,7 +105,7 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
       ? `klerosTCRregistered: true`
       : curationSource === CurationSource.ALL_SOURCES
       ? `curatedByDxDaoOrKleros: true`
-      : '', // This is option CurationSource.NO_SOURCES (i.e. show all regardless of whether it is curated or not),
+      : 'curatedByDxDaoOrKleros: false', // This is option CurationSource.NO_SOURCES (i.e. show all regardless of whether it is curated or not),
   ]
     .filter(s => s.length)
     .join(',')

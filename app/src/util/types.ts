@@ -12,7 +12,7 @@ export enum Status {
   Error = 'Error',
 }
 
-enum KlerosItemStatus {
+export enum KlerosItemStatus {
   Absent = 'Absent',
   Registered = 'Registered',
   RegistrationRequested = 'RegistrationRequested',
