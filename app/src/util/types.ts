@@ -117,7 +117,8 @@ export type MarketWithExtraData = Market & {
 export enum MarketVerificationState {
   Verified,
   NotVerified,
-  Challengeable,
+  SubmissionChallengeable,
+  RemovalChallengeable,
   WaitingArbitration,
 }
 

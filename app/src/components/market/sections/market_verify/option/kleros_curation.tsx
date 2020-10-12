@@ -1,4 +1,4 @@
-import { BigNumber, formatEther } from 'ethers/utils'
+import { formatEther } from 'ethers/utils'
 import humanizeDuration from 'humanize-duration'
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
@@ -73,14 +73,13 @@ const Description = styled.p`
   align-items: center;
   border-radius: 4px;
   border: 1px solid ${props => props.theme.borders.borderColorLighter};
-  display: flex;
   padding: 21px 25px;
   color: ${props => props.theme.colors.textColorLightish};
   font-size: 14px;
   letter-spacing: 0.2px;
   line-height: 1.4;
   margin: 25px 0;
-  display: inline-block;
+  width: 100%;
 `
 
 const Input = styled.input`
@@ -108,34 +107,36 @@ interface StatefulRadioButton {
 }
 
 interface Props {
-  status: MarketVerificationState
-  actionDeposit: string
+  status?: MarketVerificationState
+  submissionDeposit: string
+  submissionBaseDeposit: string
+  removalBaseDeposit: string
   selection?: number
   listingCriteria: string
   challengePeriodDuration: number
-  bounty: BigNumber
   selectSource: (e: ChangeEvent<HTMLInputElement>) => void
   ovmAddress: string // ovm === Omen Verified Markets, the name of the omen-kleros TCR.
-  submissionTime: number
-  itemID: string
+  submissionTime?: number
+  itemID?: string
 }
 
 export const KlerosCuration: React.FC<Props> = (props: Props) => {
   const {
-    actionDeposit,
-    bounty,
     challengePeriodDuration,
     itemID,
     listingCriteria,
     ovmAddress,
+    removalBaseDeposit,
     selectSource,
     selection,
     status,
-    submissionTime,
+    submissionBaseDeposit,
+    submissionDeposit,
+    submissionTime = 0,
   } = props
 
   const deadline = submissionTime + challengePeriodDuration
-  const deadlineUTC = '12 oct - 14h30 UTC'
+  const deadlineUTC = '12 oct - 14h30 UTC' // TODO: Build deadline
   const timeRemaining = deadline - Date.now() / 1000
 
   let klerosDetails
@@ -144,15 +145,15 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
 
   switch (status) {
     case MarketVerificationState.NotVerified: {
-      klerosDetails = `Request verification with a ${formatEther(actionDeposit)} ETH security deposit.`
+      klerosDetails = `Request verification with a ${formatEther(submissionDeposit)} ETH security deposit.`
       KlerosNotice = (
         <Description>
           Make sure your submission complies with the{' '}
           <a href={listingCriteria} rel="noopener noreferrer" target="_blank">
             listing criteria
           </a>{' '}
-          to avoid challenges. The <b>{formatEther(actionDeposit)}</b> ETH security deposit will be reimbursed if your
-          submission is accepted. The challenge period lasts{' '}
+          to avoid challenges. The <b>{formatEther(submissionDeposit)}</b> ETH security deposit will be reimbursed if
+          your submission is accepted. The challenge period lasts{' '}
           <b>
             {humanizeDuration(challengePeriodDuration * 1000, {
               delimiter: ' and ',
@@ -176,7 +177,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
       )
       break
     }
-    case MarketVerificationState.Challengeable: {
+    case MarketVerificationState.SubmissionChallengeable: {
       klerosDetails = `Challenge period pending`
       KlerosNotice = (
         <Description>
@@ -184,8 +185,36 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
           <a href={listingCriteria} rel="noopener noreferrer" target="_blank">
             listing criteria
           </a>{' '}
-          ? Collect <GreenBold>{formatEther(bounty)}</GreenBold> upon a successful challenge.
-          <RightButton buttonType={ButtonType.secondary}>Challenge</RightButton>
+          ? Collect <GreenBold>{formatEther(submissionBaseDeposit)}</GreenBold> upon a successful challenge.
+          <RightButton buttonType={ButtonType.secondaryLine}>Challenge</RightButton>
+        </Description>
+      )
+      KlerosRightColumn = (
+        <div>
+          <b>
+            Ends in{' '}
+            {humanizeDuration(timeRemaining, {
+              delimiter: ' and ',
+              largest: 2,
+              round: true,
+              units: ['y', 'mo', 'w', 'd', 'h', 'm'],
+            })}
+          </b>
+          <span>{deadlineUTC}</span>
+        </div>
+      )
+      break
+    }
+    case MarketVerificationState.RemovalChallengeable: {
+      klerosDetails = `Challenge period pending`
+      KlerosNotice = (
+        <Description>
+          Market valid according to the{' '}
+          <a href={listingCriteria} rel="noopener noreferrer" target="_blank">
+            listing criteria
+          </a>{' '}
+          ? Collect <GreenBold>{formatEther(removalBaseDeposit)}</GreenBold> upon a successful challenge.
+          <RightButton buttonType={ButtonType.secondary}>Challenge Removal</RightButton>
         </Description>
       )
       KlerosRightColumn = (
@@ -217,7 +246,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
           <a href={listingCriteria} rel="noopener noreferrer" target="_blank">
             listing criteria
           </a>{' '}
-          ?<RightButton buttonType={ButtonType.secondary}>Remove Market</RightButton>
+          ?<RightButton buttonType={ButtonType.secondaryLine}>Remove Market</RightButton>
         </Description>
       )
       KlerosRightColumn = <GreenBold>verified</GreenBold>

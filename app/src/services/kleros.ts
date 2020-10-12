@@ -7,7 +7,7 @@ import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { getKlerosCurateGraphUris, getTokensByNetwork, networkIds } from '../util/networks'
-import { KlerosItemStatus, MarketMakerData, MarketVerificationState, Token } from '../util/types'
+import { MarketMakerData, MarketVerificationState, Token } from '../util/types'
 
 const klerosBadgeAbi = [
   'function queryAddresses(address _cursor, uint _count, bool[8] _filter, bool _oldestFirst) external view returns (address[] values, bool hasMore)',
@@ -153,6 +153,20 @@ class KlerosService {
   }
 
   /**
+   * @returns {Promise<BigNumber>} The bounty for successfully challenging a submission.
+   */
+  public async getSubmissionBaseDeposit(): Promise<BigNumber> {
+    return this.omenVerifiedMarkets.submissionBaseDeposit()
+  }
+
+  /**
+   * @returns {Promise<BigNumber>} The bounty for successfully challenging a removal.
+   */
+  public async getRemovalBaseDeposit(): Promise<BigNumber> {
+    return this.omenVerifiedMarkets.removalBaseDeposit()
+  }
+
+  /**
    * Get the total amount of ETH (in wei) required to challenge a submission.
    *
    * @returns {Promise<BigNumber>} The ETH deposit required to challenge a submission.
@@ -199,52 +213,94 @@ class KlerosService {
     return [registrationMetaEvidence, removalMetaEvidence]
   }
 
-  public async getListingCriteriaURL(): Promise<any> {
+  /**
+   * @returns {Promise<string>} The URL to the listing criteria.
+   */
+  public async getListingCriteriaURL(): Promise<string> {
     const [registrationMetaEvidence] = await this.getLatestMetaEvidence()
     return `${this.ipfsGateway}${registrationMetaEvidence.fileURI}`
   }
 
+  /**
+   * @returns {Promise<BigNumber>} The duration of the challenge period in seconds.
+   */
   public async getChallengePeriodDuration(): Promise<BigNumber> {
     return await this.omenVerifiedMarkets.challengePeriodDuration()
   }
 
-  public async getMarketState(marketMakerData: MarketMakerData): Promise<MarketVerificationState> {
-    const { chainId: networkId } = await this.provider.getNetwork()
-    console.info('running getMarketState')
-
+  public async getMarketState(
+    marketMakerData: MarketMakerData,
+  ): Promise<{
+    verificationState: MarketVerificationState
+    submissionTime?: number
+    itemID?: string
+  }> {
     const { submissionIDs: submissions } = marketMakerData
-    if (submissions.filter(s => s.status !== KlerosItemStatus.Absent).length === 0)
-      return MarketVerificationState.NotVerified
-    console.info('a')
-    if (submissions.filter(s => s.status === KlerosItemStatus.Registered).length > 0)
-      return MarketVerificationState.Verified
-    console.info('c')
+    if (submissions.length === 0)
+      return {
+        verificationState: MarketVerificationState.NotVerified,
+      }
 
-    const results = await Promise.all(
-      submissions.map(async submission => {
-        const query = `
-          query item(id: "${submission.id}@${this.omenVerifiedMarkets.address.toLowerCase()}") {
-            id
+    const { chainId: networkId } = await this.provider.getNetwork()
+    const fullSubmissions = (
+      await Promise.all(
+        submissions.map(async submission => {
+          const variables = {
+            id: `${submission.id}@${this.omenVerifiedMarkets.address.toLowerCase()}`,
+          }
+          const query = `query item($id: ID!) {
+          item(id: $id) {
             itemID
             status
             requests {
-              id
               disputed
               submissionTime
               resolved
-              disputeOutcome
               requestType
+              disputeOutcome
             }
           }
+        }
         `
-        const { httpUri } = getKlerosCurateGraphUris(networkId)
-        const res = await axios.post(httpUri, { query })
+          const { httpUri } = getKlerosCurateGraphUris(networkId)
 
-        console.info(res)
-      }),
+          return await axios.post(httpUri, { query, variables })
+        }),
+      )
     )
+      .filter(d => d && d.data)
+      .map(d => d.data.data.item)
 
-    return MarketVerificationState.Verified
+    for (const item of fullSubmissions) {
+      if (item.status === 'Registered')
+        return {
+          verificationState: MarketVerificationState.Verified,
+          itemID: item.itemID,
+        }
+
+      for (const request of item.requests) {
+        if (request.resolved) continue
+        if (!request.disputed) {
+          return {
+            verificationState:
+              request.requestType === 'RegistrationRequested'
+                ? MarketVerificationState.SubmissionChallengeable
+                : MarketVerificationState.RemovalChallengeable,
+            submissionTime: request.submissionTime,
+            itemID: item.itemID,
+          }
+        } else
+          return {
+            verificationState: MarketVerificationState.WaitingArbitration,
+            submissionTime: request.submissionTime,
+            itemID: item.itemID,
+          }
+      }
+    }
+
+    return {
+      verificationState: MarketVerificationState.NotVerified,
+    }
   }
 }
 

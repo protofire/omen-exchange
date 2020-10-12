@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -32,26 +31,41 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   const { context, marketMakerData } = props || {}
   const { submissionIDs } = marketMakerData || {}
 
-  const [selection, setSelection] = useState<number>(0)
+  const [selection, setSelection] = useState<number | undefined>()
   const { kleros } = useContracts(context)
-  const [actionDeposit, setActionDeposit] = useState<string>('0')
+  const [submissionDeposit, setSubmissionDeposit] = useState<string>('0')
+  const [submissionBaseDeposit, setSubmissionBaseDeposit] = useState<string>('0')
+  const [removalBaseDeposit, setRemovalBaseDeposit] = useState<string>('0')
   const [listingCriteria, setListingCriteria] = useState<string>('')
   const [challengePeriodDuration, setChallengePeriodDuration] = useState<number>(0)
-  const [klerosVerificationState, setKlerosVerificationState] = useState<any>()
+  const [klerosVerificationData, setKlerosVerificationData] = useState<{
+    verificationState?: MarketVerificationState
+    submissionTime?: number | undefined
+    itemID?: string | undefined
+  }>({})
 
   useEffect(() => {
     ;(async () => {
-      setKlerosVerificationState(await kleros.getMarketState(marketMakerData))
-
-      const [listingCriteriaURL, submissionDeposit, challengePeriodDuration] = await Promise.all([
+      const marketVerificationData = await kleros.getMarketState(marketMakerData)
+      setKlerosVerificationData(marketVerificationData)
+      const [
+        listingCriteriaURL,
+        submissionDeposit,
+        challengePeriodDuration,
+        submissionBaseDeposit,
+        removalBaseDeposit,
+      ] = await Promise.all([
         await kleros.getListingCriteriaURL(),
         await kleros.getSubmissionDeposit(),
         await kleros.getChallengePeriodDuration(),
+        await kleros.getSubmissionBaseDeposit(),
+        await kleros.getRemovalBaseDeposit(),
       ])
-
       setListingCriteria(listingCriteriaURL)
-      setActionDeposit(submissionDeposit.toString())
+      setSubmissionDeposit(submissionDeposit.toString())
       setChallengePeriodDuration(challengePeriodDuration.toNumber())
+      setSubmissionBaseDeposit(submissionBaseDeposit.toString())
+      setRemovalBaseDeposit(removalBaseDeposit.toString())
     })()
   }, [kleros, marketMakerData, submissionIDs])
 
@@ -60,28 +74,29 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
     setSelection(Number(value))
   }, [])
 
-  if (!listingCriteria || !klerosVerificationState === undefined) return <InlineLoading />
+  if (!listingCriteria) return <InlineLoading />
 
   return (
     <>
       <SubsectionTitleWrapper>
         <SubsectionTitle>Verify</SubsectionTitle>
       </SubsectionTitleWrapper>
-      <KlerosCuration // TODO: Replace placeholders.
-        actionDeposit={actionDeposit}
-        bounty={new BigNumber(0)}
+      <KlerosCuration
         challengePeriodDuration={challengePeriodDuration}
-        itemID="0xabc123..."
+        itemID={klerosVerificationData.itemID}
         listingCriteria={listingCriteria}
-        ovmAddress={'0xb7z...'}
+        ovmAddress={kleros.omenVerifiedMarkets.address}
+        removalBaseDeposit={removalBaseDeposit}
         selectSource={selectSource}
         selection={selection}
-        status={klerosVerificationState} // ovm === Omen Verified Markets, the name of the omen-kleros TCR.
-        submissionTime={16155616}
+        status={klerosVerificationData.verificationState}
+        submissionBaseDeposit={submissionBaseDeposit}
+        submissionDeposit={submissionDeposit}
+        submissionTime={klerosVerificationData.submissionTime}
       />
       <DxDaoCuration selectSource={selectSource} selection={selection} />
       <BottomRow>
-        <RightButton buttonType={ButtonType.primary} disabled={typeof selection !== 'number'}>
+        <RightButton buttonType={ButtonType.primaryLine} disabled={typeof selection !== 'number'}>
           Request Verification
         </RightButton>
       </BottomRow>
