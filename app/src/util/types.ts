@@ -114,6 +114,13 @@ export type MarketWithExtraData = Market & {
   status: MarketStatus
 }
 
+export enum MarketVerificationState {
+  Verified,
+  NotVerified,
+  Challengeable,
+  WaitingArbitration,
+}
+
 export interface Log {
   topics: Array<string>
   data: string

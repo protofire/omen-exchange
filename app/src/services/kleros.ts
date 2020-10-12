@@ -7,7 +7,7 @@ import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { getKlerosCurateGraphUris, getTokensByNetwork, networkIds } from '../util/networks'
-import { KlerosItemStatus, MarketMakerData, Token } from '../util/types'
+import { KlerosItemStatus, MarketMakerData, MarketVerificationState, Token } from '../util/types'
 
 const klerosBadgeAbi = [
   'function queryAddresses(address _cursor, uint _count, bool[8] _filter, bool _oldestFirst) external view returns (address[] values, bool hasMore)',
@@ -17,13 +17,6 @@ const klerosTokensViewAbi = [
   'function getTokensIDsForAddresses(address _t2crAddress, address[] _tokenAddresses ) external view returns (bytes32[] result)',
   'function getTokens(address _t2crAddress, bytes32[] _tokenIDs ) external view returns (tuple(bytes32 ID, string name, string ticker, address addr, string symbolMultihash, uint8 status, uint256 decimals)[] result)',
 ]
-
-export enum KlerosMarketState {
-  Verified,
-  Submittable,
-  Challengeable,
-  WaitingArbitration,
-}
 
 interface MetaEvidence {
   fileURI: string
@@ -215,13 +208,17 @@ class KlerosService {
     return await this.omenVerifiedMarkets.challengePeriodDuration()
   }
 
-  public async getMarketState(marketMakerData: MarketMakerData): Promise<KlerosMarketState> {
+  public async getMarketState(marketMakerData: MarketMakerData): Promise<MarketVerificationState> {
     const { chainId: networkId } = await this.provider.getNetwork()
+    console.info('running getMarketState')
 
     const { submissionIDs: submissions } = marketMakerData
-    if (submissions.length === 0) return KlerosMarketState.Submittable
-    if (submissions.filter(s => s.status !== KlerosItemStatus.Absent).length === 0) return KlerosMarketState.Submittable
-    if (submissions.filter(s => s.status === KlerosItemStatus.Registered).length > 0) return KlerosMarketState.Verified
+    if (submissions.filter(s => s.status !== KlerosItemStatus.Absent).length === 0)
+      return MarketVerificationState.NotVerified
+    console.info('a')
+    if (submissions.filter(s => s.status === KlerosItemStatus.Registered).length > 0)
+      return MarketVerificationState.Verified
+    console.info('c')
 
     const results = await Promise.all(
       submissions.map(async submission => {
@@ -247,7 +244,7 @@ class KlerosService {
       }),
     )
 
-    return KlerosMarketState.Verified
+    return MarketVerificationState.Verified
   }
 }
 
