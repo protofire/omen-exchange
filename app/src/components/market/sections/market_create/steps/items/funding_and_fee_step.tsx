@@ -48,7 +48,6 @@ import { TransactionDetailsCard } from '../../../../common/transaction_details_c
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
 import { WarningMessage } from '../../../../common/warning_message'
-import { ZigZag } from '../../../../common/zigzag'
 import { Outcome } from '../outcomes'
 
 const CreateCardTop = styled(CreateCard)`
@@ -390,7 +389,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 title={'Pool Tokens'}
                 value={formatNumber(formatBigNumber(funding, collateral.decimals))}
               />
-              <ZigZag />
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsStyled>

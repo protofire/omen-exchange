@@ -40,7 +40,6 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
-import { ZigZag } from '../../common/zigzag'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
@@ -408,7 +407,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   collateral.symbol
                 }`}
               />
-              <ZigZag />
             </TransactionDetailsCard>
           )}
         </div>

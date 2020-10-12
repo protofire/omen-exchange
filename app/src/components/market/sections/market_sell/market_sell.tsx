@@ -29,7 +29,6 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
-import { ZigZag } from '../../common/zigzag'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -264,7 +263,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
               } ${collateral.symbol}`}
             />
-            <ZigZag />
           </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>

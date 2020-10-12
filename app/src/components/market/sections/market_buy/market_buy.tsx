@@ -35,7 +35,6 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
-import { ZigZag } from '../../common/zigzag'
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -275,7 +274,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               title={'Total'}
               value={total}
             />
-            <ZigZag />
           </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
