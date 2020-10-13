@@ -311,7 +311,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                         <OutcomeItemText>{outcome.name}</OutcomeItemText>
                       </OutcomeItemTextWrapper>
                     </OutcomesTD>
-                    <OutcomesTD>{outcome.probability.toFixed(0)}%</OutcomesTD>
+                    <OutcomesTD>{outcome.probability.toFixed(2)}%</OutcomesTD>
                   </OutcomesTR>
                 )
               })}
