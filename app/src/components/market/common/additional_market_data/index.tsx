@@ -81,7 +81,6 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         <AdditionalMarketDataSectionWrapper
           data-arrow-color="transparent"
           data-tip={`This market uses the ${oracle} oracle which crowed-sources the correct outcome.`}
-          data-type="light"
           href={realitioUrl}
           rel="noopener noreferrer"
           target="_blank"
@@ -92,7 +91,6 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         <AdditionalMarketDataSectionWrapper
           data-arrow-color="transparent"
           data-tip={`This market uses the ${arbitrator.name} as the final arbitrator`}
-          data-type="light"
           href={arbitrator.url}
           rel="noopener noreferrer"
           target="_blank"
@@ -107,6 +105,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         effect="solid"
         offset={{ top: -12 }}
         place="top"
+        type="light"
       />
     </AdditionalMarketDataWrapper>
   )
