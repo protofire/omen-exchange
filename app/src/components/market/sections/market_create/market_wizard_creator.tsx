@@ -55,7 +55,7 @@ export const MarketWizardCreator = (props: Props) => {
 
   const [currentStep, setCurrentStep] = useState(1)
   const [marketData, setMarketdata] = useState<MarketData>(marketDataDefault)
-  const [first, setFirst] = useState<number>(8)
+  const [first, setFirst] = useState<number>(19)
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(true)
 
   useEffect(() => {
