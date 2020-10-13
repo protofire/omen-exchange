@@ -7,7 +7,14 @@ import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { getKlerosCurateGraphUris, getTokensByNetwork, networkIds } from '../util/networks'
-import { KlerosDisputeOutcome, KlerosItemStatus, MarketMakerData, MarketVerificationState, Token } from '../util/types'
+import {
+  KlerosDisputeOutcome,
+  KlerosItemStatus,
+  MarketCurationState,
+  MarketMakerData,
+  MarketVerificationState,
+  Token,
+} from '../util/types'
 
 const klerosBadgeAbi = [
   'function queryAddresses(address _cursor, uint _count, bool[8] _filter, bool _oldestFirst) external view returns (address[] values, bool hasMore)',
@@ -20,12 +27,6 @@ const klerosTokensViewAbi = [
 
 interface MetaEvidence {
   fileURI: string
-}
-
-interface MarketState {
-  verificationState: MarketVerificationState
-  submissionTime?: number
-  itemID?: string
 }
 
 interface Request {
@@ -57,7 +58,6 @@ class KlerosService {
     omenVerifiedMarketsAddress: string,
     provider: Web3Provider,
     signerAddress: Maybe<string>,
-    generalizedTCRViewAddress: string,
     ipfsGateway: string,
   ) {
     this.provider = provider
@@ -249,10 +249,10 @@ class KlerosService {
   }
 
   /**
-   * @returns {Promise<MarketState>} The current verification state of the market.
+   * @returns {Promise<MarketCurationState>} The current verification state of the market.
    * @param marketMakerData The current state of the market.
    */
-  public async getMarketState(marketMakerData: MarketMakerData): Promise<MarketState> {
+  public async getMarketState(marketMakerData: MarketMakerData): Promise<MarketCurationState> {
     const { submissionIDs: submissions } = marketMakerData
     if (submissions.length === 0)
       return {

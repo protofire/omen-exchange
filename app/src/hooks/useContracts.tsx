@@ -44,7 +44,6 @@ export const useContracts = (context: ConnectedWeb3Context) => {
   const klerosTokenViewAddress = getContractAddress(networkId, 'klerosTokenView')
   const klerosTCRAddress = getContractAddress(networkId, 'klerosTCR')
   const omenVerifiedMarketsAddress = getContractAddress(networkId, 'omenVerifiedMarkets')
-  const generalizedTCRViewAddress = getContractAddress(networkId, 'generalizedTCRView')
   const kleros = useMemo(
     () =>
       new KlerosService(
@@ -54,18 +53,9 @@ export const useContracts = (context: ConnectedWeb3Context) => {
         omenVerifiedMarketsAddress,
         provider,
         account,
-        generalizedTCRViewAddress,
         IPFS_GATEWAY,
       ),
-    [
-      klerosBadgeAddress,
-      klerosTokenViewAddress,
-      klerosTCRAddress,
-      omenVerifiedMarketsAddress,
-      provider,
-      account,
-      generalizedTCRViewAddress,
-    ],
+    [klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, omenVerifiedMarketsAddress, provider, account],
   )
 
   const buildMarketMaker = useMemo(

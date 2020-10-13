@@ -25,6 +25,22 @@ export enum KlerosDisputeOutcome {
   Refuse = 'Refuse',
 }
 
+export interface MarketCurationState {
+  verificationState: MarketVerificationState
+  submissionTime?: number
+  itemID?: string
+}
+
+export interface KlerosCurationData {
+  listingCriteriaURL: string
+  submissionDeposit: string
+  challengePeriodDuration: string
+  submissionBaseDeposit: string
+  removalBaseDeposit: string
+  marketVerificationData: MarketCurationState
+  ovmAddress: string // ovm here stands for Omen Verified Markets, the Kleros-Omen TCR.
+}
+
 export interface BalanceItem {
   outcomeName: string
   probability: number

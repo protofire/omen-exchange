@@ -4,7 +4,7 @@ import moment from 'moment-timezone'
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
-import { MarketVerificationState } from '../../../../../util/types'
+import { KlerosCurationData, MarketVerificationState } from '../../../../../util/types'
 import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { IconExclamation, IconKleros } from '../../../../common/icons'
@@ -114,37 +114,27 @@ interface StatefulRadioButton {
 }
 
 interface Props {
-  status?: MarketVerificationState
-  submissionDeposit: string
-  submissionBaseDeposit: string
-  removalBaseDeposit: string
   selection?: number
-  listingCriteria: string
-  challengePeriodDuration: number
   selectSource: (e: ChangeEvent<HTMLInputElement>) => void
-  ovmAddress: string // ovm === Omen Verified Markets, the name of the omen-kleros TCR.
-  submissionTime?: number
-  itemID?: string
+  klerosCurationData: KlerosCurationData
 }
 
 export const KlerosCuration: React.FC<Props> = (props: Props) => {
+  const { klerosCurationData, selectSource, selection } = props
   const {
     challengePeriodDuration,
-    itemID,
-    listingCriteria,
+    listingCriteriaURL,
+    marketVerificationData,
     ovmAddress,
     removalBaseDeposit,
-    selectSource,
-    selection,
-    status,
     submissionBaseDeposit,
     submissionDeposit,
-    submissionTime = 0,
-  } = props
+  } = klerosCurationData || {}
+  const { itemID, submissionTime = 0, verificationState: status } = marketVerificationData || {}
 
-  const deadline = submissionTime + challengePeriodDuration
+  const deadline = submissionTime + Number(challengePeriodDuration)
   const timeRemaining = deadline * 1000 - Date.now()
-  const submissionTimeUTC = moment(new Date(submissionTime * 1000))
+  const submissionTimeUTC = moment(new Date(Number(submissionTime) * 1000))
     .tz('UTC')
     .format('YYYY-MM-DD - HH:mm [UTC]')
 
@@ -159,13 +149,13 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
         <Description>
           <DescriptionText>
             Make sure your submission complies with the{' '}
-            <BlueLink href={listingCriteria} rel="noopener noreferrer" target="_blank">
+            <BlueLink href={listingCriteriaURL} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>{' '}
             to avoid challenges. The <b>{formatEther(submissionDeposit)}</b> ETH security deposit will be reimbursed if
             your submission is accepted. The challenge period lasts{' '}
             <b>
-              {humanizeDuration(challengePeriodDuration * 1000, {
+              {humanizeDuration(Number(challengePeriodDuration) * 1000, {
                 delimiter: ' and ',
                 largest: 2,
                 round: true,
@@ -194,7 +184,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
         <Description>
           <DescriptionText>
             Market invalid according to the{' '}
-            <BlueLink href={listingCriteria} rel="noopener noreferrer" target="_blank">
+            <BlueLink href={listingCriteriaURL} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>
             ? Collect <SuccessVerify>{formatEther(submissionBaseDeposit)}</SuccessVerify> ETH upon a successful
@@ -224,7 +214,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
       KlerosNotice = (
         <Description>
           Market valid according to the{' '}
-          <BlueLink href={listingCriteria} rel="noopener noreferrer" target="_blank">
+          <BlueLink href={listingCriteriaURL} rel="noopener noreferrer" target="_blank">
             listing criteria
           </BlueLink>{' '}
           ? Collect <SuccessVerify>{formatEther(removalBaseDeposit)}</SuccessVerify> upon a successful challenge.
@@ -269,7 +259,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
         <Description>
           <DescriptionText>
             Market invalid according to the{' '}
-            <BlueLink href={listingCriteria} rel="noopener noreferrer" target="_blank">
+            <BlueLink href={listingCriteriaURL} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>
             ?
