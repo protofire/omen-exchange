@@ -107,7 +107,7 @@ const CurrenciesWrapper = styled.div`
   width: 100%;
 `
 
-const GridTransactionDetailsStyled = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
+const GridTransactionDetailsWrapper = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
   ${props => (props.noMarginTop ? 'margin-top: 0;' : '')};
 `
 
@@ -344,7 +344,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           href={DOCUMENT_FAQ}
           hyperlinkDescription={'More Info'}
         />
-        <GridTransactionDetailsStyled noMarginTop={true}>
+        <GridTransactionDetailsWrapper noMarginTop={true}>
           <div>
             {tokensAmount > 1 && (
               <CurrenciesWrapper>
@@ -362,6 +362,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                   decimals={collateral.decimals}
                   name="funding"
                   onChange={handleAmountChange}
+                  style={{ width: 0 }}
                   value={amount}
                 />
               }
@@ -391,7 +392,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               />
             </TransactionDetailsCard>
           </div>
-        </GridTransactionDetailsStyled>
+        </GridTransactionDetailsWrapper>
         {exceedsMaxFee && (
           <WarningMessage
             additionalDescription={''}
