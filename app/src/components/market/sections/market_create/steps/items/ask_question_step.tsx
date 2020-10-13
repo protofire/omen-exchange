@@ -86,7 +86,7 @@ const ButtonWithReadyToGoStatus = styled(Button)<{ readyToGo: boolean }>`
 `
 
 const CategoryImportWrapper = styled.div`
-  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
+  border-bottom: 1px solid ${props => props.theme.borders.borderDisabled};
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};
   padding: 0 ${props => props.theme.cards.paddingHorizontal};

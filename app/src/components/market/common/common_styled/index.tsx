@@ -21,7 +21,7 @@ export const OutcomesTableWrapper = styled.div<{ borderBottom?: boolean }>`
   overflow-x: auto;
   ${({ borderBottom, theme }) =>
     borderBottom &&
-    `border-bottom: ${`1px solid ${theme.borders.borderColor}`};
+    `border-bottom: ${`1px solid ${theme.borders.borderDisabled}`};
   padding-bottom: 24px;`}
 `
 
