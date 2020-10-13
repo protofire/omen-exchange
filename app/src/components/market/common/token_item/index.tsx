@@ -19,7 +19,6 @@ const Image = styled.img`
 const Text = styled.div`
   line-height: 1.2;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 `
 
