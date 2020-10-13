@@ -1,5 +1,7 @@
 import { css } from 'styled-components'
 
+import theme from '../index'
+
 export const ReactTooltipStylesOverride = css`
   .customTooltip {
     background-color: #313131;
@@ -49,23 +51,20 @@ export const ReactTooltipStylesOverride = css`
   .customMarketTooltip {
     &.__react_component_tooltip.type-light {
       &.place-top:after {
-        border: 0 solid #eceff1 !important;
+        border: 0 solid ${theme.borders.borderColor} !important;
       }
 
-      font-family: Roboto;
-      font-size: 14px;
+      font-size: ${theme.fonts.defaultSize};
       font-style: normal;
       font-weight: 400;
       line-height: 20px;
       letter-spacing: 0.10000000149011612px;
       text-align: left;
-
-      text-align: left;
-      background-color: #ffffff;
+      background-color: ${theme.colors.mainBodyBackground};
       opacity: 1;
-      border-radius: 6px;
+      border-radius: ${theme.borders.commonBorderRadius};
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-      border: 1px solid #eceff1;
+      border: 1px solid ${theme.borders.borderColor};
     }
   }
 `
