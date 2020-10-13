@@ -7,7 +7,7 @@ import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { getKlerosCurateGraphUris, getTokensByNetwork, networkIds } from '../util/networks'
-import { MarketMakerData, MarketVerificationState, Token } from '../util/types'
+import { KlerosDisputeOutcome, KlerosItemStatus, MarketMakerData, MarketVerificationState, Token } from '../util/types'
 
 const klerosBadgeAbi = [
   'function queryAddresses(address _cursor, uint _count, bool[8] _filter, bool _oldestFirst) external view returns (address[] values, bool hasMore)',
@@ -20,6 +20,26 @@ const klerosTokensViewAbi = [
 
 interface MetaEvidence {
   fileURI: string
+}
+
+interface MarketState {
+  verificationState: MarketVerificationState
+  submissionTime?: number
+  itemID?: string
+}
+
+interface Request {
+  disputed: boolean
+  submissionTime: number
+  resolved: boolean
+  requestType: KlerosItemStatus
+  disputeOutcome: KlerosDisputeOutcome
+}
+
+interface Item {
+  itemID: string
+  status: KlerosItemStatus
+  requests: Request[]
 }
 
 class KlerosService {
@@ -228,13 +248,11 @@ class KlerosService {
     return await this.omenVerifiedMarkets.challengePeriodDuration()
   }
 
-  public async getMarketState(
-    marketMakerData: MarketMakerData,
-  ): Promise<{
-    verificationState: MarketVerificationState
-    submissionTime?: number
-    itemID?: string
-  }> {
+  /**
+   * @returns {Promise<MarketState>} The current verification state of the market.
+   * @param marketMakerData The current state of the market.
+   */
+  public async getMarketState(marketMakerData: MarketMakerData): Promise<MarketState> {
     const { submissionIDs: submissions } = marketMakerData
     if (submissions.length === 0)
       return {
@@ -242,7 +260,7 @@ class KlerosService {
       }
 
     const { chainId: networkId } = await this.provider.getNetwork()
-    const fullSubmissions = (
+    const fullSubmissions: Item[] = (
       await Promise.all(
         submissions.map(async submission => {
           const variables = {
@@ -268,33 +286,74 @@ class KlerosService {
         }),
       )
     )
-      .filter(d => d && d.data)
-      .map(d => d.data.data.item)
+      .filter(d => d && d.data && d.data.data && d.data.data.item)
+      .map(d => d.data.data.item as Item)
+      .map(i => {
+        i.requests = i.requests.map(r => ({ ...r, submissionTime: Number(r.submissionTime) }))
+        return i
+      })
+      .sort((i1, i2) => {
+        // Sort by item with the most recent request.
+        const { submissionTime: i1SubmissionTime } = i1.requests
+          .sort((r1, r2) => r1.submissionTime - r2.submissionTime)
+          .slice(-1)[0]
+        const { submissionTime: i2SubmissionTime } = i2.requests
+          .sort((r1, r2) => r1.submissionTime - r2.submissionTime)
+          .slice(-1)[0]
+        return i1SubmissionTime - i2SubmissionTime
+      })
 
     for (const item of fullSubmissions) {
-      if (item.status === 'Registered')
-        return {
-          verificationState: MarketVerificationState.Verified,
-          itemID: item.itemID,
-        }
-
-      for (const request of item.requests) {
-        if (request.resolved) continue
-        if (!request.disputed) {
+      const { itemID } = item
+      const { disputeOutcome, disputed, requestType, resolved, submissionTime } = item.requests
+        .sort((r1, r2) => r1.submissionTime - r2.submissionTime)
+        .slice(-1)[0]
+      if (!disputed) {
+        if (resolved) {
           return {
             verificationState:
-              request.requestType === 'RegistrationRequested'
+              requestType === KlerosItemStatus.RegistrationRequested
+                ? MarketVerificationState.Verified
+                : MarketVerificationState.NotVerified,
+            submissionTime,
+            itemID,
+          }
+        } else {
+          return {
+            verificationState:
+              requestType === KlerosItemStatus.RegistrationRequested
                 ? MarketVerificationState.SubmissionChallengeable
                 : MarketVerificationState.RemovalChallengeable,
-            submissionTime: request.submissionTime,
-            itemID: item.itemID,
+            submissionTime,
+            itemID,
           }
-        } else
-          return {
-            verificationState: MarketVerificationState.WaitingArbitration,
-            submissionTime: request.submissionTime,
-            itemID: item.itemID,
-          }
+        }
+      }
+
+      if (!resolved) {
+        return {
+          verificationState: MarketVerificationState.WaitingArbitration,
+          submissionTime,
+          itemID,
+        }
+      } else {
+        let verificationState = MarketVerificationState.Verified
+        if (disputeOutcome === KlerosDisputeOutcome.Accept) {
+          if (requestType === KlerosItemStatus.ClearingRequested)
+            verificationState = MarketVerificationState.NotVerified
+        } else if (disputeOutcome === KlerosDisputeOutcome.Refuse) {
+          if (requestType === KlerosItemStatus.RegistrationRequested)
+            verificationState = MarketVerificationState.NotVerified
+        } else {
+          // Refuse to rule returns item to the previous state.
+          if (requestType === KlerosItemStatus.RegistrationRequested)
+            verificationState = MarketVerificationState.NotVerified
+        }
+        return {
+          verificationState,
+          submissionTime,
+          itemID,
+        }
       }
     }
 

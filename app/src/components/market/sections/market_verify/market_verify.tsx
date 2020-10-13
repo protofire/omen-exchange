@@ -22,6 +22,50 @@ const RightButton = styled(Button)`
   margin-left: auto;
 `
 
+export const CurationRow = styled.div`
+  border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
+  margin: 0 -25px;
+  padding: 20px 25px;
+  position: relative;
+`
+export const CurationSubRow = styled.div`
+  align-items: center;
+  display: flex;
+  flex-wrap: no-wrap;
+  position: relative;
+`
+
+export const CurationLeftColumn = styled.div`
+  margin-right: 16px;
+`
+
+export const CurationCenterColumn = styled.div``
+
+export const CurationRightColumn = styled.div`
+  margin-left: auto;
+`
+
+export const CurationRadioTick = styled.img<StatefulRadioButton>`
+  filter: ${props => (props.selected ? 'saturate(0) brightness(2)' : 'saturate(0) brightness(1.6)')};
+
+  ${CurationSubRow}:hover & {
+    filter: ${props => !props.selected && 'none'};
+  }
+`
+
+export const CurationOption = styled.div`
+  color: ${props => props.theme.colors.textColorDarker};
+  font-weight: 500;
+`
+
+export const CurationOptionDetails = styled.div`
+  color: ${props => props.theme.colors.textColorLighter};
+`
+
+interface StatefulRadioButton {
+  selected?: boolean
+}
+
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
   context: ConnectedWeb3Context
