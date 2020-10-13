@@ -1,4 +1,5 @@
 import React, { DOMAttributes } from 'react'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { Arbitrator } from '../../../../util/types'
@@ -77,15 +78,36 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <IconCategory size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{category}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper href={realitioUrl} rel="noopener noreferrer" target="_blank">
+        <AdditionalMarketDataSectionWrapper
+          data-arrow-color="transparent"
+          data-tip={`This market uses the ${oracle} oracle which crowed-sources the correct outcome.`}
+          data-type="light"
+          href={realitioUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <IconOracle size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{oracle}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper href={arbitrator.url} rel="noopener noreferrer" target="_blank">
+        <AdditionalMarketDataSectionWrapper
+          data-arrow-color="transparent"
+          data-tip={`This market uses the ${arbitrator.name} as the final arbitrator`}
+          data-type="light"
+          href={arbitrator.url}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <IconArbitrator size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>
+      <ReactTooltip
+        className="customMarketTooltip"
+        data-multiline={true}
+        effect="solid"
+        offset={{ top: -12 }}
+        place="top"
+      />
     </AdditionalMarketDataWrapper>
   )
 }
