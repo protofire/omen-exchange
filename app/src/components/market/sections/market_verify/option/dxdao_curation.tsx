@@ -3,28 +3,16 @@ import styled from 'styled-components'
 
 import { IconDxDao } from '../../../../common/icons'
 import Tick from '../img/tick.svg'
-
-const Row = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
-  margin: 0 -25px;
-  padding: 20px 25px;
-  position: relative;
-`
-const SubRow = styled.div`
-  align-items: center;
-  display: flex;
-  flex-wrap: no-wrap;
-  justify-content: space-between;
-  position: relative;
-`
-
-const LeftColumn = styled.div``
-
-const CenterColumn = styled.div`
-  width: 75%;
-`
-
-const RightColumn = styled.div``
+import {
+  CurationCenterColumn,
+  CurationLeftColumn,
+  CurationOption,
+  CurationOptionDetails,
+  CurationRadioTick,
+  CurationRightColumn,
+  CurationRow,
+  CurationSubRow,
+} from '../market_verify'
 
 const LogoWrapper = styled.div`
   border-radius: 50%;
@@ -45,23 +33,6 @@ const RadioWrapper = styled.div<StatefulRadioButton>`
   justify-content: center;
   align-items: center;
   background-color: ${props => props.selected && props.theme.colors.clickable};
-`
-
-const RadioTick = styled.img<StatefulRadioButton>`
-  filter: ${props => (props.selected ? 'saturate(0) brightness(2)' : 'saturate(0) brightness(1.6)')};
-
-  ${SubRow}:hover & {
-    filter: ${props => !props.selected && 'none'};
-  }
-`
-
-const Option = styled.div`
-  color: ${props => props.theme.colors.textColorDarker};
-  font-weight: 500;
-`
-
-const OptionDetails = styled.div`
-  color: ${props => props.theme.colors.textColorLighter};
 `
 
 const Input = styled.input`
@@ -88,24 +59,24 @@ interface Props {
 export const DxDaoCuration: React.FC<Props> = (props: Props) => {
   const { selectSource, selection } = props
   return (
-    <Row key="Dxdao Curation">
-      <SubRow>
-        <LeftColumn>
+    <CurationRow key="Dxdao Curation">
+      <CurationSubRow>
+        <CurationLeftColumn>
           <LogoWrapper>
             <IconDxDao />
           </LogoWrapper>
-        </LeftColumn>
-        <CenterColumn>
-          <Option>Dxdao Curation</Option>
-          <OptionDetails>Request verification</OptionDetails>
-        </CenterColumn>
-        <RightColumn>
+        </CurationLeftColumn>
+        <CurationCenterColumn>
+          <CurationOption>Dxdao Curation</CurationOption>
+          <CurationOptionDetails>Request verification</CurationOptionDetails>
+        </CurationCenterColumn>
+        <CurationRightColumn>
           <RadioWrapper selected={selection === 1}>
-            <RadioTick alt="tick" selected={selection === 1} src={Tick} />
+            <CurationRadioTick alt="tick" selected={selection === 1} src={Tick} />
           </RadioWrapper>
-        </RightColumn>
+        </CurationRightColumn>
         <Input checked={selection === 1} onChange={selectSource} type="radio" value={1} />
-      </SubRow>
-    </Row>
+      </CurationSubRow>
+    </CurationRow>
   )
 }

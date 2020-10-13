@@ -19,6 +19,12 @@ export enum KlerosItemStatus {
   ClearingRequested = 'ClearingRequested',
 }
 
+export enum KlerosDisputeOutcome {
+  None = 'None',
+  Accept = 'Accept',
+  Refuse = 'Refuse',
+}
+
 export interface BalanceItem {
   outcomeName: string
   probability: number

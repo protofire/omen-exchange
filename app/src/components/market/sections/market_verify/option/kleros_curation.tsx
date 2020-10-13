@@ -1,35 +1,24 @@
 import { formatEther } from 'ethers/utils'
 import humanizeDuration from 'humanize-duration'
+import moment from 'moment-timezone'
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
 import { MarketVerificationState } from '../../../../../util/types'
 import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { IconKleros } from '../../../../common/icons'
+import { IconExclamation, IconKleros } from '../../../../common/icons'
 import Tick from '../img/tick.svg'
-
-const Row = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
-  margin: 0 -25px;
-  padding: 20px 25px;
-  position: relative;
-`
-const SubRow = styled.div`
-  align-items: center;
-  display: flex;
-  flex-wrap: no-wrap;
-  justify-content: space-between;
-  position: relative;
-`
-
-const LeftColumn = styled.div``
-
-const CenterColumn = styled.div`
-  width: 75%;
-`
-
-const RightColumn = styled.div``
+import {
+  CurationCenterColumn,
+  CurationLeftColumn,
+  CurationOption,
+  CurationOptionDetails,
+  CurationRadioTick,
+  CurationRightColumn,
+  CurationRow,
+  CurationSubRow,
+} from '../market_verify'
 
 const LogoWrapper = styled.div`
   border-radius: 50%;
@@ -52,27 +41,33 @@ const RadioWrapper = styled.div<StatefulRadioButton>`
   background-color: ${props => props.selected && props.theme.colors.clickable};
 `
 
-const RadioTick = styled.img<StatefulRadioButton>`
-  filter: ${props => (props.selected ? 'saturate(0) brightness(2)' : 'saturate(0) brightness(1.6)')};
-
-  ${SubRow}:hover & {
-    filter: ${props => !props.selected && 'none'};
-  }
+const StatusContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 `
 
-const Option = styled.div`
-  color: ${props => props.theme.colors.textColorDarker};
-  font-weight: 500;
+const IconWrapper = styled.div`
+  border-radius: 50%;
+  background-color: ${props => props.theme.colors.green};
+  width: 16px;
+  height: 16px;
+  padding: 3px;
+  display: flex;
+  margin-left: 8px;
 `
 
-const OptionDetails = styled.div`
-  color: ${props => props.theme.colors.textColorLighter};
+const VerifiedTick = styled.img`
+  filter: brightness(2);
+  width: 100%;
+  height: 100%;
 `
 
-const Description = styled.p`
+const Description = styled.div`
   align-items: center;
   border-radius: 4px;
   border: 1px solid ${props => props.theme.borders.borderColorLighter};
+  display: flex;
   padding: 21px 25px;
   color: ${props => props.theme.colors.textColorLightish};
   font-size: 14px;
@@ -80,6 +75,10 @@ const Description = styled.p`
   line-height: 1.4;
   margin: 25px 0;
   width: 100%;
+`
+
+const DescriptionText = styled.p`
+  display: inline-block;
 `
 
 const Input = styled.input`
@@ -94,11 +93,19 @@ const Input = styled.input`
   border: 1px solid red;
 `
 
-const GreenBold = styled.b`
+const SuccessVerify = styled.span`
   color: ${props => props.theme.colors.green};
 `
 
+const BlueLink = styled.a`
+  color: ${props => props.theme.colors.hyperlink};
+`
+
 const RightButton = styled(Button)`
+  margin-left: 16px;
+`
+
+const RightButtonWrapper = styled.div`
   margin-left: auto;
 `
 
@@ -136,8 +143,10 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
   } = props
 
   const deadline = submissionTime + challengePeriodDuration
-  const deadlineUTC = '12 oct - 14h30 UTC' // TODO: Build deadline
-  const timeRemaining = deadline - Date.now() / 1000
+  const timeRemaining = deadline * 1000 - Date.now()
+  const submissionTimeUTC = moment(new Date(submissionTime * 1000))
+    .tz('UTC')
+    .format('YYYY-MM-DD - HH:mm [UTC]')
 
   let klerosDetails
   let KlerosNotice
@@ -148,30 +157,32 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
       klerosDetails = `Request verification with a ${formatEther(submissionDeposit)} ETH security deposit.`
       KlerosNotice = (
         <Description>
-          Make sure your submission complies with the{' '}
-          <a href={listingCriteria} rel="noopener noreferrer" target="_blank">
-            listing criteria
-          </a>{' '}
-          to avoid challenges. The <b>{formatEther(submissionDeposit)}</b> ETH security deposit will be reimbursed if
-          your submission is accepted. The challenge period lasts{' '}
-          <b>
-            {humanizeDuration(challengePeriodDuration * 1000, {
-              delimiter: ' and ',
-              largest: 2,
-              round: true,
-              units: ['y', 'mo', 'w', 'd', 'h', 'm'],
-            })}
-          </b>
-          .
+          <DescriptionText>
+            Make sure your submission complies with the{' '}
+            <BlueLink href={listingCriteria} rel="noopener noreferrer" target="_blank">
+              listing criteria
+            </BlueLink>{' '}
+            to avoid challenges. The <b>{formatEther(submissionDeposit)}</b> ETH security deposit will be reimbursed if
+            your submission is accepted. The challenge period lasts{' '}
+            <b>
+              {humanizeDuration(challengePeriodDuration * 1000, {
+                delimiter: ' and ',
+                largest: 2,
+                round: true,
+                units: ['y', 'mo', 'w', 'd', 'h', 'm'],
+              })}
+            </b>
+            .
+          </DescriptionText>
         </Description>
       )
       KlerosRightColumn = (
         <>
-          <RightColumn>
+          <CurationRightColumn>
             <RadioWrapper selected={selection === 0}>
-              <RadioTick alt="tick" selected={selection === 0} src={Tick} />
+              <CurationRadioTick alt="tick" selected={selection === 0} src={Tick} />
             </RadioWrapper>
-          </RightColumn>
+          </CurationRightColumn>
           <Input checked={selection === 0} onChange={selectSource} type="radio" value={0} />
         </>
       )
@@ -181,27 +192,30 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
       klerosDetails = `Challenge period pending`
       KlerosNotice = (
         <Description>
-          Market invalid according to the{' '}
-          <a href={listingCriteria} rel="noopener noreferrer" target="_blank">
-            listing criteria
-          </a>{' '}
-          ? Collect <GreenBold>{formatEther(submissionBaseDeposit)}</GreenBold> upon a successful challenge.
-          <RightButton buttonType={ButtonType.secondaryLine}>Challenge</RightButton>
+          <DescriptionText>
+            Market invalid according to the{' '}
+            <BlueLink href={listingCriteria} rel="noopener noreferrer" target="_blank">
+              listing criteria
+            </BlueLink>
+            ? Collect <SuccessVerify>{formatEther(submissionBaseDeposit)}</SuccessVerify> ETH upon a successful
+            challenge.
+          </DescriptionText>
+          <RightButtonWrapper>
+            <RightButton buttonType={ButtonType.secondaryLine}>Challenge</RightButton>
+          </RightButtonWrapper>
         </Description>
       )
       KlerosRightColumn = (
-        <div>
-          <b>
-            Ends in{' '}
-            {humanizeDuration(timeRemaining, {
-              delimiter: ' and ',
-              largest: 2,
-              round: true,
-              units: ['y', 'mo', 'w', 'd', 'h', 'm'],
-            })}
-          </b>
-          <span>{deadlineUTC}</span>
-        </div>
+        <CurationRightColumn>
+          Ends in{' '}
+          {humanizeDuration(timeRemaining, {
+            delimiter: ' and ',
+            largest: 2,
+            round: true,
+            units: ['y', 'mo', 'w', 'd', 'h', 'm'],
+          })}
+          <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
+        </CurationRightColumn>
       )
       break
     }
@@ -210,15 +224,17 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
       KlerosNotice = (
         <Description>
           Market valid according to the{' '}
-          <a href={listingCriteria} rel="noopener noreferrer" target="_blank">
+          <BlueLink href={listingCriteria} rel="noopener noreferrer" target="_blank">
             listing criteria
-          </a>{' '}
-          ? Collect <GreenBold>{formatEther(removalBaseDeposit)}</GreenBold> upon a successful challenge.
-          <RightButton buttonType={ButtonType.secondary}>Challenge Removal</RightButton>
+          </BlueLink>{' '}
+          ? Collect <SuccessVerify>{formatEther(removalBaseDeposit)}</SuccessVerify> upon a successful challenge.
+          <RightButtonWrapper>
+            <RightButton buttonType={ButtonType.secondary}>Challenge Removal</RightButton>
+          </RightButtonWrapper>
         </Description>
       )
       KlerosRightColumn = (
-        <div>
+        <CurationRightColumn>
           <b>
             Ends in{' '}
             {humanizeDuration(timeRemaining, {
@@ -228,28 +244,52 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
               units: ['y', 'mo', 'w', 'd', 'h', 'm'],
             })}
           </b>
-          <span>{deadlineUTC}</span>
-        </div>
+          <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
+        </CurationRightColumn>
       )
       break
     }
     case MarketVerificationState.WaitingArbitration: {
       klerosDetails = `Verification challenged`
-      KlerosRightColumn = <a href={`curate.kleros.io/tcr/${ovmAddress}/${itemID}`}>Challenge details</a>
+      KlerosRightColumn = (
+        <CurationRightColumn>
+          <StatusContainer>
+            <BlueLink href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`}>
+              Challenge details <IconExclamation />{' '}
+            </BlueLink>
+          </StatusContainer>
+          <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
+        </CurationRightColumn>
+      )
       break
     }
     case MarketVerificationState.Verified: {
       klerosDetails = `Verification successful`
       KlerosNotice = (
         <Description>
-          Market invalid according to the{' '}
-          <a href={listingCriteria} rel="noopener noreferrer" target="_blank">
-            listing criteria
-          </a>{' '}
-          ?<RightButton buttonType={ButtonType.secondaryLine}>Remove Market</RightButton>
+          <DescriptionText>
+            Market invalid according to the{' '}
+            <BlueLink href={listingCriteria} rel="noopener noreferrer" target="_blank">
+              listing criteria
+            </BlueLink>
+            ?
+          </DescriptionText>
+          <RightButtonWrapper>
+            <RightButton buttonType={ButtonType.secondaryLine}>Remove Market</RightButton>
+          </RightButtonWrapper>
         </Description>
       )
-      KlerosRightColumn = <GreenBold>verified</GreenBold>
+      KlerosRightColumn = (
+        <CurationRightColumn>
+          <StatusContainer>
+            <SuccessVerify>verified</SuccessVerify>
+            <IconWrapper>
+              <VerifiedTick alt="tick" src={Tick} />
+            </IconWrapper>
+          </StatusContainer>
+          <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
+        </CurationRightColumn>
+      )
       break
     }
     default:
@@ -257,20 +297,20 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
   }
 
   return (
-    <Row key="Kleros">
-      <SubRow>
-        <LeftColumn>
+    <CurationRow key="Kleros">
+      <CurationSubRow>
+        <CurationLeftColumn>
           <LogoWrapper>
             <IconKleros />
           </LogoWrapper>
-        </LeftColumn>
-        <CenterColumn>
-          <Option>Kleros</Option>
-          <OptionDetails>{klerosDetails}</OptionDetails>
-        </CenterColumn>
+        </CurationLeftColumn>
+        <CurationCenterColumn>
+          <CurationOption>Kleros</CurationOption>
+          <CurationOptionDetails>{klerosDetails}</CurationOptionDetails>
+        </CurationCenterColumn>
         {KlerosRightColumn}
-      </SubRow>
-      <SubRow>{KlerosNotice}</SubRow>
-    </Row>
+      </CurationSubRow>
+      <CurationSubRow>{KlerosNotice}</CurationSubRow>
+    </CurationRow>
   )
 }
