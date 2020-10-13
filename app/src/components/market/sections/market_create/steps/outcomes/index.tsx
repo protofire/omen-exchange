@@ -225,7 +225,7 @@ const Outcomes = (props: Props) => {
   return (
     <>
       <TitleWrapper uniformProbabilities={uniformProbabilities}>
-        <FormLabel>Add Outcome </FormLabel>
+        <FormLabel>Add Outcome</FormLabel>
         {manualProbabilities && <FormLabel>Probability</FormLabel>}
         {manualProbabilitiesAndNoOutcomes && (
           <TitleText>
@@ -276,7 +276,6 @@ const Outcomes = (props: Props) => {
                   onPressEnter(e)
                 }}
                 placeholder="0.00"
-                step="0.01"
                 type="number"
                 value={newOutcomeProbability ? newOutcomeProbability : ''}
               />
