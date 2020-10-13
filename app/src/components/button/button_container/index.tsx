@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div<{ borderTop?: boolean }>`
   align-items: center;
-  border-top: ${props => (props.borderTop ? `1px solid ${props.theme.borders.borderColor}` : 'none')};
+  border-top: ${props => (props.borderTop ? `1px solid ${props.theme.borders.borderDisabled}` : 'none')};
   display: flex;
   justify-content: flex-end;
   margin-top: auto;
