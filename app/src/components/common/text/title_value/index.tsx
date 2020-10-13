@@ -3,11 +3,7 @@ import React, { DOMAttributes } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-export enum ValueStates {
-  error,
-  normal,
-  success,
-}
+import { ValueStates } from '../../../market/common/transaction_details_row'
 
 const Wrapper = styled.div`
   display: flex;
@@ -32,7 +28,7 @@ const Value = styled.p<{ state: ValueStates }>`
     (props.state === ValueStates.error && props.theme.colors.error) ||
     props.theme.colors.textColor};
   font-size: 14px;
-  font-weight: 400;
+  font-weight: ${props => props.state === ValueStates.success && '500'};
   line-height: 1.2;
   margin: 0;
   text-align: right;

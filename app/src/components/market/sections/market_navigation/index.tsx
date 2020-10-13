@@ -1,5 +1,4 @@
 import React from 'react'
-import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 const MarketTabs = styled.div`
@@ -27,25 +26,29 @@ interface Props {
   hasWinningOutcomes?: Maybe<boolean>
   isQuestionFinalized: boolean
   resolutionDate: Date
+  switchMarketTab: (arg0: string) => void
 }
 
 export const MarketNavigation = (props: Props) => {
-  const history = useHistory()
-
-  const { activeTab, hasWinningOutcomes, isQuestionFinalized, marketAddress, resolutionDate } = props
+  const { activeTab, hasWinningOutcomes, isQuestionFinalized, resolutionDate, switchMarketTab } = props
 
   const marketTabs = {
     history: 'HISTORY',
     pool: 'POOL',
     swap: 'SWAP',
     verify: 'VERIFY',
+    buy: 'BUY',
+    sell: 'SELL',
   }
 
   const isFinalizing = resolutionDate < new Date() && !isQuestionFinalized
 
   return (
     <MarketTabs>
-      <MarketTab active={activeTab === marketTabs.swap} onClick={() => history.push(`/${marketAddress}`)}>
+      <MarketTab
+        active={activeTab === marketTabs.swap || activeTab === marketTabs.buy || activeTab === marketTabs.sell}
+        onClick={() => switchMarketTab('SWAP')}
+      >
         {isQuestionFinalized && hasWinningOutcomes
           ? 'Redeem'
           : isQuestionFinalized && !hasWinningOutcomes
@@ -54,23 +57,17 @@ export const MarketNavigation = (props: Props) => {
           ? 'Finalize'
           : 'Swap'}
       </MarketTab>
-      <MarketTab
-        active={activeTab === marketTabs.pool}
-        onClick={() => history.push(`/${marketAddress}/pool-liquidity`)}
-      >
+      <MarketTab active={activeTab === marketTabs.pool} onClick={() => switchMarketTab('POOL')}>
         Pool
       </MarketTab>
       {/* Verify is commented out until the underlying infrastructure is ready */}
       {/* <MarketTab 
-        active={activeTab === marketTabs.verify} 
-        onClick={() => history.push(`/${marketAddress}/verify`)}
+        active={activeTab === marketTabs.verify}
+        onClick={() => switchMarketTab('VERIFY')}
       >
         Verify
       </MarketTab> */}
-      <MarketTab
-        active={activeTab === marketTabs.history}
-        onClick={() => history.push(`/${marketAddress}/trade-history`)}
-      >
+      <MarketTab active={activeTab === marketTabs.history} onClick={() => switchMarketTab('HISTORY')}>
         History
       </MarketTab>
     </MarketTabs>
