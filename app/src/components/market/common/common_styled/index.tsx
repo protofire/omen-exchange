@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import { getOutcomeColor } from '../../../../theme/utils'
 import { Button, ButtonContainer } from '../../../button'
@@ -90,6 +90,28 @@ export const RowWrapper = styled.div`
   display: flex;
 `
 
+const OutcomeItemWrapperReadOnlyCSS = css`
+  background-color: ${({ theme }) => theme.form.common.disabled.backgroundColor};
+  border-color: ${({ theme }) => theme.form.common.disabled.borderColor};
+  color: ${({ theme }) => theme.form.common.disabled.color};
+  cursor: not-allowed !important;
+  user-select: none !important;
+  label {
+    cursor: not-allowed !important;
+    user-select: none !important;
+  }
+`
+
+const OutcomeItemWrapperActiveCSS = css`
+  &:hover {
+    border-color: ${({ theme }) => theme.textfield.borderColorOnHover};
+  }
+  &:active,
+  &:focus {
+    border-color: ${({ theme }) => theme.textfield.borderColorActive};
+  }
+`
+
 export const OutcomeItemWrapper = styled.div<{ readOnly: boolean }>`
   align-items: center;
   display: flex;
@@ -99,29 +121,11 @@ export const OutcomeItemWrapper = styled.div<{ readOnly: boolean }>`
   border-width: ${props => props.theme.textfield.borderWidth};
   border-radius: ${props => props.theme.textfield.borderRadius};
   padding: 0 ${props => props.theme.textfield.paddingHorizontal};
-
   transition: border-color 0.15s ease-in-out;
   width: 100%;
-  ${({ readOnly, theme }) =>
-    !readOnly
-      ? `&:hover {
-           border-color: ${theme.textfield.borderColorOnHover};
-         }
 
-         &:active,
-         &:focus {
-           border-color: ${theme.textfield.borderColorActive};
-         }`
-      : `background-color: ${theme.form.common.disabled.backgroundColor};
-    border-color: ${theme.form.common.disabled.borderColor};
-    color: ${theme.form.common.disabled.color};
-    cursor: not-allowed !important;
-    user-select: none !important;
-    label {
-      cursor: not-allowed !important;
-    user-select: none !important;
-    }
-         `}
+  ${({ readOnly }) => readOnly && OutcomeItemWrapperReadOnlyCSS};
+  ${({ readOnly }) => !readOnly && OutcomeItemWrapperActiveCSS};
 `
 
 export const OutcomeItemText = styled.div`
