@@ -50,6 +50,9 @@ const AdditionalMarketDataSectionTitle = styled.p`
   font-size: 14px;
   line-height: 16px;
   color: ${props => props.theme.colors.clickable};
+  &:first-letter {
+    text-transform: capitalize;
+  }
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
