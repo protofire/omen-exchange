@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useState } from 'react'
@@ -101,7 +102,7 @@ export type GraphMarketMakerData = {
   lastActiveDay: number
   dailyVolume: BigNumber
   conditionId: string
-  payouts: Maybe<number[]>
+  payouts: Maybe<Big[]>
   fee: BigNumber
   question: Question
   scaledLiquidityParameter: number
@@ -129,7 +130,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     lastActiveDay: Number(data.lastActiveDay),
     dailyVolume: bigNumberify(data.runningDailyVolume),
     conditionId: data.condition.id,
-    payouts: data.condition.payouts ? data.condition.payouts.map(Number) : null,
+    payouts: data.condition.payouts ? data.condition.payouts.map(payout => new Big(payout)) : null,
     fee: bigNumberify(data.fee),
     scaledLiquidityParameter: parseFloat(data.scaledLiquidityParameter),
     runningDailyVolumeByHour: data.runningDailyVolumeByHour,

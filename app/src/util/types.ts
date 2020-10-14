@@ -1,3 +1,4 @@
+import Big from 'big.js'
 import { Block } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
@@ -16,7 +17,7 @@ export interface BalanceItem {
   probability: number
   currentPrice: number
   shares: BigNumber
-  payout: number
+  payout: Big
   holdings: BigNumber
 }
 
@@ -203,7 +204,7 @@ export interface MarketMakerData {
   collateralVolume: BigNumber
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
-  payouts: Maybe<number[]>
+  payouts: Maybe<Big[]>
   question: Question
   totalEarnings: BigNumber
   totalPoolShares: BigNumber
