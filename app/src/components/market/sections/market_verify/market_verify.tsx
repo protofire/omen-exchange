@@ -63,6 +63,10 @@ export const CurationOptionDetails = styled.div`
   color: ${props => props.theme.colors.textColorLighter};
 `
 
+const UnstyledLink = styled.a`
+  color: inherit;
+`
+
 interface StatefulRadioButton {
   selected?: boolean
 }
@@ -82,6 +86,17 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
     setSelection(Number(value))
   }, [])
 
+  const { ovmAddress } = klerosCurationData || {}
+  const { address, question } = marketMakerData || {}
+  const { title } = question || {}
+  let requestVerificationLink = 'https://dxdao.eth.link/#/'
+  if (selection === 0) {
+    const queryParams = new URLSearchParams()
+    queryParams.append('col1', title)
+    queryParams.append('col2', `https://omen.eth.link/#/${address}`)
+    requestVerificationLink = `https://curate.kleros.io/tcr/${ovmAddress}/addItem?${queryParams.toString()}`
+  }
+
   if (!klerosCurationData) return <InlineLoading />
 
   return (
@@ -93,7 +108,9 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
       <DxDaoCuration selectSource={selectSource} selection={selection} />
       <BottomRow>
         <RightButton buttonType={ButtonType.primaryLine} disabled={typeof selection !== 'number'}>
-          Request Verification
+          <UnstyledLink href={requestVerificationLink} rel="noopener noreferrer" target="_blank">
+            Request Verification
+          </UnstyledLink>
         </RightButton>
       </BottomRow>
     </>

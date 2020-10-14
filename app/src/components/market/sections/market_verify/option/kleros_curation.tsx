@@ -109,6 +109,10 @@ const RightButtonWrapper = styled.div`
   margin-left: auto;
 `
 
+const UnstyledLink = styled.a`
+  color: inherit;
+`
+
 interface StatefulRadioButton {
   selected?: boolean
 }
@@ -191,7 +195,15 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
             challenge.
           </DescriptionText>
           <RightButtonWrapper>
-            <RightButton buttonType={ButtonType.secondaryLine}>Challenge</RightButton>
+            <RightButton buttonType={ButtonType.secondaryLine}>
+              <UnstyledLink
+                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}/challengeRequest`}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Challenge
+              </UnstyledLink>
+            </RightButton>
           </RightButtonWrapper>
         </Description>
       )
@@ -219,7 +231,15 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
           </BlueLink>{' '}
           ? Collect <SuccessVerify>{formatEther(removalBaseDeposit)}</SuccessVerify> upon a successful challenge.
           <RightButtonWrapper>
-            <RightButton buttonType={ButtonType.secondary}>Challenge Removal</RightButton>
+            <RightButton buttonType={ButtonType.secondary}>
+              <UnstyledLink
+                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}/challengeRequest`}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Challenge
+              </UnstyledLink>
+            </RightButton>
           </RightButtonWrapper>
         </Description>
       )
@@ -265,7 +285,15 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
             ?
           </DescriptionText>
           <RightButtonWrapper>
-            <RightButton buttonType={ButtonType.secondaryLine}>Remove Market</RightButton>
+            <RightButton buttonType={ButtonType.secondaryLine}>
+              <UnstyledLink
+                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}/removeItem`}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Remove Market
+              </UnstyledLink>
+            </RightButton>
           </RightButtonWrapper>
         </Description>
       )
