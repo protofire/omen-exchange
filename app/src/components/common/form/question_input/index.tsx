@@ -1,7 +1,7 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
-import { FormRowLink, Textfield } from '../..'
+import { Textfield } from '../..'
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../util/types'
 import { ModalQuestion } from '../../../modal'
@@ -15,7 +15,8 @@ interface Props {
   name: string
   onChange: (event: ChangeEvent<HTMLInputElement>) => any
   onChangeQuestion: (question: Question, arbitrator: Arbitrator) => any
-  onClearQuestion: () => void
+  isModalQuestionOpen: boolean
+  setModalQuestionState: (_: boolean) => void
   placeholder: string
   value: string
 }
@@ -33,22 +34,20 @@ export const QuestionInput = (props: Props) => {
     addCategoryCustomValue,
     context,
     disabled,
+    isModalQuestionOpen,
     name = 'question',
     onChange,
     onChangeQuestion,
-    onClearQuestion,
     placeholder = 'Type in a question...',
+    setModalQuestionState,
+
     value,
   } = props
-
-  const [isModalQuestionOpen, setModalQuestionState] = useState(false)
 
   return (
     <>
       <TitleWrapper>
         <FormLabel>Set Market Question</FormLabel>
-        {!disabled && <FormRowLink onClick={() => setModalQuestionState(true)}>import Market</FormRowLink>}
-        {disabled && <FormRowLink onClick={onClearQuestion}>clear Market</FormRowLink>}
       </TitleWrapper>
       <Textfield
         disabled={disabled}

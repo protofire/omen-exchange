@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   flex-direction: row;
   justify-content: space-between;
   border-radius: 4px;
-  border: 1px solid ${props => props.theme.borders.borderColorLighter};
+  border: 1px solid ${props => props.theme.borders.borderDisabled};
   align-content: center;
   padding: 4px 20px;
   margin-bottom: 20px;
@@ -47,6 +47,7 @@ interface Props {
   additionalDescription: string
   danger?: boolean
   grayscale?: boolean
+  style?: React.CSSProperties
 }
 
 export const WarningMessage = (props: Props) => {

@@ -18,7 +18,7 @@ const Title = styled.h2`
 const DescriptionWrapper = styled.div`
   align-items: center;
   border-radius: 4px;
-  border: 1px solid ${props => props.theme.borders.borderColorLighter};
+  border: 1px solid ${props => props.theme.borders.borderDisabled};
   display: flex;
   padding: 21px 25px;
 `

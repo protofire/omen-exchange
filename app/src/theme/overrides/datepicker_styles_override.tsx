@@ -5,7 +5,7 @@ export const DatepickerStylesOverride = css`
     &.react-datepicker {
       background-color: #fff;
       border-radius: 16px;
-      border: 1px solid ${props => props.theme.borders.borderColorLighter};
+      border: 1px solid ${props => props.theme.borders.borderDisabled};
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
       color: ${props => props.theme.colors.textColorDark};
       display: inline-block;
@@ -15,7 +15,7 @@ export const DatepickerStylesOverride = css`
 
       .react-datepicker__header {
         background-color: transparent;
-        border-bottom: 1px solid ${props => props.theme.borders.borderColorLighter};
+        border-bottom: 1px solid ${props => props.theme.borders.borderDisabled};
         border-top-left-radius: 16px;
         border-top-right-radius: 16px;
         padding-top: 12px;
@@ -108,7 +108,7 @@ export const DatepickerStylesOverride = css`
       }
 
       .react-datepicker__time-container {
-        border-left: 1px solid ${props => props.theme.borders.borderColorLighter};
+        border-left: 1px solid ${props => props.theme.borders.borderDisabled};
         width: 88px;
       }
 
@@ -131,6 +131,29 @@ export const DatepickerStylesOverride = css`
         }
       }
 
+      .react-datepicker__time-container .react-datepicker__time {
+        background-color: ${props => props.theme.textfield.backgroundColor};
+      }
+
+      .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box {
+        padding-bottom: 16px;
+        width: 100%;
+
+        ul.react-datepicker__time-list {
+          height: calc(195px + (1.7rem / 2) - 8px) !important;
+          ::-webkit-scrollbar {
+            width: 4px;
+          }
+          ::-webkit-scrollbar-thumb {
+            background-color: rgb(159, 168, 218);
+            border-radius: 2px;
+          }
+          ::-webkit-scrollbar-track {
+            background: rgb(232, 234, 246);
+            border-radius: 2px;
+          }
+        }
+      }
       .react-datepicker__time-container
         .react-datepicker__time
         .react-datepicker__time-box
@@ -146,7 +169,7 @@ export const DatepickerStylesOverride = css`
   .react-datepicker__year-read-view--down-arrow::before,
   .react-datepicker__month-read-view--down-arrow::before,
   .react-datepicker__month-year-read-view--down-arrow::before {
-    border-top-color: ${props => props.theme.borders.borderColorLighter};
+    border-top-color: ${props => props.theme.borders.borderDisabled};
     bottom: -1px;
   }
 `

@@ -32,16 +32,27 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   note?: any
   title?: string | undefined
   extraTitle?: any
+  style?: React.CSSProperties
 }
 
 export const FormRow = (props: Props) => {
-  const { error = undefined, extraTitle = null, formField, note = undefined, title = undefined, ...restProps } = props
+  const {
+    error = undefined,
+    extraTitle = null,
+    formField,
+    note = undefined,
+    style,
+    title = undefined,
+    ...restProps
+  } = props
   return (
-    <FormRowWrapper {...restProps}>
-      <TitleWrapper>
-        {title && <FormLabel>{title}</FormLabel>}
-        {extraTitle}
-      </TitleWrapper>
+    <FormRowWrapper {...restProps} style={{ marginTop: 20, ...(style || {}) }}>
+      {(title || extraTitle) && (
+        <TitleWrapper>
+          {title && <FormLabel>{title}</FormLabel>}
+          {extraTitle}
+        </TitleWrapper>
+      )}
       {formField}
       {note && <FormRowNote>{note}</FormRowNote>}
       {error && <Error>{error}</Error>}

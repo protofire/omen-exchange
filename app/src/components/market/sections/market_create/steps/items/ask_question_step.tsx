@@ -7,7 +7,7 @@ import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
-import { DateField, FormRow } from '../../../../../common'
+import { DateField, FormRow, FormStateButton } from '../../../../../common'
 import { CommonDisabledCSS } from '../../../../../common/form/common_styled'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
@@ -20,10 +20,8 @@ import { Outcome, Outcomes } from '../outcomes'
 const ButtonCategoryFocusCSS = css`
   &,
   &:hover {
-    background-color: ${props => props.theme.colors.secondary};
-    border-color: ${props => props.theme.colors.secondary};
-    color: ${props => props.theme.colors.primary};
-    font-weight: 500;
+    border-color: ${props => props.theme.textfield.borderColorActive};
+    color: ${props => props.theme.textfield.color};
   }
 `
 
@@ -32,10 +30,12 @@ const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boo
   padding-left: 10px;
   padding-right: 10px;
   width: 100%;
+  height: 36px;
+  font-weight: normal;
   &,
   &:hover {
-    color: ${props => (props.isACategorySelected ? props.theme.colors.textColorDark : '#86909e')};
-    font-weight: 400;
+    color: ${props =>
+      props.isACategorySelected ? props.theme.colors.textColorDark : props.theme.colors.textColorLighter};
   }
 
   ${props => (props.focus ? ButtonCategoryFocusCSS : '')}
@@ -57,24 +57,19 @@ const ButtonCategoryTextOverflow = styled.span`
   text-transform: capitalize;
 `
 
-const GridThreeColumns = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
-  column-gap: 20px;
+const GridTwoColumns = styled.div`
+  column-gap: 16px;
   display: grid;
   grid-template-columns: 1fr;
-  padding: 20px 0;
+  padding-bottom: 20px;
   row-gap: 20px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 `
 
-const Column = styled.div`
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    max-width: 165px;
-  }
-`
+const Column = styled.div``
 
 const ButtonWithReadyToGoStatusCSS = css`
   &,
@@ -90,6 +85,16 @@ const ButtonWithReadyToGoStatus = styled(Button)<{ readyToGo: boolean }>`
   ${props => props.readyToGo && ButtonWithReadyToGoStatusCSS}
 `
 
+const CategoryImportWrapper = styled.div`
+  border-bottom: 1px solid ${props => props.theme.borders.borderDisabled};
+  margin-left: -${props => props.theme.cards.paddingHorizontal};
+  margin-right: -${props => props.theme.cards.paddingHorizontal};
+  padding: 0 ${props => props.theme.cards.paddingHorizontal};
+  padding-bottom: 20px;
+  & > * + * {
+    margin-left: 8px;
+  }
+`
 interface Props {
   next: () => void
   values: {
@@ -146,12 +151,20 @@ const AskQuestionStep = (props: Props) => {
 
   const history = useHistory()
 
+  const [isModalQuestionOpen, setModalQuestionState] = useState(false)
   const totalProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
   const totalProbabilitiesNotFull = Math.abs(totalProbabilities - 100) > 0.000001
+  const outcomeNames = outcomes.map(outcome => outcome.name)
   const isContinueButtonDisabled =
-    totalProbabilitiesNotFull || outcomes.length < 2 || !question || !resolution || !category
+    totalProbabilitiesNotFull ||
+    outcomes.length < 2 ||
+    !question ||
+    !resolution ||
+    !category ||
+    outcomeNames.map(name => !name).reduce((e1, e2) => e1 || e2) ||
+    outcomeNames.map((name, index) => outcomeNames.indexOf(name) !== index).reduce((e1, e2) => e1 || e2)
 
-  const canAddOutcome = outcomes.length <= MAX_OUTCOME_ALLOWED && !loadedQuestionId
+  const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
   const [categoryButtonFocus, setCategoryButtonFocus] = useState(false)
 
@@ -169,7 +182,27 @@ const AskQuestionStep = (props: Props) => {
   }
 
   return (
-    <CreateCard>
+    <CreateCard style={{ paddingTop: 20, paddingBottom: 20 }}>
+      <CategoryImportWrapper>
+        <FormStateButton
+          active={!loadedQuestionId}
+          onClick={() => {
+            if (loadedQuestionId) {
+              handleClearQuestion()
+            }
+          }}
+        >
+          Categorical Market
+        </FormStateButton>
+        {!loadedQuestionId && (
+          <FormStateButton onClick={() => setModalQuestionState(true)}>Import Market</FormStateButton>
+        )}
+        {!!loadedQuestionId && (
+          <FormStateButton active onClick={handleClearQuestion}>
+            Clear Market
+          </FormStateButton>
+        )}
+      </CategoryImportWrapper>
       <FormRow
         formField={
           <QuestionInput
@@ -177,11 +210,12 @@ const AskQuestionStep = (props: Props) => {
             addCategoryCustomValue={addCategoryCustom}
             context={context}
             disabled={!!loadedQuestionId}
+            isModalQuestionOpen={isModalQuestionOpen}
             name="question"
             onChange={handleChange}
             onChangeQuestion={handleQuestionChange}
-            onClearQuestion={handleClearQuestion}
             placeholder="What question do you want the world predict?"
+            setModalQuestionState={setModalQuestionState}
             value={question}
           />
         }
@@ -193,7 +227,7 @@ const AskQuestionStep = (props: Props) => {
         outcomes={outcomes}
         totalProbabilities={totalProbabilities}
       />
-      <GridThreeColumns>
+      <GridTwoColumns>
         <Column>
           <FormRow
             formField={
@@ -205,7 +239,7 @@ const AskQuestionStep = (props: Props) => {
                 selected={resolution}
               />
             }
-            title={'Resolution Date'}
+            title={'Resolution Date (UTC)'}
           />
         </Column>
         <Column>
@@ -224,21 +258,7 @@ const AskQuestionStep = (props: Props) => {
             title={'Category'}
           />
         </Column>
-        <Column>
-          <FormRow
-            formField={
-              <Arbitrators
-                customValues={arbitratorsCustom}
-                disabled={!!loadedQuestionId}
-                networkId={context.networkId}
-                onChangeArbitrator={handleArbitratorChange}
-                value={arbitrator}
-              />
-            }
-            title={'Arbitrator'}
-          />
-        </Column>
-      </GridThreeColumns>
+      </GridTwoColumns>
       {categoryButtonFocus && (
         <Categories
           categories={categoriesCustom}
@@ -257,6 +277,20 @@ const AskQuestionStep = (props: Props) => {
         }
         href={DOCUMENT_VALIDITY_RULES}
         hyperlinkDescription={'invalid'}
+        style={{ marginBottom: 0 }}
+      />
+      <FormRow
+        formField={
+          <Arbitrators
+            customValues={arbitratorsCustom}
+            disabled={!!loadedQuestionId}
+            networkId={context.networkId}
+            onChangeArbitrator={handleArbitratorChange}
+            value={arbitrator}
+          />
+        }
+        style={{ marginBottom: 0 }}
+        title={'Arbitrator'}
       />
       <ButtonContainerFullWidth borderTop={true}>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>

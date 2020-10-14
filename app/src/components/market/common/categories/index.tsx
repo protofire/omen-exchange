@@ -17,16 +17,16 @@ interface Props {
 }
 
 const Wrapper = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  padding: 20px 0 6px;
+  align-itmes: center;
+  padding: 0 0 6px;
 `
 
 const CategoryButton = styled(Button)<{ isSelected: boolean }>`
   margin: 0 8px 14px 0;
-
+  height: 36px;
+  text-transform: capitalize;
   &,
   &:hover {
     border-color: ${props =>
@@ -55,10 +55,12 @@ export const Categories = (props: Props) => {
 
   const allCategories = categories.length > 0 ? categories : CATEGORIES
 
-  const options = allCategories.map(category => ({
-    label: category,
-    value: category,
-  }))
+  const options = allCategories
+    .filter(category => String(category).toLowerCase() === category)
+    .map(category => ({
+      label: category,
+      value: category,
+    }))
 
   return (
     <Wrapper {...restProps}>
