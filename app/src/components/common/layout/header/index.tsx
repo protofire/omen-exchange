@@ -59,9 +59,6 @@ const ButtonCreateDesktop = styled(Button)`
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: flex;
-    & > * + * {
-      margin-left: 12px;
-    }
   }
 `
 
@@ -116,6 +113,10 @@ const HeaderDropdown = styled(Dropdown)`
   ${ButtonCSS}
 `
 
+const CloseIconWrapper = styled.div`
+  margin-right: 12px;
+`
+
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   const context = useWeb3Context()
 
@@ -153,7 +154,10 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
           {isMarketCreatePage ? (
             <>
               <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...exitButtonProps}>
-                <IconClose />
+                <CloseIconWrapper>
+                  <IconClose />
+                </CloseIconWrapper>
+
                 <span>Exit</span>
               </ButtonCreateDesktop>
               <ButtonCreateMobile {...exitButtonProps}>
