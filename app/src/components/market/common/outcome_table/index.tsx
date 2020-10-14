@@ -1,3 +1,4 @@
+import Big from 'big.js'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 import styled, { css } from 'styled-components'
@@ -17,7 +18,7 @@ interface Props {
   displayRadioSelection?: boolean
   outcomeHandleChange?: (e: number) => void
   outcomeSelected?: number
-  payouts?: Maybe<number[]>
+  payouts?: Maybe<Big[]>
   probabilities: number[]
   newShares?: Maybe<BigNumber[]>
   withWinningOutcome?: boolean
@@ -131,12 +132,12 @@ export const OutcomeTable = (props: Props) => {
 
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
     const { currentPrice, outcomeName, payout, shares } = balanceItem
-    const currentPriceFormatted = withWinningOutcome ? payout : Number(currentPrice).toFixed(2)
-    const probability = withWinningOutcome ? payout * 100 : probabilities[outcomeIndex]
+    const currentPriceFormatted = withWinningOutcome ? payout.toFixed(2) : Number(currentPrice).toFixed(2)
+    const probability = withWinningOutcome ? Number(payout.mul(100).toString()) : probabilities[outcomeIndex]
     const newPrice = (probabilities[outcomeIndex] / 100).toFixed(2)
-    const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
+    const formattedPayout = formatBigNumber(mulBN(shares, Number(payout.toString())), collateral.decimals)
     const formattedShares = formatBigNumber(shares, collateral.decimals)
-    const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
+    const isWinningOutcome = payouts && payouts[outcomeIndex] && payouts[outcomeIndex].gt(0)
     const formattedNewShares = newShares ? formatBigNumber(newShares[outcomeIndex], collateral.decimals) : null
 
     return (
