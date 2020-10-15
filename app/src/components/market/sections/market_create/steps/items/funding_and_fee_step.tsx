@@ -47,12 +47,14 @@ import { TradingFeeSelector } from '../../../../common/trading_fee_selector'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
+import { VerifiedRow } from '../../../../common/verified_row'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome } from '../outcomes'
 
 const CreateCardTop = styled(CreateCard)`
   margin-bottom: 20px;
   min-height: 0;
+  padding: 24px;
 `
 
 const CreateCardBottom = styled(CreateCard)`
@@ -75,17 +77,6 @@ const QuestionText = styled.p`
   font-size: 14px;
   font-weight: normal;
   margin: 0 0 24px;
-`
-
-const Grid = styled.div`
-  display: grid;
-  grid-column-gap: 32px;
-  grid-row-gap: 20px;
-  grid-template-columns: 1fr;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
 `
 
 const TitleValueVertical = styled(TitleValue)`
@@ -147,6 +138,15 @@ const StyledTradingFeeSelector = styled(TradingFeeSelector)`
   width: 50%;
 `
 
+const FlexRowWrapper = styled.div`
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  & > * + * {
+    margin-left: 48px;
+  }
+`
+
 interface Props {
   back: () => void
   submit: () => void
@@ -160,6 +160,7 @@ interface Props {
     funding: BigNumber
     outcomes: Outcome[]
     loadedQuestionId: Maybe<string>
+    verifyLabel?: string
   }
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
@@ -318,16 +319,19 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             </OutcomesTBody>
           </OutcomesTable>
         </OutcomesTableWrapper>
-        <Grid style={{ marginTop: 20 }}>
+        <FlexRowWrapper>
           <TitleValueVertical
             date={resolution instanceof Date ? resolution : undefined}
-            title={'Resolution Date (UTC)'}
+            title={'Closing Date(UTC)'}
             tooltip={true}
             value={resolutionDate}
           />
           <TitleValueVertical title={'Category'} value={category} />
           <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
-        </Grid>
+          {!!loadedQuestionId && (
+            <TitleValueVertical title={'Verified'} value={<VerifiedRow label={values.verifyLabel} />} />
+          )}
+        </FlexRowWrapper>
       </CreateCardTop>
       <CreateCardBottom>
         <CreateCardBottomRow>
@@ -336,14 +340,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             {customFee ? 'use default trading fee' : 'set custom trading fee'}
           </CustomFeeToggle>
         </CreateCardBottomRow>
-        <WarningMessage
-          additionalDescription={''}
-          description={
-            'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
-          }
-          href={DOCUMENT_FAQ}
-          hyperlinkDescription={'More Info'}
-        />
+
         <GridTransactionDetailsWrapper noMarginTop={true}>
           <div>
             {tokensAmount > 1 && (
@@ -393,6 +390,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsWrapper>
+
         {exceedsMaxFee && (
           <WarningMessage
             additionalDescription={''}
@@ -417,8 +415,17 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             finished={allowanceFinished && RemoteData.is.success(allowance)}
             loading={RemoteData.is.asking(allowance)}
             onUnlock={unlockCollateral}
+            style={{ marginBottom: 20 }}
           />
         )}
+        <WarningMessage
+          additionalDescription={''}
+          description={
+            'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
+          }
+          href={DOCUMENT_FAQ}
+          hyperlinkDescription={'More Info'}
+        />
         <ButtonContainerFullWidth borderTop>
           <LeftButton
             buttonType={ButtonType.secondaryLine}

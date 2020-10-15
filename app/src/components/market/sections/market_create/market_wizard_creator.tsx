@@ -176,27 +176,24 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const handleQuestionChange = (questionObj: Question, arbitrator: Arbitrator) => {
-    const { category, id: questionId, outcomes, resolution, title: question } = questionObj
+  const handleQuestionChange = (
+    questionObj: Question,
+    arbitrator: Arbitrator,
+    outcomes: Outcome[],
+    verifyLabel?: string,
+  ) => {
+    const { category, id: questionId, resolution, title: question } = questionObj
 
-    const outcomesFromQuestion = outcomes.map(outcomeName => {
-      return {
-        name: outcomeName,
-        probability: outcomes.length > 0 ? 100 / outcomes.length : 100,
-      }
-    })
-
-    const newMarketData = {
-      ...marketData,
+    setMarketdata(prevMarketData => ({
+      ...prevMarketData,
       arbitrator,
       question,
       category,
       resolution,
-      outcomes: outcomesFromQuestion,
+      outcomes,
       loadedQuestionId: questionId,
-    }
-
-    setMarketdata(newMarketData)
+      verifyLabel,
+    }))
   }
 
   const handleCollateralChange = (collateral: Token) => {

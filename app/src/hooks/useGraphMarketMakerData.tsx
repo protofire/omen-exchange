@@ -171,7 +171,7 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
   }
 
   return {
-    marketMakerData,
+    marketMakerData: error ? null : marketMakerData,
     status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
   }
 }
