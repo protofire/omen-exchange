@@ -76,6 +76,7 @@ const theme = {
     activeListItemBackground: '#fafafa',
     darkGray: '#acacac',
     error: '#fa0000',
+    danger: '#E57373',
     gray: '#b7b7b7',
     green: '#4B9E98',
     mainBodyBackground: '#fff',

@@ -4,8 +4,9 @@ import styled from 'styled-components'
 import { Arbitrator } from '../../../../util/types'
 import { IconArbitrator } from '../../../common/icons/IconArbitrator'
 import { IconCategory } from '../../../common/icons/IconCategory'
+import { IconExclamation } from '../../../common/icons/IconNotVerifiedExclamation'
 import { IconOracle } from '../../../common/icons/IconOracle'
-
+import { IconVerified } from '../../../common/icons/IconVerified'
 const AdditionalMarketDataWrapper = styled.div`
   height: 45px;
   border-top: 1px solid ${props => props.theme.borders.borderDisabled};
@@ -45,11 +46,11 @@ const AdditionalMarketDataSectionWrapper = styled.a`
   }
 `
 
-const AdditionalMarketDataSectionTitle = styled.p`
+const AdditionalMarketDataSectionTitle = styled.p<{ verified?: boolean }>`
   margin-left: 6px;
   font-size: 14px;
   line-height: 16px;
-  color: ${props => props.theme.colors.clickable};
+  color: ${props => (props.verified ? props.theme.colors.danger : props.theme.colors.clickable)};
   &:first-letter {
     text-transform: capitalize;
   }
@@ -64,10 +65,15 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 
 export const AdditionalMarketData: React.FC<Props> = props => {
   const { arbitrator, category, id, oracle } = props
+  console.log(props)
+  const { marketId } = useGraphMarketIdFromQuestion(question?.id || '')
+  const { marketMakerData } = useMarketMakerData((marketId || '').toLowerCase())
 
   const windowObj: any = window
   const realitioBaseUrl =
     windowObj.ethereum && windowObj.ethereum.isMetaMask ? 'https://reality.eth' : 'https://reality.eth.link'
+
+  const verified = false
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
 
@@ -88,7 +94,18 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <IconArbitrator size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
+        <AdditionalMarketDataSectionWrapper>
+          {verified ? (
+            <IconVerified size={isMobile ? '20' : '24'} />
+          ) : (
+            <IconExclamation size={isMobile ? '20' : '24'} />
+          )}
+          <AdditionalMarketDataSectionTitle verified={!verified}>
+            {verified ? 'Verified' : 'Not verified'}
+          </AdditionalMarketDataSectionTitle>
+        </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>
     </AdditionalMarketDataWrapper>
   )
 }
+// export const AdditionalMarketData = withRouter(AdditionalMarketDatas)

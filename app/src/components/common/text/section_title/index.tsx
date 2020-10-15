@@ -8,7 +8,7 @@ import { IconArrowBack } from '../../icons/IconArrowBack'
 import CheckSVG from './img/dxdao-verified.svg'
 
 const CheckMark = styled.img`
-  margin-left 6px;
+  margin-left: 6px;
 `
 
 export enum TextAlign {
