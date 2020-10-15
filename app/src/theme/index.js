@@ -129,6 +129,7 @@ const theme = {
     xxxl: '1366px',
   },
   borders: {
+    tooltip: '#cfd8dc',
     borderColor: '#ECEFF1',
     borderColorLighter: '#E8EAF6',
     commonBorderRadius: '6px',
