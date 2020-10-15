@@ -72,7 +72,7 @@ const UserData = styled.div`
   justify-content: space-between;
   padding: 24px 25px;
   margin: 0 -25px;
-  border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
+  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
 `
 
 const UserDataTitleValue = styled(TitleValue)`
