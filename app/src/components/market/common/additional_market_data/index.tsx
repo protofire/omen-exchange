@@ -35,7 +35,7 @@ const AdditionalMarketDataLeft = styled.div`
 const AdditionalMarketDataSectionWrapper = styled.a`
   display: flex;
   align-items: center;
-  margin-left: 20px;
+  margin-left: 16px;
   cursor: pointer;
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
