@@ -416,6 +416,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             collateral={collateral}
             finished={allowanceFinished && RemoteData.is.success(allowance)}
             loading={RemoteData.is.asking(allowance)}
+            marginBottom
             onUnlock={unlockCollateral}
           />
         )}
