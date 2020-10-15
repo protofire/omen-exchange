@@ -7,6 +7,7 @@ import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import theme from '../../../../theme'
+import { getContractAddress } from '../../../../util/networks'
 import { MarketMakerData, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -55,7 +56,10 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     question,
     runningDailyVolumeByHour,
     scaledLiquidityParameter,
+    submissionIDs,
   } = marketMakerData
+  const { title } = question
+  const ovmAddress = getContractAddress(context.networkId, 'omenVerifiedMarkets')
 
   const [showingProgressBar, setShowingProgressBar] = useState(false)
 
@@ -124,11 +128,15 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         runningDailyVolumeByHour={runningDailyVolumeByHour}
       ></MarketData>
       <AdditionalMarketData
+        address={address}
         arbitrator={arbitrator}
         category={question.category}
+        curatedByDxDaoOrKleros={isVerified}
         id={question.id}
-        oracle="Reality"
-        verified={isVerified}
+        oracle="Reality.eth"
+        ovmAddress={ovmAddress}
+        submissionIDs={submissionIDs}
+        title={title}
       ></AdditionalMarketData>
     </>
   )

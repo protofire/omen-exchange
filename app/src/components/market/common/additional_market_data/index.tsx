@@ -3,8 +3,15 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { useRealityLink } from '../../../../hooks/useRealityLink'
-import { Arbitrator } from '../../../../util/types'
-import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
+import { Arbitrator, KlerosItemStatus, KlerosSubmission } from '../../../../util/types'
+import {
+  IconAlert,
+  IconArbitrator,
+  IconCategory,
+  IconExclamation,
+  IconOracle,
+  IconVerified,
+} from '../../../common/icons'
 
 const AdditionalMarketDataWrapper = styled.div`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
@@ -85,20 +92,60 @@ const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; i
   }
 `
 
+const AdditionalMarketDataSectionTitle = styled.p`
+  margin-left: 6px;
+  font-size: 14px;
+  line-height: 16px;
+  color: ${props => props.theme.colors.clickable};
+  &:first-letter {
+    text-transform: capitalize;
+  }
+`
+
+const StyledAdditionalMarketSectionTitle = styled(AdditionalMarketDataSectionTitle as any)`
+  ${props => !props.curatedByDxDaoOrKleros && `color: ${props.theme.colors.red}`}
+`
+
 interface Props extends DOMAttributes<HTMLDivElement> {
   category: string
   arbitrator: Arbitrator
   oracle: string
   id: string
-  verified: boolean
+  curatedByDxDaoOrKleros: boolean
+  submissionIDs: KlerosSubmission[]
+  ovmAddress: string
+  title: string
+  address: string
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { arbitrator, category, id, oracle, verified } = props
+  const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, ovmAddress, submissionIDs, title } = props
 
   const realitioBaseUrl = useRealityLink()
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
+
+  const isMobile = window.innerWidth < 768
+  submissionIDs.sort((s1, s2) => {
+    if (s1.status === KlerosItemStatus.Registered) return -1
+    if (s2.status === KlerosItemStatus.Registered) return 1
+    if (s1.status === KlerosItemStatus.ClearingRequested) return -1
+    if (s2.status === KlerosItemStatus.ClearingRequested) return 1
+    if (s1.status === KlerosItemStatus.RegistrationRequested) return -1
+    if (s2.status === KlerosItemStatus.RegistrationRequested) return 1
+    return 0
+  })
+
+  const queryParams = new URLSearchParams()
+  queryParams.append('col1', title)
+  queryParams.append('col2', `https://omen.eth.link/#/${address}`)
+
+  const submission = submissionIDs.length > 0 && submissionIDs[0]
+  const curateLink = submission
+    ? `https://curate.kleros.io/tcr/${ovmAddress}/${submission.id}`
+    : `https://curate.kleros.io/tcr/${ovmAddress}/addItem?${queryParams.toString()}`
+
+  const Icon = curatedByDxDaoOrKleros ? IconVerified : IconExclamation
 
   return (
     <AdditionalMarketDataWrapper>
@@ -130,15 +177,15 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         <AdditionalMarketDataSectionWrapper
           data-arrow-color="transparent"
           data-tip={
-            verified
+            curatedByDxDaoOrKleros
               ? 'This Market is verified by DXdao and therefore valid.'
               : 'This Market has not been verified and may be invalid.'
           }
-          isError={!verified}
+          isError={!curatedByDxDaoOrKleros}
         >
-          {verified ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
-          <AdditionalMarketDataSectionTitle isError={!verified}>
-            {verified ? 'Verified' : 'Not Verified'}
+          {curatedByDxDaoOrKleros ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
+          <AdditionalMarketDataSectionTitle isError={!curatedByDxDaoOrKleros}>
+            {curatedByDxDaoOrKleros ? 'Verified' : 'Not Verified'}
           </AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>
