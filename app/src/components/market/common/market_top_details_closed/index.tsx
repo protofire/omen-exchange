@@ -24,6 +24,9 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     answerFinalizedTimestamp,
     arbitrator,
     collateral: collateralToken,
+    curatedByDxDao,
+    curatedByDxDaoOrKleros,
+    klerosTCRregistered,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
@@ -43,7 +46,6 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const toggleProgressBar = () => {
     setShowingProgressBar(!showingProgressBar)
   }
-
   return (
     <>
       <SubsectionTitleWrapper>
@@ -75,6 +77,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         category={question.category}
         id={question.id}
         oracle="Reality.eth"
+        verified={curatedByDxDao || curatedByDxDaoOrKleros || klerosTCRregistered}
       ></AdditionalMarketData>
     </>
   )

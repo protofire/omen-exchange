@@ -61,19 +61,15 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   arbitrator: Arbitrator
   oracle: string
   id: string
+  verified?: boolean | number
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { arbitrator, category, id, oracle } = props
-  console.log(props)
-  const { marketId } = useGraphMarketIdFromQuestion(question?.id || '')
-  const { marketMakerData } = useMarketMakerData((marketId || '').toLowerCase())
+  const { arbitrator, category, id, oracle, verified } = props
 
   const windowObj: any = window
   const realitioBaseUrl =
     windowObj.ethereum && windowObj.ethereum.isMetaMask ? 'https://reality.eth' : 'https://reality.eth.link'
-
-  const verified = false
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
 

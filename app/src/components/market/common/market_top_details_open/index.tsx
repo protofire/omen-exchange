@@ -20,11 +20,15 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const [showingProgressBar, setShowingProgressBar] = useState(false)
 
   const { marketMakerData, title } = props
+
   const {
     address,
     answerFinalizedTimestamp,
     arbitrator,
     collateral,
+    curatedByDxDao,
+    curatedByDxDaoOrKleros,
+    klerosTCRregistered,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
@@ -90,6 +94,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         category={question.category}
         id={question.id}
         oracle="Reality.eth"
+        verified={curatedByDxDao || curatedByDxDaoOrKleros || klerosTCRregistered}
       ></AdditionalMarketData>
     </>
   )
