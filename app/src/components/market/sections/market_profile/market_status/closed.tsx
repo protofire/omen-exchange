@@ -39,7 +39,7 @@ interface Props extends RouteComponentProps<Record<string, string | undefined>> 
   marketMakerData: MarketMakerData
 }
 
-const logger = getLogger('Market::ClosedMarketDetail')
+const logger = getLogger('Market::ClosedMarketDetails')
 
 const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): Maybe<BigNumber> => {
   if (!payouts) {
@@ -312,4 +312,4 @@ const Wrapper = (props: Props) => {
   )
 }
 
-export const ClosedMarketDetail = withRouter(Wrapper)
+export const ClosedMarketDetails = withRouter(Wrapper)

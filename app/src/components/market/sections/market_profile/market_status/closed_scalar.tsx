@@ -9,9 +9,7 @@ interface Props extends RouteComponentProps<Record<string, string | undefined>> 
 }
 
 const Wrapper = (props: Props) => {
-  return (
-    <p>Closed Scalar</p>
-  )
+  return <p>Closed Scalar</p>
 }
 
 export const ClosedScalarMarketDetails = withRouter(Wrapper)

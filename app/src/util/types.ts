@@ -217,6 +217,7 @@ export interface MarketMakerData {
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
+  oracle: string
 }
 
 export enum Ternary {
