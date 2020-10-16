@@ -58,13 +58,13 @@ export const ReactTooltipStylesOverride = css`
       font-style: normal;
       font-weight: 400;
       line-height: 20px;
-      letter-spacing: 0.10000000149011612px;
+      letter-spacing: 0.1px;
       text-align: left;
       background-color: ${theme.colors.mainBodyBackground};
       opacity: 1;
       border-radius: ${theme.borders.commonBorderRadius};
-      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
-      border: 1px solid ${theme.borders.borderColor};
+      box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
+      border: 1px solid ${theme.borders.tooltip};
     }
   }
 `

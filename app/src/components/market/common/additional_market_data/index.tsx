@@ -49,11 +49,11 @@ const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean }>
 
   &:hover {
     p {
-      ${props => (props.noColorChange ? '' : 'color: #5c6bc0;')};
+      ${props => (props.noColorChange ? '' : `color:${props.theme.colors.primaryLight}`)};
     }
     svg {
       path {
-        ${props => (props.noColorChange ? '' : 'fill: #5c6bc0')};
+        ${props => (props.noColorChange ? '' : `fill:${props.theme.colors.primaryLight}`)};
       }
     }
   }

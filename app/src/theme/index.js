@@ -129,8 +129,10 @@ const theme = {
     xxxl: '1366px',
   },
   borders: {
+    tooltip: '#cfd8dc',
+    borderColor: '#ECEFF1',
+    borderColorLighter: '#E8EAF6',
     borderDisabled: '#E8EAF6',
-    borderColor: '#DCDFF2',
     commonBorderRadius: '6px',
   },
   slider: {
