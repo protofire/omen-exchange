@@ -28,8 +28,6 @@ const AdditionalMarketDataWrapper = styled.div`
 const AdditionalMarketDataLeft = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 10px;
-  margin-bottom: 10px;
 `
 
 const AdditionalMarketDataSectionWrapper = styled.a`
