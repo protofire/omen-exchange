@@ -100,8 +100,8 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <KlerosCuration klerosCurationData={klerosCurationData} selectSource={selectSource} selection={selection} />
-      <DxDaoCuration curatedByDxDao={curatedByDxDao} selectSource={selectSource} selection={selection} />
+      <KlerosCuration klerosCurationData={klerosCurationData} selection={selection} selectSource={selectSource} />
+      <DxDaoCuration curatedByDxDao={curatedByDxDao} selection={selection} selectSource={selectSource} />
       <BottomRow>
         <RightButton buttonType={ButtonType.primaryLine} disabled={typeof selection !== 'number'}>
           <UnstyledLink href={requestVerificationLink} rel="noopener noreferrer" target="_blank">
