@@ -15,13 +15,7 @@ import {
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { RemoteData } from '../../../../../../util/remote_data'
-import {
-  calcDistributionHint,
-  calcInitialFundingSendAmounts,
-  formatBigNumber,
-  formatDate,
-  formatNumber,
-} from '../../../../../../util/tools'
+import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
@@ -43,7 +37,6 @@ import {
   OutcomesTR,
   OutcomesTable,
   OutcomesTableWrapper,
-  TDFlexDiv,
 } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
 import { CurrencySelector } from '../../../../common/currency_selector'
@@ -67,21 +60,21 @@ const CreateCardBottom = styled(CreateCard)`
 `
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 `
 
 const SubTitle = styled.h3`
   color: ${props => props.theme.colors.textColorDarker};
   font-size: 14px;
   font-weight: normal;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
 `
 
 const QuestionText = styled.p`
   color: ${props => props.theme.colors.textColor};
   font-size: 14px;
   font-weight: normal;
-  margin: 0 0 20px;
+  margin: 0 0 24px;
 `
 
 const Grid = styled.div`
@@ -114,12 +107,12 @@ const CurrenciesWrapper = styled.div`
   width: 100%;
 `
 
-const GridTransactionDetailsStyled = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
+const GridTransactionDetailsWrapper = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
   ${props => (props.noMarginTop ? 'margin-top: 0;' : '')};
 `
 
 const ButtonCreate = styled(Button)`
-  font-weight: 500;
+  font-weight: 400;
 `
 
 const CreateCardBottomRow = styled.div`
@@ -129,7 +122,7 @@ const CreateCardBottomRow = styled.div`
 `
 
 const CustomFeeToggle = styled.p`
-  color: ${props => props.theme.colors.hyperlink};
+  color: ${props => props.theme.colors.primary};
   cursor: pointer;
   margin-top: 0;
 
@@ -166,6 +159,7 @@ interface Props {
     spread: number
     funding: BigNumber
     outcomes: Outcome[]
+    loadedQuestionId: Maybe<string>
   }
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
@@ -192,7 +186,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     submit,
     values,
   } = props
-  const { arbitrator, category, collateral, funding, outcomes, question, resolution, spread } = values
+  const { arbitrator, category, collateral, funding, loadedQuestionId, outcomes, question, resolution, spread } = values
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -224,18 +218,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     setIsNegativeDepositAmount(formatBigNumber(funding, collateral.decimals).includes('-'))
   }, [funding, collateral.decimals])
 
-  const resolutionDate = resolution && formatDate(resolution)
+  const resolutionDate = resolution && formatDate(resolution, false)
 
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
   const tokensAmount = useTokens(context).length
-
-  const distributionHint = calcDistributionHint(outcomes.map(outcome => outcome.probability))
-  const sharesAfterInitialFunding =
-    distributionHint.length > 0
-      ? calcInitialFundingSendAmounts(funding, distributionHint)
-      : outcomes.map(() => new BigNumber(0))
 
   const amountError =
     maybeCollateralBalance === null
@@ -302,16 +290,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   return (
     <>
       <CreateCardTop>
-        <SubsectionTitleStyled>Your Market</SubsectionTitleStyled>
-        <SubTitle>Market Question</SubTitle>
+        <SubsectionTitleStyled>Your {loadedQuestionId ? 'Imported' : 'Categorical'} Market</SubsectionTitleStyled>
+        <SubTitle>Question</SubTitle>
         <QuestionText>{question}</QuestionText>
-        <OutcomesTableWrapper>
+        <OutcomesTableWrapper borderBottom>
           <OutcomesTable>
             <OutcomesTHead>
               <OutcomesTR>
-                <OutcomesTH>Outcome</OutcomesTH>
-                <OutcomesTH textAlign="right">Probability</OutcomesTH>
-                <OutcomesTH textAlign="right">My Shares</OutcomesTH>
+                <OutcomesTH style={{ width: '60%' }}>Outcome</OutcomesTH>
+                <OutcomesTH>Probability</OutcomesTH>
               </OutcomesTR>
             </OutcomesTHead>
             <OutcomesTBody>
@@ -324,22 +311,17 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                         <OutcomeItemText>{outcome.name}</OutcomeItemText>
                       </OutcomeItemTextWrapper>
                     </OutcomesTD>
-                    <OutcomesTD textAlign="right">{outcome.probability.toFixed(2)}%</OutcomesTD>
-                    <OutcomesTD textAlign="right">
-                      <TDFlexDiv textAlign="right">
-                        {formatBigNumber(sharesAfterInitialFunding[index], collateral.decimals)}
-                      </TDFlexDiv>
-                    </OutcomesTD>
+                    <OutcomesTD>{outcome.probability.toFixed(2)}%</OutcomesTD>
                   </OutcomesTR>
                 )
               })}
             </OutcomesTBody>
           </OutcomesTable>
         </OutcomesTableWrapper>
-        <Grid>
+        <Grid style={{ marginTop: 20 }}>
           <TitleValueVertical
             date={resolution instanceof Date ? resolution : undefined}
-            title={'Resolution Date'}
+            title={'Resolution Date (UTC)'}
             tooltip={true}
             value={resolutionDate}
           />
@@ -362,7 +344,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           href={DOCUMENT_FAQ}
           hyperlinkDescription={'More Info'}
         />
-        <GridTransactionDetailsStyled noMarginTop={true}>
+        <GridTransactionDetailsWrapper noMarginTop={true}>
           <div>
             {tokensAmount > 1 && (
               <CurrenciesWrapper>
@@ -380,6 +362,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                   decimals={collateral.decimals}
                   name="funding"
                   onChange={handleAmountChange}
+                  style={{ width: 0 }}
                   value={amount}
                 />
               }
@@ -409,7 +392,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               />
             </TransactionDetailsCard>
           </div>
-        </GridTransactionDetailsStyled>
+        </GridTransactionDetailsWrapper>
         {exceedsMaxFee && (
           <WarningMessage
             additionalDescription={''}
@@ -433,10 +416,11 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             collateral={collateral}
             finished={allowanceFinished && RemoteData.is.success(allowance)}
             loading={RemoteData.is.asking(allowance)}
+            marginBottom
             onUnlock={unlockCollateral}
           />
         )}
-        <ButtonContainerFullWidth>
+        <ButtonContainerFullWidth borderTop>
           <LeftButton
             buttonType={ButtonType.secondaryLine}
             disabled={
@@ -452,7 +436,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               Connect Wallet
             </Button>
           )}
-          <ButtonCreate buttonType={ButtonType.primary} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
+          <ButtonCreate buttonType={ButtonType.secondaryLine} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
             Create Market
           </ButtonCreate>
         </ButtonContainerFullWidth>

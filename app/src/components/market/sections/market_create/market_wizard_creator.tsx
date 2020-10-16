@@ -38,7 +38,16 @@ export const MarketWizardCreator = (props: Props) => {
     collateral: defaultCollateral,
     funding: new BigNumber('0'),
     loadedQuestionId: null,
-    outcomes: [],
+    outcomes: [
+      {
+        name: '',
+        probability: 50,
+      },
+      {
+        name: '',
+        probability: 50,
+      },
+    ],
     question: '',
     resolution: null,
     spread: MARKET_FEE,
@@ -46,7 +55,7 @@ export const MarketWizardCreator = (props: Props) => {
 
   const [currentStep, setCurrentStep] = useState(1)
   const [marketData, setMarketdata] = useState<MarketData>(marketDataDefault)
-  const [first, setFirst] = useState<number>(8)
+  const [first, setFirst] = useState<number>(19)
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(true)
 
   useEffect(() => {

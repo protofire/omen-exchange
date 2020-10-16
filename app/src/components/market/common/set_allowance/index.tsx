@@ -4,7 +4,9 @@ import styled from 'styled-components'
 import { Token } from '../../../../util/types'
 import { ToggleTokenLock, ToggleTokenLockProps } from '../toggle_token_lock'
 
-const Wrapper = styled.div``
+const Wrapper = styled.div<{ marginBottom?: boolean }>`
+  margin-bottom: ${props => (props.marginBottom ? `20px` : '0')};
+`
 
 const Title = styled.h2`
   color: ${props => props.theme.colors.textColorDarker};
@@ -18,7 +20,7 @@ const Title = styled.h2`
 const DescriptionWrapper = styled.div`
   align-items: center;
   border-radius: 4px;
-  border: 1px solid ${props => props.theme.borders.borderColorLighter};
+  border: 1px solid ${props => props.theme.borders.borderDisabled};
   display: flex;
   padding: 21px 25px;
 `
@@ -34,6 +36,7 @@ const Description = styled.p`
 export type SetAllowanceProps = DOMAttributes<HTMLDivElement> &
   ToggleTokenLockProps & {
     collateral: Token
+    marginBottom?: boolean
   }
 
 export const SetAllowance: React.FC<SetAllowanceProps> = (props: SetAllowanceProps) => {

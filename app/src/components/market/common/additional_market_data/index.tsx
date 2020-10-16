@@ -9,7 +9,7 @@ import { IconOracle } from '../../../common/icons/IconOracle'
 
 const AdditionalMarketDataWrapper = styled.div`
   height: 45px;
-  border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
+  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -37,6 +37,9 @@ const AdditionalMarketDataSectionTitle = styled.p`
   font-size: 14px;
   line-height: 16px;
   color: ${props => props.theme.colors.clickable};
+  &:first-letter {
+    text-transform: capitalize;
+  }
 `
 const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean }>`
   display: flex;

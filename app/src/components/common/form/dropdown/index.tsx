@@ -73,7 +73,7 @@ const DropdownDisabledCSS = css`
 
 const DropdownVariantPillCSS = css`
   border-radius: 32px;
-  height: 34px;
+  height: 36px;
   padding: 0 14px;
   border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
 `

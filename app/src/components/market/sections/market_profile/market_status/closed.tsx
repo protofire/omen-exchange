@@ -41,7 +41,7 @@ interface Props extends RouteComponentProps<Record<string, string | undefined>> 
 
 const logger = getLogger('Market::ClosedMarketDetail')
 
-const computeEarnedCollateral = (payouts: Maybe<number[]>, balances: BigNumber[]): Maybe<BigNumber> => {
+const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): Maybe<BigNumber> => {
   if (!payouts) {
     return null
   }
@@ -50,10 +50,9 @@ const computeEarnedCollateral = (payouts: Maybe<number[]>, balances: BigNumber[]
   Big.RM = 0
 
   const earnedCollateralPerOutcome = balances.map((balance, index) => new Big(balance.toString()).mul(payouts[index]))
+  const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b.toFixed(0)), bigNumberify(0))
 
-  const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b))
-
-  return bigNumberify(earnedCollateral.toFixed(0))
+  return earnedCollateral
 }
 
 const Wrapper = (props: Props) => {
@@ -167,15 +166,22 @@ const Wrapper = (props: Props) => {
   }
 
   const hasWinningOutcomes = earnedCollateral && earnedCollateral.gt(0)
-  const winnersOutcomes = payouts ? payouts.filter(payout => payout > 0).length : 0
+  const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
   const userWinnersOutcomes = payouts
-    ? payouts.filter((payout, index) => balances[index].shares.gt(0) && payout > 0).length
+    ? payouts.filter((payout, index) => balances[index].shares.gt(0) && payout.gt(0)).length
     : 0
   const userWinnerShares = payouts
-    ? balances.reduce((acc, balance, index) => (payouts[index] > 0 ? acc.add(balance.shares) : acc), new BigNumber(0))
+    ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
     : new BigNumber(0)
   const EPS = 0.01
-  const allPayoutsEqual = payouts ? payouts.every(payout => Math.abs(payout - 1 / payouts.length) <= EPS) : false
+  const allPayoutsEqual = payouts
+    ? payouts.every(payout =>
+        payout
+          .sub(1 / payouts.length)
+          .abs()
+          .lte(EPS),
+      )
+    : false
 
   const buySellButtons = (
     <>

@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
-  background-color: ${props => props.theme.borders.borderColorLighter};
+  background-color: ${props => props.theme.borders.borderDisabled};
   height: 1px;
   line-height: 1px;
   margin: 0 0 14px;
