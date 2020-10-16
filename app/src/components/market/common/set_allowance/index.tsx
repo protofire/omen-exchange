@@ -11,7 +11,7 @@ const Wrapper = styled.div`
 `
 
 const Title = styled.h2`
-  color: ${props => props.theme.colors.textColorDarker};
+  color: ${props => props.theme.colors.textColorDark};
   font-size: 16px;
   letter-spacing: 0.4px;
   line-height: 1.2;

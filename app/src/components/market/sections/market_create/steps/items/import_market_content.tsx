@@ -108,15 +108,16 @@ const FlexRowWrapper = styled.div`
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   context: ConnectedWeb3Context
+  loadedQuestionId: Maybe<string>
   onSave: (question: Question, arbitrator: Arbitrator, outcomes: Outcome[], verifyLabel?: string) => void
 }
 
 export const ImportMarketContent = (props: Props) => {
-  const { context, onSave } = props
+  const { context, loadedQuestionId, onSave } = props
   const { realitio } = useContracts(context)
 
   const [state, setState] = useState<{ questionURL: string; loading: boolean }>({
-    questionURL: '',
+    questionURL: loadedQuestionId ? `http://reality.eth.link/app/#!/question/${loadedQuestionId}` : '',
     loading: false,
   })
 
@@ -227,7 +228,8 @@ export const ImportMarketContent = (props: Props) => {
 
           <FlexRowWrapper>
             <TitleValueVertical
-              title={'Closing Date(UTC)'}
+              date={new Date(question.resolution)}
+              title={'Closing Date (UTC)'}
               tooltip={true}
               value={formatDate(question.resolution, false)}
             />
@@ -237,7 +239,7 @@ export const ImportMarketContent = (props: Props) => {
             )}
 
             <TitleValueVertical
-              title={'Verified'}
+              title={'Verified by'}
               value={
                 <VerifiedRow
                   label={marketMakerData.curatedByDxDao ? 'DXdao' : marketMakerData.klerosTCRregistered ? 'Kleros' : ''}

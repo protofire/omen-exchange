@@ -151,7 +151,7 @@ const AskQuestionStep = (props: Props) => {
   } = values
 
   const history = useHistory()
-  const [isImport, setIsImport] = useState(false)
+  const [isImport, setIsImport] = useState(!!loadedQuestionId)
 
   const totalProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
   const totalProbabilitiesNotFull = Math.abs(totalProbabilities - 100) > 0.000001
@@ -212,7 +212,11 @@ const AskQuestionStep = (props: Props) => {
         )}
       </CategoryImportWrapper>
       {isImport ? (
-        <ImportMarketContent context={context} onSave={handleQuestionChange}></ImportMarketContent>
+        <ImportMarketContent
+          context={context}
+          loadedQuestionId={loadedQuestionId}
+          onSave={handleQuestionChange}
+        ></ImportMarketContent>
       ) : (
         <>
           <FormRow

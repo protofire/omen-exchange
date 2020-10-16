@@ -322,14 +322,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         <FlexRowWrapper>
           <TitleValueVertical
             date={resolution instanceof Date ? resolution : undefined}
-            title={'Closing Date(UTC)'}
+            title={'Closing Date (UTC)'}
             tooltip={true}
             value={resolutionDate}
           />
           <TitleValueVertical title={'Category'} value={category} />
           <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
           {!!loadedQuestionId && (
-            <TitleValueVertical title={'Verified'} value={<VerifiedRow label={values.verifyLabel} />} />
+            <TitleValueVertical title={'Verified by'} value={<VerifiedRow label={values.verifyLabel} />} />
           )}
         </FlexRowWrapper>
       </CreateCardTop>

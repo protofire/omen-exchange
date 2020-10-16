@@ -5,19 +5,19 @@ interface FormStateButtonWrapperProps {
   active?: boolean
 }
 
-const FormStateButtonWrapper = styled.span<FormStateButtonWrapperProps>`
-  color: ${({ active, theme }) => (active ? theme.colors.primary : theme.colors.clickable)};
-  background-color: ${({ active, theme }) => (active ? theme.colors.verticalDivider : '')};
-  font-weight: ${({ active }) => (active ? '500' : 'normal')};
-  cursor: pointer;
+const FormStateButtonWrapper = styled.div<FormStateButtonWrapperProps>`
   font-size: 14px;
-  font-weight: 400;
-  line-height: 1.2;
-  text-decoration: none;
+  color: ${props => (props.active ? props.theme.buttonSecondary.color : props.theme.colors.clickable)};
+  background: none;
+  border: none;
+  border-radius: 32px;
   padding: 10px 18px;
-  border-radius: 18px;
-  position: relative;
+  margin-right: 2px;
+  background: ${props => (props.active ? props.theme.buttonSecondary.backgroundColor : `none`)};
+  font-weight: ${props => (props.active ? `500` : `400`)};
+  cursor: pointer;
   display: inline-block;
+  transition: all 0.3s;
 
   &.disabled {
     color: ${props => props.theme.colors.textColor};
