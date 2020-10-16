@@ -165,14 +165,14 @@ export const ImportMarketContent = (props: Props) => {
   const { marketMakerData } = useMarketMakerData((marketId || '').toLowerCase())
 
   useEffect(() => {
-    if (marketMakerData) {
+    if (question && marketMakerData && marketMakerData.question.id === question.id) {
       setLoading(false)
-      if (question && arbitrator) {
+      if (arbitrator) {
         const outcomes = marketMakerData.balances.map(
           (balance: BalanceItem) =>
             ({
               name: balance.outcomeName,
-              probability: balance.probability,
+              probability: 100 / marketMakerData.balances.length,
             } as Outcome),
         )
         const verifyLabel = marketMakerData.curatedByDxDao
@@ -186,7 +186,7 @@ export const ImportMarketContent = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marketMakerData])
 
-  const validContent = !!question && !errorMessage && !!marketId && !!marketMakerData
+  const validContent = !!question && !errorMessage && !!marketId && !!marketMakerData && !state.loading
 
   const questionDetails = () => {
     return (
@@ -210,7 +210,7 @@ export const ImportMarketContent = (props: Props) => {
               </OutcomesTHead>
               <OutcomesTBody>
                 {marketMakerData.balances.map((balanceItem: BalanceItem, index) => {
-                  const { outcomeName, probability } = balanceItem
+                  const { outcomeName } = balanceItem
                   return (
                     <OutcomesTR key={index}>
                       <OutcomesTD>
@@ -219,7 +219,7 @@ export const ImportMarketContent = (props: Props) => {
                           <OutcomeItemText>{outcomeName}</OutcomeItemText>
                         </OutcomeItemTextWrapper>
                       </OutcomesTD>
-                      <OutcomesTD>{probability.toFixed(2)}%</OutcomesTD>
+                      <OutcomesTD>{(100 / marketMakerData.balances.length).toFixed(2)}%</OutcomesTD>
                     </OutcomesTR>
                   )
                 })}
@@ -295,18 +295,6 @@ export const ImportMarketContent = (props: Props) => {
         return (
           <WarningMessage
             description={'Market has an expired closing date and cannot be imported.'}
-            style={{ marginBottom: 20, marginTop: -4 }}
-          />
-        )
-      }
-      const totalProbabilities = marketMakerData.balances
-        .map(balance => balance.probability)
-        .reduce((probability1, probability2) => probability1 + probability2)
-
-      if (totalProbabilities !== 100) {
-        return (
-          <WarningMessage
-            description={'Market has outcomes with no probability and cannot be imported.'}
             style={{ marginBottom: 20, marginTop: -4 }}
           />
         )

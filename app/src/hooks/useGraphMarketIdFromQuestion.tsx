@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Status } from '../util/types'
 
@@ -40,9 +40,13 @@ export const useGraphMarketIdFromQuestion = (questionId: string): Result => {
 
   const { data, error, loading } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
-    skip: !!marketId,
+    skip: false,
     variables: { id: questionId },
   })
+
+  useEffect(() => {
+    if (!questionId) setMarketId('')
+  }, [questionId])
 
   if (data && data.question && data.question.indexedFixedProductMarketMakers.length > 0 && !marketId) {
     setMarketId(data.question.indexedFixedProductMarketMakers[0].id)

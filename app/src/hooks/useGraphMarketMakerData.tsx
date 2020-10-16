@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/react-hooks'
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { getOutcomes } from '../util/networks'
 import { Question, Status } from '../util/types'
@@ -162,9 +162,13 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
 
   const { data, error, loading } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
-    skip: marketMakerData !== null,
+    skip: false,
     variables: { id: marketMakerAddress },
   })
+
+  useEffect(() => {
+    setMarketMakerData(null)
+  }, [marketMakerAddress])
 
   if (data && data.fixedProductMarketMaker && !marketMakerData) {
     setMarketMakerData(wrangleResponse(data.fixedProductMarketMaker, networkId))

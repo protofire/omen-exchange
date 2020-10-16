@@ -6,6 +6,8 @@ export const useMarketMakerData = (marketMakerAddress: string) => {
   const { networkId } = useConnectedWeb3Context()
   const { marketMakerData: graphMarketMakerData } = useGraphMarketMakerData(marketMakerAddress, networkId)
   const { fetchData, marketMakerData } = useBlockchainMarketMakerData(graphMarketMakerData, networkId)
-
+  if (!marketMakerAddress) {
+    return { fetchData, marketMakerData: null }
+  }
   return { fetchData, marketMakerData }
 }
