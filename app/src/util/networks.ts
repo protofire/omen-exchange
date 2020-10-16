@@ -109,7 +109,7 @@ const networks: { [K in NetworkId]: Network } = {
       klerosTokenView: '0x0000000000000000000000000000000000000000',
       klerosTCR: '0x0000000000000000000000000000000000000000',
       dxTCR: '0x03165DF66d9448E45c2f5137486af3E7e752a352',
-      omenVerifiedMarkets: '0x58574aF265E1feC3b2B6dD005CA17af8eDa581cc',
+      omenVerifiedMarkets: '0x3b29096b7ab49428923d902cEC3dFEaa49993234',
     },
   },
 }

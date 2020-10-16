@@ -7,14 +7,13 @@ import { useKlerosCuration } from '../../../../hooks/useKlerosCuration'
 import { MarketMakerData } from '../../../../util/types'
 import { Button } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { SubsectionTitle, SubsectionTitleWrapper } from '../../../common'
 import { InlineLoading } from '../../../loading'
 
 import { DxDaoCuration } from './option/dxdao_curation'
 import { KlerosCuration } from './option/kleros_curation'
 
 const BottomRow = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
+  border-top: ${props => props.theme.cards.border};
   margin: 0 -25px;
   padding: 20px 25px 0;
 `
@@ -24,7 +23,7 @@ const RightButton = styled(Button)`
 `
 
 export const CurationRow = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderColorLighter};
+  border-top: ${props => props.theme.cards.border};
   margin: 0 -25px;
   padding: 20px 25px;
   position: relative;
@@ -101,9 +100,6 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <SubsectionTitleWrapper>
-        <SubsectionTitle>Verify</SubsectionTitle>
-      </SubsectionTitleWrapper>
       <KlerosCuration klerosCurationData={klerosCurationData} selectSource={selectSource} selection={selection} />
       <DxDaoCuration selectSource={selectSource} selection={selection} />
       <BottomRow>
