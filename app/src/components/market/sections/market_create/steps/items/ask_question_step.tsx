@@ -191,7 +191,7 @@ const AskQuestionStep = (props: Props) => {
     <CreateCard style={{ paddingTop: 20, paddingBottom: 20 }}>
       <CategoryImportWrapper>
         <FormStateButton active={!isImport} onClick={() => setIsImport(false)}>
-          Categorical Market
+          Categorical
         </FormStateButton>
 
         {!loadedQuestionId && (

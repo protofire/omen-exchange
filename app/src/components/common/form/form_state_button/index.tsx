@@ -17,7 +17,6 @@ const FormStateButtonWrapper = styled.div<FormStateButtonWrapperProps>`
   font-weight: ${props => (props.active ? `500` : `400`)};
   cursor: pointer;
   display: inline-block;
-  transition: all 0.3s;
 
   &.disabled {
     color: ${props => props.theme.colors.textColor};

@@ -10,22 +10,6 @@ const AWrapper = styled.a`
   & > * + * {
     margin-left: 8px;
   }
-  &::after {
-    position: absolute;
-    content: ' ';
-    left: 50%;
-    width: 0;
-    bottom: -5px;
-    height: 1px;
-    transition: all 0.4s;
-    background-color: ${({ theme }) => theme.colors.darkGray};
-  }
-  &:hover {
-    &::after {
-      left: 0;
-      width: 100%;
-    }
-  }
 `
 
 const Wrapper = styled.span`
