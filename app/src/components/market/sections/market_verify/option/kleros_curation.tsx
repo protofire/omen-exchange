@@ -66,7 +66,7 @@ const VerifiedTick = styled.img`
 const Description = styled.div`
   align-items: center;
   border-radius: 4px;
-  border: 1px solid ${props => props.theme.borders.borderColorLighter};
+  border: ${props => props.theme.cards.border};
   display: flex;
   padding: 21px 25px;
   color: ${props => props.theme.colors.textColorLightish};
