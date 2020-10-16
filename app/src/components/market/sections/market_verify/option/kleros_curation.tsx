@@ -197,7 +197,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondaryLine}>
               <UnstyledLink
-                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}/challengeRequest`}
+                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}?action=challenge`}
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -225,15 +225,17 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
       klerosDetails = `Challenge period pending`
       KlerosNotice = (
         <Description>
-          Market valid according to the{' '}
-          <BlueLink href={listingCriteriaURL} rel="noopener noreferrer" target="_blank">
-            listing criteria
-          </BlueLink>{' '}
-          ? Collect <SuccessVerify>{formatEther(removalBaseDeposit)}</SuccessVerify> upon a successful challenge.
+          <DescriptionText>
+            Market valid according to the{' '}
+            <BlueLink href={listingCriteriaURL} rel="noopener noreferrer" target="_blank">
+              listing criteria
+            </BlueLink>{' '}
+            ? Collect <SuccessVerify>{formatEther(removalBaseDeposit)}</SuccessVerify> upon a successful challenge.
+          </DescriptionText>
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondary}>
               <UnstyledLink
-                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}/challengeRequest`}
+                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}?action=challenge`}
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -260,7 +262,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
       break
     }
     case MarketVerificationState.WaitingArbitration: {
-      klerosDetails = `Verification challenged`
+      klerosDetails = `Market validity challenged`
       KlerosRightColumn = (
         <CurationRightColumn>
           <StatusContainer>
@@ -287,7 +289,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondaryLine}>
               <UnstyledLink
-                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}/removeItem`}
+                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}?action=remove`}
                 rel="noopener noreferrer"
                 target="_blank"
               >

@@ -86,14 +86,14 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   }, [])
 
   const { ovmAddress } = klerosCurationData || {}
-  const { address, question } = marketMakerData || {}
+  const { address, curatedByDxDao, question } = marketMakerData || {}
   const { title } = question || {}
   let requestVerificationLink = 'https://dxdao.eth.link/#/'
   if (selection === 0) {
     const queryParams = new URLSearchParams()
     queryParams.append('col1', title)
     queryParams.append('col2', `https://omen.eth.link/#/${address}`)
-    requestVerificationLink = `https://curate.kleros.io/tcr/${ovmAddress}/addItem?${queryParams.toString()}`
+    requestVerificationLink = `https://curate.kleros.io/tcr/${ovmAddress}?action=addItem&${queryParams.toString()}`
   }
 
   if (!klerosCurationData) return <InlineLoading />
@@ -101,7 +101,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   return (
     <>
       <KlerosCuration klerosCurationData={klerosCurationData} selectSource={selectSource} selection={selection} />
-      <DxDaoCuration selectSource={selectSource} selection={selection} />
+      <DxDaoCuration curatedByDxDao={curatedByDxDao} selectSource={selectSource} selection={selection} />
       <BottomRow>
         <RightButton buttonType={ButtonType.primaryLine} disabled={typeof selection !== 'number'}>
           <UnstyledLink href={requestVerificationLink} rel="noopener noreferrer" target="_blank">
