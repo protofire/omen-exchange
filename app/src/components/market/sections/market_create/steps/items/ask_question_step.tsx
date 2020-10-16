@@ -93,9 +93,6 @@ const CategoryImportWrapper = styled.div`
   margin-right: -${props => props.theme.cards.paddingHorizontal};
   padding: 0 ${props => props.theme.cards.paddingHorizontal};
   padding-bottom: 20px;
-  & > * + * {
-    margin-left: 8px;
-  }
 `
 interface Props {
   next: () => void
