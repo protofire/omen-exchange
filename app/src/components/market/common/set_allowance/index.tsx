@@ -36,6 +36,7 @@ export type SetAllowanceProps = DOMAttributes<HTMLDivElement> &
   HTMLAttributes<HTMLDivElement> &
   ToggleTokenLockProps & {
     collateral: Token
+    marginBottom?: boolean
   }
 
 export const SetAllowance: React.FC<SetAllowanceProps> = (props: SetAllowanceProps) => {
