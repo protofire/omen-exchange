@@ -23,6 +23,7 @@ import {
 } from '../../../../common/common_styled'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { VerifiedRow } from '../../../../common/verified_row'
+import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome } from '../outcomes'
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
@@ -288,6 +289,33 @@ export const ImportMarketContent = (props: Props) => {
     )
   }
 
+  const renderWarning = () => {
+    if (validContent && question && marketMakerData) {
+      if (question.resolution <= new Date()) {
+        return (
+          <WarningMessage
+            description={'Market has an expired closing date and cannot be imported.'}
+            style={{ marginBottom: 20, marginTop: -4 }}
+          />
+        )
+      }
+      const totalProbabilities = marketMakerData.balances
+        .map(balance => balance.probability)
+        .reduce((probability1, probability2) => probability1 + probability2)
+
+      if (totalProbabilities !== 100) {
+        return (
+          <WarningMessage
+            description={'Market has outcomes with no probability and cannot be imported.'}
+            style={{ marginBottom: 20, marginTop: -4 }}
+          />
+        )
+      }
+      return null
+    }
+    return null
+  }
+
   return (
     <>
       <FormRow
@@ -308,6 +336,7 @@ export const ImportMarketContent = (props: Props) => {
         title={'Set Question URL'}
       />
       <ContentWrapper>{renderContent()}</ContentWrapper>
+      {renderWarning()}
     </>
   )
 }

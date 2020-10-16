@@ -158,6 +158,7 @@ const AskQuestionStep = (props: Props) => {
     outcomes.length < 2 ||
     !question ||
     !resolution ||
+    resolution < new Date() ||
     !category ||
     outcomeNames.map(name => !name).reduce((e1, e2) => e1 || e2) ||
     outcomeNames.map((name, index) => outcomeNames.indexOf(name) !== index).reduce((e1, e2) => e1 || e2)
