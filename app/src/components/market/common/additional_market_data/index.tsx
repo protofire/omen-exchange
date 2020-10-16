@@ -43,7 +43,6 @@ const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean }>
   align-items: center;
   margin-left: 20px;
   cursor: pointer;
-  //#5c6bc0
 
   &:hover {
     p {
