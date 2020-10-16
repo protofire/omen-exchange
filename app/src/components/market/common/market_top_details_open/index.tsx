@@ -55,7 +55,8 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     arbitrator,
     collateral,
     collateralVolume,
-    curatedByDxDaoOrKleros: isVerified,
+    curatedByDxDao,
+    klerosTCRregistered,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
@@ -171,8 +172,9 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         address={address}
         arbitrator={arbitrator}
         category={question.category}
-        curatedByDxDaoOrKleros={isVerified}
+        curatedByDxDao={curatedByDxDao}
         id={question.id}
+        klerosTCRregistered={klerosTCRregistered}
         oracle="Reality.eth"
         ovmAddress={ovmAddress}
         submissionIDs={submissionIDs}

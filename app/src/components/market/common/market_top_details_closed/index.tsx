@@ -46,12 +46,15 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const isMobile = width <= parseInt(theme.themeBreakPoints.sm)
 
   const {
+    address,
     answerFinalizedTimestamp,
     arbitrator,
     collateral: collateralToken,
     collateralVolume,
     creationTimestamp,
-    curatedByDxDaoOrKleros: isVerified,
+    curatedByDxDao,
+    curatedByDxDaoOrKleros,
+    klerosTCRregistered,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
@@ -131,8 +134,9 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         address={address}
         arbitrator={arbitrator}
         category={question.category}
-        curatedByDxDaoOrKleros={isVerified}
+        curatedByDxDao={curatedByDxDao}
         id={question.id}
+        klerosTCRregistered={klerosTCRregistered}
         oracle="Reality.eth"
         ovmAddress={ovmAddress}
         submissionIDs={submissionIDs}

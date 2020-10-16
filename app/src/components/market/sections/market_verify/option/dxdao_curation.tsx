@@ -54,10 +54,11 @@ interface StatefulRadioButton {
 interface Props {
   selection?: number
   selectSource: (e: ChangeEvent<HTMLInputElement>) => void
+  curatedByDxDao: boolean
 }
 
 export const DxDaoCuration: React.FC<Props> = (props: Props) => {
-  const { selectSource, selection } = props
+  const { curatedByDxDao, selectSource, selection } = props
   return (
     <CurationRow key="Dxdao Curation">
       <CurationSubRow>
@@ -68,14 +69,18 @@ export const DxDaoCuration: React.FC<Props> = (props: Props) => {
         </CurationLeftColumn>
         <CurationCenterColumn>
           <CurationOption>Dxdao Curation</CurationOption>
-          <CurationOptionDetails>Request verification</CurationOptionDetails>
+          <CurationOptionDetails>{curatedByDxDao ? `Market verified` : 'Request verification'}</CurationOptionDetails>
         </CurationCenterColumn>
-        <CurationRightColumn>
-          <RadioWrapper selected={selection === 1}>
-            <CurationRadioTick alt="tick" selected={selection === 1} src={Tick} />
-          </RadioWrapper>
-        </CurationRightColumn>
-        <Input checked={selection === 1} onChange={selectSource} type="radio" value={1} />
+        {!curatedByDxDao && (
+          <>
+            <CurationRightColumn>
+              <RadioWrapper selected={selection === 1}>
+                <CurationRadioTick alt="tick" selected={selection === 1} src={Tick} />
+              </RadioWrapper>
+            </CurationRightColumn>
+            <Input checked={selection === 1} onChange={selectSource} type="radio" value={1} />
+          </>
+        )}
       </CurationSubRow>
     </CurationRow>
   )

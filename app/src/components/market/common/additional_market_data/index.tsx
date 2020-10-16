@@ -92,6 +92,19 @@ const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; i
   }
 `
 
+const AdditionalMarketDataSectionWrapperLabel = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-left: 11px;
+    &:nth-of-type(1) {
+      margin-left: 0;
+    }
+  }
+`
+
 const AdditionalMarketDataSectionTitle = styled.p`
   margin-left: 6px;
   font-size: 14px;
@@ -111,7 +124,8 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   arbitrator: Arbitrator
   oracle: string
   id: string
-  curatedByDxDaoOrKleros: boolean
+  klerosTCRregistered: boolean
+  curatedByDxDao: boolean
   submissionIDs: KlerosSubmission[]
   ovmAddress: string
   title: string
@@ -119,7 +133,18 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, ovmAddress, submissionIDs, title } = props
+  const {
+    address,
+    arbitrator,
+    category,
+    curatedByDxDao,
+    id,
+    klerosTCRregistered,
+    oracle,
+    ovmAddress,
+    submissionIDs,
+    title,
+  } = props
 
   const realitioBaseUrl = useRealityLink()
 
@@ -141,9 +166,14 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   queryParams.append('col2', `https://omen.eth.link/#/${address}`)
 
   const submission = submissionIDs.length > 0 && submissionIDs[0]
-  const curateLink = submission
-    ? `https://curate.kleros.io/tcr/${ovmAddress}/${submission.id}`
-    : `https://curate.kleros.io/tcr/${ovmAddress}/addItem?${queryParams.toString()}`
+  const curatedByDxDaoOrKleros = klerosTCRregistered || curatedByDxDao
+  const curateLink = curatedByDxDaoOrKleros
+    ? curatedByDxDao
+      ? 'https://dxdao.eth.link'
+      : submission
+      ? `https://curate.kleros.io/tcr/${ovmAddress}/${submission.id}`
+      : ''
+    : ''
 
   const Icon = curatedByDxDaoOrKleros ? IconVerified : IconExclamation
 
