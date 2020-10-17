@@ -118,13 +118,13 @@ interface StatefulRadioButton {
 }
 
 interface Props {
-  selection?: number
+  option?: number
   selectSource: (e: ChangeEvent<HTMLInputElement>) => void
   klerosCurationData: KlerosCurationData
 }
 
 export const KlerosCuration: React.FC<Props> = (props: Props) => {
-  const { klerosCurationData, selectSource, selection } = props
+  const { klerosCurationData, option, selectSource } = props
   const {
     challengePeriodDuration,
     listingCriteriaURL,
@@ -173,11 +173,11 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
       KlerosRightColumn = (
         <>
           <CurationRightColumn>
-            <RadioWrapper selected={selection === 0}>
-              <CurationRadioTick alt="tick" selected={selection === 0} src={Tick} />
+            <RadioWrapper selected={option === 0}>
+              <CurationRadioTick alt="tick" selected={option === 0} src={Tick} />
             </RadioWrapper>
           </CurationRightColumn>
-          <Input checked={selection === 0} onChange={selectSource} type="radio" value={0} />
+          <Input checked={option === 0} onChange={selectSource} type="radio" value={0} />
         </>
       )
       break
