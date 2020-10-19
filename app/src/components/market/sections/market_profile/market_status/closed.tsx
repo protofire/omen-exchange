@@ -223,6 +223,7 @@ const Wrapper = (props: Props) => {
 
   return (
     <>
+      <div>AVOVE</div>
       <TopCard>
         <MarketTopDetailsClosed collateral={collateral} marketMakerData={marketMakerData} />
       </TopCard>

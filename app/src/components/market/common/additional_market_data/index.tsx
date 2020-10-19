@@ -15,7 +15,6 @@ const AdditionalMarketDataWrapper = styled.div`
   justify-content: space-between;
   margin-left: -26px;
   width: ${props => props.theme.mainContainer.maxWidth};
-  padding: 0 6px;
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-direction: column;
@@ -27,14 +26,11 @@ const AdditionalMarketDataWrapper = styled.div`
 
 const AdditionalMarketDataLeft = styled.div`
   display: flex;
-  align-items: center;
-  margin-top: 10px;
-  margin-bottom: 10px;
 `
 
 const AdditionalMarketDataSectionTitle = styled.p`
   margin-left: 6px;
-  font-size: 14px;
+  font-size: ${props => props.theme.textfield.fontSize};
   line-height: 16px;
   color: ${props => props.theme.colors.clickable};
   &:first-letter {
@@ -44,7 +40,7 @@ const AdditionalMarketDataSectionTitle = styled.p`
 const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean }>`
   display: flex;
   align-items: center;
-  margin-left: 20px;
+  margin-left: 24px;
   cursor: pointer;
 
   &:hover {
