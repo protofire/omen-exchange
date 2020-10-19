@@ -151,6 +151,8 @@ const AskQuestionStep = (props: Props) => {
   const [isImport, setIsImport] = useState(!!loadedQuestionId)
 
   const totalProbabilities = outcomes.reduce((total, cur) => total + (cur.probability ? cur.probability : 0), 0)
+  const [isScalar, setIsScalar] = useState(false)
+  const [isModalQuestionOpen, setModalQuestionState] = useState(false)
   const totalProbabilitiesNotFull = Math.abs(totalProbabilities - 100) > 0.000001
   const outcomeNames = outcomes.map(outcome => outcome.name)
   const isContinueButtonDisabled =
@@ -195,9 +197,13 @@ const AskQuestionStep = (props: Props) => {
           active={isImport}
           onClick={() => {
             setIsImport(true)
+            setIsScalar(false)
           }}
         >
           Import Market
+        </FormStateButton>
+        <FormStateButton active={isScalar} onClick={() => setIsScalar(true)}>
+          Scalar Market
         </FormStateButton>
       </CategoryImportWrapper>
       {isImport ? (
@@ -210,6 +216,8 @@ const AskQuestionStep = (props: Props) => {
           outcomes={outcomes}
           totalProbabilities={totalProbabilities}
         ></ImportMarketContent>
+      ) : isScalar ? (
+        <p>scalar boi</p>
       ) : (
         <>
           <FormRow
