@@ -235,8 +235,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       : null
 
   const isCreateMarketbuttonDisabled =
-    !MarketCreationStatus.is.ready(marketCreationStatus) ||
-    MarketCreationStatus.is.error(marketCreationStatus) ||
+    MarketCreationStatus.is.creatingAMarket(marketCreationStatus) ||
     !balance ||
     funding.isZero() ||
     !account ||
