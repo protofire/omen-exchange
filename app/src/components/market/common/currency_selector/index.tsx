@@ -29,11 +29,12 @@ interface Props {
   context: ConnectedWeb3Context
   disabled?: boolean
   onSelect: (currency: Token) => void
-  balance: string
+  balance?: string
+  placeholder?: string
 }
 
 export const CurrencySelector: React.FC<Props> = props => {
-  const { balance, context, disabled, onSelect, ...restProps } = props
+  const { balance, context, disabled, onSelect, placeholder, ...restProps } = props
 
   const tokens = useTokens(context)
 
@@ -68,6 +69,7 @@ export const CurrencySelector: React.FC<Props> = props => {
         dropdownPosition={DropdownPosition.right}
         items={currencyDropdownData}
         maxHeight={true}
+        placeholder={placeholder}
         selected={false}
         showScrollbar={true}
       />
