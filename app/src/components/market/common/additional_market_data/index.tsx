@@ -1,4 +1,4 @@
-import React, { DOMAttributes } from 'react'
+import React, { DOMAttributes, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { Arbitrator } from '../../../../util/types'
@@ -64,10 +64,27 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 
 export const AdditionalMarketData: React.FC<Props> = props => {
   const { arbitrator, category, id, oracle } = props
-
+  const [connected, setConnected] = useState<boolean>()
   const windowObj: any = window
+
+  useEffect(() => {
+    const fetchUserAccounts = async () => {
+      const account = await windowObj.ethereum.request({ method: 'eth_accounts' })
+
+      setConnected(account.length !== 0)
+
+      windowObj.ethereum.on('accountsChanged', (accounts: string[]) => {
+        setConnected(accounts.length !== 0)
+      })
+    }
+    if (windowObj.ethereum) {
+      fetchUserAccounts()
+    }
+  }, [])
   const realitioBaseUrl =
-    windowObj.ethereum && windowObj.ethereum.isMetaMask ? 'https://reality.eth' : 'https://reality.eth.link'
+    windowObj.ethereum && windowObj.ethereum.isMetaMask && connected
+      ? 'https://reality.eth'
+      : 'https://reality.eth.link'
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
 
