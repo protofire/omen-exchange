@@ -80,7 +80,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
     if (windowObj.ethereum) {
       fetchUserAccounts()
     }
-  }, [])
+  }, [windowObj.ethereum])
   const realitioBaseUrl =
     windowObj.ethereum && windowObj.ethereum.isMetaMask && connected
       ? 'https://reality.eth'
