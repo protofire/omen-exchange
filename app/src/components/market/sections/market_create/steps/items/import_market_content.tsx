@@ -264,15 +264,28 @@ export const ImportMarketContent = (props: Props) => {
                                   )
                                   return
                                 }
-                                handleOutcomesChange(
-                                  outcomes.map((tcome, tIndex) =>
-                                    index !== tIndex
-                                      ? tcome
-                                      : isEmpty
-                                      ? ({ name: tcome.name } as Outcome)
-                                      : { ...tcome, probability: Number(e.target.value) },
-                                  ),
+                                const newOutcomes = outcomes.map((tcome, tIndex) =>
+                                  index !== tIndex
+                                    ? tcome
+                                    : isEmpty
+                                    ? ({ name: tcome.name } as Outcome)
+                                    : { ...tcome, probability: Number(e.target.value) },
                                 )
+                                const isNewOutcomesEmpty = newOutcomes
+                                  .map(outcome => !outcome.probability)
+                                  .reduce((res, element) => res && element)
+
+                                if (isNewOutcomesEmpty) {
+                                  setUniform(true)
+                                  const finalOutcomes = newOutcomes.map(outcome => ({
+                                    ...outcome,
+                                    probability: 100 / newOutcomes.length,
+                                  }))
+                                  handleOutcomesChange(finalOutcomes)
+                                  return
+                                }
+
+                                handleOutcomesChange(newOutcomes)
                               }}
                               placeholder={(100 / outcomes.length).toFixed(2)}
                               type="number"
