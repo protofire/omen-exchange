@@ -117,7 +117,7 @@ export const infuraNetworkURL = networks[1].url
 
 export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   cdai: {
-    symbol: 'CDAI',
+    symbol: 'cDAI',
     decimals: 18,
     addresses: {
       [networkIds.MAINNET]: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
@@ -227,6 +227,7 @@ export const getToken = (networkId: number, tokenId: KnownToken): Token => {
     address,
     decimals: token.decimals,
     symbol: token.symbol,
+    image: getImageUrl(address),
   }
 }
 

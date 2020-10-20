@@ -3,6 +3,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { WhenConnected } from '../../../../../hooks/connectedWeb3'
+import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
@@ -69,6 +70,7 @@ interface Props extends RouteComponentProps<Record<string, string | undefined>> 
 
 const Wrapper = (props: Props) => {
   const { marketMakerData } = props
+  const realitioBaseUrl = useRealityLink()
 
   const {
     address: marketMakerAddress,
@@ -88,10 +90,6 @@ const Wrapper = (props: Props) => {
 
   const probabilities = balances.map(balance => balance.probability)
   const hasFunding = totalPoolShares.gt(0)
-
-  const windowObj: any = window
-  const realitioBaseUrl =
-    windowObj.ethereum && windowObj.ethereum.isMetaMask ? 'https://reality.eth' : 'https://reality.eth.link'
 
   const renderTableData = () => {
     const disabledColumns = [OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]

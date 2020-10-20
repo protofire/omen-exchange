@@ -131,6 +131,7 @@ export interface MarketData {
   funding: BigNumber
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
+  verifiedLabel?: string
 }
 
 export enum MarketStates {

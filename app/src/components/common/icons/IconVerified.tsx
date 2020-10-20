@@ -1,7 +1,7 @@
 import React from 'react'
 
 interface Props {
-  size: string
+  size?: string
 }
 
 export const IconVerified = (props: Props) => (
