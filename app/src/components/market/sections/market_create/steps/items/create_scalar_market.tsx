@@ -1,11 +1,15 @@
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
+import { DOCUMENT_VALIDITY_RULES } from '../../../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../../../hooks'
+import { Arbitrator } from '../../../../../../util/types'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { DateField, FormRow, Textfield } from '../../../../../common'
 import { QuestionInput } from '../../../../../common/form/question_input'
+import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
+import { WarningMessage } from '../../../../common/warning_message'
 
 import { ButtonCategory, ButtonCategoryTextOverflow, Column, GridTwoColumns } from './ask_question_step'
 
@@ -28,15 +32,21 @@ interface Props {
   loadMoreButton: boolean
   setFirst: React.Dispatch<React.SetStateAction<number>>
   toggleCategoryButtonFocus: () => void
+  arbitrator: Arbitrator
+  handleArbitratorChange: (arbitrator: Arbitrator) => any
+  arbitratorsCustom: Arbitrator[]
 }
 
 export const CreateScalarMarket = (props: Props) => {
   const {
+    arbitrator,
+    arbitratorsCustom,
     categoriesCustom,
     category,
     categoryButtonFocus,
     context,
     first,
+    handleArbitratorChange,
     handleCategoryChange,
     handleChange,
     handleDateChange,
@@ -131,6 +141,28 @@ export const CreateScalarMarket = (props: Props) => {
           setFirst={setFirst}
         />
       )}
+      <WarningMessage
+        additionalDescription={'.'}
+        description={
+          "Set the market resolution date at least 6 days after the correct outcome will be known and make sure that this market won't be "
+        }
+        href={DOCUMENT_VALIDITY_RULES}
+        hyperlinkDescription={'invalid'}
+        style={{ marginBottom: 0 }}
+      />
+      <FormRow
+        formField={
+          <Arbitrators
+            customValues={arbitratorsCustom}
+            disabled={false}
+            networkId={context.networkId}
+            onChangeArbitrator={handleArbitratorChange}
+            value={arbitrator}
+          />
+        }
+        style={{ marginBottom: 0 }}
+        title={'Arbitrator'}
+      />
     </>
   )
 }

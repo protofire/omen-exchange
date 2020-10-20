@@ -234,11 +234,14 @@ const AskQuestionStep = (props: Props) => {
         ></ImportMarketContent>
       ) : currentFormState === FormState.scalar ? (
         <CreateScalarMarket
+          arbitrator={arbitrator}
+          arbitratorsCustom={arbitratorsCustom}
           categoriesCustom={categoriesCustom}
           category={category}
           categoryButtonFocus={categoryButtonFocus}
           context={context}
           first={first}
+          handleArbitratorChange={handleArbitratorChange}
           handleCategoryChange={handleCategoryChange}
           handleChange={handleChange}
           handleDateChange={handleDateChange}
