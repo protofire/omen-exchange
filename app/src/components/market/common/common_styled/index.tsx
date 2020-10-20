@@ -201,3 +201,10 @@ export const Breaker = styled.div`
     display: none;
   }
 `
+
+export const PercentWrapper = styled.label`
+  color: ${({ theme }) => theme.colors.primary};
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+`
