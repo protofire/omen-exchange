@@ -3,6 +3,7 @@ import React, { DOMAttributes } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
+import { useRealityLink } from '../../../../hooks/useRealityLink'
 import { formatDate } from '../../../../util/tools'
 
 const Wrapper = styled.div`
@@ -43,6 +44,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 
 export const DisplayResolution: React.FC<Props> = (props: Props) => {
   const { questionId, title, value, ...restProps } = props
+  const realitioBaseUrl = useRealityLink()
 
   const now = moment()
   const localResolution = moment(value).local()
@@ -56,10 +58,6 @@ export const DisplayResolution: React.FC<Props> = (props: Props) => {
   const tzName = moment.tz.guess()
   const abbr = moment.tz(tzName).zoneAbbr()
   const formatting = `MMMM Do YYYY - HH:mm:ss [${abbr}]`
-
-  const windowObj: any = window
-  const realitioBaseUrl =
-    windowObj.ethereum && windowObj.ethereum.isMetaMask ? 'https://reality.eth' : 'https://reality.eth.link'
 
   const realitioUrl = questionId ? `${realitioBaseUrl}/app/#!/question/${questionId}` : `${realitioBaseUrl}/`
 
