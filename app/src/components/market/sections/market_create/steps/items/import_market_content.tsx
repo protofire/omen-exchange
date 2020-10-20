@@ -115,6 +115,14 @@ const ResetWrapper = styled.span`
   color: ${({ theme }) => theme.colors.clickable};
 `
 
+const QuestionTextField = styled(Textfield)`
+  border-radius: 8px;
+  padding: 12px 20px;
+  &:-webkit-autofill {
+    -webkit-background-clip: text;
+  }
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   context: ConnectedWeb3Context
   loadedQuestionId: Maybe<string>
@@ -202,7 +210,8 @@ export const ImportMarketContent = (props: Props) => {
     setState(prevState => ({ ...prevState, questionURL: '' }))
   }
 
-  const validContent = !!question && !errorMessage && !!marketId && !!marketMakerData && !state.loading
+  const validContent =
+    !!state.questionURL && !!question && !errorMessage && !!marketId && !!marketMakerData && !state.loading
 
   const questionDetails = () => {
     return (
@@ -249,7 +258,7 @@ export const ImportMarketContent = (props: Props) => {
                                 ),
                               )
                             }}
-                            placeholder="0"
+                            placeholder={(100 / outcomes.length).toFixed(2)}
                             type="number"
                             value={outcome.probability}
                           />
@@ -343,10 +352,10 @@ export const ImportMarketContent = (props: Props) => {
   return (
     <>
       <FormRow
-        extraTitle={!!loadedQuestionId && <ResetWrapper onClick={onResetMarket}>Reset</ResetWrapper>}
+        extraTitle={validContent && <ResetWrapper onClick={onResetMarket}>Reset</ResetWrapper>}
         formField={
-          <Textfield
-            hasSuccess={validContent}
+          <QuestionTextField
+            focusOutline={false}
             name="questionURL"
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               const { value } = event.target
