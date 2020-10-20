@@ -6,7 +6,7 @@ import { ConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { useGraphMarketIdFromQuestion } from '../../../../../../hooks/useGraphMarketIdFromQuestion'
 import { getArbitratorFromAddress } from '../../../../../../util/networks'
 import { formatDate } from '../../../../../../util/tools'
-import { Arbitrator, BalanceItem, Question } from '../../../../../../util/types'
+import { Arbitrator, BalanceItem, Question, Status } from '../../../../../../util/types'
 import { FormRow, SimpleTextfield, Spinner, SubsectionTitle, Textfield, TitleValue } from '../../../../../common'
 import { IconReality } from '../../../../../common/icons'
 import {
@@ -183,11 +183,14 @@ export const ImportMarketContent = (props: Props) => {
   )
 
   const [question, arbitrator, errorMessage] = useAsyncDerivedValue('', [null, null, null], fetchQuestion)
-  const { marketId } = useGraphMarketIdFromQuestion(question?.id || '')
+
+  const { marketId, status: marketIdStatus } = useGraphMarketIdFromQuestion(question?.id || '')
   const { marketMakerData } = useMarketMakerData((marketId || '').toLowerCase())
 
   useEffect(() => {
-    if (question && marketMakerData && marketMakerData.question.id === question.id) {
+    if (question && marketIdStatus === Status.Error) {
+      setLoading(false)
+    } else if (question && marketMakerData && marketMakerData.question.id === question.id) {
       setLoading(false)
       if (arbitrator) {
         const outcomes = marketMakerData.balances.map(
@@ -207,7 +210,7 @@ export const ImportMarketContent = (props: Props) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [marketMakerData])
+  }, [marketMakerData, marketIdStatus])
 
   const onResetMarket = () => {
     handleClearQuestion()
