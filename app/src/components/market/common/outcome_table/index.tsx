@@ -1,8 +1,9 @@
+import Big from 'big.js'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 import styled, { css } from 'styled-components'
 
-import { formatBigNumber, mulBN } from '../../../../util/tools'
+import { formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
 import { BarDiagram } from '../bar_diagram_probabilities'
@@ -17,7 +18,7 @@ interface Props {
   displayRadioSelection?: boolean
   outcomeHandleChange?: (e: number) => void
   outcomeSelected?: number
-  payouts?: Maybe<number[]>
+  payouts?: Maybe<Big[]>
   probabilities: number[]
   newShares?: Maybe<BigNumber[]>
   withWinningOutcome?: boolean
@@ -28,7 +29,6 @@ interface Props {
 const TableWrapper = styled.div`
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};
-  margin-top: 20px;
 `
 
 const PaddingCSS = css`
@@ -40,7 +40,7 @@ const PaddingCSS = css`
   }
 `
 
-const TRExtended = styled(TR)<{ clickable?: boolean }>`
+const TRExtended = styled(TR as any)<{ clickable?: boolean }>`
   cursor: ${props => (props.clickable ? 'pointer' : 'default')};
 
   &:hover td {
@@ -52,14 +52,14 @@ TRExtended.defaultProps = {
   clickable: false,
 }
 
-const THStyled = styled(TH)`
+const THStyled = styled(TH as any)`
   ${PaddingCSS}
 `
 
-const TDStyled = styled(TD)`
+const TDStyled = styled(TD as any)`
   ${PaddingCSS}
 `
-const TDRadio = styled(TD)`
+const TDRadio = styled(TD as any)`
   ${PaddingCSS}
   width: 20px;
 `
@@ -132,12 +132,12 @@ export const OutcomeTable = (props: Props) => {
 
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
     const { currentPrice, outcomeName, payout, shares } = balanceItem
-    const currentPriceFormatted = withWinningOutcome ? payout : Number(currentPrice).toFixed(2)
-    const probability = withWinningOutcome ? payout * 100 : probabilities[outcomeIndex]
+    const currentPriceFormatted = withWinningOutcome ? payout.toFixed(2) : Number(currentPrice).toFixed(2)
+    const probability = withWinningOutcome ? Number(payout.mul(100).toString()) : probabilities[outcomeIndex]
     const newPrice = (probabilities[outcomeIndex] / 100).toFixed(2)
-    const formattedPayout = formatBigNumber(mulBN(shares, payout), collateral.decimals)
+    const formattedPayout = formatBigNumber(mulBN(shares, Number(payout.toString())), collateral.decimals)
     const formattedShares = formatBigNumber(shares, collateral.decimals)
-    const isWinningOutcome = payouts && payouts[outcomeIndex] > 0
+    const isWinningOutcome = payouts && payouts[outcomeIndex] && payouts[outcomeIndex].gt(0)
     const formattedNewShares = newShares ? formatBigNumber(newShares[outcomeIndex], collateral.decimals) : null
 
     return (
@@ -195,12 +195,16 @@ export const OutcomeTable = (props: Props) => {
           <TDStyled textAlign={TableCellsAlign[3]}>
             <TDFlexDiv textAlign={TableCellsAlign[3]}>
               {formattedShares}{' '}
-              {showSharesChange && <NewValue outcomeIndex={outcomeIndex} value={formattedNewShares} />}
+              {showSharesChange && formattedNewShares !== formattedShares && (
+                <NewValue outcomeIndex={outcomeIndex} value={formattedNewShares && formatNumber(formattedNewShares)} />
+              )}
             </TDFlexDiv>
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Payout) ? null : (
-          <TDStyled textAlign={TableCellsAlign[4]}>{withWinningOutcome && payouts ? formattedPayout : '0.00'}</TDStyled>
+          <TDStyled textAlign={TableCellsAlign[4]}>
+            {withWinningOutcome && payouts ? formatNumber(formattedPayout) : '0.00'}
+          </TDStyled>
         )}
       </TRExtended>
     )

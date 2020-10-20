@@ -18,10 +18,10 @@ export const truncateStringInTheMiddle = (str: string, strPositionStart: number,
   return str
 }
 
-export const formatDate = (date: Date): string => {
+export const formatDate = (date: Date, utcAdd = true): string => {
   return moment(date)
     .tz('UTC')
-    .format('YYYY-MM-DD - HH:mm [UTC]')
+    .format(`YYYY-MM-DD - HH:mm${utcAdd ? ' [UTC]' : ''}`)
 }
 
 export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
@@ -331,4 +331,16 @@ export const limitDecimalPlaces = (value: string, decimals: number) => {
       ? value.substr(0, value.indexOf('.')) + value.substr(value.indexOf('.'), decimals + 1)
       : value
   return Number.parseFloat(limitedString)
+}
+
+export const formatNumber = (number: string, decimals = 2): string => {
+  if (number.length < 1) {
+    return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
+  }
+
+  const fixedInt = parseFloat(number).toFixed(decimals)
+  const splitFixedInt = fixedInt.split('.')[0]
+  const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+
+  return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }

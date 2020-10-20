@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   flex-direction: row;
   justify-content: space-between;
   border-radius: 4px;
-  border: 1px solid ${props => props.theme.borders.borderColorLighter};
+  border: 1px solid ${props => props.theme.borders.borderDisabled};
   align-content: center;
   padding: 4px 20px;
   margin-bottom: 20px;
@@ -42,11 +42,12 @@ const Hyperlink = styled.a`
 
 interface Props {
   description: string
-  hyperlinkDescription: string
-  href: string
-  additionalDescription: string
+  hyperlinkDescription?: string
+  href?: string
+  additionalDescription?: string
   danger?: boolean
   grayscale?: boolean
+  style?: React.CSSProperties
 }
 
 export const WarningMessage = (props: Props) => {
@@ -58,10 +59,12 @@ export const WarningMessage = (props: Props) => {
       </AlertWrapper>
       <Description className={danger ? 'danger' : ''}>
         {description}{' '}
-        <Hyperlink href={href} target="_blank">
-          {hyperlinkDescription}
-        </Hyperlink>
-        <span>{additionalDescription}</span>
+        {href && hyperlinkDescription && (
+          <Hyperlink href={href} target="_blank">
+            {hyperlinkDescription}
+          </Hyperlink>
+        )}
+        {additionalDescription && <span>{additionalDescription}</span>}
       </Description>
     </Wrapper>
   )

@@ -1,11 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { MarketMakerDataItem } from '../../../../queries/markets_home'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { CategoryDataItem, MarketFilters, MarketStates, MarketsSortCriteria } from '../../../../util/types'
+import {
+  CategoryDataItem,
+  CurationSource,
+  MarketFilters,
+  MarketMakerDataItem,
+  MarketStates,
+  MarketsSortCriteria,
+} from '../../../../util/types'
 import { ButtonCircle } from '../../../button'
 import { SectionTitle } from '../../../common'
 import {
@@ -217,11 +223,12 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
   const [showAdvancedFilters, setShowAdvancedFilters] = useState<boolean>(
-    currentFilter.currency || currentFilter.arbitrator ? true : false,
+    currentFilter.currency || currentFilter.arbitrator || currentFilter.curationSource !== CurationSource.ALL_SOURCES,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
+  const [curationSource, setCurationSource] = useState<CurationSource>(currentFilter.curationSource)
 
   const filters = [
     {
@@ -243,8 +250,14 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       onClick: () => setState(MarketStates.finalizing),
     },
     {
+      state: MarketStates.arbitrating,
+      title: 'Arbitrating',
+      active: state === MarketStates.arbitrating,
+      onClick: () => setState(MarketStates.arbitrating),
+    },
+    {
       state: MarketStates.closed,
-      title: 'Ended',
+      title: 'Closed',
       active: state === MarketStates.closed,
       onClick: () => setState(MarketStates.closed),
     },
@@ -256,7 +269,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       state: MarketStates.myMarkets,
       title: 'My Markets',
       active: state === MarketStates.myMarkets,
-      onClick: () => setState(MarketStates.myMarkets),
+      onClick: () => {
+        setState(MarketStates.myMarkets)
+        setSortBy('openingTimestamp')
+        setSortByDirection('asc')
+      },
     })
   }
 
@@ -277,8 +294,42 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   }, [category, categories])
 
   useEffect(() => {
-    onFilterChange({ arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title })
-  }, [arbitrator, templateId, currency, category, sortBy, sortByDirection, state, title, onFilterChange])
+    onFilterChange({
+      arbitrator,
+      curationSource,
+      templateId,
+      currency,
+      category,
+      sortBy,
+      sortByDirection,
+      state,
+      title,
+    })
+  }, [
+    arbitrator,
+    curationSource,
+    templateId,
+    currency,
+    category,
+    sortBy,
+    sortByDirection,
+    state,
+    title,
+    onFilterChange,
+  ])
+
+  const isInitialMount = useRef(true)
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = true
+    } else {
+      setShowAdvancedFilters(
+        currentFilter.currency ||
+          currentFilter.arbitrator ||
+          currentFilter.curationSource !== CurationSource.ALL_SOURCES,
+      )
+    }
+  }, [currentFilter, fetchMyMarkets])
 
   const toggleSearch = useCallback(() => {
     setShowAdvancedFilters(false)
@@ -293,19 +344,32 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const sortOptions = [
     {
       title: '24h volume',
-      sortBy: 'lastActiveDayAndScaledRunningDailyVolume',
+      sortBy: `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria,
       direction: 'desc',
     },
     {
       title: 'Total volume',
-      sortBy: 'scaledCollateralVolume',
+      sortBy: 'usdVolume',
       direction: 'desc',
     },
     {
       title: 'Highest liquidity',
-      sortBy: 'scaledLiquidityParameter',
+      sortBy: 'usdLiquidityParameter',
       direction: 'desc',
     },
+    {
+      title: 'Newest',
+      sortBy: 'creationTimestamp',
+      direction: 'desc',
+    },
+    {
+      title: 'Closing soon',
+      sortBy: 'openingTimestamp',
+      direction: 'asc',
+    },
+  ] as const
+
+  const myMarketsSortOptions = [
     {
       title: 'Newest',
       sortBy: 'creationTimestamp',
@@ -319,6 +383,20 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   ] as const
 
   const sortItems: Array<DropdownItemProps> = sortOptions.map(item => {
+    return {
+      content: (
+        <CustomDropdownItem>
+          <SecondaryText className="sortBy">Sort By</SecondaryText> {item.title}
+        </CustomDropdownItem>
+      ),
+      onClick: () => {
+        setSortBy(item.sortBy)
+        setSortByDirection(item.direction)
+      },
+    }
+  })
+
+  const myMarketsSortItems: Array<DropdownItemProps> = myMarketsSortOptions.map(item => {
     return {
       content: (
         <CustomDropdownItem>
@@ -383,7 +461,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const noOwnMarkets = RemoteData.is.success(markets) && markets.data.length === 0 && state === MarketStates.myMarkets
   const noMarketsAvailable =
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
-  const showFilteringInlineLoading = !noMarketsAvailable && !noOwnMarkets && isFiltering
+  const showFilteringInlineLoading =
+    (!noMarketsAvailable && !noOwnMarkets && isFiltering) || RemoteData.is.loading(markets)
   const disableLoadNextButton =
     isFiltering || !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
   const disableLoadPrevButton =
@@ -397,7 +476,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(category)) + 1 : 0
           }
           dirty={true}
-          disabled={fetchMyMarkets}
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={categoryItems}
@@ -416,22 +494,24 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <TopContents>
           <FiltersWrapper>
             <SectionTitleMarket title={'Markets'} />
-            <FiltersControls disabled={fetchMyMarkets}>
-              <ButtonCircleStyled active={showSearch} disabled={fetchMyMarkets} onClick={toggleSearch}>
+            <FiltersControls>
+              <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
                 <IconSearch />
               </ButtonCircleStyled>
-              <ButtonCircleStyled active={showAdvancedFilters} disabled={fetchMyMarkets} onClick={toggleFilters}>
+              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
                 <IconFilter />
               </ButtonCircleStyled>
-              {!fetchMyMarkets && (
-                <Dropdown
-                  currentItem={sortOptions.findIndex(i => i.sortBy === sortBy)}
-                  dirty={true}
-                  dropdownPosition={DropdownPosition.right}
-                  items={sortItems}
-                  placeholder={<SecondaryText>Sort By</SecondaryText>}
-                />
-              )}
+              <Dropdown
+                currentItem={
+                  fetchMyMarkets
+                    ? myMarketsSortOptions.findIndex(i => i.sortBy === sortBy)
+                    : sortOptions.findIndex(i => i.sortBy === sortBy)
+                }
+                dirty={true}
+                dropdownPosition={DropdownPosition.right}
+                items={fetchMyMarkets ? myMarketsSortItems : sortItems}
+                placeholder={<SecondaryText>Sort By</SecondaryText>}
+              />
             </FiltersControls>
           </FiltersWrapper>
         </TopContents>
@@ -439,8 +519,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         {showAdvancedFilters && (
           <AdvancedFilters
             arbitrator={arbitrator}
+            curationSource={curationSource}
             currency={currency}
+            disableCurationFilter={fetchMyMarkets ? true : false}
             onChangeArbitrator={setArbitrator}
+            onChangeCurationSource={setCurationSource}
             onChangeCurrency={setCurrency}
             onChangeTemplateId={setTemplateId}
           />

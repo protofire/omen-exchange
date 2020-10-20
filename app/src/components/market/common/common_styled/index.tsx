@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import { getOutcomeColor } from '../../../../theme/utils'
 import { Button, ButtonContainer } from '../../../button'
@@ -14,14 +14,15 @@ export const ButtonContainerFullWidth = styled(ButtonContainer)`
   padding-right: ${props => props.theme.cards.paddingHorizontal};
 `
 
-export const OutcomesTableWrapper = styled.div`
-  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
-  margin-bottom: 20px;
+export const OutcomesTableWrapper = styled.div<{ borderBottom?: boolean }>`
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};
-  min-height: 180px;
+  min-height: 50px;
   overflow-x: auto;
+  ${({ borderBottom, theme }) =>
+    borderBottom &&
+    `border-bottom: ${`1px solid ${theme.borders.borderDisabled}`};
+  padding-bottom: 24px;`}
 `
 
 export const OutcomesTable = styled.table`
@@ -34,13 +35,11 @@ export const OutcomesTHead = styled.thead``
 export const OutcomesTBody = styled.tbody``
 
 export const OutcomesTH = styled.th<{ textAlign?: string }>`
-  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
-  color: ${props => props.theme.colors.textColor};
+  color: ${props => props.theme.colors.textColorDark};
   font-size: 14px;
   font-weight: 400;
-  height: 40px;
   line-height: 1.2;
-  padding: 0 15px 0 0;
+  padding: 0px 15px 6px 0;
   text-align: ${props => props.textAlign};
   white-space: nowrap;
 `
@@ -68,13 +67,11 @@ export const OutcomesTR = styled.tr`
 `
 
 export const OutcomesTD = styled.td<{ textAlign?: string }>`
-  border-bottom: 1px solid ${props => props.theme.borders.borderColor};
-  color: ${props => props.theme.colors.textColorDark};
+  color: ${props => props.theme.colors.textColorLighter};
   font-size: 14px;
   font-weight: 500;
-  height: 56px;
   line-height: 1.2;
-  padding: 0 15px 0 0;
+  padding: 6px 15px 6px 0;
   text-align: ${props => props.textAlign};
   white-space: nowrap;
 `
@@ -88,8 +85,51 @@ export const OutcomeItemTextWrapper = styled.div`
   display: flex;
 `
 
+export const RowWrapper = styled.div`
+  align-items: center;
+  display: flex;
+`
+
+const OutcomeItemWrapperReadOnlyCSS = css`
+  background-color: ${({ theme }) => theme.form.common.disabled.backgroundColor};
+  border-color: ${({ theme }) => theme.form.common.disabled.borderColor};
+  color: ${({ theme }) => theme.form.common.disabled.color};
+  cursor: not-allowed !important;
+  user-select: none !important;
+  label {
+    cursor: not-allowed !important;
+    user-select: none !important;
+  }
+`
+
+const OutcomeItemWrapperActiveCSS = css`
+  &:hover {
+    border-color: ${({ theme }) => theme.textfield.borderColorOnHover};
+  }
+  &:active,
+  &:focus {
+    border-color: ${({ theme }) => theme.textfield.borderColorActive};
+  }
+`
+
+export const OutcomeItemWrapper = styled.div<{ readOnly: boolean }>`
+  align-items: center;
+  display: flex;
+  background-color: ${props => props.theme.textfield.backgroundColor};
+  border-color: ${props => props.theme.textfield.borderColor};
+  border-style: ${props => props.theme.textfield.borderStyle};
+  border-width: ${props => props.theme.textfield.borderWidth};
+  border-radius: ${props => props.theme.textfield.borderRadius};
+  padding: 0 ${props => props.theme.textfield.paddingHorizontal};
+  transition: border-color 0.15s ease-in-out;
+  width: 100%;
+
+  ${({ readOnly }) => readOnly && OutcomeItemWrapperReadOnlyCSS};
+  ${({ readOnly }) => !readOnly && OutcomeItemWrapperActiveCSS};
+`
+
 export const OutcomeItemText = styled.div`
-  color: ${props => props.theme.colors.textColorDark};
+  color: ${props => props.theme.colors.textColorLighter};
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;

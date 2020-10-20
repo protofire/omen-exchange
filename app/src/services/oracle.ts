@@ -1,3 +1,4 @@
+import Big from 'big.js'
 import { Contract, Wallet, ethers, utils } from 'ethers'
 import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
@@ -53,28 +54,25 @@ export class OracleService {
     return oracleInterface.functions.resolve.encode([questionId, questionTemplateId, questionRaw, numOutcomes])
   }
 
-  static getPayouts = (templateId: number, realitioAnswer: string, numOutcomes: number): number[] => {
-    let payouts: number[]
+  static getPayouts = (templateId: number, realitioAnswer: string, numOutcomes: number): Big[] => {
+    let payouts: Big[]
     if (realitioAnswer === '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff') {
-      payouts = [...Array(numOutcomes)].map(() => 1)
-    }
-
-    const answer = new BigNumber(realitioAnswer).toNumber()
-
-    if (templateId === 0 || templateId === 2) {
-      payouts = [...Array(numOutcomes)].map(() => 0)
-      payouts[answer] = 1
-    } else if (templateId === 5 || templateId === 6) {
-      payouts = [0, 0]
-
-      payouts[0] = 4 - answer
-      payouts[1] = answer
+      payouts = [...Array(numOutcomes)].map(() => new Big(1))
     } else {
-      throw new Error(`Unsupported template id: '${templateId}'`)
+      const answer = new BigNumber(realitioAnswer).toNumber()
+
+      if (templateId === 0 || templateId === 2) {
+        payouts = [...Array(numOutcomes)].map(() => new Big(1))
+        payouts[answer] = new Big(1)
+      } else if (templateId === 5 || templateId === 6) {
+        payouts = [new Big(4 - answer), new Big(answer)]
+      } else {
+        throw new Error(`Unsupported template id: '${templateId}'`)
+      }
     }
 
-    const totalPayouts = payouts.reduce((a, b) => a + b)
+    const totalPayouts = payouts.reduce((a, b) => a.add(b))
 
-    return payouts.map(payout => payout / totalPayouts)
+    return payouts.map(payout => payout.div(totalPayouts))
   }
 }

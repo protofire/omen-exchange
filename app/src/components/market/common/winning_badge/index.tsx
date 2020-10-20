@@ -1,3 +1,4 @@
+import Big from 'big.js'
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
@@ -29,7 +30,7 @@ const Text = styled.div<{ outcomeIndex: number }>`
 interface Props extends DOMAttributes<HTMLDivElement> {
   index: number
   outcomeName?: string
-  payouts: Maybe<number[]>
+  payouts: Maybe<Big[]>
 }
 
 export const WinningBadge: React.FC<Props> = props => {
@@ -40,7 +41,7 @@ export const WinningBadge: React.FC<Props> = props => {
       <Wrapper outcomeIndex={index} {...restProps}>
         <IconDragonBall />
         <Text outcomeIndex={index}>
-          {payouts[index] < 1 ? `${payouts[index] * 100}% ` : ''} {outcomeName}
+          {payouts[index].lt(1) ? `${payouts[index].mul(100).toFixed(2)}% ` : ''} {outcomeName}
         </Text>
       </Wrapper>
     )

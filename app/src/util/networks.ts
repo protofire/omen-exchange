@@ -120,7 +120,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     symbol: 'CDAI',
     decimals: 18,
     addresses: {
-      [networkIds.MAINNET]: '0xa4c993e32876795abf80842adb0a241bb0eecd47',
+      [networkIds.MAINNET]: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
       [networkIds.RINKEBY]: '0x7a978b38d5af06ff929ca06647e025b759479318',
     },
     order: 2,
@@ -300,20 +300,7 @@ interface KnownArbitratorData {
   isSelectionEnabled: boolean
 }
 
-const windowObj: any = window
-const realitioBaseUrl =
-  windowObj.ethereum && windowObj.ethereum.isMetaMask ? 'https://reality.eth' : 'https://reality.eth.link'
-
 export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData } = {
-  realitio: {
-    name: 'Realitio Team',
-    url: `${realitioBaseUrl}/`,
-    addresses: {
-      [networkIds.MAINNET]: '0xdc0a2185031ecf89f091a39c63c2857a7d5c301a',
-      [networkIds.RINKEBY]: '0x02321745bE4a141E78db6C39834396f8df00e2a0',
-    },
-    isSelectionEnabled: false,
-  },
   kleros: {
     name: 'Kleros',
     url: 'https://kleros.io/',

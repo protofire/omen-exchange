@@ -10,6 +10,7 @@ import { ButtonType } from '../../button/button_styling_types'
 import { MadeBy, Spinner } from '../../common'
 import { ModalWrapper } from '../../modal/modal_wrapper'
 
+import AuthereumSVG from './img/authereum.svg'
 import MetaMaskSVG from './img/metamask.svg'
 import WalletConnectSVG from './img/wallet_connect.svg'
 
@@ -50,6 +51,7 @@ const ButtonStyled = styled(Button)`
 const Icon = css`
   background-position: 50% 50%;
   background-repeat: no-repeat;
+  background-size: contain;
   display: block;
   height: 22px;
   margin: 0 15px 0 0;
@@ -64,6 +66,11 @@ const IconMetaMask = styled.span`
 const IconWalletConnect = styled.span`
   ${Icon}
   background-image: url('${WalletConnectSVG}');
+`
+
+const IconAuthereum = styled.span`
+  ${Icon}
+  background-image: url('${AuthereumSVG}');
 `
 
 const Text = styled.span`
@@ -112,6 +119,7 @@ export const ModalConnectWallet = (props: Props) => {
   const context = useWeb3Context()
   const [connectingToWalletConnect, setConnectingToWalletConnect] = useState(false)
   const [connectingToMetamask, setConnectingToMetamask] = useState(false)
+  const [connectingToAuthereum, setConnectingToAuthereum] = useState(false)
   const { isOpen, onClose } = props
 
   if (context.error) {
@@ -128,14 +136,20 @@ export const ModalConnectWallet = (props: Props) => {
     if (wallet === Wallet.MetaMask) {
       setConnectingToMetamask(true)
     }
+    if (wallet === Wallet.Authereum) {
+      setConnectingToAuthereum(true)
+    }
 
-    context.setConnector(wallet)
-    localStorage.setItem('CONNECTOR', wallet)
+    if (wallet) {
+      context.setConnector(wallet)
+      localStorage.setItem('CONNECTOR', wallet)
+    }
   }
 
   const resetEverything = useCallback(() => {
     setConnectingToWalletConnect(false)
     setConnectingToMetamask(false)
+    setConnectingToAuthereum(false)
     WalletConnectQRCodeModal.close()
   }, [])
 
@@ -174,11 +188,25 @@ export const ModalConnectWallet = (props: Props) => {
     }
   }, [context, onClickCloseButton, connectingToMetamask])
 
-  const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect
-  const connectingText = connectingToMetamask ? 'Waiting for Approval on Metamask' : 'Opening QR for Wallet Connect'
+  useEffect(() => {
+    if (connectingToAuthereum && context.account && context.connectorName === Wallet.Authereum) {
+      onClickCloseButton()
+      setConnectingToAuthereum(false)
+    }
+  }, [context, onClickCloseButton, connectingToAuthereum])
+
+  const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect || connectingToAuthereum
+  let connectingText = `Connecting to wallet`
+  if (connectingToMetamask) {
+    connectingText = 'Waiting for Approval on Metamask'
+  }
+  if (connectingToWalletConnect) {
+    connectingText = 'Opening QR for Wallet Connect'
+  }
 
   const disableMetamask: boolean = !isMetamaskEnabled || false
   const disableWalletConnect = false
+  const disableAuthereum = false
 
   return (
     <>
@@ -213,6 +241,15 @@ export const ModalConnectWallet = (props: Props) => {
                     onClickWallet(Wallet.WalletConnect)
                   }}
                   text="Wallet Connect"
+                />
+
+                <ConnectButton
+                  disabled={disableAuthereum}
+                  icon={<IconAuthereum />}
+                  onClick={() => {
+                    onClickWallet(Wallet.Authereum)
+                  }}
+                  text="Authereum"
                 />
               </Buttons>
             </>

@@ -74,6 +74,7 @@ const theme = {
   },
   colors: {
     activeListItemBackground: '#fafafa',
+    alert: '#E57373',
     darkGray: '#acacac',
     error: '#fa0000',
     gray: '#b7b7b7',
@@ -92,6 +93,7 @@ const theme = {
     textColorLighter: '#86909E',
     textColorLightish: '#7D8189',
     verticalDivider: '#e8eaf6',
+    clickable: '#7986CB',
   },
   message: {
     colors: {
@@ -128,8 +130,8 @@ const theme = {
     xxxl: '1366px',
   },
   borders: {
-    borderColor: '#ECEFF1',
-    borderColorLighter: '#E8EAF6',
+    borderDisabled: '#E8EAF6',
+    borderColor: '#DCDFF2',
     commonBorderRadius: '6px',
   },
   slider: {
@@ -333,6 +335,12 @@ const theme = {
       padding: '10px',
       zIndex: '12345',
     },
+  },
+  progressBar: {
+    open: '#7986CB',
+    finalizing: '#9575CD',
+    arbitration: '#BA68C8',
+    closed: '#BA68C8',
   },
 }
 

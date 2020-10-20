@@ -1,3 +1,4 @@
+import Big from 'big.js'
 import { BigNumber } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -17,7 +18,7 @@ const getBalances = (
   outcomes: string[],
   marketMakerShares: BigNumber[],
   userShares: BigNumber[],
-  payouts: Maybe<number[]>,
+  payouts: Maybe<Big[]>,
 ): BalanceItem[] => {
   const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
@@ -34,7 +35,7 @@ const getBalances = (
       currentPrice,
       shares,
       holdings,
-      payout: payouts ? payouts[index] : 0,
+      payout: payouts ? payouts[index] : new Big(0),
     }
   })
 
@@ -133,6 +134,11 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       totalPoolShares,
       userEarnings,
       userPoolShares,
+      klerosTCRregistered: graphMarketMakerData.klerosTCRregistered,
+      curatedByDxDao: graphMarketMakerData.curatedByDxDao,
+      curatedByDxDaoOrKleros: graphMarketMakerData.curatedByDxDaoOrKleros,
+      runningDailyVolumeByHour: graphMarketMakerData.runningDailyVolumeByHour,
+      lastActiveDay: graphMarketMakerData.lastActiveDay,
     }
 
     setMarketMakerData(newMarketMakerData)

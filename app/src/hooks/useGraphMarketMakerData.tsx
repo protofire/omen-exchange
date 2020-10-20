@@ -1,7 +1,8 @@
 import { useQuery } from '@apollo/react-hooks'
+import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { getOutcomes } from '../util/networks'
 import { Question, Status } from '../util/types'
@@ -34,10 +35,16 @@ const query = gql`
       currentAnswer
       answerFinalizedTimestamp
       scaledLiquidityParameter
+      runningDailyVolumeByHour
+      isPendingArbitration
+      arbitrationOccurred
+      currentAnswerTimestamp
+      runningDailyVolumeByHour
       question {
         id
         data
       }
+      klerosTCRregistered
     }
   }
 `
@@ -63,6 +70,10 @@ type GraphResponseFixedProductMarketMaker = {
   openingTimestamp: string
   outcomeTokenAmounts: string[]
   outcomes: Maybe<string[]>
+  isPendingArbitration: boolean
+  arbitrationOccurred: boolean
+  currentAnswerTimestamp: string
+  runningDailyVolumeByHour: BigNumber[]
   question: {
     id: string
     data: string
@@ -72,6 +83,9 @@ type GraphResponseFixedProductMarketMaker = {
   timeout: string
   title: string
   scaledLiquidityParameter: string
+  klerosTCRregistered: boolean
+  curatedByDxDao: boolean
+  curatedByDxDaoOrKleros: boolean
 }
 
 type GraphResponse = {
@@ -88,10 +102,14 @@ export type GraphMarketMakerData = {
   lastActiveDay: number
   dailyVolume: BigNumber
   conditionId: string
-  payouts: Maybe<number[]>
+  payouts: Maybe<Big[]>
   fee: BigNumber
   question: Question
   scaledLiquidityParameter: number
+  klerosTCRregistered: boolean
+  curatedByDxDao: boolean
+  curatedByDxDaoOrKleros: boolean
+  runningDailyVolumeByHour: BigNumber[]
 }
 
 type Result = {
@@ -112,9 +130,10 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     lastActiveDay: Number(data.lastActiveDay),
     dailyVolume: bigNumberify(data.runningDailyVolume),
     conditionId: data.condition.id,
-    payouts: data.condition.payouts ? data.condition.payouts.map(Number) : null,
+    payouts: data.condition.payouts ? data.condition.payouts.map(payout => new Big(payout)) : null,
     fee: bigNumberify(data.fee),
     scaledLiquidityParameter: parseFloat(data.scaledLiquidityParameter),
+    runningDailyVolumeByHour: data.runningDailyVolumeByHour,
     question: {
       id: data.question.id,
       templateId: +data.templateId,
@@ -124,7 +143,13 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
       resolution: new Date(1000 * +data.openingTimestamp),
       arbitratorAddress: data.arbitrator,
       outcomes,
+      isPendingArbitration: data.isPendingArbitration,
+      arbitrationOccurred: data.arbitrationOccurred,
+      currentAnswerTimestamp: data.currentAnswerTimestamp ? bigNumberify(data.currentAnswerTimestamp) : null,
     },
+    curatedByDxDao: data.curatedByDxDao,
+    klerosTCRregistered: data.klerosTCRregistered,
+    curatedByDxDaoOrKleros: data.curatedByDxDaoOrKleros,
   }
 }
 
@@ -137,16 +162,20 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
 
   const { data, error, loading } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
-    skip: marketMakerData !== null,
+    skip: false,
     variables: { id: marketMakerAddress },
   })
+
+  useEffect(() => {
+    setMarketMakerData(null)
+  }, [marketMakerAddress])
 
   if (data && data.fixedProductMarketMaker && !marketMakerData) {
     setMarketMakerData(wrangleResponse(data.fixedProductMarketMaker, networkId))
   }
 
   return {
-    marketMakerData,
+    marketMakerData: error ? null : marketMakerData,
     status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
   }
 }

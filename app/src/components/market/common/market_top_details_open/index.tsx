@@ -1,141 +1,96 @@
 import React, { useState } from 'react'
 
-import { formatBigNumber, formatDate } from '../../../../util/tools'
+import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
 import { MarketMakerData } from '../../../../util/types'
-import { GridTwoColumns, SubsectionTitleAction, SubsectionTitleWrapper } from '../../../common'
-import { TitleValue } from '../../../common/text/title_value'
-import { Breaker, SubsectionTitleActionWrapper } from '../common_styled'
-import { DisplayArbitrator } from '../display_arbitrator'
-import { DisplayResolution } from '../display_resolution'
-import { HistoryChartContainer } from '../history_chart'
+import { SubsectionTitleWrapper } from '../../../common'
+import { AdditionalMarketData } from '../additional_market_data'
+import { MarketData } from '../market_data'
 import { MarketTitle } from '../market_title'
+import { ProgressBar } from '../progress_bar'
+import { ProgressBarToggle } from '../progress_bar/toggle'
 
 interface Props {
   marketMakerData: MarketMakerData
   title?: string
-  toggleTitle: string
-  isLiquidityProvision: boolean
 }
 
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
-  const [showingExtraInformation, setExtraInformation] = useState(false)
-  const [showingTradeHistory, setShowingTradeHistory] = useState(false)
-  const [tradeHistoryLoaded, setTradeHistoryLoaded] = useState(false)
+  const context = useConnectedWeb3Context()
 
-  const { isLiquidityProvision, marketMakerData, title, toggleTitle } = props
+  const [showingProgressBar, setShowingProgressBar] = useState(false)
+
+  const { marketMakerData, title } = props
   const {
     address,
     answerFinalizedTimestamp,
     arbitrator,
     collateral,
-    collateralVolume,
-    marketMakerFunding,
-    marketMakerUserFunding,
+    lastActiveDay,
     question,
-    totalEarnings,
-    userEarnings,
+    runningDailyVolumeByHour,
   } = marketMakerData
 
-  const totalVolumeFormat = collateralVolume
-    ? `${formatBigNumber(collateralVolume, collateral.decimals)} ${collateral.symbol}`
-    : '-'
+  const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
+  const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
+    : ''
+  const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
-  const toggleExtraInformation = () => {
-    showingExtraInformation ? setExtraInformation(false) : setExtraInformation(true)
-    setShowingTradeHistory(false)
-  }
+  const currentTimestamp = new Date().getTime()
 
-  const toggleTradeHistory = () => {
-    if (showingTradeHistory) {
-      setShowingTradeHistory(false)
-    } else {
-      setShowingTradeHistory(true)
-      // After first load on demand we maintain this value to only load the data when history is shown.
-      setTradeHistoryLoaded(true)
-    }
-    setExtraInformation(false)
+  // const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
+  const isPendingArbitration = question.isPendingArbitration
+  const arbitrationOccurred = question.arbitrationOccurred
+
+  const marketState =
+    question.resolution.getTime() > currentTimestamp
+      ? 'open'
+      : question.resolution.getTime() < currentTimestamp &&
+        (answerFinalizedTimestamp === null || answerFinalizedTimestamp.toNumber() * 1000 > currentTimestamp)
+      ? 'finalizing'
+      : isPendingArbitration
+      ? 'arbitration'
+      : answerFinalizedTimestamp && answerFinalizedTimestamp.toNumber() * 1000 < currentTimestamp
+      ? 'closed'
+      : ''
+
+  const toggleProgressBar = () => {
+    setShowingProgressBar(!showingProgressBar)
   }
 
   return (
     <>
       <SubsectionTitleWrapper>
         <MarketTitle templateId={question.templateId} title={title} />
-        <SubsectionTitleActionWrapper>
-          <SubsectionTitleAction onClick={toggleExtraInformation}>
-            {showingExtraInformation ? 'Hide' : 'Show'} {toggleTitle}
-          </SubsectionTitleAction>
-          <Breaker />
-          <SubsectionTitleAction onClick={toggleTradeHistory}>
-            {`${showingTradeHistory ? 'Hide' : 'Show'} Trade History`}
-          </SubsectionTitleAction>
-          <Breaker />
-        </SubsectionTitleActionWrapper>
+        <ProgressBarToggle
+          active={showingProgressBar}
+          state={marketState}
+          toggleProgressBar={toggleProgressBar}
+        ></ProgressBarToggle>
       </SubsectionTitleWrapper>
-      <GridTwoColumns>
-        {!isLiquidityProvision ? (
-          <>
-            <TitleValue title={'Category'} value={question.category} />
-            <DisplayResolution questionId={question.id} title={'Resolution Date'} value={question.resolution} />
-            <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
-            <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
-            {showingExtraInformation ? (
-              <>
-                <TitleValue
-                  title={'Total Pool Tokens'}
-                  value={collateral && formatBigNumber(marketMakerFunding, collateral.decimals)}
-                />
-                <TitleValue
-                  title={'Total Pool Earnings'}
-                  value={collateral && `${formatBigNumber(totalEarnings, collateral.decimals)} ${collateral.symbol}`}
-                />
-                <TitleValue
-                  title={'My Pool Tokens'}
-                  value={collateral && formatBigNumber(marketMakerUserFunding, collateral.decimals)}
-                />
-                <TitleValue
-                  title={'My Pool Earnings'}
-                  value={collateral && `${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
-                />
-              </>
-            ) : null}
-          </>
-        ) : (
-          <>
-            <TitleValue
-              title={'Total Pool Tokens'}
-              value={collateral && formatBigNumber(marketMakerFunding, collateral.decimals)}
-            />
-            <TitleValue
-              title={'Total Pool Earnings'}
-              value={collateral && `${formatBigNumber(totalEarnings, collateral.decimals)} ${collateral.symbol}`}
-            />
-            <TitleValue
-              title={'My Pool Tokens'}
-              value={collateral && formatBigNumber(marketMakerUserFunding, collateral.decimals)}
-            />
-            <TitleValue
-              title={'My Pool Earnings'}
-              value={collateral && `${formatBigNumber(userEarnings, collateral.decimals)} ${collateral.symbol}`}
-            />
-            {showingExtraInformation ? (
-              <>
-                <TitleValue title={'Category'} value={question.category} />
-                <TitleValue title={'Resolution Date'} value={question.resolution && formatDate(question.resolution)} />
-                <TitleValue title={'Arbitrator'} value={arbitrator && <DisplayArbitrator arbitrator={arbitrator} />} />
-                <TitleValue title={'Total Volume'} value={totalVolumeFormat} />
-              </>
-            ) : null}
-          </>
-        )}
-      </GridTwoColumns>
-      {tradeHistoryLoaded && (
-        <HistoryChartContainer
+      {showingProgressBar && (
+        <ProgressBar
           answerFinalizedTimestamp={answerFinalizedTimestamp}
-          hidden={!showingTradeHistory}
-          marketMakerAddress={address}
-          outcomes={question.outcomes}
-        />
+          arbitrationOccurred={arbitrationOccurred}
+          bondTimestamp={question.currentAnswerTimestamp}
+          creationTimestamp={creationDate}
+          pendingArbitration={isPendingArbitration}
+          resolutionTimestamp={question.resolution}
+          state={marketState}
+        ></ProgressBar>
       )}
+      <MarketData
+        currency={collateral}
+        lastActiveDay={lastActiveDay}
+        resolutionTimestamp={question.resolution}
+        runningDailyVolumeByHour={runningDailyVolumeByHour}
+      ></MarketData>
+      <AdditionalMarketData
+        arbitrator={arbitrator}
+        category={question.category}
+        id={question.id}
+        oracle="Reality.eth"
+      ></AdditionalMarketData>
     </>
   )
 }

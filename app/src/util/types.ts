@@ -1,3 +1,4 @@
+import Big from 'big.js'
 import { Block } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
@@ -16,7 +17,7 @@ export interface BalanceItem {
   probability: number
   currentPrice: number
   shares: BigNumber
-  payout: number
+  payout: Big
   holdings: BigNumber
 }
 
@@ -52,6 +53,9 @@ export interface Question {
   arbitratorAddress: string
   category: string
   outcomes: string[]
+  isPendingArbitration: boolean
+  arbitrationOccurred: boolean
+  currentAnswerTimestamp: Maybe<BigNumber>
 }
 
 export enum OutcomeTableValue {
@@ -112,6 +116,7 @@ export interface Arbitrator {
 export enum Wallet {
   MetaMask = 'MetaMask',
   WalletConnect = 'WalletConnect',
+  Authereum = 'Authereum',
 }
 
 export interface MarketData {
@@ -126,22 +131,55 @@ export interface MarketData {
   funding: BigNumber
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
+  verifiedLabel?: string
 }
 
 export enum MarketStates {
   open = 'OPEN',
   pending = 'PENDING',
   finalizing = 'FINALIZING',
+  arbitrating = 'ARBITRATING',
   closed = 'CLOSED',
   myMarkets = 'MY_MARKETS',
 }
 
 export type MarketsSortCriteria =
-  | 'scaledCollateralVolume'
+  | 'usdVolume'
   | 'creationTimestamp'
   | 'openingTimestamp'
-  | 'scaledLiquidityParameter'
+  | 'usdLiquidityParameter'
   | 'lastActiveDayAndScaledRunningDailyVolume'
+  | 'sort24HourVolume0'
+  | 'sort24HourVolume1'
+  | 'sort24HourVolume2'
+  | 'sort24HourVolume3'
+  | 'sort24HourVolume4'
+  | 'sort24HourVolume5'
+  | 'sort24HourVolume6'
+  | 'sort24HourVolume7'
+  | 'sort24HourVolume8'
+  | 'sort24HourVolume9'
+  | 'sort24HourVolume10'
+  | 'sort24HourVolume11'
+  | 'sort24HourVolume12'
+  | 'sort24HourVolume13'
+  | 'sort24HourVolume14'
+  | 'sort24HourVolume15'
+  | 'sort24HourVolume16'
+  | 'sort24HourVolume17'
+  | 'sort24HourVolume18'
+  | 'sort24HourVolume19'
+  | 'sort24HourVolume20'
+  | 'sort24HourVolume21'
+  | 'sort24HourVolume22'
+  | 'sort24HourVolume23'
+
+export enum CurationSource {
+  ALL_SOURCES = 'All Sources',
+  DXDAO = 'Dxdao',
+  KLEROS = 'Kleros',
+  NO_SOURCES = 'No Sources',
+}
 
 export interface MarketFilters {
   state: MarketStates
@@ -152,6 +190,7 @@ export interface MarketFilters {
   arbitrator: Maybe<string>
   templateId: Maybe<string>
   currency: Maybe<string>
+  curationSource: CurationSource
 }
 
 export interface MarketMakerData {
@@ -166,12 +205,17 @@ export interface MarketMakerData {
   collateralVolume: BigNumber
   marketMakerFunding: BigNumber
   marketMakerUserFunding: BigNumber
-  payouts: Maybe<number[]>
+  payouts: Maybe<Big[]>
   question: Question
   totalEarnings: BigNumber
   totalPoolShares: BigNumber
   userEarnings: BigNumber
   userPoolShares: BigNumber
+  klerosTCRregistered: boolean
+  curatedByDxDao: boolean
+  curatedByDxDaoOrKleros: boolean
+  runningDailyVolumeByHour: BigNumber[]
+  lastActiveDay: number
 }
 
 export enum Ternary {
@@ -186,7 +230,7 @@ export type HistoricDataPoint = {
 }
 
 export type HistoricData = HistoricDataPoint[]
-export type Period = '1H' | '1D' | '1W' | '1M'
+export type Period = '1H' | '1D' | '1W' | '1M' | '1Y' | 'All'
 
 export type CategoryDataItem = {
   id: string
@@ -206,4 +250,54 @@ export type TopCategoryItem = {
 
 export type GraphResponseTopCategories = {
   categories: TopCategoryItem[]
+}
+
+export type GraphMarketMakerDataItem = {
+  id: string
+  collateralVolume: string
+  collateralToken: string
+  outcomeTokenAmounts: string[]
+  title: string
+  outcomes: Maybe<string[]>
+  openingTimestamp: string
+  arbitrator: string
+  category: string
+  templateId: string
+  usdLiquidityParameter: string
+  curatedByDxDao: boolean
+  klerosTCRregistered: boolean
+  curatedByDxDaoOrKleros: boolean
+}
+
+export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
+
+export type GraphResponseMyMarkets = { account: { fpmmParticipations: Participations[] } }
+
+export type GraphResponseMarketsGeneric = {
+  fixedProductMarketMakers: GraphMarketMakerDataItem[]
+}
+
+export type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMyMarkets
+
+export type MarketMakerDataItem = {
+  address: string
+  collateralVolume: BigNumber
+  collateralToken: string
+  outcomeTokenAmounts: BigNumber[]
+  title: string
+  outcomes: Maybe<string[]>
+  openingTimestamp: Date
+  arbitrator: string
+  category: string
+  templateId: number
+  usdLiquidityParameter: number
+  curatedByDxDao: boolean
+  klerosTCRregistered: boolean
+  curatedByDxDaoOrKleros: boolean
+}
+
+export type BuildQueryType = MarketFilters & {
+  whitelistedCreators: boolean
+  whitelistedTemplateIds: boolean
+  networkId: Maybe<number>
 }

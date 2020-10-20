@@ -38,7 +38,16 @@ export const MarketWizardCreator = (props: Props) => {
     collateral: defaultCollateral,
     funding: new BigNumber('0'),
     loadedQuestionId: null,
-    outcomes: [],
+    outcomes: [
+      {
+        name: '',
+        probability: 50,
+      },
+      {
+        name: '',
+        probability: 50,
+      },
+    ],
     question: '',
     resolution: null,
     spread: MARKET_FEE,
@@ -46,7 +55,7 @@ export const MarketWizardCreator = (props: Props) => {
 
   const [currentStep, setCurrentStep] = useState(1)
   const [marketData, setMarketdata] = useState<MarketData>(marketDataDefault)
-  const [first, setFirst] = useState<number>(8)
+  const [first, setFirst] = useState<number>(19)
   const [loadMoreButton, setLoadMoreButton] = useState<boolean>(true)
 
   useEffect(() => {
@@ -167,27 +176,24 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const handleQuestionChange = (questionObj: Question, arbitrator: Arbitrator) => {
-    const { category, id: questionId, outcomes, resolution, title: question } = questionObj
+  const handleQuestionChange = (
+    questionObj: Question,
+    arbitrator: Arbitrator,
+    outcomes: Outcome[],
+    verifyLabel?: string,
+  ) => {
+    const { category, id: questionId, resolution, title: question } = questionObj
 
-    const outcomesFromQuestion = outcomes.map(outcomeName => {
-      return {
-        name: outcomeName,
-        probability: outcomes.length > 0 ? 100 / outcomes.length : 100,
-      }
-    })
-
-    const newMarketData = {
-      ...marketData,
+    setMarketdata(prevMarketData => ({
+      ...prevMarketData,
       arbitrator,
       question,
       category,
       resolution,
-      outcomes: outcomesFromQuestion,
+      outcomes,
       loadedQuestionId: questionId,
-    }
-
-    setMarketdata(newMarketData)
+      verifyLabel,
+    }))
   }
 
   const handleCollateralChange = (collateral: Token) => {
@@ -214,7 +220,16 @@ export const MarketWizardCreator = (props: Props) => {
       category: '',
       resolution: null,
       arbitrator: defaultArbitrator,
-      outcomes: [],
+      outcomes: [
+        {
+          name: '',
+          probability: 50,
+        },
+        {
+          name: '',
+          probability: 50,
+        },
+      ],
       loadedQuestionId: null,
     }
 

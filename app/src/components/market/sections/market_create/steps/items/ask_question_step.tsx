@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useState } from 'react'
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled, { css } from 'styled-components'
 
@@ -7,7 +7,7 @@ import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
-import { DateField, FormRow } from '../../../../../common'
+import { DateField, FormRow, FormStateButton } from '../../../../../common'
 import { CommonDisabledCSS } from '../../../../../common/form/common_styled'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
@@ -17,13 +17,13 @@ import { CreateCard } from '../../../../common/create_card'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome, Outcomes } from '../outcomes'
 
+import { ImportMarketContent } from './import_market_content'
+
 const ButtonCategoryFocusCSS = css`
   &,
   &:hover {
-    background-color: ${props => props.theme.colors.secondary};
-    border-color: ${props => props.theme.colors.secondary};
-    color: ${props => props.theme.colors.primary};
-    font-weight: 500;
+    border-color: ${props => props.theme.textfield.borderColorActive};
+    color: ${props => props.theme.textfield.color};
   }
 `
 
@@ -32,10 +32,12 @@ const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boo
   padding-left: 10px;
   padding-right: 10px;
   width: 100%;
+  height: 36px;
+  font-weight: normal;
   &,
   &:hover {
-    color: ${props => (props.isACategorySelected ? props.theme.colors.textColorDark : '#86909e')};
-    font-weight: 400;
+    color: ${props =>
+      props.isACategorySelected ? props.theme.colors.textColorDark : props.theme.colors.textColorLighter};
   }
 
   ${props => (props.focus ? ButtonCategoryFocusCSS : '')}
@@ -57,24 +59,19 @@ const ButtonCategoryTextOverflow = styled.span`
   text-transform: capitalize;
 `
 
-const GridThreeColumns = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
-  column-gap: 20px;
+const GridTwoColumns = styled.div`
+  column-gap: 16px;
   display: grid;
   grid-template-columns: 1fr;
-  padding: 20px 0;
+  padding-bottom: 20px;
   row-gap: 20px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 `
 
-const Column = styled.div`
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    max-width: 165px;
-  }
-`
+const Column = styled.div``
 
 const ButtonWithReadyToGoStatusCSS = css`
   &,
@@ -90,6 +87,13 @@ const ButtonWithReadyToGoStatus = styled(Button)<{ readyToGo: boolean }>`
   ${props => props.readyToGo && ButtonWithReadyToGoStatusCSS}
 `
 
+const CategoryImportWrapper = styled.div`
+  border-bottom: 1px solid ${props => props.theme.borders.borderDisabled};
+  margin-left: -${props => props.theme.cards.paddingHorizontal};
+  margin-right: -${props => props.theme.cards.paddingHorizontal};
+  padding: 0 ${props => props.theme.cards.paddingHorizontal};
+  padding-bottom: 20px;
+`
 interface Props {
   next: () => void
   values: {
@@ -105,11 +109,12 @@ interface Props {
   addArbitratorCustom: (arbitrator: Arbitrator) => void
   addCategoryCustom: (category: string) => void
   handleArbitratorChange: (arbitrator: Arbitrator) => any
+
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
   handleClearQuestion: () => any
   handleDateChange: (date: Date | null) => any
   handleOutcomesChange: (newOutcomes: Outcome[]) => any
-  handleQuestionChange: (question: Question, arbitrator: Arbitrator) => any
+  handleQuestionChange: (question: Question, arbitrator: Arbitrator, outcomes: Outcome[], verifyLabel?: string) => any
   setFirst: React.Dispatch<React.SetStateAction<number>>
   first: number
   loadMoreButton: boolean
@@ -119,8 +124,6 @@ const AskQuestionStep = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const {
-    addArbitratorCustom,
-    addCategoryCustom,
     first,
     handleArbitratorChange,
     handleChange,
@@ -145,15 +148,33 @@ const AskQuestionStep = (props: Props) => {
   } = values
 
   const history = useHistory()
+  const [isImport, setIsImport] = useState(!!loadedQuestionId)
 
   const totalProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
   const totalProbabilitiesNotFull = Math.abs(totalProbabilities - 100) > 0.000001
+  const outcomeNames = outcomes.map(outcome => outcome.name)
   const isContinueButtonDisabled =
-    totalProbabilitiesNotFull || outcomes.length < 2 || !question || !resolution || !category
+    totalProbabilitiesNotFull ||
+    outcomes.length < 2 ||
+    !question ||
+    !resolution ||
+    resolution < new Date() ||
+    !category ||
+    outcomeNames.map(name => !name).reduce((e1, e2) => e1 || e2) ||
+    outcomeNames.map((name, index) => outcomeNames.indexOf(name) !== index).reduce((e1, e2) => e1 || e2)
 
-  const canAddOutcome = outcomes.length <= MAX_OUTCOME_ALLOWED && !loadedQuestionId
+  const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
   const [categoryButtonFocus, setCategoryButtonFocus] = useState(false)
+
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+
+  useEffect(() => {
+    handleClearQuestion()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isImport])
 
   const toggleCategoryButtonFocus = useCallback(() => {
     setCategoryButtonFocus(!categoryButtonFocus)
@@ -165,62 +186,108 @@ const AskQuestionStep = (props: Props) => {
   }
 
   return (
-    <CreateCard>
-      <FormRow
-        formField={
-          <QuestionInput
-            addArbitratorCustomValue={addArbitratorCustom}
-            addCategoryCustomValue={addCategoryCustom}
-            context={context}
-            disabled={!!loadedQuestionId}
-            name="question"
-            onChange={handleChange}
-            onChangeQuestion={handleQuestionChange}
-            onClearQuestion={handleClearQuestion}
-            placeholder="What question do you want the world predict?"
-            value={question}
-          />
-        }
-      />
-      <Outcomes
-        canAddOutcome={canAddOutcome}
-        disabled={!!loadedQuestionId}
-        onChange={handleOutcomesChange}
-        outcomes={outcomes}
-        totalProbabilities={totalProbabilities}
-      />
-      <GridThreeColumns>
-        <Column>
+    <CreateCard style={{ paddingTop: 20, paddingBottom: 20 }}>
+      <CategoryImportWrapper>
+        <FormStateButton active={!isImport} onClick={() => setIsImport(false)}>
+          Categorical
+        </FormStateButton>
+
+        {!loadedQuestionId && (
+          <FormStateButton active={isImport} onClick={() => setIsImport(true)}>
+            Import Market
+          </FormStateButton>
+        )}
+        {!!loadedQuestionId && (
+          <FormStateButton
+            active
+            onClick={() => {
+              setIsImport(false)
+              handleClearQuestion()
+            }}
+          >
+            Clear Market
+          </FormStateButton>
+        )}
+      </CategoryImportWrapper>
+      {isImport ? (
+        <ImportMarketContent
+          context={context}
+          loadedQuestionId={loadedQuestionId}
+          onSave={handleQuestionChange}
+        ></ImportMarketContent>
+      ) : (
+        <>
           <FormRow
             formField={
-              <DateField
+              <QuestionInput
+                context={context}
                 disabled={!!loadedQuestionId}
-                minDate={new Date()}
-                name="resolution"
-                onChange={handleDateChange}
-                selected={resolution}
+                name="question"
+                onChange={handleChange}
+                placeholder="What question do you want the world predict?"
+                value={question}
               />
             }
-            title={'Resolution Date'}
           />
-        </Column>
-        <Column>
-          <FormRow
-            formField={
-              <ButtonCategory
-                buttonType={ButtonType.secondaryLine}
-                disabled={!!loadedQuestionId}
-                focus={categoryButtonFocus}
-                isACategorySelected={category !== ''}
-                onClick={toggleCategoryButtonFocus}
-              >
-                <ButtonCategoryTextOverflow>{category ? category : 'Select Category'}</ButtonCategoryTextOverflow>
-              </ButtonCategory>
+          <Outcomes
+            canAddOutcome={canAddOutcome}
+            disabled={!!loadedQuestionId}
+            onChange={handleOutcomesChange}
+            outcomes={outcomes}
+            totalProbabilities={totalProbabilities}
+          />
+          <GridTwoColumns>
+            <Column>
+              <FormRow
+                formField={
+                  <DateField
+                    disabled={!!loadedQuestionId}
+                    minDate={tomorrow}
+                    name="resolution"
+                    onChange={handleDateChange}
+                    selected={resolution}
+                  />
+                }
+                title={'Resolution Date (UTC)'}
+              />
+            </Column>
+            <Column>
+              <FormRow
+                formField={
+                  <ButtonCategory
+                    buttonType={ButtonType.secondaryLine}
+                    disabled={!!loadedQuestionId}
+                    focus={categoryButtonFocus}
+                    isACategorySelected={category !== ''}
+                    onClick={toggleCategoryButtonFocus}
+                  >
+                    <ButtonCategoryTextOverflow>{category ? category : 'Select Category'}</ButtonCategoryTextOverflow>
+                  </ButtonCategory>
+                }
+                title={'Category'}
+              />
+            </Column>
+          </GridTwoColumns>
+          {categoryButtonFocus && (
+            <Categories
+              categories={categoriesCustom}
+              first={first}
+              loadMoreButton={loadMoreButton}
+              name="category"
+              onChange={handleCategoryChange}
+              selectedCategory={category.toLowerCase()}
+              setFirst={setFirst}
+            />
+          )}
+          <WarningMessage
+            additionalDescription={'.'}
+            description={
+              "Set the market resolution date at least 6 days after the correct outcome will be known and make sure that this market won't be "
             }
-            title={'Category'}
+            href={DOCUMENT_VALIDITY_RULES}
+            hyperlinkDescription={'invalid'}
+            style={{ marginBottom: 0 }}
           />
-        </Column>
-        <Column>
           <FormRow
             formField={
               <Arbitrators
@@ -231,29 +298,12 @@ const AskQuestionStep = (props: Props) => {
                 value={arbitrator}
               />
             }
+            style={{ marginBottom: 0 }}
             title={'Arbitrator'}
           />
-        </Column>
-      </GridThreeColumns>
-      {categoryButtonFocus && (
-        <Categories
-          categories={categoriesCustom}
-          first={first}
-          loadMoreButton={loadMoreButton}
-          name="category"
-          onChange={handleCategoryChange}
-          selectedCategory={category.toLowerCase()}
-          setFirst={setFirst}
-        />
+        </>
       )}
-      <WarningMessage
-        additionalDescription={'.'}
-        description={
-          "Set the market resolution date at least 6 days after the correct outcome will be known and make sure that this market won't be "
-        }
-        href={DOCUMENT_VALIDITY_RULES}
-        hyperlinkDescription={'invalid'}
-      />
+
       <ButtonContainerFullWidth borderTop={true}>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
           Cancel

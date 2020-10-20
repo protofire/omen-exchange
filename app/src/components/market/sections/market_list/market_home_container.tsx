@@ -8,21 +8,19 @@ import { useLocation } from 'react-router-dom'
 
 import { MAX_MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import {
-  GraphMarketMakerDataItem,
-  MarketMakerDataItem,
-  buildQueryMarkets,
-  queryCategories,
-  queryMyMarkets,
-} from '../../../../queries/markets_home'
+import { useMarkets } from '../../../../hooks/useMarkets'
+import { queryCategories } from '../../../../queries/markets_home'
 import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   CategoryDataItem,
+  CurationSource,
+  GraphMarketMakerDataItem,
   GraphResponseCategories,
   MarketFilters,
+  MarketMakerDataItem,
   MarketStates,
   MarketsSortCriteria,
 } from '../../../../util/types'
@@ -31,21 +29,6 @@ import { MarketHome } from './market_home'
 
 const logger = getLogger('MarketHomeContainer')
 
-type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
-type GraphResponseMyMarkets = { account: { fpmmParticipations: Participations[] } }
-type GraphResponseMarketsGeneric = {
-  fixedProductMarketMakers: GraphMarketMakerDataItem[]
-}
-
-type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMyMarkets
-
-const normalizeFetchedData = (data: GraphResponseMyMarkets): GraphResponseMarketsGeneric => {
-  return {
-    fixedProductMarketMakers: data.account
-      ? data.account.fpmmParticipations.map(fpmm => fpmm.fixedProductMarketMakers)
-      : [],
-  }
-}
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
   return data.map((graphMarketMakerDataItem: GraphMarketMakerDataItem) => {
     const outcomes = graphMarketMakerDataItem.outcomes
@@ -55,6 +38,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
     return {
       address: graphMarketMakerDataItem.id,
       arbitrator: graphMarketMakerDataItem.arbitrator,
+      curatedByDxDao: graphMarketMakerDataItem.curatedByDxDao,
       category: graphMarketMakerDataItem.category,
       collateralToken: graphMarketMakerDataItem.collateralToken,
       collateralVolume: bigNumberify(graphMarketMakerDataItem.collateralVolume),
@@ -63,7 +47,9 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       outcomes,
       templateId: +graphMarketMakerDataItem.templateId,
       title: graphMarketMakerDataItem.title,
-      scaledLiquidityParameter: parseFloat(graphMarketMakerDataItem.scaledLiquidityParameter),
+      usdLiquidityParameter: parseFloat(graphMarketMakerDataItem.usdLiquidityParameter),
+      klerosTCRregistered: graphMarketMakerDataItem.klerosTCRregistered,
+      curatedByDxDaoOrKleros: graphMarketMakerDataItem.curatedByDxDaoOrKleros,
     }
   })
 }
@@ -77,38 +63,42 @@ const MarketHomeContainer: React.FC = () => {
   const sortRoute = location.pathname.split('/')[1]
   let sortDirection: 'desc' | 'asc' = 'desc'
 
-  const currencyFilter = location.pathname.includes('currency') ? true : false
+  const currencyFilter = location.pathname.includes('currency')
   let currencyRoute = location.pathname.split('/currency/')[1]
   if (currencyRoute) currencyRoute = currencyRoute.split('/')[0]
 
-  const arbitratorFilter = location.pathname.includes('arbitrator') ? true : false
+  const arbitratorFilter = location.pathname.includes('arbitrator')
   let arbitratorRoute = location.pathname.split('/arbitrator/')[1]
   if (arbitratorRoute) arbitratorRoute = arbitratorRoute.split('/')[0]
 
-  const categoryFilter = location.pathname.includes('category') ? true : false
+  const curationSourceFilter = location.pathname.includes('curation-source')
+  let curationSourceRoute = location.pathname.split('/curation-source/')[1]
+  if (curationSourceRoute) curationSourceRoute = curationSourceRoute.split('/')[0]
+
+  const categoryFilter = location.pathname.includes('category')
   let categoryRoute = location.pathname.split('/category/')[1]
   if (categoryRoute) categoryRoute = categoryRoute.split('/')[0]
 
-  const stateFilter = location.search.includes('state') ? true : false
+  const stateFilter = location.search.includes('state')
   let stateRoute = location.search.split('state=')[1]
   if (stateRoute) stateRoute = stateRoute.split('&')[0]
 
-  const searchFilter = location.search.includes('tag') ? true : false
+  const searchFilter = location.search.includes('tag')
   let searchRoute = location.search.split('tag=')[1]
   if (searchRoute) searchRoute = searchRoute.split('&')[0]
 
-  let sortParam: Maybe<MarketsSortCriteria> = 'lastActiveDayAndScaledRunningDailyVolume'
+  let sortParam: Maybe<MarketsSortCriteria> = stateRoute === 'MY_MARKETS' ? 'openingTimestamp' : 'usdLiquidityParameter'
   if (sortRoute === '24h-volume') {
-    sortParam = 'lastActiveDayAndScaledRunningDailyVolume'
+    sortParam = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria
   } else if (sortRoute === 'volume') {
-    sortParam = 'scaledCollateralVolume'
+    sortParam = 'usdVolume'
   } else if (sortRoute === 'newest') {
     sortParam = 'creationTimestamp'
   } else if (sortRoute === 'ending') {
     sortParam = 'openingTimestamp'
     sortDirection = 'asc'
   } else if (sortRoute === 'liquidity') {
-    sortParam = 'scaledLiquidityParameter'
+    sortParam = 'usdLiquidityParameter'
   }
 
   let currencyParam: string | null
@@ -125,6 +115,13 @@ const MarketHomeContainer: React.FC = () => {
     arbitratorParam = null
   }
 
+  let curationSourceParam: CurationSource
+  if (curationSourceFilter) {
+    curationSourceParam = curationSourceRoute as CurationSource
+  } else {
+    curationSourceParam = CurationSource.ALL_SOURCES
+  }
+
   let categoryParam: string
   if (categoryFilter) {
     categoryParam = categoryRoute
@@ -136,6 +133,8 @@ const MarketHomeContainer: React.FC = () => {
   if (stateFilter) {
     if (stateRoute === 'OPEN') stateParam = MarketStates.open
     if (stateRoute === 'PENDING') stateParam = MarketStates.pending
+    if (stateRoute === 'FINALIZING') stateParam = MarketStates.finalizing
+    if (stateRoute === 'ARBITRATING') stateParam = MarketStates.arbitrating
     if (stateRoute === 'CLOSED') stateParam = MarketStates.closed
     if (stateRoute === 'MY_MARKETS') stateParam = MarketStates.myMarkets
   } else {
@@ -158,57 +157,37 @@ const MarketHomeContainer: React.FC = () => {
     arbitrator: arbitratorParam,
     templateId: null,
     currency: currencyParam,
+    curationSource: curationSourceParam,
   })
 
-  const [fetchedMarkets, setFetchedMarkets] = useState<Maybe<GraphResponseMarketsGeneric>>(null)
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [categories, setCategories] = useState<RemoteData<CategoryDataItem[]>>(RemoteData.notAsked())
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
-  const [moreMarkets, setMoreMarkets] = useState(true)
+
   const [pageSize, setPageSize] = useState(4)
   const [pageIndex, setPageIndex] = useState(0)
+
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
   const [now, setNow] = useState<string>(calcNow())
   const [isFiltering, setIsFiltering] = useState(false)
-  const { account, library: provider, networkId } = context
+  const { account, library: provider } = context
   const feeBN = ethers.utils.parseEther('' + MAX_MARKET_FEE / Math.pow(10, 2))
-  const marketQuery = buildQueryMarkets({
-    whitelistedTemplateIds: true,
-    whitelistedCreators: false,
-    ...filter,
-    networkId,
-  })
 
   const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)
   const fetchMyMarkets = filter.state === MarketStates.myMarkets
 
   const marketsQueryVariables = {
     first: pageSize,
-    skip: 0,
+    skip: pageIndex,
     accounts: cpkAddress ? [cpkAddress] : null,
-    account: cpkAddress && cpkAddress.toLowerCase(),
+    account: (cpkAddress && cpkAddress.toLowerCase()) || '',
     fee: feeBN.toString(),
     now: +now,
     knownArbitrators,
     ...filter,
   }
 
-  const { error, fetchMore, loading } = useQuery<GraphResponseMarkets>(fetchMyMarkets ? queryMyMarkets : marketQuery, {
-    notifyOnNetworkStatusChange: true,
-    variables: marketsQueryVariables,
-    // loading stuck on true when using useQuery hook , using a fetchPolicy seems to fix it
-    // If you do not want to risk displaying any out-of-date information from the cache,
-    // it may make sense to use a ‘network-only’ fetch policy.
-    // This policy favors showing the most up-to-date information over quick responses.
-    fetchPolicy: 'network-only',
-    onCompleted: (data: GraphResponseMarkets) => {
-      const markets = fetchMyMarkets
-        ? normalizeFetchedData(data as GraphResponseMyMarkets)
-        : (data as GraphResponseMarketsGeneric)
-
-      setFetchedMarkets(markets)
-    },
-  })
+  const { error, loading, markets: fetchedMarkets, moreMarkets } = useMarkets(marketsQueryVariables)
 
   const { data: fetchedCategories, error: categoriesError, loading: categoriesLoading } = useQuery<
     GraphResponseCategories
@@ -241,12 +220,6 @@ const MarketHomeContainer: React.FC = () => {
 
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
 
-      if (fixedProductMarketMakers.length < pageSize) {
-        setMoreMarkets(false)
-      } else {
-        setMoreMarkets(true)
-      }
-
       setIsFiltering(false)
     } else if (error) {
       setMarkets(RemoteData.failure(error))
@@ -273,7 +246,6 @@ const MarketHomeContainer: React.FC = () => {
   const onFilterChange = useCallback(
     (filter: any) => {
       setFilter(filter)
-      setMoreMarkets(true)
       setPageIndex(0)
       setIsFiltering(true)
 
@@ -281,15 +253,15 @@ const MarketHomeContainer: React.FC = () => {
       const routeQueryStart = '?'
       const routeQueryArray: string[] = []
 
-      if (filter.sortBy === 'lastActiveDayAndScaledRunningDailyVolume') {
+      if (filter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}`) {
         route += '/24h-volume'
-      } else if (filter.sortBy === 'scaledCollateralVolume') {
+      } else if (filter.sortBy === 'usdVolume') {
         route += '/volume'
       } else if (filter.sortBy === 'creationTimestamp') {
         route += '/newest'
       } else if (filter.sortBy === 'openingTimestamp') {
         route += '/ending'
-      } else if (filter.sortBy === 'scaledLiquidityParameter') {
+      } else if (filter.sortBy === 'usdLiquidityParameter') {
         route += '/liquidity'
       }
 
@@ -313,6 +285,10 @@ const MarketHomeContainer: React.FC = () => {
         routeQueryArray.push(`tag=${filter.title}`)
       }
 
+      if (filter.curationSource) {
+        route += `/curation-source/${filter.curationSource}`
+      }
+
       const routeQueryString = routeQueryArray.join('&')
       const routeQuery = routeQueryStart.concat(routeQueryString)
 
@@ -321,21 +297,28 @@ const MarketHomeContainer: React.FC = () => {
     [history],
   )
 
+  useEffect(() => {
+    let newFilter = filter
+    if (
+      filter.state === MarketStates.myMarkets &&
+      filter.sortBy !== 'openingTimestamp' &&
+      filter.sortBy !== 'creationTimestamp'
+    ) {
+      newFilter = {
+        ...filter,
+        sortBy: 'openingTimestamp',
+      }
+    }
+
+    onFilterChange(newFilter)
+  }, [filter, onFilterChange])
+
   const loadNextPage = () => {
     if (!moreMarkets) {
       return
     }
 
-    setPageIndex(pageIndex + 1)
-
-    fetchMore({
-      variables: {
-        skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex + 1),
-      },
-      updateQuery: (prev: any, { fetchMoreResult }) => {
-        return fetchMoreResult || prev
-      },
-    })
+    setPageIndex(pageIndex + pageSize)
   }
 
   const loadPrevPage = () => {
@@ -343,16 +326,7 @@ const MarketHomeContainer: React.FC = () => {
       return
     }
 
-    setPageIndex(pageIndex - 1)
-
-    fetchMore({
-      variables: {
-        skip: fetchedMarkets && fetchedMarkets.fixedProductMarketMakers.length * (pageIndex - 1),
-      },
-      updateQuery: (prev: any, { fetchMoreResult }) => {
-        return fetchMoreResult || prev
-      },
-    })
+    setPageIndex(pageIndex - pageSize)
   }
 
   const updatePageSize = (size: number): void => {

@@ -4,8 +4,12 @@ import styled from 'styled-components'
 import { useTokens } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork } from '../../../../util/networks'
+import { CurationSource } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { TokenItem } from '../token_item'
+
+import { DxDao } from './img/dxDao'
+import { Kleros } from './img/kleros'
 
 const Wrapper = styled.div`
   border-top: 1px solid ${props => props.theme.borders.borderColor};
@@ -19,6 +23,15 @@ const Wrapper = styled.div`
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     grid-template-columns: 1fr 1fr 1fr;
   }
+`
+
+const LogoWrapper = styled.div`
+  margin-right: 6px;
+`
+
+const CurationSourceWrapper = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 const Column = styled.div`
@@ -42,9 +55,12 @@ const Options = styled(Dropdown)`
 interface Props {
   currency: Maybe<string>
   arbitrator: Maybe<string>
+  curationSource: CurationSource
   onChangeCurrency: (currency: Maybe<string>) => void
   onChangeArbitrator: (arbitrator: Maybe<string>) => void
+  onChangeCurationSource: (curationSource: CurationSource) => void
   onChangeTemplateId: (templateId: Maybe<string>) => void
+  disableCurationFilter: Maybe<boolean>
 }
 
 export const AdvancedFilters = (props: Props) => {
@@ -54,7 +70,16 @@ export const AdvancedFilters = (props: Props) => {
   const arbitrators = getArbitratorsByNetwork(networkId)
   const tokens = useTokens(context)
 
-  const { arbitrator, currency, onChangeArbitrator, onChangeCurrency, onChangeTemplateId } = props
+  const {
+    arbitrator,
+    curationSource,
+    currency,
+    disableCurationFilter,
+    onChangeArbitrator,
+    onChangeCurationSource,
+    onChangeCurrency,
+    onChangeTemplateId,
+  } = props
 
   const allTokensOptions = [{ address: null, symbol: 'All', image: null }, ...tokens]
   const currencyOptions: Array<DropdownItemProps> = allTokensOptions.map(({ address, image, symbol }) => {
@@ -93,6 +118,39 @@ export const AdvancedFilters = (props: Props) => {
       }
     })
 
+  const curationSourceOptions: Array<DropdownItemProps> = [
+    {
+      content: CurationSource.ALL_SOURCES,
+      onClick: () => onChangeCurationSource(CurationSource.ALL_SOURCES),
+    },
+    {
+      content: (
+        <CurationSourceWrapper>
+          <LogoWrapper>
+            <DxDao />
+          </LogoWrapper>
+          {CurationSource.DXDAO}
+        </CurationSourceWrapper>
+      ),
+      onClick: () => onChangeCurationSource(CurationSource.DXDAO),
+    },
+    {
+      content: (
+        <CurationSourceWrapper>
+          <LogoWrapper>
+            <Kleros />
+          </LogoWrapper>
+          {CurationSource.KLEROS}
+        </CurationSourceWrapper>
+      ),
+      onClick: () => onChangeCurationSource(CurationSource.KLEROS),
+    },
+    {
+      content: CurationSource.NO_SOURCES,
+      onClick: () => onChangeCurationSource(CurationSource.NO_SOURCES),
+    },
+  ]
+
   const showQuestionType = false
 
   return (
@@ -104,6 +162,8 @@ export const AdvancedFilters = (props: Props) => {
           dirty={true}
           dropdownPosition={DropdownPosition.left}
           items={currencyOptions}
+          maxHeight={true}
+          showScrollbar={true}
         />
       </Column>
       {showQuestionType && (
@@ -117,10 +177,26 @@ export const AdvancedFilters = (props: Props) => {
         <Options
           currentItem={arbitrators.findIndex(t => t.address === arbitrator)}
           dirty={true}
-          dropdownPosition={DropdownPosition.right}
+          dropdownPosition={DropdownPosition.center}
           items={arbitratorOptions}
         />
       </Column>
+      {!disableCurationFilter && (
+        <Column>
+          <Title>Curation Source</Title>
+          <Options
+            currentItem={[
+              CurationSource.ALL_SOURCES,
+              CurationSource.DXDAO,
+              CurationSource.KLEROS,
+              CurationSource.NO_SOURCES,
+            ].findIndex(t => t === curationSource)}
+            dirty={true}
+            dropdownPosition={DropdownPosition.right}
+            items={curationSourceOptions}
+          />
+        </Column>
+      )}
     </Wrapper>
   )
 }

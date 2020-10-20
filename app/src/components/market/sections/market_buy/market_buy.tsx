@@ -1,7 +1,7 @@
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -18,24 +18,21 @@ import {
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { computeBalanceAfterTrade, formatBigNumber, mulBN } from '../../../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
-import { MarketTopDetailsOpen } from '../../common/market_top_details_open'
 import { OutcomeTable } from '../../common/outcome_table'
 import { SetAllowance } from '../../common/set_allowance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
-import { ViewCard } from '../../common/view_card'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
 
@@ -52,6 +49,7 @@ const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
+  switchMarketTab: (arg0: string) => void
 }
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
@@ -61,7 +59,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
-  const { marketMakerData } = props
+  const { marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
@@ -69,9 +67,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
+  const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [tweet, setTweet] = useState('')
+  const [newShares, setNewShares] = useState<Maybe<BigNumber[]>>(null)
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -79,10 +79,19 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
+  useEffect(() => {
+    setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
+  }, [amount, collateral.decimals])
+
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[], BigNumber]> => {
-      const tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
+      let tradedShares: BigNumber
+      try {
+        tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
+      } catch {
+        tradedShares = new BigNumber(0)
+      }
       const balanceAfterTrade = computeBalanceAfterTrade(
         balances.map(b => b.holdings),
         outcomeIndex,
@@ -92,6 +101,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
+
+      setNewShares(
+        balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)),
+      )
 
       return [tradedShares, probabilities, amount]
     },
@@ -162,10 +175,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
-  const feeFormatted = `${formatBigNumber(feePaid.mul(-1), collateral.decimals)} ${collateral.symbol}`
-  const baseCostFormatted = `${formatBigNumber(baseCost, collateral.decimals)} ${collateral.symbol}`
-  const potentialProfitFormatted = `${formatBigNumber(potentialProfit, collateral.decimals)} ${collateral.symbol}`
-  const sharesTotal = formatBigNumber(tradedShares, collateral.decimals)
+  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
+  const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
+  const potentialProfitFormatted = `${formatNumber(formatBigNumber(potentialProfit, collateral.decimals))} ${
+    collateral.symbol
+  }`
+  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
 
   const amountError =
@@ -181,104 +196,112 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     (status !== Status.Ready && status !== Status.Error) ||
     amount.isZero() ||
     hasEnoughAllowance !== Ternary.True ||
-    amountError !== null
+    amountError !== null ||
+    isNegativeAmount
+
+  const switchOutcome = (value: number) => {
+    setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
+    setOutcomeIndex(value)
+  }
 
   return (
     <>
-      <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
-      <ViewCard>
-        <MarketTopDetailsOpen
-          isLiquidityProvision={false}
-          marketMakerData={marketMakerData}
-          title="Purchase Shares"
-          toggleTitle="Pool Information"
-        />
-        <OutcomeTable
-          balances={balances}
-          collateral={collateral}
-          disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
-          outcomeHandleChange={(value: number) => setOutcomeIndex(value)}
-          outcomeSelected={outcomeIndex}
-          probabilities={probabilities}
-          showPriceChange={amount.gt(0)}
-        />
-        <WarningMessageStyled
-          additionalDescription={'. Be aware that market makers may remove liquidity from the market at any time!'}
-          description={
-            "Before trading on a market, make sure that its outcome will be known by its resolution date and it isn't an"
-          }
-          href={DOCUMENT_VALIDITY_RULES}
-          hyperlinkDescription={'invalid market'}
-        />
-        <GridTransactionDetails>
-          <div>
-            <WalletBalance
-              onClick={() => {
-                setAmount(collateralBalance)
-                setAmountToDisplay(currentBalance)
-              }}
-              symbol={collateral.symbol}
-              value={currentBalance}
-            />
-            <ReactTooltip id="walletBalanceTooltip" />
-            <TextfieldCustomPlaceholder
-              formField={
-                <BigNumberInput
-                  decimals={collateral.decimals}
-                  name="amount"
-                  onChange={(e: BigNumberInputReturn) => {
-                    setAmount(e.value)
-                    setAmountToDisplay('')
-                  }}
-                  value={amount}
-                  valueToDisplay={amountToDisplay}
-                />
-              }
-              symbol={collateral.symbol}
-            />
-            {amountError && <GenericError>{amountError}</GenericError>}
-          </div>
-          <div>
-            <TransactionDetailsCard>
-              <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
-              <TransactionDetailsRow
-                title={'Fee'}
-                tooltip={`A ${feePercentage}% fee goes to liquidity providers.`}
-                value={feeFormatted}
-              />
-              <TransactionDetailsLine />
-              <TransactionDetailsRow
-                emphasizeValue={potentialProfit.gt(0)}
-                state={ValueStates.success}
-                title={'Potential Profit'}
-                value={potentialProfitFormatted}
-              />
-              <TransactionDetailsRow
-                emphasizeValue={parseFloat(sharesTotal) > 0}
-                state={(parseFloat(sharesTotal) > 0 && ValueStates.important) || ValueStates.normal}
-                title={'Total'}
-                value={total}
-              />
-            </TransactionDetailsCard>
-          </div>
-        </GridTransactionDetails>
-        {showSetAllowance && (
-          <SetAllowance
-            collateral={collateral}
-            finished={allowanceFinished && RemoteData.is.success(allowance)}
-            loading={RemoteData.is.asking(allowance)}
-            onUnlock={unlockCollateral}
+      <OutcomeTable
+        balances={balances}
+        collateral={collateral}
+        disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
+        newShares={newShares}
+        outcomeHandleChange={(value: number) => switchOutcome(value)}
+        outcomeSelected={outcomeIndex}
+        probabilities={probabilities}
+        showPriceChange={amount.gt(0)}
+        showSharesChange={amount.gt(0)}
+      />
+      <WarningMessageStyled
+        additionalDescription={'. Be aware that market makers may remove liquidity from the market at any time!'}
+        description={
+          "Before trading on a market, make sure that its outcome will be known by its resolution date and it isn't an"
+        }
+        href={DOCUMENT_VALIDITY_RULES}
+        hyperlinkDescription={'invalid market'}
+      />
+      <GridTransactionDetails>
+        <div>
+          <WalletBalance
+            onClick={() => {
+              setAmount(collateralBalance)
+              setAmountToDisplay(formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5))
+            }}
+            symbol={collateral.symbol}
+            value={formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5)}
           />
-        )}
-        <ButtonContainer>
-          <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => props.history.goBack()}>
-            Cancel
-          </LeftButton>
-          <Button buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>
-            Buy
-          </Button>
-        </ButtonContainer>
-      </ViewCard>
+          <ReactTooltip id="walletBalanceTooltip" />
+          <TextfieldCustomPlaceholder
+            formField={
+              <BigNumberInput
+                decimals={collateral.decimals}
+                name="amount"
+                onChange={(e: BigNumberInputReturn) => {
+                  setAmount(e.value)
+                  setAmountToDisplay('')
+                }}
+                value={amount}
+                valueToDisplay={amountToDisplay}
+              />
+            }
+            symbol={collateral.symbol}
+          />
+          {amountError && <GenericError>{amountError}</GenericError>}
+        </div>
+        <div>
+          <TransactionDetailsCard>
+            <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
+            <TransactionDetailsRow
+              title={'Fee'}
+              tooltip={`A ${feePercentage}% fee goes to liquidity providers.`}
+              value={feeFormatted}
+            />
+            <TransactionDetailsLine />
+            <TransactionDetailsRow
+              emphasizeValue={potentialProfit.gt(0)}
+              state={ValueStates.success}
+              title={'Potential Profit'}
+              value={potentialProfitFormatted}
+            />
+            <TransactionDetailsRow
+              emphasizeValue={parseFloat(sharesTotal) > 0}
+              state={(parseFloat(sharesTotal) > 0 && ValueStates.important) || ValueStates.normal}
+              title={'Total'}
+              value={total}
+            />
+          </TransactionDetailsCard>
+        </div>
+      </GridTransactionDetails>
+      {isNegativeAmount && (
+        <WarningMessage
+          additionalDescription={''}
+          danger={true}
+          description={`Your buy amount should not be negative.`}
+          href={''}
+          hyperlinkDescription={''}
+        />
+      )}
+      {showSetAllowance && (
+        <SetAllowance
+          collateral={collateral}
+          finished={allowanceFinished && RemoteData.is.success(allowance)}
+          loading={RemoteData.is.asking(allowance)}
+          onUnlock={unlockCollateral}
+        />
+      )}
+      <ButtonContainer>
+        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+          Cancel
+        </LeftButton>
+        <Button buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>
+          Buy
+        </Button>
+      </ButtonContainer>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}

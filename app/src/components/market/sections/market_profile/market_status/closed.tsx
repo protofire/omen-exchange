@@ -18,22 +18,30 @@ import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
+import { MarketBuyContainer } from '../../market_buy/market_buy_container'
+import { MarketHistoryContainer } from '../../market_history/market_history_container'
+import { MarketNavigation } from '../../market_navigation'
+import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
+import { MarketSellContainer } from '../../market_sell/market_sell_container'
+
+const TopCard = styled(ViewCard)`
+  padding-bottom: 0;
+  margin-bottom: 24px;
+`
+
+const BottomCard = styled(ViewCard)``
 
 const MarketResolutionMessageStyled = styled(MarketResolutionMessage)`
   margin: 20px 0;
 `
 
-const LeftButton = styled(Button)`
-  margin-right: auto;
-`
-
-interface Props extends RouteComponentProps<{}> {
+interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   marketMakerData: MarketMakerData
 }
 
 const logger = getLogger('Market::ClosedMarketDetail')
 
-const computeEarnedCollateral = (payouts: Maybe<number[]>, balances: BigNumber[]): Maybe<BigNumber> => {
+const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): Maybe<BigNumber> => {
   if (!payouts) {
     return null
   }
@@ -42,10 +50,9 @@ const computeEarnedCollateral = (payouts: Maybe<number[]>, balances: BigNumber[]
   Big.RM = 0
 
   const earnedCollateralPerOutcome = balances.map((balance, index) => new Big(balance.toString()).mul(payouts[index]))
+  const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b.toFixed(0)), bigNumberify(0))
 
-  const earnedCollateral = earnedCollateralPerOutcome.reduce((a, b) => a.add(b))
-
-  return bigNumberify(earnedCollateral.toFixed(0))
+  return earnedCollateral
 }
 
 const Wrapper = (props: Props) => {
@@ -53,7 +60,7 @@ const Wrapper = (props: Props) => {
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
 
-  const { history, marketMakerData } = props
+  const { marketMakerData } = props
 
   const {
     address: marketMakerAddress,
@@ -61,6 +68,7 @@ const Wrapper = (props: Props) => {
     balances,
     collateral: collateralToken,
     isConditionResolved,
+    isQuestionFinalized,
     payouts,
     question,
   } = marketMakerData
@@ -158,26 +166,22 @@ const Wrapper = (props: Props) => {
   }
 
   const hasWinningOutcomes = earnedCollateral && earnedCollateral.gt(0)
-  const winnersOutcomes = payouts ? payouts.filter(payout => payout > 0).length : 0
+  const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
   const userWinnersOutcomes = payouts
-    ? payouts.filter((payout, index) => balances[index].shares.gt(0) && payout > 0).length
+    ? payouts.filter((payout, index) => balances[index].shares.gt(0) && payout.gt(0)).length
     : 0
   const userWinnerShares = payouts
-    ? balances.reduce((acc, balance, index) => (payouts[index] > 0 ? acc.add(balance.shares) : acc), new BigNumber(0))
+    ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
     : new BigNumber(0)
   const EPS = 0.01
-  const allPayoutsEqual = payouts ? payouts.every(payout => Math.abs(payout - 1 / payouts.length) <= EPS) : false
-
-  const poolButton = (
-    <LeftButton
-      buttonType={ButtonType.secondaryLine}
-      onClick={() => {
-        history.push(`${marketMakerAddress}/pool-liquidity`)
-      }}
-    >
-      Pool Liquidity
-    </LeftButton>
-  )
+  const allPayoutsEqual = payouts
+    ? payouts.every(payout =>
+        payout
+          .sub(1 / payouts.length)
+          .abs()
+          .lte(EPS),
+      )
+    : false
 
   const buySellButtons = (
     <>
@@ -185,7 +189,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
-          history.push(`${marketMakerAddress}/sell`)
+          setCurrentTab('SELL')
         }}
       >
         Sell
@@ -194,7 +198,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
-          history.push(`${marketMakerAddress}/buy`)
+          setCurrentTab('BUY')
         }}
       >
         Buy
@@ -202,62 +206,100 @@ const Wrapper = (props: Props) => {
     </>
   )
 
+  const [currentTab, setCurrentTab] = useState('SWAP')
+
+  const marketTabs = {
+    swap: 'SWAP',
+    pool: 'POOL',
+    history: 'HISTORY',
+    verify: 'VERIFY',
+    buy: 'BUY',
+    sell: 'SELL',
+  }
+
+  const switchMarketTab = (newTab: string) => {
+    setCurrentTab(newTab)
+  }
+
   return (
     <>
-      <ViewCard>
+      <TopCard>
         <MarketTopDetailsClosed collateral={collateral} marketMakerData={marketMakerData} />
-        <OutcomeTable
-          balances={balances}
-          collateral={collateralToken}
-          disabledColumns={disabledColumns}
-          displayRadioSelection={false}
-          payouts={payouts}
-          probabilities={probabilities}
-          withWinningOutcome={true}
-        />
-        <WhenConnected>
-          {hasWinningOutcomes && (
-            <MarketResolutionMessageStyled
-              arbitrator={arbitrator}
-              collateralToken={collateralToken}
-              earnedCollateral={earnedCollateral}
-              invalid={allPayoutsEqual}
-              userWinnerShares={userWinnerShares}
-              userWinnersOutcomes={userWinnersOutcomes}
-              winnersOutcomes={winnersOutcomes}
-            ></MarketResolutionMessageStyled>
-          )}
-          {isConditionResolved && !hasWinningOutcomes ? (
-            <ButtonContainer>
-              {poolButton}
-              {buySellButtons}
-            </ButtonContainer>
-          ) : (
-            <ButtonContainerFullWidth borderTop={true}>
-              {!isConditionResolved && (
-                <>
-                  {poolButton}
-                  <Button
-                    buttonType={ButtonType.primary}
-                    disabled={status === Status.Loading}
-                    onClick={resolveCondition}
-                  >
-                    Resolve Condition
-                  </Button>
-                </>
+      </TopCard>
+      <BottomCard>
+        <MarketNavigation
+          activeTab={currentTab}
+          hasWinningOutcomes={hasWinningOutcomes}
+          isQuestionFinalized={isQuestionFinalized}
+          marketAddress={marketMakerAddress}
+          resolutionDate={question.resolution}
+          switchMarketTab={switchMarketTab}
+        ></MarketNavigation>
+        {currentTab === marketTabs.swap && (
+          <>
+            <OutcomeTable
+              balances={balances}
+              collateral={collateralToken}
+              disabledColumns={disabledColumns}
+              displayRadioSelection={false}
+              payouts={payouts}
+              probabilities={probabilities}
+              withWinningOutcome={true}
+            />
+            <WhenConnected>
+              {hasWinningOutcomes && (
+                <MarketResolutionMessageStyled
+                  arbitrator={arbitrator}
+                  collateralToken={collateralToken}
+                  earnedCollateral={earnedCollateral}
+                  invalid={allPayoutsEqual}
+                  userWinnerShares={userWinnerShares}
+                  userWinnersOutcomes={userWinnersOutcomes}
+                  winnersOutcomes={winnersOutcomes}
+                ></MarketResolutionMessageStyled>
               )}
-              {isConditionResolved && hasWinningOutcomes && (
-                <>
-                  {poolButton}
-                  <Button buttonType={ButtonType.primary} disabled={status === Status.Loading} onClick={() => redeem()}>
-                    Redeem
-                  </Button>
-                </>
+              {isConditionResolved && !hasWinningOutcomes ? (
+                <ButtonContainer>{buySellButtons}</ButtonContainer>
+              ) : (
+                <ButtonContainerFullWidth borderTop={true}>
+                  {!isConditionResolved && (
+                    <>
+                      <Button
+                        buttonType={ButtonType.primary}
+                        disabled={status === Status.Loading}
+                        onClick={resolveCondition}
+                      >
+                        Resolve Condition
+                      </Button>
+                    </>
+                  )}
+                  {isConditionResolved && hasWinningOutcomes && (
+                    <>
+                      <Button
+                        buttonType={ButtonType.primary}
+                        disabled={status === Status.Loading}
+                        onClick={() => redeem()}
+                      >
+                        Redeem
+                      </Button>
+                    </>
+                  )}
+                </ButtonContainerFullWidth>
               )}
-            </ButtonContainerFullWidth>
-          )}
-        </WhenConnected>
-      </ViewCard>
+            </WhenConnected>
+          </>
+        )}
+        {currentTab === marketTabs.pool && (
+          <MarketPoolLiquidityContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
+        {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
+        {currentTab === marketTabs.buy && (
+          <MarketBuyContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
+        {currentTab === marketTabs.sell && (
+          <MarketSellContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
+      </BottomCard>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
