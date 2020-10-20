@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import { DEFAULT_TOKEN } from '../common/constants'
 import { ERC20Service } from '../services/erc20'
 import { getLogger } from '../util/logger'
-import { getOmenTCRListId, getToken, getTokensByNetwork } from '../util/networks'
+import { getOmenTCRListId, getTokensByNetwork } from '../util/networks'
 import { getImageUrl } from '../util/token'
 import { Token } from '../util/types'
 
@@ -14,7 +13,7 @@ const logger = getLogger('Hooks::useTokens')
 
 export const useTokens = (context: ConnectedWeb3Context) => {
   const { dxTCR } = useContracts(context)
-  const defaultTokens = [getToken(context.networkId, DEFAULT_TOKEN)]
+  const defaultTokens = getTokensByNetwork(context.networkId)
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
 
   useEffect(() => {
@@ -37,8 +36,6 @@ export const useTokens = (context: ConnectedWeb3Context) => {
         setTokens(tokens)
       } catch (e) {
         logger.error('There was an error getting the tokens from the TCR:', e)
-        const tokens = getTokensByNetwork(context.networkId)
-        setTokens(tokens)
       }
     }
 
