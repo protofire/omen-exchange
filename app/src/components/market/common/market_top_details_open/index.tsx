@@ -25,6 +25,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     answerFinalizedTimestamp,
     arbitrator,
     collateral,
+    curatedByDxDaoOrKleros: isVerified,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
@@ -89,7 +90,8 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         arbitrator={arbitrator}
         category={question.category}
         id={question.id}
-        oracle="Reality.eth"
+        oracle="Reality"
+        verified={isVerified}
       ></AdditionalMarketData>
     </>
   )

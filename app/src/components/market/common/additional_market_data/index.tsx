@@ -2,12 +2,9 @@ import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
 import { Arbitrator } from '../../../../util/types'
-import { IconArbitrator } from '../../../common/icons/IconArbitrator'
-import { IconCategory } from '../../../common/icons/IconCategory'
-import { IconOracle } from '../../../common/icons/IconOracle'
+import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
 
 const AdditionalMarketDataWrapper = styled.div`
-  height: 45px;
   border-top: 1px solid ${props => props.theme.borders.borderDisabled};
   display: flex;
   align-items: center;
@@ -27,29 +24,41 @@ const AdditionalMarketDataWrapper = styled.div`
 const AdditionalMarketDataLeft = styled.div`
   display: flex;
   align-items: center;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  padding: 14px 20px;
+
+  & > * + * {
+    margin-left: 14px;
+  }
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    & > * {
+      margin: 0;
+      width: 45%;
+      margin-top: 5px;
+    }
+  }
 `
 
 const AdditionalMarketDataSectionWrapper = styled.a`
   display: flex;
   align-items: center;
-  margin-left: 20px;
   cursor: pointer;
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin-left: 11px;
-    &:nth-of-type(1) {
-      margin-left: 0;
-    }
-  }
 `
 
-const AdditionalMarketDataSectionTitle = styled.p`
-  margin-left: 6px;
+const AdditionalMarketDataSectionDivWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+`
+
+const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
+  margin: 0;
+  margin-left: 8px;
   font-size: 14px;
   line-height: 16px;
-  color: ${props => props.theme.colors.clickable};
+  white-space: nowrap;
+  color: ${({ isError, theme }) => (isError ? theme.colors.alert : theme.colors.clickable)};
   &:first-letter {
     text-transform: capitalize;
   }
@@ -60,10 +69,11 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   arbitrator: Arbitrator
   oracle: string
   id: string
+  verified: boolean
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { arbitrator, category, id, oracle } = props
+  const { arbitrator, category, id, oracle, verified } = props
 
   const windowObj: any = window
   const realitioBaseUrl =
@@ -88,6 +98,12 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <IconArbitrator size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
+        <AdditionalMarketDataSectionDivWrapper>
+          {verified ? <IconVerified size={isMobile ? '20' : '24'} /> : <IconAlert size={isMobile ? '20' : '24'} />}
+          <AdditionalMarketDataSectionTitle isError={!verified}>
+            {verified ? 'Verified' : 'Not Verified'}
+          </AdditionalMarketDataSectionTitle>
+        </AdditionalMarketDataSectionDivWrapper>
       </AdditionalMarketDataLeft>
     </AdditionalMarketDataWrapper>
   )
