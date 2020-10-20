@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components'
 import { ConnectedWeb3Context, useTokens } from '../../../../hooks'
 import { Token } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
+import { Spinner } from '../../../common/spinner'
 import { TokenItem } from '../token_item'
 
 const Wrapper = styled.div`
@@ -26,15 +27,16 @@ const CurrencyDropdown = styled(Dropdown)<{ selected: boolean }>`
 `
 
 interface Props {
+  currency?: Maybe<string>
   context: ConnectedWeb3Context
   disabled?: boolean
   onSelect: (currency: Token) => void
   balance?: string
-  placeholder?: string
+  placeholder?: Maybe<string>
 }
 
 export const CurrencySelector: React.FC<Props> = props => {
-  const { balance, context, disabled, onSelect, placeholder, ...restProps } = props
+  const { balance, context, currency, disabled, onSelect, placeholder, ...restProps } = props
 
   const tokens = useTokens(context)
 
@@ -48,7 +50,9 @@ export const CurrencySelector: React.FC<Props> = props => {
     }
   }
 
-  tokens.forEach(({ address, image, symbol }) => {
+  let currentItem: number | undefined
+
+  tokens.forEach(({ address, image, symbol }, index) => {
     currencyDropdownData.push({
       content: image ? <TokenItem image={image} text={symbol} /> : symbol,
       extraContent: balance,
@@ -60,16 +64,20 @@ export const CurrencySelector: React.FC<Props> = props => {
             return
           },
     })
+    if (currency && currency.toLowerCase() === address.toLowerCase()) {
+      currentItem = index
+    }
   })
 
   return (
     <Wrapper {...restProps}>
       <CurrencyDropdown
+        currentItem={currentItem}
         disabled={disabled}
         dropdownPosition={DropdownPosition.right}
         items={currencyDropdownData}
         maxHeight={true}
-        placeholder={placeholder}
+        placeholder={currency && currentItem === undefined ? <Spinner height={'18px'} width={'18px'} /> : placeholder}
         selected={false}
         showScrollbar={true}
       />

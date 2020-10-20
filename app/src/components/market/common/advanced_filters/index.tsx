@@ -71,6 +71,7 @@ export const AdvancedFilters = (props: Props) => {
   const {
     arbitrator,
     curationSource,
+    currency,
     disableCurationFilter,
     onChangeArbitrator,
     onChangeCurationSource,
@@ -148,9 +149,10 @@ export const AdvancedFilters = (props: Props) => {
         <Title>Currency</Title>
         <CurrencySelector
           context={context}
+          currency={currency}
           disabled={false}
           onSelect={currency => onChangeCurrency(currency.address)}
-          placeholder="All"
+          placeholder={currency ? '' : 'All'}
         />
       </Column>
       {showQuestionType && (
