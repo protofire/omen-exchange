@@ -175,7 +175,6 @@ export const ImportMarketContent = (props: Props) => {
           (balance: BalanceItem) =>
             ({
               name: balance.outcomeName,
-              probability: 0,
             } as Outcome),
         )
         const verifyLabel = marketMakerData.curatedByDxDao
@@ -215,9 +214,9 @@ export const ImportMarketContent = (props: Props) => {
                 {outcomes.map((outcome: Outcome, index: number) => (
                   <OutcomesTR key={index}>
                     <OutcomesTD style={{ paddingRight: 12 }}>
-                      <OutcomeItemWrapper readOnly={false}>
+                      <OutcomeItemWrapper readOnly>
                         <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
-                        <SimpleTextfield readOnly style={{ flex: 1 }} type="text" value={outcome.name} />
+                        <SimpleTextfield disabled style={{ flex: 1 }} type="text" value={outcome.name} />
                       </OutcomeItemWrapper>
                     </OutcomesTD>
                     <OutcomesTD>
@@ -231,7 +230,7 @@ export const ImportMarketContent = (props: Props) => {
                                 ),
                               )
                             }
-                            placeholder="outcome..."
+                            placeholder="0"
                             type="number"
                             value={outcome.probability}
                           />
