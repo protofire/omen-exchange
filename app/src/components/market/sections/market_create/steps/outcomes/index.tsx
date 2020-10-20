@@ -14,6 +14,7 @@ import {
   OutcomesTR,
   OutcomesTable,
   OutcomesTableWrapper,
+  PercentWrapper,
   RowWrapper,
 } from '../../../../common/common_styled'
 
@@ -39,13 +40,6 @@ const Note = styled.div`
   margin-bottom: 20px;
   margin-top: -20px;
   padding: 10px 0 0 0;
-`
-
-const PercentWrapper = styled.label`
-  color: ${({ theme }) => theme.colors.primary};
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.2;
 `
 
 const CustomButtonCircleAdd = styled(CustomButtonCircle as any)`

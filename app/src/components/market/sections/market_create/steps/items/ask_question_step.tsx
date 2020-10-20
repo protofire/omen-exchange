@@ -212,8 +212,11 @@ const AskQuestionStep = (props: Props) => {
       {isImport ? (
         <ImportMarketContent
           context={context}
+          handleOutcomesChange={handleOutcomesChange}
           loadedQuestionId={loadedQuestionId}
           onSave={handleQuestionChange}
+          outcomes={outcomes}
+          totalProbabilities={totalProbabilities}
         ></ImportMarketContent>
       ) : (
         <>

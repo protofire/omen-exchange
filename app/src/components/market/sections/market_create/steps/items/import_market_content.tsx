@@ -7,12 +7,11 @@ import { useGraphMarketIdFromQuestion } from '../../../../../../hooks/useGraphMa
 import { getArbitratorFromAddress } from '../../../../../../util/networks'
 import { formatDate } from '../../../../../../util/tools'
 import { Arbitrator, BalanceItem, Question } from '../../../../../../util/types'
-import { FormRow, Spinner, SubsectionTitle, Textfield, TitleValue } from '../../../../../common'
+import { FormRow, SimpleTextfield, Spinner, SubsectionTitle, Textfield, TitleValue } from '../../../../../common'
 import { IconReality } from '../../../../../common/icons'
 import {
   OutcomeItemLittleBallOfJoyAndDifferentColors,
-  OutcomeItemText,
-  OutcomeItemTextWrapper,
+  OutcomeItemWrapper,
   OutcomesTBody,
   OutcomesTD,
   OutcomesTH,
@@ -20,6 +19,8 @@ import {
   OutcomesTR,
   OutcomesTable,
   OutcomesTableWrapper,
+  PercentWrapper,
+  RowWrapper,
 } from '../../../../common/common_styled'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { VerifiedRow } from '../../../../common/verified_row'
@@ -106,15 +107,17 @@ const FlexRowWrapper = styled.div`
     margin-left: 38px;
   }
 `
-
 interface Props extends HTMLAttributes<HTMLDivElement> {
   context: ConnectedWeb3Context
   loadedQuestionId: Maybe<string>
   onSave: (question: Question, arbitrator: Arbitrator, outcomes: Outcome[], verifyLabel?: string) => void
+  handleOutcomesChange: (newOutcomes: Outcome[]) => any
+  outcomes: Outcome[]
+  totalProbabilities: number
 }
 
 export const ImportMarketContent = (props: Props) => {
-  const { context, loadedQuestionId, onSave } = props
+  const { context, handleOutcomesChange, loadedQuestionId, onSave, outcomes } = props
   const { realitio } = useContracts(context)
 
   const [state, setState] = useState<{ questionURL: string; loading: boolean }>({
@@ -172,7 +175,7 @@ export const ImportMarketContent = (props: Props) => {
           (balance: BalanceItem) =>
             ({
               name: balance.outcomeName,
-              probability: 100 / marketMakerData.balances.length,
+              probability: 0,
             } as Outcome),
         )
         const verifyLabel = marketMakerData.curatedByDxDao
@@ -204,25 +207,40 @@ export const ImportMarketContent = (props: Props) => {
             <OutcomesTable>
               <OutcomesTHead>
                 <OutcomesTR>
-                  <OutcomesTH style={{ width: '65%' }}>Outcome</OutcomesTH>
+                  <OutcomesTH style={{ width: '72%' }}>Outcome</OutcomesTH>
                   <OutcomesTH>Probability</OutcomesTH>
                 </OutcomesTR>
               </OutcomesTHead>
               <OutcomesTBody>
-                {marketMakerData.balances.map((balanceItem: BalanceItem, index) => {
-                  const { outcomeName } = balanceItem
-                  return (
-                    <OutcomesTR key={index}>
-                      <OutcomesTD>
-                        <OutcomeItemTextWrapper>
-                          <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
-                          <OutcomeItemText>{outcomeName}</OutcomeItemText>
-                        </OutcomeItemTextWrapper>
-                      </OutcomesTD>
-                      <OutcomesTD>{(100 / marketMakerData.balances.length).toFixed(2)}%</OutcomesTD>
-                    </OutcomesTR>
-                  )
-                })}
+                {outcomes.map((outcome: Outcome, index: number) => (
+                  <OutcomesTR key={index}>
+                    <OutcomesTD style={{ paddingRight: 12 }}>
+                      <OutcomeItemWrapper readOnly={false}>
+                        <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
+                        <SimpleTextfield readOnly style={{ flex: 1 }} type="text" value={outcome.name} />
+                      </OutcomeItemWrapper>
+                    </OutcomesTD>
+                    <OutcomesTD>
+                      <RowWrapper>
+                        <OutcomeItemWrapper readOnly={false}>
+                          <SimpleTextfield
+                            onChange={e =>
+                              handleOutcomesChange(
+                                outcomes.map((tcome, tIndex) =>
+                                  index !== tIndex ? tcome : { ...tcome, probability: Number(e.target.value) },
+                                ),
+                              )
+                            }
+                            placeholder="outcome..."
+                            type="number"
+                            value={outcome.probability}
+                          />
+                          <PercentWrapper>%</PercentWrapper>
+                        </OutcomeItemWrapper>
+                      </RowWrapper>
+                    </OutcomesTD>
+                  </OutcomesTR>
+                ))}
               </OutcomesTBody>
             </OutcomesTable>
           </OutcomesTableWrapper>
