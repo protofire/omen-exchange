@@ -2,6 +2,7 @@ import React, { DOMAttributes } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
+import { useRealityLink } from '../../../../hooks/useRealityLink'
 import { Arbitrator } from '../../../../util/types'
 import { IconArbitrator } from '../../../common/icons/IconArbitrator'
 import { IconCategory } from '../../../common/icons/IconCategory'
@@ -77,10 +78,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 
 export const AdditionalMarketData: React.FC<Props> = props => {
   const { arbitrator, category, id, oracle } = props
-
-  const windowObj: any = window
-  const realitioBaseUrl =
-    windowObj.ethereum && windowObj.ethereum.isMetaMask ? 'https://reality.eth' : 'https://reality.eth.link'
+  const realitioBaseUrl = useRealityLink()
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
 
