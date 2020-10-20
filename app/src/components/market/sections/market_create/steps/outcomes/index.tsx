@@ -120,17 +120,22 @@ const Outcomes = (props: Props) => {
         <RowWrapper>
           <OutcomeItemWrapper readOnly={!!uniformProbabilities}>
             <SimpleTextfield
-              onChange={e =>
+              onChange={e => {
+                const isEmpty = !e.target.value
                 props.onChange(
                   props.outcomes.map((tcome, tIndex) =>
-                    index !== tIndex ? tcome : { ...tcome, probability: Number(e.target.value) },
+                    index !== tIndex
+                      ? tcome
+                      : isEmpty
+                      ? ({ name: tcome.name } as Outcome)
+                      : { ...tcome, probability: Number(e.target.value) },
                   ),
                 )
-              }
+              }}
               placeholder="outcome..."
               readOnly={!!uniformProbabilities}
               type="number"
-              value={uniformProbabilities ? outcome.probability.toFixed(2) : outcome.probability}
+              value={uniformProbabilities ? outcome.probability?.toFixed(2) : outcome.probability}
             />
             <PercentWrapper>%</PercentWrapper>
           </OutcomeItemWrapper>

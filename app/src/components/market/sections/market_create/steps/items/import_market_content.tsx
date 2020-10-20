@@ -107,17 +107,26 @@ const FlexRowWrapper = styled.div`
     margin-left: 38px;
   }
 `
+
+const ResetWrapper = styled.span`
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colors.clickable};
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   context: ConnectedWeb3Context
   loadedQuestionId: Maybe<string>
   onSave: (question: Question, arbitrator: Arbitrator, outcomes: Outcome[], verifyLabel?: string) => void
+  handleClearQuestion: () => any
   handleOutcomesChange: (newOutcomes: Outcome[]) => any
   outcomes: Outcome[]
   totalProbabilities: number
 }
 
 export const ImportMarketContent = (props: Props) => {
-  const { context, handleOutcomesChange, loadedQuestionId, onSave, outcomes } = props
+  const { context, handleClearQuestion, handleOutcomesChange, loadedQuestionId, onSave, outcomes } = props
   const { realitio } = useContracts(context)
 
   const [state, setState] = useState<{ questionURL: string; loading: boolean }>({
@@ -188,6 +197,11 @@ export const ImportMarketContent = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marketMakerData])
 
+  const onResetMarket = () => {
+    handleClearQuestion()
+    setState(prevState => ({ ...prevState, questionURL: '' }))
+  }
+
   const validContent = !!question && !errorMessage && !!marketId && !!marketMakerData && !state.loading
 
   const questionDetails = () => {
@@ -223,13 +237,18 @@ export const ImportMarketContent = (props: Props) => {
                       <RowWrapper>
                         <OutcomeItemWrapper readOnly={false}>
                           <SimpleTextfield
-                            onChange={e =>
+                            onChange={e => {
+                              const isEmpty = !e.target.value
                               handleOutcomesChange(
                                 outcomes.map((tcome, tIndex) =>
-                                  index !== tIndex ? tcome : { ...tcome, probability: Number(e.target.value) },
+                                  index !== tIndex
+                                    ? tcome
+                                    : isEmpty
+                                    ? ({ name: tcome.name } as Outcome)
+                                    : { ...tcome, probability: Number(e.target.value) },
                                 ),
                               )
-                            }
+                            }}
                             placeholder="0"
                             type="number"
                             value={outcome.probability}
@@ -324,6 +343,7 @@ export const ImportMarketContent = (props: Props) => {
   return (
     <>
       <FormRow
+        extraTitle={!!loadedQuestionId && <ResetWrapper onClick={onResetMarket}>Reset</ResetWrapper>}
         formField={
           <Textfield
             hasSuccess={validContent}
