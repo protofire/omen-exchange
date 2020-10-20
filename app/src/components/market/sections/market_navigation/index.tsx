@@ -14,7 +14,7 @@ const MarketTab = styled.div<{ active: boolean }>`
   border: none;
   border-radius: 32px;
   padding: 10px 18px;
-  margin-right: 2px;
+  margin-right: 4px;
   background: ${props => (props.active ? props.theme.buttonSecondary.backgroundColor : `none`)};
   font-weight: ${props => (props.active ? `500` : `400`)};
   cursor: pointer;

@@ -42,9 +42,9 @@ const Hyperlink = styled.a`
 
 interface Props {
   description: string
-  hyperlinkDescription: string
-  href: string
-  additionalDescription: string
+  hyperlinkDescription?: string
+  href?: string
+  additionalDescription?: string
   danger?: boolean
   grayscale?: boolean
   style?: React.CSSProperties
@@ -59,10 +59,12 @@ export const WarningMessage = (props: Props) => {
       </AlertWrapper>
       <Description className={danger ? 'danger' : ''}>
         {description}{' '}
-        <Hyperlink href={href} target="_blank">
-          {hyperlinkDescription}
-        </Hyperlink>
-        <span>{additionalDescription}</span>
+        {href && hyperlinkDescription && (
+          <Hyperlink href={href} target="_blank">
+            {hyperlinkDescription}
+          </Hyperlink>
+        )}
+        {additionalDescription && <span>{additionalDescription}</span>}
       </Description>
     </Wrapper>
   )
