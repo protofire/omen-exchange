@@ -31,15 +31,6 @@ const AdditionalMarketDataLeft = styled.div`
   align-items: center;
 `
 
-// const AdditionalMarketDataSectionTitle = styled.p`
-//   margin-left: 6px;
-//   font-size: ${props => props.theme.textfield.fontSize};
-//   line-height: 16px;
-//   color: ${props => props.theme.colors.clickable};
-//   &:first-letter {
-//     text-transform: capitalize;
-//   }
-// `
 const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean }>`
   display: flex;
   align-items: center;
