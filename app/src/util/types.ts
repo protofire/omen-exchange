@@ -133,6 +133,10 @@ export interface MarketData {
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
   verifiedLabel?: string
+  lowerBound: string
+  upperBound: string
+  startingPoint: string
+  unit: string
 }
 
 export enum MarketStates {

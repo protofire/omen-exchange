@@ -17,6 +17,7 @@ import { CreateCard } from '../../../../common/create_card'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome, Outcomes } from '../outcomes'
 
+import { CreateScalarMarket } from './create_scalar_market'
 import { ImportMarketContent } from './import_market_content'
 
 const ButtonCategoryFocusCSS = css`
@@ -105,6 +106,10 @@ interface Props {
     arbitratorsCustom: Arbitrator[]
     loadedQuestionId: Maybe<string>
     outcomes: Outcome[]
+    lowerBound: string
+    upperBound: string
+    startingPoint: string
+    unit: string
   }
   addArbitratorCustom: (arbitrator: Arbitrator) => void
   addCategoryCustom: (category: string) => void
@@ -142,9 +147,13 @@ const AskQuestionStep = (props: Props) => {
     categoriesCustom,
     category,
     loadedQuestionId,
+    lowerBound,
     outcomes,
     question,
     resolution,
+    startingPoint,
+    unit,
+    upperBound,
   } = values
 
   const history = useHistory()
@@ -224,7 +233,15 @@ const AskQuestionStep = (props: Props) => {
           totalProbabilities={totalProbabilities}
         ></ImportMarketContent>
       ) : currentFormState === FormState.scalar ? (
-        <p>scalar boi</p>
+        <CreateScalarMarket
+          context={context}
+          handleChange={handleChange}
+          lowerBound={lowerBound}
+          question={question}
+          startingPoint={startingPoint}
+          unit={unit}
+          upperBound={upperBound}
+        />
       ) : (
         <>
           <FormRow

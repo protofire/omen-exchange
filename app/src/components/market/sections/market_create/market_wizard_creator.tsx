@@ -51,6 +51,10 @@ export const MarketWizardCreator = (props: Props) => {
     question: '',
     resolution: null,
     spread: MARKET_FEE,
+    lowerBound: '',
+    upperBound: '',
+    startingPoint: '',
+    unit: '',
   }
 
   const [currentStep, setCurrentStep] = useState(1)
@@ -257,17 +261,6 @@ export const MarketWizardCreator = (props: Props) => {
   }
 
   const currentStepFn = () => {
-    const {
-      arbitrator,
-      arbitratorsCustom,
-      categoriesCustom,
-      category,
-      loadedQuestionId,
-      outcomes,
-      question,
-      resolution,
-    } = marketData
-
     switch (currentStep) {
       case 2:
         return (
@@ -298,16 +291,7 @@ export const MarketWizardCreator = (props: Props) => {
             loadMoreButton={loadMoreButton}
             next={() => next()}
             setFirst={setFirst}
-            values={{
-              question,
-              outcomes,
-              loadedQuestionId,
-              category,
-              categoriesCustom,
-              resolution,
-              arbitrator,
-              arbitratorsCustom,
-            }}
+            values={marketData}
           />
         )
     }
