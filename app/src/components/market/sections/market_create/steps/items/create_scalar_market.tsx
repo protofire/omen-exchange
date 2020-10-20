@@ -33,19 +33,19 @@ export const CreateScalarMarket = (props: Props) => {
         }
       />
       <FormRow
-        formField={<Textfield onChange={handleChange} placeholder="0" value={lowerBound} />}
+        formField={<Textfield name="lowerBound" onChange={handleChange} placeholder="0" value={lowerBound} />}
         title={'Lower Bound'}
       />
       <FormRow
-        formField={<Textfield onChange={handleChange} placeholder="1000" value={upperBound} />}
+        formField={<Textfield name="upperBound" onChange={handleChange} placeholder="1000" value={upperBound} />}
         title={'Upper Bound'}
       />
       <FormRow
-        formField={<Textfield onChange={handleChange} placeholder="500" value={startingPoint} />}
+        formField={<Textfield name="startingPoint" onChange={handleChange} placeholder="500" value={startingPoint} />}
         title={'Starting Point'}
       />
       <FormRow
-        formField={<Textfield onChange={handleChange} placeholder="Ether" value={unit} />}
+        formField={<Textfield name="unit" onChange={handleChange} placeholder="Ether" value={unit} />}
         title={'Unit of measurement'}
       />
     </>
