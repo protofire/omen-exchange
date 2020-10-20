@@ -146,6 +146,8 @@ export const ImportMarketContent = (props: Props) => {
 
   const setLoading = (loading: boolean) => setState(prevState => ({ ...prevState, loading }))
 
+  const [isUniform, setUniform] = useState<boolean>(true)
+
   const extractId = (questionURL: string): string => {
     const reQuestionId = /question\/(0x[0-9A-Fa-f]{64})/
 
@@ -192,6 +194,7 @@ export const ImportMarketContent = (props: Props) => {
           (balance: BalanceItem) =>
             ({
               name: balance.outcomeName,
+              probability: 100 / marketMakerData.balances.length,
             } as Outcome),
         )
         const verifyLabel = marketMakerData.curatedByDxDao
@@ -199,6 +202,7 @@ export const ImportMarketContent = (props: Props) => {
           : marketMakerData.klerosTCRregistered
           ? 'Kleros'
           : ''
+        setUniform(true)
         onSave(question, arbitrator, outcomes, verifyLabel)
       }
     }
@@ -234,40 +238,53 @@ export const ImportMarketContent = (props: Props) => {
                 </OutcomesTR>
               </OutcomesTHead>
               <OutcomesTBody>
-                {outcomes.map((outcome: Outcome, index: number) => (
-                  <OutcomesTR key={index}>
-                    <OutcomesTD style={{ paddingRight: 12 }}>
-                      <OutcomeItemWrapper readOnly>
-                        <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
-                        <SimpleTextfield disabled style={{ flex: 1 }} type="text" value={outcome.name} />
-                      </OutcomeItemWrapper>
-                    </OutcomesTD>
-                    <OutcomesTD>
-                      <RowWrapper>
-                        <OutcomeItemWrapper readOnly={false}>
-                          <SimpleTextfield
-                            onChange={e => {
-                              const isEmpty = !e.target.value
-                              handleOutcomesChange(
-                                outcomes.map((tcome, tIndex) =>
-                                  index !== tIndex
-                                    ? tcome
-                                    : isEmpty
-                                    ? ({ name: tcome.name } as Outcome)
-                                    : { ...tcome, probability: Number(e.target.value) },
-                                ),
-                              )
-                            }}
-                            placeholder={(100 / outcomes.length).toFixed(2)}
-                            type="number"
-                            value={outcome.probability}
-                          />
-                          <PercentWrapper>%</PercentWrapper>
+                {outcomes.map((outcome: Outcome, index: number) => {
+                  return (
+                    <OutcomesTR key={index}>
+                      <OutcomesTD style={{ paddingRight: 12 }}>
+                        <OutcomeItemWrapper readOnly>
+                          <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
+                          <SimpleTextfield disabled style={{ flex: 1 }} type="text" value={outcome.name} />
                         </OutcomeItemWrapper>
-                      </RowWrapper>
-                    </OutcomesTD>
-                  </OutcomesTR>
-                ))}
+                      </OutcomesTD>
+                      <OutcomesTD>
+                        <RowWrapper>
+                          <OutcomeItemWrapper readOnly={false}>
+                            <SimpleTextfield
+                              onChange={e => {
+                                const isEmpty = !e.target.value
+                                if (isUniform) {
+                                  setUniform(false)
+                                  handleOutcomesChange(
+                                    outcomes.map((tcome, tIndex) =>
+                                      index !== tIndex || isEmpty
+                                        ? ({ name: tcome.name } as Outcome)
+                                        : { ...tcome, probability: Number(e.target.value) },
+                                    ),
+                                  )
+                                  return
+                                }
+                                handleOutcomesChange(
+                                  outcomes.map((tcome, tIndex) =>
+                                    index !== tIndex
+                                      ? tcome
+                                      : isEmpty
+                                      ? ({ name: tcome.name } as Outcome)
+                                      : { ...tcome, probability: Number(e.target.value) },
+                                  ),
+                                )
+                              }}
+                              placeholder={(100 / outcomes.length).toFixed(2)}
+                              type="number"
+                              value={isUniform ? '' : outcome.probability}
+                            />
+                            <PercentWrapper>%</PercentWrapper>
+                          </OutcomeItemWrapper>
+                        </RowWrapper>
+                      </OutcomesTD>
+                    </OutcomesTR>
+                  )
+                })}
               </OutcomesTBody>
             </OutcomesTable>
           </OutcomesTableWrapper>
