@@ -148,11 +148,16 @@ const AskQuestionStep = (props: Props) => {
   } = values
 
   const history = useHistory()
-  const [isImport, setIsImport] = useState(!!loadedQuestionId)
+
+  const [currentFormState, setCurrentFormState] = useState(loadedQuestionId ? 'IMPORT' : 'CATEGORICAL')
+
+  const FormState = {
+    categorical: 'CATEGORICAL',
+    import: 'IMPORT',
+    scalar: 'SCALAR',
+  }
 
   const totalProbabilities = outcomes.reduce((total, cur) => total + (cur.probability ? cur.probability : 0), 0)
-  const [isScalar, setIsScalar] = useState(false)
-  const [isModalQuestionOpen, setModalQuestionState] = useState(false)
   const totalProbabilitiesNotFull = Math.abs(totalProbabilities - 100) > 0.000001
   const outcomeNames = outcomes.map(outcome => outcome.name)
   const isContinueButtonDisabled =
@@ -176,7 +181,7 @@ const AskQuestionStep = (props: Props) => {
   useEffect(() => {
     handleClearQuestion()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImport])
+  }, [currentFormState === FormState.import])
 
   const toggleCategoryButtonFocus = useCallback(() => {
     setCategoryButtonFocus(!categoryButtonFocus)
@@ -190,23 +195,25 @@ const AskQuestionStep = (props: Props) => {
   return (
     <CreateCard style={{ paddingTop: 20, paddingBottom: 20 }}>
       <CategoryImportWrapper>
-        <FormStateButton active={!isImport} onClick={() => setIsImport(false)}>
+        <FormStateButton
+          active={currentFormState === FormState.categorical}
+          onClick={() => setCurrentFormState('CATEGORICAL')}
+        >
           Categorical Market
         </FormStateButton>
         <FormStateButton
-          active={isImport}
+          active={currentFormState === FormState.import}
           onClick={() => {
-            setIsImport(true)
-            setIsScalar(false)
+            setCurrentFormState('IMPORT')
           }}
         >
           Import Market
         </FormStateButton>
-        <FormStateButton active={isScalar} onClick={() => setIsScalar(true)}>
+        <FormStateButton active={currentFormState === FormState.scalar} onClick={() => setCurrentFormState('SCALAR')}>
           Scalar Market
         </FormStateButton>
       </CategoryImportWrapper>
-      {isImport ? (
+      {currentFormState === FormState.import ? (
         <ImportMarketContent
           context={context}
           handleClearQuestion={handleClearQuestion}
@@ -216,7 +223,7 @@ const AskQuestionStep = (props: Props) => {
           outcomes={outcomes}
           totalProbabilities={totalProbabilities}
         ></ImportMarketContent>
-      ) : isScalar ? (
+      ) : currentFormState === FormState.scalar ? (
         <p>scalar boi</p>
       ) : (
         <>
