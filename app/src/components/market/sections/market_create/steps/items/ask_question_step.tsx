@@ -28,7 +28,7 @@ const ButtonCategoryFocusCSS = css`
   }
 `
 
-const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boolean }>`
+export const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boolean }>`
   max-width: 100%;
   padding-left: 10px;
   padding-right: 10px;
@@ -49,7 +49,7 @@ ButtonCategory.defaultProps = {
   focus: false,
 }
 
-const ButtonCategoryTextOverflow = styled.span`
+export const ButtonCategoryTextOverflow = styled.span`
   display: block;
   max-width: 100%;
   overflow: hidden;
@@ -60,7 +60,7 @@ const ButtonCategoryTextOverflow = styled.span`
   text-transform: capitalize;
 `
 
-const GridTwoColumns = styled.div`
+export const GridTwoColumns = styled.div`
   column-gap: 16px;
   display: grid;
   grid-template-columns: 1fr;
@@ -72,7 +72,7 @@ const GridTwoColumns = styled.div`
   }
 `
 
-const Column = styled.div``
+export const Column = styled.div``
 
 const ButtonWithReadyToGoStatusCSS = css`
   &,
@@ -234,11 +234,22 @@ const AskQuestionStep = (props: Props) => {
         ></ImportMarketContent>
       ) : currentFormState === FormState.scalar ? (
         <CreateScalarMarket
+          categoriesCustom={categoriesCustom}
+          category={category}
+          categoryButtonFocus={categoryButtonFocus}
           context={context}
+          first={first}
+          handleCategoryChange={handleCategoryChange}
           handleChange={handleChange}
+          handleDateChange={handleDateChange}
+          loadMoreButton={loadMoreButton}
           lowerBound={lowerBound}
           question={question}
+          resolution={resolution}
+          setFirst={setFirst}
           startingPoint={startingPoint}
+          toggleCategoryButtonFocus={toggleCategoryButtonFocus}
+          tomorrow={tomorrow}
           unit={unit}
           upperBound={upperBound}
         />
