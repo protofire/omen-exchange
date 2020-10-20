@@ -1,4 +1,5 @@
 import React, { DOMAttributes } from 'react'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { Arbitrator } from '../../../../util/types'
@@ -14,7 +15,6 @@ const AdditionalMarketDataWrapper = styled.div`
   justify-content: space-between;
   margin-left: -26px;
   width: ${props => props.theme.mainContainer.maxWidth};
-  padding: 0 6px;
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-direction: column;
@@ -26,32 +26,45 @@ const AdditionalMarketDataWrapper = styled.div`
 
 const AdditionalMarketDataLeft = styled.div`
   display: flex;
-  align-items: center;
-  margin-top: 10px;
-  margin-bottom: 10px;
 `
 
-const AdditionalMarketDataSectionWrapper = styled.a`
+const AdditionalMarketDataSectionTitle = styled.p`
+  margin-left: 6px;
+  font-size: ${props => props.theme.textfield.fontSize};
+  line-height: 16px;
+  color: ${props => props.theme.colors.clickable};
+  &:first-letter {
+    text-transform: capitalize;
+  }
+`
+const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean }>`
   display: flex;
   align-items: center;
-  margin-left: 20px;
+  margin-left: 24px;
   cursor: pointer;
 
+  &:hover {
+    p {
+      color: ${props => props.theme.colors.primaryLight};
+    }
+    svg {
+      circle {
+        stroke: ${props => props.theme.colors.primaryLight};
+      }
+      path {
+        fill: ${props => (props.noColorChange ? '' : props.theme.colors.primaryLight)};
+      }
+
+      path:nth-child(even) {
+        fill: ${props => props.theme.colors.primaryLight};
+      }
+    }
+  }
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 11px;
     &:nth-of-type(1) {
       margin-left: 0;
     }
-  }
-`
-
-const AdditionalMarketDataSectionTitle = styled.p`
-  margin-left: 6px;
-  font-size: 14px;
-  line-height: 16px;
-  color: ${props => props.theme.colors.clickable};
-  &:first-letter {
-    text-transform: capitalize;
   }
 `
 
@@ -76,19 +89,39 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   return (
     <AdditionalMarketDataWrapper>
       <AdditionalMarketDataLeft>
-        <AdditionalMarketDataSectionWrapper href={`/#/24h-volume/category/${encodeURI(category)}`}>
+        <AdditionalMarketDataSectionWrapper href={`/#/24h-volume/category/${encodeURI(category)}`} noColorChange={true}>
           <IconCategory size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{category}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper href={realitioUrl} rel="noopener noreferrer" target="_blank">
+        <AdditionalMarketDataSectionWrapper
+          data-arrow-color="transparent"
+          data-tip={`This market uses the ${oracle} oracle which crowd-sources the correct outcome.`}
+          href={realitioUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <IconOracle size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{oracle}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper href={arbitrator.url} rel="noopener noreferrer" target="_blank">
+        <AdditionalMarketDataSectionWrapper
+          data-arrow-color="transparent"
+          data-tip={`This market uses ${arbitrator.name} as the final arbitrator.`}
+          href={arbitrator.url}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           <IconArbitrator size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>
+      <ReactTooltip
+        className="customMarketTooltip"
+        data-multiline={true}
+        effect="solid"
+        offset={{ top: -12 }}
+        place="top"
+        type="light"
+      />
     </AdditionalMarketDataWrapper>
   )
 }
