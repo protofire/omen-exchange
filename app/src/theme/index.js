@@ -74,6 +74,7 @@ const theme = {
   },
   colors: {
     activeListItemBackground: '#fafafa',
+    alert: '#E57373',
     darkGray: '#acacac',
     error: '#fa0000',
     gray: '#b7b7b7',
@@ -129,8 +130,9 @@ const theme = {
     xxxl: '1366px',
   },
   borders: {
+    tooltip: '#cfd8dc',
+    borderColor: '#ECEFF1',
     borderDisabled: '#E8EAF6',
-    borderColor: '#DCDFF2',
     commonBorderRadius: '6px',
   },
   slider: {
