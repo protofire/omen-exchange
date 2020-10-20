@@ -1,12 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { useTokens } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork } from '../../../../util/networks'
 import { CurationSource } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
-import { TokenItem } from '../token_item'
+import { CurrencySelector } from '../../common/currency_selector'
 
 import { DxDao } from './img/dxDao'
 import { Kleros } from './img/kleros'
@@ -68,7 +67,6 @@ export const AdvancedFilters = (props: Props) => {
   const { networkId } = context
 
   const arbitrators = getArbitratorsByNetwork(networkId)
-  const tokens = useTokens(context)
 
   const {
     arbitrator,
@@ -80,14 +78,6 @@ export const AdvancedFilters = (props: Props) => {
     onChangeCurrency,
     onChangeTemplateId,
   } = props
-
-  const allTokensOptions = [{ address: null, symbol: 'All', image: null }, ...tokens]
-  const currencyOptions: Array<DropdownItemProps> = allTokensOptions.map(({ address, image, symbol }) => {
-    return {
-      content: <TokenItem image={image} text={symbol} />,
-      onClick: () => onChangeCurrency(address),
-    }
-  })
 
   const questionTypeOptions: Array<DropdownItemProps> = [
     {
@@ -157,13 +147,12 @@ export const AdvancedFilters = (props: Props) => {
     <Wrapper>
       <Column>
         <Title>Currency</Title>
-        <Options
-          currentItem={allTokensOptions.findIndex(t => t.address === currency)}
-          dirty={true}
-          dropdownPosition={DropdownPosition.left}
-          items={currencyOptions}
-          maxHeight={true}
-          showScrollbar={true}
+        <CurrencySelector
+          context={context}
+          currency={currency}
+          disabled={false}
+          onSelect={currency => onChangeCurrency(currency.address)}
+          placeholder={currency ? '' : 'All'}
         />
       </Column>
       {showQuestionType && (
