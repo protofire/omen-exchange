@@ -218,7 +218,8 @@ const ScaleBall = styled.div<{ xValue: number }>`
   border: 3px solid ${props => props.theme.scale.ballBorder};
   background: ${props => props.theme.scale.ballBackground};
   z-index: 2;
-  left: calc(${props => props.xValue * 100}% - 10px);
+  left: ${props => props.xValue * 100}%;
+  transform: translateX(-50%);
 `
 
 const StartingPointBox = styled.div<{ xValue: number }>`
@@ -230,8 +231,9 @@ const StartingPointBox = styled.div<{ xValue: number }>`
   flex-direction: column;
   align-items: center;
   bottom: 36px;
-  left: calc(${props => props.xValue * 100}% - 12px);
-  transform: translate(-50%, -100%);
+  left: ${props => props.xValue * 100}%;
+  transform: translate(-${props => props.xValue * 100}%, -100%);
+  background: white;
 `
 
 const StartingPointTitle = styled.p`
@@ -246,6 +248,7 @@ const StartingPointSubtitle = styled.p`
   font-size: 14px;
   color: ${props => props.theme.colors.textColor};
   margin: 0;
+  white-space: nowrap;
 `
 
 interface Props {
@@ -262,6 +265,10 @@ interface Props {
     outcomes: Outcome[]
     loadedQuestionId: Maybe<string>
     verifyLabel?: string
+    lowerBound?: string
+    upperBound?: string
+    startingPoint?: string
+    unit?: string
   }
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
@@ -290,7 +297,21 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     submit,
     values,
   } = props
-  const { arbitrator, category, collateral, funding, loadedQuestionId, outcomes, question, resolution, spread } = values
+  const {
+    arbitrator,
+    category,
+    collateral,
+    funding,
+    loadedQuestionId,
+    lowerBound,
+    outcomes,
+    question,
+    resolution,
+    spread,
+    startingPoint,
+    unit,
+    upperBound,
+  } = values
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -402,19 +423,31 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         {state === 'SCALAR' ? (
           <ScaleWrapper>
             <ScaleTitleWrapper>
-              <ScaleTitle>0 USD</ScaleTitle>
-              <ScaleTitle>500 USD</ScaleTitle>
-              <ScaleTitle>1000 USD</ScaleTitle>
+              <ScaleTitle>
+                {lowerBound} {unit}
+              </ScaleTitle>
+              <ScaleTitle>
+                {Number(upperBound) / 2 + Number(lowerBound) / 2} {unit}
+              </ScaleTitle>
+              <ScaleTitle>
+                {upperBound} {unit}
+              </ScaleTitle>
             </ScaleTitleWrapper>
             <Scale>
-              <ScaleBall xValue={0.7} />
+              <ScaleBall
+                xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))}
+              />
               <VerticalBar />
               <VerticalBar />
               <VerticalBar />
               <HorizontalBar />
             </Scale>
-            <StartingPointBox xValue={0.7}>
-              <StartingPointTitle>700 USD</StartingPointTitle>
+            <StartingPointBox
+              xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))}
+            >
+              <StartingPointTitle>
+                {startingPoint} {unit}
+              </StartingPointTitle>
               <StartingPointSubtitle>Starting Point</StartingPointSubtitle>
             </StartingPointBox>
           </ScaleWrapper>
