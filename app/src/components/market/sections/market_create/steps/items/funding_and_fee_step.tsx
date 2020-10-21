@@ -147,6 +147,107 @@ const FlexRowWrapper = styled.div`
   }
 `
 
+const ScaleWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 182px;
+  border-bottom: 1px solid ${props => props.theme.scale.bar};
+  margin-left: -24px;
+  margin-right: -24px;
+  padding-left: 24px;
+  padding-right: 24px;
+`
+
+const ScaleTitleWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 5px;
+  margin-bottom: 18px;
+`
+
+const ScaleTitle = styled.p`
+  font-size: 14px;
+  color: ${props => props.theme.colors.textColor};
+  margin: 0;
+`
+
+const Scale = styled.div`
+  position: relative;
+  height: 20px;
+  width: 100%;
+`
+
+const VerticalBar = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  height: 20px;
+  background: ${props => props.theme.scale.bar};
+
+  &:nth-of-type(1) {
+    left: 0;
+  }
+
+  &:nth-of-type(2) {
+    left: calc(50% - 1px);
+  }
+
+  &:nth-of-type(3) {
+    right: 0;
+  }
+`
+
+const HorizontalBar = styled.div`
+  position: absolute;
+  top: calc(50% - 1px);
+  left: 0;
+  right: 0;
+  width: 100%
+  height: 2px;
+  background: ${props => props.theme.scale.bar};
+`
+
+const ScaleBall = styled.div<{ xValue: number }>`
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  border: 3px solid ${props => props.theme.scale.ballBorder};
+  background: ${props => props.theme.scale.ballBackground};
+  z-index: 2;
+  left: calc(${props => props.xValue * 100}% - 10px);
+`
+
+const StartingPointBox = styled.div<{ xValue: number }>`
+  position: absolute;
+  padding: 12px;
+  border: 1px solid ${props => props.theme.scale.box};
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  bottom: 36px;
+  left: calc(${props => props.xValue * 100}% - 12px);
+  transform: translate(-50%, -100%);
+`
+
+const StartingPointTitle = styled.p`
+  font-size: 14px;
+  font-weight: 500;
+  color: ${props => props.theme.colors.textColorDarker};
+  margin-bottom: 6px;
+  margin-top: 0;
+`
+
+const StartingPointSubtitle = styled.p`
+  font-size: 14px;
+  color: ${props => props.theme.colors.textColor};
+  margin: 0;
+`
+
 interface Props {
   back: (state: string) => void
   submit: () => void
@@ -299,7 +400,24 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         <SubTitle>Question</SubTitle>
         <QuestionText>{question}</QuestionText>
         {state === 'SCALAR' ? (
-          <p>Scale here</p>
+          <ScaleWrapper>
+            <ScaleTitleWrapper>
+              <ScaleTitle>0 USD</ScaleTitle>
+              <ScaleTitle>500 USD</ScaleTitle>
+              <ScaleTitle>1000 USD</ScaleTitle>
+            </ScaleTitleWrapper>
+            <Scale>
+              <ScaleBall xValue={0.7} />
+              <VerticalBar />
+              <VerticalBar />
+              <VerticalBar />
+              <HorizontalBar />
+            </Scale>
+            <StartingPointBox xValue={0.7}>
+              <StartingPointTitle>700 USD</StartingPointTitle>
+              <StartingPointSubtitle>Starting Point</StartingPointSubtitle>
+            </StartingPointBox>
+          </ScaleWrapper>
         ) : (
           <OutcomesTableWrapper borderBottom>
             <OutcomesTable>
