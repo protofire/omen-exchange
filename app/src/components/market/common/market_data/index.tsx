@@ -1,11 +1,10 @@
 import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import momentTZ from 'moment-timezone'
-import React, { DOMAttributes, useEffect, useState } from 'react'
+import React, { DOMAttributes, useState } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
-import { formatBigNumber, formatDate } from '../../../../util/tools'
+import { formatBigNumber, formatDate, formatNumber } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
 import { TextToggle } from '../TextToggle'
 
@@ -56,13 +55,6 @@ const MarketDataItemBottom = styled.div`
   font-weight: 400;
   line-height: 16px;
 `
-
-const MarketDataItemImage = styled.img`
-  max-height: 18px;
-  max-width: 18px;
-  margin-right: 10px;
-`
-
 interface Props extends DOMAttributes<HTMLDivElement> {
   collateralVolume: BigNumber
   liquidity: string
@@ -75,18 +67,8 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 export const MarketData: React.FC<Props> = props => {
   const { collateralVolume, currency, lastActiveDay, liquidity, resolutionTimestamp, runningDailyVolumeByHour } = props
 
-  const context = useConnectedWeb3Context()
-  const tokens = useTokens(context)
-
-  const [currencyIcon, setCurrencyIcon] = useState<string | undefined>('')
   const [showUTC, setShowUTC] = useState<boolean>(true)
   const [show24H, setShow24H] = useState<boolean>(false)
-
-  useEffect(() => {
-    const matchingAddress = (token: Token) => token.address.toLowerCase() === currency.address.toLowerCase()
-    const tokenIndex = tokens.findIndex(matchingAddress)
-    tokenIndex !== -1 && setCurrencyIcon(tokens[tokenIndex].image)
-  }, [tokens, currency.address])
 
   const timezoneAbbr = momentTZ.tz(momentTZ.tz.guess()).zoneAbbr()
 
@@ -101,14 +83,13 @@ export const MarketData: React.FC<Props> = props => {
     <MarketDataWrapper>
       <MarketDataItem>
         <MarketDataItemTop>
-          {liquidity} {currency.symbol}
+          {formatNumber(liquidity)} {currency.symbol}
         </MarketDataItemTop>
         <MarketDataItemBottom>Liquidity</MarketDataItemBottom>
       </MarketDataItem>
       <MarketDataItem>
         <MarketDataItemTop>
-          <MarketDataItemImage src={currencyIcon && currencyIcon}></MarketDataItemImage>
-          {show24H ? dailyVolume : totalVolume} {currency.symbol}
+          {show24H ? formatNumber(dailyVolume) : formatNumber(totalVolume)} {currency.symbol}
         </MarketDataItemTop>
         <TextToggle
           alternativeLabel="24h Volume"
