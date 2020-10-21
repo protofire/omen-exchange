@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { Card } from '../../../common/card/index'
 
 const CardStyled = styled(Card)`
-  margin: 0 auto;
   max-width: 100%;
   width: ${props => props.theme.mainContainer.maxWidth};
 `

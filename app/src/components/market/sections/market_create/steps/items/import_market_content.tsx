@@ -6,13 +6,12 @@ import { ConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { useGraphMarketIdFromQuestion } from '../../../../../../hooks/useGraphMarketIdFromQuestion'
 import { getArbitratorFromAddress } from '../../../../../../util/networks'
 import { formatDate } from '../../../../../../util/tools'
-import { Arbitrator, BalanceItem, Question } from '../../../../../../util/types'
-import { FormRow, Spinner, SubsectionTitle, Textfield, TitleValue } from '../../../../../common'
+import { Arbitrator, BalanceItem, Question, Status } from '../../../../../../util/types'
+import { FormRow, SimpleTextfield, Spinner, SubsectionTitle, Textfield, TitleValue } from '../../../../../common'
 import { IconReality } from '../../../../../common/icons'
 import {
   OutcomeItemLittleBallOfJoyAndDifferentColors,
-  OutcomeItemText,
-  OutcomeItemTextWrapper,
+  OutcomeItemWrapper,
   OutcomesTBody,
   OutcomesTD,
   OutcomesTH,
@@ -20,6 +19,8 @@ import {
   OutcomesTR,
   OutcomesTable,
   OutcomesTableWrapper,
+  PercentWrapper,
+  RowWrapper,
 } from '../../../../common/common_styled'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { VerifiedRow } from '../../../../common/verified_row'
@@ -107,14 +108,33 @@ const FlexRowWrapper = styled.div`
   }
 `
 
+const ResetWrapper = styled.span`
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 16px;
+  color: ${({ theme }) => theme.colors.clickable};
+`
+
+const QuestionTextField = styled(Textfield)`
+  border-radius: 8px;
+  padding: 12px 20px;
+  &:-webkit-autofill {
+    -webkit-background-clip: text;
+  }
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   context: ConnectedWeb3Context
   loadedQuestionId: Maybe<string>
   onSave: (question: Question, arbitrator: Arbitrator, outcomes: Outcome[], verifyLabel?: string) => void
+  handleClearQuestion: () => any
+  handleOutcomesChange: (newOutcomes: Outcome[]) => any
+  outcomes: Outcome[]
+  totalProbabilities: number
 }
 
 export const ImportMarketContent = (props: Props) => {
-  const { context, loadedQuestionId, onSave } = props
+  const { context, handleClearQuestion, handleOutcomesChange, loadedQuestionId, onSave, outcomes } = props
   const { realitio } = useContracts(context)
 
   const [state, setState] = useState<{ questionURL: string; loading: boolean }>({
@@ -125,6 +145,8 @@ export const ImportMarketContent = (props: Props) => {
   const setQuestionURL = (value: string) => setState(prevState => ({ ...prevState, questionURL: value }))
 
   const setLoading = (loading: boolean) => setState(prevState => ({ ...prevState, loading }))
+
+  const [isUniform, setUniform] = useState<boolean>(true)
 
   const extractId = (questionURL: string): string => {
     const reQuestionId = /question\/(0x[0-9A-Fa-f]{64})/
@@ -161,11 +183,14 @@ export const ImportMarketContent = (props: Props) => {
   )
 
   const [question, arbitrator, errorMessage] = useAsyncDerivedValue('', [null, null, null], fetchQuestion)
-  const { marketId } = useGraphMarketIdFromQuestion(question?.id || '')
+
+  const { marketId, status: marketIdStatus } = useGraphMarketIdFromQuestion(question?.id || '')
   const { marketMakerData } = useMarketMakerData((marketId || '').toLowerCase())
 
   useEffect(() => {
-    if (question && marketMakerData && marketMakerData.question.id === question.id) {
+    if (question && marketIdStatus === Status.Error) {
+      setLoading(false)
+    } else if (question && marketMakerData && marketMakerData.question.id === question.id) {
       setLoading(false)
       if (arbitrator) {
         const outcomes = marketMakerData.balances.map(
@@ -180,13 +205,20 @@ export const ImportMarketContent = (props: Props) => {
           : marketMakerData.klerosTCRregistered
           ? 'Kleros'
           : ''
+        setUniform(true)
         onSave(question, arbitrator, outcomes, verifyLabel)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [marketMakerData])
+  }, [marketMakerData, marketIdStatus])
 
-  const validContent = !!question && !errorMessage && !!marketId && !!marketMakerData && !state.loading
+  const onResetMarket = () => {
+    handleClearQuestion()
+    setState(prevState => ({ ...prevState, questionURL: '' }))
+  }
+
+  const validContent =
+    !!state.questionURL && !!question && !errorMessage && !!marketId && !!marketMakerData && !state.loading
 
   const questionDetails = () => {
     return (
@@ -204,22 +236,68 @@ export const ImportMarketContent = (props: Props) => {
             <OutcomesTable>
               <OutcomesTHead>
                 <OutcomesTR>
-                  <OutcomesTH style={{ width: '65%' }}>Outcome</OutcomesTH>
+                  <OutcomesTH style={{ width: '72%' }}>Outcome</OutcomesTH>
                   <OutcomesTH>Probability</OutcomesTH>
                 </OutcomesTR>
               </OutcomesTHead>
               <OutcomesTBody>
-                {marketMakerData.balances.map((balanceItem: BalanceItem, index) => {
-                  const { outcomeName } = balanceItem
+                {outcomes.map((outcome: Outcome, index: number) => {
                   return (
                     <OutcomesTR key={index}>
-                      <OutcomesTD>
-                        <OutcomeItemTextWrapper>
+                      <OutcomesTD style={{ paddingRight: 12 }}>
+                        <OutcomeItemWrapper readOnly>
                           <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
-                          <OutcomeItemText>{outcomeName}</OutcomeItemText>
-                        </OutcomeItemTextWrapper>
+                          <SimpleTextfield disabled style={{ flex: 1 }} type="text" value={outcome.name} />
+                        </OutcomeItemWrapper>
                       </OutcomesTD>
-                      <OutcomesTD>{(100 / marketMakerData.balances.length).toFixed(2)}%</OutcomesTD>
+                      <OutcomesTD>
+                        <RowWrapper>
+                          <OutcomeItemWrapper readOnly={false}>
+                            <SimpleTextfield
+                              onChange={e => {
+                                const isEmpty = !e.target.value
+                                if (isUniform) {
+                                  setUniform(false)
+                                  handleOutcomesChange(
+                                    outcomes.map((tcome, tIndex) =>
+                                      index !== tIndex || isEmpty
+                                        ? ({ name: tcome.name } as Outcome)
+                                        : { ...tcome, probability: Number(e.target.value) },
+                                    ),
+                                  )
+                                  return
+                                }
+                                const newOutcomes = outcomes.map((tcome, tIndex) =>
+                                  index !== tIndex
+                                    ? tcome
+                                    : isEmpty
+                                    ? ({ name: tcome.name } as Outcome)
+                                    : { ...tcome, probability: Number(e.target.value) },
+                                )
+                                const isNewOutcomesEmpty = newOutcomes
+                                  .map(outcome => !outcome.probability)
+                                  .reduce((res, element) => res && element)
+
+                                if (isNewOutcomesEmpty) {
+                                  setUniform(true)
+                                  const finalOutcomes = newOutcomes.map(outcome => ({
+                                    ...outcome,
+                                    probability: 100 / newOutcomes.length,
+                                  }))
+                                  handleOutcomesChange(finalOutcomes)
+                                  return
+                                }
+
+                                handleOutcomesChange(newOutcomes)
+                              }}
+                              placeholder={(100 / outcomes.length).toFixed(2)}
+                              type="number"
+                              value={isUniform ? '' : outcome.probability}
+                            />
+                            <PercentWrapper>%</PercentWrapper>
+                          </OutcomeItemWrapper>
+                        </RowWrapper>
+                      </OutcomesTD>
                     </OutcomesTR>
                   )
                 })}
@@ -307,9 +385,10 @@ export const ImportMarketContent = (props: Props) => {
   return (
     <>
       <FormRow
+        extraTitle={validContent && <ResetWrapper onClick={onResetMarket}>Reset</ResetWrapper>}
         formField={
-          <Textfield
-            hasSuccess={validContent}
+          <QuestionTextField
+            focusOutline={false}
             name="questionURL"
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
               const { value } = event.target

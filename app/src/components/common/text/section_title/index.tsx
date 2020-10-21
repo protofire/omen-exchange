@@ -18,10 +18,10 @@ export enum TextAlign {
 }
 
 const Wrapper = styled.div`
-  align-items: center;
   display: flex;
   justify-content: center;
-  margin: 0 auto 18px auto;
+  align-items: center;
+  margin-bottom: 18px;
   max-width: 100%;
   width: ${props => props.theme.mainContainer.maxWidth};
 `

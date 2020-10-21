@@ -50,6 +50,11 @@ export const useGraphMarketIdFromQuestion = (questionId: string): Result => {
 
   if (data && data.question && data.question.indexedFixedProductMarketMakers.length > 0 && !marketId) {
     setMarketId(data.question.indexedFixedProductMarketMakers[0].id)
+  } else if (data && data.question && !data.question.indexedFixedProductMarketMakers.length) {
+    return {
+      marketId,
+      status: Status.Error,
+    }
   }
 
   return {
