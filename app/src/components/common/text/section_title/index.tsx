@@ -20,6 +20,7 @@ export enum TextAlign {
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
   margin-bottom: 18px;
   max-width: 100%;
   width: ${props => props.theme.mainContainer.maxWidth};
