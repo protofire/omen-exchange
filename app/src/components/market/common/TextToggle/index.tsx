@@ -15,12 +15,26 @@ const Wrapper = styled.div<{ rotate?: boolean }>`
   align-items: center;
   cursor: pointer;
   height: 16px;
+  color: ${({ theme }) => theme.colors.clickable};
   .text-toggle-label {
-    color: ${({ theme }) => theme.colors.clickable};
     margin-left: 10px;
     font-size: 14px;
     line-height: 16px;
     font-weight: 400;
+  }
+
+  &:hover {
+    .text-toggle-label {
+      color: ${props => props.theme.colors.primaryLight};
+    }
+    svg {
+      circle {
+        stroke: ${props => props.theme.colors.primaryLight};
+      }
+      path {
+        fill: ${props => props.theme.colors.primaryLight};
+      }
+    }
   }
 `
 
