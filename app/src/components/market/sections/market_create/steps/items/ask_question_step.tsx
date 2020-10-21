@@ -169,15 +169,34 @@ const AskQuestionStep = (props: Props) => {
   const totalProbabilities = outcomes.reduce((total, cur) => total + (cur.probability ? cur.probability : 0), 0)
   const totalProbabilitiesNotFull = Math.abs(totalProbabilities - 100) > 0.000001
   const outcomeNames = outcomes.map(outcome => outcome.name)
-  const isContinueButtonDisabled =
-    totalProbabilitiesNotFull ||
-    outcomes.length < 2 ||
-    !question ||
-    !resolution ||
-    resolution < new Date() ||
-    !category ||
-    outcomeNames.map(name => !name).reduce((e1, e2) => e1 || e2) ||
-    outcomeNames.map((name, index) => outcomeNames.indexOf(name) !== index).reduce((e1, e2) => e1 || e2)
+
+  const [isContinueButtonDisabled, setIsContinueButtonDisabled] = useState(true)
+
+  useEffect(() => {
+    if (currentFormState === FormState.categorical || currentFormState === FormState.import) {
+      setIsContinueButtonDisabled(
+        totalProbabilitiesNotFull ||
+          outcomes.length < 2 ||
+          !question ||
+          !resolution ||
+          resolution < new Date() ||
+          !category ||
+          outcomeNames.map(name => !name).reduce((e1, e2) => e1 || e2) ||
+          outcomeNames.map((name, index) => outcomeNames.indexOf(name) !== index).reduce((e1, e2) => e1 || e2),
+      )
+    } else if (currentFormState === FormState.scalar) {
+      setIsContinueButtonDisabled(
+        !question ||
+          !lowerBound ||
+          !upperBound ||
+          !startingPoint ||
+          !unit ||
+          !resolution ||
+          resolution < new Date() ||
+          !category,
+      )
+    }
+  })
 
   const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
