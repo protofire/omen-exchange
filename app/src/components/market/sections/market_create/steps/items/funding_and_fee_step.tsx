@@ -148,7 +148,7 @@ const FlexRowWrapper = styled.div`
 `
 
 interface Props {
-  back: () => void
+  back: (state: string) => void
   submit: () => void
   values: {
     collateral: Token
@@ -167,6 +167,7 @@ interface Props {
   handleTradingFeeChange: (fee: string) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
+  state: string
 }
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
@@ -184,6 +185,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleTradingFeeChange,
     marketCreationStatus,
     resetTradingFee,
+    state,
     submit,
     values,
   } = props
@@ -434,7 +436,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               !MarketCreationStatus.is.ready(marketCreationStatus) &&
               !MarketCreationStatus.is.error(marketCreationStatus)
             }
-            onClick={back}
+            onClick={() => back(state)}
           >
             Back
           </LeftButton>

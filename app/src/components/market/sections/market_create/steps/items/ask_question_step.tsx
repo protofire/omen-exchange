@@ -96,7 +96,7 @@ const CategoryImportWrapper = styled.div`
   padding-bottom: 20px;
 `
 interface Props {
-  next: () => void
+  next: (state: string) => void
   values: {
     question: string
     category: string
@@ -123,6 +123,7 @@ interface Props {
   setFirst: React.Dispatch<React.SetStateAction<number>>
   first: number
   loadMoreButton: boolean
+  state: string
 }
 
 const AskQuestionStep = (props: Props) => {
@@ -138,6 +139,7 @@ const AskQuestionStep = (props: Props) => {
     handleQuestionChange,
     loadMoreButton,
     setFirst,
+    state,
     values,
   } = props
 
@@ -158,7 +160,7 @@ const AskQuestionStep = (props: Props) => {
 
   const history = useHistory()
 
-  const [currentFormState, setCurrentFormState] = useState(loadedQuestionId ? 'IMPORT' : 'CATEGORICAL')
+  const [currentFormState, setCurrentFormState] = useState(state ? state : loadedQuestionId ? 'IMPORT' : 'CATEGORICAL')
 
   const FormState = {
     categorical: 'CATEGORICAL',
@@ -371,7 +373,7 @@ const AskQuestionStep = (props: Props) => {
         <ButtonWithReadyToGoStatus
           buttonType={ButtonType.secondaryLine}
           disabled={isContinueButtonDisabled}
-          onClick={props.next}
+          onClick={() => props.next(currentFormState)}
           readyToGo={!isContinueButtonDisabled}
         >
           Continue

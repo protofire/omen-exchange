@@ -113,14 +113,18 @@ export const MarketWizardCreator = (props: Props) => {
     // eslint-disable-next-line
   }, [topCategories])
 
-  const next = (): void => {
+  const [currentFormState, setCurrentFormState] = useState('')
+
+  const next = (state: string): void => {
     const actualCurrentStep = currentStep >= 3 ? 4 : currentStep + 1
     setCurrentStep(actualCurrentStep)
+    setCurrentFormState(state)
   }
 
-  const back = (): void => {
+  const back = (state: string): void => {
     const actualCurrentStep = currentStep <= 1 ? 1 : currentStep - 1
     setCurrentStep(actualCurrentStep)
+    setCurrentFormState(state)
   }
 
   const addArbitratorCustom = (arbitrator: Arbitrator): void => {
@@ -265,12 +269,13 @@ export const MarketWizardCreator = (props: Props) => {
       case 2:
         return (
           <FundingAndFeeStep
-            back={() => back()}
+            back={back}
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
             handleTradingFeeChange={handleTradingFeeChange}
             marketCreationStatus={marketCreationStatus}
             resetTradingFee={resetTradingFee}
+            state={currentFormState}
             submit={() => submit()}
             values={marketData}
           />
@@ -289,8 +294,9 @@ export const MarketWizardCreator = (props: Props) => {
             handleOutcomesChange={handleOutcomesChange}
             handleQuestionChange={handleQuestionChange}
             loadMoreButton={loadMoreButton}
-            next={() => next()}
+            next={next}
             setFirst={setFirst}
+            state={currentFormState}
             values={marketData}
           />
         )
