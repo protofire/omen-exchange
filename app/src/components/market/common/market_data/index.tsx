@@ -83,7 +83,7 @@ export const MarketData: React.FC<Props> = props => {
   const tokens = useTokens(context)
 
   const [currencyIcon, setCurrencyIcon] = useState<string | undefined>('')
-  const [showUTC, setShowUTC] = useState<boolean>(false)
+  const [showUTC, setShowUTC] = useState<boolean>(true)
   const [show24H, setShow24H] = useState<boolean>(false)
 
   useEffect(() => {
@@ -115,9 +115,9 @@ export const MarketData: React.FC<Props> = props => {
           {show24H ? dailyVolume : totalVolume} {currency.symbol}
         </MarketDataItemTop>
         <TextToggle
-          alternativeLabel="Total Volume"
-          isMain={show24H}
-          mainLabel="24h Volume"
+          alternativeLabel="24h Volume"
+          isMain={!show24H}
+          mainLabel="Total Volume"
           onClick={() => setShow24H(value => !value)}
         />
       </MarketDataItem>
@@ -138,7 +138,7 @@ export const MarketData: React.FC<Props> = props => {
         <MarketDataItemTop>
           {resolutionTimestamp > new Date() ? moment(resolutionTimestamp).fromNow(true) : '0 days'}
         </MarketDataItemTop>
-        <MarketDataItemBottom>Time remaining</MarketDataItemBottom>
+        <MarketDataItemBottom>Remaining</MarketDataItemBottom>
       </MarketDataItem>
     </MarketDataWrapper>
   )
