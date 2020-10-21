@@ -293,34 +293,40 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   return (
     <>
       <CreateCardTop>
-        <SubsectionTitleStyled>Your {loadedQuestionId ? 'Imported' : 'Categorical'} Market</SubsectionTitleStyled>
+        <SubsectionTitleStyled>
+          Your {state.charAt(0).toUpperCase() + state.slice(1).toLowerCase()} Market
+        </SubsectionTitleStyled>
         <SubTitle>Question</SubTitle>
         <QuestionText>{question}</QuestionText>
-        <OutcomesTableWrapper borderBottom>
-          <OutcomesTable>
-            <OutcomesTHead>
-              <OutcomesTR>
-                <OutcomesTH style={{ width: '60%' }}>Outcome</OutcomesTH>
-                <OutcomesTH>Probability</OutcomesTH>
-              </OutcomesTR>
-            </OutcomesTHead>
-            <OutcomesTBody>
-              {outcomes.map((outcome, index) => {
-                return (
-                  <OutcomesTR key={index}>
-                    <OutcomesTD>
-                      <OutcomeItemTextWrapper>
-                        <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
-                        <OutcomeItemText>{outcome.name}</OutcomeItemText>
-                      </OutcomeItemTextWrapper>
-                    </OutcomesTD>
-                    <OutcomesTD>{outcome.probability.toFixed(2)}%</OutcomesTD>
-                  </OutcomesTR>
-                )
-              })}
-            </OutcomesTBody>
-          </OutcomesTable>
-        </OutcomesTableWrapper>
+        {state === 'SCALAR' ? (
+          <p>Scale here</p>
+        ) : (
+          <OutcomesTableWrapper borderBottom>
+            <OutcomesTable>
+              <OutcomesTHead>
+                <OutcomesTR>
+                  <OutcomesTH style={{ width: '60%' }}>Outcome</OutcomesTH>
+                  <OutcomesTH>Probability</OutcomesTH>
+                </OutcomesTR>
+              </OutcomesTHead>
+              <OutcomesTBody>
+                {outcomes.map((outcome, index) => {
+                  return (
+                    <OutcomesTR key={index}>
+                      <OutcomesTD>
+                        <OutcomeItemTextWrapper>
+                          <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
+                          <OutcomeItemText>{outcome.name}</OutcomeItemText>
+                        </OutcomeItemTextWrapper>
+                      </OutcomesTD>
+                      <OutcomesTD>{outcome.probability.toFixed(2)}%</OutcomesTD>
+                    </OutcomesTR>
+                  )
+                })}
+              </OutcomesTBody>
+            </OutcomesTable>
+          </OutcomesTableWrapper>
+        )}
         <FlexRowWrapper>
           <TitleValueVertical
             date={resolution instanceof Date ? resolution : undefined}
