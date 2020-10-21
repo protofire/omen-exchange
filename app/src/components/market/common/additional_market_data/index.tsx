@@ -145,7 +145,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         className="customMarketTooltip"
         data-multiline={true}
         effect="solid"
-        offset={{ top: -12 }}
+        offset={{ top: 3 }}
         place="top"
         type="light"
       />
