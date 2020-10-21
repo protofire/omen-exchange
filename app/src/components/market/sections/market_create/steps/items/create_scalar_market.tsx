@@ -80,19 +80,21 @@ export const CreateScalarMarket = (props: Props) => {
         <Column>
           <FormRow
             formField={<Textfield name="lowerBound" onChange={handleChange} placeholder="0" value={lowerBound} />}
+            style={{ marginTop: 0 }}
             title={'Lower Bound'}
           />
-          <FormRow
-            formField={<Textfield name="upperBound" onChange={handleChange} placeholder="1000" value={upperBound} />}
-            title={'Upper Bound'}
-          />
-        </Column>
-        <Column>
           <FormRow
             formField={
               <Textfield name="startingPoint" onChange={handleChange} placeholder="500" value={startingPoint} />
             }
             title={'Starting Point'}
+          />
+        </Column>
+        <Column>
+          <FormRow
+            formField={<Textfield name="upperBound" onChange={handleChange} placeholder="1000" value={upperBound} />}
+            style={{ marginTop: 0 }}
+            title={'Upper Bound'}
           />
           <FormRow
             formField={<Textfield name="unit" onChange={handleChange} placeholder="Ether" value={unit} />}
@@ -110,6 +112,7 @@ export const CreateScalarMarket = (props: Props) => {
                 selected={resolution}
               />
             }
+            style={{ marginTop: 0 }}
             title={'Closing Date (UTC)'}
           />
         </Column>
@@ -126,6 +129,7 @@ export const CreateScalarMarket = (props: Props) => {
                 <ButtonCategoryTextOverflow>{category ? category : 'Select Category'}</ButtonCategoryTextOverflow>
               </ButtonCategory>
             }
+            style={{ marginTop: 0 }}
             title={'Category'}
           />
         </Column>
@@ -141,15 +145,6 @@ export const CreateScalarMarket = (props: Props) => {
           setFirst={setFirst}
         />
       )}
-      <WarningMessage
-        additionalDescription={'.'}
-        description={
-          "Set the market resolution date at least 6 days after the correct outcome will be known and make sure that this market won't be "
-        }
-        href={DOCUMENT_VALIDITY_RULES}
-        hyperlinkDescription={'invalid'}
-        style={{ marginBottom: 0 }}
-      />
       <FormRow
         formField={
           <Arbitrators
@@ -160,8 +155,16 @@ export const CreateScalarMarket = (props: Props) => {
             value={arbitrator}
           />
         }
-        style={{ marginBottom: 0 }}
+        style={{ marginTop: 0, marginBottom: 0 }}
         title={'Arbitrator'}
+      />
+      <WarningMessage
+        additionalDescription={'.'}
+        description={
+          "Set the market resolution date at least 6 days after the correct outcome will be known and make sure that this market won't be "
+        }
+        href={DOCUMENT_VALIDITY_RULES}
+        hyperlinkDescription={'invalid'}
       />
     </>
   )

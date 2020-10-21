@@ -231,6 +231,9 @@ const AskQuestionStep = (props: Props) => {
         >
           Categorical Market
         </FormStateButton>
+        <FormStateButton active={currentFormState === FormState.scalar} onClick={() => setCurrentFormState('SCALAR')}>
+          Scalar Market
+        </FormStateButton>
         <FormStateButton
           active={currentFormState === FormState.import}
           onClick={() => {
@@ -238,9 +241,6 @@ const AskQuestionStep = (props: Props) => {
           }}
         >
           Import Market
-        </FormStateButton>
-        <FormStateButton active={currentFormState === FormState.scalar} onClick={() => setCurrentFormState('SCALAR')}>
-          Scalar Market
         </FormStateButton>
       </CategoryImportWrapper>
       {currentFormState === FormState.import ? (
