@@ -24,6 +24,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     answerFinalizedTimestamp,
     arbitrator,
     collateral: collateralToken,
+    collateralVolume,
     curatedByDxDaoOrKleros: isVerified,
     lastActiveDay,
     question,
@@ -37,6 +38,10 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
     : ''
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
+
+  const formattedLiquidity: string = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.scaledLiquidityParameter.toFixed(2)
+    : '0'
 
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred
@@ -66,8 +71,10 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         ></ProgressBar>
       )}
       <MarketData
+        collateralVolume={collateralVolume}
         currency={collateralToken}
         lastActiveDay={lastActiveDay}
+        liquidity={formattedLiquidity}
         resolutionTimestamp={question.resolution}
         runningDailyVolumeByHour={runningDailyVolumeByHour}
       ></MarketData>
@@ -75,7 +82,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         arbitrator={arbitrator}
         category={question.category}
         id={question.id}
-        oracle="Reality.eth"
+        oracle="Reality"
         verified={isVerified}
       ></AdditionalMarketData>
     </>

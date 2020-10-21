@@ -13,12 +13,18 @@ const MarketDataWrapper = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  justify-content: space-between;
   margin-bottom: 24px;
+
+  & > * + * {
+    margin-left: 38px;
+  }
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-direction: column;
     margin-bottom: 0;
+    & > * + * {
+      margin-left: 0;
+    }
   }
 `
 
@@ -28,7 +34,6 @@ const MarketDataItem = styled.div`
   align-items: flex-start;
   justify-content: space-between;
   height: 39px;
-  width: 33.33%;
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     width: 100%;
@@ -63,6 +68,8 @@ const MarketDataItemImage = styled.img`
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
+  collateralVolume: BigNumber
+  liquidity: string
   resolutionTimestamp: Date
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
@@ -70,7 +77,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const MarketData: React.FC<Props> = props => {
-  const { currency, lastActiveDay, resolutionTimestamp, runningDailyVolumeByHour } = props
+  const { collateralVolume, currency, lastActiveDay, liquidity, resolutionTimestamp, runningDailyVolumeByHour } = props
 
   const context = useConnectedWeb3Context()
   const tokens = useTokens(context)
@@ -92,12 +99,20 @@ export const MarketData: React.FC<Props> = props => {
       ? formatBigNumber(runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24], currency.decimals)
       : '0'
 
+  const totalVolume = formatBigNumber(collateralVolume, currency.decimals)
+
   return (
     <MarketDataWrapper>
       <MarketDataItem>
         <MarketDataItemTop>
+          {liquidity} {currency.symbol}
+        </MarketDataItemTop>
+        <MarketDataItemBottom>Liquidity</MarketDataItemBottom>
+      </MarketDataItem>
+      <MarketDataItem>
+        <MarketDataItemTop>
           <MarketDataItemImage src={currencyIcon && currencyIcon}></MarketDataItemImage>
-          {dailyVolume} {currency.symbol}
+          {show24H ? dailyVolume : totalVolume} {currency.symbol}
         </MarketDataItemTop>
         <TextToggle
           alternativeLabel="Total Volume"
