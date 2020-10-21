@@ -1,12 +1,12 @@
-import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useGraphMarketMakerData } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
+import { getLogger } from '../../../../util/logger'
+import { getTokenFromAddress } from '../../../../util/networks'
 import { calcPrice, formatBigNumber, formatNumber } from '../../../../util/tools'
 import { MarketMakerDataItem } from '../../../../util/types'
 import { IconStar } from '../../../common/icons/IconStar'
@@ -69,54 +69,66 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   currentFilter: any
 }
 
+const logger = getLogger('Market::ListItem')
+
 export const ListItem: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
-  const [volume, setVolume] = useState('')
-  const [symbol, setSymbol] = useState('')
-  const [decimals, setDecimals] = useState<number>()
 
   const { currentFilter, market } = props
-  const { address, collateralToken, collateralVolume, openingTimestamp, outcomeTokenAmounts, outcomes, title } = market
+  const {
+    address,
+    collateralToken,
+    collateralVolume,
+    creationTimestamp,
+    lastActiveDay,
+    openingTimestamp,
+    outcomeTokenAmounts,
+    outcomes,
+    runningDailyVolumeByHour,
+    scaledLiquidityParameter,
+    title,
+  } = market
+
+  let token
+  let tokenVolume
+  try {
+    token = getTokenFromAddress(context.networkId, collateralToken)
+    tokenVolume = formatBigNumber(collateralVolume, token.decimals)
+  } catch (err) {
+    logger.error(err.message)
+  }
+
+  const [volume, setVolume] = useState(tokenVolume || '')
+  const [symbol, setSymbol] = useState(token ? token.symbol : '')
+  const [decimals, setDecimals] = useState(token ? token.decimals : undefined)
 
   const now = moment()
   const endDate = openingTimestamp
   const endsText = moment(endDate).fromNow(true)
   const resolutionDate = moment(endDate).format('MMM Do, YYYY')
 
-  const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
-  const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
-    ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
-    : ''
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
   const formattedCreationDate = moment(creationDate).format('MMM Do, YYYY')
-  const lastActiveDay: number = useGraphMarketMakerDataResult.marketMakerData
-    ? useGraphMarketMakerDataResult.marketMakerData.lastActiveDay
-    : 0
-  const dailyVolumeUnformatted: Maybe<BigNumber> = useGraphMarketMakerDataResult.marketMakerData
-    ? useGraphMarketMakerDataResult.marketMakerData.dailyVolume
-    : null
-  const formattedLiquidity: string = useGraphMarketMakerDataResult.marketMakerData
-    ? useGraphMarketMakerDataResult.marketMakerData.scaledLiquidityParameter.toFixed(2)
-    : '0'
 
-  const dailyVolume: Maybe<BigNumber[]> =
-    useGraphMarketMakerDataResult.marketMakerData &&
-    useGraphMarketMakerDataResult.marketMakerData.runningDailyVolumeByHour
+  const formattedLiquidity: string = scaledLiquidityParameter.toFixed(2)
 
   useEffect(() => {
     const setToken = async () => {
-      const erc20Service = new ERC20Service(provider, account, collateralToken)
-      const { decimals, symbol } = await erc20Service.getProfileSummary()
-      const volume = formatBigNumber(collateralVolume, decimals)
+      if (!symbol) {
+        // fallback to token service if unknown token
+        const erc20Service = new ERC20Service(provider, account, collateralToken)
+        const { decimals, symbol } = await erc20Service.getProfileSummary()
+        const volume = formatBigNumber(collateralVolume, decimals)
 
-      setDecimals(decimals)
-      setVolume(volume)
-      setSymbol(symbol)
+        setDecimals(decimals)
+        setVolume(volume)
+        setSymbol(symbol)
+      }
     }
 
     setToken()
-  }, [account, collateralToken, collateralVolume, dailyVolumeUnformatted, provider])
+  }, [account, collateralToken, collateralVolume, provider, context.networkId, symbol])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
@@ -136,8 +148,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
             `${resolutionDate} - ${moment(endDate).isAfter(now) ? 'Closing' : 'Closed'}`}
           {currentFilter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` &&
             `${
-              Math.floor(Date.now() / 86400000) === lastActiveDay && dailyVolume && decimals
-                ? formatBigNumber(dailyVolume[Math.floor(Date.now() / (1000 * 60 * 60)) % 24], decimals)
+              Math.floor(Date.now() / 86400000) === lastActiveDay && runningDailyVolumeByHour && decimals
+                ? formatBigNumber(runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24], decimals)
                 : 0
             } ${symbol} - 24hr Volume`}
           {currentFilter.sortBy === 'usdLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
