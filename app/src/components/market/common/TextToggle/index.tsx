@@ -1,7 +1,7 @@
 import React, { MouseEventHandler } from 'react'
 import styled from 'styled-components'
 
-import { IconMiniDown } from '../../../common/icons'
+import { IconMiniDown, IconMiniUp } from '../../../common/icons'
 
 interface Props {
   mainLabel: string
@@ -22,19 +22,13 @@ const Wrapper = styled.div<{ rotate?: boolean }>`
     line-height: 16px;
     font-weight: 400;
   }
-  .text-toggle-mini-arrow {
-    transform: ${({ rotate }) => (rotate ? 'rotate(180deg)' : '')};
-  }
 `
 
 export const TextToggle = (props: Props) => {
   const { alternativeLabel, isMain, mainLabel, onClick } = props
   return (
     <Wrapper onClick={onClick} rotate={!isMain}>
-      <span className="text-toggle-mini-arrow">
-        <IconMiniDown />
-      </span>
-
+      {isMain ? <IconMiniDown /> : <IconMiniUp />}
       <div className="text-toggle-label">{isMain ? mainLabel : alternativeLabel}</div>
     </Wrapper>
   )

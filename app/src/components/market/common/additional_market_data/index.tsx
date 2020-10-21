@@ -31,12 +31,14 @@ const AdditionalMarketDataLeft = styled.div`
     margin-left: 14px;
   }
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    flex-wrap: wrap;
-    justify-content: space-between;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    width: 100%;
+    padding: 14px 24px;
     & > * {
-      margin: 0;
-      width: 45%;
-      margin-top: 5px;
+      margin: 0 !important;
+      width: 48% !important;
+      margin-top: 5px !important;
     }
   }
 `

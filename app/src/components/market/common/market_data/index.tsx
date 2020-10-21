@@ -23,6 +23,7 @@ const MarketDataWrapper = styled.div`
     flex-direction: column;
     margin-bottom: 0;
     & > * + * {
+      margin-top: 12px;
       margin-left: 0;
     }
   }
@@ -39,11 +40,6 @@ const MarketDataItem = styled.div`
     width: 100%;
     flex-direction: row-reverse;
     height: 16px;
-    margin-bottom: 12px;
-
-    &:nth-of-type(3) {
-      margin-bottom: 0;
-    }
   }
 `
 
