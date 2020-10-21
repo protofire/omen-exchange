@@ -150,7 +150,7 @@ const AskQuestionStep = (props: Props) => {
   const history = useHistory()
   const [isImport, setIsImport] = useState(!!loadedQuestionId)
 
-  const totalProbabilities = outcomes.reduce((total, cur) => total + cur.probability, 0)
+  const totalProbabilities = outcomes.reduce((total, cur) => total + (cur.probability ? cur.probability : 0), 0)
   const totalProbabilitiesNotFull = Math.abs(totalProbabilities - 100) > 0.000001
   const outcomeNames = outcomes.map(outcome => outcome.name)
   const isContinueButtonDisabled =
@@ -189,31 +189,26 @@ const AskQuestionStep = (props: Props) => {
     <CreateCard style={{ paddingTop: 20, paddingBottom: 20 }}>
       <CategoryImportWrapper>
         <FormStateButton active={!isImport} onClick={() => setIsImport(false)}>
-          Categorical
+          Categorical Market
         </FormStateButton>
-
-        {!loadedQuestionId && (
-          <FormStateButton active={isImport} onClick={() => setIsImport(true)}>
-            Import Market
-          </FormStateButton>
-        )}
-        {!!loadedQuestionId && (
-          <FormStateButton
-            active
-            onClick={() => {
-              setIsImport(false)
-              handleClearQuestion()
-            }}
-          >
-            Clear Market
-          </FormStateButton>
-        )}
+        <FormStateButton
+          active={isImport}
+          onClick={() => {
+            setIsImport(true)
+          }}
+        >
+          Import Market
+        </FormStateButton>
       </CategoryImportWrapper>
       {isImport ? (
         <ImportMarketContent
           context={context}
+          handleClearQuestion={handleClearQuestion}
+          handleOutcomesChange={handleOutcomesChange}
           loadedQuestionId={loadedQuestionId}
           onSave={handleQuestionChange}
+          outcomes={outcomes}
+          totalProbabilities={totalProbabilities}
         ></ImportMarketContent>
       ) : (
         <>
