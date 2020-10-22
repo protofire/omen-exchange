@@ -5,7 +5,7 @@ import React, { DOMAttributes, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
-import { formatBigNumber, formatDate, formatNumber } from '../../../../util/tools'
+import { formatBigNumber, formatDate, formatToShortNumber } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
 import { TextToggle } from '../TextToggle'
 
@@ -101,14 +101,14 @@ export const MarketData: React.FC<Props> = props => {
     <MarketDataWrapper>
       <MarketDataItem>
         <MarketDataItemTop>
-          {formatNumber(liquidity)} {currency.symbol}
+          {formatToShortNumber(liquidity)} {currency.symbol}
         </MarketDataItemTop>
         <MarketDataItemBottom>Liquidity</MarketDataItemBottom>
       </MarketDataItem>
       <MarketDataItem>
         <MarketDataItemTop>
           <MarketDataItemImage src={currencyIcon && currencyIcon}></MarketDataItemImage>
-          {show24H ? formatNumber(dailyVolume) : formatNumber(totalVolume)} {currency.symbol}
+          {show24H ? formatToShortNumber(dailyVolume) : formatToShortNumber(totalVolume)} {currency.symbol}
         </MarketDataItemTop>
         <TextToggle
           alternativeLabel="24h Volume"
