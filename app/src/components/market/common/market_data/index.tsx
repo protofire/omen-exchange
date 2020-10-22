@@ -21,9 +21,9 @@ const MarketDataWrapper = styled.div`
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-direction: column;
-    margin-bottom: 0;
+    margin-bottom: 20px;
     & > * + * {
-      margin-top: 12px;
+      margin-top: 13px;
       margin-left: 0;
     }
   }

@@ -11,14 +11,13 @@ const AdditionalMarketDataWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-left: -26px;
+  margin-left: -25px;
   width: ${props => props.theme.mainContainer.maxWidth};
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-direction: column;
-    width: calc(100% + 26px * 2);
+    width: calc(100% + 25px * 2);
     height: auto;
-    border-top: none;
   }
 `
 
@@ -32,13 +31,13 @@ const AdditionalMarketDataLeft = styled.div`
   }
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-wrap: wrap !important;
-    justify-content: space-between !important;
     width: 100%;
     padding: 14px 24px;
+    padding-bottom: 4px;
     & > * {
       margin: 0 !important;
-      width: 48% !important;
-      margin-top: 5px !important;
+      margin-right: 22px !important;
+      margin-bottom: 10px !important;
     }
   }
 `
@@ -105,13 +104,11 @@ export const AdditionalMarketData: React.FC<Props> = props => {
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
 
-  const isMobile = window.innerWidth < 768
-
   return (
     <AdditionalMarketDataWrapper>
       <AdditionalMarketDataLeft>
         <AdditionalMarketDataSectionWrapper href={`/#/24h-volume/category/${encodeURI(category)}`} noColorChange={true}>
-          <IconCategory size={isMobile ? '20' : '24'} />
+          <IconCategory size={'24'} />
           <AdditionalMarketDataSectionTitle>{category}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
         <AdditionalMarketDataSectionWrapper
@@ -121,7 +118,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           rel="noopener noreferrer"
           target="_blank"
         >
-          <IconOracle size={isMobile ? '20' : '24'} />
+          <IconOracle size={'24'} />
           <AdditionalMarketDataSectionTitle>{oracle}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
         <AdditionalMarketDataSectionWrapper
@@ -131,11 +128,11 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           rel="noopener noreferrer"
           target="_blank"
         >
-          <IconArbitrator size={isMobile ? '20' : '24'} />
+          <IconArbitrator size={'24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
         <AdditionalMarketDataSectionDivWrapper>
-          {verified ? <IconVerified size={isMobile ? '20' : '24'} /> : <IconAlert size={isMobile ? '20' : '24'} />}
+          {verified ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
           <AdditionalMarketDataSectionTitle isError={!verified}>
             {verified ? 'Verified' : 'Not Verified'}
           </AdditionalMarketDataSectionTitle>
