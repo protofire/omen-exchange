@@ -55,12 +55,6 @@ const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
   }
 `
 
-const AdditionalMarketDataSectionDivWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-`
-
 const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean }>`
   display: flex;
   align-items: center;
@@ -101,6 +95,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 
 export const AdditionalMarketData: React.FC<Props> = props => {
   const { arbitrator, category, id, oracle, verified } = props
+  console.log(verified)
   const realitioBaseUrl = useRealityLink()
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
@@ -134,12 +129,12 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <IconArbitrator size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionDivWrapper>
+        <AdditionalMarketDataSectionWrapper>
           {verified ? <IconVerified size={isMobile ? '20' : '24'} /> : <IconAlert size={isMobile ? '20' : '24'} />}
           <AdditionalMarketDataSectionTitle isError={!verified}>
             {verified ? 'Verified' : 'Not Verified'}
           </AdditionalMarketDataSectionTitle>
-        </AdditionalMarketDataSectionDivWrapper>
+        </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>
       <ReactTooltip
         className="customMarketTooltip"

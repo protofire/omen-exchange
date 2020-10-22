@@ -18,14 +18,16 @@ interface Props {
 const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { marketMakerData } = props
-
+  console.log(props, 'closed')
   const {
     address,
     answerFinalizedTimestamp,
     arbitrator,
     collateral: collateralToken,
     collateralVolume,
-    curatedByDxDaoOrKleros: isVerified,
+    curatedByDxDao,
+    curatedByDxDaoOrKleros,
+    klerosTCRregistered,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
@@ -83,7 +85,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         category={question.category}
         id={question.id}
         oracle="Reality"
-        verified={isVerified}
+        verified={klerosTCRregistered || curatedByDxDaoOrKleros || curatedByDxDao}
       ></AdditionalMarketData>
     </>
   )
