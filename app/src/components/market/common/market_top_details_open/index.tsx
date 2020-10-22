@@ -17,7 +17,7 @@ interface Props {
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const [showingProgressBar, setShowingProgressBar] = useState(false)
-  console.log(props)
+
   const { marketMakerData, title } = props
   const {
     address,
