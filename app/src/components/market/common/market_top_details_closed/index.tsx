@@ -25,9 +25,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     arbitrator,
     collateral: collateralToken,
     collateralVolume,
-
     curatedByDxDaoOrKleros: isVerified,
-
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
