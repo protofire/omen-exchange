@@ -54,14 +54,14 @@ const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
   }
 `
 
-const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean }>`
+const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; isError?: boolean }>`
   display: flex;
   align-items: center;
   cursor: pointer;
 
   &:hover {
     p {
-      color: ${props => props.theme.colors.primaryLight};
+      color: ${props => (props.isError ? props.theme.colors.alert : props.theme.colors.primaryLight)};
     }
     svg {
       circle {

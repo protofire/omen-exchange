@@ -25,9 +25,9 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     arbitrator,
     collateral: collateralToken,
     collateralVolume,
-    curatedByDxDao,
-    curatedByDxDaoOrKleros,
-    klerosTCRregistered,
+
+    curatedByDxDaoOrKleros: isVerified,
+
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
@@ -85,7 +85,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         category={question.category}
         id={question.id}
         oracle="Reality"
-        verified={klerosTCRregistered || curatedByDxDaoOrKleros || curatedByDxDao}
+        verified={isVerified}
       ></AdditionalMarketData>
     </>
   )
