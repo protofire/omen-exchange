@@ -9,7 +9,7 @@ import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
 import { keys, range } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
 
-import { HistoryChart } from './chart'
+import { HistoryChart } from './historySelect'
 
 // This query will return an object where each entry is
 // `fixedProductMarketMaker_X: { outcomeTokenAmounts }`,
