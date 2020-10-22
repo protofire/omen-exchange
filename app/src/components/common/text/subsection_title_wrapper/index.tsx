@@ -7,9 +7,14 @@ const Wrapper = styled.div`
   flex-wrap: wrap;
   justify-content: space-between;
   margin-bottom: 20px;
+  flex-wrap: nowrap;
 
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    flex-wrap: nowrap;
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    align-items: flex-start;
+    flex-direction: column;
+    & > * + * {
+      margin-top: 20px;
+    }
   }
 `
 

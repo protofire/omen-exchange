@@ -8,11 +8,16 @@ import { ThreeDots2 } from './img/three_dots_2'
 import { ThreeDots3 } from './img/three_dots_3'
 
 const ToggleButton = styled(Button)<{ active: boolean }>`
-  height: 36px;
+  height: 40px;
+  border-radius: 8px;
   ${props => props.active && `border: 1px solid ${props.theme.textfield.borderColorActive}`};
 
   &:hover {
     ${props => props.active && `border: 1px solid ${props.theme.textfield.borderColorActive}`};
+  }
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    width: 100%;
   }
 `
 
