@@ -253,7 +253,7 @@ const StartingPointSubtitle = styled.p`
 
 interface Props {
   back: (state: string) => void
-  submit: () => void
+  submit: (isScalar: boolean) => void
   values: {
     collateral: Token
     question: string
@@ -598,11 +598,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             Back
           </LeftButton>
           {!account && (
-            <Button buttonType={ButtonType.primary} onClick={submit}>
+            <Button buttonType={ButtonType.primary} onClick={() => submit(state === 'SCALAR')}>
               Connect Wallet
             </Button>
           )}
-          <ButtonCreate buttonType={ButtonType.secondaryLine} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
+          <ButtonCreate
+            buttonType={ButtonType.secondaryLine}
+            disabled={isCreateMarketbuttonDisabled}
+            onClick={() => submit(state === 'SCALAR')}
+          >
             Create Market
           </ButtonCreate>
         </ButtonContainerFullWidth>

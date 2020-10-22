@@ -16,7 +16,7 @@ import { AskQuestionStep, FundingAndFeeStep, MenuStep } from './steps'
 import { Outcome } from './steps/outcomes'
 
 interface Props {
-  callback: (param: MarketData) => void
+  callback: (param: MarketData, isScalar: boolean) => void
   marketCreationStatus: MarketCreationStatus
   marketMakerAddress: string | null
 }
@@ -260,8 +260,8 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const submit = () => {
-    callback(marketData as MarketData)
+  const submit = (isScalar: boolean) => {
+    callback(marketData as MarketData, isScalar)
   }
 
   const currentStepFn = () => {
@@ -276,7 +276,7 @@ export const MarketWizardCreator = (props: Props) => {
             marketCreationStatus={marketCreationStatus}
             resetTradingFee={resetTradingFee}
             state={currentFormState}
-            submit={() => submit()}
+            submit={submit}
             values={marketData}
           />
         )

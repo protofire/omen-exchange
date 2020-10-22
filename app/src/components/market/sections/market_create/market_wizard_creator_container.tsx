@@ -25,7 +25,7 @@ const MarketWizardCreatorContainer: FC = () => {
   const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(MarketCreationStatus.ready())
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
-  const handleSubmit = async (marketData: MarketData) => {
+  const handleSubmit = async (marketData: MarketData, isScalar: boolean) => {
     try {
       if (!account) {
         setModalState(true)
@@ -33,6 +33,8 @@ const MarketWizardCreatorContainer: FC = () => {
         if (!marketData.resolution) {
           throw new Error('resolution time was not specified')
         }
+
+        if (isScalar) logger.log('scalar boiiii')
 
         setMarketCreationStatus(MarketCreationStatus.creatingAMarket())
 
