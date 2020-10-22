@@ -55,14 +55,14 @@ const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
   }
 `
 
-const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean }>`
+const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; isError?: boolean }>`
   display: flex;
   align-items: center;
   cursor: pointer;
 
   &:hover {
     p {
-      color: ${props => props.theme.colors.primaryLight};
+      color: ${props => (props.isError ? props.theme.colors.alert : props.theme.colors.primaryLight)};
     }
     svg {
       circle {
@@ -129,7 +129,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <IconArbitrator size={isMobile ? '20' : '24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper>
+        <AdditionalMarketDataSectionWrapper isError={!verified}>
           {verified ? <IconVerified size={isMobile ? '20' : '24'} /> : <IconAlert size={isMobile ? '20' : '24'} />}
           <AdditionalMarketDataSectionTitle isError={!verified}>
             {verified ? 'Verified' : 'Not Verified'}

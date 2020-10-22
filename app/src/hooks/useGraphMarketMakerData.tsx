@@ -40,6 +40,8 @@ const query = gql`
       arbitrationOccurred
       currentAnswerTimestamp
       runningDailyVolumeByHour
+      curatedByDxDao
+      curatedByDxDaoOrKleros
       question {
         id
         data
