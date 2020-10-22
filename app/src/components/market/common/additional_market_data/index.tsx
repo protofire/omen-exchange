@@ -94,7 +94,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 
 export const AdditionalMarketData: React.FC<Props> = props => {
   const { arbitrator, category, id, oracle, verified } = props
-  console.log(verified)
+
   const realitioBaseUrl = useRealityLink()
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
