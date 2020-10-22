@@ -72,6 +72,7 @@ export interface Token {
   decimals: number
   symbol: string
   image?: string
+  volume?: string
 }
 
 export interface QuestionLog {
@@ -254,7 +255,9 @@ export type GraphResponseTopCategories = {
 
 export type GraphMarketMakerDataItem = {
   id: string
+  creationTimestamp: string
   collateralVolume: string
+  lastActiveDay: number
   collateralToken: string
   outcomeTokenAmounts: string[]
   title: string
@@ -265,8 +268,10 @@ export type GraphMarketMakerDataItem = {
   templateId: string
   usdLiquidityParameter: string
   curatedByDxDao: boolean
+  scaledLiquidityParameter: string
   klerosTCRregistered: boolean
   curatedByDxDaoOrKleros: boolean
+  runningDailyVolumeByHour: BigNumber[]
 }
 
 export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
@@ -281,8 +286,10 @@ export type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMy
 
 export type MarketMakerDataItem = {
   address: string
+  creationTimestamp: string
   collateralVolume: BigNumber
   collateralToken: string
+  lastActiveDay: number
   outcomeTokenAmounts: BigNumber[]
   title: string
   outcomes: Maybe<string[]>
@@ -292,8 +299,10 @@ export type MarketMakerDataItem = {
   templateId: number
   usdLiquidityParameter: number
   curatedByDxDao: boolean
+  scaledLiquidityParameter: number
   klerosTCRregistered: boolean
   curatedByDxDaoOrKleros: boolean
+  runningDailyVolumeByHour: BigNumber[]
 }
 
 export type BuildQueryType = MarketFilters & {
