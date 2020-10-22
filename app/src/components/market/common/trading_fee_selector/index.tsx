@@ -51,7 +51,6 @@ export const TradingFeeSelector: React.FC<Props> = props => {
         items={tradingFeeDropdownItems}
         maxHeight={true}
         selected={false}
-        showScrollbar={true}
       />
     </Wrapper>
   )

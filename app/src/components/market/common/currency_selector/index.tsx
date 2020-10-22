@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components'
 
 import { ConnectedWeb3Context, useTokens } from '../../../../hooks'
 import { Token } from '../../../../util/types'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
+import { Dropdown, DropdownItemProps, DropdownPosition, DropdownVariant } from '../../../common/form/dropdown'
 import { Spinner } from '../../../common/spinner'
 import { TokenItem } from '../token_item'
 
@@ -74,12 +74,12 @@ export const CurrencySelector: React.FC<Props> = props => {
       <CurrencyDropdown
         currentItem={currentItem}
         disabled={disabled}
-        dropdownPosition={DropdownPosition.right}
+        dropdownPosition={DropdownPosition.center}
+        dropdownVariant={DropdownVariant.card}
         items={currencyDropdownData}
         maxHeight={true}
         placeholder={currency && currentItem === undefined ? <Spinner height={'18px'} width={'18px'} /> : placeholder}
         selected={false}
-        showScrollbar={true}
       />
     </Wrapper>
   )

@@ -58,8 +58,8 @@ const theme = {
     buttonColorHover: '#37474F',
     dropdownItems: {
       backgroundColor: '#fff',
-      borderColor: '#ECEFF1',
-      borderRadius: '16px',
+      borderColor: '#E8EAF6',
+      borderRadius: '12px',
       boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.12)',
       item: {
         backgroundColor: 'transparent',

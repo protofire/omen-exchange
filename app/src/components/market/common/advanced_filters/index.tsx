@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork } from '../../../../util/networks'
 import { CurationSource } from '../../../../util/types'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
+import { Dropdown, DropdownItemProps, DropdownPosition, DropdownVariant } from '../../../common/form/dropdown'
 import { CurrencySelector } from '../../common/currency_selector'
 
 import { DxDao } from './img/dxDao'
@@ -167,6 +167,7 @@ export const AdvancedFilters = (props: Props) => {
           currentItem={arbitrators.findIndex(t => t.address === arbitrator)}
           dirty={true}
           dropdownPosition={DropdownPosition.center}
+          dropdownVariant={DropdownVariant.card}
           items={arbitratorOptions}
         />
       </Column>
@@ -181,7 +182,8 @@ export const AdvancedFilters = (props: Props) => {
               CurationSource.NO_SOURCES,
             ].findIndex(t => t === curationSource)}
             dirty={true}
-            dropdownPosition={DropdownPosition.right}
+            dropdownPosition={DropdownPosition.center}
+            dropdownVariant={DropdownVariant.card}
             items={curationSourceOptions}
           />
         </Column>
