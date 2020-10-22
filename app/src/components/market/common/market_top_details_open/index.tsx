@@ -19,7 +19,6 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const [showingProgressBar, setShowingProgressBar] = useState(false)
 
   const { marketMakerData, title } = props
-
   const {
     address,
     answerFinalizedTimestamp,
