@@ -72,6 +72,7 @@ export interface Token {
   decimals: number
   symbol: string
   image?: string
+  volume?: string
 }
 
 export interface QuestionLog {

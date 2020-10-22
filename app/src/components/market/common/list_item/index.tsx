@@ -8,7 +8,7 @@ import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
 import { calcPrice, formatBigNumber, formatNumber } from '../../../../util/tools'
-import { MarketMakerDataItem } from '../../../../util/types'
+import { MarketMakerDataItem, Token } from '../../../../util/types'
 import { IconStar } from '../../../common/icons/IconStar'
 
 const Wrapper = styled(NavLink)`
@@ -90,18 +90,16 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     title,
   } = market
 
-  let token
-  let tokenVolume
+  let token: Token | undefined
   try {
-    token = getTokenFromAddress(context.networkId, collateralToken)
-    tokenVolume = formatBigNumber(collateralVolume, token.decimals)
+    const tokenInfo = getTokenFromAddress(context.networkId, collateralToken)
+    const volume = formatBigNumber(collateralVolume, tokenInfo.decimals)
+    token = { ...tokenInfo, volume }
   } catch (err) {
-    logger.error(err.message)
+    logger.debug(err.message)
   }
 
-  const [volume, setVolume] = useState(tokenVolume || '')
-  const [symbol, setSymbol] = useState(token ? token.symbol : '')
-  const [decimals, setDecimals] = useState(token ? token.decimals : undefined)
+  const [{ decimals, symbol, volume }, setDetails] = useState(token || { decimals: 0, symbol: '', volume: '' })
 
   const now = moment()
   const endDate = openingTimestamp
@@ -115,20 +113,18 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     const setToken = async () => {
-      if (!symbol) {
+      if (!token) {
         // fallback to token service if unknown token
         const erc20Service = new ERC20Service(provider, account, collateralToken)
         const { decimals, symbol } = await erc20Service.getProfileSummary()
         const volume = formatBigNumber(collateralVolume, decimals)
 
-        setDecimals(decimals)
-        setVolume(volume)
-        setSymbol(symbol)
+        setDetails({ symbol, decimals, volume })
       }
     }
 
     setToken()
-  }, [account, collateralToken, collateralVolume, provider, context.networkId, symbol])
+  }, [account, collateralToken, collateralVolume, provider, context.networkId, token])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
@@ -143,7 +139,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Closed ${endsText} ago`}</span>
         <Separator>|</Separator>
         <span>
-          {currentFilter.sortBy === 'usdVolume' && `${formatNumber(volume)} ${symbol} - Volume`}
+          {currentFilter.sortBy === 'usdVolume' && volume && `${formatNumber(volume)} ${symbol} - Volume`}
           {currentFilter.sortBy === 'openingTimestamp' &&
             `${resolutionDate} - ${moment(endDate).isAfter(now) ? 'Closing' : 'Closed'}`}
           {currentFilter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` &&
