@@ -14,6 +14,7 @@ import {
   computeBalanceAfterTrade,
   divBN,
   formatNumber,
+  formatToShortNumber,
   getIndexSets,
   limitDecimalPlaces,
   truncateStringInTheMiddle as truncate,
@@ -375,6 +376,22 @@ describe('tools', () => {
     for (const [[number, decimals], result] of testCases) {
       it('should return the correct numerical string', () => {
         const formattedNumber = formatNumber(number, decimals)
+
+        expect(formattedNumber).toStrictEqual(result)
+      })
+    }
+  })
+
+  describe('formatToShortNumber', () => {
+    const testCases: [[string, number], string][] = [
+      [['1234567.8910', 2], '1.23M'],
+      [['0', 8], '0'],
+      [['4269.123123222334', 0], '4K'],
+      [['20100', 2], '20.1K'],
+    ]
+    for (const [[number, decimals], result] of testCases) {
+      it('should return the correct numerical string', () => {
+        const formattedNumber = formatToShortNumber(number, decimals)
 
         expect(formattedNumber).toStrictEqual(result)
       })
