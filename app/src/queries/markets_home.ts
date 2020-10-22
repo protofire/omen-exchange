@@ -7,7 +7,11 @@ export const MarketDataFragment = gql`
     id
     collateralVolume
     collateralToken
+    creationTimestamp
+    lastActiveDay
     outcomeTokenAmounts
+    runningDailyVolumeByHour
+    scaledLiquidityParameter
     title
     outcomes
     openingTimestamp
