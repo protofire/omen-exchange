@@ -6,6 +6,7 @@ import styled, { css } from 'styled-components'
 import { calcPrice } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { Button, ButtonSelectable } from '../../../button'
+import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
 import { InlineLoading } from '../../../loading'
 
 import { Chart } from './chart'
@@ -16,6 +17,9 @@ const commonWrapperCSS = css`
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};
   width: auto;
+`
+const DropdownMenu = styled(Dropdown)`
+  margin-left: auto;
 `
 
 const NoData = styled.div`
@@ -106,7 +110,7 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
         return { ...outcomesPrices, date: timestampToDate(h.block.timestamp, value) }
       })
   const [toogleSelect, setToogleSelect] = useState(true)
-
+  const DropdownItems = ['liquidity', 'assets']
   if (!data) {
     return <CustomInlineLoading message="Loading Trade History" />
   }
@@ -131,6 +135,9 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
               )
             })}
           </ButtonsWrapper>
+        )}
+        {toogleSelect && (
+          <DropdownMenu dropdownPosition={DropdownPosition.right} items={DropdownItems} placeholder={'All'} />
         )}
       </TitleWrapper>
       {toogleSelect ? <MarketTable /> : <Chart data={data} outcomes={outcomes} />}
