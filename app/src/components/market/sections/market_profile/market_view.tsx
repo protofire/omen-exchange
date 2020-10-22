@@ -25,10 +25,7 @@ interface Props {
 const MarketView: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
 
-  const { curatedByDxDao, isQuestionFinalized, klerosTCRregistered, oracle, question } = marketMakerData
-
-  const context = useConnectedWeb3Context()
-  const { networkId } = context
+  const { isQuestionFinalized, question } = marketMakerData
 
   const renderView = () => {
     let realitioProxy
@@ -61,12 +58,7 @@ const MarketView: React.FC<Props> = (props: Props) => {
       <Helmet>
         <title>{`${question.title} - ${DOCUMENT_TITLE}`}</title>
       </Helmet>
-      <SectionTitle
-        goBack={true}
-        textAlign={TextAlign.left}
-        title={question.title}
-        verified={curatedByDxDao || klerosTCRregistered}
-      />
+      <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       {renderView()}
     </>
   )

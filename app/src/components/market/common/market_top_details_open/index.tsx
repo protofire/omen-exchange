@@ -17,7 +17,7 @@ interface Props {
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const [showingProgressBar, setShowingProgressBar] = useState(false)
-
+  console.log(props)
   const { marketMakerData, title } = props
   const {
     address,
@@ -25,7 +25,9 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     arbitrator,
     collateral,
     collateralVolume,
-    curatedByDxDaoOrKleros: isVerified,
+    curatedByDxDao,
+    curatedByDxDaoOrKleros,
+    klerosTCRregistered,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
@@ -98,7 +100,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         category={question.category}
         id={question.id}
         oracle="Reality"
-        verified={isVerified}
+        verified={klerosTCRregistered || curatedByDxDaoOrKleros || curatedByDxDao}
       ></AdditionalMarketData>
     </>
   )
