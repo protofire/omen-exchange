@@ -18,7 +18,7 @@ interface Props {
 const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { marketMakerData } = props
-  console.log(props, 'closed')
+
   const {
     address,
     answerFinalizedTimestamp,
