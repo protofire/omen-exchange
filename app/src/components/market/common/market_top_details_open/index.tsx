@@ -16,7 +16,6 @@ interface Props {
 
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-
   const [showingProgressBar, setShowingProgressBar] = useState(false)
 
   const { marketMakerData, title } = props
@@ -25,6 +24,8 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     answerFinalizedTimestamp,
     arbitrator,
     collateral,
+    collateralVolume,
+    curatedByDxDaoOrKleros: isVerified,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
@@ -34,9 +35,14 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
     ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
     : ''
+
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
   const currentTimestamp = new Date().getTime()
+
+  const formattedLiquidity: string = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.scaledLiquidityParameter.toFixed(2)
+    : '0'
 
   // const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
   const isPendingArbitration = question.isPendingArbitration
@@ -80,8 +86,10 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         ></ProgressBar>
       )}
       <MarketData
+        collateralVolume={collateralVolume}
         currency={collateral}
         lastActiveDay={lastActiveDay}
+        liquidity={formattedLiquidity}
         resolutionTimestamp={question.resolution}
         runningDailyVolumeByHour={runningDailyVolumeByHour}
       ></MarketData>
@@ -89,7 +97,8 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         arbitrator={arbitrator}
         category={question.category}
         id={question.id}
-        oracle="Reality.eth"
+        oracle="Reality"
+        verified={isVerified}
       ></AdditionalMarketData>
     </>
   )

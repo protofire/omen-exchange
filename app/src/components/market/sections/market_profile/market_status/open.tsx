@@ -18,6 +18,7 @@ import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_l
 import { MarketSellContainer } from '../../market_sell/market_sell_container'
 
 const TopCard = styled(ViewCard)`
+  padding: 24px;
   padding-bottom: 0;
   margin-bottom: 24px;
 `
