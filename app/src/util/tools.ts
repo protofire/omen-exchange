@@ -344,3 +344,20 @@ export const formatNumber = (number: string, decimals = 2): string => {
 
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }
+
+export const formatToShortNumber = (number: string, decimals = 2): string => {
+  if (number.length < 1) {
+    return '0'
+  }
+
+  const units = ['', 'K', 'M', 'B', 'T']
+  let unitIndex = 0
+  let rNumber = parseFloat(number)
+
+  while (rNumber >= 1000 && unitIndex < 5) {
+    unitIndex += 1
+    rNumber = rNumber / 1000
+  }
+
+  return `${parseFloat(rNumber.toFixed(decimals))}${units[unitIndex]}`
+}
