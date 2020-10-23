@@ -74,6 +74,7 @@ type Props = {
   options: Period[]
   outcomes: string[]
   value: Period
+  marketMakerAddress: string
 }
 
 const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
@@ -96,7 +97,14 @@ const timestampToDate = (timestamp: number, value: string) => {
   return ts.format('MMM D')
 }
 
-export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options, outcomes, value }) => {
+export const HistoryChart: React.FC<Props> = ({
+  holdingSeries,
+  marketMakerAddress,
+  onChange,
+  options,
+  outcomes,
+  value,
+}) => {
   const data =
     holdingSeries &&
     holdingSeries
@@ -140,7 +148,11 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
           <DropdownMenu dropdownPosition={DropdownPosition.right} items={DropdownItems} placeholder={'All'} />
         )}
       </TitleWrapper>
-      {toogleSelect ? <MarketTable /> : <Chart data={data} outcomes={outcomes} />}
+      {toogleSelect ? (
+        <MarketTable marketMakerAddress={marketMakerAddress} />
+      ) : (
+        <Chart data={data} outcomes={outcomes} />
+      )}
     </ChartWrapper>
   )
 }

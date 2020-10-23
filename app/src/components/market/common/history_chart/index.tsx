@@ -137,6 +137,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
   return hidden ? null : (
     <HistoryChart
       holdingSeries={holdingsSeries}
+      marketMakerAddress={marketMakerAddress}
       onChange={setPeriod}
       options={keys(mapPeriod)}
       outcomes={outcomes}

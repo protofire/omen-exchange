@@ -1,24 +1,31 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
+import { FpmmTradeDataType, useGraphFpmmTradesFromQuestion } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
 import { Button } from '../../../button'
+import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
 
 const TableWrapper = styled.div`
   text-align: left;
 `
-const Row = styled.div<{ width: string }>`
+const Row = styled.div<{ width: string; firstRow?: boolean }>`
   width: ${props => props.width}%;
   padding-top: 0px;
   align-self: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 10px;
   &:first-child {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    padding-right: 10px;
+    svg {
+      margin-right: 10px;
+      vertical-align: sub;
+    }
   }
   &:last-child {
+    padding-right: 0px;
     text-align: end;
-    color: #7986cb;
+    color: ${({ firstRow }) => (firstRow ? '' : '#7986cb')};
   }
 `
 const PaginationButton = styled(Button)<{ marginLeft?: string }>`
@@ -55,58 +62,16 @@ const Column = styled.div`
     color: #757575 !important;
   }
 `
+// const ConnectionIconImage = styled(ConnectionIcon)``
+// const Text = styled.div``
+type Props = {
+  marketMakerAddress: string
+}
 
-export const MarketTable = () => {
-  const dummyData = [
-    {
-      id: 1,
-      user: '0x534545222a22345s431',
-      action: 'withdraw',
-      shared: 154,
-      amount: 221,
-      date: '21.10 - 01:00',
-    },
-    {
-      id: 2,
-      user: '0x5345452ddda22345s431',
-      action: 'buy',
-      shared: 121,
-      amount: 178,
-      date: '21.90 - 05:00',
-    },
-    {
-      id: 3,
-      user: '0x5345452ddda22345s431',
-      action: 'sell',
-      shared: 121,
-      amount: 178,
-      date: '21.90 - 05:00',
-    },
-    {
-      id: 4,
-      user: '0x5345452ddda22345s431',
-      action: 'buy',
-      shared: 121,
-      amount: 178,
-      date: '21.90 - 05:00',
-    },
-    {
-      id: 5,
-      user: '0x5345452ddda22345s431',
-      action: 'add Liquidty',
-      shared: 121,
-      amount: 178,
-      date: '21.90 - 05:00',
-    },
-    {
-      id: 6,
-      user: '0x5345452ddda22345s431',
-      action: 'add Liquidty',
-      shared: 121,
-      amount: 178,
-      date: '21.90 - 05:00',
-    },
-  ]
+export const MarketTable: React.FC<Props> = ({ marketMakerAddress }) => {
+  const { fpmmTrade, status } = useGraphFpmmTradesFromQuestion(marketMakerAddress)
+  //const [paginationState, setPaginationState] = useState<FpmmTradeDataType[]>([])
+
   return (
     <React.Fragment>
       <TableWrapper>
@@ -115,19 +80,25 @@ export const MarketTable = () => {
           <Row width={'20'}>Action</Row>
           <Row width={'20'}>Shares/PT</Row>
           <Row width={'18'}>Amount(DAI)</Row>
-          <Row width={'18'}>Date - UTC</Row>
+          <Row firstRow={true} width={'18'}>
+            Date - UTC
+          </Row>
         </Column>
-        {dummyData.map(({ action, amount, date, id, shared, user }) => {
-          return (
-            <Column key={id}>
-              <Row width={'24'}>{user}</Row>
-              <Row width={'20'}>{action}</Row>
-              <Row width={'20'}>{shared}</Row>
-              <Row width={'18'}>{amount}</Row>
-              <Row width={'18'}>{date}</Row>
-            </Column>
-          )
-        })}
+        {fpmmTrade &&
+          fpmmTrade.map(({ collateralAmount, collateralAmountUSD, creationTimestamp, creator, id, type }) => {
+            return (
+              <Column key={id}>
+                <Row width={'24'}>
+                  <ConnectionIcon />
+                  <span>{creator}</span>
+                </Row>
+                <Row width={'20'}>{type}</Row>
+                <Row width={'20'}>{collateralAmount}</Row>
+                <Row width={'18'}>{Number(collateralAmountUSD).toFixed(2)}</Row>
+                <Row width={'18'}>{creationTimestamp}</Row>
+              </Column>
+            )
+          })}
       </TableWrapper>
       <Pagination>
         <PaginationLeft>
