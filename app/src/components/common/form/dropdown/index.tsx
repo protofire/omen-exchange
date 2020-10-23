@@ -138,6 +138,14 @@ const CurrentItem = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  & {
+    svg,
+    img {
+      width: 22px;
+      height: 22px;
+    }
+  }
 `
 
 const CurrentItemExtra = styled.p`
@@ -156,8 +164,8 @@ const DropdownPositionRightCSS = css`
 `
 
 const DropdownPositionCenterCSS = css`
-  left: 0;
-  right: 0;
+  left: -1px;
+  right: -1px;
   top: calc(100% + 8px);
 `
 
@@ -184,7 +192,7 @@ const DropdownVariantCardItemsContainerCSS = css`
 `
 
 const DropdownMaxHeightCSS = css`
-  max-height: 218px;
+  max-height: 172px;
   overflow-y: auto;
 `
 
@@ -260,7 +268,7 @@ const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
       : props.theme.dropdown.dropdownItems.item.color};
   cursor: pointer;
   display: flex;
-  padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '9px 14px' : '12px 17px')};
+  padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '8px 12px' : '8px 12px')};
   margin: ${props => (props.dropdownVariant === DropdownVariant.card ? '0' : '0')};
   border-radius: ${props => (props.dropdownVariant === DropdownVariant.card ? '8px' : '8px')};
 
@@ -272,6 +280,14 @@ const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
         : props.theme.dropdown.dropdownItems.item.backgroundColorHover};
     div {
       color: ${props => props.theme.dropdown.buttonColor};
+    }
+  }
+
+  & {
+    svg,
+    img {
+      width: 24px;
+      height: 24px;
     }
   }
 `

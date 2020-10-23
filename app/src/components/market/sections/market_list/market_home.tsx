@@ -175,7 +175,9 @@ const DisplayButtonWrapper = styled.div`
 `
 
 const DisplayDropdown = styled(Dropdown)`
-  min-width: 170px;
+  .dropdownItems {
+    min-width: auto;
+  }
 `
 
 interface Props {
