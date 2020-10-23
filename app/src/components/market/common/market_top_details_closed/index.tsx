@@ -6,7 +6,6 @@ import { MarketMakerData } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
 import { MarketData } from '../market_data'
-import { MarketTitle } from '../market_title'
 import { ProgressBar } from '../progress_bar'
 import { ProgressBarToggle } from '../progress_bar/toggle'
 
@@ -53,10 +52,10 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   return (
     <>
       <SubsectionTitleWrapper>
-        <MarketTitle templateId={question.templateId} />
         <ProgressBarToggle
           active={showingProgressBar}
           state={'closed'}
+          templateId={question.templateId}
           toggleProgressBar={toggleProgressBar}
         ></ProgressBarToggle>
       </SubsectionTitleWrapper>

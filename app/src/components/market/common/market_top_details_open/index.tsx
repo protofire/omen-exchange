@@ -3,9 +3,9 @@ import React, { useState } from 'react'
 import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
 import { MarketMakerData } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
+import { MoreMenu } from '../../../common/form/more_menu'
 import { AdditionalMarketData } from '../additional_market_data'
 import { MarketData } from '../market_data'
-import { MarketTitle } from '../market_title'
 import { ProgressBar } from '../progress_bar'
 import { ProgressBarToggle } from '../progress_bar/toggle'
 
@@ -18,7 +18,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const [showingProgressBar, setShowingProgressBar] = useState(false)
 
-  const { marketMakerData, title } = props
+  const { marketMakerData } = props
   const {
     address,
     answerFinalizedTimestamp,
@@ -64,15 +64,25 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     setShowingProgressBar(!showingProgressBar)
   }
 
+  const moreMenuItems = [
+    {
+      onClick: () => {
+        alert('fj')
+      },
+      content: 'Clone Market',
+    },
+  ]
+
   return (
     <>
       <SubsectionTitleWrapper>
-        <MarketTitle templateId={question.templateId} title={title} />
         <ProgressBarToggle
           active={showingProgressBar}
           state={marketState}
+          templateId={question.templateId}
           toggleProgressBar={toggleProgressBar}
         ></ProgressBarToggle>
+        <MoreMenu items={moreMenuItems} />
       </SubsectionTitleWrapper>
       {showingProgressBar && (
         <ProgressBar
