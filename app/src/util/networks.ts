@@ -91,7 +91,7 @@ const networks: { [K in NetworkId]: Network } = {
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
       marketMakerFactory: '0x0fB4340432e56c014fa96286de17222822a9281b',
-      conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
+      conditionalTokens: '0x36bede640D19981A82090519bC1626249984c908',
       oracle: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
       klerosBadge: '0x0000000000000000000000000000000000000000',
       klerosTokenView: '0x0000000000000000000000000000000000000000',
