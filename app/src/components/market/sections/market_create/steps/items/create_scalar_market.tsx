@@ -11,7 +11,24 @@ import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
 import { WarningMessage } from '../../../../common/warning_message'
 
-import { ButtonCategory, ButtonCategoryTextOverflow, Column, GridTwoColumns } from './ask_question_step'
+import { ButtonCategory, ButtonCategoryTextOverflow } from './ask_question_step'
+
+const RowWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+const Row = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  & > * {
+    width: calc(50% - 10px);
+    margin-bottom: 0;
+  }
+`
 
 interface Props {
   context: ConnectedWeb3Context
@@ -76,32 +93,32 @@ export const CreateScalarMarket = (props: Props) => {
           />
         }
       />
-      <GridTwoColumns>
-        <Column>
+      <RowWrapper>
+        <Row>
           <FormRow
             formField={<Textfield name="lowerBound" onChange={handleChange} placeholder="0" value={lowerBound} />}
             style={{ marginTop: 0 }}
             title={'Lower Bound'}
           />
           <FormRow
+            formField={<Textfield name="upperBound" onChange={handleChange} placeholder="1000" value={upperBound} />}
+            style={{ marginTop: 0 }}
+            title={'Upper Bound'}
+          />
+        </Row>
+        <Row>
+          <FormRow
             formField={
               <Textfield name="startingPoint" onChange={handleChange} placeholder="500" value={startingPoint} />
             }
             title={'Starting Point'}
           />
-        </Column>
-        <Column>
-          <FormRow
-            formField={<Textfield name="upperBound" onChange={handleChange} placeholder="1000" value={upperBound} />}
-            style={{ marginTop: 0 }}
-            title={'Upper Bound'}
-          />
           <FormRow
             formField={<Textfield name="unit" onChange={handleChange} placeholder="Ether" value={unit} />}
             title={'Unit of measurement'}
           />
-        </Column>
-        <Column>
+        </Row>
+        <Row>
           <FormRow
             formField={
               <DateField
@@ -112,11 +129,9 @@ export const CreateScalarMarket = (props: Props) => {
                 selected={resolution}
               />
             }
-            style={{ marginTop: 0 }}
+            style={{ marginBottom: '20px' }}
             title={'Closing Date (UTC)'}
           />
-        </Column>
-        <Column>
           <FormRow
             formField={
               <ButtonCategory
@@ -129,11 +144,11 @@ export const CreateScalarMarket = (props: Props) => {
                 <ButtonCategoryTextOverflow>{category ? category : 'Select Category'}</ButtonCategoryTextOverflow>
               </ButtonCategory>
             }
-            style={{ marginTop: 0 }}
+            style={{ marginBottom: '20px' }}
             title={'Category'}
           />
-        </Column>
-      </GridTwoColumns>
+        </Row>
+      </RowWrapper>
       {categoryButtonFocus && (
         <Categories
           categories={categoriesCustom}
