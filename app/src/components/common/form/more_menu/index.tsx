@@ -36,7 +36,7 @@ const ItemsContainer = styled.div<{ isOpen: boolean }>`
   border: 1px solid ${({ theme }) => theme.moreMenu.items.border};
   background-color: ${({ theme }) => theme.moreMenu.items.backgroundColor};
   display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
-  padding: 12px 8px;
+  padding: 12px;
   border-radius: 12px;
 `
 
@@ -73,7 +73,7 @@ const Item = styled.div`
   display: flex;
   padding: 12px 17px;
   margin: 0;
-  border-radius: 12px;
+  border-radius: 8px;
   white-space: nowrap;
 
   &:hover {
