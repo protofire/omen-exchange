@@ -127,7 +127,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <IconArbitrator size={'24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionDivWrapper>
+        <AdditionalMarketDataSectionWrapper isError={!verified}>
           {verified ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
           <AdditionalMarketDataSectionTitle isError={!verified}>
             {verified ? 'Verified' : 'Not Verified'}
