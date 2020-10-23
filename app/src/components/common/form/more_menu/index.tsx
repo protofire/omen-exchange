@@ -36,7 +36,7 @@ const ItemsContainer = styled.div<{ isOpen: boolean }>`
   border: 1px solid ${({ theme }) => theme.moreMenu.items.border};
   background-color: ${({ theme }) => theme.moreMenu.items.backgroundColor};
   display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
-  padding: 12px;
+  padding: 8px;
   border-radius: 12px;
 `
 
@@ -68,16 +68,20 @@ const Items = styled.div`
 const Item = styled.div`
   align-items: center;
   justify-content: space-between;
-  color: ${props => props.theme.colors.textColor};
+  color: ${props => props.theme.moreMenu.item.color};
   cursor: pointer;
   display: flex;
-  padding: 12px 17px;
+  padding: 11px 12px;
   margin: 0;
   border-radius: 8px;
   white-space: nowrap;
+  text-align: left;
+  min-width: 147px;
+  font-size: 14px;
+  line-height: 16px;
 
   &:hover {
-    color: ${props => props.theme.moreMenu.item.color};
+    color: ${props => props.theme.moreMenu.item.colorHover};
     background: ${props => props.theme.moreMenu.item.backgroundColorHover};
   }
 `

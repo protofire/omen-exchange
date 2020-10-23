@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
+import { useHistory } from 'react-router'
 
+import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
 import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
 import { MarketMakerData } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
@@ -17,6 +19,7 @@ interface Props {
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const [showingProgressBar, setShowingProgressBar] = useState(false)
+  const history = useHistory()
 
   const { marketMakerData } = props
   const {
@@ -67,9 +70,10 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const moreMenuItems = [
     {
       onClick: () => {
-        alert('fj')
+        localStorage.setItem(IMPORT_QUESTION_ID_KEY, question.id)
+        history.push('/create')
       },
-      content: 'Clone Market',
+      content: 'Import Market',
     },
   ]
 

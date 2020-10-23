@@ -178,7 +178,8 @@ const theme = {
       backgroundColor: 'transparent',
       backgroundColorActive: '#F8F9FC',
       backgroundColorHover: '#F8F9FC',
-      color: '#37474F',
+      color: '#757575',
+      colorHover: '#37474F',
     },
   },
   form: {
