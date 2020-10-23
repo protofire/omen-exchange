@@ -231,8 +231,21 @@ const StartingPointBox = styled.div<{ xValue: number }>`
   flex-direction: column;
   align-items: center;
   bottom: 36px;
-  left: ${props => props.xValue * 100}%;
-  transform: translate(-${props => props.xValue * 100}%, -100%);
+  ${props =>
+    props.xValue <= 0.885
+      ? `left: ${props.xValue <= 0.115 ? `25px` : props.xValue <= 0.885 ? `${props.xValue * 100}%` : ``}`
+      : `right: 25px`}
+  transform: translate(
+    ${props =>
+      props.xValue < 0.5 && props.xValue >= 0.115
+        ? `calc(-50% + 12px)`
+        : props.xValue > 0.5 && props.xValue <= 0.885
+        ? `calc(-50% - 12px)`
+        : props.xValue === 0.5
+        ? `-50%`
+        : `0`},
+    -100%
+  );
   background: white;
 `
 
