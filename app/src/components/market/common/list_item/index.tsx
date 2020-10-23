@@ -7,7 +7,7 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
-import { calcPrice, formatBigNumber, formatNumber } from '../../../../util/tools'
+import { calcPrice, formatBigNumber, formatToShortNumber } from '../../../../util/tools'
 import { MarketMakerDataItem, Token } from '../../../../util/types'
 import { IconStar } from '../../../common/icons/IconStar'
 
@@ -139,16 +139,19 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Closed ${endsText} ago`}</span>
         <Separator>|</Separator>
         <span>
-          {currentFilter.sortBy === 'usdVolume' && volume && `${formatNumber(volume)} ${symbol} - Volume`}
+          {currentFilter.sortBy === 'usdVolume' && `${formatToShortNumber(volume || '')} ${symbol} - Volume`}
           {currentFilter.sortBy === 'openingTimestamp' &&
             `${resolutionDate} - ${moment(endDate).isAfter(now) ? 'Closing' : 'Closed'}`}
           {currentFilter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` &&
             `${
               Math.floor(Date.now() / 86400000) === lastActiveDay && runningDailyVolumeByHour && decimals
-                ? formatBigNumber(runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24], decimals)
+                ? formatToShortNumber(
+                    formatBigNumber(runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24], decimals),
+                  )
                 : 0
             } ${symbol} - 24hr Volume`}
-          {currentFilter.sortBy === 'usdLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
+          {currentFilter.sortBy === 'usdLiquidityParameter' &&
+            `${formatToShortNumber(formattedLiquidity)} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
       </Info>
