@@ -229,7 +229,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     currentFilter.currency || currentFilter.arbitrator || currentFilter.curationSource !== CurationSource.ALL_SOURCES,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
-  const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
+  const [currency, setCurrency] = useState<Maybe<string> | null>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
   const [curationSource, setCurationSource] = useState<CurationSource>(currentFilter.curationSource)
 

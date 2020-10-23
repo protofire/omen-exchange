@@ -55,7 +55,7 @@ interface Props {
   currency: Maybe<string>
   arbitrator: Maybe<string>
   curationSource: CurationSource
-  onChangeCurrency: (currency: Maybe<string>) => void
+  onChangeCurrency: (currency: Maybe<string> | null) => void
   onChangeArbitrator: (arbitrator: Maybe<string>) => void
   onChangeCurationSource: (curationSource: CurationSource) => void
   onChangeTemplateId: (templateId: Maybe<string>) => void
@@ -163,10 +163,11 @@ export const AdvancedFilters = (props: Props) => {
       <Column>
         <Title>Currency</Title>
         <CurrencySelector
+          addAll
           context={context}
           currency={currency}
           disabled={false}
-          onSelect={currency => onChangeCurrency(currency.address)}
+          onSelect={currency => onChangeCurrency(!currency ? null : currency.address)}
           placeholder={currency ? '' : 'All'}
         />
       </Column>

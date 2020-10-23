@@ -262,10 +262,7 @@ const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
     props.active
       ? props.theme.dropdown.dropdownItems.item.backgroundColorActive
       : props.theme.dropdown.dropdownItems.item.backgroundColor};
-  color: ${props =>
-    props.dropdownVariant === DropdownVariant.card && !props.active
-      ? props.theme.colors.textColor
-      : props.theme.dropdown.dropdownItems.item.color};
+  color: ${props => (props.active ? props.theme.colors.textColorDark : props.theme.colors.textColor)};
   cursor: pointer;
   display: flex;
   padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '8px 12px' : '8px 12px')};
