@@ -180,10 +180,10 @@ export type MarketsSortCriteria =
   | 'sort24HourVolume23'
 
 export enum CurationSource {
-  ALL_SOURCES = 'All Sources',
+  ALL_SOURCES = 'Any',
   DXDAO = 'Dxdao',
   KLEROS = 'Kleros',
-  NO_SOURCES = 'No Sources',
+  NO_SOURCES = 'None',
 }
 
 export interface MarketFilters {
