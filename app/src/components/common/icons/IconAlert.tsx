@@ -5,7 +5,7 @@ interface Props {
 }
 
 export const IconAlert = (props: Props) => {
-  const { size } = props
+  const { size = '20' } = props
   return (
     <svg fill="none" height={size} viewBox={`0 0 ${size} ${size}`} width={size} xmlns="http://www.w3.org/2000/svg">
       <path
