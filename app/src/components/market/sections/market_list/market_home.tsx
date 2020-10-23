@@ -534,7 +534,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <BottomContents>
           <DisplayButtonWrapper>
             <DisplayDropdown
-              currentItem={4}
+              currentItem={0}
               dirty={true}
               dropdownPosition={DropdownPosition.center}
               items={sizeItems}
