@@ -198,7 +198,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
             {context.account && (
               <>
                 <HeaderDropdown
-                  dropdownPosition={DropdownPosition.right}
+                  dropdownPosition={DropdownPosition.center}
                   items={headerDropdownItems}
                   placeholder={<Network />}
                 />

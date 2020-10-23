@@ -174,6 +174,10 @@ const DisplayButtonWrapper = styled.div`
   padding: 0 15px 0 25px;
 `
 
+const DisplayDropdown = styled(Dropdown)`
+  min-width: 170px;
+`
+
 interface Props {
   context: ConnectedWeb3Context
   count: number
@@ -527,10 +531,10 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         </ListWrapper>
         <BottomContents>
           <DisplayButtonWrapper>
-            <Dropdown
+            <DisplayDropdown
               currentItem={4}
               dirty={true}
-              dropdownPosition={DropdownPosition.left}
+              dropdownPosition={DropdownPosition.center}
               items={sizeItems}
               placeholder={<Display>Display</Display>}
             />

@@ -146,18 +146,18 @@ const CurrentItemExtra = styled.p`
 `
 
 const DropdownPositionLeftCSS = css`
-  margin-top: 8px;
+  top: calc(100% + 8px);
   left: 0;
 `
 
 const DropdownPositionRightCSS = css`
-  margin-top: 8px;
+  top: calc(100% + 8px);
   right: 0;
 `
 
 const DropdownPositionCenterCSS = css`
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
   top: calc(100% + 8px);
 `
 
@@ -260,7 +260,6 @@ const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
       : props.theme.dropdown.dropdownItems.item.color};
   cursor: pointer;
   display: flex;
-  height: 38px;
   padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '9px 14px' : '12px 17px')};
   margin: ${props => (props.dropdownVariant === DropdownVariant.card ? '0' : '0')};
   border-radius: ${props => (props.dropdownVariant === DropdownVariant.card ? '8px' : '8px')};
@@ -302,7 +301,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 
 export const Dropdown: React.FC<Props> = props => {
   const {
-    currentItem = 0,
+    currentItem = -1,
     dirty = false,
     disabled = false,
     dropdownVariant = DropdownVariant.pill,
