@@ -126,11 +126,8 @@ const CustomDropdownItem = styled.div`
   }
 `
 
-const SecondaryText = styled.span`
-  color: ${props => props.theme.colors.textColorLighter};
-  font-size: 14px;
-  line-height: 1.2;
-  margin-right: 6px;
+const SortDropdown = styled(Dropdown)`
+  min-width: 170px;
 `
 
 const MarketsDropdown = styled(Dropdown)`
@@ -175,6 +172,12 @@ const BottomContents = styled.div`
 
 const DisplayButtonWrapper = styled.div`
   padding: 0 15px 0 25px;
+`
+
+const DisplayDropdown = styled(Dropdown)`
+  .dropdownItems {
+    min-width: auto;
+  }
 `
 
 interface Props {
@@ -226,7 +229,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     currentFilter.currency || currentFilter.arbitrator || currentFilter.curationSource !== CurationSource.ALL_SOURCES,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
-  const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
+  const [currency, setCurrency] = useState<Maybe<string> | null>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
   const [curationSource, setCurationSource] = useState<CurationSource>(currentFilter.curationSource)
 
@@ -384,11 +387,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   const sortItems: Array<DropdownItemProps> = sortOptions.map(item => {
     return {
-      content: (
-        <CustomDropdownItem>
-          <SecondaryText className="sortBy">Sort By</SecondaryText> {item.title}
-        </CustomDropdownItem>
-      ),
+      content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
       onClick: () => {
         setSortBy(item.sortBy)
         setSortByDirection(item.direction)
@@ -398,11 +397,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   const myMarketsSortItems: Array<DropdownItemProps> = myMarketsSortOptions.map(item => {
     return {
-      content: (
-        <CustomDropdownItem>
-          <SecondaryText className="sortBy">Sort By</SecondaryText> {item.title}
-        </CustomDropdownItem>
-      ),
+      content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
       onClick: () => {
         setSortBy(item.sortBy)
         setSortByDirection(item.direction)
@@ -463,10 +458,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
   const showFilteringInlineLoading =
     (!noMarketsAvailable && !noOwnMarkets && isFiltering) || RemoteData.is.loading(markets)
-  const disableLoadNextButton =
-    isFiltering || !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
-  const disableLoadPrevButton =
-    isFiltering || pageIndex === 0 || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
+  const disableLoadNextButton = !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
+  const disableLoadPrevButton = pageIndex === 0 || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
 
   return (
     <>
@@ -479,7 +472,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={categoryItems}
-          showScrollbar={true}
         />
         <MarketsFilterDropdown
           currentItem={filters.findIndex(i => i.state === state)}
@@ -487,7 +479,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={filterItems}
-          showScrollbar={true}
         />
       </Actions>
       <ListCard>
@@ -501,16 +492,15 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
                 <IconFilter />
               </ButtonCircleStyled>
-              <Dropdown
+              <SortDropdown
                 currentItem={
                   fetchMyMarkets
                     ? myMarketsSortOptions.findIndex(i => i.sortBy === sortBy)
                     : sortOptions.findIndex(i => i.sortBy === sortBy)
                 }
                 dirty={true}
-                dropdownPosition={DropdownPosition.right}
+                dropdownPosition={DropdownPosition.center}
                 items={fetchMyMarkets ? myMarketsSortItems : sortItems}
-                placeholder={<SecondaryText>Sort By</SecondaryText>}
               />
             </FiltersControls>
           </FiltersWrapper>
@@ -541,10 +531,10 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         </ListWrapper>
         <BottomContents>
           <DisplayButtonWrapper>
-            <Dropdown
-              currentItem={4}
+            <DisplayDropdown
+              currentItem={0}
               dirty={true}
-              dropdownPosition={DropdownPosition.left}
+              dropdownPosition={DropdownPosition.center}
               items={sizeItems}
               placeholder={<Display>Display</Display>}
             />

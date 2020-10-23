@@ -30,13 +30,14 @@ interface Props {
   currency?: Maybe<string>
   context: ConnectedWeb3Context
   disabled?: boolean
-  onSelect: (currency: Token) => void
+  onSelect: (currency: Token | null) => void
   balance?: string
   placeholder?: Maybe<string>
+  addAll?: boolean
 }
 
 export const CurrencySelector: React.FC<Props> = props => {
-  const { balance, context, currency, disabled, onSelect, placeholder, ...restProps } = props
+  const { addAll = false, balance, context, currency, disabled, onSelect, placeholder, ...restProps } = props
 
   const tokens = useTokens(context)
 
@@ -51,6 +52,19 @@ export const CurrencySelector: React.FC<Props> = props => {
   }
 
   let currentItem: number | undefined
+
+  if (addAll) {
+    currencyDropdownData.push({
+      content: 'All',
+      onClick: () => {
+        if (!disabled) {
+          onSelect(null)
+        }
+      },
+    })
+
+    currentItem = 0
+  }
 
   tokens.forEach(({ address, image, symbol }, index) => {
     currencyDropdownData.push({
@@ -74,12 +88,11 @@ export const CurrencySelector: React.FC<Props> = props => {
       <CurrencyDropdown
         currentItem={currentItem}
         disabled={disabled}
-        dropdownPosition={DropdownPosition.right}
+        dropdownPosition={DropdownPosition.center}
         items={currencyDropdownData}
         maxHeight={true}
         placeholder={currency && currentItem === undefined ? <Spinner height={'18px'} width={'18px'} /> : placeholder}
         selected={false}
-        showScrollbar={true}
       />
     </Wrapper>
   )
