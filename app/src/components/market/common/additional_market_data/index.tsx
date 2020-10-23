@@ -61,14 +61,15 @@ const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; i
 
   &:hover {
     p {
-      color: ${props => (props.isError ? props.theme.colors.alert : props.theme.colors.primaryLight)};
+      color: ${props => (props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight)};
     }
     svg {
       circle {
         stroke: ${props => props.theme.colors.primaryLight};
       }
       path {
-        fill: ${props => (props.noColorChange ? '' : props.theme.colors.primaryLight)};
+        fill: ${props =>
+          props.noColorChange ? '' : props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight};
       }
 
       path:nth-child(even) {
