@@ -133,9 +133,9 @@ export interface MarketData {
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
   verifiedLabel?: string
-  lowerBound: string
-  upperBound: string
-  startingPoint: string
+  lowerBound: Maybe<BigNumber>
+  upperBound: Maybe<BigNumber>
+  startingPoint: Maybe<BigNumber>
   unit: string
 }
 

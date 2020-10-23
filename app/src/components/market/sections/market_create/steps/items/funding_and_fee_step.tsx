@@ -278,9 +278,9 @@ interface Props {
     outcomes: Outcome[]
     loadedQuestionId: Maybe<string>
     verifyLabel?: string
-    lowerBound?: string
-    upperBound?: string
-    startingPoint?: string
+    lowerBound?: Maybe<BigNumber>
+    upperBound?: Maybe<BigNumber>
+    startingPoint?: Maybe<BigNumber>
     unit?: string
   }
   marketCreationStatus: MarketCreationStatus

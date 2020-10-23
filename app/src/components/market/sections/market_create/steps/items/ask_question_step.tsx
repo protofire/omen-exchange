@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled, { css } from 'styled-components'
@@ -8,6 +9,7 @@ import { Arbitrator, Question } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { DateField, FormRow, FormStateButton } from '../../../../../common'
+import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { CommonDisabledCSS } from '../../../../../common/form/common_styled'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
@@ -106,16 +108,16 @@ interface Props {
     arbitratorsCustom: Arbitrator[]
     loadedQuestionId: Maybe<string>
     outcomes: Outcome[]
-    lowerBound: string
-    upperBound: string
-    startingPoint: string
+    lowerBound: Maybe<BigNumber>
+    upperBound: Maybe<BigNumber>
+    startingPoint: Maybe<BigNumber>
     unit: string
   }
   addArbitratorCustom: (arbitrator: Arbitrator) => void
   addCategoryCustom: (category: string) => void
   handleArbitratorChange: (arbitrator: Arbitrator) => any
 
-  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
+  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   handleClearQuestion: () => any
   handleDateChange: (date: Date | null) => any
   handleOutcomesChange: (newOutcomes: Outcome[]) => any

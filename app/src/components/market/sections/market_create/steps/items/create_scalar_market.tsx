@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
@@ -6,6 +7,7 @@ import { ConnectedWeb3Context } from '../../../../../../hooks'
 import { Arbitrator } from '../../../../../../util/types'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { DateField, FormRow, Textfield } from '../../../../../common'
+import { BigNumberInput, BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
@@ -30,15 +32,59 @@ const Row = styled.div`
   }
 `
 
+const NumericalInput = styled(BigNumberInput)`
+  background-color: ${props => props.theme.textfield.backgroundColor};
+  border-color: ${props => props.theme.textfield.borderColor};
+  border-style: ${props => props.theme.textfield.borderStyle};
+  border-width: ${props => props.theme.textfield.borderWidth};
+  border-radius: ${props => props.theme.textfield.borderRadius};
+  color: ${props => props.theme.textfield.color};
+  font-size: ${props => props.theme.textfield.fontSize};
+  font-weight: ${props => props.theme.textfield.fontWeight};
+  line-height: 1.2;
+  height: ${props => props.theme.textfield.height};
+  outline: ${props => props.theme.textfield.outline};
+  padding: ${props => props.theme.textfield.paddingVertical + ' ' + props.theme.textfield.paddingHorizontal};
+  transition: border-color 0.15s ease-in-out;
+  width: 100%;
+
+  &:hover {
+    border-color: ${props => props.theme.textfield.borderColorOnHover};
+  }
+
+  &:active,
+  &:focus {
+    border-color: ${props => props.theme.textfield.borderColorActive};
+  }
+
+  &::placeholder {
+    color: ${props => props.theme.textfield.placeholderColor};
+    font-size: ${props => props.theme.textfield.placeholderFontSize};
+    font-size: ${props => props.theme.textfield.placeholderFontWeight};
+  }
+
+  &:read-only,
+  [readonly] {
+    cursor: not-allowed;
+  }
+
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+  }
+`
+
 interface Props {
   context: ConnectedWeb3Context
-  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
+  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   handleDateChange: (date: Date | null) => any
   question: string
   resolution: Date | null
-  lowerBound: string
-  upperBound: string
-  startingPoint: string
+  lowerBound: Maybe<BigNumber>
+  upperBound: Maybe<BigNumber>
+  startingPoint: Maybe<BigNumber>
   unit: string
   tomorrow: Date
   categoriesCustom: string[]
@@ -96,12 +142,30 @@ export const CreateScalarMarket = (props: Props) => {
       <RowWrapper>
         <Row>
           <FormRow
-            formField={<Textfield name="lowerBound" onChange={handleChange} placeholder="0" value={lowerBound} />}
+            formField={
+              <NumericalInput
+                decimals={0}
+                name="lowerBound"
+                onChange={handleChange}
+                placeholder={'0'}
+                value={lowerBound}
+                valueToDisplay={''}
+              />
+            }
             style={{ marginTop: 0 }}
             title={'Lower Bound'}
           />
           <FormRow
-            formField={<Textfield name="upperBound" onChange={handleChange} placeholder="1000" value={upperBound} />}
+            formField={
+              <NumericalInput
+                decimals={0}
+                name="upperBound"
+                onChange={handleChange}
+                placeholder={'1000'}
+                value={upperBound}
+                valueToDisplay={''}
+              />
+            }
             style={{ marginTop: 0 }}
             title={'Upper Bound'}
           />
@@ -109,7 +173,14 @@ export const CreateScalarMarket = (props: Props) => {
         <Row>
           <FormRow
             formField={
-              <Textfield name="startingPoint" onChange={handleChange} placeholder="500" value={startingPoint} />
+              <NumericalInput
+                decimals={0}
+                name="startingPoint"
+                onChange={handleChange}
+                placeholder={'500'}
+                value={startingPoint}
+                valueToDisplay={''}
+              />
             }
             title={'Starting Point'}
           />

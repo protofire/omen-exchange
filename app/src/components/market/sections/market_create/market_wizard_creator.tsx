@@ -51,9 +51,9 @@ export const MarketWizardCreator = (props: Props) => {
     question: '',
     resolution: null,
     spread: MARKET_FEE,
-    lowerBound: '',
-    upperBound: '',
-    startingPoint: '',
+    lowerBound: null,
+    upperBound: null,
+    startingPoint: null,
     unit: '',
   }
 
