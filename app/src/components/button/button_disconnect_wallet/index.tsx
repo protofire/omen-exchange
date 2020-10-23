@@ -6,8 +6,6 @@ import { FullLoading } from '../../loading/full_loading'
 
 const Button = styled.div`
   flex-grow: 1;
-  margin: -12px -17px;
-  padding: 12px 17px;
   text-align: left;
 `
 

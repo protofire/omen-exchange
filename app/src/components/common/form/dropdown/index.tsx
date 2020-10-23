@@ -1,4 +1,4 @@
-import React, { DOMAttributes, useCallback, useEffect, useState } from 'react'
+import React, { DOMAttributes, useCallback, useEffect, useRef, useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { CardCSS } from '../../card'
@@ -26,12 +26,8 @@ const DropdownOpenCSS = css`
   &,
   &:hover {
     background: ${props => props.theme.colors.mainBodyBackground};
-    border-color: ${props => props.theme.dropdown.buttonBorderColorHover};
+    border-color: ${props => props.theme.dropdown.buttonBorderColorActive};
     z-index: 12345;
-    .currentItem {
-      color: ${props => props.theme.colors.primary};
-      font-weight: 500;
-    }
   }
   .chevronUp {
     display: block;
@@ -46,10 +42,6 @@ const DropdownVariantCardOpenCSS = css`
   &:hover {
     border-color: ${props => props.theme.textfield.borderColorActive};
     z-index: 12345;
-    .currentItem {
-      color: ${props => props.theme.colors.primary};
-      font-weight: 500;
-    }
   }
   .chevronUp {
     display: block;
@@ -72,16 +64,15 @@ const DropdownDisabledCSS = css`
 `
 
 const DropdownVariantPillCSS = css`
-  border-radius: 32px;
-  height: 36px;
-  padding: 0 14px;
+  border-radius: 8px;
+  padding: 8px 16px;
   border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
 `
 
 const DropdownVariantCardCSS = css`
   ${CardCSS}
   flex: 1;
-  padding: 13px 25px;
+  padding: 14px 25px;
   position: relative;
   border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
   text-transform: capitalize;
@@ -140,13 +131,21 @@ const CurrentItem = styled.div`
   flex-shrink: 0;
   font-size: 14px;
   font-weight: normal;
-  height: 20px;
+  height: 22px;
   line-height: 1.2;
   margin: 0 10px 0 0;
   max-width: calc(100% - 20px);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  & {
+    svg,
+    img {
+      width: 22px;
+      height: 22px;
+    }
+  }
 `
 
 const CurrentItemExtra = styled.p`
@@ -155,26 +154,27 @@ const CurrentItemExtra = styled.p`
 `
 
 const DropdownPositionLeftCSS = css`
-  margin-top: 10px;
+  top: calc(100% + 8px);
   left: 0;
 `
 
 const DropdownPositionRightCSS = css`
-  margin-top: 10px;
+  top: calc(100% + 8px);
   right: 0;
 `
 
 const DropdownPositionCenterCSS = css`
-  left: 50%;
-  transform: translateX(-50%);
+  left: -1px;
+  right: -1px;
+  top: calc(100% + 8px);
 `
 
 const DropdownDirectionDownwardsCSS = css`
-  top: calc(100% + 10px);
+  top: calc(100% + 8px);
 `
 
 const DropdownDirectionUpwardsCSS = css`
-  bottom: calc(100% + 10px);
+  bottom: calc(100% + 8px);
 `
 
 const DropdownVariantPillItemsCSS = css`
@@ -192,7 +192,7 @@ const DropdownVariantCardItemsContainerCSS = css`
 `
 
 const DropdownMaxHeightCSS = css`
-  max-height: 218px;
+  max-height: 172px;
   overflow-y: auto;
 `
 
@@ -208,7 +208,7 @@ const ItemsContainer = styled.div<{
   box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
   display: ${props => (props.isOpen ? 'block' : 'none')};
   min-width: 164px;
-  padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '12px 8px' : '12px 0')};
+  padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '9px' : '9px')};
   position: absolute;
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardItemsContainerCSS : '')};
   ${props => (props.dropdownPosition === DropdownPosition.left ? DropdownPositionLeftCSS : '')};
@@ -219,7 +219,6 @@ const ItemsContainer = styled.div<{
 `
 
 const DropdownScrollbarCSS = css`
-  margin-right: 0;
   &::-webkit-scrollbar-track {
     background: ${props => props.theme.slider.idle};
     border-radius: 2px;
@@ -235,14 +234,15 @@ const DropdownScrollbarCSS = css`
 
 const Items = styled.div<{
   dropdownVariant?: DropdownVariant
-  showScrollbar?: boolean
   maxHeight?: boolean
 }>`
   ${props => (props.dropdownVariant === DropdownVariant.pill ? DropdownVariantPillItemsCSS : '')};
-  ${props => props.dropdownVariant === DropdownVariant.card && 'margin-right: -8px'};
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardItemsCSS : '')};
-  ${props => props.showScrollbar && DropdownScrollbarCSS}
+  ${DropdownScrollbarCSS}
   ${props => props.maxHeight && DropdownMaxHeightCSS};
+  & > * + * {
+    margin-top: 6px !important;
+  }
 `
 
 const SecondaryText = styled.div`
@@ -262,16 +262,12 @@ const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
     props.active
       ? props.theme.dropdown.dropdownItems.item.backgroundColorActive
       : props.theme.dropdown.dropdownItems.item.backgroundColor};
-  color: ${props =>
-    props.dropdownVariant === DropdownVariant.card && !props.active
-      ? props.theme.colors.textColor
-      : props.theme.dropdown.dropdownItems.item.color};
+  color: ${props => (props.active ? props.theme.colors.textColorDark : props.theme.colors.textColor)};
   cursor: pointer;
   display: flex;
-  height: 48px;
-  padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '9px 14px' : '12px 17px')};
-  margin: ${props => (props.dropdownVariant === DropdownVariant.card ? '0 8px 0 0' : '0')};
-  border-radius: ${props => (props.dropdownVariant === DropdownVariant.card ? '8px' : '0')};
+  padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '8px 12px' : '8px 12px')};
+  margin: ${props => (props.dropdownVariant === DropdownVariant.card ? '0' : '0')};
+  border-radius: ${props => (props.dropdownVariant === DropdownVariant.card ? '8px' : '8px')};
 
   &:hover {
     color: ${props => props.theme.dropdown.dropdownItems.item.color};
@@ -281,6 +277,14 @@ const Item = styled.div<{ active: boolean; dropdownVariant?: DropdownVariant }>`
         : props.theme.dropdown.dropdownItems.item.backgroundColorHover};
     div {
       color: ${props => props.theme.dropdown.buttonColor};
+    }
+  }
+
+  & {
+    svg,
+    img {
+      width: 24px;
+      height: 24px;
     }
   }
 `
@@ -303,7 +307,6 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   disabled?: boolean
   dropdownPosition?: DropdownPosition | undefined
   dropdownDirection?: DropdownDirection | undefined
-  showScrollbar?: boolean
   items: any
   placeholder?: React.ReactNode | string | undefined
   maxHeight?: boolean
@@ -311,7 +314,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 
 export const Dropdown: React.FC<Props> = props => {
   const {
-    currentItem = 0,
+    currentItem = -1,
     dirty = false,
     disabled = false,
     dropdownVariant = DropdownVariant.pill,
@@ -319,7 +322,6 @@ export const Dropdown: React.FC<Props> = props => {
     dropdownPosition,
     items,
     placeholder,
-    showScrollbar = false,
     maxHeight = false,
     ...restProps
   } = props
@@ -343,6 +345,19 @@ export const Dropdown: React.FC<Props> = props => {
   const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
   const [isDirty, setIsDirty] = useState<boolean>(dirty)
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [dropdownPaddingRight, setDropdownPaddingRight] = useState(8)
+
+  const dropdownItemsRef = useRef<HTMLDivElement>(null)
+  const dropdownContainerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const itemsHeight = dropdownItemsRef?.current?.scrollHeight
+    const containerHeight = dropdownContainerRef?.current?.clientHeight
+    if (itemsHeight && containerHeight) {
+      const isScrollVisible = itemsHeight + 9 * 2 > containerHeight
+      setDropdownPaddingRight(isScrollVisible ? 8 : 0)
+    }
+  }, [isOpen, dropdownItemsRef?.current?.scrollHeight, dropdownContainerRef?.current?.clientHeight])
 
   useEffect(() => {
     setCurrentItemIndex(currentItem)
@@ -399,13 +414,14 @@ export const Dropdown: React.FC<Props> = props => {
           dropdownPosition={dropdownPosition}
           dropdownVariant={dropdownVariant}
           isOpen={isOpen}
-          // onScroll={e => {
-          // if (!!e.target.scrollHeight && e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight) {
-          // reached bottom of picker
-          // }
-          // }}
+          ref={dropdownContainerRef}
         >
-          <Items dropdownVariant={dropdownVariant} maxHeight={maxHeight} showScrollbar={showScrollbar}>
+          <Items
+            dropdownVariant={dropdownVariant}
+            maxHeight={maxHeight}
+            ref={dropdownItemsRef}
+            style={{ paddingRight: dropdownPaddingRight }}
+          >
             {items.map((item: DropdownItemProps, index: string) => {
               return (
                 <Item
