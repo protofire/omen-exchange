@@ -54,6 +54,7 @@ const theme = {
     buttonBackgroundColorHover: '#fff',
     buttonBorderColor: '#DCDFF2',
     buttonBorderColorHover: '#C5CAE9',
+    buttonBorderColorActive: '#9FA8DA',
     buttonColor: '#37474F',
     buttonColorHover: '#37474F',
     dropdownItems: {

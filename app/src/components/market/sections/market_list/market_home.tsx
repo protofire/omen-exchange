@@ -496,7 +496,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                 }
                 dirty={true}
                 dropdownPosition={DropdownPosition.center}
-                dropdownVariant={DropdownVariant.card}
                 items={fetchMyMarkets ? myMarketsSortItems : sortItems}
               />
             </FiltersControls>

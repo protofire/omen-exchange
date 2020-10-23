@@ -26,7 +26,7 @@ const DropdownOpenCSS = css`
   &,
   &:hover {
     background: ${props => props.theme.colors.mainBodyBackground};
-    border-color: ${props => props.theme.dropdown.buttonBorderColorHover};
+    border-color: ${props => props.theme.dropdown.buttonBorderColorActive};
     z-index: 12345;
   }
   .chevronUp {
@@ -65,16 +65,14 @@ const DropdownDisabledCSS = css`
 
 const DropdownVariantPillCSS = css`
   border-radius: 8px;
-  height: 40px;
-  padding: 0 13px;
+  padding: 9px 16px;
   border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
 `
 
 const DropdownVariantCardCSS = css`
   ${CardCSS}
   flex: 1;
-  height: 40px;
-  padding: 9px 13px;
+  padding: 14px 25px;
   position: relative;
   border: 1px solid ${props => props.theme.dropdown.buttonBorderColor};
   text-transform: capitalize;
@@ -133,7 +131,7 @@ const CurrentItem = styled.div`
   flex-shrink: 0;
   font-size: 14px;
   font-weight: normal;
-  height: 20px;
+  height: 21px;
   line-height: 1.2;
   margin: 0 10px 0 0;
   max-width: calc(100% - 20px);

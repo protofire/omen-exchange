@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork } from '../../../../util/networks'
 import { CurationSource } from '../../../../util/types'
-import { Dropdown, DropdownItemProps, DropdownPosition, DropdownVariant } from '../../../common/form/dropdown'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { CurrencySelector } from '../../common/currency_selector'
 
 import { DxDao } from './img/dxDao'
@@ -102,6 +102,19 @@ export const AdvancedFilters = (props: Props) => {
       return item.isSelectionEnabled
     })
     .map(({ address, name }) => {
+      if (name === CurationSource.KLEROS) {
+        return {
+          content: (
+            <CurationSourceWrapper>
+              <LogoWrapper>
+                <Kleros />
+              </LogoWrapper>
+              {name}
+            </CurationSourceWrapper>
+          ),
+          onClick: () => onChangeArbitrator(address),
+        }
+      }
       return {
         content: name,
         onClick: () => onChangeArbitrator(address),
@@ -143,6 +156,8 @@ export const AdvancedFilters = (props: Props) => {
 
   const showQuestionType = false
 
+  const activeArbitratorIndex = arbitrators.findIndex(t => t.address === arbitrator) + 1
+
   return (
     <Wrapper>
       <Column>
@@ -164,16 +179,15 @@ export const AdvancedFilters = (props: Props) => {
       <Column>
         <Title>Arbitrator</Title>
         <Options
-          currentItem={arbitrators.findIndex(t => t.address === arbitrator)}
+          currentItem={activeArbitratorIndex}
           dirty={true}
           dropdownPosition={DropdownPosition.center}
-          dropdownVariant={DropdownVariant.card}
           items={arbitratorOptions}
         />
       </Column>
       {!disableCurationFilter && (
         <Column>
-          <Title>Curation Source</Title>
+          <Title>Verified by</Title>
           <Options
             currentItem={[
               CurationSource.ALL_SOURCES,
@@ -183,7 +197,6 @@ export const AdvancedFilters = (props: Props) => {
             ].findIndex(t => t === curationSource)}
             dirty={true}
             dropdownPosition={DropdownPosition.center}
-            dropdownVariant={DropdownVariant.card}
             items={curationSourceOptions}
           />
         </Column>
