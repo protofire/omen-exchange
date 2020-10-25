@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
-import { FpmmTradeDataType, useGraphFpmmTradesFromQuestion } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
+import { useGraphFpmmTradesFromQuestion } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
 import { Button } from '../../../button'
 import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
 
@@ -62,15 +62,13 @@ const Column = styled.div`
     color: #757575 !important;
   }
 `
-// const ConnectionIconImage = styled(ConnectionIcon)``
-// const Text = styled.div``
+
 type Props = {
   marketMakerAddress: string
 }
 
 export const MarketTable: React.FC<Props> = ({ marketMakerAddress }) => {
   const { fpmmTrade, status } = useGraphFpmmTradesFromQuestion(marketMakerAddress)
-  //const [paginationState, setPaginationState] = useState<FpmmTradeDataType[]>([])
 
   return (
     <React.Fragment>
@@ -84,8 +82,9 @@ export const MarketTable: React.FC<Props> = ({ marketMakerAddress }) => {
             Date - UTC
           </Row>
         </Column>
-        {fpmmTrade &&
-          fpmmTrade.map(({ collateralAmount, collateralAmountUSD, creationTimestamp, creator, id, type }) => {
+        {status === 'Ready' &&
+          fpmmTrade &&
+          fpmmTrade.map(({ collateralAmountUSD, creationTimestamp, creator, id, outcomeTokensTraded, type }) => {
             return (
               <Column key={id}>
                 <Row width={'24'}>
@@ -93,8 +92,8 @@ export const MarketTable: React.FC<Props> = ({ marketMakerAddress }) => {
                   <span>{creator}</span>
                 </Row>
                 <Row width={'20'}>{type}</Row>
-                <Row width={'20'}>{collateralAmount}</Row>
-                <Row width={'18'}>{Number(collateralAmountUSD).toFixed(2)}</Row>
+                <Row width={'20'}>{outcomeTokensTraded}</Row>
+                <Row width={'18'}>{collateralAmountUSD}</Row>
                 <Row width={'18'}>{creationTimestamp}</Row>
               </Column>
             )

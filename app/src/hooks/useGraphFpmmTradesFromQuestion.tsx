@@ -52,7 +52,7 @@ const wrangleResponse = (data: any) => {
   const newFpmmTradesArray = data.map((trade: FpmmTradeData) => {
     return {
       collateralAmount: trade.collateralAmount,
-      collateralAmountUSD: trade.collateralAmountUSD,
+      collateralAmountUSD: Number(trade.collateralAmountUSD).toFixed(2),
       creationTimestamp: trade.creationTimestamp,
       creator: trade.creator.id,
       id: trade.id,
@@ -60,7 +60,7 @@ const wrangleResponse = (data: any) => {
       type: trade.type,
     }
   })
-  // console.log(newFpmmTradesArray)
+
   return newFpmmTradesArray
 }
 
@@ -74,11 +74,12 @@ export const useGraphFpmmTradesFromQuestion = (questionID: string): Result => {
   })
 
   useEffect(() => {
-    if (data) setFpmmTradeData(data.fpmmTrades)
+    if (data) setFpmmTradeData(wrangleResponse(data.fpmmTrades))
   }, [data])
 
+  //setFpmmTradeData(data)
   if (data && data.fpmmTrade) {
-    setFpmmTradeData(wrangleResponse(data.fpmmTrade))
+    setFpmmTradeData(wrangleResponse(data.fpmmTrades))
   }
 
   return {

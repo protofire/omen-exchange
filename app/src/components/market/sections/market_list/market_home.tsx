@@ -565,6 +565,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
                   <IconChevronRight></IconChevronRight>
                 )}
               </ButtonCircleStyled>
+              x
             </LoadMoreWrapper>
           )}
         </BottomContents>
