@@ -124,7 +124,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   arbitrator: Arbitrator
   oracle: string
   id: string
-  klerosTCRregistered: boolean
+  curatedByDxDaoOrKleros: boolean
   curatedByDxDao: boolean
   submissionIDs: KlerosSubmission[]
   ovmAddress: string
@@ -138,8 +138,8 @@ export const AdditionalMarketData: React.FC<Props> = props => {
     arbitrator,
     category,
     curatedByDxDao,
+    curatedByDxDaoOrKleros,
     id,
-    klerosTCRregistered,
     oracle,
     ovmAddress,
     submissionIDs,
@@ -166,7 +166,6 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   queryParams.append('col2', `https://omen.eth.link/#/${address}`)
 
   const submission = submissionIDs.length > 0 && submissionIDs[0]
-  const curatedByDxDaoOrKleros = klerosTCRregistered || curatedByDxDao
   const curateLink = curatedByDxDaoOrKleros
     ? curatedByDxDao
       ? 'https://dxdao.eth.link'

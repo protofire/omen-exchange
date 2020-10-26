@@ -4,10 +4,11 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks'
 import { useKlerosCuration } from '../../../../hooks/useKlerosCuration'
-import { MarketMakerData } from '../../../../util/types'
+import { MarketMakerData, Status } from '../../../../util/types'
 import { Button } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { InlineLoading } from '../../../loading'
+import { GenericError } from '../../common/common_styled'
 
 import { DxDaoCuration } from './option/dxdao_curation'
 import { KlerosCuration } from './option/kleros_curation'
@@ -78,14 +79,18 @@ interface Props extends RouteComponentProps<any> {
 const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   const { context, marketMakerData } = props || {}
   const [selection, setSelection] = useState<number | undefined>()
-  const klerosCurationData = useKlerosCuration(marketMakerData, context)
+  const { data, error, status } = useKlerosCuration(marketMakerData, context)
 
   const selectSource = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.currentTarget
     setSelection(Number(value))
   }, [])
 
-  const { ovmAddress } = klerosCurationData || {}
+  if (status === Status.Loading) return <InlineLoading />
+  const { message: errorMessage } = error || {}
+  if (errorMessage || !data) return <GenericError>{errorMessage || 'Failed to fetch curation data'}</GenericError>
+
+  const { ovmAddress } = data || {}
   const { address, curatedByDxDao, question } = marketMakerData || {}
   const { title } = question || {}
   let requestVerificationLink = 'https://dxdao.eth.link/#/'
@@ -96,11 +101,9 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
     requestVerificationLink = `https://curate.kleros.io/tcr/${ovmAddress}?action=addItem&${queryParams.toString()}`
   }
 
-  if (!klerosCurationData) return <InlineLoading />
-
   return (
     <>
-      <KlerosCuration klerosCurationData={klerosCurationData} option={selection} selectSource={selectSource} />
+      <KlerosCuration klerosCurationData={data} option={selection} selectSource={selectSource} />
       <DxDaoCuration curatedByDxDao={curatedByDxDao} option={selection} selectSource={selectSource} />
       <BottomRow>
         <RightButton buttonType={ButtonType.primaryLine} disabled={typeof selection !== 'number'}>

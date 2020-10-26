@@ -1,5 +1,4 @@
 import { formatEther } from 'ethers/utils'
-import humanizeDuration from 'humanize-duration'
 import moment from 'moment-timezone'
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
@@ -158,15 +157,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
             </BlueLink>{' '}
             to avoid challenges. The <b>{formatEther(submissionDeposit)}</b> ETH security deposit will be reimbursed if
             your submission is accepted. The challenge period lasts{' '}
-            <b>
-              {humanizeDuration(Number(challengePeriodDuration) * 1000, {
-                delimiter: ' and ',
-                largest: 2,
-                round: true,
-                units: ['y', 'mo', 'w', 'd', 'h', 'm'],
-              })}
-            </b>
-            .
+            <b>{moment.duration(Number(challengePeriodDuration) * 1000).humanize()}</b>.
           </DescriptionText>
         </Description>
       )
@@ -209,13 +200,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
       )
       KlerosRightColumn = (
         <CurationRightColumn>
-          Ends in{' '}
-          {humanizeDuration(timeRemaining, {
-            delimiter: ' and ',
-            largest: 2,
-            round: true,
-            units: ['y', 'mo', 'w', 'd', 'h', 'm'],
-          })}
+          Ends in {moment.duration(timeRemaining).humanize()}
           <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
         </CurationRightColumn>
       )
@@ -247,15 +232,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
       )
       KlerosRightColumn = (
         <CurationRightColumn>
-          <b>
-            Ends in{' '}
-            {humanizeDuration(timeRemaining, {
-              delimiter: ' and ',
-              largest: 2,
-              round: true,
-              units: ['y', 'mo', 'w', 'd', 'h', 'm'],
-            })}
-          </b>
+          <b>Ends in {moment.duration(timeRemaining).humanize()}</b>
           <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
         </CurationRightColumn>
       )
