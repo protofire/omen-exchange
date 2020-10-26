@@ -4,14 +4,7 @@ import styled from 'styled-components'
 
 import { useRealityLink } from '../../../../hooks/useRealityLink'
 import { Arbitrator, KlerosItemStatus, KlerosSubmission } from '../../../../util/types'
-import {
-  IconAlert,
-  IconArbitrator,
-  IconCategory,
-  IconExclamation,
-  IconOracle,
-  IconVerified,
-} from '../../../common/icons'
+import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
 
 const AdditionalMarketDataWrapper = styled.div`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
@@ -92,23 +85,6 @@ const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; i
   }
 `
 
-const AdditionalMarketDataSectionWrapperLabel = styled.div`
-  display: flex;
-  align-items: center;
-  margin-left: 20px;
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin-left: 11px;
-    &:nth-of-type(1) {
-      margin-left: 0;
-    }
-  }
-`
-
-const StyledAdditionalMarketSectionTitle = styled(AdditionalMarketDataSectionTitle as any)`
-  ${props => !props.curatedByDxDaoOrKleros && `color: ${props.theme.colors.red}`}
-`
-
 interface Props extends DOMAttributes<HTMLDivElement> {
   category: string
   arbitrator: Arbitrator
@@ -123,24 +99,12 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const {
-    address,
-    arbitrator,
-    category,
-    curatedByDxDao,
-    curatedByDxDaoOrKleros,
-    id,
-    oracle,
-    ovmAddress,
-    submissionIDs,
-    title,
-  } = props
+  const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
 
   const realitioBaseUrl = useRealityLink()
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
 
-  const isMobile = window.innerWidth < 768
   submissionIDs.sort((s1, s2) => {
     if (s1.status === KlerosItemStatus.Registered) return -1
     if (s2.status === KlerosItemStatus.Registered) return 1
@@ -154,17 +118,6 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   const queryParams = new URLSearchParams()
   queryParams.append('col1', title)
   queryParams.append('col2', `https://omen.eth.link/#/${address}`)
-
-  const submission = submissionIDs.length > 0 && submissionIDs[0]
-  const curateLink = curatedByDxDaoOrKleros
-    ? curatedByDxDao
-      ? 'https://dxdao.eth.link'
-      : submission
-      ? `https://curate.kleros.io/tcr/${ovmAddress}/${submission.id}`
-      : ''
-    : ''
-
-  const Icon = curatedByDxDaoOrKleros ? IconVerified : IconExclamation
 
   return (
     <AdditionalMarketDataWrapper>

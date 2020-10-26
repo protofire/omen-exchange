@@ -86,7 +86,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
     setSelection(Number(value))
   }, [])
 
-  if (status === Status.Loading) return <InlineLoading />
+  if (status === Status.Loading && !data) return <InlineLoading />
   const { message: errorMessage } = error || {}
   if (errorMessage || !data) return <GenericError>{errorMessage || 'Failed to fetch curation data'}</GenericError>
 
