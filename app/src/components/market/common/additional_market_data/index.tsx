@@ -4,56 +4,72 @@ import styled from 'styled-components'
 
 import { useRealityLink } from '../../../../hooks/useRealityLink'
 import { Arbitrator } from '../../../../util/types'
-import { IconArbitrator } from '../../../common/icons/IconArbitrator'
-import { IconCategory } from '../../../common/icons/IconCategory'
-import { IconOracle } from '../../../common/icons/IconOracle'
+import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
 
 const AdditionalMarketDataWrapper = styled.div`
-  height: 45px;
   border-top: 1px solid ${props => props.theme.borders.borderDisabled};
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-left: -26px;
+  margin-left: -25px;
   width: ${props => props.theme.mainContainer.maxWidth};
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-direction: column;
-    width: calc(100% + 26px * 2);
+    width: calc(100% + 25px * 2);
     height: auto;
-    border-top: none;
   }
 `
 
 const AdditionalMarketDataLeft = styled.div`
   display: flex;
+  align-items: center;
+  padding: 14px 20px;
+
+  & > * + * {
+    margin-left: 14px;
+  }
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    flex-wrap: wrap !important;
+    width: 100%;
+    padding: 14px 24px;
+    padding-bottom: 4px;
+    & > * {
+      margin: 0 !important;
+      margin-right: 22px !important;
+      margin-bottom: 10px !important;
+    }
+  }
 `
 
-const AdditionalMarketDataSectionTitle = styled.p`
-  margin-left: 6px;
+const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
+  margin: 0;
+  margin-left: 8px;
   font-size: ${props => props.theme.textfield.fontSize};
   line-height: 16px;
-  color: ${props => props.theme.colors.clickable};
+  white-space: nowrap;
+  color: ${({ isError, theme }) => (isError ? theme.colors.alert : theme.colors.clickable)};
   &:first-letter {
     text-transform: capitalize;
   }
 `
-const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean }>`
+
+const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; isError?: boolean }>`
   display: flex;
   align-items: center;
-  margin-left: 24px;
   cursor: pointer;
 
   &:hover {
     p {
-      color: ${props => props.theme.colors.primaryLight};
+      color: ${props => (props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight)};
     }
     svg {
       circle {
         stroke: ${props => props.theme.colors.primaryLight};
       }
       path {
-        fill: ${props => (props.noColorChange ? '' : props.theme.colors.primaryLight)};
+        fill: ${props =>
+          props.noColorChange ? '' : props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight};
       }
 
       path:nth-child(even) {
@@ -74,21 +90,21 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   arbitrator: Arbitrator
   oracle: string
   id: string
+  verified: boolean
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { arbitrator, category, id, oracle } = props
+  const { arbitrator, category, id, oracle, verified } = props
+
   const realitioBaseUrl = useRealityLink()
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
-
-  const isMobile = window.innerWidth < 768
 
   return (
     <AdditionalMarketDataWrapper>
       <AdditionalMarketDataLeft>
         <AdditionalMarketDataSectionWrapper href={`/#/24h-volume/category/${encodeURI(category)}`} noColorChange={true}>
-          <IconCategory size={isMobile ? '20' : '24'} />
+          <IconCategory size={'24'} />
           <AdditionalMarketDataSectionTitle>{category}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
         <AdditionalMarketDataSectionWrapper
@@ -98,7 +114,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           rel="noopener noreferrer"
           target="_blank"
         >
-          <IconOracle size={isMobile ? '20' : '24'} />
+          <IconOracle size={'24'} />
           <AdditionalMarketDataSectionTitle>{oracle}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
         <AdditionalMarketDataSectionWrapper
@@ -108,15 +124,21 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           rel="noopener noreferrer"
           target="_blank"
         >
-          <IconArbitrator size={isMobile ? '20' : '24'} />
+          <IconArbitrator size={'24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
+        </AdditionalMarketDataSectionWrapper>
+        <AdditionalMarketDataSectionWrapper isError={!verified}>
+          {verified ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
+          <AdditionalMarketDataSectionTitle isError={!verified}>
+            {verified ? 'Verified' : 'Not Verified'}
+          </AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>
       <ReactTooltip
         className="customMarketTooltip"
         data-multiline={true}
         effect="solid"
-        offset={{ top: -12 }}
+        offset={{ top: 0 }}
         place="top"
         type="light"
       />

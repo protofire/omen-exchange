@@ -1,10 +1,15 @@
 import React from 'react'
 
-export const IconAlert = () => {
+interface Props {
+  size?: string
+}
+
+export const IconAlert = (props: Props) => {
+  const { size = '20' } = props
   return (
-    <svg fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
+    <svg fill="none" height={size} viewBox={`0 0 ${size} ${size}`} width={size} xmlns="http://www.w3.org/2000/svg">
       <path
-        d="M10.0001 1.66666C5.40008 1.66666 1.66675 5.39999 1.66675 9.99999C1.66675 14.6 5.40008 18.3333 10.0001 18.3333C14.6001 18.3333 18.3334 14.6 18.3334 9.99999C18.3334 5.39999 14.6001 1.66666 10.0001 1.66666ZM10.8334 14.1667H9.16675V12.5H10.8334V14.1667ZM10.8334 10.8333H9.16675V5.83332H10.8334V10.8333Z"
+        d="m12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm1 15h-2v-2h2v2zm0-4h-2v-6h2v6z"
         fill="#E57373"
       />
     </svg>

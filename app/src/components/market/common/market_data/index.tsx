@@ -5,19 +5,27 @@ import React, { DOMAttributes, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
-import { formatBigNumber } from '../../../../util/tools'
+import { formatBigNumber, formatDate, formatToShortNumber } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
+import { TextToggle } from '../TextToggle'
 
 const MarketDataWrapper = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  justify-content: space-between;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
+
+  & > * + * {
+    margin-left: 38px;
+  }
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-direction: column;
-    margin-bottom: 0;
+    margin-bottom: 20px;
+    & > * + * {
+      margin-top: 13px;
+      margin-left: 0;
+    }
   }
 `
 
@@ -27,17 +35,11 @@ const MarketDataItem = styled.div`
   align-items: flex-start;
   justify-content: space-between;
   height: 39px;
-  width: 33.33%;
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     width: 100%;
     flex-direction: row-reverse;
     height: 16px;
-    margin-bottom: 12px;
-
-    &:nth-of-type(3) {
-      margin-bottom: 0;
-    }
   }
 `
 
@@ -62,6 +64,8 @@ const MarketDataItemImage = styled.img`
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
+  collateralVolume: BigNumber
+  liquidity: string
   resolutionTimestamp: Date
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
@@ -69,12 +73,14 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const MarketData: React.FC<Props> = props => {
-  const { currency, lastActiveDay, resolutionTimestamp, runningDailyVolumeByHour } = props
+  const { collateralVolume, currency, lastActiveDay, liquidity, resolutionTimestamp, runningDailyVolumeByHour } = props
 
   const context = useConnectedWeb3Context()
   const tokens = useTokens(context)
 
   const [currencyIcon, setCurrencyIcon] = useState<string | undefined>('')
+  const [showUTC, setShowUTC] = useState<boolean>(true)
+  const [show24H, setShow24H] = useState<boolean>(false)
 
   useEffect(() => {
     const matchingAddress = (token: Token) => token.address.toLowerCase() === currency.address.toLowerCase()
@@ -89,26 +95,46 @@ export const MarketData: React.FC<Props> = props => {
       ? formatBigNumber(runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24], currency.decimals)
       : '0'
 
+  const totalVolume = formatBigNumber(collateralVolume, currency.decimals)
+
   return (
     <MarketDataWrapper>
       <MarketDataItem>
         <MarketDataItemTop>
-          {moment(resolutionTimestamp).format('DD.MM.YYYY - H:mm zz')} {timezoneAbbr}
+          {formatToShortNumber(liquidity)} {currency.symbol}
         </MarketDataItemTop>
-        <MarketDataItemBottom>Closing Date</MarketDataItemBottom>
+        <MarketDataItemBottom>Liquidity</MarketDataItemBottom>
+      </MarketDataItem>
+      <MarketDataItem>
+        <MarketDataItemTop>
+          <MarketDataItemImage src={currencyIcon && currencyIcon}></MarketDataItemImage>
+          {show24H ? formatToShortNumber(dailyVolume) : formatToShortNumber(totalVolume)} {currency.symbol}
+        </MarketDataItemTop>
+        <TextToggle
+          alternativeLabel="24h Volume"
+          isMain={!show24H}
+          mainLabel="Total Volume"
+          onClick={() => setShow24H(value => !value)}
+        />
+      </MarketDataItem>
+      <MarketDataItem>
+        <MarketDataItemTop>
+          {showUTC
+            ? formatDate(resolutionTimestamp, false)
+            : moment(resolutionTimestamp).format('YYYY-MM-DD - H:mm zz')}{' '}
+        </MarketDataItemTop>
+        <TextToggle
+          alternativeLabel={`Closing Date - ${timezoneAbbr}`}
+          isMain={showUTC}
+          mainLabel="Closing Date - UTC"
+          onClick={() => setShowUTC(value => !value)}
+        />
       </MarketDataItem>
       <MarketDataItem>
         <MarketDataItemTop>
           {resolutionTimestamp > new Date() ? moment(resolutionTimestamp).fromNow(true) : '0 days'}
         </MarketDataItemTop>
-        <MarketDataItemBottom>Time remaining</MarketDataItemBottom>
-      </MarketDataItem>
-      <MarketDataItem>
-        <MarketDataItemTop>
-          <MarketDataItemImage src={currencyIcon && currencyIcon}></MarketDataItemImage>
-          {dailyVolume} {currency.symbol}
-        </MarketDataItemTop>
-        <MarketDataItemBottom>24h Trade Volume</MarketDataItemBottom>
+        <MarketDataItemBottom>Remaining</MarketDataItemBottom>
       </MarketDataItem>
     </MarketDataWrapper>
   )

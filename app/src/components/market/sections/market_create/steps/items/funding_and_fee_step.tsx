@@ -257,7 +257,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     setAllowanceFinished(true)
   }
 
-  const onCollateralChange = (token: Token) => {
+  const onCollateralChange = (token: Token | null) => {
+    if (!token) return
     handleCollateralChange(token)
     setAllowanceFinished(false)
   }

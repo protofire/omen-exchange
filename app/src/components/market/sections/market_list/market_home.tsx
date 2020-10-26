@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getLogger } from '../../../../util/logger'
@@ -13,7 +13,6 @@ import {
   MarketsSortCriteria,
 } from '../../../../util/types'
 import { ButtonCircle } from '../../../button'
-import { SectionTitle } from '../../../common'
 import {
   Dropdown,
   DropdownDirection,
@@ -21,10 +20,6 @@ import {
   DropdownPosition,
   DropdownVariant,
 } from '../../../common/form/dropdown'
-import { IconChevronLeft } from '../../../common/icons/IconChevronLeft'
-import { IconChevronLeftDisabled } from '../../../common/icons/IconChevronLeftDisabled'
-import { IconChevronRight } from '../../../common/icons/IconChevronRight'
-import { IconChevronRightDisabled } from '../../../common/icons/IconChevronRightDisabled'
 import { IconFilter } from '../../../common/icons/IconFilter'
 import { IconSearch } from '../../../common/icons/IconSearch'
 import { InlineLoading } from '../../../loading'
@@ -33,22 +28,8 @@ import { ListCard } from '../../common/list_card'
 import { ListItem } from '../../common/list_item'
 import { Search } from '../../common/search'
 
-const SectionTitleMarket = styled(SectionTitle)`
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin-bottom: 0;
-  }
-
-  .titleText {
-    font-size: 18px;
-    @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-      text-align: left;
-      padding-left: 0;
-    }
-  }
-`
-
 const TopContents = styled.div`
-  padding: 25px 25px 20px 25px;
+  padding: 24px;
 `
 
 const FiltersWrapper = styled.div`
@@ -57,7 +38,7 @@ const FiltersWrapper = styled.div`
   justify-content: space-between;
   flex-direction: column;
 
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+  @media (min-width: ${props => props.theme.themeBreakPoints.sm}) {
     flex-direction: row;
   }
 `
@@ -69,21 +50,60 @@ const FiltersControls = styled.div<{ disabled?: boolean }>`
   margin-right: auto;
   pointer-events: ${props => (props.disabled ? 'none' : 'initial')};
 
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+  @media (min-width: ${props => props.theme.themeBreakPoints.sm}) {
     margin-left: 0;
     margin-right: 0;
     padding-left: 10px;
   }
 `
 
-const ButtonCircleStyled = styled(ButtonCircle)<{ disabled?: boolean }>`
+const ButtonRoundActiveCSS = css`
+  &,
+  &:hover {
+    background-color: #fff;
+    border-color: ${props => props.theme.colors.borderColorDark};
+
+    > svg path {
+      fill: ${props => props.theme.colors.textColorDark};
+    }
+  }
+`
+
+const ButtonRoundStyled = styled(ButtonCircle)<{
+  disabled?: boolean
+}>`
+  border-radius: 8px;
+  height: 40px;
+  width: auto;
+  color: ${({ theme }) => theme.colors.textColorDark};
   svg {
     filter: ${props =>
       props.disabled
         ? 'invert(46%) sepia(0%) saturate(1168%) hue-rotate(183deg) brightness(99%) contrast(89%)'
         : 'none'};
   }
-  margin-right: 5px;
+  ${props => props.active && ButtonRoundActiveCSS}
+`
+
+const ButtonSearchStyled = styled(ButtonRoundStyled as any)`
+  width: 40px;
+`
+
+const ButtonFilterStyled = styled(ButtonRoundStyled as any)`
+  padding: 12px 17px;
+  span {
+    font-size: 14px;
+    line-height: 16px;
+  }
+  & > * + * {
+    margin-left: 10px;
+  }
+`
+
+const ButtonPaginationStyled = styled(ButtonRoundStyled as any)`
+  padding: 12px 20px;
+  font-size: 14px;
+  line-height: 16px;
 `
 
 const ListWrapper = styled.div`
@@ -112,6 +132,10 @@ const LoadMoreWrapper = styled.div`
   display: flex;
   justify-content: center;
   padding: 0 25px 0 15px;
+
+  & > * + * {
+    margin-left: 12px;
+  }
 `
 
 const CustomDropdownItem = styled.div`
@@ -126,11 +150,8 @@ const CustomDropdownItem = styled.div`
   }
 `
 
-const SecondaryText = styled.span`
-  color: ${props => props.theme.colors.textColorLighter};
-  font-size: 14px;
-  line-height: 1.2;
-  margin-right: 6px;
+const SortDropdown = styled(Dropdown)`
+  min-width: 170px;
 `
 
 const MarketsDropdown = styled(Dropdown)`
@@ -175,6 +196,23 @@ const BottomContents = styled.div`
 
 const DisplayButtonWrapper = styled.div`
   padding: 0 15px 0 25px;
+`
+
+const DisplayDropdown = styled(Dropdown)`
+  .dropdownItems {
+    min-width: auto;
+  }
+`
+
+const FiltersLeftWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  & > * + * {
+    margin-left: 10px;
+  }
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    margin-bottom: 12px;
+  }
 `
 
 interface Props {
@@ -226,7 +264,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     currentFilter.currency || currentFilter.arbitrator || currentFilter.curationSource !== CurationSource.ALL_SOURCES,
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
-  const [currency, setCurrency] = useState<Maybe<string>>(currentFilter.currency)
+  const [currency, setCurrency] = useState<Maybe<string> | null>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
   const [curationSource, setCurationSource] = useState<CurationSource>(currentFilter.curationSource)
 
@@ -384,11 +422,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   const sortItems: Array<DropdownItemProps> = sortOptions.map(item => {
     return {
-      content: (
-        <CustomDropdownItem>
-          <SecondaryText className="sortBy">Sort By</SecondaryText> {item.title}
-        </CustomDropdownItem>
-      ),
+      content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
       onClick: () => {
         setSortBy(item.sortBy)
         setSortByDirection(item.direction)
@@ -398,11 +432,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   const myMarketsSortItems: Array<DropdownItemProps> = myMarketsSortOptions.map(item => {
     return {
-      content: (
-        <CustomDropdownItem>
-          <SecondaryText className="sortBy">Sort By</SecondaryText> {item.title}
-        </CustomDropdownItem>
-      ),
+      content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
       onClick: () => {
         setSortBy(item.sortBy)
         setSortByDirection(item.direction)
@@ -463,10 +493,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
   const showFilteringInlineLoading =
     (!noMarketsAvailable && !noOwnMarkets && isFiltering) || RemoteData.is.loading(markets)
-  const disableLoadNextButton =
-    isFiltering || !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
-  const disableLoadPrevButton =
-    isFiltering || pageIndex === 0 || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
+  const disableLoadNextButton = !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
+  const disableLoadPrevButton = pageIndex === 0 || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
 
   return (
     <>
@@ -479,7 +507,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={categoryItems}
-          showScrollbar={true}
         />
         <MarketsFilterDropdown
           currentItem={filters.findIndex(i => i.state === state)}
@@ -487,30 +514,30 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
           items={filterItems}
-          showScrollbar={true}
         />
       </Actions>
       <ListCard>
         <TopContents>
           <FiltersWrapper>
-            <SectionTitleMarket title={'Markets'} />
-            <FiltersControls>
-              <ButtonCircleStyled active={showSearch} onClick={toggleSearch}>
-                <IconSearch />
-              </ButtonCircleStyled>
-              <ButtonCircleStyled active={showAdvancedFilters} onClick={toggleFilters}>
+            <FiltersLeftWrapper>
+              <ButtonFilterStyled active={showAdvancedFilters} onClick={toggleFilters}>
                 <IconFilter />
-              </ButtonCircleStyled>
-              <Dropdown
+                <span>Filters</span>
+              </ButtonFilterStyled>
+              <ButtonSearchStyled active={showSearch} onClick={toggleSearch}>
+                <IconSearch />
+              </ButtonSearchStyled>
+            </FiltersLeftWrapper>
+            <FiltersControls>
+              <SortDropdown
                 currentItem={
                   fetchMyMarkets
                     ? myMarketsSortOptions.findIndex(i => i.sortBy === sortBy)
                     : sortOptions.findIndex(i => i.sortBy === sortBy)
                 }
                 dirty={true}
-                dropdownPosition={DropdownPosition.right}
+                dropdownPosition={DropdownPosition.center}
                 items={fetchMyMarkets ? myMarketsSortItems : sortItems}
-                placeholder={<SecondaryText>Sort By</SecondaryText>}
               />
             </FiltersControls>
           </FiltersWrapper>
@@ -541,31 +568,22 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         </ListWrapper>
         <BottomContents>
           <DisplayButtonWrapper>
-            <Dropdown
-              currentItem={4}
+            <DisplayDropdown
+              currentItem={0}
               dirty={true}
-              dropdownPosition={DropdownPosition.left}
+              dropdownPosition={DropdownPosition.center}
               items={sizeItems}
               placeholder={<Display>Display</Display>}
             />
           </DisplayButtonWrapper>
           {RemoteData.hasData(markets) && markets.data.length === 0 ? null : (
             <LoadMoreWrapper>
-              <ButtonCircleStyled disabled={disableLoadPrevButton} onClick={onLoadPrevPage}>
-                {disableLoadPrevButton ? (
-                  <IconChevronLeftDisabled></IconChevronLeftDisabled>
-                ) : (
-                  <IconChevronLeft></IconChevronLeft>
-                )}
-              </ButtonCircleStyled>
-              <ButtonCircleStyled disabled={disableLoadNextButton} onClick={onLoadNextPage}>
-                {disableLoadNextButton ? (
-                  <IconChevronRightDisabled></IconChevronRightDisabled>
-                ) : (
-                  <IconChevronRight></IconChevronRight>
-                )}
-              </ButtonCircleStyled>
-              x
+              <ButtonPaginationStyled disabled={disableLoadPrevButton} onClick={onLoadPrevPage}>
+                Prev
+              </ButtonPaginationStyled>
+              <ButtonPaginationStyled disabled={disableLoadNextButton} onClick={onLoadNextPage}>
+                Next
+              </ButtonPaginationStyled>
             </LoadMoreWrapper>
           )}
         </BottomContents>

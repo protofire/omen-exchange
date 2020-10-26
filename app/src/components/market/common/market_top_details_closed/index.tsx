@@ -6,7 +6,6 @@ import { MarketMakerData } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
 import { MarketData } from '../market_data'
-import { MarketTitle } from '../market_title'
 import { ProgressBar } from '../progress_bar'
 import { ProgressBarToggle } from '../progress_bar/toggle'
 
@@ -24,6 +23,8 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     answerFinalizedTimestamp,
     arbitrator,
     collateral: collateralToken,
+    collateralVolume,
+    curatedByDxDaoOrKleros: isVerified,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
@@ -37,6 +38,10 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     : ''
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
+  const formattedLiquidity: string = useGraphMarketMakerDataResult.marketMakerData
+    ? useGraphMarketMakerDataResult.marketMakerData.scaledLiquidityParameter.toFixed(2)
+    : '0'
+
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred
 
@@ -47,10 +52,10 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   return (
     <>
       <SubsectionTitleWrapper>
-        <MarketTitle templateId={question.templateId} />
         <ProgressBarToggle
           active={showingProgressBar}
           state={'closed'}
+          templateId={question.templateId}
           toggleProgressBar={toggleProgressBar}
         ></ProgressBarToggle>
       </SubsectionTitleWrapper>
@@ -65,8 +70,10 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         ></ProgressBar>
       )}
       <MarketData
+        collateralVolume={collateralVolume}
         currency={collateralToken}
         lastActiveDay={lastActiveDay}
+        liquidity={formattedLiquidity}
         resolutionTimestamp={question.resolution}
         runningDailyVolumeByHour={runningDailyVolumeByHour}
       ></MarketData>
@@ -74,7 +81,8 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         arbitrator={arbitrator}
         category={question.category}
         id={question.id}
-        oracle="Reality.eth"
+        oracle="Reality"
+        verified={isVerified}
       ></AdditionalMarketData>
     </>
   )

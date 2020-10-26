@@ -1,6 +1,7 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
+import { getMarketTitles } from '../../../../util/tools'
 import { Button } from '../../../button'
 
 import { ThreeDots1 } from './img/three_dots_1'
@@ -8,11 +9,16 @@ import { ThreeDots2 } from './img/three_dots_2'
 import { ThreeDots3 } from './img/three_dots_3'
 
 const ToggleButton = styled(Button)<{ active: boolean }>`
-  height: 36px;
+  height: 40px;
+  border-radius: 8px;
   ${props => props.active && `border: 1px solid ${props.theme.textfield.borderColorActive}`};
 
   &:hover {
     ${props => props.active && `border: 1px solid ${props.theme.textfield.borderColorActive}`};
+  }
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    width: 100%;
   }
 `
 
@@ -23,11 +29,14 @@ const ToggleButtonText = styled.span`
 interface Props extends DOMAttributes<HTMLDivElement> {
   active: boolean
   state: string
+  templateId: Maybe<number>
   toggleProgressBar: () => void
 }
 
 export const ProgressBarToggle: React.FC<Props> = props => {
-  const { active, state, toggleProgressBar } = props
+  const { active, state, templateId, toggleProgressBar } = props
+
+  const { marketTitle } = getMarketTitles(templateId)
 
   const marketStates = {
     open: 'open',
@@ -47,16 +56,7 @@ export const ProgressBarToggle: React.FC<Props> = props => {
       ) : (
         <ThreeDots3></ThreeDots3>
       )}
-      <ToggleButtonText>
-        Market
-        {state === marketStates.open
-          ? ' Open'
-          : state === marketStates.finalizing
-          ? ' Finalizing'
-          : state === marketStates.arbitration
-          ? ' Arbitrating'
-          : ' Closed'}
-      </ToggleButtonText>
+      <ToggleButtonText>{marketTitle}</ToggleButtonText>
     </ToggleButton>
   )
 }

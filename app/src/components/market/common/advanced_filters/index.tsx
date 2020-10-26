@@ -11,12 +11,11 @@ import { DxDao } from './img/dxDao'
 import { Kleros } from './img/kleros'
 
 const Wrapper = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
   column-gap: 20px;
   display: grid;
   grid-template-columns: 1fr;
-  margin: 0 25px;
-  padding: 20px 0 25px 0;
+  margin: 0 24px;
+  margin-bottom: 24px;
   row-gap: 20px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
@@ -55,7 +54,7 @@ interface Props {
   currency: Maybe<string>
   arbitrator: Maybe<string>
   curationSource: CurationSource
-  onChangeCurrency: (currency: Maybe<string>) => void
+  onChangeCurrency: (currency: Maybe<string> | null) => void
   onChangeArbitrator: (arbitrator: Maybe<string>) => void
   onChangeCurationSource: (curationSource: CurationSource) => void
   onChangeTemplateId: (templateId: Maybe<string>) => void
@@ -102,6 +101,19 @@ export const AdvancedFilters = (props: Props) => {
       return item.isSelectionEnabled
     })
     .map(({ address, name }) => {
+      if (name === CurationSource.KLEROS) {
+        return {
+          content: (
+            <CurationSourceWrapper>
+              <LogoWrapper>
+                <Kleros />
+              </LogoWrapper>
+              {name}
+            </CurationSourceWrapper>
+          ),
+          onClick: () => onChangeArbitrator(address),
+        }
+      }
       return {
         content: name,
         onClick: () => onChangeArbitrator(address),
@@ -143,15 +155,18 @@ export const AdvancedFilters = (props: Props) => {
 
   const showQuestionType = false
 
+  const activeArbitratorIndex = arbitrators.findIndex(t => t.address === arbitrator) + 1
+
   return (
     <Wrapper>
       <Column>
         <Title>Currency</Title>
         <CurrencySelector
+          addAll
           context={context}
           currency={currency}
           disabled={false}
-          onSelect={currency => onChangeCurrency(currency.address)}
+          onSelect={currency => onChangeCurrency(!currency ? null : currency.address)}
           placeholder={currency ? '' : 'All'}
         />
       </Column>
@@ -164,7 +179,7 @@ export const AdvancedFilters = (props: Props) => {
       <Column>
         <Title>Arbitrator</Title>
         <Options
-          currentItem={arbitrators.findIndex(t => t.address === arbitrator)}
+          currentItem={activeArbitratorIndex}
           dirty={true}
           dropdownPosition={DropdownPosition.center}
           items={arbitratorOptions}
@@ -172,7 +187,7 @@ export const AdvancedFilters = (props: Props) => {
       </Column>
       {!disableCurationFilter && (
         <Column>
-          <Title>Curation Source</Title>
+          <Title>Verified by</Title>
           <Options
             currentItem={[
               CurationSource.ALL_SOURCES,
@@ -181,7 +196,7 @@ export const AdvancedFilters = (props: Props) => {
               CurationSource.NO_SOURCES,
             ].findIndex(t => t === curationSource)}
             dirty={true}
-            dropdownPosition={DropdownPosition.right}
+            dropdownPosition={DropdownPosition.center}
             items={curationSourceOptions}
           />
         </Column>

@@ -73,7 +73,6 @@ export const useGraphFpmmTradesFromQuestion = (questionID: string): Result => {
     if (data.fpmmTrades) setFpmmTradeData(wrangleResponse(data.fpmmTrades))
   }, [data])
 
-  //setFpmmTradeData(data)
   if (data && data.fpmmTrades) {
     setFpmmTradeData(wrangleResponse(data.fpmmTrades))
   }

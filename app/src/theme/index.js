@@ -54,12 +54,13 @@ const theme = {
     buttonBackgroundColorHover: '#fff',
     buttonBorderColor: '#DCDFF2',
     buttonBorderColorHover: '#C5CAE9',
+    buttonBorderColorActive: '#9FA8DA',
     buttonColor: '#37474F',
     buttonColorHover: '#37474F',
     dropdownItems: {
       backgroundColor: '#fff',
-      borderColor: '#ECEFF1',
-      borderRadius: '16px',
+      borderColor: '#E8EAF6',
+      borderRadius: '12px',
       boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.12)',
       item: {
         backgroundColor: 'transparent',
@@ -72,9 +73,12 @@ const theme = {
   buttonCircle: {
     dimensions: '34px',
   },
+
   colors: {
     activeListItemBackground: '#fafafa',
     alert: '#E57373',
+    alertHover: '#EF5350',
+    borderColorDark: '#9FA8DA',
     darkGray: '#acacac',
     error: '#fa0000',
     gray: '#b7b7b7',
@@ -163,6 +167,23 @@ const theme = {
   },
   mainContainer: {
     maxWidth: '586px',
+  },
+  moreMenu: {
+    buttonBorder: '#DCDFF2',
+    buttonBorderHover: '#C5CAE9',
+    buttonBorderActive: '#9FA8DA',
+    boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.12)',
+    items: {
+      border: '#E8EAF6',
+      backgroundColor: '#FFF',
+    },
+    item: {
+      backgroundColor: 'transparent',
+      backgroundColorActive: '#F8F9FC',
+      backgroundColorHover: '#F8F9FC',
+      color: '#757575',
+      colorHover: '#37474F',
+    },
   },
   form: {
     common: {

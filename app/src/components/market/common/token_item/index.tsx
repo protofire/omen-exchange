@@ -12,8 +12,8 @@ const Image = styled.img`
   display: flex;
   height: 100%;
   margin-right: 8px;
-  max-height: 24px;
-  max-width: 24px;
+  height: 22px;
+  width: 22px;
 `
 
 const Text = styled.div`
