@@ -105,16 +105,6 @@ const AdditionalMarketDataSectionWrapperLabel = styled.div`
   }
 `
 
-const AdditionalMarketDataSectionTitle = styled.p`
-  margin-left: 6px;
-  font-size: 14px;
-  line-height: 16px;
-  color: ${props => props.theme.colors.clickable};
-  &:first-letter {
-    text-transform: capitalize;
-  }
-`
-
 const StyledAdditionalMarketSectionTitle = styled(AdditionalMarketDataSectionTitle as any)`
   ${props => !props.curatedByDxDaoOrKleros && `color: ${props.theme.colors.red}`}
 `
