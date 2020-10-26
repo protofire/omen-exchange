@@ -61,7 +61,7 @@ const ButtonRoundActiveCSS = css`
   &,
   &:hover {
     background-color: #fff;
-    border-color: ${props => props.theme.colors.borderColorDar};
+    border-color: ${props => props.theme.colors.borderColorDark};
 
     > svg path {
       fill: ${props => props.theme.colors.textColorDark};
