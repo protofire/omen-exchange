@@ -22,7 +22,7 @@ export const VerifiedRow = (props: Props) => {
 
   return (
     <Wrapper verified={!notVerified}>
-      {notVerified ? <IconAlert /> : <IconVerified />}
+      {notVerified ? <IconAlert /> : <IconVerified size={'20'} />}
       <span>{notVerified ? 'None' : label}</span>
     </Wrapper>
   )
