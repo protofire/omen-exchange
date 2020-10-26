@@ -176,6 +176,9 @@ const AskQuestionStep = (props: Props) => {
 
   const [isContinueButtonDisabled, setIsContinueButtonDisabled] = useState(true)
 
+  const isProperScale =
+    lowerBound && startingPoint && upperBound && lowerBound?.lte(startingPoint) && startingPoint?.lte(upperBound)
+
   useEffect(() => {
     if (currentFormState === FormState.categorical || currentFormState === FormState.import) {
       setIsContinueButtonDisabled(
@@ -197,7 +200,8 @@ const AskQuestionStep = (props: Props) => {
           !unit ||
           !resolution ||
           resolution < new Date() ||
-          !category,
+          !category ||
+          !isProperScale,
       )
     }
   })
