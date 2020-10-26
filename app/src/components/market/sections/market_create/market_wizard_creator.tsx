@@ -3,7 +3,7 @@ import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useState } from 'react'
 
-import { MARKET_FEE } from '../../../../common/constants'
+import { IMPORT_QUESTION_ID_KEY, MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { queryTopCategories } from '../../../../queries/markets_home'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
@@ -30,6 +30,17 @@ export const MarketWizardCreator = (props: Props) => {
   const defaultCollateral = getDefaultToken(networkId)
   const defaultArbitrator = getDefaultArbitrator(networkId)
 
+  const getImportQuestionId = () => {
+    const reQuestionId = /(0x[0-9A-Fa-f]{64})/
+
+    const questionId = localStorage.getItem(IMPORT_QUESTION_ID_KEY)
+
+    if (!questionId) return null
+    localStorage.removeItem(IMPORT_QUESTION_ID_KEY)
+
+    return questionId.match(reQuestionId) ? questionId : null
+  }
+
   const marketDataDefault: MarketData = {
     arbitrator: defaultArbitrator,
     arbitratorsCustom: [],
@@ -37,7 +48,7 @@ export const MarketWizardCreator = (props: Props) => {
     category: '',
     collateral: defaultCollateral,
     funding: new BigNumber('0'),
-    loadedQuestionId: null,
+    loadedQuestionId: getImportQuestionId(),
     outcomes: [
       {
         name: '',
