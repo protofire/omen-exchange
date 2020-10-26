@@ -73,6 +73,7 @@ const theme = {
   buttonCircle: {
     dimensions: '34px',
   },
+
   colors: {
     activeListItemBackground: '#fafafa',
     alert: '#E57373',
@@ -165,6 +166,23 @@ const theme = {
   },
   mainContainer: {
     maxWidth: '586px',
+  },
+  moreMenu: {
+    buttonBorder: '#DCDFF2',
+    buttonBorderHover: '#C5CAE9',
+    buttonBorderActive: '#9FA8DA',
+    boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.12)',
+    items: {
+      border: '#E8EAF6',
+      backgroundColor: '#FFF',
+    },
+    item: {
+      backgroundColor: 'transparent',
+      backgroundColorActive: '#F8F9FC',
+      backgroundColorHover: '#F8F9FC',
+      color: '#757575',
+      colorHover: '#37474F',
+    },
   },
   form: {
     common: {
