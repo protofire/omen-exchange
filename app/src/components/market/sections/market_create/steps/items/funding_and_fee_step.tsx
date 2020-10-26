@@ -437,13 +437,18 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           <ScaleWrapper>
             <ScaleTitleWrapper>
               <ScaleTitle>
-                {lowerBound?.toString()} {unit}
+                {lowerBound && formatNumber(formatBigNumber(lowerBound, 18))} {unit}
               </ScaleTitle>
               <ScaleTitle>
-                {Number(upperBound) / 2 + Number(lowerBound) / 2} {unit}
+                {upperBound &&
+                  lowerBound &&
+                  formatNumber(
+                    `${Number(formatBigNumber(upperBound, 18)) / 2 + Number(formatBigNumber(lowerBound, 18)) / 2}`,
+                  )}
+                {` ${unit}`}
               </ScaleTitle>
               <ScaleTitle>
-                {upperBound?.toString()} {unit}
+                {upperBound && formatBigNumber(upperBound, 18)} {unit}
               </ScaleTitle>
             </ScaleTitleWrapper>
             <Scale>
@@ -459,7 +464,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))}
             >
               <StartingPointTitle>
-                {startingPoint?.toString()} {unit}
+                {startingPoint && formatBigNumber(startingPoint, 18)} {unit}
               </StartingPointTitle>
               <StartingPointSubtitle>Starting Point</StartingPointSubtitle>
             </StartingPointBox>

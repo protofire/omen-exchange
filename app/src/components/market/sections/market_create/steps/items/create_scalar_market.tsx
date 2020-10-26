@@ -144,7 +144,7 @@ export const CreateScalarMarket = (props: Props) => {
           <FormRow
             formField={
               <NumericalInput
-                decimals={0}
+                decimals={18}
                 name="lowerBound"
                 onChange={handleChange}
                 placeholder={'0'}
@@ -158,7 +158,7 @@ export const CreateScalarMarket = (props: Props) => {
           <FormRow
             formField={
               <NumericalInput
-                decimals={0}
+                decimals={18}
                 name="upperBound"
                 onChange={handleChange}
                 placeholder={'1000'}
@@ -174,7 +174,7 @@ export const CreateScalarMarket = (props: Props) => {
           <FormRow
             formField={
               <NumericalInput
-                decimals={0}
+                decimals={18}
                 name="startingPoint"
                 onChange={handleChange}
                 placeholder={'500'}
