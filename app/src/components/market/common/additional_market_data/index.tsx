@@ -54,27 +54,22 @@ const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
   }
 `
 
-const AdditionalMarketDataSectionDivWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-`
-
-const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean }>`
+const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; isError?: boolean }>`
   display: flex;
   align-items: center;
   cursor: pointer;
 
   &:hover {
     p {
-      color: ${props => props.theme.colors.primaryLight};
+      color: ${props => (props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight)};
     }
     svg {
       circle {
         stroke: ${props => props.theme.colors.primaryLight};
       }
       path {
-        fill: ${props => (props.noColorChange ? '' : props.theme.colors.primaryLight)};
+        fill: ${props =>
+          props.noColorChange ? '' : props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight};
       }
 
       path:nth-child(even) {
@@ -100,6 +95,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 
 export const AdditionalMarketData: React.FC<Props> = props => {
   const { arbitrator, category, id, oracle, verified } = props
+
   const realitioBaseUrl = useRealityLink()
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
@@ -131,12 +127,12 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <IconArbitrator size={'24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionDivWrapper>
+        <AdditionalMarketDataSectionWrapper isError={!verified}>
           {verified ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
           <AdditionalMarketDataSectionTitle isError={!verified}>
             {verified ? 'Verified' : 'Not Verified'}
           </AdditionalMarketDataSectionTitle>
-        </AdditionalMarketDataSectionDivWrapper>
+        </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>
       <ReactTooltip
         className="customMarketTooltip"

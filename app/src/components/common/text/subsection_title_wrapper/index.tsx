@@ -6,7 +6,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   flex-wrap: nowrap;
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
