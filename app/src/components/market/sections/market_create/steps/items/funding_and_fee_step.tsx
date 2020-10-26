@@ -437,13 +437,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           <ScaleWrapper>
             <ScaleTitleWrapper>
               <ScaleTitle>
-                {lowerBound} {unit}
+                {lowerBound?.toString()} {unit}
               </ScaleTitle>
               <ScaleTitle>
                 {Number(upperBound) / 2 + Number(lowerBound) / 2} {unit}
               </ScaleTitle>
               <ScaleTitle>
-                {upperBound} {unit}
+                {upperBound?.toString()} {unit}
               </ScaleTitle>
             </ScaleTitleWrapper>
             <Scale>
@@ -459,7 +459,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))}
             >
               <StartingPointTitle>
-                {startingPoint} {unit}
+                {startingPoint?.toString()} {unit}
               </StartingPointTitle>
               <StartingPointSubtitle>Starting Point</StartingPointSubtitle>
             </StartingPointBox>
