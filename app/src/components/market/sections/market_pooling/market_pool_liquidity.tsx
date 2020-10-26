@@ -25,7 +25,7 @@ import {
   formatNumber,
 } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
-import { Button, ButtonContainer, ButtonTab } from '../../../button'
+import { ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
@@ -40,6 +40,7 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
+import { MarketBottomNavButton } from '../market_profile/market_status/open'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
@@ -52,8 +53,8 @@ enum Tabs {
   withdraw,
 }
 
-const LeftButton = styled(Button)`
-  margin-right: auto;
+const BottomButtonWrapper = styled(ButtonContainer)`
+  justify-content: space-between;
 `
 
 const TabsGrid = styled.div`
@@ -475,25 +476,29 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           onUnlock={unlockCollateral}
         />
       )}
-      <ButtonContainer>
-        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+      <BottomButtonWrapper>
+        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
-        </LeftButton>
+        </MarketBottomNavButton>
         {activeTab === Tabs.deposit && (
-          <Button buttonType={ButtonType.secondaryLine} disabled={disableDepositButton} onClick={() => addFunding()}>
+          <MarketBottomNavButton
+            buttonType={ButtonType.secondaryLine}
+            disabled={disableDepositButton}
+            onClick={() => addFunding()}
+          >
             Deposit
-          </Button>
+          </MarketBottomNavButton>
         )}
         {activeTab === Tabs.withdraw && (
-          <Button
+          <MarketBottomNavButton
             buttonType={ButtonType.secondaryLine}
             disabled={disableWithdrawButton}
             onClick={() => removeFunding()}
           >
             Withdraw
-          </Button>
+          </MarketBottomNavButton>
         )}
-      </ButtonContainer>
+      </BottomButtonWrapper>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
