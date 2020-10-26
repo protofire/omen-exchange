@@ -38,7 +38,7 @@ const FiltersWrapper = styled.div`
   justify-content: space-between;
   flex-direction: column;
 
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+  @media (min-width: ${props => props.theme.themeBreakPoints.sm}) {
     flex-direction: row;
   }
 `
@@ -50,7 +50,7 @@ const FiltersControls = styled.div<{ disabled?: boolean }>`
   margin-right: auto;
   pointer-events: ${props => (props.disabled ? 'none' : 'initial')};
 
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+  @media (min-width: ${props => props.theme.themeBreakPoints.sm}) {
     margin-left: 0;
     margin-right: 0;
     padding-left: 10px;
@@ -205,6 +205,9 @@ const FiltersLeftWrapper = styled.div`
   align-items: center;
   & > * + * {
     margin-left: 10px;
+  }
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    margin-bottom: 12px;
   }
 `
 
