@@ -7,7 +7,6 @@ declare module '@walletconnect/web3-subprovider'
 declare module 'apollo-link-logger'
 declare module 'react-draggable'
 declare module 'react-share'
-declare module 'humanize-duration'
 
 declare type Maybe<T> = T | null
 
