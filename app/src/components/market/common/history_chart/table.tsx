@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { useGraphFpmmTradesFromQuestion } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
+import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
 import { Button } from '../../../button'
 import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
 
@@ -64,12 +64,11 @@ const Column = styled.div`
 `
 
 type Props = {
-  marketMakerAddress: string
+  fpmmTrade: FpmmTradeDataType[]
+  status: string
 }
 
-export const MarketTable: React.FC<Props> = ({ marketMakerAddress }) => {
-  const { fpmmTrade, status } = useGraphFpmmTradesFromQuestion(marketMakerAddress)
-
+export const MarketTable: React.FC<Props> = ({ fpmmTrade, status }) => {
   return (
     <React.Fragment>
       <TableWrapper>
@@ -85,6 +84,9 @@ export const MarketTable: React.FC<Props> = ({ marketMakerAddress }) => {
         {status === 'Ready' &&
           fpmmTrade &&
           fpmmTrade.map(({ collateralAmountUSD, creationTimestamp, creator, id, outcomeTokensTraded, type }) => {
+            const date = new Date(creationTimestamp)
+            const formattedDate = `${date.getDate()}.${date.getMonth()}-${date.getHours()}:${date.getMinutes()}`
+            console.log(typeof creationTimestamp)
             return (
               <Column key={id}>
                 <Row width={'24'}>
@@ -94,7 +96,7 @@ export const MarketTable: React.FC<Props> = ({ marketMakerAddress }) => {
                 <Row width={'20'}>{type}</Row>
                 <Row width={'20'}>{outcomeTokensTraded}</Row>
                 <Row width={'18'}>{collateralAmountUSD}</Row>
-                <Row width={'18'}>{creationTimestamp}</Row>
+                <Row width={'18'}>{formattedDate}</Row>
               </Column>
             )
           })}

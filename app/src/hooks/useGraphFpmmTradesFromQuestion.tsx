@@ -23,11 +23,9 @@ export type FpmmTradeDataType = {
   collateralAmount: string
   collateralAmountUSD: string
   creationTimestamp: string
-  creator:
-    | {
-        id: string
-      }
-    | string
+  creator: {
+    id: string
+  }
   id: string
   outcomeTokensTraded: string
   type: string
@@ -49,19 +47,17 @@ interface Result {
   status: string
 }
 const wrangleResponse = (data: any) => {
-  const newFpmmTradesArray = data.map((trade: FpmmTradeData) => {
+  return data.map((trade: FpmmTradeData) => {
     return {
       collateralAmount: trade.collateralAmount,
       collateralAmountUSD: Number(trade.collateralAmountUSD).toFixed(2),
-      creationTimestamp: trade.creationTimestamp,
+      creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
       creator: trade.creator.id,
       id: trade.id,
       outcomeTokensTraded: trade.outcomeTokensTraded,
       type: trade.type,
     }
   })
-
-  return newFpmmTradesArray
 }
 
 export const useGraphFpmmTradesFromQuestion = (questionID: string): Result => {
@@ -74,11 +70,11 @@ export const useGraphFpmmTradesFromQuestion = (questionID: string): Result => {
   })
 
   useEffect(() => {
-    if (data) setFpmmTradeData(wrangleResponse(data.fpmmTrades))
+    if (data.fpmmTrades) setFpmmTradeData(wrangleResponse(data.fpmmTrades))
   }, [data])
 
   //setFpmmTradeData(data)
-  if (data && data.fpmmTrade) {
+  if (data && data.fpmmTrades) {
     setFpmmTradeData(wrangleResponse(data.fpmmTrades))
   }
 

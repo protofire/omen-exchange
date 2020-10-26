@@ -85,22 +85,29 @@ type Props = {
 export const Chart: React.FC<Props> = ({ data, outcomes }) => {
   return (
     <ResponsiveWrapper>
-      <ResponsiveContainer height={300} width="106%">
-        <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} stackOffset="expand">
-          <XAxis dataKey="date" />
-          <YAxis orientation="right" tickFormatter={toPercent} />
+      <ResponsiveContainer height={300} width="100%">
+        <AreaChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} stackOffset="expand">
+          <XAxis dataKey="date" stroke="#E8EAF6" tick={{ fill: '#757575', fontFamily: 'Roboto' }} tickMargin={11} />
+          <YAxis
+            orientation="right"
+            stroke="#E8EAF6"
+            tick={{ fill: '#757575', fontFamily: 'Roboto' }}
+            tickFormatter={toPercent}
+            tickMargin={10}
+          />
           <Tooltip content={renderTooltipContent} />
 
           {outcomes
             .map((outcomeName, index) => {
               const color = getOutcomeColor(index)
+              console.log(color)
               return (
                 <Area
                   dataKey={outcomeName}
                   fill={color.medium}
                   key={`${index}-${outcomeName}`}
                   stackId="1"
-                  stroke="#8884d8"
+                  stroke={color.darker}
                   type="monotone"
                 />
               )

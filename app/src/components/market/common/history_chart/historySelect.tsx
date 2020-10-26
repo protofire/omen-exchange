@@ -3,6 +3,7 @@ import moment from 'moment'
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 
+import { useGraphFpmmTradesFromQuestion } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
 import { calcPrice } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { Button, ButtonSelectable } from '../../../button'
@@ -105,6 +106,7 @@ export const HistoryChart: React.FC<Props> = ({
   outcomes,
   value,
 }) => {
+  const { fpmmTrade, status } = useGraphFpmmTradesFromQuestion(marketMakerAddress)
   const data =
     holdingSeries &&
     holdingSeries
@@ -119,7 +121,7 @@ export const HistoryChart: React.FC<Props> = ({
       })
   const [toogleSelect, setToogleSelect] = useState(true)
   const DropdownItems = ['liquidity', 'assets']
-  if (!data) {
+  if (!data || status === 'Loading') {
     return <CustomInlineLoading message="Loading Trade History" />
   }
   if (holdingSeries && holdingSeries.length <= 1) {
@@ -148,8 +150,8 @@ export const HistoryChart: React.FC<Props> = ({
           <DropdownMenu dropdownPosition={DropdownPosition.right} items={DropdownItems} placeholder={'All'} />
         )}
       </TitleWrapper>
-      {toogleSelect ? (
-        <MarketTable marketMakerAddress={marketMakerAddress} />
+      {toogleSelect && fpmmTrade ? (
+        <MarketTable fpmmTrade={fpmmTrade} status={status} />
       ) : (
         <Chart data={data} outcomes={outcomes} />
       )}
