@@ -127,7 +127,15 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <IconArbitrator size={'24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper isError={!verified}>
+        <AdditionalMarketDataSectionWrapper
+          data-arrow-color="transparent"
+          data-tip={
+            verified
+              ? 'This Market is verified by DXdao and therefore valid.'
+              : 'This Market is has not been verified and may be invalid.'
+          }
+          isError={!verified}
+        >
           {verified ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
           <AdditionalMarketDataSectionTitle isError={!verified}>
             {verified ? 'Verified' : 'Not Verified'}
