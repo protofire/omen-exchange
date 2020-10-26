@@ -29,7 +29,7 @@ import { ListItem } from '../../common/list_item'
 import { Search } from '../../common/search'
 
 const TopContents = styled.div`
-  padding: 25px 25px 20px 25px;
+  padding: 24px;
 `
 
 const FiltersWrapper = styled.div`
@@ -62,6 +62,10 @@ const ButtonRoundActiveCSS = css`
   &:hover {
     background-color: #fff;
     border-color: ${props => props.theme.colors.borderColorDar};
+
+    > svg path {
+      fill: ${props => props.theme.colors.textColorDark};
+    }
   }
 `
 
