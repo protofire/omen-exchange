@@ -11,12 +11,11 @@ import { DxDao } from './img/dxDao'
 import { Kleros } from './img/kleros'
 
 const Wrapper = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
   column-gap: 20px;
   display: grid;
   grid-template-columns: 1fr;
   margin: 0 24px;
-  padding: 20px 0 25px 0;
+  margin-bottom: 24px;
   row-gap: 20px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
