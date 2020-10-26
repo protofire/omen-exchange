@@ -136,7 +136,8 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
   const { itemID, submissionTime = 0, verificationState: status } = marketVerificationData || {}
 
   const deadline = submissionTime + Number(challengePeriodDuration)
-  const timeRemaining = deadline * 1000 - Date.now()
+  const timeRemaining = Math.max(0, deadline * 1000 - Date.now())
+
   const submissionTimeUTC = moment(new Date(Number(submissionTime) * 1000))
     .tz('UTC')
     .format('YYYY-MM-DD - HH:mm [UTC]')

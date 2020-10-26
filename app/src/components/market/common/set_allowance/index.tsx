@@ -24,7 +24,7 @@ const DescriptionWrapper = styled.div`
   display: flex;
 `
 
-const Description = styled.div`
+const Description = styled.p`
   color: ${props => props.theme.colors.textColorLightish};
   font-size: 14px;
   letter-spacing: 0.2px;
