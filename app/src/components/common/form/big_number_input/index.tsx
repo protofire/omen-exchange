@@ -55,11 +55,7 @@ export const BigNumberInput: React.FC<Props> = props => {
     ...restProps
   } = props
 
-  console.log(value)
-
   const [currentValue, setCurrentValue] = useState('')
-
-  console.log(currentValue)
 
   const inputRef = useRef<HTMLInputElement>(null)
 

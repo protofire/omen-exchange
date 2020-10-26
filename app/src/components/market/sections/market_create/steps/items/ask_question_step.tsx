@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled, { css } from 'styled-components'
 
@@ -210,7 +210,12 @@ const AskQuestionStep = (props: Props) => {
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
 
+  const firstMount = useRef(true)
   useEffect(() => {
+    if (firstMount.current) {
+      firstMount.current = false
+      return
+    }
     handleClearQuestion()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFormState === FormState.import])
