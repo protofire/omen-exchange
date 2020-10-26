@@ -38,6 +38,7 @@ interface Network {
   omenTCRListId: number
   contracts: {
     realitio: string
+    realitioScalarAdapter: string
     marketMakerFactory: string
     conditionalTokens: string
     oracle: string
@@ -71,6 +72,7 @@ const networks: { [K in NetworkId]: Network } = {
     omenTCRListId: 3,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
+      realitioScalarAdapter: '0xaa548EfBb0972e0c4b9551dcCfb6B787A1B90082',
       marketMakerFactory: '0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
       oracle: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
@@ -90,6 +92,7 @@ const networks: { [K in NetworkId]: Network } = {
     omenTCRListId: 1,
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
+      realitioScalarAdapter: '0x3A4A1EFF11b81d3ecEbc92f1Ce902F2C738867b8',
       marketMakerFactory: '0x0fB4340432e56c014fa96286de17222822a9281b',
       conditionalTokens: '0xe6Cdc22F99FD9ffdC03647C7fFF5bB753a4eBB21',
       oracle: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',

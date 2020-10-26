@@ -22,20 +22,24 @@ const realitioAbi = [
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
 ]
+const realitioScalarAdapterAbi = ['function announceConditionQuestionId(bytes32 questionId, uint256 low, uint256 high)']
 
 class RealitioService {
   contract: Contract
   constantContract: Contract
+  scalarContract: Contract
   signerAddress: Maybe<string>
   provider: any
 
-  constructor(address: string, provider: any, signerAddress: Maybe<string>) {
+  constructor(address: string, scalarAddress: string, provider: any, signerAddress: Maybe<string>) {
     if (signerAddress) {
       const signer: Wallet = provider.getSigner()
 
       this.contract = new ethers.Contract(address, realitioAbi, provider).connect(signer)
+      this.scalarContract = new ethers.Contract(scalarAddress, realitioScalarAdapterAbi, provider).connect(signer)
     } else {
       this.contract = new ethers.Contract(address, realitioAbi, provider)
+      this.scalarContract = new ethers.Contract(scalarAddress, realitioScalarAdapterAbi, provider)
     }
 
     this.constantContract = new ethers.Contract(address, realitioCallAbi, provider)
