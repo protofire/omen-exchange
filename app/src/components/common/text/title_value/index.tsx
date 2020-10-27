@@ -58,7 +58,6 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   tooltip?: boolean
   date?: Date
   title: string | undefined
-  color?: any
   value: any
 }
 

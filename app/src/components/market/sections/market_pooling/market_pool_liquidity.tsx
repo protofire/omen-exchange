@@ -73,6 +73,7 @@ const TabsGrid = styled.div`
 `
 const WarningMessageStyled = styled(WarningMessage)`
   margin-bottom: 0;
+  margin-top: 20px;
 `
 
 const UserData = styled.div`
@@ -92,9 +93,6 @@ const UserDataRow = styled.div`
 
 const UserDataTitleValue = styled(TitleValue)`
   width: calc(50% - 16px);
-  p {
-    ${({ color, theme }) => (color ? `color: ${theme.colors.green};font-weight:500;` : '')}
-  }
 `
 const ButtonContainerWrapper = styled(ButtonContainer)`
   margin: 20px -25px 0px -25px;
@@ -106,7 +104,15 @@ const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { marketMakerData, switchMarketTab } = props
-  const { address: marketMakerAddress, balances, collateral, fee, totalPoolShares, userEarnings } = marketMakerData
+  const {
+    address: marketMakerAddress,
+    balances,
+    collateral,
+    fee,
+    totalEarnings,
+    totalPoolShares,
+    userEarnings,
+  } = marketMakerData
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
@@ -195,7 +201,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
-  console.log(formatBigNumber(totalPoolShares, collateral.decimals))
 
   const totalDepositedTokens = totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) =>
     amount.lt(min) ? amount : min,
@@ -331,26 +336,24 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
           />
           <UserDataTitleValue
-            state={userEarnings.gt(0) ? ValueStates.success : undefined}
             title={'Total Pool Tokens'}
             value={`${formatBigNumber(totalPoolShares, collateral.decimals)} ${collateral.symbol}`}
           />
         </UserDataRow>
         <UserDataRow>
           <UserDataTitleValue
-            color={userEarnings.gt(0)}
+            state={userEarnings.gt(0) ? ValueStates.success : undefined}
             title={'Your Earnings'}
             value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
               formatBigNumber(userEarnings, collateral.decimals),
             )} ${collateral.symbol}`}
           />
           <UserDataTitleValue
-            color={userEarnings.gt(0)}
-            state={userEarnings.gt(0) ? ValueStates.success : undefined}
+            state={totalEarnings.gt(0) ? ValueStates.success : undefined}
             title={'Total Earnings'}
-            value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
-              formatBigNumber(userEarnings, collateral.decimals),
-            )} ${collateral.symbol}`}
+            value={`${totalEarnings.gt(0) ? '+' : ''}${formatBigNumber(totalEarnings, collateral.decimals)} ${
+              collateral.symbol
+            }`}
           />
         </UserDataRow>
       </UserData>
