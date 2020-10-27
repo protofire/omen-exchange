@@ -32,6 +32,13 @@ const FieldWrapper = styled.div`
     }
   }
 
+  &:hover {
+    border-color: ${props => props.theme.textfield.borderColorOnHover};
+    .btn--max {
+      border-color: ${props => props.theme.textfield.borderColorOnHover};
+    }
+  }
+
   ${CommonDisabledCSS}
 
   > input {
