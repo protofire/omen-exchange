@@ -27,6 +27,9 @@ const FieldWrapper = styled.div`
 
   &:focus-within {
     border-color: ${props => props.theme.textfield.borderColorActive};
+    .btn--max {
+      border-color: ${props => props.theme.textfield.borderColorActive};
+    }
   }
 
   ${CommonDisabledCSS}
@@ -101,6 +104,8 @@ const Symbol = styled.span`
 
 const MaxButton = styled.span`
   padding-left: 20px;
+  padding-right: 20px;
+  margin-right: -20px;
   border-left: 1px solid ${props => props.theme.textfield.borderColor};
   color: ${props => props.theme.textfield.color}
   white-space: nowrap;
@@ -109,6 +114,7 @@ const MaxButton = styled.span`
   display: flex;
   align-items: center;
   cursor: pointer;
+  transition: border-color 0.15s ease-in-out;
 `
 
 export const TextfieldCustomSymbol = (props: Props) => {
@@ -120,7 +126,11 @@ export const TextfieldCustomSymbol = (props: Props) => {
     <FieldWrapper className={disabled ? 'disabled' : ''} {...restProps}>
       {React.cloneElement(formField, { disabled: disabled })}
       <Symbol>{symbol}</Symbol>
-      {shouldDisplayMaxButton && <MaxButton onClick={onClickMaxButton}>Max</MaxButton>}
+      {shouldDisplayMaxButton && (
+        <MaxButton className="btn--max" onClick={onClickMaxButton}>
+          Max
+        </MaxButton>
+      )}
     </FieldWrapper>
   )
 }
