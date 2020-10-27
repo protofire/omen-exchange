@@ -111,7 +111,7 @@ export const useMarkets = (options: Options): any => {
     setMarkets({
       fixedProductMarketMakers: [],
     })
-  }, [arbitrator, currency, curationSource, category, state])
+  }, [arbitrator, currency, curationSource, category, state, sortBy])
 
   return { markets, error, fetchMore, loading, moreMarkets }
 }
