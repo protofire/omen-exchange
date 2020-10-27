@@ -133,6 +133,10 @@ export interface MarketData {
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
   verifiedLabel?: string
+  lowerBound: Maybe<BigNumber>
+  upperBound: Maybe<BigNumber>
+  startingPoint: Maybe<BigNumber>
+  unit: string
 }
 
 export enum MarketStates {
@@ -219,6 +223,7 @@ export interface MarketMakerData {
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
   scaledLiquidityParameter: number
+  oracle: string
 }
 
 export enum Ternary {
