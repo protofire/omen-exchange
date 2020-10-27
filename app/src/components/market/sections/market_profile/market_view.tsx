@@ -25,7 +25,7 @@ interface Props {
 const MarketView: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
 
-  const { isQuestionFinalized, oracle, question } = marketMakerData
+  const { curatedByDxDao, isQuestionFinalized, klerosTCRregistered, oracle, question } = marketMakerData
 
   const context = useConnectedWeb3Context()
   const { networkId } = context
