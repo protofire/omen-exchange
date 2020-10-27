@@ -176,6 +176,10 @@ export interface MarketData {
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
   verifiedLabel?: string
+  lowerBound: Maybe<BigNumber>
+  upperBound: Maybe<BigNumber>
+  startingPoint: Maybe<BigNumber>
+  unit: string
 }
 
 export enum MarketStates {
@@ -263,6 +267,7 @@ export interface MarketMakerData {
   lastActiveDay: number
   scaledLiquidityParameter: number
   submissionIDs: KlerosSubmission[]
+  oracle: string
 }
 
 export enum Ternary {

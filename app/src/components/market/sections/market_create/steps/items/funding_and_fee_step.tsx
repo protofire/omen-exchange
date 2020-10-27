@@ -161,9 +161,126 @@ const StyledButtonContainerFullWidth = styled(ButtonContainerFullWidth as any)`
   margin-bottom: -1px;
 `
 
+const ScaleWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 182px;
+  border-bottom: 1px solid ${props => props.theme.scale.bar};
+  margin-left: -24px;
+  margin-right: -24px;
+  padding-left: 24px;
+  padding-right: 24px;
+`
+
+const ScaleTitleWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 5px;
+  margin-bottom: 18px;
+`
+
+const ScaleTitle = styled.p`
+  font-size: 14px;
+  color: ${props => props.theme.colors.textColor};
+  margin: 0;
+`
+
+const Scale = styled.div`
+  position: relative;
+  height: 20px;
+  width: 100%;
+`
+
+const VerticalBar = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  height: 20px;
+  background: ${props => props.theme.scale.bar};
+
+  &:nth-of-type(1) {
+    left: 0;
+  }
+
+  &:nth-of-type(2) {
+    left: calc(50% - 1px);
+  }
+
+  &:nth-of-type(3) {
+    right: 0;
+  }
+`
+
+const HorizontalBar = styled.div`
+  position: absolute;
+  top: calc(50% - 1px);
+  left: 0;
+  right: 0;
+  width: 100%
+  height: 2px;
+  background: ${props => props.theme.scale.bar};
+`
+
+const ScaleBall = styled.div<{ xValue: number }>`
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  border: 3px solid ${props => props.theme.scale.ballBorder};
+  background: ${props => props.theme.scale.ballBackground};
+  z-index: 2;
+  left: ${props => props.xValue * 100}%;
+  transform: translateX(-50%);
+`
+
+const StartingPointBox = styled.div<{ xValue: number }>`
+  position: absolute;
+  padding: 12px;
+  border: 1px solid ${props => props.theme.scale.box};
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  bottom: 36px;
+  ${props =>
+    props.xValue <= 0.885
+      ? `left: ${props.xValue <= 0.115 ? `25px` : props.xValue <= 0.885 ? `${props.xValue * 100}%` : ``}`
+      : `right: 25px`}
+  transform: translate(
+    ${props =>
+      props.xValue < 0.5 && props.xValue >= 0.115
+        ? `calc(-50% + 12px)`
+        : props.xValue > 0.5 && props.xValue <= 0.885
+        ? `calc(-50% - 12px)`
+        : props.xValue === 0.5
+        ? `-50%`
+        : `0`},
+    -100%
+  );
+  background: white;
+`
+
+const StartingPointTitle = styled.p`
+  font-size: 14px;
+  font-weight: 500;
+  color: ${props => props.theme.colors.textColorDarker};
+  margin-bottom: 6px;
+  margin-top: 0;
+`
+
+const StartingPointSubtitle = styled.p`
+  font-size: 14px;
+  color: ${props => props.theme.colors.textColor};
+  margin: 0;
+  white-space: nowrap;
+`
+
 interface Props {
-  back: () => void
-  submit: () => void
+  back: (state: string) => void
+  submit: (isScalar: boolean) => void
   values: {
     collateral: Token
     question: string
@@ -175,12 +292,17 @@ interface Props {
     outcomes: Outcome[]
     loadedQuestionId: Maybe<string>
     verifyLabel?: string
+    lowerBound?: Maybe<BigNumber>
+    upperBound?: Maybe<BigNumber>
+    startingPoint?: Maybe<BigNumber>
+    unit?: string
   }
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
   handleTradingFeeChange: (fee: string) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
+  state: string
 }
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
@@ -198,11 +320,25 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleTradingFeeChange,
     marketCreationStatus,
     resetTradingFee,
+    state,
     submit,
     values,
   } = props
-
-  const { arbitrator, category, collateral, funding, loadedQuestionId, outcomes, question, resolution, spread } = values
+  const {
+    arbitrator,
+    category,
+    collateral,
+    funding,
+    loadedQuestionId,
+    lowerBound,
+    outcomes,
+    question,
+    resolution,
+    spread,
+    startingPoint,
+    unit,
+    upperBound,
+  } = values
 
   const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
 
@@ -334,34 +470,74 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   return (
     <>
       <CreateCardTop>
-        <SubsectionTitleStyled>Your {loadedQuestionId ? 'Imported' : 'Categorical'} Market</SubsectionTitleStyled>
+        <SubsectionTitleStyled>
+          Your {state.charAt(0).toUpperCase() + state.slice(1).toLowerCase()} Market
+        </SubsectionTitleStyled>
         <SubTitle>Question</SubTitle>
         <QuestionText>{question}</QuestionText>
-        <OutcomesTableWrapper borderBottom>
-          <OutcomesTable>
-            <OutcomesTHead>
-              <OutcomesTR>
-                <OutcomesTH style={{ width: '60%' }}>Outcome</OutcomesTH>
-                <OutcomesTH>Probability</OutcomesTH>
-              </OutcomesTR>
-            </OutcomesTHead>
-            <OutcomesTBody>
-              {outcomes.map((outcome, index) => {
-                return (
-                  <OutcomesTR key={index}>
-                    <OutcomesTD>
-                      <OutcomeItemTextWrapper>
-                        <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
-                        <OutcomeItemText>{outcome.name}</OutcomeItemText>
-                      </OutcomeItemTextWrapper>
-                    </OutcomesTD>
-                    <OutcomesTD>{outcome.probability.toFixed(2)}%</OutcomesTD>
-                  </OutcomesTR>
-                )
-              })}
-            </OutcomesTBody>
-          </OutcomesTable>
-        </OutcomesTableWrapper>
+        {state === 'SCALAR' ? (
+          <ScaleWrapper>
+            <ScaleTitleWrapper>
+              <ScaleTitle>
+                {lowerBound && formatNumber(formatBigNumber(lowerBound, 18))} {unit}
+              </ScaleTitle>
+              <ScaleTitle>
+                {upperBound &&
+                  lowerBound &&
+                  formatNumber(
+                    `${Number(formatBigNumber(upperBound, 18)) / 2 + Number(formatBigNumber(lowerBound, 18)) / 2}`,
+                  )}
+                {` ${unit}`}
+              </ScaleTitle>
+              <ScaleTitle>
+                {upperBound && formatBigNumber(upperBound, 18)} {unit}
+              </ScaleTitle>
+            </ScaleTitleWrapper>
+            <Scale>
+              <ScaleBall
+                xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))}
+              />
+              <VerticalBar />
+              <VerticalBar />
+              <VerticalBar />
+              <HorizontalBar />
+            </Scale>
+            <StartingPointBox
+              xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))}
+            >
+              <StartingPointTitle>
+                {startingPoint && formatBigNumber(startingPoint, 18)} {unit}
+              </StartingPointTitle>
+              <StartingPointSubtitle>Starting Point</StartingPointSubtitle>
+            </StartingPointBox>
+          </ScaleWrapper>
+        ) : (
+          <OutcomesTableWrapper borderBottom>
+            <OutcomesTable>
+              <OutcomesTHead>
+                <OutcomesTR>
+                  <OutcomesTH style={{ width: '60%' }}>Outcome</OutcomesTH>
+                  <OutcomesTH>Probability</OutcomesTH>
+                </OutcomesTR>
+              </OutcomesTHead>
+              <OutcomesTBody>
+                {outcomes.map((outcome, index) => {
+                  return (
+                    <OutcomesTR key={index}>
+                      <OutcomesTD>
+                        <OutcomeItemTextWrapper>
+                          <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
+                          <OutcomeItemText>{outcome.name}</OutcomeItemText>
+                        </OutcomeItemTextWrapper>
+                      </OutcomesTD>
+                      <OutcomesTD>{outcome.probability.toFixed(2)}%</OutcomesTD>
+                    </OutcomesTR>
+                  )
+                })}
+              </OutcomesTBody>
+            </OutcomesTable>
+          </OutcomesTableWrapper>
+        )}
         <FlexRowWrapper>
           <TitleValueVertical
             date={resolution instanceof Date ? resolution : undefined}
@@ -480,18 +656,22 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               !MarketCreationStatus.is.ready(marketCreationStatus) &&
               !MarketCreationStatus.is.error(marketCreationStatus)
             }
-            onClick={back}
+            onClick={() => back(state)}
           >
             Back
           </LeftButton>
           {!account && (
-            <Button buttonType={ButtonType.primary} onClick={submit}>
+            <MarketBottomNavButton buttonType={ButtonType.primary} onClick={() => submit(state === 'SCALAR')}>
               Connect Wallet
-            </Button>
+            </MarketBottomNavButton>
           )}
-          <Button buttonType={ButtonType.secondaryLine} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
+          <ButtonCreate
+            buttonType={ButtonType.secondaryLine}
+            disabled={isCreateMarketbuttonDisabled}
+            onClick={() => submit(state === 'SCALAR')}
+          >
             Create Market
-          </Button>
+          </ButtonCreate>
         </StyledButtonContainerFullWidth>
       </CreateCardBottom>
       {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
