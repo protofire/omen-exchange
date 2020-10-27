@@ -107,6 +107,7 @@ const OutcomeItemWrapperActiveCSS = css`
     border-color: ${({ theme }) => theme.textfield.borderColorOnHover};
   }
   &:active,
+  &:focus-within,
   &:focus {
     border-color: ${({ theme }) => theme.textfield.borderColorActive};
   }
@@ -205,6 +206,13 @@ export const Breaker = styled.div`
 export const PercentWrapper = styled.label`
   color: ${({ theme }) => theme.colors.primary};
   font-size: 14px;
-  font-weight: 600;
-  line-height: 1.2;
+  line-height: 16px;
+`
+
+export const MarketBottomNavButton = styled(Button)`
+  height: 40px;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  line-height: 16px;
 `
