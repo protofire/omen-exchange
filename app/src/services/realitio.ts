@@ -223,6 +223,14 @@ class RealitioService {
 
     return questionId
   }
+
+  static encodeAnnounceConditionQuestionId = async (question: string, scalarLow: number, scalarHigh: number) => {
+    const args = [question, scalarLow, scalarHigh]
+
+    const announceConditionInterface = new utils.Interface(realitioScalarAdapterAbi)
+
+    return announceConditionInterface.functions.announceConditionQuestionId.encode([question, scalarLow, scalarHigh])
+  }
 }
 
 export { RealitioService }

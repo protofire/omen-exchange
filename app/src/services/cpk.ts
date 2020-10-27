@@ -274,6 +274,150 @@ class CPKService {
     }
   }
 
+  createScalarMarket = async ({
+    conditionalTokens,
+    marketData,
+    marketMakerFactory,
+    realitio,
+  }: CPKCreateMarketParams): Promise<string> => {
+    try {
+      const {
+        arbitrator,
+        category,
+        collateral,
+        loadedQuestionId,
+        lowerBound,
+        question,
+        resolution,
+        spread,
+        upperBound,
+      } = marketData
+
+      if (!resolution) {
+        throw new Error('Resolution time was not specified')
+      }
+
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+
+      const conditionalTokensAddress = conditionalTokens.address
+      const realitioAddress = realitio.address
+      const realitioScalarAdapterAddress = realitio.scalarContract.address
+
+      const openingDateMoment = moment(resolution)
+
+      const scalarLow = lowerBound?.toNumber()
+      const scalarHigh = upperBound?.toNumber()
+
+      const transactions = []
+
+      let questionId: string
+      if (loadedQuestionId) {
+        questionId = loadedQuestionId
+      } else {
+        // Step 1: Create question in realitio without bounds
+        transactions.push({
+          to: realitioAddress,
+          data: RealitioService.encodeAskQuestion(
+            question,
+            [],
+            category,
+            arbitrator.address,
+            openingDateMoment,
+            networkId,
+          ),
+        })
+        questionId = await realitio.askQuestionConstant(
+          question,
+          [],
+          category,
+          arbitrator.address,
+          openingDateMoment,
+          networkId,
+          this.cpk.address,
+        )
+      }
+      logger.log(`QuestionID ${questionId}`)
+
+      // Step 1.5: Announce the questionId and its bounds to the RealitioScalarAdapter
+      scalarLow &&
+        scalarHigh &&
+        transactions.push({
+          to: realitioScalarAdapterAddress,
+          data: RealitioService.encodeAnnounceConditionQuestionId(questionId, scalarLow, scalarHigh),
+        })
+
+      const oracleAddress = getContractAddress(networkId, 'realitioScalarAdapter')
+      const conditionId = conditionalTokens.getConditionId(questionId, oracleAddress, 2)
+
+      let conditionExists = false
+      if (loadedQuestionId) {
+        conditionExists = await conditionalTokens.doesConditionExist(conditionId)
+      }
+
+      if (!conditionExists) {
+        // Step 2: Prepare condition
+        logger.log(`Adding prepareCondition transaction`)
+
+        transactions.push({
+          to: conditionalTokensAddress,
+          data: ConditionalTokenService.encodePrepareCondition(questionId, oracleAddress, 2),
+        })
+      }
+
+      logger.log(`ConditionID: ${conditionId}`)
+
+      // Step 3: Approve collateral for factory
+      transactions.push({
+        to: collateral.address,
+        data: ERC20Service.encodeApproveUnlimited(marketMakerFactory.address),
+      })
+
+      // Step 4: Transfer funding from user
+      transactions.push({
+        to: collateral.address,
+        data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
+      })
+
+      // Step 5: Create market maker
+      const saltNonce = Math.round(Math.random() * 1000000)
+      const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
+        saltNonce,
+        conditionalTokens.address,
+        collateral.address,
+        conditionId,
+        this.cpk.address,
+        spread,
+      )
+      logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
+      const distributionHint = calcDistributionHint(marketData.outcomes.map(o => o.probability))
+      transactions.push({
+        to: marketMakerFactory.address,
+        data: MarketMakerFactoryService.encodeCreateMarketMaker(
+          saltNonce,
+          conditionalTokens.address,
+          collateral.address,
+          conditionId,
+          spread,
+          marketData.funding,
+          distributionHint,
+        ),
+      })
+
+      const txObject = await this.cpk.execTransactions(transactions)
+      logger.log(`Transaction hash: ${txObject.hash}`)
+
+      await this.provider.waitForTransaction(txObject.hash)
+      return predictedMarketMakerAddress
+    } catch (err) {
+      logger.error(`There was an error creating the market maker`, err.message)
+      throw err
+    }
+  }
+
   sellOutcomes = async ({
     amount,
     conditionalTokens,
