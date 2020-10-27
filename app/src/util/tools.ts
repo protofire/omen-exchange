@@ -214,9 +214,9 @@ export const calcPoolTokens = (
 ): BigNumber => {
   //implemented check so we don't get dividing by zero error, it converts pool weight into number and checks if its zero
   const poolWeight = holdingsBN.reduce((max: BigNumber, h: BigNumber) => (h.gt(max) ? h : max))
-  const Big = Number(formatNumber(formatBigNumber(poolWeight, 0)))
+  const poolWeightFormated = Number(formatNumber(formatBigNumber(poolWeight, 0)))
 
-  if (poolShareSupply.gt(0) && Big) {
+  if (poolShareSupply.gt(0) && poolWeightFormated) {
     return addedFunds.mul(poolShareSupply).div(poolWeight)
   } else {
     return addedFunds

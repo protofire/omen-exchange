@@ -52,7 +52,6 @@ enum Tabs {
   withdraw,
 }
 const WalletBalanceWrapper = styled(WalletBalance)`
-  height: auto;
   ${ButtonCSS};
   justify-content: space-between;
   margin-bottom: 20px;
@@ -413,9 +412,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              {/*//here is starts*/}
               <WalletBalanceWrapper text="Pool Tokens" value={formatNumber(sharesBalance)} />
-              {/*here it ends*/}
               <TextFieldWrapper
                 formField={
                   <BigNumberInput
