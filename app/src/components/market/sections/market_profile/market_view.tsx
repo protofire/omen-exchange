@@ -25,10 +25,10 @@ interface Props {
 const MarketView: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
 
-  const { curatedByDxDao, isQuestionFinalized, klerosTCRregistered, oracle, question } = marketMakerData
+  const { isQuestionFinalized, oracle, question } = marketMakerData
 
   const context = useConnectedWeb3Context()
-  const { networkId } = context
+  const networkId = context.networkId
 
   const renderView = () => {
     let realitioProxy
