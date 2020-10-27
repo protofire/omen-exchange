@@ -132,7 +132,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           data-tip={
             verified
               ? 'This Market is verified by DXdao and therefore valid.'
-              : 'This Market is has not been verified and may be invalid.'
+              : 'This Market has not been verified and may be invalid.'
           }
           isError={!verified}
         >
