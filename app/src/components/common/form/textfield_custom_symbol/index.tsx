@@ -24,17 +24,17 @@ const FieldWrapper = styled.div`
   padding: ${props => props.theme.textfield.paddingVertical + ' ' + props.theme.textfield.paddingHorizontal};
   width: 100%;
 
-  &:focus-within {
-    border-color: ${props => props.theme.textfield.borderColorActive};
-    .btn--max {
-      border-color: ${props => props.theme.textfield.borderColorActive};
-    }
-  }
-
   &:hover {
     border-color: ${props => props.theme.textfield.borderColorOnHover};
     .btn--max {
       border-color: ${props => props.theme.textfield.borderColorOnHover};
+    }
+  }
+
+  &:focus-within {
+    border-color: ${props => props.theme.textfield.borderColorActive};
+    .btn--max {
+      border-color: ${props => props.theme.textfield.borderColorActive};
     }
   }
 
