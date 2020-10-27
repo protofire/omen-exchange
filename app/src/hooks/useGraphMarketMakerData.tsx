@@ -19,6 +19,7 @@ const query = gql`
       condition {
         id
         payouts
+        oracle
       }
       templateId
       title
@@ -61,6 +62,7 @@ type GraphResponseFixedProductMarketMaker = {
   condition: {
     id: string
     payouts: Maybe<string[]>
+    oracle: string
   }
   creator: string
   currentAnswer: string
@@ -112,6 +114,7 @@ export type GraphMarketMakerData = {
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
+  oracle: string
 }
 
 type Result = {
@@ -133,6 +136,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     dailyVolume: bigNumberify(data.runningDailyVolume),
     conditionId: data.condition.id,
     payouts: data.condition.payouts ? data.condition.payouts.map(payout => new Big(payout)) : null,
+    oracle: data.condition.oracle,
     fee: bigNumberify(data.fee),
     scaledLiquidityParameter: parseFloat(data.scaledLiquidityParameter),
     runningDailyVolumeByHour: data.runningDailyVolumeByHour,

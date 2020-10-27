@@ -129,6 +129,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       marketMakerFunding,
       marketMakerUserFunding,
       payouts,
+      oracle: graphMarketMakerData.oracle,
       question: graphMarketMakerData.question,
       totalEarnings,
       totalPoolShares,

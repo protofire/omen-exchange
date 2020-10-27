@@ -1,4 +1,5 @@
-import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import { BigNumber } from 'ethers/utils'
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled, { css } from 'styled-components'
 
@@ -8,6 +9,7 @@ import { Arbitrator, Question } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { DateField, FormRow, FormStateButton } from '../../../../../common'
+import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { CommonDisabledCSS } from '../../../../../common/form/common_styled'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
@@ -17,6 +19,7 @@ import { CreateCard } from '../../../../common/create_card'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome, Outcomes } from '../outcomes'
 
+import { CreateScalarMarket } from './create_scalar_market'
 import { ImportMarketContent } from './import_market_content'
 
 const ButtonCategoryFocusCSS = css`
@@ -27,7 +30,7 @@ const ButtonCategoryFocusCSS = css`
   }
 `
 
-const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boolean }>`
+export const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boolean }>`
   max-width: 100%;
   padding-left: 10px;
   padding-right: 10px;
@@ -49,7 +52,7 @@ ButtonCategory.defaultProps = {
   focus: false,
 }
 
-const ButtonCategoryTextOverflow = styled.span`
+export const ButtonCategoryTextOverflow = styled.span`
   display: block;
   max-width: 100%;
   overflow: hidden;
@@ -60,8 +63,8 @@ const ButtonCategoryTextOverflow = styled.span`
   text-transform: capitalize;
 `
 
-const GridTwoColumns = styled.div`
-  column-gap: 18px;
+export const GridTwoColumns = styled.div`
+  column-gap: 16px;
   display: grid;
   grid-template-columns: 1fr;
   padding-bottom: 24px;
@@ -73,7 +76,7 @@ const GridTwoColumns = styled.div`
   }
 `
 
-const Column = styled.div``
+export const Column = styled.div``
 
 const ButtonWithReadyToGoStatusCSS = css`
   &,
@@ -108,7 +111,7 @@ const StyledButtonContainerFullWidth = styled(ButtonContainerFullWidth as any)`
 `
 
 interface Props {
-  next: () => void
+  next: (state: string) => void
   values: {
     question: string
     category: string
@@ -118,12 +121,16 @@ interface Props {
     arbitratorsCustom: Arbitrator[]
     loadedQuestionId: Maybe<string>
     outcomes: Outcome[]
+    lowerBound: Maybe<BigNumber>
+    upperBound: Maybe<BigNumber>
+    startingPoint: Maybe<BigNumber>
+    unit: string
   }
   addArbitratorCustom: (arbitrator: Arbitrator) => void
   addCategoryCustom: (category: string) => void
   handleArbitratorChange: (arbitrator: Arbitrator) => any
 
-  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => any
+  handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   handleClearQuestion: () => any
   handleDateChange: (date: Date | null) => any
   handleOutcomesChange: (newOutcomes: Outcome[]) => any
@@ -131,6 +138,7 @@ interface Props {
   setFirst: React.Dispatch<React.SetStateAction<number>>
   first: number
   loadMoreButton: boolean
+  state: string
 }
 
 const AskQuestionStep = (props: Props) => {
@@ -146,6 +154,7 @@ const AskQuestionStep = (props: Props) => {
     handleQuestionChange,
     loadMoreButton,
     setFirst,
+    state,
     values,
   } = props
 
@@ -155,26 +164,60 @@ const AskQuestionStep = (props: Props) => {
     categoriesCustom,
     category,
     loadedQuestionId,
+    lowerBound,
     outcomes,
     question,
     resolution,
+    startingPoint,
+    unit,
+    upperBound,
   } = values
 
   const history = useHistory()
-  const [isImport, setIsImport] = useState(!!loadedQuestionId)
+
+  const [currentFormState, setCurrentFormState] = useState(state ? state : loadedQuestionId ? 'IMPORT' : 'CATEGORICAL')
+
+  const FormState = {
+    categorical: 'CATEGORICAL',
+    import: 'IMPORT',
+    scalar: 'SCALAR',
+  }
 
   const totalProbabilities = outcomes.reduce((total, cur) => total + (cur.probability ? cur.probability : 0), 0)
   const totalProbabilitiesNotFull = Math.abs(totalProbabilities - 100) > 0.000001
   const outcomeNames = outcomes.map(outcome => outcome.name)
-  const isContinueButtonDisabled =
-    totalProbabilitiesNotFull ||
-    outcomes.length < 2 ||
-    !question ||
-    !resolution ||
-    resolution < new Date() ||
-    !category ||
-    outcomeNames.map(name => !name).reduce((e1, e2) => e1 || e2) ||
-    outcomeNames.map((name, index) => outcomeNames.indexOf(name) !== index).reduce((e1, e2) => e1 || e2)
+
+  const [isContinueButtonDisabled, setIsContinueButtonDisabled] = useState(true)
+
+  const isProperScale =
+    lowerBound && startingPoint && upperBound && lowerBound?.lte(startingPoint) && startingPoint?.lte(upperBound)
+
+  useEffect(() => {
+    if (currentFormState === FormState.categorical || currentFormState === FormState.import) {
+      setIsContinueButtonDisabled(
+        totalProbabilitiesNotFull ||
+          outcomes.length < 2 ||
+          !question ||
+          !resolution ||
+          resolution < new Date() ||
+          !category ||
+          outcomeNames.map(name => !name).reduce((e1, e2) => e1 || e2) ||
+          outcomeNames.map((name, index) => outcomeNames.indexOf(name) !== index).reduce((e1, e2) => e1 || e2),
+      )
+    } else if (currentFormState === FormState.scalar) {
+      setIsContinueButtonDisabled(
+        !question ||
+          !lowerBound ||
+          !upperBound ||
+          !startingPoint ||
+          !unit ||
+          !resolution ||
+          resolution < new Date() ||
+          !category ||
+          !isProperScale,
+      )
+    }
+  })
 
   const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
@@ -184,10 +227,15 @@ const AskQuestionStep = (props: Props) => {
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
 
+  const firstMount = useRef(true)
   useEffect(() => {
+    if (firstMount.current) {
+      firstMount.current = false
+      return
+    }
     handleClearQuestion()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isImport])
+  }, [currentFormState === FormState.import])
 
   const toggleCategoryButtonFocus = useCallback(() => {
     setCategoryButtonFocus(!categoryButtonFocus)
@@ -201,19 +249,25 @@ const AskQuestionStep = (props: Props) => {
   return (
     <CreateCard style={{ paddingTop: 20, paddingBottom: 20 }}>
       <CategoryImportWrapper>
-        <FormStateButton active={!isImport} onClick={() => setIsImport(false)}>
+        <FormStateButton
+          active={currentFormState === FormState.categorical}
+          onClick={() => setCurrentFormState('CATEGORICAL')}
+        >
           Categorical Market
         </FormStateButton>
+        <FormStateButton active={currentFormState === FormState.scalar} onClick={() => setCurrentFormState('SCALAR')}>
+          Scalar Market
+        </FormStateButton>
         <FormStateButton
-          active={isImport}
+          active={currentFormState === FormState.import}
           onClick={() => {
-            setIsImport(true)
+            setCurrentFormState('IMPORT')
           }}
         >
           Import Market
         </FormStateButton>
       </CategoryImportWrapper>
-      {isImport ? (
+      {currentFormState === FormState.import ? (
         <ImportMarketContent
           context={context}
           handleClearQuestion={handleClearQuestion}
@@ -223,6 +277,30 @@ const AskQuestionStep = (props: Props) => {
           outcomes={outcomes}
           totalProbabilities={totalProbabilities}
         ></ImportMarketContent>
+      ) : currentFormState === FormState.scalar ? (
+        <CreateScalarMarket
+          arbitrator={arbitrator}
+          arbitratorsCustom={arbitratorsCustom}
+          categoriesCustom={categoriesCustom}
+          category={category}
+          categoryButtonFocus={categoryButtonFocus}
+          context={context}
+          first={first}
+          handleArbitratorChange={handleArbitratorChange}
+          handleCategoryChange={handleCategoryChange}
+          handleChange={handleChange}
+          handleDateChange={handleDateChange}
+          loadMoreButton={loadMoreButton}
+          lowerBound={lowerBound}
+          question={question}
+          resolution={resolution}
+          setFirst={setFirst}
+          startingPoint={startingPoint}
+          toggleCategoryButtonFocus={toggleCategoryButtonFocus}
+          tomorrow={tomorrow}
+          unit={unit}
+          upperBound={upperBound}
+        />
       ) : (
         <>
           <FormRow
@@ -320,7 +398,7 @@ const AskQuestionStep = (props: Props) => {
         <ButtonWithReadyToGoStatus
           buttonType={ButtonType.secondaryLine}
           disabled={isContinueButtonDisabled}
-          onClick={props.next}
+          onClick={() => props.next(currentFormState)}
           readyToGo={!isContinueButtonDisabled}
         >
           Continue
