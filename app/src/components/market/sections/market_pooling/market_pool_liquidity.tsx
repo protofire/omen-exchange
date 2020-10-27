@@ -72,7 +72,6 @@ const TabsGrid = styled.div`
 `
 const WarningMessageStyled = styled(WarningMessage)`
   margin-bottom: 0;
-  margin-top: 20px;
 `
 
 const UserData = styled.div`
@@ -97,6 +96,9 @@ const ButtonContainerWrapper = styled(ButtonContainer)`
   margin: 20px -25px 0px -25px;
   padding-left: 20px;
   padding-right: 20px;
+`
+const SetAllowanceWrapper = styled(SetAllowance)`
+  margin-bottom: 20px;
 `
 
 const logger = getLogger('Market::Fund')
@@ -501,7 +503,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       {activeTab === Tabs.deposit && showSetAllowance && (
-        <SetAllowance
+        <SetAllowanceWrapper
           collateral={collateral}
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
