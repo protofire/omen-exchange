@@ -5,8 +5,9 @@ import styled from 'styled-components'
 import { WhenConnected } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
-import { Button, ButtonContainer } from '../../../../button'
+import { ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
+import { MarketBottomNavButton } from '../../../common/common_styled'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
@@ -75,14 +76,6 @@ const SellBuyWrapper = styled.div`
 
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
-`
-
-export const MarketBottomNavButton = styled(Button)`
-  height: 40px;
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-size: 14px;
-  line-height: 16px;
 `
 
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {

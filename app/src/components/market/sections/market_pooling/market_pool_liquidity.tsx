@@ -31,7 +31,7 @@ import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../..
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { GenericError } from '../../common/common_styled'
+import { GenericError, MarketBottomNavButton } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { SetAllowance } from '../../common/set_allowance'
@@ -40,7 +40,6 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
-import { MarketBottomNavButton } from '../market_profile/market_status/open'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData

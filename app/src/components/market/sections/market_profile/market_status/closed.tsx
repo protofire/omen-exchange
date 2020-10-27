@@ -13,7 +13,7 @@ import { ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
-import { ButtonContainerFullWidth } from '../../../common/common_styled'
+import { ButtonContainerFullWidth, MarketBottomNavButton } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
 import { OutcomeTable } from '../../../common/outcome_table'
@@ -23,8 +23,6 @@ import { MarketHistoryContainer } from '../../market_history/market_history_cont
 import { MarketNavigation } from '../../market_navigation'
 import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
 import { MarketSellContainer } from '../../market_sell/market_sell_container'
-
-import { MarketBottomNavButton } from './open'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
