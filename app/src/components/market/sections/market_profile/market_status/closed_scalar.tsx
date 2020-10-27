@@ -1,7 +1,14 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 
-const Wrapper = () => {
+import { MarketMakerData } from '../../../../../util/types'
+
+interface Props extends RouteComponentProps<Record<string, string | undefined>> {
+  account: Maybe<string>
+  marketMakerData: MarketMakerData
+}
+
+const Wrapper = (props: Props) => {
   return <p>Closed Scalar</p>
 }
 

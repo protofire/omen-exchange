@@ -34,6 +34,8 @@ const MarketWizardCreatorContainer: FC = () => {
           throw new Error('resolution time was not specified')
         }
 
+        if (isScalar) logger.log('scalar boiiii')
+
         setMarketCreationStatus(MarketCreationStatus.creatingAMarket())
 
         const cpk = await CPKService.create(provider)
