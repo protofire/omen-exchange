@@ -12,7 +12,7 @@ import { CommonDisabledCSS } from '../../../../../common/form/common_styled'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
-import { ButtonContainerFullWidth, LeftButton } from '../../../../common/common_styled'
+import { ButtonContainerFullWidth, MarketBottomNavButton } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome, Outcomes } from '../outcomes'
@@ -83,7 +83,7 @@ const ButtonWithReadyToGoStatusCSS = css`
   }
 `
 
-const ButtonWithReadyToGoStatus = styled(Button)<{ readyToGo: boolean }>`
+const ButtonWithReadyToGoStatus = styled(MarketBottomNavButton as any)<{ readyToGo: boolean }>`
   ${props => props.readyToGo && ButtonWithReadyToGoStatusCSS}
 `
 
@@ -94,6 +94,17 @@ const CategoryImportWrapper = styled.div`
   padding: 0 ${props => props.theme.cards.paddingHorizontal};
   padding-bottom: 20px;
 `
+
+const LeftButton = styled(MarketBottomNavButton as any)`
+  margin-right: auto;
+`
+
+const StyledButtonContainerFullWidth = styled(ButtonContainerFullWidth as any)`
+  padding: 20px 24px;
+  padding-bottom: 0;
+  margin: 0 -24px;
+`
+
 interface Props {
   next: () => void
   values: {
@@ -299,7 +310,7 @@ const AskQuestionStep = (props: Props) => {
         </>
       )}
 
-      <ButtonContainerFullWidth borderTop={true}>
+      <StyledButtonContainerFullWidth borderTop={true}>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
           Cancel
         </LeftButton>
@@ -311,7 +322,7 @@ const AskQuestionStep = (props: Props) => {
         >
           Continue
         </ButtonWithReadyToGoStatus>
-      </ButtonContainerFullWidth>
+      </StyledButtonContainerFullWidth>
     </CreateCard>
   )
 }
