@@ -15,7 +15,7 @@ import {
   mulBN,
 } from '../../../../util/tools'
 import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
-import { Button, ButtonContainer } from '../../../button'
+import { ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
@@ -29,9 +29,10 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
+import { MarketBottomNavButton } from '../market_profile/market_status/open'
 
-const LeftButton = styled(Button)`
-  margin-right: auto;
+const StyledButtonContainer = styled(ButtonContainer)`
+  justify-content: space-between;
 `
 
 const logger = getLogger('Market::Sell')
@@ -275,14 +276,18 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           hyperlinkDescription={''}
         />
       )}
-      <ButtonContainer>
-        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+      <StyledButtonContainer>
+        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
-        </LeftButton>
-        <Button buttonType={ButtonType.secondaryLine} disabled={isSellButtonDisabled} onClick={() => finish()}>
+        </MarketBottomNavButton>
+        <MarketBottomNavButton
+          buttonType={ButtonType.secondaryLine}
+          disabled={isSellButtonDisabled}
+          onClick={() => finish()}
+        >
           Sell
-        </Button>
-      </ButtonContainer>
+        </MarketBottomNavButton>
+      </StyledButtonContainer>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
