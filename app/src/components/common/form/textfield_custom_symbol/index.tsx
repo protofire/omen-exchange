@@ -22,7 +22,6 @@ const FieldWrapper = styled.div`
   display: flex;
   outline: none;
   padding: ${props => props.theme.textfield.paddingVertical + ' ' + props.theme.textfield.paddingHorizontal};
-  transition: border-color 0.15s ease-in-out;
   width: 100%;
 
   &:focus-within {
@@ -121,7 +120,6 @@ const MaxButton = styled.span`
   display: flex;
   align-items: center;
   cursor: pointer;
-  transition: border-color 0.15s ease-in-out;
 `
 
 export const TextfieldCustomSymbol = (props: Props) => {
