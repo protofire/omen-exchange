@@ -12,6 +12,7 @@ const MainScrollStyled = styled.div`
   padding-top: 30px;
   position: relative;
   z-index: 2;
+  overflow-x: hidden;
 `
 
 const MainScrollInner = styled.div`
