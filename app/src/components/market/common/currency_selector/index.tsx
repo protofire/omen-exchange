@@ -79,7 +79,7 @@ export const CurrencySelector: React.FC<Props> = props => {
           },
     })
     if (currency && currency.toLowerCase() === address.toLowerCase()) {
-      currentItem = index
+      currentItem = addAll ? index + 1 : index
     }
   })
 
