@@ -212,9 +212,12 @@ export const calcPoolTokens = (
   holdingsBN: BigNumber[],
   poolShareSupply: BigNumber,
 ): BigNumber => {
-  if (poolShareSupply.gt(0)) {
-    const poolWeight = holdingsBN.reduce((max: BigNumber, h: BigNumber) => (h.gt(max) ? h : max))
+  console.log(holdingsBN)
+  const poolWeight = holdingsBN.reduce((max: BigNumber, h: BigNumber) => (h.gt(max) ? h : max))
 
+  const Big = Number(formatNumber(formatBigNumber(poolWeight, 0)))
+  console.log(Number(Big))
+  if (poolShareSupply.gt(0) && Big) {
     return addedFunds.mul(poolShareSupply).div(poolWeight)
   } else {
     return addedFunds

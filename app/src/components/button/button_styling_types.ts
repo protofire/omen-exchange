@@ -131,14 +131,14 @@ const getButtonTypeStyles = (buttonType: ButtonType = ButtonType.primaryLine): a
 
 export const ButtonCSS = css`
   align-items: center;
-  border-radius: 32px;
+  border-radius: 8px;
   border-style: solid;
   border-width: 1px;
   cursor: pointer;
   display: flex;
   font-size: 14px;
   font-weight: 400;
-  height: 32px;
+  height: 40px;
   justify-content: center;
   letter-spacing: 0.2px;
   line-height: 1.2;

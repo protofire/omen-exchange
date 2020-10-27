@@ -52,9 +52,10 @@ enum Tabs {
   withdraw,
 }
 const WalletBalanceWrapper = styled(WalletBalance)`
-  justify-content: space-between;
   height: auto;
-  ${ButtonCSS}
+  ${ButtonCSS};
+  justify-content: space-between;
+  margin-bottom: 20px;
 `
 const TextFieldWrapper = styled(TextfieldCustomPlaceholder)`
   ${ButtonCSS}
@@ -68,10 +69,9 @@ const TabsGrid = styled.div`
   display: grid;
   grid-column-gap: 13px;
   grid-template-columns: 1fr 1fr;
-  margin: 0 0 25px;
+  margin: 0 0 20px;
 `
 const WarningMessageStyled = styled(WarningMessage)`
-  margin-top: 20px;
   margin-bottom: 0;
 `
 
@@ -92,6 +92,14 @@ const UserDataRow = styled.div`
 
 const UserDataTitleValue = styled(TitleValue)`
   width: calc(50% - 16px);
+  p {
+    ${({ color, theme }) => (color ? `color: ${theme.colors.green};font-weight:500;` : '')}
+  }
+`
+const ButtonContainerWrapper = styled(ButtonContainer)`
+  margin: 20px -25px 0px -25px;
+  padding-left: 20px;
+  padding-right: 20px;
 `
 
 const logger = getLogger('Market::Fund')
@@ -187,6 +195,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
+  console.log(formatBigNumber(totalPoolShares, collateral.decimals))
 
   const totalDepositedTokens = totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) =>
     amount.lt(min) ? amount : min,
@@ -324,17 +333,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           <UserDataTitleValue
             state={userEarnings.gt(0) ? ValueStates.success : undefined}
             title={'Total Pool Tokens'}
-            value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
-              formatBigNumber(userEarnings, collateral.decimals),
-            )} ${collateral.symbol}`}
+            value={`${formatBigNumber(totalPoolShares, collateral.decimals)} ${collateral.symbol}`}
           />
         </UserDataRow>
         <UserDataRow>
           <UserDataTitleValue
+            color={userEarnings.gt(0)}
             title={'Your Earnings'}
-            value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
+            value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
+              formatBigNumber(userEarnings, collateral.decimals),
+            )} ${collateral.symbol}`}
           />
           <UserDataTitleValue
+            color={userEarnings.gt(0)}
             state={userEarnings.gt(0) ? ValueStates.success : undefined}
             title={'Total Earnings'}
             value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
@@ -400,16 +411,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           {activeTab === Tabs.withdraw && (
             <>
               {/*//here is starts*/}
-
-              <WalletBalanceWrapper
-                // onClick={() => {
-                //   setAmountToRemove(fundingBalance)
-                //   setAmountToRemoveDisplay(sharesBalance)
-                // }}
-                text="Pool Tokens"
-                value={formatNumber(sharesBalance)}
-              />
-
+              <WalletBalanceWrapper text="Pool Tokens" value={formatNumber(sharesBalance)} />
               {/*here it ends*/}
               <TextFieldWrapper
                 formField={
@@ -424,8 +426,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                     valueToDisplay={amountToRemoveDisplay}
                   />
                 }
-                symbol="Shares"
+                onClickMaxButton={() => {
+                  setAmountToRemove(fundingBalance)
+                  setAmountToRemoveDisplay(sharesBalance)
+                }}
+                shouldDisplayMaxButton={true}
+                symbol={collateral.symbol}
               />
+
               {sharesAmountError && <GenericError>{sharesAmountError}</GenericError>}
             </>
           )}
@@ -508,7 +516,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         href={DOCUMENT_FAQ}
         hyperlinkDescription={'More Info'}
       />
-      <ButtonContainer>
+      <ButtonContainerWrapper borderTop={true}>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
         </LeftButton>
@@ -526,7 +534,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             Withdraw
           </Button>
         )}
-      </ButtonContainer>
+      </ButtonContainerWrapper>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
