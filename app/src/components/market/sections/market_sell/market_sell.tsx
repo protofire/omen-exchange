@@ -221,6 +221,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 valueToDisplay={amountSharesToDisplay}
               />
             }
+            onClickMaxButton={() => {
+              setAmountShares(balanceItem.shares)
+              setAmountSharesToDisplay(formatNumber(selectedOutcomeBalance, 5))
+            }}
+            shouldDisplayMaxButton
             symbol={'Shares'}
           />
           {amountError && <GenericError>{amountError}</GenericError>}
