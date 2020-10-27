@@ -249,6 +249,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
                 valueToDisplay={amountToDisplay}
               />
             }
+            onClickMaxButton={() => {
+              setAmount(collateralBalance)
+              setAmountToDisplay(formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5))
+            }}
+            shouldDisplayMaxButton
             symbol={collateral.symbol}
           />
           {amountError && <GenericError>{amountError}</GenericError>}
