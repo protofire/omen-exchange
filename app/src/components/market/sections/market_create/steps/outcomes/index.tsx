@@ -132,7 +132,7 @@ const Outcomes = (props: Props) => {
                   ),
                 )
               }}
-              placeholder="outcome..."
+              placeholder="50"
               readOnly={!!uniformProbabilities}
               type="number"
               value={uniformProbabilities ? outcome.probability?.toFixed(2) : outcome.probability}
