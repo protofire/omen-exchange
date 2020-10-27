@@ -2,7 +2,7 @@ import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ethers } from 'ethers'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
@@ -359,13 +359,20 @@ class CPKService {
       }
 
       if (!conditionExists) {
-        // Step 2: Prepare condition
+        // Step 2: Prepare scalar condition using the conditionQuestionId
         logger.log(`Adding prepareCondition transaction`)
 
-        transactions.push({
-          to: conditionalTokensAddress,
-          data: ConditionalTokenService.encodePrepareCondition(questionId, oracleAddress, 2),
-        })
+        scalarLow &&
+          scalarHigh &&
+          transactions.push({
+            to: conditionalTokensAddress,
+            data: ConditionalTokenService.encodePrepareScalarCondition(
+              questionId,
+              scalarLow,
+              scalarHigh,
+              oracleAddress,
+            ),
+          })
       }
 
       logger.log(`ConditionID: ${conditionId}`)
