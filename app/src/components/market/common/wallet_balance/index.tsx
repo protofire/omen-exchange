@@ -34,7 +34,7 @@ interface Props {
   onClick?: () => void
   text?: string
   value: string
-  symbol: string
+  symbol?: string
 }
 
 export const WalletBalance: React.FC<Props> = props => {

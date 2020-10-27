@@ -26,7 +26,7 @@ import {
 } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
-import { ButtonType } from '../../../button/button_styling_types'
+import { ButtonCSS, ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
@@ -51,6 +51,14 @@ enum Tabs {
   deposit,
   withdraw,
 }
+const WalletBalanceWrapper = styled(WalletBalance)`
+  justify-content: space-between;
+  height: auto;
+  ${ButtonCSS}
+`
+const TextFieldWrapper = styled(TextfieldCustomPlaceholder)`
+  ${ButtonCSS}
+`
 
 const LeftButton = styled(Button)`
   margin-right: auto;
@@ -69,10 +77,17 @@ const WarningMessageStyled = styled(WarningMessage)`
 
 const UserData = styled.div`
   display: flex;
-  justify-content: space-between;
-  padding: 24px 25px;
+  flex-direction: column;
   margin: 0 -25px;
+  padding: 20px 24px;
   border-top: 1px solid ${props => props.theme.borders.borderDisabled};
+`
+const UserDataRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  &:first-child {
+    margin-bottom: 10px;
+  }
 `
 
 const UserDataTitleValue = styled(TitleValue)`
@@ -301,17 +316,32 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   return (
     <>
       <UserData>
-        <UserDataTitleValue
-          title={'Your Liquidity'}
-          value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
-        />
-        <UserDataTitleValue
-          state={userEarnings.gt(0) ? ValueStates.success : undefined}
-          title={'Your Earnings'}
-          value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${
-            collateral.symbol
-          }`}
-        />
+        <UserDataRow>
+          <UserDataTitleValue
+            title={'Your Liquidity'}
+            value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
+          />
+          <UserDataTitleValue
+            state={userEarnings.gt(0) ? ValueStates.success : undefined}
+            title={'Total Pool Tokens'}
+            value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
+              formatBigNumber(userEarnings, collateral.decimals),
+            )} ${collateral.symbol}`}
+          />
+        </UserDataRow>
+        <UserDataRow>
+          <UserDataTitleValue
+            title={'Your Earnings'}
+            value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
+          />
+          <UserDataTitleValue
+            state={userEarnings.gt(0) ? ValueStates.success : undefined}
+            title={'Total Earnings'}
+            value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
+              formatBigNumber(userEarnings, collateral.decimals),
+            )} ${collateral.symbol}`}
+          />
+        </UserDataRow>
       </UserData>
       <OutcomeTable
         balances={balances}
@@ -321,14 +351,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         newShares={activeTab === Tabs.deposit ? sharesAfterAddingFunding : sharesAfterRemovingFunding}
         probabilities={probabilities}
         showSharesChange={showSharesChange}
-      />
-      <WarningMessageStyled
-        additionalDescription={''}
-        description={
-          'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
-        }
-        href={DOCUMENT_FAQ}
-        hyperlinkDescription={'More Info'}
       />
       <GridTransactionDetails>
         <div>
@@ -377,16 +399,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              <WalletBalance
-                onClick={() => {
-                  setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(sharesBalance)
-                }}
-                symbol="Shares"
-                text="My Pool Tokens"
+              {/*//here is starts*/}
+
+              <WalletBalanceWrapper
+                // onClick={() => {
+                //   setAmountToRemove(fundingBalance)
+                //   setAmountToRemoveDisplay(sharesBalance)
+                // }}
+                text="Pool Tokens"
                 value={formatNumber(sharesBalance)}
               />
-              <TextfieldCustomPlaceholder
+
+              {/*here it ends*/}
+              <TextFieldWrapper
                 formField={
                   <BigNumberInput
                     decimals={collateral.decimals}
@@ -475,6 +500,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           onUnlock={unlockCollateral}
         />
       )}
+      <WarningMessageStyled
+        additionalDescription={''}
+        description={
+          'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
+        }
+        href={DOCUMENT_FAQ}
+        hyperlinkDescription={'More Info'}
+      />
       <ButtonContainer>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
