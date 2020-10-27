@@ -156,7 +156,6 @@ export const AdvancedFilters = (props: Props) => {
   const showQuestionType = false
 
   const activeArbitratorIndex = arbitrators.findIndex(t => t.address === arbitrator) + 1
-
   return (
     <Wrapper>
       <Column>
@@ -166,7 +165,7 @@ export const AdvancedFilters = (props: Props) => {
           context={context}
           currency={currency}
           disabled={false}
-          onSelect={currency => onChangeCurrency(!currency ? null : currency.address)}
+          onSelect={currency => onChangeCurrency(currency ? currency.address : null)}
           placeholder={currency ? '' : 'All'}
         />
       </Column>
