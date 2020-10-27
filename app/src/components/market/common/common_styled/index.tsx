@@ -107,6 +107,7 @@ const OutcomeItemWrapperActiveCSS = css`
     border-color: ${({ theme }) => theme.textfield.borderColorOnHover};
   }
   &:active,
+  &:focus-within,
   &:focus {
     border-color: ${({ theme }) => theme.textfield.borderColorActive};
   }
