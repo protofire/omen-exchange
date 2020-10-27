@@ -157,7 +157,7 @@ const theme = {
     color: '#37474F',
     fontSize: '14px',
     fontWeight: '500',
-    height: '38px',
+    height: '40px',
     outline: 'none',
     paddingHorizontal: '20px',
     paddingVertical: '12px',
