@@ -304,7 +304,7 @@ const AskQuestionStep = (props: Props) => {
                 value={arbitrator}
               />
             }
-            style={{ marginBottom: 0 }}
+            style={{ marginBottom: 0, marginTop: 24 }}
             title={'Arbitrator'}
           />
         </>
