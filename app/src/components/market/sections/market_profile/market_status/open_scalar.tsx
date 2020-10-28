@@ -54,6 +54,7 @@ const Wrapper = (props: Props) => {
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
         <MarketScale
+          // TODO: Change to collateral.decimals
           decimals={0}
           lowerBound={lowerBound}
           startingPoint={currentPrediction}
