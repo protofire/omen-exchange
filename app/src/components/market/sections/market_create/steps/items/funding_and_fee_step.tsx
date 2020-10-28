@@ -135,10 +135,16 @@ const CustomFeeWrapper = styled.div`
 const CustomFeeLabel = styled.p`
   width: 50%;
   margin: 0;
+  color: ${props => props.theme.colors.textColorDark};
+  font-size: 14px;
+  line-height: 16px;
 `
 
 const StyledTradingFeeSelector = styled(TradingFeeSelector)`
   width: 50%;
+  .dropdownItems {
+    min-width: auto;
+  }
 `
 
 const FlexRowWrapper = styled.div`
