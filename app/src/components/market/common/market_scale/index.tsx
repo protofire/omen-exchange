@@ -126,27 +126,29 @@ interface Props {
   startingPoint: BigNumber
   unit: string
   upperBound: BigNumber
+  decimals: number
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
-  const { lowerBound, startingPoint, unit, upperBound } = props
+  const { decimals, lowerBound, startingPoint, unit, upperBound } = props
 
   return (
     <ScaleWrapper>
       <ScaleTitleWrapper>
         <ScaleTitle>
-          {lowerBound && formatNumber(formatBigNumber(lowerBound, 18))} {unit}
+          {lowerBound && formatNumber(formatBigNumber(lowerBound, decimals))} {unit}
         </ScaleTitle>
         <ScaleTitle>
           {upperBound &&
             lowerBound &&
             formatNumber(
-              `${Number(formatBigNumber(upperBound, 18)) / 2 + Number(formatBigNumber(lowerBound, 18)) / 2}`,
+              `${Number(formatBigNumber(upperBound, decimals)) / 2 +
+                Number(formatBigNumber(lowerBound, decimals)) / 2}`,
             )}
           {` ${unit}`}
         </ScaleTitle>
         <ScaleTitle>
-          {upperBound && formatBigNumber(upperBound, 18)} {unit}
+          {upperBound && formatBigNumber(upperBound, decimals)} {unit}
         </ScaleTitle>
       </ScaleTitleWrapper>
       <Scale>
@@ -160,7 +162,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))}
       >
         <StartingPointTitle>
-          {startingPoint && formatBigNumber(startingPoint, 18)} {unit}
+          {startingPoint && formatBigNumber(startingPoint, decimals)} {unit}
         </StartingPointTitle>
         <StartingPointSubtitle>Starting Point</StartingPointSubtitle>
       </StartingPointBox>
