@@ -361,9 +361,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         <QuestionText>{question}</QuestionText>
         {state === 'SCALAR' && lowerBound && upperBound && startingPoint && unit ? (
           <MarketScale
+<<<<<<< HEAD
             lowerBound={lowerBound}
             startingPoint={startingPoint}
             startingPointTitle={'Starting Point'}
+=======
+            decimals={18}
+            lowerBound={lowerBound}
+            startingPoint={startingPoint}
+>>>>>>> 9e67bfe1... Properly manage market scale decimals
             unit={unit}
             upperBound={upperBound}
           />
