@@ -61,12 +61,7 @@ const MarketView: React.FC<Props> = (props: Props) => {
       <Helmet>
         <title>{`${question.title} - ${DOCUMENT_TITLE}`}</title>
       </Helmet>
-      <SectionTitle
-        goBack={true}
-        textAlign={TextAlign.left}
-        title={question.title}
-        verified={curatedByDxDao || klerosTCRregistered}
-      />
+      <SectionTitle goBack={true} textAlign={TextAlign.left} title={question.title} />
       {renderView()}
     </>
   )
