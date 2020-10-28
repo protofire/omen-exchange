@@ -13,6 +13,7 @@ const ScaleWrapper = styled.div`
   margin-right: -24px;
   padding-left: 24px;
   padding-right: 24px;
+  position: relative;
 `
 
 const ScaleTitleWrapper = styled.div`
@@ -87,12 +88,12 @@ const StartingPointBox = styled.div<{ xValue: number }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  bottom: 36px;
+  bottom: 24px;
   ${props =>
     props.xValue <= 0.885
       ? `left: ${props.xValue <= 0.115 ? `25px` : props.xValue <= 0.885 ? `${props.xValue * 100}%` : ``}`
       : `right: 25px`}
-  transform: translate(
+  transform: translateX(
     ${props =>
       props.xValue < 0.5 && props.xValue >= 0.115
         ? `calc(-50% + 12px)`
@@ -100,8 +101,7 @@ const StartingPointBox = styled.div<{ xValue: number }>`
         ? `calc(-50% - 12px)`
         : props.xValue === 0.5
         ? `-50%`
-        : `0`},
-    -100%
+        : `0`}
   );
   background: white;
 `
