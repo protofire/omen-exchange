@@ -252,7 +252,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
                 balance={formatNumber(collateralBalanceFormatted)}
                 context={context}
                 currency={collateral.address}
-                disabled={false}
+                disabled
                 onSelect={(token: Token | null) => {
                   if (token) {
                     setCollateral(token)
