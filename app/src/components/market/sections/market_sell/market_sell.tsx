@@ -1,11 +1,19 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
-import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import {
+  useAsyncDerivedValue,
+  useCollateralBalance,
+  useConnectedWeb3Context,
+  useContracts,
+  useTokens,
+} from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
+import { fetchAccountBalance } from '../../../../store/reducer'
 import { getLogger } from '../../../../util/logger'
 import {
   calcSellAmountInCollateral,
@@ -14,20 +22,20 @@ import {
   formatNumber,
   mulBN,
 } from '../../../../util/tools'
-import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
+import { BalanceItem, MarketMakerData, OutcomeTableValue, Status, Token } from '../../../../util/types'
 import { ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
-import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
 
 const StyledButtonContainer = styled(ButtonContainer)`
@@ -43,10 +51,13 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
-
+  const dispatch = useDispatch()
   const { marketMakerData, switchMarketTab } = props
-  const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
+  const { address: marketMakerAddress, balances, fee } = marketMakerData
+  const tokensAmount = useTokens(context).length
+  const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
 
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
@@ -68,7 +79,23 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
+  useEffect(() => {
+    dispatch(fetchAccountBalance(account, provider, collateral))
+  }, [dispatch, account, provider, collateral])
+
+  const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
+  const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
+    formatBigNumber(collateralBalance, collateral.decimals),
+  )
+  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
+
+  useEffect(() => {
+    setCollateralBalance(maybeCollateralBalance || Zero)
+    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals))
+    // eslint-disable-next-line
+  }, [maybeCollateralBalance])
 
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares, collateral.decimals).includes('-'))
@@ -192,22 +219,22 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       />
       <GridTransactionDetails>
         <div>
-          <WalletBalance
-            data-class="customTooltip"
-            data-delay-hide="500"
-            data-effect="solid"
-            data-for="walletBalanceTooltip"
-            data-multiline={true}
-            data-place="right"
-            data-tip={`Sell all of the selected outcome's shares.`}
-            onClick={() => {
-              setAmountShares(balanceItem.shares)
-              setAmountSharesToDisplay(formatNumber(selectedOutcomeBalance, 5))
-            }}
-            symbol="Shares"
-            value={formatNumber(selectedOutcomeBalance, 5)}
-          />
-          <ReactTooltip id="walletBalanceTooltip" />
+          {tokensAmount > 1 && (
+            <CurrenciesWrapper>
+              <CurrencySelector
+                balance={formatNumber(collateralBalanceFormatted)}
+                context={context}
+                currency={collateral.address}
+                disabled={false}
+                onSelect={(token: Token | null) => {
+                  if (token) {
+                    setCollateral(token)
+                    setAmountShares(new BigNumber(0))
+                  }
+                }}
+              />
+            </CurrenciesWrapper>
+          )}
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
