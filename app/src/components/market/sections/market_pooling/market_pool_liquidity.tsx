@@ -83,11 +83,6 @@ const UserDataTitleValue = styled(TitleValue)`
   width: calc(50% - 16px);
 `
 
-const GridTransactionDetailsColumn = styled.div`
-  width: 100%;
-  overflow-x: hidden;
-`
-
 const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
@@ -364,7 +359,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         hyperlinkDescription={'More Info'}
       />
       <GridTransactionDetails>
-        <GridTransactionDetailsColumn>
+        <div>
           <TabsGrid>
             <ButtonTab
               active={disableDepositTab ? false : activeTab === Tabs.deposit}
@@ -398,28 +393,27 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   />
                 </CurrenciesWrapper>
               )}
-              <div>
-                <TextfieldCustomPlaceholder
-                  formField={
-                    <BigNumberInput
-                      decimals={collateral.decimals}
-                      name="amountToFund"
-                      onChange={(e: BigNumberInputReturn) => {
-                        setAmountToFund(e.value)
-                        setAmountToFundDisplay('')
-                      }}
-                      value={amountToFund}
-                      valueToDisplay={amountToFundDisplay}
-                    />
-                  }
-                  onClickMaxButton={() => {
-                    setAmountToFund(collateralBalance)
-                    setAmountToFundDisplay(walletBalance)
-                  }}
-                  shouldDisplayMaxButton
-                  symbol={collateral.symbol}
-                />
-              </div>
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInput
+                    decimals={collateral.decimals}
+                    name="amountToFund"
+                    onChange={(e: BigNumberInputReturn) => {
+                      setAmountToFund(e.value)
+                      setAmountToFundDisplay('')
+                    }}
+                    style={{ width: 0 }}
+                    value={amountToFund}
+                    valueToDisplay={amountToFundDisplay}
+                  />
+                }
+                onClickMaxButton={() => {
+                  setAmountToFund(collateralBalance)
+                  setAmountToFundDisplay(walletBalance)
+                }}
+                shouldDisplayMaxButton
+                symbol={collateral.symbol}
+              />
 
               {collateralAmountError && <GenericError>{collateralAmountError}</GenericError>}
             </>
@@ -427,34 +421,34 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           {activeTab === Tabs.withdraw && (
             <>
               <TokenBalance text="Pool Tokens" value={formatNumber(sharesBalance)} />
-              <div>
-                <TextfieldCustomPlaceholder
-                  formField={
-                    <BigNumberInput
-                      decimals={collateral.decimals}
-                      name="amountToRemove"
-                      onChange={(e: BigNumberInputReturn) => {
-                        setAmountToRemove(e.value)
-                        setAmountToRemoveDisplay('')
-                      }}
-                      value={amountToRemove}
-                      valueToDisplay={amountToRemoveDisplay}
-                    />
-                  }
-                  onClickMaxButton={() => {
-                    setAmountToRemove(fundingBalance)
-                    setAmountToRemoveDisplay(sharesBalance)
-                  }}
-                  shouldDisplayMaxButton
-                  symbol="Shares"
-                />
-              </div>
+
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInput
+                    decimals={collateral.decimals}
+                    name="amountToRemove"
+                    onChange={(e: BigNumberInputReturn) => {
+                      setAmountToRemove(e.value)
+                      setAmountToRemoveDisplay('')
+                    }}
+                    style={{ width: 0 }}
+                    value={amountToRemove}
+                    valueToDisplay={amountToRemoveDisplay}
+                  />
+                }
+                onClickMaxButton={() => {
+                  setAmountToRemove(fundingBalance)
+                  setAmountToRemoveDisplay(sharesBalance)
+                }}
+                shouldDisplayMaxButton
+                symbol="Shares"
+              />
 
               {sharesAmountError && <GenericError>{sharesAmountError}</GenericError>}
             </>
           )}
-        </GridTransactionDetailsColumn>
-        <GridTransactionDetailsColumn>
+        </div>
+        <div>
           {activeTab === Tabs.deposit && (
             <TransactionDetailsCard>
               <TransactionDetailsRow
@@ -496,7 +490,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               />
             </TransactionDetailsCard>
           )}
-        </GridTransactionDetailsColumn>
+        </div>
       </GridTransactionDetails>
       {isNegativeAmountToFund && (
         <WarningMessage
