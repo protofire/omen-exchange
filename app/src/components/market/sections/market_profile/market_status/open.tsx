@@ -18,13 +18,13 @@ import { MarketNavigation } from '../../market_navigation'
 import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
 import { MarketSellContainer } from '../../market_sell/market_sell_container'
 
-const TopCard = styled(ViewCard)`
+export const TopCard = styled(ViewCard)`
   padding: 24px;
   padding-bottom: 0;
   margin-bottom: 24px;
 `
 
-const BottomCard = styled(ViewCard)``
+export const BottomCard = styled(ViewCard)``
 
 const MessageWrapper = styled.div`
   border-radius: 4px;
