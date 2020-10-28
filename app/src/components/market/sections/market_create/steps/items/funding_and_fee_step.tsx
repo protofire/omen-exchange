@@ -452,6 +452,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             decimals={18}
             lowerBound={lowerBound}
             startingPoint={startingPoint}
+            startingPointTitle={'Starting Point'}
             unit={unit}
             upperBound={upperBound}
           />

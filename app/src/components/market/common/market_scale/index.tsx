@@ -127,10 +127,11 @@ interface Props {
   unit: string
   upperBound: BigNumber
   decimals: number
+  startingPointTitle: string
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
-  const { decimals, lowerBound, startingPoint, unit, upperBound } = props
+  const { decimals, lowerBound, startingPoint, startingPointTitle, unit, upperBound } = props
 
   return (
     <ScaleWrapper>
@@ -164,7 +165,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         <StartingPointTitle>
           {startingPoint && formatBigNumber(startingPoint, decimals)} {unit}
         </StartingPointTitle>
-        <StartingPointSubtitle>Starting Point</StartingPointSubtitle>
+        <StartingPointSubtitle>{startingPointTitle}</StartingPointSubtitle>
       </StartingPointBox>
     </ScaleWrapper>
   )
