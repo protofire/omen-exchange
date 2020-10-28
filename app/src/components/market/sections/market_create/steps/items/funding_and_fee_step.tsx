@@ -369,7 +369,11 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             decimals={18}
             lowerBound={lowerBound}
             startingPoint={startingPoint}
+<<<<<<< HEAD
 >>>>>>> 9e67bfe1... Properly manage market scale decimals
+=======
+            startingPointTitle={'Starting Point'}
+>>>>>>> 97063dcc... Add dynamic starting point title
             unit={unit}
             upperBound={upperBound}
           />
