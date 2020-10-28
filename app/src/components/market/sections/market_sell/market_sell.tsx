@@ -244,6 +244,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                   setAmountShares(e.value)
                   setAmountSharesToDisplay('')
                 }}
+                style={{ width: 0 }}
                 value={amountShares}
                 valueToDisplay={amountSharesToDisplay}
               />

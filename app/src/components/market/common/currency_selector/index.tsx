@@ -11,6 +11,10 @@ const Wrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+
+  .token_item_wrapper {
+    color: ${props => props.theme.colors.textColorDark};
+  }
 `
 
 const CurrencyButtonSelectedCSS = css`
@@ -68,7 +72,7 @@ export const CurrencySelector: React.FC<Props> = props => {
 
   tokens.forEach(({ address, image, symbol }, index) => {
     currencyDropdownData.push({
-      content: image ? <TokenItem image={image} text={symbol} /> : symbol,
+      content: <TokenItem image={image} text={symbol} />,
       extraContent: balance,
       onClick: !disabled
         ? () => {

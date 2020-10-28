@@ -271,6 +271,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
                   setAmount(e.value)
                   setAmountToDisplay('')
                 }}
+                style={{ width: 0 }}
                 value={amount}
                 valueToDisplay={amountToDisplay}
               />

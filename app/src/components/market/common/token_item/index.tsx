@@ -23,7 +23,7 @@ const Text = styled.div`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  image: any
+  image?: any
   text: string
 }
 
@@ -32,8 +32,8 @@ export const TokenItem: React.FC<Props> = props => {
   const [showImage, setShowImage] = useState(true)
 
   return (
-    <Wrapper>
-      {showImage && <Image onError={() => setShowImage(false)} src={image} />}
+    <Wrapper className="token_item_wrapper">
+      {!!image && showImage && <Image onError={() => setShowImage(false)} src={image} />}
       <Text>{text}</Text>
     </Wrapper>
   )
