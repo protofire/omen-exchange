@@ -39,6 +39,7 @@ import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { SetAllowance } from '../../common/set_allowance'
+import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
@@ -63,7 +64,7 @@ const TabsGrid = styled.div`
   display: grid;
   grid-column-gap: 13px;
   grid-template-columns: 1fr 1fr;
-  margin: 0 0 25px;
+  margin: 0 0 20px;
 `
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
@@ -80,6 +81,11 @@ const UserData = styled.div`
 
 const UserDataTitleValue = styled(TitleValue)`
   width: calc(50% - 16px);
+`
+
+const GridTransactionDetailsColumn = styled.div`
+  width: 100%;
+  overflow-x: hidden;
 `
 
 const logger = getLogger('Market::Fund')
@@ -358,7 +364,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         hyperlinkDescription={'More Info'}
       />
       <GridTransactionDetails>
-        <div>
+        <GridTransactionDetailsColumn>
           <TabsGrid>
             <ButtonTab
               active={disableDepositTab ? false : activeTab === Tabs.deposit}
@@ -392,72 +398,63 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   />
                 </CurrenciesWrapper>
               )}
-              <TextfieldCustomPlaceholder
-                formField={
-                  <BigNumberInput
-                    decimals={collateral.decimals}
-                    name="amountToFund"
-                    onChange={(e: BigNumberInputReturn) => {
-                      setAmountToFund(e.value)
-                      setAmountToFundDisplay('')
-                    }}
-                    value={amountToFund}
-                    valueToDisplay={amountToFundDisplay}
-                  />
-                }
-                onClickMaxButton={() => {
-                  setAmountToFund(collateralBalance)
-                  setAmountToFundDisplay(walletBalance)
-                }}
-                shouldDisplayMaxButton
-                symbol={collateral.symbol}
-              />
+              <div>
+                <TextfieldCustomPlaceholder
+                  formField={
+                    <BigNumberInput
+                      decimals={collateral.decimals}
+                      name="amountToFund"
+                      onChange={(e: BigNumberInputReturn) => {
+                        setAmountToFund(e.value)
+                        setAmountToFundDisplay('')
+                      }}
+                      value={amountToFund}
+                      valueToDisplay={amountToFundDisplay}
+                    />
+                  }
+                  onClickMaxButton={() => {
+                    setAmountToFund(collateralBalance)
+                    setAmountToFundDisplay(walletBalance)
+                  }}
+                  shouldDisplayMaxButton
+                  symbol={collateral.symbol}
+                />
+              </div>
+
               {collateralAmountError && <GenericError>{collateralAmountError}</GenericError>}
             </>
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              {tokensAmount > 1 && (
-                <CurrenciesWrapper>
-                  <CurrencySelector
-                    balance={formatNumber(collateralBalanceFormatted)}
-                    context={context}
-                    currency={collateral.address}
-                    disabled={false}
-                    onSelect={(token: Token | null) => {
-                      if (token) {
-                        setCollateral(token)
-                        setAmountToRemove(new BigNumber(0))
-                      }
-                    }}
-                  />
-                </CurrenciesWrapper>
-              )}
-              <TextfieldCustomPlaceholder
-                formField={
-                  <BigNumberInput
-                    decimals={collateral.decimals}
-                    name="amountToRemove"
-                    onChange={(e: BigNumberInputReturn) => {
-                      setAmountToRemove(e.value)
-                      setAmountToRemoveDisplay('')
-                    }}
-                    value={amountToRemove}
-                    valueToDisplay={amountToRemoveDisplay}
-                  />
-                }
-                onClickMaxButton={() => {
-                  setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(sharesBalance)
-                }}
-                shouldDisplayMaxButton
-                symbol="Shares"
-              />
+              <TokenBalance text="Pool Tokens" value={formatNumber(sharesBalance)} />
+              <div>
+                <TextfieldCustomPlaceholder
+                  formField={
+                    <BigNumberInput
+                      decimals={collateral.decimals}
+                      name="amountToRemove"
+                      onChange={(e: BigNumberInputReturn) => {
+                        setAmountToRemove(e.value)
+                        setAmountToRemoveDisplay('')
+                      }}
+                      value={amountToRemove}
+                      valueToDisplay={amountToRemoveDisplay}
+                    />
+                  }
+                  onClickMaxButton={() => {
+                    setAmountToRemove(fundingBalance)
+                    setAmountToRemoveDisplay(sharesBalance)
+                  }}
+                  shouldDisplayMaxButton
+                  symbol="Shares"
+                />
+              </div>
+
               {sharesAmountError && <GenericError>{sharesAmountError}</GenericError>}
             </>
           )}
-        </div>
-        <div>
+        </GridTransactionDetailsColumn>
+        <GridTransactionDetailsColumn>
           {activeTab === Tabs.deposit && (
             <TransactionDetailsCard>
               <TransactionDetailsRow
@@ -499,7 +496,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               />
             </TransactionDetailsCard>
           )}
-        </div>
+        </GridTransactionDetailsColumn>
       </GridTransactionDetails>
       {isNegativeAmountToFund && (
         <WarningMessage
