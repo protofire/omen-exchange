@@ -73,21 +73,28 @@ const WarningMessageStyled = styled(WarningMessage)`
 
 const UserData = styled.div`
   display: flex;
-  justify-content: space-between;
-  padding: 24px 25px;
+  flex-direction: column;
   margin: 0 -25px;
+  padding: 20px 24px;
   border-top: 1px solid ${props => props.theme.borders.borderDisabled};
 `
 
 const UserDataTitleValue = styled(TitleValue)`
   width: calc(50% - 16px);
 `
+const UserDataRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  &:first-child {
+    margin-bottom: 12px;
+  }
+`
 
 const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { marketMakerData, switchMarketTab } = props
-  const { address: marketMakerAddress, balances, fee, totalPoolShares, userEarnings } = marketMakerData
+  const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
@@ -329,17 +336,32 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   return (
     <>
       <UserData>
-        <UserDataTitleValue
-          title={'Your Liquidity'}
-          value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
-        />
-        <UserDataTitleValue
-          state={userEarnings.gt(0) ? ValueStates.success : undefined}
-          title={'Your Earnings'}
-          value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${
-            collateral.symbol
-          }`}
-        />
+        <UserDataRow>
+          <UserDataTitleValue
+            title="Your Liquidity"
+            value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
+          />
+          <UserDataTitleValue
+            title="Total Pool Tokens"
+            value={`${formatBigNumber(totalPoolShares, collateral.decimals)} ${collateral.symbol}`}
+          />
+        </UserDataRow>
+        <UserDataRow>
+          <UserDataTitleValue
+            state={userEarnings.gt(0) ? ValueStates.success : undefined}
+            title="Your Earnings"
+            value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
+              formatBigNumber(userEarnings, collateral.decimals),
+            )} ${collateral.symbol}`}
+          />
+          <UserDataTitleValue
+            state={totalEarnings.gt(0) ? ValueStates.success : undefined}
+            title="Total Earnings"
+            value={`${totalEarnings.gt(0) ? '+' : ''}${formatBigNumber(totalEarnings, collateral.decimals)} ${
+              collateral.symbol
+            }`}
+          />
+        </UserDataRow>
       </UserData>
       <OutcomeTable
         balances={balances}
@@ -351,12 +373,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         showSharesChange={showSharesChange}
       />
       <WarningMessageStyled
-        additionalDescription={''}
-        description={
-          'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
-        }
+        additionalDescription=""
+        description="Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time."
         href={DOCUMENT_FAQ}
-        hyperlinkDescription={'More Info'}
+        hyperlinkDescription="More Info"
       />
       <GridTransactionDetails>
         <div>
@@ -454,14 +474,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               <TransactionDetailsRow
                 emphasizeValue={fee.gt(0)}
                 state={ValueStates.success}
-                title={'Earn Trading Fee'}
+                title="Earn Trading Fee"
                 value={feeFormatted}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={poolTokens.gt(0)}
                 state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
-                title={'Pool Tokens'}
+                title="Pool Tokens"
                 value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals))}`}
               />
             </TransactionDetailsCard>
@@ -471,19 +491,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               <TransactionDetailsRow
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
-                title={'Earned'}
+                title="Earned"
                 value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
-                title={'Deposited'}
+                title="Deposited"
                 value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${collateral.symbol}`}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={depositedTokensTotal.gt(0)}
                 state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
-                title={'Total'}
+                title="Total"
                 value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${
                   collateral.symbol
                 }`}
@@ -494,20 +514,20 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       </GridTransactionDetails>
       {isNegativeAmountToFund && (
         <WarningMessage
-          additionalDescription={''}
+          additionalDescription=""
           danger={true}
-          description={`Your deposit amount should not be negative.`}
-          href={''}
-          hyperlinkDescription={''}
+          description="Your deposit amount should not be negative."
+          href=""
+          hyperlinkDescription=""
         />
       )}
       {isNegativeAmountToRemove && (
         <WarningMessage
-          additionalDescription={''}
-          danger={true}
-          description={`Your withdraw amount should not be negative.`}
-          href={''}
-          hyperlinkDescription={''}
+          additionalDescription=""
+          danger
+          description="Your withdraw amount should not be negative."
+          href=""
+          hyperlinkDescription=""
         />
       )}
       {activeTab === Tabs.deposit && showSetAllowance && (
