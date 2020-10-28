@@ -73,7 +73,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         localStorage.setItem(IMPORT_QUESTION_ID_KEY, question.id)
         history.push('/create')
       },
-      content: 'Import Market',
+      content: 'Add Currency',
     },
   ]
 
