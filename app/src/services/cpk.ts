@@ -291,6 +291,7 @@ class CPKService {
         resolution,
         spread,
         startingPoint,
+        unit,
         upperBound,
       } = marketData
 
@@ -323,18 +324,18 @@ class CPKService {
         // Step 1: Create question in realitio without bounds
         transactions.push({
           to: realitioAddress,
-          data: RealitioService.encodeAskQuestion(
+          data: RealitioService.encodeAskScalarQuestion(
             question,
-            [],
+            unit,
             category,
             arbitrator.address,
             openingDateMoment,
             networkId,
           ),
         })
-        questionId = await realitio.askQuestionConstant(
+        questionId = await realitio.askScalarQuestionConstant(
           question,
-          [],
+          unit,
           category,
           arbitrator.address,
           openingDateMoment,

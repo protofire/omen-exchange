@@ -200,6 +200,26 @@ class RealitioService {
     return askQuestionInterface.functions.askQuestion.encode(args)
   }
 
+  static encodeAskScalarQuestion = (
+    question: string,
+    unit: string,
+    category: string,
+    arbitratorAddress: string,
+    openingDateMoment: Moment,
+    networkId: number,
+  ): string => {
+    const openingTimestamp = openingDateMoment.unix()
+    const questionText = RealitioQuestionLib.encodeText('single-select', question, unit, category)
+
+    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+
+    const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+
+    const askQuestionInterface = new utils.Interface(realitioAbi)
+
+    return askQuestionInterface.functions.askQuestion.encode(args)
+  }
+
   askQuestionConstant = async (
     question: string,
     outcomes: Outcome[],
@@ -212,6 +232,29 @@ class RealitioService {
     const openingTimestamp = openingDateMoment.unix()
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
     const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
+
+    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+
+    const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+
+    const questionId = await this.constantContract.askQuestion(...args, {
+      from: signerAddress,
+    })
+
+    return questionId
+  }
+
+  askScalarQuestionConstant = async (
+    question: string,
+    unit: string,
+    category: string,
+    arbitratorAddress: string,
+    openingDateMoment: Moment,
+    networkId: number,
+    signerAddress: string,
+  ): Promise<string> => {
+    const openingTimestamp = openingDateMoment.unix()
+    const questionText = RealitioQuestionLib.encodeText('single-select', question, unit, category)
 
     const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
 
