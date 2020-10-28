@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { WhenConnected } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
-import { Button, ButtonContainer } from '../../../../button'
+import { ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
+import { MarketBottomNavButton } from '../../../common/common_styled'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
@@ -52,11 +53,24 @@ const Text = styled.p`
 `
 
 const StyledButtonContainer = styled(ButtonContainer)`
-  margin: 0 -25px;
-  padding: 20px 25px 0;
+  margin: 0 -24px;
+  margin-bottom: -1px;
+  padding: 20px 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
   &.border {
     border-top: 1px solid ${props => props.theme.colors.verticalDivider};
+  }
+`
+
+const SellBuyWrapper = styled.div`
+  display: flex;
+  align-items: center;
+
+  & > * + * {
+    margin-left: 12px;
   }
 `
 
@@ -72,6 +86,7 @@ interface Props extends RouteComponentProps<Record<string, string | undefined>> 
 const Wrapper = (props: Props) => {
   const { marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
+  const history = useHistory()
 
   const {
     address: marketMakerAddress,
@@ -118,19 +133,19 @@ const Wrapper = (props: Props) => {
   )
 
   const openInRealitioButton = (
-    <Button
+    <MarketBottomNavButton
       buttonType={ButtonType.secondaryLine}
       onClick={() => {
         window.open(`${realitioBaseUrl}/app/#!/question/${question.id}`)
       }}
     >
       Answer on Reality.eth
-    </Button>
+    </MarketBottomNavButton>
   )
 
   const buySellButtons = (
-    <>
-      <Button
+    <SellBuyWrapper>
+      <MarketBottomNavButton
         buttonType={ButtonType.secondaryLine}
         disabled={!userHasShares || !hasFunding}
         onClick={() => {
@@ -138,8 +153,8 @@ const Wrapper = (props: Props) => {
         }}
       >
         Sell
-      </Button>
-      <Button
+      </MarketBottomNavButton>
+      <MarketBottomNavButton
         buttonType={ButtonType.secondaryLine}
         disabled={!hasFunding}
         onClick={() => {
@@ -147,8 +162,8 @@ const Wrapper = (props: Props) => {
         }}
       >
         Buy
-      </Button>
-    </>
+      </MarketBottomNavButton>
+    </SellBuyWrapper>
   )
 
   const [currentTab, setCurrentTab] = useState('SWAP')
@@ -194,6 +209,14 @@ const Wrapper = (props: Props) => {
             )}
             <WhenConnected>
               <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+                <MarketBottomNavButton
+                  buttonType={ButtonType.secondaryLine}
+                  onClick={() => {
+                    history.goBack()
+                  }}
+                >
+                  Back
+                </MarketBottomNavButton>
                 {isQuestionOpen ? openInRealitioButton : buySellButtons}
               </StyledButtonContainer>
             </WhenConnected>

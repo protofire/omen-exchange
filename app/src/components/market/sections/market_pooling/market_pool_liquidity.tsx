@@ -25,13 +25,13 @@ import {
   formatNumber,
 } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
-import { Button, ButtonContainer, ButtonTab } from '../../../button'
+import { ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { GenericError } from '../../common/common_styled'
+import { GenericError, MarketBottomNavButton } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { SetAllowance } from '../../common/set_allowance'
@@ -52,8 +52,8 @@ enum Tabs {
   withdraw,
 }
 
-const LeftButton = styled(Button)`
-  margin-right: auto;
+const BottomButtonWrapper = styled(ButtonContainer)`
+  justify-content: space-between;
 `
 
 const TabsGrid = styled.div`
@@ -69,21 +69,36 @@ const WarningMessageStyled = styled(WarningMessage)`
 
 const UserData = styled.div`
   display: flex;
-  justify-content: space-between;
-  padding: 24px 25px;
+  flex-direction: column;
   margin: 0 -25px;
+  padding: 20px 24px;
   border-top: 1px solid ${props => props.theme.borders.borderDisabled};
 `
 
 const UserDataTitleValue = styled(TitleValue)`
   width: calc(50% - 16px);
 `
+const UserDataRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  &:first-child {
+    margin-bottom: 12px;
+  }
+`
 
 const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { marketMakerData, switchMarketTab } = props
-  const { address: marketMakerAddress, balances, collateral, fee, totalPoolShares, userEarnings } = marketMakerData
+  const {
+    address: marketMakerAddress,
+    balances,
+    collateral,
+    fee,
+    totalEarnings,
+    totalPoolShares,
+    userEarnings,
+  } = marketMakerData
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
@@ -301,17 +316,32 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   return (
     <>
       <UserData>
-        <UserDataTitleValue
-          title={'Your Liquidity'}
-          value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
-        />
-        <UserDataTitleValue
-          state={userEarnings.gt(0) ? ValueStates.success : undefined}
-          title={'Your Earnings'}
-          value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${
-            collateral.symbol
-          }`}
-        />
+        <UserDataRow>
+          <UserDataTitleValue
+            title="Your Liquidity"
+            value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
+          />
+          <UserDataTitleValue
+            title="Total Pool Tokens"
+            value={`${formatBigNumber(totalPoolShares, collateral.decimals)} ${collateral.symbol}`}
+          />
+        </UserDataRow>
+        <UserDataRow>
+          <UserDataTitleValue
+            state={userEarnings.gt(0) ? ValueStates.success : undefined}
+            title="Your Earnings"
+            value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
+              formatBigNumber(userEarnings, collateral.decimals),
+            )} ${collateral.symbol}`}
+          />
+          <UserDataTitleValue
+            state={totalEarnings.gt(0) ? ValueStates.success : undefined}
+            title="Total Earnings"
+            value={`${totalEarnings.gt(0) ? '+' : ''}${formatBigNumber(totalEarnings, collateral.decimals)} ${
+              collateral.symbol
+            }`}
+          />
+        </UserDataRow>
       </UserData>
       <OutcomeTable
         balances={balances}
@@ -370,6 +400,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                     valueToDisplay={amountToFundDisplay}
                   />
                 }
+                onClickMaxButton={() => {
+                  setAmountToFund(collateralBalance)
+                  setAmountToFundDisplay(walletBalance)
+                }}
+                shouldDisplayMaxButton
                 symbol={collateral.symbol}
               />
               {collateralAmountError && <GenericError>{collateralAmountError}</GenericError>}
@@ -399,6 +434,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                     valueToDisplay={amountToRemoveDisplay}
                   />
                 }
+                onClickMaxButton={() => {
+                  setAmountToRemove(fundingBalance)
+                  setAmountToRemoveDisplay(sharesBalance)
+                }}
+                shouldDisplayMaxButton
                 symbol="Shares"
               />
               {sharesAmountError && <GenericError>{sharesAmountError}</GenericError>}
@@ -475,25 +515,29 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           onUnlock={unlockCollateral}
         />
       )}
-      <ButtonContainer>
-        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+      <BottomButtonWrapper>
+        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
-        </LeftButton>
+        </MarketBottomNavButton>
         {activeTab === Tabs.deposit && (
-          <Button buttonType={ButtonType.secondaryLine} disabled={disableDepositButton} onClick={() => addFunding()}>
+          <MarketBottomNavButton
+            buttonType={ButtonType.secondaryLine}
+            disabled={disableDepositButton}
+            onClick={() => addFunding()}
+          >
             Deposit
-          </Button>
+          </MarketBottomNavButton>
         )}
         {activeTab === Tabs.withdraw && (
-          <Button
+          <MarketBottomNavButton
             buttonType={ButtonType.secondaryLine}
             disabled={disableWithdrawButton}
             onClick={() => removeFunding()}
           >
             Withdraw
-          </Button>
+          </MarketBottomNavButton>
         )}
-      </ButtonContainer>
+      </BottomButtonWrapper>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}

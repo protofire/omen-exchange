@@ -18,12 +18,13 @@ import {
   RowWrapper,
 } from '../../../../common/common_styled'
 
-const BUTTON_DIMENSIONS = '36px'
+const BUTTON_DIMENSIONS = '40px'
 
 const CustomButtonCircle = styled(ButtonCircle)`
   margin-left: 15px;
   height: ${BUTTON_DIMENSIONS};
   width: ${BUTTON_DIMENSIONS};
+  border-radius: 8px;
   &[disabled] {
     border-color: ${props => props.theme.form.common.disabled.borderColor};
   }
@@ -132,7 +133,7 @@ const Outcomes = (props: Props) => {
                   ),
                 )
               }}
-              placeholder="outcome..."
+              placeholder="50"
               readOnly={!!uniformProbabilities}
               type="number"
               value={uniformProbabilities ? outcome.probability?.toFixed(2) : outcome.probability}

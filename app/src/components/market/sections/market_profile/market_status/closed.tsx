@@ -1,7 +1,7 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useContracts } from '../../../../../hooks'
@@ -9,11 +9,11 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/con
 import { CPKService, ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
-import { Button, ButtonContainer } from '../../../../button'
+import { ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
-import { ButtonContainerFullWidth } from '../../../common/common_styled'
+import { ButtonContainerFullWidth, MarketBottomNavButton } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
 import { OutcomeTable } from '../../../common/outcome_table'
@@ -33,6 +33,28 @@ const BottomCard = styled(ViewCard)``
 
 const MarketResolutionMessageStyled = styled(MarketResolutionMessage)`
   margin: 20px 0;
+`
+
+const StyledButtonContainer = styled(ButtonContainer)`
+  margin: 0 -24px;
+  margin-bottom: -1px;
+  padding: 20px 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &.border {
+    border-top: 1px solid ${props => props.theme.colors.verticalDivider};
+  }
+`
+
+const SellBuyWrapper = styled.div`
+  display: flex;
+  align-items: center;
+
+  & > * + * {
+    margin-left: 12px;
+  }
 `
 
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
@@ -72,6 +94,8 @@ const Wrapper = (props: Props) => {
     payouts,
     question,
   } = marketMakerData
+
+  const history = useHistory()
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [modalTitle, setModalTitle] = useState<string>('')
@@ -184,8 +208,8 @@ const Wrapper = (props: Props) => {
     : false
 
   const buySellButtons = (
-    <>
-      <Button
+    <SellBuyWrapper>
+      <MarketBottomNavButton
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
@@ -193,8 +217,8 @@ const Wrapper = (props: Props) => {
         }}
       >
         Sell
-      </Button>
-      <Button
+      </MarketBottomNavButton>
+      <MarketBottomNavButton
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
@@ -202,8 +226,8 @@ const Wrapper = (props: Props) => {
         }}
       >
         Buy
-      </Button>
-    </>
+      </MarketBottomNavButton>
+    </SellBuyWrapper>
   )
 
   const [currentTab, setCurrentTab] = useState('SWAP')
@@ -259,29 +283,39 @@ const Wrapper = (props: Props) => {
                 ></MarketResolutionMessageStyled>
               )}
               {isConditionResolved && !hasWinningOutcomes ? (
-                <ButtonContainer>{buySellButtons}</ButtonContainer>
+                <StyledButtonContainer>
+                  <MarketBottomNavButton
+                    buttonType={ButtonType.secondaryLine}
+                    onClick={() => {
+                      history.goBack()
+                    }}
+                  >
+                    Back
+                  </MarketBottomNavButton>
+                  {buySellButtons}
+                </StyledButtonContainer>
               ) : (
                 <ButtonContainerFullWidth borderTop={true}>
                   {!isConditionResolved && (
                     <>
-                      <Button
+                      <MarketBottomNavButton
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
                         onClick={resolveCondition}
                       >
                         Resolve Condition
-                      </Button>
+                      </MarketBottomNavButton>
                     </>
                   )}
                   {isConditionResolved && hasWinningOutcomes && (
                     <>
-                      <Button
+                      <MarketBottomNavButton
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
                         onClick={() => redeem()}
                       >
                         Redeem
-                      </Button>
+                      </MarketBottomNavButton>
                     </>
                   )}
                 </ButtonContainerFullWidth>
