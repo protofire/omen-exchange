@@ -42,17 +42,21 @@ const MarketView: React.FC<Props> = (props: Props) => {
     }
 
     if (isQuestionFinalized) {
-      if (oracle === realitioProxy) {
-        return <ClosedMarketDetails {...props} />
-      } else if (oracle === realitioScalarAdapter) {
-        return <ClosedScalarMarketDetails {...props} />
-      }
+      // if (oracle === realitioProxy) {
+      //   return <ClosedMarketDetails {...props} />
+      // } else if (oracle === realitioScalarAdapter) {
+      //   return <ClosedScalarMarketDetails {...props} />
+      // }
+      // TODO: Remove hardcoding
+      return <ClosedScalarMarketDetails {...props} />
     } else {
-      if (oracle === realitioProxy) {
-        return <OpenMarketDetails {...props} />
-      } else if (oracle === realitioScalarAdapter) {
-        return <OpenScalarMarketDetails {...props} />
-      }
+      // if (oracle === realitioProxy) {
+      //   return <OpenMarketDetails {...props} />
+      // } else if (oracle === realitioScalarAdapter) {
+      //   return <OpenScalarMarketDetails {...props} />
+      // }
+      // TODO: Remove hardcoding
+      return <OpenScalarMarketDetails {...props} />
     }
   }
 
