@@ -58,6 +58,7 @@ const Wrapper = (props: Props) => {
           decimals={0}
           lowerBound={lowerBound}
           startingPoint={currentPrediction}
+          startingPointTitle={'Current prediction'}
           unit={unit}
           upperBound={upperBound}
         />
