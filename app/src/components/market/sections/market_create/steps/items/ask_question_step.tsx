@@ -32,7 +32,8 @@ const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boo
   padding-left: 10px;
   padding-right: 10px;
   width: 100%;
-  height: 36px;
+  height: 40px;
+  border-radius: 8px;
   font-weight: normal;
   &,
   &:hover {
@@ -60,10 +61,11 @@ const ButtonCategoryTextOverflow = styled.span`
 `
 
 const GridTwoColumns = styled.div`
-  column-gap: 16px;
+  column-gap: 18px;
   display: grid;
   grid-template-columns: 1fr;
-  padding-bottom: 20px;
+  padding-bottom: 24px;
+  padding-top: 4px;
   row-gap: 20px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
@@ -251,10 +253,11 @@ const AskQuestionStep = (props: Props) => {
                     minDate={tomorrow}
                     name="resolution"
                     onChange={handleDateChange}
+                    placeholder="Select closing date"
                     selected={resolution}
                   />
                 }
-                title={'Resolution Date (UTC)'}
+                title={'Closing Date - UTC'}
               />
             </Column>
             <Column>
@@ -267,7 +270,7 @@ const AskQuestionStep = (props: Props) => {
                     isACategorySelected={category !== ''}
                     onClick={toggleCategoryButtonFocus}
                   >
-                    <ButtonCategoryTextOverflow>{category ? category : 'Select Category'}</ButtonCategoryTextOverflow>
+                    <ButtonCategoryTextOverflow>{category ? category : 'Select category'}</ButtonCategoryTextOverflow>
                   </ButtonCategory>
                 }
                 title={'Category'}
