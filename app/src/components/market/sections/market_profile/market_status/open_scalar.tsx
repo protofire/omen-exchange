@@ -1,7 +1,9 @@
+import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 
 import { MarketMakerData } from '../../../../../util/types'
+import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { MarketNavigation } from '../../market_navigation'
 
@@ -16,6 +18,12 @@ const Wrapper = (props: Props) => {
   const { marketMakerData } = props
 
   const { address: marketMakerAddress, isQuestionFinalized, question } = marketMakerData
+
+  // TODO: Remove hardcoded values
+  const lowerBound = new BigNumber('0')
+  const currentPrediction = new BigNumber('720')
+  const upperBound = new BigNumber('1000')
+  const unit = 'USD'
 
   const [currentTab, setCurrentTab] = useState('SWAP')
 
@@ -45,6 +53,13 @@ const Wrapper = (props: Props) => {
           resolutionDate={question.resolution}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
+        <MarketScale
+          decimals={0}
+          lowerBound={lowerBound}
+          startingPoint={currentPrediction}
+          unit={unit}
+          upperBound={upperBound}
+        />
       </BottomCard>
     </>
   )
