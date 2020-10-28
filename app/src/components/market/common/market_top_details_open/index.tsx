@@ -5,10 +5,11 @@ import styled from 'styled-components'
 import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
 import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
-import { MarketMakerData } from '../../../../util/types'
+import { MarketMakerData, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { MoreMenu } from '../../../common/form/more_menu'
 import { AdditionalMarketData } from '../additional_market_data'
+import { CurrencySelector } from '../currency_selector'
 import { MarketData } from '../market_data'
 import { ProgressBar } from '../progress_bar'
 import { ProgressBarToggle } from '../progress_bar/toggle'
@@ -18,6 +19,12 @@ const SubsectionTitleLeftWrapper = styled.div`
   align-items: center;
   & > * + * {
     margin-left: 20px;
+  }
+`
+
+const MarketCurrencySelector = styled(CurrencySelector)`
+  .dropdownItems {
+    min-width: auto;
   }
 `
 
@@ -75,8 +82,6 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
   const { markets: marketsRelatedQuestion } = useGraphMarketsFromQuestion(question.id)
 
-  console.log(marketsRelatedQuestion)
-
   const toggleProgressBar = () => {
     setShowingProgressBar(!showingProgressBar)
   }
@@ -91,10 +96,26 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     },
   ]
 
+  const onChangeMarketCurrency = (currency: Token | null) => {
+    if (currency) {
+      console.log(currency)
+    }
+  }
+
   return (
     <>
       <SubsectionTitleWrapper>
         <SubsectionTitleLeftWrapper>
+          {marketsRelatedQuestion.length > 1 && (
+            <MarketCurrencySelector
+              context={context}
+              currency={collateral.address}
+              disabled={false}
+              filters={marketsRelatedQuestion.map(element => element.collateralToken)}
+              onSelect={onChangeMarketCurrency}
+              placeholder=""
+            />
+          )}
           <ProgressBarToggle
             active={showingProgressBar}
             state={marketState}
