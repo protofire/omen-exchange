@@ -42,6 +42,7 @@ import { CreateCard } from '../../../../common/create_card'
 import { CurrencySelector } from '../../../../common/currency_selector'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
+import { MarketScale } from '../../../../common/market_scale'
 import { SetAllowance } from '../../../../common/set_allowance'
 import { TradingFeeSelector } from '../../../../common/trading_fee_selector'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
@@ -446,42 +447,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         </SubsectionTitleStyled>
         <SubTitle>Question</SubTitle>
         <QuestionText>{question}</QuestionText>
-        {state === 'SCALAR' ? (
-          <ScaleWrapper>
-            <ScaleTitleWrapper>
-              <ScaleTitle>
-                {lowerBound && formatNumber(formatBigNumber(lowerBound, 18))} {unit}
-              </ScaleTitle>
-              <ScaleTitle>
-                {upperBound &&
-                  lowerBound &&
-                  formatNumber(
-                    `${Number(formatBigNumber(upperBound, 18)) / 2 + Number(formatBigNumber(lowerBound, 18)) / 2}`,
-                  )}
-                {` ${unit}`}
-              </ScaleTitle>
-              <ScaleTitle>
-                {upperBound && formatBigNumber(upperBound, 18)} {unit}
-              </ScaleTitle>
-            </ScaleTitleWrapper>
-            <Scale>
-              <ScaleBall
-                xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))}
-              />
-              <VerticalBar />
-              <VerticalBar />
-              <VerticalBar />
-              <HorizontalBar />
-            </Scale>
-            <StartingPointBox
-              xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))}
-            >
-              <StartingPointTitle>
-                {startingPoint && formatBigNumber(startingPoint, 18)} {unit}
-              </StartingPointTitle>
-              <StartingPointSubtitle>Starting Point</StartingPointSubtitle>
-            </StartingPointBox>
-          </ScaleWrapper>
+        {state === 'SCALAR' && lowerBound && upperBound && startingPoint && unit ? (
+          <MarketScale lowerBound={lowerBound} startingPoint={startingPoint} unit={unit} upperBound={upperBound} />
         ) : (
           <OutcomesTableWrapper borderBottom>
             <OutcomesTable>
