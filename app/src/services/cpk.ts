@@ -7,7 +7,7 @@ import moment from 'moment'
 
 import { getLogger } from '../util/logger'
 import { getCPKAddresses, getContractAddress } from '../util/networks'
-import { calcDistributionHint } from '../util/tools'
+import { calcDistributionHint, formatBigNumber } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -290,6 +290,7 @@ class CPKService {
         question,
         resolution,
         spread,
+        startingPoint,
         upperBound,
       } = marketData
 
@@ -309,8 +310,9 @@ class CPKService {
 
       const openingDateMoment = moment(resolution)
 
-      const scalarLow = lowerBound?.toNumber()
-      const scalarHigh = upperBound?.toNumber()
+      const scalarLow = lowerBound && Number(formatBigNumber(lowerBound, 18))
+      const scalarHigh = upperBound && Number(formatBigNumber(upperBound, 18))
+      const scalarStart = startingPoint && Number(formatBigNumber(startingPoint, 18))
 
       const transactions = []
 
@@ -389,6 +391,11 @@ class CPKService {
         data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
       })
 
+      // Step 4.5: Calculate probabilities for distributionHint
+      const a = scalarLow && scalarHigh && scalarStart && ((scalarStart - scalarLow) / (scalarHigh - scalarLow)) * 100
+      const b = a && 100 - a
+      const probabilities = [a || 50, b || 50]
+
       // Step 5: Create market maker
       const saltNonce = Math.round(Math.random() * 1000000)
       const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
@@ -400,7 +407,7 @@ class CPKService {
         spread,
       )
       logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
-      const distributionHint = calcDistributionHint(marketData.outcomes.map(o => o.probability))
+      const distributionHint = calcDistributionHint(probabilities)
       transactions.push({
         to: marketMakerFactory.address,
         data: MarketMakerFactoryService.encodeCreateMarketMaker(
