@@ -2,12 +2,16 @@ import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 
-import { MarketMakerData } from '../../../../../util/types'
+import { WhenConnected } from '../../../../../hooks/connectedWeb3'
+import { useRealityLink } from '../../../../../hooks/useRealityLink'
+import { BalanceItem, MarketMakerData } from '../../../../../util/types'
+import { Button } from '../../../../button'
+import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { MarketNavigation } from '../../market_navigation'
 
-import { BottomCard, TopCard } from './open'
+import { BottomCard, StyledButtonContainer, TopCard } from './open'
 
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   account: Maybe<string>
@@ -16,14 +20,58 @@ interface Props extends RouteComponentProps<Record<string, string | undefined>> 
 
 const Wrapper = (props: Props) => {
   const { marketMakerData } = props
+  const realitioBaseUrl = useRealityLink()
 
-  const { address: marketMakerAddress, isQuestionFinalized, question } = marketMakerData
+  const { address: marketMakerAddress, balances, isQuestionFinalized, question, totalPoolShares } = marketMakerData
 
   // TODO: Remove hardcoded values
   const lowerBound = new BigNumber('0')
   const currentPrediction = new BigNumber('720')
   const upperBound = new BigNumber('1000')
   const unit = 'USD'
+
+  const isQuestionOpen = question.resolution.valueOf() < Date.now()
+
+  const userHasShares = balances.some((balanceItem: BalanceItem) => {
+    const { shares } = balanceItem
+    return !shares.isZero()
+  })
+
+  const hasFunding = totalPoolShares.gt(0)
+
+  const openInRealitioButton = (
+    <Button
+      buttonType={ButtonType.secondaryLine}
+      onClick={() => {
+        window.open(`${realitioBaseUrl}/app/#!/question/${question.id}`)
+      }}
+    >
+      Answer on Reality.eth
+    </Button>
+  )
+
+  const buySellButtons = (
+    <>
+      <Button
+        buttonType={ButtonType.secondaryLine}
+        disabled={!userHasShares || !hasFunding}
+        onClick={() => {
+          setCurrentTab('SELL')
+        }}
+      >
+        Sell
+      </Button>
+      <Button
+        buttonType={ButtonType.secondaryLine}
+        disabled={!hasFunding}
+        onClick={() => {
+          setCurrentTab('BUY')
+        }}
+      >
+        Buy
+      </Button>
+    </>
+  )
 
   const [currentTab, setCurrentTab] = useState('SWAP')
 
@@ -62,6 +110,11 @@ const Wrapper = (props: Props) => {
           unit={unit}
           upperBound={upperBound}
         />
+        <WhenConnected>
+          <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+            {isQuestionOpen ? openInRealitioButton : buySellButtons}
+          </StyledButtonContainer>
+        </WhenConnected>
       </BottomCard>
     </>
   )

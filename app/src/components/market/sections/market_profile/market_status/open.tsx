@@ -59,7 +59,6 @@ const StyledButtonContainer = styled(ButtonContainer)`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   &.border {
     border-top: 1px solid ${props => props.theme.colors.verticalDivider};
   }
