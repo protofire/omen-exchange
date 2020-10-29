@@ -122,8 +122,8 @@ export const HistoryChartContainer: React.FC<Props> = ({
 
       if (latestBlockNumber) {
         const blockNumbers = range(totalDataPoints).map(multiplier => latestBlockNumber - multiplier * blocksPerPeriod)
-        const blocks = await Promise.all(blockNumbers.map(blockNumber => library.getBlock(blockNumber)))
-
+        let blocks = await Promise.all(blockNumbers.map(blockNumber => library.getBlock(blockNumber)))
+        blocks = blocks.filter(block => block)
         setBlocks(blocks)
       }
     }
