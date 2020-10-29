@@ -299,6 +299,13 @@ class CPKService {
         throw new Error('Resolution time was not specified')
       }
 
+      const shouldThrow =
+        !lowerBound || !upperBound || !startingPoint || lowerBound.gt(startingPoint) || startingPoint.gt(upperBound)
+
+      if (shouldThrow) {
+        throw new Error('Invalid scalar market parameters')
+      }
+
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
 
@@ -310,10 +317,6 @@ class CPKService {
       const realitioScalarAdapterAddress = realitio.scalarContract.address
 
       const openingDateMoment = moment(resolution)
-
-      // const scalarLow = lowerBound && Number(formatBigNumber(lowerBound, 18))
-      // const scalarHigh = upperBound && Number(formatBigNumber(upperBound, 18))
-      // const scalarStart = startingPoint && Number(formatBigNumber(startingPoint, 18))
 
       const transactions = []
 
