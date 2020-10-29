@@ -34,7 +34,10 @@ type HistoricDataPoint = {
 type HistoricData = HistoricDataPoint[]
 
 const useHoldingsHistory = (marketMakerAddress: string, blocks: Maybe<Block[]>): Maybe<HistoricData> => {
-  const queries = useMemo(() => (blocks ? buildQueriesHistory(blocks.map(block => block.number)) : null), [blocks])
+  const queries = useMemo(
+    () => (blocks && blocks.length ? buildQueriesHistory(blocks.map(block => block.number)) : null),
+    [blocks],
+  )
   const variables = useMemo(() => {
     return { id: marketMakerAddress }
   }, [marketMakerAddress])
@@ -122,9 +125,8 @@ export const HistoryChartContainer: React.FC<Props> = ({
 
       if (latestBlockNumber) {
         const blockNumbers = range(totalDataPoints).map(multiplier => latestBlockNumber - multiplier * blocksPerPeriod)
-        let blocks = await Promise.all(blockNumbers.map(blockNumber => library.getBlock(blockNumber)))
-        blocks = blocks.filter(block => block)
-        setBlocks(blocks)
+        const blocks = await Promise.all(blockNumbers.map(blockNumber => library.getBlock(blockNumber)))
+        setBlocks(blocks.filter(block => block))
       }
     }
 
