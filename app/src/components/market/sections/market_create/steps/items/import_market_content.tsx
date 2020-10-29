@@ -52,7 +52,7 @@ const SpinnerStyled = styled(Spinner)`
 `
 
 const ContentWrapper = styled.div`
-  border: 1px solid ${({ theme }) => theme.borders.borderDisabled};
+  border: ${({ theme }) => theme.borders.borderLineDisabled};
   border-radius: 8px;
   padding: 21px 25px;
   height: 100%;

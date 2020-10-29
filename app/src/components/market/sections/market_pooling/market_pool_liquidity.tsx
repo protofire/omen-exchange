@@ -76,7 +76,7 @@ const UserData = styled.div`
   flex-direction: column;
   margin: 0 -25px;
   padding: 20px 24px;
-  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
+  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
 `
 
 const UserDataTitleValue = styled(TitleValue)`

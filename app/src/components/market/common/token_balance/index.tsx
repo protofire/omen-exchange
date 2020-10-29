@@ -9,7 +9,7 @@ const Wrapper = styled.div`
   padding: 0 20px;
   height: 40px;
   border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.borders.borderDisabled};
+  border: ${({ theme }) => theme.borders.borderLineDisabled};
 `
 
 const Title = styled.h3`
