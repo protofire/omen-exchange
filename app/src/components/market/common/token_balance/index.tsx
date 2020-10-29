@@ -14,14 +14,14 @@ const Wrapper = styled.div`
 
 const Title = styled.h3`
   color: ${props => props.theme.colors.textColorDark};
-  font-size: 14px;
+  font-size: ${props => props.theme.fonts.defaultSize};
   font-weight: 400;
   line-height: 16px;
 `
 
 const Value = styled.p`
   color: ${props => props.theme.colors.textColor};
-  font-size: 14px;
+  font-size: ${props => props.theme.fonts.defaultSize};
   font-weight: 400;
   line-height: 16px;
   margin: 0;
