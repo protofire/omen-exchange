@@ -64,7 +64,7 @@ const Column = styled.div`
 `
 
 type Props = {
-  fpmmTrade: FpmmTradeDataType[]
+  fpmmTrade: FpmmTradeDataType[] | null
   status: string
 }
 

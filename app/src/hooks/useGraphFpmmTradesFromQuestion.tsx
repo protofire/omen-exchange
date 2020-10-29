@@ -70,7 +70,8 @@ export const useGraphFpmmTradesFromQuestion = (questionID: string): Result => {
   })
 
   useEffect(() => {
-    if (data.fpmmTrades) setFpmmTradeData(wrangleResponse(data.fpmmTrades))
+    console.log('inside loop')
+    if (data) setFpmmTradeData(wrangleResponse(data.fpmmTrades))
   }, [data])
 
   if (data && data.fpmmTrades) {

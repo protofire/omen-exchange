@@ -150,11 +150,7 @@ export const HistoryChart: React.FC<Props> = ({
           <DropdownMenu dropdownPosition={DropdownPosition.right} items={DropdownItems} placeholder={'All'} />
         )}
       </TitleWrapper>
-      {toogleSelect && fpmmTrade ? (
-        <MarketTable fpmmTrade={fpmmTrade} status={status} />
-      ) : (
-        <Chart data={data} outcomes={outcomes} />
-      )}
+      {toogleSelect ? <MarketTable fpmmTrade={fpmmTrade} status={status} /> : <Chart data={data} outcomes={outcomes} />}
     </ChartWrapper>
   )
 }
