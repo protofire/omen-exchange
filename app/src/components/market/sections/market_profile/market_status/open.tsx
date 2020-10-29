@@ -229,7 +229,7 @@ const Wrapper = (props: Props) => {
           <MarketBuyContainer isScalar={false} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
         )}
         {currentTab === marketTabs.sell && (
-          <MarketSellContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketSellContainer isScalar={false} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
         )}
         {/* {currentTab === marketTabs.verify && <p>verify</p>} */}
       </BottomCard>

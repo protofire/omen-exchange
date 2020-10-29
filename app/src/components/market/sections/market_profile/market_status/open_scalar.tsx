@@ -11,6 +11,7 @@ import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { MarketBuyContainer } from '../../market_buy/market_buy_container'
 import { MarketNavigation } from '../../market_navigation'
+import { MarketSellContainer } from '../../market_sell/market_sell_container'
 
 import { BottomCard, StyledButtonContainer, TopCard } from './open'
 
@@ -127,9 +128,9 @@ const Wrapper = (props: Props) => {
         {currentTab === marketTabs.buy && (
           <MarketBuyContainer isScalar={true} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
         )}
-        {/* {currentTab === marketTabs.sell && (
-          <MarketSellContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
-        )} */}
+        {currentTab === marketTabs.sell && (
+          <MarketSellContainer isScalar={true} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+        )}
         {/* {currentTab === marketTabs.verify && <p>verify</p>} */}
       </BottomCard>
     </>
