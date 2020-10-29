@@ -18,7 +18,7 @@ const SubsectionTitleLeftWrapper = styled.div`
   display: flex;
   align-items: center;
   & > * + * {
-    margin-left: 20px;
+    margin-left: 12px;
   }
 `
 
@@ -101,7 +101,6 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       const selectedMarket = marketsRelatedQuestion.find(e => e.collateralToken === currency.address.toLowerCase())
       if (selectedMarket && selectedMarket.collateralToken !== collateral.address) {
         history.push(`/${selectedMarket.id}`)
-        history.go(0)
       }
     }
   }

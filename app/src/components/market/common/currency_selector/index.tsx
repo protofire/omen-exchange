@@ -83,13 +83,9 @@ export const CurrencySelector: React.FC<Props> = props => {
       currencyDropdownData.push({
         content: image ? <TokenItem image={image} text={symbol} /> : symbol,
         extraContent: balance,
-        onClick: !disabled
-          ? () => {
-              onChange(address)
-            }
-          : () => {
-              return
-            },
+        onClick: () => {
+          if (!disabled) onChange(address)
+        },
       })
       if (currency && currency.toLowerCase() === address.toLowerCase()) {
         currentItem = addAll ? index + 1 : index
