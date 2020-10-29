@@ -1,9 +1,9 @@
 import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ethers } from 'ethers'
+import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
-import { Zero } from 'ethers/constants'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
@@ -424,7 +424,7 @@ class CPKService {
         logger.log(`Transaction hash: ${txObject.hash}`)
 
         await this.provider.waitForTransaction(txObject.hash)
-        return predictedMarketMakerAddress 
+        return predictedMarketMakerAddress
       } else {
         throw new Error('Invalid scalar market parameters')
       }
