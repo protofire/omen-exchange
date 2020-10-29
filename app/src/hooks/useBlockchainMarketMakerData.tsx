@@ -158,6 +158,13 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
     fetchData()
   }, [fetchData])
 
+  useEffect(() => {
+    if (marketMakerData) {
+      fetchData()
+    }
+    // eslint-disable-next-line
+  }, [graphMarketMakerData])
+
   return {
     fetchData,
     marketMakerData,
