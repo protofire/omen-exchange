@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
 import { EARLIEST_MAINNET_BLOCK_TO_CHECK } from '../../../../common/constants'
+import { useGraphFpmmTradesFromQuestion } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
 import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
 import { keys, range } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
@@ -92,6 +93,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
 }) => {
   const { library } = useWeb3Context()
   const [latestBlockNumber, setLatestBlockNumber] = useState<Maybe<number>>(null)
+  const { fpmmTrade, status } = useGraphFpmmTradesFromQuestion(marketMakerAddress)
   const [blocks, setBlocks] = useState<Maybe<Block[]>>(null)
   const holdingsSeries = useHoldingsHistory(marketMakerAddress, blocks)
   const [period, setPeriod] = useState<Period>('1M')
@@ -136,8 +138,9 @@ export const HistoryChartContainer: React.FC<Props> = ({
 
   return hidden ? null : (
     <HistoryChart
+      fpmmTrade={fpmmTrade}
+      fpmmTradeLoader={status}
       holdingSeries={holdingsSeries}
-      marketMakerAddress={marketMakerAddress}
       onChange={setPeriod}
       options={keys(mapPeriod)}
       outcomes={outcomes}

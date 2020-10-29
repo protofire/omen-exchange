@@ -100,7 +100,7 @@ export const Chart: React.FC<Props> = ({ data, outcomes }) => {
           {outcomes
             .map((outcomeName, index) => {
               const color = getOutcomeColor(index)
-              console.log(color)
+
               return (
                 <Area
                   dataKey={outcomeName}

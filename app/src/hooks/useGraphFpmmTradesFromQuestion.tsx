@@ -6,7 +6,7 @@ import { Status } from '../util/types'
 
 const query = gql`
   query fpmmTrades($id: ID!) {
-    fpmmTrades(where: { fpmm: $id }) {
+    fpmmTrades(where: { fpmm: $id }, first: 6, orderBy: creationTimestamp) {
       id
       creator {
         id
@@ -62,7 +62,7 @@ const wrangleResponse = (data: any) => {
 
 export const useGraphFpmmTradesFromQuestion = (questionID: string): Result => {
   const [fpmmTradeData, setFpmmTradeData] = useState<Maybe<FpmmTradeData[]>>(null)
-
+  console.log('inside the gargantua')
   const { data, error, loading } = useQuery(query, {
     notifyOnNetworkStatusChange: true,
     skip: false,
@@ -70,11 +70,10 @@ export const useGraphFpmmTradesFromQuestion = (questionID: string): Result => {
   })
 
   useEffect(() => {
-    console.log('inside loop')
-    if (data) setFpmmTradeData(wrangleResponse(data.fpmmTrades))
-  }, [data])
+    setFpmmTradeData(null)
+  }, [questionID])
 
-  if (data && data.fpmmTrades) {
+  if (data && data.fpmmTrades && fpmmTradeData === null) {
     setFpmmTradeData(wrangleResponse(data.fpmmTrades))
   }
 

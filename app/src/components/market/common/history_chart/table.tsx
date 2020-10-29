@@ -69,6 +69,7 @@ type Props = {
 }
 
 export const MarketTable: React.FC<Props> = ({ fpmmTrade, status }) => {
+  console.log(fpmmTrade)
   return (
     <React.Fragment>
       <TableWrapper>
@@ -86,7 +87,7 @@ export const MarketTable: React.FC<Props> = ({ fpmmTrade, status }) => {
           fpmmTrade.map(({ collateralAmountUSD, creationTimestamp, creator, id, outcomeTokensTraded, type }) => {
             const date = new Date(creationTimestamp)
             const formattedDate = `${date.getDate()}.${date.getMonth()}-${date.getHours()}:${date.getMinutes()}`
-            console.log(typeof creationTimestamp)
+
             return (
               <Column key={id}>
                 <Row width={'24'}>

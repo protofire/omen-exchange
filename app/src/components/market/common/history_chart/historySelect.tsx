@@ -3,7 +3,7 @@ import moment from 'moment'
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 
-import { useGraphFpmmTradesFromQuestion } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
+import { FpmmTradeDataType, useGraphFpmmTradesFromQuestion } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
 import { calcPrice } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { Button, ButtonSelectable } from '../../../button'
@@ -75,7 +75,8 @@ type Props = {
   options: Period[]
   outcomes: string[]
   value: Period
-  marketMakerAddress: string
+  fpmmTrade: Maybe<FpmmTradeDataType[]>
+  fpmmTradeLoader: string
 }
 
 const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
@@ -99,14 +100,14 @@ const timestampToDate = (timestamp: number, value: string) => {
 }
 
 export const HistoryChart: React.FC<Props> = ({
+  fpmmTrade,
+  fpmmTradeLoader,
   holdingSeries,
-  marketMakerAddress,
   onChange,
   options,
   outcomes,
   value,
 }) => {
-  const { fpmmTrade, status } = useGraphFpmmTradesFromQuestion(marketMakerAddress)
   const data =
     holdingSeries &&
     holdingSeries
@@ -121,12 +122,14 @@ export const HistoryChart: React.FC<Props> = ({
       })
   const [toogleSelect, setToogleSelect] = useState(true)
   const DropdownItems = ['liquidity', 'assets']
-  if (!data || status === 'Loading') {
+
+  if (!data || fpmmTradeLoader === 'Loading') {
     return <CustomInlineLoading message="Loading Trade History" />
   }
   if (holdingSeries && holdingSeries.length <= 1) {
     return <NoData>There is not enough historical data for this market</NoData>
   }
+
   return (
     <ChartWrapper>
       <TitleWrapper>
@@ -150,7 +153,11 @@ export const HistoryChart: React.FC<Props> = ({
           <DropdownMenu dropdownPosition={DropdownPosition.right} items={DropdownItems} placeholder={'All'} />
         )}
       </TitleWrapper>
-      {toogleSelect ? <MarketTable fpmmTrade={fpmmTrade} status={status} /> : <Chart data={data} outcomes={outcomes} />}
+      {toogleSelect ? (
+        <MarketTable fpmmTrade={fpmmTrade} status={fpmmTradeLoader} />
+      ) : (
+        <Chart data={data} outcomes={outcomes} />
+      )}
     </ChartWrapper>
   )
 }
