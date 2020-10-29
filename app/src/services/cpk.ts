@@ -407,7 +407,7 @@ class CPKService {
           spread,
         )
         logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
-        !!distributionHint && transactions.push({
+        transactions.push({
           to: marketMakerFactory.address,
           data: MarketMakerFactoryService.encodeCreateMarketMaker(
             saltNonce,
