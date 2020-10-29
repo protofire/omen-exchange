@@ -228,7 +228,9 @@ const Wrapper = (props: Props) => {
             switchMarketTab={switchMarketTab}
           />
         )}
-        {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
+        {currentTab === marketTabs.history && (
+          <MarketHistoryContainer isScalar={false} marketMakerData={marketMakerData} />
+        )}
         {currentTab === marketTabs.buy && (
           <MarketBuyContainer isScalar={false} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
         )}
