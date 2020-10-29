@@ -56,10 +56,6 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
   const [marketMakerData, setMarketMakerData] = useState<Maybe<MarketMakerData>>(null)
   const [status, setStatus] = useState<Status>(Status.Loading)
 
-  useEffect(() => {
-    setMarketMakerData(null)
-  }, [graphMarketMakerData])
-
   const doFetchData = useCallback(async () => {
     if (!graphMarketMakerData) {
       return
@@ -161,6 +157,13 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
   useEffect(() => {
     fetchData()
   }, [fetchData])
+
+  useEffect(() => {
+    if (marketMakerData) {
+      fetchData()
+    }
+    // eslint-disable-next-line
+  }, [graphMarketMakerData])
 
   return {
     fetchData,
