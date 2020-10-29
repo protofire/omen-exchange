@@ -2,12 +2,12 @@ import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ethers } from 'ethers'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
-import { BigNumber, keccak256 } from 'ethers/utils'
+import { BigNumber, formatUnits } from 'ethers/utils'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
 import { getCPKAddresses, getContractAddress } from '../util/networks'
-import { calcDistributionHint, formatBigNumber } from '../util/tools'
+import { calcDistributionHint } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -311,9 +311,9 @@ class CPKService {
 
       const openingDateMoment = moment(resolution)
 
-      const scalarLow = lowerBound && Number(formatBigNumber(lowerBound, 18))
-      const scalarHigh = upperBound && Number(formatBigNumber(upperBound, 18))
-      const scalarStart = startingPoint && Number(formatBigNumber(startingPoint, 18))
+      // const scalarLow = lowerBound && Number(formatBigNumber(lowerBound, 18))
+      // const scalarHigh = upperBound && Number(formatBigNumber(upperBound, 18))
+      // const scalarStart = startingPoint && Number(formatBigNumber(startingPoint, 18))
 
       const transactions = []
 
@@ -346,11 +346,11 @@ class CPKService {
       logger.log(`QuestionID ${questionId}`)
 
       // Step 1.5: Announce the questionId and its bounds to the RealitioScalarAdapter
-      scalarLow &&
-        scalarHigh &&
+      lowerBound &&
+        upperBound &&
         transactions.push({
           to: realitioScalarAdapterAddress,
-          data: RealitioService.encodeAnnounceConditionQuestionId(questionId, scalarLow, scalarHigh),
+          data: RealitioService.encodeAnnounceConditionQuestionId(questionId, lowerBound, upperBound),
         })
 
       const oracleAddress = getContractAddress(networkId, 'realitioScalarAdapter')
@@ -365,14 +365,14 @@ class CPKService {
         // Step 2: Prepare scalar condition using the conditionQuestionId
         logger.log(`Adding prepareCondition transaction`)
 
-        scalarLow &&
-          scalarHigh &&
+        lowerBound &&
+          upperBound &&
           transactions.push({
             to: conditionalTokensAddress,
             data: ConditionalTokenService.encodePrepareScalarCondition(
               questionId,
-              scalarLow,
-              scalarHigh,
+              lowerBound,
+              upperBound,
               oracleAddress,
             ),
           })
@@ -393,9 +393,9 @@ class CPKService {
       })
 
       // Step 4.5: Calculate probabilities for distributionHint
-      const a = scalarLow && scalarHigh && scalarStart && ((scalarStart - scalarLow) / (scalarHigh - scalarLow)) * 100
-      const b = a && 100 - a
-      const probabilities = [a || 50, b || 50]
+      const lowerBoundNumber = lowerBound && Number(formatUnits(lowerBound, 18))
+      const upperBoundNumber = upperBound && Number(formatUnits(upperBound, 18))
+      const startingPointNumber = startingPoint && Number(formatUnits(startingPoint, 18))
 
       // Step 5: Create market maker
       const saltNonce = Math.round(Math.random() * 1000000)

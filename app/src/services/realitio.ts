@@ -1,7 +1,7 @@
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 // eslint-disable-next-line import/named
 import { Moment } from 'moment'
 
@@ -267,7 +267,7 @@ class RealitioService {
     return questionId
   }
 
-  static encodeAnnounceConditionQuestionId = async (question: string, scalarLow: number, scalarHigh: number) => {
+  static encodeAnnounceConditionQuestionId = async (question: string, scalarLow: BigNumber, scalarHigh: BigNumber) => {
     const args = [question, scalarLow, scalarHigh]
 
     const announceConditionInterface = new utils.Interface(realitioScalarAdapterAbi)
