@@ -172,7 +172,12 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
     setMarketMakerData(null)
   }, [marketMakerAddress])
 
-  if (data && data.fixedProductMarketMaker && !marketMakerData) {
+  if (
+    data &&
+    data.fixedProductMarketMaker &&
+    !marketMakerData &&
+    data.fixedProductMarketMaker.id === marketMakerAddress
+  ) {
     setMarketMakerData(wrangleResponse(data.fixedProductMarketMaker, networkId))
   }
 
