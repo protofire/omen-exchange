@@ -10,6 +10,7 @@ import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { MarketBuyContainer } from '../../market_buy/market_buy_container'
+import { MarketHistoryContainer } from '../../market_history/market_history_container'
 import { MarketNavigation } from '../../market_navigation'
 import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
 import { MarketSellContainer } from '../../market_sell/market_sell_container'
@@ -129,7 +130,9 @@ const Wrapper = (props: Props) => {
             switchMarketTab={switchMarketTab}
           />
         )}
-        {/* {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />} */}
+        {currentTab === marketTabs.history && (
+          <MarketHistoryContainer isScalar={true} marketMakerData={marketMakerData} />
+        )}
         {currentTab === marketTabs.buy && (
           <MarketBuyContainer isScalar={true} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
         )}
