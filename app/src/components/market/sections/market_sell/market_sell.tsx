@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
@@ -205,7 +206,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               }}
             />
           </CurrenciesWrapper>
-
+          <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput

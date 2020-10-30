@@ -3,6 +3,7 @@ import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES } from '../../../../common/constants'
@@ -241,6 +242,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               }}
             />
           </CurrenciesWrapper>
+          <ReactTooltip id="walletBalanceTooltip" />
 
           <TextfieldCustomPlaceholder
             formField={
