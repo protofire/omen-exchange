@@ -24,6 +24,7 @@ import { TitleValue } from '../../../../../common/text/title_value'
 import { FullLoading } from '../../../../../loading'
 import {
   ButtonContainerFullWidth,
+  CurrenciesWrapper,
   GenericError,
   MarketBottomNavButton,
   OutcomeItemLittleBallOfJoyAndDifferentColors,
@@ -94,11 +95,6 @@ const TitleValueVertical = styled(TitleValue)`
   > p {
     text-align: left;
   }
-`
-
-const CurrenciesWrapper = styled.div`
-  padding: 0 0 20px 0;
-  width: 100%;
 `
 
 const GridTransactionDetailsWrapper = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`

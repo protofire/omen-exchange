@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   flex-direction: row;
   justify-content: space-between;
   border-radius: 4px;
-  border: 1px solid ${props => props.theme.borders.borderDisabled};
+  border: ${({ theme }) => theme.borders.borderLineDisabled};
   align-content: center;
   padding: 4px 20px;
   margin-bottom: 20px;

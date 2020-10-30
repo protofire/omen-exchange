@@ -7,7 +7,7 @@ import { Arbitrator } from '../../../../util/types'
 import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
 
 const AdditionalMarketDataWrapper = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
+  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
   display: flex;
   align-items: center;
   justify-content: space-between;
