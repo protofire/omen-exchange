@@ -24,21 +24,22 @@ import {
   formatBigNumber,
   formatNumber,
 } from '../../../../util/tools'
-import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
+import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
 import { ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { SetAllowance } from '../../common/set_allowance'
+import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
-import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
 
 interface Props extends RouteComponentProps<any> {
@@ -60,7 +61,7 @@ const TabsGrid = styled.div`
   display: grid;
   grid-column-gap: 13px;
   grid-template-columns: 1fr 1fr;
-  margin: 0 0 25px;
+  margin: 0 0 20px;
 `
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
@@ -72,7 +73,7 @@ const UserData = styled.div`
   flex-direction: column;
   margin: 0 -25px;
   padding: 20px 24px;
-  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
+  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
 `
 
 const UserDataTitleValue = styled(TitleValue)`
@@ -90,15 +91,7 @@ const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { marketMakerData, switchMarketTab } = props
-  const {
-    address: marketMakerAddress,
-    balances,
-    collateral,
-    fee,
-    totalEarnings,
-    totalPoolShares,
-    userEarnings,
-  } = marketMakerData
+  const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
@@ -109,6 +102,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const signer = useMemo(() => provider.getSigner(), [provider])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const [amountToFund, setAmountToFund] = useState<BigNumber>(new BigNumber(0))
@@ -353,12 +347,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         showSharesChange={showSharesChange}
       />
       <WarningMessageStyled
-        additionalDescription={''}
-        description={
-          'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
-        }
+        additionalDescription=""
+        description="Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time."
         href={DOCUMENT_FAQ}
-        hyperlinkDescription={'More Info'}
+        hyperlinkDescription="More Info"
       />
       <GridTransactionDetails>
         <div>
@@ -379,14 +371,21 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           </TabsGrid>
           {activeTab === Tabs.deposit && (
             <>
-              <WalletBalance
-                onClick={() => {
-                  setAmountToFund(collateralBalance)
-                  setAmountToFundDisplay(walletBalance)
-                }}
-                symbol={collateral.symbol}
-                value={walletBalance}
-              />
+              <CurrenciesWrapper>
+                <CurrencySelector
+                  balance={walletBalance}
+                  context={context}
+                  currency={collateral.address}
+                  disabled
+                  onSelect={(token: Token | null) => {
+                    if (token) {
+                      setCollateral(token)
+                      setAmountToFund(new BigNumber(0))
+                    }
+                  }}
+                />
+              </CurrenciesWrapper>
+
               <TextfieldCustomPlaceholder
                 formField={
                   <BigNumberInput
@@ -396,6 +395,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                       setAmountToFund(e.value)
                       setAmountToFundDisplay('')
                     }}
+                    style={{ width: 0 }}
                     value={amountToFund}
                     valueToDisplay={amountToFundDisplay}
                   />
@@ -407,20 +407,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 shouldDisplayMaxButton
                 symbol={collateral.symbol}
               />
+
               {collateralAmountError && <GenericError>{collateralAmountError}</GenericError>}
             </>
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              <WalletBalance
-                onClick={() => {
-                  setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(sharesBalance)
-                }}
-                symbol="Shares"
-                text="My Pool Tokens"
-                value={formatNumber(sharesBalance)}
-              />
+              <TokenBalance text="Pool Tokens" value={formatNumber(sharesBalance)} />
+
               <TextfieldCustomPlaceholder
                 formField={
                   <BigNumberInput
@@ -430,6 +424,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                       setAmountToRemove(e.value)
                       setAmountToRemoveDisplay('')
                     }}
+                    style={{ width: 0 }}
                     value={amountToRemove}
                     valueToDisplay={amountToRemoveDisplay}
                   />
@@ -441,6 +436,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 shouldDisplayMaxButton
                 symbol="Shares"
               />
+
               {sharesAmountError && <GenericError>{sharesAmountError}</GenericError>}
             </>
           )}
@@ -451,14 +447,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               <TransactionDetailsRow
                 emphasizeValue={fee.gt(0)}
                 state={ValueStates.success}
-                title={'Earn Trading Fee'}
+                title="Earn Trading Fee"
                 value={feeFormatted}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={poolTokens.gt(0)}
                 state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
-                title={'Pool Tokens'}
+                title="Pool Tokens"
                 value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals))}`}
               />
             </TransactionDetailsCard>
@@ -468,19 +464,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               <TransactionDetailsRow
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
-                title={'Earned'}
+                title="Earned"
                 value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
-                title={'Deposited'}
+                title="Deposited"
                 value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${collateral.symbol}`}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={depositedTokensTotal.gt(0)}
                 state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
-                title={'Total'}
+                title="Total"
                 value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${
                   collateral.symbol
                 }`}
@@ -491,20 +487,20 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       </GridTransactionDetails>
       {isNegativeAmountToFund && (
         <WarningMessage
-          additionalDescription={''}
+          additionalDescription=""
           danger={true}
-          description={`Your deposit amount should not be negative.`}
-          href={''}
-          hyperlinkDescription={''}
+          description="Your deposit amount should not be negative."
+          href=""
+          hyperlinkDescription=""
         />
       )}
       {isNegativeAmountToRemove && (
         <WarningMessage
-          additionalDescription={''}
-          danger={true}
-          description={`Your withdraw amount should not be negative.`}
-          href={''}
-          hyperlinkDescription={''}
+          additionalDescription=""
+          danger
+          description="Your withdraw amount should not be negative."
+          href=""
+          hyperlinkDescription=""
         />
       )}
       {activeTab === Tabs.deposit && showSetAllowance && (

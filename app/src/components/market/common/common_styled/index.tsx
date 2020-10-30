@@ -216,3 +216,7 @@ export const MarketBottomNavButton = styled(Button)`
   font-size: 14px;
   line-height: 16px;
 `
+export const CurrenciesWrapper = styled.div`
+  padding: 0 0 20px 0;
+  width: 100%;
+`

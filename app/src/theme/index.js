@@ -137,6 +137,7 @@ const theme = {
     tooltip: '#cfd8dc',
     borderColor: '#ECEFF1',
     borderDisabled: '#E8EAF6',
+    borderLineDisabled: '1px solid #E8EAF6',
     commonBorderRadius: '6px',
   },
   slider: {

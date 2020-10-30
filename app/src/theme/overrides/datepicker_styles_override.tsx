@@ -5,7 +5,7 @@ export const DatepickerStylesOverride = css`
     &.react-datepicker {
       background-color: #fff;
       border-radius: 16px;
-      border: 1px solid ${props => props.theme.borders.borderDisabled};
+      border: ${({ theme }) => theme.borders.borderLineDisabled};
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
       color: ${props => props.theme.colors.textColorDark};
       display: inline-block;
@@ -15,7 +15,7 @@ export const DatepickerStylesOverride = css`
 
       .react-datepicker__header {
         background-color: transparent;
-        border-bottom: 1px solid ${props => props.theme.borders.borderDisabled};
+        border-bottom: ${({ theme }) => theme.borders.borderLineDisabled};
         border-top-left-radius: 16px;
         border-top-right-radius: 16px;
         padding-top: 12px;
@@ -108,7 +108,7 @@ export const DatepickerStylesOverride = css`
       }
 
       .react-datepicker__time-container {
-        border-left: 1px solid ${props => props.theme.borders.borderDisabled};
+        border-left: ${({ theme }) => theme.borders.borderLineDisabled};
         width: 88px;
       }
 
