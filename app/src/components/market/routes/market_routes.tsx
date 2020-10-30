@@ -2,7 +2,7 @@ import { useInterval } from '@react-corekit/use-interval'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
-import { Redirect, Route, RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 
 import { FETCH_DETAILS_INTERVAL, MAX_MARKET_FEE } from '../../../common/constants'
 import { useCheckContractExists, useMarketMakerData } from '../../../hooks'
@@ -53,16 +53,10 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
   }
 
   return (
-    <Route
-      exact
-      path="/:address"
-      render={props => (
-        <>
-          <MarketDetailsPage {...props} marketMakerData={marketMakerData} />
-          <ThreeBoxComments threadName={marketMakerAddress} />
-        </>
-      )}
-    />
+    <>
+      <MarketDetailsPage {...props} marketMakerData={marketMakerData} />
+      <ThreeBoxComments threadName={marketMakerAddress} />
+    </>
   )
 }
 
