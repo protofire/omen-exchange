@@ -318,10 +318,6 @@ class CPKService {
 
         const transactions = []
 
-        const lowerBoundNumber = Number(formatUnits(lowerBound, 18))
-        const upperBoundNumber = Number(formatUnits(upperBound, 18))
-        const startingPointNumber = Number(formatUnits(startingPoint, 18))
-
         let questionId: string
         if (loadedQuestionId) {
           questionId = loadedQuestionId
