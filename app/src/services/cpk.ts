@@ -3,7 +3,7 @@ import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapt
 import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, formatUnits } from 'ethers/utils'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
@@ -318,6 +318,10 @@ class CPKService {
 
         const transactions = []
 
+        const lowerBoundNumber = Number(formatUnits(lowerBound, 18))
+        const upperBoundNumber = Number(formatUnits(upperBound, 18))
+        const startingPointNumber = Number(formatUnits(startingPoint, 18))
+
         let questionId: string
         if (loadedQuestionId) {
           questionId = loadedQuestionId
@@ -349,7 +353,7 @@ class CPKService {
         // Step 1.5: Announce the questionId and its bounds to the RealitioScalarAdapter
         transactions.push({
           to: realitioScalarAdapterAddress,
-          data: RealitioService.encodeAnnounceConditionQuestionId(questionId, lowerBound, upperBound),
+          data: await RealitioService.encodeAnnounceConditionQuestionId(questionId, lowerBound, upperBound),
         })
 
         const oracleAddress = getContractAddress(networkId, 'realitioScalarAdapter')
@@ -419,6 +423,7 @@ class CPKService {
             distributionHint,
           ),
         })
+        console.log(transactions)
 
         const txObject = await this.cpk.execTransactions(transactions)
         logger.log(`Transaction hash: ${txObject.hash}`)
