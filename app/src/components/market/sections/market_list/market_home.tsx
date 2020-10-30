@@ -89,8 +89,22 @@ const ButtonSearchStyled = styled(ButtonRoundStyled as any)`
   width: 40px;
 `
 
+const FilterBadgeLabel = styled.span`
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: ${({ theme }) => theme.colors.clickable};
+  color: ${({ theme }) => theme.colors.mainBodyBackground};
+  font-size: ${({ theme }) => theme.fonts.defaultSize};
+  line-height: 16px;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
 const ButtonFilterStyled = styled(ButtonRoundStyled as any)`
-  padding: 12px 17px;
+  padding: 0 17px;
   span {
     font-size: 14px;
     line-height: 16px;
@@ -267,6 +281,10 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [currency, setCurrency] = useState<Maybe<string> | null>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(null)
   const [curationSource, setCurationSource] = useState<CurationSource>(currentFilter.curationSource)
+
+  const advancedFilterSelectedCount = [currency, arbitrator, curationSource !== CurationSource.ALL_SOURCES].filter(
+    element => element,
+  ).length
 
   const filters = [
     {
@@ -521,7 +539,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           <FiltersWrapper>
             <FiltersLeftWrapper>
               <ButtonFilterStyled active={showAdvancedFilters} onClick={toggleFilters}>
-                <IconFilter />
+                {advancedFilterSelectedCount > 0 ? (
+                  <FilterBadgeLabel>{advancedFilterSelectedCount}</FilterBadgeLabel>
+                ) : (
+                  <IconFilter />
+                )}
                 <span>Filters</span>
               </ButtonFilterStyled>
               <ButtonSearchStyled active={showSearch} onClick={toggleSearch}>
