@@ -9,17 +9,19 @@ const query = gql`
     question(id: $id) {
       indexedFixedProductMarketMakers {
         id
+        collateralToken
       }
     }
   }
 `
 
+type MarketTokenPair = {
+  id: string
+  collateralToken: string
+}
+
 type GraphResponseMarketIdMaker = {
-  indexedFixedProductMarketMakers: [
-    {
-      id: string
-    },
-  ]
+  indexedFixedProductMarketMakers: MarketTokenPair[]
 }
 
 type GraphResponse = {
@@ -27,7 +29,7 @@ type GraphResponse = {
 }
 
 type Result = {
-  marketId: Maybe<string>
+  markets: MarketTokenPair[]
   status: Status
 }
 
@@ -35,8 +37,8 @@ type Result = {
  * Get data from the graph for the given market maker. All the information returned by this hook comes from the graph,
  * other necessary information should be fetched from the blockchain.
  */
-export const useGraphMarketIdFromQuestion = (questionId: string): Result => {
-  const [marketId, setMarketId] = useState<Maybe<string>>('')
+export const useGraphMarketsFromQuestion = (questionId: string): Result => {
+  const [markets, setMarkets] = useState<MarketTokenPair[]>([])
 
   const { data, error, loading } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
@@ -45,20 +47,20 @@ export const useGraphMarketIdFromQuestion = (questionId: string): Result => {
   })
 
   useEffect(() => {
-    if (!questionId) setMarketId('')
+    if (!questionId) setMarkets([])
   }, [questionId])
 
-  if (data && data.question && data.question.indexedFixedProductMarketMakers.length > 0 && !marketId) {
-    setMarketId(data.question.indexedFixedProductMarketMakers[0].id)
+  if (data && data.question && data.question.indexedFixedProductMarketMakers.length > 0 && markets.length === 0) {
+    setMarkets(data.question.indexedFixedProductMarketMakers)
   } else if (data && data.question && !data.question.indexedFixedProductMarketMakers.length) {
     return {
-      marketId,
+      markets: [],
       status: Status.Error,
     }
   }
 
   return {
-    marketId,
+    markets,
     status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
   }
 }

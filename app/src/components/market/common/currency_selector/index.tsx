@@ -30,6 +30,7 @@ interface Props {
   currency?: Maybe<string>
   context: ConnectedWeb3Context
   disabled?: boolean
+  filters?: Array<string>
   onSelect: (currency: Token | null) => void
   balance?: string
   placeholder?: Maybe<string>
@@ -37,7 +38,17 @@ interface Props {
 }
 
 export const CurrencySelector: React.FC<Props> = props => {
-  const { addAll = false, balance, context, currency, disabled, onSelect, placeholder, ...restProps } = props
+  const {
+    addAll = false,
+    balance,
+    context,
+    currency,
+    disabled,
+    filters = [],
+    onSelect,
+    placeholder,
+    ...restProps
+  } = props
 
   const tokens = useTokens(context)
 
@@ -66,22 +77,20 @@ export const CurrencySelector: React.FC<Props> = props => {
     currentItem = 0
   }
 
-  tokens.forEach(({ address, image, symbol }, index) => {
-    currencyDropdownData.push({
-      content: image ? <TokenItem image={image} text={symbol} /> : symbol,
-      extraContent: balance,
-      onClick: !disabled
-        ? () => {
-            onChange(address)
-          }
-        : () => {
-            return
-          },
+  tokens
+    .filter(({ address }) => filters.length === 0 || filters.indexOf(address.toLowerCase()) >= 0)
+    .forEach(({ address, image, symbol }, index) => {
+      currencyDropdownData.push({
+        content: image ? <TokenItem image={image} text={symbol} /> : symbol,
+        extraContent: balance,
+        onClick: () => {
+          if (!disabled) onChange(address)
+        },
+      })
+      if (currency && currency.toLowerCase() === address.toLowerCase()) {
+        currentItem = addAll ? index + 1 : index
+      }
     })
-    if (currency && currency.toLowerCase() === address.toLowerCase()) {
-      currentItem = addAll ? index + 1 : index
-    }
-  })
 
   return (
     <Wrapper {...restProps}>

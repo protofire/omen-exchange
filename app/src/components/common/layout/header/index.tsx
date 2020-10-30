@@ -55,7 +55,8 @@ const LogoWrapper = styled(NavLink)`
 
 const ButtonCreateDesktop = styled(Button)`
   display: none;
-  height: 34px;
+  height: 40px;
+  border-radius: 8px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: flex;
@@ -83,6 +84,8 @@ const ButtonCSS = css`
 
 const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
   ${ButtonCSS}
+  height: 40px;
+  border-radius: 8px;
 `
 
 const ButtonWrapper = styled.div`
