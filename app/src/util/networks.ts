@@ -467,3 +467,5 @@ export const getOmenTCRListId = (networkId: number): number => {
 
   return networks[networkId].omenTCRListId
 }
+
+export const targetGnosisSafeImplementation = '0x6851D6fDFAfD08c0295C392436245E5bc78B0185' // v1.2.0

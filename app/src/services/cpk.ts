@@ -6,7 +6,7 @@ import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
-import { getCPKAddresses, getContractAddress } from '../util/networks'
+import { getCPKAddresses, getContractAddress, targetGnosisSafeImplementation } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
@@ -67,13 +67,20 @@ interface CPKRedeemParams {
   conditionalTokens: ConditionalTokenService
 }
 
+const proxyAbi = [
+  'function masterCopy() external view returns (address)',
+  'function changeMasterCopy(address _masterCopy) external',
+]
+
 class CPKService {
   cpk: any
   provider: Web3Provider
+  proxy: any
 
   constructor(cpk: any, provider: Web3Provider) {
     this.cpk = cpk
     this.provider = provider
+    this.proxy = new ethers.Contract(cpk.contract.address, proxyAbi, provider.getSigner())
   }
 
   static async create(provider: Web3Provider) {
@@ -454,6 +461,30 @@ class CPKService {
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
+      throw err
+    }
+  }
+
+  proxyIsUpdated = async (): Promise<boolean> => {
+    const implementation = await this.proxy.masterCopy()
+    if (implementation.toLowerCase() === targetGnosisSafeImplementation.toLowerCase()) {
+      return true
+    }
+    return false
+  }
+
+  upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {
+    try {
+      // upgrade the proxy to delegatecall a different version of Gnosis Safe
+      const txObject = await this.cpk.execTransactions([
+        {
+          to: this.cpk.address,
+          data: this.proxy.interface.functions.changeMasterCopy.encode([targetGnosisSafeImplementation]),
+        },
+      ])
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(`Error trying to update proxy`, err.message)
       throw err
     }
   }
