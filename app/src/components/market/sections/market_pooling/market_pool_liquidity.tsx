@@ -1,7 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -16,7 +15,6 @@ import {
 } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
-import { fetchAccountBalance } from '../../../../store/reducer'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import {
@@ -98,7 +96,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
   const cpk = useCpk()
-  const dispatch = useDispatch()
 
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -118,10 +115,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
-
-  useEffect(() => {
-    dispatch(fetchAccountBalance(account, provider, collateral))
-  }, [dispatch, account, provider, collateral])
 
   useEffect(() => {
     setIsNegativeAmountToFund(formatBigNumber(amountToFund, collateral.decimals).includes('-'))
