@@ -1,15 +1,32 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router'
+import styled from 'styled-components'
 
 import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
 import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
-import { MarketMakerData } from '../../../../util/types'
+import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
+import { MarketMakerData, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { MoreMenu } from '../../../common/form/more_menu'
 import { AdditionalMarketData } from '../additional_market_data'
+import { CurrencySelector } from '../currency_selector'
 import { MarketData } from '../market_data'
 import { ProgressBar } from '../progress_bar'
 import { ProgressBarToggle } from '../progress_bar/toggle'
+
+const SubsectionTitleLeftWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  & > * + * {
+    margin-left: 12px;
+  }
+`
+
+const MarketCurrencySelector = styled(CurrencySelector)`
+  .dropdownItems {
+    min-width: auto;
+  }
+`
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -63,6 +80,8 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       ? 'closed'
       : ''
 
+  const { markets: marketsRelatedQuestion } = useGraphMarketsFromQuestion(question.id)
+
   const toggleProgressBar = () => {
     setShowingProgressBar(!showingProgressBar)
   }
@@ -77,15 +96,37 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     },
   ]
 
+  const onChangeMarketCurrency = (currency: Token | null) => {
+    if (currency) {
+      const selectedMarket = marketsRelatedQuestion.find(e => e.collateralToken === currency.address.toLowerCase())
+      if (selectedMarket && selectedMarket.collateralToken !== collateral.address) {
+        history.push(`/${selectedMarket.id}`)
+      }
+    }
+  }
+
   return (
     <>
       <SubsectionTitleWrapper>
-        <ProgressBarToggle
-          active={showingProgressBar}
-          state={marketState}
-          templateId={question.templateId}
-          toggleProgressBar={toggleProgressBar}
-        ></ProgressBarToggle>
+        <SubsectionTitleLeftWrapper>
+          {marketsRelatedQuestion.length > 1 && (
+            <MarketCurrencySelector
+              context={context}
+              currency={collateral.address}
+              disabled={false}
+              filters={marketsRelatedQuestion.map(element => element.collateralToken)}
+              onSelect={onChangeMarketCurrency}
+              placeholder=""
+            />
+          )}
+          <ProgressBarToggle
+            active={showingProgressBar}
+            state={marketState}
+            templateId={question.templateId}
+            toggleProgressBar={toggleProgressBar}
+          ></ProgressBarToggle>
+        </SubsectionTitleLeftWrapper>
+
         <MoreMenu items={moreMenuItems} />
       </SubsectionTitleWrapper>
       {showingProgressBar && (
