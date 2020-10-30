@@ -20,6 +20,7 @@ const Text = styled.div`
   line-height: 1.2;
   overflow: hidden;
   white-space: nowrap;
+  color: ${props => props.theme.colors.textColorDark};
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -32,7 +33,7 @@ export const TokenItem: React.FC<Props> = props => {
   const [showImage, setShowImage] = useState(true)
 
   return (
-    <Wrapper className="token_item_wrapper">
+    <Wrapper>
       {!!image && showImage && <Image onError={() => setShowImage(false)} src={image} />}
       <Text>{text}</Text>
     </Wrapper>

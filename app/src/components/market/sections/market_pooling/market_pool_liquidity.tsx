@@ -13,7 +13,6 @@ import {
   useCpk,
   useCpkAllowance,
   useFundingBalance,
-  useTokens,
 } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
@@ -123,19 +122,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, collateral))
   }, [dispatch, account, provider, collateral])
-  const tokensAmount = useTokens(context).length
-
-  const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
-  const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
-    formatBigNumber(collateralBalance, collateral.decimals),
-  )
-  const maybeCollateralBalance = useCollateralBalance(collateral, context)
-
-  useEffect(() => {
-    setCollateralBalance(maybeCollateralBalance || Zero)
-    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals))
-    // eslint-disable-next-line
-  }, [maybeCollateralBalance])
 
   useEffect(() => {
     setIsNegativeAmountToFund(formatBigNumber(amountToFund, collateral.decimals).includes('-'))
@@ -149,13 +135,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const currentDate = new Date().getTime()
   const disableDepositTab = currentDate > resolutionDate
   const [activeTab, setActiveTab] = useState(disableDepositTab ? Tabs.withdraw : Tabs.deposit)
-
-  useEffect(() => {
-    setCollateral(marketMakerData.collateral)
-    setAmountToFund(new BigNumber(0))
-    setAmountToRemove(new BigNumber(0))
-    // eslint-disable-next-line
-  }, [activeTab])
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
@@ -192,6 +171,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const showSharesChange = activeTab === Tabs.deposit ? amountToFund.gt(0) : amountToRemove.gt(0)
 
+  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const collateralBalance = maybeCollateralBalance || Zero
   const probabilities = balances.map(balance => balance.probability)
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
@@ -397,22 +378,21 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           </TabsGrid>
           {activeTab === Tabs.deposit && (
             <>
-              {tokensAmount > 1 && (
-                <CurrenciesWrapper>
-                  <CurrencySelector
-                    balance={formatNumber(collateralBalanceFormatted)}
-                    context={context}
-                    currency={collateral.address}
-                    disabled
-                    onSelect={(token: Token | null) => {
-                      if (token) {
-                        setCollateral(token)
-                        setAmountToFund(new BigNumber(0))
-                      }
-                    }}
-                  />
-                </CurrenciesWrapper>
-              )}
+              <CurrenciesWrapper>
+                <CurrencySelector
+                  balance={walletBalance}
+                  context={context}
+                  currency={collateral.address}
+                  disabled
+                  onSelect={(token: Token | null) => {
+                    if (token) {
+                      setCollateral(token)
+                      setAmountToFund(new BigNumber(0))
+                    }
+                  }}
+                />
+              </CurrenciesWrapper>
+
               <TextfieldCustomPlaceholder
                 formField={
                   <BigNumberInput

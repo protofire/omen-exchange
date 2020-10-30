@@ -2,7 +2,6 @@ import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -14,10 +13,8 @@ import {
   useContracts,
   useCpk,
   useCpkAllowance,
-  useTokens,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
-import { fetchAccountBalance } from '../../../../store/reducer'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
@@ -57,9 +54,8 @@ interface Props extends RouteComponentProps<any> {
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useCpk()
-  const { account, library: provider } = context
+  const { library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
-  const dispatch = useDispatch()
 
   const { buildMarketMaker } = useContracts(context)
   const { marketMakerData, switchMarketTab } = props
@@ -77,29 +73,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [tweet, setTweet] = useState('')
   const [newShares, setNewShares] = useState<Maybe<BigNumber[]>>(null)
 
-  useEffect(() => {
-    dispatch(fetchAccountBalance(account, provider, collateral))
-  }, [dispatch, account, provider, collateral])
-
-  const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
-  const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
-    formatBigNumber(collateralBalance, collateral.decimals),
-  )
-  const maybeCollateralBalance = useCollateralBalance(collateral, context)
-
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
-  const tokensAmount = useTokens(context).length
-
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
-
-  useEffect(() => {
-    setCollateralBalance(maybeCollateralBalance || Zero)
-    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals))
-    // eslint-disable-next-line
-  }, [maybeCollateralBalance])
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
@@ -138,6 +116,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     [new BigNumber(0), balances.map(() => 0), amount],
     calcBuyAmount,
   )
+
+  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const collateralBalance = maybeCollateralBalance || Zero
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -246,22 +227,21 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       />
       <GridTransactionDetails>
         <div>
-          {tokensAmount > 1 && (
-            <CurrenciesWrapper>
-              <CurrencySelector
-                balance={formatNumber(collateralBalanceFormatted)}
-                context={context}
-                currency={collateral.address}
-                disabled
-                onSelect={(token: Token | null) => {
-                  if (token) {
-                    setCollateral(token)
-                    setAmount(new BigNumber(0))
-                  }
-                }}
-              />
-            </CurrenciesWrapper>
-          )}
+          <CurrenciesWrapper>
+            <CurrencySelector
+              balance={formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals)}
+              context={context}
+              currency={collateral.address}
+              disabled
+              onSelect={(token: Token | null) => {
+                if (token) {
+                  setCollateral(token)
+                  setAmount(new BigNumber(0))
+                }
+              }}
+            />
+          </CurrenciesWrapper>
+
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput

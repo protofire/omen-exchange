@@ -11,10 +11,6 @@ const Wrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-
-  .token_item_wrapper {
-    color: ${props => props.theme.colors.textColorDark};
-  }
 `
 
 const CurrencyButtonSelectedCSS = css`
