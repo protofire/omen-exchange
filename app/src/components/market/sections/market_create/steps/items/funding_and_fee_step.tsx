@@ -17,7 +17,6 @@ import { MarketCreationStatus } from '../../../../../../util/market_creation_sta
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
-import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
@@ -26,7 +25,7 @@ import { FullLoading } from '../../../../../loading'
 import {
   ButtonContainerFullWidth,
   GenericError,
-  LeftButton,
+  MarketBottomNavButton,
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
   OutcomeItemTextWrapper,
@@ -63,6 +62,10 @@ const CreateCardBottom = styled(CreateCard)`
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
   margin-bottom: 24px;
+`
+
+const LeftButton = styled(MarketBottomNavButton as any)`
+  margin-right: auto;
 `
 
 const SubTitle = styled.h3`
@@ -102,7 +105,7 @@ const GridTransactionDetailsWrapper = styled(GridTransactionDetails)<{ noMarginT
   ${props => (props.noMarginTop ? 'margin-top: 0;' : '')};
 `
 
-const ButtonCreate = styled(Button)`
+const ButtonCreate = styled(MarketBottomNavButton as any)`
   font-weight: 400;
 `
 
@@ -132,10 +135,16 @@ const CustomFeeWrapper = styled.div`
 const CustomFeeLabel = styled.p`
   width: 50%;
   margin: 0;
+  color: ${props => props.theme.colors.textColorDark};
+  font-size: 14px;
+  line-height: 16px;
 `
 
 const StyledTradingFeeSelector = styled(TradingFeeSelector)`
   width: 50%;
+  .dropdownItems {
+    min-width: auto;
+  }
 `
 
 const FlexRowWrapper = styled.div`
@@ -145,6 +154,13 @@ const FlexRowWrapper = styled.div`
   & > * + * {
     margin-left: 48px;
   }
+`
+
+const StyledButtonContainerFullWidth = styled(ButtonContainerFullWidth as any)`
+  padding: 24px;
+  padding-bottom: 0;
+  margin: 0 -24px;
+  margin-bottom: -1px;
 `
 
 interface Props {
@@ -428,7 +444,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           href={DOCUMENT_FAQ}
           hyperlinkDescription={'More Info'}
         />
-        <ButtonContainerFullWidth borderTop>
+        <StyledButtonContainerFullWidth borderTop>
           <LeftButton
             buttonType={ButtonType.secondaryLine}
             disabled={
@@ -440,14 +456,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             Back
           </LeftButton>
           {!account && (
-            <Button buttonType={ButtonType.primary} onClick={submit}>
+            <MarketBottomNavButton buttonType={ButtonType.primary} onClick={submit}>
               Connect Wallet
-            </Button>
+            </MarketBottomNavButton>
           )}
           <ButtonCreate buttonType={ButtonType.secondaryLine} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
             Create Market
           </ButtonCreate>
-        </ButtonContainerFullWidth>
+        </StyledButtonContainerFullWidth>
       </CreateCardBottom>
       {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
         <FullLoading message={`${marketCreationStatus._type}...`} />

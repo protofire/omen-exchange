@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { useAsyncDerivedValue, useContracts, useMarketMakerData } from '../../../../../../hooks'
 import { ConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
-import { useGraphMarketIdFromQuestion } from '../../../../../../hooks/useGraphMarketIdFromQuestion'
+import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { getArbitratorFromAddress } from '../../../../../../util/networks'
 import { formatDate } from '../../../../../../util/tools'
 import { Arbitrator, BalanceItem, Question, Status } from '../../../../../../util/types'
@@ -184,8 +184,9 @@ export const ImportMarketContent = (props: Props) => {
 
   const [question, arbitrator, errorMessage] = useAsyncDerivedValue('', [null, null, null], fetchQuestion)
 
-  const { marketId, status: marketIdStatus } = useGraphMarketIdFromQuestion(question?.id || '')
-  const { marketMakerData } = useMarketMakerData((marketId || '').toLowerCase())
+  const { markets, status: marketIdStatus } = useGraphMarketsFromQuestion(question?.id || '')
+  const marketId = markets[0]?.id || ''
+  const { marketMakerData } = useMarketMakerData(marketId.toLowerCase())
 
   useEffect(() => {
     if (question && marketIdStatus === Status.Error) {

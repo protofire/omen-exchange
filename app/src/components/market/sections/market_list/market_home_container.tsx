@@ -147,7 +147,7 @@ const MarketHomeContainer: React.FC = () => {
 
   let searchParam: string
   if (searchFilter) {
-    searchParam = searchRoute
+    searchParam = decodeURIComponent(searchRoute)
   } else {
     searchParam = ''
   }

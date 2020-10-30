@@ -40,6 +40,8 @@ const query = gql`
       arbitrationOccurred
       currentAnswerTimestamp
       runningDailyVolumeByHour
+      curatedByDxDao
+      curatedByDxDaoOrKleros
       question {
         id
         data
@@ -159,6 +161,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
  */
 export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: number): Result => {
   const [marketMakerData, setMarketMakerData] = useState<Maybe<GraphMarketMakerData>>(null)
+  const [needUpdate, setNeedUpdate] = useState<boolean>(false)
 
   const { data, error, loading } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
@@ -167,11 +170,12 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
   })
 
   useEffect(() => {
-    setMarketMakerData(null)
+    setNeedUpdate(true)
   }, [marketMakerAddress])
 
-  if (data && data.fixedProductMarketMaker && !marketMakerData) {
+  if (data && data.fixedProductMarketMaker && needUpdate && data.fixedProductMarketMaker.id === marketMakerAddress) {
     setMarketMakerData(wrangleResponse(data.fixedProductMarketMaker, networkId))
+    setNeedUpdate(false)
   }
 
   return {

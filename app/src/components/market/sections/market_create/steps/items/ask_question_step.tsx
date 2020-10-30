@@ -12,7 +12,7 @@ import { CommonDisabledCSS } from '../../../../../common/form/common_styled'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
-import { ButtonContainerFullWidth, LeftButton } from '../../../../common/common_styled'
+import { ButtonContainerFullWidth, MarketBottomNavButton } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome, Outcomes } from '../outcomes'
@@ -32,7 +32,8 @@ const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boo
   padding-left: 10px;
   padding-right: 10px;
   width: 100%;
-  height: 36px;
+  height: 40px;
+  border-radius: 8px;
   font-weight: normal;
   &,
   &:hover {
@@ -60,10 +61,11 @@ const ButtonCategoryTextOverflow = styled.span`
 `
 
 const GridTwoColumns = styled.div`
-  column-gap: 16px;
+  column-gap: 18px;
   display: grid;
   grid-template-columns: 1fr;
-  padding-bottom: 20px;
+  padding-bottom: 24px;
+  padding-top: 4px;
   row-gap: 20px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
@@ -83,7 +85,7 @@ const ButtonWithReadyToGoStatusCSS = css`
   }
 `
 
-const ButtonWithReadyToGoStatus = styled(Button)<{ readyToGo: boolean }>`
+const ButtonWithReadyToGoStatus = styled(MarketBottomNavButton as any)<{ readyToGo: boolean }>`
   ${props => props.readyToGo && ButtonWithReadyToGoStatusCSS}
 `
 
@@ -94,6 +96,17 @@ const CategoryImportWrapper = styled.div`
   padding: 0 ${props => props.theme.cards.paddingHorizontal};
   padding-bottom: 20px;
 `
+
+const LeftButton = styled(MarketBottomNavButton as any)`
+  margin-right: auto;
+`
+
+const StyledButtonContainerFullWidth = styled(ButtonContainerFullWidth as any)`
+  padding: 20px 24px;
+  padding-bottom: 0;
+  margin: 0 -24px;
+`
+
 interface Props {
   next: () => void
   values: {
@@ -240,10 +253,11 @@ const AskQuestionStep = (props: Props) => {
                     minDate={tomorrow}
                     name="resolution"
                     onChange={handleDateChange}
+                    placeholder="Select closing date"
                     selected={resolution}
                   />
                 }
-                title={'Resolution Date (UTC)'}
+                title={'Closing Date - UTC'}
               />
             </Column>
             <Column>
@@ -256,7 +270,7 @@ const AskQuestionStep = (props: Props) => {
                     isACategorySelected={category !== ''}
                     onClick={toggleCategoryButtonFocus}
                   >
-                    <ButtonCategoryTextOverflow>{category ? category : 'Select Category'}</ButtonCategoryTextOverflow>
+                    <ButtonCategoryTextOverflow>{category ? category : 'Select category'}</ButtonCategoryTextOverflow>
                   </ButtonCategory>
                 }
                 title={'Category'}
@@ -293,13 +307,13 @@ const AskQuestionStep = (props: Props) => {
                 value={arbitrator}
               />
             }
-            style={{ marginBottom: 0 }}
+            style={{ marginBottom: 0, marginTop: 24 }}
             title={'Arbitrator'}
           />
         </>
       )}
 
-      <ButtonContainerFullWidth borderTop={true}>
+      <StyledButtonContainerFullWidth borderTop={true}>
         <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => history.push(`/`)}>
           Cancel
         </LeftButton>
@@ -311,7 +325,7 @@ const AskQuestionStep = (props: Props) => {
         >
           Continue
         </ButtonWithReadyToGoStatus>
-      </ButtonContainerFullWidth>
+      </StyledButtonContainerFullWidth>
     </CreateCard>
   )
 }

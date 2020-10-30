@@ -1,6 +1,7 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
+import { getMarketTitles } from '../../../../util/tools'
 import { Button } from '../../../button'
 
 import { ThreeDots1 } from './img/three_dots_1'
@@ -28,11 +29,14 @@ const ToggleButtonText = styled.span`
 interface Props extends DOMAttributes<HTMLDivElement> {
   active: boolean
   state: string
+  templateId: Maybe<number>
   toggleProgressBar: () => void
 }
 
 export const ProgressBarToggle: React.FC<Props> = props => {
-  const { active, state, toggleProgressBar } = props
+  const { active, state, templateId, toggleProgressBar } = props
+
+  const { marketTitle } = getMarketTitles(templateId)
 
   const marketStates = {
     open: 'open',
@@ -52,16 +56,7 @@ export const ProgressBarToggle: React.FC<Props> = props => {
       ) : (
         <ThreeDots3></ThreeDots3>
       )}
-      <ToggleButtonText>
-        Market
-        {state === marketStates.open
-          ? ' Open'
-          : state === marketStates.finalizing
-          ? ' Finalizing'
-          : state === marketStates.arbitration
-          ? ' Arbitrating'
-          : ' Closed'}
-      </ToggleButtonText>
+      <ToggleButtonText>{marketTitle}</ToggleButtonText>
     </ToggleButton>
   )
 }

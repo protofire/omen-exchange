@@ -15,13 +15,13 @@ import {
   mulBN,
 } from '../../../../util/tools'
 import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
-import { Button, ButtonContainer } from '../../../button'
+import { ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { GenericError } from '../../common/common_styled'
+import { GenericError, MarketBottomNavButton } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
@@ -30,8 +30,8 @@ import { TransactionDetailsRow, ValueStates } from '../../common/transaction_det
 import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
 
-const LeftButton = styled(Button)`
-  margin-right: auto;
+const StyledButtonContainer = styled(ButtonContainer)`
+  justify-content: space-between;
 `
 
 const logger = getLogger('Market::Sell')
@@ -221,6 +221,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 valueToDisplay={amountSharesToDisplay}
               />
             }
+            onClickMaxButton={() => {
+              setAmountShares(balanceItem.shares)
+              setAmountSharesToDisplay(formatNumber(selectedOutcomeBalance, 5))
+            }}
+            shouldDisplayMaxButton
             symbol={'Shares'}
           />
           {amountError && <GenericError>{amountError}</GenericError>}
@@ -275,14 +280,18 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           hyperlinkDescription={''}
         />
       )}
-      <ButtonContainer>
-        <LeftButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+      <StyledButtonContainer>
+        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
-        </LeftButton>
-        <Button buttonType={ButtonType.secondaryLine} disabled={isSellButtonDisabled} onClick={() => finish()}>
+        </MarketBottomNavButton>
+        <MarketBottomNavButton
+          buttonType={ButtonType.secondaryLine}
+          disabled={isSellButtonDisabled}
+          onClick={() => finish()}
+        >
           Sell
-        </Button>
-      </ButtonContainer>
+        </MarketBottomNavButton>
+      </StyledButtonContainer>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
