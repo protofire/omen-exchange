@@ -19,21 +19,21 @@ import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
-import { MarketMakerData, OutcomeTableValue, Status, Ternary } from '../../../../util/types'
+import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
 import { ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { SetAllowance } from '../../common/set_allowance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
-import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
 
 const WarningMessageStyled = styled(WarningMessage)`
@@ -60,9 +60,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const { buildMarketMaker } = useContracts(context)
   const { marketMakerData, switchMarketTab } = props
-  const { address: marketMakerAddress, balances, collateral, fee, question } = marketMakerData
+  const { address: marketMakerAddress, balances, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
+  const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
@@ -227,15 +228,22 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       />
       <GridTransactionDetails>
         <div>
-          <WalletBalance
-            onClick={() => {
-              setAmount(collateralBalance)
-              setAmountToDisplay(formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5))
-            }}
-            symbol={collateral.symbol}
-            value={formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5)}
-          />
+          <CurrenciesWrapper>
+            <CurrencySelector
+              balance={formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals)}
+              context={context}
+              currency={collateral.address}
+              disabled
+              onSelect={(token: Token | null) => {
+                if (token) {
+                  setCollateral(token)
+                  setAmount(new BigNumber(0))
+                }
+              }}
+            />
+          </CurrenciesWrapper>
           <ReactTooltip id="walletBalanceTooltip" />
+
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
@@ -245,6 +253,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
                   setAmount(e.value)
                   setAmountToDisplay('')
                 }}
+                style={{ width: 0 }}
                 value={amount}
                 valueToDisplay={amountToDisplay}
               />

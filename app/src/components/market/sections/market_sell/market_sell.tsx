@@ -14,20 +14,20 @@ import {
   formatNumber,
   mulBN,
 } from '../../../../util/tools'
-import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
+import { BalanceItem, MarketMakerData, OutcomeTableValue, Status, Token } from '../../../../util/types'
 import { ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
-import { WalletBalance } from '../../common/wallet_balance'
 import { WarningMessage } from '../../common/warning_message'
 
 const StyledButtonContainer = styled(ButtonContainer)`
@@ -44,9 +44,9 @@ interface Props extends RouteComponentProps<any> {
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
-
   const { marketMakerData, switchMarketTab } = props
-  const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
+  const { address: marketMakerAddress, balances, fee } = marketMakerData
+  const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
 
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
@@ -192,21 +192,20 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       />
       <GridTransactionDetails>
         <div>
-          <WalletBalance
-            data-class="customTooltip"
-            data-delay-hide="500"
-            data-effect="solid"
-            data-for="walletBalanceTooltip"
-            data-multiline={true}
-            data-place="right"
-            data-tip={`Sell all of the selected outcome's shares.`}
-            onClick={() => {
-              setAmountShares(balanceItem.shares)
-              setAmountSharesToDisplay(formatNumber(selectedOutcomeBalance, 5))
-            }}
-            symbol="Shares"
-            value={formatNumber(selectedOutcomeBalance, 5)}
-          />
+          <CurrenciesWrapper>
+            <CurrencySelector
+              balance={formatNumber(selectedOutcomeBalance, 5)}
+              context={context}
+              currency={collateral.address}
+              disabled
+              onSelect={(token: Token | null) => {
+                if (token) {
+                  setCollateral(token)
+                  setAmountShares(new BigNumber(0))
+                }
+              }}
+            />
+          </CurrenciesWrapper>
           <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
             formField={
@@ -217,6 +216,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                   setAmountShares(e.value)
                   setAmountSharesToDisplay('')
                 }}
+                style={{ width: 0 }}
                 value={amountShares}
                 valueToDisplay={amountSharesToDisplay}
               />

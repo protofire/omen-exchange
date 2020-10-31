@@ -12,7 +12,7 @@ import { InlineLoading } from '../../../loading'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../common_styled'
 
 const commonWrapperCSS = css`
-  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
+  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
   padding-top: 20px;
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};
@@ -45,7 +45,7 @@ const ChartWrapper = styled.div`
 
 const TitleWrapper = styled.div`
   align-items: center;
-  border-bottom: 1px solid ${props => props.theme.borders.borderDisabled};
+  border-bottom: ${({ theme }) => theme.borders.borderLineDisabled};
   display: flex;
   justify-content: space-between;
   margin: 0 0 -11px;
@@ -72,7 +72,7 @@ const ButtonsWrapper = styled.div`
 const ChartTooltip = styled.div`
   background: #fff;
   border-radius: 2px;
-  border: 1px solid ${props => props.theme.borders.borderDisabled};
+  border: ${({ theme }) => theme.borders.borderLineDisabled};
   box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.12);
   min-width: 160px;
   padding: 17px;

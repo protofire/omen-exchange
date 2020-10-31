@@ -90,7 +90,7 @@ const ButtonWithReadyToGoStatus = styled(MarketBottomNavButton as any)<{ readyTo
 `
 
 const CategoryImportWrapper = styled.div`
-  border-bottom: 1px solid ${props => props.theme.borders.borderDisabled};
+  border-bottom: ${({ theme }) => theme.borders.borderLineDisabled};
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};
   padding: 0 ${props => props.theme.cards.paddingHorizontal};

@@ -38,12 +38,30 @@ const Column = styled.div`
   }
 `
 
+const TitleWrapper = styled.div`
+  margin: 0 0 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
+
 const Title = styled.h2`
   color: ${props => props.theme.colors.textColorDark};
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.fonts.defaultSize};
   font-weight: normal;
   line-height: 1.2;
-  margin: 0 0 12px;
+  margin: 0;
+`
+
+const ClearLabel = styled.span`
+  color: ${props => props.theme.colors.clickable};
+  font-size: ${({ theme }) => theme.fonts.defaultSize};
+  font-weight: normal;
+  line-height: 1.2;
+  cursor: pointer;
+  &:hover {
+    color: ${props => props.theme.colors.primaryLight};
+  }
 `
 
 const Options = styled(Dropdown)`
@@ -159,7 +177,11 @@ export const AdvancedFilters = (props: Props) => {
   return (
     <Wrapper>
       <Column>
-        <Title>Currency</Title>
+        <TitleWrapper>
+          <Title>Currency</Title>
+          {currency && <ClearLabel onClick={() => onChangeCurrency(null)}>Clear</ClearLabel>}
+        </TitleWrapper>
+
         <CurrencySelector
           addAll
           context={context}
@@ -171,12 +193,18 @@ export const AdvancedFilters = (props: Props) => {
       </Column>
       {showQuestionType && (
         <Column>
-          <Title>Question Type</Title>
+          <TitleWrapper>
+            <Title>Question Type</Title>
+          </TitleWrapper>
+
           <Options items={questionTypeOptions} />
         </Column>
       )}
       <Column>
-        <Title>Arbitrator</Title>
+        <TitleWrapper>
+          <Title>Arbitrator</Title>
+          {arbitrator && <ClearLabel onClick={() => onChangeArbitrator(null)}>Clear</ClearLabel>}
+        </TitleWrapper>
         <Options
           currentItem={activeArbitratorIndex}
           dirty={true}
@@ -186,7 +214,13 @@ export const AdvancedFilters = (props: Props) => {
       </Column>
       {!disableCurationFilter && (
         <Column>
-          <Title>Verified by</Title>
+          <TitleWrapper>
+            <Title>Verified by</Title>
+            {curationSource !== CurationSource.ALL_SOURCES && (
+              <ClearLabel onClick={() => onChangeCurationSource(CurationSource.ALL_SOURCES)}>Clear</ClearLabel>
+            )}
+          </TitleWrapper>
+
           <Options
             currentItem={[
               CurationSource.ALL_SOURCES,

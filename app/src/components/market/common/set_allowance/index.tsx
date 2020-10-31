@@ -6,7 +6,7 @@ import { ToggleTokenLock, ToggleTokenLockProps } from '../toggle_token_lock'
 
 const Wrapper = styled.div`
   border-radius: 4px;
-  border: 1px solid ${props => props.theme.borders.borderDisabled};
+  border: ${({ theme }) => theme.borders.borderLineDisabled};
   padding: 21px 25px;
 `
 
