@@ -33,7 +33,19 @@ export const useTokens = (context: ConnectedWeb3Context) => {
             return token
           }),
         )
-        setTokens(tokens)
+
+        // preserve ordering of default tokens and remove duplicates from TCR
+        const combinedTokens: Token[] = Object.values(
+          [...defaultTokens, ...tokens].reduce((prev, curr) => {
+            // @ts-expect-error ignore
+            if (prev[curr.symbol]) {
+              return prev
+            }
+            return { ...prev, [curr.symbol]: curr }
+          }, {}),
+        )
+
+        setTokens(combinedTokens)
       } catch (e) {
         logger.error('There was an error getting the tokens from the TCR:', e)
       }
