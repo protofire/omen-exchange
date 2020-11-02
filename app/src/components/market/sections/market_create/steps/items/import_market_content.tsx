@@ -87,6 +87,11 @@ const TitleValueVertical = styled(TitleValue)`
   justify-content: flex-start;
   text-transform: capitalize;
 
+  &:last-child {
+    p {
+      margin-top: -3px;
+    }
+  }
   > h2 {
     margin: 0 0 10px;
     line-height: 16px;
