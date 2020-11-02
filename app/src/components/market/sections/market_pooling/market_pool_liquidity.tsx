@@ -402,7 +402,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToFund(collateralBalance)
-                  setAmountToFundDisplay('')
+                  setAmountToFundDisplay(formatBigNumber(collateralBalance, collateral.decimals))
                 }}
                 shouldDisplayMaxButton
                 symbol={collateral.symbol}

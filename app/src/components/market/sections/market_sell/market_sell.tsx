@@ -223,7 +223,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmountShares(balanceItem.shares)
-              setAmountSharesToDisplay('')
+              setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals))
             }}
             shouldDisplayMaxButton
             symbol={'Shares'}
