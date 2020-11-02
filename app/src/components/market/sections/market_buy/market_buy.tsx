@@ -230,7 +230,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <div>
           <CurrenciesWrapper>
             <CurrencySelector
-              balance={formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals)}
+              balance={formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5)}
               context={context}
               currency={collateral.address}
               disabled
@@ -260,7 +260,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmount(collateralBalance)
-              setAmountToDisplay(formatBigNumber(collateralBalance, collateral.decimals))
+              setAmountToDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
             }}
             shouldDisplayMaxButton
             symbol={collateral.symbol}
