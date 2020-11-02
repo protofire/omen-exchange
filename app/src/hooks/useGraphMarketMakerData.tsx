@@ -5,6 +5,7 @@ import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
 import { getOutcomes } from '../util/networks'
+import { isObjectEqual } from '../util/tools'
 import { Question, Status } from '../util/types'
 
 const query = gql`
@@ -173,9 +174,14 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
     setNeedUpdate(true)
   }, [marketMakerAddress])
 
-  if (data && data.fixedProductMarketMaker && needUpdate && data.fixedProductMarketMaker.id === marketMakerAddress) {
-    setMarketMakerData(wrangleResponse(data.fixedProductMarketMaker, networkId))
-    setNeedUpdate(false)
+  if (data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
+    const rangledValue = wrangleResponse(data.fixedProductMarketMaker, networkId)
+    if (needUpdate) {
+      setMarketMakerData(rangledValue)
+      setNeedUpdate(false)
+    } else if (!isObjectEqual(marketMakerData, rangledValue)) {
+      setMarketMakerData(rangledValue)
+    }
   }
 
   return {
