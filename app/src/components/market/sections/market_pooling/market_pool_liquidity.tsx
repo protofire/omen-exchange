@@ -31,7 +31,7 @@ import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../..
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { CurrenciesWrapper, GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError, MarketBottomNavButton, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -57,12 +57,6 @@ const BottomButtonWrapper = styled(ButtonContainer)`
   justify-content: space-between;
 `
 
-const TabsGrid = styled.div`
-  display: grid;
-  grid-column-gap: 13px;
-  grid-template-columns: 1fr 1fr;
-  margin: 0 0 20px;
-`
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
   margin-bottom: 0;
