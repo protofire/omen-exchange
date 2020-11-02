@@ -52,7 +52,7 @@ const Text = styled.p`
   margin: 0;
 `
 
-const StyledButtonContainer = styled(ButtonContainer)`
+export const StyledButtonContainer = styled(ButtonContainer)`
   margin: 0 -24px;
   margin-bottom: -1px;
   padding: 20px 24px 0;
