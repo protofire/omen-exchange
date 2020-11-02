@@ -15,7 +15,7 @@ export const useRealityLink = (): 'https://reality.eth' | 'https://reality.eth.l
         setConnected(accountsEvent.length !== 0)
       })
       windowObj.ethereum.on('chainChanged', (chaindIdEvent: string) => {
-        setConnected(account.length !== 0 && chaindIdEvent === '0x4')
+        setConnected(account.length !== 0 && chaindIdEvent === '0x1')
       })
     }
     if (windowObj.ethereum) {
