@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react'
 import { Status } from '../util/types'
 
 const query = gql`
-  query fpmmTrades($id: ID!) {
-    fpmmTrades(where: { fpmm: $id }, first: 6, orderBy: creationTimestamp) {
+  query fpmmTrades($id: ID!, $pageSize: Int, $pageIndex: Int) {
+    fpmmTrades(where: { fpmm: $id }, first: $pageSize, skip: $pageIndex, orderBy: creationTimestamp) {
       id
       creator {
         id
@@ -45,6 +45,7 @@ interface FpmmTradeData {
 interface Result {
   fpmmTrade: FpmmTradeData[] | null
   status: string
+  fetchMore: any
 }
 const wrangleResponse = (data: any) => {
   return data.map((trade: FpmmTradeData) => {
@@ -60,13 +61,13 @@ const wrangleResponse = (data: any) => {
   })
 }
 
-export const useGraphFpmmTradesFromQuestion = (questionID: string): Result => {
+export const useGraphFpmmTradesFromQuestion = (questionID: string, pageSize: number, pageIndex: number): Result => {
   const [fpmmTradeData, setFpmmTradeData] = useState<Maybe<FpmmTradeData[]>>(null)
-  console.log('inside the gargantua')
-  const { data, error, loading } = useQuery(query, {
+
+  const { data, error, fetchMore, loading } = useQuery(query, {
     notifyOnNetworkStatusChange: true,
     skip: false,
-    variables: { id: questionID },
+    variables: { id: questionID, pageSize: pageSize, pageIndex: pageIndex },
   })
 
   useEffect(() => {
@@ -74,11 +75,13 @@ export const useGraphFpmmTradesFromQuestion = (questionID: string): Result => {
   }, [questionID])
 
   if (data && data.fpmmTrades && fpmmTradeData === null) {
+    console.log('in here')
     setFpmmTradeData(wrangleResponse(data.fpmmTrades))
   }
 
   return {
     fpmmTrade: error ? null : fpmmTradeData,
     status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
+    fetchMore,
   }
 }

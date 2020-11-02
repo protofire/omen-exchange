@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
@@ -66,10 +66,11 @@ const Column = styled.div`
 type Props = {
   fpmmTrade: FpmmTradeDataType[] | null
   status: string
+  onLoadNextPage: () => void
+  onLoadPrevPage: () => void
 }
 
-export const MarketTable: React.FC<Props> = ({ fpmmTrade, status }) => {
-  console.log(fpmmTrade)
+export const MarketTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoadPrevPage, status }) => {
   return (
     <React.Fragment>
       <TableWrapper>
@@ -107,8 +108,10 @@ export const MarketTable: React.FC<Props> = ({ fpmmTrade, status }) => {
           <PaginationButton>Back</PaginationButton>
         </PaginationLeft>
         <PaginationRight>
-          <PaginationButton>Prev</PaginationButton>
-          <PaginationButton marginLeft={'12'}>Next</PaginationButton>
+          <PaginationButton onClick={onLoadPrevPage}>Prev</PaginationButton>
+          <PaginationButton marginLeft={'12'} onClick={onLoadNextPage}>
+            Next
+          </PaginationButton>
         </PaginationRight>
       </Pagination>
     </React.Fragment>

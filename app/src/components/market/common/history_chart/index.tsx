@@ -4,13 +4,14 @@ import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
+import { MarketHome } from '../../..'
 import { EARLIEST_MAINNET_BLOCK_TO_CHECK } from '../../../../common/constants'
 import { useGraphFpmmTradesFromQuestion } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
 import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
 import { keys, range } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
 
-import { HistoryChart } from './historySelect'
+import { HistorySelect } from './historySelect'
 
 // This query will return an object where each entry is
 // `fixedProductMarketMaker_X: { outcomeTokenAmounts }`,
@@ -93,10 +94,56 @@ export const HistoryChartContainer: React.FC<Props> = ({
 }) => {
   const { library } = useWeb3Context()
   const [latestBlockNumber, setLatestBlockNumber] = useState<Maybe<number>>(null)
-  const { fpmmTrade, status } = useGraphFpmmTradesFromQuestion(marketMakerAddress)
+  const [pageIndex, setPageIndex] = useState(0)
+  const [pageSize] = useState(6)
+  const { fetchMore, fpmmTrade, status } = useGraphFpmmTradesFromQuestion(marketMakerAddress, pageSize, pageIndex)
+
   const [blocks, setBlocks] = useState<Maybe<Block[]>>(null)
   const holdingsSeries = useHoldingsHistory(marketMakerAddress, blocks)
   const [period, setPeriod] = useState<Period>('1M')
+
+  const loadNextPage = () => {
+    const newPageIndex = pageIndex + pageSize
+    console.log(newPageIndex)
+
+    console.log(pageSize, pageIndex)
+    fetchMore({
+      variables: {
+        id: marketMakerAddress,
+        pageSize: pageSize,
+        pageIndex: newPageIndex,
+      },
+      updateQuery: (prevResult: any, { fetchMoreResult }: any) => {
+        console.log('NEXT', 'prev', prevResult, 'nrext', fetchMoreResult)
+        console.log(prevResult === fetchMoreResult)
+        return fetchMoreResult
+      },
+    })
+    setPageIndex(newPageIndex)
+  }
+  const loadPrevPage = () => {
+    if (pageIndex <= 1) {
+      return
+    }
+    const newPageIndex = pageIndex - pageSize - 1
+
+    fetchMore({
+      variables: {
+        id: marketMakerAddress,
+        pageSize: pageSize,
+        pageIndex: newPageIndex,
+      },
+      updateQuery: (prevResult: any, { fetchMoreResult }: any) => {
+        console.log('PREV', prevResult, fetchMoreResult)
+        return fetchMoreResult
+      },
+    })
+    setPageIndex(newPageIndex)
+  }
+  useEffect(() => {
+    console.log(fpmmTrade, 'LOGGIGNGNAKSDKASJ CHANGE')
+  }, [fpmmTrade])
+
   const blocksOffset = useMemo(
     () => (answerFinalizedTimestamp ? calcOffsetByDate(answerFinalizedTimestamp.toNumber() * 1000) : 0),
     [answerFinalizedTimestamp],
@@ -137,11 +184,13 @@ export const HistoryChartContainer: React.FC<Props> = ({
   }, [latestBlockNumber, library, period])
 
   return hidden ? null : (
-    <HistoryChart
+    <HistorySelect
       fpmmTrade={fpmmTrade}
       fpmmTradeLoader={status}
       holdingSeries={holdingsSeries}
       onChange={setPeriod}
+      onLoadNextPage={loadNextPage}
+      onLoadPrevPage={loadPrevPage}
       options={keys(mapPeriod)}
       outcomes={outcomes}
       value={period}

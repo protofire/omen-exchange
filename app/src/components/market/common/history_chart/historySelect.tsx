@@ -77,6 +77,8 @@ type Props = {
   value: Period
   fpmmTrade: Maybe<FpmmTradeDataType[]>
   fpmmTradeLoader: string
+  onLoadNextPage: () => void
+  onLoadPrevPage: () => void
 }
 
 const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
@@ -99,11 +101,13 @@ const timestampToDate = (timestamp: number, value: string) => {
   return ts.format('MMM D')
 }
 
-export const HistoryChart: React.FC<Props> = ({
+export const HistorySelect: React.FC<Props> = ({
   fpmmTrade,
   fpmmTradeLoader,
   holdingSeries,
   onChange,
+  onLoadNextPage,
+  onLoadPrevPage,
   options,
   outcomes,
   value,
@@ -154,7 +158,12 @@ export const HistoryChart: React.FC<Props> = ({
         )}
       </TitleWrapper>
       {toogleSelect ? (
-        <MarketTable fpmmTrade={fpmmTrade} status={fpmmTradeLoader} />
+        <MarketTable
+          fpmmTrade={fpmmTrade}
+          onLoadNextPage={onLoadNextPage}
+          onLoadPrevPage={onLoadPrevPage}
+          status={fpmmTradeLoader}
+        />
       ) : (
         <Chart data={data} outcomes={outcomes} />
       )}
