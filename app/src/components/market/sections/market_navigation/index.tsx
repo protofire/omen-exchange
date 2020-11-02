@@ -12,7 +12,7 @@ const MarketTab = styled.div<{ active: boolean }>`
   color: ${props => (props.active ? props.theme.buttonSecondary.color : props.theme.colors.clickable)};
   background: none;
   border: none;
-  border-radius: 32px;
+  border-radius: 8px;
   padding: 10px 18px;
   margin-right: 4px;
   background: ${props => (props.active ? props.theme.buttonSecondary.backgroundColor : `none`)};

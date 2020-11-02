@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -86,10 +86,14 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   const [selection, setSelection] = useState<number | undefined>()
   const { data, error, status } = useKlerosCuration(marketMakerData, context)
 
-  const selectSource = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.currentTarget
-    setSelection(Number(value))
-  }, [])
+  const selectSource = useCallback(
+    (value: number) => {
+      if (value === selection) {
+        setSelection(undefined)
+      } else setSelection(value)
+    },
+    [selection],
+  )
 
   const loading = status === Status.Loading && !data
   const { message: errorMessage } = error || {}
