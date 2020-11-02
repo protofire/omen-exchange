@@ -6,7 +6,13 @@ import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
-import { getCPKAddresses, getContractAddress, targetGnosisSafeImplementation } from '../util/networks'
+import {
+  getCPKAddresses,
+  getContractAddress,
+  getToken,
+  pseudoEthAddress,
+  targetGnosisSafeImplementation,
+} from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
@@ -71,6 +77,8 @@ const proxyAbi = [
   'function masterCopy() external view returns (address)',
   'function changeMasterCopy(address _masterCopy) external',
 ]
+
+const wethAbi = ['function deposit() public payable']
 
 class CPKService {
   cpk: any
@@ -166,7 +174,7 @@ class CPKService {
     realitio,
   }: CPKCreateMarketParams): Promise<string> => {
     try {
-      const { arbitrator, category, collateral, loadedQuestionId, outcomes, question, resolution, spread } = marketData
+      const { arbitrator, category, loadedQuestionId, outcomes, question, resolution, spread } = marketData
 
       if (!resolution) {
         throw new Error('Resolution time was not specified')
@@ -184,6 +192,37 @@ class CPKService {
       const openingDateMoment = moment(resolution)
 
       const transactions = []
+
+      interface TxOptions {
+        value?: BigNumber
+        gas?: number
+      }
+
+      const txOptions: TxOptions = {}
+
+      let collateral
+      if (marketData.collateral.address === pseudoEthAddress) {
+        // ultimately WETH will be the collateral if we fund with native ether
+        collateral = getToken(networkId, 'weth')
+
+        // we need to send the funding amount in native ether
+        txOptions.value = marketData.funding
+
+        // Step 0: Wrap ether
+        transactions.push({
+          to: collateral.address,
+          value: marketData.funding,
+        })
+
+        // const weth = new ethers.Contract(collateral.address, wethAbi, signer)
+        // transactions.push({
+        //   to: collateral.address,
+        //   data: weth.interface.functions.deposit.encode([]),
+        //   value: marketData.funding,
+        // })
+      } else {
+        collateral = marketData.collateral
+      }
 
       let questionId: string
       if (loadedQuestionId) {
@@ -240,10 +279,13 @@ class CPKService {
       })
 
       // Step 4: Transfer funding from user
-      transactions.push({
-        to: collateral.address,
-        data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
-      })
+      // If we are funding with native ether we can skip this step
+      if (marketData.collateral.address !== pseudoEthAddress) {
+        transactions.push({
+          to: collateral.address,
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
+        })
+      }
 
       // Step 5: Create market maker
       const saltNonce = Math.round(Math.random() * 1000000)
@@ -270,7 +312,7 @@ class CPKService {
         ),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
       logger.log(`Transaction hash: ${txObject.hash}`)
 
       await this.provider.waitForTransaction(txObject.hash)

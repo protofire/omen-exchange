@@ -1,8 +1,7 @@
 import React, { DOMAttributes, HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { Token } from '../../../../util/types'
-import { ButtonStateful, ButtonStates } from '../../../button/button_stateful'
+import { ButtonStateful } from '../../../button/button_stateful'
 
 const Wrapper = styled.div`
   border-radius: 4px;

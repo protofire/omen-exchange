@@ -73,7 +73,6 @@ export const MarketWizardCreator = (props: Props) => {
     let isSubscribed = true
 
     const updateMarketData = async () => {
-      console.log(marketData.collateral)
       const collateral = getToken(networkId, marketData.collateral.symbol.toLowerCase() as KnownToken)
       const arbitrator = getArbitrator(networkId, marketData.arbitrator.id)
 
