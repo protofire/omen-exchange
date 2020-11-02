@@ -50,6 +50,7 @@ const logger = getLogger('Market::Buy')
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: string) => void
+  fetchMarketMakerData: () => Promise<void>
 }
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
@@ -59,7 +60,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
-  const { marketMakerData, switchMarketTab } = props
+  const { fetchMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
@@ -83,6 +84,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
+
+  useEffect(() => {
+    setCollateral(marketMakerData.collateral)
+  }, [marketMakerData.collateral])
 
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
@@ -146,6 +151,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         outcomeIndex,
         marketMaker,
       })
+      await fetchMarketMakerData()
 
       setTweet(
         stripIndents(`${question.title}

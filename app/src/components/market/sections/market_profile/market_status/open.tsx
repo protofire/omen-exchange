@@ -81,10 +81,11 @@ const WarningMessageStyled = styled(WarningMessage)`
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   account: Maybe<string>
   marketMakerData: MarketMakerData
+  fetchMarketMakerData: () => Promise<void>
 }
 
 const Wrapper = (props: Props) => {
-  const { marketMakerData } = props
+  const { fetchMarketMakerData, marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
 
@@ -227,7 +228,11 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === marketTabs.buy && (
-          <MarketBuyContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketBuyContainer
+            fetchMarketMakerData={fetchMarketMakerData}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
         {currentTab === marketTabs.sell && (
           <MarketSellContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />

@@ -176,6 +176,7 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
 
   if (data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
     const rangledValue = wrangleResponse(data.fixedProductMarketMaker, networkId)
+
     if (needUpdate) {
       setMarketMakerData(rangledValue)
       setNeedUpdate(false)

@@ -59,6 +59,7 @@ const SellBuyWrapper = styled.div`
 
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   marketMakerData: MarketMakerData
+  fetchMarketMakerData: () => Promise<void>
 }
 
 const logger = getLogger('Market::ClosedMarketDetail')
@@ -82,7 +83,7 @@ const Wrapper = (props: Props) => {
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
 
-  const { marketMakerData } = props
+  const { fetchMarketMakerData, marketMakerData } = props
 
   const {
     address: marketMakerAddress,
@@ -328,7 +329,11 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === marketTabs.buy && (
-          <MarketBuyContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketBuyContainer
+            fetchMarketMakerData={fetchMarketMakerData}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
         {currentTab === marketTabs.sell && (
           <MarketSellContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
