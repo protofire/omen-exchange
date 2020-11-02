@@ -5,26 +5,30 @@ import styled from 'styled-components'
 import { ConnectedWeb3Context } from '../../../../hooks'
 import { useKlerosCuration } from '../../../../hooks/useKlerosCuration'
 import { MarketMakerData, Status } from '../../../../util/types'
-import { Button } from '../../../button'
+import { ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { InlineLoading } from '../../../loading'
-import { GenericError } from '../../common/common_styled'
+import { GenericError, MarketBottomNavButton } from '../../common/common_styled'
 
 import { DxDaoCuration } from './option/dxdao_curation'
 import { KlerosCuration } from './option/kleros_curation'
 
-const BottomRow = styled.div`
-  border-top: ${props => props.theme.cards.border};
-  margin: 0 -25px;
-  padding: 20px 25px 0;
+const CustomInlineLoading = styled(InlineLoading)`
+  margin: 24px 0 35px;
 `
 
-const RightButton = styled(Button)`
-  margin-left: auto;
+const BottomButtonWrapper = styled(ButtonContainer)`
+  justify-content: space-between;
+`
+
+const MarketVerification = styled.div`
+  margin: 0 -25px;
+  padding: 0 24px 0;
+  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
 `
 
 export const CurationRow = styled.div`
-  border-top: ${props => props.theme.cards.border};
+  border-bottom: ${props => props.theme.cards.border};
   margin: 0 -25px;
   padding: 20px 25px;
   position: relative;
@@ -74,10 +78,11 @@ interface StatefulRadioButton {
 interface Props extends RouteComponentProps<any> {
   context: ConnectedWeb3Context
   marketMakerData: MarketMakerData
+  switchMarketTab: (arg0: string) => void
 }
 
 const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
-  const { context, marketMakerData } = props || {}
+  const { context, marketMakerData, switchMarketTab } = props || {}
   const [selection, setSelection] = useState<number | undefined>()
   const { data, error, status } = useKlerosCuration(marketMakerData, context)
 
@@ -86,9 +91,9 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
     setSelection(Number(value))
   }, [])
 
-  if (status === Status.Loading && !data) return <InlineLoading />
+  const loading = status === Status.Loading && !data
   const { message: errorMessage } = error || {}
-  if (errorMessage || !data) return <GenericError>{errorMessage || 'Failed to fetch curation data'}</GenericError>
+  if (!loading && errorMessage) return <GenericError>{errorMessage || 'Failed to fetch curation data'}</GenericError>
 
   const { ovmAddress } = data || {}
   const { address, curatedByDxDao, question } = marketMakerData || {}
@@ -102,17 +107,31 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   return (
-    <>
-      <KlerosCuration klerosCurationData={data} option={selection} selectSource={selectSource} />
-      <DxDaoCuration curatedByDxDao={curatedByDxDao} option={selection} selectSource={selectSource} />
-      <BottomRow>
-        <RightButton buttonType={ButtonType.primaryLine} disabled={typeof selection !== 'number'}>
+    <MarketVerification>
+      {loading || !data ? (
+        <CurationRow>
+          <CustomInlineLoading big message="Loading Curation Services" />
+        </CurationRow>
+      ) : (
+        <>
+          <KlerosCuration klerosCurationData={data} option={selection} selectSource={selectSource} />
+          <DxDaoCuration curatedByDxDao={curatedByDxDao} option={selection} selectSource={selectSource} />
+        </>
+      )}
+      <BottomButtonWrapper>
+        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+          Cancel
+        </MarketBottomNavButton>
+        <MarketBottomNavButton
+          buttonType={ButtonType.secondaryLine}
+          disabled={loading || typeof selection !== 'number'}
+        >
           <UnstyledLink href={requestVerificationLink} rel="noopener noreferrer" target="_blank">
             Request Verification
           </UnstyledLink>
-        </RightButton>
-      </BottomRow>
-    </>
+        </MarketBottomNavButton>
+      </BottomButtonWrapper>
+    </MarketVerification>
   )
 }
 

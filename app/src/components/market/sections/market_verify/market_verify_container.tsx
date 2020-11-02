@@ -8,12 +8,13 @@ import { MarketVerify } from './market_verify'
 interface Props {
   marketMakerData: MarketMakerData
   context: ConnectedWeb3Context
+  switchMarketTab: (arg0: string) => void
 }
 
 const MarketVerifyContainer: React.FC<Props> = (props: Props) => {
-  const { context, marketMakerData } = props
+  const { context, marketMakerData, switchMarketTab } = props
 
-  return <MarketVerify context={context} marketMakerData={marketMakerData} />
+  return <MarketVerify context={context} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
 }
 
 export { MarketVerifyContainer }
