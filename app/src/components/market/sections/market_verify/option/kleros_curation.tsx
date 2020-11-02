@@ -3,6 +3,7 @@ import moment from 'moment-timezone'
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
+import { DOCUMENT_VALIDITY_RULES } from '../../../../../common/constants'
 import { KlerosCurationData, MarketVerificationState } from '../../../../../util/types'
 import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
@@ -126,7 +127,6 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
   const { klerosCurationData, option, selectSource } = props
   const {
     challengePeriodDuration,
-    listingCriteriaURL,
     marketVerificationData,
     ovmAddress,
     removalBaseDeposit,
@@ -153,7 +153,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
         <Description>
           <DescriptionText>
             Make sure your submission complies with the{' '}
-            <BlueLink href={listingCriteriaURL} rel="noopener noreferrer" target="_blank">
+            <BlueLink href={DOCUMENT_VALIDITY_RULES} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>{' '}
             to avoid challenges. The <b>{formatEther(submissionDeposit)}</b> ETH security deposit will be reimbursed if
@@ -180,7 +180,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
         <Description>
           <DescriptionText>
             Market invalid according to the{' '}
-            <BlueLink href={listingCriteriaURL} rel="noopener noreferrer" target="_blank">
+            <BlueLink href={DOCUMENT_VALIDITY_RULES} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>
             ? Collect <SuccessVerify>{formatEther(submissionBaseDeposit)}</SuccessVerify> ETH upon a successful
@@ -213,7 +213,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
         <Description>
           <DescriptionText>
             Market valid according to the{' '}
-            <BlueLink href={listingCriteriaURL} rel="noopener noreferrer" target="_blank">
+            <BlueLink href={DOCUMENT_VALIDITY_RULES} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>{' '}
             ? Collect <SuccessVerify>{formatEther(removalBaseDeposit)}</SuccessVerify> upon a successful challenge.
@@ -259,7 +259,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
         <Description>
           <DescriptionText>
             Market invalid according to the{' '}
-            <BlueLink href={listingCriteriaURL} rel="noopener noreferrer" target="_blank">
+            <BlueLink href={DOCUMENT_VALIDITY_RULES} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>
             ?
