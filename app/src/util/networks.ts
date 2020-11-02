@@ -469,3 +469,6 @@ export const getOmenTCRListId = (networkId: number): number => {
 }
 
 export const targetGnosisSafeImplementation = '0x6851D6fDFAfD08c0295C392436245E5bc78B0185' // v1.2.0
+export const pseudoEthAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
+export const etherTokenImage =
+  'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'

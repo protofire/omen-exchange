@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
 import { ERC20Service } from '../services'
+import { pseudoEthAddress } from '../util/networks'
 import { RemoteData } from '../util/remote_data'
 
 import { useCpk } from './useCpk'
@@ -23,9 +24,14 @@ export const useCpkAllowance = (signer: Signer, tokenAddress: string) => {
   const updateAllowance = useCallback(async () => {
     if (cpk && provider) {
       const account = await signer.getAddress()
-      const collateralService = new ERC20Service(provider, account, tokenAddress)
-      const allowance = await collateralService.allowance(account, cpk.address)
-      setAllowance(RemoteData.success(allowance))
+      if (tokenAddress === pseudoEthAddress) {
+        const allowance = await provider.getBalance(account)
+        setAllowance(RemoteData.success(allowance))
+      } else {
+        const collateralService = new ERC20Service(provider, account, tokenAddress)
+        const allowance = await collateralService.allowance(account, cpk.address)
+        setAllowance(RemoteData.success(allowance))
+      }
     }
   }, [tokenAddress, cpk, provider, signer])
 

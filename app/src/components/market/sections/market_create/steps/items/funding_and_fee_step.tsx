@@ -359,6 +359,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             {tokensAmount > 1 && (
               <CurrenciesWrapper>
                 <CurrencySelector
+                  addEther
                   balance={formatNumber(collateralBalanceFormatted)}
                   context={context}
                   disabled={false}

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { ERC20Service } from '../services/erc20'
 import { getLogger } from '../util/logger'
-import { getOmenTCRListId, getTokensByNetwork } from '../util/networks'
+import { etherTokenImage, getOmenTCRListId, getTokensByNetwork, pseudoEthAddress } from '../util/networks'
 import { getImageUrl } from '../util/token'
 import { Token } from '../util/types'
 
@@ -11,11 +11,13 @@ import { useContracts } from './useContracts'
 
 const logger = getLogger('Hooks::useTokens')
 
-export const useTokens = (context: ConnectedWeb3Context) => {
+export const useTokens = (context: ConnectedWeb3Context, addEther?: boolean) => {
   const { dxTCR } = useContracts(context)
   const defaultTokens = getTokensByNetwork(context.networkId)
+  if (addEther) {
+    defaultTokens.splice(1, 0, { address: pseudoEthAddress, image: etherTokenImage, symbol: 'ETH', decimals: 18 })
+  }
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
-
   useEffect(() => {
     const fetchTokens = async () => {
       try {
@@ -52,7 +54,7 @@ export const useTokens = (context: ConnectedWeb3Context) => {
     }
 
     fetchTokens()
-  }, [context.library, context.networkId, dxTCR])
+  }, [context.library, context.networkId, dxTCR, defaultTokens])
 
   return tokens
 }
