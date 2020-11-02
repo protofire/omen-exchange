@@ -220,3 +220,10 @@ export const CurrenciesWrapper = styled.div`
   padding: 0 0 20px 0;
   width: 100%;
 `
+
+export const TabsGrid = styled.div`
+  display: grid;
+  grid-column-gap: 13px;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 0 20px;
+`
