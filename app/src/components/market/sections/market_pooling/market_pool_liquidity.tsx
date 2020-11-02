@@ -317,7 +317,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           />
           <UserDataTitleValue
             title="Total Pool Tokens"
-            value={`${formatBigNumber(totalPoolShares, collateral.decimals)}`}
+            value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals))}`}
           />
         </UserDataRow>
         <UserDataRow>
