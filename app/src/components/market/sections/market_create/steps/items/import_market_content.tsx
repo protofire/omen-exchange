@@ -82,16 +82,11 @@ const CommentLabel = styled.div`
   }
 `
 
-const TitleValueVertical = styled(TitleValue)<{ verified?: boolean }>`
+const TitleValueVertical = styled(TitleValue)`
   flex-direction: column;
   justify-content: flex-start;
   text-transform: capitalize;
 
-  &:last-child {
-    p {
-      ${({ verified }) => (verified ? '' : `margin-top:-3px;`)};
-    }
-  }
   > h2 {
     margin: 0 0 10px;
     line-height: 16px;
@@ -330,7 +325,6 @@ export const ImportMarketContent = (props: Props) => {
                   label={marketMakerData.curatedByDxDao ? 'DXdao' : marketMakerData.klerosTCRregistered ? 'Kleros' : ''}
                 />
               }
-              verified={marketMakerData.curatedByDxDao || marketMakerData.klerosTCRregistered}
             />
           </FlexRowWrapper>
         </>
