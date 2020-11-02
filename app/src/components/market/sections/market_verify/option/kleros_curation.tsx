@@ -1,6 +1,6 @@
 import { formatEther } from 'ethers/utils'
 import moment from 'moment-timezone'
-import React, { ChangeEvent } from 'react'
+import React, { FC } from 'react'
 import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES } from '../../../../../common/constants'
@@ -19,6 +19,10 @@ import {
   CurationRow,
   CurationSubRow,
 } from '../market_verify'
+
+const Bold = styled.b`
+  font-weight: 500;
+`
 
 const LogoWrapper = styled.div`
   border-radius: 50%;
@@ -73,12 +77,13 @@ const Description = styled.div`
   font-size: 14px;
   letter-spacing: 0.2px;
   line-height: 1.4;
-  margin: 25px 0;
+  margin-top: 25px;
   width: 100%;
 `
 
 const DescriptionText = styled.p`
   display: inline-block;
+  margin: 0;
 `
 
 const Input = styled.input`
@@ -98,7 +103,7 @@ const SuccessVerify = styled.span`
 `
 
 const BlueLink = styled.a`
-  color: ${props => props.theme.colors.hyperlink};
+  color: ${props => props.theme.colors.clickable};
 `
 
 const RightButton = styled(Button)`
@@ -119,11 +124,13 @@ interface StatefulRadioButton {
 
 interface Props {
   option?: number
-  selectSource: (e: ChangeEvent<HTMLInputElement>) => void
+  selectSource: (option: number) => void
   klerosCurationData: KlerosCurationData
 }
 
-export const KlerosCuration: React.FC<Props> = (props: Props) => {
+const KLEROS_OPTION = 0
+
+export const KlerosCuration: FC<Props> = (props: Props) => {
   const { klerosCurationData, option, selectSource } = props
   const {
     challengePeriodDuration,
@@ -156,20 +163,25 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
             <BlueLink href={DOCUMENT_VALIDITY_RULES} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>{' '}
-            to avoid challenges. The <b>{formatEther(submissionDeposit)}</b> ETH security deposit will be reimbursed if
-            your submission is accepted. The challenge period lasts{' '}
-            <b>{moment.duration(Number(challengePeriodDuration) * 1000).humanize()}</b>.
+            to avoid challenges. The <Bold>{formatEther(submissionDeposit)}</Bold> ETH security deposit will be
+            reimbursed if your submission is accepted. The challenge period lasts{' '}
+            <Bold>{moment.duration(Number(challengePeriodDuration) * 1000).humanize()}</Bold>.
           </DescriptionText>
         </Description>
       )
       KlerosRightColumn = (
         <>
           <CurationRightColumn>
-            <RadioWrapper selected={option === 0}>
-              <CurationRadioTick alt="tick" selected={option === 0} src={Tick} />
+            <RadioWrapper selected={option === KLEROS_OPTION}>
+              <CurationRadioTick alt="tick" selected={option === KLEROS_OPTION} src={Tick} />
             </RadioWrapper>
           </CurationRightColumn>
-          <Input checked={option === 0} onChange={selectSource} type="radio" value={0} />
+          <Input
+            checked={option === KLEROS_OPTION}
+            onClick={() => selectSource(KLEROS_OPTION)}
+            type="radio"
+            value={0}
+          />
         </>
       )
       break
@@ -233,7 +245,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
       )
       KlerosRightColumn = (
         <CurationRightColumn>
-          <b>Ends in {moment.duration(timeRemaining).humanize()}</b>
+          <Bold>Ends in {moment.duration(timeRemaining).humanize()}</Bold>
           <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
         </CurationRightColumn>
       )
@@ -308,7 +320,7 @@ export const KlerosCuration: React.FC<Props> = (props: Props) => {
         </CurationCenterColumn>
         {KlerosRightColumn}
       </CurationSubRow>
-      <CurationSubRow>{KlerosNotice}</CurationSubRow>
+      {option === KLEROS_OPTION && <CurationSubRow>{KlerosNotice}</CurationSubRow>}
     </CurationRow>
   )
 }
