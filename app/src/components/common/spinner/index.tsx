@@ -2,6 +2,7 @@ import React, { HTMLAttributes } from 'react'
 import styled, { keyframes } from 'styled-components'
 
 import SpinnerSVG from './img/spinnerMain.svg'
+import SpinnerBigSVG from './img/spinnerMainBig.svg'
 
 const rotate = keyframes`
   from {
@@ -34,14 +35,15 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   color?: string
   height?: string | undefined
   width?: string | undefined
+  big?: boolean | undefined
 }
 
 export const Spinner: React.FC<Props> = (props: Props) => {
-  const { color = '#fff', height, width, ...restProps } = props
+  const { big, color = '#fff', height, width, ...restProps } = props
 
   return (
     <RotatingSpinner color={color} height={height} width={width} {...restProps}>
-      <SpinnerIcon alt="Loading..." src={SpinnerSVG} />
+      <SpinnerIcon alt="Loading..." src={big ? SpinnerBigSVG : SpinnerSVG} />
     </RotatingSpinner>
   )
 }
