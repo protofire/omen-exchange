@@ -14,6 +14,7 @@ import {
 } from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
+import { pseudoEthAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
@@ -47,6 +48,7 @@ import { TradingFeeSelector } from '../../../../common/trading_fee_selector'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
+import { UpgradeProxy } from '../../../../common/upgrade_proxy'
 import { VerifiedRow } from '../../../../common/verified_row'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome } from '../outcomes'
@@ -206,6 +208,25 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const [amount, setAmount] = useState<BigNumber>(funding)
 
+  const [isDeployed, setIsDeployed] = useState(false)
+  const [isUpgraded, setIsUpgraded] = useState(false)
+
+  useEffect(() => {
+    if (!cpk) {
+      return
+    }
+    const updateProxy = async () => {
+      const isProxyDeployed = await cpk.cpk.isProxyDeployed()
+      setIsDeployed(isProxyDeployed)
+      if (isProxyDeployed) {
+        const isProxyUpdated = await cpk.proxyIsUpdated()
+        setIsUpgraded(isProxyUpdated)
+      }
+    }
+
+    updateProxy()
+  }, [cpk])
+
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
@@ -273,6 +294,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     if (!token) return
     handleCollateralChange(token)
     setAllowanceFinished(false)
+  }
+
+  const upgradeProxy = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await cpk?.upgradeProxyImplementation()
+    setIsUpgraded(true)
   }
 
   const toggleCustomFee = () => {
@@ -432,6 +462,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             onUnlock={unlockCollateral}
             style={{ marginBottom: 20 }}
           />
+        )}
+        {isDeployed && !isUpgraded && collateral.address === pseudoEthAddress && (
+          <UpgradeProxy style={{ marginBottom: 20 }} upgradeProxy={upgradeProxy} />
         )}
         <WarningMessage
           additionalDescription={''}
