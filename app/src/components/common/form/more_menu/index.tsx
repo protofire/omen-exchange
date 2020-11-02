@@ -39,7 +39,8 @@ const ItemsContainer = styled.div<{ isOpen: boolean }>`
   padding: 8px;
   border-radius: 12px;
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    right: -123px;
+    right: unset;
+    left: 0;
   }
 `
 
