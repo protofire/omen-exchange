@@ -402,7 +402,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToFund(collateralBalance)
-                  setAmountToFundDisplay(walletBalance)
+                  setAmountToFundDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
                 }}
                 shouldDisplayMaxButton
                 symbol={collateral.symbol}
@@ -431,7 +431,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(sharesBalance)
+                  setAmountToRemoveDisplay(formatBigNumber(fundingBalance, collateral.decimals, 5))
                 }}
                 shouldDisplayMaxButton
                 symbol="Shares"
