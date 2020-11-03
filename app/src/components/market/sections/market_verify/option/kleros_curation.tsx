@@ -15,6 +15,7 @@ import {
   CurationOption,
   CurationOptionDetails,
   CurationRadioTick,
+  CurationRadioWrapper,
   CurationRightColumn,
   CurationRow,
   CurationSubRow,
@@ -36,22 +37,6 @@ const LogoWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
-
-const RadioWrapper = styled.div<StatefulRadioButton>`
-  border-radius: 50%;
-  border: 1px solid ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
-  cursor: pointer;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: ${props => props.selected && props.theme.colors.clickable};
-
-  &:hover {
-    border: 1px solid ${props => props.theme.colors.tertiary};
-  }
 `
 
 const TimeRemainingContainer = styled.div`
@@ -125,10 +110,6 @@ const UnstyledLink = styled.a`
   color: inherit;
 `
 
-interface StatefulRadioButton {
-  selected?: boolean
-}
-
 interface Props {
   option?: number
   selectSource: (option: number) => void
@@ -179,9 +160,9 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       KlerosRightColumn = (
         <>
           <CurationRightColumn>
-            <RadioWrapper onClick={() => selectSource(KLEROS_OPTION)} selected={option === KLEROS_OPTION}>
+            <CurationRadioWrapper onClick={() => selectSource(KLEROS_OPTION)} selected={option === KLEROS_OPTION}>
               <CurationRadioTick alt="tick" selected={option === KLEROS_OPTION} src={Tick} />
-            </RadioWrapper>
+            </CurationRadioWrapper>
           </CurationRightColumn>
         </>
       )
