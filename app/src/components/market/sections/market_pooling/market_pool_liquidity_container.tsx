@@ -3,7 +3,6 @@ import React from 'react'
 import { MarketMakerData } from '../../../../util/types'
 
 import { MarketPoolLiquidity } from './market_pool_liquidity'
-import { ScalarMarketPoolLiquidity } from './scalar_market_pool_liquidity'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -14,11 +13,7 @@ interface Props {
 const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const { isScalar, marketMakerData, switchMarketTab } = props
 
-  if (isScalar) {
-    return <ScalarMarketPoolLiquidity marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
-  } else {
-    return <MarketPoolLiquidity marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
-  }
+  return <MarketPoolLiquidity isScalar={isScalar} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
 }
 
 export { MarketPoolLiquidityContainer }

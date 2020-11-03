@@ -48,6 +48,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
+  isScalar: boolean
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: string) => void
 }
