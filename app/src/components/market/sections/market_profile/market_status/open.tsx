@@ -186,6 +186,12 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
+  // TODO: Remove hardcoded values
+  const lowerBound = new BigNumber('0')
+  const currentPrediction = new BigNumber('720')
+  const upperBound = new BigNumber('1000')
+  const unit = 'USD'
+
   return (
     <>
       <TopCard>
