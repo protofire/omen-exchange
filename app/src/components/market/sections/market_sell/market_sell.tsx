@@ -38,7 +38,11 @@ const StyledButtonContainer = styled(ButtonContainer)`
 const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
+<<<<<<< HEAD
   fetchGraphMarketMakerData: () => Promise<void>
+=======
+  isScalar: boolean
+>>>>>>> cac9b307... Rearchitect components to keep code DRY
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: string) => void
 }
