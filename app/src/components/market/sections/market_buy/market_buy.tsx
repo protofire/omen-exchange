@@ -210,7 +210,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
     setOutcomeIndex(value)
   }
-
   return (
     <>
       <OutcomeTable
@@ -236,7 +235,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <div>
           <CurrenciesWrapper>
             <CurrencySelector
-              balance={formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals)}
+              balance={formatNumber(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals))}
               context={context}
               currency={collateral.address}
               disabled
