@@ -55,7 +55,19 @@ export const CurationRightColumn = styled.div`
 `
 
 export const CurationRadioTick = styled.img<StatefulRadioButton>`
-  filter: ${props => props.selected && 'saturate(0) brightness(2)'};
+  filter: ${props => (props.selected ? 'saturate(0) brightness(2)' : props.disabled ? 'saturate(0)' : '')};
+`
+
+export const CurationRadioWrapper = styled.div<StatefulRadioButton>`
+  border-radius: 50%;
+  border: ${props => !props.selected && `1px solid ${props.theme.colors.tertiary}`};
+  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+  width: 38px;
+  height: 38px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: ${props => props.selected && props.theme.colors.clickable};
 `
 
 export const CurationOption = styled.div`
@@ -74,6 +86,7 @@ const UnstyledLink = styled.a`
 
 interface StatefulRadioButton {
   selected?: boolean
+  disabled?: boolean
 }
 
 interface Props extends RouteComponentProps<any> {
@@ -125,7 +138,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
       )}
       <BottomButtonWrapper>
         <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
-          Cancel
+          Back
         </MarketBottomNavButton>
         <MarketBottomNavButton
           buttonType={ButtonType.secondaryLine}

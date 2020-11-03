@@ -9,40 +9,25 @@ import {
   CurationOption,
   CurationOptionDetails,
   CurationRadioTick,
+  CurationRadioWrapper,
   CurationRightColumn,
   CurationRow,
   CurationSubRow,
 } from '../market_verify'
 
+const Bold = styled.b`
+  font-weight: 500;
+`
+
 const LogoWrapper = styled.div`
   border-radius: 50%;
   border: 1px solid ${props => props.theme.colors.tertiary};
-  width: 38px;
-  height: 38px;
+  width: 48px;
+  height: 48px;
   display: flex;
   justify-content: center;
   align-items: center;
 `
-
-const RadioWrapper = styled.div<StatefulRadioButton>`
-  border-radius: 50%;
-  border: 1px solid ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
-  cursor: pointer;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: ${props => props.selected && props.theme.colors.clickable};
-
-  &:hover {
-    border: 1px solid ${props => props.theme.colors.tertiary};
-  }
-`
-
-interface StatefulRadioButton {
-  selected?: boolean
-}
 
 interface Props {
   option?: number
@@ -50,10 +35,8 @@ interface Props {
   curatedByDxDao: boolean
 }
 
-const DXDAO_OPTION = 1
-
 export const DxDaoCuration: FC<Props> = (props: Props) => {
-  const { curatedByDxDao, option, selectSource } = props
+  const { curatedByDxDao } = props
   return (
     <CurationRow key="Dxdao Curation">
       <CurationSubRow>
@@ -64,14 +47,22 @@ export const DxDaoCuration: FC<Props> = (props: Props) => {
         </CurationLeftColumn>
         <CurationCenterColumn>
           <CurationOption>Dxdao Curation</CurationOption>
-          <CurationOptionDetails>{curatedByDxDao ? `Market verified` : 'Request verification'}</CurationOptionDetails>
+          <CurationOptionDetails>
+            {curatedByDxDao ? (
+              `Market verified`
+            ) : (
+              <>
+                Request verification and earn <Bold>10 DXdao Reputation</Bold>
+              </>
+            )}
+          </CurationOptionDetails>
         </CurationCenterColumn>
         {!curatedByDxDao && (
           <>
             <CurationRightColumn>
-              <RadioWrapper onClick={() => selectSource(DXDAO_OPTION)} selected={option === 1}>
-                <CurationRadioTick alt="tick" selected={option === DXDAO_OPTION} src={Tick} />
-              </RadioWrapper>
+              <CurationRadioWrapper disabled>
+                <CurationRadioTick alt="tick" disabled src={Tick} />
+              </CurationRadioWrapper>
             </CurationRightColumn>
           </>
         )}
