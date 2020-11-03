@@ -11,7 +11,6 @@ const Wrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  color: blue;
 `
 
 const CurrencyButtonSelectedCSS = css`
