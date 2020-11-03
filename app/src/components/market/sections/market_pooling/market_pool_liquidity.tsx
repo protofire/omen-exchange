@@ -174,7 +174,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const fundingBalance = maybeFundingBalance || Zero
 
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
-  const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
+  const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals, 5)
 
   const totalUserShareAmounts = calcRemoveFundingSendAmounts(
     fundingBalance,
@@ -413,7 +413,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              <TokenBalance text="Pool Tokens" value={formatNumber(sharesBalance)} />
+              <TokenBalance text="Pool Tokens" value={formatNumber(sharesBalance, 5)} />
 
               <TextfieldCustomPlaceholder
                 formField={
