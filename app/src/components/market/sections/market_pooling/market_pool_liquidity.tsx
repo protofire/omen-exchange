@@ -43,6 +43,7 @@ import { TransactionDetailsRow, ValueStates } from '../../common/transaction_det
 import { WarningMessage } from '../../common/warning_message'
 
 interface Props extends RouteComponentProps<any> {
+  isScalar: boolean
   marketMakerData: MarketMakerData
   theme?: any
   switchMarketTab: (arg0: string) => void
