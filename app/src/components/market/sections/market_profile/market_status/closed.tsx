@@ -15,6 +15,7 @@ import { FullLoading } from '../../../../loading'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
 import { ButtonContainerFullWidth, MarketBottomNavButton } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
+import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
@@ -83,7 +84,7 @@ const Wrapper = (props: Props) => {
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
 
-  const { marketMakerData } = props
+  const { isScalar, marketMakerData } = props
 
   const {
     address: marketMakerAddress,
@@ -246,6 +247,12 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
+  // TODO: Remove hardcoded values
+  const lowerBound = new BigNumber('0')
+  const currentPrediction = new BigNumber('720')
+  const upperBound = new BigNumber('1000')
+  const unit = 'USD'
+
   return (
     <>
       <TopCard>
@@ -262,15 +269,27 @@ const Wrapper = (props: Props) => {
         ></MarketNavigation>
         {currentTab === marketTabs.swap && (
           <>
-            <OutcomeTable
-              balances={balances}
-              collateral={collateralToken}
-              disabledColumns={disabledColumns}
-              displayRadioSelection={false}
-              payouts={payouts}
-              probabilities={probabilities}
-              withWinningOutcome={true}
-            />
+            {isScalar ? (
+              <MarketScale
+                // TODO: Change to collateral.decimals
+                decimals={0}
+                lowerBound={lowerBound}
+                startingPoint={currentPrediction}
+                startingPointTitle={'Current prediction'}
+                unit={unit}
+                upperBound={upperBound}
+              />
+            ) : (
+              <OutcomeTable
+                balances={balances}
+                collateral={collateralToken}
+                disabledColumns={disabledColumns}
+                displayRadioSelection={false}
+                payouts={payouts}
+                probabilities={probabilities}
+                withWinningOutcome={true}
+              />
+            )}
             <WhenConnected>
               {hasWinningOutcomes && (
                 <MarketResolutionMessageStyled
