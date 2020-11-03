@@ -8,6 +8,13 @@ const Wrapper = styled.div`
   justify-content: space-between;
   margin-bottom: 24px;
   flex-wrap: nowrap;
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    align-items: flex-start;
+    flex-direction: column;
+    & > * + * {
+      margin-top: 20px;
+    }
+  }
 `
 
 export const SubsectionTitleWrapper: React.FC = props => {
