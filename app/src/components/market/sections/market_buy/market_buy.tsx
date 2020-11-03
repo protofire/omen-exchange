@@ -204,7 +204,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
     setOutcomeIndex(value)
   }
-
   return (
     <>
       <OutcomeTable
