@@ -6,10 +6,11 @@ import { Contract, ethers } from 'ethers'
 import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
-import { getKlerosCurateGraphUris, getTokensByNetwork, networkIds } from '../util/networks'
+import { getGraphUris, getKlerosCurateGraphUris, getTokensByNetwork, networkIds } from '../util/networks'
 import {
   KlerosDisputeOutcome,
   KlerosItemStatus,
+  KlerosSubmission,
   MarketCurationState,
   MarketMakerData,
   MarketVerificationState,
@@ -253,13 +254,34 @@ class KlerosService {
    * @param marketMakerData The current state of the market.
    */
   public async getMarketState(marketMakerData: MarketMakerData): Promise<MarketCurationState> {
-    const { submissionIDs: submissions } = marketMakerData
-    if (submissions.length === 0)
+    const query = `
+      query fixedProductMarketMaker($id: ID!) {
+        fixedProductMarketMaker(id: $id) {
+          submissionIDs {
+            id
+            status
+          }
+        }
+      }
+    `
+
+    const variables = {
+      id: marketMakerData.address.toLowerCase(),
+    }
+    const { chainId: networkId } = await this.provider.getNetwork()
+    const { httpUri } = getGraphUris(networkId)
+    const response = await axios.post(httpUri, { query, variables })
+    const { data: responseData } = response || {}
+    const { data } = responseData || {}
+    const { fixedProductMarketMaker } = data || {}
+    const { submissionIDs } = fixedProductMarketMaker || {}
+    const submissions: KlerosSubmission[] = submissionIDs ? submissionIDs : []
+
+    if (!submissions || submissions.length === 0)
       return {
         verificationState: MarketVerificationState.NotVerified,
       }
 
-    const { chainId: networkId } = await this.provider.getNetwork()
     const fullSubmissions: Item[] = (
       await Promise.all(
         submissions.map(async submission => {

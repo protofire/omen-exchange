@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { getLogger } from '../util/logger'
 import { KlerosCurationData, MarketMakerData, Status } from '../util/types'
@@ -20,7 +20,7 @@ export const useKlerosCuration = (marketMakerData: MarketMakerData, context: Con
   const [error, setError] = useState<Maybe<Error>>(null)
   const [loading, setLoading] = useState<boolean>(false)
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     ;(async () => {
       try {
         setLoading(true)
@@ -59,6 +59,25 @@ export const useKlerosCuration = (marketMakerData: MarketMakerData, context: Con
       }
     })()
   }, [kleros, marketMakerData])
+
+  useEffect(() => {
+    if (loading || !kleros || data || error) return
+
+    fetchData()
+  }, [data, error, fetchData, kleros, loading])
+
+  // Setup event listener after fetching data.
+  useEffect(() => {
+    if (!kleros || error) return
+
+    kleros.omenVerifiedMarkets.on('ItemStatusChange', () => {
+      setTimeout(fetchData, 2000) // Give time for the subgraph to sync.
+    })
+
+    return () => {
+      kleros.omenVerifiedMarkets.removeAllListeners('ItemStatusChange')
+    }
+  }, [error, fetchData, kleros])
 
   return {
     data,
