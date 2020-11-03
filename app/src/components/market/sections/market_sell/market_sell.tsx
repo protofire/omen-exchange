@@ -155,7 +155,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
-  const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals, 5)}`
+  const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals, 5), 5)
 
   const amountError =
     balanceItem.shares === null
@@ -171,7 +171,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     amountShares.isZero() ||
     amountError !== null ||
     isNegativeAmountShares
-
   return (
     <>
       <OutcomeTable
@@ -194,7 +193,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         <div>
           <CurrenciesWrapper>
             <CurrencySelector
-              balance={formatNumber(selectedOutcomeBalance, 5)}
+              balance={selectedOutcomeBalance}
               context={context}
               currency={collateral.address}
               disabled
@@ -223,7 +222,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmountShares(balanceItem.shares)
-              setAmountSharesToDisplay(formatNumber(selectedOutcomeBalance, 5))
+              setAmountSharesToDisplay(selectedOutcomeBalance)
             }}
             shouldDisplayMaxButton
             symbol={'Shares'}
