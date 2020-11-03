@@ -110,7 +110,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       onClick: () => {
         toggleProgressBar()
       },
-      content: 'Show Market State',
+      content: showingProgressBar ? 'Hide Market State' : 'Show Market State',
     },
   ]
 
