@@ -317,7 +317,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           />
           <UserDataTitleValue
             title="Total Pool Tokens"
-            value={`${formatBigNumber(totalPoolShares, collateral.decimals)}`}
+            value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals))}`}
           />
         </UserDataRow>
         <UserDataRow>
@@ -331,9 +331,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           <UserDataTitleValue
             state={totalEarnings.gt(0) ? ValueStates.success : undefined}
             title="Total Earnings"
-            value={`${totalEarnings.gt(0) ? '+' : ''}${formatBigNumber(totalEarnings, collateral.decimals)} ${
-              collateral.symbol
-            }`}
+            value={`${totalEarnings.gt(0) ? '+' : ''}${formatNumber(
+              formatBigNumber(totalEarnings, collateral.decimals),
+            )} ${collateral.symbol}`}
           />
         </UserDataRow>
       </UserData>
