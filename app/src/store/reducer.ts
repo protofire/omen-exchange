@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers/utils'
 
 import { ERC20Service } from '../services'
 import { getLogger } from '../util/logger'
+import { pseudoEthAddress } from '../util/networks'
 
 export type BalanceState = {
   balance: Maybe<BigNumber>
@@ -27,11 +28,16 @@ export const { setBalance } = balanceSlice.actions
 export default balanceSlice.reducer
 
 export const fetchAccountBalance = (account: any, provider: any, collateral: any) => async (dispatch: any) => {
-  const collateralService = new ERC20Service(provider, account, collateral.address)
   try {
     if (account) {
-      const balance = await collateralService.getCollateral(account)
-      dispatch(setBalance({ balance: balance.toString() }))
+      if (collateral.address === pseudoEthAddress) {
+        const balance = await provider.getBalance(account)
+        dispatch(setBalance({ balance: balance.toString() }))
+      } else {
+        const collateralService = new ERC20Service(provider, account, collateral.address)
+        const balance = await collateralService.getCollateral(account)
+        dispatch(setBalance({ balance: balance.toString() }))
+      }
     } else {
       dispatch(setBalance({ balance: null }))
     }

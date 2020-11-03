@@ -201,6 +201,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     submit,
     values,
   } = props
+
   const { arbitrator, category, collateral, funding, loadedQuestionId, outcomes, question, resolution, spread } = values
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)

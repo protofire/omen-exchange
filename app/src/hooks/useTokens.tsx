@@ -54,7 +54,8 @@ export const useTokens = (context: ConnectedWeb3Context, addEther?: boolean) => 
     }
 
     fetchTokens()
-  }, [context.library, context.networkId, dxTCR, defaultTokens])
+    // eslint-disable-next-line
+  }, [context.library, context.networkId, dxTCR, defaultTokens.length])
 
   return tokens
 }
