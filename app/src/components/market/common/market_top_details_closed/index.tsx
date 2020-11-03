@@ -1,10 +1,11 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
+import theme from '../../../../theme'
 import { MarketMakerData, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -16,6 +17,9 @@ import { ProgressBarToggle } from '../progress_bar/toggle'
 const SubsectionTitleLeftWrapper = styled.div`
   display: flex;
   align-items: center;
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex-grow: 1;
+  }
   & > * + * {
     margin-left: 12px;
   }
@@ -35,6 +39,13 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { marketMakerData } = props
   const history = useHistory()
+
+  const screenEvaluationEquation = window.innerWidth <= parseInt(theme.themeBreakPoints.sm)
+  const [isMobile, setIsMobile] = useState(screenEvaluationEquation)
+
+  useEffect(() => {
+    setIsMobile(screenEvaluationEquation)
+  }, [screenEvaluationEquation])
 
   const {
     address,
@@ -92,12 +103,14 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
               placeholder=""
             />
           )}
-          <ProgressBarToggle
-            active={showingProgressBar}
-            state={'closed'}
-            templateId={question.templateId}
-            toggleProgressBar={toggleProgressBar}
-          ></ProgressBarToggle>
+          {(!isMobile || marketsRelatedQuestion.length === 1) && (
+            <ProgressBarToggle
+              active={showingProgressBar}
+              state={'closed'}
+              templateId={question.templateId}
+              toggleProgressBar={toggleProgressBar}
+            ></ProgressBarToggle>
+          )}
         </SubsectionTitleLeftWrapper>
       </SubsectionTitleWrapper>
       {showingProgressBar && (

@@ -9,6 +9,7 @@ const Wrapper = styled.div`
   position: relative;
   display: inline-block;
   outline: none;
+  margin-left: 10px;
 `
 
 const MoreButton = styled.div<{ isOpen: boolean }>`
@@ -38,10 +39,10 @@ const ItemsContainer = styled.div<{ isOpen: boolean }>`
   display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
   padding: 8px;
   border-radius: 12px;
-  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
-    right: unset;
-    left: 0;
-  }
+  // @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+  //   right: unset;
+  //   left: 0;
+  // }
 `
 
 const DropdownScrollbarCSS = css`
