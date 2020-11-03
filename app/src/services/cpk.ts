@@ -78,8 +78,6 @@ const proxyAbi = [
   'function changeMasterCopy(address _masterCopy) external',
 ]
 
-const wethAbi = ['function deposit() public payable']
-
 class CPKService {
   cpk: any
   provider: Web3Provider
@@ -213,13 +211,6 @@ class CPKService {
           to: collateral.address,
           value: marketData.funding,
         })
-
-        // const weth = new ethers.Contract(collateral.address, wethAbi, signer)
-        // transactions.push({
-        //   to: collateral.address,
-        //   data: weth.interface.functions.deposit.encode([]),
-        //   value: marketData.funding,
-        // })
       } else {
         collateral = marketData.collateral
       }
