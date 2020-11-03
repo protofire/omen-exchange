@@ -38,6 +38,10 @@ const ItemsContainer = styled.div<{ isOpen: boolean }>`
   display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
   padding: 8px;
   border-radius: 12px;
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    right: unset;
+    left: 0;
+  }
 `
 
 const DropdownScrollbarCSS = css`
