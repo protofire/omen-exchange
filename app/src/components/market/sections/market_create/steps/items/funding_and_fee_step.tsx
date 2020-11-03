@@ -209,7 +209,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [amount, setAmount] = useState<BigNumber>(funding)
 
   const [isDeployed, setIsDeployed] = useState(false)
-  const [isUpgraded, setIsUpgraded] = useState(false)
+  const [upgradeRequired, setUpgradeRequired] = useState(false)
 
   useEffect(() => {
     if (!cpk) {
@@ -220,7 +220,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       setIsDeployed(isProxyDeployed)
       if (isProxyDeployed) {
         const isProxyUpdated = await cpk.proxyIsUpdated()
-        setIsUpgraded(isProxyUpdated)
+        if (!isProxyUpdated) {
+          setUpgradeRequired(true)
+        }
       }
     }
 
@@ -302,7 +304,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     }
 
     await cpk?.upgradeProxyImplementation()
-    setIsUpgraded(true)
+    setUpgradeRequired(false)
   }
 
   const toggleCustomFee = () => {
@@ -463,7 +465,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             style={{ marginBottom: 20 }}
           />
         )}
-        {isDeployed && !isUpgraded && collateral.address === pseudoEthAddress && (
+        {upgradeRequired && collateral.address === pseudoEthAddress && (
           <UpgradeProxy style={{ marginBottom: 20 }} upgradeProxy={upgradeProxy} />
         )}
         <WarningMessage
