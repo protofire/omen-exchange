@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -8,6 +9,7 @@ import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../
 import { ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketBottomNavButton } from '../../../common/common_styled'
+import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
@@ -84,7 +86,7 @@ interface Props extends RouteComponentProps<Record<string, string | undefined>> 
 }
 
 const Wrapper = (props: Props) => {
-  const { marketMakerData } = props
+  const { isScalar, marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
 
@@ -181,6 +183,12 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
+  // TODO: Remove hardcoded values
+  const lowerBound = new BigNumber('0')
+  const currentPrediction = new BigNumber('720')
+  const upperBound = new BigNumber('1000')
+  const unit = 'USD'
+
   return (
     <>
       <TopCard>
@@ -196,7 +204,19 @@ const Wrapper = (props: Props) => {
         ></MarketNavigation>
         {currentTab === marketTabs.swap && (
           <>
-            {renderTableData()}
+            {isScalar ? (
+              <MarketScale
+                // TODO: Change to collateral.decimals
+                decimals={0}
+                lowerBound={lowerBound}
+                startingPoint={currentPrediction}
+                startingPointTitle={'Current prediction'}
+                unit={unit}
+                upperBound={upperBound}
+              />
+            ) : (
+              renderTableData()
+            )}
             {isQuestionOpen && openQuestionMessage}
             {!hasFunding && !isQuestionOpen && (
               <WarningMessageStyled

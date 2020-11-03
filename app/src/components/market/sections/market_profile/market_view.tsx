@@ -11,9 +11,7 @@ import { MarketMakerData } from '../../../../util/types'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 
 import { ClosedMarketDetails } from './market_status/closed'
-import { ClosedScalarMarketDetails } from './market_status/closed_scalar'
 import { OpenMarketDetails } from './market_status/open'
-import { OpenScalarMarketDetails } from './market_status/open_scalar'
 
 interface Props {
   account: Maybe<string>
