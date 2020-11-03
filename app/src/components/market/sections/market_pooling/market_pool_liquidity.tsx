@@ -31,11 +31,7 @@ import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../..
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-<<<<<<< HEAD
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
-=======
-import { CurrenciesWrapper, GenericError, MarketBottomNavButton, TabsGrid } from '../../common/common_styled'
->>>>>>> 56594086... Partially complete scalar market buy view
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -47,6 +43,7 @@ import { TransactionDetailsRow, ValueStates } from '../../common/transaction_det
 import { WarningMessage } from '../../common/warning_message'
 
 interface Props extends RouteComponentProps<any> {
+  isScalar: boolean
   marketMakerData: MarketMakerData
   theme?: any
   switchMarketTab: (arg0: string) => void
