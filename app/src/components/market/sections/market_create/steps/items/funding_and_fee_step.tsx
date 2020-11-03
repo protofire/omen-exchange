@@ -205,6 +205,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const [amount, setAmount] = useState<BigNumber>(funding)
+  const [amountToDispaly, setAmountToDisplay] = useState<string>('')
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
@@ -215,7 +216,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
   const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
-    formatBigNumber(collateralBalance, collateral.decimals),
+    formatBigNumber(collateralBalance, collateral.decimals, 5),
   )
   const maybeCollateralBalance = useCollateralBalance(collateral, context)
 
@@ -223,7 +224,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     setCollateralBalance(maybeCollateralBalance || Zero)
-    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals))
+    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5))
     // eslint-disable-next-line
   }, [maybeCollateralBalance])
 
@@ -290,6 +291,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const handleAmountChange = (event: BigNumberInputReturn) => {
     setAmount(event.value)
+    setAmountToDisplay('')
     handleChange(event)
   }
 
@@ -299,6 +301,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       name: 'funding',
       value: collateralBalance,
     })
+    setAmountToDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
   }
 
   return (
@@ -359,7 +362,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             {tokensAmount > 1 && (
               <CurrenciesWrapper>
                 <CurrencySelector
-                  balance={formatNumber(collateralBalanceFormatted)}
+                  balance={formatNumber(collateralBalanceFormatted, 5)}
                   context={context}
                   disabled={false}
                   onSelect={onCollateralChange}
@@ -374,6 +377,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                   onChange={handleAmountChange}
                   style={{ width: 0 }}
                   value={amount}
+                  valueToDisplay={amountToDispaly}
                 />
               }
               onClickMaxButton={onClickMaxButton}
