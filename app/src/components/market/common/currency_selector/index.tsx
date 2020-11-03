@@ -11,6 +11,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+  color: blue;
 `
 
 const CurrencyButtonSelectedCSS = css`
@@ -21,9 +22,13 @@ const CurrencyButtonSelectedCSS = css`
   }
 `
 
-const CurrencyDropdown = styled(Dropdown)<{ selected: boolean }>`
-  ${props => props.selected && CurrencyButtonSelectedCSS}
+const CurrencyDropdown = styled(Dropdown)<{ selected: boolean; placeholder: any }>`
+  ${props => props.selected && CurrencyButtonSelectedCSS};
   width: 100%;
+  .currentItem {
+     ${({ placeholder, theme }) => (placeholder ? `color:${theme.cards.textColor}!important` : null)} ;
+  }
+  }
 `
 
 interface Props {

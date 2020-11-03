@@ -204,6 +204,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                   setAmountShares(new BigNumber(0))
                 }
               }}
+              placeholder="Your Shares"
             />
           </CurrenciesWrapper>
           <ReactTooltip id="walletBalanceTooltip" />
