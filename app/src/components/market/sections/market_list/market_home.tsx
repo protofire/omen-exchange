@@ -598,16 +598,14 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               placeholder={<Display>Display</Display>}
             />
           </DisplayButtonWrapper>
-          {RemoteData.hasData(markets) && markets.data.length === 0 ? null : (
-            <LoadMoreWrapper>
-              <ButtonPaginationStyled disabled={disableLoadPrevButton} onClick={onLoadPrevPage}>
-                Prev
-              </ButtonPaginationStyled>
-              <ButtonPaginationStyled disabled={disableLoadNextButton} onClick={onLoadNextPage}>
-                Next
-              </ButtonPaginationStyled>
-            </LoadMoreWrapper>
-          )}
+          <LoadMoreWrapper>
+            <ButtonPaginationStyled disabled={disableLoadPrevButton} onClick={onLoadPrevPage}>
+              Prev
+            </ButtonPaginationStyled>
+            <ButtonPaginationStyled disabled={disableLoadNextButton} onClick={onLoadNextPage}>
+              Next
+            </ButtonPaginationStyled>
+          </LoadMoreWrapper>
         </BottomContents>
       </ListCard>
     </>
