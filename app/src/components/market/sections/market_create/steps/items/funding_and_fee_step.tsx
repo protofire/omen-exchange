@@ -278,7 +278,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     !account ||
     amountError !== null ||
     exceedsMaxFee ||
-    isNegativeDepositAmount
+    isNegativeDepositAmount ||
+    (!isDeployed && collateral.address === pseudoEthAddress) ||
+    upgradeRequired
 
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
