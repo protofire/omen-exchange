@@ -33,6 +33,7 @@ export const CurationRow = styled.div`
   padding: 20px 25px;
   position: relative;
 `
+
 export const CurationSubRow = styled.div`
   align-items: center;
   display: flex;
@@ -48,14 +49,13 @@ export const CurationCenterColumn = styled.div``
 
 export const CurationRightColumn = styled.div`
   margin-left: auto;
+  text-align: right;
+  color: ${props => props.theme.colors.textColorDar};
+  font-weight: 500;
 `
 
 export const CurationRadioTick = styled.img<StatefulRadioButton>`
-  filter: ${props => (props.selected ? 'saturate(0) brightness(2)' : 'saturate(0) brightness(1.6)')};
-
-  ${CurationSubRow}:hover & {
-    filter: ${props => !props.selected && 'none'};
-  }
+  filter: ${props => props.selected && 'saturate(0) brightness(2)'};
 `
 
 export const CurationOption = styled.div`
@@ -65,6 +65,7 @@ export const CurationOption = styled.div`
 
 export const CurationOptionDetails = styled.div`
   color: ${props => props.theme.colors.textColorLighter};
+  font-weight: 400;
 `
 
 const UnstyledLink = styled.a`

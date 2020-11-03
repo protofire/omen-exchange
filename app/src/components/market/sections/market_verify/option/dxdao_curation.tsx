@@ -26,25 +26,18 @@ const LogoWrapper = styled.div`
 
 const RadioWrapper = styled.div<StatefulRadioButton>`
   border-radius: 50%;
-  border: 1px solid ${props => props.theme.colors.tertiary};
+  border: 1px solid ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
+  cursor: pointer;
   width: 38px;
   height: 38px;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: ${props => props.selected && props.theme.colors.clickable};
-`
 
-const Input = styled.input`
-  cursor: pointer;
-  height: 100%;
-  left: 0;
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 5;
-  border: 1px solid red;
+  &:hover {
+    border: 1px solid ${props => props.theme.colors.tertiary};
+  }
 `
 
 interface StatefulRadioButton {
@@ -76,11 +69,10 @@ export const DxDaoCuration: FC<Props> = (props: Props) => {
         {!curatedByDxDao && (
           <>
             <CurationRightColumn>
-              <RadioWrapper selected={option === 1}>
+              <RadioWrapper onClick={() => selectSource(DXDAO_OPTION)} selected={option === 1}>
                 <CurationRadioTick alt="tick" selected={option === DXDAO_OPTION} src={Tick} />
               </RadioWrapper>
             </CurationRightColumn>
-            <Input checked={option === 1} onClick={() => selectSource(DXDAO_OPTION)} type="radio" value={1} />
           </>
         )}
       </CurationSubRow>

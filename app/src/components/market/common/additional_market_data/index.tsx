@@ -150,7 +150,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           data-arrow-color="transparent"
           data-tip={
             curatedByDxDaoOrKleros
-              ? 'This Market is verified by DXdao and therefore valid.'
+              ? 'This Market is verified by DXdao or Kleros and therefore valid.'
               : 'This Market has not been verified and may be invalid.'
           }
           isError={!curatedByDxDaoOrKleros}

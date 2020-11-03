@@ -7,7 +7,7 @@ import { DOCUMENT_VALIDITY_RULES } from '../../../../../common/constants'
 import { KlerosCurationData, MarketVerificationState } from '../../../../../util/types'
 import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { IconExclamation, IconKleros } from '../../../../common/icons'
+import { IconExclamation, IconKleros, IconSchedule } from '../../../../common/icons'
 import Tick from '../img/tick.svg'
 import {
   CurationCenterColumn,
@@ -24,6 +24,10 @@ const Bold = styled.b`
   font-weight: 500;
 `
 
+const IconScheduleWrapper = styled.div`
+  margin-left: 8px;
+`
+
 const LogoWrapper = styled.div`
   border-radius: 50%;
   border: 1px solid ${props => props.theme.colors.tertiary};
@@ -36,19 +40,34 @@ const LogoWrapper = styled.div`
 
 const RadioWrapper = styled.div<StatefulRadioButton>`
   border-radius: 50%;
-  border: 1px solid ${props => props.theme.colors.tertiary};
+  border: 1px solid ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
+  cursor: pointer;
   width: 38px;
   height: 38px;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: ${props => props.selected && props.theme.colors.clickable};
+
+  &:hover {
+    border: 1px solid ${props => props.theme.colors.tertiary};
+  }
+`
+
+const TimeRemainingContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-transform: lowercase;
+  color: ${props => props.theme.colors.textColorDark};
 `
 
 const StatusContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  align-items: center;
+  font-size: medium;
 `
 
 const IconWrapper = styled.div`
@@ -84,18 +103,6 @@ const Description = styled.div`
 const DescriptionText = styled.p`
   display: inline-block;
   margin: 0;
-`
-
-const Input = styled.input`
-  cursor: pointer;
-  height: 100%;
-  left: 0;
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 5;
-  border: 1px solid red;
 `
 
 const SuccessVerify = styled.span`
@@ -147,7 +154,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
 
   const submissionTimeUTC = moment(new Date(Number(submissionTime) * 1000))
     .tz('UTC')
-    .format('YYYY-MM-DD - HH:mm [UTC]')
+    .format('DD.MM.YYYY - HH:mm [UTC]')
 
   let klerosDetails
   let KlerosNotice
@@ -172,16 +179,10 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       KlerosRightColumn = (
         <>
           <CurationRightColumn>
-            <RadioWrapper selected={option === KLEROS_OPTION}>
+            <RadioWrapper onClick={() => selectSource(KLEROS_OPTION)} selected={option === KLEROS_OPTION}>
               <CurationRadioTick alt="tick" selected={option === KLEROS_OPTION} src={Tick} />
             </RadioWrapper>
           </CurationRightColumn>
-          <Input
-            checked={option === KLEROS_OPTION}
-            onClick={() => selectSource(KLEROS_OPTION)}
-            type="radio"
-            value={0}
-          />
         </>
       )
       break
@@ -213,7 +214,12 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       )
       KlerosRightColumn = (
         <CurationRightColumn>
-          Ends in {moment.duration(timeRemaining).humanize()}
+          <TimeRemainingContainer>
+            Ends in {moment.duration(timeRemaining).humanize()}
+            <IconScheduleWrapper>
+              <IconSchedule />
+            </IconScheduleWrapper>
+          </TimeRemainingContainer>
           <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
         </CurationRightColumn>
       )
@@ -245,7 +251,12 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       )
       KlerosRightColumn = (
         <CurationRightColumn>
-          <Bold>Ends in {moment.duration(timeRemaining).humanize()}</Bold>
+          <TimeRemainingContainer>
+            Ends in {moment.duration(timeRemaining).humanize()}{' '}
+            <IconScheduleWrapper>
+              <IconSchedule />
+            </IconScheduleWrapper>
+          </TimeRemainingContainer>
           <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
         </CurationRightColumn>
       )
