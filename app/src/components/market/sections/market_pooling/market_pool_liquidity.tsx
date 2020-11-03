@@ -221,6 +221,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Ready)
       setAmountToFund(new BigNumber(0))
+      setAmountToFundDisplay('')
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
     } catch (err) {
       setStatus(Status.Error)
@@ -256,6 +257,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Ready)
       setAmountToRemove(new BigNumber(0))
+      setAmountToRemoveDisplay('')
       setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
       setIsModalTransactionResultOpen(true)
     } catch (err) {
