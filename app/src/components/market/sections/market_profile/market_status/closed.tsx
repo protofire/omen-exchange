@@ -58,6 +58,7 @@ const SellBuyWrapper = styled.div`
 `
 
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
+  isScalar: boolean
   marketMakerData: MarketMakerData
 }
 
@@ -324,7 +325,11 @@ const Wrapper = (props: Props) => {
           </>
         )}
         {currentTab === marketTabs.pool && (
-          <MarketPoolLiquidityContainer isScalar={false} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketPoolLiquidityContainer
+            isScalar={false}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
         {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === marketTabs.buy && (

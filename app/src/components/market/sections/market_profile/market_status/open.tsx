@@ -79,6 +79,7 @@ const WarningMessageStyled = styled(WarningMessage)`
 
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   account: Maybe<string>
+  isScalar: boolean
   marketMakerData: MarketMakerData
 }
 

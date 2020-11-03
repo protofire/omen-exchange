@@ -3,8 +3,6 @@ import { Helmet } from 'react-helmet'
 
 import {
   DOCUMENT_TITLE,
-  REALITIO_PROXY_ADDRESS,
-  REALITIO_PROXY_ADDRESS_RINKEBY,
   REALITIO_SCALAR_ADAPTER_ADDRESS,
   REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY,
 } from '../../../../common/constants'
@@ -31,32 +29,22 @@ const MarketView: React.FC<Props> = (props: Props) => {
   const { networkId } = context
 
   const renderView = () => {
-    let realitioProxy
     let realitioScalarAdapter
     if (networkId === 1) {
-      realitioProxy = REALITIO_PROXY_ADDRESS.toLowerCase()
       realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase()
     } else if (networkId === 4) {
-      realitioProxy = REALITIO_PROXY_ADDRESS_RINKEBY.toLowerCase()
       realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
     }
 
+    let isScalar = false
+    if (oracle === realitioScalarAdapter) {
+      isScalar = true
+    }
+
     if (isQuestionFinalized) {
-      // if (oracle === realitioProxy) {
-      //   return <ClosedMarketDetails {...props} />
-      // } else if (oracle === realitioScalarAdapter) {
-      //   return <ClosedScalarMarketDetails {...props} />
-      // }
-      // TODO: Remove hardcoding
-      return <ClosedScalarMarketDetails {...props} />
+      return <ClosedMarketDetails isScalar={isScalar} {...props} />
     } else {
-      // if (oracle === realitioProxy) {
-      //   return <OpenMarketDetails {...props} />
-      // } else if (oracle === realitioScalarAdapter) {
-      //   return <OpenScalarMarketDetails {...props} />
-      // }
-      // TODO: Remove hardcoding
-      return <OpenScalarMarketDetails {...props} />
+      return <OpenMarketDetails isScalar={isScalar} {...props} />
     }
   }
 
