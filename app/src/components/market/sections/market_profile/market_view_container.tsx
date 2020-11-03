@@ -7,7 +7,7 @@ import { MarketView } from './market_view'
 
 interface Props {
   marketMakerData: MarketMakerData
-  fetchMarketMakerData: () => Promise<void>
+  fetchGraphMarketMakerData: () => Promise<void>
 }
 
 const MarketViewContainer: React.FC<Props> = (props: Props) => {

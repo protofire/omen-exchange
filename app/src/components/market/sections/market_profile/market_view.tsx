@@ -11,7 +11,7 @@ import { OpenMarketDetails } from './market_status/open'
 interface Props {
   account: Maybe<string>
   marketMakerData: MarketMakerData
-  fetchMarketMakerData: () => Promise<void>
+  fetchGraphMarketMakerData: () => Promise<void>
 }
 
 const MarketView: React.FC<Props> = (props: Props) => {

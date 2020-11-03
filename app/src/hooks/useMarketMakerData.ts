@@ -4,7 +4,10 @@ import { useGraphMarketMakerData } from './useGraphMarketMakerData'
 
 export const useMarketMakerData = (marketMakerAddress: string) => {
   const { networkId } = useConnectedWeb3Context()
-  const { marketMakerData: graphMarketMakerData } = useGraphMarketMakerData(marketMakerAddress, networkId)
+  const { fetchData: fetchGraphMarketMakerData, marketMakerData: graphMarketMakerData } = useGraphMarketMakerData(
+    marketMakerAddress,
+    networkId,
+  )
   const { fetchData, marketMakerData } = useBlockchainMarketMakerData(graphMarketMakerData, networkId)
-  return { fetchData, marketMakerData }
+  return { fetchData, marketMakerData, fetchGraphMarketMakerData }
 }

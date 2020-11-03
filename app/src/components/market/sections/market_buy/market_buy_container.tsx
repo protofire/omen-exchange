@@ -7,7 +7,7 @@ import { MarketBuy } from './market_buy'
 interface Props {
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: string) => void
-  fetchMarketMakerData: () => Promise<void>
+  fetchGraphMarketMakerData: () => Promise<void>
 }
 
 const MarketBuyContainer: React.FC<Props> = (props: Props) => {

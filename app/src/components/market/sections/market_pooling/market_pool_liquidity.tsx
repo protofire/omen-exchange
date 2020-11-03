@@ -46,6 +46,7 @@ interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
   theme?: any
   switchMarketTab: (arg0: string) => void
+  fetchGraphMarketMakerData: () => Promise<void>
 }
 
 enum Tabs {
@@ -90,7 +91,7 @@ const UserDataRow = styled.div`
 const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
-  const { marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
 
   const context = useConnectedWeb3Context()
@@ -123,6 +124,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     setIsNegativeAmountToRemove(formatBigNumber(amountToRemove, collateral.decimals).includes('-'))
   }, [amountToRemove, collateral.decimals])
+
+  useEffect(() => {
+    setCollateral(marketMakerData.collateral)
+  }, [marketMakerData.collateral])
 
   const resolutionDate = marketMakerData.question.resolution.getTime()
   const currentDate = new Date().getTime()
@@ -170,7 +175,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
   const depositedTokensTotal = depositedTokens.add(userEarnings)
-  const maybeFundingBalance = useFundingBalance(marketMakerAddress, context)
+  const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
 
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
@@ -219,6 +224,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         marketMaker,
       })
 
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+
       setStatus(Status.Ready)
       setAmountToFund(new BigNumber(0))
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
@@ -253,6 +261,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         outcomesCount: balances.length,
         sharesToBurn: amountToRemove,
       })
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
 
       setStatus(Status.Ready)
       setAmountToRemove(new BigNumber(0))

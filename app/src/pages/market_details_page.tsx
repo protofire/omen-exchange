@@ -4,7 +4,7 @@ import { MarketViewContainer } from '../components'
 import { MarketMakerData } from '../util/types'
 
 type Props = {
-  fetchMarketMakerData: () => Promise<void>
+  fetchGraphMarketMakerData: () => Promise<void>
   marketMakerData: MarketMakerData
 }
 

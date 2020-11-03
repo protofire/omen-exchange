@@ -116,6 +116,7 @@ export type GraphMarketMakerData = {
 }
 
 type Result = {
+  fetchData: () => Promise<void>
   marketMakerData: Maybe<GraphMarketMakerData>
   status: Status
 }
@@ -164,7 +165,7 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
   const [marketMakerData, setMarketMakerData] = useState<Maybe<GraphMarketMakerData>>(null)
   const [needUpdate, setNeedUpdate] = useState<boolean>(false)
 
-  const { data, error, loading } = useQuery<GraphResponse>(query, {
+  const { data, error, loading, refetch } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
     skip: false,
     variables: { id: marketMakerAddress },
@@ -176,7 +177,6 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
 
   if (data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
     const rangledValue = wrangleResponse(data.fixedProductMarketMaker, networkId)
-
     if (needUpdate) {
       setMarketMakerData(rangledValue)
       setNeedUpdate(false)
@@ -185,7 +185,12 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
     }
   }
 
+  const fetchData = async () => {
+    await refetch()
+  }
+
   return {
+    fetchData,
     marketMakerData: error ? null : marketMakerData,
     status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
   }

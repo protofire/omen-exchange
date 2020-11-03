@@ -37,6 +37,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
+  fetchGraphMarketMakerData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: string) => void
 }
@@ -44,7 +45,7 @@ interface Props extends RouteComponentProps<any> {
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
-  const { marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, fee } = marketMakerData
   const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
 
@@ -73,6 +74,15 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])
+
+  useEffect(() => {
+    setBalanceItem(balances[outcomeIndex])
+    // eslint-disable-next-line
+  }, [balances[outcomeIndex]])
+
+  useEffect(() => {
+    setCollateral(marketMakerData.collateral)
+  }, [marketMakerData.collateral])
 
   const calcSellAmount = useMemo(
     () => async (
@@ -143,6 +153,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         marketMaker,
         conditionalTokens,
       })
+
+      await fetchGraphMarketMakerData()
 
       setAmountShares(new BigNumber(0))
       setStatus(Status.Ready)

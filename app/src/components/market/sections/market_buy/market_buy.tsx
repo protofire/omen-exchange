@@ -50,7 +50,7 @@ const logger = getLogger('Market::Buy')
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: string) => void
-  fetchMarketMakerData: () => Promise<void>
+  fetchGraphMarketMakerData: () => Promise<void>
 }
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
@@ -60,7 +60,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
-  const { fetchMarketMakerData, marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
@@ -151,7 +151,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         outcomeIndex,
         marketMaker,
       })
-      await fetchMarketMakerData()
+      await fetchGraphMarketMakerData()
 
       setTweet(
         stripIndents(`${question.title}

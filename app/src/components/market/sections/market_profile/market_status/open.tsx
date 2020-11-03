@@ -81,11 +81,11 @@ const WarningMessageStyled = styled(WarningMessage)`
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   account: Maybe<string>
   marketMakerData: MarketMakerData
-  fetchMarketMakerData: () => Promise<void>
+  fetchGraphMarketMakerData: () => Promise<void>
 }
 
 const Wrapper = (props: Props) => {
-  const { fetchMarketMakerData, marketMakerData } = props
+  const { fetchGraphMarketMakerData, marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
 
@@ -224,18 +224,26 @@ const Wrapper = (props: Props) => {
           </>
         )}
         {currentTab === marketTabs.pool && (
-          <MarketPoolLiquidityContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketPoolLiquidityContainer
+            fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
         {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === marketTabs.buy && (
           <MarketBuyContainer
-            fetchMarketMakerData={fetchMarketMakerData}
+            fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />
         )}
         {currentTab === marketTabs.sell && (
-          <MarketSellContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketSellContainer
+            fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
         {/* {currentTab === marketTabs.verify && <p>verify</p>} */}
       </BottomCard>
