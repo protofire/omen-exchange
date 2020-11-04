@@ -24,6 +24,39 @@ const realitioCallAbi = [
 ]
 const realitioScalarAdapterAbi = ['function announceConditionQuestionId(bytes32 questionId, uint256 low, uint256 high)']
 
+function getQuestionArgs(
+  question: string,
+  outcomes: Outcome[],
+  category: string,
+  arbitratorAddress: string,
+  openingDateMoment: Moment,
+  networkId: number,
+) {
+  const openingTimestamp = openingDateMoment.unix()
+  const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
+  const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
+
+  const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+
+  return [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+}
+
+function getScalarQuestionArgs(
+  question: string,
+  unit: string,
+  category: string,
+  arbitratorAddress: string,
+  openingDateMoment: Moment,
+  networkId: number,
+) {
+  const openingTimestamp = openingDateMoment.unix()
+  const questionText = RealitioQuestionLib.encodeText('uint', `${question} [${unit}]`, null, category)
+
+  const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+
+  return [UINT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+}
+
 class RealitioService {
   contract: Contract
   constantContract: Contract
@@ -187,13 +220,7 @@ class RealitioService {
     openingDateMoment: Moment,
     networkId: number,
   ): string => {
-    const openingTimestamp = openingDateMoment.unix()
-    const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
-    const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
-
-    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
-
-    const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+    const args = getQuestionArgs(question, outcomes, category, arbitratorAddress, openingDateMoment, networkId)
 
     const askQuestionInterface = new utils.Interface(realitioAbi)
 
@@ -208,12 +235,7 @@ class RealitioService {
     openingDateMoment: Moment,
     networkId: number,
   ): string => {
-    const openingTimestamp = openingDateMoment.unix()
-    const questionText = RealitioQuestionLib.encodeText('uint', `${question} [${unit}]`, null, category)
-
-    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
-
-    const args = [UINT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+    const args = getScalarQuestionArgs(question, unit, category, arbitratorAddress, openingDateMoment, networkId)
 
     const askQuestionInterface = new utils.Interface(realitioAbi)
 
@@ -229,13 +251,7 @@ class RealitioService {
     networkId: number,
     signerAddress: string,
   ): Promise<string> => {
-    const openingTimestamp = openingDateMoment.unix()
-    const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
-    const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
-
-    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
-
-    const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+    const args = getQuestionArgs(question, outcomes, category, arbitratorAddress, openingDateMoment, networkId)
 
     const questionId = await this.constantContract.askQuestion(...args, {
       from: signerAddress,
@@ -253,12 +269,7 @@ class RealitioService {
     networkId: number,
     signerAddress: string,
   ): Promise<string> => {
-    const openingTimestamp = openingDateMoment.unix()
-    const questionText = RealitioQuestionLib.encodeText('single-select', question, unit, category)
-
-    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
-
-    const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+    const args = getScalarQuestionArgs(question, unit, category, arbitratorAddress, openingDateMoment, networkId)
 
     const questionId = await this.constantContract.askQuestion(...args, {
       from: signerAddress,
