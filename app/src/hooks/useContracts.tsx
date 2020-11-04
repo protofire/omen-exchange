@@ -33,7 +33,7 @@ export const useContracts = (context: ConnectedWeb3Context) => {
   const realitioScalarAdapterAddress = getContractAddress(networkId, 'realitioScalarAdapter')
   const realitio = useMemo(
     () => new RealitioService(realitioAddress, realitioScalarAdapterAddress, provider, account),
-    [realitioAddress, provider, account],
+    [realitioAddress, provider, account, realitioScalarAdapterAddress],
   )
 
   const oracleAddress = getContractAddress(networkId, 'oracle')
