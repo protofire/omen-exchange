@@ -76,6 +76,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     setOutcomeIndex(defaultOutcomeIndex)
+    setBalanceItem(balances[defaultOutcomeIndex])
     setAmountShares(null)
     setAmountSharesToDisplay('')
     // eslint-disable-next-line
