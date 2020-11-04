@@ -3,7 +3,7 @@ import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapt
 import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
-import { BigNumber, formatUnits } from 'ethers/utils'
+import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
@@ -318,9 +318,9 @@ class CPKService {
 
         const transactions = []
 
-        let questionId: string
+        let realityEthQuestionId: string
         if (loadedQuestionId) {
-          questionId = loadedQuestionId
+          realityEthQuestionId = loadedQuestionId
         } else {
           // Step 1: Create question in realitio without bounds
           transactions.push({
@@ -334,7 +334,7 @@ class CPKService {
               networkId,
             ),
           })
-          questionId = await realitio.askScalarQuestionConstant(
+          realityEthQuestionId = await realitio.askScalarQuestionConstant(
             question,
             unit,
             category,
@@ -344,16 +344,20 @@ class CPKService {
             this.cpk.address,
           )
         }
-        logger.log(`QuestionID ${questionId}`)
+        const conditionQuestionId = keccak256(
+          defaultAbiCoder.encode(['bytes32', 'uint256', 'uint256'], [realityEthQuestionId, lowerBound, upperBound]),
+        )
+        logger.log(`Reality.eth QuestionID ${realityEthQuestionId}`)
+        logger.log(`Conditional Tokens QuestionID ${conditionQuestionId}`)
 
         // Step 1.5: Announce the questionId and its bounds to the RealitioScalarAdapter
         transactions.push({
           to: realitioScalarAdapterAddress,
-          data: await RealitioService.encodeAnnounceConditionQuestionId(questionId, lowerBound, upperBound),
+          data: await RealitioService.encodeAnnounceConditionQuestionId(realityEthQuestionId, lowerBound, upperBound),
         })
 
         const oracleAddress = getContractAddress(networkId, 'realitioScalarAdapter')
-        const conditionId = conditionalTokens.getConditionId(questionId, oracleAddress, 2)
+        const conditionId = conditionalTokens.getConditionId(conditionQuestionId, oracleAddress, 2)
 
         let conditionExists = false
         if (loadedQuestionId) {
@@ -366,12 +370,7 @@ class CPKService {
 
           transactions.push({
             to: conditionalTokensAddress,
-            data: ConditionalTokenService.encodePrepareScalarCondition(
-              questionId,
-              lowerBound,
-              upperBound,
-              oracleAddress,
-            ),
+            data: ConditionalTokenService.encodePrepareCondition(conditionQuestionId, oracleAddress, 2),
           })
         }
 
