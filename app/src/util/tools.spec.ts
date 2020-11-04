@@ -398,7 +398,7 @@ describe('tools', () => {
       })
     }
   })
-      
+
   describe('clampBigNumber', () => {
     const testCases: [[BigNumber, BigNumber, BigNumber], BigNumber][] = [
       [[new BigNumber(0), new BigNumber(2), new BigNumber(7)], new BigNumber(2)],
