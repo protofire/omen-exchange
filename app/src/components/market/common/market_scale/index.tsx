@@ -153,7 +153,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         </ScaleTitle>
       </ScaleTitleWrapper>
       <Scale>
-        <ScaleBall xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))} />
+        <ScaleBall
+          xValue={
+            (Number(formatBigNumber(startingPoint, decimals)) - Number(formatBigNumber(lowerBound, decimals))) /
+            (Number(formatBigNumber(upperBound, decimals)) - Number(formatBigNumber(lowerBound, decimals)))
+          }
+        />
         <VerticalBar />
         <VerticalBar />
         <VerticalBar />
