@@ -105,10 +105,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
-  const [amountToFund, setAmountToFund] = useState<BigNumber>(new BigNumber(0))
+  const [amountToFund, setAmountToFund] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
   const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
-  const [amountToRemove, setAmountToRemove] = useState<BigNumber>(new BigNumber(0))
+  const [amountToRemove, setAmountToRemove] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
   const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -117,11 +117,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
   useEffect(() => {
-    setIsNegativeAmountToFund(formatBigNumber(amountToFund, collateral.decimals).includes('-'))
+    setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
   }, [amountToFund, collateral.decimals])
 
   useEffect(() => {
-    setIsNegativeAmountToRemove(formatBigNumber(amountToRemove, collateral.decimals).includes('-'))
+    setIsNegativeAmountToRemove(formatBigNumber(amountToRemove || Zero, collateral.decimals).includes('-'))
   }, [amountToRemove, collateral.decimals])
 
   const resolutionDate = marketMakerData.question.resolution.getTime()
@@ -131,16 +131,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
-  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund))
+  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const poolTokens = calcPoolTokens(
-    amountToFund,
+    amountToFund || Zero,
     balances.map(b => b.holdings),
     totalPoolShares,
   )
   const sendAmountsAfterAddingFunding = calcAddFundingSendAmounts(
-    amountToFund,
+    amountToFund || Zero,
     balances.map(b => b.holdings),
     totalPoolShares,
   )
@@ -149,7 +149,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     : balances.map(balance => balance.shares)
 
   const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
-    amountToRemove,
+    amountToRemove || Zero,
     balances.map(b => b.holdings),
     totalPoolShares,
   )
@@ -162,7 +162,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     return balance.shares.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
   })
 
-  const showSharesChange = activeTab === Tabs.deposit ? amountToFund.gt(0) : amountToRemove.gt(0)
+  const showSharesChange = activeTab === Tabs.deposit ? amountToFund?.gt(0) : amountToRemove?.gt(0)
 
   const maybeCollateralBalance = useCollateralBalance(collateral, context)
   const collateralBalance = maybeCollateralBalance || Zero
@@ -199,7 +199,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown")
       }
 
-      const fundsAmount = formatBigNumber(amountToFund, collateral.decimals)
+      const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
@@ -214,13 +214,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       }
 
       await cpk.addFunding({
-        amount: amountToFund,
+        amount: amountToFund || Zero,
         collateral,
         marketMaker,
       })
 
       setStatus(Status.Ready)
-      setAmountToFund(new BigNumber(0))
+      setAmountToFund(null)
+      setAmountToFundDisplay('')
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
     } catch (err) {
       setStatus(Status.Error)
@@ -251,11 +252,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         earnings: userEarnings,
         marketMaker,
         outcomesCount: balances.length,
-        sharesToBurn: amountToRemove,
+        sharesToBurn: amountToRemove || Zero,
       })
 
       setStatus(Status.Ready)
-      setAmountToRemove(new BigNumber(0))
+      setAmountToRemove(null)
+      setAmountToRemoveDisplay('')
       setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
       setIsModalTransactionResultOpen(true)
     } catch (err) {
@@ -279,31 +281,31 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const collateralAmountError =
     maybeCollateralBalance === null
       ? null
-      : maybeCollateralBalance.isZero() && amountToFund.gt(maybeCollateralBalance)
+      : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
       ? `Insufficient balance`
-      : amountToFund.gt(maybeCollateralBalance)
+      : amountToFund?.gt(maybeCollateralBalance)
       ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
       : null
 
   const sharesAmountError =
     maybeFundingBalance === null
       ? null
-      : maybeFundingBalance.isZero() && amountToRemove.gt(maybeFundingBalance)
+      : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
       ? `Insufficient balance`
-      : amountToRemove.gt(maybeFundingBalance)
+      : amountToRemove?.gt(maybeFundingBalance)
       ? `Value must be less than or equal to ${sharesBalance} pool shares`
       : null
 
   const disableDepositButton =
-    amountToFund.isZero() ||
+    amountToFund?.isZero() ||
     hasEnoughAllowance !== Ternary.True ||
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
     isNegativeAmountToFund
 
   const disableWithdrawButton =
-    amountToRemove.isZero() ||
-    amountToRemove.gt(fundingBalance) ||
+    amountToRemove?.isZero() ||
+    amountToRemove?.gt(fundingBalance) ||
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
