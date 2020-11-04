@@ -430,7 +430,6 @@ class CPKService {
           distributionHint,
         ),
       })
-      console.log(transactions)
 
       const txObject = await this.cpk.execTransactions(transactions)
       logger.log(`Transaction hash: ${txObject.hash}`)
