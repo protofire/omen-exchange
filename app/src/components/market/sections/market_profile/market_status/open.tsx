@@ -186,7 +186,7 @@ const Wrapper = (props: Props) => {
   }
 
   // TODO: Remove hardcoded values
-  const currentPrediction = new BigNumber('72')
+  const currentPrediction = new BigNumber(`${72 * 10 ** 18}`)
   const unit = 'USD'
 
   return (
