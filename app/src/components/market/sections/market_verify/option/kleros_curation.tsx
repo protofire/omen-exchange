@@ -12,6 +12,7 @@ import Tick from '../img/tick.svg'
 import {
   CurationCenterColumn,
   CurationLeftColumn,
+  CurationLogoWrapper,
   CurationOption,
   CurationOptionDetails,
   CurationRadioTick,
@@ -27,16 +28,6 @@ const Bold = styled.b`
 
 const IconScheduleWrapper = styled.div`
   margin-left: 8px;
-`
-
-const LogoWrapper = styled.div`
-  border-radius: 50%;
-  border: 1px solid ${props => props.theme.colors.tertiary};
-  width: 38px;
-  height: 38px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `
 
 const TimeRemainingContainer = styled.div`
@@ -302,9 +293,9 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
     <CurationRow key="Kleros">
       <CurationSubRow>
         <CurationLeftColumn>
-          <LogoWrapper>
+          <CurationLogoWrapper>
             <IconKleros />
-          </LogoWrapper>
+          </CurationLogoWrapper>
         </CurationLeftColumn>
         <CurationCenterColumn>
           <CurationOption>Kleros</CurationOption>
@@ -312,7 +303,9 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
         </CurationCenterColumn>
         {KlerosRightColumn}
       </CurationSubRow>
-      {option === KLEROS_OPTION && <CurationSubRow>{KlerosNotice}</CurationSubRow>}
+      {(option === KLEROS_OPTION ||
+        status === MarketVerificationState.RemovalChallengeable ||
+        status === MarketVerificationState.SubmissionChallengeable) && <CurationSubRow>{KlerosNotice}</CurationSubRow>}
     </CurationRow>
   )
 }
