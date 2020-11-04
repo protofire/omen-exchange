@@ -5,7 +5,7 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 // eslint-disable-next-line import/named
 import { Moment } from 'moment'
 
-import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from '../common/constants'
+import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID, UINT_TEMPLATE_ID } from '../common/constants'
 import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck, getRealitioTimeout } from '../util/networks'
@@ -209,11 +209,11 @@ class RealitioService {
     networkId: number,
   ): string => {
     const openingTimestamp = openingDateMoment.unix()
-    const questionText = RealitioQuestionLib.encodeText('single-select', question, unit, category)
+    const questionText = RealitioQuestionLib.encodeText('uint', `${question} [${unit}]`, null, category)
 
     const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
 
-    const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+    const args = [UINT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
 
     const askQuestionInterface = new utils.Interface(realitioAbi)
 

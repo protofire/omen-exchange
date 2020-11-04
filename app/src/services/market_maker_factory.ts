@@ -199,14 +199,6 @@ class MarketMakerFactoryService {
 
     const create2FixedProductMarketMakerInterface = new utils.Interface(marketMakerFactoryAbi)
 
-    console.log('saltNonce: ', saltNonce)
-    console.log('conditionalTokenAddress: ', conditionalTokenAddress)
-    console.log('collateralAddress: ', collateralAddress)
-    console.log('conditionId: ', conditionId)
-    console.log('spread: ', spread)
-    console.log('initialFunds: ', initialFunds)
-    console.log('distributionHint: ', distributionHint)
-
     return create2FixedProductMarketMakerInterface.functions.create2FixedProductMarketMaker.encode([
       saltNonce,
       conditionalTokenAddress,

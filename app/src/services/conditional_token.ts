@@ -1,6 +1,6 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
 import { TransactionReceipt } from 'ethers/providers'
-import { BigNumber, BigNumberish, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
+import { BigNumber, BigNumberish, bigNumberify } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck } from '../util/networks'
@@ -164,25 +164,6 @@ class ConditionalTokenService {
       oracleAddress,
       questionId,
       bigNumberify(outcomeSlotCount),
-    ])
-  }
-
-  static encodePrepareScalarCondition = (
-    realitioQuestionId: string,
-    lowerBound: BigNumber,
-    upperBound: BigNumber,
-    oracleAddress: string,
-  ): string => {
-    const prepareConditionInterface = new utils.Interface(conditionalTokensAbi)
-
-    const conditionQuestionId = keccak256(
-      defaultAbiCoder.encode(['bytes32', 'uint256', 'uint256'], [realitioQuestionId, lowerBound, upperBound]),
-    )
-
-    return prepareConditionInterface.functions.prepareCondition.encode([
-      oracleAddress,
-      conditionQuestionId,
-      bigNumberify(2),
     ])
   }
 

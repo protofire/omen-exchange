@@ -18,6 +18,7 @@ export const FETCH_EVENTS_CHUNK_SIZE = parseInt(process.env.REACT_APP_FETCH_EVEN
 const MAX_OUTCOMES = parseInt(process.env.REACT_APP_MAX_OUTCOME_ALLOWED || '8', 10)
 export const MAX_OUTCOME_ALLOWED = MAX_OUTCOMES > 256 ? 256 : MAX_OUTCOMES
 
+export const UINT_TEMPLATE_ID = 1
 export const SINGLE_SELECT_TEMPLATE_ID = 2
 
 export const MARKET_FEE = parseFloat(process.env.REACT_APP_MARKET_FEE || '2.00')

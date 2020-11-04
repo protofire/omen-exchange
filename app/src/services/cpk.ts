@@ -3,7 +3,7 @@ import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapt
 import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
-import { BigNumber, formatUnits } from 'ethers/utils'
+import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
@@ -300,135 +300,142 @@ class CPKService {
         throw new Error('Resolution time was not specified')
       }
 
-      const shouldThrow =
-        !lowerBound || !upperBound || !startingPoint || lowerBound.gt(startingPoint) || startingPoint.gt(upperBound)
+      if (!lowerBound) {
+        throw new Error('Lower bound not specified')
+      }
 
-      if (upperBound && lowerBound && startingPoint && !shouldThrow) {
-        const signer = this.provider.getSigner()
-        const account = await signer.getAddress()
+      if (!upperBound) {
+        throw new Error('Upper bound not specified')
+      }
 
-        const network = await this.provider.getNetwork()
-        const networkId = network.chainId
+      if (!startingPoint) {
+        throw new Error('Starting expected value not specified')
+      }
 
-        const conditionalTokensAddress = conditionalTokens.address
-        const realitioAddress = realitio.address
-        const realitioScalarAdapterAddress = realitio.scalarContract.address
+      if (lowerBound.gt(startingPoint) || startingPoint.gt(upperBound)) {
+        throw new Error('Starting expected value should be between lowerBound and upperBound')
+      }
 
-        const openingDateMoment = moment(resolution)
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
 
-        const transactions = []
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
-        let questionId: string
-        if (loadedQuestionId) {
-          questionId = loadedQuestionId
-        } else {
-          // Step 1: Create question in realitio without bounds
-          transactions.push({
-            to: realitioAddress,
-            data: RealitioService.encodeAskScalarQuestion(
-              question,
-              unit,
-              category,
-              arbitrator.address,
-              openingDateMoment,
-              networkId,
-            ),
-          })
-          questionId = await realitio.askScalarQuestionConstant(
+      const conditionalTokensAddress = conditionalTokens.address
+      const realitioAddress = realitio.address
+      const realitioScalarAdapterAddress = realitio.scalarContract.address
+
+      const openingDateMoment = moment(resolution)
+
+      const transactions = []
+
+      let realityEthQuestionId: string
+      if (loadedQuestionId) {
+        realityEthQuestionId = loadedQuestionId
+      } else {
+        // Step 1: Create question in realitio without bounds
+        transactions.push({
+          to: realitioAddress,
+          data: RealitioService.encodeAskScalarQuestion(
             question,
             unit,
             category,
             arbitrator.address,
             openingDateMoment,
             networkId,
-            this.cpk.address,
-          )
-        }
-        logger.log(`QuestionID ${questionId}`)
-
-        // Step 1.5: Announce the questionId and its bounds to the RealitioScalarAdapter
-        transactions.push({
-          to: realitioScalarAdapterAddress,
-          data: await RealitioService.encodeAnnounceConditionQuestionId(questionId, lowerBound, upperBound),
+          ),
         })
+        realityEthQuestionId = await realitio.askScalarQuestionConstant(
+          question,
+          unit,
+          category,
+          arbitrator.address,
+          openingDateMoment,
+          networkId,
+          this.cpk.address,
+        )
+      }
+      const conditionQuestionId = keccak256(
+        defaultAbiCoder.encode(['bytes32', 'uint256', 'uint256'], [realityEthQuestionId, lowerBound, upperBound]),
+      )
+      logger.log(`Reality.eth QuestionID ${realityEthQuestionId}`)
+      logger.log(`Conditional Tokens QuestionID ${conditionQuestionId}`)
 
-        const oracleAddress = getContractAddress(networkId, 'realitioScalarAdapter')
-        const conditionId = conditionalTokens.getConditionId(questionId, oracleAddress, 2)
+      // Step 1.5: Announce the questionId and its bounds to the RealitioScalarAdapter
+      transactions.push({
+        to: realitioScalarAdapterAddress,
+        data: await RealitioService.encodeAnnounceConditionQuestionId(realityEthQuestionId, lowerBound, upperBound),
+      })
 
-        let conditionExists = false
-        if (loadedQuestionId) {
-          conditionExists = await conditionalTokens.doesConditionExist(conditionId)
-        }
+      const oracleAddress = getContractAddress(networkId, 'realitioScalarAdapter')
+      const conditionId = conditionalTokens.getConditionId(conditionQuestionId, oracleAddress, 2)
 
-        if (!conditionExists) {
-          // Step 2: Prepare scalar condition using the conditionQuestionId
-          logger.log(`Adding prepareCondition transaction`)
+      let conditionExists = false
+      if (loadedQuestionId) {
+        conditionExists = await conditionalTokens.doesConditionExist(conditionId)
+      }
 
-          transactions.push({
-            to: conditionalTokensAddress,
-            data: ConditionalTokenService.encodePrepareScalarCondition(
-              questionId,
-              lowerBound,
-              upperBound,
-              oracleAddress,
-            ),
-          })
-        }
+      if (!conditionExists) {
+        // Step 2: Prepare scalar condition using the conditionQuestionId
+        logger.log(`Adding prepareCondition transaction`)
 
-        logger.log(`ConditionID: ${conditionId}`)
-
-        // Step 3: Approve collateral for factory
         transactions.push({
-          to: collateral.address,
-          data: ERC20Service.encodeApproveUnlimited(marketMakerFactory.address),
+          to: conditionalTokensAddress,
+          data: ConditionalTokenService.encodePrepareCondition(conditionQuestionId, oracleAddress, 2),
         })
+      }
 
-        // Step 4: Transfer funding from user
-        transactions.push({
-          to: collateral.address,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
-        })
+      logger.log(`ConditionID: ${conditionId}`)
 
-        // Step 4.5: Calculate distributionHint
-        const domainSize = upperBound.sub(lowerBound)
-        const a = clampBigNumber(upperBound.sub(startingPoint), Zero, domainSize)
-        const b = clampBigNumber(startingPoint.sub(lowerBound), Zero, domainSize)
+      // Step 3: Approve collateral for factory
+      transactions.push({
+        to: collateral.address,
+        data: ERC20Service.encodeApproveUnlimited(marketMakerFactory.address),
+      })
 
-        const distributionHint = [b, a]
+      // Step 4: Transfer funding from user
+      transactions.push({
+        to: collateral.address,
+        data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
+      })
 
-        // Step 5: Create market maker
-        const saltNonce = Math.round(Math.random() * 1000000)
-        const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
+      // Step 4.5: Calculate distributionHint
+      const domainSize = upperBound.sub(lowerBound)
+      const a = clampBigNumber(upperBound.sub(startingPoint), Zero, domainSize)
+      const b = clampBigNumber(startingPoint.sub(lowerBound), Zero, domainSize)
+
+      const distributionHint = [b, a]
+
+      // Step 5: Create market maker
+      const saltNonce = Math.round(Math.random() * 1000000)
+      const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
+        saltNonce,
+        conditionalTokens.address,
+        collateral.address,
+        conditionId,
+        this.cpk.address,
+        spread,
+      )
+      logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
+      transactions.push({
+        to: marketMakerFactory.address,
+        data: MarketMakerFactoryService.encodeCreateMarketMaker(
           saltNonce,
           conditionalTokens.address,
           collateral.address,
           conditionId,
-          this.cpk.address,
           spread,
-        )
-        logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
-        transactions.push({
-          to: marketMakerFactory.address,
-          data: MarketMakerFactoryService.encodeCreateMarketMaker(
-            saltNonce,
-            conditionalTokens.address,
-            collateral.address,
-            conditionId,
-            spread,
-            marketData.funding,
-            distributionHint,
-          ),
-        })
-        console.log(transactions)
+          marketData.funding,
+          distributionHint,
+        ),
+      })
 
-        const txObject = await this.cpk.execTransactions(transactions)
-        logger.log(`Transaction hash: ${txObject.hash}`)
+      const txObject = await this.cpk.execTransactions(transactions)
+      logger.log(`Transaction hash: ${txObject.hash}`)
 
-        await this.provider.waitForTransaction(txObject.hash)
-        return predictedMarketMakerAddress
-      } else {
-        throw new Error('Invalid scalar market parameters')
-      }
+      await this.provider.waitForTransaction(txObject.hash)
+      return predictedMarketMakerAddress
     } catch (err) {
       logger.error(`There was an error creating the market maker`, err.message)
       throw err
