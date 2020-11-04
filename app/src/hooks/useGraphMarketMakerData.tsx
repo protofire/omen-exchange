@@ -48,6 +48,8 @@ const query = gql`
         data
       }
       klerosTCRregistered
+      scalarLow
+      scalarHigh
     }
   }
 `
@@ -90,6 +92,8 @@ type GraphResponseFixedProductMarketMaker = {
   klerosTCRregistered: boolean
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
+  scalarLow: string
+  scalarHigh: string
 }
 
 type GraphResponse = {
@@ -115,6 +119,8 @@ export type GraphMarketMakerData = {
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
   oracle: string
+  scalarLow: BigNumber
+  scalarHigh: BigNumber
 }
 
 type Result = {
@@ -156,6 +162,8 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     curatedByDxDao: data.curatedByDxDao,
     klerosTCRregistered: data.klerosTCRregistered,
     curatedByDxDaoOrKleros: data.curatedByDxDaoOrKleros,
+    scalarLow: bigNumberify(data.scalarLow),
+    scalarHigh: bigNumberify(data.scalarHigh),
   }
 }
 
