@@ -66,7 +66,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
-  const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  const [amount, setAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
@@ -77,11 +77,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
-  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
+  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount || Zero))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   useEffect(() => {
-    setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
+    setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
 
   // get the amount of shares that will be traded and the estimated prices after trade
@@ -113,7 +113,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const [tradedShares, probabilities, debouncedAmount] = useAsyncDerivedValue(
-    amount,
+    amount || Zero,
     [new BigNumber(0), balances.map(() => 0), amount],
     calcBuyAmount,
   )
@@ -142,7 +142,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setMessage(`Buying ${sharesAmount} shares ...`)
 
       await cpk.buyOutcomes({
-        amount,
+        amount: amount || Zero,
         outcomeIndex,
         marketMaker,
       })
@@ -155,7 +155,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       What do you think?`),
       )
 
-      setAmount(new BigNumber(0))
+      setAmount(null)
+      setAmountToDisplay('')
       setStatus(Status.Ready)
       setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
@@ -169,15 +170,17 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
 
-  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
+  const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
 
-  const baseCost = debouncedAmount.sub(feePaid)
-  const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
+  const baseCost = debouncedAmount?.sub(feePaid)
+  const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount || Zero)
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
-  const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
+  const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost || Zero, collateral.decimals))} ${
+    collateral.symbol
+  }`
   const potentialProfitFormatted = `${formatNumber(formatBigNumber(potentialProfit, collateral.decimals))} ${
     collateral.symbol
   }`
@@ -187,15 +190,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const amountError =
     maybeCollateralBalance === null
       ? null
-      : maybeCollateralBalance.isZero() && amount.gt(maybeCollateralBalance)
+      : maybeCollateralBalance.isZero() && amount?.gt(maybeCollateralBalance)
       ? `Insufficient balance`
-      : amount.gt(maybeCollateralBalance)
+      : amount?.gt(maybeCollateralBalance)
       ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
       : null
 
   const isBuyDisabled =
     (status !== Status.Ready && status !== Status.Error) ||
-    amount.isZero() ||
+    amount?.isZero() ||
     hasEnoughAllowance !== Ternary.True ||
     amountError !== null ||
     isNegativeAmount
@@ -214,8 +217,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         outcomeHandleChange={(value: number) => switchOutcome(value)}
         outcomeSelected={outcomeIndex}
         probabilities={probabilities}
-        showPriceChange={amount.gt(0)}
-        showSharesChange={amount.gt(0)}
+        showPriceChange={amount?.gt(0)}
+        showSharesChange={amount?.gt(0)}
       />
       <WarningMessageStyled
         additionalDescription={'. Be aware that market makers may remove liquidity from the market at any time!'}
