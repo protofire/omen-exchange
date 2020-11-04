@@ -338,7 +338,7 @@ export const formatNumber = (number: string, decimals = 2): string => {
     return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
 
-  const fixedInt = parseFloat(number).toFixed(decimals)
+  const fixedInt = parseFloat(number.split(',').join('')).toFixed(decimals)
   const splitFixedInt = fixedInt.split('.')[0]
   const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 
@@ -352,7 +352,7 @@ export const formatToShortNumber = (number: string, decimals = 2): string => {
 
   const units = ['', 'K', 'M', 'B', 'T']
   let unitIndex = 0
-  let rNumber = parseFloat(number)
+  let rNumber = parseFloat(number.split(',').join(''))
 
   while (rNumber >= 1000 && unitIndex < 5) {
     unitIndex += 1
