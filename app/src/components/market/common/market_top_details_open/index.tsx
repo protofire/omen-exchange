@@ -118,7 +118,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     if (currency) {
       const selectedMarket = marketsRelatedQuestion.find(e => e.collateralToken === currency.address.toLowerCase())
       if (selectedMarket && selectedMarket.collateralToken !== collateral.address) {
-        history.push(`/${selectedMarket.id}`)
+        history.replace(`/${selectedMarket.id}`)
       }
     }
   }
