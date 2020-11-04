@@ -95,7 +95,7 @@ const TitleValueVertical = styled(TitleValue)`
 
   > p {
     text-align: left;
-    line-height: 16px;
+    line-height: 22px;
     margin: 0;
   }
 `
