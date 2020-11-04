@@ -6,6 +6,7 @@ import Tick from '../img/tick.svg'
 import {
   CurationCenterColumn,
   CurationLeftColumn,
+  CurationLogoWrapper,
   CurationOption,
   CurationOptionDetails,
   CurationRadioTick,
@@ -17,16 +18,6 @@ import {
 
 const Bold = styled.b`
   font-weight: 500;
-`
-
-const LogoWrapper = styled.div`
-  border-radius: 50%;
-  border: 1px solid ${props => props.theme.colors.tertiary};
-  width: 48px;
-  height: 48px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `
 
 interface Props {
@@ -41,9 +32,9 @@ export const DxDaoCuration: FC<Props> = (props: Props) => {
     <CurationRow key="Dxdao Curation">
       <CurationSubRow>
         <CurationLeftColumn>
-          <LogoWrapper>
+          <CurationLogoWrapper>
             <IconDxDao />
-          </LogoWrapper>
+          </CurationLogoWrapper>
         </CurationLeftColumn>
         <CurationCenterColumn>
           <CurationOption>Dxdao Curation</CurationOption>

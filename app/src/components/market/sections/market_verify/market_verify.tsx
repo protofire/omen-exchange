@@ -56,18 +56,34 @@ export const CurationRightColumn = styled.div`
 
 export const CurationRadioTick = styled.img<StatefulRadioButton>`
   filter: ${props => (props.selected ? 'saturate(0) brightness(2)' : props.disabled ? 'saturate(0)' : '')};
+  cursor: ${props => (props.disabled ? 'initial' : 'pointer')};
+`
+
+export const CurationLogoWrapper = styled.div`
+  padding: 11px;
+  border-radius: 50%;
+  border: 1px solid ${props => props.theme.colors.tertiary};
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 
 export const CurationRadioWrapper = styled.div<StatefulRadioButton>`
   border-radius: 50%;
-  border: ${props => !props.selected && `1px solid ${props.theme.colors.tertiary}`};
-  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+  border: 1px solid ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
+  cursor: ${props => (props.disabled ? 'initial' : 'pointer')};
   width: 38px;
   height: 38px;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: ${props => props.selected && props.theme.colors.clickable};
+
+  &:hover {
+    border-color: ${props => !props.disabled && props.theme.colors.tertiary};
+  }
 `
 
 export const CurationOption = styled.div`
@@ -141,7 +157,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
           Back
         </MarketBottomNavButton>
         <MarketBottomNavButton
-          buttonType={ButtonType.secondaryLine}
+          buttonType={ButtonType.primaryAlternative}
           disabled={loading || typeof selection !== 'number'}
         >
           <UnstyledLink href={requestVerificationLink} rel="noopener noreferrer" target="_blank">
