@@ -23,7 +23,6 @@ import {
   calcRemoveFundingSendAmounts,
   formatBigNumber,
   formatNumber,
-  waitABit,
 } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
 import { ButtonContainer, ButtonTab } from '../../../button'
@@ -225,8 +224,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         marketMaker,
       })
 
-      await waitABit()
-
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
 
@@ -265,9 +262,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         outcomesCount: balances.length,
         sharesToBurn: amountToRemove || Zero,
       })
-
-      await waitABit()
-
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
 

@@ -5,7 +5,7 @@ import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
 import { getOutcomes } from '../util/networks'
-import { isObjectEqual } from '../util/tools'
+import { isObjectEqual, waitABit } from '../util/tools'
 import { Question, Status } from '../util/types'
 
 const query = gql`
@@ -157,6 +157,8 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
   }
 }
 
+let needRefetch = false
+
 /**
  * Get data from the graph for the given market maker. All the information returned by this hook comes from the graph,
  * other necessary information should be fetched from the blockchain.
@@ -182,11 +184,17 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
       setNeedUpdate(false)
     } else if (!isObjectEqual(marketMakerData, rangledValue)) {
       setMarketMakerData(rangledValue)
+      needRefetch = false
     }
   }
 
   const fetchData = async () => {
-    await refetch()
+    needRefetch = true
+    await waitABit()
+    while (needRefetch) {
+      await refetch()
+      await waitABit()
+    }
   }
 
   return {

@@ -393,7 +393,7 @@ export const isObjectEqual = (obj1?: any, obj2?: any): boolean => {
   return true
 }
 
-export const waitABit = (milli = 3000) =>
+export const waitABit = (milli = 1000) =>
   new Promise(resolve => {
     setTimeout(resolve, milli)
   })
