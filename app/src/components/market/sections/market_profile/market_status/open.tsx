@@ -96,6 +96,8 @@ const Wrapper = (props: Props) => {
     collateral,
     isQuestionFinalized,
     question,
+    scalarHigh,
+    scalarLow,
     totalPoolShares,
   } = marketMakerData
 
@@ -184,9 +186,7 @@ const Wrapper = (props: Props) => {
   }
 
   // TODO: Remove hardcoded values
-  const lowerBound = new BigNumber('0')
-  const currentPrediction = new BigNumber('720')
-  const upperBound = new BigNumber('1000')
+  const currentPrediction = new BigNumber('72')
   const unit = 'USD'
 
   return (
@@ -206,13 +206,12 @@ const Wrapper = (props: Props) => {
           <>
             {isScalar ? (
               <MarketScale
-                // TODO: Change to collateral.decimals
-                decimals={0}
-                lowerBound={lowerBound}
+                decimals={18}
+                lowerBound={scalarLow || new BigNumber(0)}
                 startingPoint={currentPrediction}
                 startingPointTitle={'Current prediction'}
                 unit={unit}
-                upperBound={upperBound}
+                upperBound={scalarHigh || new BigNumber(0)}
               />
             ) : (
               renderTableData()
