@@ -95,6 +95,8 @@ const Wrapper = (props: Props) => {
     isQuestionFinalized,
     payouts,
     question,
+    scalarHigh,
+    scalarLow,
   } = marketMakerData
 
   const history = useHistory()
@@ -273,11 +275,11 @@ const Wrapper = (props: Props) => {
               <MarketScale
                 // TODO: Change to collateral.decimals
                 decimals={0}
-                lowerBound={lowerBound}
+                lowerBound={scalarLow || new BigNumber(0)}
                 startingPoint={currentPrediction}
                 startingPointTitle={'Current prediction'}
                 unit={unit}
-                upperBound={upperBound}
+                upperBound={scalarHigh || new BigNumber(0)}
               />
             ) : (
               <OutcomeTable
