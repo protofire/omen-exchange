@@ -74,8 +74,13 @@ export const useKlerosCuration = (marketMakerData: MarketMakerData, context: Con
       setTimeout(fetchData, 2000) // Give time for the subgraph to sync.
     })
 
+    kleros.omenVerifiedMarkets.on('Dispute', () => {
+      setTimeout(fetchData, 2000) // Give time for the subgraph to sync.
+    })
+
     return () => {
       kleros.omenVerifiedMarkets.removeAllListeners('ItemStatusChange')
+      kleros.omenVerifiedMarkets.removeAllListeners('Dispute')
     }
   }, [error, fetchData, kleros])
 

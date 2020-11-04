@@ -26,7 +26,7 @@ const Bold = styled.b`
   font-weight: 500;
 `
 
-const IconScheduleWrapper = styled.div`
+const IconStatusWrapper = styled.div`
   margin-left: 8px;
 `
 
@@ -43,7 +43,8 @@ const StatusContainer = styled.div`
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
-  font-size: medium;
+  text-transform: lowercase;
+  font-size: 14px;
 `
 
 const IconWrapper = styled.div`
@@ -188,9 +189,9 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
         <CurationRightColumn>
           <TimeRemainingContainer>
             Ends in {moment.duration(timeRemaining).humanize()}
-            <IconScheduleWrapper>
+            <IconStatusWrapper>
               <IconSchedule />
-            </IconScheduleWrapper>
+            </IconStatusWrapper>
           </TimeRemainingContainer>
           <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
         </CurationRightColumn>
@@ -225,9 +226,9 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
         <CurationRightColumn>
           <TimeRemainingContainer>
             Ends in {moment.duration(timeRemaining).humanize()}{' '}
-            <IconScheduleWrapper>
+            <IconStatusWrapper>
               <IconSchedule />
-            </IconScheduleWrapper>
+            </IconStatusWrapper>
           </TimeRemainingContainer>
           <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
         </CurationRightColumn>
@@ -239,9 +240,10 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       KlerosRightColumn = (
         <CurationRightColumn>
           <StatusContainer>
-            <BlueLink href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`}>
-              Challenge details <IconExclamation />{' '}
-            </BlueLink>
+            <BlueLink href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`}>challenge details </BlueLink>
+            <IconStatusWrapper>
+              <IconExclamation />
+            </IconStatusWrapper>
           </StatusContainer>
           <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
         </CurationRightColumn>
