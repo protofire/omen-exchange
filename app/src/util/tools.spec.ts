@@ -386,7 +386,7 @@ describe('tools', () => {
     const testCases: [[BigNumber, BigNumber, BigNumber], BigNumber][] = [
       [[new BigNumber(0), new BigNumber(2), new BigNumber(7)], new BigNumber(2)],
       [[new BigNumber(1232), new BigNumber(0), new BigNumber(283)], new BigNumber(283)],
-      [[new BigNumber(3), new BigNumber(1), new BigNumber(14)], new BigNumber(3)]
+      [[new BigNumber(3), new BigNumber(1), new BigNumber(14)], new BigNumber(3)],
     ]
     for (const [[x, min, max], result] of testCases) {
       it('should return a clamped big number', () => {
