@@ -89,7 +89,7 @@ const TitleValueVertical = styled(TitleValue)`
   text-transform: capitalize;
 
   > h2 {
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     line-height: 16px;
   }
 
