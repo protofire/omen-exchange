@@ -98,6 +98,12 @@ const networks: { [K in NetworkId]: Network } = {
       klerosTCR: '0x0000000000000000000000000000000000000000',
       dxTCR: '0x03165DF66d9448E45c2f5137486af3E7e752a352',
     },
+    cpk: {
+      masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
+      proxyFactoryAddress: '0x336c19296d3989e9e0c2561ef21c964068657c38',
+      multiSendAddress: '0x82CFd05a033e202E980Bc99eA50A4C6BB91CE0d7',
+      fallbackHandlerAddress: '0x40A930851BD2e590Bd5A5C981b436de25742E980',
+    },
   },
 }
 

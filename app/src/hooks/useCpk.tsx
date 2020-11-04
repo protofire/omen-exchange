@@ -1,10 +1,8 @@
-import CPK from 'contract-proxy-kit/lib/esm'
-import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
-import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
 import { CPKService } from '../services'
+import { createCPK } from '../util/cpk'
 
 /**
  * Returns an instance of CPKService. While the instance is being (asynchronously) created, the returned value is null.
@@ -14,13 +12,13 @@ export const useCpk = (): Maybe<CPKService> => {
   const { account, library } = useWeb3Context()
 
   useEffect(() => {
-    if (account && library) {
-      const signer = library.getSigner()
-
-      CPK.create({ ethLibAdapter: new EthersAdapter({ ethers, signer }) })
-        .then(cpk => new CPKService(cpk, library))
-        .then(setCpk)
+    const loadCpk = async () => {
+      if (account && library) {
+        const cpk = await createCPK(library)
+        setCpk(new CPKService(cpk, library))
+      }
     }
+    loadCpk()
   }, [account, library])
 
   return cpk

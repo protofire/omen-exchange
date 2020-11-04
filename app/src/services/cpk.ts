@@ -1,18 +1,11 @@
-import CPK from 'contract-proxy-kit/lib/esm'
-import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ethers } from 'ethers'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 
+import { createCPK } from '../util/cpk'
 import { getLogger } from '../util/logger'
-import {
-  getCPKAddresses,
-  getContractAddress,
-  getToken,
-  pseudoEthAddress,
-  targetGnosisSafeImplementation,
-} from '../util/networks'
+import { getContractAddress, getToken, pseudoEthAddress, targetGnosisSafeImplementation } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
@@ -90,21 +83,7 @@ class CPKService {
   }
 
   static async create(provider: Web3Provider) {
-    const signer = provider.getSigner()
-    const network = await provider.getNetwork()
-    const cpkAddresses = getCPKAddresses(network.chainId)
-    const networks = cpkAddresses
-      ? {
-          [network.chainId]: cpkAddresses,
-        }
-      : {}
-    const cpk = await CPK.create({
-      ethLibAdapter: new EthersAdapter({
-        ethers,
-        signer,
-      }),
-      networks,
-    })
+    const cpk = await createCPK(provider)
     return new CPKService(cpk, provider)
   }
 
