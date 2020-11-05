@@ -1,4 +1,8 @@
-import React, { useCallback, useState } from 'react'
+/* eslint-disable import/no-extraneous-dependencies */
+import { ItemTypes, gtcrEncode } from '@kleros/gtcr-encoder'
+import { abi as _GeneralizedTCR } from '@kleros/tcr/build/contracts/GeneralizedTCR.json'
+import { ethers } from 'ethers'
+import React, { useCallback, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -96,10 +100,6 @@ export const CurationOptionDetails = styled.div`
   font-weight: 400;
 `
 
-const UnstyledLink = styled.a`
-  color: inherit;
-`
-
 interface StatefulRadioButton {
   selected?: boolean
   disabled?: boolean
@@ -126,19 +126,42 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const loading = status === Status.Loading && !data
-  const { message: errorMessage } = error || {}
-  if (!loading && errorMessage) return <GenericError>{errorMessage || 'Failed to fetch curation data'}</GenericError>
-
   const { ovmAddress } = data || {}
+  const { message: errorMessage } = error || {}
   const { address, curatedByDxDao, question } = marketMakerData || {}
   const { title } = question || {}
-  let requestVerificationLink = 'https://dxdao.eth.link/#/'
-  if (selection === 0) {
-    const queryParams = new URLSearchParams()
-    queryParams.append('col1', title)
-    queryParams.append('col2', `https://omen.eth.link/#/${address}`)
-    requestVerificationLink = `https://curate.kleros.io/tcr/${ovmAddress}?action=addItem&${queryParams.toString()}`
-  }
+
+  const ovmInstance = useMemo(() => {
+    if (!context || !context.account || !ovmAddress) return
+    const signer = context.library.getSigner()
+    return new ethers.Contract(ovmAddress, _GeneralizedTCR, signer)
+  }, [context, ovmAddress])
+
+  const onSubmitMarket = useCallback(() => {
+    if (!ovmInstance || !data) return
+
+    const columns = [
+      {
+        label: 'Question',
+        type: ItemTypes.TEXT,
+      },
+      {
+        label: 'Market URL',
+        type: ItemTypes.LINK,
+      },
+    ]
+    const values = {
+      Question: title,
+      'Market URL': `https://omen.eth.link/#/${address}`,
+    }
+
+    const encodedParams = gtcrEncode({ columns, values })
+    ovmInstance.addItem(encodedParams, {
+      value: ethers.utils.bigNumberify(data.submissionDeposit),
+    })
+  }, [address, data, ovmInstance, title])
+
+  if (!loading && errorMessage) return <GenericError>{errorMessage || 'Failed to fetch curation data'}</GenericError>
 
   return (
     <MarketVerification>
@@ -158,11 +181,10 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
         </MarketBottomNavButton>
         <MarketBottomNavButton
           buttonType={ButtonType.primaryAlternative}
-          disabled={loading || typeof selection !== 'number'}
+          disabled={loading || typeof selection !== 'number' || !ovmInstance}
+          onClick={onSubmitMarket}
         >
-          <UnstyledLink href={requestVerificationLink} rel="noopener noreferrer" target="_blank">
-            Request Verification
-          </UnstyledLink>
+          Request Verification
         </MarketBottomNavButton>
       </BottomButtonWrapper>
     </MarketVerification>
