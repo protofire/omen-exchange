@@ -273,6 +273,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       })
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
+      await fetchCollateralBalance()
 
       setStatus(Status.Ready)
       setAmountToRemove(null)
