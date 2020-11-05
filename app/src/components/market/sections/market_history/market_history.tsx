@@ -2,7 +2,7 @@ import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 
 import { MarketMakerData } from '../../../../util/types'
-import { HistoryChartContainer } from '../../common/history_chart'
+import { HistoryChartContainer } from '../../common/history_section'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData

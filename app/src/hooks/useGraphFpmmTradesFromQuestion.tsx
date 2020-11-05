@@ -45,7 +45,7 @@ interface FpmmTradeData {
 interface Result {
   fpmmTrade: FpmmTradeData[] | null
   status: string
-  fetchMore: any
+  paginationNext: boolean
 }
 const wrangleResponse = (data: any) => {
   return data.map((trade: FpmmTradeData) => {
@@ -63,11 +63,15 @@ const wrangleResponse = (data: any) => {
 
 export const useGraphFpmmTradesFromQuestion = (questionID: string, pageSize: number, pageIndex: number): Result => {
   const [fpmmTradeData, setFpmmTradeData] = useState<Maybe<FpmmTradeData[]>>(null)
-
-  const { data, error, fetchMore, loading } = useQuery(query, {
+  const [morePagination, setMorePagination] = useState<boolean>(false)
+  const { data, error, loading } = useQuery(query, {
     notifyOnNetworkStatusChange: true,
     skip: false,
     variables: { id: questionID, pageSize: pageSize, pageIndex: pageIndex },
+    onCompleted: ({ fpmmTrades }: any) => {
+      setMorePagination(fpmmTrades.length === pageSize)
+      setFpmmTradeData(wrangleResponse(fpmmTrades))
+    },
   })
 
   useEffect(() => {
@@ -75,13 +79,12 @@ export const useGraphFpmmTradesFromQuestion = (questionID: string, pageSize: num
   }, [questionID])
 
   if (data && data.fpmmTrades && fpmmTradeData === null) {
-    console.log('in here')
     setFpmmTradeData(wrangleResponse(data.fpmmTrades))
   }
 
   return {
+    paginationNext: morePagination,
     fpmmTrade: error ? null : fpmmTradeData,
     status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
-    fetchMore,
   }
 }

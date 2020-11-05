@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
@@ -8,7 +8,7 @@ import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
 const TableWrapper = styled.div`
   text-align: left;
 `
-const Row = styled.div<{ width: string; firstRow?: boolean }>`
+const HistoryRow = styled.div<{ width: string; firstRow?: boolean }>`
   width: ${props => props.width}%;
   padding-top: 0px;
   align-self: center;
@@ -34,10 +34,7 @@ const PaginationButton = styled(Button)<{ marginLeft?: string }>`
 `
 const Pagination = styled.div`
   display: flex;
-  margin-top: 20px;
-  margin-left: 24px;
-  margin-right: 24px;
-  margin-bottom: -5px;
+  margin: 20px 24px -5px;
 `
 const PaginationLeft = styled.div`
   justify-content: start;
@@ -47,19 +44,19 @@ const PaginationRight = styled.div`
   display: flex;
   margin-left: auto;
 `
-const Column = styled.div`
+const HistoryColumns = styled.div`
   display: flex;
   padding: 20px 25px 20px 25px;
   border-bottom: 1px solid ${props => props.theme.borders.borderDisabled};
-  font-family: Roboto;
-  font-size: 14px;
+  font-family: ${props => props.theme.fonts.fontFamily};
+  font-size: ${props => props.theme.fonts.fontSize};
   font-style: normal;
   font-weight: 400;
   line-height: 16px;
-  color: #37474f;
+  color: ${props => props.theme.colors.textColorDark};
   &:first-child {
     padding: 26px 25px 13px 25px;
-    color: #757575 !important;
+    color: ${props => props.theme.colors.textColor} !important;
   }
 `
 
@@ -70,19 +67,19 @@ type Props = {
   onLoadPrevPage: () => void
 }
 
-export const MarketTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoadPrevPage, status }) => {
+export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoadPrevPage, status }) => {
   return (
     <React.Fragment>
       <TableWrapper>
-        <Column>
-          <Row width={'24'}>User</Row>
-          <Row width={'20'}>Action</Row>
-          <Row width={'20'}>Shares/PT</Row>
-          <Row width={'18'}>Amount(DAI)</Row>
-          <Row firstRow={true} width={'18'}>
+        <HistoryColumns>
+          <HistoryRow width={'24'}>User</HistoryRow>
+          <HistoryRow width={'20'}>Action</HistoryRow>
+          <HistoryRow width={'20'}>Shares/PT</HistoryRow>
+          <HistoryRow width={'18'}>Amount(DAI)</HistoryRow>
+          <HistoryRow firstRow={true} width={'18'}>
             Date - UTC
-          </Row>
-        </Column>
+          </HistoryRow>
+        </HistoryColumns>
         {status === 'Ready' &&
           fpmmTrade &&
           fpmmTrade.map(({ collateralAmountUSD, creationTimestamp, creator, id, outcomeTokensTraded, type }) => {
@@ -90,16 +87,16 @@ export const MarketTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoad
             const formattedDate = `${date.getDate()}.${date.getMonth()}-${date.getHours()}:${date.getMinutes()}`
 
             return (
-              <Column key={id}>
-                <Row width={'24'}>
+              <HistoryColumns key={id}>
+                <HistoryRow width={'24'}>
                   <ConnectionIcon />
                   <span>{creator}</span>
-                </Row>
-                <Row width={'20'}>{type}</Row>
-                <Row width={'20'}>{outcomeTokensTraded}</Row>
-                <Row width={'18'}>{collateralAmountUSD}</Row>
-                <Row width={'18'}>{formattedDate}</Row>
-              </Column>
+                </HistoryRow>
+                <HistoryRow width={'20'}>{type}</HistoryRow>
+                <HistoryRow width={'20'}>{outcomeTokensTraded}</HistoryRow>
+                <HistoryRow width={'18'}>{collateralAmountUSD}</HistoryRow>
+                <HistoryRow width={'18'}>{formattedDate}</HistoryRow>
+              </HistoryColumns>
             )
           })}
       </TableWrapper>

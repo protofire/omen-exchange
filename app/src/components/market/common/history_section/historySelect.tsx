@@ -3,15 +3,14 @@ import moment from 'moment'
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 
-import { FpmmTradeDataType, useGraphFpmmTradesFromQuestion } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
+import { useGraphFpmmTradesFromQuestion } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
 import { calcPrice } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { Button, ButtonSelectable } from '../../../button'
 import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
 import { InlineLoading } from '../../../loading'
-
-import { Chart } from './chart'
-import { MarketTable } from './table'
+import { HistoryChart } from '../history_chart'
+import { HistoryTable } from '../history_table'
 
 const commonWrapperCSS = css`
   border-top: 1px solid ${props => props.theme.borders.borderDisabled};
@@ -24,7 +23,7 @@ const DropdownMenu = styled(Dropdown)`
 `
 
 const NoData = styled.div`
-  ${commonWrapperCSS}
+  ${commonWrapperCSS};
   align-items: center;
   color: ${props => props.theme.colors.textColorDarker};
   display: flex;
@@ -39,7 +38,7 @@ const NoData = styled.div`
 `
 
 const CustomInlineLoading = styled(InlineLoading)`
-  ${commonWrapperCSS}
+  ${commonWrapperCSS};
   height: 340px;
 `
 
@@ -51,9 +50,7 @@ const TitleWrapper = styled.div`
   align-items: center;
   border-bottom: 1px solid ${props => props.theme.borders.borderDisabled};
   display: flex;
-
   margin: 0 0 -11px;
-  // padding-bottom: 20px;
   padding: ${props => props.theme.cards.paddingVertical};
 `
 
@@ -75,10 +72,8 @@ type Props = {
   options: Period[]
   outcomes: string[]
   value: Period
-  fpmmTrade: Maybe<FpmmTradeDataType[]>
-  fpmmTradeLoader: string
-  onLoadNextPage: () => void
-  onLoadPrevPage: () => void
+
+  marketMakerAddress: string
 }
 
 const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
@@ -102,12 +97,9 @@ const timestampToDate = (timestamp: number, value: string) => {
 }
 
 export const HistorySelect: React.FC<Props> = ({
-  fpmmTrade,
-  fpmmTradeLoader,
   holdingSeries,
+  marketMakerAddress,
   onChange,
-  onLoadNextPage,
-  onLoadPrevPage,
   options,
   outcomes,
   value,
@@ -125,9 +117,27 @@ export const HistorySelect: React.FC<Props> = ({
         return { ...outcomesPrices, date: timestampToDate(h.block.timestamp, value) }
       })
   const [toogleSelect, setToogleSelect] = useState(true)
-  const DropdownItems = ['liquidity', 'assets']
+  const DropdownItems = [{ content: 'All' }, { content: 'Liquidity' }, { content: 'Trades' }]
+  const [pageIndex, setPageIndex] = useState(0)
+  const [pageSize] = useState(6)
+  const { fpmmTrade, paginationNext, status } = useGraphFpmmTradesFromQuestion(marketMakerAddress, pageSize, pageIndex)
 
-  if (!data || fpmmTradeLoader === 'Loading') {
+  const loadNextPage = () => {
+    const newPageIndex = pageIndex + pageSize
+    if (!paginationNext) {
+      return
+    }
+    setPageIndex(newPageIndex)
+  }
+  const loadPrevPage = () => {
+    if (pageIndex < 1) {
+      return
+    }
+    const newPageIndex = pageIndex - pageSize
+    setPageIndex(newPageIndex)
+  }
+
+  if (!data || status === 'Loading') {
     return <CustomInlineLoading message="Loading Trade History" />
   }
   if (holdingSeries && holdingSeries.length <= 1) {
@@ -142,7 +152,9 @@ export const HistorySelect: React.FC<Props> = ({
           <ButtonSelect onClick={() => setToogleSelect(false)}>Graph</ButtonSelect>
         </SelectWrapper>
 
-        {!toogleSelect && (
+        {toogleSelect ? (
+          <DropdownMenu dropdownPosition={DropdownPosition.right} items={DropdownItems} placeholder={'All'} />
+        ) : (
           <ButtonsWrapper>
             {options.map((item, index) => {
               return (
@@ -153,19 +165,16 @@ export const HistorySelect: React.FC<Props> = ({
             })}
           </ButtonsWrapper>
         )}
-        {toogleSelect && (
-          <DropdownMenu dropdownPosition={DropdownPosition.right} items={DropdownItems} placeholder={'All'} />
-        )}
       </TitleWrapper>
       {toogleSelect ? (
-        <MarketTable
+        <HistoryTable
           fpmmTrade={fpmmTrade}
-          onLoadNextPage={onLoadNextPage}
-          onLoadPrevPage={onLoadPrevPage}
-          status={fpmmTradeLoader}
+          onLoadNextPage={loadNextPage}
+          onLoadPrevPage={loadPrevPage}
+          status={status}
         />
       ) : (
-        <Chart data={data} outcomes={outcomes} />
+        <HistoryChart data={data} outcomes={outcomes} />
       )}
     </ChartWrapper>
   )
