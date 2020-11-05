@@ -183,6 +183,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       : null
 
   const isSellButtonDisabled =
+    !amountShares ||
     (status !== Status.Ready && status !== Status.Error) ||
     amountShares?.isZero() ||
     amountError !== null ||

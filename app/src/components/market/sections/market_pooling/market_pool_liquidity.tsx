@@ -317,6 +317,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       : null
 
   const disableDepositButton =
+    !amountToFund ||
     amountToFund?.isZero() ||
     hasEnoughAllowance !== Ternary.True ||
     collateralAmountError !== null ||
@@ -324,6 +325,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     isNegativeAmountToFund
 
   const disableWithdrawButton =
+    !amountToRemove ||
     amountToRemove?.isZero() ||
     amountToRemove?.gt(fundingBalance) ||
     sharesAmountError !== null ||

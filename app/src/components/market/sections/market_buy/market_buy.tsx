@@ -210,6 +210,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       : null
 
   const isBuyDisabled =
+    !amount ||
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
     hasEnoughAllowance !== Ternary.True ||
