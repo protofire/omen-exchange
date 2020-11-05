@@ -131,7 +131,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setAmountToFundDisplay('')
     setAmountToRemove(null)
     setAmountToRemoveDisplay('')
-  }, [marketMakerData.collateral])
+    // eslint-disable-next-line
+  }, [marketMakerData.collateral.address])
 
   const resolutionDate = marketMakerData.question.resolution.getTime()
   const currentDate = new Date().getTime()

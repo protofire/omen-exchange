@@ -89,7 +89,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setCollateral(marketMakerData.collateral)
     setAmount(null)
     setAmountToDisplay('')
-  }, [marketMakerData])
+    // eslint-disable-next-line
+  }, [marketMakerData.collateral.address])
 
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(

@@ -79,13 +79,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     setBalanceItem(balances[outcomeIndex])
     // eslint-disable-next-line
   }, [balances[outcomeIndex]])
+
   useEffect(() => {
     setOutcomeIndex(defaultOutcomeIndex)
     setBalanceItem(balances[defaultOutcomeIndex])
     setAmountShares(null)
     setAmountSharesToDisplay('')
     // eslint-disable-next-line
-  }, [collateral])
+  }, [collateral.address])
 
   const calcSellAmount = useMemo(
     () => async (
