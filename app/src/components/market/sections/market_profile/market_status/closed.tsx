@@ -273,8 +273,7 @@ const Wrapper = (props: Props) => {
           <>
             {isScalar ? (
               <MarketScale
-                // TODO: Change to collateral.decimals
-                decimals={0}
+                decimals={18}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPoint={currentPrediction}
                 startingPointTitle={'Current prediction'}
