@@ -126,13 +126,14 @@ interface Props {
   startingPoint?: Maybe<BigNumber>
   unit: string
   upperBound: BigNumber
-  decimals: number
   startingPointTitle: string
   currentPrediction?: Maybe<string>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
-  const { currentPrediction, decimals, lowerBound, startingPoint, startingPointTitle, unit, upperBound } = props
+  const { currentPrediction, lowerBound, startingPoint, startingPointTitle, unit, upperBound } = props
+
+  const decimals = 18
 
   const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, decimals))
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, decimals))
