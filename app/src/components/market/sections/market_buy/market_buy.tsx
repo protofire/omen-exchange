@@ -126,7 +126,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     calcBuyAmount,
   )
 
-  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(collateral, context)
+  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
+    collateral,
+    context,
+  )
   const collateralBalance = maybeCollateralBalance || Zero
 
   const unlockCollateral = async () => {
@@ -155,6 +158,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         marketMaker,
       })
       await fetchGraphMarketMakerData()
+      await fetchCollateralBalance()
 
       setTweet(
         stripIndents(`${question.title}
