@@ -192,7 +192,7 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
     needRefetch = true
     let counter = 0
     await waitABit()
-    while (needRefetch || counter < 10) {
+    while (needRefetch && counter < 10) {
       await refetch()
       await waitABit()
       counter += 1
