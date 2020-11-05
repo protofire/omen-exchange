@@ -232,6 +232,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
 
+      setCollateral(marketMakerData.collateral)
       setStatus(Status.Ready)
       setAmountToFund(null)
       setAmountToFundDisplay('')
