@@ -66,6 +66,11 @@ interface CPKRedeemParams {
   conditionalTokens: ConditionalTokenService
 }
 
+interface TxOptions {
+  value?: BigNumber
+  gas?: number
+}
+
 const proxyAbi = [
   'function masterCopy() external view returns (address)',
   'function changeMasterCopy(address _masterCopy) external',
@@ -169,11 +174,6 @@ class CPKService {
       const openingDateMoment = moment(resolution)
 
       const transactions = []
-
-      interface TxOptions {
-        value?: BigNumber
-        gas?: number
-      }
 
       const txOptions: TxOptions = {}
 
@@ -345,10 +345,33 @@ class CPKService {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
 
-      // Check  if the allowance of the CPK to the market maker is enough.
-      const collateralService = new ERC20Service(this.provider, account, collateral.address)
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
       const transactions = []
+
+      const txOptions: TxOptions = {}
+
+      let collateralAddress
+      if (collateral.address === pseudoEthAddress) {
+        // ultimately WETH will be the collateral if we fund with native ether
+        collateralAddress = getToken(networkId, 'weth').address
+
+        // we need to send the funding amount in native ether
+        txOptions.value = amount
+
+        // Step 0: Wrap ether
+        transactions.push({
+          to: collateralAddress,
+          value: amount,
+        })
+      } else {
+        collateralAddress = collateral.address
+      }
+
+      // Check  if the allowance of the CPK to the market maker is enough.
+      const collateralService = new ERC20Service(this.provider, account, collateralAddress)
+
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
         marketMaker.address,
@@ -358,23 +381,27 @@ class CPKService {
       if (!hasCPKEnoughAlowance) {
         // Step 1:  Approve unlimited amount to be transferred to the market maker
         transactions.push({
-          to: collateral.address,
+          to: collateralAddress,
           data: ERC20Service.encodeApproveUnlimited(marketMaker.address),
         })
       }
 
-      transactions.push(
-        {
-          to: collateral.address,
+      // Step 2: Transfer funding from user
+      // If we are funding with native ether we can skip this step
+      if (collateral.address !== pseudoEthAddress) {
+        transactions.push({
+          to: collateralAddress,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
-        },
-        {
-          to: marketMaker.address,
-          data: MarketMakerService.encodeAddFunding(amount),
-        },
-      )
+        })
+      }
 
-      const txObject = await this.cpk.execTransactions(transactions)
+      // Step 3: Add funding to market
+      transactions.push({
+        to: marketMaker.address,
+        data: MarketMakerService.encodeAddFunding(amount),
+      })
+
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
 
       logger.log(`Transaction hash: ${txObject.hash}`)
       return this.provider.waitForTransaction(txObject.hash)

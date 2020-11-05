@@ -214,6 +214,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : false
+
   const [amount, setAmount] = useState<BigNumber>(funding)
 
   useEffect(() => {
@@ -266,7 +267,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     (!isUpdated && collateral.address === pseudoEthAddress)
 
   const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+    collateral.address !== pseudoEthAddress &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const showUpgrade = (!isUpdated && collateral.address === pseudoEthAddress) || upgradeFinished
 
