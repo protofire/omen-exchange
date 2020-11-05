@@ -115,11 +115,19 @@ const DropdownButton = styled.div`
   display: flex;
   height: 100%;
   justify-content: space-between;
+
+  & > * + * {
+    margin-left: 10px;
+  }
 `
 
 const DropdownButtonRight = styled.div`
   display: flex;
   align-items: center;
+
+  & > * + * {
+    margin-left: 10px;
+  }
 `
 
 const CurrentItem = styled.div`
@@ -133,7 +141,7 @@ const CurrentItem = styled.div`
   font-weight: normal;
   height: 22px;
   line-height: 1.2;
-  margin: 0 10px 0 0;
+  margin: 0;
   max-width: calc(100% - 20px);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -149,7 +157,7 @@ const CurrentItem = styled.div`
 `
 
 const CurrentItemExtra = styled.p`
-  margin: 0 10px 0 0;
+  margin: 0;
   color: ${props => props.theme.buttonSecondaryLine.colorDisabled};
 `
 
@@ -402,10 +410,12 @@ export const Dropdown: React.FC<Props> = props => {
           </CurrentItem>
           <DropdownButtonRight>
             <CurrentItemExtra>{getItemExtraContent(currentItemIndex)}</CurrentItemExtra>
-            <ChevronWrapper>
-              <ChevronDown />
-              <ChevronUp />
-            </ChevronWrapper>
+            {!disabled && (
+              <ChevronWrapper>
+                <ChevronDown />
+                <ChevronUp />
+              </ChevronWrapper>
+            )}
           </DropdownButtonRight>
         </DropdownButton>
         <ItemsContainer

@@ -28,7 +28,7 @@ const BottomCard = styled(ViewCard)``
 
 const MessageWrapper = styled.div`
   border-radius: 4px;
-  border: 1px solid ${props => props.theme.borders.borderDisabled};
+  border: ${({ theme }) => theme.borders.borderLineDisabled};
   margin-top: 20px;
   margin-bottom: 20px;
   padding: 20px 25px;

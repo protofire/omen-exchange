@@ -62,7 +62,7 @@ export class OracleService {
       const answer = new BigNumber(realitioAnswer).toNumber()
 
       if (templateId === 0 || templateId === 2) {
-        payouts = [...Array(numOutcomes)].map(() => new Big(1))
+        payouts = [...Array(numOutcomes)].map(() => new Big(0))
         payouts[answer] = new Big(1)
       } else if (templateId === 5 || templateId === 6) {
         payouts = [new Big(4 - answer), new Big(answer)]

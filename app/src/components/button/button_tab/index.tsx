@@ -5,7 +5,8 @@ import { ButtonCSS, ButtonProps, ButtonType } from '../button_styling_types'
 
 const Wrapper = styled.button<ButtonProps>`
   ${ButtonCSS}
-  border-radius: 6px;
+  border-radius: 8px;
+  height: 40px;
 `
 
 interface ButtonTabProps extends ButtonProps {
