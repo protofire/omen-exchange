@@ -95,6 +95,7 @@ const Wrapper = (props: Props) => {
     balances,
     collateral,
     isQuestionFinalized,
+    outcomeTokenMarginalPrices,
     question,
     scalarHigh,
     scalarLow,
@@ -185,8 +186,6 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
-  // TODO: Remove hardcoded values
-  const currentPrediction = new BigNumber(`${72 * 10 ** 18}`)
   const unit = question.title.split('[')[1].split(']')[0]
 
   return (
@@ -206,9 +205,9 @@ const Wrapper = (props: Props) => {
           <>
             {isScalar ? (
               <MarketScale
+                currentPrediction={outcomeTokenMarginalPrices[1]}
                 decimals={18}
                 lowerBound={scalarLow || new BigNumber(0)}
-                startingPoint={currentPrediction}
                 startingPointTitle={'Current prediction'}
                 unit={unit}
                 upperBound={scalarHigh || new BigNumber(0)}
