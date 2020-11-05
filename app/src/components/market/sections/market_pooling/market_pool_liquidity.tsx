@@ -124,6 +124,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setIsNegativeAmountToRemove(formatBigNumber(amountToRemove || Zero, collateral.decimals).includes('-'))
   }, [amountToRemove, collateral.decimals])
 
+  useEffect(() => {
+    setCollateral(marketMakerData.collateral)
+    setAmountToFund(null)
+    setAmountToFundDisplay('')
+    setAmountToRemove(null)
+    setAmountToRemoveDisplay('')
+  }, [marketMakerData.collateral])
+
   const resolutionDate = marketMakerData.question.resolution.getTime()
   const currentDate = new Date().getTime()
   const disableDepositTab = currentDate > resolutionDate

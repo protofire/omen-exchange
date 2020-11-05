@@ -74,6 +74,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])
 
+  useEffect(() => {
+    setOutcomeIndex(defaultOutcomeIndex)
+    setBalanceItem(balances[defaultOutcomeIndex])
+    setAmountShares(null)
+    setAmountSharesToDisplay('')
+    // eslint-disable-next-line
+  }, [collateral])
+
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
