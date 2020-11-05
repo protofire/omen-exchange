@@ -84,6 +84,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
 
+  useEffect(() => {
+    setCollateral(marketMakerData.collateral)
+    setAmount(null)
+    setAmountToDisplay('')
+  }, [marketMakerData])
+
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[], BigNumber]> => {
