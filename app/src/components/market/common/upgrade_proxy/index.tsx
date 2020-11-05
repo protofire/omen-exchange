@@ -47,7 +47,7 @@ export const UpgradeProxy: React.FC<UpgradeProxyProps> = (props: UpgradeProxyPro
     <Wrapper {...restProps}>
       <Title>Enable Ether</Title>
       <DescriptionWrapper>
-        <Description>This permission allows the smart contracts to use Ether.</Description>
+        <Description>This permission allows the smart contracts to interact with your Ether.</Description>
         <ButtonStateful disabled={loading || finished} onClick={upgradeProxy} state={state}>
           Enable
         </ButtonStateful>
