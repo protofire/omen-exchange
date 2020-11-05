@@ -119,6 +119,7 @@ interface Props {
   upperBound: BigNumber
   startingPointTitle: string
   currentPrediction?: Maybe<string>
+<<<<<<< HEAD
   border?: boolean
 }
 
@@ -126,6 +127,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const { border, currentPrediction, lowerBound, startingPoint, startingPointTitle, unit, upperBound } = props
 
   const decimals = 18
+=======
+}
+
+export const MarketScale: React.FC<Props> = (props: Props) => {
+  const { currentPrediction, decimals, lowerBound, startingPoint, startingPointTitle, unit, upperBound } = props
+>>>>>>> afe65645... Retrieve and use currentPrediction in market scale
 
   const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, decimals))
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, decimals))
@@ -173,6 +180,24 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           <StartingPointSubtitle>{startingPointTitle}</StartingPointSubtitle>
         </StartingPointBox>
       </Scale>
+<<<<<<< HEAD
+=======
+      <StartingPointBox
+        xValue={
+          currentPrediction
+            ? Number(currentPrediction)
+            : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
+        }
+      >
+        <StartingPointTitle>
+          {currentPrediction
+            ? Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
+            : startingPoint && startingPointNumber}
+          {` ${unit}`}
+        </StartingPointTitle>
+        <StartingPointSubtitle>{startingPointTitle}</StartingPointSubtitle>
+      </StartingPointBox>
+>>>>>>> afe65645... Retrieve and use currentPrediction in market scale
     </ScaleWrapper>
   )
 }

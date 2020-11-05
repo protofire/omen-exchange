@@ -186,8 +186,6 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
-  // TODO: Remove hardcoded values
-  const currentPrediction = new BigNumber(`${72 * 10 ** 18}`)
   const unit = question.title.split('[')[1].split(']')[0]
 
   return (
@@ -207,8 +205,13 @@ const Wrapper = (props: Props) => {
           <>
             {isScalar ? (
               <MarketScale
+<<<<<<< HEAD
                 border={true}
                 currentPrediction={outcomeTokenMarginalPrices[1]}
+=======
+                currentPrediction={outcomeTokenMarginalPrices[1]}
+                decimals={18}
+>>>>>>> afe65645... Retrieve and use currentPrediction in market scale
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Current prediction'}
                 unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}

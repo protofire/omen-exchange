@@ -122,8 +122,13 @@ export type GraphMarketMakerData = {
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
   oracle: string
+<<<<<<< HEAD
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
+=======
+  scalarLow: BigNumber
+  scalarHigh: BigNumber
+>>>>>>> afe65645... Retrieve and use currentPrediction in market scale
   outcomeTokenMarginalPrices: string[]
 }
 
@@ -167,8 +172,13 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     curatedByDxDao: data.curatedByDxDao,
     klerosTCRregistered: data.klerosTCRregistered,
     curatedByDxDaoOrKleros: data.curatedByDxDaoOrKleros,
+<<<<<<< HEAD
     scalarLow: data.scalarLow ? bigNumberify(data.scalarLow || 0) : null,
     scalarHigh: data.scalarHigh ? bigNumberify(data.scalarHigh || 0) : null,
+=======
+    scalarLow: bigNumberify(data.scalarLow),
+    scalarHigh: bigNumberify(data.scalarHigh),
+>>>>>>> afe65645... Retrieve and use currentPrediction in market scale
     outcomeTokenMarginalPrices: data.outcomeTokenMarginalPrices,
   }
 }
