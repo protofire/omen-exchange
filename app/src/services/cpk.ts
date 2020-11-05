@@ -477,10 +477,13 @@ class CPKService {
     }
   }
 
-  proxyIsUpdated = async (): Promise<boolean> => {
-    const implementation = await this.proxy.masterCopy()
-    if (implementation.toLowerCase() === targetGnosisSafeImplementation.toLowerCase()) {
-      return true
+  proxyIsUpToDate = async (): Promise<boolean> => {
+    const deployed = await this.cpk.isProxyDeployed()
+    if (deployed) {
+      const implementation = await this.proxy.masterCopy()
+      if (implementation.toLowerCase() === targetGnosisSafeImplementation.toLowerCase()) {
+        return true
+      }
     }
     return false
   }

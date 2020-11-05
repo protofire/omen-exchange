@@ -10,6 +10,7 @@ import {
   useConnectedWeb3Context,
   useCpk,
   useCpkAllowance,
+  useCpkProxy,
   useTokens,
 } from '../../../../../../hooks'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
@@ -207,31 +208,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
-  const [amount, setAmount] = useState<BigNumber>(funding)
-
-  const [isDeployed, setIsDeployed] = useState(false)
-  const [upgradeRequired, setUpgradeRequired] = useState(false)
-
-  useEffect(() => {
-    if (!cpk) {
-      return
-    }
-    const updateProxy = async () => {
-      const isProxyDeployed = await cpk.cpk.isProxyDeployed()
-      setIsDeployed(isProxyDeployed)
-      if (isProxyDeployed) {
-        const isProxyUpdated = await cpk.proxyIsUpdated()
-        if (!isProxyUpdated) {
-          setUpgradeRequired(true)
-        }
-      }
-    }
-
-    updateProxy()
-  }, [cpk])
-
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
+
+  const [upgradeFinished, setUpgradeFinished] = useState(false)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : false
+  const [amount, setAmount] = useState<BigNumber>(funding)
 
   useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, collateral))
@@ -280,11 +263,21 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     amountError !== null ||
     exceedsMaxFee ||
     isNegativeDepositAmount ||
-    (!isDeployed && collateral.address === pseudoEthAddress) ||
-    upgradeRequired
+    (!isUpdated && collateral.address === pseudoEthAddress)
 
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+
+  const showUpgrade = (!isUpdated && collateral.address === pseudoEthAddress) || upgradeFinished
+
+  const upgradeProxy = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await updateProxy()
+    setUpgradeFinished(true)
+  }
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -299,15 +292,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     if (!token) return
     handleCollateralChange(token)
     setAllowanceFinished(false)
-  }
-
-  const upgradeProxy = async () => {
-    if (!cpk) {
-      return
-    }
-
-    await cpk?.upgradeProxyImplementation()
-    setUpgradeRequired(false)
   }
 
   const toggleCustomFee = () => {
@@ -468,8 +452,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             style={{ marginBottom: 20 }}
           />
         )}
-        {upgradeRequired && collateral.address === pseudoEthAddress && (
-          <UpgradeProxy style={{ marginBottom: 20 }} upgradeProxy={upgradeProxy} />
+        {showUpgrade && (
+          <UpgradeProxy
+            finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
+            loading={RemoteData.is.asking(proxyIsUpToDate)}
+            style={{ marginBottom: 20 }}
+            upgradeProxy={upgradeProxy}
+          />
         )}
         <WarningMessage
           additionalDescription={''}

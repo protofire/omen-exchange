@@ -1,4 +1,4 @@
-import React, { DOMAttributes, HTMLAttributes, useState } from 'react'
+import React, { DOMAttributes, HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
 import { ButtonStateful, ButtonStates } from '../../../button/button_stateful'
@@ -33,14 +33,14 @@ const Description = styled.p`
 
 export type UpgradeProxyProps = DOMAttributes<HTMLDivElement> &
   HTMLAttributes<HTMLDivElement> & {
+    loading: boolean
+    finished: boolean
     upgradeProxy?: any
   }
 
 export const UpgradeProxy: React.FC<UpgradeProxyProps> = (props: UpgradeProxyProps) => {
-  const { upgradeProxy, ...restProps } = props
+  const { finished, loading, upgradeProxy, ...restProps } = props
 
-  const [loading, setLoading] = useState(false)
-  const [finished, setFinished] = useState(false)
   const state = loading ? ButtonStates.working : finished ? ButtonStates.finished : ButtonStates.idle
 
   return (
@@ -48,16 +48,7 @@ export const UpgradeProxy: React.FC<UpgradeProxyProps> = (props: UpgradeProxyPro
       <Title>Upgrade Proxy</Title>
       <DescriptionWrapper>
         <Description>This permission allows the smart contracts to fund markets with native Ether.</Description>
-        <ButtonStateful
-          disabled={loading || finished}
-          onClick={async () => {
-            setLoading(true)
-            await upgradeProxy()
-            setLoading(false)
-            setFinished(true)
-          }}
-          state={state}
-        >
+        <ButtonStateful disabled={loading || finished} onClick={upgradeProxy} state={state}>
           Upgrade
         </ButtonStateful>
       </DescriptionWrapper>
