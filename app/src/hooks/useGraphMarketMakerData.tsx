@@ -16,6 +16,7 @@ const query = gql`
       fee
       collateralVolume
       outcomeTokenAmounts
+      outcomeTokenMarginalPrices
       condition {
         id
         payouts
@@ -75,6 +76,7 @@ type GraphResponseFixedProductMarketMaker = {
   creationTimestamp: string
   openingTimestamp: string
   outcomeTokenAmounts: string[]
+  outcomeTokenMarginalPrices: string[]
   outcomes: Maybe<string[]>
   isPendingArbitration: boolean
   arbitrationOccurred: boolean
@@ -121,6 +123,7 @@ export type GraphMarketMakerData = {
   oracle: string
   scalarLow: BigNumber
   scalarHigh: BigNumber
+  outcomeTokenMarginalPrices: string[]
 }
 
 type Result = {
@@ -164,6 +167,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     curatedByDxDaoOrKleros: data.curatedByDxDaoOrKleros,
     scalarLow: bigNumberify(data.scalarLow),
     scalarHigh: bigNumberify(data.scalarHigh),
+    outcomeTokenMarginalPrices: data.outcomeTokenMarginalPrices,
   }
 }
 

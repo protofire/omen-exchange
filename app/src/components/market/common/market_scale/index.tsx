@@ -123,29 +123,29 @@ const StartingPointSubtitle = styled.p`
 
 interface Props {
   lowerBound: BigNumber
-  startingPoint: BigNumber
+  startingPoint?: Maybe<BigNumber>
   unit: string
   upperBound: BigNumber
   decimals: number
   startingPointTitle: string
+  currentPrediction?: Maybe<string>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
-  const { decimals, lowerBound, startingPoint, startingPointTitle, unit, upperBound } = props
+  const { currentPrediction, decimals, lowerBound, startingPoint, startingPointTitle, unit, upperBound } = props
+
+  const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, decimals))
+  const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, decimals))
+  const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), decimals))
 
   return (
     <ScaleWrapper>
       <ScaleTitleWrapper>
         <ScaleTitle>
-          {lowerBound && formatNumber(formatBigNumber(lowerBound, decimals))} {unit}
+          {formatNumber(lowerBoundNumber.toString())} {unit}
         </ScaleTitle>
         <ScaleTitle>
-          {upperBound &&
-            lowerBound &&
-            formatNumber(
-              `${Number(formatBigNumber(upperBound, decimals)) / 2 +
-                Number(formatBigNumber(lowerBound, decimals)) / 2}`,
-            )}
+          {formatNumber(`${upperBoundNumber / 2 + lowerBoundNumber / 2}`)}
           {` ${unit}`}
         </ScaleTitle>
         <ScaleTitle>
@@ -155,8 +155,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       <Scale>
         <ScaleBall
           xValue={
-            (Number(formatBigNumber(startingPoint, decimals)) - Number(formatBigNumber(lowerBound, decimals))) /
-            (Number(formatBigNumber(upperBound, decimals)) - Number(formatBigNumber(lowerBound, decimals)))
+            currentPrediction
+              ? Number(currentPrediction)
+              : (startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)
           }
         />
         <VerticalBar />
@@ -165,10 +166,17 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         <HorizontalBar />
       </Scale>
       <StartingPointBox
-        xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))}
+        xValue={
+          currentPrediction
+            ? Number(currentPrediction)
+            : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
+        }
       >
         <StartingPointTitle>
-          {startingPoint && formatBigNumber(startingPoint, decimals)} {unit}
+          {currentPrediction
+            ? Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
+            : startingPoint && startingPointNumber}
+          {` ${unit}`}
         </StartingPointTitle>
         <StartingPointSubtitle>{startingPointTitle}</StartingPointSubtitle>
       </StartingPointBox>
