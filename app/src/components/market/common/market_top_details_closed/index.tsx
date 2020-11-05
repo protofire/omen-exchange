@@ -1,10 +1,11 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
+import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import theme from '../../../../theme'
 import { MarketMakerData, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
@@ -40,12 +41,8 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
   const history = useHistory()
 
-  const screenEvaluationEquation = window.innerWidth <= parseInt(theme.themeBreakPoints.sm)
-  const [isMobile, setIsMobile] = useState(screenEvaluationEquation)
-
-  useEffect(() => {
-    setIsMobile(screenEvaluationEquation)
-  }, [screenEvaluationEquation])
+  const { width } = useWindowDimensions()
+  const isMobile = width <= parseInt(theme.themeBreakPoints.sm)
 
   const {
     address,
