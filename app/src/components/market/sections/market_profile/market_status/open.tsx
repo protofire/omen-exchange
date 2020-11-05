@@ -205,13 +205,8 @@ const Wrapper = (props: Props) => {
           <>
             {isScalar ? (
               <MarketScale
-<<<<<<< HEAD
                 border={true}
                 currentPrediction={outcomeTokenMarginalPrices[1]}
-=======
-                currentPrediction={outcomeTokenMarginalPrices[1]}
-                decimals={18}
->>>>>>> afe65645... Retrieve and use currentPrediction in market scale
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Current prediction'}
                 unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
