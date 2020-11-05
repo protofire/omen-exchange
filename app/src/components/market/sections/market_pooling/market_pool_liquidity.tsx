@@ -127,6 +127,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     setCollateral(marketMakerData.collateral)
+    setAmountToFund(null)
+    setAmountToFundDisplay('')
+    setAmountToRemove(null)
+    setAmountToRemoveDisplay('')
   }, [marketMakerData.collateral])
 
   const resolutionDate = marketMakerData.question.resolution.getTime()
