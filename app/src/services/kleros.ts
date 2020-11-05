@@ -1,4 +1,4 @@
-/* eslint import/no-extraneous-dependencies: 0 */
+/* eslint-disable import/no-extraneous-dependencies */
 import { abi as arbitratorAbi } from '@kleros/erc-792/build/contracts/IArbitrator.json'
 import { abi as gtcrAbi } from '@kleros/tcr/build/contracts/GeneralizedTCR.json'
 import axios from 'axios'
