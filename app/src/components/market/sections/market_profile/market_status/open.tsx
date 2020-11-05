@@ -186,8 +186,6 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
-  // TODO: Remove hardcoded values
-  const currentPrediction = new BigNumber(`${72 * 10 ** 18}`)
   const unit = question.title.split('[')[1].split(']')[0]
 
   return (
