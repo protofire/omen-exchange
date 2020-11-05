@@ -174,7 +174,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const showSharesChange = activeTab === Tabs.deposit ? amountToFund?.gt(0) : amountToRemove?.gt(0)
 
-  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
+    collateral,
+    context,
+  )
   const collateralBalance = maybeCollateralBalance || Zero
   const probabilities = balances.map(balance => balance.probability)
   const showSetAllowance =
@@ -231,8 +234,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
+      await fetchCollateralBalance()
 
-      setCollateral(marketMakerData.collateral)
       setStatus(Status.Ready)
       setAmountToFund(null)
       setAmountToFundDisplay('')

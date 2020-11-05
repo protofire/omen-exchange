@@ -126,7 +126,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     calcBuyAmount,
   )
 
-  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(collateral, context)
   const collateralBalance = maybeCollateralBalance || Zero
 
   const unlockCollateral = async () => {
