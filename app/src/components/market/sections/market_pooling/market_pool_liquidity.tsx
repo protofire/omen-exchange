@@ -58,7 +58,6 @@ const BottomButtonWrapper = styled(ButtonContainer)`
   justify-content: space-between;
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
   margin: 0 -24px;
-
   padding: 20px 24px 0;
 `
 
@@ -254,7 +253,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const removeFunding = async () => {
     setModalTitle('Funds Withdrawal')
-
     try {
       setStatus(Status.Loading)
 
