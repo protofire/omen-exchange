@@ -14,9 +14,11 @@ import {
   useContracts,
   useCpk,
   useCpkAllowance,
+  useCpkProxy,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
+import { getToken, pseudoEthAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
@@ -34,6 +36,7 @@ import { SetAllowance } from '../../common/set_allowance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
+import { UpgradeProxy } from '../../common/upgrade_proxy'
 import { WarningMessage } from '../../common/warning_message'
 
 const WarningMessageStyled = styled(WarningMessage)`
@@ -56,7 +59,7 @@ interface Props extends RouteComponentProps<any> {
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useCpk()
-  const { library: provider } = context
+  const { library: provider, networkId } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
@@ -80,6 +83,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount || Zero))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
+
+  const [upgradeFinished, setUpgradeFinished] = useState(false)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : false
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals).includes('-'))
@@ -141,6 +148,17 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setAllowanceFinished(true)
   }
 
+  const showUpgrade = (!isUpdated && collateral.address === pseudoEthAddress) || upgradeFinished
+
+  const upgradeProxy = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await updateProxy()
+    setUpgradeFinished(true)
+  }
+
   const finish = async () => {
     try {
       if (!cpk) {
@@ -154,6 +172,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       await cpk.buyOutcomes({
         amount: amount || Zero,
+        collateral,
         outcomeIndex,
         marketMaker,
       })
@@ -181,7 +200,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+    collateral.address !== pseudoEthAddress &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
@@ -217,6 +237,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     amountError !== null ||
     isNegativeAmount
 
+  const wethAddress = getToken(networkId, 'weth').address
+
+  const currencyFilters =
+    collateral.address === wethAddress || collateral.address === pseudoEthAddress
+      ? [wethAddress, pseudoEthAddress.toLowerCase()]
+      : []
+
   const switchOutcome = (value: number) => {
     setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
     setOutcomeIndex(value)
@@ -246,10 +273,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <div>
           <CurrenciesWrapper>
             <CurrencySelector
+              addEther
               balance={formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5)}
               context={context}
               currency={collateral.address}
-              disabled
+              disabled={currencyFilters.length ? false : true}
+              filters={currencyFilters}
               onSelect={(token: Token | null) => {
                 if (token) {
                   setCollateral(token)
@@ -322,6 +351,14 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockCollateral}
+        />
+      )}
+      {showUpgrade && (
+        <UpgradeProxy
+          finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
+          loading={RemoteData.is.asking(proxyIsUpToDate)}
+          style={{ marginBottom: 20 }}
+          upgradeProxy={upgradeProxy}
         />
       )}
       <StyledButtonContainer>

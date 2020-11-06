@@ -20,6 +20,7 @@ const logger = getLogger('Services::CPKService')
 
 interface CPKBuyOutcomesParams {
   amount: BigNumber
+  collateral: Token
   outcomeIndex: number
   marketMaker: MarketMakerService
 }
@@ -74,6 +75,8 @@ interface TxOptions {
 const proxyAbi = [
   'function masterCopy() external view returns (address)',
   'function changeMasterCopy(address _masterCopy) external',
+  'function swapOwner(address prevOwner, address oldOwner, address newOwner) external',
+  'function getOwners() public view returns (address[] memory)',
 ]
 
 class CPKService {
@@ -96,12 +99,39 @@ class CPKService {
     return this.cpk.address
   }
 
-  buyOutcomes = async ({ amount, marketMaker, outcomeIndex }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
+  buyOutcomes = async ({
+    amount,
+    collateral,
+    marketMaker,
+    outcomeIndex,
+  }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
-      const collateralAddress = await marketMaker.getCollateralToken()
+      const transactions = []
+
+      const txOptions: TxOptions = {}
+
+      let collateralAddress
+      if (collateral.address === pseudoEthAddress) {
+        // ultimately WETH will be the collateral if we fund with native ether
+        collateralAddress = getToken(networkId, 'weth').address
+
+        // we need to send the funding amount in native ether
+        txOptions.value = amount
+
+        // Step 0: Wrap ether
+        transactions.push({
+          to: collateralAddress,
+          value: amount,
+        })
+      } else {
+        collateralAddress = await marketMaker.getCollateralToken()
+      }
+
       const marketMakerAddress = marketMaker.address
 
       const collateralService = new ERC20Service(this.provider, account, collateralAddress)
@@ -111,20 +141,7 @@ class CPKService {
       const outcomeTokensToBuy = await marketMaker.calcBuyAmount(amount, outcomeIndex)
       logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
 
-      const transactions = [
-        // Step 2: Transfer the amount of collateral being spent from the user to the CPK
-        {
-          to: collateralAddress,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
-        },
-        // Step 3: Buy outcome tokens with the CPK
-        {
-          to: marketMakerAddress,
-          data: MarketMakerService.encodeBuy(amount, outcomeIndex, outcomeTokensToBuy),
-        },
-      ]
-
-      // Check  if the allowance of the CPK to the market maker is enough.
+      // Check if the allowance of the CPK to the market maker is enough.
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
         marketMakerAddress,
@@ -133,13 +150,28 @@ class CPKService {
 
       if (!hasCPKEnoughAlowance) {
         // Step 1:  Approve unlimited amount to be transferred to the market maker)
-        transactions.unshift({
+        transactions.push({
           to: collateralAddress,
           data: ERC20Service.encodeApproveUnlimited(marketMakerAddress),
         })
       }
 
-      const txObject = await this.cpk.execTransactions(transactions)
+      // Step 2: Transfer the amount of collateral being spent from the user to the CPK
+      // If we are funding with native ether we can skip this step
+      if (collateral.address !== pseudoEthAddress) {
+        transactions.push({
+          to: collateralAddress,
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+        })
+      }
+
+      // Step 3: Buy outcome tokens with the CPK
+      transactions.push({
+        to: marketMakerAddress,
+        data: MarketMakerService.encodeBuy(amount, outcomeIndex, outcomeTokensToBuy),
+      })
+
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
 
       logger.log(`Transaction hash: ${txObject.hash}`)
       return this.provider.waitForTransaction(txObject.hash)
@@ -517,13 +549,16 @@ class CPKService {
 
   upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {
     try {
-      // upgrade the proxy to delegatecall a different version of Gnosis Safe
-      const txObject = await this.cpk.execTransactions([
-        {
-          to: this.cpk.address,
-          data: this.proxy.interface.functions.changeMasterCopy.encode([targetGnosisSafeImplementation]),
-        },
-      ])
+      const deployed = await this.cpk.isProxyDeployed()
+      if (!deployed) {
+        throw new Error('Proxy must be deployed first')
+      }
+      const transactions = []
+      transactions.push({
+        to: this.cpk.address,
+        data: this.proxy.interface.functions.changeMasterCopy.encode([targetGnosisSafeImplementation]),
+      })
+      const txObject = await this.cpk.execTransactions(transactions)
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`Error trying to update proxy`, err.message)
