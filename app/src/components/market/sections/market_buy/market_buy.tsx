@@ -50,6 +50,7 @@ const logger = getLogger('Market::Buy')
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: string) => void
+  fetchGraphMarketMakerData: () => Promise<void>
 }
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
@@ -59,7 +60,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
-  const { marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
@@ -88,7 +89,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setCollateral(marketMakerData.collateral)
     setAmount(null)
     setAmountToDisplay('')
-  }, [marketMakerData])
+    // eslint-disable-next-line
+  }, [marketMakerData.collateral.address])
 
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
@@ -124,7 +126,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     calcBuyAmount,
   )
 
-  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
+    collateral,
+    context,
+  )
   const collateralBalance = maybeCollateralBalance || Zero
 
   const unlockCollateral = async () => {
@@ -152,6 +157,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         outcomeIndex,
         marketMaker,
       })
+      await fetchGraphMarketMakerData()
+      await fetchCollateralBalance()
 
       setTweet(
         stripIndents(`${question.title}
@@ -203,6 +210,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       : null
 
   const isBuyDisabled =
+    !amount ||
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
     hasEnoughAllowance !== Ternary.True ||

@@ -199,6 +199,7 @@ export interface MarketMakerData {
   answerFinalizedTimestamp: Maybe<BigNumber>
   arbitrator: Arbitrator
   balances: BalanceItem[]
+  creationTimestamp: string
   collateral: Token
   fee: BigNumber
   isConditionResolved: boolean
@@ -217,6 +218,7 @@ export interface MarketMakerData {
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
+  scaledLiquidityParameter: number
 }
 
 export enum Ternary {
