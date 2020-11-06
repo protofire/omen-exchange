@@ -15,16 +15,8 @@ interface Props {
 const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const { isScalar } = props
 
-<<<<<<< HEAD
   if (isScalar) return <ScalarMarketPoolLiquidity {...props} />
   return <MarketPoolLiquidity {...props} />
-=======
-  if (isScalar) {
-    return <ScalarMarketPoolLiquidity marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
-  } else {
-    return <MarketPoolLiquidity marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
-  }
->>>>>>> 03eb98e8... Conditionally render scalar market pool liquidity component
 }
 
 export { MarketPoolLiquidityContainer }
