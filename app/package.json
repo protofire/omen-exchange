@@ -50,7 +50,7 @@
     "big.js": "^5.2.2",
     "circular-dependency-plugin": "^5.2.0",
     "common-tags": "^1.8.0",
-    "contract-proxy-kit": "^2.0.1",
+    "contract-proxy-kit": "2.2.0-alpha.1",
     "disqus-react": "^1.0.8",
     "eslint-config-react-app": "^5.2.1",
     "ethers": "^4.0.36",
