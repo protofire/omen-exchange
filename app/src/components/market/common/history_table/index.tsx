@@ -1,7 +1,9 @@
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
+import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { Button } from '../../../button'
 import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
 
@@ -82,7 +84,7 @@ export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoa
         </HistoryColumns>
         {status === 'Ready' &&
           fpmmTrade &&
-          fpmmTrade.map(({ collateralAmountUSD, creationTimestamp, creator, id, outcomeTokensTraded, type }) => {
+          fpmmTrade.map(({ collateralAmount, creationTimestamp, id, transactionType, user }) => {
             const date = new Date(creationTimestamp)
             const formattedDate = `${date.getDate()}.${date.getMonth()}-${date.getHours()}:${date.getMinutes()}`
 
@@ -90,11 +92,11 @@ export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoa
               <HistoryColumns key={id}>
                 <HistoryRow width={'24'}>
                   <ConnectionIcon />
-                  <span>{creator}</span>
+                  <span>{user}</span>
                 </HistoryRow>
-                <HistoryRow width={'20'}>{type}</HistoryRow>
-                <HistoryRow width={'20'}>{outcomeTokensTraded}</HistoryRow>
-                <HistoryRow width={'18'}>{collateralAmountUSD}</HistoryRow>
+                <HistoryRow width={'20'}>{transactionType}</HistoryRow>
+                <HistoryRow width={'20'}>{formatNumber(collateralAmount)}</HistoryRow>
+                <HistoryRow width={'18'}>Coming Soon</HistoryRow>
                 <HistoryRow width={'18'}>{formattedDate}</HistoryRow>
               </HistoryColumns>
             )

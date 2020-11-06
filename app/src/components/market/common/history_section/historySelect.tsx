@@ -117,10 +117,35 @@ export const HistorySelect: React.FC<Props> = ({
         return { ...outcomesPrices, date: timestampToDate(h.block.timestamp, value) }
       })
   const [toogleSelect, setToogleSelect] = useState(true)
-  const DropdownItems = [{ content: 'All' }, { content: 'Liquidity' }, { content: 'Trades' }]
+  const [type, setType] = useState(0)
+  const DropdownItems = [
+    {
+      content: 'All',
+      onClick: () => {
+        setType(0)
+      },
+    },
+    {
+      content: 'Liquidity',
+      onClick: () => {
+        setType(1)
+      },
+    },
+    {
+      content: 'Trades',
+      onClick: () => {
+        setType(2)
+      },
+    },
+  ]
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize] = useState(6)
-  const { fpmmTrade, paginationNext, status } = useGraphFpmmTradesFromQuestion(marketMakerAddress, pageSize, pageIndex)
+  const { fpmmTrade, paginationNext, status } = useGraphFpmmTradesFromQuestion(
+    marketMakerAddress,
+    pageSize,
+    pageIndex,
+    type,
+  )
 
   const loadNextPage = () => {
     const newPageIndex = pageIndex + pageSize
@@ -153,7 +178,7 @@ export const HistorySelect: React.FC<Props> = ({
         </SelectWrapper>
 
         {toogleSelect ? (
-          <DropdownMenu dropdownPosition={DropdownPosition.right} items={DropdownItems} placeholder={'All'} />
+          <DropdownMenu currentItem={type} dropdownPosition={DropdownPosition.right} items={DropdownItems} />
         ) : (
           <ButtonsWrapper>
             {options.map((item, index) => {
