@@ -224,7 +224,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
     formatBigNumber(collateralBalance, collateral.decimals, 5),
   )
-  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(collateral, context)
 
   const [isNegativeDepositAmount, setIsNegativeDepositAmount] = useState<boolean>(false)
 
