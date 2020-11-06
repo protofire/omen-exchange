@@ -187,7 +187,7 @@ export const ImportMarketContent = (props: Props) => {
   const { markets, status: marketIdStatus } = useGraphMarketsFromQuestion(question?.id || '')
   const marketId = markets[0]?.id || ''
   const { marketMakerData } = useMarketMakerData(marketId.toLowerCase())
-  // console.log(markets.length)
+
   useEffect(() => {
     if (question && marketIdStatus === Status.Error) {
       setLoading(false)
