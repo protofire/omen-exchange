@@ -3,6 +3,7 @@ import React from 'react'
 import { MarketMakerData } from '../../../../util/types'
 
 import { MarketSell } from './market_sell'
+import { ScalarMarketSell } from './scalar_market_sell'
 
 interface Props {
   isScalar: boolean
