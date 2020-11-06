@@ -186,8 +186,6 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
-  const unit = question.title.split('[')[1].split(']')[0]
-
   return (
     <>
       <TopCard>
