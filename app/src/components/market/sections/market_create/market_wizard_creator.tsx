@@ -278,7 +278,6 @@ export const MarketWizardCreator = (props: Props) => {
       question,
       resolution,
     } = marketData
-    console.log(marketData)
 
     switch (currentStep) {
       case 2:
