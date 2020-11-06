@@ -206,7 +206,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
 
   const [currentToken, setCurrentToken] = useState({ exists: false, token: '', marketAddress: '' })
-  // const marketTokens = markets.map(item => item.collateralToken)
   useEffect(() => {
     const rinkebyDai = '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea'
     const mainnetDai = '0x6b175474e89094c44da98b954eedeac495271d0f'
