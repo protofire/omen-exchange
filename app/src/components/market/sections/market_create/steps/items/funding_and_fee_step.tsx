@@ -13,7 +13,6 @@ import {
   useTokens,
 } from '../../../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
-import { useRealityLink } from '../../../../../../hooks/useRealityLink'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { RemoteData } from '../../../../../../util/remote_data'
@@ -186,7 +185,6 @@ interface Props {
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useCpk()
-  const realitioBaseUrl = useRealityLink()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
   const { account, library: provider } = context
@@ -202,11 +200,27 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     submit,
     values,
   } = props
-  const { arbitrator, category, collateral, funding, loadedQuestionId, outcomes, question, resolution, spread } = values
-  const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
-  const [currentToken, setCurrentToken] = useState({ exists: false, token: '' })
-  const allMarkets = markets.map(item => item.collateralToken)
 
+  const { arbitrator, category, collateral, funding, loadedQuestionId, outcomes, question, resolution, spread } = values
+
+  const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
+
+  const [currentToken, setCurrentToken] = useState({ exists: false, token: '', marketAddress: '' })
+  // const marketTokens = markets.map(item => item.collateralToken)
+  useEffect(() => {
+    const rinkebyDai = '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea'
+    const mainnetDai = '0x6b175474e89094c44da98b954eedeac495271d0f'
+    const array = markets.find(
+      ({ collateralToken }) => collateralToken === rinkebyDai || collateralToken === mainnetDai,
+    )
+    setCurrentToken({
+      exists: array ? true : false,
+      token: 'DAI',
+      marketAddress: array ? array.id : '',
+    })
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
@@ -280,7 +294,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const onCollateralChange = (token: Token | null) => {
     if (!token) return
     const tokenAddressFormatted = token.address.toLowerCase()
-    setCurrentToken({ exists: allMarkets.includes(tokenAddressFormatted), token: token.symbol })
+    const array = markets.find(({ collateralToken }) => collateralToken === tokenAddressFormatted)
+    setCurrentToken({ exists: array ? true : false, token: token.symbol, marketAddress: array ? array.id : '' })
     handleCollateralChange(token)
     setAllowanceFinished(false)
   }
@@ -452,7 +467,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               ? `An identical market with ${currentToken.token} as a currency exists already. Please use a different currency or  provide liquidity for the`
               : 'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
           }
-          href={currentToken.exists ? `${realitioBaseUrl}/app/#!/question/${loadedQuestionId}` : DOCUMENT_FAQ}
+          href={currentToken.exists ? `/#/${currentToken.marketAddress}` : DOCUMENT_FAQ}
           hyperlinkDescription={currentToken.exists ? 'existing market.' : 'More Info'}
         />
         <StyledButtonContainerFullWidth borderTop>
