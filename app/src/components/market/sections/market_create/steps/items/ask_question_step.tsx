@@ -217,7 +217,23 @@ const AskQuestionStep = (props: Props) => {
           !isProperScale,
       )
     }
-  })
+  }, [
+    currentFormState,
+    FormState.categorical,
+    FormState.import,
+    FormState.scalar,
+    totalProbabilitiesNotFull,
+    outcomes.length,
+    question,
+    resolution,
+    category,
+    outcomeNames,
+    lowerBound,
+    upperBound,
+    startingPoint,
+    unit,
+    isProperScale,
+  ])
 
   const canAddOutcome = outcomes.length < MAX_OUTCOME_ALLOWED && !loadedQuestionId
 
