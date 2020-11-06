@@ -16,8 +16,8 @@ export const SponsoredBy: React.FC = props => (
     version="1.1"
     viewBox="0 0 702 702"
     x="0"
-    xmlns="http://www.w3.org/2000/svg"
     xmlSpace="preserve"
+    xmlns="http://www.w3.org/2000/svg"
     y="0"
   >
     <path
