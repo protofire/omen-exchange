@@ -94,8 +94,8 @@ type GraphResponseFixedProductMarketMaker = {
   klerosTCRregistered: boolean
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
-  scalarLow: string
-  scalarHigh: string
+  scalarLow: Maybe<string>
+  scalarHigh: Maybe<string>
 }
 
 type GraphResponse = {
@@ -121,8 +121,8 @@ export type GraphMarketMakerData = {
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
   oracle: string
-  scalarLow: BigNumber
-  scalarHigh: BigNumber
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
   outcomeTokenMarginalPrices: string[]
 }
 
@@ -165,8 +165,8 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     curatedByDxDao: data.curatedByDxDao,
     klerosTCRregistered: data.klerosTCRregistered,
     curatedByDxDaoOrKleros: data.curatedByDxDaoOrKleros,
-    scalarLow: bigNumberify(data.scalarLow),
-    scalarHigh: bigNumberify(data.scalarHigh),
+    scalarLow: data.scalarLow ? bigNumberify(data.scalarLow || 0) : null,
+    scalarHigh: data.scalarHigh ? bigNumberify(data.scalarHigh || 0) : null,
     outcomeTokenMarginalPrices: data.outcomeTokenMarginalPrices,
   }
 }

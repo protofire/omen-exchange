@@ -186,8 +186,6 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
-  const unit = question.title.split('[')[1].split(']')[0]
-
   return (
     <>
       <TopCard>
@@ -208,7 +206,7 @@ const Wrapper = (props: Props) => {
                 currentPrediction={outcomeTokenMarginalPrices[1]}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Current prediction'}
-                unit={unit}
+                unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
                 upperBound={scalarHigh || new BigNumber(0)}
               />
             ) : (
