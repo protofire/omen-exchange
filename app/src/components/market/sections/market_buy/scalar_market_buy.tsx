@@ -1,6 +1,7 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
+import styled from 'styled-components'
 
 import { useCollateralBalance, useConnectedWeb3Context } from '../../../../hooks'
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
@@ -22,5 +23,26 @@ interface Props {
 }
 
 export const ScalarMarketBuy = (props: Props) => {
-  return <p>scalar buy</p>
+  const { marketMakerData, switchMarketTab } = props
+
+  const { outcomeTokenMarginalPrices, question, scalarHigh, scalarLow } = marketMakerData
+
+  return (
+    <>
+      <MarketScale
+        currentPrediction={outcomeTokenMarginalPrices[1]}
+        lowerBound={scalarLow || new BigNumber(0)}
+        startingPointTitle={'Current prediction'}
+        unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+        upperBound={scalarHigh || new BigNumber(0)}
+      />
+      <StyledButtonContainer>
+        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+          Cancel
+        </MarketBottomNavButton>
+        {/* TODO: Add isBuyDisabled and onClick handler */}
+        <MarketBottomNavButton buttonType={ButtonType.secondaryLine}>Buy Position</MarketBottomNavButton>
+      </StyledButtonContainer>
+    </>
+  )
 }
