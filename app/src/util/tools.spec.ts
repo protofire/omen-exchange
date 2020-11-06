@@ -16,6 +16,7 @@ import {
   formatNumber,
   formatToShortNumber,
   getIndexSets,
+  isObjectEqual,
   limitDecimalPlaces,
   truncateStringInTheMiddle as truncate,
 } from './tools'
@@ -394,6 +395,51 @@ describe('tools', () => {
         const formattedNumber = formatToShortNumber(number, decimals)
 
         expect(formattedNumber).toStrictEqual(result)
+      })
+    }
+  })
+
+  describe('isObjectEqual', () => {
+    const testCases: [[any, any], boolean][] = [
+      [['', ''], true],
+      [['0', '0'], true],
+      [[0, 0], true],
+      [['0', 0], false],
+      [[{}, {}], true],
+      [
+        [
+          { a: 1, b: 'z' },
+          { a: 1, b: 'z' },
+        ],
+        true,
+      ],
+      [
+        [
+          ['a', 'b', 3],
+          ['a', 'b', 3],
+        ],
+        true,
+      ],
+      [
+        [
+          { a: 1, b: { c: 1, d: 1 } },
+          { a: 1, b: { c: 1, d: 1 } },
+        ],
+        true,
+      ],
+      [
+        [
+          { a: 1, b: { c: ['2', '3'], d: 1 } },
+          { a: 1, b: { c: ['2', '3'], d: 1 } },
+        ],
+        true,
+      ],
+    ]
+    for (const [[obj1, obj2], result] of testCases) {
+      it('should return if two params are the same', () => {
+        const isSame = isObjectEqual(obj1, obj2)
+
+        expect(isSame).toStrictEqual(result)
       })
     }
   })

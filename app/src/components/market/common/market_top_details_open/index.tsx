@@ -3,7 +3,7 @@ import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
-import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { MarketMakerData, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
@@ -40,29 +40,23 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
   const { marketMakerData } = props
   const {
-    address,
     answerFinalizedTimestamp,
     arbitrator,
     collateral,
     collateralVolume,
+    creationTimestamp,
     curatedByDxDaoOrKleros: isVerified,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
+    scaledLiquidityParameter,
   } = marketMakerData
-
-  const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
-  const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
-    ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
-    : ''
 
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
   const currentTimestamp = new Date().getTime()
 
-  const formattedLiquidity: string = useGraphMarketMakerDataResult.marketMakerData
-    ? useGraphMarketMakerDataResult.marketMakerData.scaledLiquidityParameter.toFixed(2)
-    : '0'
+  const formattedLiquidity: string = scaledLiquidityParameter ? scaledLiquidityParameter.toFixed(2) : '0'
 
   // const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
   const isPendingArbitration = question.isPendingArbitration
@@ -100,7 +94,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     if (currency) {
       const selectedMarket = marketsRelatedQuestion.find(e => e.collateralToken === currency.address.toLowerCase())
       if (selectedMarket && selectedMarket.collateralToken !== collateral.address) {
-        history.push(`/${selectedMarket.id}`)
+        history.replace(`/${selectedMarket.id}`)
       }
     }
   }

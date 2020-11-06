@@ -5,6 +5,7 @@ import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
 import { getOutcomes } from '../util/networks'
+import { isObjectEqual, waitABit } from '../util/tools'
 import { Question, Status } from '../util/types'
 
 const query = gql`
@@ -115,6 +116,7 @@ export type GraphMarketMakerData = {
 }
 
 type Result = {
+  fetchData: () => Promise<void>
   marketMakerData: Maybe<GraphMarketMakerData>
   status: Status
 }
@@ -155,6 +157,8 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
   }
 }
 
+let needRefetch = false
+
 /**
  * Get data from the graph for the given market maker. All the information returned by this hook comes from the graph,
  * other necessary information should be fetched from the blockchain.
@@ -163,7 +167,7 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
   const [marketMakerData, setMarketMakerData] = useState<Maybe<GraphMarketMakerData>>(null)
   const [needUpdate, setNeedUpdate] = useState<boolean>(false)
 
-  const { data, error, loading } = useQuery<GraphResponse>(query, {
+  const { data, error, loading, refetch } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
     skip: false,
     variables: { id: marketMakerAddress },
@@ -173,12 +177,30 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
     setNeedUpdate(true)
   }, [marketMakerAddress])
 
-  if (data && data.fixedProductMarketMaker && needUpdate && data.fixedProductMarketMaker.id === marketMakerAddress) {
-    setMarketMakerData(wrangleResponse(data.fixedProductMarketMaker, networkId))
-    setNeedUpdate(false)
+  if (data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
+    const rangledValue = wrangleResponse(data.fixedProductMarketMaker, networkId)
+    if (needUpdate) {
+      setMarketMakerData(rangledValue)
+      setNeedUpdate(false)
+    } else if (!isObjectEqual(marketMakerData, rangledValue)) {
+      setMarketMakerData(rangledValue)
+      needRefetch = false
+    }
+  }
+
+  const fetchData = async () => {
+    needRefetch = true
+    let counter = 0
+    await waitABit()
+    while (needRefetch && counter < 15) {
+      await refetch()
+      await waitABit()
+      counter += 1
+    }
   }
 
   return {
+    fetchData,
     marketMakerData: error ? null : marketMakerData,
     status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
   }

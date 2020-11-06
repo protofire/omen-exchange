@@ -1,3 +1,4 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
@@ -14,17 +15,17 @@ import {
   formatNumber,
   mulBN,
 } from '../../../../util/tools'
-import { BalanceItem, MarketMakerData, OutcomeTableValue, Status, Token } from '../../../../util/types'
+import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { CurrenciesWrapper, GenericError, MarketBottomNavButton } from '../../common/common_styled'
-import { CurrencySelector } from '../../common/currency_selector'
+import { GenericError, MarketBottomNavButton } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
+import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
@@ -37,6 +38,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
+  fetchGraphMarketMakerData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: string) => void
 }
@@ -44,9 +46,8 @@ interface Props extends RouteComponentProps<any> {
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
-  const { marketMakerData, switchMarketTab } = props
-  const { address: marketMakerAddress, balances, fee } = marketMakerData
-  const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
+  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+  const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
 
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
@@ -62,7 +63,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
-  const [amountShares, setAmountShares] = useState<BigNumber>(new BigNumber(0))
+  const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
@@ -71,8 +72,21 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
 
   useEffect(() => {
-    setIsNegativeAmountShares(formatBigNumber(amountShares, collateral.decimals).includes('-'))
+    setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])
+
+  useEffect(() => {
+    setBalanceItem(balances[outcomeIndex])
+    // eslint-disable-next-line
+  }, [balances[outcomeIndex]])
+
+  useEffect(() => {
+    setOutcomeIndex(defaultOutcomeIndex)
+    setBalanceItem(balances[defaultOutcomeIndex])
+    setAmountShares(null)
+    setAmountSharesToDisplay('')
+    // eslint-disable-next-line
+  }, [collateral.address])
 
   const calcSellAmount = useMemo(
     () => async (
@@ -119,7 +133,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const [probabilities, costFee, tradedCollateral, potentialValue] = useAsyncDerivedValue(
-    amountShares,
+    amountShares || Zero,
     [balances.map(() => 0), null, null, null],
     calcSellAmount,
   )
@@ -130,7 +144,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         return
       }
 
-      const sharesAmount = formatBigNumber(amountShares, collateral.decimals)
+      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
       setMessage(`Selling ${sharesAmount} shares...`)
@@ -144,7 +158,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         conditionalTokens,
       })
 
-      setAmountShares(new BigNumber(0))
+      await fetchGraphMarketMakerData()
+      setAmountShares(null)
+      setAmountSharesToDisplay('')
       setStatus(Status.Ready)
       setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
@@ -155,23 +171,23 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
-  const selectedOutcomeBalance = `${formatBigNumber(balanceItem.shares, collateral.decimals, 5)}`
+  const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
 
   const amountError =
     balanceItem.shares === null
       ? null
-      : balanceItem.shares.isZero() && amountShares.gt(balanceItem.shares)
+      : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
       ? `Insufficient balance`
-      : amountShares.gt(balanceItem.shares)
+      : amountShares?.gt(balanceItem.shares)
       ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
       : null
 
   const isSellButtonDisabled =
+    !amountShares ||
     (status !== Status.Ready && status !== Status.Error) ||
-    amountShares.isZero() ||
+    amountShares?.isZero() ||
     amountError !== null ||
     isNegativeAmountShares
-
   return (
     <>
       <OutcomeTable
@@ -179,7 +195,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         collateral={collateral}
         disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
         newShares={balances.map((balance, i) =>
-          i === outcomeIndex ? balance.shares.sub(amountShares) : balance.shares,
+          i === outcomeIndex ? balance.shares.sub(amountShares || Zero) : balance.shares,
         )}
         outcomeHandleChange={(value: number) => {
           setOutcomeIndex(value)
@@ -187,25 +203,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         }}
         outcomeSelected={outcomeIndex}
         probabilities={probabilities}
-        showPriceChange={amountShares.gt(0)}
-        showSharesChange={amountShares.gt(0)}
+        showPriceChange={amountShares?.gt(0)}
+        showSharesChange={amountShares?.gt(0)}
       />
       <GridTransactionDetails>
         <div>
-          <CurrenciesWrapper>
-            <CurrencySelector
-              balance={formatNumber(selectedOutcomeBalance, 5)}
-              context={context}
-              currency={collateral.address}
-              disabled
-              onSelect={(token: Token | null) => {
-                if (token) {
-                  setCollateral(token)
-                  setAmountShares(new BigNumber(0))
-                }
-              }}
-            />
-          </CurrenciesWrapper>
+          <TokenBalance text="Your Shares" value={formatNumber(selectedOutcomeBalance)} />
           <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
             formField={
@@ -223,7 +226,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmountShares(balanceItem.shares)
-              setAmountSharesToDisplay(formatNumber(selectedOutcomeBalance, 5))
+              setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals, 5))
             }}
             shouldDisplayMaxButton
             symbol={'Shares'}
@@ -234,7 +237,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           <TransactionDetailsCard>
             <TransactionDetailsRow
               title={'Sell Amount'}
-              value={`${formatNumber(formatBigNumber(amountShares, collateral.decimals))} Shares`}
+              value={`${formatNumber(formatBigNumber(amountShares || Zero, collateral.decimals))} Shares`}
             />
             <TransactionDetailsRow
               emphasizeValue={potentialValue ? potentialValue.gt(0) : false}

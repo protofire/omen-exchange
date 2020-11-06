@@ -7,14 +7,13 @@ import { MarketView } from './market_view'
 
 interface Props {
   marketMakerData: MarketMakerData
+  fetchGraphMarketMakerData: () => Promise<void>
 }
 
 const MarketViewContainer: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
-  const { marketMakerData } = props
-
-  return <MarketView account={context.account} marketMakerData={marketMakerData} />
+  return <MarketView account={context.account} {...props} />
 }
 
 export { MarketViewContainer }
