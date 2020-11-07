@@ -91,6 +91,16 @@ export const ScalarMarketBuy = (props: Props) => {
             symbol={collateral.symbol}
           />
         </div>
+        <div>
+          <TransactionDetailsCard>
+            <TransactionDetailsRow title={'Base Cost'} value={''} />
+            <TransactionDetailsRow title={'Fee'} tooltip={`A ${''}% fee goes to liquidity providers`} value={''} />
+            <TransactionDetailsLine />
+            <TransactionDetailsRow title={'Max. Loss'} value={''} />
+            <TransactionDetailsRow title={'Max. Profit'} value={''} />
+            <TransactionDetailsRow title={'Total'} value={''} />
+          </TransactionDetailsCard>
+        </div>
       </GridTransactionDetails>
       <StyledButtonContainer>
         <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
