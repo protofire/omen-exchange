@@ -181,6 +181,13 @@ export const ScalarMarketBuy = (props: Props) => {
     amountError !== null ||
     isNegativeAmount
 
+  const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  const [amountDisplay, setAmountDisplay] = useState<string>('')
+
+  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const collateralBalance = maybeCollateralBalance || Zero
+  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
+
   return (
     <>
       <MarketScale
