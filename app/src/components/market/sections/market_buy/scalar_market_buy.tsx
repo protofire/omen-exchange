@@ -24,8 +24,9 @@ interface Props {
 
 export const ScalarMarketBuy = (props: Props) => {
   const { marketMakerData, switchMarketTab } = props
+  const context = useConnectedWeb3Context()
 
-  const { outcomeTokenMarginalPrices, question, scalarHigh, scalarLow } = marketMakerData
+  const { collateral, outcomeTokenMarginalPrices, question, scalarHigh, scalarLow } = marketMakerData
 
   return (
     <>
@@ -42,6 +43,15 @@ export const ScalarMarketBuy = (props: Props) => {
             <ButtonTab>Short</ButtonTab>
             <ButtonTab>Long</ButtonTab>
           </TabsGrid>
+          <CurrenciesWrapper>
+            <CurrencySelector
+              balance={'100'}
+              context={context}
+              currency={collateral.address}
+              disabled
+              onSelect={() => null}
+            />
+          </CurrenciesWrapper>
         </div>
       </GridTransactionDetails>
       <StyledButtonContainer>
