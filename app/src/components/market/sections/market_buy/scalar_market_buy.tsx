@@ -1,11 +1,15 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { useCollateralBalance, useConnectedWeb3Context } from '../../../../hooks'
+import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
+import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { CurrenciesWrapper, MarketBottomNavButton, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
@@ -26,6 +30,13 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const { collateral, outcomeTokenMarginalPrices, question, scalarHigh, scalarLow } = marketMakerData
 
+  const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  const [amountDisplay, setAmountDisplay] = useState<string>('')
+
+  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const collateralBalance = maybeCollateralBalance || Zero
+  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
+
   return (
     <>
       <MarketScale
@@ -43,13 +54,33 @@ export const ScalarMarketBuy = (props: Props) => {
           </TabsGrid>
           <CurrenciesWrapper>
             <CurrencySelector
-              balance={'100'}
+              balance={walletBalance}
               context={context}
               currency={collateral.address}
               disabled
               onSelect={() => null}
             />
           </CurrenciesWrapper>
+          <TextfieldCustomPlaceholder
+            formField={
+              <BigNumberInput
+                decimals={collateral.decimals}
+                name="amount"
+                onChange={(e: BigNumberInputReturn) => {
+                  setAmount(e.value)
+                }}
+                style={{ width: 0 }}
+                value={amount}
+                valueToDisplay={amountDisplay}
+              />
+            }
+            onClickMaxButton={() => {
+              setAmount(collateralBalance)
+              setAmountDisplay(walletBalance)
+            }}
+            shouldDisplayMaxButton
+            symbol={collateral.symbol}
+          />
         </div>
       </GridTransactionDetails>
       <StyledButtonContainer>
