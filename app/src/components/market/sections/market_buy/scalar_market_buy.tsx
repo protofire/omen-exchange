@@ -181,8 +181,14 @@ export const ScalarMarketBuy = (props: Props) => {
     amountError !== null ||
     isNegativeAmount
 
+  const Tabs = {
+    short: 'short',
+    long: 'long',
+  }
+
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountDisplay, setAmountDisplay] = useState<string>('')
+  const [activeTab, setActiveTab] = useState(Tabs.short)
 
   const maybeCollateralBalance = useCollateralBalance(collateral, context)
   const collateralBalance = maybeCollateralBalance || Zero
