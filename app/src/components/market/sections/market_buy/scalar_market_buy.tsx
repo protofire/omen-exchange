@@ -30,8 +30,14 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const { collateral, outcomeTokenMarginalPrices, question, scalarHigh, scalarLow } = marketMakerData
 
+  const Tabs = {
+    short: 'short',
+    long: 'long',
+  }
+
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountDisplay, setAmountDisplay] = useState<string>('')
+  const [activeTab, setActiveTab] = useState(Tabs.short)
 
   const maybeCollateralBalance = useCollateralBalance(collateral, context)
   const collateralBalance = maybeCollateralBalance || Zero
@@ -49,8 +55,12 @@ export const ScalarMarketBuy = (props: Props) => {
       <GridTransactionDetails>
         <div>
           <TabsGrid>
-            <ButtonTab>Short</ButtonTab>
-            <ButtonTab>Long</ButtonTab>
+            <ButtonTab active={activeTab === Tabs.short} onClick={() => setActiveTab(Tabs.short)}>
+              Short
+            </ButtonTab>
+            <ButtonTab active={activeTab === Tabs.long} onClick={() => setActiveTab(Tabs.long)}>
+              Long
+            </ButtonTab>
           </TabsGrid>
           <CurrenciesWrapper>
             <CurrencySelector
@@ -68,6 +78,7 @@ export const ScalarMarketBuy = (props: Props) => {
                 name="amount"
                 onChange={(e: BigNumberInputReturn) => {
                   setAmount(e.value)
+                  setAmountDisplay('')
                 }}
                 style={{ width: 0 }}
                 value={amount}
