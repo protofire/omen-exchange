@@ -2,10 +2,12 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
+import { useConnectedWeb3Context } from '../../../../hooks'
 import { MarketMakerData } from '../../../../util/types'
 import { ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { MarketBottomNavButton, TabsGrid } from '../../common/common_styled'
+import { CurrenciesWrapper, MarketBottomNavButton, TabsGrid } from '../../common/common_styled'
+import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 
@@ -20,8 +22,9 @@ interface Props {
 
 export const ScalarMarketBuy = (props: Props) => {
   const { marketMakerData, switchMarketTab } = props
+  const context = useConnectedWeb3Context()
 
-  const { outcomeTokenMarginalPrices, question, scalarHigh, scalarLow } = marketMakerData
+  const { collateral, outcomeTokenMarginalPrices, question, scalarHigh, scalarLow } = marketMakerData
 
   return (
     <>
@@ -38,6 +41,15 @@ export const ScalarMarketBuy = (props: Props) => {
             <ButtonTab>Short</ButtonTab>
             <ButtonTab>Long</ButtonTab>
           </TabsGrid>
+          <CurrenciesWrapper>
+            <CurrencySelector
+              balance={'100'}
+              context={context}
+              currency={collateral.address}
+              disabled
+              onSelect={() => null}
+            />
+          </CurrenciesWrapper>
         </div>
       </GridTransactionDetails>
       <StyledButtonContainer>
