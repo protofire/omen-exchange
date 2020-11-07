@@ -36,6 +36,14 @@ export const ScalarMarketBuy = (props: Props) => {
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
         upperBound={scalarHigh || new BigNumber(0)}
       />
+      <GridTransactionDetails>
+        <div>
+          <TabsGrid>
+            <ButtonTab>Short</ButtonTab>
+            <ButtonTab>Long</ButtonTab>
+          </TabsGrid>
+        </div>
+      </GridTransactionDetails>
       <StyledButtonContainer>
         <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
