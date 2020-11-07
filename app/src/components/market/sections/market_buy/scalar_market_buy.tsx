@@ -3,9 +3,10 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { MarketMakerData } from '../../../../util/types'
-import { ButtonContainer } from '../../../button'
+import { ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { MarketBottomNavButton } from '../../common/common_styled'
+import { MarketBottomNavButton, TabsGrid } from '../../common/common_styled'
+import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 
 const StyledButtonContainer = styled(ButtonContainer)`
@@ -31,6 +32,14 @@ export const ScalarMarketBuy = (props: Props) => {
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
         upperBound={scalarHigh || new BigNumber(0)}
       />
+      <GridTransactionDetails>
+        <div>
+          <TabsGrid>
+            <ButtonTab>Short</ButtonTab>
+            <ButtonTab>Long</ButtonTab>
+          </TabsGrid>
+        </div>
+      </GridTransactionDetails>
       <StyledButtonContainer>
         <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
