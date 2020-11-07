@@ -14,6 +14,9 @@ import { CurrenciesWrapper, MarketBottomNavButton, TabsGrid } from '../../common
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
+import { TransactionDetailsCard } from '../../common/transaction_details_card'
+import { TransactionDetailsLine } from '../../common/transaction_details_line'
+import { TransactionDetailsRow } from '../../common/transaction_details_row'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
@@ -92,6 +95,16 @@ export const ScalarMarketBuy = (props: Props) => {
             shouldDisplayMaxButton
             symbol={collateral.symbol}
           />
+        </div>
+        <div>
+          <TransactionDetailsCard>
+            <TransactionDetailsRow title={'Base Cost'} value={''} />
+            <TransactionDetailsRow title={'Fee'} tooltip={`A ${''}% fee goes to liquidity providers`} value={''} />
+            <TransactionDetailsLine />
+            <TransactionDetailsRow title={'Max. Loss'} value={''} />
+            <TransactionDetailsRow title={'Max. Profit'} value={''} />
+            <TransactionDetailsRow title={'Total'} value={''} />
+          </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
       <StyledButtonContainer>
