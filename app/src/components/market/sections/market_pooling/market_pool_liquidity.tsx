@@ -24,7 +24,7 @@ import {
   formatBigNumber,
   formatNumber,
 } from '../../../../util/tools'
-import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
 import { ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
@@ -45,7 +45,7 @@ import { WarningMessage } from '../../common/warning_message'
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
   theme?: any
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
 }
 
@@ -536,7 +536,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <BottomButtonWrapper>
-        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <MarketBottomNavButton
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => switchMarketTab(MarketDetailsTab.swap)}
+        >
           Cancel
         </MarketBottomNavButton>
         {activeTab === Tabs.deposit && (

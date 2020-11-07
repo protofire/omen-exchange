@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
-import { MarketMakerData, Token } from '../../../../util/types'
+import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
 import { CurrencySelector } from '../currency_selector'
@@ -102,7 +102,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
           creationTimestamp={creationDate}
           pendingArbitration={isPendingArbitration}
           resolutionTimestamp={question.resolution}
-          state={'closed'}
+          state={MarketState.closed}
         ></ProgressBar>
       )}
       <MarketData

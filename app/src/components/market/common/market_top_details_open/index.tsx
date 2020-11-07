@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
-import { MarketMakerData, Token } from '../../../../util/types'
+import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { MoreMenu } from '../../../common/form/more_menu'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -64,15 +64,15 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
   const marketState =
     question.resolution.getTime() > currentTimestamp
-      ? 'open'
+      ? MarketState.open
       : question.resolution.getTime() < currentTimestamp &&
         (answerFinalizedTimestamp === null || answerFinalizedTimestamp.toNumber() * 1000 > currentTimestamp)
-      ? 'finalizing'
+      ? MarketState.finalizing
       : isPendingArbitration
-      ? 'arbitration'
+      ? MarketState.arbitration
       : answerFinalizedTimestamp && answerFinalizedTimestamp.toNumber() * 1000 < currentTimestamp
-      ? 'closed'
-      : ''
+      ? MarketState.closed
+      : MarketState.none
 
   const { markets: marketsRelatedQuestion } = useGraphMarketsFromQuestion(question.id)
 

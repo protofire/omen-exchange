@@ -15,7 +15,7 @@ import {
   formatNumber,
   mulBN,
 } from '../../../../util/tools'
-import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
+import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -40,7 +40,7 @@ const logger = getLogger('Market::Sell')
 interface Props extends RouteComponentProps<any> {
   fetchGraphMarketMakerData: () => Promise<void>
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
@@ -284,7 +284,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <StyledButtonContainer>
-        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <MarketBottomNavButton
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => switchMarketTab(MarketDetailsTab.swap)}
+        >
           Cancel
         </MarketBottomNavButton>
         <MarketBottomNavButton

@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import { WhenConnected } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
-import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
+import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketBottomNavButton } from '../../../common/common_styled'
@@ -65,7 +65,16 @@ const StyledButtonContainer = styled(ButtonContainer)`
   }
 `
 
-const SellBuyWrapper = styled.div`
+const MarketBottomNavGroupWrapper = styled.div`
+  display: flex;
+  align-items: center;
+
+  & > * + * {
+    margin-left: 12px;
+  }
+`
+
+const MarketBottomFinalizeNavGroupWrapper = styled.div`
   display: flex;
   align-items: center;
 
@@ -94,6 +103,7 @@ const Wrapper = (props: Props) => {
     balances,
     collateral,
     isQuestionFinalized,
+    payouts,
     question,
     totalPoolShares,
   } = marketMakerData
@@ -126,6 +136,26 @@ const Wrapper = (props: Props) => {
     )
   }
 
+  const renderFinalizeTableData = () => {
+    const disabledColumns = [
+      OutcomeTableValue.OutcomeProbability,
+      OutcomeTableValue.Probability,
+      OutcomeTableValue.CurrentPrice,
+    ]
+
+    return (
+      <OutcomeTable
+        balances={balances}
+        collateral={collateral}
+        disabledColumns={disabledColumns}
+        displayRadioSelection={false}
+        payouts={payouts}
+        probabilities={probabilities}
+        withWinningOutcome
+      />
+    )
+  }
+
   const openQuestionMessage = (
     <MessageWrapper>
       <Title>The question is being resolved.</Title>
@@ -144,13 +174,34 @@ const Wrapper = (props: Props) => {
     </MarketBottomNavButton>
   )
 
+  const finalizeButtons = (
+    <MarketBottomFinalizeNavGroupWrapper>
+      <MarketBottomNavButton
+        buttonType={ButtonType.secondaryLine}
+        onClick={() => {
+          window.open(`${realitioBaseUrl}/app/#!/question/${question.id}`)
+        }}
+      >
+        Call Arbitrator
+      </MarketBottomNavButton>
+      <MarketBottomNavButton
+        buttonType={ButtonType.primary}
+        onClick={() => {
+          setCurrentTab(MarketDetailsTab.setOutcome)
+        }}
+      >
+        Set Outcome
+      </MarketBottomNavButton>
+    </MarketBottomFinalizeNavGroupWrapper>
+  )
+
   const buySellButtons = (
-    <SellBuyWrapper>
+    <MarketBottomNavGroupWrapper>
       <MarketBottomNavButton
         buttonType={ButtonType.secondaryLine}
         disabled={!userHasShares || !hasFunding}
         onClick={() => {
-          setCurrentTab('SELL')
+          setCurrentTab(MarketDetailsTab.sell)
         }}
       >
         Sell
@@ -159,26 +210,21 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={!hasFunding}
         onClick={() => {
-          setCurrentTab('BUY')
+          setCurrentTab(MarketDetailsTab.buy)
         }}
       >
         Buy
       </MarketBottomNavButton>
-    </SellBuyWrapper>
+    </MarketBottomNavGroupWrapper>
   )
 
-  const [currentTab, setCurrentTab] = useState('SWAP')
+  const isFinalizing = question.resolution < new Date() && !isQuestionFinalized
 
-  const marketTabs = {
-    swap: 'SWAP',
-    pool: 'POOL',
-    history: 'HISTORY',
-    verify: 'VERIFY',
-    buy: 'BUY',
-    sell: 'SELL',
-  }
+  const [currentTab, setCurrentTab] = useState(
+    isQuestionFinalized || !isFinalizing ? MarketDetailsTab.swap : MarketDetailsTab.finalize,
+  )
 
-  const switchMarketTab = (newTab: string) => {
+  const switchMarketTab = (newTab: MarketDetailsTab) => {
     setCurrentTab(newTab)
   }
 
@@ -195,7 +241,7 @@ const Wrapper = (props: Props) => {
           resolutionDate={question.resolution}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
-        {currentTab === marketTabs.swap && (
+        {currentTab === MarketDetailsTab.swap && (
           <>
             {renderTableData()}
             {isQuestionOpen && openQuestionMessage}
@@ -223,29 +269,47 @@ const Wrapper = (props: Props) => {
             </WhenConnected>
           </>
         )}
-        {currentTab === marketTabs.pool && (
+        {currentTab === MarketDetailsTab.finalize && (
+          <>
+            {renderFinalizeTableData()}
+            <WhenConnected>
+              <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+                <MarketBottomNavButton
+                  buttonType={ButtonType.secondaryLine}
+                  onClick={() => {
+                    history.goBack()
+                  }}
+                >
+                  Back
+                </MarketBottomNavButton>
+                {finalizeButtons}
+              </StyledButtonContainer>
+            </WhenConnected>
+          </>
+        )}
+        {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />
         )}
-        {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
-        {currentTab === marketTabs.buy && (
+        {currentTab === MarketDetailsTab.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
+        {currentTab === MarketDetailsTab.buy && (
           <MarketBuyContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />
         )}
-        {currentTab === marketTabs.sell && (
+        {currentTab === MarketDetailsTab.sell && (
           <MarketSellContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />
         )}
-        {/* {currentTab === marketTabs.verify && <p>verify</p>} */}
+        {/* {currentTab === MarketDetailsTab.verify && <p>verify</p>} */}
       </BottomCard>
     </>
   )

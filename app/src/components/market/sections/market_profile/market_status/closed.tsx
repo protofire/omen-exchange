@@ -8,7 +8,7 @@ import { useContracts } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { CPKService, ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
-import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
@@ -233,15 +233,6 @@ const Wrapper = (props: Props) => {
 
   const [currentTab, setCurrentTab] = useState('SWAP')
 
-  const marketTabs = {
-    swap: 'SWAP',
-    pool: 'POOL',
-    history: 'HISTORY',
-    verify: 'VERIFY',
-    buy: 'BUY',
-    sell: 'SELL',
-  }
-
   const switchMarketTab = (newTab: string) => {
     setCurrentTab(newTab)
   }
@@ -260,7 +251,7 @@ const Wrapper = (props: Props) => {
           resolutionDate={question.resolution}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
-        {currentTab === marketTabs.swap && (
+        {currentTab === MarketDetailsTab.swap && (
           <>
             <OutcomeTable
               balances={balances}
@@ -324,22 +315,22 @@ const Wrapper = (props: Props) => {
             </WhenConnected>
           </>
         )}
-        {currentTab === marketTabs.pool && (
+        {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />
         )}
-        {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
-        {currentTab === marketTabs.buy && (
+        {currentTab === MarketDetailsTab.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
+        {currentTab === MarketDetailsTab.buy && (
           <MarketBuyContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />
         )}
-        {currentTab === marketTabs.sell && (
+        {currentTab === MarketDetailsTab.sell && (
           <MarketSellContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             marketMakerData={marketMakerData}

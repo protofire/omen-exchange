@@ -2,6 +2,7 @@ import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
 import { getMarketTitles } from '../../../../util/tools'
+import { MarketState } from '../../../../util/types'
 import { Button } from '../../../button'
 
 import { ThreeDots1 } from './img/three_dots_1'
@@ -38,20 +39,13 @@ export const ProgressBarToggle: React.FC<Props> = props => {
 
   const { marketTitle } = getMarketTitles(templateId)
 
-  const marketStates = {
-    open: 'open',
-    finalizing: 'finalizing',
-    arbitration: 'arbitration',
-    closed: 'closed',
-  }
-
   return (
     <ToggleButton active={active} onClick={toggleProgressBar}>
-      {state === marketStates.open ? (
+      {state === MarketState.open ? (
         <ThreeDots1></ThreeDots1>
-      ) : state === marketStates.finalizing ? (
+      ) : state === MarketState.finalizing ? (
         <ThreeDots2></ThreeDots2>
-      ) : state === marketStates.arbitration ? (
+      ) : state === MarketState.arbitration ? (
         <ThreeDots2></ThreeDots2>
       ) : (
         <ThreeDots3></ThreeDots3>

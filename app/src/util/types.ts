@@ -312,3 +312,22 @@ export type BuildQueryType = MarketFilters & {
   whitelistedTemplateIds: boolean
   networkId: Maybe<number>
 }
+
+export enum MarketDetailsTab {
+  swap = 'SWAP',
+  pool = 'POOL',
+  history = 'HISTORY',
+  verify = 'VERIFY',
+  buy = 'BUY',
+  sell = 'SELL',
+  finalize = 'FINALIZE',
+  setOutcome = 'SET_OUTCOME',
+}
+
+export enum MarketState {
+  open = 'open',
+  finalizing = 'finalizing',
+  arbitration = 'arbitration',
+  closed = 'closed',
+  none = '',
+}

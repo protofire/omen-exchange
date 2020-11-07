@@ -19,7 +19,7 @@ import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
-import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
 import { ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -49,7 +49,7 @@ const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
 }
 
@@ -325,7 +325,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <StyledButtonContainer>
-        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <MarketBottomNavButton
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => switchMarketTab(MarketDetailsTab.swap)}
+        >
           Cancel
         </MarketBottomNavButton>
         <MarketBottomNavButton buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>
