@@ -340,17 +340,21 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === marketTabs.pool && (
           <MarketPoolLiquidityContainer
-            isScalar={false}
+            isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />
         )}
         {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === marketTabs.buy && (
-          <MarketBuyContainer isScalar={false} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketBuyContainer isScalar={isScalar} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
         )}
         {currentTab === marketTabs.sell && (
-          <MarketSellContainer isScalar={false} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketSellContainer
+            isScalar={isScalar}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
       </BottomCard>
       <ModalTransactionResult
