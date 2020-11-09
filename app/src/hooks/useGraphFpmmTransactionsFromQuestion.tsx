@@ -4,25 +4,39 @@ import { useEffect, useState } from 'react'
 
 import { Status } from '../util/types'
 
-const query = gql`
+const fragment = gql`
+  fragment TransactionFields on FpmmTransaction {
+    id
+    user {
+      id
+    }
+    transactionType
+    collateralAmount
+    collateralTokenAddress
+    collateralTokenAmount
+    creationTimestamp
+  }
+`
+const withTransactionType = gql`
   query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int, $transactionType: String) {
     fpmmTransactions(
-      where: { fpmm: $id, fpmmType: $transactionType }
+      where: { fpmm: $id, transactionType: $transactionType }
       first: $pageSize
       skip: $pageIndex
       orderBy: creationTimestamp
     ) {
-      id
-      transactionType
-      user {
-        id
-      }
-      collateralAmount
-      collateralTokenAddress
-      collateralTokenAmount
-      creationTimestamp
+      ...TransactionFields
     }
   }
+  ${fragment}
+`
+const withoutTransactionType = gql`
+  query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int) {
+    fpmmTransactions(where: { fpmm: $id }, first: $pageSize, skip: $pageIndex, orderBy: creationTimestamp) {
+      ...TransactionFields
+    }
+  }
+  ${fragment}
 `
 export type FpmmTradeDataType = {
   id: string
@@ -74,13 +88,18 @@ export const useGraphFpmmTransactionsFromQuestion = (
   pageIndex: number,
   type: number,
 ): Result => {
-  console.log(type)
   const [fpmmTradeData, setFpmmTradeData] = useState<Maybe<FpmmTradeData[]>>(null)
   const [morePagination, setMorePagination] = useState<boolean>(false)
-  const { data, error, loading } = useQuery(query, {
+
+  const { data, error, loading } = useQuery(type === 0 ? withoutTransactionType : withTransactionType, {
     notifyOnNetworkStatusChange: true,
     skip: false,
-    variables: { id: questionID, pageSize: pageSize, pageIndex: pageIndex },
+    variables: {
+      id: questionID,
+      pageSize: pageSize,
+      pageIndex: pageIndex,
+      transactionType: type === 1 ? 'Sell' : 'Add',
+    },
     onCompleted: ({ fpmmTransactions }: any) => {
       setMorePagination(fpmmTransactions.length === pageSize)
       setFpmmTradeData(wrangleResponse(fpmmTransactions))
