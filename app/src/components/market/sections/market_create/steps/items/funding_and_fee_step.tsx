@@ -297,8 +297,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const onCollateralChange = (token: Token | null) => {
     if (!token) return
     const tokenAddressFormatted = token.address.toLowerCase()
-    const array = markets.find(({ collateralToken }) => collateralToken === tokenAddressFormatted)
-    setCurrentToken({ tokenExists: array ? true : false, symbol: token.symbol, marketAddress: array ? array.id : '' })
+    const selectedToken = markets.find(({ collateralToken }) => collateralToken === tokenAddressFormatted)
+    setCurrentToken({
+      tokenExists: selectedToken ? true : false,
+      symbol: token.symbol,
+      marketAddress: selectedToken ? selectedToken.id : '',
+    })
     handleCollateralChange(token)
     setAllowanceFinished(false)
   }
