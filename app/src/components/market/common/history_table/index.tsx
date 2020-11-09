@@ -2,7 +2,7 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
+import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { Button } from '../../../button'
 import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'

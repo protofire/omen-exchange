@@ -3,7 +3,7 @@ import moment from 'moment'
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 
-import { useGraphFpmmTradesFromQuestion } from '../../../../hooks/useGraphFpmmTradesFromQuestion'
+import { useGraphFpmmTransactionsFromQuestion } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
 import { calcPrice } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { Button, ButtonSelectable } from '../../../button'
@@ -140,7 +140,7 @@ export const HistorySelect: React.FC<Props> = ({
   ]
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize] = useState(6)
-  const { fpmmTrade, paginationNext, status } = useGraphFpmmTradesFromQuestion(
+  const { fpmmTrade, paginationNext, status } = useGraphFpmmTransactionsFromQuestion(
     marketMakerAddress,
     pageSize,
     pageIndex,

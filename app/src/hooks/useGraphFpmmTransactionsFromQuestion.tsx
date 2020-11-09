@@ -5,8 +5,13 @@ import { useEffect, useState } from 'react'
 import { Status } from '../util/types'
 
 const query = gql`
-  query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int) {
-    fpmmTransactions(where: { fpmm: $id }, first: $pageSize, skip: $pageIndex, orderBy: creationTimestamp) {
+  query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int, $transactionType: String) {
+    fpmmTransactions(
+      where: { fpmm: $id, fpmmType: $transactionType }
+      first: $pageSize
+      skip: $pageIndex
+      orderBy: creationTimestamp
+    ) {
       id
       transactionType
       user {
@@ -39,6 +44,7 @@ interface FpmmTradeData {
   collateralAmount: string
   collateralTokenAddress: string
   collateralTokenAmount: string
+  collateralAmountUSD: string
   creationTimestamp: string
 }
 
@@ -53,6 +59,7 @@ const wrangleResponse = (data: any) => {
       id: trade.id,
       transactionType: trade.transactionType,
       user: trade.user.id,
+      collateralAmountUSD: trade.collateralAmountUSD,
       collateralAmount: trade.collateralAmount,
       collateralTokenAddress: trade.collateralTokenAddress,
       creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
@@ -61,7 +68,7 @@ const wrangleResponse = (data: any) => {
   })
 }
 
-export const useGraphFpmmTradesFromQuestion = (
+export const useGraphFpmmTransactionsFromQuestion = (
   questionID: string,
   pageSize: number,
   pageIndex: number,
