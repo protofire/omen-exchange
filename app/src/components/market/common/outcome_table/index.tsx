@@ -99,9 +99,10 @@ export const OutcomeTable = (props: Props) => {
     OutcomeTableValue.CurrentPrice,
     OutcomeTableValue.Shares,
     OutcomeTableValue.Payout,
+    OutcomeTableValue.Bonded,
   ]
 
-  const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right']
+  const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
     return (
@@ -205,6 +206,9 @@ export const OutcomeTable = (props: Props) => {
           <TDStyled textAlign={TableCellsAlign[4]}>
             {withWinningOutcome && payouts ? formatNumber(formattedPayout) : '0.00'}
           </TDStyled>
+        )}
+        {disabledColumns.includes(OutcomeTableValue.Bonded) ? null : (
+          <TDStyled textAlign={TableCellsAlign[6]}></TDStyled>
         )}
       </TRExtended>
     )

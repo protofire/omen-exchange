@@ -70,10 +70,19 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
   currency: Token
+  isFinalize?: boolean
 }
 
 export const MarketData: React.FC<Props> = props => {
-  const { collateralVolume, currency, lastActiveDay, liquidity, resolutionTimestamp, runningDailyVolumeByHour } = props
+  const {
+    collateralVolume,
+    currency,
+    isFinalize = false,
+    lastActiveDay,
+    liquidity,
+    resolutionTimestamp,
+    runningDailyVolumeByHour,
+  } = props
 
   const context = useConnectedWeb3Context()
   const tokens = useTokens(context)
@@ -132,9 +141,15 @@ export const MarketData: React.FC<Props> = props => {
       </MarketDataItem>
       <MarketDataItem>
         <MarketDataItemTop>
-          {resolutionTimestamp > new Date() ? moment(resolutionTimestamp).fromNow(true) : '0 days'}
+          {isFinalize
+            ? moment(resolutionTimestamp)
+                .add('day', 1)
+                .fromNow(true)
+            : resolutionTimestamp > new Date()
+            ? moment(resolutionTimestamp).fromNow(true)
+            : '0 days'}
         </MarketDataItemTop>
-        <MarketDataItemBottom>Remaining</MarketDataItemBottom>
+        <MarketDataItemBottom>{isFinalize ? 'Finalized' : 'Remaining'}</MarketDataItemBottom>
       </MarketDataItem>
     </MarketDataWrapper>
   )

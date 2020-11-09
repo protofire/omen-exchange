@@ -12,6 +12,7 @@ import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 import { WarningMessage } from '../../../common/warning_message'
+import { MarketBondContainer } from '../../market_bond/market_bond_container'
 import { MarketBuyContainer } from '../../market_buy/market_buy_container'
 import { MarketHistoryContainer } from '../../market_history/market_history_container'
 import { MarketNavigation } from '../../market_navigation'
@@ -108,6 +109,8 @@ const Wrapper = (props: Props) => {
     totalPoolShares,
   } = marketMakerData
 
+  console.log(marketMakerData)
+
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
@@ -119,7 +122,12 @@ const Wrapper = (props: Props) => {
   const hasFunding = totalPoolShares.gt(0)
 
   const renderTableData = () => {
-    const disabledColumns = [OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]
+    const disabledColumns = [
+      OutcomeTableValue.Payout,
+      OutcomeTableValue.Outcome,
+      OutcomeTableValue.Probability,
+      OutcomeTableValue.Bonded,
+    ]
 
     if (!userHasShares) {
       disabledColumns.push(OutcomeTableValue.Shares)
@@ -141,6 +149,7 @@ const Wrapper = (props: Props) => {
       OutcomeTableValue.OutcomeProbability,
       OutcomeTableValue.Probability,
       OutcomeTableValue.CurrentPrice,
+      OutcomeTableValue.Payout,
     ]
 
     return (
@@ -286,6 +295,13 @@ const Wrapper = (props: Props) => {
               </StyledButtonContainer>
             </WhenConnected>
           </>
+        )}
+        {currentTab === MarketDetailsTab.setOutcome && (
+          <MarketBondContainer
+            fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
         {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer

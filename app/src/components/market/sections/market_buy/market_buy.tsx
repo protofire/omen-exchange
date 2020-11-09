@@ -226,7 +226,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <OutcomeTable
         balances={balances}
         collateral={collateral}
-        disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
+        disabledColumns={[
+          OutcomeTableValue.Payout,
+          OutcomeTableValue.Outcome,
+          OutcomeTableValue.Probability,
+          OutcomeTableValue.Bonded,
+        ]}
         newShares={newShares}
         outcomeHandleChange={(value: number) => switchOutcome(value)}
         outcomeSelected={outcomeIndex}

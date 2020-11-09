@@ -193,7 +193,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       <OutcomeTable
         balances={balances}
         collateral={collateral}
-        disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
+        disabledColumns={[
+          OutcomeTableValue.Payout,
+          OutcomeTableValue.Outcome,
+          OutcomeTableValue.Probability,
+          OutcomeTableValue.Bonded,
+        ]}
         newShares={balances.map((balance, i) =>
           i === outcomeIndex ? balance.shares.sub(amountShares || Zero) : balance.shares,
         )}

@@ -364,7 +364,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       <OutcomeTable
         balances={balances}
         collateral={collateral}
-        disabledColumns={[OutcomeTableValue.OutcomeProbability, OutcomeTableValue.Payout]}
+        disabledColumns={[OutcomeTableValue.OutcomeProbability, OutcomeTableValue.Payout, OutcomeTableValue.Bonded]}
         displayRadioSelection={false}
         newShares={activeTab === Tabs.deposit ? sharesAfterAddingFunding : sharesAfterRemovingFunding}
         probabilities={probabilities}

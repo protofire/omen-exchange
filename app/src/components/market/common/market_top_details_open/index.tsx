@@ -137,6 +137,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       <MarketData
         collateralVolume={collateralVolume}
         currency={collateral}
+        isFinalize={marketState === MarketState.finalizing}
         lastActiveDay={lastActiveDay}
         liquidity={formattedLiquidity}
         resolutionTimestamp={question.resolution}

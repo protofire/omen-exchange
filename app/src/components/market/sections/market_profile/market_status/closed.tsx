@@ -184,7 +184,7 @@ const Wrapper = (props: Props) => {
 
   const probabilities = balances.map(balance => balance.probability)
 
-  const disabledColumns = [OutcomeTableValue.Outcome, OutcomeTableValue.Probability]
+  const disabledColumns = [OutcomeTableValue.Outcome, OutcomeTableValue.Probability, OutcomeTableValue.Bonded]
 
   if (!account) {
     disabledColumns.push(OutcomeTableValue.Shares)

@@ -56,6 +56,7 @@ export interface Question {
   isPendingArbitration: boolean
   arbitrationOccurred: boolean
   currentAnswerTimestamp: Maybe<BigNumber>
+  currentAnswerBond: Maybe<BigNumber>
 }
 
 export enum OutcomeTableValue {
@@ -65,6 +66,7 @@ export enum OutcomeTableValue {
   Payout = 'Payout',
   Outcome = 'Outcome',
   Probability = 'Probability',
+  Bonded = 'Bonded (ETH)',
 }
 
 export interface Token {
