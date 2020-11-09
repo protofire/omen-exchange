@@ -2,7 +2,7 @@ import React from 'react'
 
 export const DxDao = () => (
   <svg fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="10" cy="10" fill="url(#paint0_radial)" r="10" />
+    <circle cx="10" cy="10" fill="url(#dxdao_paint0_radial)" r="10" />
     <path
       d="M4.90864 4.90882C7.06142 2.75604 10.2383 2.25149 12.8711 3.39518L11.4972 4.76909C9.6596 4.24488 7.60018 4.70629 6.15314 6.15332C4.24055 8.06592 4.04982 11.0484 5.58096 13.1743L7.62393 11.1314L8.86844 12.3759L5.56854 15.6758C5.33974 15.4967 5.11929 15.3018 4.90864 15.0912C2.09686 12.2794 2.09686 7.72059 4.90864 4.90882Z"
       fill="white"
@@ -20,7 +20,7 @@ export const DxDao = () => (
         cy="0"
         gradientTransform="translate(10 10) rotate(90) scale(10)"
         gradientUnits="userSpaceOnUse"
-        id="paint0_radial"
+        id="dxdao_paint0_radial"
         r="1"
       >
         <stop stopColor="#304FFE" />
