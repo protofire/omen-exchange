@@ -506,6 +506,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
         </div>
       </GridTransactionDetails>
+      {activeTab === Tabs.deposit && showSetAllowance && (
+        <SetAllowance
+          collateral={collateral}
+          finished={allowanceFinished && RemoteData.is.success(allowance)}
+          loading={RemoteData.is.asking(allowance)}
+          onUnlock={unlockCollateral}
+        />
+      )}
       <WarningMessageStyled
         additionalDescription=""
         description="Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time."
@@ -528,14 +536,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           description="Your withdraw amount should not be negative."
           href=""
           hyperlinkDescription=""
-        />
-      )}
-      {activeTab === Tabs.deposit && showSetAllowance && (
-        <SetAllowance
-          collateral={collateral}
-          finished={allowanceFinished && RemoteData.is.success(allowance)}
-          loading={RemoteData.is.asking(allowance)}
-          onUnlock={unlockCollateral}
         />
       )}
       <BottomButtonWrapper>

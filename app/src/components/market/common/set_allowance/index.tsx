@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   border-radius: 4px;
   border: ${({ theme }) => theme.borders.borderLineDisabled};
   padding: 21px 25px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 `
 
 const Title = styled.h2`
