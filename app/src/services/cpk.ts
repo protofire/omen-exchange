@@ -549,16 +549,19 @@ class CPKService {
 
   upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {
     try {
+      const txOptions: TxOptions = {}
       const deployed = await this.cpk.isProxyDeployed()
       if (!deployed) {
-        throw new Error('Proxy must be deployed first')
+        // add plenty of gas to avoid locked proxy https://github.com/gnosis/contract-proxy-kit/issues/132
+        txOptions.gas = 400000
       }
-      const transactions = []
-      transactions.push({
-        to: this.cpk.address,
-        data: this.proxy.interface.functions.changeMasterCopy.encode([targetGnosisSafeImplementation]),
-      })
-      const txObject = await this.cpk.execTransactions(transactions)
+      const transactions = [
+        {
+          to: this.cpk.address,
+          data: this.proxy.interface.functions.changeMasterCopy.encode([targetGnosisSafeImplementation]),
+        },
+      ]
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`Error trying to update proxy`, err.message)
