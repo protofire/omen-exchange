@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@kleros/gtcr-encoder": "^1.1.3"
+  }
+}
