@@ -4,7 +4,12 @@ import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { DOCUMENT_FAQ, MAX_MARKET_FEE } from '../../../../../../common/constants'
+import {
+  DOCUMENT_FAQ,
+  MAINNET_DAI_ADDRESS,
+  MAX_MARKET_FEE,
+  RINKEBY_DAI_ADDRESS,
+} from '../../../../../../common/constants'
 import {
   useCollateralBalance,
   useConnectedWeb3Context,
@@ -205,15 +210,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
 
-  const [currentToken, setCurrentToken] = useState({ exists: false, token: '', marketAddress: '' })
+  const [currentToken, setCurrentToken] = useState({ tokenExists: false, token: '', marketAddress: '' })
   useEffect(() => {
-    const rinkebyDai = '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea'
-    const mainnetDai = '0x6b175474e89094c44da98b954eedeac495271d0f'
     const array = markets.find(
-      ({ collateralToken }) => collateralToken === rinkebyDai || collateralToken === mainnetDai,
+      ({ collateralToken }) => collateralToken === RINKEBY_DAI_ADDRESS || collateralToken === MAINNET_DAI_ADDRESS,
     )
     setCurrentToken({
-      exists: array ? true : false,
+      tokenExists: array ? true : false,
       token: 'DAI',
       marketAddress: array ? array.id : '',
     })
@@ -270,7 +273,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const isCreateMarketbuttonDisabled =
     MarketCreationStatus.is.creatingAMarket(marketCreationStatus) ||
     MarketCreationStatus.is.done(marketCreationStatus) ||
-    currentToken.exists ||
+    currentToken.tokenExists ||
     !balance ||
     funding.isZero() ||
     !account ||
@@ -294,7 +297,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     if (!token) return
     const tokenAddressFormatted = token.address.toLowerCase()
     const array = markets.find(({ collateralToken }) => collateralToken === tokenAddressFormatted)
-    setCurrentToken({ exists: array ? true : false, token: token.symbol, marketAddress: array ? array.id : '' })
+    setCurrentToken({ tokenExists: array ? true : false, token: token.symbol, marketAddress: array ? array.id : '' })
     handleCollateralChange(token)
     setAllowanceFinished(false)
   }
@@ -462,12 +465,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         <WarningMessage
           additionalDescription={''}
           description={
-            currentToken.exists
+            currentToken.tokenExists
               ? `An identical market with ${currentToken.token} as a currency exists already. Please use a different currency or  provide liquidity for the`
               : 'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
           }
-          href={currentToken.exists ? `/#/${currentToken.marketAddress}` : DOCUMENT_FAQ}
-          hyperlinkDescription={currentToken.exists ? 'existing market.' : 'More Info'}
+          href={currentToken.tokenExists ? `/#/${currentToken.marketAddress}` : DOCUMENT_FAQ}
+          hyperlinkDescription={currentToken.tokenExists ? 'existing market.' : 'More Info'}
         />
         <StyledButtonContainerFullWidth borderTop>
           <LeftButton

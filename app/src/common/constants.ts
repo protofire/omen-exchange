@@ -105,3 +105,6 @@ export const FETCH_DETAILS_INTERVAL = parseInt(process.env.REACT_APP_FETCH_DETAI
 export const SHOW_FOOTER = process.env.REACT_APP_SHOW_FOOTER === 'false' ? false : true
 
 export const IMPORT_QUESTION_ID_KEY = 'importQuestionId'
+
+export const RINKEBY_DAI_ADDRESS = '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea'
+export const MAINNET_DAI_ADDRESS = '0x6b175474e89094c44da98b954eedeac495271d0f'
