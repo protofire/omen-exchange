@@ -17,7 +17,7 @@ export const ArbitratorIcon = ({ id }: Props) => {
     case 'kleros':
       return (
         <IconWrapper>
-          <IconKleros />
+          <IconKleros id={id} />
         </IconWrapper>
       )
     default:

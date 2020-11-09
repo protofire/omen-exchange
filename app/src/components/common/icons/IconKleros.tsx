@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const IconKleros = () => (
+export const IconKleros = ({ id = '' }) => (
   <svg
     height="100%"
     viewBox="0 0 16 16"
@@ -14,13 +14,13 @@ export const IconKleros = () => (
       </filter>
       <image
         height="16"
-        id="image9"
+        id={`kleros_image_${id}9`}
         width="17"
         xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAABmJLR0QA/wD/AP+gvaeTAAAAS0lEQVQ4jWNkCQlh/rJtmwgDGYDj27eXDAwMDIzL2NkVV/7500+OIRv//g1gYGBgYCJHMzoYNWTUkBFoCIstA8P/C4yMv6hhGEUAAHPzECeYcVARAAAAAElFTkSuQmCC"
       ></image>
       <mask id="mask0">
         <g filter="url(#alpha)">
-          <use xlinkHref="#image9"></use>
+          <use xlinkHref={`#kleros_image_${id}9`}></use>
         </g>
       </mask>
       <clipPath id="clip1">
@@ -76,13 +76,13 @@ export const IconKleros = () => (
       </linearGradient>
       <image
         height="16"
-        id="image17"
+        id={`kleros_image_${id}17`}
         width="17"
         xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAABmJLR0QA/wD/AP+gvaeTAAAAVElEQVQ4jWNgGAU0AYzYBFWZmaucGRiMkMVKGBiuq/z9W4tNPQs2wWcMDMzP0eReMTAw43IJE2HHEgbDzBCsARvKyLgp4v//48hieoyM76lh4UgBAMpEDRjpQhojAAAAAElFTkSuQmCC"
       ></image>
       <mask id="mask1">
         <g filter="url(#alpha)">
-          <use xlinkHref="#image17"></use>
+          <use xlinkHref={`#kleros_image_${id}17`}></use>
         </g>
       </mask>
       <clipPath id="clip2">
@@ -93,13 +93,13 @@ export const IconKleros = () => (
       </g>
       <image
         height="16"
-        id="image25"
+        id={`kleros_image_${id}25`}
         width="17"
         xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAABmJLR0QA/wD/AP+gvaeTAAAAU0lEQVQ4jWNgoAXIMjJivc/Kqo2OWeztWXDpYUQXiODgkP7++/dUdHFNDo60jq9fX2EzhIkyd1PREAx/HmBk/JfNyPgDXbyBgeE/NSwcBaNg4AEAAYITa3FtUCwAAAAASUVORK5CYII="
       ></image>
       <mask id="mask2">
         <g filter="url(#alpha)">
-          <use xlinkHref="#image25"></use>
+          <use xlinkHref={`#kleros_image_${id}25`}></use>
         </g>
       </mask>
       <clipPath id="clip3">
@@ -110,13 +110,13 @@ export const IconKleros = () => (
       </g>
       <image
         height="16"
-        id="image33"
+        id={`kleros_image_${id}33`}
         width="17"
         xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAABmJLR0QA/wD/AP+gvaeTAAAAWklEQVQ4jWNgGAWjgDBgRBdQYWeX3/3vHw+ymOLv31fxGcKCLnD8z5+kFAYGfRRFISHBf9as+YvLECbCjiUMBo8hGGFi9///+XwmprfIYttXrfrHwEQV+2gMALfTFYwj1UJVAAAAAElFTkSuQmCC"
       ></image>
       <mask id="mask3">
         <g filter="url(#alpha)">
-          <use xlinkHref="#image33"></use>
+          <use xlinkHref={`#kleros_image_${id}33`}></use>
         </g>
       </mask>
       <clipPath id="clip4">
@@ -127,13 +127,13 @@ export const IconKleros = () => (
       </g>
       <image
         height="16"
-        id="image41"
+        id={`kleros_image_${id}41`}
         width="17"
         xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAABmJLR0QA/wD/AP+gvaeTAAAATElEQVQ4jWNgGAXogJEUxcwiIjzI/L9v3nwhyRCWkBBm7/Xr1yKLbfz7N4CBgYGBiRSX4AKjhmACFqJtW7Xqnycb2z5ksY3UcMEwBQBp/g4pFSMmPAAAAABJRU5ErkJggg=="
       ></image>
       <mask id="mask4">
         <g filter="url(#alpha)">
-          <use xlinkHref="#image41"></use>
+          <use xlinkHref={`#kleros_image_${id}41`}></use>
         </g>
       </mask>
       <clipPath id="clip5">
@@ -144,13 +144,13 @@ export const IconKleros = () => (
       </g>
       <image
         height="16"
-        id="image49"
+        id={`kleros_image_${id}49`}
         width="17"
         xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAABmJLR0QA/wD/AP+gvaeTAAAAP0lEQVQ4jWNgGAWjYBQMGGDEJXGWmbm15v9/URh/FSPjM96/fxuwqWXBZYgKE9OF+///88L4kv/+fSTTocQBABrQDu57DSqpAAAAAElFTkSuQmCC"
       ></image>
       <mask id="mask5">
         <g filter="url(#alpha)">
-          <use xlinkHref="#image49"></use>
+          <use xlinkHref={`#kleros_image_${id}49`}></use>
         </g>
       </mask>
       <clipPath id="clip6">
@@ -161,13 +161,13 @@ export const IconKleros = () => (
       </g>
       <image
         height="16"
-        id="image57"
+        id={`kleros_image_${id}57`}
         width="17"
         xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAABmJLR0QA/wD/AP+gvaeTAAAAW0lEQVQ4jWNgGAWjgE6AkRTFbP/+wdX/YmL6D2OzEGsAs4gIjycr6xIkQ+Zu//dvMwMDAwMTKS7BBQaPIUQHLNu/f4wGHBxKMP5Zbu7Xf9+//0QNRzAwMDAwAAD4EBI832oOSgAAAABJRU5ErkJggg=="
       ></image>
       <mask id="mask6">
         <g filter="url(#alpha)">
-          <use xlinkHref="#image57"></use>
+          <use xlinkHref={`#kleros_image_${id}57`}></use>
         </g>
       </mask>
       <clipPath id="clip7">
@@ -178,13 +178,13 @@ export const IconKleros = () => (
       </g>
       <image
         height="16"
-        id="image65"
+        id={`kleros_image_${id}65`}
         width="17"
         xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAABmJLR0QA/wD/AP+gvaeTAAAASUlEQVQ4jWNgGLJAlZm5aj8zczszK2sITIyJVEP+//+vPoGBQbPr/39psg3BBqhiCAupGuIZGZcv+/+fYx8j4yNqOGAUjAKSAAAOEA4zr6nEnQAAAABJRU5ErkJggg=="
       ></image>
       <mask id="mask7">
         <g filter="url(#alpha)">
-          <use xlinkHref="#image65"></use>
+          <use xlinkHref={`#kleros_image_${id}65`}></use>
         </g>
       </mask>
       <clipPath id="clip8">
@@ -195,13 +195,13 @@ export const IconKleros = () => (
       </g>
       <image
         height="16"
-        id="image73"
+        id={`kleros_image_${id}73`}
         width="17"
         xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAABmJLR0QA/wD/AP+gvaeTAAAAVUlEQVQ4jWNgoAJgxCepysxsq8vAYAHjBzIy/oj982cyujomfIZkMDHJ/WVgsIbhvH//LLCpw+sSlpAQZoZr15hh/DQOjv/Tzp37jU/PKBgFo4B4AABm4BLZBJ7f/wAAAABJRU5ErkJggg=="
       ></image>
       <mask id="mask8">
         <g filter="url(#alpha)">
-          <use xlinkHref="#image73"></use>
+          <use xlinkHref={`#kleros_image_${id}73`}></use>
         </g>
       </mask>
       <clipPath id="clip9">
@@ -212,13 +212,13 @@ export const IconKleros = () => (
       </g>
       <image
         height="16"
-        id="image81"
+        id={`kleros_image_${id}81`}
         width="17"
         xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAABmJLR0QA/wD/AP+gvaeTAAAAY0lEQVQ4jWNgGCyAkYGBgaGciclTh5HRiYGBgaHt//+j1//920CKISwMDAwM35mYRNb8/6/KwMDAsJ+J6Y7Ev38kuYSJJNU0N2T3v3+fuf//f879///z74yM76lh8CgYBTQBAC1/Gw8WKHGAAAAAAElFTkSuQmCC"
       ></image>
       <mask id="mask9">
         <g filter="url(#alpha)">
-          <use xlinkHref="#image81"></use>
+          <use xlinkHref={`#kleros_image_${id}81`}></use>
         </g>
       </mask>
       <clipPath id="clip10">
@@ -229,13 +229,13 @@ export const IconKleros = () => (
       </g>
       <image
         height="16"
-        id="image89"
+        id={`kleros_image_${id}89`}
         width="17"
         xlinkHref="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAQCAYAAADwMZRfAAAABmJLR0QA/wD/AP+gvaeTAAAAV0lEQVQ4jWNgGAXDHDAzMDAw5LGwxMYzMsbrMDIyH/3//w6phjAxMDAw3Pr/X3InA4OyGDOzEDkuYSJH0+A1hIWBgYHh2///N7gYGf+v/PfvITUMHeIAAAJ/EctT3nrUAAAAAElFTkSuQmCC"
       ></image>
       <mask id="mask10">
         <g filter="url(#alpha)">
-          <use xlinkHref="#image89"></use>
+          <use xlinkHref={`#kleros_image_${id}89`}></use>
         </g>
       </mask>
       <clipPath id="clip11">

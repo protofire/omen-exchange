@@ -296,7 +296,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       <CurationSubRow>
         <CurationLeftColumn>
           <CurationLogoWrapper>
-            <IconKleros />
+            <IconKleros id="curationSource" />
           </CurationLogoWrapper>
         </CurationLeftColumn>
         <CurationCenterColumn>
