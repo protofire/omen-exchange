@@ -55,6 +55,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     arbitrator,
     collateral,
     collateralVolume,
+    creationTimestamp,
     curatedByDxDao,
     curatedByDxDaoOrKleros,
     lastActiveDay,
@@ -64,12 +65,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     submissionIDs,
   } = marketMakerData
 
-  const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
   const ovmAddress = getContractAddress(context.networkId, 'omenVerifiedMarkets')
-  const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
-    ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
-    : ''
-
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
   const currentTimestamp = new Date().getTime()
