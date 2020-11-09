@@ -3,7 +3,7 @@ import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
-import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { getContractAddress } from '../../../../util/networks'
 import { MarketMakerData, Token } from '../../../../util/types'
