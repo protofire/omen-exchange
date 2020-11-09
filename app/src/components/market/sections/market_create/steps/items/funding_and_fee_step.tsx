@@ -212,14 +212,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const [currentToken, setCurrentToken] = useState({ tokenExists: false, symbol: '', marketAddress: '' })
   useEffect(() => {
-    const array = markets.find(
+    const selectedToken = markets.find(
       ({ collateralToken }) =>
         collateralToken === DEFAULT_TOKEN_ADDRESS_RINKEBY || collateralToken === DEFAULT_TOKEN_ADDRESS,
     )
     setCurrentToken({
-      tokenExists: array ? true : false,
+      tokenExists: selectedToken ? true : false,
       symbol: 'DAI',
-      marketAddress: array ? array.id : '',
+      marketAddress: selectedToken ? selectedToken.id : '',
     })
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
