@@ -5,10 +5,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import {
+  DEFAULT_TOKEN_ADDRESS,
+  DEFAULT_TOKEN_ADDRESS_RINKEBY,
   DOCUMENT_FAQ,
-  MAINNET_DAI_ADDRESS,
   MAX_MARKET_FEE,
-  RINKEBY_DAI_ADDRESS,
 } from '../../../../../../common/constants'
 import {
   useCollateralBalance,
@@ -210,14 +210,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
 
-  const [currentToken, setCurrentToken] = useState({ tokenExists: false, token: '', marketAddress: '' })
+  const [currentToken, setCurrentToken] = useState({ tokenExists: false, symbol: '', marketAddress: '' })
   useEffect(() => {
     const array = markets.find(
-      ({ collateralToken }) => collateralToken === RINKEBY_DAI_ADDRESS || collateralToken === MAINNET_DAI_ADDRESS,
+      ({ collateralToken }) =>
+        collateralToken === DEFAULT_TOKEN_ADDRESS_RINKEBY || collateralToken === DEFAULT_TOKEN_ADDRESS,
     )
     setCurrentToken({
       tokenExists: array ? true : false,
-      token: 'DAI',
+      symbol: 'DAI',
       marketAddress: array ? array.id : '',
     })
 
@@ -297,7 +298,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     if (!token) return
     const tokenAddressFormatted = token.address.toLowerCase()
     const array = markets.find(({ collateralToken }) => collateralToken === tokenAddressFormatted)
-    setCurrentToken({ tokenExists: array ? true : false, token: token.symbol, marketAddress: array ? array.id : '' })
+    setCurrentToken({ tokenExists: array ? true : false, symbol: token.symbol, marketAddress: array ? array.id : '' })
     handleCollateralChange(token)
     setAllowanceFinished(false)
   }
@@ -466,7 +467,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           additionalDescription={''}
           description={
             currentToken.tokenExists
-              ? `An identical market with ${currentToken.token} as a currency exists already. Please use a different currency or  provide liquidity for the`
+              ? `An identical market with ${currentToken.symbol} as a currency exists already. Please use a different currency or  provide liquidity for the`
               : 'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
           }
           href={currentToken.tokenExists ? `/#/${currentToken.marketAddress}` : DOCUMENT_FAQ}
