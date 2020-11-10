@@ -398,3 +398,9 @@ export const waitABit = (milli = 1000) =>
   new Promise(resolve => {
     setTimeout(resolve, milli)
   })
+
+export const clampBigNumber = (x: BigNumber, min: BigNumber, max: BigNumber): BigNumber => {
+  if (x.lt(min)) return min
+  if (x.gt(max)) return max
+  return x
+}

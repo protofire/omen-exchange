@@ -1,6 +1,6 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
 import { TransactionReceipt } from 'ethers/providers'
-import { BigNumber, BigNumberish } from 'ethers/utils'
+import { BigNumber, BigNumberish, bigNumberify } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck } from '../util/networks'
@@ -48,7 +48,7 @@ class ConditionalTokenService {
     const transactionObject = await this.contract.prepareCondition(
       oracleAddress,
       questionId,
-      new BigNumber(outcomeSlotCount),
+      bigNumberify(outcomeSlotCount),
       {
         value: '0x0',
         gasLimit: 750000,
@@ -163,7 +163,7 @@ class ConditionalTokenService {
     return prepareConditionInterface.functions.prepareCondition.encode([
       oracleAddress,
       questionId,
-      new BigNumber(outcomeSlotCount),
+      bigNumberify(outcomeSlotCount),
     ])
   }
 
