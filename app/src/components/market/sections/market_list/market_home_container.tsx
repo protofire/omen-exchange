@@ -100,7 +100,7 @@ const MarketHomeContainer: React.FC = () => {
     sortParam = 'creationTimestamp'
   } else if (sortRoute === 'ending') {
     sortParam = 'openingTimestamp'
-    sortDirection = 'asc'
+    sortDirection = stateRoute === 'MY_MARKETS' ? 'desc' : 'asc'
   } else if (sortRoute === 'liquidity') {
     sortParam = 'usdLiquidityParameter'
   }
@@ -289,7 +289,7 @@ const MarketHomeContainer: React.FC = () => {
         routeQueryArray.push(`tag=${filter.title}`)
       }
 
-      if (filter.curationSource) {
+      if (filter.curationSource && filter.curationSource !== 'Any') {
         route += `/curation-source/${filter.curationSource}`
       }
 

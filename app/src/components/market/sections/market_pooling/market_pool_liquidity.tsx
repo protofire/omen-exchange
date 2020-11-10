@@ -75,22 +75,47 @@ const SetAllowanceStyled = styled(SetAllowance)`
   margin-bottom: 20px;
 `
 
-const UserData = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin: 0 -24px;
-  padding: 20px 24px;
-  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
+const UserDataTitleValue = styled(TitleValue)`
+  flex: 0 calc(50% - 16px);
+
+  &:nth-child(odd) {
+    margin-right: 32px;
+  }
+  &:nth-child(-n + 2) {
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex: 0 50%;
+
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
+
+    &:not(:first-child) {
+      margin-top: 12px;
+    }
+    &:nth-child(2) {
+      order: 2;
+    }
+    &:nth-child(3) {
+      order: 1;
+    }
+    &:nth-child(4) {
+      order: 3;
+    }
+  }
 `
 
-const UserDataTitleValue = styled(TitleValue)`
-  width: calc(50% - 16px);
-`
-const UserDataRow = styled.div`
+const UserData = styled.div`
   display: flex;
-  justify-content: space-between;
-  &:first-child {
-    margin-bottom: 12px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0 -25px;
+  padding: 20px 24px;
+  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex-wrap: nowrap;
+    flex-direction: column;
   }
 `
 
@@ -340,32 +365,28 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   return (
     <>
       <UserData>
-        <UserDataRow>
-          <UserDataTitleValue
-            title="Your Liquidity"
-            value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
-          />
-          <UserDataTitleValue
-            title="Total Pool Tokens"
-            value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals))}`}
-          />
-        </UserDataRow>
-        <UserDataRow>
-          <UserDataTitleValue
-            state={userEarnings.gt(0) ? ValueStates.success : undefined}
-            title="Your Earnings"
-            value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
-              formatBigNumber(userEarnings, collateral.decimals),
-            )} ${collateral.symbol}`}
-          />
-          <UserDataTitleValue
-            state={totalEarnings.gt(0) ? ValueStates.success : undefined}
-            title="Total Earnings"
-            value={`${totalEarnings.gt(0) ? '+' : ''}${formatNumber(
-              formatBigNumber(totalEarnings, collateral.decimals),
-            )} ${collateral.symbol}`}
-          />
-        </UserDataRow>
+        <UserDataTitleValue
+          title="Your Liquidity"
+          value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
+        />
+        <UserDataTitleValue
+          title="Total Pool Tokens"
+          value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals))}`}
+        />
+        <UserDataTitleValue
+          state={userEarnings.gt(0) ? ValueStates.success : undefined}
+          title="Your Earnings"
+          value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${
+            collateral.symbol
+          }`}
+        />
+        <UserDataTitleValue
+          state={totalEarnings.gt(0) ? ValueStates.success : undefined}
+          title="Total Earnings"
+          value={`${totalEarnings.gt(0) ? '+' : ''}${formatNumber(
+            formatBigNumber(totalEarnings, collateral.decimals),
+          )} ${collateral.symbol}`}
+        />
       </UserData>
       <OutcomeTable
         balances={balances}
@@ -539,6 +560,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           description="Your withdraw amount should not be negative."
           href=""
           hyperlinkDescription=""
+        />
+      )}
+      {activeTab === Tabs.deposit && showSetAllowance && (
+        <SetAllowance
+          collateral={collateral}
+          finished={allowanceFinished && RemoteData.is.success(allowance)}
+          loading={RemoteData.is.asking(allowance)}
+          onUnlock={unlockCollateral}
         />
       )}
       <BottomButtonWrapper>
