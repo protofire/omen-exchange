@@ -13,14 +13,15 @@ const fragment = gql`
     transactionType
     collateralAmount
     collateralTokenAddress
+    collateralAmountUSD
     collateralTokenAmount
     creationTimestamp
   }
 `
-const withTransactionType = gql`
-  query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int, $transactionType: String) {
+const withFpmmType = gql`
+  query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int, $fpmmType: String) {
     fpmmTransactions(
-      where: { fpmm: $id, transactionType: $transactionType }
+      where: { fpmm: $id, fpmmType: $fpmmType }
       first: $pageSize
       skip: $pageIndex
       orderBy: creationTimestamp
@@ -30,7 +31,7 @@ const withTransactionType = gql`
   }
   ${fragment}
 `
-const withoutTransactionType = gql`
+const withoutFpmmType = gql`
   query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int) {
     fpmmTransactions(where: { fpmm: $id }, first: $pageSize, skip: $pageIndex, orderBy: creationTimestamp) {
       ...TransactionFields
@@ -47,6 +48,7 @@ export type FpmmTradeDataType = {
   collateralAmount: string
   collateralTokenAddress: string
   collateralTokenAmount: string
+  collateralAmountUSD: number
   creationTimestamp: string
 }
 interface FpmmTradeData {
@@ -58,7 +60,7 @@ interface FpmmTradeData {
   collateralAmount: string
   collateralTokenAddress: string
   collateralTokenAmount: string
-  collateralAmountUSD: string
+  collateralAmountUSD: number
   creationTimestamp: string
 }
 
@@ -73,7 +75,7 @@ const wrangleResponse = (data: any) => {
       id: trade.id,
       transactionType: trade.transactionType,
       user: trade.user.id,
-      collateralAmountUSD: trade.collateralAmountUSD,
+      collateralAmountUSD: Number(trade.collateralAmountUSD).toFixed(2),
       collateralAmount: trade.collateralAmount,
       collateralTokenAddress: trade.collateralTokenAddress,
       creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
@@ -91,14 +93,14 @@ export const useGraphFpmmTransactionsFromQuestion = (
   const [fpmmTradeData, setFpmmTradeData] = useState<Maybe<FpmmTradeData[]>>(null)
   const [morePagination, setMorePagination] = useState<boolean>(false)
 
-  const { data, error, loading } = useQuery(type === 0 ? withoutTransactionType : withTransactionType, {
+  const { data, error, loading } = useQuery(type === 0 ? withoutFpmmType : withFpmmType, {
     notifyOnNetworkStatusChange: true,
     skip: false,
     variables: {
       id: questionID,
       pageSize: pageSize,
       pageIndex: pageIndex,
-      transactionType: type === 1 ? 'Sell' : 'Add',
+      fpmmType: type === 1 ? 'Liquidity' : 'Trade',
     },
     onCompleted: ({ fpmmTransactions }: any) => {
       setMorePagination(fpmmTransactions.length === pageSize)
