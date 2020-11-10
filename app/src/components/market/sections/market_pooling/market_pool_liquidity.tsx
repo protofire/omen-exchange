@@ -562,14 +562,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           hyperlinkDescription=""
         />
       )}
-      {activeTab === Tabs.deposit && showSetAllowance && (
-        <SetAllowance
-          collateral={collateral}
-          finished={allowanceFinished && RemoteData.is.success(allowance)}
-          loading={RemoteData.is.asking(allowance)}
-          onUnlock={unlockCollateral}
-        />
-      )}
       <BottomButtonWrapper>
         <MarketBottomNavButton
           buttonType={ButtonType.secondaryLine}
