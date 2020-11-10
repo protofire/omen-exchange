@@ -1,12 +1,14 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 
-import { useCollateralBalance, useConnectedWeb3Context } from '../../../../hooks'
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
-import { MarketMakerData, Token } from '../../../../util/types'
-import { ButtonTab } from '../../../button'
+import { useAsyncDerivedValue, useCollateralBalance, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { MarketMakerService } from '../../../../services'
+import { computeBalanceAfterTrade, formatBigNumber, formatNumber } from '../../../../util/tools'
+import { MarketMakerData } from '../../../../util/types'
+import { ButtonContainer, ButtonTab } from '../../../button'
+import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
@@ -26,7 +28,17 @@ export const ScalarMarketBuy = (props: Props) => {
   const { marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
 
-  const { collateral, outcomeTokenMarginalPrices, question, scalarHigh, scalarLow } = marketMakerData
+  const {
+    address: marketMakerAddress,
+    balances,
+    collateral,
+    outcomeTokenMarginalPrices,
+    question,
+    scalarHigh,
+    scalarLow,
+  } = marketMakerData
+  const { buildMarketMaker } = useContracts(context)
+  const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const Tabs = {
     short: 'short',
@@ -40,6 +52,38 @@ export const ScalarMarketBuy = (props: Props) => {
   const maybeCollateralBalance = useCollateralBalance(collateral, context)
   const collateralBalance = maybeCollateralBalance || Zero
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
+
+  const calcBuyAmount = useMemo(
+    () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber]> => {
+      let tradedShares: BigNumber
+      const positionIndex = activeTab === Tabs.short ? 0 : 1
+
+      try {
+        tradedShares = await marketMaker.calcBuyAmount(amount, positionIndex)
+      } catch {
+        tradedShares = new BigNumber(0)
+      }
+
+      const balanceAfterTrade = computeBalanceAfterTrade(
+        balances.map(b => b.holdings),
+        positionIndex,
+        amount,
+        tradedShares,
+      )
+      const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
+
+      const newPrediction = pricesAfterTrade[1] * 100
+
+      return [tradedShares, newPrediction, amount]
+    },
+    [balances, marketMaker],
+  )
+
+  const [tradedShares, newPrediction, debouncedAmount] = useAsyncDerivedValue(
+    amount,
+    [new BigNumber(0), 0, amount],
+    calcBuyAmount,
+  )
 
   return (
     <>
