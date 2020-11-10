@@ -73,7 +73,7 @@ const UserDataTitleValue = styled(TitleValue)`
   width: calc(50% - 16px);
   @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
     width: auto;
-    margin-top: 14px;
+    margin-top: 12px;
   }
 `
 const UserDataRow = styled.div`
@@ -96,7 +96,7 @@ const UserData = styled.div`
   padding: 20px 24px;
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
   @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
-    padding-top: 7px;
+    padding-top: 9px;
   }
 `
 
