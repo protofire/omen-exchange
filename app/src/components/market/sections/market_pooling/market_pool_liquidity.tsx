@@ -69,22 +69,34 @@ const WarningMessageStyled = styled(WarningMessage)`
   margin-bottom: 0;
 `
 
-const UserData = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin: 0 -25px;
-  padding: 20px 24px;
-  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
-`
-
 const UserDataTitleValue = styled(TitleValue)`
   width: calc(50% - 16px);
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    width: auto;
+    margin-top: 14px;
+  }
 `
 const UserDataRow = styled.div`
   display: flex;
   justify-content: space-between;
   &:first-child {
     margin-bottom: 12px;
+  }
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex-direction: column;
+    &:first-child {
+      margin-bottom: 0px;
+    }
+  }
+`
+const UserData = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 0 -25px;
+  padding: 20px 24px;
+  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    padding-top: 7px;
   }
 `
 
