@@ -361,3 +361,9 @@ export const formatToShortNumber = (number: string, decimals = 2): string => {
 
   return `${parseFloat(rNumber.toFixed(decimals))}${units[unitIndex]}`
 }
+
+export const clampBigNumber = (x: BigNumber, min: BigNumber, max: BigNumber): BigNumber => {
+  if (x.lt(min)) return min
+  if (x.gt(max)) return max
+  return x
+}

@@ -34,8 +34,6 @@ const MarketWizardCreatorContainer: FC = () => {
           throw new Error('resolution time was not specified')
         }
 
-        if (isScalar) logger.log('scalar boiiii')
-
         setMarketCreationStatus(MarketCreationStatus.creatingAMarket())
 
         const cpk = await CPKService.create(provider)
@@ -47,16 +45,30 @@ const MarketWizardCreatorContainer: FC = () => {
         if (!hasEnoughAlowance) {
           await collateralService.approveUnlimited(cpk.address)
         }
-        const marketMakerAddress = await cpk.createMarket({
-          marketData,
-          conditionalTokens,
-          realitio,
-          marketMakerFactory,
-        })
-        setMarketMakerAddress(marketMakerAddress)
 
-        setMarketCreationStatus(MarketCreationStatus.done())
-        history.replace(`/${marketMakerAddress}`)
+        if (isScalar) {
+          const marketMakerAddress = await cpk.createScalarMarket({
+            marketData,
+            conditionalTokens,
+            realitio,
+            marketMakerFactory,
+          })
+          setMarketMakerAddress(marketMakerAddress)
+
+          setMarketCreationStatus(MarketCreationStatus.done())
+          history.replace(`/${marketMakerAddress}`)
+        } else {
+          const marketMakerAddress = await cpk.createMarket({
+            marketData,
+            conditionalTokens,
+            realitio,
+            marketMakerFactory,
+          })
+          setMarketMakerAddress(marketMakerAddress)
+
+          setMarketCreationStatus(MarketCreationStatus.done())
+          history.replace(`/${marketMakerAddress}`)
+        }
       }
     } catch (err) {
       setMarketCreationStatus(MarketCreationStatus.error(err))

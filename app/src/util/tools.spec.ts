@@ -11,6 +11,7 @@ import {
   calcPoolTokens,
   calcPrice,
   calcSellAmountInCollateral,
+  clampBigNumber,
   computeBalanceAfterTrade,
   divBN,
   formatNumber,
@@ -394,6 +395,21 @@ describe('tools', () => {
         const formattedNumber = formatToShortNumber(number, decimals)
 
         expect(formattedNumber).toStrictEqual(result)
+      })
+    }
+  })
+
+  describe('clampBigNumber', () => {
+    const testCases: [[BigNumber, BigNumber, BigNumber], BigNumber][] = [
+      [[new BigNumber(0), new BigNumber(2), new BigNumber(7)], new BigNumber(2)],
+      [[new BigNumber(1232), new BigNumber(0), new BigNumber(283)], new BigNumber(283)],
+      [[new BigNumber(3), new BigNumber(1), new BigNumber(14)], new BigNumber(3)],
+    ]
+    for (const [[x, min, max], result] of testCases) {
+      it('should return a clamped big number', () => {
+        const clampedBigNumber = clampBigNumber(x, min, max)
+
+        expect(clampedBigNumber).toStrictEqual(result)
       })
     }
   })
