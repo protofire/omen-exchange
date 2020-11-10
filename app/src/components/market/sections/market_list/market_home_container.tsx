@@ -100,7 +100,7 @@ const MarketHomeContainer: React.FC = () => {
     sortParam = 'creationTimestamp'
   } else if (sortRoute === 'ending') {
     sortParam = 'openingTimestamp'
-    sortDirection = 'asc'
+    sortDirection = stateRoute === 'MY_MARKETS' ? 'desc' : 'asc'
   } else if (sortRoute === 'liquidity') {
     sortParam = 'usdLiquidityParameter'
   }
