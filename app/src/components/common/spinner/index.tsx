@@ -35,15 +35,15 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   color?: string
   height?: string | undefined
   width?: string | undefined
-  big?: boolean | undefined
+  large?: boolean | undefined
 }
 
 export const Spinner: React.FC<Props> = (props: Props) => {
-  const { big, color = '#fff', height, width, ...restProps } = props
+  const { color = '#fff', height, large, width, ...restProps } = props
 
   return (
     <RotatingSpinner color={color} height={height} width={width} {...restProps}>
-      <SpinnerIcon alt="Loading..." src={big ? SpinnerBigSVG : SpinnerSVG} />
+      <SpinnerIcon alt="Loading..." src={large ? SpinnerBigSVG : SpinnerSVG} />
     </RotatingSpinner>
   )
 }

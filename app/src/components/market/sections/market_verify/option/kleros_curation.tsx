@@ -22,7 +22,7 @@ import {
   CurationSubRow,
 } from '../market_verify'
 
-const Bold = styled.b`
+const Bold = styled.p`
   font-weight: 500;
 `
 
