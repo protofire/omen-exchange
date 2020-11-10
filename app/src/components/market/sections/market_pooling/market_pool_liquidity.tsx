@@ -71,6 +71,9 @@ const WarningMessageStyled = styled(WarningMessage)`
   margin-bottom: 0;
   margin-bottom: 24px;
 `
+const SetAllowanceStyled = styled(SetAllowance)`
+  margin-bottom: 20px;
+`
 
 const UserData = styled.div`
   display: flex;
@@ -507,7 +510,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         </div>
       </GridTransactionDetails>
       {activeTab === Tabs.deposit && showSetAllowance && (
-        <SetAllowance
+        <SetAllowanceStyled
           collateral={collateral}
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
