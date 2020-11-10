@@ -289,7 +289,7 @@ const MarketHomeContainer: React.FC = () => {
         routeQueryArray.push(`tag=${filter.title}`)
       }
 
-      if (filter.curationSource) {
+      if (filter.curationSource && filter.curationSource !== 'Any') {
         route += `/curation-source/${filter.curationSource}`
       }
 
