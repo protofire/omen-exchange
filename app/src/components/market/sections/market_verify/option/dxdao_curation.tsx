@@ -16,7 +16,7 @@ import {
   CurationSubRow,
 } from '../market_verify'
 
-const Bold = styled.p`
+const Bold = styled.b`
   font-weight: 500;
 `
 
