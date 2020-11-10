@@ -328,7 +328,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       onClick: () => {
         setState(MarketStates.myMarkets)
         setSortBy('openingTimestamp')
-        setSortByDirection('asc')
+        setSortByDirection('desc')
       },
     })
   }
@@ -434,7 +434,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     {
       title: 'Ending soon',
       sortBy: 'openingTimestamp',
-      direction: 'asc',
+      direction: 'desc',
     },
   ] as const
 
@@ -584,7 +584,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             markets.data.slice(0, count).map(item => {
               return <ListItem currentFilter={currentFilter} key={item.address} market={item}></ListItem>
             })}
-          {noOwnMarkets && <NoOwnMarkets>You have not created any market yet.</NoOwnMarkets>}
+          {noOwnMarkets && <NoOwnMarkets>You have not created or participated in any markets yet.</NoOwnMarkets>}
           {noMarketsAvailable && <NoMarketsAvailable>No markets available.</NoMarketsAvailable>}
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
