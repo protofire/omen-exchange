@@ -5,6 +5,8 @@ import styled from 'styled-components'
 import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
+import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
+import theme from '../../../../theme'
 import { MarketMakerData, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { MoreMenu } from '../../../common/form/more_menu'
@@ -17,6 +19,10 @@ import { ProgressBarToggle } from '../progress_bar/toggle'
 const SubsectionTitleLeftWrapper = styled.div`
   display: flex;
   align-items: center;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex-grow: 1;
+  }
   & > * + * {
     margin-left: 12px;
   }
@@ -35,6 +41,9 @@ interface Props {
 
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { width } = useWindowDimensions()
+  const isMobile = width <= parseInt(theme.themeBreakPoints.sm)
+
   const [showingProgressBar, setShowingProgressBar] = useState(false)
   const history = useHistory()
 
@@ -88,6 +97,12 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       },
       content: 'Add Currency',
     },
+    {
+      onClick: () => {
+        toggleProgressBar()
+      },
+      content: showingProgressBar ? 'Hide Market State' : 'Show Market State',
+    },
   ]
 
   const onChangeMarketCurrency = (currency: Token | null) => {
@@ -113,15 +128,17 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
               placeholder=""
             />
           )}
-          <ProgressBarToggle
-            active={showingProgressBar}
-            state={marketState}
-            templateId={question.templateId}
-            toggleProgressBar={toggleProgressBar}
-          ></ProgressBarToggle>
+          {(!isMobile || marketsRelatedQuestion.length === 1) && (
+            <ProgressBarToggle
+              active={showingProgressBar}
+              state={marketState}
+              templateId={question.templateId}
+              toggleProgressBar={toggleProgressBar}
+            ></ProgressBarToggle>
+          )}
         </SubsectionTitleLeftWrapper>
 
-        <MoreMenu items={moreMenuItems} />
+        <MoreMenu items={marketsRelatedQuestion.length > 1 && isMobile ? moreMenuItems : new Array(moreMenuItems[0])} />
       </SubsectionTitleWrapper>
       {showingProgressBar && (
         <ProgressBar
