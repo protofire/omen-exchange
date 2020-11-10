@@ -25,13 +25,13 @@ import {
   formatNumber,
 } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
-import { ButtonContainer, ButtonTab } from '../../../button'
+import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { CurrenciesWrapper, GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -536,26 +536,22 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <BottomButtonWrapper>
-        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
-        </MarketBottomNavButton>
+        </Button>
         {activeTab === Tabs.deposit && (
-          <MarketBottomNavButton
-            buttonType={ButtonType.secondaryLine}
-            disabled={disableDepositButton}
-            onClick={() => addFunding()}
-          >
+          <Button buttonType={ButtonType.secondaryLine} disabled={disableDepositButton} onClick={() => addFunding()}>
             Deposit
-          </MarketBottomNavButton>
+          </Button>
         )}
         {activeTab === Tabs.withdraw && (
-          <MarketBottomNavButton
+          <Button
             buttonType={ButtonType.secondaryLine}
             disabled={disableWithdrawButton}
             onClick={() => removeFunding()}
           >
             Withdraw
-          </MarketBottomNavButton>
+          </Button>
         )}
       </BottomButtonWrapper>
       <ModalTransactionResult

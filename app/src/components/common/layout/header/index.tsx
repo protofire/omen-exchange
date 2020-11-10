@@ -7,8 +7,7 @@ import { useWeb3Context } from 'web3-react/dist'
 
 import { Logo } from '../../../../common/constants'
 import { ConnectedWeb3 } from '../../../../hooks'
-import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
-import { ButtonType } from '../../../button/button_styling_types'
+import { ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { ModalConnectWallet } from '../../../modal'
@@ -53,10 +52,8 @@ const LogoWrapper = styled(NavLink)`
   min-width: fit-content;
 `
 
-const ButtonCreateDesktop = styled(Button)`
+const ButtonCreateDesktop = styled(ButtonRound)`
   display: none;
-  height: 40px;
-  border-radius: 8px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: flex;
@@ -84,8 +81,6 @@ const ButtonCSS = css`
 
 const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
   ${ButtonCSS}
-  height: 40px;
-  border-radius: 8px;
 `
 
 const ButtonWrapper = styled.div`
@@ -156,7 +151,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
         <ContentsRight>
           {isMarketCreatePage ? (
             <>
-              <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...exitButtonProps}>
+              <ButtonCreateDesktop {...exitButtonProps}>
                 <CloseIconWrapper>
                   <IconClose />
                 </CloseIconWrapper>
@@ -169,9 +164,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
             </>
           ) : (
             <>
-              <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...createButtonProps}>
-                Create Market
-              </ButtonCreateDesktop>
+              <ButtonCreateDesktop {...createButtonProps}>Create Market</ButtonCreateDesktop>
               <ButtonCreateMobile {...createButtonProps}>
                 <IconAdd />
               </ButtonCreateMobile>

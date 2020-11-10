@@ -16,13 +16,13 @@ import {
   mulBN,
 } from '../../../../util/tools'
 import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
-import { ButtonContainer } from '../../../button'
+import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { TokenBalance } from '../../common/token_balance'
@@ -284,16 +284,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <StyledButtonContainer>
-        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
-        </MarketBottomNavButton>
-        <MarketBottomNavButton
-          buttonType={ButtonType.secondaryLine}
-          disabled={isSellButtonDisabled}
-          onClick={() => finish()}
-        >
+        </Button>
+        <Button buttonType={ButtonType.secondaryLine} disabled={isSellButtonDisabled} onClick={() => finish()}>
           Sell
-        </MarketBottomNavButton>
+        </Button>
       </StyledButtonContainer>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}

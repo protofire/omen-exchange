@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getLogger } from '../../../../util/logger'
@@ -12,7 +12,7 @@ import {
   MarketStates,
   MarketsSortCriteria,
 } from '../../../../util/types'
-import { ButtonCircle } from '../../../button'
+import { ButtonRound } from '../../../button'
 import {
   Dropdown,
   DropdownDirection,
@@ -57,23 +57,9 @@ const FiltersControls = styled.div<{ disabled?: boolean }>`
   }
 `
 
-const ButtonRoundActiveCSS = css`
-  &,
-  &:hover {
-    background-color: #fff;
-    border-color: ${props => props.theme.colors.borderColorDark};
-
-    > svg path {
-      fill: ${props => props.theme.colors.textColorDark};
-    }
-  }
-`
-
-const ButtonRoundStyled = styled(ButtonCircle)<{
+const ButtonRoundStyled = styled(ButtonRound)<{
   disabled?: boolean
 }>`
-  border-radius: 8px;
-  height: 40px;
   width: auto;
   color: ${({ theme }) => theme.colors.textColorDark};
   svg {
@@ -82,11 +68,11 @@ const ButtonRoundStyled = styled(ButtonCircle)<{
         ? 'invert(46%) sepia(0%) saturate(1168%) hue-rotate(183deg) brightness(99%) contrast(89%)'
         : 'none'};
   }
-  ${props => props.active && ButtonRoundActiveCSS}
 `
 
 const ButtonSearchStyled = styled(ButtonRoundStyled as any)`
   width: 40px;
+  padding: 0;
 `
 
 const FilterBadgeLabel = styled.span`
@@ -112,12 +98,6 @@ const ButtonFilterStyled = styled(ButtonRoundStyled as any)`
   & > * + * {
     margin-left: 10px;
   }
-`
-
-const ButtonPaginationStyled = styled(ButtonRoundStyled as any)`
-  padding: 12px 20px;
-  font-size: 14px;
-  line-height: 16px;
 `
 
 const ListWrapper = styled.div`
@@ -599,12 +579,12 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             />
           </DisplayButtonWrapper>
           <LoadMoreWrapper>
-            <ButtonPaginationStyled disabled={disableLoadPrevButton} onClick={onLoadPrevPage}>
+            <ButtonRoundStyled disabled={disableLoadPrevButton} onClick={onLoadPrevPage}>
               Prev
-            </ButtonPaginationStyled>
-            <ButtonPaginationStyled disabled={disableLoadNextButton} onClick={onLoadNextPage}>
+            </ButtonRoundStyled>
+            <ButtonRoundStyled disabled={disableLoadNextButton} onClick={onLoadNextPage}>
               Next
-            </ButtonPaginationStyled>
+            </ButtonRoundStyled>
           </LoadMoreWrapper>
         </BottomContents>
       </ListCard>
