@@ -29,7 +29,7 @@ const MarketView: React.FC<Props> = (props: Props) => {
   const { isQuestionFinalized, oracle, question } = marketMakerData
 
   const context = useConnectedWeb3Context()
-  const { networkId } = context
+  const networkId = context.networkId
 
   const renderView = () => {
     let realitioProxy
