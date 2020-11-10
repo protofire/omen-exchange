@@ -1,6 +1,5 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useState } from 'react'
 import { useHistory } from 'react-router'
-import { useWeb3Context } from 'web3-react/dist'
 
 import { useContracts } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
@@ -8,7 +7,7 @@ import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
-import { MarketData, Wallet } from '../../../../util/types'
+import { MarketData } from '../../../../util/types'
 import { ModalConnectWallet } from '../../../modal'
 
 import { MarketWizardCreator } from './market_wizard_creator'
@@ -16,7 +15,6 @@ import { MarketWizardCreator } from './market_wizard_creator'
 const logger = getLogger('Market::MarketWizardCreatorContainer')
 
 const MarketWizardCreatorContainer: FC = () => {
-  const web3Context = useWeb3Context()
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
   const history = useHistory()
@@ -26,15 +24,6 @@ const MarketWizardCreatorContainer: FC = () => {
 
   const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(MarketCreationStatus.ready())
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
-
-  const isConnectedViaWalletConnector = web3Context.connectorName === Wallet.WalletConnect
-
-  useEffect(() => {
-    if (isConnectedViaWalletConnector) {
-      history.replace('/')
-    }
-    // eslint-disable-next-line
-  }, [isConnectedViaWalletConnector])
 
   const handleSubmit = async (marketData: MarketData) => {
     try {

@@ -7,7 +7,6 @@ import { useWeb3Context } from 'web3-react/dist'
 
 import { Logo } from '../../../../common/constants'
 import { ConnectedWeb3 } from '../../../../hooks'
-import { Wallet } from '../../../../util/types'
 import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { Network } from '../../../common'
@@ -146,8 +145,6 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
     onClick: () => history.push('/'),
   }
 
-  const isConnectedViaWalletConnector = context.connectorName === Wallet.WalletConnect
-
   return (
     <HeaderWrapper {...restProps}>
       <HeaderInner>
@@ -171,16 +168,14 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               </ButtonCreateMobile>
             </>
           ) : (
-            !isConnectedViaWalletConnector && (
-              <>
-                <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...createButtonProps}>
-                  Create Market
-                </ButtonCreateDesktop>
-                <ButtonCreateMobile {...createButtonProps}>
-                  <IconAdd />
-                </ButtonCreateMobile>
-              </>
-            )
+            <>
+              <ButtonCreateDesktop buttonType={ButtonType.secondaryLine} {...createButtonProps}>
+                Create Market
+              </ButtonCreateDesktop>
+              <ButtonCreateMobile {...createButtonProps}>
+                <IconAdd />
+              </ButtonCreateMobile>
+            </>
           )}
 
           {!context.account && (
