@@ -7,7 +7,7 @@ import { formatBigNumber, formatNumber } from '../../../../util/tools'
 const ScaleWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: 182px;
+  height: 186px;
   border-bottom: 1px solid ${props => props.theme.scale.bar};
   margin-left: -24px;
   margin-right: -24px;
@@ -88,21 +88,12 @@ const StartingPointBox = styled.div<{ xValue: number }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  bottom: 24px;
+  top: 44px;
   ${props =>
     props.xValue <= 0.885
       ? `left: ${props.xValue <= 0.115 ? `25px` : props.xValue <= 0.885 ? `${props.xValue * 100}%` : ``}`
       : `right: 25px`}
-  transform: translateX(
-    ${props =>
-      props.xValue < 0.5 && props.xValue >= 0.115
-        ? `calc(-50% + 12px)`
-        : props.xValue > 0.5 && props.xValue <= 0.885
-        ? `calc(-50% - 12px)`
-        : props.xValue === 0.5
-        ? `-50%`
-        : `0`}
-  );
+  transform: translateX(-50%);
   background: white;
 `
 
@@ -165,22 +156,22 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         <VerticalBar />
         <VerticalBar />
         <HorizontalBar />
+        <StartingPointBox
+          xValue={
+            currentPrediction
+              ? Number(currentPrediction)
+              : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
+          }
+        >
+          <StartingPointTitle>
+            {currentPrediction
+              ? Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
+              : startingPoint && startingPointNumber}
+            {` ${unit}`}
+          </StartingPointTitle>
+          <StartingPointSubtitle>{startingPointTitle}</StartingPointSubtitle>
+        </StartingPointBox>
       </Scale>
-      <StartingPointBox
-        xValue={
-          currentPrediction
-            ? Number(currentPrediction)
-            : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
-        }
-      >
-        <StartingPointTitle>
-          {currentPrediction
-            ? Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
-            : startingPoint && startingPointNumber}
-          {` ${unit}`}
-        </StartingPointTitle>
-        <StartingPointSubtitle>{startingPointTitle}</StartingPointSubtitle>
-      </StartingPointBox>
     </ScaleWrapper>
   )
 }
