@@ -20,7 +20,7 @@ import { ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { CurrenciesWrapper, MarketBottomNavButton, TabsGrid } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError, MarketBottomNavButton, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
@@ -28,6 +28,7 @@ import { SetAllowance } from '../../common/set_allowance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
+import { WarningMessage } from '../../common/warning_message'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
@@ -203,6 +204,7 @@ export const ScalarMarketBuy = (props: Props) => {
               onSelect={() => null}
             />
           </CurrenciesWrapper>
+          <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
@@ -224,7 +226,7 @@ export const ScalarMarketBuy = (props: Props) => {
             shouldDisplayMaxButton
             symbol={collateral.symbol}
           />
-          <ReactTooltip id="walletBalanceTooltip" />
+          {amountError && <GenericError>{amountError}</GenericError>}
         </div>
         <div>
           <TransactionDetailsCard>
@@ -246,6 +248,15 @@ export const ScalarMarketBuy = (props: Props) => {
           </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
+      {isNegativeAmount && (
+        <WarningMessage
+          additionalDescription={''}
+          danger={true}
+          description={`Your buy amount should not be negative.`}
+          href={''}
+          hyperlinkDescription={''}
+        />
+      )}
       {showSetAllowance && (
         <SetAllowance
           collateral={collateral}
