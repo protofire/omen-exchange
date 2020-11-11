@@ -1,12 +1,15 @@
 import React from 'react'
+import { useHistory } from 'react-router'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import styled from 'styled-components'
 
 import { getOutcomeColor } from '../../../../theme/utils'
+import { Button } from '../../../button/button'
+import { ButtonType } from '../../../button/button_styling_types'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../common_styled'
 
 const ResponsiveWrapper = styled.div`
-  margin: 21px 21px 24.5px 21px;
+  margin: 21px 24.5px;
   border: 1px solid ${props => props.theme.borders.borderDisabled};
   padding-bottom: 16px;
   border-radius: 6px;
@@ -32,6 +35,11 @@ const Legends = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
+`
+const ButtonWrapper = styled.div`
+  border-top: ${props => props.theme.borders.borderLineDisabled};
+  padding-top: 20px;
+  padding-left: 24px;
 `
 
 const Legend = styled.li`
@@ -84,38 +92,46 @@ type Props = {
 }
 
 export const HistoryChart: React.FC<Props> = ({ data, outcomes }) => {
+  const history = useHistory()
   return (
-    <ResponsiveWrapper>
-      <ResponsiveContainer height={300} width="100%">
-        <AreaChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} stackOffset="expand">
-          <XAxis dataKey="date" stroke="#E8EAF6" tick={{ fill: '#757575', fontFamily: 'Roboto' }} tickMargin={11} />
-          <YAxis
-            orientation="right"
-            stroke="#E8EAF6"
-            tick={{ fill: '#757575', fontFamily: 'Roboto' }}
-            tickFormatter={toPercent}
-            tickMargin={10}
-          />
-          <Tooltip content={renderTooltipContent} />
+    <>
+      <ResponsiveWrapper>
+        <ResponsiveContainer height={300} width="100%">
+          <AreaChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} stackOffset="expand">
+            <XAxis dataKey="date" stroke="#E8EAF6" tick={{ fill: '#757575', fontFamily: 'Roboto' }} tickMargin={11} />
+            <YAxis
+              orientation="right"
+              stroke="#E8EAF6"
+              tick={{ fill: '#757575', fontFamily: 'Roboto' }}
+              tickFormatter={toPercent}
+              tickMargin={10}
+            />
+            <Tooltip content={renderTooltipContent} />
 
-          {outcomes
-            .map((outcomeName, index) => {
-              const color = getOutcomeColor(index)
+            {outcomes
+              .map((outcomeName, index) => {
+                const color = getOutcomeColor(index)
 
-              return (
-                <Area
-                  dataKey={outcomeName}
-                  fill={color.medium}
-                  key={`${index}-${outcomeName}`}
-                  stackId="1"
-                  stroke={color.darker}
-                  type="monotone"
-                />
-              )
-            })
-            .reverse()}
-        </AreaChart>
-      </ResponsiveContainer>
-    </ResponsiveWrapper>
+                return (
+                  <Area
+                    dataKey={outcomeName}
+                    fill={color.medium}
+                    key={`${index}-${outcomeName}`}
+                    stackId="1"
+                    stroke={color.darker}
+                    type="monotone"
+                  />
+                )
+              })
+              .reverse()}
+          </AreaChart>
+        </ResponsiveContainer>
+      </ResponsiveWrapper>
+      <ButtonWrapper>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
+          Back
+        </Button>
+      </ButtonWrapper>
+    </>
   )
 }

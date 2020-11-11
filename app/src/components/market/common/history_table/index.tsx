@@ -79,7 +79,7 @@ export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoa
     const minuteWithZero = (minute < 10 ? '0' : '') + minute
     const hour = date.getHours()
     const hourWithZero = (hour < 10 ? '0' : '') + hour
-    return `${date.getDate()}.${date.getMonth()}-${hourWithZero}:${minuteWithZero}`
+    return `${date.getDate()}.${date.getMonth()} - ${hourWithZero}:${minuteWithZero}`
   }
   return (
     <React.Fragment>

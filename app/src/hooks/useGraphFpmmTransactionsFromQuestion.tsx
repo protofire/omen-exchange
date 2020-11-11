@@ -76,7 +76,12 @@ const wrangleResponse = (data: any) => {
   return data.map((trade: FpmmTradeData) => {
     return {
       id: trade.id,
-      transactionType: trade.transactionType,
+      transactionType:
+        trade.transactionType === 'Add'
+          ? 'Deposit'
+          : trade.transactionType === 'Remove'
+          ? 'Withdraw'
+          : trade.transactionType,
       user: trade.user.id,
       collateralAmountUSD: Number(trade.collateralAmountUSD).toFixed(2),
       collateralAmount: trade.collateralAmount,

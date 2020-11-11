@@ -50,8 +50,8 @@ const TitleWrapper = styled.div`
   align-items: center;
   border-bottom: 1px solid ${props => props.theme.borders.borderDisabled};
   display: flex;
-  margin: 0 0 -11px;
-  padding: ${props => props.theme.cards.paddingVertical};
+  margin: 0;
+  padding: 20px 24px;
 `
 
 const ButtonsWrapper = styled.div`
@@ -77,7 +77,8 @@ type Props = {
 }
 
 const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
-  color: ${props => (props.active ? props.theme.colors.primary : props.theme.colors.textColor)};
+  color: ${props => (props.active ? props.theme.colors.primary : props.theme.colors.clickable)};
+  font-weight: 500;
   margin-left: 5px;
 
   &:first-child {
