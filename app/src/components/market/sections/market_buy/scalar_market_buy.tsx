@@ -271,7 +271,7 @@ export const ScalarMarketBuy = (props: Props) => {
               value={feeFormatted}
             />
             <TransactionDetailsLine />
-            <TransactionDetailsRow title={'Max. Loss'} value={''} />
+            <TransactionDetailsRow title={'Max. Loss'} value={potentialLossFormatted} />
             <TransactionDetailsRow
               emphasizeValue={potentialProfit.gt(0)}
               state={ValueStates.success}
