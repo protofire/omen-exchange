@@ -7,14 +7,13 @@ import styled from 'styled-components'
 import { DOCUMENT_FAQ } from '../../../../common/constants'
 import {
   useCollateralBalance,
+  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
-  useCpk,
   useCpkAllowance,
   useFundingBalance,
 } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
-import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import {
@@ -121,7 +120,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
 
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -230,6 +229,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setModalTitle('Funds Deposit')
 
     try {
+      if (!cpk) {
+        return
+      }
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
@@ -241,8 +243,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
-
-      const cpk = await CPKService.create(provider)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const collateralService = new ERC20Service(provider, account, collateralAddress)
@@ -276,6 +276,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const removeFunding = async () => {
     setModalTitle('Funds Withdrawal')
     try {
+      if (!cpk) {
+        return
+      }
       setStatus(Status.Loading)
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
@@ -284,7 +287,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
-      const cpk = await CPKService.create(provider)
 
       await cpk.removeFunding({
         amountToMerge: depositedTokens,

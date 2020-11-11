@@ -10,9 +10,9 @@ import { DOCUMENT_VALIDITY_RULES } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
+  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
-  useCpk,
   useCpkAllowance,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
@@ -55,7 +55,7 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
   const { library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 

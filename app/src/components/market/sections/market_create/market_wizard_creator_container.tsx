@@ -1,10 +1,9 @@
 import React, { FC, useState } from 'react'
 import { useHistory } from 'react-router'
 
-import { useContracts } from '../../../../hooks'
+import { useConnectedCPKContext, useContracts } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
-import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { MarketData } from '../../../../util/types'
@@ -16,6 +15,7 @@ const logger = getLogger('Market::MarketWizardCreatorContainer')
 
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
+  const cpk = useConnectedCPKContext()
   const { account, library: provider } = context
   const history = useHistory()
 
@@ -33,10 +33,11 @@ const MarketWizardCreatorContainer: FC = () => {
         if (!marketData.resolution) {
           throw new Error('resolution time was not specified')
         }
+        if (!cpk) {
+          return
+        }
 
         setMarketCreationStatus(MarketCreationStatus.creatingAMarket())
-
-        const cpk = await CPKService.create(provider)
 
         // Approve collateral to the proxy contract
         const collateralService = new ERC20Service(provider, account, marketData.collateral.address)
