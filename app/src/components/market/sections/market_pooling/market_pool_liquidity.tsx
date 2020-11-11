@@ -1,7 +1,7 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { DOCUMENT_FAQ } from '../../../../common/constants'
@@ -56,6 +56,9 @@ enum Tabs {
 
 const BottomButtonWrapper = styled(ButtonContainer)`
   justify-content: space-between;
+  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
+  margin: 0 -24px;
+  padding: 20px 24px 0;
 `
 
 const TabsGrid = styled.div`
@@ -65,8 +68,11 @@ const TabsGrid = styled.div`
   margin: 0 0 20px;
 `
 const WarningMessageStyled = styled(WarningMessage)`
-  margin-top: 20px;
   margin-bottom: 0;
+  margin-bottom: 24px;
+`
+const SetAllowanceStyled = styled(SetAllowance)`
+  margin-bottom: 20px;
 `
 
 const UserDataTitleValue = styled(TitleValue)`
@@ -116,9 +122,9 @@ const UserData = styled.div`
 const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
-  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, marketMakerData } = props
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
-
+  const history = useHistory()
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
   const cpk = useCpk()
@@ -391,12 +397,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         probabilities={probabilities}
         showSharesChange={showSharesChange}
       />
-      <WarningMessageStyled
-        additionalDescription=""
-        description="Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time."
-        href={DOCUMENT_FAQ}
-        hyperlinkDescription="More Info"
-      />
       <GridTransactionDetails>
         <div>
           <TabsGrid>
@@ -530,6 +530,20 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
         </div>
       </GridTransactionDetails>
+      {activeTab === Tabs.deposit && showSetAllowance && (
+        <SetAllowanceStyled
+          collateral={collateral}
+          finished={allowanceFinished && RemoteData.is.success(allowance)}
+          loading={RemoteData.is.asking(allowance)}
+          onUnlock={unlockCollateral}
+        />
+      )}
+      <WarningMessageStyled
+        additionalDescription=""
+        description="Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time."
+        href={DOCUMENT_FAQ}
+        hyperlinkDescription="More Info"
+      />
       {isNegativeAmountToFund && (
         <WarningMessage
           additionalDescription=""
@@ -548,17 +562,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           hyperlinkDescription=""
         />
       )}
-      {activeTab === Tabs.deposit && showSetAllowance && (
-        <SetAllowance
-          collateral={collateral}
-          finished={allowanceFinished && RemoteData.is.success(allowance)}
-          loading={RemoteData.is.asking(allowance)}
-          onUnlock={unlockCollateral}
-        />
-      )}
       <BottomButtonWrapper>
-        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
-          Cancel
+        <MarketBottomNavButton
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => {
+            history.goBack()
+          }}
+        >
+          Back
         </MarketBottomNavButton>
         {activeTab === Tabs.deposit && (
           <MarketBottomNavButton
