@@ -119,10 +119,11 @@ interface Props {
   upperBound: BigNumber
   startingPointTitle: string
   currentPrediction?: Maybe<string>
+  newPrediction?: Maybe<number>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
-  const { currentPrediction, lowerBound, startingPoint, startingPointTitle, unit, upperBound } = props
+  const { currentPrediction, lowerBound, newPrediction, startingPoint, startingPointTitle, unit, upperBound } = props
 
   const decimals = 18
 
@@ -147,7 +148,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       <Scale>
         <ScaleBall
           xValue={
-            currentPrediction
+            newPrediction
+              ? newPrediction
+              : currentPrediction
               ? Number(currentPrediction)
               : (startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)
           }
