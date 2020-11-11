@@ -23,6 +23,7 @@ import { MarketCreationStatus } from '../../../../../../util/market_creation_sta
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
+import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
@@ -32,7 +33,6 @@ import {
   ButtonContainerFullWidth,
   CurrenciesWrapper,
   GenericError,
-  MarketBottomNavButton,
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
   OutcomeItemTextWrapper,
@@ -71,7 +71,7 @@ const SubsectionTitleStyled = styled(SubsectionTitle)`
   margin-bottom: 24px;
 `
 
-const LeftButton = styled(MarketBottomNavButton as any)`
+const LeftButton = styled(Button as any)`
   margin-right: auto;
 `
 
@@ -105,10 +105,6 @@ const TitleValueVertical = styled(TitleValue)`
 
 const GridTransactionDetailsWrapper = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
   ${props => (props.noMarginTop ? 'margin-top: 0;' : '')};
-`
-
-const ButtonCreate = styled(MarketBottomNavButton as any)`
-  font-weight: 400;
 `
 
 const CreateCardBottomRow = styled.div`
@@ -489,13 +485,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             Back
           </LeftButton>
           {!account && (
-            <MarketBottomNavButton buttonType={ButtonType.primary} onClick={submit}>
+            <Button buttonType={ButtonType.primary} onClick={submit}>
               Connect Wallet
-            </MarketBottomNavButton>
+            </Button>
           )}
-          <ButtonCreate buttonType={ButtonType.secondaryLine} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
+          <Button buttonType={ButtonType.secondaryLine} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
             Create Market
-          </ButtonCreate>
+          </Button>
         </StyledButtonContainerFullWidth>
       </CreateCardBottom>
       {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
