@@ -64,13 +64,16 @@ export const ScalarMarketBuy = (props: Props) => {
   }, [activeTab])
 
   const calcBuyAmount = useMemo(
-    () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber]> => {
+    () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber, BigNumber]> => {
       let tradedShares: BigNumber
+      let reverseTradedShares: BigNumber
 
       try {
         tradedShares = await marketMaker.calcBuyAmount(amount, positionIndex)
+        reverseTradedShares = await marketMaker.calcBuyAmount(amount, positionIndex === 0 ? 1 : 0)
       } catch {
         tradedShares = new BigNumber(0)
+        reverseTradedShares = new BigNumber(0)
       }
 
       const balanceAfterTrade = computeBalanceAfterTrade(
@@ -83,14 +86,14 @@ export const ScalarMarketBuy = (props: Props) => {
 
       const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
 
-      return [tradedShares, newPrediction, amount]
+      return [tradedShares, newPrediction, amount, reverseTradedShares]
     },
     [balances, marketMaker, positionIndex],
   )
 
-  const [tradedShares, newPrediction, debouncedAmount] = useAsyncDerivedValue(
+  const [tradedShares, newPrediction, debouncedAmount, reverseTradedShares] = useAsyncDerivedValue(
     amount,
-    [new BigNumber(0), 0, amount],
+    [new BigNumber(0), 0, amount, new BigNumber(0)],
     calcBuyAmount,
   )
   console.log(tradedShares)
@@ -102,11 +105,15 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
+  const potentialLoss = reverseTradedShares.isZero() ? new BigNumber(0) : reverseTradedShares.sub(amount)
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
   const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
   const potentialProfitFormatted = `${formatNumber(formatBigNumber(potentialProfit, collateral.decimals))} ${
+    collateral.symbol
+  }`
+  const potentialLossFormatted = `${formatNumber(formatBigNumber(potentialLoss, collateral.decimals))} ${
     collateral.symbol
   }`
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
@@ -172,7 +179,7 @@ export const ScalarMarketBuy = (props: Props) => {
               value={feeFormatted}
             />
             <TransactionDetailsLine />
-            <TransactionDetailsRow title={'Max. Loss'} value={''} />
+            <TransactionDetailsRow title={'Max. Loss'} value={potentialLossFormatted} />
             <TransactionDetailsRow
               emphasizeValue={potentialProfit.gt(0)}
               state={ValueStates.success}
