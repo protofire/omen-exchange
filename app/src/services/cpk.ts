@@ -1,3 +1,4 @@
+import { txs } from '@gnosis.pm/safe-apps-sdk/dist/txs'
 import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ethers } from 'ethers'
@@ -7,7 +8,7 @@ import moment from 'moment'
 
 import { getLogger } from '../util/logger'
 import { getCPKAddresses, getContractAddress } from '../util/networks'
-import { calcDistributionHint } from '../util/tools'
+import { calcDistributionHint, waitABit } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -67,6 +68,11 @@ interface CPKRedeemParams {
   conditionalTokens: ConditionalTokenService
 }
 
+interface TransactionResult {
+  hash?: string
+  safeTxHash?: string
+}
+
 class CPKService {
   cpk: any
   provider: Web3Provider
@@ -97,6 +103,27 @@ class CPKService {
 
   get address(): string {
     return this.cpk.address
+  }
+
+  getTransactionHash = async (txObject: TransactionResult): Promise<string> => {
+    if (txObject.hash) {
+      return txObject.hash
+    }
+
+    if (txObject.safeTxHash) {
+      let transactionHash
+      // poll for safe tx data
+      while (!transactionHash) {
+        const safeTransaction = await txs.getBySafeTxHash(txObject.safeTxHash)
+        if (safeTransaction.transactionHash) {
+          transactionHash = safeTransaction.transactionHash
+        }
+        await waitABit()
+      }
+      return transactionHash
+    }
+
+    return ''
   }
 
   buyOutcomes = async ({ amount, marketMaker, outcomeIndex }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
@@ -143,9 +170,9 @@ class CPKService {
       }
 
       const txObject = await this.cpk.execTransactions(transactions)
-
-      logger.log(`Transaction hash: ${txObject.hash}`)
-      return this.provider.waitForTransaction(txObject.hash)
+      const txHash = await this.getTransactionHash(txObject)
+      logger.log(`Transaction hash: ${txHash}`)
+      return this.provider.waitForTransaction(txHash)
     } catch (err) {
       logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
       throw err
@@ -264,9 +291,10 @@ class CPKService {
       })
 
       const txObject = await this.cpk.execTransactions(transactions)
-      logger.log(`Transaction hash: ${txObject.hash}`)
+      const txHash = await this.getTransactionHash(txObject)
+      logger.log(`Transaction hash: ${txHash}`)
 
-      await this.provider.waitForTransaction(txObject.hash)
+      await this.provider.waitForTransaction(txHash)
       return predictedMarketMakerAddress
     } catch (err) {
       logger.error(`There was an error creating the market maker`, err.message)
@@ -312,9 +340,9 @@ class CPKService {
       )
 
       const txObject = await this.cpk.execTransactions(transactions)
-
-      logger.log(`Transaction hash: ${txObject.hash}`)
-      return this.provider.waitForTransaction(txObject.hash)
+      const txHash = await this.getTransactionHash(txObject)
+      logger.log(`Transaction hash: ${txHash}`)
+      return this.provider.waitForTransaction(txHash)
     } catch (err) {
       logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
       throw err
@@ -356,9 +384,9 @@ class CPKService {
       )
 
       const txObject = await this.cpk.execTransactions(transactions)
-
-      logger.log(`Transaction hash: ${txObject.hash}`)
-      return this.provider.waitForTransaction(txObject.hash)
+      const txHash = await this.getTransactionHash(txObject)
+      logger.log(`Transaction hash: ${txHash}`)
+      return this.provider.waitForTransaction(txHash)
     } catch (err) {
       logger.error(`There was an error adding an amount of '${amount.toString()}' for funding`, err.message)
       throw err
@@ -403,9 +431,9 @@ class CPKService {
       const transactions = [removeFundingTx, mergePositionsTx, transferCollateralTx]
 
       const txObject = await this.cpk.execTransactions(transactions)
-
-      logger.log(`Transaction hash: ${txObject.hash}`)
-      return this.provider.waitForTransaction(txObject.hash)
+      const txHash = await this.getTransactionHash(txObject)
+      logger.log(`Transaction hash: ${txHash}`)
+      return this.provider.waitForTransaction(txHash)
     } catch (err) {
       logger.error(`There was an error removing amount '${sharesToBurn.toString()}' for funding`, err.message)
       throw err
@@ -449,9 +477,9 @@ class CPKService {
       }
 
       const txObject = await this.cpk.execTransactions(transactions)
-
-      logger.log(`Transaction hash: ${txObject.hash}`)
-      return this.provider.waitForTransaction(txObject.hash)
+      const txHash = await this.getTransactionHash(txObject)
+      logger.log(`Transaction hash: ${txHash}`)
+      return this.provider.waitForTransaction(txHash)
     } catch (err) {
       logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
       throw err

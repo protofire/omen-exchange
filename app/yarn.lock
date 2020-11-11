@@ -1780,7 +1780,7 @@
   dependencies:
     big.js "^5.2.2"
 
-"@gnosis.pm/safe-apps-sdk@^0.4.1":
+"@gnosis.pm/safe-apps-sdk@^0.4.1", "@gnosis.pm/safe-apps-sdk@^0.4.2":
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-sdk/-/safe-apps-sdk-0.4.2.tgz#ae87b2164931c006cb0efdede3d82ff210df1648"
   integrity sha512-BwA2dyCebPMdi4JhhTkp6EjkhEM6vAIviKdhqHiHnSmL+sDfxtP1jdOuE8ME2/4+5TiLSS8k8qscYjLSlf1LLw==
