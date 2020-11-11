@@ -2,6 +2,7 @@ import Big from 'big.js'
 import { BigNumber } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
+import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
 import { CPKService, ERC20Service, MarketMakerService, OracleService } from '../services'
 import { getLogger } from '../util/logger'
 import { getArbitratorFromAddress } from '../util/networks'
@@ -24,6 +25,34 @@ const getBalances = (
 
   const balances: BalanceItem[] = outcomes.map((outcome: string, index: number) => {
     const outcomeName = outcome
+    const probability = actualPrices[index] * 100
+    const currentPrice = actualPrices[index]
+    const shares = userShares[index]
+    const holdings = marketMakerShares[index]
+
+    return {
+      outcomeName,
+      probability,
+      currentPrice,
+      shares,
+      holdings,
+      payout: payouts ? payouts[index] : new Big(0),
+    }
+  })
+
+  return balances
+}
+
+const getScalarBalances = (
+  outcomePrices: string[],
+  marketMakerShares: BigNumber[],
+  userShares: BigNumber[],
+  payouts: Maybe<Big[]>,
+): BalanceItem[] => {
+  const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
+
+  const balances: BalanceItem[] = outcomePrices.map((price: string, index: number) => {
+    const outcomeName = index === 0 ? 'short' : 'long'
     const probability = actualPrices[index] * 100
     const currentPrice = actualPrices[index]
     const shares = userShares[index]
@@ -76,6 +105,12 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       ? Date.now() > 1000 * graphMarketMakerData.answerFinalizedTimestamp.toNumber()
       : false
 
+    const isScalar =
+      graphMarketMakerData.oracle === REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase() ||
+      graphMarketMakerData.oracle === REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
+
+    const outcomesLength = isScalar ? 2 : outcomes.length
+
     const {
       collateral,
       isConditionResolved,
@@ -88,10 +123,10 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       userPoolShares,
       userShares,
     } = await promiseProps({
-      marketMakerShares: marketMaker.getBalanceInformation(graphMarketMakerData.address, outcomes.length),
+      marketMakerShares: marketMaker.getBalanceInformation(graphMarketMakerData.address, outcomesLength),
       userShares:
         cpk && cpk.address
-          ? marketMaker.getBalanceInformation(cpk.address, outcomes.length)
+          ? marketMaker.getBalanceInformation(cpk.address, outcomesLength)
           : outcomes.map(() => new BigNumber(0)),
       collateral: getERC20Token(provider, graphMarketMakerData.collateralAddress),
       isConditionResolved: conditionalTokens.isConditionResolved(graphMarketMakerData.conditionId),
@@ -112,9 +147,18 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
     const payouts = graphMarketMakerData.payouts
       ? graphMarketMakerData.payouts
       : realitioAnswer
-      ? OracleService.getPayouts(graphMarketMakerData.question.templateId, realitioAnswer, outcomes.length)
+      ? OracleService.getPayouts(graphMarketMakerData.question.templateId, realitioAnswer, outcomesLength)
       : null
-    const balances = getBalances(outcomes, marketMakerShares, userShares, payouts)
+
+    let balances: BalanceItem[]
+    isScalar
+      ? (balances = getScalarBalances(
+          graphMarketMakerData.outcomeTokenMarginalPrices,
+          marketMakerShares,
+          userShares,
+          payouts,
+        ))
+      : (balances = getBalances(outcomes, marketMakerShares, userShares, payouts))
 
     const newMarketMakerData: MarketMakerData = {
       address: graphMarketMakerData.address,
