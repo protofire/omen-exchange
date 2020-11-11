@@ -3,7 +3,6 @@ import styled from 'styled-components'
 
 const MarketTabs = styled.div`
   display: flex;
-  margin-top: -5px;
   margin-bottom: 20px;
 `
 
