@@ -1,11 +1,12 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useMemo, useState } from 'react'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { useAsyncDerivedValue, useCollateralBalance, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
-import { computeBalanceAfterTrade, formatBigNumber, formatNumber } from '../../../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -17,7 +18,7 @@ import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
-import { TransactionDetailsRow } from '../../common/transaction_details_row'
+import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -32,6 +33,7 @@ export const ScalarMarketBuy = (props: Props) => {
     address: marketMakerAddress,
     balances,
     collateral,
+    fee,
     outcomeTokenMarginalPrices,
     question,
     scalarHigh,
@@ -88,6 +90,21 @@ export const ScalarMarketBuy = (props: Props) => {
     calcBuyAmount,
   )
 
+  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
+  const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
+
+  const baseCost = debouncedAmount.sub(feePaid)
+  const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
+
+  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
+  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
+  const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
+  const potentialProfitFormatted = `${formatNumber(formatBigNumber(potentialProfit, collateral.decimals))} ${
+    collateral.symbol
+  }`
+  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
+  const total = `${sharesTotal} Shares`
+
   return (
     <>
       <MarketScale
@@ -137,15 +154,25 @@ export const ScalarMarketBuy = (props: Props) => {
             shouldDisplayMaxButton
             symbol={collateral.symbol}
           />
+          <ReactTooltip id="walletBalanceTooltip" />
         </div>
         <div>
           <TransactionDetailsCard>
-            <TransactionDetailsRow title={'Base Cost'} value={''} />
-            <TransactionDetailsRow title={'Fee'} tooltip={`A ${''}% fee goes to liquidity providers`} value={''} />
+            <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
+            <TransactionDetailsRow
+              title={'Fee'}
+              tooltip={`A ${feePercentage}% fee goes to liquidity providers`}
+              value={feeFormatted}
+            />
             <TransactionDetailsLine />
             <TransactionDetailsRow title={'Max. Loss'} value={''} />
-            <TransactionDetailsRow title={'Max. Profit'} value={''} />
-            <TransactionDetailsRow title={'Total'} value={''} />
+            <TransactionDetailsRow
+              emphasizeValue={potentialProfit.gt(0)}
+              state={ValueStates.success}
+              title={'Max. Profit'}
+              value={potentialProfitFormatted}
+            />
+            <TransactionDetailsRow title={'Total'} value={total} />
           </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
