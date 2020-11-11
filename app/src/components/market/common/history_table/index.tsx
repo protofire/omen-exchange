@@ -71,7 +71,6 @@ type Props = {
 
 export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoadPrevPage, status }) => {
   const history = useHistory()
-  // console.log(window.ethereum)
   const windowObj: any = window
 
   const dateFormatter = (dateData: string) => {
@@ -106,7 +105,6 @@ export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoa
               transactionType,
               user,
             }) => {
-              // console.log(transactionHash)
               const chainID = windowObj.ethereum.chainId
               const mainnetOrRinkebyUrl =
                 chainID === '0x4'
