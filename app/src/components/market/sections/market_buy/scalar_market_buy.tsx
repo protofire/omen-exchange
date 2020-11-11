@@ -132,9 +132,8 @@ export const ScalarMarketBuy = (props: Props) => {
     [new BigNumber(0), 0, amount, new BigNumber(0)],
     calcBuyAmount,
   )
-  console.log(tradedShares)
-  console.log(newPrediction)
-  console.log(debouncedAmount)
+
+  const formattedNewPrediction = (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
 
   const formattedNewPrediction =
     newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
