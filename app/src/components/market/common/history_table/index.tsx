@@ -21,7 +21,7 @@ const HistoryRow = styled.div<{ width: string; firstRow?: boolean }>`
   &:first-child {
     svg {
       margin-right: 10px;
-      vertical-align: sub;
+      vertical-align: middle;
     }
   }
   &:last-child {
@@ -71,6 +71,17 @@ type Props = {
 
 export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoadPrevPage, status }) => {
   const history = useHistory()
+  // console.log(window.ethereum)
+  const windowObj: any = window
+
+  const dateFormatter = (dateData: string) => {
+    const date = new Date(dateData)
+    const minute = date.getMinutes()
+    const minuteWithZero = (minute < 10 ? '0' : '') + minute
+    const hour = date.getHours()
+    const hourWithZero = (hour < 10 ? '0' : '') + hour
+    return `${date.getDate()}.${date.getMonth()}-${hourWithZero}:${minuteWithZero}`
+  }
   return (
     <React.Fragment>
       <TableWrapper>
@@ -85,23 +96,40 @@ export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoa
         </HistoryColumns>
         {status === 'Ready' &&
           fpmmTrade &&
-          fpmmTrade.map(({ collateralAmount, collateralAmountUSD, creationTimestamp, id, transactionType, user }) => {
-            const date = new Date(creationTimestamp)
-            const formattedDate = `${date.getDate()}.${date.getMonth()}-${date.getHours()}:${date.getMinutes()}`
-
-            return (
-              <HistoryColumns key={id}>
-                <HistoryRow width={'24'}>
-                  <ConnectionIcon />
-                  <span>{user}</span>
-                </HistoryRow>
-                <HistoryRow width={'20'}>{transactionType}</HistoryRow>
-                <HistoryRow width={'20'}>{formatNumber(collateralAmount)}</HistoryRow>
-                <HistoryRow width={'18'}>{collateralAmountUSD}</HistoryRow>
-                <HistoryRow width={'18'}>{formattedDate}</HistoryRow>
-              </HistoryColumns>
-            )
-          })}
+          fpmmTrade.map(
+            ({
+              collateralAmount,
+              collateralAmountUSD,
+              creationTimestamp,
+              id,
+              transactionHash,
+              transactionType,
+              user,
+            }) => {
+              // console.log(transactionHash)
+              const chainID = windowObj.ethereum.chainId
+              const mainnetOrRinkebyUrl =
+                chainID === '0x4'
+                  ? 'https://rinkeby.etherscan.io/tx/'
+                  : chainID === '0x1'
+                  ? 'https://etherscan.io/tx/'
+                  : ''
+              return (
+                <HistoryColumns key={id}>
+                  <HistoryRow width={'24'}>
+                    <ConnectionIcon size={'22'} />
+                    <span>{user}</span>
+                  </HistoryRow>
+                  <HistoryRow width={'20'}>{transactionType}</HistoryRow>
+                  <HistoryRow width={'20'}>{formatNumber(collateralAmount)}</HistoryRow>
+                  <HistoryRow width={'18'}>{collateralAmountUSD}</HistoryRow>
+                  <HistoryRow as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank" width={'18'}>
+                    {dateFormatter(creationTimestamp)}
+                  </HistoryRow>
+                </HistoryColumns>
+              )
+            },
+          )}
       </TableWrapper>
       <Pagination>
         <PaginationLeft>

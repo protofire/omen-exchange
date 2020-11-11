@@ -16,6 +16,7 @@ const fragment = gql`
     collateralAmountUSD
     collateralTokenAmount
     creationTimestamp
+    transactionHash
   }
 `
 const withFpmmType = gql`
@@ -50,6 +51,7 @@ export type FpmmTradeDataType = {
   collateralTokenAmount: string
   collateralAmountUSD: number
   creationTimestamp: string
+  transactionHash: string
 }
 interface FpmmTradeData {
   id: string
@@ -62,6 +64,7 @@ interface FpmmTradeData {
   collateralTokenAmount: string
   collateralAmountUSD: number
   creationTimestamp: string
+  transactionHash: string
 }
 
 interface Result {
@@ -80,6 +83,7 @@ const wrangleResponse = (data: any) => {
       collateralTokenAddress: trade.collateralTokenAddress,
       creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
       collateralTokenAmount: trade.collateralTokenAmount,
+      transactionHash: trade.transactionHash,
     }
   })
 }
