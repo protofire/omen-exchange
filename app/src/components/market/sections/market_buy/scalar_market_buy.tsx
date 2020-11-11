@@ -1,6 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
@@ -54,6 +54,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountDisplay, setAmountDisplay] = useState<string>('')
   const [activeTab, setActiveTab] = useState(Tabs.short)
+  const [positionIndex, setPositionIndex] = useState(0)
 
   const maybeCollateralBalance = useCollateralBalance(collateral, context)
   const collateralBalance = maybeCollateralBalance || Zero
@@ -62,10 +63,13 @@ export const ScalarMarketBuy = (props: Props) => {
   const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
   const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
 
+  useEffect(() => {
+    activeTab === Tabs.short ? setPositionIndex(0) : setPositionIndex(1)
+  }, [activeTab])
+
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber]> => {
       let tradedShares: BigNumber
-      const positionIndex = activeTab === Tabs.short ? 0 : 1
 
       try {
         tradedShares = await marketMaker.calcBuyAmount(amount, positionIndex)
@@ -85,7 +89,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
       return [tradedShares, newPrediction, amount]
     },
-    [balances, marketMaker],
+    [balances, marketMaker, positionIndex],
   )
 
   const [tradedShares, newPrediction, debouncedAmount] = useAsyncDerivedValue(
@@ -93,6 +97,9 @@ export const ScalarMarketBuy = (props: Props) => {
     [new BigNumber(0), 0, amount],
     calcBuyAmount,
   )
+  console.log(tradedShares)
+  console.log(newPrediction)
+  console.log(debouncedAmount)
 
   const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
