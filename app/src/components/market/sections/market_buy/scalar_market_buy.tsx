@@ -28,6 +28,7 @@ import { SetAllowance } from '../../common/set_allowance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
+import { WarningMessage } from '../../common/warning_message'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -199,6 +200,7 @@ export const ScalarMarketBuy = (props: Props) => {
               onSelect={() => null}
             />
           </CurrenciesWrapper>
+          <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
@@ -220,7 +222,7 @@ export const ScalarMarketBuy = (props: Props) => {
             shouldDisplayMaxButton
             symbol={collateral.symbol}
           />
-          <ReactTooltip id="walletBalanceTooltip" />
+          {amountError && <GenericError>{amountError}</GenericError>}
         </div>
         <div>
           <TransactionDetailsCard>
@@ -242,6 +244,15 @@ export const ScalarMarketBuy = (props: Props) => {
           </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
+      {isNegativeAmount && (
+        <WarningMessage
+          additionalDescription={''}
+          danger={true}
+          description={`Your buy amount should not be negative.`}
+          href={''}
+          hyperlinkDescription={''}
+        />
+      )}
       {showSetAllowance && (
         <SetAllowance
           collateral={collateral}
