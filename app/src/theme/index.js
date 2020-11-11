@@ -1,6 +1,7 @@
 const theme = {
   fonts: {
     defaultSize: '14px',
+    defaultLineHeight: '16px',
     fontFamily: `'Roboto', 'Helvetica Neue', 'Arial', 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', '-apple-system', 'BlinkMacSystemFont', sans-serif`,
     fontFamilyCode: `source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace`,
   },
@@ -71,7 +72,14 @@ const theme = {
     },
   },
   buttonCircle: {
-    dimensions: '34px',
+    dimensions: '40px',
+  },
+  buttonRound: {
+    borderRadius: '8px',
+    fontSize: '14px',
+    height: '40px',
+    lineHeight: '16px',
+    padding: '12px 17px',
   },
 
   colors: {
