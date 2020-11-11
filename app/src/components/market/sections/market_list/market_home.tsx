@@ -98,6 +98,10 @@ const ButtonFilterStyled = styled(ButtonRoundStyled as any)`
   & > * + * {
     margin-left: 10px;
   }
+  & > svg {
+    width: 24px;
+    height: 24px;
+  }
 `
 
 const ListWrapper = styled.div`

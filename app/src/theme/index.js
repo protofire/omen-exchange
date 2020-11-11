@@ -72,7 +72,7 @@ const theme = {
     },
   },
   buttonCircle: {
-    dimensions: '34px',
+    dimensions: '40px',
   },
   buttonRound: {
     borderRadius: '8px',

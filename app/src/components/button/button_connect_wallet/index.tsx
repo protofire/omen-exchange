@@ -6,13 +6,9 @@ import { ButtonProps, ButtonType } from '../button_styling_types'
 
 const Wrapper = styled(Button)`
   font-size: 12px;
-  padding-left: 10px;
-  padding-right: 10px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     font-size: 14px;
-    padding-left: 20px;
-    padding-right: 20px;
   }
 `
 
