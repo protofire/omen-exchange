@@ -20,7 +20,8 @@ import { ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
+import { FullLoading } from '../../../loading'
+import { CurrenciesWrapper, GenericError, MarketBottomNavButton, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
@@ -66,6 +67,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const [positionIndex, setPositionIndex] = useState(0)
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
+  const [message, setMessage] = useState<string>('')
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -270,6 +272,7 @@ export const ScalarMarketBuy = (props: Props) => {
           Buy Position
         </MarketBottomNavButton>
       </StyledButtonContainer>
+      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }
