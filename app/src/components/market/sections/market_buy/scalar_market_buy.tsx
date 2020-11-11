@@ -24,6 +24,7 @@ import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_s
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
+import { SetAllowance } from '../../common/set_allowance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
@@ -85,6 +86,15 @@ export const ScalarMarketBuy = (props: Props) => {
   useEffect(() => {
     activeTab === Tabs.short ? setPositionIndex(0) : setPositionIndex(1)
   }, [activeTab])
+
+  const unlockCollateral = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await unlock()
+    setAllowanceFinished(true)
+  }
 
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber, BigNumber]> => {
@@ -232,6 +242,14 @@ export const ScalarMarketBuy = (props: Props) => {
           </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
+      {showSetAllowance && (
+        <SetAllowance
+          collateral={collateral}
+          finished={allowanceFinished && RemoteData.is.success(allowance)}
+          loading={RemoteData.is.asking(allowance)}
+          onUnlock={unlockCollateral}
+        />
+      )}
       <StyledButtonContainer>
         <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
