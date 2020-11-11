@@ -4,10 +4,18 @@ import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useAsyncDerivedValue, useCollateralBalance, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import {
+  useAsyncDerivedValue,
+  useCollateralBalance,
+  useConnectedWeb3Context,
+  useContracts,
+  useCpk,
+  useCpkAllowance,
+} from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
+import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
-import { MarketMakerData } from '../../../../util/types'
+import { MarketMakerData, Status, Ternary } from '../../../../util/types'
 import { ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -32,6 +40,9 @@ interface Props {
 export const ScalarMarketBuy = (props: Props) => {
   const { marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
+  const cpk = useCpk()
+  const { library: provider } = context
+  const signer = useMemo(() => provider.getSigner(), [provider])
 
   const {
     address: marketMakerAddress,
@@ -55,6 +66,14 @@ export const ScalarMarketBuy = (props: Props) => {
   const [amountDisplay, setAmountDisplay] = useState<string>('')
   const [activeTab, setActiveTab] = useState(Tabs.short)
   const [positionIndex, setPositionIndex] = useState(0)
+  const [status, setStatus] = useState<Status>(Status.Ready)
+  const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
+
+  const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
+
+  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
+  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const maybeCollateralBalance = useCollateralBalance(collateral, context)
   const collateralBalance = maybeCollateralBalance || Zero
@@ -62,6 +81,10 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
   const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
+
+  useEffect(() => {
+    setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
+  }, [amount, collateral.decimals])
 
   useEffect(() => {
     activeTab === Tabs.short ? setPositionIndex(0) : setPositionIndex(1)
@@ -122,6 +145,25 @@ export const ScalarMarketBuy = (props: Props) => {
   }`
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
+
+  const showSetAllowance =
+    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+
+  const amountError =
+    maybeCollateralBalance === null
+      ? null
+      : maybeCollateralBalance.isZero() && amount.gt(maybeCollateralBalance)
+      ? `Insufficient balance`
+      : amount.gt(maybeCollateralBalance)
+      ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
+      : null
+
+  const isBuyDisabled =
+    (status !== Status.Ready && status !== Status.Error) ||
+    amount.isZero() ||
+    hasEnoughAllowance !== Ternary.True ||
+    amountError !== null ||
+    isNegativeAmount
 
   return (
     <>
@@ -199,7 +241,9 @@ export const ScalarMarketBuy = (props: Props) => {
           Cancel
         </MarketBottomNavButton>
         {/* TODO: Add isBuyDisabled and onClick handler */}
-        <MarketBottomNavButton buttonType={ButtonType.secondaryLine}>Buy Position</MarketBottomNavButton>
+        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled}>
+          Buy Position
+        </MarketBottomNavButton>
       </StyledButtonContainer>
     </>
   )
