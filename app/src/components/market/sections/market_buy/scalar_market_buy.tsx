@@ -53,6 +53,9 @@ export const ScalarMarketBuy = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
 
+  const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
+  const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
+
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber]> => {
       let tradedShares: BigNumber
@@ -72,7 +75,7 @@ export const ScalarMarketBuy = (props: Props) => {
       )
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
-      const newPrediction = pricesAfterTrade[1] * 100
+      const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
 
       return [tradedShares, newPrediction, amount]
     },
