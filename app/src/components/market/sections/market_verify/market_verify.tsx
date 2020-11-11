@@ -9,10 +9,10 @@ import styled from 'styled-components'
 import { ConnectedWeb3Context } from '../../../../hooks'
 import { useKlerosCuration } from '../../../../hooks/useKlerosCuration'
 import { MarketMakerData, Status } from '../../../../util/types'
-import { ButtonContainer } from '../../../button'
+import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { InlineLoading } from '../../../loading'
-import { GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { GenericError } from '../../common/common_styled'
 
 import { DxDaoCuration } from './option/dxdao_curation'
 import { KlerosCuration } from './option/kleros_curation'
@@ -176,16 +176,16 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
         </>
       )}
       <BottomButtonWrapper>
-        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Back
-        </MarketBottomNavButton>
-        <MarketBottomNavButton
+        </Button>
+        <Button
           buttonType={ButtonType.primaryAlternative}
           disabled={loading || typeof selection !== 'number' || !ovmInstance}
           onClick={onSubmitMarket}
         >
           Request Verification
-        </MarketBottomNavButton>
+        </Button>
       </BottomButtonWrapper>
     </MarketVerification>
   )
