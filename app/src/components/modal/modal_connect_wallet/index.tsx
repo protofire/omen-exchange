@@ -34,7 +34,6 @@ const Buttons = styled.div`
 `
 
 const ButtonStyled = styled(Button)`
-  height: 38px;
   margin-bottom: 14px;
   width: 200px;
 
