@@ -81,6 +81,19 @@ const ScaleBall = styled.div<{ xValue: number }>`
   transform: translateX(-50%);
 `
 
+const ScaleDot = styled.div<{ xValue: number }>`
+  position: absolute;
+  height: 8px;
+  width: 8px;
+  // TODO: Set color dynamically
+  background: black;
+  border-radius: 50%;
+  z-index: 2;
+  left: ${props => props.xValue * 100}%;
+  transform: translateX(-50%);
+  margin-top: 6px;
+`
+
 const StartingPointBox = styled.div<{ xValue: number }>`
   position: absolute;
   padding: 12px;
@@ -165,6 +178,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               : (startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)
           }
         />
+        {newPrediction && <ScaleDot xValue={Number(currentPrediction)} />}
         <VerticalBar />
         <VerticalBar />
         <VerticalBar />
