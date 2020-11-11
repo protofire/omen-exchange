@@ -132,9 +132,8 @@ export const ScalarMarketBuy = (props: Props) => {
     [new BigNumber(0), 0, amount, new BigNumber(0)],
     calcBuyAmount,
   )
-  console.log(tradedShares)
-  console.log(newPrediction)
-  console.log(debouncedAmount)
+
+  const formattedNewPrediction = (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
 
   const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
@@ -179,6 +178,7 @@ export const ScalarMarketBuy = (props: Props) => {
       <MarketScale
         currentPrediction={outcomeTokenMarginalPrices[1]}
         lowerBound={scalarLow || new BigNumber(0)}
+        newPrediction={formattedNewPrediction}
         startingPointTitle={'Current prediction'}
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
         upperBound={scalarHigh || new BigNumber(0)}
