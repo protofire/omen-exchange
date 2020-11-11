@@ -11,7 +11,7 @@ const MarketTab = styled.div<{ active: boolean }>`
   color: ${props => (props.active ? props.theme.buttonSecondary.color : props.theme.colors.clickable)};
   background: none;
   border: none;
-  border-radius: 32px;
+  border-radius: 8px;
   padding: 10px 18px;
   margin-right: 4px;
   background: ${props => (props.active ? props.theme.buttonSecondary.backgroundColor : `none`)};
@@ -59,15 +59,11 @@ export const MarketNavigation = (props: Props) => {
       <MarketTab active={activeTab === marketTabs.pool} onClick={() => switchMarketTab('POOL')}>
         Pool
       </MarketTab>
-      {/* Verify is commented out until the underlying infrastructure is ready */}
-      {/* <MarketTab 
-        active={activeTab === marketTabs.verify}
-        onClick={() => switchMarketTab('VERIFY')}
-      >
-        Verify
-      </MarketTab> */}
       <MarketTab active={activeTab === marketTabs.history} onClick={() => switchMarketTab('HISTORY')}>
         History
+      </MarketTab>
+      <MarketTab active={activeTab === marketTabs.verify} onClick={() => switchMarketTab('VERIFY')}>
+        Verify
       </MarketTab>
     </MarketTabs>
   )

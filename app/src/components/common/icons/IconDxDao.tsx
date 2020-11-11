@@ -1,7 +1,7 @@
 import React from 'react'
 
 export const IconDxDao = () => (
-  <svg fill="none" height="21" viewBox="0 0 20 21" width="20" xmlns="http://www.w3.org/2000/svg">
+  <svg fill="none" height="100%" viewBox="0 0 20 20" width="100%" xmlns="http://www.w3.org/2000/svg">
     <circle cx="10" cy="10.1936" fill="url(#paint0_radial)" r="10" />
     <g filter="url(#filter0_d)">
       <path

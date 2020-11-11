@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { WhenConnected } from '../../../../../hooks/connectedWeb3'
+import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
@@ -16,6 +16,7 @@ import { MarketHistoryContainer } from '../../market_history/market_history_cont
 import { MarketNavigation } from '../../market_navigation'
 import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
 import { MarketSellContainer } from '../../market_sell/market_sell_container'
+import { MarketVerifyContainer } from '../../market_verify/market_verify_container'
 
 const TopCard = styled(ViewCard)`
   padding: 24px;
@@ -96,6 +97,7 @@ const Wrapper = (props: Props) => {
     question,
     totalPoolShares,
   } = marketMakerData
+  const context = useConnectedWeb3Context()
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
@@ -244,7 +246,13 @@ const Wrapper = (props: Props) => {
             switchMarketTab={switchMarketTab}
           />
         )}
-        {/* {currentTab === marketTabs.verify && <p>verify</p>} */}
+        {currentTab === marketTabs.verify && (
+          <MarketVerifyContainer
+            context={context}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
+        )}
       </BottomCard>
     </>
   )
