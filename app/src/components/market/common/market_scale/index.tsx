@@ -94,23 +94,57 @@ const ScaleDot = styled.div<{ xValue: number }>`
   margin-top: 6px;
 `
 
-const StartingPointBox = styled.div<{ xValue: number }>`
-  position: absolute;
+const ValueBoxes = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+  width: 100%;
+`
+
+const ValueBoxPair = styled.div`
+  width: calc(50% - 6px);
+  display: flex;
+  align-items: center;
+`
+
+const ValueBox = styled.div<{ xValue?: number }>`
   padding: 12px;
   border: 1px solid ${props => props.theme.scale.box};
-  border-radius: 4px;
+  // border-radius: 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
   top: 36px;
   ${props =>
-    props.xValue <= 0.885
-      ? `left: ${props.xValue <= 0.115 ? `0` : `${props.xValue * 100}%; transform: translateX(-50%);`}`
-      : `right: 0`}
+    props.xValue
+      ? props.xValue <= 0.885
+        ? `left: ${
+            props.xValue <= 0.115
+              ? `25px`
+              : props.xValue <= 0.885
+              ? `${props.xValue * 100}%; transform: translateX(-50%); position: absolute;`
+              : ``
+          }`
+        : `right: 25px; transform: translateX(-50%); position: absolute;`
+      : 'width: 50%;'}
   background: white;
+
+  &:nth-of-type(odd) {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  &:nth-of-type(even) {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
 `
 
-const StartingPointTitle = styled.p`
+const ValueBoxTitle = styled.p`
   font-size: 14px;
   font-weight: 500;
   color: ${props => props.theme.colors.textColorDarker};
@@ -118,7 +152,7 @@ const StartingPointTitle = styled.p`
   margin-top: 0;
 `
 
-const StartingPointSubtitle = styled.p`
+const ValueBoxSubtitle = styled.p`
   font-size: 14px;
   color: ${props => props.theme.colors.textColor};
   margin: 0;
@@ -154,6 +188,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, decimals))
   const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), decimals))
 
+  const currentPredictionNumber = Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
+  const newPredictionNumber = Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
+
   return (
     <ScaleWrapper border={border}>
       <ScaleTitleWrapper>
@@ -183,22 +220,52 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         <VerticalBar />
         <VerticalBar />
         <HorizontalBar />
-        <StartingPointBox
-          xValue={
-            currentPrediction
-              ? Number(currentPrediction)
-              : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
-          }
-        >
-          <StartingPointTitle>
-            {currentPrediction
-              ? Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
-              : startingPoint && startingPointNumber}
-            {` ${unit}`}
-          </StartingPointTitle>
-          <StartingPointSubtitle>{startingPointTitle}</StartingPointSubtitle>
-        </StartingPointBox>
+        {!newPrediction && (
+          <ValueBox
+            xValue={
+              currentPrediction
+                ? Number(currentPrediction)
+                : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
+            }
+          >
+            <ValueBoxTitle>
+              {currentPrediction ? currentPredictionNumber : startingPoint && startingPointNumber}
+              {` ${unit}`}
+            </ValueBoxTitle>
+            <ValueBoxSubtitle>{startingPointTitle}</ValueBoxSubtitle>
+          </ValueBox>
+        )}
       </Scale>
+      {newPrediction && (
+        <ValueBoxes>
+          <ValueBoxPair>
+            <ValueBox>
+              <ValueBoxTitle>
+                {formatNumber(currentPredictionNumber.toString())} {unit}
+              </ValueBoxTitle>
+              <ValueBoxSubtitle>Current Prediction</ValueBoxSubtitle>
+            </ValueBox>
+            <ValueBox>
+              <ValueBoxTitle>
+                {formatNumber(newPredictionNumber.toString())} {unit}
+              </ValueBoxTitle>
+              <ValueBoxSubtitle>New Prediction</ValueBoxSubtitle>
+            </ValueBox>
+          </ValueBoxPair>
+          <ValueBoxPair>
+            <ValueBox>
+              {/* TODO: Replace hardcoded value and collateral symbol */}
+              <ValueBoxTitle>{'0.00 DAI'}</ValueBoxTitle>
+              <ValueBoxSubtitle>Your Payout</ValueBoxSubtitle>
+            </ValueBox>
+            <ValueBox>
+              {/* TODO: Replace hardcoded value */}
+              <ValueBoxTitle>{'0.00%'}</ValueBoxTitle>
+              <ValueBoxSubtitle>Profit/Loss</ValueBoxSubtitle>
+            </ValueBox>
+          </ValueBoxPair>
+        </ValueBoxes>
+      )}
     </ScaleWrapper>
   )
 }
