@@ -98,12 +98,11 @@ const ScaleBall = styled.div<{ xValue: number }>`
   transform: translateX(-50%);
 `
 
-const ScaleDot = styled.div<{ xValue: number }>`
+const ScaleDot = styled.div<{ xValue: number; positive: Maybe<boolean> }>`
   position: absolute;
   height: 8px;
   width: 8px;
-  // TODO: Set color dynamically
-  background: black;
+  background: ${props => (props.positive ? `${props.theme.scale.positive}` : `${props.theme.scale.negative}`)};
   border-radius: 50%;
   z-index: 3;
   left: ${props => props.xValue * 100}%;
@@ -234,7 +233,15 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               : (startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)
           }
         />
-        {isAmountInputted && <ScaleDot xValue={Number(currentPrediction)} />}
+        {isAmountInputted && (
+          <ScaleDot
+            positive={
+              (long && (newPrediction || 0) <= Number(currentPrediction)) ||
+              (!long && (newPrediction || 0) >= Number(currentPrediction))
+            }
+            xValue={Number(currentPrediction)}
+          />
+        )}
         <VerticalBar position={0} positive={isAmountInputted ? !long : null} />
         <VerticalBar
           position={1}
