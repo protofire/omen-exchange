@@ -176,7 +176,12 @@ export const ModalConnectWallet = (props: Props) => {
       context.connector.walletConnector.on('connect', () => {
         setConnectingToWalletConnect(false)
         WalletConnectQRCodeModal.close()
+        onClickCloseButton()
       })
+    }
+    if (connectingToWalletConnect && context.account && context.connectorName === Wallet.WalletConnect) {
+      onClickCloseButton()
+      setConnectingToWalletConnect(false)
     }
   }, [context, onClickCloseButton, connectingToWalletConnect])
 
