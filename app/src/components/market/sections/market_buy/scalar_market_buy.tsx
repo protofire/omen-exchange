@@ -177,6 +177,7 @@ export const ScalarMarketBuy = (props: Props) => {
     <>
       <MarketScale
         currentPrediction={outcomeTokenMarginalPrices[1]}
+        long={activeTab === Tabs.long}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
         startingPointTitle={'Current prediction'}
