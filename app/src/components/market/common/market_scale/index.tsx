@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
@@ -46,7 +46,6 @@ const VerticalBar = styled.div<{ position: number; positive: Maybe<boolean> }>`
   height: 20px;
 
   ${props => (props.position === 0 ? 'left: 0;' : props.position === 1 ? 'left: calc(50% - 1px);' : 'right: 0;')}
-  // TODO: Use proper color values
   background: ${props =>
     props.positive
       ? `${props.theme.scale.positive}`
@@ -95,6 +94,38 @@ const ScaleBall = styled.div<{ xValue: number }>`
   z-index: 3;
   left: ${props => props.xValue * 100}%;
   transform: translateX(-50%);
+`
+
+const ScaleBallContainer = styled.div`
+  width: 100%;
+`
+
+const ScaleBallSlider = styled.input`
+  height: 20px;
+  width: 100%;
+  background: none;
+  outline: none;
+  -webkit-appearance: none;
+  z-index: 3;
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    border: 3px solid ${props => props.theme.scale.ballBorder};
+    background: ${props => props.theme.scale.ballBackground};
+    cursor: pointer;
+  }
+
+  &::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    border: 3px solid ${props => props.theme.scale.ballBorder};
+    background: ${props => props.theme.scale.ballBackground};
+    cursor: pointer;
+  }
 `
 
 const ScaleDot = styled.div<{ xValue: number; positive: Maybe<boolean> }>`
@@ -210,6 +241,23 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const isAmountInputted = newPrediction && newPrediction !== Number(currentPrediction)
 
+  const [scaleValue, setScaleValue] = useState<number | undefined>(
+    newPrediction
+      ? newPrediction * 100
+      : currentPrediction
+      ? Number(currentPrediction) * 100
+      : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+  )
+
+  const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
+  const handleScaleBallChange = () => {
+    setScaleValue(Number(scaleBall?.value))
+  }
+
+  useEffect(() => {
+    setScaleValue((newPrediction || 0) * 100)
+  }, [newPrediction])
+
   return (
     <ScaleWrapper border={border}>
       <ScaleTitleWrapper>
@@ -225,15 +273,17 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         </ScaleTitle>
       </ScaleTitleWrapper>
       <Scale>
-        <ScaleBall
-          xValue={
-            newPrediction
-              ? newPrediction
-              : currentPrediction
-              ? Number(currentPrediction)
-              : (startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)
-          }
-        />
+        <ScaleBallContainer>
+          <ScaleBallSlider
+            className="scale-ball"
+            disabled={!isAmountInputted}
+            max="100"
+            min="0"
+            onChange={handleScaleBallChange}
+            type="range"
+            value={scaleValue}
+          />
+        </ScaleBallContainer>
         {isAmountInputted && (
           <ScaleDot
             positive={
