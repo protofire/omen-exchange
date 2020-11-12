@@ -146,7 +146,6 @@ const ValueBoxPair = styled.div`
 const ValueBox = styled.div<{ xValue?: number }>`
   padding: 12px;
   border: 1px solid ${props => props.theme.scale.box};
-  // border-radius: 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -237,14 +236,17 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       ? Number(currentPrediction) * 100
       : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
   )
+  const [scaleValuePrediction, setScaleValuePrediction] = useState(newPredictionNumber)
 
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
     setScaleValue(Number(scaleBall?.value))
+    setScaleValuePrediction((Number(scaleBall?.value) / 100) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
   }
 
   useEffect(() => {
     setScaleValue((newPrediction || 0) * 100)
+    setScaleValuePrediction(Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
   }, [newPrediction])
 
   return (
@@ -327,7 +329,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             </ValueBox>
             <ValueBox>
               <ValueBoxTitle>
-                {formatNumber(newPredictionNumber.toString())} {unit}
+                {formatNumber(scaleValuePrediction.toString())} {unit}
               </ValueBoxTitle>
               <ValueBoxSubtitle>New Prediction</ValueBoxSubtitle>
             </ValueBox>
