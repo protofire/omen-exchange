@@ -68,6 +68,7 @@ type Props = {
   marketMakerAddress: string
   hidden: boolean
   outcomes: string[]
+  currency: string
 }
 
 const blocksPerAllTimePeriod = 10000
@@ -86,6 +87,7 @@ const calcOffsetByDate = (nowOrClosedTs: number) => {
 
 export const HistoryChartContainer: React.FC<Props> = ({
   answerFinalizedTimestamp,
+  currency,
   hidden,
   marketMakerAddress,
   outcomes,
@@ -138,6 +140,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
 
   return hidden ? null : (
     <HistorySelect
+      currency={currency}
       holdingSeries={holdingsSeries}
       marketMakerAddress={marketMakerAddress}
       onChange={setPeriod}

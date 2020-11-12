@@ -2,6 +2,7 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
 import { formatNumber } from '../../../../util/tools'
 import { Button } from '../../../button'
@@ -28,6 +29,11 @@ const HistoryRow = styled.div<{ width: string; firstRow?: boolean }>`
     padding-right: 0px;
     text-align: end;
     color: ${({ firstRow }) => (firstRow ? '' : '#7986cb')};
+  }
+  &:nth-child(4) {
+    overflow: auto;
+    text-overflow: unset;
+    white-space: unset;
   }
 `
 const PaginationButton = styled(Button)<{ marginLeft?: string }>`
@@ -67,10 +73,14 @@ type Props = {
   status: string
   onLoadNextPage: () => void
   onLoadPrevPage: () => void
+  currency: string
 }
 
-export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoadPrevPage, status }) => {
+export const HistoryTable: React.FC<Props> = ({ currency, fpmmTrade, onLoadNextPage, onLoadPrevPage, status }) => {
   const history = useHistory()
+  const context = useConnectedWeb3Context()
+  const tokens = useTokens(context)
+
   const windowObj: any = window
 
   const dateFormatter = (dateData: string) => {
@@ -88,7 +98,7 @@ export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoa
           <HistoryRow width={'24'}>User</HistoryRow>
           <HistoryRow width={'20'}>Action</HistoryRow>
           <HistoryRow width={'20'}>Shares/PT</HistoryRow>
-          <HistoryRow width={'18'}>Amount(DAI)</HistoryRow>
+          <HistoryRow width={'21'}>Amount({currency})</HistoryRow>
           <HistoryRow firstRow={true} width={'18'}>
             Date - UTC
           </HistoryRow>
@@ -99,6 +109,7 @@ export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoa
             ({
               collateralAmount,
               collateralAmountUSD,
+              collateralTokenAddress,
               creationTimestamp,
               id,
               transactionHash,
@@ -106,6 +117,9 @@ export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoa
               user,
             }) => {
               const chainID = windowObj.ethereum.chainId
+
+              const token = tokens.find(({ address }) => address.toLowerCase() === collateralTokenAddress)
+
               const mainnetOrRinkebyUrl =
                 chainID === '0x4'
                   ? 'https://rinkeby.etherscan.io/tx/'
@@ -120,7 +134,10 @@ export const HistoryTable: React.FC<Props> = ({ fpmmTrade, onLoadNextPage, onLoa
                   </HistoryRow>
                   <HistoryRow width={'20'}>{transactionType}</HistoryRow>
                   <HistoryRow width={'20'}>{formatNumber(collateralAmount)}</HistoryRow>
-                  <HistoryRow width={'18'}>{collateralAmountUSD}</HistoryRow>
+                  <HistoryRow width={'21'}>
+                    {collateralAmountUSD}
+                    {token ? ` ${token.symbol}` : ''}
+                  </HistoryRow>
                   <HistoryRow as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank" width={'18'}>
                     {dateFormatter(creationTimestamp)}
                   </HistoryRow>

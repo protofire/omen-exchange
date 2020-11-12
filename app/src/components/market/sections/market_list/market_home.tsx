@@ -247,6 +247,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     onUpdatePageSize,
     pageIndex,
   } = props
+  console.log(currentFilter)
   const [counts, setCounts] = useState({
     open: 0,
     closed: 0,

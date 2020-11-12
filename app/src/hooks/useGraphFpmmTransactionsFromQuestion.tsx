@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 
 import { Status } from '../util/types'
 
+import { useTokens } from './useTokens'
+
 const fragment = gql`
   fragment TransactionFields on FpmmTransaction {
     id
@@ -17,6 +19,7 @@ const fragment = gql`
     collateralTokenAmount
     creationTimestamp
     transactionHash
+    fpmmType
   }
 `
 const withFpmmType = gql`
@@ -52,6 +55,7 @@ export type FpmmTradeDataType = {
   collateralAmountUSD: number
   creationTimestamp: string
   transactionHash: string
+  fpmmType: string
 }
 interface FpmmTradeData {
   id: string
@@ -65,6 +69,7 @@ interface FpmmTradeData {
   collateralAmountUSD: number
   creationTimestamp: string
   transactionHash: string
+  fpmmType: string
 }
 
 interface Result {
@@ -72,6 +77,7 @@ interface Result {
   status: string
   paginationNext: boolean
 }
+
 const wrangleResponse = (data: any) => {
   return data.map((trade: FpmmTradeData) => {
     return {
@@ -87,7 +93,7 @@ const wrangleResponse = (data: any) => {
       collateralAmount: trade.collateralAmount,
       collateralTokenAddress: trade.collateralTokenAddress,
       creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
-      collateralTokenAmount: trade.collateralTokenAmount,
+      collateralTokenAmount: Number(trade.collateralTokenAmount),
       transactionHash: trade.transactionHash,
     }
   })

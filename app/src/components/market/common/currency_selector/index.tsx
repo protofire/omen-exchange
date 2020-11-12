@@ -22,7 +22,7 @@ const CurrencyButtonSelectedCSS = css`
 `
 
 const CurrencyDropdown = styled(Dropdown)<{ selected: boolean }>`
-  ${props => props.selected && CurrencyButtonSelectedCSS}
+  ${props => props.selected && CurrencyButtonSelectedCSS};
   width: 100%;
 `
 
@@ -49,9 +49,9 @@ export const CurrencySelector: React.FC<Props> = props => {
     placeholder,
     ...restProps
   } = props
-
+  console.log(currency)
   const tokens = useTokens(context)
-
+  console.log(tokens)
   const currencyDropdownData: Array<DropdownItemProps> = []
 
   const onChange = (address: string) => {

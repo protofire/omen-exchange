@@ -72,7 +72,7 @@ type Props = {
   options: Period[]
   outcomes: string[]
   value: Period
-
+  currency: string
   marketMakerAddress: string
 }
 
@@ -98,6 +98,7 @@ const timestampToDate = (timestamp: number, value: string) => {
 }
 
 export const HistorySelect: React.FC<Props> = ({
+  currency,
   holdingSeries,
   marketMakerAddress,
   onChange,
@@ -194,6 +195,7 @@ export const HistorySelect: React.FC<Props> = ({
       </TitleWrapper>
       {toogleSelect ? (
         <HistoryTable
+          currency={currency}
           fpmmTrade={fpmmTrade}
           onLoadNextPage={loadNextPage}
           onLoadPrevPage={loadPrevPage}
