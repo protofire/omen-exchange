@@ -77,7 +77,6 @@ interface Result {
   status: string
   paginationNext: boolean
 }
-
 const wrangleResponse = (data: any) => {
   return data.map((trade: FpmmTradeData) => {
     return {

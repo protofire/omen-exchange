@@ -49,9 +49,8 @@ export const CurrencySelector: React.FC<Props> = props => {
     placeholder,
     ...restProps
   } = props
-  console.log(currency)
+
   const tokens = useTokens(context)
-  console.log(tokens)
   const currencyDropdownData: Array<DropdownItemProps> = []
 
   const onChange = (address: string) => {
