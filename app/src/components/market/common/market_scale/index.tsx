@@ -69,7 +69,7 @@ const HorizontalBar = styled.div`
   background: ${props => props.theme.scale.bar};
 `
 
-const HorizontalBarLeft = styled.div<{ positive: boolean; width: number }>`
+const HorizontalBarLeft = styled.div<{ positive: boolean | null; width: number }>`
   position: absolute;
   top: calc(50% - 1px);
   left: 0;
@@ -79,7 +79,7 @@ const HorizontalBarLeft = styled.div<{ positive: boolean; width: number }>`
   z-index: 2;
 `
 
-const HorizontalBarRight = styled.div<{ positive: boolean; width: number }>`
+const HorizontalBarRight = styled.div<{ positive: boolean | null; width: number }>`
   position: absolute;
   top: calc(50% - 1px);
   right: 0;
@@ -188,12 +188,14 @@ interface Props {
   currentPrediction?: Maybe<string>
   border?: boolean
   newPrediction?: Maybe<number>
+  long?: Maybe<boolean>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
   const {
     border,
     currentPrediction,
+    long,
     lowerBound,
     newPrediction,
     startingPoint,
@@ -244,9 +246,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         <HorizontalBar />
         {isAmountInputted && (
           <>
-            {/* TODO: Remove color hardcoding */}
-            <HorizontalBarLeft positive={false} width={newPrediction || 0} />
-            <HorizontalBarRight positive={true} width={1 - (newPrediction || 0)} />
+            <HorizontalBarLeft positive={!long || null} width={newPrediction || 0} />
+            <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
           </>
         )}
         {!isAmountInputted && (
