@@ -46,7 +46,12 @@ const VerticalBar = styled.div<{ position: number; positive: Maybe<boolean> }>`
 
   ${props => (props.position === 0 ? 'left: 0;' : props.position === 1 ? 'left: calc(50% - 1px);' : 'right: 0;')}
   // TODO: Use proper color values
-  background: ${props => (props.positive ? 'green;' : props.positive === null ? `${props.theme.scale.bar}` : 'red;')}
+  background: ${props =>
+    props.positive
+      ? `${props.theme.scale.positive}`
+      : props.positive === null
+      ? `${props.theme.scale.bar}`
+      : `${props.theme.scale.negative}`};
 `
 
 const HorizontalBar = styled.div`
@@ -65,7 +70,7 @@ const HorizontalBarLeft = styled.div<{ positive: boolean | null; width: number }
   left: 0;
   width: ${props => props.width * 100}%;
   // TODO: Use proper colors
-  background: ${props => (props.positive ? 'green' : 'red')};
+  background: ${props => (props.positive ? `${props.theme.scale.positive}` : `${props.theme.scale.negative}`)};
   height: 2px;
   z-index: 2;
 `
@@ -76,7 +81,7 @@ const HorizontalBarRight = styled.div<{ positive: boolean | null; width: number 
   right: 0;
   width: ${props => props.width * 100}%;
   // TODO: Use proper colors
-  background: ${props => (props.positive ? 'green' : 'red')};
+  background: ${props => (props.positive ? `${props.theme.scale.positive}` : `${props.theme.scale.negative}`)};
   height: 2px;
   z-index: 2;
 `
