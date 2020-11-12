@@ -5,6 +5,8 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
+import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
+import theme from '../../../../theme'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -16,6 +18,9 @@ import { ProgressBarToggle } from '../progress_bar/toggle'
 const SubsectionTitleLeftWrapper = styled.div`
   display: flex;
   align-items: center;
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex-grow: 1;
+  }
   & > * + * {
     margin-left: 12px;
   }
@@ -35,6 +40,9 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { marketMakerData } = props
   const history = useHistory()
+
+  const { width } = useWindowDimensions()
+  const isMobile = width <= parseInt(theme.themeBreakPoints.sm)
 
   const {
     answerFinalizedTimestamp,
@@ -87,12 +95,14 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
               placeholder=""
             />
           )}
-          <ProgressBarToggle
-            active={showingProgressBar}
-            state={'closed'}
-            templateId={question.templateId}
-            toggleProgressBar={toggleProgressBar}
-          ></ProgressBarToggle>
+          {(!isMobile || marketsRelatedQuestion.length === 1) && (
+            <ProgressBarToggle
+              active={showingProgressBar}
+              state={'closed'}
+              templateId={question.templateId}
+              toggleProgressBar={toggleProgressBar}
+            ></ProgressBarToggle>
+          )}
         </SubsectionTitleLeftWrapper>
       </SubsectionTitleWrapper>
       {showingProgressBar && (

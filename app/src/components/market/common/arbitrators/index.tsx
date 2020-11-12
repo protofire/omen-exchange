@@ -14,8 +14,6 @@ const Wrapper = styled.div`
 `
 
 const ArbitratorButton = styled(Button)<{ isSelected: boolean }>`
-  border-radius: 8px;
-  height: 40px;
   margin: 0 8px 12px 0;
   &,
   &:hover {

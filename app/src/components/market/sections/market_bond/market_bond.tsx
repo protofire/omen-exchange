@@ -19,13 +19,13 @@ import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { calcPoolTokens, formatBigNumber, formatNumber } from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
-import { ButtonContainer } from '../../../button'
+import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { CurrenciesWrapper, GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -282,19 +282,12 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <BottomButtonWrapper>
-        <MarketBottomNavButton
-          buttonType={ButtonType.secondaryLine}
-          onClick={() => switchMarketTab(MarketDetailsTab.finalize)}
-        >
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.finalize)}>
           Back
-        </MarketBottomNavButton>
-        <MarketBottomNavButton
-          buttonType={ButtonType.primary}
-          disabled={disableDepositButton}
-          onClick={() => addFunding()}
-        >
+        </Button>
+        <Button buttonType={ButtonType.primary} disabled={disableDepositButton} onClick={() => addFunding()}>
           Bond ETH
-        </MarketBottomNavButton>
+        </Button>
       </BottomButtonWrapper>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}

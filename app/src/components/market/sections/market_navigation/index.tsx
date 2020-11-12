@@ -5,7 +5,6 @@ import { MarketDetailsTab } from '../../../../util/types'
 
 const MarketTabs = styled.div`
   display: flex;
-  margin-top: -5px;
   margin-bottom: 20px;
 `
 
