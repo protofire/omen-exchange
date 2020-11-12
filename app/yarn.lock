@@ -2104,7 +2104,7 @@
   dependencies:
     big.js "^5.2.2"
 
-"@gnosis.pm/safe-apps-sdk@0.4.2", "@gnosis.pm/safe-apps-sdk@^0.4.1":
+"@gnosis.pm/safe-apps-sdk@0.4.2", "@gnosis.pm/safe-apps-sdk@^0.4.2":
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-sdk/-/safe-apps-sdk-0.4.2.tgz#ae87b2164931c006cb0efdede3d82ff210df1648"
   integrity sha512-BwA2dyCebPMdi4JhhTkp6EjkhEM6vAIviKdhqHiHnSmL+sDfxtP1jdOuE8ME2/4+5TiLSS8k8qscYjLSlf1LLw==
@@ -3011,10 +3011,10 @@
   dependencies:
     source-map-support "^0.5.19"
 
-"@truffle/codec@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@truffle/codec/-/codec-0.8.0.tgz#7ad35a2564dc5e4a5d63f9b71aa3ac6188f0c344"
-  integrity sha512-sxT1FfykqxcuvXPuvM9BUR2NOeamh/8vUieVRtetMeEx1H0OBDY7WDuKOC4GydWOd7oO8w9EvOsiqTGKkzPXQQ==
+"@truffle/codec@^0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@truffle/codec/-/codec-0.8.1.tgz#1f7b62a9d4063ed1b91ecb81d2d83be4ff97389d"
+  integrity sha512-X6BcpS97zpmLWRoAg9zJJIPoEiAJ3MRRJd5zf+qTmLbYXVhek9frreDMhs4WoaQSe3/DOYjVxtPmwmY4+alVvw==
   dependencies:
     big.js "^5.2.2"
     bn.js "^4.11.8"
@@ -3038,14 +3038,14 @@
     crypto-js "^3.1.9-1"
     debug "^4.1.0"
 
-"@truffle/contract@^4.2.23":
-  version "4.2.29"
-  resolved "https://registry.yarnpkg.com/@truffle/contract/-/contract-4.2.29.tgz#ace820def695ed1dca2a1537d0786637e8295324"
-  integrity sha512-pJx9LBmT9KrF+n6zl6J4AYkR3M8QGW9shjkJ9VWVF96bQ1uOrLP2DkhQknkIkVkQ+4NCgge2Q9cncFI5QAE6nw==
+"@truffle/contract@^4.2.26":
+  version "4.2.30"
+  resolved "https://registry.yarnpkg.com/@truffle/contract/-/contract-4.2.30.tgz#44a2a20e4baa6b40cbb0748a6bce997c22865bcd"
+  integrity sha512-BXQC+ddH18W9cVoRTlKH7hqnyrOo0HN7/Hyv7UiAgPh4JNpkZVUxFSd+/MLaE5r8NEG2hykDusOVJ3OaR9wvmw==
   dependencies:
     "@truffle/blockchain-utils" "^0.0.25"
     "@truffle/contract-schema" "^3.3.2"
-    "@truffle/debug-utils" "^5.0.0"
+    "@truffle/debug-utils" "^5.0.1"
     "@truffle/error" "^0.0.11"
     "@truffle/interface-adapter" "^0.4.18"
     bignumber.js "^7.2.1"
@@ -3058,12 +3058,12 @@
     web3-eth-abi "1.2.9"
     web3-utils "1.2.9"
 
-"@truffle/debug-utils@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@truffle/debug-utils/-/debug-utils-5.0.0.tgz#de1f2d13259911fc71d825491ae2a72fdf9b73e5"
-  integrity sha512-ss0wiJLjIdKGp+gjwybjvje/q3cqNe1fvJXSV2bNke8mGssfQ4hcrhdrZG4BR80k5DIrYchoyA/a07UmVxpPDQ==
+"@truffle/debug-utils@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@truffle/debug-utils/-/debug-utils-5.0.1.tgz#7650f273ddba704377f3a25bd4a10ffb338da8e0"
+  integrity sha512-CDt92c6YmCE72TMxmXMcbK3MPXHPRzhrYshFKY0jlo0T3IhLn3xBMqdqXi7SL9y0gV5U386R2l2lK5a+TGE6vw==
   dependencies:
-    "@truffle/codec" "^0.8.0"
+    "@truffle/codec" "^0.8.1"
     "@trufflesuite/chromafi" "^2.2.1"
     chalk "^2.4.2"
     debug "^4.1.0"
@@ -5616,6 +5616,11 @@ bignumber.js@7.2.1, bignumber.js@^7.2.1:
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-7.2.1.tgz#80c048759d826800807c4bfd521e50edbba57a5f"
   integrity sha512-S4XzBk5sMB+Rcb/LNcpzXr57VRTxgAvaAEDAl1AwRx27j00hT84O6OkteE7u8UB3NuaaygCRrEpqox4uDOrbdQ==
 
+bignumber.js@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.0.1.tgz#8d7ba124c882bfd8e43260c67475518d0689e4e5"
+  integrity sha512-IdZR9mh6ahOBv/hYGiXyVuyCetmGJhtYkqLBpTStdhEGjegpPlUawydyaF3pbIOFynJTpllEs+NP+CS9jKFLjA==
+
 "bignumber.js@git+https://github.com/frozeman/bignumber.js-nolookahead.git":
   version "2.0.7"
   resolved "git+https://github.com/frozeman/bignumber.js-nolookahead.git#57692b3ecfc98bbdd6b3a516cb2353652ea49934"
@@ -7049,17 +7054,17 @@ content-type@~1.0.4:
   resolved "https://registry.yarnpkg.com/content-type/-/content-type-1.0.4.tgz#e138cc75e040c727b1966fe5e5f8c9aee256fe3b"
   integrity sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==
 
-contract-proxy-kit@2.2.0-alpha.1:
-  version "2.2.0-alpha.1"
-  resolved "https://registry.yarnpkg.com/contract-proxy-kit/-/contract-proxy-kit-2.2.0-alpha.1.tgz#88ac672c847cdd43e87ab39c298e5a7a8c48a618"
-  integrity sha512-ke3D//bog09jnszlfxbY340mbhfjRZgwObj7Jb2+QgNExGWkBER7xXMp++lYBto0XPK+5BTTmm3Dg34Y/3I9Sg==
+contract-proxy-kit@^2.2.0-alpha.2:
+  version "2.2.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/contract-proxy-kit/-/contract-proxy-kit-2.2.0-alpha.2.tgz#7ad44b4c411bdcb66e3b76871c31d5a289c63cff"
+  integrity sha512-35Hxjh4eE2Na0fuJuj4rEH6myAoUcgSt9rFUy7L3aAWnGkHZnIsPPWjBXJLFRh8BDu6SMr4OC+eXZAaQmQyt4g==
   dependencies:
-    "@gnosis.pm/safe-apps-sdk" "^0.4.1"
-    "@truffle/contract" "^4.2.23"
+    "@gnosis.pm/safe-apps-sdk" "^0.4.2"
+    "@truffle/contract" "^4.2.26"
     "@types/uuid" "^8.3.0"
-    bignumber.js "^9.0.0"
+    bignumber.js "^9.0.1"
     node-fetch "^2.6.1"
-    uuid "^8.3.0"
+    uuid "^8.3.1"
 
 convert-source-map@1.7.0, convert-source-map@^1.4.0, convert-source-map@^1.5.1, convert-source-map@^1.6.0, convert-source-map@^1.7.0:
   version "1.7.0"
@@ -22810,6 +22815,11 @@ uuid@^8.3.0:
   version "8.3.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.0.tgz#ab738085ca22dc9a8c92725e459b1d507df5d6ea"
   integrity sha512-fX6Z5o4m6XsXBdli9g7DtWgAx+osMsRRZFKma1mIUsLCz6vRvv+pz5VNbyu9UEDzpMWulZfvpgb/cmDXVulYFQ==
+
+uuid@^8.3.1:
+  version "8.3.1"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.1.tgz#2ba2e6ca000da60fce5a196954ab241131e05a31"
+  integrity sha512-FOmRr+FmWEIG8uhZv6C2bTgEVXsHk08kE7mPlrBbEe+c3r9pjceVPgupIfNIhc4yx55H69OXANrUaSuu9eInKg==
 
 uuidv4@6.0.6:
   version "6.0.6"
