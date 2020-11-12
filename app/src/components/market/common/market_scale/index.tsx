@@ -68,6 +68,26 @@ const HorizontalBar = styled.div`
   background: ${props => props.theme.scale.bar};
 `
 
+const HorizontalBarLeft = styled.div<{ positive: boolean; width: number }>`
+  position: absolute;
+  top: calc(50% - 1px);
+  left: 0;
+  width: ${props => props.width * 100}%;
+  background: ${props => (props.positive ? 'green' : 'red')};
+  height: 2px;
+  z-index: 2;
+`
+
+const HorizontalBarRight = styled.div<{ positive: boolean; width: number }>`
+  position: absolute;
+  top: calc(50% - 1px);
+  right: 0;
+  width: ${props => props.width * 100}%;
+  background: ${props => (props.positive ? 'green' : 'red')};
+  height: 2px;
+  z-index: 2;
+`
+
 const ScaleBall = styled.div<{ xValue: number }>`
   position: absolute;
   height: 20px;
@@ -75,7 +95,7 @@ const ScaleBall = styled.div<{ xValue: number }>`
   border-radius: 50%;
   border: 3px solid ${props => props.theme.scale.ballBorder};
   background: ${props => props.theme.scale.ballBackground};
-  z-index: 2;
+  z-index: 3;
   left: ${props => props.xValue * 100}%;
   transform: translateX(-50%);
 `
@@ -87,7 +107,7 @@ const ScaleDot = styled.div<{ xValue: number }>`
   // TODO: Set color dynamically
   background: black;
   border-radius: 50%;
-  z-index: 2;
+  z-index: 3;
   left: ${props => props.xValue * 100}%;
   transform: translateX(-50%);
   margin-top: 6px;
@@ -211,6 +231,13 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         <VerticalBar />
         <VerticalBar />
         <HorizontalBar />
+        {isAmountInputted && (
+          <>
+            {/* TODO: Remove color hardcoding */}
+            <HorizontalBarLeft positive={false} width={newPrediction || 0} />
+            <HorizontalBarRight positive={true} width={1 - (newPrediction || 0)} />
+          </>
+        )}
         {!isAmountInputted && (
           <ValueBox
             xValue={
