@@ -37,15 +37,16 @@ const Scale = styled.div`
   width: 100%;
 `
 
-const VerticalBar = styled.div<{ position: number }>`
+const VerticalBar = styled.div<{ position: number; positive: Maybe<boolean> }>`
   position: absolute;
   top: 0;
   bottom: 0;
   width: 2px;
   height: 20px;
-  background: ${props => props.theme.scale.bar};
 
   ${props => (props.position === 0 ? 'left: 0;' : props.position === 1 ? 'left: calc(50% - 1px);' : 'right: 0;')}
+  // TODO: Use proper color values
+  background: ${props => (props.positive ? 'green;' : props.positive === null ? `${props.theme.scale.bar}` : 'red;')}
 `
 
 const HorizontalBar = styled.div`
@@ -229,9 +230,14 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           }
         />
         {isAmountInputted && <ScaleDot xValue={Number(currentPrediction)} />}
-        <VerticalBar position={0} />
-        <VerticalBar position={1} />
-        <VerticalBar position={2} />
+        <VerticalBar position={0} positive={isAmountInputted ? !long : null} />
+        <VerticalBar
+          position={1}
+          positive={
+            isAmountInputted ? (long && (newPrediction || 0) <= 0.5) || (!long && (newPrediction || 0) >= 0.5) : null
+          }
+        />
+        <VerticalBar position={2} positive={isAmountInputted ? !!long : null} />
         <HorizontalBar />
         {isAmountInputted && (
           <>
