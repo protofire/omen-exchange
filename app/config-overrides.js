@@ -28,9 +28,9 @@ module.exports = (config, env) => {
       chunkFilename: 'static/css/[name].chunk.css',
     }),
   )
-  config.module.rules[1].oneOf.find(rule => rule.loader === require.resolve('file-loader')).options.name =
+  config.module.rules[2].oneOf.find(rule => rule.loader === require.resolve('file-loader')).options.name =
     'static/media/[name].[ext]'
-  config.module.rules[1].oneOf.find(rule => rule.loader === require.resolve('url-loader')).options.name =
+  config.module.rules[2].oneOf.find(rule => rule.loader === require.resolve('url-loader')).options.name =
     'static/media/[name].[ext]'
   config.optimization.moduleIds = 'hashed'
   return config
