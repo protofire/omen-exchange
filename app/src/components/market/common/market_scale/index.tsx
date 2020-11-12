@@ -70,7 +70,6 @@ const HorizontalBarLeft = styled.div<{ positive: boolean | null; width: number }
   top: calc(50% - 1px);
   left: 0;
   width: ${props => props.width * 100}%;
-  // TODO: Use proper colors
   background: ${props => (props.positive ? `${props.theme.scale.positive}` : `${props.theme.scale.negative}`)};
   height: 2px;
   z-index: 2;
@@ -81,7 +80,6 @@ const HorizontalBarRight = styled.div<{ positive: boolean | null; width: number 
   top: calc(50% - 1px);
   right: 0;
   width: ${props => props.width * 100}%;
-  // TODO: Use proper colors
   background: ${props => (props.positive ? `${props.theme.scale.positive}` : `${props.theme.scale.negative}`)};
   height: 2px;
   z-index: 2;
