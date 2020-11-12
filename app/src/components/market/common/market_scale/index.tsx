@@ -84,29 +84,18 @@ const HorizontalBarRight = styled.div<{ positive: boolean | null; width: number 
   z-index: 2;
 `
 
-const ScaleBall = styled.div<{ xValue: number }>`
-  position: absolute;
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  border: 3px solid ${props => props.theme.scale.ballBorder};
-  background: ${props => props.theme.scale.ballBackground};
-  z-index: 3;
-  left: ${props => props.xValue * 100}%;
-  transform: translateX(-50%);
-`
-
 const ScaleBallContainer = styled.div`
   width: 100%;
 `
 
-const ScaleBallSlider = styled.input`
+const ScaleBall = styled.input`
   height: 20px;
   width: 100%;
   background: none;
   outline: none;
   -webkit-appearance: none;
-  z-index: 3;
+  z-index: 4;
+  position: absolute;
 
   &::-webkit-slider-thumb {
     appearance: none;
@@ -274,7 +263,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       </ScaleTitleWrapper>
       <Scale>
         <ScaleBallContainer>
-          <ScaleBallSlider
+          <ScaleBall
             className="scale-ball"
             disabled={!isAmountInputted}
             max="100"
@@ -285,13 +274,16 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           />
         </ScaleBallContainer>
         {isAmountInputted && (
-          <ScaleDot
-            positive={
-              (long && (newPrediction || 0) <= Number(currentPrediction)) ||
-              (!long && (newPrediction || 0) >= Number(currentPrediction))
-            }
-            xValue={Number(currentPrediction)}
-          />
+          <>
+            <ScaleDot
+              positive={
+                (long && (newPrediction || 0) <= Number(currentPrediction)) ||
+                (!long && (newPrediction || 0) >= Number(currentPrediction))
+              }
+              xValue={Number(currentPrediction)}
+            />
+            <ScaleDot positive={true} xValue={newPrediction || 0} />
+          </>
         )}
         <VerticalBar position={0} positive={isAmountInputted ? !long : null} />
         <VerticalBar
