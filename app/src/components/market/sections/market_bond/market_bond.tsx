@@ -55,13 +55,13 @@ const logger = getLogger('Market::Bond')
 
 const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
-  const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
+  const { address: marketMakerAddress, balances, fee, totalPoolShares } = marketMakerData
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
   const cpk = useCpk()
 
-  const { buildMarketMaker, conditionalTokens } = useContracts(context)
+  const { buildMarketMaker } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const signer = useMemo(() => provider.getSigner(), [provider])

@@ -109,8 +109,6 @@ const Wrapper = (props: Props) => {
     totalPoolShares,
   } = marketMakerData
 
-  console.log(marketMakerData)
-
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
