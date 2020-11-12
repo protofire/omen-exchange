@@ -38,7 +38,7 @@ const Scale = styled.div`
   width: 100%;
 `
 
-const VerticalBar = styled.div`
+const VerticalBar = styled.div<{ position: number }>`
   position: absolute;
   top: 0;
   bottom: 0;
@@ -46,17 +46,7 @@ const VerticalBar = styled.div`
   height: 20px;
   background: ${props => props.theme.scale.bar};
 
-  &:nth-of-type(1) {
-    left: 0;
-  }
-
-  &:nth-of-type(2) {
-    left: calc(50% - 1px);
-  }
-
-  &:nth-of-type(3) {
-    right: 0;
-  }
+  ${props => (props.position === 0 ? 'left: 0;' : props.position === 1 ? 'left: calc(50% - 1px);' : 'right: 0;')}
 `
 
 const HorizontalBar = styled.div`
@@ -74,6 +64,7 @@ const HorizontalBarLeft = styled.div<{ positive: boolean | null; width: number }
   top: calc(50% - 1px);
   left: 0;
   width: ${props => props.width * 100}%;
+  // TODO: Use proper colors
   background: ${props => (props.positive ? 'green' : 'red')};
   height: 2px;
   z-index: 2;
@@ -84,6 +75,7 @@ const HorizontalBarRight = styled.div<{ positive: boolean | null; width: number 
   top: calc(50% - 1px);
   right: 0;
   width: ${props => props.width * 100}%;
+  // TODO: Use proper colors
   background: ${props => (props.positive ? 'green' : 'red')};
   height: 2px;
   z-index: 2;
@@ -240,9 +232,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           }
         />
         {isAmountInputted && <ScaleDot xValue={Number(currentPrediction)} />}
-        <VerticalBar />
-        <VerticalBar />
-        <VerticalBar />
+        <VerticalBar position={0} />
+        <VerticalBar position={1} />
+        <VerticalBar position={2} />
         <HorizontalBar />
         {isAmountInputted && (
           <>
