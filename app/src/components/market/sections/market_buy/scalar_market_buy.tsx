@@ -140,7 +140,11 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
-  const potentialLoss = reverseTradedShares.isZero() ? new BigNumber(0) : reverseTradedShares.sub(amount)
+  const potentialLoss = reverseTradedShares.isZero()
+    ? new BigNumber(0)
+    : reverseTradedShares.sub(amount).lt(debouncedAmount)
+    ? reverseTradedShares.sub(amount)
+    : debouncedAmount
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
