@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react'
 
 import { Status } from '../util/types'
 
-import { useTokens } from './useTokens'
-
 const fragment = gql`
   fragment TransactionFields on FpmmTransaction {
     id

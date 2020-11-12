@@ -42,7 +42,7 @@ const PaginationButton = styled(Button)<{ marginLeft?: string }>`
 `
 const Pagination = styled.div`
   display: flex;
-  margin: 20px 24px -5px;
+  margin: 20px 24px 0 24px;
 `
 const PaginationLeft = styled.div`
   justify-content: start;
@@ -54,7 +54,7 @@ const PaginationRight = styled.div`
 `
 const HistoryColumns = styled.div`
   display: flex;
-  padding: 20px 25px 20px 25px;
+  padding: 17px 25px;
   border-bottom: 1px solid ${props => props.theme.borders.borderDisabled};
   font-family: ${props => props.theme.fonts.fontFamily};
   font-size: ${props => props.theme.fonts.fontSize};
@@ -63,7 +63,7 @@ const HistoryColumns = styled.div`
   line-height: 16px;
   color: ${props => props.theme.colors.textColorDark};
   &:first-child {
-    padding: 26px 25px 13px 25px;
+    padding: 13px 25px;
     color: ${props => props.theme.colors.textColor} !important;
   }
 `
@@ -95,8 +95,8 @@ export const HistoryTable: React.FC<Props> = ({ currency, fpmmTrade, onLoadNextP
     <React.Fragment>
       <TableWrapper>
         <HistoryColumns>
-          <HistoryRow width={'24'}>User</HistoryRow>
-          <HistoryRow width={'20'}>Action</HistoryRow>
+          <HistoryRow width={'25'}>User</HistoryRow>
+          <HistoryRow width={'18'}>Action</HistoryRow>
           <HistoryRow width={'20'}>Shares/PT</HistoryRow>
           <HistoryRow width={'21'}>Amount({currency})</HistoryRow>
           <HistoryRow firstRow={true} width={'18'}>
@@ -128,11 +128,11 @@ export const HistoryTable: React.FC<Props> = ({ currency, fpmmTrade, onLoadNextP
                   : ''
               return (
                 <HistoryColumns key={id}>
-                  <HistoryRow width={'24'}>
+                  <HistoryRow width={'25'}>
                     <ConnectionIcon size={'22'} />
                     <span>{user}</span>
                   </HistoryRow>
-                  <HistoryRow width={'20'}>{transactionType}</HistoryRow>
+                  <HistoryRow width={'18'}>{transactionType}</HistoryRow>
                   <HistoryRow width={'20'}>{formatNumber(collateralAmount)}</HistoryRow>
                   <HistoryRow width={'21'}>
                     {collateralAmountUSD}

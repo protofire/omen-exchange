@@ -20,6 +20,7 @@ const commonWrapperCSS = css`
 `
 const DropdownMenu = styled(Dropdown)`
   margin-left: auto;
+  width: 33%;
 `
 
 const NoData = styled.div`
