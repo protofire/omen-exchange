@@ -180,6 +180,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const currentPredictionNumber = Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
   const newPredictionNumber = Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
 
+  const isAmountInputted = newPrediction && newPrediction !== Number(currentPrediction)
+
   return (
     <ScaleWrapper>
       <ScaleTitleWrapper>
@@ -204,12 +206,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               : (startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)
           }
         />
-        {newPrediction && <ScaleDot xValue={Number(currentPrediction)} />}
+        {isAmountInputted && <ScaleDot xValue={Number(currentPrediction)} />}
         <VerticalBar />
         <VerticalBar />
         <VerticalBar />
         <HorizontalBar />
-        {!newPrediction && (
+        {!isAmountInputted && (
           <ValueBox
             xValue={
               currentPrediction
@@ -225,7 +227,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           </ValueBox>
         )}
       </Scale>
-      {newPrediction && (
+      {isAmountInputted && (
         <ValueBoxes>
           <ValueBoxPair>
             <ValueBox>
