@@ -7,16 +7,13 @@ import { DOCUMENT_VALIDITY_RULES } from '../../../../../common/constants'
 import { KlerosCurationData, MarketVerificationState } from '../../../../../util/types'
 import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { IconExclamation, IconKleros, IconSchedule } from '../../../../common/icons'
-import { IconTick } from '../../../../common/icons/IconTick'
-import Tick from '../img/tick.svg'
+import { IconExclamation, IconKleros, IconSchedule, IconTick } from '../../../../common/icons'
 import {
   CurationCenterColumn,
   CurationLeftColumn,
   CurationLogoWrapper,
   CurationOption,
   CurationOptionDetails,
-  CurationRadioTick,
   CurationRadioWrapper,
   CurationRightColumn,
   CurationRow,
@@ -56,12 +53,11 @@ const IconWrapper = styled.div`
   padding: 3px;
   display: flex;
   margin-left: 8px;
-`
-
-const VerifiedTick = styled.img`
-  filter: brightness(2);
-  width: 100%;
-  height: 100%;
+  svg {
+    filter: brightness(2);
+    width: 100%;
+    height: 100%;
+  }
 `
 
 const Description = styled.div`
@@ -102,11 +98,6 @@ const RightButtonWrapper = styled.div`
 const UnstyledLink = styled.a`
   color: inherit;
 `
-// const IconTickStyled = styled(IconTick)`
-//   filter: brightness(2);
-//   width: 100%;
-//   height: 100%;
-// `
 
 interface Props {
   option?: number
@@ -158,7 +149,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
         <>
           <CurationRightColumn>
             <CurationRadioWrapper onClick={() => selectSource(KLEROS_OPTION)} selected={option === KLEROS_OPTION}>
-              <CurationRadioTick alt="tick" selected={option === KLEROS_OPTION} src={Tick} />
+              <IconTick selected={option === KLEROS_OPTION} />
             </CurationRadioWrapper>
           </CurationRightColumn>
         </>
@@ -285,8 +276,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
           <StatusContainer>
             <SuccessVerify>verified</SuccessVerify>
             <IconWrapper>
-              <VerifiedTick alt="tick" src={IconTick} />
-              {/*<IconTickStyled/>*/}
+              <IconTick />
             </IconWrapper>
           </StatusContainer>
           <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>

@@ -1,15 +1,13 @@
 import React, { FC } from 'react'
 import styled from 'styled-components'
 
-import { IconDxDao } from '../../../../common/icons'
-import Tick from '../img/tick.svg'
+import { IconDxDao, IconTick } from '../../../../common/icons'
 import {
   CurationCenterColumn,
   CurationLeftColumn,
   CurationLogoWrapper,
   CurationOption,
   CurationOptionDetails,
-  CurationRadioTick,
   CurationRadioWrapper,
   CurationRightColumn,
   CurationRow,
@@ -19,7 +17,6 @@ import {
 const Bold = styled.b`
   font-weight: 500;
 `
-
 interface Props {
   option?: number
   selectSource: (option: number) => void
@@ -53,7 +50,7 @@ export const DxDaoCuration: FC<Props> = (props: Props) => {
           <>
             <CurationRightColumn>
               <CurationRadioWrapper disabled>
-                <CurationRadioTick alt="tick" disabled src={Tick} />
+                <IconTick disabled={true} />
               </CurationRadioWrapper>
             </CurationRightColumn>
           </>
