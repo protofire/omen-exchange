@@ -253,6 +253,14 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [yourPayout, setYourPayout] = useState(0)
   const [profitLoss, setProfitLoss] = useState(0)
 
+  console.log(
+    newPrediction
+      ? newPrediction * 100
+      : currentPrediction
+      ? Number(currentPrediction) * 100
+      : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+  )
+
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
     setScaleValue(Number(scaleBall?.value))
@@ -260,9 +268,15 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   }
 
   useEffect(() => {
-    setScaleValue((newPrediction || 0) * 100)
+    setScaleValue(
+      newPrediction
+        ? newPrediction * 100
+        : currentPrediction
+        ? Number(currentPrediction) * 100
+        : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+    )
     setScaleValuePrediction(Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
-  }, [newPrediction])
+  }, [newPrediction, currentPrediction, lowerBoundNumber, startingPointNumber, upperBoundNumber])
 
   useEffect(() => {
     let positionValue
