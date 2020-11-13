@@ -278,7 +278,7 @@ export const ScalarMarketBuy = (props: Props) => {
           Cancel
         </MarketBottomNavButton>
         {/* TODO: Add isBuyDisabled and onClick handler */}
-        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled}>
+        <MarketBottomNavButton buttonType={ButtonType.primaryAlternative} disabled={isBuyDisabled}>
           Buy Position
         </MarketBottomNavButton>
       </StyledButtonContainer>
