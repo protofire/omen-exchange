@@ -180,6 +180,30 @@ const ValueBox = styled.div<{ xValue?: number }>`
   }
 `
 
+const ValueBoxRegular = styled.div<{ xValue?: number }>`
+  padding: 12px;
+  border: 1px solid ${props => props.theme.scale.box};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  ${props =>
+    props.xValue
+      ? props.xValue <= 0.885
+        ? `left: ${
+            props.xValue <= 0.115
+              ? `0`
+              : props.xValue <= 0.885
+              ? `${props.xValue * 100}%; transform: translateX(-50%);`
+              : ``
+          }`
+        : `right: 0;`
+      : ''}
+  background: white;
+  position: absolute;
+  top: 44px;
+  border-radius: 4px;
+`
+
 const ValueBoxTitle = styled.p`
   font-size: 14px;
   font-weight: 500;
@@ -380,7 +404,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           </>
         )}
         {!isAmountInputted && (
-          <ValueBox
+          <ValueBoxRegular
             xValue={
               currentPrediction
                 ? Number(currentPrediction)
@@ -392,7 +416,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               {` ${unit}`}
             </ValueBoxTitle>
             <ValueBoxSubtitle>{startingPointTitle}</ValueBoxSubtitle>
-          </ValueBox>
+          </ValueBoxRegular>
         )}
       </Scale>
       {isAmountInputted && (
