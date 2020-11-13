@@ -34,6 +34,7 @@ export const MarketNavigation = (props: Props) => {
   const currentTimestamp = new Date().getTime()
 
   const isOpen = question.resolution.getTime() > currentTimestamp
+  const isFinalizing = question.resolution < new Date() && !isQuestionFinalized
 
   const marketTabs = {
     history: 'HISTORY',
@@ -43,8 +44,6 @@ export const MarketNavigation = (props: Props) => {
     buy: 'BUY',
     sell: 'SELL',
   }
-
-  const isFinalizing = question.resolution < new Date() && !isQuestionFinalized
 
   return (
     <MarketTabs>
@@ -66,7 +65,6 @@ export const MarketNavigation = (props: Props) => {
       <MarketTab active={activeTab === marketTabs.history} onClick={() => switchMarketTab('HISTORY')}>
         History
       </MarketTab>
-      {/*here chaning display based upon market state*/}
       {isOpen && (
         <MarketTab active={activeTab === marketTabs.verify} onClick={() => switchMarketTab('VERIFY')}>
           Verify
