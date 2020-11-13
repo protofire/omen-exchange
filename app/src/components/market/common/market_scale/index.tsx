@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { Token } from '../../../../util/types'
 
 const ScaleWrapper = styled.div<{ border: boolean | undefined }>`
   display: flex;
@@ -203,15 +204,21 @@ interface Props {
   border?: boolean
   newPrediction?: Maybe<number>
   long?: Maybe<boolean>
+  potentialLoss?: Maybe<BigNumber>
+  potentialProfit?: Maybe<BigNumber>
+  collateral?: Maybe<Token>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
   const {
     border,
+    collateral,
     currentPrediction,
     long,
     lowerBound,
     newPrediction,
+    potentialLoss,
+    potentialProfit,
     startingPoint,
     startingPointTitle,
     unit,
@@ -227,6 +234,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const currentPredictionNumber = Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
   const newPredictionNumber = Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
 
+  const potentialProfitNumber =
+    collateral && Number(formatBigNumber(potentialProfit || new BigNumber(0), collateral.decimals))
+  const potentialLossNumber =
+    collateral && Number(formatBigNumber(potentialLoss || new BigNumber(0), collateral.decimals))
+
   const isAmountInputted = newPrediction && newPrediction !== Number(currentPrediction)
 
   const [scaleValue, setScaleValue] = useState<number | undefined>(
@@ -237,6 +249,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
   )
   const [scaleValuePrediction, setScaleValuePrediction] = useState(newPredictionNumber)
+  const [yourPayout, setYourPayout] = useState(0)
+  const [profitLoss, setProfitLoss] = useState(0)
 
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
@@ -248,6 +262,26 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     setScaleValue((newPrediction || 0) * 100)
     setScaleValuePrediction(Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
   }, [newPrediction])
+
+  useEffect(() => {
+    if (long) {
+      if (scaleValuePrediction > newPredictionNumber) {
+        const positionValue = (scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
+        setYourPayout(positionValue * (potentialProfitNumber || 0))
+      } else {
+        const positionValue = -(scaleValuePrediction - newPredictionNumber) / (lowerBoundNumber - newPredictionNumber)
+        setYourPayout(positionValue * (potentialLossNumber || 0))
+      }
+    } else {
+      if (scaleValuePrediction < newPredictionNumber) {
+        const positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
+        setYourPayout(positionValue * (potentialProfitNumber || 0))
+      } else {
+        const positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
+        setYourPayout(positionValue * (potentialLossNumber || 0))
+      }
+    }
+  }, [scaleValuePrediction])
 
   return (
     <ScaleWrapper border={border}>
@@ -337,12 +371,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           <ValueBoxPair>
             <ValueBox>
               {/* TODO: Replace hardcoded value and collateral symbol */}
-              <ValueBoxTitle>{'0.00 DAI'}</ValueBoxTitle>
+              <ValueBoxTitle>{`${formatNumber(yourPayout.toString())} DAI`}</ValueBoxTitle>
               <ValueBoxSubtitle>Your Payout</ValueBoxSubtitle>
             </ValueBox>
             <ValueBox>
               {/* TODO: Replace hardcoded value */}
-              <ValueBoxTitle>{'0.00%'}</ValueBoxTitle>
+              <ValueBoxTitle>{`${formatNumber(profitLoss.toString())}%`}</ValueBoxTitle>
               <ValueBoxSubtitle>Profit/Loss</ValueBoxSubtitle>
             </ValueBox>
           </ValueBoxPair>
