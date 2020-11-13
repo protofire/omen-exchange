@@ -89,14 +89,7 @@ const Wrapper = (props: Props) => {
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
 
-  const {
-    address: marketMakerAddress,
-    balances,
-    collateral,
-    isQuestionFinalized,
-    question,
-    totalPoolShares,
-  } = marketMakerData
+  const { balances, collateral, question, totalPoolShares } = marketMakerData
   const context = useConnectedWeb3Context()
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
@@ -191,9 +184,7 @@ const Wrapper = (props: Props) => {
       <BottomCard>
         <MarketNavigation
           activeTab={currentTab}
-          isQuestionFinalized={isQuestionFinalized}
-          marketAddress={marketMakerAddress}
-          resolutionDate={question.resolution}
+          marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
         {currentTab === marketTabs.swap && (
