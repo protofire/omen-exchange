@@ -256,14 +256,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [yourPayout, setYourPayout] = useState(0)
   const [profitLoss, setProfitLoss] = useState(0)
 
-  console.log(
-    newPrediction
-      ? newPrediction * 100
-      : currentPrediction
-      ? Number(currentPrediction) * 100
-      : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
-  )
-
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
     setScaleValue(Number(scaleBall?.value))
@@ -320,7 +312,16 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         )
       }
     }
-  }, [scaleValuePrediction])
+  }, [
+    scaleValuePrediction,
+    amountNumber,
+    long,
+    lowerBoundNumber,
+    newPredictionNumber,
+    potentialLossNumber,
+    potentialProfitNumber,
+    upperBoundNumber,
+  ])
 
   return (
     <ScaleWrapper border={border}>
@@ -409,12 +410,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           </ValueBoxPair>
           <ValueBoxPair>
             <ValueBox>
-              {/* TODO: Replace hardcoded value and collateral symbol */}
               <ValueBoxTitle>{`${formatNumber(yourPayout.toString())} DAI`}</ValueBoxTitle>
               <ValueBoxSubtitle>Your Payout</ValueBoxSubtitle>
             </ValueBox>
             <ValueBox>
-              {/* TODO: Replace hardcoded value */}
               <ValueBoxTitle>{`${formatNumber(profitLoss.toString())}%`}</ValueBoxTitle>
               <ValueBoxSubtitle>Profit/Loss</ValueBoxSubtitle>
             </ValueBox>
