@@ -243,7 +243,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
 
-  const isAmountInputted = newPrediction && newPrediction !== Number(currentPrediction)
+  const [isAmountInputted, setIsAmountInputted] = useState(false)
+
+  useEffect(() => {
+    setIsAmountInputted(newPrediction ? newPrediction !== Number(currentPrediction) : false)
+  }, [newPrediction, currentPrediction])
 
   const [scaleValue, setScaleValue] = useState<number | undefined>(
     newPrediction
