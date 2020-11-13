@@ -3,7 +3,7 @@ import { ItemTypes, gtcrEncode } from '@kleros/gtcr-encoder'
 import { abi as _GeneralizedTCR } from '@kleros/tcr/build/contracts/GeneralizedTCR.json'
 import { ethers } from 'ethers'
 import React, { useCallback, useMemo, useState } from 'react'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks'
@@ -112,9 +112,10 @@ interface Props extends RouteComponentProps<any> {
 }
 
 const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
-  const { context, marketMakerData, switchMarketTab } = props || {}
+  const { context, marketMakerData } = props || {}
   const [selection, setSelection] = useState<number | undefined>()
   const { data, error, status } = useKlerosCuration(marketMakerData, context)
+  const history = useHistory()
 
   const selectSource = useCallback(
     (value: number) => {
@@ -176,7 +177,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
         </>
       )}
       <BottomButtonWrapper>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
           Back
         </Button>
         <Button
