@@ -343,6 +343,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             ? -100
             : -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100,
         )
+        console.log(positionValue)
       }
     }
   }, [
