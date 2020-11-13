@@ -329,8 +329,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     upperBoundNumber,
   ])
 
-  console.log(yourPayout)
-
   return (
     <ScaleWrapper border={border}>
       <ScaleTitleWrapper>
@@ -422,7 +420,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               <ValueBoxSubtitle>Your Payout</ValueBoxSubtitle>
             </ValueBox>
             <ValueBox>
-              <ValueBoxTitle>{`${formatNumber(profitLoss.toString())}%`}</ValueBoxTitle>
+              <ValueBoxTitle>{`${formatNumber(profitLoss ? profitLoss.toString() : '0')}%`}</ValueBoxTitle>
               <ValueBoxSubtitle>Profit/Loss</ValueBoxSubtitle>
             </ValueBox>
           </ValueBoxPair>
