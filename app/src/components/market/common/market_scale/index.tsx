@@ -300,7 +300,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         )
       }
     } else {
-      if (scaleValuePrediction < newPredictionNumber) {
+      if (scaleValuePrediction <= newPredictionNumber) {
         positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
         setYourPayout(positionValue * (potentialProfitNumber || 0))
         setProfitLoss(((positionValue * (potentialProfitNumber || 0)) / (amountNumber || 0)) * 100)
