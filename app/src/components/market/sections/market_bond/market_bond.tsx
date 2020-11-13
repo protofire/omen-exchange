@@ -4,36 +4,25 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { DOCUMENT_FAQ } from '../../../../common/constants'
-import {
-  useCollateralBalance,
-  useConnectedWeb3Context,
-  useContracts,
-  useCpk,
-  useCpkAllowance,
-  useFundingBalance,
-} from '../../../../hooks'
+import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { calcPoolTokens, formatBigNumber, formatNumber } from '../../../../util/tools'
-import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
+import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, TokenEthereum } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
-import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
-import { CurrencySelector } from '../../common/currency_selector'
+import { CurrenciesWrapper } from '../../common/common_styled'
+import { EthBalance } from '../../common/eth_balance'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
-import { SetAllowance } from '../../common/set_allowance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
-import { WarningMessage } from '../../common/warning_message'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
@@ -46,113 +35,63 @@ const BottomButtonWrapper = styled(ButtonContainer)`
   justify-content: space-between;
 `
 
-const WarningMessageStyled = styled(WarningMessage)`
-  margin-top: 20px;
-  margin-bottom: 0;
-`
-
 const logger = getLogger('Market::Bond')
 
 const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
-  const { address: marketMakerAddress, balances, fee, totalPoolShares } = marketMakerData
+  const {
+    address: marketMakerAddress,
+    balances,
+    fee,
+    question: { currentAnswerBond },
+  } = marketMakerData
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
-  const cpk = useCpk()
 
   const { buildMarketMaker } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const signer = useMemo(() => provider.getSigner(), [provider])
-  const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
-  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
-
-  const [amountToFund, setAmountToFund] = useState<Maybe<BigNumber>>(new BigNumber(0))
-  const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
-  const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
-
-  useEffect(() => {
-    setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
-  }, [amountToFund, collateral.decimals])
-
-  useEffect(() => {
-    setCollateral(marketMakerData.collateral)
-    setAmountToFund(null)
-    setAmountToFundDisplay('')
-    // eslint-disable-next-line
-  }, [marketMakerData.collateral.address])
-
-  const resolutionDate = marketMakerData.question.resolution.getTime()
-  const currentDate = new Date().getTime()
-
-  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
-
-  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
-  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
-
-  const poolTokens = calcPoolTokens(
-    amountToFund || Zero,
-    balances.map(b => b.holdings),
-    totalPoolShares,
-  )
-
-  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
-    collateral,
-    context,
-  )
-  const collateralBalance = maybeCollateralBalance || Zero
+  const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const probabilities = balances.map(balance => balance.probability)
-  const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
-  const { fetchFundingBalance } = useFundingBalance(marketMakerAddress, context)
+  const [bondEthAmount, setBondEthAmount] = useState<BigNumber>(
+    currentAnswerBond ? currentAnswerBond.mul(2) : new BigNumber('10000000000000000'),
+  )
+  const [ethBalance, setEthBalance] = useState<BigNumber>(Zero)
 
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
+  useEffect(() => {
+    const fetchEthBalance = async () => {
+      try {
+        const balance = await provider.getBalance(account || '')
+        setEthBalance(balance)
+      } catch (error) {
+        setEthBalance(Zero)
+      }
+    }
+    if (account) {
+      fetchEthBalance()
+    }
+  }, [account, provider])
 
-  const addFunding = async () => {
-    setModalTitle('Funds Deposit')
+  useEffect(() => {
+    if (currentAnswerBond && !currentAnswerBond.mul(2).eq(bondEthAmount)) {
+      setBondEthAmount(currentAnswerBond.mul(2))
+    }
+    // eslint-disable-next-line
+  }, [currentAnswerBond])
+
+  const bondOutcome = async () => {
+    setModalTitle('Bond Outcome')
 
     try {
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
-      if (hasEnoughAllowance === Ternary.Unknown) {
-        throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown")
-      }
-
-      const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
-
-      setStatus(Status.Loading)
-      setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
-
-      const cpk = await CPKService.create(provider)
-
-      const collateralAddress = await marketMaker.getCollateralToken()
-      const collateralService = new ERC20Service(provider, account, collateralAddress)
-
-      if (hasEnoughAllowance === Ternary.False) {
-        await collateralService.approveUnlimited(cpk.address)
-      }
-
-      await cpk.addFunding({
-        amount: amountToFund || Zero,
-        collateral,
-        marketMaker,
-      })
-
-      await fetchGraphMarketMakerData()
-      await fetchFundingBalance()
-      await fetchCollateralBalance()
-
-      setStatus(Status.Ready)
-      setAmountToFund(null)
-      setAmountToFundDisplay('')
-      setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to deposit funds.`)
@@ -161,131 +100,80 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
-  const unlockCollateral = async () => {
-    if (!cpk) {
-      return
-    }
-
-    await unlock()
-
-    setAllowanceFinished(true)
-  }
-
-  const collateralAmountError =
-    maybeCollateralBalance === null
-      ? null
-      : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
-      ? `Insufficient balance`
-      : amountToFund?.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
-      : null
-
-  const disableDepositButton =
-    !amountToFund ||
-    amountToFund?.isZero() ||
-    hasEnoughAllowance !== Ternary.True ||
-    collateralAmountError !== null ||
-    currentDate > resolutionDate ||
-    isNegativeAmountToFund
-
   return (
     <>
       <OutcomeTable
         balances={balances}
-        collateral={collateral}
-        disabledColumns={[OutcomeTableValue.OutcomeProbability, OutcomeTableValue.Payout, OutcomeTableValue.Bonded]}
-        displayRadioSelection={false}
+        bonds={marketMakerData.question.bonds}
+        collateral={marketMakerData.collateral}
+        disabledColumns={[
+          OutcomeTableValue.OutcomeProbability,
+          OutcomeTableValue.Probability,
+          OutcomeTableValue.CurrentPrice,
+          OutcomeTableValue.Payout,
+        ]}
+        isBond
+        newBonds={marketMakerData.question.bonds?.map((bond, bondIndex) =>
+          bondIndex !== outcomeIndex ? bond : { ...bond, bondedEth: bond.bondedEth.add(bondEthAmount) },
+        )}
+        outcomeHandleChange={(value: number) => {
+          setOutcomeIndex(value)
+        }}
+        outcomeSelected={outcomeIndex}
         probabilities={probabilities}
-      />
-      <WarningMessageStyled
-        additionalDescription=""
-        description="Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time."
-        href={DOCUMENT_FAQ}
-        hyperlinkDescription="More Info"
+        showBondChange
       />
       <GridTransactionDetails>
         <div>
           <>
             <CurrenciesWrapper>
-              <CurrencySelector
-                balance={walletBalance}
-                context={context}
-                currency={collateral.address}
-                disabled
-                onSelect={(token: Token | null) => {
-                  if (token) {
-                    setCollateral(token)
-                    setAmountToFund(new BigNumber(0))
-                  }
-                }}
-              />
+              <EthBalance value={`${formatNumber(formatBigNumber(ethBalance, TokenEthereum.decimals, 3), 3)}`} />
             </CurrenciesWrapper>
 
             <TextfieldCustomPlaceholder
+              disabled
               formField={
                 <BigNumberInput
-                  decimals={collateral.decimals}
-                  name="amountToFund"
-                  onChange={(e: BigNumberInputReturn) => {
-                    setAmountToFund(e.value)
-                    setAmountToFundDisplay('')
-                  }}
+                  decimals={TokenEthereum.decimals}
+                  name="bondAmount"
+                  // eslint-disable-next-line @typescript-eslint/no-empty-function
+                  onChange={() => {}}
                   style={{ width: 0 }}
-                  value={amountToFund}
-                  valueToDisplay={amountToFundDisplay}
+                  value={bondEthAmount}
                 />
               }
-              onClickMaxButton={() => {
-                setAmountToFund(collateralBalance)
-                setAmountToFundDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
-              }}
-              shouldDisplayMaxButton
-              symbol={collateral.symbol}
+              symbol={TokenEthereum.symbol}
             />
-
-            {collateralAmountError && <GenericError>{collateralAmountError}</GenericError>}
           </>
         </div>
         <div>
           <TransactionDetailsCard>
             <TransactionDetailsRow
-              emphasizeValue={fee.gt(0)}
-              state={ValueStates.success}
-              title="Earn Trading Fee"
-              value={feeFormatted}
+              state={ValueStates.normal}
+              title="Bond Amount"
+              value={`${formatNumber(formatBigNumber(bondEthAmount, TokenEthereum.decimals))} ${TokenEthereum.symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
-              emphasizeValue={poolTokens.gt(0)}
-              state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
-              title="Pool Tokens"
-              value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals))}`}
+              state={ValueStates.normal}
+              title="Potential Profit"
+              value={`${formatNumber(formatBigNumber(currentAnswerBond || new BigNumber(0), 18))} ETH`}
+            />
+
+            <TransactionDetailsRow
+              state={ValueStates.normal}
+              title="Potential Loss"
+              value={`${formatNumber(formatBigNumber(bondEthAmount, 18))} ETH`}
             />
           </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
-      {isNegativeAmountToFund && (
-        <WarningMessage
-          additionalDescription=""
-          danger={true}
-          description="Your deposit amount should not be negative."
-          href=""
-          hyperlinkDescription=""
-        />
-      )}
-      {showSetAllowance && (
-        <SetAllowance
-          collateral={collateral}
-          finished={allowanceFinished && RemoteData.is.success(allowance)}
-          loading={RemoteData.is.asking(allowance)}
-          onUnlock={unlockCollateral}
-        />
-      )}
+
       <BottomButtonWrapper>
         <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.finalize)}>
           Back
         </Button>
-        <Button buttonType={ButtonType.primary} disabled={disableDepositButton} onClick={() => addFunding()}>
+        <Button buttonType={ButtonType.primary} onClick={() => bondOutcome()}>
           Bond ETH
         </Button>
       </BottomButtonWrapper>

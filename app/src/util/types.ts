@@ -21,6 +21,16 @@ export interface BalanceItem {
   holdings: BigNumber
 }
 
+export interface BondItem {
+  outcomeName: string
+  bondedEth: BigNumber
+}
+
+export interface AnswerItem {
+  answer: string
+  bondAggregate: BigNumber
+}
+
 export enum Stage {
   Running = 0,
   Paused = 1,
@@ -57,6 +67,11 @@ export interface Question {
   arbitrationOccurred: boolean
   currentAnswerTimestamp: Maybe<BigNumber>
   currentAnswerBond: Maybe<BigNumber>
+  answers?: {
+    answer: string
+    bondAggregate: BigNumber
+  }[]
+  bonds?: BondItem[]
 }
 
 export enum OutcomeTableValue {
@@ -75,6 +90,11 @@ export interface Token {
   symbol: string
   image?: string
   volume?: string
+}
+
+export const TokenEthereum = {
+  decimals: 18,
+  symbol: 'ETH',
 }
 
 export interface QuestionLog {

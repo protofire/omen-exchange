@@ -71,12 +71,14 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   lastActiveDay: number
   currency: Token
   isFinalize?: boolean
+  currentAnswerTimestamp?: Maybe<BigNumber>
 }
 
 export const MarketData: React.FC<Props> = props => {
   const {
     collateralVolume,
     currency,
+    currentAnswerTimestamp,
     isFinalize = false,
     lastActiveDay,
     liquidity,
@@ -139,18 +141,24 @@ export const MarketData: React.FC<Props> = props => {
           onClick={() => setShowUTC(value => !value)}
         />
       </MarketDataItem>
-      <MarketDataItem>
-        <MarketDataItemTop>
-          {isFinalize
-            ? moment(resolutionTimestamp)
-                .add('day', 1)
-                .fromNow(true)
-            : resolutionTimestamp > new Date()
-            ? moment(resolutionTimestamp).fromNow(true)
-            : '0 days'}
-        </MarketDataItemTop>
-        <MarketDataItemBottom>{isFinalize ? 'Finalized' : 'Remaining'}</MarketDataItemBottom>
-      </MarketDataItem>
+      {isFinalize && currentAnswerTimestamp && (
+        <MarketDataItem>
+          <MarketDataItemTop>
+            {moment(currentAnswerTimestamp.toNumber())
+              .add('day', 1)
+              .fromNow(true)}
+          </MarketDataItemTop>
+          <MarketDataItemBottom>{isFinalize ? 'Finalized' : 'Remaining'}</MarketDataItemBottom>
+        </MarketDataItem>
+      )}
+      {!isFinalize && (
+        <MarketDataItem>
+          <MarketDataItemTop>
+            {resolutionTimestamp > new Date() ? moment(resolutionTimestamp).fromNow(true) : '0 days'}
+          </MarketDataItemTop>
+          <MarketDataItemBottom>{isFinalize ? 'Finalized' : 'Remaining'}</MarketDataItemBottom>
+        </MarketDataItem>
+      )}
     </MarketDataWrapper>
   )
 }

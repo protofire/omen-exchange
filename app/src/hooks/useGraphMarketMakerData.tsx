@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 
 import { getOutcomes } from '../util/networks'
 import { isObjectEqual, waitABit } from '../util/tools'
-import { Question, Status } from '../util/types'
+import { AnswerItem, BondItem, Question, Status } from '../util/types'
 
 const query = gql`
   query GetMarket($id: ID!) {
@@ -47,6 +47,10 @@ const query = gql`
       question {
         id
         data
+        answers {
+          answer
+          bondAggregate
+        }
       }
       klerosTCRregistered
     }
@@ -82,6 +86,10 @@ type GraphResponseFixedProductMarketMaker = {
   question: {
     id: string
     data: string
+    answers: {
+      answer: string
+      bondAggregate: BigNumber
+    }[]
   }
   resolutionTimestamp: string
   templateId: string
@@ -123,6 +131,35 @@ type Result = {
   status: Status
 }
 
+const getBondedItems = (outcomes: string[], answers: AnswerItem[]): BondItem[] => {
+  const bondedItems: BondItem[] = outcomes.map((outcome: string, index: number) => {
+    const answer = answers.find(answer => new BigNumber(answer.answer).toNumber() === index)
+    if (answer) {
+      return {
+        outcomeName: outcome,
+        bondedEth: answer.bondAggregate,
+      } as BondItem
+    }
+    return {
+      outcomeName: outcome,
+      bondedEth: new BigNumber(0),
+    }
+  })
+
+  const invalidAnswer = answers.find(
+    answer => answer.answer === '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+  )
+
+  bondedItems.push({
+    outcomeName: 'Invalid',
+    bondedEth: invalidAnswer ? invalidAnswer.bondAggregate : new BigNumber(0),
+  })
+
+  // add invalid outcome
+
+  return bondedItems
+}
+
 const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: number): GraphMarketMakerData => {
   const outcomes = data.outcomes ? data.outcomes : getOutcomes(networkId, +data.templateId)
 
@@ -153,6 +190,8 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
       arbitrationOccurred: data.arbitrationOccurred,
       currentAnswerTimestamp: data.currentAnswerTimestamp ? bigNumberify(data.currentAnswerTimestamp) : null,
       currentAnswerBond: data.currentAnswerBond,
+      answers: data.question.answers,
+      bonds: getBondedItems(outcomes, data.question.answers),
     },
     curatedByDxDao: data.curatedByDxDao,
     klerosTCRregistered: data.klerosTCRregistered,

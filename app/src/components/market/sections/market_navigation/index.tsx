@@ -26,9 +26,6 @@ const MarketSetOutcomeTab = styled.div`
   color: ${props => props.theme.colors.textColorDark};
   background: none;
   border: none;
-  border-radius: 32px;
-  padding: 10px 18px;
-  margin-right: 4px;
 `
 
 interface Props {

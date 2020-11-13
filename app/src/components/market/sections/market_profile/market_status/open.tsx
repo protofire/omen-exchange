@@ -152,9 +152,11 @@ const Wrapper = (props: Props) => {
     return (
       <OutcomeTable
         balances={balances}
+        bonds={question.bonds}
         collateral={collateral}
         disabledColumns={disabledColumns}
         displayRadioSelection={false}
+        isBond
         payouts={payouts}
         probabilities={probabilities}
         withWinningOutcome
