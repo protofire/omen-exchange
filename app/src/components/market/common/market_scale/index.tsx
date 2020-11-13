@@ -91,12 +91,14 @@ const ScaleBallContainer = styled.div`
 
 const ScaleBall = styled.input`
   height: 20px;
-  width: 100%;
+  width: calc(100% + 20px);
   background: none;
   outline: none;
   -webkit-appearance: none;
   z-index: 4;
   position: absolute;
+  left: -10px;
+  right: -10px;
 
   &::-webkit-slider-thumb {
     appearance: none;
@@ -326,6 +328,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     potentialProfitNumber,
     upperBoundNumber,
   ])
+
+  console.log(yourPayout)
 
   return (
     <ScaleWrapper border={border}>
