@@ -8,6 +8,7 @@ import { KlerosCurationData, MarketVerificationState } from '../../../../../util
 import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { IconExclamation, IconKleros, IconSchedule } from '../../../../common/icons'
+import { IconTick } from '../../../../common/icons/IconTick'
 import Tick from '../img/tick.svg'
 import {
   CurationCenterColumn,
@@ -101,6 +102,11 @@ const RightButtonWrapper = styled.div`
 const UnstyledLink = styled.a`
   color: inherit;
 `
+// const IconTickStyled = styled(IconTick)`
+//   filter: brightness(2);
+//   width: 100%;
+//   height: 100%;
+// `
 
 interface Props {
   option?: number
@@ -121,7 +127,6 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
     submissionDeposit,
   } = klerosCurationData || {}
   const { itemID, submissionTime = 0, verificationState: status } = marketVerificationData || {}
-
   const deadline = submissionTime + Number(challengePeriodDuration)
   const timeRemaining = Math.max(0, deadline * 1000 - Date.now())
 
@@ -274,12 +279,14 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
           </RightButtonWrapper>
         </Description>
       )
+
       KlerosRightColumn = (
         <CurationRightColumn>
           <StatusContainer>
             <SuccessVerify>verified</SuccessVerify>
             <IconWrapper>
-              <VerifiedTick alt="tick" src={Tick} />
+              <VerifiedTick alt="tick" src={IconTick} />
+              {/*<IconTickStyled/>*/}
             </IconWrapper>
           </StatusContainer>
           <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>

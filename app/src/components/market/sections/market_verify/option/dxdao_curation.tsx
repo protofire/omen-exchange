@@ -28,6 +28,7 @@ interface Props {
 
 export const DxDaoCuration: FC<Props> = (props: Props) => {
   const { curatedByDxDao } = props
+
   return (
     <CurationRow key="Dxdao Curation">
       <CurationSubRow>
