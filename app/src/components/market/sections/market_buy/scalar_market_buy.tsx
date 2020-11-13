@@ -144,6 +144,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
+  const potentialLossUncapped = reverseTradedShares.isZero() ? new BigNumber(0) : reverseTradedShares.sub(amount)
   const potentialLoss = reverseTradedShares.isZero()
     ? new BigNumber(0)
     : reverseTradedShares.sub(amount).lt(debouncedAmount)
@@ -184,12 +185,13 @@ export const ScalarMarketBuy = (props: Props) => {
   return (
     <>
       <MarketScale
+        amount={amount}
         collateral={collateral}
         currentPrediction={outcomeTokenMarginalPrices[1]}
         long={activeTab === Tabs.long}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
-        potentialLoss={potentialLoss}
+        potentialLoss={potentialLossUncapped}
         potentialProfit={potentialProfit}
         startingPointTitle={'Current prediction'}
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}

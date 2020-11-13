@@ -207,10 +207,12 @@ interface Props {
   potentialLoss?: Maybe<BigNumber>
   potentialProfit?: Maybe<BigNumber>
   collateral?: Maybe<Token>
+  amount?: Maybe<BigNumber>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
   const {
+    amount,
     border,
     collateral,
     currentPrediction,
@@ -239,6 +241,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const potentialLossNumber =
     collateral && Number(formatBigNumber(potentialLoss || new BigNumber(0), collateral.decimals))
 
+  const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
+
   const isAmountInputted = newPrediction && newPrediction !== Number(currentPrediction)
 
   const [scaleValue, setScaleValue] = useState<number | undefined>(
@@ -264,21 +268,42 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   }, [newPrediction])
 
   useEffect(() => {
+    let positionValue
     if (long) {
       if (scaleValuePrediction > newPredictionNumber) {
-        const positionValue = (scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
+        positionValue = (scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
         setYourPayout(positionValue * (potentialProfitNumber || 0))
+        setProfitLoss(((positionValue * (potentialProfitNumber || 0)) / (amountNumber || 0)) * 100)
       } else {
-        const positionValue = -(scaleValuePrediction - newPredictionNumber) / (lowerBoundNumber - newPredictionNumber)
-        setYourPayout(positionValue * (potentialLossNumber || 0))
+        positionValue = -(scaleValuePrediction - newPredictionNumber) / (lowerBoundNumber - newPredictionNumber)
+        setYourPayout(
+          positionValue * (potentialLossNumber || 0) < -(amountNumber || 0)
+            ? -(amountNumber || 0)
+            : positionValue * (potentialLossNumber || 0),
+        )
+        setProfitLoss(
+          -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100 < -100
+            ? -100
+            : -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100,
+        )
       }
     } else {
       if (scaleValuePrediction < newPredictionNumber) {
-        const positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
+        positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
         setYourPayout(positionValue * (potentialProfitNumber || 0))
+        setProfitLoss(((positionValue * (potentialProfitNumber || 0)) / (amountNumber || 0)) * 100)
       } else {
-        const positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
-        setYourPayout(positionValue * (potentialLossNumber || 0))
+        positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
+        setYourPayout(
+          positionValue * (potentialLossNumber || 0) < -(amountNumber || 0)
+            ? -(amountNumber || 0)
+            : positionValue * (potentialLossNumber || 0),
+        )
+        setProfitLoss(
+          -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100 < -100
+            ? -100
+            : -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100,
+        )
       }
     }
   }, [scaleValuePrediction])
