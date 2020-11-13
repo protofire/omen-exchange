@@ -356,6 +356,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     upperBoundNumber,
   ])
 
+  console.log(yourPayout)
+
   return (
     <ScaleWrapper border={border}>
       <ScaleTitleWrapper>
