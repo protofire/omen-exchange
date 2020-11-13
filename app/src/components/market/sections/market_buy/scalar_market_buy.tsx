@@ -184,10 +184,13 @@ export const ScalarMarketBuy = (props: Props) => {
   return (
     <>
       <MarketScale
+        collateral={collateral}
         currentPrediction={outcomeTokenMarginalPrices[1]}
         long={activeTab === Tabs.long}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
+        potentialLoss={potentialLoss}
+        potentialProfit={potentialProfit}
         startingPointTitle={'Current prediction'}
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
         upperBound={scalarHigh || new BigNumber(0)}
