@@ -353,3 +353,5 @@ export enum MarketState {
   closed = 'closed',
   none = '',
 }
+
+export const INVALID_ANSWER_ID = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'

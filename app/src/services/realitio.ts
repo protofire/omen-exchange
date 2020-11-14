@@ -1,7 +1,7 @@
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 // eslint-disable-next-line import/named
 import { Moment } from 'moment'
 
@@ -18,6 +18,7 @@ const realitioAbi = [
   'event LogNewQuestion(bytes32 indexed question_id, address indexed user, uint256 template_id, string question, bytes32 indexed content_hash, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce, uint256 created)',
   'function isFinalized(bytes32 question_id) view public returns (bool)',
   'function resultFor(bytes32 question_id) external view returns (bytes32)',
+  'function submitAnswer(bytes32 question_id, bytes32 answer, uint256 max_previous)',
 ]
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
@@ -173,6 +174,15 @@ class RealitioService {
     } catch (err) {
       logger.error(`There was an error querying the result for question with id '${questionId}'`, err.message)
       throw err
+    }
+  }
+
+  submitAnswer = async (questionId: string, answer: string, amount: BigNumber): Promise<void> => {
+    try {
+      await this.contract.submitAnswer(questionId, answer, 0, { value: utils.parseEther(amount.toString()) })
+    } catch (error) {
+      logger.error(`There was an error submitting answer '${questionId}'`, error.message)
+      throw error
     }
   }
 

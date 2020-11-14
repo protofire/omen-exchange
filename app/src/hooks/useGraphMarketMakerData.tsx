@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 
 import { getOutcomes } from '../util/networks'
 import { isObjectEqual, waitABit } from '../util/tools'
-import { AnswerItem, BondItem, Question, Status } from '../util/types'
+import { AnswerItem, BondItem, INVALID_ANSWER_ID, Question, Status } from '../util/types'
 
 const query = gql`
   query GetMarket($id: ID!) {
@@ -137,7 +137,7 @@ const getBondedItems = (outcomes: string[], answers: AnswerItem[]): BondItem[] =
     if (answer) {
       return {
         outcomeName: outcome,
-        bondedEth: answer.bondAggregate,
+        bondedEth: new BigNumber(answer.bondAggregate),
       } as BondItem
     }
     return {
@@ -146,9 +146,7 @@ const getBondedItems = (outcomes: string[], answers: AnswerItem[]): BondItem[] =
     }
   })
 
-  const invalidAnswer = answers.find(
-    answer => answer.answer === '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
-  )
+  const invalidAnswer = answers.find(answer => answer.answer === INVALID_ANSWER_ID)
 
   bondedItems.push({
     outcomeName: 'Invalid',

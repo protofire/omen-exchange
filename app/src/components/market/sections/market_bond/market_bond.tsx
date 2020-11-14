@@ -10,7 +10,14 @@ import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
-import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, TokenEthereum } from '../../../../util/types'
+import {
+  INVALID_ANSWER_ID,
+  MarketDetailsTab,
+  MarketMakerData,
+  OutcomeTableValue,
+  Status,
+  TokenEthereum,
+} from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -40,19 +47,15 @@ const logger = getLogger('Market::Bond')
 const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const {
-    address: marketMakerAddress,
     balances,
-    fee,
     question: { currentAnswerBond },
   } = marketMakerData
 
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
 
-  const { buildMarketMaker } = useContracts(context)
-  const marketMaker = buildMarketMaker(marketMakerAddress)
+  const { realitio } = useContracts(context)
 
-  const signer = useMemo(() => provider.getSigner(), [provider])
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
@@ -60,7 +63,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const probabilities = balances.map(balance => balance.probability)
   const [bondEthAmount, setBondEthAmount] = useState<BigNumber>(
-    currentAnswerBond ? currentAnswerBond.mul(2) : new BigNumber('10000000000000000'),
+    currentAnswerBond ? new BigNumber(currentAnswerBond).mul(2) : new BigNumber('10000000000000000'),
   )
   const [ethBalance, setEthBalance] = useState<BigNumber>(Zero)
 
@@ -79,8 +82,8 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   }, [account, provider])
 
   useEffect(() => {
-    if (currentAnswerBond && !currentAnswerBond.mul(2).eq(bondEthAmount)) {
-      setBondEthAmount(currentAnswerBond.mul(2))
+    if (currentAnswerBond && !new BigNumber(currentAnswerBond).mul(2).eq(bondEthAmount)) {
+      setBondEthAmount(new BigNumber(currentAnswerBond).mul(2))
     }
     // eslint-disable-next-line
   }, [currentAnswerBond])
@@ -92,9 +95,22 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
+      const answer = outcomeIndex >= balances.length ? INVALID_ANSWER_ID : new BigNumber(outcomeIndex).toHexString()
+      logger.log(`Submit Answer questionId: ${marketMakerData.question.id}, answer: ${answer}`)
+      await realitio.submitAnswer(marketMakerData.question.id, answer, bondEthAmount)
+      await fetchGraphMarketMakerData()
+
+      setStatus(Status.Ready)
+      setMessage(
+        `Successfully bonded ${formatBigNumber(bondEthAmount, TokenEthereum.decimals)}ETH on ${
+          outcomeIndex < marketMakerData.question.outcomes.length
+            ? marketMakerData.question.outcomes[outcomeIndex]
+            : 'Invalid'
+        }`,
+      )
     } catch (err) {
       setStatus(Status.Error)
-      setMessage(`Error trying to deposit funds.`)
+      setMessage(`Error trying to bond Eth.`)
       logger.error(`${message} - ${err.message}`)
     }
     setIsModalTransactionResultOpen(true)
