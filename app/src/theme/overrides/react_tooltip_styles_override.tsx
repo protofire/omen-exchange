@@ -85,6 +85,7 @@ export const ReactTooltipStylesOverride = css`
       border-radius: ${theme.borders.commonBorderRadius};
       box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
       border: 1px solid ${theme.borders.tooltip};
+      padding: 5px 8px;
     }
   }
 `
