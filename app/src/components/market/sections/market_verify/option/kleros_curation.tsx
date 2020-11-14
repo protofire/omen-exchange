@@ -7,15 +7,13 @@ import { DOCUMENT_VALIDITY_RULES } from '../../../../../common/constants'
 import { KlerosCurationData, MarketVerificationState } from '../../../../../util/types'
 import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { IconExclamation, IconKleros, IconSchedule } from '../../../../common/icons'
-import Tick from '../img/tick.svg'
+import { IconExclamation, IconKleros, IconSchedule, IconTick } from '../../../../common/icons'
 import {
   CurationCenterColumn,
   CurationLeftColumn,
   CurationLogoWrapper,
   CurationOption,
   CurationOptionDetails,
-  CurationRadioTick,
   CurationRadioWrapper,
   CurationRightColumn,
   CurationRow,
@@ -55,12 +53,11 @@ const IconWrapper = styled.div`
   padding: 3px;
   display: flex;
   margin-left: 8px;
-`
-
-const VerifiedTick = styled.img`
-  filter: brightness(2);
-  width: 100%;
-  height: 100%;
+  svg {
+    filter: brightness(2);
+    width: 100%;
+    height: 100%;
+  }
 `
 
 const Description = styled.div`
@@ -121,7 +118,6 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
     submissionDeposit,
   } = klerosCurationData || {}
   const { itemID, submissionTime = 0, verificationState: status } = marketVerificationData || {}
-
   const deadline = submissionTime + Number(challengePeriodDuration)
   const timeRemaining = Math.max(0, deadline * 1000 - Date.now())
 
@@ -153,7 +149,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
         <>
           <CurationRightColumn>
             <CurationRadioWrapper onClick={() => selectSource(KLEROS_OPTION)} selected={option === KLEROS_OPTION}>
-              <CurationRadioTick alt="tick" selected={option === KLEROS_OPTION} src={Tick} />
+              <IconTick selected={option === KLEROS_OPTION} />
             </CurationRadioWrapper>
           </CurationRightColumn>
         </>
@@ -274,12 +270,13 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
           </RightButtonWrapper>
         </Description>
       )
+
       KlerosRightColumn = (
         <CurationRightColumn>
           <StatusContainer>
             <SuccessVerify>verified</SuccessVerify>
             <IconWrapper>
-              <VerifiedTick alt="tick" src={Tick} />
+              <IconTick />
             </IconWrapper>
           </StatusContainer>
           <CurationOptionDetails>{submissionTimeUTC}</CurationOptionDetails>
