@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
@@ -290,6 +291,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const handleScaleBallChange = () => {
     setScaleValue(Number(scaleBall?.value))
     setScaleValuePrediction((Number(scaleBall?.value) / 100) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
+    ReactTooltip.rebuild()
   }
 
   useEffect(() => {
@@ -369,8 +371,19 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       </ScaleTitleWrapper>
       <Scale>
         <ScaleBallContainer>
+          <ReactTooltip
+            className="scalarValueTooltip"
+            effect="float"
+            getContent={() => `${formatNumber(scaleValuePrediction.toString())} ${unit}`}
+            id="scalarTooltip"
+            offset={{ top: 10 }}
+            place="top"
+            type="light"
+          />
           <ScaleBall
             className="scale-ball"
+            data-for="scalarTooltip"
+            data-tip={`${formatNumber(scaleValuePrediction.toString())} ${unit}`}
             disabled={!isAmountInputted}
             max="100"
             min="0"

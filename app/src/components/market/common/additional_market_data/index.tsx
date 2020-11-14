@@ -109,6 +109,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         </AdditionalMarketDataSectionWrapper>
         <AdditionalMarketDataSectionWrapper
           data-arrow-color="transparent"
+          data-for="marketData"
           data-tip={`This market uses the ${oracle} oracle which crowd-sources the correct outcome.`}
           href={realitioUrl}
           rel="noopener noreferrer"
@@ -119,6 +120,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         </AdditionalMarketDataSectionWrapper>
         <AdditionalMarketDataSectionWrapper
           data-arrow-color="transparent"
+          data-for="marketData"
           data-tip={`This market uses ${arbitrator.name} as the final arbitrator.`}
           href={arbitrator.url}
           rel="noopener noreferrer"
@@ -129,6 +131,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         </AdditionalMarketDataSectionWrapper>
         <AdditionalMarketDataSectionWrapper
           data-arrow-color="transparent"
+          data-for="marketData"
           data-tip={
             verified
               ? 'This Market is verified by DXdao and therefore valid.'
@@ -146,6 +149,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         className="customMarketTooltip"
         data-multiline={true}
         effect="solid"
+        id="marketData"
         offset={{ top: 0 }}
         place="top"
         type="light"
