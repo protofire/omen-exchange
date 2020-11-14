@@ -1,14 +1,11 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
-import { ERC20Service } from '../../../../services'
-import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
-import { RemoteData } from '../../../../util/remote_data'
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
