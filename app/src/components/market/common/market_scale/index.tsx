@@ -7,14 +7,14 @@ import { formatBigNumber, formatNumber } from '../../../../util/tools'
 const ScaleWrapper = styled.div<{ border: boolean | undefined }>`
   display: flex;
   flex-direction: column;
-  height: 186px;
+  height: 178px;
   border-bottom: 1px solid ${props => props.theme.scale.bar};
   margin-left: -24px;
   margin-right: -24px;
   padding-left: 24px;
   padding-right: 24px;
   position: relative;
-  ${props => props.border && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 210px;`};
+  ${props => props.border && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 202px;`};
 `
 
 const ScaleTitleWrapper = styled.div`
@@ -89,7 +89,7 @@ const StartingPointBox = styled.div<{ xValue: number }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  top: 44px;
+  top: 36px;
   ${props =>
     props.xValue <= 0.885
       ? `left: ${props.xValue <= 0.115 ? `25px` : props.xValue <= 0.885 ? `${props.xValue * 100}%` : ``}`
@@ -102,7 +102,7 @@ const StartingPointTitle = styled.p`
   font-size: 14px;
   font-weight: 500;
   color: ${props => props.theme.colors.textColorDarker};
-  margin-bottom: 6px;
+  margin-bottom: 2px;
   margin-top: 0;
 `
 
