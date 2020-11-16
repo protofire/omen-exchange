@@ -1,6 +1,7 @@
 import React, { FC } from 'react'
 import styled from 'styled-components'
 
+import { IconDxDao, IconTick } from '../../../../common/icons'
 import {
   CurationCenterColumn,
   CurationLeftColumn,
@@ -11,8 +12,7 @@ import {
   CurationRightColumn,
   CurationRow,
   CurationSubRow,
-} from '../../../../common/form/common_styled'
-import { IconDxDao, IconTick } from '../../../../common/icons'
+} from '../../../common/common_styled'
 
 const Bold = styled.b`
   font-weight: 500;

@@ -7,6 +7,7 @@ import { DOCUMENT_VALIDITY_RULES } from '../../../../../common/constants'
 import { KlerosCurationData, MarketVerificationState } from '../../../../../util/types'
 import { Button } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
+import { IconExclamation, IconKleros, IconSchedule, IconTick } from '../../../../common/icons'
 import {
   CurationCenterColumn,
   CurationLeftColumn,
@@ -17,8 +18,7 @@ import {
   CurationRightColumn,
   CurationRow,
   CurationSubRow,
-} from '../../../../common/form/common_styled'
-import { IconExclamation, IconKleros, IconSchedule, IconTick } from '../../../../common/icons'
+} from '../../../common/common_styled'
 
 const Bold = styled.b`
   font-weight: 500;
