@@ -9,7 +9,7 @@ import { Token } from '../../../../util/types'
 const ScaleWrapper = styled.div<{ border: boolean | undefined }>`
   display: flex;
   flex-direction: column;
-  height: 178px;
+  height: 174px;
   border-bottom: 1px solid ${props => props.theme.scale.bar};
   margin-left: -24px;
   margin-right: -24px;
@@ -137,7 +137,7 @@ const ValueBoxes = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 24px;
+  margin-top: 12px;
   width: 100%;
 `
 
@@ -153,7 +153,6 @@ const ValueBox = styled.div<{ xValue?: number }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  top: 36px;
   ${props =>
     props.xValue
       ? props.xValue <= 0.885
@@ -202,7 +201,7 @@ const ValueBoxRegular = styled.div<{ xValue?: number }>`
       : ''}
   background: white;
   position: absolute;
-  top: 44px;
+  top: 32px;
   border-radius: 4px;
 `
 
