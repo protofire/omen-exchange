@@ -462,7 +462,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             <ValueBox>
               <ValueBoxTitle positive={yourPayout > 0 ? true : yourPayout < 0 ? false : undefined}>{`${formatNumber(
                 yourPayout.toString(),
-              )} DAI`}</ValueBoxTitle>
+              )} ${collateral && collateral.symbol}`}</ValueBoxTitle>
               <ValueBoxSubtitle>Your Payout</ValueBoxSubtitle>
             </ValueBox>
             <ValueBox>
