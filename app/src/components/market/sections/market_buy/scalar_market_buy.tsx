@@ -183,6 +183,7 @@ export const ScalarMarketBuy = (props: Props) => {
     <>
       <MarketScale
         amount={amount}
+        border={true}
         collateral={collateral}
         currentPrediction={outcomeTokenMarginalPrices[1]}
         long={activeTab === Tabs.long}
