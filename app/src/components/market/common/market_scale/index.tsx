@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
@@ -272,7 +272,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
+  const initialMount = useRef(true)
   useEffect(() => {
+    if (initialMount.current) {
+      initialMount.current = false
+      return
+    }
     setIsAmountInputted(newPrediction ? newPrediction !== Number(currentPrediction) : false)
   }, [newPrediction, currentPrediction])
 
