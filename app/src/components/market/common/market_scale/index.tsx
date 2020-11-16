@@ -6,6 +6,12 @@ import styled from 'styled-components'
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
 
+const SCALE_HEIGHT = '20px'
+const BAR_WIDTH = '2px'
+const BALL_SIZE = '20px'
+const DOT_SIZE = '8px'
+const VALUE_BOXES_MARGIN = '12px'
+
 const ScaleWrapper = styled.div<{ border: boolean | undefined }>`
   display: flex;
   flex-direction: column;
@@ -36,7 +42,7 @@ const ScaleTitle = styled.p`
 
 const Scale = styled.div`
   position: relative;
-  height: 20px;
+  height: ${SCALE_HEIGHT};
   width: 100%;
 `
 
@@ -44,8 +50,8 @@ const VerticalBar = styled.div<{ position: number; positive: Maybe<boolean> }>`
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 2px;
-  height: 20px;
+  width: ${BAR_WIDTH};
+  height: ${SCALE_HEIGHT};
 
   ${props => (props.position === 0 ? 'left: 0;' : props.position === 1 ? 'left: calc(50% - 1px);' : 'right: 0;')}
   background: ${props =>
@@ -58,31 +64,31 @@ const VerticalBar = styled.div<{ position: number; positive: Maybe<boolean> }>`
 
 const HorizontalBar = styled.div`
   position: absolute;
-  top: calc(50% - 1px);
+  top: calc(50% - ${BAR_WIDTH} / 2);
   left: 0;
   right: 0;
   width: 100%
-  height: 2px;
+  height: ${BAR_WIDTH};
   background: ${props => props.theme.scale.bar};
 `
 
 const HorizontalBarLeft = styled.div<{ positive: boolean | null; width: number }>`
   position: absolute;
-  top: calc(50% - 1px);
+  top: calc(50% - ${BAR_WIDTH} / 2);
   left: 0;
   width: ${props => props.width * 100}%;
   background: ${props => (props.positive ? `${props.theme.scale.positive}` : `${props.theme.scale.negative}`)};
-  height: 2px;
+  height: ${BAR_WIDTH};
   z-index: 2;
 `
 
 const HorizontalBarRight = styled.div<{ positive: boolean | null; width: number }>`
   position: absolute;
-  top: calc(50% - 1px);
+  top: calc(50% - ${BAR_WIDTH} / 2);
   right: 0;
   width: ${props => props.width * 100}%;
   background: ${props => (props.positive ? `${props.theme.scale.positive}` : `${props.theme.scale.negative}`)};
-  height: 2px;
+  height: ${BAR_WIDTH};
   z-index: 2;
 `
 
@@ -91,20 +97,20 @@ const ScaleBallContainer = styled.div`
 `
 
 const ScaleBall = styled.input`
-  height: 20px;
-  width: calc(100% + 20px);
+  height: ${SCALE_HEIGHT};
+  width: calc(100% + ${BALL_SIZE});
   background: none;
   outline: none;
   -webkit-appearance: none;
   z-index: 4;
   position: absolute;
-  left: -10px;
-  right: -10px;
+  left: calc(-${BALL_SIZE} / 2);
+  right: calc(-${BALL_SIZE} / 2);
 
   &::-webkit-slider-thumb {
     appearance: none;
-    height: 20px;
-    width: 20px;
+    height: ${BALL_SIZE};
+    width: ${BALL_SIZE};
     border-radius: 50%;
     border: 3px solid ${props => props.theme.scale.ballBorder};
     background: ${props => props.theme.scale.ballBackground};
@@ -112,8 +118,8 @@ const ScaleBall = styled.input`
   }
 
   &::-moz-range-thumb {
-    height: 20px;
-    width: 20px;
+    height: ${BALL_SIZE};
+    width: ${BALL_SIZE};
     border-radius: 50%;
     border: 3px solid ${props => props.theme.scale.ballBorder};
     background: ${props => props.theme.scale.ballBackground};
@@ -123,26 +129,26 @@ const ScaleBall = styled.input`
 
 const ScaleDot = styled.div<{ xValue: number; positive: Maybe<boolean> }>`
   position: absolute;
-  height: 8px;
-  width: 8px;
+  height: ${DOT_SIZE};
+  width: ${DOT_SIZE};
   background: ${props => (props.positive ? `${props.theme.scale.positive}` : `${props.theme.scale.negative}`)};
   border-radius: 50%;
   z-index: 3;
   left: ${props => props.xValue * 100}%;
   transform: translateX(-50%);
-  margin-top: 6px;
+  margin-top: calc((${SCALE_HEIGHT} - ${DOT_SIZE}) / 2);
 `
 
 const ValueBoxes = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 12px;
+  margin-top: ${VALUE_BOXES_MARGIN};
   width: 100%;
 `
 
 const ValueBoxPair = styled.div`
-  width: calc(50% - 6px);
+  width: calc(50% - ${VALUE_BOXES_MARGIN} / 2);
   display: flex;
   align-items: center;
 `
@@ -153,18 +159,7 @@ const ValueBox = styled.div<{ xValue?: number }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  ${props =>
-    props.xValue
-      ? props.xValue <= 0.885
-        ? `left: ${
-            props.xValue <= 0.115
-              ? `25px`
-              : props.xValue <= 0.885
-              ? `${props.xValue * 100}%; transform: translateX(-50%); position: absolute;`
-              : ``
-          }`
-        : `right: 25px; transform: translateX(-50%); position: absolute;`
-      : 'width: 50%;'}
+  width: 50%;
   background: white;
 
   &:nth-of-type(odd) {
@@ -201,7 +196,7 @@ const ValueBoxRegular = styled.div<{ xValue?: number }>`
       : ''}
   background: white;
   position: absolute;
-  top: 32px;
+  top: calc(${SCALE_HEIGHT} + ${VALUE_BOXES_MARGIN});
   border-radius: 4px;
 `
 
