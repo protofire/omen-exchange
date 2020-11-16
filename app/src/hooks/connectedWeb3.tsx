@@ -80,7 +80,7 @@ export const ConnectedWeb3: React.FC = props => {
     return () => {
       isSubscribed = false
     }
-  }, [context, library, active, error, networkId, isSafeApp])
+  }, [context, library, active, error, networkId, isSafeApp, safeSdk.safeAppInfo])
 
   if (!networkId || !library) {
     return null
