@@ -74,9 +74,19 @@ type Props = {
   onLoadNextPage: () => void
   onLoadPrevPage: () => void
   currency: string
+  next: boolean
+  prev: boolean
 }
 
-export const HistoryTable: React.FC<Props> = ({ currency, fpmmTrade, onLoadNextPage, onLoadPrevPage, status }) => {
+export const HistoryTable: React.FC<Props> = ({
+  currency,
+  fpmmTrade,
+  next,
+  onLoadNextPage,
+  onLoadPrevPage,
+  prev,
+  status,
+}) => {
   const history = useHistory()
   const context = useConnectedWeb3Context()
   const tokens = useTokens(context)
@@ -98,7 +108,7 @@ export const HistoryTable: React.FC<Props> = ({ currency, fpmmTrade, onLoadNextP
           <HistoryRow width={'25'}>User</HistoryRow>
           <HistoryRow width={'18'}>Action</HistoryRow>
           <HistoryRow width={'20'}>Shares/PT</HistoryRow>
-          <HistoryRow width={'21'}>Amount({currency})</HistoryRow>
+          <HistoryRow width={'22'}>Amount ({currency})</HistoryRow>
           <HistoryRow firstRow={true} width={'18'}>
             Date - UTC
           </HistoryRow>
@@ -134,7 +144,7 @@ export const HistoryTable: React.FC<Props> = ({ currency, fpmmTrade, onLoadNextP
                   </HistoryRow>
                   <HistoryRow width={'18'}>{transactionType}</HistoryRow>
                   <HistoryRow width={'20'}>{formatNumber(collateralAmount)}</HistoryRow>
-                  <HistoryRow width={'21'}>
+                  <HistoryRow width={'22'}>
                     {collateralAmountUSD}
                     {token ? ` ${token.symbol}` : ''}
                   </HistoryRow>
@@ -157,8 +167,10 @@ export const HistoryTable: React.FC<Props> = ({ currency, fpmmTrade, onLoadNextP
           </PaginationButton>
         </PaginationLeft>
         <PaginationRight>
-          <PaginationButton onClick={onLoadPrevPage}>Prev</PaginationButton>
-          <PaginationButton marginLeft={'12'} onClick={onLoadNextPage}>
+          <PaginationButton disabled={prev} onClick={onLoadPrevPage}>
+            Prev
+          </PaginationButton>
+          <PaginationButton disabled={next} marginLeft={'12'} onClick={onLoadNextPage}>
             Next
           </PaginationButton>
         </PaginationRight>

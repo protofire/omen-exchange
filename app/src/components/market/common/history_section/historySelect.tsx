@@ -198,8 +198,10 @@ export const HistorySelect: React.FC<Props> = ({
         <HistoryTable
           currency={currency}
           fpmmTrade={fpmmTrade}
+          next={!paginationNext}
           onLoadNextPage={loadNextPage}
           onLoadPrevPage={loadPrevPage}
+          prev={pageIndex < 1}
           status={status}
         />
       ) : (
