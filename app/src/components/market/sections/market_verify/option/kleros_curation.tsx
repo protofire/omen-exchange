@@ -81,10 +81,12 @@ const DescriptionText = styled.p`
 
 const SuccessVerify = styled.span`
   color: ${props => props.theme.colors.green};
+  font-weight: ${props => props.theme.textfield.fontWeight};
 `
 
 const BlueLink = styled.a`
   color: ${props => props.theme.colors.clickable};
+  font-weight: ${props => props.theme.textfield.fontWeight};
 `
 
 const RightButton = styled(Button)`
@@ -165,7 +167,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
             <BlueLink href={DOCUMENT_VALIDITY_RULES} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>
-            ? Collect <SuccessVerify>{formatEther(submissionBaseDeposit)}</SuccessVerify> ETH upon a successful
+            ?<br /> Collect <SuccessVerify>{formatEther(submissionBaseDeposit)} ETH</SuccessVerify> upon a successful
             challenge.
           </DescriptionText>
           <RightButtonWrapper>
@@ -203,7 +205,8 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
             <BlueLink href={DOCUMENT_VALIDITY_RULES} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>{' '}
-            ? Collect <SuccessVerify>{formatEther(removalBaseDeposit)}</SuccessVerify> upon a successful challenge.
+            ?<br /> Collect <SuccessVerify>{formatEther(removalBaseDeposit)} ETH</SuccessVerify> upon a successful
+            challenge.
           </DescriptionText>
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondary}>
