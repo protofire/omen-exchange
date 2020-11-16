@@ -264,7 +264,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Remove Markets
+                Remove Market
               </UnstyledLink>
             </RightButton>
           </RightButtonWrapper>
