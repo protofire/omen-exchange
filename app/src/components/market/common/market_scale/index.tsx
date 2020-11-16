@@ -92,9 +92,8 @@ const StartingPointBox = styled.div<{ xValue: number }>`
   top: 36px;
   ${props =>
     props.xValue <= 0.885
-      ? `left: ${props.xValue <= 0.115 ? `25px` : props.xValue <= 0.885 ? `${props.xValue * 100}%` : ``}`
-      : `right: 25px`}
-  transform: translateX(-50%);
+      ? `left: ${props.xValue <= 0.115 ? `0` : `${props.xValue * 100}%; transform: translateX(-50%);`}`
+      : `right: 0`}
   background: white;
 `
 
