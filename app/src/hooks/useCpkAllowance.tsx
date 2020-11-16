@@ -24,8 +24,14 @@ export const useCpkAllowance = (signer: Signer, tokenAddress: string) => {
     if (cpk && provider) {
       const account = await signer.getAddress()
       const collateralService = new ERC20Service(provider, account, tokenAddress)
-      const allowance = await collateralService.allowance(account, cpk.address)
-      setAllowance(RemoteData.success(allowance))
+      if (cpk?.cpk.isSafeApp()) {
+        // safe app has permission to use it's own assets
+        const balance = await collateralService.getCollateral(cpk.address)
+        setAllowance(RemoteData.success(balance))
+      } else {
+        const allowance = await collateralService.allowance(account, cpk.address)
+        setAllowance(RemoteData.success(allowance))
+      }
     }
   }, [tokenAddress, cpk, provider, signer])
 

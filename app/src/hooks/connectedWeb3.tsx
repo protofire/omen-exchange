@@ -1,9 +1,11 @@
+import SafeAppsSdkConnector from 'contract-proxy-kit/lib/esm/safeAppsSdkConnector'
 import { providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
 import connectors from '../util/connectors'
 import { getLogger } from '../util/logger'
+import { networkIds } from '../util/networks'
 
 const logger = getLogger('Hooks::ConnectedWeb3')
 
@@ -35,19 +37,31 @@ export const useConnectedWeb3Context = () => {
  */
 export const ConnectedWeb3: React.FC = props => {
   const [networkId, setNetworkId] = useState<number | null>(null)
+  const [safeSdk] = useState<SafeAppsSdkConnector>(new SafeAppsSdkConnector())
+  const isSafeApp = safeSdk.isSafeApp()
   const context = useWeb3Context()
   const { account, active, error, library } = context
 
   useEffect(() => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
-
-    if (active) {
+    if (isSafeApp && connector !== 'Safe') {
+      if (safeSdk.safeAppInfo) {
+        try {
+          // @ts-expect-error ignore
+          const netId = networkIds[safeSdk.safeAppInfo.network.toUpperCase()]
+          connectors.Safe.init(safeSdk.safeAppInfo.safeAddress, netId)
+          context.setConnector('Safe')
+        } catch (e) {
+          logger.log(e.message)
+        }
+      }
+    } else if (active) {
       if (connector && connector in connectors) {
         context.setConnector(connector)
       }
     } else if (error) {
-      logger.debug(error.message)
+      logger.log(error.message)
       localStorage.removeItem('CONNECTOR')
       context.setConnector('Infura')
     } else {
@@ -66,7 +80,7 @@ export const ConnectedWeb3: React.FC = props => {
     return () => {
       isSubscribed = false
     }
-  }, [context, library, active, error])
+  }, [context, library, active, error, networkId, isSafeApp])
 
   if (!networkId || !library) {
     return null
