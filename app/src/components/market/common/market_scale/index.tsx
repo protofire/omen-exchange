@@ -206,12 +206,14 @@ const ValueBoxRegular = styled.div<{ xValue?: number }>`
   border-radius: 4px;
 `
 
-const ValueBoxTitle = styled.p`
+const ValueBoxTitle = styled.p<{ positive?: boolean | undefined }>`
   font-size: 14px;
   font-weight: 500;
   color: ${props => props.theme.colors.textColorDarker};
   margin-bottom: 2px;
   margin-top: 0;
+  color: ${props =>
+    props.positive ? props.theme.scale.positiveText : props.positive === false ? props.theme.scale.negativeText : ''};
 `
 
 const ValueBoxSubtitle = styled.p`
@@ -458,11 +460,15 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           </ValueBoxPair>
           <ValueBoxPair>
             <ValueBox>
-              <ValueBoxTitle>{`${formatNumber(yourPayout.toString())} DAI`}</ValueBoxTitle>
+              <ValueBoxTitle positive={yourPayout > 0 ? true : yourPayout < 0 ? false : undefined}>{`${formatNumber(
+                yourPayout.toString(),
+              )} DAI`}</ValueBoxTitle>
               <ValueBoxSubtitle>Your Payout</ValueBoxSubtitle>
             </ValueBox>
             <ValueBox>
-              <ValueBoxTitle>{`${formatNumber(profitLoss ? profitLoss.toString() : '0')}%`}</ValueBoxTitle>
+              <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>{`${formatNumber(
+                profitLoss ? profitLoss.toString() : '0',
+              )}%`}</ValueBoxTitle>
               <ValueBoxSubtitle>Profit/Loss</ValueBoxSubtitle>
             </ValueBox>
           </ValueBoxPair>
