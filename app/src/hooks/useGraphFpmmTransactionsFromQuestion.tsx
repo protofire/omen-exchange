@@ -113,7 +113,7 @@ export const useGraphFpmmTransactionsFromQuestion = (
   const [fpmmTradeData, setFpmmTradeData] = useState<Maybe<FpmmTradeData[]>>(null)
   const [morePagination, setMorePagination] = useState<boolean>(false)
 
-  const { data, error, loading, refetch: refetch } = useQuery(type === 0 ? withoutFpmmType : withFpmmType, {
+  const { data, error, loading, refetch } = useQuery(type === 0 ? withoutFpmmType : withFpmmType, {
     notifyOnNetworkStatusChange: true,
     skip: false,
     variables: {
