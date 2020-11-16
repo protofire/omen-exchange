@@ -133,7 +133,8 @@ export const ScalarMarketBuy = (props: Props) => {
     calcBuyAmount,
   )
 
-  const formattedNewPrediction = (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
+  const formattedNewPrediction =
+    newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
 
   const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
