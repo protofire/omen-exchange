@@ -1,6 +1,6 @@
 import { bigNumberify } from 'ethers/utils'
 import moment from 'moment'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { useGraphFpmmTransactionsFromQuestion } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
@@ -143,13 +143,19 @@ export const HistorySelect: React.FC<Props> = ({
   ]
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize] = useState(6)
-  const { fpmmTrade, paginationNext, status } = useGraphFpmmTransactionsFromQuestion(
+  const { fpmmTrade, paginationNext, refetch, status } = useGraphFpmmTransactionsFromQuestion(
     marketMakerAddress,
     pageSize,
     pageIndex,
     type,
   )
-
+  useEffect(() => {
+    setPageIndex(0)
+  }, [type])
+  useEffect(() => {
+    refetch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const loadNextPage = () => {
     const newPageIndex = pageIndex + pageSize
     if (!paginationNext) {

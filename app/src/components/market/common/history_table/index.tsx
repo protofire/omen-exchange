@@ -101,6 +101,7 @@ export const HistoryTable: React.FC<Props> = ({
     const hourWithZero = (hour < 10 ? '0' : '') + hour
     return `${date.getDate()}.${date.getMonth()} - ${hourWithZero}:${minuteWithZero}`
   }
+
   return (
     <React.Fragment>
       <TableWrapper>
@@ -136,6 +137,7 @@ export const HistoryTable: React.FC<Props> = ({
                   : chainID === '0x1'
                   ? 'https://etherscan.io/tx/'
                   : ''
+
               return (
                 <HistoryColumns key={id}>
                   <HistoryRow width={'25'}>

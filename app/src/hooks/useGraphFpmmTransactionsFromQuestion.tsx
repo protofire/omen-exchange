@@ -27,6 +27,7 @@ const withFpmmType = gql`
       first: $pageSize
       skip: $pageIndex
       orderBy: creationTimestamp
+      orderDirection: desc
     ) {
       ...TransactionFields
     }
@@ -35,7 +36,13 @@ const withFpmmType = gql`
 `
 const withoutFpmmType = gql`
   query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int) {
-    fpmmTransactions(where: { fpmm: $id }, first: $pageSize, skip: $pageIndex, orderBy: creationTimestamp) {
+    fpmmTransactions(
+      where: { fpmm: $id }
+      first: $pageSize
+      skip: $pageIndex
+      orderBy: creationTimestamp
+      orderDirection: desc
+    ) {
       ...TransactionFields
     }
   }
@@ -74,6 +81,7 @@ interface Result {
   fpmmTrade: FpmmTradeData[] | null
   status: string
   paginationNext: boolean
+  refetch: any
 }
 const wrangleResponse = (data: any) => {
   return data.map((trade: FpmmTradeData) => {
@@ -105,7 +113,7 @@ export const useGraphFpmmTransactionsFromQuestion = (
   const [fpmmTradeData, setFpmmTradeData] = useState<Maybe<FpmmTradeData[]>>(null)
   const [morePagination, setMorePagination] = useState<boolean>(false)
 
-  const { data, error, loading } = useQuery(type === 0 ? withoutFpmmType : withFpmmType, {
+  const { data, error, loading, refetch: refetch } = useQuery(type === 0 ? withoutFpmmType : withFpmmType, {
     notifyOnNetworkStatusChange: true,
     skip: false,
     variables: {
@@ -122,7 +130,7 @@ export const useGraphFpmmTransactionsFromQuestion = (
 
   useEffect(() => {
     setFpmmTradeData(null)
-  }, [questionID])
+  }, [questionID, type])
 
   if (data && data.fpmmTrades && fpmmTradeData === null) {
     setFpmmTradeData(wrangleResponse(data.fpmmTrades))
@@ -132,5 +140,6 @@ export const useGraphFpmmTransactionsFromQuestion = (
     paginationNext: morePagination,
     fpmmTrade: error ? null : fpmmTradeData,
     status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
+    refetch,
   }
 }
