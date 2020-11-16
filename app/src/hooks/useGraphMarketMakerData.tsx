@@ -133,7 +133,9 @@ type Result = {
 
 const getBondedItems = (outcomes: string[], answers: AnswerItem[]): BondItem[] => {
   const bondedItems: BondItem[] = outcomes.map((outcome: string, index: number) => {
-    const answer = answers.find(answer => new BigNumber(answer.answer).toNumber() === index)
+    const answer = answers.find(
+      answer => answer.answer !== INVALID_ANSWER_ID && new BigNumber(answer.answer).toNumber() === index,
+    )
     if (answer) {
       return {
         outcomeName: outcome,

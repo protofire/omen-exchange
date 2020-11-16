@@ -179,7 +179,8 @@ class RealitioService {
 
   submitAnswer = async (questionId: string, answer: string, amount: BigNumber): Promise<void> => {
     try {
-      await this.contract.submitAnswer(questionId, answer, 0, { value: utils.parseEther(amount.toString()) })
+      const result = await this.contract.submitAnswer(questionId, answer, 0, { value: amount })
+      console.log('---submit answe3r', result)
     } catch (error) {
       logger.error(`There was an error submitting answer '${questionId}'`, error.message)
       throw error

@@ -89,11 +89,22 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
     setModalTitle('Bond Outcome')
 
     try {
+      setStatus(Status.Loading)
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
+
       const answer = outcomeIndex >= balances.length ? INVALID_ANSWER_ID : numberToByte32(outcomeIndex)
-      logger.log(`Submit Answer questionId: ${marketMakerData.question.id}, answer: ${answer}`)
+
+      setMessage(
+        `Bonding ${formatBigNumber(bondEthAmount, TokenEthereum.decimals)}Eth on: ${
+          outcomeIndex >= marketMakerData.question.outcomes.length
+            ? 'Invalid'
+            : marketMakerData.question.outcomes[outcomeIndex]
+        }`,
+      )
+
+      logger.log(`Submit Answer questionId: ${marketMakerData.question.id}, answer: ${answer}`, bondEthAmount)
       await realitio.submitAnswer(marketMakerData.question.id, answer, bondEthAmount)
       await fetchGraphMarketMakerData()
 

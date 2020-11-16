@@ -337,7 +337,7 @@ export const OutcomeTable = (props: Props) => {
     <TableWrapper>
       <Table head={renderTableHeader()}>
         {renderTable()}
-        {isBond && renderInvalidRow(Outcomes.length + 1)}
+        {isBond && renderInvalidRow(balances.length)}
       </Table>
     </TableWrapper>
   )
