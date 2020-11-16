@@ -14,11 +14,8 @@ interface Props {
 const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const { isScalar, marketMakerData, switchMarketTab } = props
 
-  if (isScalar) {
-    return <ScalarMarketPoolLiquidity marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
-  } else {
-    return <MarketPoolLiquidity marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
-  }
+  if (isScalar) return <ScalarMarketPoolLiquidity marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+  return <MarketPoolLiquidity marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
 }
 
 export { MarketPoolLiquidityContainer }
