@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { formatBigNumber, formatNumber, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,
@@ -92,7 +92,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
-      const answer = outcomeIndex >= balances.length ? INVALID_ANSWER_ID : new BigNumber(outcomeIndex).toHexString()
+      const answer = outcomeIndex >= balances.length ? INVALID_ANSWER_ID : numberToByte32(outcomeIndex)
       logger.log(`Submit Answer questionId: ${marketMakerData.question.id}, answer: ${answer}`)
       await realitio.submitAnswer(marketMakerData.question.id, answer, bondEthAmount)
       await fetchGraphMarketMakerData()
