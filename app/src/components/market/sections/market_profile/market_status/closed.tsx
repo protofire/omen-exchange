@@ -268,6 +268,7 @@ const Wrapper = (props: Props) => {
           <>
             {isScalar ? (
               <MarketScale
+                border={true}
                 currentPrediction={outcomeTokenMarginalPrices[1]}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Current prediction'}

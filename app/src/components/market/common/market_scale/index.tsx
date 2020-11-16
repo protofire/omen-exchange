@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
 
-const ScaleWrapper = styled.div`
+const ScaleWrapper = styled.div<{ border: boolean | undefined }>`
   display: flex;
   flex-direction: column;
   height: 186px;
@@ -14,6 +14,7 @@ const ScaleWrapper = styled.div`
   padding-left: 24px;
   padding-right: 24px;
   position: relative;
+  ${props => props.border && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 210px;`};
 `
 
 const ScaleTitleWrapper = styled.div`
@@ -119,10 +120,11 @@ interface Props {
   upperBound: BigNumber
   startingPointTitle: string
   currentPrediction?: Maybe<string>
+  border?: boolean
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
-  const { currentPrediction, lowerBound, startingPoint, startingPointTitle, unit, upperBound } = props
+  const { border, currentPrediction, lowerBound, startingPoint, startingPointTitle, unit, upperBound } = props
 
   const decimals = 18
 
@@ -131,7 +133,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), decimals))
 
   return (
-    <ScaleWrapper>
+    <ScaleWrapper border={border}>
       <ScaleTitleWrapper>
         <ScaleTitle>
           {formatNumber(lowerBoundNumber.toString())} {unit}
