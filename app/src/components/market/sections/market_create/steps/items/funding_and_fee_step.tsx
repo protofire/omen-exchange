@@ -71,14 +71,14 @@ const LeftButton = styled(MarketBottomNavButton as any)`
 `
 
 const SubTitle = styled.h3`
-  color: ${props => props.theme.colors.textColorDarker};
+  color: ${props => props.theme.colors.textColor};
   font-size: 14px;
   font-weight: normal;
   margin: 0 0 8px;
 `
 
 const QuestionText = styled.p`
-  color: ${props => props.theme.colors.textColor};
+  color: ${props => props.theme.colors.textColorDarker};
   font-size: 14px;
   font-weight: normal;
   margin: 0 0 24px;
@@ -368,14 +368,23 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         <FlexRowWrapper>
           <TitleValueVertical
             date={resolution instanceof Date ? resolution : undefined}
+            invertedColors={true}
             title={'Closing Date (UTC)'}
             tooltip={true}
             value={resolutionDate}
           />
-          <TitleValueVertical title={'Category'} value={category} />
-          <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
+          <TitleValueVertical invertedColors={true} title={'Category'} value={category} />
+          <TitleValueVertical
+            invertedColors={true}
+            title={'Arbitrator'}
+            value={<DisplayArbitrator arbitrator={arbitrator} />}
+          />
           {!!loadedQuestionId && (
-            <TitleValueVertical title={'Verified by'} value={<VerifiedRow label={values.verifyLabel} />} />
+            <TitleValueVertical
+              invertedColors={true}
+              title={'Verified by'}
+              value={<VerifiedRow label={values.verifyLabel} />}
+            />
           )}
         </FlexRowWrapper>
       </CreateCardTop>
