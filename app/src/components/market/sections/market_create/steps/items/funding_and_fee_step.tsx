@@ -279,7 +279,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     isNegativeDepositAmount
 
   const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+    !cpk?.cpk.isSafeApp() &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const unlockCollateral = async () => {
     if (!cpk) {

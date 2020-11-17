@@ -181,7 +181,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+    !cpk?.cpk.isSafeApp() &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
