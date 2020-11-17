@@ -312,7 +312,8 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       </CurationSubRow>
       {(option === KLEROS_OPTION ||
         status === MarketVerificationState.RemovalChallengeable ||
-        status === MarketVerificationState.SubmissionChallengeable) && <CurationSubRow>{KlerosNotice}</CurationSubRow>}
+        status === MarketVerificationState.SubmissionChallengeable ||
+        status === MarketVerificationState.Verified) && <CurationSubRow>{KlerosNotice}</CurationSubRow>}
     </CurationRow>
   )
 }
