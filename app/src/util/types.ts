@@ -268,6 +268,9 @@ export interface MarketMakerData {
   scaledLiquidityParameter: number
   submissionIDs: KlerosSubmission[]
   oracle: string
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
+  outcomeTokenMarginalPrices: string[]
 }
 
 export enum Ternary {

@@ -48,6 +48,7 @@ import { CreateCard } from '../../../../common/create_card'
 import { CurrencySelector } from '../../../../common/currency_selector'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
+import { MarketScale } from '../../../../common/market_scale'
 import { SetAllowance } from '../../../../common/set_allowance'
 import { TradingFeeSelector } from '../../../../common/trading_fee_selector'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
@@ -76,14 +77,14 @@ const LeftButton = styled(Button as any)`
 `
 
 const SubTitle = styled.h3`
-  color: ${props => props.theme.colors.textColorDarker};
+  color: ${props => props.theme.colors.textColor};
   font-size: 14px;
   font-weight: normal;
   margin: 0 0 8px;
 `
 
 const QuestionText = styled.p`
-  color: ${props => props.theme.colors.textColor};
+  color: ${props => props.theme.colors.textColorDarker};
   font-size: 14px;
   font-weight: normal;
   margin: 0 0 24px;
@@ -159,123 +160,6 @@ const StyledButtonContainerFullWidth = styled(ButtonContainerFullWidth as any)`
   padding-bottom: 0;
   margin: 0 -24px;
   margin-bottom: -1px;
-`
-
-const ScaleWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 182px;
-  border-bottom: 1px solid ${props => props.theme.scale.bar};
-  margin-left: -24px;
-  margin-right: -24px;
-  padding-left: 24px;
-  padding-right: 24px;
-`
-
-const ScaleTitleWrapper = styled.div`
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 5px;
-  margin-bottom: 18px;
-`
-
-const ScaleTitle = styled.p`
-  font-size: 14px;
-  color: ${props => props.theme.colors.textColor};
-  margin: 0;
-`
-
-const Scale = styled.div`
-  position: relative;
-  height: 20px;
-  width: 100%;
-`
-
-const VerticalBar = styled.div`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  height: 20px;
-  background: ${props => props.theme.scale.bar};
-
-  &:nth-of-type(1) {
-    left: 0;
-  }
-
-  &:nth-of-type(2) {
-    left: calc(50% - 1px);
-  }
-
-  &:nth-of-type(3) {
-    right: 0;
-  }
-`
-
-const HorizontalBar = styled.div`
-  position: absolute;
-  top: calc(50% - 1px);
-  left: 0;
-  right: 0;
-  width: 100%
-  height: 2px;
-  background: ${props => props.theme.scale.bar};
-`
-
-const ScaleBall = styled.div<{ xValue: number }>`
-  position: absolute;
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  border: 3px solid ${props => props.theme.scale.ballBorder};
-  background: ${props => props.theme.scale.ballBackground};
-  z-index: 2;
-  left: ${props => props.xValue * 100}%;
-  transform: translateX(-50%);
-`
-
-const StartingPointBox = styled.div<{ xValue: number }>`
-  position: absolute;
-  padding: 12px;
-  border: 1px solid ${props => props.theme.scale.box};
-  border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  bottom: 36px;
-  ${props =>
-    props.xValue <= 0.885
-      ? `left: ${props.xValue <= 0.115 ? `25px` : props.xValue <= 0.885 ? `${props.xValue * 100}%` : ``}`
-      : `right: 25px`}
-  transform: translate(
-    ${props =>
-      props.xValue < 0.5 && props.xValue >= 0.115
-        ? `calc(-50% + 12px)`
-        : props.xValue > 0.5 && props.xValue <= 0.885
-        ? `calc(-50% - 12px)`
-        : props.xValue === 0.5
-        ? `-50%`
-        : `0`},
-    -100%
-  );
-  background: white;
-`
-
-const StartingPointTitle = styled.p`
-  font-size: 14px;
-  font-weight: 500;
-  color: ${props => props.theme.colors.textColorDarker};
-  margin-bottom: 6px;
-  margin-top: 0;
-`
-
-const StartingPointSubtitle = styled.p`
-  font-size: 14px;
-  color: ${props => props.theme.colors.textColor};
-  margin: 0;
-  white-space: nowrap;
 `
 
 interface Props {
@@ -475,42 +359,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         </SubsectionTitleStyled>
         <SubTitle>Question</SubTitle>
         <QuestionText>{question}</QuestionText>
-        {state === 'SCALAR' ? (
-          <ScaleWrapper>
-            <ScaleTitleWrapper>
-              <ScaleTitle>
-                {lowerBound && formatNumber(formatBigNumber(lowerBound, 18))} {unit}
-              </ScaleTitle>
-              <ScaleTitle>
-                {upperBound &&
-                  lowerBound &&
-                  formatNumber(
-                    `${Number(formatBigNumber(upperBound, 18)) / 2 + Number(formatBigNumber(lowerBound, 18)) / 2}`,
-                  )}
-                {` ${unit}`}
-              </ScaleTitle>
-              <ScaleTitle>
-                {upperBound && formatBigNumber(upperBound, 18)} {unit}
-              </ScaleTitle>
-            </ScaleTitleWrapper>
-            <Scale>
-              <ScaleBall
-                xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))}
-              />
-              <VerticalBar />
-              <VerticalBar />
-              <VerticalBar />
-              <HorizontalBar />
-            </Scale>
-            <StartingPointBox
-              xValue={(Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))}
-            >
-              <StartingPointTitle>
-                {startingPoint && formatBigNumber(startingPoint, 18)} {unit}
-              </StartingPointTitle>
-              <StartingPointSubtitle>Starting Point</StartingPointSubtitle>
-            </StartingPointBox>
-          </ScaleWrapper>
+        {state === 'SCALAR' && lowerBound && upperBound && startingPoint && unit ? (
+          <MarketScale
+            lowerBound={lowerBound}
+            startingPoint={startingPoint}
+            startingPointTitle={'Starting Point'}
+            unit={unit}
+            upperBound={upperBound}
+          />
         ) : (
           <OutcomesTableWrapper borderBottom>
             <OutcomesTable>
@@ -541,14 +397,23 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         <FlexRowWrapper>
           <TitleValueVertical
             date={resolution instanceof Date ? resolution : undefined}
+            invertedColors={true}
             title={'Closing Date (UTC)'}
             tooltip={true}
             value={resolutionDate}
           />
-          <TitleValueVertical title={'Category'} value={category} />
-          <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
+          <TitleValueVertical invertedColors={true} title={'Category'} value={category} />
+          <TitleValueVertical
+            invertedColors={true}
+            title={'Arbitrator'}
+            value={<DisplayArbitrator arbitrator={arbitrator} />}
+          />
           {!!loadedQuestionId && (
-            <TitleValueVertical title={'Verified by'} value={<VerifiedRow label={values.verifyLabel} />} />
+            <TitleValueVertical
+              invertedColors={true}
+              title={'Verified by'}
+              value={<VerifiedRow label={values.verifyLabel} />}
+            />
           )}
         </FlexRowWrapper>
       </CreateCardTop>

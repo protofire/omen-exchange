@@ -316,6 +316,8 @@ export const getMarketTitles = (templateId: Maybe<number>) => {
     return { marketTitle: 'Nuanced Binary Market', marketSubtitle: 'What is a nuanced-binary market?' }
   } else if (templateId === 2) {
     return { marketTitle: 'Categorical Market', marketSubtitle: 'What is a categorical market?' }
+  } else if (templateId === 1) {
+    return { marketTitle: 'Scalar Market', marketSubtitle: 'What is a scalar market?' }
   } else {
     return { marketTitle: 'Binary Market', marketSubtitle: 'What is a binary market?' }
   }

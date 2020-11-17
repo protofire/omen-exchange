@@ -479,8 +479,11 @@ export const getKlerosCurateGraphUris = (networkId: number): { httpUri: string; 
 export const getOutcomes = (networkId: number, templateId: number) => {
   const isBinary = templateId === 0
   const isNuancedBinary = (networkId === 1 && templateId === 6) || (networkId === 4 && templateId === 5)
+  const isScalar = templateId === 1
   if (isBinary || isNuancedBinary) {
     return ['No', 'Yes']
+  } else if (isScalar) {
+    return []
   } else {
     throw new Error(`Cannot get outcomes for network '${networkId}' and template id '${templateId}'`)
   }

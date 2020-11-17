@@ -379,6 +379,7 @@ const theme = {
     box: '#e8eaf6',
     ballBorder: '#7986cb',
     ballBackground: '#fff',
+    border: '#E8EAF6',
   },
 }
 

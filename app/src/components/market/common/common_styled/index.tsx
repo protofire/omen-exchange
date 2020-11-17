@@ -274,4 +274,10 @@ export const CurationOption = styled.div`
 export const CurationOptionDetails = styled.div`
   color: ${props => props.theme.colors.textColorLighter};
   font-weight: 400;
+
+export const TabsGrid = styled.div`
+  display: grid;
+  grid-column-gap: 13px;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 0 20px;
 `
