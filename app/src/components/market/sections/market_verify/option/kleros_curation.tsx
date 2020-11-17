@@ -208,7 +208,12 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       )
       KlerosRightColumn = (
         <CurationRightColumn>
-          <TimeRemainingContainer>
+          <TimeRemainingContainer
+            as="a"
+            href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             Ends in {moment.duration(timeRemaining).humanize()}
             <IconStatusWrapper>
               <IconSchedule />
@@ -246,7 +251,12 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       )
       KlerosRightColumn = (
         <CurationRightColumn>
-          <TimeRemainingContainer>
+          <TimeRemainingContainer
+            as="a"
+            href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             Ends in {moment.duration(timeRemaining).humanize()}{' '}
             <IconStatusWrapper>
               <IconSchedule />
