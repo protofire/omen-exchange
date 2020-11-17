@@ -145,7 +145,9 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
-  const potentialLossUncapped = reverseTradedShares.isZero() ? new BigNumber(0) : reverseTradedShares.sub(amount)
+  const potentialLossUncapped = reverseTradedShares.isZero()
+    ? new BigNumber(0)
+    : reverseTradedShares.sub(amount.add(feePaid))
   const potentialLoss = reverseTradedShares.isZero()
     ? new BigNumber(0)
     : reverseTradedShares.sub(amount).lt(debouncedAmount)
