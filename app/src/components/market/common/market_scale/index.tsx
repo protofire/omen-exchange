@@ -9,10 +9,10 @@ const ScaleWrapper = styled.div<{ border: boolean | undefined }>`
   flex-direction: column;
   height: 178px;
   border-bottom: 1px solid ${props => props.theme.scale.bar};
-  margin-left: -24px;
-  margin-right: -24px;
-  padding-left: 24px;
-  padding-right: 24px;
+  margin-left: -25px;
+  margin-right: -25px;
+  padding-left: 25px;
+  padding-right: 25px;
   position: relative;
   ${props => props.border && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 202px;`};
 `
