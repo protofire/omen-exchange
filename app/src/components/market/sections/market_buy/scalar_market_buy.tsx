@@ -1,3 +1,4 @@
+import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -13,6 +14,7 @@ import {
   useCpkAllowance,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
+import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { MarketMakerData, Status, Ternary } from '../../../../util/types'
@@ -21,6 +23,7 @@ import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
+import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { CurrenciesWrapper, GenericError, MarketBottomNavButton, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
@@ -34,6 +37,8 @@ import { WarningMessage } from '../../common/warning_message'
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
 `
+
+const logger = getLogger('Scalar Market::Buy')
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -72,6 +77,8 @@ export const ScalarMarketBuy = (props: Props) => {
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
+  const [tweet, setTweet] = useState('')
+  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -203,13 +210,13 @@ export const ScalarMarketBuy = (props: Props) => {
         marketMaker,
       })
 
-      // setTweet(
-      //   stripIndents(`${question.title}
+      setTweet(
+        stripIndents(`${question.title}
 
-      // I predict ${balances[outcomeIndex].outcomeName}
+      I predict ${balances[outcomeIndex].outcomeName}
 
-      // What do you think?`),
-      // )
+      What do you think?`),
+      )
 
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
@@ -217,9 +224,9 @@ export const ScalarMarketBuy = (props: Props) => {
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
-      // logger.error(`${message} - ${err.message}`)
+      logger.error(`${message} - ${err.message}`)
     }
-    // setIsModalTransactionResultOpen(true)
+    setIsModalTransactionResultOpen(true)
   }
 
   return (
@@ -326,6 +333,15 @@ export const ScalarMarketBuy = (props: Props) => {
           Buy Position
         </MarketBottomNavButton>
       </StyledButtonContainer>
+      <ModalTransactionResult
+        isOpen={isModalTransactionResultOpen}
+        onClose={() => setIsModalTransactionResultOpen(false)}
+        shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
+        status={status}
+        text={message}
+        title={status === Status.Error ? 'Transaction Error' : 'Buy Shares'}
+        tweet={tweet}
+      />
       {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
