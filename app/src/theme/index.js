@@ -370,16 +370,11 @@ const theme = {
     box: '#e8eaf6',
     ballBorder: '#7986cb',
     ballBackground: '#fff',
-<<<<<<< HEAD
     border: '#E8EAF6',
     positive: '#80CBC4',
     negative: '#EF9A9A',
     positiveText: '#4B9E98',
     negativeText: '#EF5350',
-=======
-    positive: '#80CBC4',
-    negative: '#EF9A9A',
->>>>>>> 90768488e690c50dfd5909f1963194fc60b753bb
   },
 }
 
