@@ -661,17 +661,17 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             Back
           </LeftButton>
           {!account && (
-            <MarketBottomNavButton buttonType={ButtonType.primary} onClick={() => submit(state === 'SCALAR')}>
+            <Button buttonType={ButtonType.primary} onClick={() => submit(state === 'SCALAR')}>
               Connect Wallet
-            </MarketBottomNavButton>
+            </Button>
           )}
-          <ButtonCreate
+          <Button
             buttonType={ButtonType.secondaryLine}
             disabled={isCreateMarketbuttonDisabled}
             onClick={() => submit(state === 'SCALAR')}
           >
             Create Market
-          </ButtonCreate>
+          </Button>
         </StyledButtonContainerFullWidth>
       </CreateCardBottom>
       {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
