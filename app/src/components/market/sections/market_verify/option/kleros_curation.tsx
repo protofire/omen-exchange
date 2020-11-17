@@ -70,7 +70,7 @@ const Description = styled.div`
   font-size: 14px;
   letter-spacing: 0.2px;
   line-height: 1.4;
-  margin-top: 25px;
+  margin-top: 20px;
   width: 100%;
 `
 
