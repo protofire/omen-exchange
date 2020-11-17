@@ -183,6 +183,43 @@ export const ScalarMarketBuy = (props: Props) => {
     amountError !== null ||
     isNegativeAmount
 
+  const finish = async () => {
+    const outcomeIndex = positionIndex
+    try {
+      if (!cpk) {
+        return
+      }
+
+      const sharesAmount = formatBigNumber(tradedShares, collateral.decimals)
+
+      setStatus(Status.Loading)
+      setMessage(`Buying ${sharesAmount} shares ...`)
+
+      await cpk.buyOutcomes({
+        amount,
+        outcomeIndex,
+        marketMaker,
+      })
+
+      // setTweet(
+      //   stripIndents(`${question.title}
+
+      // I predict ${balances[outcomeIndex].outcomeName}
+
+      // What do you think?`),
+      // )
+
+      setAmount(new BigNumber(0))
+      setStatus(Status.Ready)
+      setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+    } catch (err) {
+      setStatus(Status.Error)
+      setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
+      // logger.error(`${message} - ${err.message}`)
+    }
+    // setIsModalTransactionResultOpen(true)
+  }
+
   return (
     <>
       <MarketScale
@@ -302,8 +339,7 @@ export const ScalarMarketBuy = (props: Props) => {
         <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
         </MarketBottomNavButton>
-        {/* TODO: Add isBuyDisabled and onClick handler */}
-        <MarketBottomNavButton buttonType={ButtonType.primaryAlternative} disabled={isBuyDisabled}>
+        <MarketBottomNavButton buttonType={ButtonType.primaryAlternative} disabled={isBuyDisabled} onClick={finish}>
           Buy Position
         </MarketBottomNavButton>
       </StyledButtonContainer>
