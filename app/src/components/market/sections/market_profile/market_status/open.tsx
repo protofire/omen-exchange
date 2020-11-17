@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -8,6 +9,7 @@ import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../
 import { ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketBottomNavButton } from '../../../common/common_styled'
+import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
@@ -18,13 +20,13 @@ import { MarketNavigation } from '../../market_navigation'
 import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
 import { MarketSellContainer } from '../../market_sell/market_sell_container'
 
-const TopCard = styled(ViewCard)`
+export const TopCard = styled(ViewCard)`
   padding: 24px;
   padding-bottom: 0;
   margin-bottom: 24px;
 `
 
-const BottomCard = styled(ViewCard)``
+export const BottomCard = styled(ViewCard)``
 
 const MessageWrapper = styled.div`
   border-radius: 4px;
@@ -52,14 +54,13 @@ const Text = styled.p`
   margin: 0;
 `
 
-const StyledButtonContainer = styled(ButtonContainer)`
+export const StyledButtonContainer = styled(ButtonContainer)`
   margin: 0 -24px;
   margin-bottom: -1px;
   padding: 20px 24px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   &.border {
     border-top: 1px solid ${props => props.theme.colors.verticalDivider};
   }
@@ -80,11 +81,12 @@ const WarningMessageStyled = styled(WarningMessage)`
 
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   account: Maybe<string>
+  isScalar: boolean
   marketMakerData: MarketMakerData
 }
 
 const Wrapper = (props: Props) => {
-  const { marketMakerData } = props
+  const { isScalar, marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
 
@@ -93,7 +95,10 @@ const Wrapper = (props: Props) => {
     balances,
     collateral,
     isQuestionFinalized,
+    outcomeTokenMarginalPrices,
     question,
+    scalarHigh,
+    scalarLow,
     totalPoolShares,
   } = marketMakerData
 
@@ -196,7 +201,18 @@ const Wrapper = (props: Props) => {
         ></MarketNavigation>
         {currentTab === marketTabs.swap && (
           <>
-            {renderTableData()}
+            {isScalar ? (
+              <MarketScale
+                border={true}
+                currentPrediction={outcomeTokenMarginalPrices[1]}
+                lowerBound={scalarLow || new BigNumber(0)}
+                startingPointTitle={'Current prediction'}
+                unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+                upperBound={scalarHigh || new BigNumber(0)}
+              />
+            ) : (
+              renderTableData()
+            )}
             {isQuestionOpen && openQuestionMessage}
             {!hasFunding && !isQuestionOpen && (
               <WarningMessageStyled
@@ -223,14 +239,22 @@ const Wrapper = (props: Props) => {
           </>
         )}
         {currentTab === marketTabs.pool && (
-          <MarketPoolLiquidityContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketPoolLiquidityContainer
+            isScalar={isScalar}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
         {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === marketTabs.buy && (
-          <MarketBuyContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketBuyContainer isScalar={isScalar} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
         )}
         {currentTab === marketTabs.sell && (
-          <MarketSellContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketSellContainer
+            isScalar={isScalar}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
         {/* {currentTab === marketTabs.verify && <p>verify</p>} */}
       </BottomCard>

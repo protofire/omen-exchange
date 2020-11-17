@@ -15,6 +15,7 @@ import { FullLoading } from '../../../../loading'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
 import { ButtonContainerFullWidth, MarketBottomNavButton } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
+import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
@@ -58,6 +59,7 @@ const SellBuyWrapper = styled.div`
 `
 
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
+  isScalar: boolean
   marketMakerData: MarketMakerData
 }
 
@@ -82,7 +84,7 @@ const Wrapper = (props: Props) => {
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
 
-  const { marketMakerData } = props
+  const { isScalar, marketMakerData } = props
 
   const {
     address: marketMakerAddress,
@@ -91,8 +93,11 @@ const Wrapper = (props: Props) => {
     collateral: collateralToken,
     isConditionResolved,
     isQuestionFinalized,
+    outcomeTokenMarginalPrices,
     payouts,
     question,
+    scalarHigh,
+    scalarLow,
   } = marketMakerData
 
   const history = useHistory()
@@ -261,15 +266,26 @@ const Wrapper = (props: Props) => {
         ></MarketNavigation>
         {currentTab === marketTabs.swap && (
           <>
-            <OutcomeTable
-              balances={balances}
-              collateral={collateralToken}
-              disabledColumns={disabledColumns}
-              displayRadioSelection={false}
-              payouts={payouts}
-              probabilities={probabilities}
-              withWinningOutcome={true}
-            />
+            {isScalar ? (
+              <MarketScale
+                border={true}
+                currentPrediction={outcomeTokenMarginalPrices[1]}
+                lowerBound={scalarLow || new BigNumber(0)}
+                startingPointTitle={'Current prediction'}
+                unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+                upperBound={scalarHigh || new BigNumber(0)}
+              />
+            ) : (
+              <OutcomeTable
+                balances={balances}
+                collateral={collateralToken}
+                disabledColumns={disabledColumns}
+                displayRadioSelection={false}
+                payouts={payouts}
+                probabilities={probabilities}
+                withWinningOutcome={true}
+              />
+            )}
             <WhenConnected>
               {hasWinningOutcomes && (
                 <MarketResolutionMessageStyled
@@ -324,14 +340,22 @@ const Wrapper = (props: Props) => {
           </>
         )}
         {currentTab === marketTabs.pool && (
-          <MarketPoolLiquidityContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketPoolLiquidityContainer
+            isScalar={isScalar}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
         {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === marketTabs.buy && (
-          <MarketBuyContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketBuyContainer isScalar={isScalar} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
         )}
         {currentTab === marketTabs.sell && (
-          <MarketSellContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketSellContainer
+            isScalar={isScalar}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
       </BottomCard>
       <ModalTransactionResult

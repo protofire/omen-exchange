@@ -222,6 +222,9 @@ export interface MarketMakerData {
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
   oracle: string
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
+  outcomeTokenMarginalPrices: string[]
 }
 
 export enum Ternary {
