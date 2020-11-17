@@ -142,6 +142,9 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       lastActiveDay: graphMarketMakerData.lastActiveDay,
       creationTimestamp: graphMarketMakerData.creationTimestamp,
       scaledLiquidityParameter: graphMarketMakerData.scaledLiquidityParameter,
+      scalarLow: graphMarketMakerData.scalarLow,
+      scalarHigh: graphMarketMakerData.scalarHigh,
+      outcomeTokenMarginalPrices: graphMarketMakerData.outcomeTokenMarginalPrices,
     }
 
     setMarketMakerData(newMarketMakerData)
