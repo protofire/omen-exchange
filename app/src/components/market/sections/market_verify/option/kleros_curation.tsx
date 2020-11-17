@@ -276,7 +276,12 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
 
       KlerosRightColumn = (
         <CurationRightColumn>
-          <StatusContainer>
+          <StatusContainer
+            as="a"
+            href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             <SuccessVerify>verified</SuccessVerify>
             <IconWrapper>
               <IconTick />
