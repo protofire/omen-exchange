@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
+import { isObjectEqual } from '../util/tools'
 import { Status } from '../util/types'
 
 const query = gql`
@@ -50,13 +51,10 @@ export const useGraphMarketsFromQuestion = (questionId: string): Result => {
     if (!questionId) setMarkets([])
   }, [questionId])
 
-  if (data && data.question && data.question.indexedFixedProductMarketMakers.length > 0 && markets.length === 0) {
+  if (data && data.question && !isObjectEqual(markets, data.question.indexedFixedProductMarketMakers)) {
     setMarkets(data.question.indexedFixedProductMarketMakers)
   } else if (data && data.question && !data.question.indexedFixedProductMarketMakers.length) {
-    return {
-      markets: [],
-      status: Status.Error,
-    }
+    setMarkets([])
   }
 
   return {

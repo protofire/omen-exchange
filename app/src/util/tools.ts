@@ -373,6 +373,7 @@ export const isObjectEqual = (obj1?: any, obj2?: any): boolean => {
   }
 
   if (Array.isArray(obj1)) {
+    if (obj1.length !== obj2.length) return false
     for (let index = 0; index < obj1.length; index += 1) {
       if (!isObjectEqual(obj1[index], obj2[index])) return false
     }
