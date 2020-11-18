@@ -134,6 +134,7 @@ export const OutcomeTable = (props: Props) => {
               <THStyled
                 colSpan={index === 0 && displayRadioSelection ? 2 : 1}
                 key={index}
+                style={isBond && index === 1 ? { width: '53%' } : {}}
                 textAlign={TableCellsAlign[index]}
               >
                 {value} {value === OutcomeTableValue.CurrentPrice && `(${collateral.symbol})`}
