@@ -18,13 +18,13 @@ import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { MarketMakerData, Status, Ternary } from '../../../../util/types'
-import { ButtonContainer, ButtonTab } from '../../../button'
+import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { CurrenciesWrapper, GenericError, MarketBottomNavButton, TabsGrid } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
@@ -86,7 +86,10 @@ export const ScalarMarketBuy = (props: Props) => {
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
-  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
+    collateral,
+    context,
+  )
   const collateralBalance = maybeCollateralBalance || Zero
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
 
@@ -143,8 +146,6 @@ export const ScalarMarketBuy = (props: Props) => {
     [new BigNumber(0), 0, amount, new BigNumber(0)],
     calcBuyAmount,
   )
-
-  const formattedNewPrediction = (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
 
   const formattedNewPrediction =
     newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
@@ -347,12 +348,12 @@ export const ScalarMarketBuy = (props: Props) => {
         />
       )}
       <StyledButtonContainer>
-        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
-        </MarketBottomNavButton>
-        <MarketBottomNavButton buttonType={ButtonType.primaryAlternative} disabled={isBuyDisabled} onClick={finish}>
+        </Button>
+        <Button buttonType={ButtonType.primaryAlternative} disabled={isBuyDisabled} onClick={finish}>
           Buy Position
-        </MarketBottomNavButton>
+        </Button>
       </StyledButtonContainer>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
