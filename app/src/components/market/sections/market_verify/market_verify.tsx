@@ -2,6 +2,7 @@
 import { ItemTypes, gtcrEncode } from '@kleros/gtcr-encoder'
 import { abi as _GeneralizedTCR } from '@kleros/tcr/build/contracts/GeneralizedTCR.json'
 import { ethers } from 'ethers'
+import { Web3Provider } from 'ethers/providers'
 import React, { useCallback, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -11,7 +12,7 @@ import { useKlerosCuration } from '../../../../hooks/useKlerosCuration'
 import { MarketMakerData, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { InlineLoading } from '../../../loading'
+import { FullLoading, InlineLoading } from '../../../loading'
 import { CurationRow, GenericError } from '../../common/common_styled'
 
 import { DxDaoCuration } from './option/dxdao_curation'
@@ -40,7 +41,7 @@ interface Props extends RouteComponentProps<any> {
 const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   const { context, marketMakerData } = props || {}
   const [selection, setSelection] = useState<number | undefined>()
-  const [modalTitle, setModalTitle] = useState<string>('')
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const { data, error, status } = useKlerosCuration(marketMakerData, context)
   const history = useHistory()
 
@@ -58,35 +59,57 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   const { message: errorMessage } = error || {}
   const { address, curatedByDxDao, question } = marketMakerData || {}
   const { title } = question || {}
-
+  console.log(ethers)
   const ovmInstance = useMemo(() => {
-    if (!context || !context.account || !ovmAddress) return
+    if (!context || !context.account || !ovmAddress) {
+      console.log('nagrabusio')
+      return
+    }
+    console.log(context)
     const signer = context.library.getSigner()
+    setIsModalOpen(false)
     return new ethers.Contract(ovmAddress, _GeneralizedTCR, signer)
   }, [context, ovmAddress])
 
-  const onSubmitMarket = useCallback(() => {
-    if (!ovmInstance || !data) return
-    setModalTitle('Transaction Intiated')
-    const columns = [
-      {
-        label: 'Question',
-        type: ItemTypes.TEXT,
-      },
-      {
-        label: 'Market URL',
-        type: ItemTypes.LINK,
-      },
-    ]
-    const values = {
-      Question: title,
-      'Market URL': `https://omen.eth.link/#/${address}`,
-    }
+  const onSubmitMarket = useCallback(async () => {
+    try {
+      setIsModalOpen(true)
+      if (!ovmInstance || !data) {
+        setIsModalOpen(false)
+        return
+      }
 
-    const encodedParams = gtcrEncode({ columns, values })
-    ovmInstance.addItem(encodedParams, {
-      value: ethers.utils.bigNumberify(data.submissionDeposit),
-    })
+      const columns = [
+        {
+          label: 'Question',
+          type: ItemTypes.TEXT,
+        },
+        {
+          label: 'Market URL',
+          type: ItemTypes.LINK,
+        },
+      ]
+      const values = {
+        Question: title,
+        'Market URL': `https://omen.eth.link/#/${address}`,
+      }
+
+      const encodedParams = gtcrEncode({ columns, values })
+
+      const transaction = await ovmInstance.addItem(encodedParams, {
+        value: ethers.utils.bigNumberify(data.submissionDeposit),
+      })
+
+      await ethers.getDefaultProvider().waitForTransaction(transaction.hash)
+
+      // await Web3Provider.waitForTransaction(transaction)
+      console.log('AFTER AWIAT SKF KSJFKSJFKJSKJKJSFKJFSKJ')
+      setIsModalOpen(false)
+      console.log(transaction)
+    } catch (e) {
+      console.log(e, 'herhehrehrherhe')
+      setIsModalOpen(false)
+    }
   }, [address, data, ovmInstance, title])
 
   if (!loading && errorMessage) return <GenericError>{errorMessage || 'Failed to fetch curation data'}</GenericError>
@@ -115,6 +138,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
           Request Verification
         </Button>
       </BottomButtonWrapper>
+      {isModalOpen && <FullLoading message={'Requesting Market Removal'} />}
     </MarketVerification>
   )
 }
