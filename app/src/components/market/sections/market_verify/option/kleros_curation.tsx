@@ -25,11 +25,15 @@ const Bold = styled.b`
 `
 
 const IconStatusWrapper = styled.div`
+  cursor: pointer;
   margin-left: 8px;
 `
 
 const TimeRemainingContainer = styled.div`
   display: flex;
+  width: fit-content;
+  margin-left: auto;
+  cursor: pointer;
   align-items: center;
   justify-content: flex-end;
   text-transform: lowercase;
@@ -46,6 +50,8 @@ const TimeRemainingContainer = styled.div`
 
 const StatusContainer = styled.div<{ challenge?: boolean }>`
   display: flex;
+  width: fit-content;
+  margin-left: auto;
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
@@ -71,6 +77,7 @@ const StatusContainer = styled.div<{ challenge?: boolean }>`
 `
 
 const IconWrapper = styled.div`
+  cursor: pointer;
   border-radius: 50%;
   background-color: ${props => props.theme.colors.clickable};
   width: 16px;
@@ -85,6 +92,7 @@ const IconWrapper = styled.div`
   }
 `
 const SuccessVerify = styled.span`
+  cursor: pointer;
   color: ${props => props.theme.colors.clickable};
   font-weight: ${props => props.theme.textfield.fontWeight};
 `
@@ -108,6 +116,7 @@ const DescriptionText = styled.p`
 `
 
 const BlueLink = styled.a`
+  cursor: pointer;
   color: ${props => props.theme.colors.clickable};
   font-weight: ${props => props.theme.textfield.fontWeight};
 `
@@ -145,6 +154,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
   const { itemID, submissionTime = 0, verificationState: status } = marketVerificationData || {}
   const deadline = submissionTime + Number(challengePeriodDuration)
   const timeRemaining = Math.max(0, deadline * 1000 - Date.now())
+  const baseKlerosLink = `https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`
 
   const submissionTimeUTC = moment(new Date(Number(submissionTime) * 1000))
     .tz('UTC')
@@ -154,6 +164,10 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
   let KlerosNotice
   let KlerosRightColumn
 
+  const urlSwitch = (url: string) => {
+    const win = window.open(url, '_blank')
+    win && win.focus()
+  }
   switch (status) {
     case MarketVerificationState.NotVerified: {
       klerosDetails = `Request verification with a ${formatEther(submissionDeposit)} ETH security deposit.`
@@ -196,9 +210,9 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondaryLine}>
               <UnstyledLink
-                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}?action=challenge`}
-                rel="noopener noreferrer"
-                target="_blank"
+                onClick={() => {
+                  urlSwitch(`${baseKlerosLink}?action=challenge`)
+                }}
               >
                 Challenge
               </UnstyledLink>
@@ -209,10 +223,9 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       KlerosRightColumn = (
         <CurationRightColumn>
           <TimeRemainingContainer
-            as="a"
-            href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`}
-            rel="noopener noreferrer"
-            target="_blank"
+            onClick={() => {
+              urlSwitch(baseKlerosLink)
+            }}
           >
             Ends in {moment.duration(timeRemaining).humanize()}
             <IconStatusWrapper>
@@ -239,9 +252,9 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondary}>
               <UnstyledLink
-                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}?action=challenge`}
-                rel="noopener noreferrer"
-                target="_blank"
+                onClick={() => {
+                  urlSwitch(`${baseKlerosLink}?action=challenge`)
+                }}
               >
                 Challenge
               </UnstyledLink>
@@ -252,10 +265,9 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       KlerosRightColumn = (
         <CurationRightColumn>
           <TimeRemainingContainer
-            as="a"
-            href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`}
-            rel="noopener noreferrer"
-            target="_blank"
+            onClick={() => {
+              urlSwitch(baseKlerosLink)
+            }}
           >
             Ends in {moment.duration(timeRemaining).humanize()}{' '}
             <IconStatusWrapper>
@@ -271,15 +283,19 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       klerosDetails = `Market validity challenged`
       KlerosRightColumn = (
         <CurationRightColumn>
-          <StatusContainer
-            as="a"
-            challenge={true}
-            href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <BlueLink>challenge details </BlueLink>
-            <IconStatusWrapper>
+          <StatusContainer challenge={true}>
+            <BlueLink
+              onClick={() => {
+                urlSwitch(baseKlerosLink)
+              }}
+            >
+              challenge details{' '}
+            </BlueLink>
+            <IconStatusWrapper
+              onClick={() => {
+                urlSwitch(baseKlerosLink)
+              }}
+            >
               <IconExclamation />
             </IconStatusWrapper>
           </StatusContainer>
@@ -302,9 +318,9 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondaryLine}>
               <UnstyledLink
-                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}?action=remove`}
-                rel="noopener noreferrer"
-                target="_blank"
+                onClick={() => {
+                  urlSwitch(`${baseKlerosLink}?action=remove`)
+                }}
               >
                 Remove Market
               </UnstyledLink>
@@ -315,14 +331,19 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
 
       KlerosRightColumn = (
         <CurationRightColumn>
-          <StatusContainer
-            as="a"
-            href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <SuccessVerify>verified</SuccessVerify>
-            <IconWrapper>
+          <StatusContainer>
+            <SuccessVerify
+              onClick={() => {
+                urlSwitch(baseKlerosLink)
+              }}
+            >
+              verified
+            </SuccessVerify>
+            <IconWrapper
+              onClick={() => {
+                urlSwitch(baseKlerosLink)
+              }}
+            >
               <IconTick />
             </IconWrapper>
           </StatusContainer>
