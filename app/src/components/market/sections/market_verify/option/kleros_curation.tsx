@@ -171,7 +171,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
             challenge.
           </DescriptionText>
           <RightButtonWrapper>
-            <RightButton buttonType={ButtonType.secondaryLine}>
+            <RightButton>
               <UnstyledLink
                 href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}?action=challenge`}
                 rel="noopener noreferrer"
@@ -209,7 +209,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
             challenge.
           </DescriptionText>
           <RightButtonWrapper>
-            <RightButton buttonType={ButtonType.secondary}>
+            <RightButton>
               <UnstyledLink
                 href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}?action=challenge`}
                 rel="noopener noreferrer"
