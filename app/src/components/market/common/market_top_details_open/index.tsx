@@ -152,9 +152,9 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         ></ProgressBar>
       )}
       <MarketData
+        answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
         collateralVolume={collateralVolume}
         currency={collateral}
-        currentAnswerTimestamp={question.currentAnswerTimestamp}
         isFinalize={marketState === MarketState.finalizing}
         lastActiveDay={lastActiveDay}
         liquidity={formattedLiquidity}
