@@ -4,9 +4,17 @@ import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useCollateralBalance, useConnectedWeb3Context, useContracts, useCpk, useCpkAllowance } from '../../../../hooks'
+import {
+  useAsyncDerivedValue,
+  useCollateralBalance,
+  useConnectedWeb3Context,
+  useContracts,
+  useCpk,
+  useCpkAllowance,
+} from '../../../../hooks'
+import { MarketMakerService } from '../../../../services'
 import { RemoteData } from '../../../../util/remote_data'
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber, formatNumber } from '../../../../util/tools'
 import { MarketMakerData, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -45,7 +53,7 @@ export const ScalarMarketSell = (props: Props) => {
     scalarHigh,
     scalarLow,
   } = marketMakerData
-  const { buildMarketMaker } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const Tabs = {
@@ -57,6 +65,7 @@ export const ScalarMarketSell = (props: Props) => {
   const [amountDisplay, setAmountDisplay] = useState<string>('')
   const [activeTab, setActiveTab] = useState(Tabs.short)
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
+  const [positionIndex, setPositionIndex] = useState(0)
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -71,16 +80,16 @@ export const ScalarMarketSell = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
 
-  // const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
-  // const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
+  const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
+  const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
 
-  // useEffect(() => {
-  //   activeTab === Tabs.short ? setPositionIndex(0) : setPositionIndex(1)
-  // }, [activeTab, Tabs.short])
+  useEffect(() => {
+    activeTab === Tabs.short ? setPositionIndex(0) : setPositionIndex(1)
+  }, [activeTab, Tabs.short])
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -91,39 +100,39 @@ export const ScalarMarketSell = (props: Props) => {
     setAllowanceFinished(true)
   }
 
-  // const calcBuyAmount = useMemo(
-  //   () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber, BigNumber]> => {
-  //     let tradedShares: BigNumber
-  //     let reverseTradedShares: BigNumber
+  const calcSellAmount = useMemo(
+    () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber, BigNumber]> => {
+      let tradedShares: BigNumber
+      let reverseTradedShares: BigNumber
 
-  //     try {
-  //       tradedShares = await marketMaker.calcBuyAmount(amount, positionIndex)
-  //       reverseTradedShares = await marketMaker.calcBuyAmount(amount, positionIndex === 0 ? 1 : 0)
-  //     } catch {
-  //       tradedShares = new BigNumber(0)
-  //       reverseTradedShares = new BigNumber(0)
-  //     }
+      try {
+        tradedShares = await marketMaker.calcSellAmount(amount, positionIndex)
+        reverseTradedShares = await marketMaker.calcSellAmount(amount, positionIndex === 0 ? 1 : 0)
+      } catch {
+        tradedShares = new BigNumber(0)
+        reverseTradedShares = new BigNumber(0)
+      }
 
-  //     const balanceAfterTrade = computeBalanceAfterTrade(
-  //       balances.map(b => b.holdings),
-  //       positionIndex,
-  //       amount,
-  //       tradedShares,
-  //     )
-  //     const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
+      const balanceAfterTrade = computeBalanceAfterTrade(
+        balances.map(b => b.holdings),
+        positionIndex,
+        amount,
+        tradedShares,
+      )
+      const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
-  //     const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
+      const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
 
-  //     return [tradedShares, newPrediction, amount, reverseTradedShares]
-  //   },
-  //   [balances, marketMaker, positionIndex, lowerBound, upperBound],
-  // )
+      return [tradedShares, newPrediction, amount, reverseTradedShares]
+    },
+    [balances, marketMaker, positionIndex, lowerBound, upperBound],
+  )
 
-  // const [tradedShares, newPrediction, debouncedAmount, reverseTradedShares] = useAsyncDerivedValue(
-  //   amount,
-  //   [new BigNumber(0), 0, amount, new BigNumber(0)],
-  //   calcBuyAmount,
-  // )
+  const [tradedShares, newPrediction, debouncedAmount, reverseTradedShares] = useAsyncDerivedValue(
+    amount,
+    [new BigNumber(0), 0, amount, new BigNumber(0)],
+    calcSellAmount,
+  )
 
   // const formattedNewPrediction =
   //   newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
@@ -172,6 +181,47 @@ export const ScalarMarketSell = (props: Props) => {
   //   hasEnoughAllowance !== Ternary.True ||
   //   amountError !== null ||
   //   isNegativeAmount
+
+  const finish = async () => {
+    const outcomeIndex = positionIndex
+    try {
+      if (!cpk) {
+        return
+      }
+
+      const sharesAmount = formatBigNumber(tradedShares, collateral.decimals)
+
+      // setStatus(Status.Loading)
+      // setMessage(`Buying ${sharesAmount} shares ...`)
+
+      await cpk.sellOutcomes({
+        amount,
+        conditionalTokens,
+        marketMaker,
+        outcomeIndex,
+      })
+
+      await fetchGraphMarketMakerData()
+      await fetchCollateralBalance()
+
+      // setTweet(
+      //   stripIndents(`${question.title}
+
+      // I predict ${balances[outcomeIndex].outcomeName}
+
+      // What do you think?`),
+      // )
+
+      setAmount(new BigNumber(0))
+      // setStatus(Status.Ready)
+      // setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+    } catch (err) {
+      // setStatus(Status.Error)
+      // setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
+      // logger.error(`${message} - ${err.message}`)
+    }
+    // setIsModalTransactionResultOpen(true)
+  }
 
   return (
     <>
@@ -240,7 +290,9 @@ export const ScalarMarketSell = (props: Props) => {
         <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
         </Button>
-        <Button buttonType={ButtonType.primaryAlternative}>Sell Position</Button>
+        <Button buttonType={ButtonType.primaryAlternative} onClick={finish}>
+          Sell Position
+        </Button>
       </StyledButtonContainer>
     </>
   )
