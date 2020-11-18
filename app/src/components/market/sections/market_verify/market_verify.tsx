@@ -40,6 +40,7 @@ interface Props extends RouteComponentProps<any> {
 const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   const { context, marketMakerData } = props || {}
   const [selection, setSelection] = useState<number | undefined>()
+  const [modalTitle, setModalTitle] = useState<string>('')
   const { data, error, status } = useKlerosCuration(marketMakerData, context)
   const history = useHistory()
 
@@ -66,7 +67,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
 
   const onSubmitMarket = useCallback(() => {
     if (!ovmInstance || !data) return
-
+    setModalTitle('Transaction Intiated')
     const columns = [
       {
         label: 'Question',
