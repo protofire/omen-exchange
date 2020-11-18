@@ -85,8 +85,6 @@ const BondRadioInput = styled(RadioInput)`
   margin-right: 16px;
 `
 
-const InvalidColorIndex = 32
-
 export const OutcomeTable = (props: Props) => {
   const {
     bonds = [],
@@ -174,7 +172,7 @@ export const OutcomeTable = (props: Props) => {
         {disabledColumns.includes(OutcomeTableValue.Outcome) ? null : (
           <TDStyled textAlign={TableCellsAlign[4]}>
             {showBondBadge ? (
-              <WinningBadge index={InvalidColorIndex} outcomeName={outcomeName} payouts={null} showPayout={false} />
+              <WinningBadge index={outcomeIndex} outcomeName={outcomeName} payouts={null} showPayout={false} />
             ) : (
               <OutcomeItemTextWrapper>
                 {bondRadioVisible && (
@@ -183,11 +181,11 @@ export const OutcomeTable = (props: Props) => {
                     data-testid={`outcome_table_radio_invalid`}
                     name="outcome"
                     onChange={(e: any) => selectRow(+e.target.value)}
-                    outcomeIndex={InvalidColorIndex}
+                    outcomeIndex={outcomeIndex}
                     value={outcomeIndex}
                   />
                 )}
-                {!bondRadioVisible && <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={InvalidColorIndex} />}
+                {!bondRadioVisible && <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={outcomeIndex} />}
                 <OutcomeItemText>{outcomeName}</OutcomeItemText>
               </OutcomeItemTextWrapper>
             )}
@@ -200,13 +198,13 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.Bonded) ? null : (
           <TDStyled
-            style={showBondBadge ? { color: getOutcomeColor(InvalidColorIndex).darker } : {}}
+            style={showBondBadge ? { color: getOutcomeColor(outcomeIndex).darker } : {}}
             textAlign={TableCellsAlign[6]}
           >
             <TDFlexDiv textAlign={TableCellsAlign[6]}>
               {formattedBondedEth}{' '}
               {showBondChange && formattedBondedEth !== formattedNewBondedEth && (
-                <NewValue outcomeIndex={InvalidColorIndex} value={formattedNewBondedEth} />
+                <NewValue outcomeIndex={outcomeIndex} value={formattedNewBondedEth} />
               )}
             </TDFlexDiv>
           </TDStyled>

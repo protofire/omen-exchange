@@ -130,7 +130,7 @@ export const OutcomeItemWrapper = styled.div<{ readOnly: boolean }>`
 `
 
 export const OutcomeItemText = styled.div`
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${props => props.theme.colors.textColorDark};
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;

@@ -152,7 +152,7 @@ const getBondedItems = (outcomes: string[], answers: AnswerItem[]): BondItem[] =
 
   bondedItems.push({
     outcomeName: 'Invalid',
-    bondedEth: invalidAnswer ? invalidAnswer.bondAggregate : new BigNumber(0),
+    bondedEth: invalidAnswer ? new BigNumber(invalidAnswer.bondAggregate) : new BigNumber(0),
   })
 
   // add invalid outcome
