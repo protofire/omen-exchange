@@ -23,7 +23,7 @@ class ERC20Service {
   provider: any
   contract: Contract
 
-  constructor(provider: any, signerAddress: Maybe<string>, tokenAddress: string) {
+  constructor(provider: any, signerAddress: Maybe<string> | undefined, tokenAddress: string) {
     this.provider = provider
     if (signerAddress) {
       const signer: Wallet = provider.getSigner()

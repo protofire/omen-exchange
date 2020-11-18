@@ -3,7 +3,6 @@ import React, { useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import theme from '../../../../theme'
@@ -37,7 +36,6 @@ interface Props {
 }
 
 const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
-  const context = useConnectedWeb3Context()
   const { marketMakerData } = props
   const history = useHistory()
 
@@ -87,7 +85,6 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         <SubsectionTitleLeftWrapper>
           {marketsRelatedQuestion.length > 1 && (
             <MarketCurrencySelector
-              context={context}
               currency={collateralToken.address}
               disabled={false}
               filters={marketsRelatedQuestion.map(element => element.collateralToken)}

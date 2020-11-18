@@ -113,8 +113,6 @@ export const supportedNetworkURLs = entries(networks).reduce<{
   {},
 )
 
-export const infuraNetworkURL = networks[1].url
-
 export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   cdai: {
     symbol: 'cDAI',

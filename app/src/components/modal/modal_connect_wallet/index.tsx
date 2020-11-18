@@ -1,8 +1,8 @@
-import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
+import { useWeb3React } from '@web3-react/core'
 import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
-import { useWeb3Context } from 'web3-react'
 
+import connectors from '../../../util/connectors'
 import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
@@ -115,7 +115,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const ModalConnectWallet = (props: Props) => {
-  const context = useWeb3Context()
+  const context = useWeb3React()
   const [connectingToWalletConnect, setConnectingToWalletConnect] = useState(false)
   const [connectingToMetamask, setConnectingToMetamask] = useState(false)
   const [connectingToAuthereum, setConnectingToAuthereum] = useState(false)
@@ -123,7 +123,6 @@ export const ModalConnectWallet = (props: Props) => {
 
   if (context.error) {
     logger.error('Error in web3 context', context.error)
-    localStorage.removeItem('CONNECTOR')
     onClose()
   }
 
@@ -140,8 +139,7 @@ export const ModalConnectWallet = (props: Props) => {
     }
 
     if (wallet) {
-      context.setConnector(wallet)
-      localStorage.setItem('CONNECTOR', wallet)
+      context.activate(connectors[wallet])
     }
   }
 
@@ -149,7 +147,6 @@ export const ModalConnectWallet = (props: Props) => {
     setConnectingToWalletConnect(false)
     setConnectingToMetamask(false)
     setConnectingToAuthereum(false)
-    WalletConnectQRCodeModal.close()
   }, [])
 
   const onClickCloseButton = useCallback(() => {
@@ -158,42 +155,21 @@ export const ModalConnectWallet = (props: Props) => {
   }, [onClose, resetEverything])
 
   useEffect(() => {
-    if (
-      connectingToWalletConnect &&
-      context.active &&
-      !context.account &&
-      context.connectorName === Wallet.WalletConnect
-    ) {
-      const uri = context.connector.walletConnector.uri
-      WalletConnectQRCodeModal.open(uri, () => {
-        // Callback passed to the onClose click of the QRCode modal
-        setConnectingToWalletConnect(false)
-        onClickCloseButton()
-        localStorage.removeItem('CONNECTOR')
-        context.unsetConnector()
-      })
-
-      context.connector.walletConnector.on('connect', () => {
-        setConnectingToWalletConnect(false)
-        WalletConnectQRCodeModal.close()
-        onClickCloseButton()
-      })
-    }
-    if (connectingToWalletConnect && context.account && context.connectorName === Wallet.WalletConnect) {
+    if (connectingToWalletConnect && context.account && context.connector === connectors[Wallet.WalletConnect]) {
       onClickCloseButton()
       setConnectingToWalletConnect(false)
     }
   }, [context, onClickCloseButton, connectingToWalletConnect])
 
   useEffect(() => {
-    if (connectingToMetamask && context.account && context.connectorName === Wallet.MetaMask) {
+    if (connectingToMetamask && context.account && context.connector === connectors[Wallet.MetaMask]) {
       onClickCloseButton()
       setConnectingToMetamask(false)
     }
   }, [context, onClickCloseButton, connectingToMetamask])
 
   useEffect(() => {
-    if (connectingToAuthereum && context.account && context.connectorName === Wallet.Authereum) {
+    if (connectingToAuthereum && context.account && context.connector === connectors[Wallet.Authereum]) {
       onClickCloseButton()
       setConnectingToAuthereum(false)
     }

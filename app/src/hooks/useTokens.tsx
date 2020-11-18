@@ -1,3 +1,4 @@
+import { useWeb3React } from '@web3-react/core'
 import { useEffect, useState } from 'react'
 
 import { ERC20Service } from '../services/erc20'
@@ -6,20 +7,22 @@ import { getOmenTCRListId, getTokensByNetwork } from '../util/networks'
 import { getImageUrl } from '../util/token'
 import { Token } from '../util/types'
 
-import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
 
 const logger = getLogger('Hooks::useTokens')
 
-export const useTokens = (context: ConnectedWeb3Context) => {
-  const { dxTCR } = useContracts(context)
-  const defaultTokens = getTokensByNetwork(context.networkId)
+export const useTokens = () => {
+  const context = useWeb3React()
+  const chainId = context.chainId == null ? 1 : context.chainId
+
+  const { dxTCR } = useContracts()
+  const defaultTokens = getTokensByNetwork(chainId)
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
 
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        const omenTCRListId = getOmenTCRListId(context.networkId)
+        const omenTCRListId = getOmenTCRListId(chainId)
         const tokensAddresses = await dxTCR.getTokens(omenTCRListId)
         const tokens = await Promise.all(
           tokensAddresses.map(async tokenAddress => {
@@ -40,7 +43,7 @@ export const useTokens = (context: ConnectedWeb3Context) => {
     }
 
     fetchTokens()
-  }, [context.library, context.networkId, dxTCR])
+  }, [context.library, chainId, dxTCR])
 
   return tokens
 }

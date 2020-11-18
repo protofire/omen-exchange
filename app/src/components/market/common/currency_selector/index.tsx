@@ -1,7 +1,7 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
 
-import { ConnectedWeb3Context, useTokens } from '../../../../hooks'
+import { useTokens } from '../../../../hooks'
 import { Token } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { Spinner } from '../../../common/spinner'
@@ -28,7 +28,6 @@ const CurrencyDropdown = styled(Dropdown)<{ selected: boolean }>`
 
 interface Props {
   currency?: Maybe<string>
-  context: ConnectedWeb3Context
   disabled?: boolean
   filters?: Array<string>
   onSelect: (currency: Token | null) => void
@@ -38,19 +37,9 @@ interface Props {
 }
 
 export const CurrencySelector: React.FC<Props> = props => {
-  const {
-    addAll = false,
-    balance,
-    context,
-    currency,
-    disabled,
-    filters = [],
-    onSelect,
-    placeholder,
-    ...restProps
-  } = props
+  const { addAll = false, balance, currency, disabled, filters = [], onSelect, placeholder, ...restProps } = props
 
-  const tokens = useTokens(context)
+  const tokens = useTokens()
 
   const currencyDropdownData: Array<DropdownItemProps> = []
 

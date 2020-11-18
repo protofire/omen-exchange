@@ -1,19 +1,19 @@
+import { useWeb3React } from '@web3-react/core'
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
 import { useConnectedCPKContext } from './connectedCpk'
-import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
 
 export const useFundingBalance = (
   marketMakerAddress: string,
-  context: ConnectedWeb3Context,
 ): {
   fundingBalance: Maybe<BigNumber>
   fetchFundingBalance: () => Promise<void>
 } => {
+  const context = useWeb3React()
   const { account, library: provider } = context
-  const { buildMarketMaker } = useContracts(context)
+  const { buildMarketMaker } = useContracts()
   const cpk = useConnectedCPKContext()
 
   const [fundingBalance, setFundingBalance] = useState<Maybe<BigNumber>>(null)

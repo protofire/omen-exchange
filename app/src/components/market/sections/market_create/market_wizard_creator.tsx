@@ -1,10 +1,10 @@
 import { useQuery } from '@apollo/react-hooks'
+import { useWeb3React } from '@web3-react/core'
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useState } from 'react'
 
 import { IMPORT_QUESTION_ID_KEY, MARKET_FEE } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { queryTopCategories } from '../../../../queries/markets_home'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../../../util/networks'
@@ -22,13 +22,13 @@ interface Props {
 }
 
 export const MarketWizardCreator = (props: Props) => {
-  const context = useConnectedWeb3Context()
-  const { networkId } = context
+  const context = useWeb3React()
+  const chainId = context.chainId == null ? 1 : context.chainId
 
   const { callback, marketCreationStatus } = props
 
-  const defaultCollateral = getDefaultToken(networkId)
-  const defaultArbitrator = getDefaultArbitrator(networkId)
+  const defaultCollateral = getDefaultToken(chainId)
+  const defaultArbitrator = getDefaultArbitrator(chainId)
 
   const getImportQuestionId = () => {
     const reQuestionId = /(0x[0-9A-Fa-f]{64})/
@@ -73,8 +73,8 @@ export const MarketWizardCreator = (props: Props) => {
     let isSubscribed = true
 
     const updateMarketData = async () => {
-      const collateral = getToken(networkId, marketData.collateral.symbol.toLowerCase() as KnownToken)
-      const arbitrator = getArbitrator(networkId, marketData.arbitrator.id)
+      const collateral = getToken(chainId, marketData.collateral.symbol.toLowerCase() as KnownToken)
+      const arbitrator = getArbitrator(chainId, marketData.arbitrator.id)
 
       const newMarketData = {
         ...marketData,
@@ -95,7 +95,7 @@ export const MarketWizardCreator = (props: Props) => {
     /* NOTE: The linter want us to add marketData to the dependency array, but it
     creates a sort of infinite loop, so I'm not gonna do it for now */
     // eslint-disable-next-line
-  }, [networkId])
+  }, [chainId])
 
   const { data: topCategories } = useQuery<GraphResponseTopCategories>(queryTopCategories, {
     notifyOnNetworkStatusChange: true,

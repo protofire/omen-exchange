@@ -1,7 +1,7 @@
+import { useWeb3React } from '@web3-react/core'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import {
@@ -214,7 +214,6 @@ const FiltersLeftWrapper = styled.div`
 `
 
 interface Props {
-  context: ConnectedWeb3Context
   count: number
   currentFilter: any
   isFiltering?: boolean
@@ -232,9 +231,9 @@ interface Props {
 const logger = getLogger('MarketHome')
 
 export const MarketHome: React.FC<Props> = (props: Props) => {
+  const context = useWeb3React()
   const {
     categories,
-    context,
     count,
     currentFilter,
     fetchMyMarkets,

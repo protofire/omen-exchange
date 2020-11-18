@@ -1,10 +1,10 @@
 import Box from '3box'
 import ThreeBoxCommentsReact from '3box-comments-react'
+import { useWeb3React } from '@web3-react/core'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { THREEBOX_ADMIN_ADDRESS, THREEBOX_SPACE_NAME } from '../../common/constants'
-import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../hooks/connectedWeb3'
 
 const CommentsTitle = styled.h3`
   color: #000;
@@ -49,13 +49,13 @@ interface Props {
 }
 
 export const ThreeBoxComments = (props: Props) => {
-  const context: ConnectedWeb3Context = useConnectedWeb3Context()
+  const context = useWeb3React()
+
   const { library } = context
   const { threadName } = props
 
   const [box, setBox] = useState<any>(null)
-  // eslint-disable-next-line no-warning-comments
-  // TODO: fix with useConnectedWeb3Wallet context
+
   const currentUserAddress = context.account || ''
 
   const handleLogin = async () => {

@@ -1,16 +1,13 @@
+import { useWeb3React } from '@web3-react/core'
 import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ethers } from 'ethers'
 import React, { useEffect, useState } from 'react'
-import { useWeb3Context } from 'web3-react'
 
 import { CPKService } from '../services'
 
 const ConnectedCPKContext = React.createContext<Maybe<CPKService>>(null)
 
-/**
- * This hook can only be used by components under the `ConnectedWeb3` component. Otherwise it will throw.
- */
 export const useConnectedCPKContext = () => React.useContext(ConnectedCPKContext)
 
 /**
@@ -18,7 +15,7 @@ export const useConnectedCPKContext = () => React.useContext(ConnectedCPKContext
  */
 export const ConnectedCPK: React.FC = props => {
   const [cpk, setCpk] = useState<Maybe<CPKService>>(null)
-  const { account, library } = useWeb3Context()
+  const { account, library } = useWeb3React()
   useEffect(() => {
     if (account && library) {
       const signer = library.getSigner()

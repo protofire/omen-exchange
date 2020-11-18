@@ -1,7 +1,7 @@
+import { useWeb3React } from '@web3-react/core'
 import * as React from 'react'
 import { Helmet } from 'react-helmet'
 import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
-import { useWeb3Context } from 'web3-react'
 
 import {
   DOCUMENT_DESCRIPTION,
@@ -15,6 +15,7 @@ import {
   TWITTER_IMAGE_ALT,
   TWITTER_SITE,
 } from '../../common/constants'
+import connectors from '../../util/connectors'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { Disclaimer } from '../common/disclaimer'
 import { Footer } from '../common/layout/footer'
@@ -26,7 +27,12 @@ import { MarketHomeContainer } from '../market/sections/market_list/market_home_
 const RedirectToHome = () => <Redirect to="/" />
 
 export const Main: React.FC = () => {
-  const context = useWeb3Context()
+  const context = useWeb3React()
+  const { activate } = context
+  React.useEffect(() => {
+    activate(connectors.Infura)
+  }, [activate])
+
   return (
     <Router>
       <MainWrapper>

@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { WhenConnected } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
@@ -84,7 +83,7 @@ interface Props extends RouteComponentProps<Record<string, string | undefined>> 
 }
 
 const Wrapper = (props: Props) => {
-  const { fetchGraphMarketMakerData, marketMakerData } = props
+  const { account, fetchGraphMarketMakerData, marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
 
@@ -207,19 +206,21 @@ const Wrapper = (props: Props) => {
                 hyperlinkDescription={''}
               />
             )}
-            <WhenConnected>
-              <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
-                <Button
-                  buttonType={ButtonType.secondaryLine}
-                  onClick={() => {
-                    history.goBack()
-                  }}
-                >
-                  Back
-                </Button>
-                {isQuestionOpen ? openInRealitioButton : buySellButtons}
-              </StyledButtonContainer>
-            </WhenConnected>
+            {account && (
+              <>
+                <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+                  <Button
+                    buttonType={ButtonType.secondaryLine}
+                    onClick={() => {
+                      history.goBack()
+                    }}
+                  >
+                    Back
+                  </Button>
+                  {isQuestionOpen ? openInRealitioButton : buySellButtons}
+                </StyledButtonContainer>
+              </>
+            )}
           </>
         )}
         {currentTab === marketTabs.pool && (

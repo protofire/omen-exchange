@@ -1,16 +1,15 @@
+import { useWeb3React } from '@web3-react/core'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { DEFAULT_TOKEN } from '../../../../common/constants'
 import { useContracts } from '../../../../hooks'
-import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getToken } from '../../../../util/networks'
 import { Token } from '../../../../util/types'
 import { Select } from '../../../common/form/select'
 
 interface Props {
   autoFocus?: boolean
-  context: ConnectedWeb3Context
   disabled?: boolean
   name: string
   onClick?: (event: React.MouseEvent<HTMLSelectElement>) => any
@@ -22,11 +21,13 @@ interface Props {
 const FormOption = styled.option``
 
 export const Tokens = (props: Props) => {
-  const { context, onTokenChange, value, ...restProps } = props
+  const context = useWeb3React()
+  const chainId = context.chainId == null ? 1 : context.chainId
+  const { onTokenChange, value, ...restProps } = props
 
-  const defaultTokens = [getToken(context.networkId, DEFAULT_TOKEN)]
+  const defaultTokens = [getToken(chainId, DEFAULT_TOKEN)]
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
-  const { kleros } = useContracts(context)
+  const { kleros } = useContracts()
 
   useEffect(() => {
     const fetchTokens = async () => {

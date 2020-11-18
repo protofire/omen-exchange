@@ -1,8 +1,8 @@
+import { useWeb3React } from '@web3-react/core'
 import React, { ChangeEvent, HTMLAttributes, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { useAsyncDerivedValue, useContracts, useMarketMakerData } from '../../../../../../hooks'
-import { ConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { useRealityLink } from '../../../../../../hooks/useRealityLink'
 import { getArbitratorFromAddress } from '../../../../../../util/networks'
@@ -125,7 +125,6 @@ const QuestionTextField = styled(Textfield)`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  context: ConnectedWeb3Context
   loadedQuestionId: Maybe<string>
   onSave: (question: Question, arbitrator: Arbitrator, outcomes: Outcome[], verifyLabel?: string) => void
   handleClearQuestion: () => any
@@ -135,8 +134,9 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const ImportMarketContent = (props: Props) => {
-  const { context, handleClearQuestion, handleOutcomesChange, loadedQuestionId, onSave, outcomes } = props
-  const { realitio } = useContracts(context)
+  const context = useWeb3React()
+  const { handleClearQuestion, handleOutcomesChange, loadedQuestionId, onSave, outcomes } = props
+  const { realitio } = useContracts()
   const realitioBaseUrl = useRealityLink()
 
   const [state, setState] = useState<{ questionURL: string; loading: boolean }>({
@@ -170,8 +170,9 @@ export const ImportMarketContent = (props: Props) => {
 
       setLoading(true)
       try {
+        const chainId = context.chainId == null ? 1 : context.chainId
         const question = await realitio.getQuestion(questionId)
-        const arbitrator = getArbitratorFromAddress(context.networkId, question.arbitratorAddress)
+        const arbitrator = getArbitratorFromAddress(chainId, question.arbitratorAddress)
         return [question, arbitrator, null]
       } catch (err) {
         console.warn(err)

@@ -4,7 +4,7 @@ import momentTZ from 'moment-timezone'
 import React, { DOMAttributes, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
+import { useTokens } from '../../../../hooks'
 import { formatBigNumber, formatDate, formatToShortNumber } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
 import { TextToggle } from '../TextToggle'
@@ -75,8 +75,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 export const MarketData: React.FC<Props> = props => {
   const { collateralVolume, currency, lastActiveDay, liquidity, resolutionTimestamp, runningDailyVolumeByHour } = props
 
-  const context = useConnectedWeb3Context()
-  const tokens = useTokens(context)
+  const tokens = useTokens()
 
   const [currencyIcon, setCurrencyIcon] = useState<string | undefined>('')
   const [showUTC, setShowUTC] = useState<boolean>(true)

@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/react-hooks'
 import { useInterval } from '@react-corekit/use-interval'
+import { useWeb3React } from '@web3-react/core'
 import { ethers } from 'ethers'
 import { bigNumberify } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -7,7 +8,7 @@ import { useHistory } from 'react-router'
 import { useLocation } from 'react-router-dom'
 
 import { MAX_MARKET_FEE } from '../../../../common/constants'
-import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedCPKContext } from '../../../../hooks'
 import { useMarkets } from '../../../../hooks/useMarkets'
 import { queryCategories } from '../../../../queries/markets_home'
 import { getLogger } from '../../../../util/logger'
@@ -58,7 +59,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
 }
 
 const MarketHomeContainer: React.FC = () => {
-  const context = useConnectedWeb3Context()
+  const context = useWeb3React()
   const cpk = useConnectedCPKContext()
   const history = useHistory()
 
@@ -175,9 +176,11 @@ const MarketHomeContainer: React.FC = () => {
   const [now, setNow] = useState<string>(calcNow())
   const [isFiltering, setIsFiltering] = useState(false)
   const { account, library: provider } = context
+  const chainId = context.chainId == null ? 1 : context.chainId
+
   const feeBN = ethers.utils.parseEther('' + MAX_MARKET_FEE / Math.pow(10, 2))
 
-  const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)
+  const knownArbitrators = getArbitratorsByNetwork(chainId).map(x => x.address)
   const fetchMyMarkets = filter.state === MarketStates.myMarkets
 
   const marketsQueryVariables = {
@@ -223,15 +226,13 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
     } else if (fetchedMarkets) {
       const { fixedProductMarketMakers } = fetchedMarkets
-
-      setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
-
+      setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, chainId)))
       setIsFiltering(false)
     } else if (error) {
       setMarkets(RemoteData.failure(error))
       setIsFiltering(false)
     }
-  }, [fetchedMarkets, loading, error, context.networkId, pageSize, pageIndex])
+  }, [fetchedMarkets, loading, error, chainId, pageSize, pageIndex])
 
   useEffect(() => {
     if (categoriesLoading) {
@@ -247,7 +248,7 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(RemoteData.failure(categoriesError))
       setIsFiltering(false)
     }
-  }, [fetchedCategories, categoriesLoading, categoriesError, context.networkId])
+  }, [fetchedCategories, categoriesLoading, categoriesError, chainId])
 
   const onFilterChange = useCallback(
     (filter: any) => {
@@ -344,7 +345,6 @@ const MarketHomeContainer: React.FC = () => {
     <>
       <MarketHome
         categories={categories}
-        context={context}
         count={fetchedMarkets ? fetchedMarkets.fixedProductMarketMakers.length : 0}
         currentFilter={filter}
         fetchMyMarkets={fetchMyMarkets}

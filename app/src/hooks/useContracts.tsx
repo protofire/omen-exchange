@@ -1,3 +1,4 @@
+import { useWeb3React } from '@web3-react/core'
 import { useMemo } from 'react'
 
 import {
@@ -11,49 +12,55 @@ import {
 } from '../services'
 import { getContractAddress } from '../util/networks'
 
-import { ConnectedWeb3Context } from './connectedWeb3'
+export const useContracts = () => {
+  const context = useWeb3React()
+  const { library: provider } = context
+  const account = context.account as Maybe<string>
+  const chainId = context.chainId == null ? 1 : context.chainId
 
-export const useContracts = (context: ConnectedWeb3Context) => {
-  const { account, library: provider, networkId } = context
+  const conditionalTokensAddress = getContractAddress(chainId, 'conditionalTokens')
+  const conditionalTokens = useMemo(
+    () => provider && new ConditionalTokenService(conditionalTokensAddress, provider, account),
+    [conditionalTokensAddress, provider, account],
+  )
 
-  const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
-  const conditionalTokens = useMemo(() => new ConditionalTokenService(conditionalTokensAddress, provider, account), [
-    conditionalTokensAddress,
-    provider,
-    account,
-  ])
-
-  const marketMakerFactoryAddress = getContractAddress(networkId, 'marketMakerFactory')
+  const marketMakerFactoryAddress = getContractAddress(chainId, 'marketMakerFactory')
   const marketMakerFactory = useMemo(
-    () => new MarketMakerFactoryService(marketMakerFactoryAddress, provider, account),
+    () => provider && new MarketMakerFactoryService(marketMakerFactoryAddress, provider, account),
     [marketMakerFactoryAddress, provider, account],
   )
 
-  const realitioAddress = getContractAddress(networkId, 'realitio')
-  const realitio = useMemo(() => new RealitioService(realitioAddress, provider, account), [
+  const realitioAddress = getContractAddress(chainId, 'realitio')
+  const realitio = useMemo(() => provider && new RealitioService(realitioAddress, provider, account), [
     realitioAddress,
     provider,
     account,
   ])
 
-  const oracleAddress = getContractAddress(networkId, 'oracle')
-  const oracle = useMemo(() => new OracleService(oracleAddress, provider, account), [oracleAddress, provider, account])
+  const oracleAddress = getContractAddress(chainId, 'oracle')
+  const oracle = useMemo(() => provider && new OracleService(oracleAddress, provider, account), [
+    oracleAddress,
+    provider,
+    account,
+  ])
 
-  const klerosBadgeAddress = getContractAddress(networkId, 'klerosBadge')
-  const klerosTokenViewAddress = getContractAddress(networkId, 'klerosTokenView')
-  const klerosTCRAddress = getContractAddress(networkId, 'klerosTCR')
+  const klerosBadgeAddress = getContractAddress(chainId, 'klerosBadge')
+  const klerosTokenViewAddress = getContractAddress(chainId, 'klerosTokenView')
+  const klerosTCRAddress = getContractAddress(chainId, 'klerosTCR')
   const kleros = useMemo(
-    () => new KlerosService(klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, provider, account),
+    () =>
+      provider && new KlerosService(klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, provider, account),
     [klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, provider, account],
   )
 
   const buildMarketMaker = useMemo(
-    () => (address: string) => new MarketMakerService(address, conditionalTokens, realitio, provider, account),
+    () => (address: string) =>
+      provider && new MarketMakerService(address, conditionalTokens, realitio, provider, account),
     [conditionalTokens, realitio, provider, account],
   )
 
-  const dxTCRAddress = getContractAddress(networkId, 'dxTCR')
-  const dxTCR = useMemo(() => new DxTCRService(dxTCRAddress, provider), [provider, dxTCRAddress])
+  const dxTCRAddress = getContractAddress(chainId, 'dxTCR')
+  const dxTCR = useMemo(() => provider && new DxTCRService(dxTCRAddress, provider), [provider, dxTCRAddress])
 
   return useMemo(
     () => ({

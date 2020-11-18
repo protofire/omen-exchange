@@ -1,6 +1,6 @@
+import { useWeb3React } from '@web3-react/core'
 import React from 'react'
 
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { MarketMakerData } from '../../../../util/types'
 
 import { MarketView } from './market_view'
@@ -11,9 +11,8 @@ interface Props {
 }
 
 const MarketViewContainer: React.FC<Props> = (props: Props) => {
-  const context = useConnectedWeb3Context()
-
-  return <MarketView account={context.account} {...props} />
+  const account = useWeb3React().account as Maybe<string>
+  return <MarketView account={account} {...props} />
 }
 
 export { MarketViewContainer }

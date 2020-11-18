@@ -1,50 +1,32 @@
-import WalletConnectApi from '@walletconnect/web3-subprovider'
-import AuthereumApi from 'authereum'
-import { Connectors } from 'web3-react'
+import { AuthereumConnector } from '@web3-react/authereum-connector'
+import { InjectedConnector } from '@web3-react/injected-connector'
+import { NetworkConnector } from '@web3-react/network-connector'
+import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
 
-import { infuraNetworkURL, supportedNetworkIds, supportedNetworkURLs } from '../util/networks'
-
-const { InjectedConnector, NetworkOnlyConnector, WalletConnectConnector } = Connectors
+import { supportedNetworkIds, supportedNetworkURLs } from '../util/networks'
 
 const MetaMask = new InjectedConnector({
-  supportedNetworks: supportedNetworkIds,
+  supportedChainIds: supportedNetworkIds,
 })
 
 const WalletConnect = new WalletConnectConnector({
-  api: WalletConnectApi,
+  rpc: { [1]: supportedNetworkURLs[1] },
   bridge: 'https://safe-walletconnect.gnosis.io',
-  supportedNetworkURLs,
-  defaultNetwork: 1,
+  qrcode: true,
 })
 
-const Infura = new NetworkOnlyConnector({
-  providerURL: infuraNetworkURL,
+const Infura = new NetworkConnector({
+  urls: supportedNetworkURLs,
+  defaultChainId: 1,
 })
 
-class AuthereumConnector extends Connectors.Connector {
-  authereum: any
-
-  onActivation(): Promise<void> {
-    this.authereum = new AuthereumApi()
-    return this.authereum.login()
-  }
-
-  getProvider() {
-    return this.authereum.getProvider()
-  }
-
-  changeNetwork(network: string) {
-    this.authereum = new AuthereumApi({
-      networkId: network,
-    })
-  }
-}
-
-const Authereum = new AuthereumConnector()
+const Authereum = new AuthereumConnector({
+  chainId: 1,
+})
 
 export default {
   Infura,
   MetaMask,
   WalletConnect,
   Authereum,
-}
+} as Record<string, any>

@@ -1,18 +1,17 @@
+import { useWeb3React } from '@web3-react/core'
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
 import { ERC20Service } from '../services'
 import { Token } from '../util/types'
 
-import { ConnectedWeb3Context } from './connectedWeb3'
-
 export const useCollateralBalance = (
   collateral: Token,
-  context: ConnectedWeb3Context,
 ): {
   collateralBalance: Maybe<BigNumber>
   fetchCollateralBalance: () => Promise<void>
 } => {
+  const context = useWeb3React()
   const { account, library: provider } = context
 
   const [collateralBalance, setCollateralBalance] = useState<Maybe<BigNumber>>(null)

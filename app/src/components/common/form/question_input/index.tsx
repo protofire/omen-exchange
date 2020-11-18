@@ -2,11 +2,9 @@ import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
 import { Textfield } from '../..'
-import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { FormLabel } from '../form_label'
 
 interface Props {
-  context: ConnectedWeb3Context
   disabled: boolean
   name: string
   onChange: (event: ChangeEvent<HTMLInputElement>) => any

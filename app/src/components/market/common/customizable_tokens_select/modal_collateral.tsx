@@ -2,7 +2,6 @@ import React, { ChangeEvent, HTMLAttributes, useState } from 'react'
 import styled from 'styled-components'
 
 import { useCollateral } from '../../../../hooks'
-import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { Token } from '../../../../util/types'
 import { Button } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -37,16 +36,15 @@ const SpinnerStyled = styled(Spinner)`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  context: ConnectedWeb3Context
   isOpen: boolean
   onClose: () => void
   onSave: (collateral: Token) => void
 }
 
 export const ModalCollateral = (props: Props) => {
-  const { context, isOpen, onClose, onSave } = props
+  const { isOpen, onClose, onSave } = props
   const [collateralAddress, setCollateralAddress] = useState<string>('')
-  const { collateral, errorMessage, isSpinnerOn } = useCollateral(collateralAddress, context)
+  const { collateral, errorMessage, isSpinnerOn } = useCollateral(collateralAddress)
 
   const validCollateralAddress: Maybe<Token> = collateral ? { ...collateral } : null
 

@@ -1,7 +1,8 @@
+import { useWeb3React } from '@web3-react/core'
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { useWeb3Context } from 'web3-react'
 
+import connectors from '../../../util/connectors'
 import { FullLoading } from '../../loading/full_loading'
 
 const Button = styled.div`
@@ -10,15 +11,14 @@ const Button = styled.div`
 `
 
 export const ButtonDisconnectWallet: React.FC = props => {
-  const context = useWeb3Context()
-  const { account, active, connectorName, error } = context
+  const context = useWeb3React()
+  const { account, activate, active, connector, error } = context
   const [isDisconnecting, setIsDisconnecting] = useState(false)
 
   const logout = () => {
-    if (active || (error && connectorName)) {
+    if (active || (error && connector)) {
       setIsDisconnecting(true)
-      localStorage.removeItem('CONNECTOR')
-      context.setConnector('Infura')
+      activate(connectors.Infura)
     }
   }
 

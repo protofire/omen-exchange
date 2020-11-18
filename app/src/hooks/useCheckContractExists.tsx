@@ -1,24 +1,23 @@
+import { useWeb3React } from '@web3-react/core'
 import { useEffect, useState } from 'react'
 
 import { isContract } from '../util/tools'
 
-import { ConnectedWeb3Context } from './connectedWeb3'
-
-export const useCheckContractExists = (marketMakerAddress: string, context: ConnectedWeb3Context): boolean => {
+export const useCheckContractExists = (marketMakerAddress: string): boolean => {
+  const { library } = useWeb3React()
   const [contractExists, setContractExists] = useState<boolean>(true)
 
   useEffect(() => {
     let isSubscribed = true
-    const provider = context.library
     const fetchIsContract = async () => {
-      if (isSubscribed) setContractExists(await isContract(provider, marketMakerAddress))
+      if (isSubscribed && library) setContractExists(await isContract(library, marketMakerAddress))
     }
 
     fetchIsContract()
     return () => {
       isSubscribed = false
     }
-  }, [context, marketMakerAddress])
+  }, [library, marketMakerAddress])
 
   return contractExists
 }

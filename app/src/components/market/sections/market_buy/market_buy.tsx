@@ -1,3 +1,4 @@
+import { useWeb3React } from '@web3-react/core'
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
@@ -11,7 +12,6 @@ import {
   useAsyncDerivedValue,
   useCollateralBalance,
   useConnectedCPKContext,
-  useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
 } from '../../../../hooks'
@@ -54,12 +54,12 @@ interface Props extends RouteComponentProps<any> {
 }
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
-  const context = useConnectedWeb3Context()
+  const context = useWeb3React()
   const cpk = useConnectedCPKContext()
   const { library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
-  const { buildMarketMaker } = useContracts(context)
+  const { buildMarketMaker } = useContracts()
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
@@ -126,10 +126,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     calcBuyAmount,
   )
 
-  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
-    collateral,
-    context,
-  )
+  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(collateral)
   const collateralBalance = maybeCollateralBalance || Zero
 
   const unlockCollateral = async () => {
@@ -247,7 +244,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           <CurrenciesWrapper>
             <CurrencySelector
               balance={formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5)}
-              context={context}
               currency={collateral.address}
               disabled
               onSelect={(token: Token | null) => {

@@ -1,3 +1,4 @@
+import { useWeb3React } from '@web3-react/core'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -8,7 +9,6 @@ import { DOCUMENT_FAQ } from '../../../../common/constants'
 import {
   useCollateralBalance,
   useConnectedCPKContext,
-  useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
   useFundingBalance,
@@ -124,11 +124,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { fetchGraphMarketMakerData, marketMakerData } = props
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
   const history = useHistory()
-  const context = useConnectedWeb3Context()
+  const context = useWeb3React()
   const { account, library: provider } = context
   const cpk = useConnectedCPKContext()
 
-  const { buildMarketMaker, conditionalTokens } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens } = useContracts()
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const signer = useMemo(() => provider.getSigner(), [provider])
@@ -204,16 +204,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const showSharesChange = activeTab === Tabs.deposit ? amountToFund?.gt(0) : amountToRemove?.gt(0)
 
-  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
-    collateral,
-    context,
-  )
+  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(collateral)
   const collateralBalance = maybeCollateralBalance || Zero
   const probabilities = balances.map(balance => balance.probability)
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
   const depositedTokensTotal = depositedTokens.add(userEarnings)
-  const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress, context)
+  const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress)
   const fundingBalance = maybeFundingBalance || Zero
 
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
@@ -421,7 +418,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               <CurrenciesWrapper>
                 <CurrencySelector
                   balance={walletBalance}
-                  context={context}
                   currency={collateral.address}
                   disabled
                   onSelect={(token: Token | null) => {

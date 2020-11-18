@@ -1,3 +1,4 @@
+import { useWeb3React } from '@web3-react/core'
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -5,7 +6,6 @@ import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useConnectedCPKContext, useContracts } from '../../../../../hooks'
-import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
@@ -79,11 +79,11 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
 }
 
 const Wrapper = (props: Props) => {
-  const context = useConnectedWeb3Context()
+  const context = useWeb3React()
   const cpk = useConnectedCPKContext()
 
   const { account, library: provider } = context
-  const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens, oracle } = useContracts()
 
   const { fetchGraphMarketMakerData, marketMakerData } = props
 
@@ -275,57 +275,59 @@ const Wrapper = (props: Props) => {
               probabilities={probabilities}
               withWinningOutcome={true}
             />
-            <WhenConnected>
-              {hasWinningOutcomes && (
-                <MarketResolutionMessageStyled
-                  arbitrator={arbitrator}
-                  collateralToken={collateralToken}
-                  earnedCollateral={earnedCollateral}
-                  invalid={allPayoutsEqual}
-                  userWinnerShares={userWinnerShares}
-                  userWinnersOutcomes={userWinnersOutcomes}
-                  winnersOutcomes={winnersOutcomes}
-                ></MarketResolutionMessageStyled>
-              )}
-              {isConditionResolved && !hasWinningOutcomes ? (
-                <StyledButtonContainer>
-                  <Button
-                    buttonType={ButtonType.secondaryLine}
-                    onClick={() => {
-                      history.goBack()
-                    }}
-                  >
-                    Back
-                  </Button>
-                  {buySellButtons}
-                </StyledButtonContainer>
-              ) : (
-                <ButtonContainerFullWidth borderTop={true}>
-                  {!isConditionResolved && (
-                    <>
-                      <Button
-                        buttonType={ButtonType.primary}
-                        disabled={status === Status.Loading}
-                        onClick={resolveCondition}
-                      >
-                        Resolve Condition
-                      </Button>
-                    </>
-                  )}
-                  {isConditionResolved && hasWinningOutcomes && (
-                    <>
-                      <Button
-                        buttonType={ButtonType.primary}
-                        disabled={status === Status.Loading}
-                        onClick={() => redeem()}
-                      >
-                        Redeem
-                      </Button>
-                    </>
-                  )}
-                </ButtonContainerFullWidth>
-              )}
-            </WhenConnected>
+            {account && (
+              <>
+                {hasWinningOutcomes && (
+                  <MarketResolutionMessageStyled
+                    arbitrator={arbitrator}
+                    collateralToken={collateralToken}
+                    earnedCollateral={earnedCollateral}
+                    invalid={allPayoutsEqual}
+                    userWinnerShares={userWinnerShares}
+                    userWinnersOutcomes={userWinnersOutcomes}
+                    winnersOutcomes={winnersOutcomes}
+                  ></MarketResolutionMessageStyled>
+                )}
+                {isConditionResolved && !hasWinningOutcomes ? (
+                  <StyledButtonContainer>
+                    <Button
+                      buttonType={ButtonType.secondaryLine}
+                      onClick={() => {
+                        history.goBack()
+                      }}
+                    >
+                      Back
+                    </Button>
+                    {buySellButtons}
+                  </StyledButtonContainer>
+                ) : (
+                  <ButtonContainerFullWidth borderTop={true}>
+                    {!isConditionResolved && (
+                      <>
+                        <Button
+                          buttonType={ButtonType.primary}
+                          disabled={status === Status.Loading}
+                          onClick={resolveCondition}
+                        >
+                          Resolve Condition
+                        </Button>
+                      </>
+                    )}
+                    {isConditionResolved && hasWinningOutcomes && (
+                      <>
+                        <Button
+                          buttonType={ButtonType.primary}
+                          disabled={status === Status.Loading}
+                          onClick={() => redeem()}
+                        >
+                          Redeem
+                        </Button>
+                      </>
+                    )}
+                  </ButtonContainerFullWidth>
+                )}
+              </>
+            )}
           </>
         )}
         {currentTab === marketTabs.pool && (

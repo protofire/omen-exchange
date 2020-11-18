@@ -1,12 +1,13 @@
 import { ApolloProvider } from '@apollo/react-hooks'
+import { useWeb3React } from '@web3-react/core'
 import React from 'react'
 
 import { getApolloClient } from '../apolloClientConfig'
-import { useConnectedWeb3Context } from '../hooks'
 
 export const ApolloProviderWrapper: React.FC = ({ children }) => {
-  const { networkId } = useConnectedWeb3Context()
-  const client = React.useMemo(() => getApolloClient(networkId), [networkId])
+  const context = useWeb3React()
+  const chainId = context.chainId == null ? 1 : context.chainId
+  const client = React.useMemo(() => getApolloClient(chainId), [chainId])
 
   return <ApolloProvider client={client}>{children}</ApolloProvider>
 }

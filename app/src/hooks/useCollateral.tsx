@@ -1,10 +1,9 @@
+import { useWeb3React } from '@web3-react/core'
 import { useEffect, useState } from 'react'
 
 import { ERC20Service } from '../services'
 import { getTokenFromAddress } from '../util/networks'
 import { Token } from '../util/types'
-
-import { ConnectedWeb3Context } from './connectedWeb3'
 
 const getTokenFromAddressIfExists = (networkId: number, collateralAddress: string): Maybe<Token> => {
   try {
@@ -16,9 +15,10 @@ const getTokenFromAddressIfExists = (networkId: number, collateralAddress: strin
 
 export const useCollateral = (
   collateralAddress: string,
-  context: ConnectedWeb3Context,
 ): { collateral: Maybe<Token>; errorMessage: Maybe<string>; isSpinnerOn: boolean } => {
-  const { account, library: provider, networkId } = context
+  const context = useWeb3React()
+  const { account, library: provider } = context
+  const chainId = context.chainId == null ? 1 : context.chainId
 
   const [collateral, setCollateral] = useState<Maybe<Token>>(null)
   const [errorMessage, setErrorMessage] = useState<Maybe<string>>(null)
@@ -33,7 +33,7 @@ export const useCollateral = (
       }
 
       if (isSubscribed) setSpinnerOn(true)
-      let newCollateral = getTokenFromAddressIfExists(networkId, collateralAddress)
+      let newCollateral = getTokenFromAddressIfExists(chainId, collateralAddress)
       let newErrorMessage: Maybe<string> = null
 
       // If the address doesn't belong to a knowToken, we fetch its metadata
@@ -59,7 +59,7 @@ export const useCollateral = (
     return () => {
       isSubscribed = false
     }
-  }, [provider, account, networkId, collateralAddress])
+  }, [provider, account, chainId, collateralAddress])
 
   return {
     collateral,

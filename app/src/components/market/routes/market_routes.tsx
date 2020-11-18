@@ -4,7 +4,6 @@ import { Redirect, RouteComponentProps } from 'react-router'
 
 import { FETCH_DETAILS_INTERVAL } from '../../../common/constants'
 import { useCheckContractExists, useMarketMakerData } from '../../../hooks'
-import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { MarketDetailsPage } from '../../../pages'
 import { getLogger } from '../../../util/logger'
 import { isAddress } from '../../../util/tools'
@@ -23,12 +22,10 @@ interface Props {
 }
 
 const MarketValidation: React.FC<Props> = (props: Props) => {
-  const context = useConnectedWeb3Context()
-
   const { marketMakerAddress } = props
 
   // Validate contract REALLY exists
-  const contractExists = useCheckContractExists(marketMakerAddress, context)
+  const contractExists = useCheckContractExists(marketMakerAddress)
   const { fetchData, fetchGraphMarketMakerData, marketMakerData } = useMarketMakerData(marketMakerAddress.toLowerCase())
   useInterval(fetchData, FETCH_DETAILS_INTERVAL)
   if (!contractExists) {

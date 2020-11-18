@@ -1,9 +1,9 @@
+import { useWeb3React } from '@web3-react/core'
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled, { css } from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES, MAX_OUTCOME_ALLOWED } from '../../../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { Arbitrator, Question } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
@@ -131,7 +131,8 @@ interface Props {
 }
 
 const AskQuestionStep = (props: Props) => {
-  const context = useConnectedWeb3Context()
+  const context = useWeb3React()
+  const chainId = context.chainId == null ? 1 : context.chainId
 
   const {
     first,
@@ -212,7 +213,6 @@ const AskQuestionStep = (props: Props) => {
       </CategoryImportWrapper>
       {isImport ? (
         <ImportMarketContent
-          context={context}
           handleClearQuestion={handleClearQuestion}
           handleOutcomesChange={handleOutcomesChange}
           loadedQuestionId={loadedQuestionId}
@@ -225,7 +225,6 @@ const AskQuestionStep = (props: Props) => {
           <FormRow
             formField={
               <QuestionInput
-                context={context}
                 disabled={!!loadedQuestionId}
                 name="question"
                 onChange={handleChange}
@@ -299,7 +298,7 @@ const AskQuestionStep = (props: Props) => {
               <Arbitrators
                 customValues={arbitratorsCustom}
                 disabled={!!loadedQuestionId}
-                networkId={context.networkId}
+                networkId={chainId}
                 onChangeArbitrator={handleArbitratorChange}
                 value={arbitrator}
               />

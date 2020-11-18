@@ -1,7 +1,7 @@
+import { useWeb3React } from '@web3-react/core'
 import React from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork } from '../../../../util/networks'
 import { CurationSource } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
@@ -80,10 +80,11 @@ interface Props {
 }
 
 export const AdvancedFilters = (props: Props) => {
-  const context = useConnectedWeb3Context()
-  const { networkId } = context
+  const context = useWeb3React()
 
-  const arbitrators = getArbitratorsByNetwork(networkId)
+  const chainId = context.chainId == null ? 1 : context.chainId
+
+  const arbitrators = getArbitratorsByNetwork(chainId)
 
   const {
     arbitrator,
@@ -184,7 +185,6 @@ export const AdvancedFilters = (props: Props) => {
 
         <CurrencySelector
           addAll
-          context={context}
           currency={currency}
           disabled={false}
           onSelect={currency => onChangeCurrency(currency ? currency.address : null)}

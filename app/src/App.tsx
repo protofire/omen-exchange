@@ -1,37 +1,39 @@
 import { configureStore } from '@reduxjs/toolkit'
+import { Web3ReactProvider } from '@web3-react/core'
+import { providers } from 'ethers'
 import React from 'react'
 import { Provider } from 'react-redux'
 import { ThemeProvider } from 'styled-components'
-import Web3Provider from 'web3-react'
 
 import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
 
 import { Main } from './components/main'
 import { ApolloProviderWrapper } from './contexts/Apollo'
-import { ConnectedCPK, ConnectedWeb3 } from './hooks'
+import { ConnectedCPK } from './hooks'
 import balanceReducer from './store/reducer'
 import theme from './theme'
 import { GlobalStyle } from './theme/global_style'
-import connectors from './util/connectors'
 
 const store = configureStore({ reducer: balanceReducer })
+
+function getLibrary(provider: any) {
+  return new providers.Web3Provider(provider)
+}
 
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
-      <Web3Provider connectors={connectors} libraryName="ethers.js">
-        <ConnectedWeb3>
-          <ConnectedCPK>
-            <ApolloProviderWrapper>
-              <Provider store={store}>
-                <GlobalStyle />
-                <Main />
-              </Provider>
-            </ApolloProviderWrapper>
-          </ConnectedCPK>
-        </ConnectedWeb3>
-      </Web3Provider>
+      <Web3ReactProvider getLibrary={getLibrary}>
+        <ConnectedCPK>
+          <ApolloProviderWrapper>
+            <Provider store={store}>
+              <GlobalStyle />
+              <Main />
+            </Provider>
+          </ApolloProviderWrapper>
+        </ConnectedCPK>
+      </Web3ReactProvider>
     </ThemeProvider>
   )
 }

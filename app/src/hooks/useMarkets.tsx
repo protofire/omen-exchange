@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import { useWeb3React } from '@web3-react/core'
 import React from 'react'
 
 import { buildQueryMarkets, buildQueryMyMarkets } from '../queries/markets_home'
@@ -11,8 +12,6 @@ import {
   MarketFilters,
   MarketStates,
 } from '../util/types'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
 
 interface MarketVariables {
   first: number
@@ -31,7 +30,8 @@ const normalizeFetchedData = (data: GraphResponseMyMarkets): GraphMarketMakerDat
 }
 
 export const useMarkets = (options: Options): any => {
-  const { networkId } = useConnectedWeb3Context()
+  const context = useWeb3React()
+  const chainId = context.chainId == null ? 1 : context.chainId
 
   const {
     arbitrator,
@@ -55,7 +55,7 @@ export const useMarkets = (options: Options): any => {
   const queryOptions: BuildQueryType = {
     whitelistedCreators: false,
     whitelistedTemplateIds: true,
-    networkId,
+    networkId: chainId,
     state,
     category,
     title,

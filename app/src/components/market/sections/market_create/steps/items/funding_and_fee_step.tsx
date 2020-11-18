@@ -1,3 +1,4 @@
+import { useWeb3React } from '@web3-react/core'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
@@ -10,13 +11,7 @@ import {
   DOCUMENT_FAQ,
   MAX_MARKET_FEE,
 } from '../../../../../../common/constants'
-import {
-  useCollateralBalance,
-  useConnectedCPKContext,
-  useConnectedWeb3Context,
-  useCpkAllowance,
-  useTokens,
-} from '../../../../../../hooks'
+import { useCollateralBalance, useConnectedCPKContext, useCpkAllowance, useTokens } from '../../../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
@@ -184,7 +179,7 @@ interface Props {
 }
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
-  const context = useConnectedWeb3Context()
+  const context = useWeb3React()
   const cpk = useConnectedCPKContext()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
@@ -237,7 +232,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
     formatBigNumber(collateralBalance, collateral.decimals, 5),
   )
-  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(collateral, context)
+  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(collateral)
 
   const [isNegativeDepositAmount, setIsNegativeDepositAmount] = useState<boolean>(false)
 
@@ -256,7 +251,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
-  const tokensAmount = useTokens(context).length
+  const tokensAmount = useTokens().length
 
   const amountError =
     maybeCollateralBalance === null
@@ -390,7 +385,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               <CurrenciesWrapper>
                 <CurrencySelector
                   balance={formatNumber(collateralBalanceFormatted, 5)}
-                  context={context}
                   disabled={false}
                   onSelect={onCollateralChange}
                 />

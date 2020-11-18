@@ -1,8 +1,8 @@
+import { useWeb3React } from '@web3-react/core'
 import React, { FC, useState } from 'react'
 import { useHistory } from 'react-router'
 
 import { useConnectedCPKContext, useContracts } from '../../../../hooks'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
@@ -14,13 +14,13 @@ import { MarketWizardCreator } from './market_wizard_creator'
 const logger = getLogger('Market::MarketWizardCreatorContainer')
 
 const MarketWizardCreatorContainer: FC = () => {
-  const context = useConnectedWeb3Context()
+  const context = useWeb3React()
   const cpk = useConnectedCPKContext()
   const { account, library: provider } = context
   const history = useHistory()
 
   const [isModalOpen, setModalState] = useState(false)
-  const { conditionalTokens, marketMakerFactory, realitio } = useContracts(context)
+  const { conditionalTokens, marketMakerFactory, realitio } = useContracts()
 
   const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(MarketCreationStatus.ready())
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)

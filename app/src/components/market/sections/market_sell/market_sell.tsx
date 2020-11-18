@@ -5,7 +5,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useAsyncDerivedValue, useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { useAsyncDerivedValue, useConnectedCPKContext, useContracts } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
@@ -44,9 +44,8 @@ interface Props extends RouteComponentProps<any> {
 }
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
-  const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
-  const { buildMarketMaker, conditionalTokens } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens } = useContracts()
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
 

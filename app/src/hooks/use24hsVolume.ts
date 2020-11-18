@@ -1,11 +1,10 @@
 import { useQuery } from '@apollo/react-hooks'
+import { useWeb3React } from '@web3-react/core'
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
 import { getLogger } from '../util/logger'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
 
 const logger = getLogger('Market::use24hsVolume')
 
@@ -31,7 +30,7 @@ export const use24hsVolume = (marketMakerAddress: string): Maybe<BigNumber> => {
   const [hash, setHash] = useState<Maybe<string>>(null)
   const [lastDayVolume, setLastDayVolume] = useState<Maybe<BigNumber>>(null)
 
-  const { library: provider } = useConnectedWeb3Context()
+  const { library: provider } = useWeb3React()
 
   const { data: volumeNow, error: errorVolumeNow } = useQuery(GET_COLLATERAL_VOLUME_NOW, {
     skip: !!lastDayVolume,

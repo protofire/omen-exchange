@@ -1,8 +1,8 @@
+import { useWeb3React } from '@web3-react/core'
 import { Block } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useWeb3Context } from 'web3-react'
 
 import { EARLIEST_MAINNET_BLOCK_TO_CHECK } from '../../../../common/constants'
 import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
@@ -93,7 +93,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
   marketMakerAddress,
   outcomes,
 }) => {
-  const { library } = useWeb3Context()
+  const { library } = useWeb3React()
   const [latestBlockNumber, setLatestBlockNumber] = useState<Maybe<number>>(null)
   const [blocks, setBlocks] = useState<Maybe<Block[]>>(null)
   const holdingsSeries = useHoldingsHistory(marketMakerAddress, blocks)

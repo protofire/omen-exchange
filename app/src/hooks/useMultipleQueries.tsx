@@ -1,9 +1,8 @@
+import { useWeb3React } from '@web3-react/core'
 import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 
 import { getGraphUris } from '../util/networks'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
 
 type GraphVariables = { [key: string]: string }
 const fetchQuery = (query: string, variables: GraphVariables, endpoint: string) => {
@@ -11,10 +10,11 @@ const fetchQuery = (query: string, variables: GraphVariables, endpoint: string) 
 }
 
 export const useMultipleQueries = <T,>(queries: Maybe<string[]>, variables: GraphVariables): Maybe<T[]> => {
-  const { networkId } = useConnectedWeb3Context()
+  const { chainId } = useWeb3React()
+  if (chainId == null) throw new Error('Missing chain ID')
   const [queriesResult, setQueriesResult] = useState<Maybe<T[]>>(null)
 
-  const { httpUri } = getGraphUris(networkId)
+  const { httpUri } = getGraphUris(chainId)
   const fetchQueries = useCallback(async () => {
     if (queries) {
       const response = await Promise.all(queries.map(q => fetchQuery(q, variables, httpUri)))

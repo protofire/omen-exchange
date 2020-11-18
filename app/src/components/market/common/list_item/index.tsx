@@ -1,9 +1,9 @@
+import { useWeb3React } from '@web3-react/core'
 import moment from 'moment'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
@@ -72,7 +72,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 const logger = getLogger('Market::ListItem')
 
 export const ListItem: React.FC<Props> = (props: Props) => {
-  const context = useConnectedWeb3Context()
+  const context = useWeb3React()
   const { account, library: provider } = context
 
   const { currentFilter, market } = props
@@ -92,7 +92,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   let token: Token | undefined
   try {
-    const tokenInfo = getTokenFromAddress(context.networkId, collateralToken)
+    const chainId = context.chainId == null ? 1 : context.chainId
+    const tokenInfo = getTokenFromAddress(chainId, collateralToken)
     const volume = formatBigNumber(collateralVolume, tokenInfo.decimals)
     token = { ...tokenInfo, volume }
   } catch (err) {
@@ -113,7 +114,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     const setToken = async () => {
-      if (!token) {
+      if (!token && provider != null) {
         // fallback to token service if unknown token
         const erc20Service = new ERC20Service(provider, account, collateralToken)
         const { decimals, symbol } = await erc20Service.getProfileSummary()
@@ -124,7 +125,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     }
 
     setToken()
-  }, [account, collateralToken, collateralVolume, provider, context.networkId, token])
+  }, [account, collateralToken, collateralVolume, provider, context.chainId, token])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
