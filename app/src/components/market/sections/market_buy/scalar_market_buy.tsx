@@ -103,7 +103,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
   useEffect(() => {
     activeTab === Tabs.short ? setPositionIndex(0) : setPositionIndex(1)
-  }, [activeTab])
+  }, [activeTab, Tabs.short])
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -139,7 +139,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
       return [tradedShares, newPrediction, amount, reverseTradedShares]
     },
-    [balances, marketMaker, positionIndex],
+    [balances, marketMaker, positionIndex, lowerBound, upperBound],
   )
 
   const [tradedShares, newPrediction, debouncedAmount, reverseTradedShares] = useAsyncDerivedValue(
