@@ -64,7 +64,6 @@ export const ScalarMarketSell = (props: Props) => {
   }
 
   const [activeTab, setActiveTab] = useState(Tabs.short)
-  const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const [positionIndex, setPositionIndex] = useState(0)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[positionIndex])
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -294,11 +293,11 @@ export const ScalarMarketSell = (props: Props) => {
           {amountError && <GenericError>{amountError}</GenericError>}
         </div>
       </GridTransactionDetails>
-      {isNegativeAmount && (
+      {isNegativeAmountShares && (
         <WarningMessage
           additionalDescription={''}
           danger={true}
-          description={`Your buy amount should not be negative.`}
+          description={`Your sell amount should not be negative.`}
           href={''}
           hyperlinkDescription={''}
         />
