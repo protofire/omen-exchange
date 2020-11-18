@@ -333,6 +333,10 @@ const theme = {
         darker: '#a51546',
         medium: '#e91e63',
       },
+      {
+        darker: '#7FA0BA',
+        medium: '#9FA8DA',
+      },
     ],
   },
   modalStyle: {

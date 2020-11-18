@@ -37,6 +37,8 @@ interface Props extends RouteComponentProps<any> {
 
 const BottomButtonWrapper = styled(ButtonContainer)`
   justify-content: space-between;
+  margin: 0 -24px;
+  padding: 20px 24px 0;
 `
 
 const logger = getLogger('Market::Bond')
@@ -193,7 +195,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         </div>
       </GridTransactionDetails>
 
-      <BottomButtonWrapper>
+      <BottomButtonWrapper borderTop>
         <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.finalize)}>
           Back
         </Button>

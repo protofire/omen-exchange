@@ -287,7 +287,7 @@ const Wrapper = (props: Props) => {
                   {buySellButtons}
                 </StyledButtonContainer>
               ) : (
-                <ButtonContainerFullWidth borderTop={true}>
+                <ButtonContainerFullWidth>
                   {!isConditionResolved && (
                     <>
                       <Button
