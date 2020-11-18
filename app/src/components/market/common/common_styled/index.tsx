@@ -252,10 +252,10 @@ export const CurationLogoWrapper = styled.div`
 
 export const CurationRadioWrapper = styled.div<StatefulRadioButton>`
   border-radius: 50%;
-  border: 1px solid ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
+  border: ${props => (props.selected ? '' : `1px solid ${props.theme.buttonPrimaryLine.borderColorDisabled}`)};
   cursor: ${props => (props.disabled ? 'initial' : 'pointer')};
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
