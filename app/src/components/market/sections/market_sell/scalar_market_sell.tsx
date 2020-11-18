@@ -23,8 +23,8 @@ import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
-import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
+import { TokenBalance } from '../../common/token_balance'
 import { WarningMessage } from '../../common/warning_message'
 
 const StyledButtonContainer = styled(ButtonContainer)`
@@ -268,15 +268,7 @@ export const ScalarMarketSell = (props: Props) => {
               Long
             </ButtonTab>
           </TabsGrid>
-          <CurrenciesWrapper>
-            <CurrencySelector
-              balance={walletBalance}
-              context={context}
-              currency={collateral.address}
-              disabled
-              onSelect={() => null}
-            />
-          </CurrenciesWrapper>
+          <TokenBalance text="Your Shares" value={formatNumber(selectedOutcomeBalance)} />
           <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
             formField={
