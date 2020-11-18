@@ -18,7 +18,7 @@ import {
   CurationRightColumn,
   CurationRow,
   CurationSubRow,
-} from '../market_verify'
+} from '../../../common/common_styled'
 
 const Bold = styled.b`
   font-weight: 500;
