@@ -73,6 +73,11 @@ interface TransactionResult {
   safeTxHash?: string
 }
 
+interface TxOptions {
+  value?: BigNumber
+  gas?: number
+}
+
 class CPKService {
   cpk: any
   provider: Web3Provider
@@ -142,6 +147,12 @@ class CPKService {
       logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
       const transactions = []
 
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp()) {
+        txOptions.gas = 400000
+      }
+
       // Check  if the allowance of the CPK to the market maker is enough.
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
@@ -172,7 +183,7 @@ class CPKService {
         data: MarketMakerService.encodeBuy(amount, outcomeIndex, outcomeTokensToBuy),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
       const txHash = await this.getTransactionHash(txObject)
       logger.log(`Transaction hash: ${txHash}`)
       return this.provider.waitForTransaction(txHash)
@@ -207,6 +218,11 @@ class CPKService {
       const openingDateMoment = moment(resolution)
 
       const transactions = []
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp()) {
+        txOptions.gas = 1200000
+      }
 
       let questionId: string
       if (loadedQuestionId) {
@@ -296,7 +312,7 @@ class CPKService {
         ),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
       const txHash = await this.getTransactionHash(txObject)
       logger.log(`Transaction hash: ${txHash}`)
 
@@ -322,6 +338,12 @@ class CPKService {
       const collateralAddress = await marketMaker.getCollateralToken()
 
       const transactions = []
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp()) {
+        txOptions.gas = 400000
+      }
+
       const isAlreadyApprovedForMarketMaker = await conditionalTokens.isApprovedForAll(
         this.cpk.address,
         marketMaker.address,
@@ -348,7 +370,7 @@ class CPKService {
         })
       }
 
-      const txObject = await this.cpk.execTransactions(transactions)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
       const txHash = await this.getTransactionHash(txObject)
       logger.log(`Transaction hash: ${txHash}`)
       return this.provider.waitForTransaction(txHash)
@@ -367,6 +389,12 @@ class CPKService {
       const collateralService = new ERC20Service(this.provider, account, collateral.address)
 
       const transactions = []
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp()) {
+        txOptions.gas = 400000
+      }
+
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
         marketMaker.address,
@@ -395,7 +423,7 @@ class CPKService {
         data: MarketMakerService.encodeAddFunding(amount),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
       const txHash = await this.getTransactionHash(txObject)
       logger.log(`Transaction hash: ${txHash}`)
       return this.provider.waitForTransaction(txHash)
@@ -436,6 +464,12 @@ class CPKService {
 
       const transactions = [removeFundingTx, mergePositionsTx]
 
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp()) {
+        txOptions.gas = 400000
+      }
+
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
         // transfer to the user the merged collateral plus the earned fees
@@ -470,6 +504,11 @@ class CPKService {
       const account = await signer.getAddress()
 
       const transactions = []
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp()) {
+        txOptions.gas = 400000
+      }
       if (!isConditionResolved) {
         transactions.push({
           to: oracle.address,
