@@ -15,7 +15,7 @@ import {
   formatNumber,
   mulBN,
 } from '../../../../util/tools'
-import { MarketMakerData, Status, Ternary } from '../../../../util/types'
+import { BalanceItem, MarketMakerData, Status } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -63,10 +63,10 @@ export const ScalarMarketSell = (props: Props) => {
     long: 'long',
   }
 
-  const [amountDisplay, setAmountDisplay] = useState<string>('')
   const [activeTab, setActiveTab] = useState(Tabs.short)
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const [positionIndex, setPositionIndex] = useState(0)
+  const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[positionIndex])
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
@@ -88,10 +88,10 @@ export const ScalarMarketSell = (props: Props) => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])
 
-  // useEffect(() => {
-  //   setBalanceItem(balances[outcomeIndex])
-  //   // eslint-disable-next-line
-  // }, [balances[outcomeIndex]])
+  useEffect(() => {
+    setBalanceItem(balances[positionIndex])
+    // eslint-disable-next-line
+  }, [balances[positionIndex]])
 
   // useEffect(() => {
   //   setOutcomeIndex(defaultOutcomeIndex)
@@ -233,15 +233,38 @@ export const ScalarMarketSell = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
+  const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
+
+  const amountError =
+    balanceItem.shares === null
+      ? null
+      : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
+      ? `Insufficient balance`
+      : amountShares?.gt(balanceItem.shares)
+      ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
+      : null
+
   return (
     <>
       <GridTransactionDetails>
         <div>
           <TabsGrid>
-            <ButtonTab active={activeTab === Tabs.short} onClick={() => setActiveTab(Tabs.short)}>
+            <ButtonTab
+              active={activeTab === Tabs.short}
+              onClick={() => {
+                setActiveTab(Tabs.short)
+                setBalanceItem(balances[0])
+              }}
+            >
               Short
             </ButtonTab>
-            <ButtonTab active={activeTab === Tabs.long} onClick={() => setActiveTab(Tabs.long)}>
+            <ButtonTab
+              active={activeTab === Tabs.long}
+              onClick={() => {
+                setActiveTab(Tabs.long)
+                setBalanceItem(balances[1])
+              }}
+            >
               Long
             </ButtonTab>
           </TabsGrid>
@@ -270,13 +293,13 @@ export const ScalarMarketSell = (props: Props) => {
               />
             }
             onClickMaxButton={() => {
-              setAmountShares(collateralBalance)
-              setAmountSharesToDisplay(walletBalance)
+              setAmountShares(balanceItem.shares)
+              setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals, 5))
             }}
             shouldDisplayMaxButton
             symbol={collateral.symbol}
           />
-          {/* {amountError && <GenericError>{amountError}</GenericError>} */}
+          {amountError && <GenericError>{amountError}</GenericError>}
         </div>
       </GridTransactionDetails>
       {isNegativeAmount && (
