@@ -310,25 +310,6 @@ export const ScalarMarketBuy = (props: Props) => {
             <TransactionDetailsRow title={'Total'} value={total} />
           </TransactionDetailsCard>
         </div>
-        <div>
-          <TransactionDetailsCard>
-            <TransactionDetailsRow title={'Base Cost'} value={baseCostFormatted} />
-            <TransactionDetailsRow
-              title={'Fee'}
-              tooltip={`A ${feePercentage}% fee goes to liquidity providers`}
-              value={feeFormatted}
-            />
-            <TransactionDetailsLine />
-            <TransactionDetailsRow title={'Max. Loss'} value={potentialLossFormatted} />
-            <TransactionDetailsRow
-              emphasizeValue={potentialProfit.gt(0)}
-              state={ValueStates.success}
-              title={'Max. Profit'}
-              value={potentialProfitFormatted}
-            />
-            <TransactionDetailsRow title={'Total'} value={total} />
-          </TransactionDetailsCard>
-        </div>
       </GridTransactionDetails>
       {isNegativeAmount && (
         <WarningMessage
