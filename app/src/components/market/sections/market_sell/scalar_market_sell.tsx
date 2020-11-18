@@ -22,9 +22,12 @@ import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
+import { GenericError, TabsGrid } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { TokenBalance } from '../../common/token_balance'
+import { TransactionDetailsCard } from '../../common/transaction_details_card'
+import { TransactionDetailsLine } from '../../common/transaction_details_line'
+import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
 
 const StyledButtonContainer = styled(ButtonContainer)`
@@ -167,6 +170,8 @@ export const ScalarMarketSell = (props: Props) => {
     calcSellAmount,
   )
 
+  const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
+
   // const formattedNewPrediction =
   //   newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
 
@@ -298,6 +303,46 @@ export const ScalarMarketSell = (props: Props) => {
             symbol={collateral.symbol}
           />
           {amountError && <GenericError>{amountError}</GenericError>}
+        </div>
+        <div>
+          <TransactionDetailsCard>
+            <TransactionDetailsRow
+              title={'Sell Amount'}
+              value={`${formatNumber(formatBigNumber(amountShares || Zero, collateral.decimals))} Shares`}
+            />
+            <TransactionDetailsRow
+              title={'Fee'}
+              value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'} ${
+                collateral.symbol
+              }`}
+            />
+            <TransactionDetailsRow
+              emphasizeValue={potentialProfit ? potentialProfit.gt(0) : false}
+              state={ValueStates.success}
+              title={'Max. Profit'}
+              value={
+                potentialProfit
+                  ? `${formatNumber(formatBigNumber(potentialProfit, collateral.decimals, 2))} ${collateral.symbol}`
+                  : '0.00'
+              }
+            />
+            <TransactionDetailsLine />
+            <TransactionDetailsRow
+              emphasizeValue={
+                (tradedCollateral && parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0) || false
+              }
+              state={
+                (tradedCollateral &&
+                  parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0 &&
+                  ValueStates.important) ||
+                ValueStates.normal
+              }
+              title={'Total'}
+              value={`${
+                tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
+              } ${collateral.symbol}`}
+            />
+          </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
       {isNegativeAmountShares && (
