@@ -206,21 +206,19 @@ const Wrapper = (props: Props) => {
                 hyperlinkDescription={''}
               />
             )}
-            {account && (
-              <>
-                <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
-                  <Button
-                    buttonType={ButtonType.secondaryLine}
-                    onClick={() => {
-                      history.goBack()
-                    }}
-                  >
-                    Back
-                  </Button>
-                  {isQuestionOpen ? openInRealitioButton : buySellButtons}
-                </StyledButtonContainer>
-              </>
-            )}
+            <WhenConnected>
+              <StyledButtonContainer className={!hasFunding || isQuestionOpen ? 'border' : ''}>
+                <Button
+                  buttonType={ButtonType.secondaryLine}
+                  onClick={() => {
+                    history.goBack()
+                  }}
+                >
+                  Back
+                </Button>
+                {isQuestionOpen ? openInRealitioButton : buySellButtons}
+              </StyledButtonContainer>
+            </WhenConnected>
           </>
         )}
         {currentTab === marketTabs.pool && (
