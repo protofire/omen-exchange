@@ -58,19 +58,16 @@ const StatusContainer = styled.div<{ challenge?: boolean }>`
   text-transform: lowercase;
   font-size: 14px;
   &:hover {
-    a {
-      ${props => (props.challenge ? `color:${props.theme.colors.primaryLight};` : '')}
-    }
     svg {
       path {
         ${props => (props.challenge ? `fill:${props.theme.colors.primaryLight};` : '')}
       }
     }
 
-    span {
+    a {
       color: ${props => props.theme.colors.primaryLight};
     }
-    div {
+    & a:nth-child(2) {
       background-color: ${props => (!props.challenge ? props.theme.colors.primaryLight : '')};
     }
   }
@@ -91,7 +88,7 @@ const IconWrapper = styled.div`
     height: 100%;
   }
 `
-const SuccessVerify = styled.span`
+const SuccessVerify = styled.a`
   cursor: pointer;
   color: ${props => props.theme.colors.clickable};
   font-weight: ${props => props.theme.textfield.fontWeight};
@@ -164,10 +161,6 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
   let KlerosNotice
   let KlerosRightColumn
 
-  const urlSwitch = (url: string) => {
-    const win = window.open(url, '_blank')
-    win && win.focus()
-  }
   switch (status) {
     case MarketVerificationState.NotVerified: {
       klerosDetails = `Request verification with a ${formatEther(submissionDeposit)} ETH security deposit.`
@@ -209,11 +202,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
           </DescriptionText>
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondaryLine}>
-              <UnstyledLink
-                onClick={() => {
-                  urlSwitch(`${baseKlerosLink}?action=challenge`)
-                }}
-              >
+              <UnstyledLink href={`${baseKlerosLink}?action=challenge`} rel="noopener noreferrer" target="_blank">
                 Challenge
               </UnstyledLink>
             </RightButton>
@@ -222,11 +211,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       )
       KlerosRightColumn = (
         <CurationRightColumn>
-          <TimeRemainingContainer
-            onClick={() => {
-              urlSwitch(baseKlerosLink)
-            }}
-          >
+          <TimeRemainingContainer as="a" href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
             Ends in {moment.duration(timeRemaining).humanize()}
             <IconStatusWrapper>
               <IconSchedule />
@@ -251,11 +236,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
           </DescriptionText>
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondary}>
-              <UnstyledLink
-                onClick={() => {
-                  urlSwitch(`${baseKlerosLink}?action=challenge`)
-                }}
-              >
+              <UnstyledLink href={`${baseKlerosLink}?action=challenge`} rel="noopener noreferrer" target="_blank">
                 Challenge
               </UnstyledLink>
             </RightButton>
@@ -264,11 +245,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       )
       KlerosRightColumn = (
         <CurationRightColumn>
-          <TimeRemainingContainer
-            onClick={() => {
-              urlSwitch(baseKlerosLink)
-            }}
-          >
+          <TimeRemainingContainer as="a" href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
             Ends in {moment.duration(timeRemaining).humanize()}{' '}
             <IconStatusWrapper>
               <IconSchedule />
@@ -284,18 +261,10 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       KlerosRightColumn = (
         <CurationRightColumn>
           <StatusContainer challenge={true}>
-            <BlueLink
-              onClick={() => {
-                urlSwitch(baseKlerosLink)
-              }}
-            >
+            <BlueLink href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
               challenge details{' '}
             </BlueLink>
-            <IconStatusWrapper
-              onClick={() => {
-                urlSwitch(baseKlerosLink)
-              }}
-            >
+            <IconStatusWrapper as="a" href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
               <IconExclamation />
             </IconStatusWrapper>
           </StatusContainer>
@@ -317,11 +286,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
           </DescriptionText>
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondaryLine}>
-              <UnstyledLink
-                onClick={() => {
-                  urlSwitch(`${baseKlerosLink}?action=remove`)
-                }}
-              >
+              <UnstyledLink href={`${baseKlerosLink}?action=remove`} rel="noopener noreferrer" target="_blank">
                 Remove Market
               </UnstyledLink>
             </RightButton>
@@ -332,18 +297,10 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       KlerosRightColumn = (
         <CurationRightColumn>
           <StatusContainer>
-            <SuccessVerify
-              onClick={() => {
-                urlSwitch(baseKlerosLink)
-              }}
-            >
+            <SuccessVerify href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
               verified
             </SuccessVerify>
-            <IconWrapper
-              onClick={() => {
-                urlSwitch(baseKlerosLink)
-              }}
-            >
+            <IconWrapper as="a" href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
               <IconTick />
             </IconWrapper>
           </StatusContainer>
