@@ -243,6 +243,13 @@ export const ScalarMarketSell = (props: Props) => {
       ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
       : null
 
+  const isSellButtonDisabled =
+    !amountShares ||
+    (status !== Status.Ready && status !== Status.Error) ||
+    amountShares?.isZero() ||
+    amountError !== null ||
+    isNegativeAmountShares
+
   return (
     <>
       <GridTransactionDetails>
@@ -306,7 +313,7 @@ export const ScalarMarketSell = (props: Props) => {
         <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
         </Button>
-        <Button buttonType={ButtonType.primaryAlternative} onClick={finish}>
+        <Button buttonType={ButtonType.primaryAlternative} disabled={isSellButtonDisabled} onClick={finish}>
           Sell Position
         </Button>
       </StyledButtonContainer>
