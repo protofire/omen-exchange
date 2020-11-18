@@ -1,6 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import { MarketMakerData } from '../../../../util/types'
+
 const MarketTabs = styled.div`
   display: flex;
   margin-bottom: 20px;
@@ -21,15 +23,18 @@ const MarketTab = styled.div<{ active: boolean }>`
 
 interface Props {
   activeTab: string
-  marketAddress: string
   hasWinningOutcomes?: Maybe<boolean>
-  isQuestionFinalized: boolean
-  resolutionDate: Date
+  marketMakerData: MarketMakerData
   switchMarketTab: (arg0: string) => void
 }
 
 export const MarketNavigation = (props: Props) => {
-  const { activeTab, hasWinningOutcomes, isQuestionFinalized, resolutionDate, switchMarketTab } = props
+  const { activeTab, hasWinningOutcomes, marketMakerData, switchMarketTab } = props
+  const { isQuestionFinalized, question } = marketMakerData
+  const currentTimestamp = new Date().getTime()
+
+  const isOpen = question.resolution.getTime() > currentTimestamp
+  const isFinalizing = question.resolution < new Date() && !isQuestionFinalized
 
   const marketTabs = {
     history: 'HISTORY',
@@ -39,8 +44,6 @@ export const MarketNavigation = (props: Props) => {
     buy: 'BUY',
     sell: 'SELL',
   }
-
-  const isFinalizing = resolutionDate < new Date() && !isQuestionFinalized
 
   return (
     <MarketTabs>
@@ -62,9 +65,11 @@ export const MarketNavigation = (props: Props) => {
       <MarketTab active={activeTab === marketTabs.history} onClick={() => switchMarketTab('HISTORY')}>
         History
       </MarketTab>
-      <MarketTab active={activeTab === marketTabs.verify} onClick={() => switchMarketTab('VERIFY')}>
-        Verify
-      </MarketTab>
+      {isOpen && (
+        <MarketTab active={activeTab === marketTabs.verify} onClick={() => switchMarketTab('VERIFY')}>
+          Verify
+        </MarketTab>
+      )}
     </MarketTabs>
   )
 }

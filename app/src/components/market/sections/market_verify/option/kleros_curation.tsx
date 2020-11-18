@@ -18,7 +18,7 @@ import {
   CurationRightColumn,
   CurationRow,
   CurationSubRow,
-} from '../market_verify'
+} from '../../../common/common_styled'
 
 const Bold = styled.b`
   font-weight: 500;
@@ -171,7 +171,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
             <BlueLink href={DOCUMENT_VALIDITY_RULES} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>{' '}
-            to avoid challenges. The <Bold>{formatEther(submissionDeposit)}</Bold> ETH security deposit will be
+            to avoid challenges. The <Bold>{formatEther(submissionDeposit)} ETH</Bold> security deposit will be
             reimbursed if your submission is accepted. The challenge period lasts{' '}
             <Bold>{moment.duration(Number(challengePeriodDuration) * 1000).humanize()}</Bold>.
           </DescriptionText>
