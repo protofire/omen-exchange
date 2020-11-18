@@ -85,7 +85,7 @@ const networks: { [K in NetworkId]: Network } = {
     url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
     graphHttpUri: GRAPH_RINKEBY_HTTP,
     graphWsUri: GRAPH_RINKEBY_WS,
-    realitioTimeout: 10,
+    realitioTimeout: 180,
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     omenTCRListId: 1,
     contracts: {
