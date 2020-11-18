@@ -92,13 +92,13 @@ export const ScalarMarketSell = (props: Props) => {
     // eslint-disable-next-line
   }, [balances[positionIndex]])
 
-  // useEffect(() => {
-  //   setOutcomeIndex(defaultOutcomeIndex)
-  //   setBalanceItem(balances[defaultOutcomeIndex])
-  //   setAmountShares(null)
-  //   setAmountSharesToDisplay('')
-  //   // eslint-disable-next-line
-  // }, [collateral.address])
+  useEffect(() => {
+    setPositionIndex(0)
+    setBalanceItem(balances[0])
+    setAmountShares(null)
+    setAmountSharesToDisplay('')
+    // eslint-disable-next-line
+  }, [collateral.address])
 
   useEffect(() => {
     activeTab === Tabs.short ? setPositionIndex(0) : setPositionIndex(1)
