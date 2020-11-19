@@ -1,12 +1,22 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useCollateralBalance, useConnectedWeb3Context, useFundingBalance } from '../../../../hooks'
+import {
+  useCollateralBalance,
+  useConnectedWeb3Context,
+  useContracts,
+  useCpk,
+  useCpkAllowance,
+  useFundingBalance,
+} from '../../../../hooks'
+import { ERC20Service } from '../../../../services'
+import { CPKService } from '../../../../services/cpk'
+import { RemoteData } from '../../../../util/remote_data'
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
-import { MarketMakerData, Token } from '../../../../util/types'
+import { MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
@@ -42,6 +52,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
   const context = useConnectedWeb3Context()
   const history = useHistory()
+  const { account, library: provider } = context
+  const cpk = useCpk()
+
+  const { buildMarketMaker, conditionalTokens } = useContracts(context)
+  const marketMaker = buildMarketMaker(marketMakerAddress)
 
   const resolutionDate = marketMakerData.question.resolution.getTime()
   const currentDate = new Date().getTime()
@@ -53,6 +68,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
   const [amountToRemove, setAmountToRemove] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
+  const [status, setStatus] = useState<Status>(Status.Ready)
+
+  const signer = useMemo(() => provider.getSigner(), [provider])
+  const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
     collateral,
@@ -64,6 +84,56 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
+
+  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
+  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
+
+  const addFunding = async () => {
+    // setModalTitle('Funds Deposit')
+
+    try {
+      if (!account) {
+        throw new Error('Please connect to your wallet to perform this action.')
+      }
+      if (hasEnoughAllowance === Ternary.Unknown) {
+        throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown")
+      }
+
+      const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
+
+      setStatus(Status.Loading)
+      // setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
+
+      const cpk = await CPKService.create(provider)
+
+      const collateralAddress = await marketMaker.getCollateralToken()
+      const collateralService = new ERC20Service(provider, account, collateralAddress)
+
+      if (hasEnoughAllowance === Ternary.False) {
+        await collateralService.approveUnlimited(cpk.address)
+      }
+
+      await cpk.addFunding({
+        amount: amountToFund || Zero,
+        collateral,
+        marketMaker,
+      })
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+
+      setStatus(Status.Ready)
+      setAmountToFund(null)
+      setAmountToFundDisplay('')
+      // setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
+    } catch (err) {
+      // setStatus(Status.Error)
+      // setMessage(`Error trying to deposit funds.`)
+      // logger.error(`${message} - ${err.message}`)
+    }
+    // setIsModalTransactionResultOpen(true)
+  }
 
   return (
     <>
@@ -157,7 +227,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
           Cancel
         </Button>
-        {activeTab === Tabs.deposit && <Button buttonType={ButtonType.primaryAlternative}>Deposit</Button>}
+        {activeTab === Tabs.deposit && (
+          <Button buttonType={ButtonType.primaryAlternative} onClick={addFunding}>
+            Deposit
+          </Button>
+        )}
         {activeTab === Tabs.withdraw && <Button buttonType={ButtonType.primaryAlternative}>Withdraw</Button>}
       </BottomButtonWrapper>
     </>
