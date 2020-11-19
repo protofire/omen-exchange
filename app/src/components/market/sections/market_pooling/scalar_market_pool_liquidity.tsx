@@ -1,9 +1,10 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { DOCUMENT_FAQ } from '../../../../common/constants'
 import {
   useCollateralBalance,
   useConnectedWeb3Context,
@@ -38,12 +39,18 @@ import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
+import { WarningMessage } from '../../common/warning_message'
 
 const BottomButtonWrapper = styled(ButtonContainer)`
   justify-content: space-between;
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
   margin: 0 -24px;
   padding: 20px 24px 0;
+`
+
+const WarningMessageStyled = styled(WarningMessage)`
+  margin-bottom: 0;
+  margin-bottom: 24px;
 `
 
 enum Tabs {
@@ -95,6 +102,16 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
+  const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
+  const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
+
+  useEffect(() => {
+    setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
+  }, [amountToFund, collateral.decimals])
+
+  useEffect(() => {
+    setIsNegativeAmountToRemove(formatBigNumber(amountToRemove || Zero, collateral.decimals).includes('-'))
+  }, [amountToRemove, collateral.decimals])
 
   const signer = useMemo(() => provider.getSigner(), [provider])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -368,6 +385,30 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           )}
         </div>
       </GridTransactionDetails>
+      <WarningMessageStyled
+        additionalDescription=""
+        description="Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time."
+        href={DOCUMENT_FAQ}
+        hyperlinkDescription="More Info"
+      />
+      {isNegativeAmountToFund && (
+        <WarningMessage
+          additionalDescription=""
+          danger={true}
+          description="Your deposit amount should not be negative."
+          href=""
+          hyperlinkDescription=""
+        />
+      )}
+      {isNegativeAmountToRemove && (
+        <WarningMessage
+          additionalDescription=""
+          danger
+          description="Your withdraw amount should not be negative."
+          href=""
+          hyperlinkDescription=""
+        />
+      )}
       <BottomButtonWrapper>
         <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
           Cancel
