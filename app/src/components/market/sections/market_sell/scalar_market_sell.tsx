@@ -24,6 +24,7 @@ import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError, TabsGrid } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
+import { MarketScale } from '../../common/market_scale'
 import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
@@ -172,8 +173,8 @@ export const ScalarMarketSell = (props: Props) => {
 
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
 
-  // const formattedNewPrediction =
-  //   newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
+  const formattedNewPrediction =
+    newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
 
   // const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
   // const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
@@ -257,6 +258,20 @@ export const ScalarMarketSell = (props: Props) => {
 
   return (
     <>
+      <MarketScale
+        amount={potentialValue}
+        border={true}
+        collateral={collateral}
+        currentPrediction={outcomeTokenMarginalPrices[1]}
+        long={activeTab === Tabs.long}
+        lowerBound={scalarLow || new BigNumber(0)}
+        newPrediction={formattedNewPrediction}
+        // potentialLoss={potentialLossUncapped}
+        // potentialProfit={potentialProfit}
+        startingPointTitle={'Current prediction'}
+        unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+        upperBound={scalarHigh || new BigNumber(0)}
+      />
       <GridTransactionDetails>
         <div>
           <TabsGrid>
