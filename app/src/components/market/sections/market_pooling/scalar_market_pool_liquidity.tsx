@@ -15,7 +15,13 @@ import {
 import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
 import { RemoteData } from '../../../../util/remote_data'
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import {
+  calcAddFundingSendAmounts,
+  calcPoolTokens,
+  calcRemoveFundingSendAmounts,
+  formatBigNumber,
+  formatNumber,
+} from '../../../../util/tools'
 import { MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -88,6 +94,35 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
+  const poolTokens = calcPoolTokens(
+    amountToFund || Zero,
+    balances.map(b => b.holdings),
+    totalPoolShares,
+  )
+  const sendAmountsAfterAddingFunding = calcAddFundingSendAmounts(
+    amountToFund || Zero,
+    balances.map(b => b.holdings),
+    totalPoolShares,
+  )
+  const sharesAfterAddingFunding = sendAmountsAfterAddingFunding
+    ? balances.map((balance, i) => balance.shares.add(sendAmountsAfterAddingFunding[i]))
+    : balances.map(balance => balance.shares)
+
+  const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
+    amountToRemove || Zero,
+    balances.map(b => b.holdings),
+    totalPoolShares,
+  )
+
+  const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
+    amount.lt(min) ? amount : min,
+  )
+  const depositedTokensTotal = depositedTokens.add(userEarnings)
+
+  const sharesAfterRemovingFunding = balances.map((balance, i) => {
+    return balance.shares.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
+  })
+
   const addFunding = async () => {
     // setModalTitle('Funds Deposit')
 
@@ -130,6 +165,46 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     } catch (err) {
       // setStatus(Status.Error)
       // setMessage(`Error trying to deposit funds.`)
+      // logger.error(`${message} - ${err.message}`)
+    }
+    // setIsModalTransactionResultOpen(true)
+  }
+
+  const removeFunding = async () => {
+    // setModalTitle('Funds Withdrawal')
+    try {
+      setStatus(Status.Loading)
+
+      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
+
+      // setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
+
+      const collateralAddress = await marketMaker.getCollateralToken()
+      const conditionId = await marketMaker.getConditionId()
+      const cpk = await CPKService.create(provider)
+
+      await cpk.removeFunding({
+        amountToMerge: depositedTokens,
+        collateralAddress,
+        conditionId,
+        conditionalTokens,
+        earnings: userEarnings,
+        marketMaker,
+        outcomesCount: balances.length,
+        sharesToBurn: amountToRemove || Zero,
+      })
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+
+      setStatus(Status.Ready)
+      setAmountToRemove(null)
+      setAmountToRemoveDisplay('')
+      // setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
+      // setIsModalTransactionResultOpen(true)
+    } catch (err) {
+      setStatus(Status.Error)
+      // setMessage(`Error trying to withdraw funds.`)
       // logger.error(`${message} - ${err.message}`)
     }
     // setIsModalTransactionResultOpen(true)
@@ -232,7 +307,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
             Deposit
           </Button>
         )}
-        {activeTab === Tabs.withdraw && <Button buttonType={ButtonType.primaryAlternative}>Withdraw</Button>}
+        {activeTab === Tabs.withdraw && (
+          <Button buttonType={ButtonType.primaryAlternative} onClick={removeFunding}>
+            Withdraw
+          </Button>
+        )}
       </BottomButtonWrapper>
     </>
   )
