@@ -33,6 +33,7 @@ import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
+import { MarketScale } from '../../common/market_scale'
 import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
@@ -60,7 +61,18 @@ const logger = getLogger('Scalar Market::Fund')
 
 export const ScalarMarketPoolLiquidity = (props: Props) => {
   const { fetchGraphMarketMakerData, marketMakerData } = props
-  const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
+  const {
+    address: marketMakerAddress,
+    balances,
+    fee,
+    outcomeTokenMarginalPrices,
+    question,
+    scalarHigh,
+    scalarLow,
+    totalEarnings,
+    totalPoolShares,
+    userEarnings,
+  } = marketMakerData
   const context = useConnectedWeb3Context()
   const history = useHistory()
   const { account, library: provider } = context
@@ -69,7 +81,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
-  const resolutionDate = marketMakerData.question.resolution.getTime()
+  const resolutionDate = question.resolution.getTime()
   const currentDate = new Date().getTime()
   const disableDepositTab = currentDate > resolutionDate
 
@@ -218,6 +230,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   return (
     <>
+      <MarketScale
+        border={true}
+        collateral={collateral}
+        currentPrediction={outcomeTokenMarginalPrices[1]}
+        lowerBound={scalarLow || new BigNumber(0)}
+        startingPointTitle={'Current prediction'}
+        unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+        upperBound={scalarHigh || new BigNumber(0)}
+      />
       <GridTransactionDetails>
         <div>
           <TabsGrid>
