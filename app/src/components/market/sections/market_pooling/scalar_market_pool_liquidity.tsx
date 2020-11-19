@@ -263,6 +263,21 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       ? `Value must be less than or equal to ${sharesBalance} pool shares`
       : null
 
+  const disableDepositButton =
+    !amountToFund ||
+    amountToFund?.isZero() ||
+    hasEnoughAllowance !== Ternary.True ||
+    collateralAmountError !== null ||
+    currentDate > resolutionDate ||
+    isNegativeAmountToFund
+
+  const disableWithdrawButton =
+    !amountToRemove ||
+    amountToRemove?.isZero() ||
+    amountToRemove?.gt(fundingBalance) ||
+    sharesAmountError !== null ||
+    isNegativeAmountToRemove
+
   return (
     <>
       <MarketScale
@@ -436,12 +451,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           Cancel
         </Button>
         {activeTab === Tabs.deposit && (
-          <Button buttonType={ButtonType.primaryAlternative} onClick={addFunding}>
+          <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={addFunding}>
             Deposit
           </Button>
         )}
         {activeTab === Tabs.withdraw && (
-          <Button buttonType={ButtonType.primaryAlternative} onClick={removeFunding}>
+          <Button buttonType={ButtonType.primaryAlternative} disabled={disableWithdrawButton} onClick={removeFunding}>
             Withdraw
           </Button>
         )}
