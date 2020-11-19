@@ -14,6 +14,7 @@ import {
 } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
+import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   calcAddFundingSendAmounts,
@@ -27,6 +28,8 @@ import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { FullLoading } from '../../../loading'
+import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
@@ -53,6 +56,8 @@ interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
 }
 
+const logger = getLogger('Scalar Market::Fund')
+
 export const ScalarMarketPoolLiquidity = (props: Props) => {
   const { fetchGraphMarketMakerData, marketMakerData } = props
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
@@ -75,6 +80,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [amountToRemove, setAmountToRemove] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
   const [status, setStatus] = useState<Status>(Status.Ready)
+  const [modalTitle, setModalTitle] = useState<string>('')
+  const [message, setMessage] = useState<string>('')
+  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
   const signer = useMemo(() => provider.getSigner(), [provider])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -124,7 +132,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   })
 
   const addFunding = async () => {
-    // setModalTitle('Funds Deposit')
+    setModalTitle('Deposit Funds')
 
     try {
       if (!account) {
@@ -137,7 +145,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
-      // setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
+      setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       const cpk = await CPKService.create(provider)
 
@@ -161,23 +169,23 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setStatus(Status.Ready)
       setAmountToFund(null)
       setAmountToFundDisplay('')
-      // setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
+      setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
     } catch (err) {
-      // setStatus(Status.Error)
-      // setMessage(`Error trying to deposit funds.`)
-      // logger.error(`${message} - ${err.message}`)
+      setStatus(Status.Error)
+      setMessage(`Error trying to deposit funds.`)
+      logger.error(`${message} - ${err.message}`)
     }
-    // setIsModalTransactionResultOpen(true)
+    setIsModalTransactionResultOpen(true)
   }
 
   const removeFunding = async () => {
-    // setModalTitle('Funds Withdrawal')
+    setModalTitle('Withdraw Funds')
     try {
       setStatus(Status.Loading)
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
 
-      // setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
+      setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
@@ -200,14 +208,14 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setStatus(Status.Ready)
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
-      // setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
-      // setIsModalTransactionResultOpen(true)
+      setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
+      setIsModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
-      // setMessage(`Error trying to withdraw funds.`)
-      // logger.error(`${message} - ${err.message}`)
+      setMessage(`Error trying to withdraw funds.`)
+      logger.error(`${message} - ${err.message}`)
     }
-    // setIsModalTransactionResultOpen(true)
+    setIsModalTransactionResultOpen(true)
   }
 
   return (
@@ -313,6 +321,14 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           </Button>
         )}
       </BottomButtonWrapper>
+      <ModalTransactionResult
+        isOpen={isModalTransactionResultOpen}
+        onClose={() => setIsModalTransactionResultOpen(false)}
+        status={status}
+        text={message}
+        title={modalTitle}
+      />
+      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }
