@@ -35,6 +35,7 @@ import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_s
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
+import { SetAllowance } from '../../common/set_allowance'
 import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
@@ -51,6 +52,10 @@ const BottomButtonWrapper = styled(ButtonContainer)`
 const WarningMessageStyled = styled(WarningMessage)`
   margin-bottom: 0;
   margin-bottom: 24px;
+`
+
+const SetAllowanceStyled = styled(SetAllowance)`
+  margin-bottom: 20px;
 `
 
 enum Tabs {
@@ -130,6 +135,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
+  const showSetAllowance =
+    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
 
   const poolTokens = calcPoolTokens(
     amountToFund || Zero,
@@ -243,6 +250,16 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       logger.error(`${message} - ${err.message}`)
     }
     setIsModalTransactionResultOpen(true)
+  }
+
+  const unlockCollateral = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await unlock()
+
+    setAllowanceFinished(true)
   }
 
   const collateralAmountError =
@@ -422,6 +439,14 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           )}
         </div>
       </GridTransactionDetails>
+      {activeTab === Tabs.deposit && showSetAllowance && (
+        <SetAllowanceStyled
+          collateral={collateral}
+          finished={allowanceFinished && RemoteData.is.success(allowance)}
+          loading={RemoteData.is.asking(allowance)}
+          onUnlock={unlockCollateral}
+        />
+      )}
       <WarningMessageStyled
         additionalDescription=""
         description="Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time."
