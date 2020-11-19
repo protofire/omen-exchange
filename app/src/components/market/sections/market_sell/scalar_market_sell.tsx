@@ -308,7 +308,7 @@ export const ScalarMarketSell = (props: Props) => {
               setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals, 5))
             }}
             shouldDisplayMaxButton
-            symbol={collateral.symbol}
+            symbol={'Shares'}
           />
           {amountError && <GenericError>{amountError}</GenericError>}
         </div>
