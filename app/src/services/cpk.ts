@@ -150,7 +150,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp()) {
-        txOptions.gas = 400000
+        txOptions.gas = 500000
       }
 
       // Check  if the allowance of the CPK to the market maker is enough.
@@ -341,7 +341,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp()) {
-        txOptions.gas = 400000
+        txOptions.gas = 500000
       }
 
       const isAlreadyApprovedForMarketMaker = await conditionalTokens.isApprovedForAll(
@@ -392,7 +392,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp()) {
-        txOptions.gas = 400000
+        txOptions.gas = 500000
       }
 
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
@@ -467,7 +467,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp()) {
-        txOptions.gas = 400000
+        txOptions.gas = 500000
       }
 
       // If we are signed in as a safe we don't need to transfer
@@ -507,7 +507,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp()) {
-        txOptions.gas = 400000
+        txOptions.gas = 500000
       }
       if (!isConditionResolved) {
         transactions.push({
@@ -531,7 +531,7 @@ class CPKService {
         })
       }
 
-      const txObject = await this.cpk.execTransactions(transactions)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
       const txHash = await this.getTransactionHash(txObject)
       logger.log(`Transaction hash: ${txHash}`)
       return this.provider.waitForTransaction(txHash)
