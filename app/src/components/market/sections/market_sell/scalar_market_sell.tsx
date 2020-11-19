@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -62,7 +62,7 @@ export const ScalarMarketSell = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
-  const [positionIndex, setPositionIndex] = useState(0)
+  const [positionIndex, setPositionIndex] = useState(balances[0].shares.gte(balances[1].shares) ? 0 : 1)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[positionIndex])
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
@@ -91,8 +91,8 @@ export const ScalarMarketSell = (props: Props) => {
   }, [balances[positionIndex]])
 
   useEffect(() => {
-    setPositionIndex(0)
-    setBalanceItem(balances[0])
+    setPositionIndex(balances[0].shares.gte(balances[1].shares) ? 0 : 1)
+    setBalanceItem(balances[positionIndex])
     setAmountShares(null)
     setAmountSharesToDisplay('')
     // eslint-disable-next-line
@@ -243,6 +243,10 @@ export const ScalarMarketSell = (props: Props) => {
     amountError !== null ||
     isNegativeAmountShares
 
+  const dust = parseUnits('0.00001', collateral.decimals)
+  const isShortTabDisabled = balances[0].shares.lt(dust)
+  const isLongTabDisabled = balances[1].shares.lt(dust)
+
   return (
     <>
       <MarketScale
@@ -263,7 +267,8 @@ export const ScalarMarketSell = (props: Props) => {
         <div>
           <TabsGrid>
             <ButtonTab
-              active={positionIndex === 0}
+              active={(positionIndex === 0 && !isShortTabDisabled) || (isLongTabDisabled && !isShortTabDisabled)}
+              disabled={isShortTabDisabled}
               onClick={() => {
                 setBalanceItem(balances[0])
                 setPositionIndex(0)
@@ -272,7 +277,8 @@ export const ScalarMarketSell = (props: Props) => {
               Short
             </ButtonTab>
             <ButtonTab
-              active={positionIndex === 1}
+              active={(positionIndex === 1 && !isLongTabDisabled) || (isShortTabDisabled && !isLongTabDisabled)}
+              disabled={isLongTabDisabled}
               onClick={() => {
                 setBalanceItem(balances[1])
                 setPositionIndex(1)
