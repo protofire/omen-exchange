@@ -479,7 +479,7 @@ class CPKService {
         })
       }
 
-      const txObject = await this.cpk.execTransactions(transactions)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
       const txHash = await this.getTransactionHash(txObject)
       logger.log(`Transaction hash: ${txHash}`)
       return this.provider.waitForTransaction(txHash)
