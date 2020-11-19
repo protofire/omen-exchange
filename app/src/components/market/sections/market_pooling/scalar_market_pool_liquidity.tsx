@@ -1,11 +1,14 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
+import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
+import styled from 'styled-components'
 
 import { useCollateralBalance, useConnectedWeb3Context, useFundingBalance } from '../../../../hooks'
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { MarketMakerData, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
+import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
@@ -16,21 +19,29 @@ import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 
-interface Props {
-  marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
-  fetchGraphMarketMakerData: () => Promise<void>
-}
+const BottomButtonWrapper = styled(ButtonContainer)`
+  justify-content: space-between;
+  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
+  margin: 0 -24px;
+  padding: 20px 24px 0;
+`
 
 enum Tabs {
   deposit,
   withdraw,
 }
 
+interface Props {
+  marketMakerData: MarketMakerData
+  switchMarketTab: (arg0: string) => void
+  fetchGraphMarketMakerData: () => Promise<void>
+}
+
 export const ScalarMarketPoolLiquidity = (props: Props) => {
   const { fetchGraphMarketMakerData, marketMakerData } = props
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
   const context = useConnectedWeb3Context()
+  const history = useHistory()
 
   const resolutionDate = marketMakerData.question.resolution.getTime()
   const currentDate = new Date().getTime()
@@ -142,6 +153,13 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           )}
         </div>
       </GridTransactionDetails>
+      <BottomButtonWrapper>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
+          Cancel
+        </Button>
+        {activeTab === Tabs.deposit && <Button buttonType={ButtonType.primaryAlternative}>Deposit</Button>}
+        {activeTab === Tabs.withdraw && <Button buttonType={ButtonType.primaryAlternative}>Withdraw</Button>}
+      </BottomButtonWrapper>
     </>
   )
 }
