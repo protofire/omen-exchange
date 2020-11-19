@@ -245,6 +245,24 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
+  const collateralAmountError =
+    maybeCollateralBalance === null
+      ? null
+      : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
+      ? `Insufficient balance`
+      : amountToFund?.gt(maybeCollateralBalance)
+      ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
+      : null
+
+  const sharesAmountError =
+    maybeFundingBalance === null
+      ? null
+      : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
+      ? `Insufficient balance`
+      : amountToRemove?.gt(maybeFundingBalance)
+      ? `Value must be less than or equal to ${sharesBalance} pool shares`
+      : null
+
   return (
     <>
       <MarketScale
@@ -311,6 +329,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 shouldDisplayMaxButton
                 symbol={collateral.symbol}
               />
+
+              {collateralAmountError && <GenericError>{collateralAmountError}</GenericError>}
             </>
           )}
           {activeTab === Tabs.withdraw && (
@@ -338,6 +358,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 shouldDisplayMaxButton
                 symbol="Shares"
               />
+
+              {sharesAmountError && <GenericError>{sharesAmountError}</GenericError>}
             </>
           )}
         </div>
