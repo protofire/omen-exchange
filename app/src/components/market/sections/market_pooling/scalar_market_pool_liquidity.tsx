@@ -127,9 +127,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   )
   const depositedTokensTotal = depositedTokens.add(userEarnings)
 
-  const sharesAfterRemovingFunding = balances.map((balance, i) => {
-    return balance.shares.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
-  })
+  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
   const addFunding = async () => {
     setModalTitle('Deposit Funds')
@@ -303,6 +301,49 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 symbol="Shares"
               />
             </>
+          )}
+        </div>
+        <div>
+          {activeTab === Tabs.deposit && (
+            <TransactionDetailsCard>
+              <TransactionDetailsRow
+                emphasizeValue={fee.gt(0)}
+                state={ValueStates.success}
+                title="Earn Trading Fee"
+                value={feeFormatted}
+              />
+              <TransactionDetailsLine />
+              <TransactionDetailsRow
+                emphasizeValue={poolTokens.gt(0)}
+                state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
+                title="Pool Tokens"
+                value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals))}`}
+              />
+            </TransactionDetailsCard>
+          )}
+          {activeTab === Tabs.withdraw && (
+            <TransactionDetailsCard>
+              <TransactionDetailsRow
+                emphasizeValue={userEarnings.gt(0)}
+                state={ValueStates.success}
+                title="Earned"
+                value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
+              />
+              <TransactionDetailsRow
+                state={ValueStates.normal}
+                title="Deposited"
+                value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${collateral.symbol}`}
+              />
+              <TransactionDetailsLine />
+              <TransactionDetailsRow
+                emphasizeValue={depositedTokensTotal.gt(0)}
+                state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
+                title="Total"
+                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${
+                  collateral.symbol
+                }`}
+              />
+            </TransactionDetailsCard>
           )}
         </div>
       </GridTransactionDetails>
