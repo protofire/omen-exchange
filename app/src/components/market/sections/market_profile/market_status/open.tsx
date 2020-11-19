@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -235,6 +235,13 @@ const Wrapper = (props: Props) => {
   const switchMarketTab = (newTab: MarketDetailsTab) => {
     setCurrentTab(newTab)
   }
+
+  useEffect(() => {
+    if ((isQuestionFinalized || !isFinalizing) && currentTab === MarketDetailsTab.finalize) {
+      setCurrentTab(MarketDetailsTab.swap)
+    }
+    // eslint-disable-next-line
+  }, [isQuestionFinalized, isFinalizing])
 
   return (
     <>

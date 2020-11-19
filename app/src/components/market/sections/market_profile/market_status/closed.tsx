@@ -214,7 +214,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
-          setCurrentTab('SELL')
+          setCurrentTab(MarketDetailsTab.sell)
         }}
       >
         Sell
@@ -223,7 +223,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
-          setCurrentTab('BUY')
+          setCurrentTab(MarketDetailsTab.buy)
         }}
       >
         Buy
@@ -231,9 +231,9 @@ const Wrapper = (props: Props) => {
     </SellBuyWrapper>
   )
 
-  const [currentTab, setCurrentTab] = useState('SWAP')
+  const [currentTab, setCurrentTab] = useState(MarketDetailsTab.swap)
 
-  const switchMarketTab = (newTab: string) => {
+  const switchMarketTab = (newTab: MarketDetailsTab) => {
     setCurrentTab(newTab)
   }
 
