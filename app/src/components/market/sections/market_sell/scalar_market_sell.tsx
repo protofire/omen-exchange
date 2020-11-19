@@ -62,12 +62,6 @@ export const ScalarMarketSell = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
-  const Tabs = {
-    short: 'short',
-    long: 'long',
-  }
-
-  const [activeTab, setActiveTab] = useState(Tabs.short)
   const [positionIndex, setPositionIndex] = useState(0)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[positionIndex])
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -104,25 +98,18 @@ export const ScalarMarketSell = (props: Props) => {
     // eslint-disable-next-line
   }, [collateral.address])
 
-  useEffect(() => {
-    activeTab === Tabs.short ? setPositionIndex(0) : setPositionIndex(1)
-  }, [activeTab, Tabs.short])
-
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
+
+  const holdings = balances.map(balance => balance.holdings)
+  const holdingsOfSoldOutcome = holdings[positionIndex]
+  const holdingsOfOtherOutcome = holdings.filter((item, index) => {
+    return index !== positionIndex
+  })
 
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
     ): Promise<[Maybe<BigNumber>, Maybe<number>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
-      let tradedShares: BigNumber
-      let reverseTradedShares: BigNumber
-
-      const holdings = balances.map(balance => balance.holdings)
-      const holdingsOfSoldOutcome = holdings[positionIndex]
-      const holdingsOfOtherOutcome = holdings.filter((item, index) => {
-        return index !== positionIndex
-      })
-
       const amountToSell = calcSellAmountInCollateral(
         // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
         amountShares,
@@ -263,7 +250,7 @@ export const ScalarMarketSell = (props: Props) => {
         border={true}
         collateral={collateral}
         currentPrediction={outcomeTokenMarginalPrices[1]}
-        long={activeTab === Tabs.long}
+        long={positionIndex === 1}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
         // potentialLoss={potentialLossUncapped}
@@ -276,19 +263,19 @@ export const ScalarMarketSell = (props: Props) => {
         <div>
           <TabsGrid>
             <ButtonTab
-              active={activeTab === Tabs.short}
+              active={positionIndex === 0}
               onClick={() => {
-                setActiveTab(Tabs.short)
                 setBalanceItem(balances[0])
+                setPositionIndex(0)
               }}
             >
               Short
             </ButtonTab>
             <ButtonTab
-              active={activeTab === Tabs.long}
+              active={positionIndex === 1}
               onClick={() => {
-                setActiveTab(Tabs.long)
                 setBalanceItem(balances[1])
+                setPositionIndex(1)
               }}
             >
               Long
