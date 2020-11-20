@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
@@ -7,18 +8,6 @@ import { Status } from '../util/types'
 
 const fragment = gql`
   fragment TransactionFields on FpmmTransaction {
-    #    id
-    #    user {
-    #      id
-    #    }
-    #    transactionType
-    #    collateralAmount
-    #    collateralTokenAddress
-    #    collateralAmountUSD
-    #    collateralTokenAmount
-    #    creationTimestamp
-    #    transactionHash
-    #    fpmmType
     id
     user {
       id
@@ -73,7 +62,7 @@ export type FpmmTradeDataType = {
   }
   collateralTokenAddress: string
   sharesOrPoolTokenAmount: BigNumber
-  collateralTokenAmount: string
+  collateralTokenAmount: BigNumber
   creationTimestamp: string
   transactionHash: string
   fpmmType: string
@@ -89,7 +78,7 @@ interface FpmmTradeData {
   }
   collateralTokenAddress: string
   sharesOrPoolTokenAmount: BigNumber
-  collateralTokenAmount: string
+  collateralTokenAmount: BigNumber
   creationTimestamp: string
   transactionHash: string
   fpmmType: string
@@ -103,7 +92,6 @@ interface Result {
 }
 const wrangleResponse = (data: any) => {
   return data.map((trade: FpmmTradeData) => {
-    console.log(trade)
     return {
       id: trade.id,
       transactionType:
@@ -114,9 +102,9 @@ const wrangleResponse = (data: any) => {
           : trade.transactionType,
       user: trade.user.id,
       collateralTokenAddress: trade.fpmm.collateralToken,
-      sharesOrPoolTokenAmount: trade.sharesOrPoolTokenAmount,
+      sharesOrPoolTokenAmount: parseFloat(ethers.utils.formatEther(trade.sharesOrPoolTokenAmount)).toFixed(2),
       creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
-      collateralTokenAmount: Number(trade.collateralTokenAmount),
+      collateralTokenAmount: parseFloat(ethers.utils.formatEther(trade.collateralTokenAmount)).toFixed(2),
       transactionHash: trade.transactionHash,
     }
   })

@@ -345,6 +345,20 @@ export const formatNumber = (number: string, decimals = 2): string => {
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }
 
+export const formatHistoryDate = (dateData: string) => {
+  const date = new Date(dateData)
+  const minute = date.getMinutes()
+  const minuteWithZero = (minute < 10 ? '0' : '') + minute
+  const hour = date.getHours()
+  const hourWithZero = (hour < 10 ? '0' : '') + hour
+  return `${date.getDate()}.${date.getMonth()} - ${hourWithZero}:${minuteWithZero}`
+}
+
+export const formatHistoryUser = (user: any) => {
+  // console.log(user.splice(2, 5), typeof user)
+  console.log('issue with typescript needs more looking into', user)
+}
+
 export const formatToShortNumber = (number: string, decimals = 2): string => {
   if (number.length < 1) {
     return '0'

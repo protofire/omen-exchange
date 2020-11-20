@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { formatHistoryDate, formatHistoryUser } from '../../../../util/tools'
 import { Button } from '../../../button'
 import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
 
@@ -93,15 +93,6 @@ export const HistoryTable: React.FC<Props> = ({
 
   const windowObj: any = window
 
-  const dateFormatter = (dateData: string) => {
-    const date = new Date(dateData)
-    const minute = date.getMinutes()
-    const minuteWithZero = (minute < 10 ? '0' : '') + minute
-    const hour = date.getHours()
-    const hourWithZero = (hour < 10 ? '0' : '') + hour
-    return `${date.getDate()}.${date.getMonth()} - ${hourWithZero}:${minuteWithZero}`
-  }
-
   return (
     <React.Fragment>
       <TableWrapper>
@@ -128,7 +119,7 @@ export const HistoryTable: React.FC<Props> = ({
               user,
             }) => {
               const chainID = windowObj.ethereum.chainId
-              console.log(sharesOrPoolTokenAmount)
+
               const token = tokens.find(({ address }) => address.toLowerCase() === collateralTokenAddress)
 
               const mainnetOrRinkebyUrl =
@@ -137,7 +128,7 @@ export const HistoryTable: React.FC<Props> = ({
                   : chainID === '0x1'
                   ? 'https://etherscan.io/tx/'
                   : ''
-
+              formatHistoryUser(user)
               return (
                 <HistoryColumns key={id}>
                   <HistoryRow width={'25'}>
@@ -145,13 +136,13 @@ export const HistoryTable: React.FC<Props> = ({
                     <span>{user}</span>
                   </HistoryRow>
                   <HistoryRow width={'18'}>{transactionType}</HistoryRow>
-                  <HistoryRow width={'20'}>{formatNumber(formatBigNumber(sharesOrPoolTokenAmount, 3))}</HistoryRow>
+                  <HistoryRow width={'20'}>{sharesOrPoolTokenAmount}</HistoryRow>
                   <HistoryRow width={'22'}>
                     {collateralTokenAmount}
                     {token ? ` ${token.symbol}` : ''}
                   </HistoryRow>
                   <HistoryRow as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank" width={'18'}>
-                    {dateFormatter(creationTimestamp)}
+                    {formatHistoryDate(creationTimestamp)}
                   </HistoryRow>
                 </HistoryColumns>
               )
