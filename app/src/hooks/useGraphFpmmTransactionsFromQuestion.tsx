@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
@@ -6,18 +7,31 @@ import { Status } from '../util/types'
 
 const fragment = gql`
   fragment TransactionFields on FpmmTransaction {
+    #    id
+    #    user {
+    #      id
+    #    }
+    #    transactionType
+    #    collateralAmount
+    #    collateralTokenAddress
+    #    collateralAmountUSD
+    #    collateralTokenAmount
+    #    creationTimestamp
+    #    transactionHash
+    #    fpmmType
     id
     user {
       id
     }
+    fpmm {
+      collateralToken
+    }
+    fpmmType
     transactionType
-    collateralAmount
-    collateralTokenAddress
-    collateralAmountUSD
     collateralTokenAmount
+    sharesOrPoolTokenAmount
     creationTimestamp
     transactionHash
-    fpmmType
   }
 `
 const withFpmmType = gql`
@@ -54,10 +68,12 @@ export type FpmmTradeDataType = {
   user: {
     id: string
   }
-  collateralAmount: string
+  fpmm: {
+    collateralToken: string
+  }
   collateralTokenAddress: string
+  sharesOrPoolTokenAmount: BigNumber
   collateralTokenAmount: string
-  collateralAmountUSD: number
   creationTimestamp: string
   transactionHash: string
   fpmmType: string
@@ -68,10 +84,12 @@ interface FpmmTradeData {
   user: {
     id: string
   }
-  collateralAmount: string
+  fpmm: {
+    collateralToken: string
+  }
   collateralTokenAddress: string
+  sharesOrPoolTokenAmount: BigNumber
   collateralTokenAmount: string
-  collateralAmountUSD: number
   creationTimestamp: string
   transactionHash: string
   fpmmType: string
@@ -85,6 +103,7 @@ interface Result {
 }
 const wrangleResponse = (data: any) => {
   return data.map((trade: FpmmTradeData) => {
+    console.log(trade)
     return {
       id: trade.id,
       transactionType:
@@ -94,9 +113,8 @@ const wrangleResponse = (data: any) => {
           ? 'Withdraw'
           : trade.transactionType,
       user: trade.user.id,
-      collateralAmountUSD: Number(trade.collateralAmountUSD).toFixed(2),
-      collateralAmount: trade.collateralAmount,
-      collateralTokenAddress: trade.collateralTokenAddress,
+      collateralTokenAddress: trade.fpmm.collateralToken,
+      sharesOrPoolTokenAmount: trade.sharesOrPoolTokenAmount,
       creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
       collateralTokenAmount: Number(trade.collateralTokenAmount),
       transactionHash: trade.transactionHash,

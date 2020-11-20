@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
-import { formatNumber } from '../../../../util/tools'
+import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { Button } from '../../../button'
 import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
 
@@ -118,17 +118,17 @@ export const HistoryTable: React.FC<Props> = ({
           fpmmTrade &&
           fpmmTrade.map(
             ({
-              collateralAmount,
-              collateralAmountUSD,
               collateralTokenAddress,
+              collateralTokenAmount,
               creationTimestamp,
               id,
+              sharesOrPoolTokenAmount,
               transactionHash,
               transactionType,
               user,
             }) => {
               const chainID = windowObj.ethereum.chainId
-
+              console.log(sharesOrPoolTokenAmount)
               const token = tokens.find(({ address }) => address.toLowerCase() === collateralTokenAddress)
 
               const mainnetOrRinkebyUrl =
@@ -145,9 +145,9 @@ export const HistoryTable: React.FC<Props> = ({
                     <span>{user}</span>
                   </HistoryRow>
                   <HistoryRow width={'18'}>{transactionType}</HistoryRow>
-                  <HistoryRow width={'20'}>{formatNumber(collateralAmount)}</HistoryRow>
+                  <HistoryRow width={'20'}>{formatNumber(formatBigNumber(sharesOrPoolTokenAmount, 3))}</HistoryRow>
                   <HistoryRow width={'22'}>
-                    {collateralAmountUSD}
+                    {collateralTokenAmount}
                     {token ? ` ${token.symbol}` : ''}
                   </HistoryRow>
                   <HistoryRow as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank" width={'18'}>
