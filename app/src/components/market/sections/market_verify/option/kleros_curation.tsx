@@ -25,29 +25,58 @@ const Bold = styled.b`
 `
 
 const IconStatusWrapper = styled.div`
+  cursor: pointer;
   margin-left: 8px;
 `
 
 const TimeRemainingContainer = styled.div`
   display: flex;
+  width: fit-content;
+  margin-left: auto;
+  cursor: pointer;
   align-items: center;
   justify-content: flex-end;
   text-transform: lowercase;
-  color: ${props => props.theme.colors.textColorDark};
+  color: ${props => props.theme.colors.clickable};
+  &:hover {
+    color: ${props => props.theme.colors.primaryLight};
+    svg {
+      path {
+        fill: ${props => props.theme.colors.primaryLight};
+      }
+    }
+  }
 `
 
-const StatusContainer = styled.div`
+const StatusContainer = styled.div<{ challenge?: boolean }>`
   display: flex;
+  width: fit-content;
+  margin-left: auto;
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
   text-transform: lowercase;
   font-size: 14px;
+  &:hover {
+    svg {
+      path {
+        ${props => (props.challenge ? `fill:${props.theme.colors.primaryLight};` : '')}
+      }
+    }
+
+    a {
+      color: ${props => props.theme.colors.primaryLight};
+    }
+    & a:nth-child(2) {
+      background-color: ${props => (!props.challenge ? props.theme.colors.primaryLight : '')};
+    }
+  }
 `
 
 const IconWrapper = styled.div`
+  cursor: pointer;
   border-radius: 50%;
-  background-color: ${props => props.theme.colors.green};
+  background-color: ${props => props.theme.colors.clickable};
   width: 16px;
   height: 16px;
   padding: 3px;
@@ -59,7 +88,11 @@ const IconWrapper = styled.div`
     height: 100%;
   }
 `
-
+const SuccessVerify = styled.a`
+  cursor: pointer;
+  color: ${props => props.theme.colors.clickable};
+  font-weight: ${props => props.theme.textfield.fontWeight};
+`
 const Description = styled.div`
   align-items: center;
   border-radius: 4px;
@@ -79,12 +112,8 @@ const DescriptionText = styled.p`
   margin: 0;
 `
 
-const SuccessVerify = styled.span`
-  color: ${props => props.theme.colors.green};
-  font-weight: ${props => props.theme.textfield.fontWeight};
-`
-
 const BlueLink = styled.a`
+  cursor: pointer;
   color: ${props => props.theme.colors.clickable};
   font-weight: ${props => props.theme.textfield.fontWeight};
 `
@@ -122,6 +151,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
   const { itemID, submissionTime = 0, verificationState: status } = marketVerificationData || {}
   const deadline = submissionTime + Number(challengePeriodDuration)
   const timeRemaining = Math.max(0, deadline * 1000 - Date.now())
+  const baseKlerosLink = `https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`
 
   const submissionTimeUTC = moment(new Date(Number(submissionTime) * 1000))
     .tz('UTC')
@@ -141,7 +171,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
             <BlueLink href={DOCUMENT_VALIDITY_RULES} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>{' '}
-            to avoid challenges. The <Bold>{formatEther(submissionDeposit)}</Bold> ETH security deposit will be
+            to avoid challenges. The <Bold>{formatEther(submissionDeposit)} ETH</Bold> security deposit will be
             reimbursed if your submission is accepted. The challenge period lasts{' '}
             <Bold>{moment.duration(Number(challengePeriodDuration) * 1000).humanize()}</Bold>.
           </DescriptionText>
@@ -172,11 +202,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
           </DescriptionText>
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondaryLine}>
-              <UnstyledLink
-                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}?action=challenge`}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
+              <UnstyledLink href={`${baseKlerosLink}?action=challenge`} rel="noopener noreferrer" target="_blank">
                 Challenge
               </UnstyledLink>
             </RightButton>
@@ -185,7 +211,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       )
       KlerosRightColumn = (
         <CurationRightColumn>
-          <TimeRemainingContainer>
+          <TimeRemainingContainer as="a" href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
             Ends in {moment.duration(timeRemaining).humanize()}
             <IconStatusWrapper>
               <IconSchedule />
@@ -210,11 +236,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
           </DescriptionText>
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondary}>
-              <UnstyledLink
-                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}?action=challenge`}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
+              <UnstyledLink href={`${baseKlerosLink}?action=challenge`} rel="noopener noreferrer" target="_blank">
                 Challenge
               </UnstyledLink>
             </RightButton>
@@ -223,7 +245,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       )
       KlerosRightColumn = (
         <CurationRightColumn>
-          <TimeRemainingContainer>
+          <TimeRemainingContainer as="a" href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
             Ends in {moment.duration(timeRemaining).humanize()}{' '}
             <IconStatusWrapper>
               <IconSchedule />
@@ -238,9 +260,11 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       klerosDetails = `Market validity challenged`
       KlerosRightColumn = (
         <CurationRightColumn>
-          <StatusContainer>
-            <BlueLink href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`}>challenge details </BlueLink>
-            <IconStatusWrapper>
+          <StatusContainer challenge={true}>
+            <BlueLink href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
+              challenge details{' '}
+            </BlueLink>
+            <IconStatusWrapper as="a" href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
               <IconExclamation />
             </IconStatusWrapper>
           </StatusContainer>
@@ -262,11 +286,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
           </DescriptionText>
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondaryLine}>
-              <UnstyledLink
-                href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}?action=remove`}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
+              <UnstyledLink href={`${baseKlerosLink}?action=remove`} rel="noopener noreferrer" target="_blank">
                 Remove Market
               </UnstyledLink>
             </RightButton>
@@ -276,14 +296,11 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
 
       KlerosRightColumn = (
         <CurationRightColumn>
-          <StatusContainer
-            as="a"
-            href={`https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            <SuccessVerify>verified</SuccessVerify>
-            <IconWrapper>
+          <StatusContainer>
+            <SuccessVerify href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
+              verified
+            </SuccessVerify>
+            <IconWrapper as="a" href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
               <IconTick />
             </IconWrapper>
           </StatusContainer>
