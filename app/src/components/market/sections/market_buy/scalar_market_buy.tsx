@@ -36,6 +36,11 @@ import { WarningMessage } from '../../common/warning_message'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
+  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
+  margin-left: -25px;
+  margin-right: -25px;
+  padding-left: 25px;
+  padding-right: 25px;
 `
 
 const logger = getLogger('Scalar Market::Buy')
