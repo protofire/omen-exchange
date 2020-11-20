@@ -68,6 +68,12 @@ interface CPKRedeemParams {
   conditionalTokens: ConditionalTokenService
 }
 
+interface CPKRequestVerificationParams {
+  params: string
+  ovmAddress: string
+  submissionDeposit: string
+}
+
 class CPKService {
   cpk: any
   provider: Web3Provider
@@ -412,7 +418,7 @@ class CPKService {
       throw err
     }
   }
-  requestVerification = async (marketData: any, params: any, ovmAddress: any, submissionDeposit: any) => {
+  requestVerification = async ({ ovmAddress, params, submissionDeposit }: CPKRequestVerificationParams) => {
     try {
       const signer = this.provider.getSigner()
       const ovm = new OvmService()
@@ -437,7 +443,7 @@ class CPKService {
     numOutcomes,
     oracle,
     question,
-  }: CPKRedeemParams): Promise<TransactionReceipt> => {
+  }: CPKRedeemParams) => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
@@ -471,6 +477,7 @@ class CPKService {
     } catch (err) {
       logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
       throw err
+      return false
     }
   }
 }

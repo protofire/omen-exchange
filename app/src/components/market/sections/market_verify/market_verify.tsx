@@ -83,12 +83,16 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
       }
 
       const encodedParams = gtcrEncode({ columns, values })
-      if (!cpk || !marketMakerData || !data) {
+      if (!cpk || !marketMakerData || !data || !ovmAddress) {
         setIsModalOpen(false)
         return
       }
 
-      await cpk.requestVerification(marketMakerData, encodedParams, ovmAddress, data.submissionDeposit)
+      await cpk.requestVerification({
+        params: encodedParams,
+        submissionDeposit: data.submissionDeposit,
+        ovmAddress,
+      })
     } catch {
       setIsModalOpen(false)
     }

@@ -8,11 +8,10 @@ class OvmService {
     this.abi = abi
   }
 
-  createOvmContractInstance = async (signer: any, ovmAddress: any) => {
-    const contract = new ethers.Contract(ovmAddress, this.abi, signer)
-    return contract
+  createOvmContractInstance = async (signer: ethers.providers.JsonRpcSigner, ovmAddress: string) => {
+    return new ethers.Contract(ovmAddress, this.abi, signer)
   }
-  generateTransaction = async (params: any, contract: any, deposit: any) => {
+  generateTransaction = async (params: string, contract: any, deposit: string) => {
     try {
       if (!params || !contract || !deposit) return false
       const transaction = await contract.addItem(params, {
