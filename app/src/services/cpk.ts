@@ -443,7 +443,7 @@ class CPKService {
     numOutcomes,
     oracle,
     question,
-  }: CPKRedeemParams) => {
+  }: CPKRedeemParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
@@ -477,7 +477,6 @@ class CPKService {
     } catch (err) {
       logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
       throw err
-      return false
     }
   }
 }

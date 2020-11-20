@@ -60,7 +60,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   const { address, curatedByDxDao, question } = marketMakerData || {}
   const { title } = question || {}
   useEffect(() => {
-    if (isModalOpen && verificationState) setIsModalOpen(false)
+    if (isModalOpen && verificationState != 1) setIsModalOpen(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marketVerificationData])
   const onSubmitMarket = useCallback(async () => {
