@@ -1,13 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ItemTypes, gtcrEncode } from '@kleros/gtcr-encoder'
-import { abi as _GeneralizedTCR } from '@kleros/tcr/build/contracts/GeneralizedTCR.json'
-import { ethers } from 'ethers'
-import { Web3Provider } from 'ethers/providers'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { ConnectedWeb3Context } from '../../../../hooks'
+import { ConnectedWeb3Context, useCpk } from '../../../../hooks'
 import { useKlerosCuration } from '../../../../hooks/useKlerosCuration'
 import { MarketMakerData, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
@@ -43,7 +40,9 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   const [selection, setSelection] = useState<number | undefined>()
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const { data, error, status } = useKlerosCuration(marketMakerData, context)
+
   const history = useHistory()
+  const cpk = useCpk()
 
   const selectSource = useCallback(
     (value: number) => {
@@ -55,29 +54,18 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const loading = status === Status.Loading && !data
-  const { ovmAddress } = data || {}
+  const { marketVerificationData, ovmAddress } = data || {}
+  const verificationState = marketVerificationData ? marketVerificationData.verificationState : false
   const { message: errorMessage } = error || {}
   const { address, curatedByDxDao, question } = marketMakerData || {}
   const { title } = question || {}
-  console.log(ethers)
-  const ovmInstance = useMemo(() => {
-    if (!context || !context.account || !ovmAddress) {
-      console.log('nagrabusio')
-      return
-    }
-    console.log(context)
-    const signer = context.library.getSigner()
-    setIsModalOpen(false)
-    return new ethers.Contract(ovmAddress, _GeneralizedTCR, signer)
-  }, [context, ovmAddress])
-
+  useEffect(() => {
+    if (isModalOpen && verificationState) setIsModalOpen(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [marketVerificationData])
   const onSubmitMarket = useCallback(async () => {
     try {
       setIsModalOpen(true)
-      if (!ovmInstance || !data) {
-        setIsModalOpen(false)
-        return
-      }
 
       const columns = [
         {
@@ -95,22 +83,16 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
       }
 
       const encodedParams = gtcrEncode({ columns, values })
+      if (!cpk || !marketMakerData || !data) {
+        setIsModalOpen(false)
+        return
+      }
 
-      const transaction = await ovmInstance.addItem(encodedParams, {
-        value: ethers.utils.bigNumberify(data.submissionDeposit),
-      })
-
-      await ethers.getDefaultProvider().waitForTransaction(transaction.hash)
-
-      // await Web3Provider.waitForTransaction(transaction)
-      console.log('AFTER AWIAT SKF KSJFKSJFKJSKJKJSFKJFSKJ')
-      setIsModalOpen(false)
-      console.log(transaction)
-    } catch (e) {
-      console.log(e, 'herhehrehrherhe')
+      await cpk.requestVerification(marketMakerData, encodedParams, ovmAddress, data.submissionDeposit)
+    } catch {
       setIsModalOpen(false)
     }
-  }, [address, data, ovmInstance, title])
+  }, [address, data, ovmAddress, title, marketMakerData, cpk])
 
   if (!loading && errorMessage) return <GenericError>{errorMessage || 'Failed to fetch curation data'}</GenericError>
 
@@ -132,13 +114,13 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
         </Button>
         <Button
           buttonType={ButtonType.primaryAlternative}
-          disabled={loading || typeof selection !== 'number' || !ovmInstance}
+          disabled={loading || typeof selection !== 'number' || !ovmAddress || verificationState != 1}
           onClick={onSubmitMarket}
         >
           Request Verification
         </Button>
       </BottomButtonWrapper>
-      {isModalOpen && <FullLoading message={'Requesting Market Removal'} />}
+      {isModalOpen && <FullLoading message={`Requesting ${selection === 0 ? `Kleros` : `DxDao`} verification`} />}
     </MarketVerification>
   )
 }
