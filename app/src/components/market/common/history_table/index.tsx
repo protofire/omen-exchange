@@ -1,3 +1,4 @@
+import { formatEther, formatUnits } from 'ethers/utils'
 import React from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
@@ -136,9 +137,11 @@ export const HistoryTable: React.FC<Props> = ({
                     <span>{user}</span>
                   </HistoryRow>
                   <HistoryRow width={'18'}>{transactionType}</HistoryRow>
-                  <HistoryRow width={'20'}>{sharesOrPoolTokenAmount}</HistoryRow>
+                  <HistoryRow width={'20'}>
+                    {formatUnits(sharesOrPoolTokenAmount, token ? token.decimals : '18')}
+                  </HistoryRow>
                   <HistoryRow width={'22'}>
-                    {collateralTokenAmount}
+                    {formatEther(collateralTokenAmount)}
                     {token ? ` ${token.symbol}` : ''}
                   </HistoryRow>
                   <HistoryRow as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank" width={'18'}>

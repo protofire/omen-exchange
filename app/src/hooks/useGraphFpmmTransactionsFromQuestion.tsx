@@ -1,5 +1,4 @@
 import { useQuery } from '@apollo/react-hooks'
-import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
@@ -102,9 +101,9 @@ const wrangleResponse = (data: any) => {
           : trade.transactionType,
       user: trade.user.id,
       collateralTokenAddress: trade.fpmm.collateralToken,
-      sharesOrPoolTokenAmount: parseFloat(ethers.utils.formatEther(trade.sharesOrPoolTokenAmount)).toFixed(2),
+      sharesOrPoolTokenAmount: trade.sharesOrPoolTokenAmount,
       creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
-      collateralTokenAmount: parseFloat(ethers.utils.formatEther(trade.collateralTokenAmount)).toFixed(2),
+      collateralTokenAmount: trade.collateralTokenAmount,
       transactionHash: trade.transactionHash,
     }
   })
@@ -128,7 +127,7 @@ export const useGraphFpmmTransactionsFromQuestion = (
       pageIndex: pageIndex,
       fpmmType: type === 1 ? 'Liquidity' : 'Trade',
     },
-    onCompleted: ({ fpmmTransactions }: any) => {
+    onCompleted: async ({ fpmmTransactions }: any) => {
       setMorePagination(fpmmTransactions.length === pageSize)
       setFpmmTradeData(wrangleResponse(fpmmTransactions))
     },
