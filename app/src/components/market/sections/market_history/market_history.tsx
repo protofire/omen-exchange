@@ -17,6 +17,7 @@ const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
       <HistoryChartContainer
         answerFinalizedTimestamp={answerFinalizedTimestamp}
         currency={collateral.symbol}
+        decimals={collateral.decimals}
         hidden={false}
         marketMakerAddress={marketMakerAddress}
         outcomes={question.outcomes}

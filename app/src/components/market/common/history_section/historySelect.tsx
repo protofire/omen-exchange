@@ -75,6 +75,7 @@ type Props = {
   value: Period
   currency: string
   marketMakerAddress: string
+  decimals: number
 }
 
 const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
@@ -100,6 +101,7 @@ const timestampToDate = (timestamp: number, value: string) => {
 
 export const HistorySelect: React.FC<Props> = ({
   currency,
+  decimals,
   holdingSeries,
   marketMakerAddress,
   onChange,
@@ -148,6 +150,7 @@ export const HistorySelect: React.FC<Props> = ({
     pageSize,
     pageIndex,
     type,
+    decimals,
   )
   useEffect(() => {
     setPageIndex(0)

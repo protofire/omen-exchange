@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, formatUnits } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
@@ -89,7 +89,7 @@ interface Result {
   paginationNext: boolean
   refetch: any
 }
-const wrangleResponse = (data: any) => {
+const wrangleResponse = (data: any, decimals: number) => {
   return data.map((trade: FpmmTradeData) => {
     return {
       id: trade.id,
@@ -101,9 +101,9 @@ const wrangleResponse = (data: any) => {
           : trade.transactionType,
       user: trade.user.id,
       collateralTokenAddress: trade.fpmm.collateralToken,
-      sharesOrPoolTokenAmount: trade.sharesOrPoolTokenAmount,
+      sharesOrPoolTokenAmount: parseFloat(formatUnits(trade.sharesOrPoolTokenAmount, decimals)).toFixed(2),
       creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
-      collateralTokenAmount: trade.collateralTokenAmount,
+      collateralTokenAmount: parseFloat(formatUnits(trade.collateralTokenAmount, decimals)).toFixed(2),
       transactionHash: trade.transactionHash,
     }
   })
@@ -114,6 +114,7 @@ export const useGraphFpmmTransactionsFromQuestion = (
   pageSize: number,
   pageIndex: number,
   type: number,
+  decimals: number,
 ): Result => {
   const [fpmmTradeData, setFpmmTradeData] = useState<Maybe<FpmmTradeData[]>>(null)
   const [morePagination, setMorePagination] = useState<boolean>(false)
@@ -129,7 +130,7 @@ export const useGraphFpmmTransactionsFromQuestion = (
     },
     onCompleted: async ({ fpmmTransactions }: any) => {
       setMorePagination(fpmmTransactions.length === pageSize)
-      setFpmmTradeData(wrangleResponse(fpmmTransactions))
+      setFpmmTradeData(wrangleResponse(fpmmTransactions, decimals))
     },
   })
 
@@ -138,7 +139,7 @@ export const useGraphFpmmTransactionsFromQuestion = (
   }, [questionID, type])
 
   if (data && data.fpmmTrades && fpmmTradeData === null) {
-    setFpmmTradeData(wrangleResponse(data.fpmmTrades))
+    setFpmmTradeData(wrangleResponse(data.fpmmTrades, decimals))
   }
 
   return {

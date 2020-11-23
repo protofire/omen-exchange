@@ -1,9 +1,7 @@
-import { formatEther, formatUnits } from 'ethers/utils'
 import React from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
 import { formatHistoryDate, formatHistoryUser } from '../../../../util/tools'
 import { Button } from '../../../button'
@@ -89,8 +87,6 @@ export const HistoryTable: React.FC<Props> = ({
   status,
 }) => {
   const history = useHistory()
-  const context = useConnectedWeb3Context()
-  const tokens = useTokens(context)
 
   const windowObj: any = window
 
@@ -110,7 +106,6 @@ export const HistoryTable: React.FC<Props> = ({
           fpmmTrade &&
           fpmmTrade.map(
             ({
-              collateralTokenAddress,
               collateralTokenAmount,
               creationTimestamp,
               id,
@@ -120,8 +115,6 @@ export const HistoryTable: React.FC<Props> = ({
               user,
             }) => {
               const chainID = windowObj.ethereum.chainId
-
-              const token = tokens.find(({ address }) => address.toLowerCase() === collateralTokenAddress)
 
               const mainnetOrRinkebyUrl =
                 chainID === '0x4'
@@ -137,12 +130,10 @@ export const HistoryTable: React.FC<Props> = ({
                     <span>{user}</span>
                   </HistoryRow>
                   <HistoryRow width={'18'}>{transactionType}</HistoryRow>
-                  <HistoryRow width={'20'}>
-                    {formatUnits(sharesOrPoolTokenAmount, token ? token.decimals : '18')}
-                  </HistoryRow>
+                  <HistoryRow width={'20'}>{sharesOrPoolTokenAmount}</HistoryRow>
                   <HistoryRow width={'22'}>
-                    {formatEther(collateralTokenAmount)}
-                    {token ? ` ${token.symbol}` : ''}
+                    {collateralTokenAmount}
+                    {` ${currency}`}
                   </HistoryRow>
                   <HistoryRow as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank" width={'18'}>
                     {formatHistoryDate(creationTimestamp)}
