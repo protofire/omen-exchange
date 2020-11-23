@@ -94,7 +94,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
     <MarketVerification>
       {loading || !data ? (
         <CurationRow>
-          <CustomInlineLoading big message="Loading Curation Services" />
+          <CustomInlineLoading message="Loading Curation Services" />
         </CurationRow>
       ) : (
         <>

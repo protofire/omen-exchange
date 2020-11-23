@@ -341,7 +341,7 @@ export const ImportMarketContent = (props: Props) => {
       <EmptyWrapper>
         {state.loading && (
           <>
-            <SpinnerStyled height={'38px'} width={'38px'} />
+            <SpinnerStyled size="38" />
             <CommentLabel>
               importing market from{' '}
               <a href={realitioBaseUrl} target="_blink">
