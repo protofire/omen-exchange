@@ -99,7 +99,9 @@ const wrangleResponse = (data: any, decimals: number) => {
           : trade.transactionType === 'Remove'
           ? 'Withdraw'
           : trade.transactionType,
-      user: trade.user.id,
+      user: {
+        id: trade.user.id,
+      },
       collateralTokenAddress: trade.fpmm.collateralToken,
       sharesOrPoolTokenAmount: parseFloat(formatUnits(trade.sharesOrPoolTokenAmount, decimals)).toFixed(2),
       creationTimestamp: 1000 * parseInt(trade.creationTimestamp),

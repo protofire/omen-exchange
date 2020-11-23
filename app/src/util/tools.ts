@@ -355,8 +355,11 @@ export const formatHistoryDate = (dateData: string) => {
 }
 
 export const formatHistoryUser = (user: any) => {
-  // // console.log(user.splice(2, 5), typeof user)
-  // console.log('issue with typescript needs more looking into', user)
+  const string = user.id
+  const firstStringPart = string ? string.substring(0, 5) + '...' : ''
+  const lastPart = string ? string.substring(string.length - 3, string.length) : ''
+
+  return firstStringPart + lastPart
 }
 
 export const formatToShortNumber = (number: string, decimals = 2): string => {
