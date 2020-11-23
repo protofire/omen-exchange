@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { useAsyncDerivedValue, useContracts, useMarketMakerData } from '../../../../../../hooks'
 import { ConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
+import { useRealityLink } from '../../../../../../hooks/useRealityLink'
 import { getArbitratorFromAddress } from '../../../../../../util/networks'
 import { formatDate } from '../../../../../../util/tools'
 import { Arbitrator, BalanceItem, Question, Status } from '../../../../../../util/types'
@@ -88,13 +89,13 @@ const TitleValueVertical = styled(TitleValue)`
   text-transform: capitalize;
 
   > h2 {
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     line-height: 16px;
   }
 
   > p {
     text-align: left;
-    line-height: 16px;
+    line-height: 22px;
     margin: 0;
   }
 `
@@ -136,9 +137,10 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const ImportMarketContent = (props: Props) => {
   const { context, handleClearQuestion, handleOutcomesChange, loadedQuestionId, onSave, outcomes } = props
   const { realitio } = useContracts(context)
+  const realitioBaseUrl = useRealityLink()
 
   const [state, setState] = useState<{ questionURL: string; loading: boolean }>({
-    questionURL: loadedQuestionId ? `http://reality.eth.link/app/#!/question/${loadedQuestionId}` : '',
+    questionURL: loadedQuestionId ? `${realitioBaseUrl}/app/#!/question/${loadedQuestionId}` : '',
     loading: false,
   })
 
@@ -157,8 +159,6 @@ export const ImportMarketContent = (props: Props) => {
 
     return questionMatch ? questionMatch[1] : ''
   }
-
-  const isWeb3Connected = !!context.account
 
   const fetchQuestion = useMemo(
     () => async (): Promise<[Maybe<Question>, Maybe<Arbitrator>, Maybe<string>]> => {
@@ -336,7 +336,7 @@ export const ImportMarketContent = (props: Props) => {
     if (validContent) {
       return questionDetails()
     }
-    const link = isWeb3Connected ? 'reality.eth' : 'reality.eth.link'
+
     return (
       <EmptyWrapper>
         {state.loading && (
@@ -344,8 +344,8 @@ export const ImportMarketContent = (props: Props) => {
             <SpinnerStyled height={'38px'} width={'38px'} />
             <CommentLabel>
               importing market from{' '}
-              <a href={`https://${link}`} target="_blink">
-                {link}
+              <a href={realitioBaseUrl} target="_blink">
+                {realitioBaseUrl}
               </a>
             </CommentLabel>
           </>
@@ -358,8 +358,8 @@ export const ImportMarketContent = (props: Props) => {
               <IconReality />
               <CommentLabel>
                 Import Market from{' '}
-                <a href={`https://${link}`} target="_blink">
-                  {link}
+                <a href={realitioBaseUrl} target="_blink">
+                  {realitioBaseUrl}
                 </a>
               </CommentLabel>
             </>
@@ -395,7 +395,7 @@ export const ImportMarketContent = (props: Props) => {
               const { value } = event.target
               setQuestionURL(value.trim())
             }}
-            placeholder="https://reality.eth.link/app/#!/..."
+            placeholder={`${realitioBaseUrl}/app/#!/...`}
             type="text"
             value={state.questionURL}
           />

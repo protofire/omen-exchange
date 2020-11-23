@@ -338,7 +338,7 @@ export const formatNumber = (number: string, decimals = 2): string => {
     return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
 
-  const fixedInt = parseFloat(number).toFixed(decimals)
+  const fixedInt = parseFloat(number.split(',').join('')).toFixed(decimals)
   const splitFixedInt = fixedInt.split('.')[0]
   const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 
@@ -352,7 +352,7 @@ export const formatToShortNumber = (number: string, decimals = 2): string => {
 
   const units = ['', 'K', 'M', 'B', 'T']
   let unitIndex = 0
-  let rNumber = parseFloat(number)
+  let rNumber = parseFloat(number.split(',').join(''))
 
   while (rNumber >= 1000 && unitIndex < 5) {
     unitIndex += 1
@@ -361,3 +361,40 @@ export const formatToShortNumber = (number: string, decimals = 2): string => {
 
   return `${parseFloat(rNumber.toFixed(decimals))}${units[unitIndex]}`
 }
+
+export const isObjectEqual = (obj1?: any, obj2?: any): boolean => {
+  if (!obj1 && obj2) return false
+  if (!obj2 && obj1) return false
+  if (!obj1 && !obj2) return true
+  if (typeof obj1 !== typeof obj2) return false
+
+  if (typeof obj1 !== 'object' && !Array.isArray(obj1)) {
+    return obj1 === obj2
+  }
+
+  if (Array.isArray(obj1)) {
+    if (obj1.length !== obj2.length) return false
+    for (let index = 0; index < obj1.length; index += 1) {
+      if (!isObjectEqual(obj1[index], obj2[index])) return false
+    }
+    return true
+  }
+
+  const keys1 = Object.keys(obj1)
+  const keys2 = Object.keys(obj2)
+
+  if (keys1.length !== keys2.length) return false
+
+  for (let keyIndex = 0; keyIndex < keys1.length; keyIndex += 1) {
+    const key = keys1[keyIndex]
+    if (typeof obj1[key] !== typeof obj2[key]) return false
+    if (!isObjectEqual(obj1[key], obj2[key])) return false
+  }
+
+  return true
+}
+
+export const waitABit = (milli = 1000) =>
+  new Promise(resolve => {
+    setTimeout(resolve, milli)
+  })

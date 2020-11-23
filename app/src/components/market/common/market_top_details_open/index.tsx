@@ -3,8 +3,10 @@ import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
-import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
+import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
+import theme from '../../../../theme'
 import { MarketMakerData, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { MoreMenu } from '../../../common/form/more_menu'
@@ -17,6 +19,10 @@ import { ProgressBarToggle } from '../progress_bar/toggle'
 const SubsectionTitleLeftWrapper = styled.div`
   display: flex;
   align-items: center;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex-grow: 1;
+  }
   & > * + * {
     margin-left: 12px;
   }
@@ -35,34 +41,31 @@ interface Props {
 
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { width } = useWindowDimensions()
+  const isMobile = width <= parseInt(theme.themeBreakPoints.sm)
+
   const [showingProgressBar, setShowingProgressBar] = useState(false)
   const history = useHistory()
 
   const { marketMakerData } = props
   const {
-    address,
     answerFinalizedTimestamp,
     arbitrator,
     collateral,
     collateralVolume,
+    creationTimestamp,
     curatedByDxDaoOrKleros: isVerified,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
+    scaledLiquidityParameter,
   } = marketMakerData
-
-  const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
-  const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
-    ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
-    : ''
 
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
   const currentTimestamp = new Date().getTime()
 
-  const formattedLiquidity: string = useGraphMarketMakerDataResult.marketMakerData
-    ? useGraphMarketMakerDataResult.marketMakerData.scaledLiquidityParameter.toFixed(2)
-    : '0'
+  const formattedLiquidity: string = scaledLiquidityParameter ? scaledLiquidityParameter.toFixed(2) : '0'
 
   // const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
   const isPendingArbitration = question.isPendingArbitration
@@ -94,13 +97,19 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       },
       content: 'Add Currency',
     },
+    {
+      onClick: () => {
+        toggleProgressBar()
+      },
+      content: showingProgressBar ? 'Hide Market State' : 'Show Market State',
+    },
   ]
 
   const onChangeMarketCurrency = (currency: Token | null) => {
     if (currency) {
       const selectedMarket = marketsRelatedQuestion.find(e => e.collateralToken === currency.address.toLowerCase())
       if (selectedMarket && selectedMarket.collateralToken !== collateral.address) {
-        history.push(`/${selectedMarket.id}`)
+        history.replace(`/${selectedMarket.id}`)
       }
     }
   }
@@ -119,15 +128,17 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
               placeholder=""
             />
           )}
-          <ProgressBarToggle
-            active={showingProgressBar}
-            state={marketState}
-            templateId={question.templateId}
-            toggleProgressBar={toggleProgressBar}
-          ></ProgressBarToggle>
+          {(!isMobile || marketsRelatedQuestion.length === 1) && (
+            <ProgressBarToggle
+              active={showingProgressBar}
+              state={marketState}
+              templateId={question.templateId}
+              toggleProgressBar={toggleProgressBar}
+            ></ProgressBarToggle>
+          )}
         </SubsectionTitleLeftWrapper>
 
-        <MoreMenu items={moreMenuItems} />
+        <MoreMenu items={marketsRelatedQuestion.length > 1 && isMobile ? moreMenuItems : new Array(moreMenuItems[0])} />
       </SubsectionTitleWrapper>
       {showingProgressBar && (
         <ProgressBar

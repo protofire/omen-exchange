@@ -1,17 +1,14 @@
 import { useInterval } from '@react-corekit/use-interval'
-import { ethers } from 'ethers'
-import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import { Redirect, RouteComponentProps } from 'react-router'
 
-import { FETCH_DETAILS_INTERVAL, MAX_MARKET_FEE } from '../../../common/constants'
+import { FETCH_DETAILS_INTERVAL } from '../../../common/constants'
 import { useCheckContractExists, useMarketMakerData } from '../../../hooks'
 import { useConnectedWeb3Context } from '../../../hooks/connectedWeb3'
 import { MarketDetailsPage } from '../../../pages'
 import { getLogger } from '../../../util/logger'
 import { isAddress } from '../../../util/tools'
 import { ThreeBoxComments } from '../../comments'
-import { SectionTitle } from '../../common'
 import { InlineLoading } from '../../loading'
 import { MarketNotFound } from '../sections/market_not_found'
 
@@ -32,7 +29,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
 
   // Validate contract REALLY exists
   const contractExists = useCheckContractExists(marketMakerAddress, context)
-  const { fetchData, marketMakerData } = useMarketMakerData(marketMakerAddress.toLowerCase())
+  const { fetchData, fetchGraphMarketMakerData, marketMakerData } = useMarketMakerData(marketMakerAddress.toLowerCase())
   useInterval(fetchData, FETCH_DETAILS_INTERVAL)
   if (!contractExists) {
     logger.log(`Market address not found`)
@@ -42,19 +39,14 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
   if (!marketMakerData) {
     return <InlineLoading />
   }
-  const { fee } = marketMakerData
-
-  // Validate Markets with wrong FEE
-  const feeBN = ethers.utils.parseEther('' + MAX_MARKET_FEE / Math.pow(10, 2))
-  const zeroBN = new BigNumber(0)
-  if (!(fee.gte(zeroBN) && fee.lte(feeBN))) {
-    logger.log(`Market was not created with this app (different fee)`)
-    return <SectionTitle title={'Invalid market'} />
-  }
 
   return (
     <>
-      <MarketDetailsPage {...props} marketMakerData={marketMakerData} />
+      <MarketDetailsPage
+        {...props}
+        fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+        marketMakerData={marketMakerData}
+      />
       <ThreeBoxComments threadName={marketMakerAddress} />
     </>
   )

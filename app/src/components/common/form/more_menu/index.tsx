@@ -9,6 +9,7 @@ const Wrapper = styled.div`
   position: relative;
   display: inline-block;
   outline: none;
+  margin-left: 10px;
 `
 
 const MoreButton = styled.div<{ isOpen: boolean }>`

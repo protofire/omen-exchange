@@ -209,13 +209,6 @@ export const PercentWrapper = styled.label`
   line-height: 16px;
 `
 
-export const MarketBottomNavButton = styled(Button)`
-  height: 40px;
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-size: 14px;
-  line-height: 16px;
-`
 export const CurrenciesWrapper = styled.div`
   padding: 0 0 20px 0;
   width: 100%;

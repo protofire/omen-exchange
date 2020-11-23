@@ -5,9 +5,8 @@ import styled from 'styled-components'
 import { WhenConnected } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
-import { ButtonContainer } from '../../../../button'
+import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { MarketBottomNavButton } from '../../../common/common_styled'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
@@ -81,10 +80,11 @@ const WarningMessageStyled = styled(WarningMessage)`
 interface Props extends RouteComponentProps<Record<string, string | undefined>> {
   account: Maybe<string>
   marketMakerData: MarketMakerData
+  fetchGraphMarketMakerData: () => Promise<void>
 }
 
 const Wrapper = (props: Props) => {
-  const { marketMakerData } = props
+  const { fetchGraphMarketMakerData, marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
 
@@ -133,19 +133,19 @@ const Wrapper = (props: Props) => {
   )
 
   const openInRealitioButton = (
-    <MarketBottomNavButton
+    <Button
       buttonType={ButtonType.secondaryLine}
       onClick={() => {
         window.open(`${realitioBaseUrl}/app/#!/question/${question.id}`)
       }}
     >
       Answer on Reality.eth
-    </MarketBottomNavButton>
+    </Button>
   )
 
   const buySellButtons = (
     <SellBuyWrapper>
-      <MarketBottomNavButton
+      <Button
         buttonType={ButtonType.secondaryLine}
         disabled={!userHasShares || !hasFunding}
         onClick={() => {
@@ -153,8 +153,8 @@ const Wrapper = (props: Props) => {
         }}
       >
         Sell
-      </MarketBottomNavButton>
-      <MarketBottomNavButton
+      </Button>
+      <Button
         buttonType={ButtonType.secondaryLine}
         disabled={!hasFunding}
         onClick={() => {
@@ -162,7 +162,7 @@ const Wrapper = (props: Props) => {
         }}
       >
         Buy
-      </MarketBottomNavButton>
+      </Button>
     </SellBuyWrapper>
   )
 
@@ -208,29 +208,41 @@ const Wrapper = (props: Props) => {
               />
             )}
             <WhenConnected>
-              <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
-                <MarketBottomNavButton
+              <StyledButtonContainer className={!hasFunding || isQuestionOpen ? 'border' : ''}>
+                <Button
                   buttonType={ButtonType.secondaryLine}
                   onClick={() => {
                     history.goBack()
                   }}
                 >
                   Back
-                </MarketBottomNavButton>
+                </Button>
                 {isQuestionOpen ? openInRealitioButton : buySellButtons}
               </StyledButtonContainer>
             </WhenConnected>
           </>
         )}
         {currentTab === marketTabs.pool && (
-          <MarketPoolLiquidityContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketPoolLiquidityContainer
+            fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
         {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === marketTabs.buy && (
-          <MarketBuyContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketBuyContainer
+            fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
         {currentTab === marketTabs.sell && (
-          <MarketSellContainer marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+          <MarketSellContainer
+            fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
         )}
         {/* {currentTab === marketTabs.verify && <p>verify</p>} */}
       </BottomCard>

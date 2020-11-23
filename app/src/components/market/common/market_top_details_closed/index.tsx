@@ -3,8 +3,10 @@ import React, { useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useGraphMarketMakerData } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
+import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
+import theme from '../../../../theme'
 import { MarketMakerData, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -16,6 +18,9 @@ import { ProgressBarToggle } from '../progress_bar/toggle'
 const SubsectionTitleLeftWrapper = styled.div`
   display: flex;
   align-items: center;
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex-grow: 1;
+  }
   & > * + * {
     margin-left: 12px;
   }
@@ -36,29 +41,27 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
   const history = useHistory()
 
+  const { width } = useWindowDimensions()
+  const isMobile = width <= parseInt(theme.themeBreakPoints.sm)
+
   const {
-    address,
     answerFinalizedTimestamp,
     arbitrator,
     collateral: collateralToken,
     collateralVolume,
+    creationTimestamp,
     curatedByDxDaoOrKleros: isVerified,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
+    scaledLiquidityParameter,
   } = marketMakerData
 
   const [showingProgressBar, setShowingProgressBar] = useState(false)
 
-  const useGraphMarketMakerDataResult = useGraphMarketMakerData(address, context.networkId)
-  const creationTimestamp: string = useGraphMarketMakerDataResult.marketMakerData
-    ? useGraphMarketMakerDataResult.marketMakerData.creationTimestamp
-    : ''
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
-  const formattedLiquidity: string = useGraphMarketMakerDataResult.marketMakerData
-    ? useGraphMarketMakerDataResult.marketMakerData.scaledLiquidityParameter.toFixed(2)
-    : '0'
+  const formattedLiquidity: string = scaledLiquidityParameter ? scaledLiquidityParameter.toFixed(2) : '0'
 
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred
@@ -92,12 +95,14 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
               placeholder=""
             />
           )}
-          <ProgressBarToggle
-            active={showingProgressBar}
-            state={'closed'}
-            templateId={question.templateId}
-            toggleProgressBar={toggleProgressBar}
-          ></ProgressBarToggle>
+          {(!isMobile || marketsRelatedQuestion.length === 1) && (
+            <ProgressBarToggle
+              active={showingProgressBar}
+              state={'closed'}
+              templateId={question.templateId}
+              toggleProgressBar={toggleProgressBar}
+            ></ProgressBarToggle>
+          )}
         </SubsectionTitleLeftWrapper>
       </SubsectionTitleWrapper>
       {showingProgressBar && (

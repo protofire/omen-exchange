@@ -4,7 +4,12 @@ import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { DOCUMENT_FAQ, MAX_MARKET_FEE } from '../../../../../../common/constants'
+import {
+  DEFAULT_TOKEN_ADDRESS,
+  DEFAULT_TOKEN_ADDRESS_RINKEBY,
+  DOCUMENT_FAQ,
+  MAX_MARKET_FEE,
+} from '../../../../../../common/constants'
 import {
   useCollateralBalance,
   useConnectedWeb3Context,
@@ -12,11 +17,13 @@ import {
   useCpkAllowance,
   useTokens,
 } from '../../../../../../hooks'
+import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
+import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
@@ -26,7 +33,6 @@ import {
   ButtonContainerFullWidth,
   CurrenciesWrapper,
   GenericError,
-  MarketBottomNavButton,
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
   OutcomeItemTextWrapper,
@@ -65,7 +71,7 @@ const SubsectionTitleStyled = styled(SubsectionTitle)`
   margin-bottom: 24px;
 `
 
-const LeftButton = styled(MarketBottomNavButton as any)`
+const LeftButton = styled(Button as any)`
   margin-right: auto;
 `
 
@@ -99,10 +105,6 @@ const TitleValueVertical = styled(TitleValue)`
 
 const GridTransactionDetailsWrapper = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
   ${props => (props.noMarginTop ? 'margin-top: 0;' : '')};
-`
-
-const ButtonCreate = styled(MarketBottomNavButton as any)`
-  font-weight: 400;
 `
 
 const CreateCardBottomRow = styled.div`
@@ -199,12 +201,30 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     submit,
     values,
   } = props
+
   const { arbitrator, category, collateral, funding, loadedQuestionId, outcomes, question, resolution, spread } = values
 
+  const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
+
+  const [currentToken, setCurrentToken] = useState({ tokenExists: false, symbol: '', marketAddress: '' })
+  useEffect(() => {
+    const selectedToken = markets.find(
+      ({ collateralToken }) =>
+        collateralToken === DEFAULT_TOKEN_ADDRESS_RINKEBY || collateralToken === DEFAULT_TOKEN_ADDRESS,
+    )
+    setCurrentToken({
+      tokenExists: selectedToken ? true : false,
+      symbol: 'DAI',
+      marketAddress: selectedToken ? selectedToken.id : '',
+    })
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const [amount, setAmount] = useState<BigNumber>(funding)
+  const [amountToDispaly, setAmountToDisplay] = useState<string>('')
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
@@ -215,15 +235,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
   const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
-    formatBigNumber(collateralBalance, collateral.decimals),
+    formatBigNumber(collateralBalance, collateral.decimals, 5),
   )
-  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(collateral, context)
 
   const [isNegativeDepositAmount, setIsNegativeDepositAmount] = useState<boolean>(false)
 
   useEffect(() => {
     setCollateralBalance(maybeCollateralBalance || Zero)
-    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals))
+    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5))
     // eslint-disable-next-line
   }, [maybeCollateralBalance])
 
@@ -250,6 +270,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const isCreateMarketbuttonDisabled =
     MarketCreationStatus.is.creatingAMarket(marketCreationStatus) ||
     MarketCreationStatus.is.done(marketCreationStatus) ||
+    currentToken.tokenExists ||
     !balance ||
     funding.isZero() ||
     !account ||
@@ -271,6 +292,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const onCollateralChange = (token: Token | null) => {
     if (!token) return
+    const tokenAddressFormatted = token.address.toLowerCase()
+    const selectedToken = markets.find(({ collateralToken }) => collateralToken === tokenAddressFormatted)
+    setCurrentToken({
+      tokenExists: selectedToken ? true : false,
+      symbol: token.symbol,
+      marketAddress: selectedToken ? selectedToken.id : '',
+    })
     handleCollateralChange(token)
     setAllowanceFinished(false)
   }
@@ -290,6 +318,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const handleAmountChange = (event: BigNumberInputReturn) => {
     setAmount(event.value)
+    setAmountToDisplay('')
     handleChange(event)
   }
 
@@ -299,6 +328,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       name: 'funding',
       value: collateralBalance,
     })
+    setAmountToDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
   }
 
   return (
@@ -359,7 +389,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             {tokensAmount > 1 && (
               <CurrenciesWrapper>
                 <CurrencySelector
-                  balance={formatNumber(collateralBalanceFormatted)}
+                  balance={formatNumber(collateralBalanceFormatted, 5)}
                   context={context}
                   disabled={false}
                   onSelect={onCollateralChange}
@@ -374,6 +404,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                   onChange={handleAmountChange}
                   style={{ width: 0 }}
                   value={amount}
+                  valueToDisplay={amountToDispaly}
                 />
               }
               onClickMaxButton={onClickMaxButton}
@@ -435,10 +466,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         <WarningMessage
           additionalDescription={''}
           description={
-            'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
+            currentToken.tokenExists
+              ? `An identical market with ${currentToken.symbol} as a currency exists already. Please use a different currency or  provide liquidity for the`
+              : 'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
           }
-          href={DOCUMENT_FAQ}
-          hyperlinkDescription={'More Info'}
+          href={currentToken.tokenExists ? `/#/${currentToken.marketAddress}` : DOCUMENT_FAQ}
+          hyperlinkDescription={currentToken.tokenExists ? 'existing market.' : 'More Info'}
         />
         <StyledButtonContainerFullWidth borderTop>
           <LeftButton
@@ -452,13 +485,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             Back
           </LeftButton>
           {!account && (
-            <MarketBottomNavButton buttonType={ButtonType.primary} onClick={submit}>
+            <Button buttonType={ButtonType.primary} onClick={submit}>
               Connect Wallet
-            </MarketBottomNavButton>
+            </Button>
           )}
-          <ButtonCreate buttonType={ButtonType.secondaryLine} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
+          <Button buttonType={ButtonType.secondaryLine} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
             Create Market
-          </ButtonCreate>
+          </Button>
         </StyledButtonContainerFullWidth>
       </CreateCardBottom>
       {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
