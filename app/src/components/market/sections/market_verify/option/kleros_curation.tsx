@@ -88,9 +88,9 @@ const IconWrapper = styled.div`
     height: 100%;
   }
 `
-const SuccessVerify = styled.a`
-  cursor: pointer;
-  color: ${props => props.theme.colors.clickable};
+const SuccessVerify = styled.a<{ green?: boolean }>`
+  ${props => (props.green ? '' : 'cursor: pointer;')};
+  color: ${props => (props.green ? props.theme.colors.green : props.theme.colors.clickable)};
   font-weight: ${props => props.theme.textfield.fontWeight};
 `
 const Description = styled.div`
@@ -197,8 +197,8 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
             <BlueLink href={DOCUMENT_VALIDITY_RULES} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>
-            ?<br /> Collect <SuccessVerify>{formatEther(submissionBaseDeposit)} ETH</SuccessVerify> upon a successful
-            challenge.
+            ?<br /> Collect <SuccessVerify green={true}>{formatEther(submissionBaseDeposit)} ETH</SuccessVerify> upon a
+            successful challenge.
           </DescriptionText>
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondaryLine}>
@@ -231,8 +231,8 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
             <BlueLink href={DOCUMENT_VALIDITY_RULES} rel="noopener noreferrer" target="_blank">
               listing criteria
             </BlueLink>{' '}
-            ?<br /> Collect <SuccessVerify>{formatEther(removalBaseDeposit)} ETH</SuccessVerify> upon a successful
-            challenge.
+            ?<br /> Collect <SuccessVerify green={true}>{formatEther(removalBaseDeposit)} ETH</SuccessVerify> upon a
+            successful challenge.
           </DescriptionText>
           <RightButtonWrapper>
             <RightButton buttonType={ButtonType.secondary}>
