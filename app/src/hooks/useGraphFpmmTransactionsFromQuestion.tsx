@@ -128,7 +128,7 @@ export const useGraphFpmmTransactionsFromQuestion = (
       pageIndex: pageIndex,
       fpmmType: type === 1 ? 'Liquidity' : 'Trade',
     },
-    onCompleted: async ({ fpmmTransactions }: any) => {
+    onCompleted: ({ fpmmTransactions }: any) => {
       let internalArray = fpmmTransactions
 
       setMorePagination(internalArray.length === pageSize + 1)
