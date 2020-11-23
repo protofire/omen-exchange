@@ -89,7 +89,6 @@ export const useMarkets = (options: Options): any => {
         const marketsGeneric = data as GraphResponseMarketsGeneric
         internalMarkets = marketsGeneric.fixedProductMarketMakers
       }
-
       setMoreMarkets(internalMarkets.length === first + 1)
       if (internalMarkets.length === first + 1) {
         internalMarkets = internalMarkets.slice(0, first)

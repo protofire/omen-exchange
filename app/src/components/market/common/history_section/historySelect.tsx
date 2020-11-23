@@ -161,7 +161,7 @@ export const HistorySelect: React.FC<Props> = ({
     refetch()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  const loadNextPage = () => {
+  const loadNextPage = async () => {
     const newPageIndex = pageIndex + pageSize
     if (!paginationNext) {
       return

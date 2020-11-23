@@ -117,20 +117,25 @@ export const useGraphFpmmTransactionsFromQuestion = (
   decimals: number,
 ): Result => {
   const [fpmmTradeData, setFpmmTradeData] = useState<Maybe<FpmmTradeData[]>>(null)
-  const [morePagination, setMorePagination] = useState<boolean>(false)
+  const [morePagination, setMorePagination] = useState<boolean>(true)
 
   const { data, error, loading, refetch } = useQuery(type === 0 ? withoutFpmmType : withFpmmType, {
     notifyOnNetworkStatusChange: true,
     skip: false,
     variables: {
       id: questionID,
-      pageSize: pageSize,
+      pageSize: pageSize + 1,
       pageIndex: pageIndex,
       fpmmType: type === 1 ? 'Liquidity' : 'Trade',
     },
     onCompleted: async ({ fpmmTransactions }: any) => {
-      setMorePagination(fpmmTransactions.length === pageSize)
-      setFpmmTradeData(wrangleResponse(fpmmTransactions, decimals))
+      let internalArray = fpmmTransactions
+
+      setMorePagination(internalArray.length === pageSize + 1)
+      if (internalArray.length === pageSize + 1) {
+        internalArray = internalArray.slice(0, pageSize)
+      }
+      setFpmmTradeData(wrangleResponse(internalArray, decimals))
     },
   })
 
