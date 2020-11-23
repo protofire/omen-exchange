@@ -22,7 +22,7 @@ const MarketTab = styled.div<{ active: boolean }>`
 `
 
 const MarketSetOutcomeTab = styled.div`
-  font-size: ${({ theme }) => theme.fonts.defaultSize};
+  font-size: 16px;
   color: ${props => props.theme.colors.textColorDark};
   background: none;
   border: none;

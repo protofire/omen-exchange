@@ -99,7 +99,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       const answer = outcomeIndex >= balances.length ? INVALID_ANSWER_ID : numberToByte32(outcomeIndex)
 
       setMessage(
-        `Bonding ${formatBigNumber(bondEthAmount, TokenEthereum.decimals)}Eth on: ${
+        `Bonding ${formatBigNumber(bondEthAmount, TokenEthereum.decimals)} ETH on: ${
           outcomeIndex >= marketMakerData.question.outcomes.length
             ? 'Invalid'
             : marketMakerData.question.outcomes[outcomeIndex]
@@ -112,7 +112,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Ready)
       setMessage(
-        `Successfully bonded ${formatBigNumber(bondEthAmount, TokenEthereum.decimals)}ETH on ${
+        `Successfully bonded ${formatBigNumber(bondEthAmount, TokenEthereum.decimals)} ETH on ${
           outcomeIndex < marketMakerData.question.outcomes.length
             ? marketMakerData.question.outcomes[outcomeIndex]
             : 'Invalid'
