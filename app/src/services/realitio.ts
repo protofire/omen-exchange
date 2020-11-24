@@ -73,7 +73,7 @@ class RealitioService {
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
     const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
 
-    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+    const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
     const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
 
@@ -199,7 +199,7 @@ class RealitioService {
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
     const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
 
-    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+    const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
     const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
 
@@ -221,7 +221,7 @@ class RealitioService {
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
     const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
 
-    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+    const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
     const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
 

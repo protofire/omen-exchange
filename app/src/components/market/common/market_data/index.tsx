@@ -144,7 +144,7 @@ export const MarketData: React.FC<Props> = props => {
       {isFinalize && answerFinalizedTimestamp && (
         <MarketDataItem>
           <MarketDataItemTop>
-            In {moment().from(moment(answerFinalizedTimestamp.toNumber() * 1000), true)}
+            In {moment().from(moment(answerFinalizedTimestamp.toNumber() * 1000), false)}
           </MarketDataItemTop>
           <MarketDataItemBottom>Finalized</MarketDataItemBottom>
         </MarketDataItem>
