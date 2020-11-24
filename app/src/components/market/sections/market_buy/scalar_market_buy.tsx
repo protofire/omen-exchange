@@ -293,7 +293,7 @@ export const ScalarMarketBuy = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmount(collateralBalance)
-              setAmountDisplay(walletBalance)
+              setAmountDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
             }}
             shouldDisplayMaxButton
             symbol={collateral.symbol}
