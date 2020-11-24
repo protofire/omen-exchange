@@ -10,6 +10,7 @@ export const MarketDataFragment = gql`
     creationTimestamp
     lastActiveDay
     outcomeTokenAmounts
+    outcomeTokenMarginalPrices
     runningDailyVolumeByHour
     scaledLiquidityParameter
     title

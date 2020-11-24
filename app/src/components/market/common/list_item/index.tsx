@@ -86,8 +86,11 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     openingTimestamp,
     oracle,
     outcomeTokenAmounts,
+    outcomeTokenMarginalPrices,
     outcomes,
     runningDailyVolumeByHour,
+    scalarHigh,
+    scalarLow,
     scaledLiquidityParameter,
     title,
   } = market
@@ -141,6 +144,10 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   let isScalar = false
   if (oracle === realitioScalarAdapter) {
     isScalar = true
+  }
+
+  if (isScalar) {
+    console.log(outcomeTokenMarginalPrices[1])
   }
 
   return (

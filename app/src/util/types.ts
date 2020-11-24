@@ -271,6 +271,7 @@ export type GraphMarketMakerDataItem = {
   collateralToken: string
   condition: MarketCondition
   outcomeTokenAmounts: string[]
+  outcomeTokenMarginalPrices: string[]
   title: string
   outcomes: Maybe<string[]>
   openingTimestamp: string
@@ -283,6 +284,8 @@ export type GraphMarketMakerDataItem = {
   klerosTCRregistered: boolean
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
 }
 
 export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
@@ -303,6 +306,7 @@ export type MarketMakerDataItem = {
   lastActiveDay: number
   oracle: string
   outcomeTokenAmounts: BigNumber[]
+  outcomeTokenMarginalPrices: string[]
   title: string
   outcomes: Maybe<string[]>
   openingTimestamp: Date
@@ -315,6 +319,8 @@ export type MarketMakerDataItem = {
   klerosTCRregistered: boolean
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
 }
 
 export type BuildQueryType = MarketFilters & {

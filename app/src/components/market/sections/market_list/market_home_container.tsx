@@ -49,12 +49,15 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       openingTimestamp: new Date(1000 * +graphMarketMakerDataItem.openingTimestamp),
       oracle: graphMarketMakerDataItem.condition.oracle,
       outcomeTokenAmounts: graphMarketMakerDataItem.outcomeTokenAmounts.map(bigNumberify),
+      outcomeTokenMarginalPrices: graphMarketMakerDataItem.outcomeTokenMarginalPrices,
       outcomes,
       templateId: +graphMarketMakerDataItem.templateId,
       title: graphMarketMakerDataItem.title,
       usdLiquidityParameter: parseFloat(graphMarketMakerDataItem.usdLiquidityParameter),
       klerosTCRregistered: graphMarketMakerDataItem.klerosTCRregistered,
       curatedByDxDaoOrKleros: graphMarketMakerDataItem.curatedByDxDaoOrKleros,
+      scalarLow: graphMarketMakerDataItem.scalarLow,
+      scalarHigh: graphMarketMakerDataItem.scalarHigh,
     }
   })
 }
