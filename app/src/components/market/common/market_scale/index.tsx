@@ -477,15 +477,17 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           </ValueBoxPair>
           <ValueBoxPair>
             <ValueBox>
-              <ValueBoxTitle positive={yourPayout > 0 ? true : yourPayout < 0 ? false : undefined}>{`${formatNumber(
-                yourPayout.toString(),
-              )} ${collateral && collateral.symbol}`}</ValueBoxTitle>
+              <ValueBoxTitle positive={yourPayout > 0 ? true : yourPayout < 0 ? false : undefined}>
+                {yourPayout > 0 && '+'}
+                {`${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`}
+              </ValueBoxTitle>
               <ValueBoxSubtitle>Your Payout</ValueBoxSubtitle>
             </ValueBox>
             <ValueBox>
-              <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>{`${formatNumber(
-                profitLoss ? profitLoss.toString() : '0',
-              )}%`}</ValueBoxTitle>
+              <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>
+                {profitLoss > 0 && '+'}
+                {`${formatNumber(profitLoss ? profitLoss.toString() : '0')}%`}
+              </ValueBoxTitle>
               <ValueBoxSubtitle>Profit/Loss</ValueBoxSubtitle>
             </ValueBox>
           </ValueBoxPair>
