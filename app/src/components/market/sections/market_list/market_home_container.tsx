@@ -47,6 +47,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       scaledLiquidityParameter: parseFloat(graphMarketMakerDataItem.scaledLiquidityParameter),
       runningDailyVolumeByHour: graphMarketMakerDataItem.runningDailyVolumeByHour,
       openingTimestamp: new Date(1000 * +graphMarketMakerDataItem.openingTimestamp),
+      oracle: graphMarketMakerDataItem.condition.oracle,
       outcomeTokenAmounts: graphMarketMakerDataItem.outcomeTokenAmounts.map(bigNumberify),
       outcomes,
       templateId: +graphMarketMakerDataItem.templateId,

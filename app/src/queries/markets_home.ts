@@ -21,6 +21,11 @@ export const MarketDataFragment = gql`
     scaledLiquidityParameter
     curatedByDxDao
     klerosTCRregistered
+    condition {
+      oracle
+      scalarLow
+      scalarHigh
+    }
   }
 `
 

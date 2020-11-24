@@ -269,6 +269,7 @@ export type GraphMarketMakerDataItem = {
   collateralVolume: string
   lastActiveDay: number
   collateralToken: string
+  condition: MarketCondition
   outcomeTokenAmounts: string[]
   title: string
   outcomes: Maybe<string[]>
@@ -300,6 +301,7 @@ export type MarketMakerDataItem = {
   collateralVolume: BigNumber
   collateralToken: string
   lastActiveDay: number
+  oracle: string
   outcomeTokenAmounts: BigNumber[]
   title: string
   outcomes: Maybe<string[]>
@@ -319,4 +321,10 @@ export type BuildQueryType = MarketFilters & {
   whitelistedCreators: boolean
   whitelistedTemplateIds: boolean
   networkId: Maybe<number>
+}
+
+export type MarketCondition = {
+  oracle: string
+  scalarHigh: Maybe<BigNumber>
+  scalarLow: Maybe<BigNumber>
 }

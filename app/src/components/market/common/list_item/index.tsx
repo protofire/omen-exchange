@@ -3,6 +3,7 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -83,6 +84,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     creationTimestamp,
     lastActiveDay,
     openingTimestamp,
+    oracle,
     outcomeTokenAmounts,
     outcomes,
     runningDailyVolumeByHour,
@@ -129,12 +131,28 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
 
+  let realitioScalarAdapter
+  if (context.networkId === 1) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase()
+  } else if (context.networkId === 4) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
+  }
+
+  let isScalar = false
+  if (oracle === realitioScalarAdapter) {
+    isScalar = true
+  }
+
   return (
     <Wrapper to={`/${address}`}>
       <Title>{title}</Title>
       <Info>
         <IconStar></IconStar>
-        <Outcome>{outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}</Outcome>
+        <Outcome>
+          {isScalar
+            ? 'scalar'
+            : outcomes && `${outcomes[indexMax]} (${!isScalar && (percentages[indexMax] * 100).toFixed(2)}%)`}
+        </Outcome>
         <Separator>|</Separator>
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Closed ${endsText} ago`}</span>
         <Separator>|</Separator>
