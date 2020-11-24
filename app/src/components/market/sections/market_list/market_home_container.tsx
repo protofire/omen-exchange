@@ -56,8 +56,8 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       usdLiquidityParameter: parseFloat(graphMarketMakerDataItem.usdLiquidityParameter),
       klerosTCRregistered: graphMarketMakerDataItem.klerosTCRregistered,
       curatedByDxDaoOrKleros: graphMarketMakerDataItem.curatedByDxDaoOrKleros,
-      scalarLow: graphMarketMakerDataItem.scalarLow,
-      scalarHigh: graphMarketMakerDataItem.scalarHigh,
+      scalarLow: graphMarketMakerDataItem.condition.scalarLow,
+      scalarHigh: graphMarketMakerDataItem.condition.scalarHigh,
     }
   })
 }

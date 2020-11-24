@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
@@ -8,7 +9,7 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
-import { calcPrice, formatBigNumber, formatToShortNumber } from '../../../../util/tools'
+import { calcPrice, formatBigNumber, formatNumber, formatToShortNumber } from '../../../../util/tools'
 import { MarketMakerDataItem, Token } from '../../../../util/types'
 import { IconStar } from '../../../common/icons/IconStar'
 
@@ -146,8 +147,15 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     isScalar = true
   }
 
+  let currentPrediction
+  let unit
   if (isScalar) {
-    console.log(outcomeTokenMarginalPrices[1])
+    unit = title.split('[')[1].split(']')[0]
+    const lowerBoundNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
+    const upperBoundNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
+    currentPrediction =
+      Number(outcomeTokenMarginalPrices[1]) *
+      ((upperBoundNumber || 0) - (lowerBoundNumber || 0) + (lowerBoundNumber || 0))
   }
 
   return (
@@ -157,8 +165,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <IconStar></IconStar>
         <Outcome>
           {isScalar
-            ? 'scalar'
-            : outcomes && `${outcomes[indexMax]} (${!isScalar && (percentages[indexMax] * 100).toFixed(2)}%)`}
+            ? `${currentPrediction && formatNumber(currentPrediction.toString())} ${unit}`
+            : outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}
         </Outcome>
         <Separator>|</Separator>
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Closed ${endsText} ago`}</span>
