@@ -150,7 +150,10 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
   } = klerosCurationData || {}
   const { itemID, submissionTime = 0, verificationState: status } = marketVerificationData || {}
   const deadline = submissionTime + Number(challengePeriodDuration)
-  const timeRemaining = Math.max(0, deadline * 1000 - Date.now())
+  const timeRemaining = deadline * 1000 - Date.now()
+  const timeRemainingMessage = `${timeRemaining <= 0 ? 'ended' : 'ends'} ${moment
+    .duration(timeRemaining)
+    .humanize(true)}`
   const baseKlerosLink = `https://curate.kleros.io/tcr/${ovmAddress}/${itemID}`
 
   const submissionTimeUTC = moment(new Date(Number(submissionTime) * 1000))
@@ -212,7 +215,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       KlerosRightColumn = (
         <CurationRightColumn>
           <TimeRemainingContainer as="a" href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
-            Ends in {moment.duration(timeRemaining).humanize()}
+            {timeRemainingMessage}
             <IconStatusWrapper>
               <IconSchedule />
             </IconStatusWrapper>
@@ -246,7 +249,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
       KlerosRightColumn = (
         <CurationRightColumn>
           <TimeRemainingContainer as="a" href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
-            Ends in {moment.duration(timeRemaining).humanize()}{' '}
+            {timeRemainingMessage}
             <IconStatusWrapper>
               <IconSchedule />
             </IconStatusWrapper>
