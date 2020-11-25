@@ -1,10 +1,12 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { WhenConnected } from '../../../../../hooks/connectedWeb3'
+import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
+import { useGraphMarketTradeData } from '../../../../../hooks/useGraphMarketTradeData'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
+import { CPKService } from '../../../../../services'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
@@ -89,6 +91,8 @@ const Wrapper = (props: Props) => {
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
+  const context = useConnectedWeb3Context()
+  const { account, library: provider } = context
 
   const {
     address: marketMakerAddress,
@@ -185,6 +189,24 @@ const Wrapper = (props: Props) => {
   const switchMarketTab = (newTab: string) => {
     setCurrentTab(newTab)
   }
+
+  const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
+
+  useEffect(() => {
+    const getCpkAddress = async () => {
+      try {
+        const cpk = await CPKService.create(provider)
+        setCpkAddress(cpk.address)
+      } catch (e) {
+        console.error('Could not get address of CPK', e.message)
+      }
+    }
+
+    getCpkAddress()
+  }, [provider, account])
+
+  const { trades } = useGraphMarketTradeData(question.title, collateral.address, cpkAddress?.toLowerCase())
+  console.log(trades)
 
   return (
     <>

@@ -6,7 +6,7 @@ import { isObjectEqual } from '../util/tools'
 import { Status } from '../util/types'
 
 const query = gql`
-  query GetMarketTradeData($title: String!, $collateral: Bytes!, $account: Account) {
+  query GetMarketTradeData($title: String!, $collateral: Bytes!, $account: String!) {
     fpmmTrades(where: { title: $title, collateralToken: $collateral, creator: $account }) {
       title
       outcomeTokensTraded
@@ -44,13 +44,13 @@ type Result = {
   status: Status
 }
 
-export const useGraphMarketTradeData = (title: string, collateral: string): Result => {
+export const useGraphMarketTradeData = (title: string, collateral: string, account: string | undefined): Result => {
   const [trades, setTrades] = useState<TradeObject[]>([])
 
   const { data, error, loading } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
     skip: false,
-    variables: { title: title, collateral: collateral },
+    variables: { title: title, collateral: collateral, account: account },
   })
 
   useEffect(() => {
