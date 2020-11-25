@@ -206,7 +206,7 @@ const Wrapper = (props: Props) => {
                 hyperlinkDescription={''}
               />
             )}
-            <WhenConnected>
+            {account && (
               <StyledButtonContainer className={!hasFunding || isQuestionOpen ? 'border' : ''}>
                 <Button
                   buttonType={ButtonType.secondaryLine}
@@ -218,7 +218,7 @@ const Wrapper = (props: Props) => {
                 </Button>
                 {isQuestionOpen ? openInRealitioButton : buySellButtons}
               </StyledButtonContainer>
-            </WhenConnected>
+            )}
           </>
         )}
         {currentTab === marketTabs.pool && (
