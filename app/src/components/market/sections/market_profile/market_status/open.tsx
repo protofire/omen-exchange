@@ -201,7 +201,7 @@ const Wrapper = (props: Props) => {
               />
             )}
             <WhenConnected>
-              <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+              <StyledButtonContainer className={!hasFunding || isQuestionOpen ? 'border' : ''}>
                 <Button
                   buttonType={ButtonType.secondaryLine}
                   onClick={() => {
