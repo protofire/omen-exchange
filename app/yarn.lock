@@ -6272,10 +6272,10 @@ content-type@~1.0.4:
   resolved "https://registry.yarnpkg.com/content-type/-/content-type-1.0.4.tgz#e138cc75e040c727b1966fe5e5f8c9aee256fe3b"
   integrity sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==
 
-contract-proxy-kit@^2.2.0-alpha.2:
-  version "2.2.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/contract-proxy-kit/-/contract-proxy-kit-2.2.0-alpha.2.tgz#7ad44b4c411bdcb66e3b76871c31d5a289c63cff"
-  integrity sha512-35Hxjh4eE2Na0fuJuj4rEH6myAoUcgSt9rFUy7L3aAWnGkHZnIsPPWjBXJLFRh8BDu6SMr4OC+eXZAaQmQyt4g==
+contract-proxy-kit@^2.2.0-alpha.3:
+  version "2.2.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/contract-proxy-kit/-/contract-proxy-kit-2.2.0-alpha.3.tgz#7bba9568fab95388931e52e6ceece1f4627a8bb0"
+  integrity sha512-arI7F5Bo1JMxgKb1t9aCmxWyx6WbvHn787T7VF+Ewg5wHCB541sOC9YTU/aT55GOXMTfzSAuaKl5LvRyuTOz2w==
   dependencies:
     "@gnosis.pm/safe-apps-sdk" "^0.4.2"
     "@truffle/contract" "^4.2.26"
