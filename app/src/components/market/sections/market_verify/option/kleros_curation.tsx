@@ -204,7 +204,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
             successful challenge.
           </DescriptionText>
           <RightButtonWrapper>
-            <RightButton buttonType={ButtonType.secondaryLine}>
+            <RightButton>
               <UnstyledLink href={`${baseKlerosLink}?action=challenge`} rel="noopener noreferrer" target="_blank">
                 Challenge
               </UnstyledLink>
@@ -238,7 +238,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
             successful challenge.
           </DescriptionText>
           <RightButtonWrapper>
-            <RightButton buttonType={ButtonType.secondary}>
+            <RightButton>
               <UnstyledLink href={`${baseKlerosLink}?action=challenge`} rel="noopener noreferrer" target="_blank">
                 Challenge
               </UnstyledLink>
