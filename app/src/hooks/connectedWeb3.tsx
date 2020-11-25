@@ -48,8 +48,7 @@ export const ConnectedWeb3: React.FC = props => {
     if (isSafeApp && connector !== 'Safe') {
       if (safeSdk.safeAppInfo) {
         try {
-          // @ts-expect-error ignore
-          const netId = networkIds[safeSdk.safeAppInfo.network.toUpperCase()]
+          const netId = (networkIds as any)[safeSdk.safeAppInfo.network.toUpperCase()]
           connectors.Safe.init(safeSdk.safeAppInfo.safeAddress, netId)
           context.setConnector('Safe')
         } catch (e) {

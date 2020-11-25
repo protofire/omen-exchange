@@ -67,8 +67,7 @@ function standardizeTransaction(tx: Transaction): StandardTransaction {
 class OCPK extends CPK {
   txCallbacks = new Map<RequestId, TxCallback>()
 
-  // @ts-expect-error ignore
-  constructor(opts?: CPKConfig) {
+  constructor(opts?: any) {
     super(opts)
 
     window.addEventListener('message', ({ data, origin }) => {

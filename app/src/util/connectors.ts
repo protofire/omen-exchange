@@ -49,18 +49,15 @@ class SafeConnector extends Connectors.Connector {
     this.networkId = networkId
   }
 
-  // @ts-expect-error ignore
-  getProvider() {
+  public async getProvider(): Promise<any> {
     const provider = new ethers.providers.JsonRpcProvider(getInfuraUrl(this.networkId), this.networkId)
     const getSigner = provider.getSigner.bind(provider)
     provider.getSigner = () => getSigner(this.address)
-    this.provider = provider
     return provider
   }
 
   public async getNetworkId(): Promise<number> {
-    const networkId = await this.provider.getNetwork()
-    return this._validateNetworkId(networkId)
+    return this._validateNetworkId(this.networkId)
   }
 
   public async getAccount(): Promise<string> {
