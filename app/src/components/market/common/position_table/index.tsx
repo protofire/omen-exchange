@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { BalanceItem, TradeObject } from '../../../../util/types'
@@ -19,8 +19,28 @@ export const PositionTable = (props: Props) => {
   const shortSharesFormatted = formatNumber(formatBigNumber(shortShares, 18))
   const longSharesFormatted = formatNumber(formatBigNumber(longShares, 18))
 
-  console.log(shortSharesFormatted)
-  console.log(longSharesFormatted)
+  const [averageShortPrediction, setAverageShortPrediction] = useState<number>(0)
+  const [averageLongPrediction, setAverageLongPrediction] = useState<number>(0)
+
+  useEffect(() => {
+    const averagePrediction = (trades: TradeObject[]) => {
+      const individualAverages = trades.map(trade => {
+        return (Number(trade.outcomeTokenMarginalPrice) + Number(trade.oldOutcomeTokenMarginalPrice)) / 2
+      })
+      const collateralAmounts = trades.map(trade => Number(trade.collateralAmount))
+      const totalCollateralAmount = collateralAmounts.reduce((a, b) => a + b)
+      const collateralWeights = collateralAmounts.map(collateralAmount => collateralAmount / totalCollateralAmount)
+      const tradeSums = individualAverages.map((individualAverage, i) => individualAverage * collateralWeights[i])
+      const averagePrediction = tradeSums.reduce((a, b) => a + b)
+      return averagePrediction
+    }
+
+    setAverageShortPrediction(1 - averagePrediction(shortTrades))
+    setAverageLongPrediction(averagePrediction(longTrades))
+  }, [shortTrades, longTrades])
+
+  console.log(averageShortPrediction)
+  console.log(averageLongPrediction)
 
   return <p>hello</p>
 }
