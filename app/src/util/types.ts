@@ -67,6 +67,13 @@ export enum OutcomeTableValue {
   Probability = 'Probability',
 }
 
+export enum PositionTableValue {
+  YourPosition = 'Your Position',
+  Shares = 'Shares',
+  Payout = 'Payout',
+  ProfitLoss = 'Profit/loss',
+}
+
 export interface Token {
   address: string
   decimals: number

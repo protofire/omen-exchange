@@ -1,15 +1,36 @@
 import React, { useEffect, useState } from 'react'
+import styled, { css } from 'styled-components'
 
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
-import { BalanceItem, TradeObject } from '../../../../util/types'
+import { BalanceItem, PositionTableValue, Token, TradeObject } from '../../../../util/types'
+import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
+
+const TableWrapper = styled.div`
+  // margin-left: -${props => props.theme.cards.paddingHorizontal};
+  // margin-right: -${props => props.theme.cards.paddingHorizontal};
+`
+
+const PaddingCSS = css`
+  padding-left: 25px;
+  padding-right: 0;
+
+  &:last-child {
+    padding-right: 25px;
+  }
+`
+
+const THStyled = styled(TH as any)`
+  ${PaddingCSS}
+`
 
 interface Props {
   trades: TradeObject[]
   balances: BalanceItem[]
+  collateral: Token
 }
 
 export const PositionTable = (props: Props) => {
-  const { balances, trades } = props
+  const { balances, collateral, trades } = props
 
   const shortTrades = trades.filter(trade => trade.outcomeIndex === '0')
   const longTrades = trades.filter(trade => trade.outcomeIndex === '1')
@@ -39,8 +60,36 @@ export const PositionTable = (props: Props) => {
     setAverageLongPrediction(averagePrediction(longTrades))
   }, [shortTrades, longTrades])
 
-  console.log(averageShortPrediction)
-  console.log(averageLongPrediction)
+  const TableHead: PositionTableValue[] = [
+    PositionTableValue.YourPosition,
+    PositionTableValue.Shares,
+    PositionTableValue.Payout,
+    PositionTableValue.ProfitLoss,
+  ]
 
-  return <p>hello</p>
+  const TableCellsAlign = ['left', 'right', 'right', 'right']
+
+  const renderTableHeader = () => {
+    return (
+      <THead>
+        <TR>
+          {TableHead.map((value, index) => {
+            return (
+              <THStyled key={index} textAlign={TableCellsAlign[index]}>
+                {value} {value === PositionTableValue.Payout && `(${collateral.symbol})`}
+              </THStyled>
+            )
+          })}
+        </TR>
+      </THead>
+    )
+  }
+
+  return (
+    <TableWrapper>
+      <Table head={renderTableHeader()}>
+        <p>hello</p>
+      </Table>
+    </TableWrapper>
+  )
 }
