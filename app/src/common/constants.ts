@@ -56,17 +56,12 @@ export const GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/name/protofire
 export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
 export const GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
 
-export const KLEROS_CURATE_GRAPH_MAINNET_HTTP =
-  process.env.REACT_APP_KLEROS_CURATE_GRAPH_MAINNET_HTTP || 'https://api.thegraph.com/subgraphs/name/kleros/curate'
-export const KLEROS_CURATE_GRAPH_MAINNET_WS =
-  process.env.REACT_APP_KLEROS_CURATE_GRAPH_MAINNET_WS || 'wss://api.thegraph.com/subgraphs/name/kleros/curate'
-export const KLEROS_CURATE_GRAPH_RINKEBY_HTTP =
-  process.env.REACT_APP_KLEROS_CURATE_GRAPH_RINKEBY_HTTP ||
-  'https://api.thegraph.com/subgraphs/name/kleros/curate-rinkeby'
-export const KLEROS_CURATE_GRAPH_RINKEBY_WS =
-  process.env.REACT_APP_KLEROS_CURATE_GRAPH_RINKEBY_WS || 'wss://api.thegraph.com/subgraphs/name/kleros/curate-rinkeby'
+export const KLEROS_CURATE_GRAPH_MAINNET_HTTP = 'https://api.thegraph.com/subgraphs/name/kleros/curate'
+export const KLEROS_CURATE_GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/name/kleros/curate'
+export const KLEROS_CURATE_GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/kleros/curate-rinkeby'
+export const KLEROS_CURATE_GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/kleros/curate-rinkeby'
 
-export const IPFS_GATEWAY = process.env.REACT_APP_IPFS_GATEWAY || 'https://ipfs.kleros.io'
+export const IPFS_GATEWAY = 'https://ipfs.kleros.io'
 
 export const Logo = OmenLogo
 

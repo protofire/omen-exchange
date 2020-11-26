@@ -6,7 +6,6 @@ import styled from 'styled-components'
 import { DOCUMENT_VALIDITY_RULES } from '../../../../../common/constants'
 import { KlerosCurationData, MarketVerificationState } from '../../../../../util/types'
 import { Button } from '../../../../button'
-import { ButtonType } from '../../../../button/button_styling_types'
 import { IconExclamation, IconKleros, IconSchedule, IconTick } from '../../../../common/icons'
 import {
   CurationCenterColumn,
