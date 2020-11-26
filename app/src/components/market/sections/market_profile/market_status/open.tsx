@@ -7,12 +7,13 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/con
 import { useGraphMarketTradeData } from '../../../../../hooks/useGraphMarketTradeData'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { CPKService } from '../../../../../services'
-import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
+import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
+import { PositionTable } from '../../../common/position_table'
 import { ViewCard } from '../../../common/view_card'
 import { WarningMessage } from '../../../common/warning_message'
 import { MarketBuyContainer } from '../../market_buy/market_buy_container'
@@ -205,8 +206,7 @@ const Wrapper = (props: Props) => {
     getCpkAddress()
   }, [provider, account])
 
-  const { trades } = useGraphMarketTradeData(question.title, collateral.address, cpkAddress?.toLowerCase())
-  console.log(trades)
+  const { status, trades } = useGraphMarketTradeData(question.title, collateral.address, cpkAddress?.toLowerCase())
 
   return (
     <>
@@ -224,14 +224,17 @@ const Wrapper = (props: Props) => {
         {currentTab === marketTabs.swap && (
           <>
             {isScalar ? (
-              <MarketScale
-                border={true}
-                currentPrediction={outcomeTokenMarginalPrices[1]}
-                lowerBound={scalarLow || new BigNumber(0)}
-                startingPointTitle={'Current prediction'}
-                unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
-                upperBound={scalarHigh || new BigNumber(0)}
-              />
+              <>
+                <MarketScale
+                  border={true}
+                  currentPrediction={outcomeTokenMarginalPrices[1]}
+                  lowerBound={scalarLow || new BigNumber(0)}
+                  startingPointTitle={'Current prediction'}
+                  unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+                  upperBound={scalarHigh || new BigNumber(0)}
+                />
+                {status === Status.Ready && <PositionTable trades={trades} />}
+              </>
             ) : (
               renderTableData()
             )}

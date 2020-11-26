@@ -3,7 +3,7 @@ import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
 import { isObjectEqual } from '../util/tools'
-import { Status } from '../util/types'
+import { Status, TradeObject } from '../util/types'
 
 const query = gql`
   query GetMarketTradeData($title: String!, $collateral: Bytes!, $account: String!) {
@@ -19,21 +19,6 @@ const query = gql`
     }
   }
 `
-
-type TradeObject = {
-  title: string
-  outcomeTokensTraded: string
-  collateralAmount: string
-  feeAmount: string
-  outcomeTokenMarginalPrice: string
-  oldOutcomeTokenMarginalPrice: string
-  type: string
-  outcomeIndex: string
-}
-
-// type GraphResponseTrades = {
-//   tradeObjects: TradeObject[]
-// }
 
 type GraphResponse = {
   fpmmTrades: Maybe<TradeObject[]>
@@ -58,7 +43,6 @@ export const useGraphMarketTradeData = (title: string, collateral: string, accou
   }, [title, collateral])
 
   if (data && data.fpmmTrades && !isObjectEqual(trades, data.fpmmTrades)) {
-    console.log('right')
     setTrades(data.fpmmTrades)
   } else if (data && data.fpmmTrades && !data.fpmmTrades.length) {
     setTrades([])

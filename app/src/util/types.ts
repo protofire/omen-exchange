@@ -320,3 +320,14 @@ export type BuildQueryType = MarketFilters & {
   whitelistedTemplateIds: boolean
   networkId: Maybe<number>
 }
+
+export type TradeObject = {
+  title: string
+  outcomeTokensTraded: string
+  collateralAmount: string
+  feeAmount: string
+  outcomeTokenMarginalPrice: string
+  oldOutcomeTokenMarginalPrice: string
+  type: string
+  outcomeIndex: string
+}
