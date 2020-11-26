@@ -31,12 +31,12 @@ type TradeObject = {
   outcomeIndex: string
 }
 
-type GraphResponseTrades = {
-  tradeObjects: TradeObject[]
-}
+// type GraphResponseTrades = {
+//   tradeObjects: TradeObject[]
+// }
 
 type GraphResponse = {
-  trades: Maybe<GraphResponseTrades>
+  fpmmTrades: Maybe<TradeObject[]>
 }
 
 type Result = {
@@ -54,12 +54,13 @@ export const useGraphMarketTradeData = (title: string, collateral: string, accou
   })
 
   useEffect(() => {
-    if (!title || !collateral) setTrades([])
+    if (!title || !collateral || !account) setTrades([])
   }, [title, collateral])
 
-  if (data && data.trades && !isObjectEqual(trades, data.trades)) {
-    setTrades(data.trades.tradeObjects)
-  } else if (data && data.trades && !data.trades.tradeObjects.length) {
+  if (data && data.fpmmTrades && !isObjectEqual(trades, data.fpmmTrades)) {
+    console.log('right')
+    setTrades(data.fpmmTrades)
+  } else if (data && data.fpmmTrades && !data.fpmmTrades.length) {
     setTrades([])
   }
 
