@@ -288,7 +288,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
             ?
           </DescriptionText>
           <RightButtonWrapper>
-            <RightButton buttonType={ButtonType.secondaryLine}>
+            <RightButton>
               <UnstyledLink href={`${baseKlerosLink}?action=remove`} rel="noopener noreferrer" target="_blank">
                 Remove Market
               </UnstyledLink>
