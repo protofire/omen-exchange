@@ -23,6 +23,15 @@ const THStyled = styled(TH as any)`
   ${PaddingCSS}
 `
 
+const TDStyled = styled(TD as any)`
+  ${PaddingCSS}
+`
+
+const TDPosition = styled(TD as any)`
+  ${PaddingCSS}
+  font-weight: 400;
+`
+
 interface Props {
   trades: TradeObject[]
   balances: BalanceItem[]
@@ -85,13 +94,26 @@ export const PositionTable = (props: Props) => {
     )
   }
 
-  // const renderTableRow = (index: number) => {}
+  const renderTableRow = (index: number) => {
+    if (index === 0 && !shortTrades.length) return
+    if (index === 1 && !longTrades.length) return
+    return (
+      <TR>
+        <TDPosition textAlign={TableCellsAlign[0]}>{index === 0 ? 'Short' : 'Long'}</TDPosition>
+        <TDStyled textAlign={TableCellsAlign[1]}>{index === 0 ? shortSharesFormatted : longSharesFormatted}</TDStyled>
+        <TDStyled textAlign={TableCellsAlign[2]}>0</TDStyled>
+        <TDStyled textAlign={TableCellsAlign[3]}>0</TDStyled>
+      </TR>
+    )
+  }
+
+  const renderTable = () => {
+    return [0, 1].map(index => renderTableRow(index))
+  }
 
   return (
     <TableWrapper>
-      <Table head={renderTableHeader()}>
-        <p>hello</p>
-      </Table>
+      <Table head={renderTableHeader()}>{renderTable()}</Table>
     </TableWrapper>
   )
 }
