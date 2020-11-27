@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 
 import { getOutcomes } from '../util/networks'
 import { isObjectEqual, waitABit } from '../util/tools'
-import { Question, Status } from '../util/types'
+import { KlerosSubmission, Question, Status } from '../util/types'
 
 const query = gql`
   query GetMarket($id: ID!) {
@@ -48,6 +48,12 @@ const query = gql`
         data
       }
       klerosTCRregistered
+      curatedByDxDaoOrKleros
+      curatedByDxDao
+      submissionIDs {
+        id
+        status
+      }
     }
   }
 `
@@ -89,6 +95,7 @@ type GraphResponseFixedProductMarketMaker = {
   klerosTCRregistered: boolean
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
+  submissionIDs: KlerosSubmission[]
 }
 
 type GraphResponse = {
@@ -113,6 +120,7 @@ export type GraphMarketMakerData = {
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
+  submissionIDs: KlerosSubmission[]
 }
 
 type Result = {
@@ -154,6 +162,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     curatedByDxDao: data.curatedByDxDao,
     klerosTCRregistered: data.klerosTCRregistered,
     curatedByDxDaoOrKleros: data.curatedByDxDaoOrKleros,
+    submissionIDs: data.submissionIDs,
   }
 }
 
