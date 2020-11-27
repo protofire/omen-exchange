@@ -12,17 +12,17 @@ const BALL_SIZE = '20px'
 const DOT_SIZE = '8px'
 const VALUE_BOXES_MARGIN = '12px'
 
-const ScaleWrapper = styled.div<{ border: boolean | undefined }>`
+const ScaleWrapper = styled.div<{ borderBottom: boolean | undefined; borderTop: boolean | undefined }>`
   display: flex;
   flex-direction: column;
   height: 174px;
-  border-bottom: 1px solid ${props => props.theme.scale.bar};
+  border-bottom: ${props => (!props.borderBottom ? 'none' : `1px solid ${props.theme.scale.bar}`)};
   margin-left: -25px;
   margin-right: -25px;
   padding-left: 25px;
   padding-right: 25px;
   position: relative;
-  ${props => props.border && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 202px;`};
+  ${props => props.borderTop && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 202px;`};
 `
 
 const ScaleTitleWrapper = styled.div`
@@ -224,7 +224,8 @@ interface Props {
   upperBound: BigNumber
   startingPointTitle: string
   currentPrediction?: Maybe<string>
-  border?: boolean
+  borderBottom?: boolean
+  borderTop?: boolean
   newPrediction?: Maybe<number>
   long?: Maybe<boolean>
   potentialLoss?: Maybe<BigNumber>
@@ -236,7 +237,8 @@ interface Props {
 export const MarketScale: React.FC<Props> = (props: Props) => {
   const {
     amount,
-    border,
+    borderBottom,
+    borderTop,
     collateral,
     currentPrediction,
     long,
@@ -357,7 +359,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   ])
 
   return (
-    <ScaleWrapper border={border}>
+    <ScaleWrapper borderBottom={borderBottom} borderTop={borderTop}>
       <ScaleTitleWrapper>
         <ScaleTitle>
           {formatNumber(lowerBoundNumber.toString())} {unit}

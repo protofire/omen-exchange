@@ -251,7 +251,7 @@ export const ScalarMarketSell = (props: Props) => {
     <>
       <MarketScale
         amount={potentialValue}
-        border={true}
+        borderTop={true}
         collateral={collateral}
         currentPrediction={outcomeTokenMarginalPrices[1]}
         long={positionIndex === 1}

@@ -6,8 +6,8 @@ import { BalanceItem, PositionTableValue, Token, TradeObject } from '../../../..
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
 
 const TableWrapper = styled.div`
-  // margin-left: -${props => props.theme.cards.paddingHorizontal};
-  // margin-right: -${props => props.theme.cards.paddingHorizontal};
+  margin-left: -24px
+  margin-right: -24px
 `
 
 const PaddingCSS = css`
@@ -84,6 +84,8 @@ export const PositionTable = (props: Props) => {
       </THead>
     )
   }
+
+  // const renderTableRow = (index: number) => {}
 
   return (
     <TableWrapper>

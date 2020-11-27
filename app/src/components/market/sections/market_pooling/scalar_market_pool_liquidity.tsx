@@ -298,7 +298,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   return (
     <>
       <MarketScale
-        border={true}
+        borderTop={true}
         collateral={collateral}
         currentPrediction={outcomeTokenMarginalPrices[1]}
         lowerBound={scalarLow || new BigNumber(0)}
