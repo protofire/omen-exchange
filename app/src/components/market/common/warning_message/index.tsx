@@ -60,7 +60,7 @@ export const WarningMessage = (props: Props) => {
       <Description className={danger ? 'danger' : ''}>
         {description}{' '}
         {href && hyperlinkDescription && (
-          <Hyperlink href={href} target="_blank">
+          <Hyperlink href={href} rel="noopener noreferrer" target="_blank">
             {hyperlinkDescription}
           </Hyperlink>
         )}

@@ -6,6 +6,7 @@ export enum ButtonType {
   primaryLine,
   secondary,
   secondaryLine,
+  primaryAlternative,
 }
 
 export interface ButtonCommonProps {
@@ -60,6 +61,22 @@ const PrimaryLineCSS = css`
     color: ${props => props.theme.buttonPrimaryLine.colorDisabled};
     cursor: not-allowed;
     opacity: 0.5;
+  }
+`
+
+const PrimaryAlternativeCSS = css`
+  & {
+    border: 1px solid ${props => props.theme.buttonPrimary.borderColorHover};
+    background-color: ${props => props.theme.buttonPrimary.backgroundColor};
+    color: ${props => props.theme.buttonPrimary.color};
+  }
+
+  &[disabled],
+  &[disabled]:hover {
+    background-color: ${props => props.theme.buttonPrimaryLine.backgroundColorDisabled};
+    border-color: ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
+    color: ${props => props.theme.colors.textColorLighter};
+    cursor: not-allowed;
   }
 `
 
@@ -124,6 +141,10 @@ const getButtonTypeStyles = (buttonType: ButtonType = ButtonType.primaryLine): a
 
   if (buttonType === ButtonType.secondaryLine) {
     return SecondaryLineCSS
+  }
+
+  if (buttonType === ButtonType.primaryAlternative) {
+    return PrimaryAlternativeCSS
   }
 
   return PrimaryCSS
