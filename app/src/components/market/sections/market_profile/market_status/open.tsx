@@ -235,7 +235,12 @@ const Wrapper = (props: Props) => {
                   upperBound={scalarHigh || new BigNumber(0)}
                 />
                 {status === Status.Ready && (
-                  <PositionTable balances={balances} collateral={collateral} trades={trades} />
+                  <PositionTable
+                    balances={balances}
+                    collateral={collateral}
+                    currentPrediction={outcomeTokenMarginalPrices[1]}
+                    trades={trades}
+                  />
                 )}
               </>
             ) : (

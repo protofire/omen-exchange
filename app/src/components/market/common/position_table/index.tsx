@@ -36,10 +36,11 @@ interface Props {
   trades: TradeObject[]
   balances: BalanceItem[]
   collateral: Token
+  currentPrediction: string
 }
 
 export const PositionTable = (props: Props) => {
-  const { balances, collateral, trades } = props
+  const { balances, collateral, currentPrediction, trades } = props
 
   const shortTrades = trades.filter(trade => trade.outcomeIndex === '0')
   const longTrades = trades.filter(trade => trade.outcomeIndex === '1')
@@ -51,6 +52,8 @@ export const PositionTable = (props: Props) => {
 
   const [averageShortPrediction, setAverageShortPrediction] = useState<number>(0)
   const [averageLongPrediction, setAverageLongPrediction] = useState<number>(0)
+  const [shortProfitPercentage, setShortProfitPercentage] = useState<number>(0)
+  const [longProfitPercentage, setLongProfitPercentage] = useState<number>(0)
 
   useEffect(() => {
     const averagePrediction = (trades: TradeObject[]) => {
@@ -68,6 +71,11 @@ export const PositionTable = (props: Props) => {
     setAverageShortPrediction(1 - averagePrediction(shortTrades))
     setAverageLongPrediction(averagePrediction(longTrades))
   }, [shortTrades, longTrades])
+
+  useEffect(() => {
+    setShortProfitPercentage((Number(currentPrediction) - averageShortPrediction) * 100)
+    setLongProfitPercentage((Number(currentPrediction) - averageLongPrediction) * 100)
+  }, [averageShortPrediction, averageLongPrediction, currentPrediction])
 
   const TableHead: PositionTableValue[] = [
     PositionTableValue.YourPosition,
@@ -102,7 +110,11 @@ export const PositionTable = (props: Props) => {
         <TDPosition textAlign={TableCellsAlign[0]}>{index === 0 ? 'Short' : 'Long'}</TDPosition>
         <TDStyled textAlign={TableCellsAlign[1]}>{index === 0 ? shortSharesFormatted : longSharesFormatted}</TDStyled>
         <TDStyled textAlign={TableCellsAlign[2]}>0</TDStyled>
-        <TDStyled textAlign={TableCellsAlign[3]}>0</TDStyled>
+        <TDStyled textAlign={TableCellsAlign[3]}>
+          (
+          {index === 0 ? formatNumber(shortProfitPercentage.toString()) : formatNumber(longProfitPercentage.toString())}
+          %)
+        </TDStyled>
       </TR>
     )
   }
