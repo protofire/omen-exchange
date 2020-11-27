@@ -350,9 +350,9 @@ const Wrapper = (props: Props) => {
         {currentTab === marketTabs.buy && (
           <MarketBuyContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
-            isScalar={isScalar}
           />
         )}
         {currentTab === marketTabs.sell && (
