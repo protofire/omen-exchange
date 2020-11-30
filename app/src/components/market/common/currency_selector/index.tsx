@@ -99,7 +99,7 @@ export const CurrencySelector: React.FC<Props> = props => {
         dropdownPosition={DropdownPosition.center}
         items={currencyDropdownData}
         maxHeight={true}
-        placeholder={currency && currentItem === undefined ? <Spinner height={'18px'} width={'18px'} /> : placeholder}
+        placeholder={currency && currentItem === undefined ? <Spinner size="18" /> : placeholder}
         selected={false}
       />
     </Wrapper>
