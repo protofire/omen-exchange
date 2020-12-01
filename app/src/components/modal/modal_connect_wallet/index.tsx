@@ -34,7 +34,6 @@ const Buttons = styled.div`
 `
 
 const ButtonStyled = styled(Button)`
-  height: 38px;
   margin-bottom: 14px;
   width: 200px;
 
@@ -177,7 +176,12 @@ export const ModalConnectWallet = (props: Props) => {
       context.connector.walletConnector.on('connect', () => {
         setConnectingToWalletConnect(false)
         WalletConnectQRCodeModal.close()
+        onClickCloseButton()
       })
+    }
+    if (connectingToWalletConnect && context.account && context.connectorName === Wallet.WalletConnect) {
+      onClickCloseButton()
+      setConnectingToWalletConnect(false)
     }
   }, [context, onClickCloseButton, connectingToWalletConnect])
 

@@ -14,6 +14,7 @@ import { ERC20Service } from './erc20'
 import { MarketMakerService } from './market_maker'
 import { MarketMakerFactoryService } from './market_maker_factory'
 import { OracleService } from './oracle'
+import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
 
 const logger = getLogger('Services::CPKService')
@@ -78,6 +79,12 @@ const proxyAbi = [
   'function swapOwner(address prevOwner, address oldOwner, address newOwner) external',
   'function getOwners() public view returns (address[] memory)',
 ]
+
+interface CPKRequestVerificationParams {
+  params: string
+  ovmAddress: string
+  submissionDeposit: string
+}
 
 class CPKService {
   cpk: any
@@ -486,6 +493,21 @@ class CPKService {
       return this.provider.waitForTransaction(txObject.hash)
     } catch (err) {
       logger.error(`There was an error removing amount '${sharesToBurn.toString()}' for funding`, err.message)
+      throw err
+    }
+  }
+  requestVerification = async ({ ovmAddress, params, submissionDeposit }: CPKRequestVerificationParams) => {
+    try {
+      const signer = this.provider.getSigner()
+      const ovm = new OvmService()
+      const contractInstance = await ovm.createOvmContractInstance(signer, ovmAddress)
+
+      const { hash } = await ovm.generateTransaction(params, contractInstance, submissionDeposit)
+
+      await this.provider.waitForTransaction(hash)
+      return true
+    } catch (err) {
+      logger.error('Error while requesting market verification via Kleros!', err.message)
       throw err
     }
   }

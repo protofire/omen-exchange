@@ -12,7 +12,7 @@ import { CommonDisabledCSS } from '../../../../../common/form/common_styled'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
-import { ButtonContainerFullWidth, MarketBottomNavButton } from '../../../../common/common_styled'
+import { ButtonContainerFullWidth } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome, Outcomes } from '../outcomes'
@@ -32,9 +32,6 @@ const ButtonCategory = styled(Button)<{ focus: boolean; isACategorySelected: boo
   padding-left: 10px;
   padding-right: 10px;
   width: 100%;
-  height: 40px;
-  border-radius: 8px;
-  font-weight: normal;
   &,
   &:hover {
     color: ${props =>
@@ -85,7 +82,7 @@ const ButtonWithReadyToGoStatusCSS = css`
   }
 `
 
-const ButtonWithReadyToGoStatus = styled(MarketBottomNavButton as any)<{ readyToGo: boolean }>`
+const ButtonWithReadyToGoStatus = styled(Button as any)<{ readyToGo: boolean }>`
   ${props => props.readyToGo && ButtonWithReadyToGoStatusCSS}
 `
 
@@ -97,7 +94,7 @@ const CategoryImportWrapper = styled.div`
   padding-bottom: 20px;
 `
 
-const LeftButton = styled(MarketBottomNavButton as any)`
+const LeftButton = styled(Button as any)`
   margin-right: auto;
 `
 

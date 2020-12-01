@@ -22,13 +22,13 @@ import { getToken, pseudoEthAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
-import { ButtonContainer } from '../../../button'
+import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { CurrenciesWrapper, GenericError, MarketBottomNavButton } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -362,12 +362,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <StyledButtonContainer>
-        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
           Cancel
-        </MarketBottomNavButton>
-        <MarketBottomNavButton buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>
+        </Button>
+        <Button buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>
           Buy
-        </MarketBottomNavButton>
+        </Button>
       </StyledButtonContainer>
       <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}

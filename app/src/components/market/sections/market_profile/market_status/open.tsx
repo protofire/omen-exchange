@@ -2,12 +2,11 @@ import React, { useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { WhenConnected } from '../../../../../hooks/connectedWeb3'
+import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
-import { ButtonContainer } from '../../../../button'
+import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { MarketBottomNavButton } from '../../../common/common_styled'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
@@ -17,6 +16,7 @@ import { MarketHistoryContainer } from '../../market_history/market_history_cont
 import { MarketNavigation } from '../../market_navigation'
 import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
 import { MarketSellContainer } from '../../market_sell/market_sell_container'
+import { MarketVerifyContainer } from '../../market_verify/market_verify_container'
 
 const TopCard = styled(ViewCard)`
   padding: 24px;
@@ -89,14 +89,8 @@ const Wrapper = (props: Props) => {
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
 
-  const {
-    address: marketMakerAddress,
-    balances,
-    collateral,
-    isQuestionFinalized,
-    question,
-    totalPoolShares,
-  } = marketMakerData
+  const { balances, collateral, question, totalPoolShares } = marketMakerData
+  const context = useConnectedWeb3Context()
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
@@ -134,19 +128,19 @@ const Wrapper = (props: Props) => {
   )
 
   const openInRealitioButton = (
-    <MarketBottomNavButton
+    <Button
       buttonType={ButtonType.secondaryLine}
       onClick={() => {
         window.open(`${realitioBaseUrl}/app/#!/question/${question.id}`)
       }}
     >
       Answer on Reality.eth
-    </MarketBottomNavButton>
+    </Button>
   )
 
   const buySellButtons = (
     <SellBuyWrapper>
-      <MarketBottomNavButton
+      <Button
         buttonType={ButtonType.secondaryLine}
         disabled={!userHasShares || !hasFunding}
         onClick={() => {
@@ -154,8 +148,8 @@ const Wrapper = (props: Props) => {
         }}
       >
         Sell
-      </MarketBottomNavButton>
-      <MarketBottomNavButton
+      </Button>
+      <Button
         buttonType={ButtonType.secondaryLine}
         disabled={!hasFunding}
         onClick={() => {
@@ -163,7 +157,7 @@ const Wrapper = (props: Props) => {
         }}
       >
         Buy
-      </MarketBottomNavButton>
+      </Button>
     </SellBuyWrapper>
   )
 
@@ -190,9 +184,7 @@ const Wrapper = (props: Props) => {
       <BottomCard>
         <MarketNavigation
           activeTab={currentTab}
-          isQuestionFinalized={isQuestionFinalized}
-          marketAddress={marketMakerAddress}
-          resolutionDate={question.resolution}
+          marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
         {currentTab === marketTabs.swap && (
@@ -209,15 +201,15 @@ const Wrapper = (props: Props) => {
               />
             )}
             <WhenConnected>
-              <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
-                <MarketBottomNavButton
+              <StyledButtonContainer className={!hasFunding || isQuestionOpen ? 'border' : ''}>
+                <Button
                   buttonType={ButtonType.secondaryLine}
                   onClick={() => {
                     history.goBack()
                   }}
                 >
                   Back
-                </MarketBottomNavButton>
+                </Button>
                 {isQuestionOpen ? openInRealitioButton : buySellButtons}
               </StyledButtonContainer>
             </WhenConnected>
@@ -245,7 +237,13 @@ const Wrapper = (props: Props) => {
             switchMarketTab={switchMarketTab}
           />
         )}
-        {/* {currentTab === marketTabs.verify && <p>verify</p>} */}
+        {currentTab === marketTabs.verify && (
+          <MarketVerifyContainer
+            context={context}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
+        )}
       </BottomCard>
     </>
   )
