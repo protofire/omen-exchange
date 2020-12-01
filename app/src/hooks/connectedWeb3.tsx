@@ -1,4 +1,3 @@
-import SafeAppsSdkConnector from 'contract-proxy-kit/lib/esm/safeAppsSdkConnector'
 import { providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
@@ -6,6 +5,8 @@ import { useWeb3Context } from 'web3-react'
 import connectors from '../util/connectors'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
+
+import { useSafeApp } from './useSafeApp'
 
 const logger = getLogger('Hooks::ConnectedWeb3')
 
@@ -37,23 +38,19 @@ export const useConnectedWeb3Context = () => {
  */
 export const ConnectedWeb3: React.FC = props => {
   const [networkId, setNetworkId] = useState<number | null>(null)
-  const [safeSdk] = useState<SafeAppsSdkConnector>(new SafeAppsSdkConnector())
-  const isSafeApp = safeSdk.isSafeApp()
+  const safeAppInfo = useSafeApp()
   const context = useWeb3Context()
   const { account, active, error, library } = context
 
   useEffect(() => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
-    if (isSafeApp && connector !== 'Safe') {
-      if (safeSdk.safeAppInfo) {
-        try {
-          const netId = (networkIds as any)[safeSdk.safeAppInfo.network.toUpperCase()]
-          connectors.Safe.init(safeSdk.safeAppInfo.safeAddress, netId)
-          context.setConnector('Safe')
-        } catch (e) {
-          logger.log(e.message)
-        }
+    if (safeAppInfo) {
+      if (context.connectorName !== 'Safe') {
+        localStorage.removeItem('CONNECTOR')
+        const netId = (networkIds as any)[safeAppInfo.network.toUpperCase()]
+        connectors.Safe.init(safeAppInfo.safeAddress, netId)
+        context.setConnector('Safe')
       }
     } else if (active) {
       if (connector && connector in connectors) {
@@ -79,7 +76,7 @@ export const ConnectedWeb3: React.FC = props => {
     return () => {
       isSubscribed = false
     }
-  }, [context, library, active, error, networkId, isSafeApp, safeSdk.safeAppInfo])
+  }, [context, library, active, error, networkId, safeAppInfo])
 
   if (!networkId || !library) {
     return null
