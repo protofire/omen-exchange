@@ -93,7 +93,6 @@ const Wrapper = (props: Props) => {
     balances,
     collateral: collateralToken,
     isConditionResolved,
-    isQuestionFinalized,
     payouts,
     question,
   } = marketMakerData
@@ -259,9 +258,7 @@ const Wrapper = (props: Props) => {
         <MarketNavigation
           activeTab={currentTab}
           hasWinningOutcomes={hasWinningOutcomes}
-          isQuestionFinalized={isQuestionFinalized}
-          marketAddress={marketMakerAddress}
-          resolutionDate={question.resolution}
+          marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
         {currentTab === marketTabs.swap && (
