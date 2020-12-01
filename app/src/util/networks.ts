@@ -92,10 +92,10 @@ const networks: { [K in NetworkId]: Network } = {
     omenTCRListId: 1,
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
-      realitioScalarAdapter: '0x3A4A1EFF11b81d3ecEbc92f1Ce902F2C738867b8',
+      realitioScalarAdapter: '0x0e8Db8caD541C0Bf5b611636e81fEc0828bc7902',
       marketMakerFactory: '0x0fB4340432e56c014fa96286de17222822a9281b',
       conditionalTokens: '0x36bede640D19981A82090519bC1626249984c908',
-      oracle: '0x576b76eebe6b5411c0ef310e65de9bff8a60130f',
+      oracle: '0x17174dC1b62add32a1DE477A357e75b0dcDEed6E',
       klerosBadge: '0x0000000000000000000000000000000000000000',
       klerosTokenView: '0x0000000000000000000000000000000000000000',
       klerosTCR: '0x0000000000000000000000000000000000000000',
