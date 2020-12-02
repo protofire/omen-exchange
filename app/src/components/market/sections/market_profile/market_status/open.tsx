@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { useCpk } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useGraphMarketTradeData } from '../../../../../hooks/useGraphMarketTradeData'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
@@ -94,6 +95,7 @@ const Wrapper = (props: Props) => {
   const history = useHistory()
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
+  const cpk = useCpk()
 
   const {
     address: marketMakerAddress,
@@ -191,22 +193,7 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
-  const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
-
-  useEffect(() => {
-    const getCpkAddress = async () => {
-      try {
-        const cpk = await CPKService.create(provider)
-        setCpkAddress(cpk.address)
-      } catch (e) {
-        console.error('Could not get address of CPK', e.message)
-      }
-    }
-
-    getCpkAddress()
-  }, [provider, account])
-
-  const { status, trades } = useGraphMarketTradeData(question.title, collateral.address, cpkAddress?.toLowerCase())
+  const { status, trades } = useGraphMarketTradeData(question.title, collateral.address, cpk?.address.toLowerCase())
 
   return (
     <>

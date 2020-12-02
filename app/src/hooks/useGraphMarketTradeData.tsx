@@ -38,6 +38,8 @@ export const useGraphMarketTradeData = (title: string, collateral: string, accou
     variables: { title: title, collateral: collateral, account: account },
   })
 
+  console.log(data)
+
   useEffect(() => {
     if (!title || !collateral || !account) setTrades([])
   }, [title, collateral])
