@@ -33,13 +33,14 @@ interface Props extends RouteComponentProps<any> {
   context: ConnectedWeb3Context
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: string) => void
+  fetchGraphMarketMakerData: () => Promise<void>
 }
 
 const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
-  const { context, marketMakerData } = props || {}
+  const { context, fetchGraphMarketMakerData, marketMakerData } = props || {}
   const [selection, setSelection] = useState<number | undefined>()
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-  const { data, error, status } = useKlerosCuration(marketMakerData, context)
+  const { data, error, status } = useKlerosCuration(marketMakerData, context, fetchGraphMarketMakerData)
 
   const history = useHistory()
   const cpk = useCpk()
@@ -93,6 +94,8 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
         submissionDeposit: data.submissionDeposit,
         ovmAddress,
       })
+
+      setIsModalOpen(false)
     } catch {
       setIsModalOpen(false)
     }

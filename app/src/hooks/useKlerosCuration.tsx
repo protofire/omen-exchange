@@ -5,6 +5,7 @@ import { KlerosCurationData, MarketMakerData, Status } from '../util/types'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
+import { useGraphMeta } from './useGraphMeta'
 
 const logger = getLogger('KlerosCuration')
 
@@ -14,16 +15,24 @@ type Result = {
   error: Maybe<Error>
 }
 
-export const useKlerosCuration = (marketMakerData: MarketMakerData, context: ConnectedWeb3Context): Result => {
+export const useKlerosCuration = (
+  marketMakerData: MarketMakerData,
+  context: ConnectedWeb3Context,
+  fetchGraphMarketMakerData: () => Promise<void>,
+): Result => {
   const { kleros } = useContracts(context)
   const [data, setData] = useState<Maybe<KlerosCurationData>>(null)
   const [error, setError] = useState<Maybe<Error>>(null)
   const [loading, setLoading] = useState<boolean>(false)
+  const { waitForBlockToSync } = useGraphMeta()
 
   const fetchData = useCallback(() => {
     ;(async () => {
       try {
         setLoading(true)
+
+        fetchGraphMarketMakerData()
+
         const [
           listingCriteriaURL,
           submissionDeposit,
@@ -58,6 +67,7 @@ export const useKlerosCuration = (marketMakerData: MarketMakerData, context: Con
         setLoading(false)
       }
     })()
+    // eslint-disable-next-line
   }, [kleros, marketMakerData])
 
   useEffect(() => {
@@ -70,18 +80,23 @@ export const useKlerosCuration = (marketMakerData: MarketMakerData, context: Con
   useEffect(() => {
     if (!kleros || error) return
 
-    kleros.omenVerifiedMarkets.on('ItemStatusChange', () => {
-      setTimeout(fetchData, 5000) // Give time for the subgraph to sync.
+    kleros.omenVerifiedMarkets.on('ItemStatusChange', async (...args) => {
+      const event = args.pop()
+      await waitForBlockToSync(event.blockNumber)
+      fetchData()
     })
 
-    kleros.omenVerifiedMarkets.on('Dispute', () => {
-      setTimeout(fetchData, 5000) // Give time for the subgraph to sync.
+    kleros.omenVerifiedMarkets.on('Dispute', async (...args) => {
+      const event = args.pop()
+      await waitForBlockToSync(event.blockNumber)
+      fetchData()
     })
 
     return () => {
       kleros.omenVerifiedMarkets.removeAllListeners('ItemStatusChange')
       kleros.omenVerifiedMarkets.removeAllListeners('Dispute')
     }
+    // eslint-disable-next-line
   }, [error, fetchData, kleros])
 
   return {
