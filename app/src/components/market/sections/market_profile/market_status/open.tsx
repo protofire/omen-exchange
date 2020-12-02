@@ -221,7 +221,7 @@ const Wrapper = (props: Props) => {
                   unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
                   upperBound={scalarHigh || new BigNumber(0)}
                 />
-                {status === Status.Ready && (
+                {status === Status.Ready && !!trades.length && (
                   <PositionTable
                     balances={balances}
                     collateral={collateral}

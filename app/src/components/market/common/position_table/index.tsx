@@ -57,6 +57,7 @@ export const PositionTable = (props: Props) => {
 
   useEffect(() => {
     const averagePrediction = (trades: TradeObject[]) => {
+      if (!trades.length) return 0
       const individualAverages = trades.map(trade => {
         return (Number(trade.outcomeTokenMarginalPrice) + Number(trade.oldOutcomeTokenMarginalPrice)) / 2
       })

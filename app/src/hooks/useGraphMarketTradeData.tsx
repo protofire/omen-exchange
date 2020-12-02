@@ -30,7 +30,7 @@ type Result = {
 }
 
 export const useGraphMarketTradeData = (title: string, collateral: string, account: string | undefined): Result => {
-  const [trades, setTrades] = useState<TradeObject[]>([])
+  let trades: TradeObject[] = []
 
   const { data, error, loading } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
@@ -38,16 +38,16 @@ export const useGraphMarketTradeData = (title: string, collateral: string, accou
     variables: { title: title, collateral: collateral, account: account },
   })
 
-  console.log(data)
-
   useEffect(() => {
-    if (!title || !collateral || !account) setTrades([])
+    if (!title || !collateral || !account) {
+      trades = []
+    }
   }, [title, collateral])
 
   if (data && data.fpmmTrades && !isObjectEqual(trades, data.fpmmTrades)) {
-    setTrades(data.fpmmTrades)
+    trades = data.fpmmTrades
   } else if (data && data.fpmmTrades && !data.fpmmTrades.length) {
-    setTrades([])
+    trades = []
   }
 
   return {
