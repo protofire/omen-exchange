@@ -210,12 +210,10 @@ export const HistorySelect: React.FC<Props> = ({
   useEffect(() => {
     setPageIndex(0)
     refetch()
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type])
   useEffect(() => {
     refetch()
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const loadNextPage = () => {
