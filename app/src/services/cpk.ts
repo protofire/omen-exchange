@@ -496,7 +496,11 @@ class CPKService {
     }
   }
 
-  requestVerification = async ({ ovmAddress, params, submissionDeposit }: CPKRequestVerificationParams) => {
+  requestVerification = async ({
+    ovmAddress,
+    params,
+    submissionDeposit,
+  }: CPKRequestVerificationParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const ovm = new OvmService()
@@ -504,8 +508,7 @@ class CPKService {
 
       const { hash } = await ovm.generateTransaction(params, contractInstance, submissionDeposit)
 
-      await this.provider.waitForTransaction(hash)
-      return true
+      return this.provider.waitForTransaction(hash)
     } catch (err) {
       logger.error('Error while requesting market verification via Kleros!', err.message)
       throw err
