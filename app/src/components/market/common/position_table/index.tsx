@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
@@ -54,31 +55,61 @@ export const PositionTable = (props: Props) => {
   const [averageLongPrediction, setAverageLongPrediction] = useState<number>(0)
   const [shortProfitPercentage, setShortProfitPercentage] = useState<number>(0)
   const [longProfitPercentage, setLongProfitPercentage] = useState<number>(0)
+  const [totalShortCollateralAmount, setTotalShortCollateralAmount] = useState<BigNumber>(new BigNumber(0))
+  const [totalLongCollateralAmount, setTotalLongCollateralAmount] = useState<BigNumber>(new BigNumber(0))
+  const [shortProfitAmount, setShortProfitAmount] = useState<number>(0)
+  const [longProfitAmount, setLongProfitAmount] = useState<number>(0)
 
   useEffect(() => {
-    const averagePrediction = (trades: TradeObject[]) => {
-      if (!trades.length) return 0
+    const calcPositionData = (
+      trades: TradeObject[],
+    ): { averagePrediction: number; totalCollateralAmount: BigNumber } => {
+      if (!trades.length) return { averagePrediction: 0, totalCollateralAmount: new BigNumber(0) }
       const tradePrices = trades.map(trade => {
         return Number(trade.outcomeTokenMarginalPrice)
       })
-      const collateralAmounts = trades.map(trade =>
-        Number(formatBigNumber(trade.collateralAmount, collateral.decimals)),
-      )
-      const totalCollateralAmount = collateralAmounts.reduce((a, b) => a + b)
-      const collateralWeights = collateralAmounts.map(collateralAmount => collateralAmount / totalCollateralAmount)
-      const tradeSums = tradePrices.map((trade, i) => trade * collateralWeights[i])
+      const collateralAmounts = trades.map(trade => trade.collateralAmount)
+      const totalCollateralAmount = collateralAmounts.reduce((a, b) => a.add(b))
+      const collateralWeights = collateralAmounts.map(collateralAmount => collateralAmount.div(totalCollateralAmount))
+      const tradeSums = tradePrices.map((trade, i) => trade * collateralWeights[i].toNumber())
       const averagePrediction = tradeSums.reduce((a, b) => a + b)
-      return averagePrediction
+      return { averagePrediction, totalCollateralAmount }
     }
 
-    setAverageShortPrediction(1 - averagePrediction(shortTrades))
-    setAverageLongPrediction(averagePrediction(longTrades))
+    const {
+      averagePrediction: averageShortPrediction,
+      totalCollateralAmount: totalShortCollateralAmount,
+    } = calcPositionData(shortTrades)
+    const {
+      averagePrediction: averageLongPrediction,
+      totalCollateralAmount: totalLongCollateralAmount,
+    } = calcPositionData(longTrades)
+
+    setAverageShortPrediction(1 - averageShortPrediction)
+    setAverageLongPrediction(averageLongPrediction)
+    setTotalShortCollateralAmount(totalShortCollateralAmount)
+    setTotalLongCollateralAmount(totalLongCollateralAmount)
   }, [shortTrades, longTrades])
 
   useEffect(() => {
     setShortProfitPercentage(averageShortPrediction - Number(currentPrediction) * 100)
     setLongProfitPercentage((Number(currentPrediction) - averageLongPrediction) * 100)
-  }, [averageShortPrediction, averageLongPrediction, currentPrediction])
+    setShortProfitAmount(
+      (shortProfitPercentage * Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals))) / 100,
+    )
+    setLongProfitAmount(
+      (longProfitPercentage * Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals))) / 100,
+    )
+  }, [
+    averageShortPrediction,
+    averageLongPrediction,
+    currentPrediction,
+    collateral.decimals,
+    longProfitPercentage,
+    shortProfitPercentage,
+    totalLongCollateralAmount,
+    totalShortCollateralAmount,
+  ])
 
   const TableHead: PositionTableValue[] = [
     PositionTableValue.YourPosition,
@@ -114,7 +145,7 @@ export const PositionTable = (props: Props) => {
         <TDStyled textAlign={TableCellsAlign[1]}>{index === 0 ? shortSharesFormatted : longSharesFormatted}</TDStyled>
         <TDStyled textAlign={TableCellsAlign[2]}>0</TDStyled>
         <TDStyled textAlign={TableCellsAlign[3]}>
-          (
+          {index === 0 ? formatNumber(shortProfitAmount.toString()) : formatNumber(longProfitAmount.toString())}(
           {index === 0 ? formatNumber(shortProfitPercentage.toString()) : formatNumber(longProfitPercentage.toString())}
           %)
         </TDStyled>
