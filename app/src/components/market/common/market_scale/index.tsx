@@ -288,6 +288,18 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     setIsAmountInputted(newPrediction ? newPrediction !== Number(currentPrediction) : false)
   }, [newPrediction, currentPrediction])
 
+  useEffect(() => {
+    setScaleValue(
+      newPrediction
+        ? newPrediction * 100
+        : currentPrediction
+        ? Number(currentPrediction) * 100
+        : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+    )
+    newPrediction &&
+      setScaleValuePrediction(Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
+  }, [newPrediction, currentPrediction, lowerBoundNumber, startingPointNumber, upperBoundNumber])
+
   const [scaleValue, setScaleValue] = useState<number | undefined>(
     newPrediction
       ? newPrediction * 100
@@ -295,7 +307,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       ? Number(currentPrediction) * 100
       : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
   )
-  const [scaleValuePrediction, setScaleValuePrediction] = useState(newPredictionNumber)
+  const [scaleValuePrediction, setScaleValuePrediction] = useState(
+    newPredictionNumber ? newPredictionNumber : currentPredictionNumber,
+  )
   const [yourPayout, setYourPayout] = useState(0)
   const [profitLoss, setProfitLoss] = useState(0)
 
@@ -305,17 +319,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     setScaleValuePrediction((Number(scaleBall?.value) / 100) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
     ReactTooltip.rebuild()
   }
-
-  useEffect(() => {
-    setScaleValue(
-      newPrediction
-        ? newPrediction * 100
-        : currentPrediction
-        ? Number(currentPrediction) * 100
-        : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
-    )
-    setScaleValuePrediction(Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
-  }, [newPrediction, currentPrediction, lowerBoundNumber, startingPointNumber, upperBoundNumber])
 
   useEffect(() => {
     if (!positionTable) {
