@@ -330,11 +330,11 @@ export type BuildQueryType = MarketFilters & {
 
 export type TradeObject = {
   title: string
-  outcomeTokensTraded: string
-  collateralAmount: string
-  feeAmount: string
-  outcomeTokenMarginalPrice: string
-  oldOutcomeTokenMarginalPrice: string
+  outcomeTokensTraded: BigNumber
+  collateralAmount: BigNumber
+  feeAmount: BigNumber
+  outcomeTokenMarginalPrice: number
+  oldOutcomeTokenMarginalPrice: number
   type: string
   outcomeIndex: string
 }

@@ -1,4 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
@@ -20,13 +21,41 @@ const query = gql`
   }
 `
 
+type GraphResponseTradeObject = {
+  title: string
+  outcomeTokensTraded: string
+  collateralAmount: string
+  feeAmount: string
+  outcomeTokenMarginalPrice: string
+  oldOutcomeTokenMarginalPrice: string
+  type: string
+  outcomeIndex: string
+}
+
 type GraphResponse = {
-  fpmmTrades: Maybe<TradeObject[]>
+  fpmmTrades: Maybe<GraphResponseTradeObject[]>
 }
 
 type Result = {
   trades: TradeObject[]
   status: Status
+}
+
+const wrangleResponse = (data: GraphResponseTradeObject[]) => {
+  const mappedData = data.map(datum => {
+    return {
+      title: datum.title,
+      outcomeTokensTraded: bigNumberify(datum.outcomeTokensTraded),
+      collateralAmount: bigNumberify(datum.collateralAmount),
+      feeAmount: bigNumberify(datum.feeAmount),
+      outcomeTokenMarginalPrice: Number(datum.outcomeTokenMarginalPrice),
+      oldOutcomeTokenMarginalPrice: Number(datum.oldOutcomeTokenMarginalPrice),
+      type: datum.type,
+      outcomeIndex: datum.outcomeIndex,
+    }
+  })
+
+  return mappedData
 }
 
 export const useGraphMarketTradeData = (title: string, collateral: string, account: string | undefined): Result => {
@@ -45,7 +74,7 @@ export const useGraphMarketTradeData = (title: string, collateral: string, accou
   }, [title, collateral])
 
   if (data && data.fpmmTrades && !isObjectEqual(trades, data.fpmmTrades)) {
-    trades = data.fpmmTrades
+    trades = wrangleResponse(data.fpmmTrades)
   } else if (data && data.fpmmTrades && !data.fpmmTrades.length) {
     trades = []
   }
