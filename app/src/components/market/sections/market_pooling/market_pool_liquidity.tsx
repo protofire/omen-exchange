@@ -185,6 +185,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
+
   const sharesAfterAddingFunding = sendAmountsAfterAddingFunding
     ? balances.map((balance, i) => balance.shares.add(sendAmountsAfterAddingFunding[i]))
     : balances.map(balance => balance.shares)

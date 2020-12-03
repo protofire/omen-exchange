@@ -1,3 +1,4 @@
+import { formatUnits } from 'ethers/utils'
 import React from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
@@ -75,6 +76,7 @@ type Props = {
   currency: string
   next: boolean
   prev: boolean
+  shareData: string[]
 }
 
 export const HistoryTable: React.FC<Props> = ({
@@ -84,6 +86,7 @@ export const HistoryTable: React.FC<Props> = ({
   onLoadNextPage,
   onLoadPrevPage,
   prev,
+  shareData,
   status,
 }) => {
   const history = useHistory()
@@ -105,17 +108,21 @@ export const HistoryTable: React.FC<Props> = ({
         {status === 'Ready' &&
           fpmmTrade &&
           fpmmTrade.map(
-            ({
-              collateralTokenAmount,
-              creationTimestamp,
-              id,
-              sharesOrPoolTokenAmount,
-              transactionHash,
-              transactionType,
-              user,
-            }) => {
+            (
+              {
+                collateralTokenAmount,
+                creationTimestamp,
+                decimals,
+                fpmmType,
+                id,
+                sharesOrPoolTokenAmount,
+                transactionHash,
+                transactionType,
+                user,
+              },
+              index,
+            ) => {
               const chainID = windowObj.ethereum.chainId
-
               const mainnetOrRinkebyUrl =
                 chainID === '0x4'
                   ? 'https://rinkeby.etherscan.io/tx/'
@@ -130,9 +137,13 @@ export const HistoryTable: React.FC<Props> = ({
                     <span>{formatHistoryUser(user)}</span>
                   </HistoryRow>
                   <HistoryRow width={'18'}>{transactionType}</HistoryRow>
-                  <HistoryRow width={'20'}>{sharesOrPoolTokenAmount}</HistoryRow>
+                  <HistoryRow width={'20'}>
+                    {fpmmType === 'Liquidity'
+                      ? `${shareData[index]}/${sharesOrPoolTokenAmount}`
+                      : sharesOrPoolTokenAmount}
+                  </HistoryRow>
                   <HistoryRow width={'22'}>
-                    {collateralTokenAmount}
+                    {parseFloat(formatUnits(collateralTokenAmount, decimals)).toFixed(2)}
                     {` ${currency}`}
                   </HistoryRow>
                   <HistoryRow as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank" width={'18'}>

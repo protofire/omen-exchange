@@ -57,6 +57,10 @@ class MarketMakerService {
     return this.contract.address
   }
 
+  getBlockNumber = async (transactionHash: string): Promise<string> => {
+    return this.provider.getTransaction(transactionHash)
+  }
+
   getConditionalTokens = async (): Promise<string> => {
     return this.contract.conditionalTokens()
   }
@@ -124,6 +128,30 @@ class MarketMakerService {
    * Return the holdings of each outcome for the given address
    */
   getBalanceInformation = async (ownerAddress: string, outcomeQuantity: number): Promise<BigNumber[]> => {
+    const conditionId = await this.contract.conditionIds(0)
+    const collateralTokenAddress = await this.getCollateralToken()
+
+    const balances = []
+    logger.debug(`Balance information :: Outcomes quantity ${outcomeQuantity}`)
+    for (let i = 0; i < outcomeQuantity; i++) {
+      const collectionId = await this.conditionalTokens.getCollectionIdForOutcome(conditionId, 1 << i)
+
+      logger.debug(
+        `Balance information :: Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
+      )
+      const positionIdForCollectionId = await this.conditionalTokens.getPositionId(collateralTokenAddress, collectionId)
+      const balance = await this.conditionalTokens.getBalanceOf(ownerAddress, positionIdForCollectionId)
+
+      logger.debug(`Balance information :: Balance ${balance.toString()}`)
+      balances.push(balance)
+    }
+    return balances
+  }
+  getBalanceInformationByBlock = async (
+    ownerAddress: any,
+    outcomeQuantity: number,
+    blockNumber: number,
+  ): Promise<BigNumber[]> => {
     const conditionId = await this.getConditionId()
     const collateralTokenAddress = await this.getCollateralToken()
 
@@ -135,7 +163,11 @@ class MarketMakerService {
         `Balance information :: Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
       )
       const positionIdForCollectionId = await this.conditionalTokens.getPositionId(collateralTokenAddress, collectionId)
-      const balance = await this.conditionalTokens.getBalanceOf(ownerAddress, positionIdForCollectionId)
+      const balance = await this.conditionalTokens.getBalanceOfByBlock(
+        ownerAddress,
+        positionIdForCollectionId,
+        blockNumber,
+      )
       logger.debug(`Balance information :: Balance ${balance.toString()}`)
       balances.push(balance)
     }
@@ -187,6 +219,14 @@ class MarketMakerService {
   poolSharesTotalSupply = async (): Promise<BigNumber> => {
     try {
       return this.contract.totalSupply()
+    } catch (err) {
+      logger.error(`There was an error getting the supply of pool shares`, err.message)
+      throw err
+    }
+  }
+  poolSharesTotalSupplyByBlockNumber = async (data: number): Promise<BigNumber> => {
+    try {
+      return this.contract.totalSupply({ blockTag: data })
     } catch (err) {
       logger.error(`There was an error getting the supply of pool shares`, err.message)
       throw err

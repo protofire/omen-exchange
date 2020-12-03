@@ -65,6 +65,7 @@ export type FpmmTradeDataType = {
   creationTimestamp: string
   transactionHash: string
   fpmmType: string
+  decimals?: string
 }
 interface FpmmTradeData {
   id: string
@@ -81,6 +82,7 @@ interface FpmmTradeData {
   creationTimestamp: string
   transactionHash: string
   fpmmType: string
+  decimals?: string
 }
 
 interface Result {
@@ -102,10 +104,12 @@ const wrangleResponse = (data: any, decimals: number) => {
       user: {
         id: trade.user.id,
       },
+      fpmmType: trade.fpmmType,
+      decimals: decimals,
       collateralTokenAddress: trade.fpmm.collateralToken,
       sharesOrPoolTokenAmount: parseFloat(formatUnits(trade.sharesOrPoolTokenAmount, decimals)).toFixed(2),
       creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
-      collateralTokenAmount: parseFloat(formatUnits(trade.collateralTokenAmount, decimals)).toFixed(2),
+      collateralTokenAmount: trade.collateralTokenAmount,
       transactionHash: trade.transactionHash,
     }
   })

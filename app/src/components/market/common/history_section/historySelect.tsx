@@ -1,10 +1,12 @@
-import { bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
+import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { useGraphFpmmTransactionsFromQuestion } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
-import { calcPrice } from '../../../../util/tools'
+import { CPKService } from '../../../../services'
+import { calcPrice, calculateSharesBought } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { Button, ButtonSelectable } from '../../../button'
 import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
@@ -109,6 +111,14 @@ export const HistorySelect: React.FC<Props> = ({
   outcomes,
   value,
 }) => {
+  const context = useConnectedWeb3Context()
+  const { library: provider } = context
+  const contracts = useContracts(context)
+  const { buildMarketMaker } = contracts
+  const marketMaker = buildMarketMaker(marketMakerAddress)
+  const [sharesData, setSharesData] = useState<string[]>([])
+  const [sharesDataLoader, setSharesDataLoader] = useState<boolean>(true)
+
   const data =
     holdingSeries &&
     holdingSeries
@@ -152,13 +162,60 @@ export const HistorySelect: React.FC<Props> = ({
     type,
     decimals,
   )
+
+  useEffect(() => {
+    ;(async () => {
+      setSharesDataLoader(true)
+      if (fpmmTrade) {
+        const response: any[] = await Promise.all(
+          fpmmTrade.map(async item => {
+            const block = await marketMaker.getBlockNumber(item.transactionHash)
+            return {
+              blockNumber: block,
+              amount: item.collateralTokenAmount,
+            }
+          }),
+        )
+
+        if (response) {
+          const cpk = await CPKService.create(provider)
+
+          const poolTokensForEveryOne = await Promise.all(
+            response.map(async ({ amount, blockNumber }) => {
+              return {
+                poolShares: await marketMaker.poolSharesTotalSupplyByBlockNumber(blockNumber.blockNumber),
+                balances: await marketMaker.getBalanceInformationByBlock(
+                  marketMakerAddress,
+                  outcomes.length,
+                  blockNumber.blockNumber,
+                ),
+                shares: await marketMaker.getBalanceInformationByBlock(
+                  cpk.address,
+                  outcomes.length,
+                  blockNumber.blockNumber,
+                ),
+                buyAmount: new BigNumber(amount),
+              }
+            }),
+          )
+          const sharesForCurrentItems = calculateSharesBought(poolTokensForEveryOne, decimals)
+          setSharesData(sharesForCurrentItems)
+          setSharesDataLoader(false)
+        }
+      }
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fpmmTrade])
+
   useEffect(() => {
     setPageIndex(0)
     refetch()
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type])
   useEffect(() => {
     refetch()
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const loadNextPage = () => {
@@ -176,7 +233,7 @@ export const HistorySelect: React.FC<Props> = ({
     setPageIndex(newPageIndex)
   }
 
-  if (!data || status === 'Loading') {
+  if (!data || status === 'Loading' || sharesDataLoader) {
     return <CustomInlineLoading message="Loading Trade History" />
   }
   if (holdingSeries && holdingSeries.length <= 1) {
@@ -213,6 +270,7 @@ export const HistorySelect: React.FC<Props> = ({
           onLoadNextPage={loadNextPage}
           onLoadPrevPage={loadPrevPage}
           prev={pageIndex < 1}
+          shareData={sharesData}
           status={status}
         />
       ) : (
