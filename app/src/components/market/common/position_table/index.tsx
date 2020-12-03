@@ -59,6 +59,8 @@ export const PositionTable = (props: Props) => {
   const [totalLongCollateralAmount, setTotalLongCollateralAmount] = useState<BigNumber>(new BigNumber(0))
   const [shortProfitAmount, setShortProfitAmount] = useState<number>(0)
   const [longProfitAmount, setLongProfitAmount] = useState<number>(0)
+  const [shortPayoutAmount, setShortPayoutAmount] = useState<number>(0)
+  const [longPayoutAmount, setLongPayoutAmount] = useState<number>(0)
 
   useEffect(() => {
     const calcPositionData = (
@@ -100,6 +102,8 @@ export const PositionTable = (props: Props) => {
     setLongProfitAmount(
       (longProfitPercentage * Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals))) / 100,
     )
+    setShortPayoutAmount(Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals)) + shortProfitAmount)
+    setLongPayoutAmount(Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals)) + longProfitAmount)
   }, [
     averageShortPrediction,
     averageLongPrediction,
@@ -143,7 +147,9 @@ export const PositionTable = (props: Props) => {
       <TR>
         <TDPosition textAlign={TableCellsAlign[0]}>{index === 0 ? 'Short' : 'Long'}</TDPosition>
         <TDStyled textAlign={TableCellsAlign[1]}>{index === 0 ? shortSharesFormatted : longSharesFormatted}</TDStyled>
-        <TDStyled textAlign={TableCellsAlign[2]}>0</TDStyled>
+        <TDStyled textAlign={TableCellsAlign[2]}>
+          {index === 0 ? formatNumber(shortPayoutAmount.toString()) : formatNumber(longPayoutAmount.toString())}
+        </TDStyled>
         <TDStyled textAlign={TableCellsAlign[3]}>
           {index === 0 ? formatNumber(shortProfitAmount.toString()) : formatNumber(longProfitAmount.toString())}(
           {index === 0 ? formatNumber(shortProfitPercentage.toString()) : formatNumber(longProfitPercentage.toString())}
