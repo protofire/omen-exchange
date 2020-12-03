@@ -240,6 +240,7 @@ const Wrapper = (props: Props) => {
         {currentTab === marketTabs.verify && (
           <MarketVerifyContainer
             context={context}
+            fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />
