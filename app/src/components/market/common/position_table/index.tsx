@@ -58,13 +58,13 @@ export const PositionTable = (props: Props) => {
   useEffect(() => {
     const averagePrediction = (trades: TradeObject[]) => {
       if (!trades.length) return 0
-      const individualAverages = trades.map(trade => {
-        return (Number(trade.outcomeTokenMarginalPrice) + Number(trade.oldOutcomeTokenMarginalPrice)) / 2
+      const tradePrices = trades.map(trade => {
+        return Number(trade.outcomeTokenMarginalPrice)
       })
       const collateralAmounts = trades.map(trade => Number(trade.collateralAmount))
       const totalCollateralAmount = collateralAmounts.reduce((a, b) => a + b)
       const collateralWeights = collateralAmounts.map(collateralAmount => collateralAmount / totalCollateralAmount)
-      const tradeSums = individualAverages.map((individualAverage, i) => individualAverage * collateralWeights[i])
+      const tradeSums = tradePrices.map((trade, i) => trade * collateralWeights[i])
       const averagePrediction = tradeSums.reduce((a, b) => a + b)
       return averagePrediction
     }
