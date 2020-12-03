@@ -318,42 +318,44 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   }, [newPrediction, currentPrediction, lowerBoundNumber, startingPointNumber, upperBoundNumber])
 
   useEffect(() => {
-    let positionValue
-    if (long) {
-      if (scaleValuePrediction > newPredictionNumber) {
-        positionValue = (scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
-        setYourPayout(positionValue * (potentialProfitNumber || 0))
-        setProfitLoss(((positionValue * (potentialProfitNumber || 0)) / (amountNumber || 0)) * 100)
+    if (!positionTable) {
+      let positionValue
+      if (long) {
+        if (scaleValuePrediction > newPredictionNumber) {
+          positionValue = (scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
+          setYourPayout(positionValue * (potentialProfitNumber || 0))
+          setProfitLoss(((positionValue * (potentialProfitNumber || 0)) / (amountNumber || 0)) * 100)
+        } else {
+          positionValue = -(scaleValuePrediction - newPredictionNumber) / (lowerBoundNumber - newPredictionNumber)
+          setYourPayout(
+            positionValue * (potentialLossNumber || 0) < -(amountNumber || 0)
+              ? -(amountNumber || 0)
+              : positionValue * (potentialLossNumber || 0),
+          )
+          setProfitLoss(
+            -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100 < -100
+              ? -100
+              : -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100,
+          )
+        }
       } else {
-        positionValue = -(scaleValuePrediction - newPredictionNumber) / (lowerBoundNumber - newPredictionNumber)
-        setYourPayout(
-          positionValue * (potentialLossNumber || 0) < -(amountNumber || 0)
-            ? -(amountNumber || 0)
-            : positionValue * (potentialLossNumber || 0),
-        )
-        setProfitLoss(
-          -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100 < -100
-            ? -100
-            : -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100,
-        )
-      }
-    } else {
-      if (scaleValuePrediction <= newPredictionNumber) {
-        positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
-        setYourPayout(positionValue * (potentialProfitNumber || 0))
-        setProfitLoss(((positionValue * (potentialProfitNumber || 0)) / (amountNumber || 0)) * 100)
-      } else {
-        positionValue = -(scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
-        setYourPayout(
-          positionValue * (potentialLossNumber || 0) < -(amountNumber || 0)
-            ? -(amountNumber || 0)
-            : positionValue * (potentialLossNumber || 0),
-        )
-        setProfitLoss(
-          -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100 < -100
-            ? -100
-            : -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100,
-        )
+        if (scaleValuePrediction <= newPredictionNumber) {
+          positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
+          setYourPayout(positionValue * (potentialProfitNumber || 0))
+          setProfitLoss(((positionValue * (potentialProfitNumber || 0)) / (amountNumber || 0)) * 100)
+        } else {
+          positionValue = -(scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
+          setYourPayout(
+            positionValue * (potentialLossNumber || 0) < -(amountNumber || 0)
+              ? -(amountNumber || 0)
+              : positionValue * (potentialLossNumber || 0),
+          )
+          setProfitLoss(
+            -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100 < -100
+              ? -100
+              : -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100,
+          )
+        }
       }
     }
   }, [
@@ -397,7 +399,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               className="scale-ball"
               data-for="scalarTooltip"
               data-tip={`${formatNumber(scaleValuePrediction.toString())} ${unit}`}
-              disabled={!isAmountInputted}
+              disabled={!isAmountInputted && !positionTable}
               max="100"
               min="0"
               onChange={handleScaleBallChange}
@@ -493,7 +495,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           <PositionTable
             balances={balances}
             collateral={collateral}
-            currentPrediction={currentPrediction}
+            currentPrediction={
+              scaleValue || scaleValue === 0
+                ? (scaleValue / 100 === 0 ? 0.01 : scaleValue / 100).toString()
+                : currentPrediction
+            }
             trades={trades}
           />
         )}
