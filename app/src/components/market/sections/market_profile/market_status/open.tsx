@@ -213,22 +213,19 @@ const Wrapper = (props: Props) => {
             {isScalar ? (
               <>
                 <MarketScale
+                  balances={balances}
                   borderBottom={false}
                   borderTop={true}
+                  collateral={collateral}
                   currentPrediction={outcomeTokenMarginalPrices[1]}
                   lowerBound={scalarLow || new BigNumber(0)}
+                  positionTable={true}
                   startingPointTitle={'Current prediction'}
+                  status={status}
+                  trades={trades}
                   unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
                   upperBound={scalarHigh || new BigNumber(0)}
                 />
-                {status === Status.Ready && !!trades.length && (
-                  <PositionTable
-                    balances={balances}
-                    collateral={collateral}
-                    currentPrediction={outcomeTokenMarginalPrices[1]}
-                    trades={trades}
-                  />
-                )}
               </>
             ) : (
               renderTableData()

@@ -4,7 +4,8 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
-import { Token } from '../../../../util/types'
+import { BalanceItem, Status, Token, TradeObject } from '../../../../util/types'
+import { PositionTable } from '../position_table'
 
 const SCALE_HEIGHT = '20px'
 const BAR_WIDTH = '2px'
@@ -232,11 +233,16 @@ interface Props {
   potentialProfit?: Maybe<BigNumber>
   collateral?: Maybe<Token>
   amount?: Maybe<BigNumber>
+  positionTable?: Maybe<boolean>
+  trades?: Maybe<TradeObject[]>
+  status?: Maybe<Status>
+  balances?: Maybe<BalanceItem[]>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
   const {
     amount,
+    balances,
     borderBottom,
     borderTop,
     collateral,
@@ -244,10 +250,13 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     long,
     lowerBound,
     newPrediction,
+    positionTable,
     potentialLoss,
     potentialProfit,
     startingPoint,
     startingPointTitle,
+    status,
+    trades,
     unit,
     upperBound,
   } = props
@@ -359,119 +368,135 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   ])
 
   return (
-    <ScaleWrapper borderBottom={borderBottom} borderTop={borderTop}>
-      <ScaleTitleWrapper>
-        <ScaleTitle>
-          {formatNumber(lowerBoundNumber.toString())} {unit}
-        </ScaleTitle>
-        <ScaleTitle>
-          {formatNumber(`${upperBoundNumber / 2 + lowerBoundNumber / 2}`)}
-          {` ${unit}`}
-        </ScaleTitle>
-        <ScaleTitle>
-          {upperBound && formatBigNumber(upperBound, decimals)} {unit}
-        </ScaleTitle>
-      </ScaleTitleWrapper>
-      <Scale>
-        <ScaleBallContainer>
-          <ReactTooltip
-            className="scalarValueTooltip"
-            effect="float"
-            getContent={() => `${formatNumber(scaleValuePrediction.toString())} ${unit}`}
-            id="scalarTooltip"
-            offset={{ top: 10 }}
-            place="top"
-            type="light"
-          />
-          <ScaleBall
-            className="scale-ball"
-            data-for="scalarTooltip"
-            data-tip={`${formatNumber(scaleValuePrediction.toString())} ${unit}`}
-            disabled={!isAmountInputted}
-            max="100"
-            min="0"
-            onChange={handleScaleBallChange}
-            type="range"
-            value={scaleValue}
-          />
-        </ScaleBallContainer>
-        {isAmountInputted && (
-          <>
-            <ScaleDot
-              positive={
-                (long && (newPrediction || 0) <= Number(currentPrediction)) ||
-                (!long && (newPrediction || 0) >= Number(currentPrediction))
-              }
-              xValue={Number(currentPrediction)}
+    <>
+      <ScaleWrapper borderBottom={borderBottom} borderTop={borderTop}>
+        <ScaleTitleWrapper>
+          <ScaleTitle>
+            {formatNumber(lowerBoundNumber.toString())} {unit}
+          </ScaleTitle>
+          <ScaleTitle>
+            {formatNumber(`${upperBoundNumber / 2 + lowerBoundNumber / 2}`)}
+            {` ${unit}`}
+          </ScaleTitle>
+          <ScaleTitle>
+            {upperBound && formatBigNumber(upperBound, decimals)} {unit}
+          </ScaleTitle>
+        </ScaleTitleWrapper>
+        <Scale>
+          <ScaleBallContainer>
+            <ReactTooltip
+              className="scalarValueTooltip"
+              effect="float"
+              getContent={() => `${formatNumber(scaleValuePrediction.toString())} ${unit}`}
+              id="scalarTooltip"
+              offset={{ top: 10 }}
+              place="top"
+              type="light"
             />
-            <ScaleDot positive={true} xValue={newPrediction || 0} />
-          </>
-        )}
-        <VerticalBar position={0} positive={isAmountInputted ? !long : null} />
-        <VerticalBar
-          position={1}
-          positive={
-            isAmountInputted ? (long && (newPrediction || 0) <= 0.5) || (!long && (newPrediction || 0) >= 0.5) : null
-          }
-        />
-        <VerticalBar position={2} positive={isAmountInputted ? !!long : null} />
-        <HorizontalBar />
-        {isAmountInputted && (
-          <>
-            <HorizontalBarLeft positive={!long || null} width={newPrediction || 0} />
-            <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
-          </>
-        )}
-        {!isAmountInputted && (
-          <ValueBoxRegular
-            xValue={
-              currentPrediction
-                ? Number(currentPrediction)
-                : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
+            <ScaleBall
+              className="scale-ball"
+              data-for="scalarTooltip"
+              data-tip={`${formatNumber(scaleValuePrediction.toString())} ${unit}`}
+              disabled={!isAmountInputted}
+              max="100"
+              min="0"
+              onChange={handleScaleBallChange}
+              type="range"
+              value={scaleValue}
+            />
+          </ScaleBallContainer>
+          {isAmountInputted && (
+            <>
+              <ScaleDot
+                positive={
+                  (long && (newPrediction || 0) <= Number(currentPrediction)) ||
+                  (!long && (newPrediction || 0) >= Number(currentPrediction))
+                }
+                xValue={Number(currentPrediction)}
+              />
+              <ScaleDot positive={true} xValue={newPrediction || 0} />
+            </>
+          )}
+          <VerticalBar position={0} positive={isAmountInputted ? !long : null} />
+          <VerticalBar
+            position={1}
+            positive={
+              isAmountInputted ? (long && (newPrediction || 0) <= 0.5) || (!long && (newPrediction || 0) >= 0.5) : null
             }
-          >
-            <ValueBoxTitle>
-              {currentPrediction
-                ? formatNumber(currentPredictionNumber.toString())
-                : startingPoint && startingPointNumber}
-              {` ${unit}`}
-            </ValueBoxTitle>
-            <ValueBoxSubtitle>{startingPointTitle}</ValueBoxSubtitle>
-          </ValueBoxRegular>
+          />
+          <VerticalBar position={2} positive={isAmountInputted ? !!long : null} />
+          <HorizontalBar />
+          {isAmountInputted && (
+            <>
+              <HorizontalBarLeft positive={!long || null} width={newPrediction || 0} />
+              <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
+            </>
+          )}
+          {!isAmountInputted && (
+            <ValueBoxRegular
+              xValue={
+                currentPrediction
+                  ? Number(currentPrediction)
+                  : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
+              }
+            >
+              <ValueBoxTitle>
+                {currentPrediction
+                  ? formatNumber(currentPredictionNumber.toString())
+                  : startingPoint && startingPointNumber}
+                {` ${unit}`}
+              </ValueBoxTitle>
+              <ValueBoxSubtitle>{startingPointTitle}</ValueBoxSubtitle>
+            </ValueBoxRegular>
+          )}
+        </Scale>
+        {isAmountInputted && (
+          <ValueBoxes>
+            <ValueBoxPair>
+              <ValueBox>
+                <ValueBoxTitle>
+                  {formatNumber(currentPredictionNumber.toString())} {unit}
+                </ValueBoxTitle>
+                <ValueBoxSubtitle>Current Prediction</ValueBoxSubtitle>
+              </ValueBox>
+              <ValueBox>
+                <ValueBoxTitle>
+                  {formatNumber(scaleValuePrediction.toString())} {unit}
+                </ValueBoxTitle>
+                <ValueBoxSubtitle>New Prediction</ValueBoxSubtitle>
+              </ValueBox>
+            </ValueBoxPair>
+            <ValueBoxPair>
+              <ValueBox>
+                <ValueBoxTitle positive={yourPayout > 0 ? true : yourPayout < 0 ? false : undefined}>{`${formatNumber(
+                  yourPayout.toString(),
+                )} ${collateral && collateral.symbol}`}</ValueBoxTitle>
+                <ValueBoxSubtitle>Your Payout</ValueBoxSubtitle>
+              </ValueBox>
+              <ValueBox>
+                <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>{`${formatNumber(
+                  profitLoss ? profitLoss.toString() : '0',
+                )}%`}</ValueBoxTitle>
+                <ValueBoxSubtitle>Profit/Loss</ValueBoxSubtitle>
+              </ValueBox>
+            </ValueBoxPair>
+          </ValueBoxes>
         )}
-      </Scale>
-      {isAmountInputted && (
-        <ValueBoxes>
-          <ValueBoxPair>
-            <ValueBox>
-              <ValueBoxTitle>
-                {formatNumber(currentPredictionNumber.toString())} {unit}
-              </ValueBoxTitle>
-              <ValueBoxSubtitle>Current Prediction</ValueBoxSubtitle>
-            </ValueBox>
-            <ValueBox>
-              <ValueBoxTitle>
-                {formatNumber(scaleValuePrediction.toString())} {unit}
-              </ValueBoxTitle>
-              <ValueBoxSubtitle>New Prediction</ValueBoxSubtitle>
-            </ValueBox>
-          </ValueBoxPair>
-          <ValueBoxPair>
-            <ValueBox>
-              <ValueBoxTitle positive={yourPayout > 0 ? true : yourPayout < 0 ? false : undefined}>{`${formatNumber(
-                yourPayout.toString(),
-              )} ${collateral && collateral.symbol}`}</ValueBoxTitle>
-              <ValueBoxSubtitle>Your Payout</ValueBoxSubtitle>
-            </ValueBox>
-            <ValueBox>
-              <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>{`${formatNumber(
-                profitLoss ? profitLoss.toString() : '0',
-              )}%`}</ValueBoxTitle>
-              <ValueBoxSubtitle>Profit/Loss</ValueBoxSubtitle>
-            </ValueBox>
-          </ValueBoxPair>
-        </ValueBoxes>
-      )}
-    </ScaleWrapper>
+      </ScaleWrapper>
+      {positionTable &&
+        status === Status.Ready &&
+        trades &&
+        balances &&
+        currentPrediction &&
+        collateral &&
+        !!trades.length && (
+          <PositionTable
+            balances={balances}
+            collateral={collateral}
+            currentPrediction={currentPrediction}
+            trades={trades}
+          />
+        )}
+    </>
   )
 }
