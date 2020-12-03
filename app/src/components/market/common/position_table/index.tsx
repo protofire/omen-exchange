@@ -61,7 +61,9 @@ export const PositionTable = (props: Props) => {
       const tradePrices = trades.map(trade => {
         return Number(trade.outcomeTokenMarginalPrice)
       })
-      const collateralAmounts = trades.map(trade => Number(trade.collateralAmount))
+      const collateralAmounts = trades.map(trade =>
+        Number(formatBigNumber(trade.collateralAmount, collateral.decimals)),
+      )
       const totalCollateralAmount = collateralAmounts.reduce((a, b) => a + b)
       const collateralWeights = collateralAmounts.map(collateralAmount => collateralAmount / totalCollateralAmount)
       const tradeSums = tradePrices.map((trade, i) => trade * collateralWeights[i])
@@ -74,7 +76,7 @@ export const PositionTable = (props: Props) => {
   }, [shortTrades, longTrades])
 
   useEffect(() => {
-    setShortProfitPercentage((Number(currentPrediction) - averageShortPrediction) * 100)
+    setShortProfitPercentage(averageShortPrediction - Number(currentPrediction) * 100)
     setLongProfitPercentage((Number(currentPrediction) - averageLongPrediction) * 100)
   }, [averageShortPrediction, averageLongPrediction, currentPrediction])
 
