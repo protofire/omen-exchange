@@ -11,6 +11,7 @@ const logger = getLogger('KlerosCuration')
 
 type Result = {
   data: Maybe<KlerosCurationData>
+  syncAndRefetchData: (blockNum: number) => Promise<void>
   status: Status
   error: Maybe<Error>
 }
@@ -26,49 +27,46 @@ export const useKlerosCuration = (
   const [loading, setLoading] = useState<boolean>(false)
   const { waitForBlockToSync } = useGraphMeta()
 
-  const fetchData = useCallback(() => {
-    ;(async () => {
-      try {
-        setLoading(true)
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true)
 
-        fetchGraphMarketMakerData()
+      fetchGraphMarketMakerData()
 
-        const [
-          listingCriteriaURL,
-          submissionDeposit,
-          challengePeriodDuration,
-          submissionBaseDeposit,
-          removalBaseDeposit,
-          marketVerificationData,
-        ] = await Promise.all([
-          kleros.getListingCriteriaURL(),
-          kleros.getSubmissionDeposit(),
-          kleros.getChallengePeriodDuration(),
-          kleros.getSubmissionBaseDeposit(),
-          kleros.getRemovalBaseDeposit(),
-          kleros.getMarketState(marketMakerData),
-        ])
+      const [
+        listingCriteriaURL,
+        submissionDeposit,
+        challengePeriodDuration,
+        submissionBaseDeposit,
+        removalBaseDeposit,
+        marketVerificationData,
+      ] = await Promise.all([
+        kleros.getListingCriteriaURL(),
+        kleros.getSubmissionDeposit(),
+        kleros.getChallengePeriodDuration(),
+        kleros.getSubmissionBaseDeposit(),
+        kleros.getRemovalBaseDeposit(),
+        kleros.getMarketState(marketMakerData),
+      ])
 
-        setData({
-          listingCriteriaURL,
-          submissionDeposit: submissionDeposit.toString(),
-          challengePeriodDuration: challengePeriodDuration.toString(),
-          submissionBaseDeposit: submissionBaseDeposit.toString(),
-          removalBaseDeposit: removalBaseDeposit.toString(),
-          marketVerificationData,
-          ovmAddress: kleros.omenVerifiedMarkets.address,
-        })
-        setError(null)
-      } catch (_err) {
-        const errorMessage = 'Error fetching market validity curation data.'
-        logger.error(errorMessage)
-        setError(new Error(errorMessage))
-      } finally {
-        setLoading(false)
-      }
-    })()
-    // eslint-disable-next-line
-  }, [kleros, marketMakerData])
+      setData({
+        listingCriteriaURL,
+        submissionDeposit: submissionDeposit.toString(),
+        challengePeriodDuration: challengePeriodDuration.toString(),
+        submissionBaseDeposit: submissionBaseDeposit.toString(),
+        removalBaseDeposit: removalBaseDeposit.toString(),
+        marketVerificationData,
+        ovmAddress: kleros.omenVerifiedMarkets.address,
+      })
+      setError(null)
+    } catch (_err) {
+      const errorMessage = 'Error fetching market validity curation data.'
+      logger.error(errorMessage)
+      setError(new Error(errorMessage))
+    } finally {
+      setLoading(false)
+    }
+  }, [kleros, marketMakerData, fetchGraphMarketMakerData])
 
   useEffect(() => {
     if (loading || !kleros || data || error) return
@@ -76,20 +74,24 @@ export const useKlerosCuration = (
     fetchData()
   }, [data, error, fetchData, kleros, loading])
 
+  const syncAndRefetchData = async (blockNum: number): Promise<void> => {
+    await waitForBlockToSync(blockNum)
+    await kleros.waitForBlockToSync(blockNum)
+    await fetchData()
+  }
+
   // Setup event listener after fetching data.
   useEffect(() => {
     if (!kleros || error) return
 
-    kleros.omenVerifiedMarkets.on('ItemStatusChange', async (...args) => {
+    kleros.omenVerifiedMarkets.on('ItemStatusChange', (...args) => {
       const event = args.pop()
-      await waitForBlockToSync(event.blockNumber)
-      fetchData()
+      syncAndRefetchData(event.blockNumber)
     })
 
-    kleros.omenVerifiedMarkets.on('Dispute', async (...args) => {
+    kleros.omenVerifiedMarkets.on('Dispute', (...args) => {
       const event = args.pop()
-      await waitForBlockToSync(event.blockNumber)
-      fetchData()
+      syncAndRefetchData(event.blockNumber)
     })
 
     return () => {
@@ -101,7 +103,8 @@ export const useKlerosCuration = (
 
   return {
     data,
-    status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
     error,
+    syncAndRefetchData,
+    status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
   }
 }

@@ -40,7 +40,11 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   const { context, fetchGraphMarketMakerData, marketMakerData } = props || {}
   const [selection, setSelection] = useState<number | undefined>()
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-  const { data, error, status } = useKlerosCuration(marketMakerData, context, fetchGraphMarketMakerData)
+  const { data, error, status, syncAndRefetchData } = useKlerosCuration(
+    marketMakerData,
+    context,
+    fetchGraphMarketMakerData,
+  )
 
   const history = useHistory()
   const cpk = useCpk()
@@ -89,17 +93,21 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
         return
       }
 
-      await cpk.requestVerification({
+      const transaction = await cpk.requestVerification({
         params: encodedParams,
         submissionDeposit: data.submissionDeposit,
         ovmAddress,
       })
 
+      if (transaction.blockNumber) {
+        await syncAndRefetchData(transaction.blockNumber)
+      }
+
       setIsModalOpen(false)
     } catch {
       setIsModalOpen(false)
     }
-  }, [address, data, ovmAddress, title, marketMakerData, cpk])
+  }, [address, data, ovmAddress, title, marketMakerData, cpk, syncAndRefetchData])
 
   if (!loading && errorMessage) return <GenericError>{errorMessage || 'Failed to fetch curation data'}</GenericError>
 

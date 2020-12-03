@@ -18,9 +18,11 @@ const getLink = (httpLink: any, wsLink: any) =>
     // split based on operation type
     ({ query }) => {
       try {
+        // InMemoryCache adds __typename to every query to better understand our schema
+        // However thegraph does not supply a __typename field for _meta queries, causing an error (https://github.com/graphprotocol/graph-node/issues/1280)
+        // While there are solutions that remove __typename for every query it is better to remove it just for _meta queries
         // @ts-expect-error ignore
         const name = query.definitions[0] && query.definitions[0].selectionSet.selections[0].name.value
-        // remove __typename from _meta query, relevant: https://github.com/graphprotocol/graph-node/issues/1280
         if (name === '_meta') {
           // @ts-expect-error ignore
           const selections = query.definitions[0].selectionSet.selections[0].selectionSet.selections

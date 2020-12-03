@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
-import { useRef } from 'react'
+import { useCallback, useRef } from 'react'
 
 import { getLogger } from '../util/logger'
 import { waitABit } from '../util/tools'
@@ -40,21 +40,25 @@ export const useGraphMeta = (): Result => {
     skip: false,
   })
 
+  // ref used for waitForBlockToSync to access updated meta data
   const blockRef = useRef(data)
   if (data) {
     blockRef.current = data._meta.block
   }
 
-  const waitForBlockToSync = async (blockNum: number) => {
-    try {
-      while (!blockRef.current || blockRef.current.number < blockNum) {
-        await waitABit()
-        await refetch()
+  const waitForBlockToSync = useCallback(
+    async (blockNum: number) => {
+      try {
+        while (!blockRef.current || blockRef.current.number < blockNum + 1) {
+          await waitABit(5000)
+          await refetch()
+        }
+      } catch (error) {
+        logger.log(error.message)
       }
-    } catch (error) {
-      logger.log(error.message)
-    }
-  }
+    },
+    [refetch],
+  )
 
   const fetchData = async () => {
     await refetch()
