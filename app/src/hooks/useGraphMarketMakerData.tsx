@@ -2,11 +2,20 @@ import { useQuery } from '@apollo/react-hooks'
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
-import { getOutcomes } from '../util/networks'
+import { useCpk } from '../hooks'
+import { DEFAULT_OPTIONS, buildQueryMyMarkets } from '../queries/markets_home'
+import { getArbitratorsByNetwork, getOutcomes } from '../util/networks'
 import { isObjectEqual, waitABit } from '../util/tools'
-import { KlerosSubmission, Question, Status } from '../util/types'
+import {
+  GraphResponseMarkets,
+  GraphResponseMarketsGeneric,
+  GraphResponseMyMarkets,
+  KlerosSubmission,
+  Question,
+  Status,
+} from '../util/types'
 
 const query = gql`
   query GetMarket($id: ID!) {
@@ -57,6 +66,14 @@ const query = gql`
     }
   }
 `
+
+type Participations = {
+  fixedProductMarketMakers: GraphResponseFixedProductMarketMaker
+}
+
+type GraphResponseAccountMarkets = {
+  account: { fpmmParticipations: Participations[] }
+}
 
 type GraphResponseFixedProductMarketMaker = {
   id: string
@@ -123,11 +140,15 @@ export type GraphMarketMakerData = {
   submissionIDs: KlerosSubmission[]
 }
 
+export type GraphMarketMakerDataCollection = GraphMarketMakerData[]
+
 type Result = {
   fetchData: () => Promise<void>
-  marketMakerData: Maybe<GraphMarketMakerData>
+  marketMakerData: Maybe<GraphMarketMakerDataCollection>
   status: Status
 }
+
+type MarketMakerAddresses = string
 
 const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: number): GraphMarketMakerData => {
   const outcomes = data.outcomes ? data.outcomes : getOutcomes(networkId, +data.templateId)
@@ -172,30 +193,71 @@ let needRefetch = false
  * Get data from the graph for the given market maker. All the information returned by this hook comes from the graph,
  * other necessary information should be fetched from the blockchain.
  */
-export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: number): Result => {
-  const [marketMakerData, setMarketMakerData] = useState<Maybe<GraphMarketMakerData>>(null)
+export const useGraphMarketMakerData = (networkId: number, myMarkets: boolean, marketMakerAddress?: string): Result => {
+  const [marketMakerData, setMarketMakerData] = useState<Maybe<GraphMarketMakerDataCollection>>(null)
   const [needUpdate, setNeedUpdate] = useState<boolean>(false)
+  const knownArbitrators = getArbitratorsByNetwork(networkId).map(x => x.address)
+  const cpk = useCpk()
 
-  const { data, error, loading, refetch } = useQuery<GraphResponse>(query, {
+  const myMarketsQuery = buildQueryMyMarkets(
+    Object.assign({}, DEFAULT_OPTIONS, {
+      allData: true,
+    }),
+  )
+
+  const requestQuery = myMarkets ? myMarketsQuery : query
+  const requestVariables = myMarkets
+    ? {
+        account: cpk?.address.toLowerCase(),
+        skip: 0,
+        first: 4,
+        knownArbitrators,
+      }
+    : { id: marketMakerAddress }
+
+  const { data, error, loading, refetch } = useQuery<GraphResponse | GraphResponseAccountMarkets>(requestQuery, {
     notifyOnNetworkStatusChange: true,
     skip: false,
-    variables: { id: marketMakerAddress },
+    variables: requestVariables,
   })
 
   useEffect(() => {
     setNeedUpdate(true)
   }, [marketMakerAddress])
 
-  if (data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
-    const rangledValue = wrangleResponse(data.fixedProductMarketMaker, networkId)
-    if (needUpdate) {
-      setMarketMakerData(rangledValue)
-      setNeedUpdate(false)
-    } else if (!isObjectEqual(marketMakerData, rangledValue)) {
-      setMarketMakerData(rangledValue)
-      needRefetch = false
-    }
+  const isGraphResponse = (value: GraphResponse | GraphResponseAccountMarkets): value is GraphResponse => {
+    return Object.prototype.hasOwnProperty.call(value, 'fixedProductMarketMaker')
   }
+
+  useMemo(() => {
+    if (data) {
+      if (isGraphResponse(data)) {
+        if (data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
+          const rangledValue = wrangleResponse(data.fixedProductMarketMaker, networkId)
+          if (needUpdate) {
+            setMarketMakerData([rangledValue])
+            setNeedUpdate(false)
+          } else if (!isObjectEqual(marketMakerData, rangledValue)) {
+            setMarketMakerData([rangledValue])
+            needRefetch = false
+          }
+        }
+      } else {
+        if (data && data.account && data.account.fpmmParticipations) {
+          const rangledValues = data.account.fpmmParticipations.map(fpmmParticipation => {
+            return wrangleResponse(fpmmParticipation.fixedProductMarketMakers, networkId)
+          })
+          if (needUpdate) {
+            setMarketMakerData(rangledValues)
+            setNeedUpdate(false)
+          } else if (!isObjectEqual(marketMakerData, rangledValues)) {
+            setMarketMakerData(rangledValues)
+            needRefetch = false
+          }
+        }
+      }
+    }
+  }, [data])
 
   const fetchData = async () => {
     needRefetch = true

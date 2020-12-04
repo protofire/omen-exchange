@@ -235,6 +235,7 @@ export interface MarketFilters {
   templateId: Maybe<string>
   currency: Maybe<string>
   curationSource: CurationSource
+  allData?: Maybe<boolean>
 }
 
 export interface MarketMakerData {

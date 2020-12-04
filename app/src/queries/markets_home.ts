@@ -24,7 +24,55 @@ export const MarketDataFragment = gql`
   }
 `
 
+export const FullMarketDataFragment = gql`
+  fragment marketData on FixedProductMarketMaker {
+    id
+    creator
+    collateralToken
+    fee
+    collateralVolume
+    outcomeTokenAmounts
+    condition {
+      id
+      payouts
+    }
+    templateId
+    title
+    outcomes
+    category
+    language
+    lastActiveDay
+    runningDailyVolume
+    arbitrator
+    creationTimestamp
+    openingTimestamp
+    timeout
+    resolutionTimestamp
+    currentAnswer
+    answerFinalizedTimestamp
+    scaledLiquidityParameter
+    runningDailyVolumeByHour
+    isPendingArbitration
+    arbitrationOccurred
+    currentAnswerTimestamp
+    runningDailyVolumeByHour
+    curatedByDxDao
+    curatedByDxDaoOrKleros
+    question {
+      id
+      data
+    }
+    klerosTCRregistered
+    curatedByDxDaoOrKleros
+    curatedByDxDao
+    submissionIDs {
+      id
+      status
+    }
+  }
+`
 export const DEFAULT_OPTIONS = {
+  allData: false,
   state: MarketStates.open,
   whitelistedCreators: false,
   whitelistedTemplateIds: true,
@@ -40,7 +88,7 @@ export const DEFAULT_OPTIONS = {
 }
 
 export const buildQueryMyMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => {
-  const { arbitrator, category, currency, title } = options
+  const { allData, arbitrator, category, currency, title } = options
 
   const myMarketsWhereClause = [
     category === 'All' ? '' : 'category: $category',
@@ -51,7 +99,8 @@ export const buildQueryMyMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) =
     .filter(s => s.length)
     .join(',')
 
-  const queryMyMarkets = gql`
+  const queryMyMarkets = !allData
+    ? gql`
     query GetMyMarkets($account: String!, $first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $arbitrator: String, $knownArbitrators: [String!], $currency: String, $title: String) {
       account(id: $account) {
         fpmmParticipations(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${myMarketsWhereClause} }) {
@@ -63,7 +112,18 @@ export const buildQueryMyMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) =
     }
     ${MarketDataFragment}
   `
-
+    : gql` 
+    query GetMyMarkets($account: String!, $first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $arbitrator: String, $knownArbitrators: [String!], $currency: String, $title: String) {
+      account(id: $account) {
+        fpmmParticipations(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${myMarketsWhereClause} }) {
+          fixedProductMarketMakers: fpmm {
+            ...marketData
+          }
+        }
+      }
+    }
+    ${FullMarketDataFragment}
+  `
   return queryMyMarkets
 }
 

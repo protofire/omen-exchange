@@ -1,4 +1,5 @@
 import Big from 'big.js'
+import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -10,7 +11,7 @@ import { BalanceItem, MarketMakerData, Status, Token } from '../util/types'
 
 import { useConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
-import { GraphMarketMakerData } from './useGraphMarketMakerData'
+import { GraphMarketMakerData, GraphMarketMakerDataCollection } from './useGraphMarketMakerData'
 
 const logger = getLogger('useBlockchainMarketMakerData')
 
@@ -49,31 +50,35 @@ const getERC20Token = async (provider: any, address: string): Promise<Token> => 
   return token
 }
 
-export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMarketMakerData>, networkId: number) => {
-  const context = useConnectedWeb3Context()
-  const { account, library: provider } = context
-  const contracts = useContracts(context)
-  const [marketMakerData, setMarketMakerData] = useState<Maybe<MarketMakerData>>(null)
-  const [status, setStatus] = useState<Status>(Status.Loading)
+const doFetch = async (
+  graphMarketMakerData: Maybe<GraphMarketMakerDataCollection>,
+  account: Maybe<string>,
+  provider: Web3Provider,
+  contracts: any,
+  networkId: number,
+  setMarketMakerData: any,
+  setStatus: any,
+) => {
+  if (!graphMarketMakerData) {
+    return
+  }
 
-  const doFetchData = useCallback(async () => {
-    if (!graphMarketMakerData) {
-      return
-    }
+  let cpk: Maybe<CPKService> = null
+  if (account) {
+    cpk = await CPKService.create(provider)
+  }
 
-    const { buildMarketMaker, conditionalTokens } = contracts
+  const { buildMarketMaker, conditionalTokens } = contracts
 
-    const marketMaker = buildMarketMaker(graphMarketMakerData.address)
+  const marketMakerDataCollection: MarketMakerData[] = []
 
-    let cpk: Maybe<CPKService> = null
-    if (account) {
-      cpk = await CPKService.create(provider)
-    }
+  for (const graphMarketMakerDataItem of graphMarketMakerData) {
+    const marketMaker = buildMarketMaker(graphMarketMakerDataItem.address)
 
-    const { outcomes } = graphMarketMakerData.question
+    const { outcomes } = graphMarketMakerDataItem.question
 
-    const isQuestionFinalized = graphMarketMakerData.answerFinalizedTimestamp
-      ? Date.now() > 1000 * graphMarketMakerData.answerFinalizedTimestamp.toNumber()
+    const isQuestionFinalized = graphMarketMakerDataItem.answerFinalizedTimestamp
+      ? Date.now() > 1000 * graphMarketMakerDataItem.answerFinalizedTimestamp.toNumber()
       : false
 
     const {
@@ -88,16 +93,18 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       userPoolShares,
       userShares,
     } = await promiseProps({
-      marketMakerShares: marketMaker.getBalanceInformation(graphMarketMakerData.address, outcomes.length),
+      marketMakerShares: marketMaker.getBalanceInformation(graphMarketMakerDataItem.address, outcomes.length),
       userShares:
         cpk && cpk.address
           ? marketMaker.getBalanceInformation(cpk.address, outcomes.length)
           : outcomes.map(() => new BigNumber(0)),
-      collateral: getERC20Token(provider, graphMarketMakerData.collateralAddress),
-      isConditionResolved: conditionalTokens.isConditionResolved(graphMarketMakerData.conditionId),
+      collateral: getERC20Token(provider, graphMarketMakerDataItem.collateralAddress),
+      isConditionResolved: conditionalTokens.isConditionResolved(graphMarketMakerDataItem.conditionId),
       marketMakerFunding: marketMaker.getTotalSupply(),
       marketMakerUserFunding: cpk && cpk.address ? marketMaker.balanceOf(cpk.address) : new BigNumber(0),
-      realitioAnswer: isQuestionFinalized ? contracts.realitio.getResultFor(graphMarketMakerData.question.id) : null,
+      realitioAnswer: isQuestionFinalized
+        ? contracts.realitio.getResultFor(graphMarketMakerDataItem.question.id)
+        : null,
       totalEarnings: marketMaker.getCollectedFees(),
       totalPoolShares: marketMaker.poolSharesTotalSupply(),
       userPoolShares: cpk && cpk.address ? marketMaker.poolSharesBalanceOf(cpk.address) : new BigNumber(0),
@@ -108,54 +115,112 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
         ? await marketMaker.getFeesWithdrawableBy(cpk.address)
         : new BigNumber(0)
 
-    const arbitrator = getArbitratorFromAddress(networkId, graphMarketMakerData.arbitratorAddress)
-    const payouts = graphMarketMakerData.payouts
-      ? graphMarketMakerData.payouts
+    const arbitrator = getArbitratorFromAddress(networkId, graphMarketMakerDataItem.arbitratorAddress)
+    const payouts = graphMarketMakerDataItem.payouts
+      ? graphMarketMakerDataItem.payouts
       : realitioAnswer
-      ? OracleService.getPayouts(graphMarketMakerData.question.templateId, realitioAnswer, outcomes.length)
+      ? OracleService.getPayouts(graphMarketMakerDataItem.question.templateId, realitioAnswer, outcomes.length)
       : null
     const balances = getBalances(outcomes, marketMakerShares, userShares, payouts)
 
     const newMarketMakerData: MarketMakerData = {
-      address: graphMarketMakerData.address,
-      answerFinalizedTimestamp: graphMarketMakerData.answerFinalizedTimestamp,
+      address: graphMarketMakerDataItem.address,
+      answerFinalizedTimestamp: graphMarketMakerDataItem.answerFinalizedTimestamp,
       arbitrator,
       balances,
       collateral,
-      fee: graphMarketMakerData.fee,
-      collateralVolume: graphMarketMakerData.collateralVolume,
+      fee: graphMarketMakerDataItem.fee,
+      collateralVolume: graphMarketMakerDataItem.collateralVolume,
       isConditionResolved,
       isQuestionFinalized,
       marketMakerFunding,
       marketMakerUserFunding,
       payouts,
-      question: graphMarketMakerData.question,
+      question: graphMarketMakerDataItem.question,
       totalEarnings,
       totalPoolShares,
       userEarnings,
       userPoolShares,
-      klerosTCRregistered: graphMarketMakerData.klerosTCRregistered,
-      curatedByDxDao: graphMarketMakerData.curatedByDxDao,
-      curatedByDxDaoOrKleros: graphMarketMakerData.curatedByDxDaoOrKleros,
-      runningDailyVolumeByHour: graphMarketMakerData.runningDailyVolumeByHour,
-      lastActiveDay: graphMarketMakerData.lastActiveDay,
-      creationTimestamp: graphMarketMakerData.creationTimestamp,
-      scaledLiquidityParameter: graphMarketMakerData.scaledLiquidityParameter,
-      submissionIDs: graphMarketMakerData.submissionIDs,
+      klerosTCRregistered: graphMarketMakerDataItem.klerosTCRregistered,
+      curatedByDxDao: graphMarketMakerDataItem.curatedByDxDao,
+      curatedByDxDaoOrKleros: graphMarketMakerDataItem.curatedByDxDaoOrKleros,
+      runningDailyVolumeByHour: graphMarketMakerDataItem.runningDailyVolumeByHour,
+      lastActiveDay: graphMarketMakerDataItem.lastActiveDay,
+      creationTimestamp: graphMarketMakerDataItem.creationTimestamp,
+      scaledLiquidityParameter: graphMarketMakerDataItem.scaledLiquidityParameter,
+      submissionIDs: graphMarketMakerDataItem.submissionIDs,
     }
+    marketMakerDataCollection.push(newMarketMakerData)
+  }
 
-    setMarketMakerData(newMarketMakerData)
-    setStatus(Status.Ready)
-  }, [graphMarketMakerData, account, provider, contracts, networkId])
+  if (graphMarketMakerData.length > 1) {
+    setMarketMakerData(marketMakerDataCollection)
+  } else {
+    setMarketMakerData(marketMakerDataCollection[0])
+  }
+
+  setStatus(Status.Ready)
+}
+
+export const useMyBlockchainMarketMakerData = (
+  graphMarketMakerData: Maybe<GraphMarketMakerDataCollection>,
+  networkId: number,
+) => {
+  const context = useConnectedWeb3Context()
+  const { account, library: provider } = context
+  const contracts = useContracts(context)
+  const [marketMakerData, setMarketMakerData] = useState<Maybe<MarketMakerData[]>>(null)
+  const [status, setStatus] = useState<Status>(Status.Loading)
+
+  const doFetchData = useCallback(doFetch, [graphMarketMakerData, account, provider, contracts, networkId])
 
   const fetchData = useCallback(async () => {
     try {
-      await doFetchData()
+      await doFetchData(graphMarketMakerData, account, provider, contracts, networkId, setMarketMakerData, setStatus)
     } catch (e) {
       logger.error(e.message)
       setStatus(Status.Error)
     }
   }, [doFetchData])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
+  useEffect(() => {
+    if (marketMakerData) {
+      fetchData()
+    }
+    // eslint-disable-next-line
+  }, [graphMarketMakerData])
+
+  return {
+    fetchData,
+    marketMakerData,
+    status,
+  }
+}
+
+export const useBlockchainMarketMakerData = (
+  graphMarketMakerData: Maybe<GraphMarketMakerDataCollection>,
+  networkId: number,
+) => {
+  const context = useConnectedWeb3Context()
+  const { account, library: provider } = context
+  const contracts = useContracts(context)
+  const [marketMakerData, setMarketMakerData] = useState<Maybe<MarketMakerData>>(null)
+  const [status, setStatus] = useState<Status>(Status.Loading)
+
+  const doFetchData = useCallback(doFetch, [graphMarketMakerData, account, provider, contracts, networkId])
+
+  const fetchData = useCallback(async () => {
+    try {
+      await doFetchData(graphMarketMakerData, account, provider, contracts, networkId, setMarketMakerData, setStatus)
+    } catch (e) {
+      logger.error(e.message)
+      setStatus(Status.Error)
+    }
+  }, [doFetchData, graphMarketMakerData])
 
   useEffect(() => {
     fetchData()

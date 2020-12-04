@@ -39,7 +39,6 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
   if (!marketMakerData) {
     return <InlineLoading />
   }
-
   return (
     <>
       <MarketDetailsPage
