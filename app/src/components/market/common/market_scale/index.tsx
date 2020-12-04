@@ -370,6 +370,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     potentialLossNumber,
     potentialProfitNumber,
     upperBoundNumber,
+    positionTable,
   ])
 
   return (
