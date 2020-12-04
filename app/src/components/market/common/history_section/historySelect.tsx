@@ -4,7 +4,10 @@ import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
-import { useGraphFpmmTransactionsFromQuestion } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
+import {
+  FpmmTradeDataType,
+  useGraphFpmmTransactionsFromQuestion,
+} from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
 import { CPKService } from '../../../../services'
 import { calcPrice, calculateSharesBought } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
@@ -116,7 +119,7 @@ export const HistorySelect: React.FC<Props> = ({
   const contracts = useContracts(context)
   const { buildMarketMaker } = contracts
   const marketMaker = buildMarketMaker(marketMakerAddress)
-  const [sharesData, setSharesData] = useState<string[]>([])
+  const [sharesData, setSharesData] = useState<FpmmTradeDataType[]>([])
   const [sharesDataLoader, setSharesDataLoader] = useState<boolean>(true)
 
   const data =
@@ -164,44 +167,61 @@ export const HistorySelect: React.FC<Props> = ({
   )
 
   useEffect(() => {
+    setSharesDataLoader(true)
     ;(async () => {
-      setSharesDataLoader(true)
       if (fpmmTrade) {
+        const cpk = await CPKService.create(provider)
         const response: any[] = await Promise.all(
           fpmmTrade.map(async item => {
-            const block = await marketMaker.getBlockNumber(item.transactionHash)
-            return {
-              blockNumber: block,
-              amount: item.collateralTokenAmount,
-            }
-          }),
-        )
+            if (item.fpmmType === 'Liquidity') {
+              const block: any = await marketMaker.getBlockNumber(item.transactionHash)
 
-        if (response) {
-          const cpk = await CPKService.create(provider)
-
-          const poolTokensForEveryOne = await Promise.all(
-            response.map(async ({ amount, blockNumber }) => {
               return {
-                poolShares: await marketMaker.poolSharesTotalSupplyByBlockNumber(blockNumber.blockNumber),
+                blockNumber: block,
+                id: item.id,
+                amount: item.collateralTokenAmount,
+                fpmmType: item.fpmmType,
+                poolShares: await marketMaker.poolSharesTotalSupplyByBlockNumber(block.blockNumber),
                 balances: await marketMaker.getBalanceInformationByBlock(
                   marketMakerAddress,
                   outcomes.length,
-                  blockNumber.blockNumber,
+                  block.blockNumber,
                 ),
-                shares: await marketMaker.getBalanceInformationByBlock(
-                  cpk.address,
-                  outcomes.length,
-                  blockNumber.blockNumber,
-                ),
-                buyAmount: new BigNumber(amount),
+                shares: await marketMaker.getBalanceInformationByBlock(cpk.address, outcomes.length, block.blockNumber),
+                collateralTokenAmount: new BigNumber(item.collateralTokenAmount),
               }
-            }),
-          )
-          const sharesForCurrentItems = calculateSharesBought(poolTokensForEveryOne, decimals)
-          setSharesData(sharesForCurrentItems)
-          setSharesDataLoader(false)
-        }
+            }
+            return {}
+          }),
+        )
+        const newFpmmTradeArray: any[] = []
+        await fpmmTrade.forEach(item => {
+          newFpmmTradeArray.push(item)
+          if (item.fpmmType === 'Liquidity') {
+            const findInResponse = response.find(element => element.id === item.id)
+            if (findInResponse) {
+              newFpmmTradeArray.push({
+                sharesOrPoolTokenAmount: calculateSharesBought(
+                  findInResponse.poolShares,
+                  findInResponse.balances,
+                  findInResponse.shares,
+                  findInResponse.collateralTokenAmount,
+                  decimals,
+                ),
+                decimals: item.decimals,
+                collateralTokenAmount: item.collateralTokenAmount,
+                creationTimestamp: item.creationTimestamp,
+                id: item.id + 1,
+                transactionHash: item.transactionHash,
+                transactionType: item.transactionType === 'Deposit' ? 'Buy' : 'Sell',
+                user: item.user,
+              })
+            }
+          }
+        })
+
+        setSharesDataLoader(false)
+        setSharesData(newFpmmTradeArray)
       }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -263,12 +283,11 @@ export const HistorySelect: React.FC<Props> = ({
       {toogleSelect ? (
         <HistoryTable
           currency={currency}
-          fpmmTrade={fpmmTrade}
+          fpmmTrade={sharesData}
           next={!paginationNext}
           onLoadNextPage={loadNextPage}
           onLoadPrevPage={loadPrevPage}
           prev={pageIndex < 1}
-          shareData={sharesData}
           status={status}
         />
       ) : (

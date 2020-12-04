@@ -363,29 +363,30 @@ export const formatHistoryUser = (user: any) => {
 }
 
 export const calculateSharesBought = (
-  arrayOfItems: { poolShares: BigNumber; balances: BigNumber[]; shares: BigNumber[]; buyAmount: BigNumber }[],
+  poolShares: BigNumber,
+  balances: BigNumber[],
+  shares: BigNumber[],
+  collateralTokenAmount: BigNumber,
   decimals: number,
 ) => {
-  return arrayOfItems.map(({ balances, buyAmount, poolShares, shares }) => {
-    const sendAmountsAfterAddingFunding = calcAddFundingSendAmounts(buyAmount, balances, poolShares)
+  const sendAmountsAfterAddingFunding = calcAddFundingSendAmounts(collateralTokenAmount, balances, poolShares)
 
-    const sharesAfterAddingFunding = sendAmountsAfterAddingFunding
-      ? shares.map((balance, i) => balance.add(sendAmountsAfterAddingFunding[i]))
-      : shares.map(share => share)
+  const sharesAfterAddingFunding = sendAmountsAfterAddingFunding
+    ? shares.map((balance, i) => balance.add(sendAmountsAfterAddingFunding[i]))
+    : shares.map(share => share)
 
-    const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(buyAmount, balances, poolShares)
-    const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
-      amount.lt(min) ? amount : min,
-    )
-    const sharesAfterRemovingFunding = shares.map((share, i) => {
-      return share.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
-    })
-    const subtractedValues =
-      Number(formatBigNumber(sharesAfterAddingFunding[0], decimals, 3)) -
-      Number(formatBigNumber(sharesAfterRemovingFunding[0], decimals, 3))
-
-    return subtractedValues.toFixed(2)
+  const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(collateralTokenAmount, balances, poolShares)
+  const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
+    amount.lt(min) ? amount : min,
+  )
+  const sharesAfterRemovingFunding = shares.map((share, i) => {
+    return share.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
   })
+  const subtractedValues =
+    Number(formatBigNumber(sharesAfterAddingFunding[0], decimals, 3)) -
+    Number(formatBigNumber(sharesAfterRemovingFunding[0], decimals, 3))
+
+  return subtractedValues.toFixed(2)
 }
 export const formatToShortNumber = (number: string, decimals = 2): string => {
   if (number.length < 1) {
