@@ -238,6 +238,7 @@ export const HistorySelect: React.FC<Props> = ({
   }, [])
   const loadNextPage = () => {
     const newPageIndex = pageIndex + pageSize
+    setSharesDataLoader(true)
     if (!paginationNext) {
       return
     }
