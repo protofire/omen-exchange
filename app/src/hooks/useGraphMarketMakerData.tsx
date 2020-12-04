@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { useCpk } from '../hooks'
 import { DEFAULT_OPTIONS, buildQueryMyMarkets } from '../queries/markets_home'
+import { getLogger } from '../util/logger'
 import { getArbitratorsByNetwork, getOutcomes } from '../util/networks'
 import { isObjectEqual, waitABit } from '../util/tools'
 import {
@@ -16,6 +17,8 @@ import {
   Question,
   Status,
 } from '../util/types'
+
+const logger = getLogger('useGraphMarketMakerData')
 
 const query = gql`
   query GetMarket($id: ID!) {
@@ -260,13 +263,17 @@ export const useGraphMarketMakerData = (networkId: number, myMarkets: boolean, m
   }, [data])
 
   const fetchData = async () => {
-    needRefetch = true
-    let counter = 0
-    await waitABit()
-    while (needRefetch && counter < 15) {
-      await refetch()
+    try {
+      needRefetch = true
+      let counter = 0
       await waitABit()
-      counter += 1
+      while (needRefetch && counter < 15) {
+        await refetch()
+        await waitABit()
+        counter += 1
+      }
+    } catch (error) {
+      logger.log(error.message)
     }
   }
 

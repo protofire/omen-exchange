@@ -7,6 +7,7 @@ import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { getGraphUris, getKlerosCurateGraphUris, getTokensByNetwork, networkIds } from '../util/networks'
+import { waitABit } from '../util/tools'
 import {
   KlerosDisputeOutcome,
   KlerosItemStatus,
@@ -247,6 +248,31 @@ class KlerosService {
    */
   public async getChallengePeriodDuration(): Promise<BigNumber> {
     return await this.omenVerifiedMarkets.challengePeriodDuration()
+  }
+
+  public async getKlerosGraphMeta() {
+    const query = `
+      query {
+        _meta {
+          block {
+            hash
+            number
+          }
+        }
+      }
+    `
+    const { chainId: networkId } = await this.provider.getNetwork()
+    const { httpUri } = getKlerosCurateGraphUris(networkId)
+    const result = await axios.post(httpUri, { query })
+    return result.data.data._meta.block
+  }
+
+  public async waitForBlockToSync(blockNum: number) {
+    let block
+    while (!block || block.number < blockNum + 1) {
+      block = await this.getKlerosGraphMeta()
+      await waitABit()
+    }
   }
 
   /**
