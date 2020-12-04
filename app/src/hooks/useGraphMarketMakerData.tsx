@@ -4,9 +4,12 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
+import { getLogger } from '../util/logger'
 import { getOutcomes } from '../util/networks'
 import { isObjectEqual, waitABit } from '../util/tools'
 import { KlerosSubmission, Question, Status } from '../util/types'
+
+const logger = getLogger('useGraphMarketMakerData')
 
 const query = gql`
   query GetMarket($id: ID!) {
@@ -198,13 +201,17 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
   }
 
   const fetchData = async () => {
-    needRefetch = true
-    let counter = 0
-    await waitABit()
-    while (needRefetch && counter < 15) {
-      await refetch()
+    try {
+      needRefetch = true
+      let counter = 0
       await waitABit()
-      counter += 1
+      while (needRefetch && counter < 15) {
+        await refetch()
+        await waitABit()
+        counter += 1
+      }
+    } catch (error) {
+      logger.log(error.message)
     }
   }
 
