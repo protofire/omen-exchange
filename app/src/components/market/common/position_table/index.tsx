@@ -45,6 +45,8 @@ export const PositionTable = (props: Props) => {
 
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
+  const shortSharesNumber = Number(formatBigNumber(shortShares, 18))
+  const longSharesNumber = Number(formatBigNumber(longShares, 18))
   const shortSharesFormatted = formatNumber(formatBigNumber(shortShares, 18))
   const longSharesFormatted = formatNumber(formatBigNumber(longShares, 18))
 
@@ -93,28 +95,33 @@ export const PositionTable = (props: Props) => {
   }, [longTrades, shortTrades])
 
   useEffect(() => {
-    setShortProfitPercentage(averageShortPrediction - Number(currentPrediction) * 100)
-    setLongProfitPercentage((Number(currentPrediction) - averageLongPrediction) * 100)
-    setShortProfitAmount(
-      (shortProfitPercentage * Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals))) / 100,
-    )
-    setLongProfitAmount(
-      (longProfitPercentage * Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals))) / 100,
-    )
-    setShortPayoutAmount(Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals)) + shortProfitAmount)
-    setLongPayoutAmount(Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals)) + longProfitAmount)
-  }, [
-    averageShortPrediction,
-    averageLongPrediction,
-    currentPrediction,
-    collateral.decimals,
-    longProfitPercentage,
-    shortProfitPercentage,
-    totalLongCollateralAmount,
-    totalShortCollateralAmount,
-    longProfitAmount,
-    shortProfitAmount,
-  ])
+    setShortPayoutAmount(shortSharesNumber * (1 - Number(currentPrediction)))
+    setLongPayoutAmount(longSharesNumber * Number(currentPrediction))
+  }, [shortSharesNumber, currentPrediction, longSharesNumber])
+
+  // useEffect(() => {
+  //   setShortProfitPercentage(averageShortPrediction - Number(currentPrediction) * 100)
+  //   setLongProfitPercentage((Number(currentPrediction) - averageLongPrediction) * 100)
+  //   setShortProfitAmount(
+  //     (shortProfitPercentage * Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals))) / 100,
+  //   )
+  //   setLongProfitAmount(
+  //     (longProfitPercentage * Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals))) / 100,
+  //   )
+  //   setShortPayoutAmount(Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals)) + shortProfitAmount)
+  //   setLongPayoutAmount(Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals)) + longProfitAmount)
+  // }, [
+  //   averageShortPrediction,
+  //   averageLongPrediction,
+  //   currentPrediction,
+  //   collateral.decimals,
+  //   longProfitPercentage,
+  //   shortProfitPercentage,
+  //   totalLongCollateralAmount,
+  //   totalShortCollateralAmount,
+  //   longProfitAmount,
+  //   shortProfitAmount,
+  // ])
 
   const TableHead: PositionTableValue[] = [
     PositionTableValue.YourPosition,
