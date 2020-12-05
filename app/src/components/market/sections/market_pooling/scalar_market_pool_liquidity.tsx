@@ -1,7 +1,7 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { DOCUMENT_FAQ } from '../../../../common/constants'
@@ -17,17 +17,11 @@ import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import {
-  calcAddFundingSendAmounts,
-  calcPoolTokens,
-  calcRemoveFundingSendAmounts,
-  formatBigNumber,
-  formatNumber,
-} from '../../../../util/tools'
+import { calcPoolTokens, calcRemoveFundingSendAmounts, formatBigNumber, formatNumber } from '../../../../util/tools'
 import { MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
@@ -81,7 +75,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     question,
     scalarHigh,
     scalarLow,
-    totalEarnings,
     totalPoolShares,
     userEarnings,
   } = marketMakerData
@@ -143,14 +136,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
-  const sendAmountsAfterAddingFunding = calcAddFundingSendAmounts(
-    amountToFund || Zero,
-    balances.map(b => b.holdings),
-    totalPoolShares,
-  )
-  const sharesAfterAddingFunding = sendAmountsAfterAddingFunding
-    ? balances.map((balance, i) => balance.shares.add(sendAmountsAfterAddingFunding[i]))
-    : balances.map(balance => balance.shares)
 
   const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
     amountToRemove || Zero,
