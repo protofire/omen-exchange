@@ -503,7 +503,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             collateral={collateral}
             currentPrediction={
               scaleValue || scaleValue === 0
-                ? (scaleValue / 100 === 0 ? 0.01 : scaleValue / 100).toString()
+                ? (scaleValue / 100 === 0 ? 0.0001 : scaleValue / 100).toString()
                 : currentPrediction
             }
             fee={fee}
