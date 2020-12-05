@@ -237,6 +237,7 @@ interface Props {
   trades?: Maybe<TradeObject[]>
   status?: Maybe<Status>
   balances?: Maybe<BalanceItem[]>
+  fee?: Maybe<BigNumber>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -247,6 +248,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     borderTop,
     collateral,
     currentPrediction,
+    fee,
     long,
     lowerBound,
     newPrediction,
@@ -504,6 +506,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
                 ? (scaleValue / 100 === 0 ? 0.01 : scaleValue / 100).toString()
                 : currentPrediction
             }
+            fee={fee}
             trades={trades}
           />
         )}

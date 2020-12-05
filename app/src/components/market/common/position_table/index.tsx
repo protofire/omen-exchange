@@ -1,8 +1,9 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import styled, { css } from 'styled-components'
 
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { useAsyncDerivedValue } from '../../../../hooks'
+import { calcSellAmountInCollateral, formatBigNumber, formatNumber } from '../../../../util/tools'
 import { BalanceItem, PositionTableValue, Token, TradeObject } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
 
@@ -38,15 +39,14 @@ interface Props {
   balances: BalanceItem[]
   collateral: Token
   currentPrediction: string
+  fee: BigNumber | null | undefined
 }
 
 export const PositionTable = (props: Props) => {
-  const { balances, collateral, currentPrediction, trades } = props
+  const { balances, collateral, currentPrediction, fee, trades } = props
 
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
-  const shortSharesNumber = Number(formatBigNumber(shortShares, 18))
-  const longSharesNumber = Number(formatBigNumber(longShares, 18))
   const shortSharesFormatted = formatNumber(formatBigNumber(shortShares, 18))
   const longSharesFormatted = formatNumber(formatBigNumber(longShares, 18))
 
@@ -60,10 +60,6 @@ export const PositionTable = (props: Props) => {
   const [totalLongCollateralAmount, setTotalLongCollateralAmount] = useState<BigNumber>(new BigNumber(0))
   const [shortProfitAmount, setShortProfitAmount] = useState<number>(0)
   const [longProfitAmount, setLongProfitAmount] = useState<number>(0)
-  const [shortPayoutAmount, setShortPayoutAmount] = useState<number>(0)
-  const [longPayoutAmount, setLongPayoutAmount] = useState<number>(0)
-
-  console.log(balances)
 
   const calcPositionData = (trades: TradeObject[]): { averagePrediction: number; totalCollateralAmount: BigNumber } => {
     if (!trades.length) return { averagePrediction: 0, totalCollateralAmount: new BigNumber(0) }
@@ -94,34 +90,64 @@ export const PositionTable = (props: Props) => {
     setTotalLongCollateralAmount(totalLongCollateralAmount)
   }, [longTrades, shortTrades])
 
-  useEffect(() => {
-    setShortPayoutAmount(shortSharesNumber * (1 - Number(currentPrediction)))
-    setLongPayoutAmount(longSharesNumber * Number(currentPrediction))
-  }, [shortSharesNumber, currentPrediction, longSharesNumber])
+  const holdings = balances.map(balance => balance.holdings)
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee || new BigNumber(0), 18))
 
-  // useEffect(() => {
-  //   setShortProfitPercentage(averageShortPrediction - Number(currentPrediction) * 100)
-  //   setLongProfitPercentage((Number(currentPrediction) - averageLongPrediction) * 100)
-  //   setShortProfitAmount(
-  //     (shortProfitPercentage * Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals))) / 100,
-  //   )
-  //   setLongProfitAmount(
-  //     (longProfitPercentage * Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals))) / 100,
-  //   )
-  //   setShortPayoutAmount(Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals)) + shortProfitAmount)
-  //   setLongPayoutAmount(Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals)) + longProfitAmount)
-  // }, [
-  //   averageShortPrediction,
-  //   averageLongPrediction,
-  //   currentPrediction,
-  //   collateral.decimals,
-  //   longProfitPercentage,
-  //   shortProfitPercentage,
-  //   totalLongCollateralAmount,
-  //   totalShortCollateralAmount,
-  //   longProfitAmount,
-  //   shortProfitAmount,
-  // ])
+  const calcShortPayoutAmount = useMemo(
+    () => async (amountShares: BigNumber): Promise<Maybe<BigNumber>> => {
+      const payoutAmount = calcSellAmountInCollateral(
+        amountShares,
+        holdings[0],
+        [holdings[1]],
+        marketFeeWithTwoDecimals,
+      )
+
+      return payoutAmount
+    },
+    [],
+  )
+
+  const calcLongPayoutAmount = useMemo(
+    () => async (amountShares: BigNumber): Promise<Maybe<BigNumber>> => {
+      const payoutAmount = calcSellAmountInCollateral(
+        amountShares,
+        holdings[1],
+        [holdings[0]],
+        marketFeeWithTwoDecimals,
+      )
+
+      return payoutAmount
+    },
+    [],
+  )
+
+  const shortPayoutAmount = useAsyncDerivedValue(shortShares, new BigNumber(0), calcShortPayoutAmount)
+  const longPayoutAmount = useAsyncDerivedValue(longShares, new BigNumber(0), calcLongPayoutAmount)
+  const shortPayoutAmountNumber = Number(formatBigNumber(shortPayoutAmount || new BigNumber(0), collateral.decimals))
+  const longPayoutAmountNumber = Number(formatBigNumber(longPayoutAmount || new BigNumber(0), collateral.decimals))
+
+  useEffect(() => {
+    setShortProfitPercentage(
+      (shortPayoutAmountNumber / Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals)) - 1) * 100,
+    )
+    setLongProfitPercentage(
+      (longPayoutAmountNumber / Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals)) - 1) * 100,
+    )
+    setShortProfitAmount(
+      (shortProfitPercentage * Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals))) / 100,
+    )
+    setLongProfitAmount(
+      (longProfitPercentage * Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals))) / 100,
+    )
+  }, [
+    shortPayoutAmountNumber,
+    totalShortCollateralAmount,
+    collateral.decimals,
+    longPayoutAmountNumber,
+    totalLongCollateralAmount,
+    shortProfitPercentage,
+    longProfitPercentage,
+  ])
 
   const TableHead: PositionTableValue[] = [
     PositionTableValue.YourPosition,
@@ -156,7 +182,9 @@ export const PositionTable = (props: Props) => {
         <TDPosition textAlign={TableCellsAlign[0]}>{index === 0 ? 'Short' : 'Long'}</TDPosition>
         <TDStyled textAlign={TableCellsAlign[1]}>{index === 0 ? shortSharesFormatted : longSharesFormatted}</TDStyled>
         <TDStyled textAlign={TableCellsAlign[2]}>
-          {index === 0 ? formatNumber(shortPayoutAmount.toString()) : formatNumber(longPayoutAmount.toString())}
+          {index === 0
+            ? formatNumber(formatBigNumber(shortPayoutAmount || new BigNumber(0), collateral.decimals))
+            : formatNumber(formatBigNumber(longPayoutAmount || new BigNumber(0), collateral.decimals))}
         </TDStyled>
         <TDStyled textAlign={TableCellsAlign[3]}>
           {index === 0 ? formatNumber(shortProfitAmount.toString()) : formatNumber(longProfitAmount.toString())}(
