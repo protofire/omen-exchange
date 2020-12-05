@@ -39,12 +39,13 @@ const logger = getLogger('Scalar Market::Buy')
 
 interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
+  fetchGraphMarketTradeData?: () => Promise<void> | undefined
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: string) => void
 }
 
 export const ScalarMarketSell = (props: Props) => {
-  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, fetchGraphMarketTradeData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const { library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
@@ -212,6 +213,7 @@ export const ScalarMarketSell = (props: Props) => {
 
       await fetchGraphMarketMakerData()
       await fetchCollateralBalance()
+      fetchGraphMarketTradeData && (await fetchGraphMarketTradeData())
 
       setAmountShares(null)
       setAmountSharesToDisplay('')

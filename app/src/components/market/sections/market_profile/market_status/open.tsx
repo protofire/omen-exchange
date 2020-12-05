@@ -192,7 +192,11 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
-  const { status, trades } = useGraphMarketTradeData(question.title, collateral.address, cpk?.address.toLowerCase())
+  const { fetchData: fetchGraphMarketTradeData, status, trades } = useGraphMarketTradeData(
+    question.title,
+    collateral.address,
+    cpk?.address.toLowerCase(),
+  )
 
   return (
     <>
@@ -258,6 +262,7 @@ const Wrapper = (props: Props) => {
         {currentTab === marketTabs.pool && (
           <MarketPoolLiquidityContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
@@ -267,6 +272,7 @@ const Wrapper = (props: Props) => {
         {currentTab === marketTabs.buy && (
           <MarketBuyContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
@@ -275,6 +281,7 @@ const Wrapper = (props: Props) => {
         {currentTab === marketTabs.sell && (
           <MarketSellContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
