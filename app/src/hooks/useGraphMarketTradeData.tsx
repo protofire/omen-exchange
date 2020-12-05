@@ -81,22 +81,13 @@ export const useGraphMarketTradeData = (title: string, collateral: string, accou
     }
   }, [title, collateral])
 
-  if (data && data.fpmmTrades && !isObjectEqual(trades, data.fpmmTrades)) {
+  if (data && data.fpmmTrades) {
     trades = wrangleResponse(data.fpmmTrades)
     if (needUpdate) {
       trades = wrangleResponse(data.fpmmTrades)
       setNeedUpdate(false)
-    } else if (isObjectEqual(trades, data.fpmmTrades)) {
+    } else if (!isObjectEqual(trades, data.fpmmTrades)) {
       trades = wrangleResponse(data.fpmmTrades)
-      needRefetch = false
-    }
-  } else if (data && data.fpmmTrades && !data.fpmmTrades.length) {
-    trades = []
-    if (needUpdate) {
-      trades = []
-      setNeedUpdate(false)
-    } else if (isObjectEqual(trades, data.fpmmTrades)) {
-      trades = []
       needRefetch = false
     }
   }

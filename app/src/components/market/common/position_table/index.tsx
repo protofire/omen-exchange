@@ -64,14 +64,21 @@ export const PositionTable = (props: Props) => {
   const [virtualHoldings, setVirtualHoldings] = useState<BigNumber[]>(holdings)
 
   useEffect(() => {
-    const shortCollateralAmounts = shortTrades.map(trade => trade.collateralAmount)
-    const totalShortCollateralAmount = shortCollateralAmounts.reduce((a, b) => a.add(b))
+    let totalShortCollateralAmount
+    let totalLongCollateralAmount
 
-    const longCollateralAmounts = longTrades.map(trade => trade.collateralAmount)
-    const totalLongCollateralAmount = longCollateralAmounts.reduce((a, b) => a.add(b))
+    if (shortTrades.length) {
+      const shortCollateralAmounts = shortTrades.map(trade => trade.collateralAmount)
+      totalShortCollateralAmount = shortCollateralAmounts.reduce((a, b) => a.add(b))
+    }
 
-    setTotalShortCollateralAmount(totalShortCollateralAmount)
-    setTotalLongCollateralAmount(totalLongCollateralAmount)
+    if (longTrades.length) {
+      const longCollateralAmounts = longTrades.map(trade => trade.collateralAmount)
+      totalLongCollateralAmount = longCollateralAmounts.reduce((a, b) => a.add(b))
+    }
+
+    totalShortCollateralAmount && setTotalShortCollateralAmount(totalShortCollateralAmount)
+    totalLongCollateralAmount && setTotalLongCollateralAmount(totalLongCollateralAmount)
   }, [longTrades, shortTrades])
 
   useEffect(() => {
