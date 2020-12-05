@@ -4,10 +4,9 @@ import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useAsyncDerivedValue, useCollateralBalance, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { RemoteData } from '../../../../util/remote_data'
 import {
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
@@ -52,7 +51,6 @@ export const ScalarMarketSell = (props: Props) => {
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const { library: provider } = context
-  const signer = useMemo(() => provider.getSigner(), [provider])
 
   const {
     address: marketMakerAddress,
@@ -75,13 +73,6 @@ export const ScalarMarketSell = (props: Props) => {
   const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
-
-  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
-    collateral,
-    context,
-  )
-  const collateralBalance = maybeCollateralBalance || Zero
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
 
   const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
   const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
@@ -130,14 +121,6 @@ export const ScalarMarketSell = (props: Props) => {
         return [null, null, null, null]
       }
 
-      // try {
-      //   tradedShares = await marketMaker.calcSellAmount(amount, positionIndex)
-      //   reverseTradedShares = await marketMaker.calcSellAmount(amount, positionIndex === 0 ? 1 : 0)
-      // } catch {
-      //   tradedShares = new BigNumber(0)
-      //   reverseTradedShares = new BigNumber(0)
-      // }
-
       const balanceAfterTrade = computeBalanceAfterTrade(
         balances.map(b => b.holdings),
         positionIndex,
@@ -154,7 +137,7 @@ export const ScalarMarketSell = (props: Props) => {
       logger.log(`Amount to sell ${amountToSell}`)
       return [costFee, newPrediction, amountToSell, potentialValue]
     },
-    [balances, marketMaker, positionIndex, lowerBound, upperBound],
+    [balances, positionIndex, lowerBound, upperBound],
   )
 
   const [costFee, newPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(
@@ -163,36 +146,8 @@ export const ScalarMarketSell = (props: Props) => {
     calcSellAmount,
   )
 
-  const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
-
   const formattedNewPrediction =
     newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
-
-  // const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
-  // const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
-
-  // const baseCost = debouncedAmount.sub(feePaid)
-  // const potentialValue = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
-  // const potentialLossUncapped = reverseTradedShares.isZero()
-  //   ? new BigNumber(0)
-  //   : reverseTradedShares.sub(amount.add(feePaid))
-  // const potentialLoss = reverseTradedShares.isZero()
-  //   ? new BigNumber(0)
-  //   : reverseTradedShares.sub(amount).lt(debouncedAmount)
-  //   ? reverseTradedShares.sub(amount)
-  //   : debouncedAmount
-
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
-  // const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
-  // const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
-  // const potentialValueFormatted = `${formatNumber(formatBigNumber(potentialValue, collateral.decimals))} ${
-  //   collateral.symbol
-  // }`
-  // const potentialLossFormatted = `${formatNumber(formatBigNumber(potentialLoss, collateral.decimals))} ${
-  //   collateral.symbol
-  // }`
-  // const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
-  // const total = `${sharesTotal} Shares`
 
   const finish = async () => {
     const outcomeIndex = positionIndex
@@ -216,7 +171,6 @@ export const ScalarMarketSell = (props: Props) => {
       })
 
       await fetchGraphMarketMakerData()
-      await fetchCollateralBalance()
 
       setAmountShares(null)
       setAmountSharesToDisplay('')
@@ -262,8 +216,6 @@ export const ScalarMarketSell = (props: Props) => {
         long={positionIndex === 1}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
-        // potentialLoss={potentialLossUncapped}
-        // potentialProfit={potentialProfit}
         startingPointTitle={'Current prediction'}
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
         upperBound={scalarHigh || new BigNumber(0)}
