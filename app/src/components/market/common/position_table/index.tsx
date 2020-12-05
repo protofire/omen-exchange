@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, formatUnits, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import styled, { css } from 'styled-components'
 
@@ -50,6 +50,9 @@ export const PositionTable = (props: Props) => {
   const shortSharesFormatted = formatNumber(formatBigNumber(shortShares, 18))
   const longSharesFormatted = formatNumber(formatBigNumber(longShares, 18))
 
+  const holdings = balances.map(balance => balance.holdings)
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee || new BigNumber(0), 18))
+
   const [shortTrades, setShortTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '0'))
   const [longTrades, setlongTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '1'))
   const [averageShortPrediction, setAverageShortPrediction] = useState<number>(0)
@@ -60,6 +63,7 @@ export const PositionTable = (props: Props) => {
   const [totalLongCollateralAmount, setTotalLongCollateralAmount] = useState<BigNumber>(new BigNumber(0))
   const [shortProfitAmount, setShortProfitAmount] = useState<number>(0)
   const [longProfitAmount, setLongProfitAmount] = useState<number>(0)
+  const [virtualHoldings, setVirtualHoldings] = useState<BigNumber[]>(holdings)
 
   const calcPositionData = (trades: TradeObject[]): { averagePrediction: number; totalCollateralAmount: BigNumber } => {
     if (!trades.length) return { averagePrediction: 0, totalCollateralAmount: new BigNumber(0) }
@@ -90,35 +94,40 @@ export const PositionTable = (props: Props) => {
     setTotalLongCollateralAmount(totalLongCollateralAmount)
   }, [longTrades, shortTrades])
 
-  const holdings = balances.map(balance => balance.holdings)
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee || new BigNumber(0), 18))
+  useEffect(() => {
+    const virtualHoldings = [
+      new BigNumber(parseUnits(String(20 * Number(currentPrediction)), 18)),
+      new BigNumber(parseUnits(String(20 * (1 - Number(currentPrediction))), 18)),
+    ]
+    setVirtualHoldings(virtualHoldings)
+  }, [currentPrediction])
 
   const calcShortPayoutAmount = useMemo(
     () => async (amountShares: BigNumber): Promise<Maybe<BigNumber>> => {
       const payoutAmount = calcSellAmountInCollateral(
         amountShares,
-        holdings[0],
-        [holdings[1]],
+        virtualHoldings[0],
+        [virtualHoldings[1]],
         marketFeeWithTwoDecimals,
       )
 
       return payoutAmount
     },
-    [],
+    [virtualHoldings],
   )
 
   const calcLongPayoutAmount = useMemo(
     () => async (amountShares: BigNumber): Promise<Maybe<BigNumber>> => {
       const payoutAmount = calcSellAmountInCollateral(
         amountShares,
-        holdings[1],
-        [holdings[0]],
+        virtualHoldings[1],
+        [virtualHoldings[0]],
         marketFeeWithTwoDecimals,
       )
 
       return payoutAmount
     },
-    [],
+    [virtualHoldings],
   )
 
   const shortPayoutAmount = useAsyncDerivedValue(shortShares, new BigNumber(0), calcShortPayoutAmount)
@@ -148,6 +157,8 @@ export const PositionTable = (props: Props) => {
     shortProfitPercentage,
     longProfitPercentage,
   ])
+
+  // console.log(Number(formatBigNumber(longShares, 18)) * Number(currentPrediction))
 
   const TableHead: PositionTableValue[] = [
     PositionTableValue.YourPosition,
