@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import { isObjectEqual } from '../util/tools'
 import { Status, TradeObject } from '../util/types'

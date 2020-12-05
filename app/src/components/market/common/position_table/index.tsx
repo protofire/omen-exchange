@@ -1,11 +1,11 @@
-import { BigNumber, formatUnits, parseUnits } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { useAsyncDerivedValue } from '../../../../hooks'
 import { calcSellAmountInCollateral, formatBigNumber, formatNumber } from '../../../../util/tools'
 import { BalanceItem, PositionTableValue, Token, TradeObject } from '../../../../util/types'
-import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
+import { TD, TH, THead, TR, Table } from '../../../common'
 
 const TableWrapper = styled.div`
   margin-left: -24px
@@ -51,12 +51,10 @@ export const PositionTable = (props: Props) => {
   const longSharesFormatted = formatNumber(formatBigNumber(longShares, 18))
 
   const holdings = balances.map(balance => balance.holdings)
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee || new BigNumber(0), 18))
 
-  const [shortTrades, setShortTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '0'))
-  const [longTrades, setlongTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '1'))
-  const [averageShortPrediction, setAverageShortPrediction] = useState<number>(0)
-  const [averageLongPrediction, setAverageLongPrediction] = useState<number>(0)
+  const [shortTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '0'))
+  const [longTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '1'))
+  const [marketFee] = useState<number>(Number(formatBigNumber(fee || new BigNumber(0), 18)))
   const [shortProfitPercentage, setShortProfitPercentage] = useState<number>(0)
   const [longProfitPercentage, setLongProfitPercentage] = useState<number>(0)
   const [totalShortCollateralAmount, setTotalShortCollateralAmount] = useState<BigNumber>(new BigNumber(0))
@@ -65,31 +63,13 @@ export const PositionTable = (props: Props) => {
   const [longProfitAmount, setLongProfitAmount] = useState<number>(0)
   const [virtualHoldings, setVirtualHoldings] = useState<BigNumber[]>(holdings)
 
-  const calcPositionData = (trades: TradeObject[]): { averagePrediction: number; totalCollateralAmount: BigNumber } => {
-    if (!trades.length) return { averagePrediction: 0, totalCollateralAmount: new BigNumber(0) }
-    const tradePrices = trades.map(trade => {
-      return Number(trade.outcomeTokenMarginalPrice)
-    })
-    const collateralAmounts = trades.map(trade => trade.collateralAmount)
-    const totalCollateralAmount = collateralAmounts.reduce((a, b) => a.add(b))
-    const collateralWeights = collateralAmounts.map(collateralAmount => collateralAmount.div(totalCollateralAmount))
-    const tradeSums = tradePrices.map((trade, i) => trade * collateralWeights[i].toNumber())
-    const averagePrediction = tradeSums.reduce((a, b) => a + b)
-    return { averagePrediction, totalCollateralAmount }
-  }
-
   useEffect(() => {
-    const {
-      averagePrediction: averageShortPrediction,
-      totalCollateralAmount: totalShortCollateralAmount,
-    } = calcPositionData(shortTrades)
-    const {
-      averagePrediction: averageLongPrediction,
-      totalCollateralAmount: totalLongCollateralAmount,
-    } = calcPositionData(longTrades)
+    const shortCollateralAmounts = shortTrades.map(trade => trade.collateralAmount)
+    const totalShortCollateralAmount = shortCollateralAmounts.reduce((a, b) => a.add(b))
 
-    setAverageShortPrediction(1 - averageShortPrediction)
-    setAverageLongPrediction(averageLongPrediction)
+    const longCollateralAmounts = longTrades.map(trade => trade.collateralAmount)
+    const totalLongCollateralAmount = longCollateralAmounts.reduce((a, b) => a.add(b))
+
     setTotalShortCollateralAmount(totalShortCollateralAmount)
     setTotalLongCollateralAmount(totalLongCollateralAmount)
   }, [longTrades, shortTrades])
@@ -104,30 +84,20 @@ export const PositionTable = (props: Props) => {
 
   const calcShortPayoutAmount = useMemo(
     () => async (amountShares: BigNumber): Promise<Maybe<BigNumber>> => {
-      const payoutAmount = calcSellAmountInCollateral(
-        amountShares,
-        virtualHoldings[0],
-        [virtualHoldings[1]],
-        marketFeeWithTwoDecimals,
-      )
+      const payoutAmount = calcSellAmountInCollateral(amountShares, virtualHoldings[0], [virtualHoldings[1]], marketFee)
 
       return payoutAmount
     },
-    [virtualHoldings],
+    [virtualHoldings, marketFee],
   )
 
   const calcLongPayoutAmount = useMemo(
     () => async (amountShares: BigNumber): Promise<Maybe<BigNumber>> => {
-      const payoutAmount = calcSellAmountInCollateral(
-        amountShares,
-        virtualHoldings[1],
-        [virtualHoldings[0]],
-        marketFeeWithTwoDecimals,
-      )
+      const payoutAmount = calcSellAmountInCollateral(amountShares, virtualHoldings[1], [virtualHoldings[0]], marketFee)
 
       return payoutAmount
     },
-    [virtualHoldings],
+    [virtualHoldings, marketFee],
   )
 
   const shortPayoutAmount = useAsyncDerivedValue(shortShares, new BigNumber(0), calcShortPayoutAmount)
@@ -157,8 +127,6 @@ export const PositionTable = (props: Props) => {
     shortProfitPercentage,
     longProfitPercentage,
   ])
-
-  // console.log(Number(formatBigNumber(longShares, 18)) * Number(currentPrediction))
 
   const TableHead: PositionTableValue[] = [
     PositionTableValue.YourPosition,
