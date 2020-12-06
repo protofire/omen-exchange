@@ -9,12 +9,19 @@ interface Props {
   marketMakerData: MarketMakerData
   context: ConnectedWeb3Context
   switchMarketTab: (arg0: string) => void
+  fetchGraphMarketMakerData: () => Promise<void>
 }
 
 const MarketVerifyContainer: React.FC<Props> = (props: Props) => {
-  const { context, marketMakerData, switchMarketTab } = props
-
-  return <MarketVerify context={context} marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+  const { context, fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+  return (
+    <MarketVerify
+      context={context}
+      fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+      marketMakerData={marketMakerData}
+      switchMarketTab={switchMarketTab}
+    />
+  )
 }
 
 export { MarketVerifyContainer }
