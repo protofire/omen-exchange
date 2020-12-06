@@ -107,7 +107,7 @@ const wrangleResponse = (data: any, decimals: number) => {
       fpmmType: trade.fpmmType,
       decimals: decimals,
       collateralTokenAddress: trade.fpmm.collateralToken,
-      sharesOrPoolTokenAmount: parseFloat(formatUnits(trade.sharesOrPoolTokenAmount, decimals)).toFixed(2),
+      sharesOrPoolTokenAmount: parseFloat(formatUnits(trade.sharesOrPoolTokenAmount, decimals)).toFixed(3),
       creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
       collateralTokenAmount: trade.collateralTokenAmount,
       transactionHash: trade.transactionHash,

@@ -386,7 +386,7 @@ export const calculateSharesBought = (
     Number(formatBigNumber(sharesAfterAddingFunding[0], decimals, 3)) -
     Number(formatBigNumber(sharesAfterRemovingFunding[0], decimals, 3))
 
-  return subtractedValues.toFixed(2)
+  return subtractedValues.toFixed(3)
 }
 export const formatToShortNumber = (number: string, decimals = 2): string => {
   if (number.length < 1) {

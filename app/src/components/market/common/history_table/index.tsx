@@ -124,7 +124,6 @@ export const HistoryTable: React.FC<Props> = ({
                   : chainID === '0x1'
                   ? 'https://etherscan.io/tx/'
                   : ''
-
               return (
                 <HistoryColumns key={id}>
                   <HistoryRow width={'25'}>
@@ -134,7 +133,7 @@ export const HistoryTable: React.FC<Props> = ({
                   <HistoryRow width={'18'}>{transactionType}</HistoryRow>
                   <HistoryRow width={'20'}>{sharesOrPoolTokenAmount}</HistoryRow>
                   <HistoryRow width={'22'}>
-                    {parseFloat(formatUnits(collateralTokenAmount, decimals)).toFixed(2)}
+                    {parseFloat(formatUnits(collateralTokenAmount, decimals)).toFixed(3)}
                     {` ${currency}`}
                   </HistoryRow>
                   <HistoryRow as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank" width={'18'}>

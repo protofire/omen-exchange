@@ -196,28 +196,31 @@ export const HistorySelect: React.FC<Props> = ({
         )
         const newFpmmTradeArray: any[] = []
         await fpmmTrade.forEach(item => {
-          newFpmmTradeArray.push(item)
           if (item.fpmmType === 'Liquidity') {
             const findInResponse = response.find(element => element.id === item.id)
             if (findInResponse) {
-              newFpmmTradeArray.push({
-                sharesOrPoolTokenAmount: calculateSharesBought(
-                  findInResponse.poolShares,
-                  findInResponse.balances,
-                  findInResponse.shares,
-                  findInResponse.collateralTokenAmount,
-                  decimals,
-                ),
-                decimals: item.decimals,
-                collateralTokenAmount: item.collateralTokenAmount,
-                creationTimestamp: item.creationTimestamp,
-                id: item.id + 1,
-                transactionHash: item.transactionHash,
-                transactionType: item.transactionType === 'Deposit' ? 'Buy' : 'Sell',
-                user: item.user,
-              })
+              const sharesCalculation = calculateSharesBought(
+                findInResponse.poolShares,
+                findInResponse.balances,
+                findInResponse.shares,
+                findInResponse.collateralTokenAmount,
+                decimals,
+              )
+              if (Number(sharesCalculation) !== 0) {
+                newFpmmTradeArray.push({
+                  sharesOrPoolTokenAmount: sharesCalculation,
+                  decimals: item.decimals,
+                  collateralTokenAmount: item.collateralTokenAmount,
+                  creationTimestamp: item.creationTimestamp,
+                  id: item.id + 1,
+                  transactionHash: item.transactionHash,
+                  transactionType: item.transactionType === 'Deposit' ? 'Buy' : 'Sell',
+                  user: item.user,
+                })
+              }
             }
           }
+          newFpmmTradeArray.push(item)
         })
 
         setSharesDataLoader(false)
