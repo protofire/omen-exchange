@@ -268,7 +268,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     collateral && Number(formatBigNumber(potentialLoss || new BigNumber(0), collateral.decimals))
 
   const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
-  const feeNumber = fee && collateral && Number(formatBigNumber(fee, collateral.decimals))
+  const feeNumber = fee && collateral && (Number(formatBigNumber(fee, collateral.decimals)) + 1) ** 2 - 1
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
