@@ -74,6 +74,11 @@ interface CPKRequestVerificationParams {
   submissionDeposit: string
 }
 
+interface CreateMarketResult {
+  transaction: TransactionReceipt
+  marketMakerAddress: string
+}
+
 class CPKService {
   cpk: any
   provider: Web3Provider
@@ -164,7 +169,7 @@ class CPKService {
     marketData,
     marketMakerFactory,
     realitio,
-  }: CPKCreateMarketParams): Promise<string> => {
+  }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
       const { arbitrator, category, collateral, loadedQuestionId, outcomes, question, resolution, spread } = marketData
 
@@ -273,8 +278,11 @@ class CPKService {
       const txObject = await this.cpk.execTransactions(transactions)
       logger.log(`Transaction hash: ${txObject.hash}`)
 
-      await this.provider.waitForTransaction(txObject.hash)
-      return predictedMarketMakerAddress
+      const transaction = await this.provider.waitForTransaction(txObject.hash)
+      return {
+        transaction,
+        marketMakerAddress: predictedMarketMakerAddress,
+      }
     } catch (err) {
       logger.error(`There was an error creating the market maker`, err.message)
       throw err

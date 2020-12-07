@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react'
 import { useHistory } from 'react-router'
 
-import { useContracts } from '../../../../hooks'
+import { useContracts, useGraphMeta } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
@@ -18,6 +18,7 @@ const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
   const history = useHistory()
+  const { waitForBlockToSync } = useGraphMeta()
 
   const [isModalOpen, setModalState] = useState(false)
   const { conditionalTokens, marketMakerFactory, realitio } = useContracts(context)
@@ -45,13 +46,17 @@ const MarketWizardCreatorContainer: FC = () => {
         if (!hasEnoughAlowance) {
           await collateralService.approveUnlimited(cpk.address)
         }
-        const marketMakerAddress = await cpk.createMarket({
+        const { marketMakerAddress, transaction } = await cpk.createMarket({
           marketData,
           conditionalTokens,
           realitio,
           marketMakerFactory,
         })
         setMarketMakerAddress(marketMakerAddress)
+
+        if (transaction.blockNumber) {
+          await waitForBlockToSync(transaction.blockNumber)
+        }
 
         setMarketCreationStatus(MarketCreationStatus.done())
         history.replace(`/${marketMakerAddress}`)
