@@ -296,7 +296,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         ? newPrediction * 100
         : currentPrediction
         ? Number(currentPrediction) * 100
-        : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+        : (((startingPointNumber || 0) - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
     )
     newPrediction &&
       setScaleValuePrediction(Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
@@ -307,7 +307,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       ? newPrediction * 100
       : currentPrediction
       ? Number(currentPrediction) * 100
-      : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+      : (((startingPointNumber || 0) - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
   )
   const [scaleValuePrediction, setScaleValuePrediction] = useState(
     newPredictionNumber ? newPredictionNumber : currentPredictionNumber,
@@ -321,6 +321,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     setScaleValuePrediction((Number(scaleBall?.value) / 100) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
     ReactTooltip.rebuild()
   }
+
+  console.log((((startingPointNumber || 0) - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100)
 
   useEffect(() => {
     if (!positionTable) {
