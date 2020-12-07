@@ -322,8 +322,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     ReactTooltip.rebuild()
   }
 
-  console.log((((startingPointNumber || 0) - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100)
-
   useEffect(() => {
     if (!positionTable) {
       let positionValue
@@ -376,6 +374,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     upperBoundNumber,
     positionTable,
   ])
+
+  console.log(balances?.map(balance => balance.holdings))
 
   return (
     <>

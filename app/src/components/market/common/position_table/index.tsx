@@ -144,6 +144,11 @@ export const PositionTable = (props: Props) => {
 
   const TableCellsAlign = ['left', 'right', 'right', 'right']
 
+  const dust = parseUnits('0.00001', collateral.decimals)
+  if (shortPayoutAmount?.lte(dust) && longPayoutAmount?.lte(dust)) {
+    return <></>
+  }
+
   const renderTableHeader = () => {
     return (
       <THead>
@@ -161,8 +166,8 @@ export const PositionTable = (props: Props) => {
   }
 
   const renderTableRow = (index: number) => {
-    if (index === 0 && !shortTrades.length) return
-    if (index === 1 && !longTrades.length) return
+    if ((index === 0 && !shortTrades.length) || (index === 0 && shortPayoutAmount?.lte(dust))) return
+    if ((index === 1 && !longTrades.length) || (index === 1 && longPayoutAmount?.lte(dust))) return
     return (
       <TR key={index}>
         <TDPosition textAlign={TableCellsAlign[0]}>{index === 0 ? 'Short' : 'Long'}</TDPosition>
