@@ -248,6 +248,7 @@ export const ScalarMarketBuy = (props: Props) => {
         border={true}
         collateral={collateral}
         currentPrediction={outcomeTokenMarginalPrices[1]}
+        fee={feePaid}
         long={activeTab === Tabs.long}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
