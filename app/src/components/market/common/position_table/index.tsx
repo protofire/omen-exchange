@@ -164,7 +164,7 @@ export const PositionTable = (props: Props) => {
     if (index === 0 && !shortTrades.length) return
     if (index === 1 && !longTrades.length) return
     return (
-      <TR>
+      <TR key={index}>
         <TDPosition textAlign={TableCellsAlign[0]}>{index === 0 ? 'Short' : 'Long'}</TDPosition>
         <TDStyled textAlign={TableCellsAlign[1]}>{index === 0 ? shortSharesFormatted : longSharesFormatted}</TDStyled>
         <TDStyled textAlign={TableCellsAlign[2]}>
