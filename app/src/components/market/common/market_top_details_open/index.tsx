@@ -7,6 +7,7 @@ import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import theme from '../../../../theme'
+import { getContractAddress } from '../../../../util/networks'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { MoreMenu } from '../../../common/form/more_menu'
@@ -49,18 +50,22 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
   const { marketMakerData } = props
   const {
+    address,
     answerFinalizedTimestamp,
     arbitrator,
     collateral,
     collateralVolume,
     creationTimestamp,
-    curatedByDxDaoOrKleros: isVerified,
+    curatedByDxDao,
+    curatedByDxDaoOrKleros,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
     scaledLiquidityParameter,
+    submissionIDs,
   } = marketMakerData
 
+  const ovmAddress = getContractAddress(context.networkId, 'omenVerifiedMarkets')
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
   const currentTimestamp = new Date().getTime()
@@ -162,11 +167,16 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         runningDailyVolumeByHour={runningDailyVolumeByHour}
       ></MarketData>
       <AdditionalMarketData
+        address={address}
         arbitrator={arbitrator}
         category={question.category}
+        curatedByDxDao={curatedByDxDao}
+        curatedByDxDaoOrKleros={curatedByDxDaoOrKleros}
         id={question.id}
-        oracle="Reality"
-        verified={isVerified}
+        oracle="Reality.eth"
+        ovmAddress={ovmAddress}
+        submissionIDs={submissionIDs}
+        title={question.title}
       ></AdditionalMarketData>
     </>
   )

@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { MarketDetailsTab } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
 const MarketTabs = styled.div`
   display: flex;
@@ -13,7 +13,7 @@ const MarketTab = styled.div<{ active: boolean }>`
   color: ${props => (props.active ? props.theme.buttonSecondary.color : props.theme.colors.clickable)};
   background: none;
   border: none;
-  border-radius: 32px;
+  border-radius: 8px;
   padding: 10px 18px;
   margin-right: 4px;
   background: ${props => (props.active ? props.theme.buttonSecondary.backgroundColor : `none`)};
@@ -30,17 +30,18 @@ const MarketSetOutcomeTab = styled.div`
 
 interface Props {
   activeTab: string
-  marketAddress: string
   hasWinningOutcomes?: Maybe<boolean>
-  isQuestionFinalized: boolean
-  resolutionDate: Date
+  marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 export const MarketNavigation = (props: Props) => {
-  const { activeTab, hasWinningOutcomes, isQuestionFinalized, resolutionDate, switchMarketTab } = props
+  const { activeTab, hasWinningOutcomes, marketMakerData, switchMarketTab } = props
+  const { isQuestionFinalized, question } = marketMakerData
+  const currentTimestamp = new Date().getTime()
 
-  const isFinalizing = resolutionDate < new Date() && !isQuestionFinalized
+  const isOpen = question.resolution.getTime() > currentTimestamp
+  const isFinalizing = question.resolution < new Date() && !isQuestionFinalized
 
   if (activeTab === MarketDetailsTab.setOutcome) {
     return (
@@ -85,6 +86,14 @@ export const MarketNavigation = (props: Props) => {
       >
         History
       </MarketTab>
+      {isOpen && (
+        <MarketTab
+          active={activeTab === MarketDetailsTab.verify}
+          onClick={() => switchMarketTab(MarketDetailsTab.verify)}
+        >
+          Verify
+        </MarketTab>
+      )}
     </MarketTabs>
   )
 }

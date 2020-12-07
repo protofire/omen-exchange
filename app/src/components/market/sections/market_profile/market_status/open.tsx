@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { WhenConnected } from '../../../../../hooks/connectedWeb3'
+import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
@@ -17,6 +17,7 @@ import { MarketHistoryContainer } from '../../market_history/market_history_cont
 import { MarketNavigation } from '../../market_navigation'
 import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
 import { MarketSellContainer } from '../../market_sell/market_sell_container'
+import { MarketVerifyContainer } from '../../market_verify/market_verify_container'
 
 const TopCard = styled(ViewCard)`
   padding: 24px;
@@ -98,15 +99,9 @@ const Wrapper = (props: Props) => {
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
 
-  const {
-    address: marketMakerAddress,
-    balances,
-    collateral,
-    isQuestionFinalized,
-    payouts,
-    question,
-    totalPoolShares,
-  } = marketMakerData
+  const { balances, collateral, isQuestionFinalized, payouts, question, totalPoolShares } = marketMakerData
+
+  const context = useConnectedWeb3Context()
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
@@ -251,9 +246,7 @@ const Wrapper = (props: Props) => {
       <BottomCard>
         <MarketNavigation
           activeTab={currentTab}
-          isQuestionFinalized={isQuestionFinalized}
-          marketAddress={marketMakerAddress}
-          resolutionDate={question.resolution}
+          marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
         {currentTab === MarketDetailsTab.swap && (
@@ -331,7 +324,14 @@ const Wrapper = (props: Props) => {
             switchMarketTab={switchMarketTab}
           />
         )}
-        {/* {currentTab === MarketDetailsTab.verify && <p>verify</p>} */}
+        {currentTab === MarketDetailsTab.verify && (
+          <MarketVerifyContainer
+            context={context}
+            fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
+        )}
       </BottomCard>
     </>
   )

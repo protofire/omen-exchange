@@ -49,29 +49,29 @@ export const Footer = () => {
         <Break>·</Break>
         <Link href={`https://etherscan.io/address/${marketMakerFactory.address}`}>Omen Contract</Link>
         <Break>·</Break>
-        <Link href="https://explore.duneanalytics.com/dashboard/omen-stats" target="_blank">
+        <Link href="https://explore.duneanalytics.com/dashboard/omen-stats" rel="noopener noreferrer" target="_blank">
           Statistics
         </Link>
         <Break>·</Break>
         <Link href="http://alchemy.daostack.io/dao/0x519b70055af55a007110b4ff99b0ea33071c720a">Propose Token</Link>
         <Break>·</Break>
-        <Link href={DOCUMENT_FAQ} target="_blank">
+        <Link href={DOCUMENT_FAQ} rel="noopener noreferrer" target="_blank">
           FAQ
         </Link>
         <Break>·</Break>
-        <Link href={DOCUMENT_VALIDITY_RULES} target="_blank">
+        <Link href={DOCUMENT_VALIDITY_RULES} rel="noopener noreferrer" target="_blank">
           Market Rules
         </Link>
         <Break>·</Break>
-        <Link href="https://dxdao.eth.link" target="_blank">
+        <Link href="https://dxdao.eth.link" rel="noopener noreferrer" target="_blank">
           DXdao.eth
         </Link>
         <Break>·</Break>
-        <Link href="https://twitter.com/Omen_eth" target="_blank">
+        <Link href="https://twitter.com/Omen_eth" rel="noopener noreferrer" target="_blank">
           Twitter
         </Link>
         <Break>·</Break>
-        <Link href="https://t.me/omen_eth" target="_blank">
+        <Link href="https://t.me/omen_eth" rel="noopener noreferrer" target="_blank">
           Telegram
         </Link>
       </Wrapper>

@@ -12,6 +12,35 @@ export enum Status {
   Error = 'Error',
 }
 
+export enum KlerosItemStatus {
+  Absent = 'Absent',
+  Registered = 'Registered',
+  RegistrationRequested = 'RegistrationRequested',
+  ClearingRequested = 'ClearingRequested',
+}
+
+export enum KlerosDisputeOutcome {
+  None = 'None',
+  Accept = 'Accept',
+  Refuse = 'Refuse',
+}
+
+export interface MarketCurationState {
+  verificationState: MarketVerificationState
+  submissionTime?: number
+  itemID?: string
+}
+
+export interface KlerosCurationData {
+  listingCriteriaURL: string
+  submissionDeposit: string
+  challengePeriodDuration: string
+  submissionBaseDeposit: string
+  removalBaseDeposit: string
+  marketVerificationData: MarketCurationState
+  ovmAddress: string // ovm here stands for Omen Verified Markets, the Kleros-Omen TCR.
+}
+
 export interface BalanceItem {
   outcomeName: string
   probability: number
@@ -29,6 +58,12 @@ export interface BondItem {
 export interface AnswerItem {
   answer: string
   bondAggregate: BigNumber
+}
+
+export interface KlerosSubmission {
+  id: string
+  status: KlerosItemStatus
+  listAddress: string
 }
 
 export enum Stage {
@@ -121,6 +156,14 @@ export type MarketWithExtraData = Market & {
   fee: BigNumber
   question: Question
   status: MarketStatus
+}
+
+export enum MarketVerificationState {
+  Verified,
+  NotVerified,
+  SubmissionChallengeable,
+  RemovalChallengeable,
+  WaitingArbitration,
 }
 
 export interface Log {
@@ -241,6 +284,7 @@ export interface MarketMakerData {
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
   scaledLiquidityParameter: number
+  submissionIDs: KlerosSubmission[]
 }
 
 export enum Ternary {
