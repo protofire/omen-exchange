@@ -5,8 +5,8 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
-import { CPKService, MarketMakerService } from '../../../../services'
+import { useAsyncDerivedValue, useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
   calcSellAmountInCollateral,
@@ -45,6 +45,7 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const cpk = useConnectedCPKContext()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
@@ -144,12 +145,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         return
       }
 
+      if (!cpk) {
+        return
+      }
+
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
       setMessage(`Selling ${sharesAmount} shares...`)
-
-      const cpk = await CPKService.create(context.library)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
