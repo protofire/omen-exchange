@@ -39,7 +39,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
   border-top: 1px solid ${props => props.theme.colors.verticalDivider};
 `
 
-const logger = getLogger('Scalar Market::Buy')
+const logger = getLogger('Scalar Market::Sell')
 
 interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
