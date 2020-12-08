@@ -3,7 +3,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { useRealityLink } from '../../../../hooks/useRealityLink'
-import { Arbitrator } from '../../../../util/types'
+import { Arbitrator, KlerosItemStatus, KlerosSubmission } from '../../../../util/types'
 import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
 
 const AdditionalMarketDataWrapper = styled.div`
@@ -90,15 +90,34 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   arbitrator: Arbitrator
   oracle: string
   id: string
-  verified: boolean
+  curatedByDxDaoOrKleros: boolean
+  curatedByDxDao: boolean
+  submissionIDs: KlerosSubmission[]
+  ovmAddress: string
+  title: string
+  address: string
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { arbitrator, category, id, oracle, verified } = props
+  const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
 
   const realitioBaseUrl = useRealityLink()
 
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
+
+  submissionIDs.sort((s1, s2) => {
+    if (s1.status === KlerosItemStatus.Registered) return -1
+    if (s2.status === KlerosItemStatus.Registered) return 1
+    if (s1.status === KlerosItemStatus.ClearingRequested) return -1
+    if (s2.status === KlerosItemStatus.ClearingRequested) return 1
+    if (s1.status === KlerosItemStatus.RegistrationRequested) return -1
+    if (s2.status === KlerosItemStatus.RegistrationRequested) return 1
+    return 0
+  })
+
+  const queryParams = new URLSearchParams()
+  queryParams.append('col1', title)
+  queryParams.append('col2', `https://omen.eth.link/#/${address}`)
 
   return (
     <AdditionalMarketDataWrapper>
@@ -133,15 +152,15 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           data-arrow-color="transparent"
           data-for="marketData"
           data-tip={
-            verified
-              ? 'This Market is verified by DXdao and therefore valid.'
+            curatedByDxDaoOrKleros
+              ? 'This Market is verified by DXdao or Kleros and therefore valid.'
               : 'This Market has not been verified and may be invalid.'
           }
-          isError={!verified}
+          isError={!curatedByDxDaoOrKleros}
         >
-          {verified ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
-          <AdditionalMarketDataSectionTitle isError={!verified}>
-            {verified ? 'Verified' : 'Not Verified'}
+          {curatedByDxDaoOrKleros ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
+          <AdditionalMarketDataSectionTitle isError={!curatedByDxDaoOrKleros}>
+            {curatedByDxDaoOrKleros ? 'Verified' : 'Not Verified'}
           </AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
       </AdditionalMarketDataLeft>

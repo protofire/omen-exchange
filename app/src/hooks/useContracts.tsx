@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 
+import { IPFS_GATEWAY } from '../common/constants'
 import {
   ConditionalTokenService,
   DxTCRService,
@@ -42,9 +43,19 @@ export const useContracts = (context: ConnectedWeb3Context) => {
   const klerosBadgeAddress = getContractAddress(networkId, 'klerosBadge')
   const klerosTokenViewAddress = getContractAddress(networkId, 'klerosTokenView')
   const klerosTCRAddress = getContractAddress(networkId, 'klerosTCR')
+  const omenVerifiedMarketsAddress = getContractAddress(networkId, 'omenVerifiedMarkets')
   const kleros = useMemo(
-    () => new KlerosService(klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, provider, account),
-    [klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, provider, account],
+    () =>
+      new KlerosService(
+        klerosBadgeAddress,
+        klerosTokenViewAddress,
+        klerosTCRAddress,
+        omenVerifiedMarketsAddress,
+        provider,
+        account,
+        IPFS_GATEWAY,
+      ),
+    [klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, omenVerifiedMarketsAddress, provider, account],
   )
 
   const buildMarketMaker = useMemo(

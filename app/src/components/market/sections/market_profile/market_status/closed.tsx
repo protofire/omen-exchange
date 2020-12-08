@@ -260,9 +260,7 @@ const Wrapper = (props: Props) => {
         <MarketNavigation
           activeTab={currentTab}
           hasWinningOutcomes={hasWinningOutcomes}
-          isQuestionFinalized={isQuestionFinalized}
-          marketAddress={marketMakerAddress}
-          resolutionDate={question.resolution}
+          marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
         {currentTab === marketTabs.swap && (
