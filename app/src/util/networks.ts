@@ -18,11 +18,12 @@ import { entries, isNotNull } from '../util/type-utils'
 import { getImageUrl } from './token'
 import { Arbitrator, Token } from './types'
 
-export type NetworkId = 1 | 4
+export type NetworkId = 1 | 4 | 77
 
 export const networkIds = {
   MAINNET: 1,
   RINKEBY: 4,
+  SOKOL: 77,
 } as const
 
 type CPKAddresses = {
@@ -112,6 +113,34 @@ const networks: { [K in NetworkId]: Network } = {
       omenVerifiedMarkets: '0x3b29096b7ab49428923d902cEC3dFEaa49993234',
     },
   },
+  [networkIds.SOKOL]: {
+    label: 'Sokol',
+    url: 'https://sokol.poa.network',
+    graphHttpUri: GRAPH_RINKEBY_HTTP,
+    graphWsUri: GRAPH_RINKEBY_WS,
+    klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
+    klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
+    realitioTimeout: 10,
+    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+    omenTCRListId: 1,
+    contracts: {
+      realitio: '0x63975d9e7CF434dCd04bD808d8c79d03EF69100B',
+      marketMakerFactory: '0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5',
+      conditionalTokens: '0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f',
+      oracle: '0xF6176D7126d7C68a7753F566362C72Ad36AF1e04',
+      klerosBadge: '0x0000000000000000000000000000000000000000',
+      klerosTokenView: '0x0000000000000000000000000000000000000000',
+      klerosTCR: '0x0000000000000000000000000000000000000000',
+      dxTCR: '0x5486a9050f2aC6f535a72526e37738A060508361',
+      omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
+    },
+    cpk: {
+      masterCopyAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
+      proxyFactoryAddress: '0xaaF0CCef0C0C355Ee764B3d36bcCF257C527269B',
+      multiSendAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
+      fallbackHandlerAddress: '0x1e9C3EBAd833b26E522D2fDa180Af3D2A32459D2',
+    },
+  },
 }
 
 export const supportedNetworkIds = Object.keys(networks).map(Number) as NetworkId[]
@@ -151,6 +180,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     addresses: {
       [networkIds.MAINNET]: '0x6b175474e89094c44da98b954eedeac495271d0f',
       [networkIds.RINKEBY]: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+      [networkIds.SOKOL]: '0x3B6578D5A24e16010830bf6443bc9223D6B53480',
     },
     order: 1,
   },
@@ -328,6 +358,7 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     addresses: {
       [networkIds.MAINNET]: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       [networkIds.RINKEBY]: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
+      [networkIds.SOKOL]: '0xFE083F7B16B26582D74Deb57Cf63d755b597eA05',
     },
     isSelectionEnabled: true,
   },
