@@ -36,6 +36,11 @@ import { WarningMessage } from '../../common/warning_message'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
+  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
+  margin-left: -25px;
+  margin-right: -25px;
+  padding-left: 25px;
+  padding-right: 25px;
 `
 
 const logger = getLogger('Scalar Market::Buy')
@@ -243,6 +248,7 @@ export const ScalarMarketBuy = (props: Props) => {
         border={true}
         collateral={collateral}
         currentPrediction={outcomeTokenMarginalPrices[1]}
+        fee={feePaid}
         long={activeTab === Tabs.long}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
@@ -288,7 +294,7 @@ export const ScalarMarketBuy = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmount(collateralBalance)
-              setAmountDisplay(walletBalance)
+              setAmountDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
             }}
             shouldDisplayMaxButton
             symbol={collateral.symbol}

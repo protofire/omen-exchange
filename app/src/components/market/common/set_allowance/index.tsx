@@ -30,6 +30,7 @@ const Description = styled.p`
   letter-spacing: 0.2px;
   line-height: 1.4;
   margin: 0 32px 0 0;
+  display: inline-block;
 `
 
 export type SetAllowanceProps = DOMAttributes<HTMLDivElement> &
