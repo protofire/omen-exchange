@@ -94,18 +94,17 @@ export const ScalarMarketSell = (props: Props) => {
     // eslint-disable-next-line
   }, [collateral.address])
 
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
-
-  const holdings = balances.map(balance => balance.holdings)
-  const holdingsOfSoldOutcome = holdings[positionIndex]
-  const holdingsOfOtherOutcome = holdings.filter((item, index) => {
-    return index !== positionIndex
-  })
-
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
     ): Promise<[Maybe<BigNumber>, Maybe<number>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
+      const holdings = balances.map(balance => balance.holdings)
+      const holdingsOfSoldOutcome = holdings[positionIndex]
+      const holdingsOfOtherOutcome = holdings.filter((item, index) => {
+        return index !== positionIndex
+      })
+      const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
+
       const amountToSell = calcSellAmountInCollateral(
         // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
         amountShares,
@@ -137,7 +136,7 @@ export const ScalarMarketSell = (props: Props) => {
       logger.log(`Amount to sell ${amountToSell}`)
       return [costFee, newPrediction, amountToSell, potentialValue]
     },
-    [balances, positionIndex, lowerBound, upperBound],
+    [balances, positionIndex, lowerBound, upperBound, fee],
   )
 
   const [costFee, newPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(
