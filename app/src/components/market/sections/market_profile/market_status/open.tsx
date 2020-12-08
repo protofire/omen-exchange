@@ -93,10 +93,8 @@ const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const {
-    address: marketMakerAddress,
     balances,
     collateral,
-    isQuestionFinalized,
     outcomeTokenMarginalPrices,
     question,
     scalarHigh,

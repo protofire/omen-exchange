@@ -93,7 +93,6 @@ const Wrapper = (props: Props) => {
     balances,
     collateral: collateralToken,
     isConditionResolved,
-    isQuestionFinalized,
     outcomeTokenMarginalPrices,
     payouts,
     question,
