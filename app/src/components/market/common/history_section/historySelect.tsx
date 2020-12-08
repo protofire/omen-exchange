@@ -9,7 +9,7 @@ import {
   useGraphFpmmTransactionsFromQuestion,
 } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
 import { CPKService } from '../../../../services'
-import { calcPrice, calculateSharesBought } from '../../../../util/tools'
+import { calcPrice, calcSellAmountInCollateral, calculateSharesBought, formatBigNumber } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { Button, ButtonSelectable } from '../../../button'
 import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
@@ -81,6 +81,7 @@ type Props = {
   currency: string
   marketMakerAddress: string
   decimals: number
+  fee: BigNumber
 }
 
 const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
@@ -107,6 +108,7 @@ const timestampToDate = (timestamp: number, value: string) => {
 export const HistorySelect: React.FC<Props> = ({
   currency,
   decimals,
+  fee,
   holdingSeries,
   marketMakerAddress,
   onChange,
@@ -158,6 +160,7 @@ export const HistorySelect: React.FC<Props> = ({
   ]
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize] = useState(6)
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
   const { fpmmTrade, paginationNext, refetch, status } = useGraphFpmmTransactionsFromQuestion(
     marketMakerAddress,
     pageSize,
@@ -195,22 +198,39 @@ export const HistorySelect: React.FC<Props> = ({
           }),
         )
         const newFpmmTradeArray: any[] = []
-        await fpmmTrade.forEach(item => {
+        fpmmTrade.forEach(item => {
           if (item.fpmmType === 'Liquidity') {
+            let sharesValue
             const findInResponse = response.find(element => element.id === item.id)
             if (findInResponse) {
-              const sharesCalculation = calculateSharesBought(
-                findInResponse.poolShares,
-                findInResponse.balances,
-                findInResponse.shares,
-                findInResponse.collateralTokenAmount,
-                decimals,
+              const { balances, collateralTokenAmount, poolShares, shares } = findInResponse
+              let firstItem = balances[0]
+              let outcomeIndex = 0
+
+              balances.forEach((item: BigNumber, index: number) => {
+                if (item.lt(firstItem)) {
+                  firstItem = item
+                  outcomeIndex = index
+                }
+              })
+              const holdingsOfOtherOutcomes = balances.filter((item: BigNumber, index: number) => {
+                return index !== outcomeIndex
+              })
+
+              const sharesCalculation = calculateSharesBought(poolShares, balances, shares, collateralTokenAmount)
+
+              sharesValue = calcSellAmountInCollateral(
+                sharesCalculation,
+                firstItem,
+                holdingsOfOtherOutcomes,
+                marketFeeWithTwoDecimals,
               )
+
               if (Number(sharesCalculation) !== 0) {
                 newFpmmTradeArray.push({
-                  sharesOrPoolTokenAmount: sharesCalculation,
+                  sharesOrPoolTokenAmount: formatBigNumber(sharesCalculation, decimals, 3),
                   decimals: item.decimals,
-                  collateralTokenAmount: item.collateralTokenAmount,
+                  collateralTokenAmount: sharesValue && sharesValue,
                   creationTimestamp: item.creationTimestamp,
                   id: item.id + 1,
                   transactionHash: item.transactionHash,
@@ -219,8 +239,22 @@ export const HistorySelect: React.FC<Props> = ({
                 })
               }
             }
+
+            const collateralBigNumber = new BigNumber(item.collateralTokenAmount)
+
+            newFpmmTradeArray.push({
+              sharesOrPoolTokenAmount: item.sharesOrPoolTokenAmount,
+              decimals: item.decimals,
+              creationTimestamp: item.creationTimestamp,
+              id: item.id,
+              collateralTokenAmount: sharesValue ? collateralBigNumber.sub(sharesValue) : collateralBigNumber,
+              transactionHash: item.transactionHash,
+              transactionType: item.transactionType,
+              user: item.user,
+            })
+          } else {
+            newFpmmTradeArray.push(item)
           }
-          newFpmmTradeArray.push(item)
         })
 
         setSharesDataLoader(false)

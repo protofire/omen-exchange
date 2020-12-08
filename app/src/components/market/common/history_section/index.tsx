@@ -69,6 +69,7 @@ type Props = {
   hidden: boolean
   outcomes: string[]
   currency: string
+  fee: BigNumber
   decimals: number
 }
 
@@ -90,6 +91,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
   answerFinalizedTimestamp,
   currency,
   decimals,
+  fee,
   hidden,
   marketMakerAddress,
   outcomes,
@@ -144,6 +146,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
     <HistorySelect
       currency={currency}
       decimals={decimals}
+      fee={fee}
       holdingSeries={holdingsSeries}
       marketMakerAddress={marketMakerAddress}
       onChange={setPeriod}

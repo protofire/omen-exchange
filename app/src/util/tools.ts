@@ -367,7 +367,6 @@ export const calculateSharesBought = (
   balances: BigNumber[],
   shares: BigNumber[],
   collateralTokenAmount: BigNumber,
-  decimals: number,
 ) => {
   const sendAmountsAfterAddingFunding = calcAddFundingSendAmounts(collateralTokenAmount, balances, poolShares)
 
@@ -382,11 +381,8 @@ export const calculateSharesBought = (
   const sharesAfterRemovingFunding = shares.map((share, i) => {
     return share.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
   })
-  const subtractedValues =
-    Number(formatBigNumber(sharesAfterAddingFunding[0], decimals, 3)) -
-    Number(formatBigNumber(sharesAfterRemovingFunding[0], decimals, 3))
 
-  return subtractedValues.toFixed(3)
+  return sharesAfterAddingFunding[0].sub(sharesAfterRemovingFunding[0])
 }
 export const formatToShortNumber = (number: string, decimals = 2): string => {
   if (number.length < 1) {
