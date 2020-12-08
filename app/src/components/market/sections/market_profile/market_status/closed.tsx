@@ -4,9 +4,9 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useContracts } from '../../../../../hooks'
+import { useConnectedCPKContext, useContracts } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
-import { CPKService, ERC20Service } from '../../../../../services'
+import { ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
@@ -80,6 +80,8 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
 
 const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const cpk = useConnectedCPKContext()
+
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
 
@@ -154,10 +156,12 @@ const Wrapper = (props: Props) => {
         return
       }
 
+      if (!cpk) {
+        return
+      }
+
       setStatus(Status.Loading)
       setMessage('Redeeming payout...')
-
-      const cpk = await CPKService.create(provider)
 
       await cpk.redeemPositions({
         isConditionResolved,

@@ -7,14 +7,13 @@ import styled from 'styled-components'
 import { DOCUMENT_FAQ } from '../../../../common/constants'
 import {
   useCollateralBalance,
+  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
-  useCpk,
   useCpkAllowance,
   useFundingBalance,
 } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
-import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import {
@@ -127,7 +126,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const history = useHistory()
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
 
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -212,7 +211,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const probabilities = balances.map(balance => balance.probability)
   const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+    !cpk?.cpk.isSafeApp() &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
   const depositedTokensTotal = depositedTokens.add(userEarnings)
   const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
@@ -236,6 +236,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setModalTitle('Funds Deposit')
 
     try {
+      if (!cpk) {
+        return
+      }
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
@@ -248,13 +251,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
 
-      const cpk = await CPKService.create(provider)
+      if (!cpk.cpk.isSafeApp()) {
+        const collateralAddress = await marketMaker.getCollateralToken()
+        const collateralService = new ERC20Service(provider, account, collateralAddress)
 
-      const collateralAddress = await marketMaker.getCollateralToken()
-      const collateralService = new ERC20Service(provider, account, collateralAddress)
-
-      if (hasEnoughAllowance === Ternary.False) {
-        await collateralService.approveUnlimited(cpk.address)
+        if (hasEnoughAllowance === Ternary.False) {
+          await collateralService.approveUnlimited(cpk.address)
+        }
       }
 
       await cpk.addFunding({
@@ -282,6 +285,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const removeFunding = async () => {
     setModalTitle('Funds Withdrawal')
     try {
+      if (!cpk) {
+        return
+      }
       setStatus(Status.Loading)
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
@@ -290,7 +296,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
-      const cpk = await CPKService.create(provider)
 
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
@@ -350,7 +355,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const disableDepositButton =
     !amountToFund ||
     amountToFund?.isZero() ||
-    hasEnoughAllowance !== Ternary.True ||
+    (!cpk?.cpk.isSafeApp() && hasEnoughAllowance !== Ternary.True) ||
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
     isNegativeAmountToFund
