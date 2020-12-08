@@ -206,17 +206,17 @@ export const ScalarMarketSell = (props: Props) => {
   const isShortTabDisabled = balances[0].shares.lt(dust)
   const isLongTabDisabled = balances[1].shares.lt(dust)
 
+  const isNewPrediction = formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))
+
   return (
     <>
       <MarketScale
-        amount={potentialValue}
         border={true}
         collateral={collateral}
-        currentPrediction={outcomeTokenMarginalPrices[1]}
+        currentPrediction={isNewPrediction ? String(formattedNewPrediction) : outcomeTokenMarginalPrices[1]}
         long={positionIndex === 1}
         lowerBound={scalarLow || new BigNumber(0)}
-        newPrediction={formattedNewPrediction}
-        startingPointTitle={'Current prediction'}
+        startingPointTitle={isNewPrediction ? 'New prediction' : 'Current prediction'}
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
         upperBound={scalarHigh || new BigNumber(0)}
       />
