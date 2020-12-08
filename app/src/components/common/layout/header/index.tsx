@@ -12,6 +12,8 @@ import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { ModalConnectWallet } from '../../../modal'
 import { IconAdd, IconClose } from '../../icons'
+import { IconArrowRight } from '../../icons/IconArrowRight'
+import { XdaiIcon } from '../../icons/currencies/XdaiIcon'
 
 const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -54,6 +56,28 @@ const LogoWrapper = styled(NavLink)`
 
 const ButtonCreateDesktop = styled(ButtonRound)`
   display: none;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: flex;
+  }
+`
+const ArrowWrapper = styled.div`
+  margin-left: 20px;
+  margin-right: 20px;
+`
+const CurrencyWrapper = styled.div`
+  display: inline-flex;
+  text-align: center;
+`
+const CurrencyText = styled.div`
+  padding-left: 12px;
+  font-size: ${props => props.theme.fonts.defaultSize};
+  font-family: ${props => props.theme.fonts.fontFamily};
+  line-height: 22.41px;
+`
+const ButtonRoundBridge = styled(ButtonRound)`
+  display: none;
+  margin-left: 12px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: flex;
@@ -169,6 +193,19 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
                 <IconAdd />
               </ButtonCreateMobile>
             </>
+          )}
+          {context.networkId === 1 && context.account && (
+            <ButtonRoundBridge>
+              <CurrencyWrapper>
+                <XdaiIcon /> <CurrencyText>Dai</CurrencyText>
+              </CurrencyWrapper>
+              <ArrowWrapper>
+                <IconArrowRight />
+              </ArrowWrapper>
+              <CurrencyWrapper>
+                <XdaiIcon /> <CurrencyText>xDai</CurrencyText>
+              </CurrencyWrapper>
+            </ButtonRoundBridge>
           )}
 
           {!context.account && (
