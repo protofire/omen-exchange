@@ -47,13 +47,17 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       scaledLiquidityParameter: parseFloat(graphMarketMakerDataItem.scaledLiquidityParameter),
       runningDailyVolumeByHour: graphMarketMakerDataItem.runningDailyVolumeByHour,
       openingTimestamp: new Date(1000 * +graphMarketMakerDataItem.openingTimestamp),
+      oracle: graphMarketMakerDataItem.condition.oracle ? graphMarketMakerDataItem.condition.oracle : null,
       outcomeTokenAmounts: graphMarketMakerDataItem.outcomeTokenAmounts.map(bigNumberify),
+      outcomeTokenMarginalPrices: graphMarketMakerDataItem.outcomeTokenMarginalPrices,
       outcomes,
       templateId: +graphMarketMakerDataItem.templateId,
       title: graphMarketMakerDataItem.title,
       usdLiquidityParameter: parseFloat(graphMarketMakerDataItem.usdLiquidityParameter),
       klerosTCRregistered: graphMarketMakerDataItem.klerosTCRregistered,
       curatedByDxDaoOrKleros: graphMarketMakerDataItem.curatedByDxDaoOrKleros,
+      scalarLow: graphMarketMakerDataItem.condition.scalarLow ? graphMarketMakerDataItem.condition.scalarLow : null,
+      scalarHigh: graphMarketMakerDataItem.condition.scalarHigh ? graphMarketMakerDataItem.condition.scalarHigh : null,
     }
   })
 }

@@ -3,6 +3,7 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -83,9 +84,13 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     creationTimestamp,
     lastActiveDay,
     openingTimestamp,
+    oracle,
     outcomeTokenAmounts,
+    outcomeTokenMarginalPrices,
     outcomes,
     runningDailyVolumeByHour,
+    scalarHigh,
+    scalarLow,
     scaledLiquidityParameter,
     title,
   } = market
