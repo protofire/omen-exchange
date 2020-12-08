@@ -245,7 +245,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
               state={ValueStates.success}
-              title={'Profit'}
+              title={'Revenue'}
               value={
                 potentialValue
                   ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${collateral.symbol}`
