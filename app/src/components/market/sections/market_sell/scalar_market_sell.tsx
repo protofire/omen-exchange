@@ -206,7 +206,8 @@ export const ScalarMarketSell = (props: Props) => {
   const isShortTabDisabled = balances[0].shares.lt(dust)
   const isLongTabDisabled = balances[1].shares.lt(dust)
 
-  const isNewPrediction = formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))
+  const isNewPrediction =
+    formattedNewPrediction !== 0 && formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))
 
   return (
     <>
