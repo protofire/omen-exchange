@@ -184,7 +184,9 @@ export const HistoryChart: React.FC<Props> = ({
   const scalarHighNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
 
   const toScaleValue = (decimal: number, fixed = 0) => {
-    return `${decimal * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) + (scalarLowNumber || 0)} ${unit}`
+    return `${(decimal * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) + (scalarLowNumber || 0)).toFixed(
+      fixed,
+    )} ${unit}`
   }
 
   const data =
@@ -195,7 +197,9 @@ export const HistoryChart: React.FC<Props> = ({
       .map(h => {
         const prices = calcPrice(h.holdings.map(bigNumberify))
         const outcomesPrices: { [outcomeName: string]: number } = {}
-        outcomes.forEach((k, i) => (outcomesPrices[k] = prices[i]))
+        isScalar
+          ? outcomeTokenMarginalPrices.forEach((k, i) => (outcomesPrices[k] = prices[i]))
+          : outcomes.forEach((k, i) => (outcomesPrices[k] = prices[i]))
 
         return { ...outcomesPrices, date: timestampToDate(h.block.timestamp, value) }
       })

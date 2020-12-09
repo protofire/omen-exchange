@@ -20,8 +20,6 @@ const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
     scalarLow,
   } = marketMakerData
 
-  console.log(marketMakerData)
-
   return (
     <>
       <HistoryChartContainer
