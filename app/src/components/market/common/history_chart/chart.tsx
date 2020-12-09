@@ -200,7 +200,7 @@ export const HistoryChart: React.FC<Props> = ({
         isScalar
           ? outcomeTokenMarginalPrices.forEach((k, i) => (outcomesPrices[k] = prices[i]))
           : outcomes.forEach((k, i) => (outcomesPrices[k] = prices[i]))
-
+        console.log(outcomesPrices)
         return { ...outcomesPrices, date: timestampToDate(h.block.timestamp, value) }
       })
 
@@ -228,7 +228,7 @@ export const HistoryChart: React.FC<Props> = ({
         <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} stackOffset="expand">
           <XAxis dataKey="date" />
           <YAxis orientation="right" tickFormatter={isScalar ? toScaleValue : toPercent} />
-          <Tooltip content={renderTooltipContent} />
+          {/* <Tooltip content={renderTooltipContent} /> */}
 
           {outcomes
             .map((outcomeName, index) => {

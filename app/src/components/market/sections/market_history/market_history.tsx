@@ -31,7 +31,7 @@ const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
         outcomes={question.outcomes}
         scalarHigh={scalarHigh}
         scalarLow={scalarLow}
-        unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+        unit={question.title && question.title.includes('[') ? question.title.split('[')[1].split(']')[0] : ''}
       />
     </>
   )
