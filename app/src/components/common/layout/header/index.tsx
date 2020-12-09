@@ -10,9 +10,11 @@ import { ConnectedWeb3 } from '../../../../hooks'
 import { ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
+import { XdaiBridgeTransfer } from '../../../market/common/xdai_bridge_transfer'
 import { ModalConnectWallet } from '../../../modal'
 import { IconAdd, IconClose } from '../../icons'
 import { IconArrowRight } from '../../icons/IconArrowRight'
+import { DaiIcon } from '../../icons/currencies/DaiIcon'
 import { XdaiIcon } from '../../icons/currencies/XdaiIcon'
 
 const HeaderWrapper = styled.div`
@@ -66,7 +68,7 @@ const ArrowWrapper = styled.div`
   margin-right: 20px;
 `
 const CurrencyWrapper = styled.div`
-  display: inline-flex;
+  display: flex;
   text-align: center;
 `
 const CurrencyText = styled.div`
@@ -159,6 +161,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
     disabled: disableConnectButton || isMarketCreatePage,
     onClick: () => history.push('/create'),
   }
+  const [isBridgeOpen, setIsBridgeOpen] = useState<boolean>(false)
 
   const exitButtonProps = {
     onClick: () => history.push('/'),
@@ -195,17 +198,24 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
             </>
           )}
           {context.networkId === 1 && context.account && (
-            <ButtonRoundBridge>
-              <CurrencyWrapper>
-                <XdaiIcon /> <CurrencyText>Dai</CurrencyText>
-              </CurrencyWrapper>
-              <ArrowWrapper>
-                <IconArrowRight />
-              </ArrowWrapper>
-              <CurrencyWrapper>
-                <XdaiIcon /> <CurrencyText>xDai</CurrencyText>
-              </CurrencyWrapper>
-            </ButtonRoundBridge>
+            <>
+              <ButtonRoundBridge
+                onClick={() => {
+                  setIsBridgeOpen(!isBridgeOpen)
+                }}
+              >
+                <CurrencyWrapper>
+                  <DaiIcon size="22" /> <CurrencyText>Dai</CurrencyText>
+                </CurrencyWrapper>
+                <ArrowWrapper>
+                  <IconArrowRight />
+                </ArrowWrapper>
+                <CurrencyWrapper>
+                  <XdaiIcon /> <CurrencyText>xDai</CurrencyText>
+                </CurrencyWrapper>
+                <XdaiBridgeTransfer open={isBridgeOpen} />
+              </ButtonRoundBridge>
+            </>
           )}
 
           {!context.account && (
