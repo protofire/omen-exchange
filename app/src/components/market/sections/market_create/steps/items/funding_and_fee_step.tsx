@@ -392,6 +392,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 <CurrencySelector
                   balance={formatNumber(collateralBalanceFormatted, 5)}
                   context={context}
+                  currency={collateral.address}
                   disabled={false}
                   onSelect={onCollateralChange}
                 />
