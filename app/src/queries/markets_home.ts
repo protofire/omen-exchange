@@ -23,6 +23,7 @@ export const MarketDataFragment = gql`
     klerosTCRregistered
     outcomeTokenMarginalPrices
     condition {
+      id
       oracle
       scalarLow
       scalarHigh
