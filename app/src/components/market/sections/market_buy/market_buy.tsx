@@ -10,9 +10,9 @@ import { DOCUMENT_VALIDITY_RULES } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
+  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
-  useCpk,
   useCpkAllowance,
   useCpkProxy,
 } from '../../../../hooks'
@@ -58,7 +58,7 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
   const { library: provider, networkId } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
@@ -201,6 +201,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const showSetAllowance =
     collateral.address !== pseudoEthAddress &&
+    !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, 18, 4)))
@@ -233,7 +234,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     !amount ||
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
-    hasEnoughAllowance !== Ternary.True ||
+    (!cpk?.cpk.isSafeApp() && hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount
 

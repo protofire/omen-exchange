@@ -1,8 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import { CPKService } from '../services'
-
+import { useConnectedCPKContext } from './connectedCpk'
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
 
@@ -15,14 +14,14 @@ export const useFundingBalance = (
 } => {
   const { account, library: provider } = context
   const { buildMarketMaker } = useContracts(context)
+  const cpk = useConnectedCPKContext()
 
   const [fundingBalance, setFundingBalance] = useState<Maybe<BigNumber>>(null)
 
   const fetchFundingBalance = async () => {
     let fundingBalance = new BigNumber(0)
 
-    if (account) {
-      const cpk = await CPKService.create(provider)
+    if (account && cpk) {
       const marketMaker = buildMarketMaker(marketMakerAddress)
       fundingBalance = await marketMaker.balanceOf(cpk.address)
     }
@@ -33,7 +32,7 @@ export const useFundingBalance = (
   useEffect(() => {
     fetchFundingBalance()
     // eslint-disable-next-line
-  }, [account, provider, buildMarketMaker, marketMakerAddress])
+  }, [account, provider, buildMarketMaker, marketMakerAddress, cpk])
 
   return { fundingBalance, fetchFundingBalance }
 }

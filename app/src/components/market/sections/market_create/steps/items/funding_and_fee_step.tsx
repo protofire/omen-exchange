@@ -12,8 +12,8 @@ import {
 } from '../../../../../../common/constants'
 import {
   useCollateralBalance,
+  useConnectedCPKContext,
   useConnectedWeb3Context,
-  useCpk,
   useCpkAllowance,
   useCpkProxy,
   useTokens,
@@ -188,7 +188,7 @@ interface Props {
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
   const { account, library: provider } = context
@@ -287,6 +287,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const showSetAllowance =
     collateral.address !== pseudoEthAddress &&
+    !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const showUpgrade = (!isUpdated && collateral.address === pseudoEthAddress) || upgradeFinished

@@ -23,6 +23,33 @@ interface Transaction {
   data?: string
 }
 
+type NumberLike = number | string | bigint | Record<string, any>
+
+interface GasLimitOptions {
+  gas?: NumberLike
+  gasLimit?: NumberLike
+}
+
+interface BaseTxOptions extends GasLimitOptions {
+  gasPrice?: NumberLike
+}
+
+interface ExecOptions extends BaseTxOptions {
+  nonce?: NumberLike
+}
+
+interface TransactionResult {
+  hash?: string
+  safeTxHash?: string
+}
+
+interface TxCallback {
+  confirm: (txResult: TransactionResult) => void
+  reject: (error: Error) => void
+}
+
+type RequestId = number | string
+
 const defaultTxOperation = OperationType.Call
 const defaultTxValue = '0'
 const defaultTxData = '0x'
@@ -37,23 +64,67 @@ function standardizeTransaction(tx: Transaction): StandardTransaction {
 }
 
 // Omen CPK monkey patch
-// @ts-expect-error ignore
 class OCPK extends CPK {
-  private getSafeExecTxParams(transactions: Transaction[]): StandardTransaction {
-    if (transactions.length === 1) {
-      return standardizeTransaction(transactions[0])
+  txCallbacks = new Map<RequestId, TxCallback>()
+
+  constructor(opts?: any) {
+    super(opts)
+
+    window.addEventListener('message', ({ data, origin }) => {
+      if (origin === window.origin) {
+        return
+      }
+
+      const { data: messagePayload, messageId, requestId } = data
+
+      const TRANSACTION_CONFIRMED = 'TRANSACTION_CONFIRMED'
+      const TRANSACTION_REJECTED = 'TRANSACTION_REJECTED'
+
+      if (messageId === TRANSACTION_CONFIRMED) {
+        const callback = this.txCallbacks.get(requestId)
+        if (callback) {
+          this.txCallbacks.delete(requestId)
+          callback.confirm({ safeTxHash: messagePayload.safeTxHash })
+        }
+      }
+      if (messageId === TRANSACTION_REJECTED) {
+        const callback = this.txCallbacks.get(requestId)
+        if (callback) {
+          this.txCallbacks.delete(requestId)
+          callback.reject(new Error('Transaction rejected'))
+        }
+      }
+    })
+  }
+
+  sendTransactions(transactions: StandardTransaction[], options?: ExecOptions): Promise<TransactionResult> {
+    const requestId = Math.trunc(Date.now())
+    return new Promise<TransactionResult>((confirm, reject) => {
+      const SEND_TRANSACTIONS_V2 = 'SEND_TRANSACTIONS_V2'
+      const txs = transactions.map(standardizeTransaction)
+      const params = { safeTxGas: options?.gas }
+      const data = {
+        txs,
+        params,
+      }
+      const message = {
+        messageId: SEND_TRANSACTIONS_V2,
+        requestId,
+        data,
+      }
+
+      this.txCallbacks.set(requestId, { confirm, reject })
+
+      window.parent.postMessage(message, '*')
+    })
+  }
+
+  async execTransactions(transactions: Transaction[], options?: ExecOptions): Promise<TransactionResult> {
+    if (this.isSafeApp() && transactions.length >= 1) {
+      return this.sendTransactions(transactions.map(standardizeTransaction), options)
     }
 
-    if (!this.multiSend) {
-      throw new Error('CPK MultiSend uninitialized')
-    }
-
-    return {
-      to: this.multiSend.address,
-      value: '',
-      data: this.encodeMultiSendCallData(transactions),
-      operation: CPK.DelegateCall,
-    }
+    return super.execTransactions(transactions, options)
   }
 
   encodeMultiSendCallData(transactions: Transaction[]): string {

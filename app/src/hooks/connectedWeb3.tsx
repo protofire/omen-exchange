@@ -4,6 +4,9 @@ import { useWeb3Context } from 'web3-react'
 
 import connectors from '../util/connectors'
 import { getLogger } from '../util/logger'
+import { networkIds } from '../util/networks'
+
+import { useSafeApp } from './useSafeApp'
 
 const logger = getLogger('Hooks::ConnectedWeb3')
 
@@ -35,19 +38,26 @@ export const useConnectedWeb3Context = () => {
  */
 export const ConnectedWeb3: React.FC = props => {
   const [networkId, setNetworkId] = useState<number | null>(null)
+  const safeAppInfo = useSafeApp()
   const context = useWeb3Context()
   const { account, active, error, library } = context
 
   useEffect(() => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
-
-    if (active) {
+    if (safeAppInfo) {
+      if (context.connectorName !== 'Safe') {
+        localStorage.removeItem('CONNECTOR')
+        const netId = (networkIds as any)[safeAppInfo.network.toUpperCase()]
+        connectors.Safe.init(safeAppInfo.safeAddress, netId)
+        context.setConnector('Safe')
+      }
+    } else if (active) {
       if (connector && connector in connectors) {
         context.setConnector(connector)
       }
     } else if (error) {
-      logger.debug(error.message)
+      logger.log(error.message)
       localStorage.removeItem('CONNECTOR')
       context.setConnector('Infura')
     } else {
@@ -66,7 +76,7 @@ export const ConnectedWeb3: React.FC = props => {
     return () => {
       isSubscribed = false
     }
-  }, [context, library, active, error])
+  }, [context, library, active, error, networkId, safeAppInfo])
 
   if (!networkId || !library) {
     return null
