@@ -6,7 +6,12 @@ import moment from 'moment'
 
 import { createCPK } from '../util/cpk'
 import { getLogger } from '../util/logger'
-import { getContractAddress, getToken, pseudoEthAddress, targetGnosisSafeImplementation } from '../util/networks'
+import {
+  getContractAddress,
+  getToken,
+  pseudoNativeAssetAddress,
+  targetGnosisSafeImplementation,
+} from '../util/networks'
 import { calcDistributionHint, waitABit } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
@@ -155,7 +160,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       let collateralAddress
-      if (collateral.address === pseudoEthAddress) {
+      if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateralAddress = getToken(networkId, 'weth').address
 
@@ -202,7 +207,7 @@ class CPKService {
       // Step 2: Transfer the amount of collateral being spent from the user to the CPK
       // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp() || collateral.address !== pseudoEthAddress) {
+      if (!this.cpk.isSafeApp() || collateral.address !== pseudoNativeAssetAddress) {
         // Step 2: Transfer the amount of collateral being spent from the user to the CPK
         transactions.push({
           to: collateralAddress,
@@ -259,7 +264,7 @@ class CPKService {
 
       let collateral
 
-      if (marketData.collateral.address === pseudoEthAddress) {
+      if (marketData.collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateral = getToken(networkId, 'weth')
 
@@ -332,7 +337,7 @@ class CPKService {
       // Step 4: Transfer funding from user
       // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp() && marketData.collateral.address !== pseudoEthAddress) {
+      if (!this.cpk.isSafeApp() && marketData.collateral.address !== pseudoNativeAssetAddress) {
         transactions.push({
           to: collateral.address,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
@@ -449,7 +454,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       let collateralAddress
-      if (collateral.address === pseudoEthAddress) {
+      if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateralAddress = getToken(networkId, 'weth').address
 
@@ -489,7 +494,7 @@ class CPKService {
       // Step 2: Transfer funding from user
       // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp() && collateral.address !== pseudoEthAddress) {
+      if (!this.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress) {
         transactions.push({
           to: collateral.address,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),

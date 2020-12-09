@@ -21,7 +21,7 @@ import {
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
-import { pseudoEthAddress } from '../../../../../../util/networks'
+import { pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
@@ -283,14 +283,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     amountError !== null ||
     exceedsMaxFee ||
     isNegativeDepositAmount ||
-    (!isUpdated && collateral.address === pseudoEthAddress)
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
 
   const showSetAllowance =
-    collateral.address !== pseudoEthAddress &&
+    collateral.address !== pseudoNativeAssetAddress &&
     !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
-  const showUpgrade = (!isUpdated && collateral.address === pseudoEthAddress) || upgradeFinished
+  const showUpgrade = (!isUpdated && collateral.address === pseudoNativeAssetAddress) || upgradeFinished
 
   const upgradeProxy = async () => {
     if (!cpk) {

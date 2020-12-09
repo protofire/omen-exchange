@@ -130,7 +130,6 @@ class OCPK extends CPK {
   }
 
   private getSafeExecTxParams(transactions: Transaction[]): StandardTransaction {
-    console.log('here')
     if (transactions.length === 1) {
       return standardizeTransaction(transactions[0])
     }

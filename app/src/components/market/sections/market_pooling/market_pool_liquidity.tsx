@@ -16,7 +16,7 @@ import {
 } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getToken, pseudoEthAddress } from '../../../../util/networks'
+import { getToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   calcAddFundingSendAmounts,
@@ -218,7 +218,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const probabilities = balances.map(balance => balance.probability)
   const showSetAllowance =
-    collateral.address !== pseudoEthAddress &&
+    collateral.address !== pseudoNativeAssetAddress &&
     !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
   const depositedTokensTotal = depositedTokens.add(userEarnings)
@@ -239,7 +239,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
-  const symbol = collateral.address === pseudoEthAddress ? 'WETH' : collateral.symbol
+  const symbol = collateral.address === pseudoNativeAssetAddress ? 'WETH' : collateral.symbol
 
   const addFunding = async () => {
     setModalTitle('Funds Deposit')
@@ -260,7 +260,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
 
-      if (!cpk.cpk.isSafeApp() || collateral.address !== pseudoEthAddress) {
+      if (!cpk.cpk.isSafeApp() || collateral.address !== pseudoNativeAssetAddress) {
         const collateralAddress = await marketMaker.getCollateralToken()
         const collateralService = new ERC20Service(provider, account, collateralAddress)
 
@@ -343,7 +343,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setAllowanceFinished(true)
   }
 
-  const showUpgrade = (!isUpdated && collateral.address === pseudoEthAddress) || upgradeFinished
+  const showUpgrade = (!isUpdated && collateral.address === pseudoNativeAssetAddress) || upgradeFinished
 
   const upgradeProxy = async () => {
     if (!cpk) {
@@ -390,8 +390,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const wethAddress = getToken(networkId, 'weth').address
 
   const currencyFilters =
-    collateral.address === wethAddress || collateral.address === pseudoEthAddress
-      ? [wethAddress, pseudoEthAddress.toLowerCase()]
+    collateral.address === wethAddress || collateral.address === pseudoNativeAssetAddress
+      ? [wethAddress, pseudoNativeAssetAddress.toLowerCase()]
       : []
 
   return (

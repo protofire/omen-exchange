@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 import styled, { css } from 'styled-components'
 
-import { pseudoEthAddress } from '../../../../util/networks'
+import { pseudoNativeAssetAddress } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
@@ -104,7 +104,7 @@ export const OutcomeTable = (props: Props) => {
 
   const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right']
 
-  const symbol = collateral.address === pseudoEthAddress ? 'WETH' : collateral.symbol
+  const symbol = collateral.address === pseudoNativeAssetAddress ? 'WETH' : collateral.symbol
 
   const renderTableHeader = () => {
     return (

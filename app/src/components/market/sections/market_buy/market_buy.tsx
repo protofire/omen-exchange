@@ -18,7 +18,7 @@ import {
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getToken, pseudoEthAddress } from '../../../../util/networks'
+import { getToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
@@ -148,7 +148,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setAllowanceFinished(true)
   }
 
-  const showUpgrade = (!isUpdated && collateral.address === pseudoEthAddress) || upgradeFinished
+  const showUpgrade = (!isUpdated && collateral.address === pseudoNativeAssetAddress) || upgradeFinished
 
   const upgradeProxy = async () => {
     if (!cpk) {
@@ -200,7 +200,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const showSetAllowance =
-    collateral.address !== pseudoEthAddress &&
+    collateral.address !== pseudoNativeAssetAddress &&
     !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
@@ -241,8 +241,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const wethAddress = getToken(networkId, 'weth').address
 
   const currencyFilters =
-    collateral.address === wethAddress || collateral.address === pseudoEthAddress
-      ? [wethAddress, pseudoEthAddress.toLowerCase()]
+    collateral.address === wethAddress || collateral.address === pseudoNativeAssetAddress
+      ? [wethAddress, pseudoNativeAssetAddress.toLowerCase()]
       : []
 
   const switchOutcome = (value: number) => {
