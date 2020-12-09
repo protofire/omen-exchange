@@ -1,4 +1,4 @@
-import { bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import moment from 'moment'
 import React from 'react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
@@ -118,9 +118,13 @@ const AnEvenSmallerLittleBall = styled(OutcomeItemLittleBallOfJoyAndDifferentCol
 
 type Props = {
   holdingSeries: Maybe<HistoricData>
+  isScalar?: Maybe<boolean>
   onChange: (s: Period) => void
   options: Period[]
+  outcomeTokenMarginalPrices: string[]
   outcomes: string[]
+  scalarHigh?: Maybe<BigNumber>
+  scalarLow?: Maybe<BigNumber>
   value: Period
 }
 
