@@ -5,7 +5,7 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'rec
 import styled, { css } from 'styled-components'
 
 import { getOutcomeColor } from '../../../../theme/utils'
-import { calcPrice } from '../../../../util/tools'
+import { calcPrice, formatBigNumber } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { ButtonSelectable } from '../../../button'
 import { InlineLoading } from '../../../loading'
@@ -125,6 +125,7 @@ type Props = {
   outcomes: string[]
   scalarHigh?: Maybe<BigNumber>
   scalarLow?: Maybe<BigNumber>
+  unit: string
   value: Period
 }
 
@@ -167,7 +168,25 @@ const renderTooltipContent = (o: any) => {
   )
 }
 
-export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options, outcomes, value }) => {
+export const HistoryChart: React.FC<Props> = ({
+  holdingSeries,
+  isScalar,
+  onChange,
+  options,
+  outcomeTokenMarginalPrices,
+  outcomes,
+  scalarHigh,
+  scalarLow,
+  unit,
+  value,
+}) => {
+  const scalarLowNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
+  const scalarHighNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
+
+  const toScaleValue = (decimal: number, fixed = 0) => {
+    return `${decimal * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) + (scalarLowNumber || 0)} ${unit}`
+  }
+
   const data =
     holdingSeries &&
     holdingSeries
@@ -204,7 +223,7 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
       <ResponsiveContainer height={300} width="100%">
         <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} stackOffset="expand">
           <XAxis dataKey="date" />
-          <YAxis orientation="right" tickFormatter={toPercent} />
+          <YAxis orientation="right" tickFormatter={isScalar ? toScaleValue : toPercent} />
           <Tooltip content={renderTooltipContent} />
 
           {outcomes

@@ -79,6 +79,7 @@ type Props = {
   outcomeTokenMarginalPrices: string[]
   scalarHigh: Maybe<BigNumber>
   scalarLow: Maybe<BigNumber>
+  unit: string
 }
 
 const blocksPerAllTimePeriod = 10000
@@ -104,6 +105,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
   outcomes,
   scalarHigh,
   scalarLow,
+  unit,
 }) => {
   const context = useWeb3Context()
   const { library } = context
@@ -171,6 +173,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
       outcomes={outcomes}
       scalarHigh={scalarHigh}
       scalarLow={scalarLow}
+      unit={unit}
       value={period}
     />
   )
