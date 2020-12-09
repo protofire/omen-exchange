@@ -258,6 +258,7 @@ class CPKService {
       }
 
       let collateral
+
       if (marketData.collateral.address === pseudoEthAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateral = getToken(networkId, 'weth')
@@ -331,7 +332,7 @@ class CPKService {
       // Step 4: Transfer funding from user
       // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp() || marketData.collateral.address !== pseudoEthAddress) {
+      if (!this.cpk.isSafeApp() && marketData.collateral.address !== pseudoEthAddress) {
         transactions.push({
           to: collateral.address,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
@@ -488,7 +489,7 @@ class CPKService {
       // Step 2: Transfer funding from user
       // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp() || collateral.address !== pseudoEthAddress) {
+      if (!this.cpk.isSafeApp() && collateral.address !== pseudoEthAddress) {
         transactions.push({
           to: collateral.address,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
@@ -606,6 +607,7 @@ class CPKService {
       if (this.cpk.isSafeApp()) {
         txOptions.gas = 500000
       }
+
       if (!isConditionResolved) {
         transactions.push({
           to: oracle.address,

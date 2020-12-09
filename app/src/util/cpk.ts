@@ -64,6 +64,8 @@ function standardizeTransaction(tx: Transaction): StandardTransaction {
 }
 
 // Omen CPK monkey patch
+
+// @ts-expect-error ignore
 class OCPK extends CPK {
   txCallbacks = new Map<RequestId, TxCallback>()
 
@@ -125,6 +127,24 @@ class OCPK extends CPK {
     }
 
     return super.execTransactions(transactions, options)
+  }
+
+  private getSafeExecTxParams(transactions: Transaction[]): StandardTransaction {
+    console.log('here')
+    if (transactions.length === 1) {
+      return standardizeTransaction(transactions[0])
+    }
+
+    if (!this.multiSend) {
+      throw new Error('CPK MultiSend uninitialized')
+    }
+
+    return {
+      to: this.multiSend.address,
+      value: '',
+      data: this.encodeMultiSendCallData(transactions),
+      operation: CPK.DelegateCall,
+    }
   }
 
   encodeMultiSendCallData(transactions: Transaction[]): string {
