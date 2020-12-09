@@ -8,7 +8,7 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
-import { calcPrice, formatBigNumber, formatToShortNumber } from '../../../../util/tools'
+import { calcPrice, formatBigNumber, formatNumber, formatToShortNumber } from '../../../../util/tools'
 import { MarketMakerDataItem, Token } from '../../../../util/types'
 import { IconStar } from '../../../common/icons/IconStar'
 
@@ -146,14 +146,27 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     isScalar = true
   }
 
-  console.log(isScalar)
+  let currentPrediction
+  let unit
+  if (isScalar) {
+    unit = title.split('[')[1].split(']')[0]
+    const lowerBoundNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
+    const upperBoundNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
+    currentPrediction =
+      Number(outcomeTokenMarginalPrices[1]) *
+      ((upperBoundNumber || 0) - (lowerBoundNumber || 0) + (lowerBoundNumber || 0))
+  }
 
   return (
     <Wrapper to={`/${address}`}>
       <Title>{title}</Title>
       <Info>
         <IconStar></IconStar>
-        <Outcome>{outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}</Outcome>
+        <Outcome>
+          {isScalar
+            ? `${currentPrediction && formatNumber(currentPrediction.toString())} ${unit}`
+            : outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}
+        </Outcome>
         <Separator>|</Separator>
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Closed ${endsText} ago`}</span>
         <Separator>|</Separator>
