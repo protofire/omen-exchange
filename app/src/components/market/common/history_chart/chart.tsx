@@ -121,7 +121,6 @@ type Props = {
   isScalar?: Maybe<boolean>
   onChange: (s: Period) => void
   options: Period[]
-  outcomeTokenMarginalPrices: string[]
   outcomes: string[]
   scalarHigh?: Maybe<BigNumber>
   scalarLow?: Maybe<BigNumber>
@@ -173,7 +172,6 @@ export const HistoryChart: React.FC<Props> = ({
   isScalar,
   onChange,
   options,
-  outcomeTokenMarginalPrices,
   outcomes,
   scalarHigh,
   scalarLow,
@@ -189,6 +187,8 @@ export const HistoryChart: React.FC<Props> = ({
     )} ${unit}`
   }
 
+  const outcomeArray: string[] = outcomes.length ? outcomes : ['Short', 'Long']
+
   const data =
     holdingSeries &&
     holdingSeries
@@ -197,10 +197,7 @@ export const HistoryChart: React.FC<Props> = ({
       .map(h => {
         const prices = calcPrice(h.holdings.map(bigNumberify))
         const outcomesPrices: { [outcomeName: string]: number } = {}
-        isScalar
-          ? outcomeTokenMarginalPrices.forEach((k, i) => (outcomesPrices[k] = prices[i]))
-          : outcomes.forEach((k, i) => (outcomesPrices[k] = prices[i]))
-        console.log(outcomesPrices)
+        outcomeArray.forEach((k, i) => (outcomesPrices[k] = prices[i]))
         return { ...outcomesPrices, date: timestampToDate(h.block.timestamp, value) }
       })
 
@@ -228,9 +225,9 @@ export const HistoryChart: React.FC<Props> = ({
         <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} stackOffset="expand">
           <XAxis dataKey="date" />
           <YAxis orientation="right" tickFormatter={isScalar ? toScaleValue : toPercent} />
-          {/* <Tooltip content={renderTooltipContent} /> */}
+          <Tooltip content={renderTooltipContent} />
 
-          {outcomes
+          {outcomeArray
             .map((outcomeName, index) => {
               const color = getOutcomeColor(index)
               return (

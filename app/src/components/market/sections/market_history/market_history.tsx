@@ -14,7 +14,6 @@ const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
     address: marketMakerAddress,
     answerFinalizedTimestamp,
     oracle,
-    outcomeTokenMarginalPrices,
     question,
     scalarHigh,
     scalarLow,
@@ -27,7 +26,6 @@ const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
         hidden={false}
         marketMakerAddress={marketMakerAddress}
         oracle={oracle}
-        outcomeTokenMarginalPrices={outcomeTokenMarginalPrices}
         outcomes={question.outcomes}
         scalarHigh={scalarHigh}
         scalarLow={scalarLow}

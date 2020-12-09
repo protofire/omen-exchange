@@ -76,7 +76,6 @@ type Props = {
   hidden: boolean
   oracle: Maybe<string>
   outcomes: string[]
-  outcomeTokenMarginalPrices: string[]
   scalarHigh: Maybe<BigNumber>
   scalarLow: Maybe<BigNumber>
   unit: string
@@ -101,7 +100,6 @@ export const HistoryChartContainer: React.FC<Props> = ({
   hidden,
   marketMakerAddress,
   oracle,
-  outcomeTokenMarginalPrices,
   outcomes,
   scalarHigh,
   scalarLow,
@@ -169,7 +167,6 @@ export const HistoryChartContainer: React.FC<Props> = ({
       isScalar={isScalar}
       onChange={setPeriod}
       options={keys(mapPeriod)}
-      outcomeTokenMarginalPrices={outcomeTokenMarginalPrices}
       outcomes={outcomes}
       scalarHigh={scalarHigh}
       scalarLow={scalarLow}
