@@ -16,7 +16,7 @@ import {
 } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   calcAddFundingSendAmounts,
@@ -239,7 +239,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
-  const symbol = collateral.address === pseudoNativeAssetAddress ? 'WETH' : collateral.symbol
+
+  const wrapToken = getWrapToken(networkId)
+  const symbol = collateral.address === pseudoNativeAssetAddress ? wrapToken.symbol : collateral.symbol
 
   const addFunding = async () => {
     setModalTitle('Funds Deposit')
@@ -387,11 +389,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
-  const wethAddress = getToken(networkId, 'weth').address
+  const wrapAddress = wrapToken.address
 
   const currencyFilters =
-    collateral.address === wethAddress || collateral.address === pseudoNativeAssetAddress
-      ? [wethAddress, pseudoNativeAssetAddress.toLowerCase()]
+    collateral.address === wrapAddress || collateral.address === pseudoNativeAssetAddress
+      ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
       : []
 
   return (

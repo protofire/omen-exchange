@@ -18,7 +18,7 @@ import {
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
@@ -238,11 +238,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     amountError !== null ||
     isNegativeAmount
 
-  const wethAddress = getToken(networkId, 'weth').address
+  const wrapAddress = getWrapToken(networkId).address
 
   const currencyFilters =
-    collateral.address === wethAddress || collateral.address === pseudoNativeAssetAddress
-      ? [wethAddress, pseudoNativeAssetAddress.toLowerCase()]
+    collateral.address === wrapAddress || collateral.address === pseudoNativeAssetAddress
+      ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
       : []
 
   const switchOutcome = (value: number) => {

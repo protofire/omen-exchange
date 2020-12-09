@@ -54,6 +54,7 @@ interface Network {
     omenVerifiedMarkets: string
   }
   cpk?: CPKAddresses
+  wrapToken: string
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -89,6 +90,7 @@ const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8',
       omenVerifiedMarkets: '0xb72103eE8819F2480c25d306eEAb7c3382fBA612',
     },
+    wrapToken: 'weth',
   },
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
@@ -117,6 +119,7 @@ const networks: { [K in NetworkId]: Network } = {
       multiSendAddress: '0x82CFd05a033e202E980Bc99eA50A4C6BB91CE0d7',
       fallbackHandlerAddress: '0x40A930851BD2e590Bd5A5C981b436de25742E980',
     },
+    wrapToken: 'weth',
   },
 }
 
@@ -502,6 +505,14 @@ export const getOmenTCRListId = (networkId: number): number => {
   }
 
   return networks[networkId].omenTCRListId
+}
+
+export const getWrapToken = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  const tokenId = networks[networkId].wrapToken as KnownToken
+  return getToken(networkId, tokenId)
 }
 
 export const targetGnosisSafeImplementation = '0x6851D6fDFAfD08c0295C392436245E5bc78B0185' // v1.2.0

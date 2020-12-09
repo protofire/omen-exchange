@@ -3,7 +3,8 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 import styled, { css } from 'styled-components'
 
-import { pseudoNativeAssetAddress } from '../../../../util/networks'
+import { useConnectedWeb3Context } from '../../../../hooks'
+import { getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
@@ -104,7 +105,9 @@ export const OutcomeTable = (props: Props) => {
 
   const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right']
 
-  const symbol = collateral.address === pseudoNativeAssetAddress ? 'WETH' : collateral.symbol
+  const context = useConnectedWeb3Context()
+  const wrapSymbol = getWrapToken(context.networkId).symbol
+  const symbol = collateral.address === pseudoNativeAssetAddress ? wrapSymbol : collateral.symbol
 
   const renderTableHeader = () => {
     return (
