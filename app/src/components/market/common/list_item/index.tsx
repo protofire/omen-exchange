@@ -134,6 +134,20 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
 
+  let realitioScalarAdapter
+  if (context.networkId === 1) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase()
+  } else if (context.networkId === 4) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
+  }
+
+  let isScalar = false
+  if (oracle === realitioScalarAdapter) {
+    isScalar = true
+  }
+
+  console.log(isScalar)
+
   return (
     <Wrapper to={`/${address}`}>
       <Title>{title}</Title>
