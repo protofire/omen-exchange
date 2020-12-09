@@ -6,12 +6,7 @@ import moment from 'moment'
 
 import { createCPK } from '../util/cpk'
 import { getLogger } from '../util/logger'
-import {
-  getContractAddress,
-  getToken,
-  pseudoNativeAssetAddress,
-  targetGnosisSafeImplementation,
-} from '../util/networks'
+import { getContractAddress, getTargetSafeImplementation, getToken, pseudoNativeAssetAddress } from '../util/networks'
 import { calcDistributionHint, waitABit } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
@@ -648,8 +643,9 @@ class CPKService {
   proxyIsUpToDate = async (): Promise<boolean> => {
     const deployed = await this.cpk.isProxyDeployed()
     if (deployed) {
+      const network = await this.provider.getNetwork()
       const implementation = await this.proxy.masterCopy()
-      if (implementation.toLowerCase() === targetGnosisSafeImplementation.toLowerCase()) {
+      if (implementation.toLowerCase() === getTargetSafeImplementation(network.chainId).toLowerCase()) {
         return true
       }
     }
@@ -664,6 +660,8 @@ class CPKService {
         // add plenty of gas to avoid locked proxy https://github.com/gnosis/contract-proxy-kit/issues/132
         txOptions.gas = 400000
       }
+      const network = await this.provider.getNetwork()
+      const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId).toLowerCase()
       const transactions = [
         {
           to: this.cpk.address,

@@ -55,6 +55,7 @@ interface Network {
   }
   cpk?: CPKAddresses
   wrapToken: string
+  targetSafeImplementation: string
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -91,6 +92,7 @@ const networks: { [K in NetworkId]: Network } = {
       omenVerifiedMarkets: '0xb72103eE8819F2480c25d306eEAb7c3382fBA612',
     },
     wrapToken: 'weth',
+    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
   },
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
@@ -120,6 +122,7 @@ const networks: { [K in NetworkId]: Network } = {
       fallbackHandlerAddress: '0x40A930851BD2e590Bd5A5C981b436de25742E980',
     },
     wrapToken: 'weth',
+    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
   },
 }
 
@@ -515,7 +518,13 @@ export const getWrapToken = (networkId: number): Token => {
   return getToken(networkId, tokenId)
 }
 
-export const targetGnosisSafeImplementation = '0x6851D6fDFAfD08c0295C392436245E5bc78B0185' // v1.2.0
+export const getTargetSafeImplementation = (networkId: number): string => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].targetSafeImplementation.toLowerCase()
+}
+
 export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
 export const etherTokenImage =
   'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'
