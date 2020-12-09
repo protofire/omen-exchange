@@ -70,7 +70,11 @@ type Props = {
   answerFinalizedTimestamp: Maybe<BigNumber>
   marketMakerAddress: string
   hidden: boolean
+  oracle: Maybe<string>
   outcomes: string[]
+  outcomeTokenMarginalPrices: string[]
+  scalarHigh: Maybe<BigNumber>
+  scalarLow: Maybe<BigNumber>
 }
 
 const blocksPerAllTimePeriod = 10000
