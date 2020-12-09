@@ -78,16 +78,23 @@ const CurrencyText = styled.div`
   line-height: 22.41px;
 `
 const ButtonRoundBridge = styled(ButtonRound)`
-  display: none;
-  margin-left: 12px;
+  display: flex;
 
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    flex-basis: calc(100vw - 20px);
+    order: 3;
+    margin-right: 12px;
+    position: relative;
+    left: -95px;
+  }
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    display: flex;
+    margin-left: 12px;
   }
 `
 
 const ButtonCreateMobile = styled(ButtonCircle)`
   display: flex;
+  margin-left: auto;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: none;
@@ -126,10 +133,12 @@ const ContentsLeft = styled.div`
 const ContentsRight = styled.div`
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   margin: auto 0 auto auto;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin: auto 0 0 auto;
+    flex-wrap: unset;
   }
 `
 
