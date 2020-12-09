@@ -187,6 +187,26 @@ export const HistoryChart: React.FC<Props> = ({
     )} ${unit}`
   }
 
+  const renderScalarTooltipContent = (o: any) => {
+    const { label, payload } = o
+    const prediction = (
+      payload[1]?.value * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) +
+      (scalarLowNumber || 0)
+    ).toFixed(0)
+    return (
+      <ChartTooltip>
+        <TooltipTitle>{label}</TooltipTitle>
+        <Legends>
+          <Legend key={`item-0`}>
+            <AnEvenSmallerLittleBall outcomeIndex={0} />
+            <strong>{`${prediction}`}</strong>
+            {`${unit}`}
+          </Legend>
+        </Legends>
+      </ChartTooltip>
+    )
+  }
+
   const outcomeArray: string[] = outcomes.length ? outcomes : ['Short', 'Long']
 
   const data =
@@ -225,7 +245,7 @@ export const HistoryChart: React.FC<Props> = ({
         <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} stackOffset="expand">
           <XAxis dataKey="date" />
           <YAxis orientation="right" tickFormatter={isScalar ? toScaleValue : toPercent} />
-          <Tooltip content={renderTooltipContent} />
+          <Tooltip content={isScalar ? renderScalarTooltipContent : renderTooltipContent} />
 
           {outcomeArray
             .map((outcomeName, index) => {
