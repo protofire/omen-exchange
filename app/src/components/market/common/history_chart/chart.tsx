@@ -244,7 +244,7 @@ export const HistoryChart: React.FC<Props> = ({
       <ResponsiveContainer height={300} width="100%">
         <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} stackOffset="expand">
           <XAxis dataKey="date" />
-          <YAxis orientation="right" tickFormatter={isScalar ? toScaleValue : toPercent} />
+          <YAxis orientation="right" tickFormatter={isScalar ? toScaleValue : toPercent} width={80} />
           <Tooltip content={isScalar ? renderScalarTooltipContent : renderTooltipContent} />
 
           {outcomeArray
