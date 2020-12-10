@@ -160,7 +160,9 @@ class CPKService {
         collateralAddress = getToken(networkId, 'weth').address
 
         // we need to send the funding amount in native ether
-        txOptions.value = amount
+        if (!this.cpk.isSafeApp()) {
+          txOptions.value = amount
+        }
 
         // Step 0: Wrap ether
         transactions.push({
@@ -264,7 +266,9 @@ class CPKService {
         collateral = getToken(networkId, 'weth')
 
         // we need to send the funding amount in native ether
-        txOptions.value = marketData.funding
+        if (!this.cpk.isSafeApp()) {
+          txOptions.value = marketData.funding
+        }
 
         // Step 0: Wrap ether
         transactions.push({
@@ -454,7 +458,9 @@ class CPKService {
         collateralAddress = getToken(networkId, 'weth').address
 
         // we need to send the funding amount in native ether
-        txOptions.value = amount
+        if (!this.cpk.isSafeApp()) {
+          txOptions.value = amount
+        }
 
         // Step 0: Wrap ether
         transactions.push({
