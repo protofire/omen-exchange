@@ -321,7 +321,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         // Calculate profit amount given how close it is to the upper bound, i.e. how close it is to max profit
         const profit = positionValue * (potentialProfitNumber || 0) - (feeNumber || 0)
         // Calculate total payout by adding profit to amount
-        setYourPayout((amountNumber || 0) + (amountNumber || 0) * profit)
+        setYourPayout((amountNumber || 0) + profit)
         // Return profit amount
         setProfitLoss(profit)
       } else {
@@ -330,7 +330,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         // Calculate loss amount given how close it is to lower bound, i.e. how close it is to max loss
         const loss = positionValue * (potentialLossNumber || 0) - (feeNumber || 0)
         // Calculate total payout by adding loss to amount
-        setYourPayout((amountNumber || 0) + (amountNumber || 0) * loss)
+        setYourPayout((amountNumber || 0) + loss)
         // Return loss amount
         setProfitLoss(loss)
       }
@@ -343,7 +343,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         // Calculate profit amount given how close it is to the lower bound, i.e. how close it is to max profit
         const profit = positionValue * (potentialProfitNumber || 0) - (feeNumber || 0)
         // Calculate total payout by adding profit to amount
-        setYourPayout((amountNumber || 0) + (amountNumber || 0) * profit)
+        setYourPayout((amountNumber || 0) + profit)
         // Return profit amount
         setProfitLoss(profit)
       } else {
@@ -352,7 +352,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         // Calculate loss amount given how close it is to upper bound, i.e. how close it is to max loss
         const loss = positionValue * (potentialLossNumber || 0) - (feeNumber || 0)
         // Calculate total payout by adding loss to amount
-        setYourPayout((amountNumber || 0) + (amountNumber || 0) * loss)
+        setYourPayout((amountNumber || 0) + loss)
         // Return loss amount
         setProfitLoss(loss)
       }
