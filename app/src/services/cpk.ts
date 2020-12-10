@@ -6,7 +6,12 @@ import moment from 'moment'
 
 import { createCPK } from '../util/cpk'
 import { getLogger } from '../util/logger'
-import { getContractAddress, getTargetSafeImplementation, getToken, pseudoNativeAssetAddress } from '../util/networks'
+import {
+  getContractAddress,
+  getTargetSafeImplementation,
+  getWrapToken,
+  pseudoNativeAssetAddress,
+} from '../util/networks'
 import { calcDistributionHint, waitABit } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
@@ -157,7 +162,7 @@ class CPKService {
       let collateralAddress
       if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
-        collateralAddress = getToken(networkId, 'weth').address
+        collateralAddress = getWrapToken(networkId).address
 
         // we need to send the funding amount in native ether
         if (!this.cpk.isSafeApp()) {
@@ -263,7 +268,7 @@ class CPKService {
 
       if (marketData.collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
-        collateral = getToken(networkId, 'weth')
+        collateral = getWrapToken(networkId)
 
         // we need to send the funding amount in native ether
         if (!this.cpk.isSafeApp()) {
@@ -455,7 +460,7 @@ class CPKService {
       let collateralAddress
       if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
-        collateralAddress = getToken(networkId, 'weth').address
+        collateralAddress = getWrapToken(networkId).address
 
         // we need to send the funding amount in native ether
         if (!this.cpk.isSafeApp()) {
