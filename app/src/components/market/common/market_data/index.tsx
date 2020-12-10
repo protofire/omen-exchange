@@ -149,11 +149,10 @@ export const MarketData: React.FC<Props> = props => {
           <MarketDataItemBottom>Finalized</MarketDataItemBottom>
         </MarketDataItem>
       )}
-      {!isFinalize && (
+      {/*here is the change i need to do*/}
+      {!isFinalize && resolutionTimestamp > new Date() && (
         <MarketDataItem>
-          <MarketDataItemTop>
-            {resolutionTimestamp > new Date() ? moment(resolutionTimestamp).fromNow(true) : '0 days'}
-          </MarketDataItemTop>
+          <MarketDataItemTop>{moment(resolutionTimestamp).fromNow(true)}</MarketDataItemTop>
           <MarketDataItemBottom>Remaining</MarketDataItemBottom>
         </MarketDataItem>
       )}

@@ -105,6 +105,17 @@ const Wrapper = (props: Props) => {
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
+  useEffect(() => {
+    const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
+    if (timeDifference > 0) {
+      setTimeout(callAfterTimeout, timeDifference + 2000)
+    }
+    function callAfterTimeout() {
+      fetchGraphMarketMakerData()
+      setCurrentTab(MarketDetailsTab.finalize)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
     return !shares.isZero()
