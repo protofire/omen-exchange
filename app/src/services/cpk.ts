@@ -110,7 +110,7 @@ class CPKService {
   constructor(cpk: any, provider: Web3Provider) {
     this.cpk = cpk
     this.provider = provider
-    this.proxy = new ethers.Contract(cpk.contract.address, proxyAbi, provider.getSigner())
+    this.proxy = new ethers.Contract(cpk.address, proxyAbi, provider.getSigner())
   }
 
   static async create(provider: Web3Provider) {
@@ -665,13 +665,10 @@ class CPKService {
   upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {
     try {
       const txOptions: TxOptions = {}
-      const deployed = await this.cpk.isProxyDeployed()
-      if (!deployed) {
-        // add plenty of gas to avoid locked proxy https://github.com/gnosis/contract-proxy-kit/issues/132
-        txOptions.gas = 500000
-      }
+      // add plenty of gas to avoid locked proxy https://github.com/gnosis/contract-proxy-kit/issues/132
+      txOptions.gas = 500000
       const network = await this.provider.getNetwork()
-      const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId).toLowerCase()
+      const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId)
       const transactions = [
         {
           to: this.cpk.address,

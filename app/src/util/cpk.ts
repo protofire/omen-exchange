@@ -122,7 +122,7 @@ class OCPK extends CPK {
   }
 
   async execTransactions(transactions: Transaction[], options?: ExecOptions): Promise<TransactionResult> {
-    if (this.isSafeApp() && transactions.length >= 1) {
+    if (this.isSafeApp()) {
       return this.sendTransactions(transactions.map(standardizeTransaction), options)
     }
 
