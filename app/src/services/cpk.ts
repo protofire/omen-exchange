@@ -209,8 +209,7 @@ class CPKService {
       // Step 2: Transfer the amount of collateral being spent from the user to the CPK
       // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp() || collateral.address !== pseudoNativeAssetAddress) {
-        // Step 2: Transfer the amount of collateral being spent from the user to the CPK
+      if (!this.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress) {
         transactions.push({
           to: collateralAddress,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
