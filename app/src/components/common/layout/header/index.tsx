@@ -151,7 +151,8 @@ const CloseIconWrapper = styled.div`
 `
 
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-  const context = useWeb3Context()
+  const { account, networkId } = useWeb3Context()
+  console.log(networkId)
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
@@ -206,7 +207,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               </ButtonCreateMobile>
             </>
           )}
-          {context.networkId === 1 && context.account && (
+          {networkId === 1 && account && (
             <>
               <ButtonRoundBridge
                 onClick={() => {
@@ -227,7 +228,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
             </>
           )}
 
-          {!context.account && (
+          {!account && (
             <ButtonWrapper
               data-class="customTooltip"
               data-delay-hide="500"
@@ -247,7 +248,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
             </ButtonWrapper>
           )}
           <ConnectedWeb3>
-            {context.account && (
+            {account && (
               <>
                 <HeaderDropdown
                   dropdownPosition={DropdownPosition.center}
