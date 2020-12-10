@@ -36,7 +36,7 @@ const Description = styled.p`
 export type SetAllowanceProps = DOMAttributes<HTMLDivElement> &
   HTMLAttributes<HTMLDivElement> &
   ToggleTokenLockProps & {
-    collateral: Token
+    collateral?: Token
     marginBottom?: boolean
   }
 
@@ -48,8 +48,8 @@ export const SetAllowance: React.FC<SetAllowanceProps> = (props: SetAllowancePro
       <Title>Set Allowance</Title>
       <DescriptionWrapper>
         <Description>
-          This permission allows the smart contracts to interact with your {collateral.symbol}. This has to be done for
-          each new token.
+          This permission allows the smart contracts to interact with your {collateral && collateral.symbol}. This has
+          to be done for each new token.
         </Description>
         <ToggleTokenLock finished={finished} loading={loading} onUnlock={onUnlock} />
       </DescriptionWrapper>
