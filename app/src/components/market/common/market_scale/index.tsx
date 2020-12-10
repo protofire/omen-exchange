@@ -139,6 +139,28 @@ const ScaleDot = styled.div<{ xValue: number; positive: Maybe<boolean> }>`
   margin-top: calc((${SCALE_HEIGHT} - ${DOT_SIZE}) / 2);
 `
 
+const ScaleTooltip = styled.div<{ xValue: number }>`
+  position: absolute;
+  padding: 5px 8px;
+  top: -42px;
+  left: ${({ xValue }) => xValue}%;
+  transform: translateX(-50%);
+  background-color: ${({ theme }) => theme.colors.mainBodyBackground};
+  border-radius: ${({ theme }) => theme.borders.commonBorderRadius};
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid ${({ theme }) => theme.borders.tooltip};
+`
+
+const ScaleTooltipMessage = styled.p`
+  font-size: ${({ theme }) => theme.fonts.defaultSize};
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+  text-align: left;
+  margin: 0;
+`
+
 const ValueBoxes = styled.div`
   display: flex;
   align-items: center;
@@ -397,15 +419,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       </ScaleTitleWrapper>
       <Scale>
         <ScaleBallContainer>
-          <ReactTooltip
-            className="scalarValueTooltip"
-            effect="float"
-            getContent={() => `${formatNumber(scaleValuePrediction.toString())} ${unit}`}
-            id="scalarTooltip"
-            offset={{ top: 10 }}
-            place="top"
-            type="light"
-          />
+          <ScaleTooltip xValue={scaleValue || 0}>
+            <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
+          </ScaleTooltip>
           <ScaleBall
             className="scale-ball"
             data-for="scalarTooltip"
