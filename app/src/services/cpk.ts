@@ -159,6 +159,10 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
+      if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
+        txOptions.gas = 500000
+      }
+
       let collateralAddress
       if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
@@ -186,10 +190,6 @@ class CPKService {
 
       const outcomeTokensToBuy = await marketMaker.calcBuyAmount(amount, outcomeIndex)
       logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
-
-      if (this.cpk.isSafeApp()) {
-        txOptions.gas = 500000
-      }
 
       // Check  if the allowance of the CPK to the market maker is enough.
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
@@ -260,8 +260,8 @@ class CPKService {
       const transactions = []
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp()) {
-        txOptions.gas = 1200000
+      if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
+        txOptions.gas = 1000000
       }
 
       let collateral
@@ -457,6 +457,10 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
+      if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
+        txOptions.gas = 500000
+      }
+
       let collateralAddress
       if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
@@ -478,10 +482,6 @@ class CPKService {
 
       // Check  if the allowance of the CPK to the market maker is enough.
       const collateralService = new ERC20Service(this.provider, account, collateralAddress)
-
-      if (this.cpk.isSafeApp()) {
-        txOptions.gas = 500000
-      }
 
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
@@ -669,7 +669,7 @@ class CPKService {
       const deployed = await this.cpk.isProxyDeployed()
       if (!deployed) {
         // add plenty of gas to avoid locked proxy https://github.com/gnosis/contract-proxy-kit/issues/132
-        txOptions.gas = 400000
+        txOptions.gas = 500000
       }
       const network = await this.provider.getNetwork()
       const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId).toLowerCase()
