@@ -290,7 +290,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
-  const showUpgrade = (!isUpdated && collateral.address === pseudoNativeAssetAddress) || upgradeFinished
+  const showUpgrade =
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
 
   const upgradeProxy = async () => {
     if (!cpk) {
@@ -486,6 +488,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         )}
         {showUpgrade && (
           <UpgradeProxy
+            context={context}
             finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
             loading={RemoteData.is.asking(proxyIsUpToDate)}
             style={{ marginBottom: 20 }}

@@ -148,7 +148,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setAllowanceFinished(true)
   }
 
-  const showUpgrade = (!isUpdated && collateral.address === pseudoNativeAssetAddress) || upgradeFinished
+  const showUpgrade =
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
 
   const upgradeProxy = async () => {
     if (!cpk) {
@@ -234,9 +236,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     !amount ||
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
-    (!cpk?.cpk.isSafeApp() && hasEnoughAllowance !== Ternary.True) ||
+    (!cpk?.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
-    isNegativeAmount
+    isNegativeAmount ||
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
 
   const wrapAddress = getWrapToken(networkId).address
 
@@ -249,6 +252,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
     setOutcomeIndex(value)
   }
+
   return (
     <>
       <OutcomeTable
@@ -356,6 +360,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )}
       {showUpgrade && (
         <UpgradeProxy
+          context={context}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           style={{ marginBottom: 20 }}

@@ -1,6 +1,8 @@
 import React, { DOMAttributes, HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
+import { ConnectedWeb3Context } from '../../../../hooks'
+import { getNativeAsset } from '../../../../util/networks'
 import { ButtonStateful, ButtonStates } from '../../../button/button_stateful'
 
 const Wrapper = styled.div`
@@ -36,18 +38,21 @@ export type UpgradeProxyProps = DOMAttributes<HTMLDivElement> &
     loading: boolean
     finished: boolean
     upgradeProxy?: any
+    context: ConnectedWeb3Context
   }
 
 export const UpgradeProxy: React.FC<UpgradeProxyProps> = (props: UpgradeProxyProps) => {
-  const { finished, loading, upgradeProxy, ...restProps } = props
-
+  const { context, finished, loading, upgradeProxy, ...restProps } = props
+  const nativeAsset = getNativeAsset(context.networkId)
   const state = loading ? ButtonStates.working : finished ? ButtonStates.finished : ButtonStates.idle
 
   return (
     <Wrapper {...restProps}>
-      <Title>Enable Ether</Title>
+      <Title>Enable {nativeAsset.symbol}</Title>
       <DescriptionWrapper>
-        <Description>This permission allows the smart contracts to interact with your Ether.</Description>
+        <Description>
+          This permission allows the smart contracts to interact with your {nativeAsset.symbol}.
+        </Description>
         <ButtonStateful disabled={loading || finished} onClick={upgradeProxy} state={state}>
           Enable
         </ButtonStateful>

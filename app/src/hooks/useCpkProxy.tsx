@@ -2,14 +2,14 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { RemoteData } from '../util/remote_data'
 
-import { useCpk } from './useCpk'
+import { useConnectedCPKContext } from './connectedCpk'
 
 /**
  * Return details about a user's proxy contract
  * proxyIsUpToDate: Has the proxy implementation been upgraded to the target implementation
  */
 export const useCpkProxy = () => {
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
 
   const [proxyIsUpToDate, setUpdated] = useState<RemoteData<boolean>>(RemoteData.notAsked())
 
