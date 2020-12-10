@@ -481,7 +481,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             <ValueBox>
               <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>
                 {profitLoss > 0 && '+'}
-                {`${formatNumber(profitLoss ? profitLoss.toString() : '0')}%`}
+                {`${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`}
               </ValueBoxTitle>
               <ValueBoxSubtitle>Profit/Loss</ValueBoxSubtitle>
             </ValueBox>
