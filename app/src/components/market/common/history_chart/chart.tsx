@@ -192,7 +192,7 @@ export const HistoryChart: React.FC<Props> = ({
     const prediction = (
       payload[0]?.value * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) +
       (scalarLowNumber || 0)
-    ).toFixed(0)
+    ).toFixed(2)
     return (
       <ChartTooltip>
         <TooltipTitle>{label}</TooltipTitle>
