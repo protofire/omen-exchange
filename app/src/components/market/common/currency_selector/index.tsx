@@ -35,13 +35,13 @@ interface Props {
   balance?: string
   placeholder?: Maybe<string>
   addAll?: boolean
-  addEther?: boolean
+  addNativeAsset?: boolean
 }
 
 export const CurrencySelector: React.FC<Props> = props => {
   const {
     addAll = false,
-    addEther = false,
+    addNativeAsset = false,
     balance,
     context,
     currency,
@@ -52,7 +52,7 @@ export const CurrencySelector: React.FC<Props> = props => {
     ...restProps
   } = props
 
-  const tokens = useTokens(context, addEther)
+  const tokens = useTokens(context, addNativeAsset)
 
   const currencyDropdownData: Array<DropdownItemProps> = []
 

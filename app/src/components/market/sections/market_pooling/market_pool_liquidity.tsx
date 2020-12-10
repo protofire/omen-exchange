@@ -452,7 +452,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             <>
               <CurrenciesWrapper>
                 <CurrencySelector
-                  addEther
+                  addNativeAsset
                   balance={walletBalance}
                   context={context}
                   currency={collateral.address}

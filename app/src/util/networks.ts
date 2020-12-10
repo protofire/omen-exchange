@@ -56,6 +56,7 @@ interface Network {
   cpk?: CPKAddresses
   wrapToken: string
   targetSafeImplementation: string
+  nativeAsset: Token
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -68,6 +69,8 @@ interface KnownTokenData {
   }
   order: number
 }
+
+export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
 
 const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
@@ -92,6 +95,12 @@ const networks: { [K in NetworkId]: Network } = {
       omenVerifiedMarkets: '0xb72103eE8819F2480c25d306eEAb7c3382fBA612',
     },
     wrapToken: 'weth',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'),
+      symbol: 'ETH',
+      decimals: 18,
+    },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
   },
   [networkIds.RINKEBY]: {
@@ -123,6 +132,12 @@ const networks: { [K in NetworkId]: Network } = {
     },
     wrapToken: 'weth',
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'),
+      symbol: 'ETH',
+      decimals: 18,
+    },
   },
 }
 
@@ -518,13 +533,16 @@ export const getWrapToken = (networkId: number): Token => {
   return getToken(networkId, tokenId)
 }
 
+export const getNativeAsset = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].nativeAsset as Token
+}
+
 export const getTargetSafeImplementation = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
   return networks[networkId].targetSafeImplementation.toLowerCase()
 }
-
-export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
-export const etherTokenImage =
-  'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'

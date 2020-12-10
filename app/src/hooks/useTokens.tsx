@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { ERC20Service } from '../services/erc20'
 import { getLogger } from '../util/logger'
-import { etherTokenImage, getOmenTCRListId, getTokensByNetwork, pseudoNativeAssetAddress } from '../util/networks'
+import { getNativeAsset, getOmenTCRListId, getTokensByNetwork } from '../util/networks'
 import { getImageUrl } from '../util/token'
 import { Token } from '../util/types'
 
@@ -11,16 +11,11 @@ import { useContracts } from './useContracts'
 
 const logger = getLogger('Hooks::useTokens')
 
-export const useTokens = (context: ConnectedWeb3Context, addEther?: boolean) => {
+export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolean) => {
   const { dxTCR } = useContracts(context)
   const defaultTokens = getTokensByNetwork(context.networkId)
-  if (addEther) {
-    defaultTokens.splice(1, 0, {
-      address: pseudoNativeAssetAddress,
-      image: etherTokenImage,
-      symbol: 'ETH',
-      decimals: 18,
-    })
+  if (addNativeAsset) {
+    defaultTokens.splice(1, 0, getNativeAsset(context.networkId))
   }
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
   useEffect(() => {
