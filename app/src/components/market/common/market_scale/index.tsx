@@ -319,26 +319,20 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         // Determine the percentage distance from the new prediction number to the upper bound
         positionValue = (scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
         // Calculate profit amount given how close it is to the upper bound, i.e. how close it is to max profit
-        setYourPayout(positionValue * (potentialProfitNumber || 0) - (feeNumber || 0))
-        // Calculate percentage profit given how close it is to the upper bound, i.e. how close it is to max profit
-        setProfitLoss(((positionValue * (potentialProfitNumber || 0) - (feeNumber || 0)) / (amountNumber || 0)) * 100)
+        const profit = positionValue * (potentialProfitNumber || 0) - (feeNumber || 0)
+        // Calculate total payout by adding profit to amount
+        setYourPayout((amountNumber || 0) + (amountNumber || 0) * profit)
+        // Return profit amount
+        setProfitLoss(profit)
       } else {
         // Determine the percentage distance from the new prediction number to the lower bound as a negative value
         positionValue = -(scaleValuePrediction - newPredictionNumber) / (lowerBoundNumber - newPredictionNumber)
         // Calculate loss amount given how close it is to lower bound, i.e. how close it is to max loss
-        // If return value is less than amount, return the amount
-        setYourPayout(
-          positionValue * (potentialLossNumber || 0) - (feeNumber || 0) < -(amountNumber || 0)
-            ? -(amountNumber || 0)
-            : positionValue * (potentialLossNumber || 0) - (feeNumber || 0),
-        )
-        // Calculate percentage loss given how close it is to lower bound, i.e. how close it is to max loss
-        // If return value is less than -100%, return -100%
-        setProfitLoss(
-          -(-(positionValue * (potentialLossNumber || 0) - (feeNumber || 0)) / (amountNumber || 0)) * 100 < -100
-            ? -100
-            : -(-(positionValue * (potentialLossNumber || 0) - (feeNumber || 0)) / (amountNumber || 0)) * 100,
-        )
+        const loss = positionValue * (potentialLossNumber || 0) - (feeNumber || 0)
+        // Calculate total payout by adding loss to amount
+        setYourPayout((amountNumber || 0) + (amountNumber || 0) * loss)
+        // Return loss amount
+        setProfitLoss(loss)
       }
       // If taking a short position
     } else {
@@ -347,26 +341,20 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         // Determine the percentage distance from the new prediction number to the lower bound
         positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
         // Calculate profit amount given how close it is to the lower bound, i.e. how close it is to max profit
-        setYourPayout(positionValue * (potentialProfitNumber || 0) - (feeNumber || 0))
-        // Calculate percentage profit given how close it is to the lower bound, i.e. how close it is to max profit
-        setProfitLoss(((positionValue * (potentialProfitNumber || 0) - (feeNumber || 0)) / (amountNumber || 0)) * 100)
+        const profit = positionValue * (potentialProfitNumber || 0) - (feeNumber || 0)
+        // Calculate total payout by adding profit to amount
+        setYourPayout((amountNumber || 0) + (amountNumber || 0) * profit)
+        // Return profit amount
+        setProfitLoss(profit)
       } else {
         // Determine the percentage distance from the new prediction number to the upper bound as a negative value
         positionValue = -(scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
         // Calculate loss amount given how close it is to upper bound, i.e. how close it is to max loss
-        // If return value is less than amount, return the amount
-        setYourPayout(
-          positionValue * (potentialLossNumber || 0) - (feeNumber || 0) < -(amountNumber || 0)
-            ? -(amountNumber || 0)
-            : positionValue * (potentialLossNumber || 0) - (feeNumber || 0),
-        )
-        // Calculate percentage loss given how close it is to upper bound, i.e. how close it is to max loss
-        // If return value is less than -100%, return -100%
-        setProfitLoss(
-          -(-(positionValue * (potentialLossNumber || 0) - (feeNumber || 0)) / (amountNumber || 0)) * 100 < -100
-            ? -100
-            : -(-(positionValue * (potentialLossNumber || 0) - (feeNumber || 0)) / (amountNumber || 0)) * 100,
-        )
+        const loss = positionValue * (potentialLossNumber || 0) - (feeNumber || 0)
+        // Calculate total payout by adding loss to amount
+        setYourPayout((amountNumber || 0) + (amountNumber || 0) * loss)
+        // Return loss amount
+        setProfitLoss(loss)
       }
     }
   }, [
