@@ -94,6 +94,12 @@ const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8',
       omenVerifiedMarkets: '0xb72103eE8819F2480c25d306eEAb7c3382fBA612',
     },
+    cpk: {
+      masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
+      proxyFactoryAddress: '0x0fB4340432e56c014fa96286de17222822a9281b',
+      multiSendAddress: '0xc3BD4deCF75e9937aefb7a4CE6Ec8931dB4cfAF0',
+      fallbackHandlerAddress: '0x40A930851BD2e590Bd5A5C981b436de25742E980',
+    },
     wrapToken: 'weth',
     nativeAsset: {
       address: pseudoNativeAssetAddress,
@@ -131,13 +137,13 @@ const networks: { [K in NetworkId]: Network } = {
       fallbackHandlerAddress: '0x40A930851BD2e590Bd5A5C981b436de25742E980',
     },
     wrapToken: 'weth',
-    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     nativeAsset: {
       address: pseudoNativeAssetAddress,
       image: getImageUrl('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'),
       symbol: 'ETH',
       decimals: 18,
     },
+    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
   },
 }
 
