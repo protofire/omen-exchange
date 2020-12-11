@@ -143,9 +143,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     totalPoolShares,
   )
 
-  const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
-    amount.lt(min) ? amount : min,
-  )
+  const depositedTokens = sendAmountsAfterRemovingFunding.length
+    ? sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
+    : new BigNumber(0)
   const depositedTokensTotal = depositedTokens.add(userEarnings)
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
@@ -285,7 +285,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       <MarketScale
         border={true}
         collateral={collateral}
-        currentPrediction={outcomeTokenMarginalPrices[1]}
+        currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
         lowerBound={scalarLow || new BigNumber(0)}
         startingPointTitle={'Current prediction'}
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
