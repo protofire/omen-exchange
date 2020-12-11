@@ -262,7 +262,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
-  const tokensAmount = useTokens(context).length
+  const tokensAmount = useTokens(context, true).length
 
   const amountError =
     maybeCollateralBalance === null
@@ -414,6 +414,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                   addNativeAsset
                   balance={formatNumber(collateralBalanceFormatted, 5)}
                   context={context}
+                  currency={collateral.address}
                   disabled={false}
                   onSelect={onCollateralChange}
                 />
