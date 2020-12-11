@@ -12,6 +12,35 @@ export enum Status {
   Error = 'Error',
 }
 
+export enum KlerosItemStatus {
+  Absent = 'Absent',
+  Registered = 'Registered',
+  RegistrationRequested = 'RegistrationRequested',
+  ClearingRequested = 'ClearingRequested',
+}
+
+export enum KlerosDisputeOutcome {
+  None = 'None',
+  Accept = 'Accept',
+  Refuse = 'Refuse',
+}
+
+export interface MarketCurationState {
+  verificationState: MarketVerificationState
+  submissionTime?: number
+  itemID?: string
+}
+
+export interface KlerosCurationData {
+  listingCriteriaURL: string
+  submissionDeposit: string
+  challengePeriodDuration: string
+  submissionBaseDeposit: string
+  removalBaseDeposit: string
+  marketVerificationData: MarketCurationState
+  ovmAddress: string // ovm here stands for Omen Verified Markets, the Kleros-Omen TCR.
+}
+
 export interface BalanceItem {
   outcomeName: string
   probability: number
@@ -19,6 +48,12 @@ export interface BalanceItem {
   shares: BigNumber
   payout: Big
   holdings: BigNumber
+}
+
+export interface KlerosSubmission {
+  id: string
+  status: KlerosItemStatus
+  listAddress: string
 }
 
 export enum Stage {
@@ -99,6 +134,14 @@ export type MarketWithExtraData = Market & {
   fee: BigNumber
   question: Question
   status: MarketStatus
+}
+
+export enum MarketVerificationState {
+  Verified,
+  NotVerified,
+  SubmissionChallengeable,
+  RemovalChallengeable,
+  WaitingArbitration,
 }
 
 export interface Log {
@@ -223,6 +266,7 @@ export interface MarketMakerData {
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
   scaledLiquidityParameter: number
+  submissionIDs: KlerosSubmission[]
   oracle: string
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
@@ -282,6 +326,10 @@ export type GraphMarketMakerDataItem = {
   klerosTCRregistered: boolean
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
+  condition: MarketCondition
+  outcomeTokenMarginalPrices: string[]
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
 }
 
 export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
@@ -313,10 +361,20 @@ export type MarketMakerDataItem = {
   klerosTCRregistered: boolean
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
+  oracle: Maybe<string>
+  outcomeTokenMarginalPrices: string[]
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
 }
 
 export type BuildQueryType = MarketFilters & {
   whitelistedCreators: boolean
   whitelistedTemplateIds: boolean
   networkId: Maybe<number>
+}
+
+export type MarketCondition = {
+  oracle: Maybe<string>
+  scalarHigh: Maybe<BigNumber>
+  scalarLow: Maybe<BigNumber>
 }

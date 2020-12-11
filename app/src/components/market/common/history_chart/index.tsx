@@ -4,7 +4,11 @@ import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
-import { EARLIEST_MAINNET_BLOCK_TO_CHECK } from '../../../../common/constants'
+import {
+  EARLIEST_MAINNET_BLOCK_TO_CHECK,
+  REALITIO_SCALAR_ADAPTER_ADDRESS,
+  REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY,
+} from '../../../../common/constants'
 import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
 import { keys, range } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
@@ -70,7 +74,11 @@ type Props = {
   answerFinalizedTimestamp: Maybe<BigNumber>
   marketMakerAddress: string
   hidden: boolean
+  oracle: Maybe<string>
   outcomes: string[]
+  scalarHigh: Maybe<BigNumber>
+  scalarLow: Maybe<BigNumber>
+  unit: string
 }
 
 const blocksPerAllTimePeriod = 10000
@@ -91,9 +99,14 @@ export const HistoryChartContainer: React.FC<Props> = ({
   answerFinalizedTimestamp,
   hidden,
   marketMakerAddress,
+  oracle,
   outcomes,
+  scalarHigh,
+  scalarLow,
+  unit,
 }) => {
-  const { library } = useWeb3Context()
+  const context = useWeb3Context()
+  const { library } = context
   const [latestBlockNumber, setLatestBlockNumber] = useState<Maybe<number>>(null)
   const [blocks, setBlocks] = useState<Maybe<Block[]>>(null)
   const holdingsSeries = useHoldingsHistory(marketMakerAddress, blocks)
@@ -136,12 +149,28 @@ export const HistoryChartContainer: React.FC<Props> = ({
     // eslint-disable-next-line
   }, [latestBlockNumber, library, period])
 
+  let realitioScalarAdapter
+  if (context.networkId === 1) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase()
+  } else if (context.networkId === 4) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
+  }
+
+  let isScalar = false
+  if (oracle === realitioScalarAdapter) {
+    isScalar = true
+  }
+
   return hidden ? null : (
     <HistoryChart
       holdingSeries={holdingsSeries}
+      isScalar={isScalar}
       onChange={setPeriod}
       options={keys(mapPeriod)}
       outcomes={outcomes}
+      scalarHigh={scalarHigh}
+      scalarLow={scalarLow}
+      unit={unit}
       value={period}
     />
   )

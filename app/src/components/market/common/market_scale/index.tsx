@@ -139,6 +139,31 @@ const ScaleDot = styled.div<{ xValue: number; positive: Maybe<boolean> }>`
   margin-top: calc((${SCALE_HEIGHT} - ${DOT_SIZE}) / 2);
 `
 
+const ScaleTooltip = styled.div<{ xValue: number }>`
+  position: absolute;
+  padding: 5px 8px;
+  top: -42px;
+  left: ${({ xValue }) => xValue}%;
+  transform: translateX(-50%);
+  background-color: ${({ theme }) => theme.colors.mainBodyBackground};
+  border-radius: ${({ theme }) => theme.borders.commonBorderRadius};
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid ${({ theme }) => theme.borders.tooltip};
+  white-space: nowrap;
+  opacity: 0;
+  transition: 0.2s opacity;
+`
+
+const ScaleTooltipMessage = styled.p`
+  font-size: ${({ theme }) => theme.fonts.defaultSize};
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.1px;
+  text-align: left;
+  margin: 0;
+`
+
 const ValueBoxes = styled.div`
   display: flex;
   align-items: center;
@@ -173,6 +198,7 @@ const ValueBox = styled.div<{ xValue?: number }>`
     border-bottom-right-radius: 4px;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
+    border-left: none;
   }
 `
 
@@ -231,6 +257,7 @@ interface Props {
   potentialProfit?: Maybe<BigNumber>
   collateral?: Maybe<Token>
   amount?: Maybe<BigNumber>
+  fee?: Maybe<BigNumber>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -239,6 +266,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     border,
     collateral,
     currentPrediction,
+    fee,
     long,
     lowerBound,
     newPrediction,
@@ -265,6 +293,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     collateral && Number(formatBigNumber(potentialLoss || new BigNumber(0), collateral.decimals))
 
   const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
+  const feeNumber = fee && collateral && (Number(formatBigNumber(fee, collateral.decimals)) + 1) ** 2 - 1
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
@@ -292,7 +321,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const handleScaleBallChange = () => {
     setScaleValue(Number(scaleBall?.value))
     setScaleValuePrediction((Number(scaleBall?.value) / 100) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
-    ReactTooltip.rebuild()
   }
 
   useEffect(() => {
@@ -301,48 +329,56 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         ? newPrediction * 100
         : currentPrediction
         ? Number(currentPrediction) * 100
-        : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+        : (((startingPointNumber || 0) - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
     )
     setScaleValuePrediction(Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
   }, [newPrediction, currentPrediction, lowerBoundNumber, startingPointNumber, upperBoundNumber])
 
   useEffect(() => {
     let positionValue
+    // If taking a long position
     if (long) {
+      // If the value selected by the slider is > the new prediction number
       if (scaleValuePrediction > newPredictionNumber) {
+        // Determine the percentage distance from the new prediction number to the upper bound
         positionValue = (scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
-        setYourPayout(positionValue * (potentialProfitNumber || 0))
-        setProfitLoss(((positionValue * (potentialProfitNumber || 0)) / (amountNumber || 0)) * 100)
+        // Calculate profit amount given how close it is to the upper bound, i.e. how close it is to max profit
+        const profit = positionValue * (potentialProfitNumber || 0) - (feeNumber || 0)
+        // Calculate total payout by adding profit to amount
+        setYourPayout((amountNumber || 0) + profit)
+        // Return profit amount
+        setProfitLoss(profit)
       } else {
+        // Determine the percentage distance from the new prediction number to the lower bound as a negative value
         positionValue = -(scaleValuePrediction - newPredictionNumber) / (lowerBoundNumber - newPredictionNumber)
-        setYourPayout(
-          positionValue * (potentialLossNumber || 0) < -(amountNumber || 0)
-            ? -(amountNumber || 0)
-            : positionValue * (potentialLossNumber || 0),
-        )
-        setProfitLoss(
-          -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100 < -100
-            ? -100
-            : -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100,
-        )
+        // Calculate loss amount given how close it is to lower bound, i.e. how close it is to max loss
+        const loss = positionValue * (potentialLossNumber || 0) - (feeNumber || 0)
+        // Calculate total payout by adding loss to amount
+        setYourPayout((amountNumber || 0) + loss)
+        // Return loss amount
+        setProfitLoss(loss)
       }
+      // If taking a short position
     } else {
+      // If the value selected by the slider is < the new prediction number
       if (scaleValuePrediction <= newPredictionNumber) {
+        // Determine the percentage distance from the new prediction number to the lower bound
         positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
-        setYourPayout(positionValue * (potentialProfitNumber || 0))
-        setProfitLoss(((positionValue * (potentialProfitNumber || 0)) / (amountNumber || 0)) * 100)
+        // Calculate profit amount given how close it is to the lower bound, i.e. how close it is to max profit
+        const profit = positionValue * (potentialProfitNumber || 0) - (feeNumber || 0)
+        // Calculate total payout by adding profit to amount
+        setYourPayout((amountNumber || 0) + profit)
+        // Return profit amount
+        setProfitLoss(profit)
       } else {
+        // Determine the percentage distance from the new prediction number to the upper bound as a negative value
         positionValue = -(scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
-        setYourPayout(
-          positionValue * (potentialLossNumber || 0) < -(amountNumber || 0)
-            ? -(amountNumber || 0)
-            : positionValue * (potentialLossNumber || 0),
-        )
-        setProfitLoss(
-          -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100 < -100
-            ? -100
-            : -(-(positionValue * (potentialLossNumber || 0)) / (amountNumber || 0)) * 100,
-        )
+        // Calculate loss amount given how close it is to upper bound, i.e. how close it is to max loss
+        const loss = positionValue * (potentialLossNumber || 0) - (feeNumber || 0)
+        // Calculate total payout by adding loss to amount
+        setYourPayout((amountNumber || 0) + loss)
+        // Return loss amount
+        setProfitLoss(loss)
       }
     }
   }, [
@@ -354,7 +390,22 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     potentialLossNumber,
     potentialProfitNumber,
     upperBoundNumber,
+    feeNumber,
   ])
+
+  const activateTooltip = () => {
+    const scaleTooltip: HTMLElement | null = document.querySelector('#scale-tooltip')
+    if (scaleTooltip) {
+      scaleTooltip.style.opacity = '1'
+    }
+  }
+
+  const deactivateTooltip = () => {
+    const scaleTooltip: HTMLElement | null = document.querySelector('#scale-tooltip')
+    if (scaleTooltip) {
+      scaleTooltip.style.opacity = '0'
+    }
+  }
 
   return (
     <ScaleWrapper border={border}>
@@ -372,15 +423,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       </ScaleTitleWrapper>
       <Scale>
         <ScaleBallContainer>
-          <ReactTooltip
-            className="scalarValueTooltip"
-            effect="float"
-            getContent={() => `${formatNumber(scaleValuePrediction.toString())} ${unit}`}
-            id="scalarTooltip"
-            offset={{ top: 10 }}
-            place="top"
-            type="light"
-          />
+          <ScaleTooltip id="scale-tooltip" xValue={scaleValue || 0}>
+            <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
+          </ScaleTooltip>
           <ScaleBall
             className="scale-ball"
             data-for="scalarTooltip"
@@ -389,6 +434,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             max="100"
             min="0"
             onChange={handleScaleBallChange}
+            onMouseDown={activateTooltip}
+            onMouseUp={deactivateTooltip}
             type="range"
             value={scaleValue}
           />
@@ -456,15 +503,20 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           </ValueBoxPair>
           <ValueBoxPair>
             <ValueBox>
-              <ValueBoxTitle positive={yourPayout > 0 ? true : yourPayout < 0 ? false : undefined}>{`${formatNumber(
-                yourPayout.toString(),
-              )} ${collateral && collateral.symbol}`}</ValueBoxTitle>
+              <ValueBoxTitle
+                positive={
+                  yourPayout > (amountNumber || 0) ? true : yourPayout < (amountNumber || 0) ? false : undefined
+                }
+              >
+                {`${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`}
+              </ValueBoxTitle>
               <ValueBoxSubtitle>Your Payout</ValueBoxSubtitle>
             </ValueBox>
             <ValueBox>
-              <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>{`${formatNumber(
-                profitLoss ? profitLoss.toString() : '0',
-              )}%`}</ValueBoxTitle>
+              <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>
+                {profitLoss > 0 && '+'}
+                {`${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`}
+              </ValueBoxTitle>
               <ValueBoxSubtitle>Profit/Loss</ValueBoxSubtitle>
             </ValueBox>
           </ValueBoxPair>

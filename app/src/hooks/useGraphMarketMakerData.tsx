@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 
 import { getOutcomes } from '../util/networks'
 import { isObjectEqual, waitABit } from '../util/tools'
-import { Question, Status } from '../util/types'
+import { KlerosSubmission, Question, Status } from '../util/types'
 
 const query = gql`
   query GetMarket($id: ID!) {
@@ -50,6 +50,12 @@ const query = gql`
         data
       }
       klerosTCRregistered
+      curatedByDxDaoOrKleros
+      curatedByDxDao
+      submissionIDs {
+        id
+        status
+      }
       scalarLow
       scalarHigh
     }
@@ -95,6 +101,7 @@ type GraphResponseFixedProductMarketMaker = {
   klerosTCRregistered: boolean
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
+  submissionIDs: KlerosSubmission[]
   scalarLow: Maybe<string>
   scalarHigh: Maybe<string>
 }
@@ -121,6 +128,7 @@ export type GraphMarketMakerData = {
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
+  submissionIDs: KlerosSubmission[]
   oracle: string
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
@@ -167,6 +175,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     curatedByDxDao: data.curatedByDxDao,
     klerosTCRregistered: data.klerosTCRregistered,
     curatedByDxDaoOrKleros: data.curatedByDxDaoOrKleros,
+    submissionIDs: data.submissionIDs,
     scalarLow: data.scalarLow ? bigNumberify(data.scalarLow || 0) : null,
     scalarHigh: data.scalarHigh ? bigNumberify(data.scalarHigh || 0) : null,
     outcomeTokenMarginalPrices: data.outcomeTokenMarginalPrices,
