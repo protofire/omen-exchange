@@ -149,6 +149,7 @@ const ScaleTooltip = styled.div<{ xValue: number }>`
   border-radius: ${({ theme }) => theme.borders.commonBorderRadius};
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
   border: 1px solid ${({ theme }) => theme.borders.tooltip};
+  white-space: nowrap;
 `
 
 const ScaleTooltipMessage = styled.p`
@@ -418,10 +419,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         </ScaleTitle>
       </ScaleTitleWrapper>
       <Scale>
+        <ScaleTooltip xValue={scaleValue || 0}>
+          <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
+        </ScaleTooltip>
         <ScaleBallContainer>
-          <ScaleTooltip xValue={scaleValue || 0}>
-            <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
-          </ScaleTooltip>
           <ScaleBall
             className="scale-ball"
             data-for="scalarTooltip"
