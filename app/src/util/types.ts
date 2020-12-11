@@ -326,6 +326,10 @@ export type GraphMarketMakerDataItem = {
   klerosTCRregistered: boolean
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
+  condition: MarketCondition
+  outcomeTokenMarginalPrices: string[]
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
 }
 
 export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
@@ -357,10 +361,20 @@ export type MarketMakerDataItem = {
   klerosTCRregistered: boolean
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
+  oracle: Maybe<string>
+  outcomeTokenMarginalPrices: string[]
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
 }
 
 export type BuildQueryType = MarketFilters & {
   whitelistedCreators: boolean
   whitelistedTemplateIds: boolean
   networkId: Maybe<number>
+}
+
+export type MarketCondition = {
+  oracle: Maybe<string>
+  scalarHigh: Maybe<BigNumber>
+  scalarLow: Maybe<BigNumber>
 }
