@@ -138,7 +138,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   )
 
   const dust = parseUnits('0.00001', collateral.decimals)
-  const disableWithdrawTab = poolTokens.lt(dust)
+  const disableWithdrawTab = fundingBalance.lt(dust)
 
   const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
     amountToRemove || Zero,
