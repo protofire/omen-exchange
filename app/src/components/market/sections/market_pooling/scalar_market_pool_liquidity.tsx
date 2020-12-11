@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
@@ -136,6 +136,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
+
+  const dust = parseUnits('0.00001', collateral.decimals)
+  const disableWithdrawTab = poolTokens.lt(dust)
 
   const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
     amountToRemove || Zero,
@@ -302,7 +305,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
               Deposit
             </ButtonTab>
             <ButtonTab
-              active={disableDepositTab ? true : activeTab === Tabs.withdraw}
+              active={!disableWithdrawTab && activeTab === Tabs.withdraw}
+              disabled={disableWithdrawTab}
               onClick={() => setActiveTab(Tabs.withdraw)}
             >
               Withdraw
