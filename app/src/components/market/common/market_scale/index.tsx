@@ -150,6 +150,8 @@ const ScaleTooltip = styled.div<{ xValue: number }>`
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
   border: 1px solid ${({ theme }) => theme.borders.tooltip};
   white-space: nowrap;
+  opacity: 0;
+  transition: 0.2s opacity;
 `
 
 const ScaleTooltipMessage = styled.p`
@@ -319,7 +321,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const handleScaleBallChange = () => {
     setScaleValue(Number(scaleBall?.value))
     setScaleValuePrediction((Number(scaleBall?.value) / 100) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
-    ReactTooltip.rebuild()
   }
 
   useEffect(() => {
@@ -404,6 +405,20 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     feeNumber,
   ])
 
+  const activateTooltip = () => {
+    const scaleTooltip: HTMLElement | null = document.querySelector('#scale-tooltip')
+    if (scaleTooltip) {
+      scaleTooltip.style.opacity = '1'
+    }
+  }
+
+  const deactivateTooltip = () => {
+    const scaleTooltip: HTMLElement | null = document.querySelector('#scale-tooltip')
+    if (scaleTooltip) {
+      scaleTooltip.style.opacity = '0'
+    }
+  }
+
   return (
     <ScaleWrapper border={border}>
       <ScaleTitleWrapper>
@@ -419,10 +434,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         </ScaleTitle>
       </ScaleTitleWrapper>
       <Scale>
-        <ScaleTooltip xValue={scaleValue || 0}>
-          <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
-        </ScaleTooltip>
         <ScaleBallContainer>
+          <ScaleTooltip id="scale-tooltip" xValue={scaleValue || 0}>
+            <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
+          </ScaleTooltip>
           <ScaleBall
             className="scale-ball"
             data-for="scalarTooltip"
@@ -431,6 +446,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             max="100"
             min="0"
             onChange={handleScaleBallChange}
+            onMouseDown={activateTooltip}
+            onMouseUp={deactivateTooltip}
             type="range"
             value={scaleValue}
           />
