@@ -1,14 +1,14 @@
 import React from 'react'
 
 import { ConnectedWeb3Context } from '../../../../hooks'
-import { MarketMakerData } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
 import { MarketVerify } from './market_verify'
 
 interface Props {
   marketMakerData: MarketMakerData
   context: ConnectedWeb3Context
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
 }
 
