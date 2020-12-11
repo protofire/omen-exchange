@@ -10,7 +10,14 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
-  const { address: marketMakerAddress, answerFinalizedTimestamp, question } = marketMakerData
+  const {
+    address: marketMakerAddress,
+    answerFinalizedTimestamp,
+    oracle,
+    question,
+    scalarHigh,
+    scalarLow,
+  } = marketMakerData
 
   return (
     <>
@@ -18,7 +25,11 @@ const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
         answerFinalizedTimestamp={answerFinalizedTimestamp}
         hidden={false}
         marketMakerAddress={marketMakerAddress}
+        oracle={oracle}
         outcomes={question.outcomes}
+        scalarHigh={scalarHigh}
+        scalarLow={scalarLow}
+        unit={question.title && question.title.includes('[') ? question.title.split('[')[1].split(']')[0] : ''}
       />
     </>
   )
