@@ -262,7 +262,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
 
-      if (!cpk.cpk.isSafeApp() || collateral.address !== pseudoNativeAssetAddress) {
+      if (!cpk.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress) {
         const collateralAddress = await marketMaker.getCollateralToken()
         const collateralService = new ERC20Service(provider, account, collateralAddress)
 
