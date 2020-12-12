@@ -22,7 +22,10 @@ const realitioAbi = [
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
 ]
-const realitioScalarAdapterAbi = ['function announceConditionQuestionId(bytes32 questionId, uint256 low, uint256 high)']
+const realitioScalarAdapterAbi = [
+  'function announceConditionQuestionId(bytes32 questionId, uint256 low, uint256 high)',
+  'function resolve(bytes32 questionId, string question, uint256 low, uint256 high)',
+]
 
 function getQuestionArgs(
   question: string,
@@ -283,6 +286,18 @@ class RealitioService {
 
     const announceConditionInterface = new utils.Interface(realitioScalarAdapterAbi)
     return announceConditionInterface.functions.announceConditionQuestionId.encode(args)
+  }
+
+  static encodeResolveCondition = async (
+    questionId: string,
+    question: string,
+    scalarLow: BigNumber,
+    scalarHigh: BigNumber,
+  ) => {
+    const args = [questionId, question, scalarLow, scalarHigh]
+
+    const resolveConditionInterface = new utils.Interface(realitioScalarAdapterAbi)
+    return resolveConditionInterface.functions.resolve.encode(args)
   }
 }
 
