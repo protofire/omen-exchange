@@ -83,7 +83,7 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
 const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
-  const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
 
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
 
@@ -117,7 +117,11 @@ const Wrapper = (props: Props) => {
     try {
       setStatus(Status.Loading)
       setMessage('Resolving condition...')
-      await oracle.resolveCondition(question, balances.length)
+      if (isScalar && scalarLow && scalarHigh) {
+        await realitio.encodeResolveCondition(question.id, question.title, scalarLow, scalarHigh)
+      } else {
+        await oracle.resolveCondition(question, balances.length)
+      }
 
       setStatus(Status.Ready)
       setMessage(`Condition successfully resolved.`)

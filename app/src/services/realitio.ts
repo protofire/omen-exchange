@@ -288,7 +288,7 @@ class RealitioService {
     return announceConditionInterface.functions.announceConditionQuestionId.encode(args)
   }
 
-  static encodeResolveCondition = async (
+  encodeResolveCondition = async (
     questionId: string,
     question: string,
     scalarLow: BigNumber,
