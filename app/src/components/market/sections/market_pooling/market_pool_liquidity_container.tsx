@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { MarketMakerData } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
 import { MarketPoolLiquidity } from './market_pool_liquidity'
 import { ScalarMarketPoolLiquidity } from './scalar_market_pool_liquidity'
@@ -8,7 +8,7 @@ import { ScalarMarketPoolLiquidity } from './scalar_market_pool_liquidity'
 interface Props {
   marketMakerData: MarketMakerData
   fetchGraphMarketMakerData: () => Promise<void>
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
   isScalar: boolean
 }
 

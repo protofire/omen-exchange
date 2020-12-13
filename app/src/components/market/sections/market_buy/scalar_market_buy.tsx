@@ -8,16 +8,16 @@ import styled from 'styled-components'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
+  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
-  useCpk,
   useCpkAllowance,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
-import { MarketMakerData, Status, Ternary } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -48,13 +48,13 @@ const logger = getLogger('Scalar Market::Buy')
 interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 export const ScalarMarketBuy = (props: Props) => {
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
   const { library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
