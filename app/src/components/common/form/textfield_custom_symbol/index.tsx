@@ -89,15 +89,14 @@ const FieldWrapper = styled.div`
   }
 `
 
-const Symbol = styled.span`
+const Symbol = styled.span<{ marginRight?: boolean }>`
   color: ${props => props.theme.colors.primary};
   flex-shrink: 0;
   font-size: 14px;
   font-weight: 500;
   line-height: 1.2;
   text-align: right;
-  margin-right: 20px;
-
+  ${({ marginRight }) => marginRight && 'margin-right: 20px;'};
   .disabled &,
   .disabled:hover &,
   :disabled &,
@@ -130,7 +129,7 @@ export const TextfieldCustomSymbol = (props: Props) => {
   return (
     <FieldWrapper className={disabled ? 'disabled' : ''} {...restProps}>
       {React.cloneElement(formField, { disabled: disabled })}
-      <Symbol>{symbol}</Symbol>
+      <Symbol marginRight={shouldDisplayMaxButton}>{symbol}</Symbol>
       {shouldDisplayMaxButton && (
         <MaxButton className="btn--max" onClick={onClickMaxButton}>
           Max

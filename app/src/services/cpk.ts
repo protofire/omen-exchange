@@ -1,3 +1,4 @@
+import { txs } from '@gnosis.pm/safe-apps-sdk/dist/txs'
 import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ethers } from 'ethers'
@@ -8,7 +9,7 @@ import moment from 'moment'
 
 import { getLogger } from '../util/logger'
 import { getCPKAddresses, getContractAddress } from '../util/networks'
-import { calcDistributionHint, clampBigNumber } from '../util/tools'
+import { calcDistributionHint, clampBigNumber, waitABit } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -69,10 +70,25 @@ interface CPKRedeemParams {
   conditionalTokens: ConditionalTokenService
 }
 
+interface TransactionResult {
+  hash?: string
+  safeTxHash?: string
+}
+
+interface TxOptions {
+  value?: BigNumber
+  gas?: number
+}
+
 interface CPKRequestVerificationParams {
   params: string
   ovmAddress: string
   submissionDeposit: string
+}
+
+interface CreateMarketResult {
+  transaction: TransactionReceipt
+  marketMakerAddress: string
 }
 
 class CPKService {
@@ -107,6 +123,27 @@ class CPKService {
     return this.cpk.address
   }
 
+  getTransactionHash = async (txObject: TransactionResult): Promise<string> => {
+    if (txObject.hash) {
+      return txObject.hash
+    }
+
+    if (txObject.safeTxHash) {
+      let transactionHash
+      // poll for safe tx data
+      while (!transactionHash) {
+        const safeTransaction = await txs.getBySafeTxHash(txObject.safeTxHash)
+        if (safeTransaction.transactionHash) {
+          transactionHash = safeTransaction.transactionHash
+        }
+        await waitABit()
+      }
+      return transactionHash
+    }
+
+    return ''
+  }
+
   buyOutcomes = async ({ amount, marketMaker, outcomeIndex }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -121,19 +158,13 @@ class CPKService {
 
       const outcomeTokensToBuy = await marketMaker.calcBuyAmount(amount, outcomeIndex)
       logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
+      const transactions = []
 
-      const transactions = [
-        // Step 2: Transfer the amount of collateral being spent from the user to the CPK
-        {
-          to: collateralAddress,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
-        },
-        // Step 3: Buy outcome tokens with the CPK
-        {
-          to: marketMakerAddress,
-          data: MarketMakerService.encodeBuy(amount, outcomeIndex, outcomeTokensToBuy),
-        },
-      ]
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp()) {
+        txOptions.gas = 500000
+      }
 
       // Check  if the allowance of the CPK to the market maker is enough.
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
@@ -144,16 +175,31 @@ class CPKService {
 
       if (!hasCPKEnoughAlowance) {
         // Step 1:  Approve unlimited amount to be transferred to the market maker)
-        transactions.unshift({
+        transactions.push({
           to: collateralAddress,
           data: ERC20Service.encodeApproveUnlimited(marketMakerAddress),
         })
       }
 
-      const txObject = await this.cpk.execTransactions(transactions)
+      // If we are signed in as a safe we don't need to transfer
+      if (!this.cpk.isSafeApp()) {
+        // Step 2: Transfer the amount of collateral being spent from the user to the CPK
+        transactions.push({
+          to: collateralAddress,
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+        })
+      }
 
-      logger.log(`Transaction hash: ${txObject.hash}`)
-      return this.provider.waitForTransaction(txObject.hash)
+      // Step 3: Buy outcome tokens with the CPK
+      transactions.push({
+        to: marketMakerAddress,
+        data: MarketMakerService.encodeBuy(amount, outcomeIndex, outcomeTokensToBuy),
+      })
+
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      const txHash = await this.getTransactionHash(txObject)
+      logger.log(`Transaction hash: ${txHash}`)
+      return this.provider.waitForTransaction(txHash)
     } catch (err) {
       logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
       throw err
@@ -165,7 +211,7 @@ class CPKService {
     marketData,
     marketMakerFactory,
     realitio,
-  }: CPKCreateMarketParams): Promise<string> => {
+  }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
       const { arbitrator, category, collateral, loadedQuestionId, outcomes, question, resolution, spread } = marketData
 
@@ -185,6 +231,11 @@ class CPKService {
       const openingDateMoment = moment(resolution)
 
       const transactions = []
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp()) {
+        txOptions.gas = 1200000
+      }
 
       let questionId: string
       if (loadedQuestionId) {
@@ -240,11 +291,14 @@ class CPKService {
         data: ERC20Service.encodeApproveUnlimited(marketMakerFactory.address),
       })
 
-      // Step 4: Transfer funding from user
-      transactions.push({
-        to: collateral.address,
-        data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
-      })
+      // If we are signed in as a safe we don't need to transfer
+      if (!this.cpk.isSafeApp()) {
+        // Step 4: Transfer funding from user
+        transactions.push({
+          to: collateral.address,
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
+        })
+      }
 
       // Step 5: Create market maker
       const saltNonce = Math.round(Math.random() * 1000000)
@@ -271,11 +325,15 @@ class CPKService {
         ),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions)
-      logger.log(`Transaction hash: ${txObject.hash}`)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      const txHash = await this.getTransactionHash(txObject)
+      logger.log(`Transaction hash: ${txHash}`)
 
-      await this.provider.waitForTransaction(txObject.hash)
-      return predictedMarketMakerAddress
+      const transaction = await this.provider.waitForTransaction(txObject.hash)
+      return {
+        transaction,
+        marketMakerAddress: predictedMarketMakerAddress,
+      }
     } catch (err) {
       logger.error(`There was an error creating the market maker`, err.message)
       throw err
@@ -463,6 +521,12 @@ class CPKService {
       const collateralAddress = await marketMaker.getCollateralToken()
 
       const transactions = []
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp()) {
+        txOptions.gas = 500000
+      }
+
       const isAlreadyApprovedForMarketMaker = await conditionalTokens.isApprovedForAll(
         this.cpk.address,
         marketMaker.address,
@@ -475,21 +539,24 @@ class CPKService {
         })
       }
 
-      transactions.push(
-        {
-          to: marketMaker.address,
-          data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
-        },
-        {
+      transactions.push({
+        to: marketMaker.address,
+        data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
+      })
+
+      // If we are signed in as a safe we don't need to transfer
+      if (!this.cpk.isSafeApp()) {
+        // Step 4: Transfer funding to user
+        transactions.push({
           to: collateralAddress,
           data: ERC20Service.encodeTransfer(account, amount),
-        },
-      )
+        })
+      }
 
-      const txObject = await this.cpk.execTransactions(transactions)
-
-      logger.log(`Transaction hash: ${txObject.hash}`)
-      return this.provider.waitForTransaction(txObject.hash)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      const txHash = await this.getTransactionHash(txObject)
+      logger.log(`Transaction hash: ${txHash}`)
+      return this.provider.waitForTransaction(txHash)
     } catch (err) {
       logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
       throw err
@@ -505,6 +572,12 @@ class CPKService {
       const collateralService = new ERC20Service(this.provider, account, collateral.address)
 
       const transactions = []
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp()) {
+        txOptions.gas = 500000
+      }
+
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
         marketMaker.address,
@@ -519,21 +592,24 @@ class CPKService {
         })
       }
 
-      transactions.push(
-        {
+      // If we are signed in as a safe we don't need to transfer
+      if (!this.cpk.isSafeApp()) {
+        // Step 4: Transfer funding from user
+        transactions.push({
           to: collateral.address,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
-        },
-        {
-          to: marketMaker.address,
-          data: MarketMakerService.encodeAddFunding(amount),
-        },
-      )
+        })
+      }
 
-      const txObject = await this.cpk.execTransactions(transactions)
+      transactions.push({
+        to: marketMaker.address,
+        data: MarketMakerService.encodeAddFunding(amount),
+      })
 
-      logger.log(`Transaction hash: ${txObject.hash}`)
-      return this.provider.waitForTransaction(txObject.hash)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      const txHash = await this.getTransactionHash(txObject)
+      logger.log(`Transaction hash: ${txHash}`)
+      return this.provider.waitForTransaction(txHash)
     } catch (err) {
       logger.error(`There was an error adding an amount of '${amount.toString()}' for funding`, err.message)
       throw err
@@ -569,24 +645,38 @@ class CPKService {
         ),
       }
 
-      // transfer to the user the merged collateral plus the earned fees
-      const transferCollateralTx = {
-        to: collateralAddress,
-        data: ERC20Service.encodeTransfer(account, amountToMerge.add(earnings)),
+      const transactions = [removeFundingTx, mergePositionsTx]
+
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp()) {
+        txOptions.gas = 500000
       }
 
-      const transactions = [removeFundingTx, mergePositionsTx, transferCollateralTx]
+      // If we are signed in as a safe we don't need to transfer
+      if (!this.cpk.isSafeApp()) {
+        // transfer to the user the merged collateral plus the earned fees
+        transactions.push({
+          to: collateralAddress,
+          data: ERC20Service.encodeTransfer(account, amountToMerge.add(earnings)),
+        })
+      }
 
-      const txObject = await this.cpk.execTransactions(transactions)
-
-      logger.log(`Transaction hash: ${txObject.hash}`)
-      return this.provider.waitForTransaction(txObject.hash)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      const txHash = await this.getTransactionHash(txObject)
+      logger.log(`Transaction hash: ${txHash}`)
+      return this.provider.waitForTransaction(txHash)
     } catch (err) {
       logger.error(`There was an error removing amount '${sharesToBurn.toString()}' for funding`, err.message)
       throw err
     }
   }
-  requestVerification = async ({ ovmAddress, params, submissionDeposit }: CPKRequestVerificationParams) => {
+
+  requestVerification = async ({
+    ovmAddress,
+    params,
+    submissionDeposit,
+  }: CPKRequestVerificationParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const ovm = new OvmService()
@@ -594,8 +684,7 @@ class CPKService {
 
       const { hash } = await ovm.generateTransaction(params, contractInstance, submissionDeposit)
 
-      await this.provider.waitForTransaction(hash)
-      return true
+      return this.provider.waitForTransaction(hash)
     } catch (err) {
       logger.error('Error while requesting market verification via Kleros!', err.message)
       throw err
@@ -617,6 +706,11 @@ class CPKService {
       const account = await signer.getAddress()
 
       const transactions = []
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp()) {
+        txOptions.gas = 500000
+      }
       if (!isConditionResolved) {
         transactions.push({
           to: oracle.address,
@@ -631,17 +725,18 @@ class CPKService {
         data: ConditionalTokenService.encodeRedeemPositions(collateralToken.address, conditionId, numOutcomes),
       })
 
-      if (earnedCollateral) {
+      // If we are signed in as a safe we don't need to transfer
+      if (!this.cpk.isSafeApp() && earnedCollateral) {
         transactions.push({
           to: collateralToken.address,
           data: ERC20Service.encodeTransfer(account, earnedCollateral),
         })
       }
 
-      const txObject = await this.cpk.execTransactions(transactions)
-
-      logger.log(`Transaction hash: ${txObject.hash}`)
-      return this.provider.waitForTransaction(txObject.hash)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      const txHash = await this.getTransactionHash(txObject)
+      logger.log(`Transaction hash: ${txHash}`)
+      return this.provider.waitForTransaction(txHash)
     } catch (err) {
       logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
       throw err

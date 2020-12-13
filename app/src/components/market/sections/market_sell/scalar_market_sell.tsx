@@ -14,7 +14,7 @@ import {
   formatNumber,
   mulBN,
 } from '../../../../util/tools'
-import { BalanceItem, MarketMakerData, Status } from '../../../../util/types'
+import { BalanceItem, MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -44,7 +44,7 @@ const logger = getLogger('Scalar Market::Sell')
 interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 export const ScalarMarketSell = (props: Props) => {
@@ -320,7 +320,7 @@ export const ScalarMarketSell = (props: Props) => {
         />
       )}
       <StyledButtonContainer>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
           Cancel
         </Button>
         <Button buttonType={ButtonType.primaryAlternative} disabled={isSellButtonDisabled} onClick={finish}>

@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { MarketMakerData } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
 const MarketTabs = styled.div`
   display: flex;
@@ -9,7 +9,7 @@ const MarketTabs = styled.div`
 `
 
 const MarketTab = styled.div<{ active: boolean }>`
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.fonts.defaultSize};
   color: ${props => (props.active ? props.theme.buttonSecondary.color : props.theme.colors.clickable)};
   background: none;
   border: none;
@@ -21,11 +21,18 @@ const MarketTab = styled.div<{ active: boolean }>`
   cursor: pointer;
 `
 
+const MarketSetOutcomeTab = styled.div`
+  font-size: 16px;
+  color: ${props => props.theme.colors.textColorDark};
+  background: none;
+  border: none;
+`
+
 interface Props {
   activeTab: string
   hasWinningOutcomes?: Maybe<boolean>
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 export const MarketNavigation = (props: Props) => {
@@ -36,37 +43,54 @@ export const MarketNavigation = (props: Props) => {
   const isOpen = question.resolution.getTime() > currentTimestamp
   const isFinalizing = question.resolution < new Date() && !isQuestionFinalized
 
-  const marketTabs = {
-    history: 'HISTORY',
-    pool: 'POOL',
-    swap: 'SWAP',
-    verify: 'VERIFY',
-    buy: 'BUY',
-    sell: 'SELL',
+  if (activeTab === MarketDetailsTab.setOutcome) {
+    return (
+      <MarketTabs>
+        <MarketSetOutcomeTab>Set Outcome</MarketSetOutcomeTab>
+      </MarketTabs>
+    )
   }
 
   return (
     <MarketTabs>
-      <MarketTab
-        active={activeTab === marketTabs.swap || activeTab === marketTabs.buy || activeTab === marketTabs.sell}
-        onClick={() => switchMarketTab('SWAP')}
-      >
-        {isQuestionFinalized && hasWinningOutcomes
-          ? 'Redeem'
-          : isQuestionFinalized && !hasWinningOutcomes
-          ? 'Results'
-          : isFinalizing
-          ? 'Finalize'
-          : 'Swap'}
-      </MarketTab>
-      <MarketTab active={activeTab === marketTabs.pool} onClick={() => switchMarketTab('POOL')}>
+      {(isQuestionFinalized || !isFinalizing) && (
+        <MarketTab
+          active={
+            activeTab === MarketDetailsTab.swap ||
+            activeTab === MarketDetailsTab.buy ||
+            activeTab === MarketDetailsTab.sell
+          }
+          onClick={() => switchMarketTab(MarketDetailsTab.swap)}
+        >
+          {isQuestionFinalized && hasWinningOutcomes
+            ? 'Redeem'
+            : isQuestionFinalized && !hasWinningOutcomes
+            ? 'Results'
+            : 'Swap'}
+        </MarketTab>
+      )}
+      {isFinalizing && (
+        <MarketTab
+          active={activeTab === MarketDetailsTab.finalize}
+          onClick={() => switchMarketTab(MarketDetailsTab.finalize)}
+        >
+          Finalize
+        </MarketTab>
+      )}
+      <MarketTab active={activeTab === MarketDetailsTab.pool} onClick={() => switchMarketTab(MarketDetailsTab.pool)}>
         Pool
       </MarketTab>
-      <MarketTab active={activeTab === marketTabs.history} onClick={() => switchMarketTab('HISTORY')}>
+      <MarketTab
+        active={activeTab === MarketDetailsTab.history}
+        onClick={() => switchMarketTab(MarketDetailsTab.history)}
+      >
         History
       </MarketTab>
       {isOpen && (
-        <MarketTab active={activeTab === marketTabs.verify} onClick={() => switchMarketTab('VERIFY')}>
+        <MarketTab
+          active={activeTab === MarketDetailsTab.verify}
+          onClick={() => switchMarketTab(MarketDetailsTab.verify)}
+        >
           Verify
         </MarketTab>
       )}
