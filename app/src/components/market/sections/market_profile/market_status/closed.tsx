@@ -8,6 +8,7 @@ import { useContracts } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { CPKService, ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
+import { formatBigNumber, formatNumber } from '../../../../../util/tools'
 import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
@@ -97,6 +98,7 @@ const Wrapper = (props: Props) => {
     outcomeTokenMarginalPrices,
     payouts,
     question,
+    realitioAnswer,
     scalarHigh,
     scalarLow,
   } = marketMakerData
@@ -255,6 +257,12 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
+  const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), 18))
+  const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), 18))
+  const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), 18))
+
+  const currentPrediction = ((realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)).toString()
+
   return (
     <>
       <TopCard>
@@ -272,9 +280,9 @@ const Wrapper = (props: Props) => {
             {isScalar ? (
               <MarketScale
                 border={true}
-                currentPrediction={outcomeTokenMarginalPrices[1]}
+                currentPrediction={currentPrediction}
                 lowerBound={scalarLow || new BigNumber(0)}
-                startingPointTitle={'Current prediction'}
+                startingPointTitle={'Final answer'}
                 unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
                 upperBound={scalarHigh || new BigNumber(0)}
               />

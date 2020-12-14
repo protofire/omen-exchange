@@ -1,5 +1,5 @@
 import Big from 'big.js'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
 import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
@@ -178,6 +178,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       payouts,
       oracle: graphMarketMakerData.oracle,
       question: graphMarketMakerData.question,
+      realitioAnswer: realitioAnswer ? bigNumberify(realitioAnswer) : null,
       totalEarnings,
       totalPoolShares,
       userEarnings,
