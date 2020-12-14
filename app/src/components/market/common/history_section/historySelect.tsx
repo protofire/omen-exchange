@@ -93,9 +93,10 @@ const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
     margin-left: 0;
   }
 `
-const ButtonSelect = styled(Button)`
+const ButtonSelect = styled(Button)<{ active: boolean }>`
   margin-right: 10px;
   padding: 20px 15px;
+  ${props => (props.active ? `border-color:${props.theme.colors.borderColorDark}` : '')};
 `
 
 const timestampToDate = (timestamp: number, value: string) => {
@@ -292,6 +293,7 @@ export const HistorySelect: React.FC<Props> = ({
   if (!data || status === 'Loading' || sharesDataLoader) {
     return <CustomInlineLoading message="Loading Trade History" />
   }
+
   if (holdingSeries && holdingSeries.length <= 1) {
     return <NoData>There is not enough historical data for this market</NoData>
   }
@@ -300,8 +302,12 @@ export const HistorySelect: React.FC<Props> = ({
     <ChartWrapper>
       <TitleWrapper>
         <SelectWrapper>
-          <ButtonSelect onClick={() => setToogleSelect(true)}>Activities</ButtonSelect>
-          <ButtonSelect onClick={() => setToogleSelect(false)}>Graph</ButtonSelect>
+          <ButtonSelect active={toogleSelect} onClick={() => setToogleSelect(true)}>
+            Activities
+          </ButtonSelect>
+          <ButtonSelect active={!toogleSelect} onClick={() => setToogleSelect(false)}>
+            Graph
+          </ButtonSelect>
         </SelectWrapper>
 
         {toogleSelect ? (
