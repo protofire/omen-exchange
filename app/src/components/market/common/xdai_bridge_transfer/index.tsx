@@ -5,10 +5,10 @@ import styled from 'styled-components'
 import { useCpk, useCpkAllowance } from '../../../../hooks'
 import { RemoteData } from '../../../../util/remote_data'
 import { ButtonRound } from '../../../button/button_round'
+import { ButtonStateful } from '../../../button/button_stateful'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { SetAllowance } from '../set_allowance'
-import { ToggleTokenLock } from '../toggle_token_lock'
+import { XDaiStake } from '../../../common/icons/currencies/XDaiStake'
 
 interface Props {
   open: boolean
@@ -16,16 +16,20 @@ interface Props {
 }
 
 const BridgeWrapper = styled(ButtonRound)<{ isOpen: boolean }>`
-  ${props => (!props.isOpen ? 'display:none' : '')};
+  ${props => (!props.isOpen ? 'display:none' : 'display: flow-root')};
   position: absolute;
   top: calc(100% + 8px);
   width: 207.27px;
   right: 207.27px;
-  z-index: 4321;
+  z-index: 0;
   height: fit-content;
   box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
   padding: 17px 20px;
-  display: flow-root;
+  @media only screen and (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    top: calc(100% + 54px);
+    width: calc(100% - 20px);
+    right: 10px;
+  }
 `
 
 const ChainText = styled.div`
@@ -46,14 +50,9 @@ const XDaiWrapper = styled.div`
   width: 100%;
   display: flex;
 `
-const BalanceWrapper = styled.div`
+const BalanceWrapper = styled.div<{ isOpen: boolean }>`
   flex-wrap: wrap;
-`
-const AllowanceButton = styled(ButtonRound)`
-  width: 100%;
-  margin-top: 20px;
-  color: ${props => props.theme.colors.textColorDark};
-  //background-color: ;
+  ${props => (!props.isOpen ? 'display:none' : 'display: flow-root')};
 `
 
 const TextFieldCustomPlace = styled(TextfieldCustomPlaceholder)`
@@ -62,10 +61,29 @@ const TextFieldCustomPlace = styled(TextfieldCustomPlaceholder)`
     margin-right: 0px;
   }
 `
-const ToogleTokenLocker = styled(ToggleTokenLock)`
-  button {
-    width: 100% !important;
-  }
+const SetAllowanceButton = styled(ButtonStateful)`
+  margin-top: 20px;
+  width: 100% !important;
+  font-weight: 500;
+`
+const TransferButton = styled(ButtonRound)`
+  margin-top: 12px;
+  width: 100%;
+`
+const PoweredByStakeWrapper = styled.div`
+  display: flex;
+
+  margin-top: 16px;
+  margin-left: 6px;
+`
+const StakeText = styled.div`
+  margin-left: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #7986cb;
+`
+const TransferState = styled.div<{ show: boolean }>`
+  ${props => (!props.show ? 'display:none' : 'display: flow-root')};
 `
 
 export const XdaiBridgeTransfer: React.FC<Props> = props => {
@@ -75,6 +93,7 @@ export const XdaiBridgeTransfer: React.FC<Props> = props => {
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const [amount, setAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const [transferState, setTransferState] = useState<boolean>(false)
   const unlockCollateral = async () => {
     if (!cpk) {
       return
@@ -84,37 +103,59 @@ export const XdaiBridgeTransfer: React.FC<Props> = props => {
 
     setAllowanceFinished(true)
   }
+
   return (
-    <BridgeWrapper isOpen={props.open}>
-      <BalanceWrapper>
-        <MainnetWrapper>
-          <ChainText>Mainnet</ChainText>
-          <BalanceText>1225 DAI</BalanceText>
-        </MainnetWrapper>
-        <XDaiWrapper>
-          <ChainText>xDai Chain</ChainText>
-          <BalanceText>0 XDAI</BalanceText>
-        </XDaiWrapper>
-      </BalanceWrapper>
-      <TextFieldCustomPlace
-        formField={
-          <BigNumberInput
-            decimals={18}
-            name="amount"
-            onChange={(e: BigNumberInputReturn) => {
-              console.log('e')
-              setAmount(e.value)
-              setAmountToDisplay('')
-            }}
-            style={{ width: 0 }}
-            value={amount}
-            valueToDisplay={amountToDisplay}
+    <>
+      <BridgeWrapper isOpen={props.open}>
+        <BalanceWrapper isOpen={!transferState}>
+          <MainnetWrapper>
+            <ChainText>Mainnet</ChainText>
+            <BalanceText>1225 DAI</BalanceText>
+          </MainnetWrapper>
+          <XDaiWrapper>
+            <ChainText>xDai Chain</ChainText>
+            <BalanceText>0 XDAI</BalanceText>
+          </XDaiWrapper>
+
+          <TextFieldCustomPlace
+            formField={
+              <BigNumberInput
+                decimals={18}
+                name="amount"
+                onChange={(e: BigNumberInputReturn) => {
+                  console.log('e')
+                  setAmount(e.value)
+                  setAmountToDisplay('')
+                }}
+                style={{ width: 0 }}
+                value={amount}
+                valueToDisplay={amountToDisplay}
+              />
+            }
+            symbol={'DAI'}
           />
-        }
-        symbol={'DAI'}
-      />
-      {/*<AllowanceButton>Set Allowance</AllowanceButton>*/}
-      <ToogleTokenLocker finished={true} loading={false} />
-    </BridgeWrapper>
+          <SetAllowanceButton
+            onClick={() => {
+              console.log('jere')
+            }}
+            state={0}
+          >
+            Set Allowance
+          </SetAllowanceButton>
+          <TransferButton
+            onClick={() => {
+              console.log('here')
+            }}
+          >
+            Transfer
+          </TransferButton>
+          <PoweredByStakeWrapper>
+            <XDaiStake />
+            <StakeText>Powered by STAKE Bridge</StakeText>
+          </PoweredByStakeWrapper>
+        </BalanceWrapper>
+        <TransferState show={transferState}>Milan</TransferState>
+      </BridgeWrapper>
+    </>
   )
 }

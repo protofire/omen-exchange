@@ -83,9 +83,10 @@ const ButtonRoundBridge = styled(ButtonRound)`
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-basis: calc(100vw - 20px);
     order: 3;
-    margin-right: 12px;
+    margin-top: 12px;
+    //margin-right: 12px;
     position: relative;
-    left: -95px;
+    left: -84px;
   }
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 12px;
@@ -210,6 +211,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
             <>
               <ButtonRoundBridge
                 onClick={() => {
+                  console.log(isBridgeOpen)
                   setIsBridgeOpen(!isBridgeOpen)
                 }}
               >
