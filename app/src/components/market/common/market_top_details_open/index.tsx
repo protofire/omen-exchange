@@ -8,7 +8,7 @@ import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFr
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import theme from '../../../../theme'
 import { getContractAddress } from '../../../../util/networks'
-import { MarketMakerData, Token } from '../../../../util/types'
+import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { MoreMenu } from '../../../common/form/more_menu'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -78,15 +78,15 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
   const marketState =
     question.resolution.getTime() > currentTimestamp
-      ? 'open'
+      ? MarketState.open
       : question.resolution.getTime() < currentTimestamp &&
         (answerFinalizedTimestamp === null || answerFinalizedTimestamp.toNumber() * 1000 > currentTimestamp)
-      ? 'finalizing'
+      ? MarketState.finalizing
       : isPendingArbitration
-      ? 'arbitration'
+      ? MarketState.arbitration
       : answerFinalizedTimestamp && answerFinalizedTimestamp.toNumber() * 1000 < currentTimestamp
-      ? 'closed'
-      : ''
+      ? MarketState.closed
+      : MarketState.none
 
   const { markets: marketsRelatedQuestion } = useGraphMarketsFromQuestion(question.id)
 
@@ -157,8 +157,10 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         ></ProgressBar>
       )}
       <MarketData
+        answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
         collateralVolume={collateralVolume}
         currency={collateral}
+        isFinalize={marketState === MarketState.finalizing}
         lastActiveDay={lastActiveDay}
         liquidity={formattedLiquidity}
         resolutionTimestamp={question.resolution}

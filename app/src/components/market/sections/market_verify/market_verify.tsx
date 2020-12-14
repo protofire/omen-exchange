@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context, useConnectedCPKContext } from '../../../../hooks'
 import { useKlerosCuration } from '../../../../hooks/useKlerosCuration'
-import { MarketMakerData, Status } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { FullLoading, InlineLoading } from '../../../loading'
@@ -32,7 +32,7 @@ const MarketVerification = styled.div`
 interface Props extends RouteComponentProps<any> {
   context: ConnectedWeb3Context
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
 }
 

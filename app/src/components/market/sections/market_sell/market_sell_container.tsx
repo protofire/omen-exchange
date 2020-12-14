@@ -1,12 +1,12 @@
 import React from 'react'
 
-import { MarketMakerData } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
 import { MarketSell } from './market_sell'
 
 interface Props {
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
 }
 

@@ -70,10 +70,21 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
   currency: Token
+  isFinalize?: boolean
+  answerFinalizedTimestamp?: Maybe<BigNumber>
 }
 
 export const MarketData: React.FC<Props> = props => {
-  const { collateralVolume, currency, lastActiveDay, liquidity, resolutionTimestamp, runningDailyVolumeByHour } = props
+  const {
+    answerFinalizedTimestamp,
+    collateralVolume,
+    currency,
+    isFinalize = false,
+    lastActiveDay,
+    liquidity,
+    resolutionTimestamp,
+    runningDailyVolumeByHour,
+  } = props
 
   const context = useConnectedWeb3Context()
   const tokens = useTokens(context)
@@ -130,12 +141,20 @@ export const MarketData: React.FC<Props> = props => {
           onClick={() => setShowUTC(value => !value)}
         />
       </MarketDataItem>
-      <MarketDataItem>
-        <MarketDataItemTop>
-          {resolutionTimestamp > new Date() ? moment(resolutionTimestamp).fromNow(true) : '0 days'}
-        </MarketDataItemTop>
-        <MarketDataItemBottom>Remaining</MarketDataItemBottom>
-      </MarketDataItem>
+      {isFinalize && answerFinalizedTimestamp && (
+        <MarketDataItem>
+          <MarketDataItemTop>
+            {moment().from(moment(answerFinalizedTimestamp.toNumber() * 1000), false)}
+          </MarketDataItemTop>
+          <MarketDataItemBottom>Finalized</MarketDataItemBottom>
+        </MarketDataItem>
+      )}
+      {!isFinalize && resolutionTimestamp > new Date() && (
+        <MarketDataItem>
+          <MarketDataItemTop>{moment(resolutionTimestamp).fromNow(true)}</MarketDataItemTop>
+          <MarketDataItemBottom>Remaining</MarketDataItemBottom>
+        </MarketDataItem>
+      )}
     </MarketDataWrapper>
   )
 }

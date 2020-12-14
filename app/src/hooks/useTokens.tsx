@@ -1,46 +1,71 @@
+import { useQuery } from '@apollo/react-hooks'
+import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
-import { ERC20Service } from '../services/erc20'
-import { getLogger } from '../util/logger'
 import { getOmenTCRListId, getTokensByNetwork } from '../util/networks'
 import { getImageUrl } from '../util/token'
+import { isObjectEqual } from '../util/tools'
 import { Token } from '../util/types'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
-import { useContracts } from './useContracts'
 
-const logger = getLogger('Hooks::useTokens')
-
-export const useTokens = (context: ConnectedWeb3Context) => {
-  const { dxTCR } = useContracts(context)
-  const defaultTokens = getTokensByNetwork(context.networkId)
-  const [tokens, setTokens] = useState<Token[]>(defaultTokens)
-
-  useEffect(() => {
-    const fetchTokens = async () => {
-      try {
-        const omenTCRListId = getOmenTCRListId(context.networkId)
-        const tokensAddresses = await dxTCR.getTokens(omenTCRListId)
-        const tokens = await Promise.all(
-          tokensAddresses.map(async tokenAddress => {
-            const erc20 = new ERC20Service(context.library, null, tokenAddress)
-            const erc20Info = await erc20.getProfileSummary()
-            const token = {
-              ...erc20Info,
-              image: getImageUrl(tokenAddress),
-            }
-
-            return token
-          }),
-        )
-        setTokens(tokens)
-      } catch (e) {
-        logger.error('There was an error getting the tokens from the TCR:', e)
+const query = gql`
+  query GetTokenList($listId: String!) {
+    tokenLists(where: { listId: $listId }) {
+      id
+      listId
+      listName
+      activeTokenCount
+      tokens {
+        id
+        address
+        name
+        symbol
+        decimals
       }
     }
+  }
+`
 
-    fetchTokens()
-  }, [context.library, context.networkId, dxTCR])
+type GraphResponse = {
+  tokenLists: [
+    {
+      tokens: Token[]
+      listId: string
+      listName: string
+      id: string
+    },
+  ]
+}
+
+export const useTokens = (context: ConnectedWeb3Context) => {
+  const defaultTokens = getTokensByNetwork(context.networkId)
+  const [tokens, setTokens] = useState<Token[]>(defaultTokens)
+  const omenTCRListId = getOmenTCRListId(context.networkId)
+
+  const { data, error, loading, refetch } = useQuery<GraphResponse>(query, {
+    notifyOnNetworkStatusChange: true,
+    skip: false,
+    variables: { listId: omenTCRListId.toString() },
+  })
+
+  if (!error && !loading && data?.tokenLists && data.tokenLists.length > 0) {
+    const tokensWithImage: Token[] = data.tokenLists[0].tokens.map(token => ({
+      ...token,
+      image: getImageUrl(token.address),
+    }))
+    if (!isObjectEqual(tokens, tokensWithImage)) {
+      setTokens(tokensWithImage)
+    }
+  }
+
+  useEffect(() => {
+    const reload = async () => {
+      await refetch()
+    }
+    reload()
+    // eslint-disable-next-line
+  }, [context.library, context.networkId])
 
   return tokens
 }
