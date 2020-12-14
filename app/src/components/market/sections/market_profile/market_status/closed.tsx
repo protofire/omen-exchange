@@ -1,5 +1,5 @@
 import Big from 'big.js'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -81,6 +81,25 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
   return earnedCollateral
 }
 
+const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: BigNumber[]): Maybe<BigNumber> => {
+  if (balances[0].isZero() && balances[1].isZero()) return null
+
+  const numberBalances = balances.map(balance => Number(formatBigNumber(balance, 18, 18)))
+  const shortEarnedCollateral = numberBalances[0] * (1 - finalAnswerPercentage)
+  const longEarnedCollateral = numberBalances[1] * finalAnswerPercentage
+  const earnedCollateral = parseUnits((shortEarnedCollateral + longEarnedCollateral).toString(), 18)
+
+  // const bigFinalAnswerPercentage = parseUnits(finalAnswerPercentage.toString(), 18)
+  // console.log(bigFinalAnswerPercentage)
+  // const shortEarnedCollateral = balances[0].mul(parseUnits('1', 18).sub(bigFinalAnswerPercentage))
+  // const longEarnedCollateral = balances[1].mul(bigFinalAnswerPercentage)
+  // const earnedCollateral = shortEarnedCollateral.add(longEarnedCollateral)
+  // console.log(balances[0])
+
+  // return earnedCollateral
+  return earnedCollateral
+}
+
 const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account, library: provider } = context
@@ -153,11 +172,6 @@ const Wrapper = (props: Props) => {
     }
   }, [provider, account, marketMakerAddress, marketMaker])
 
-  const earnedCollateral = computeEarnedCollateral(
-    payouts,
-    balances.map(balance => balance.shares),
-  )
-
   const redeem = async () => {
     setModalTitle('Redeem Payout')
 
@@ -201,24 +215,6 @@ const Wrapper = (props: Props) => {
     disabledColumns.push(OutcomeTableValue.Shares)
   }
 
-  const hasWinningOutcomes = earnedCollateral && earnedCollateral.gt(0)
-  const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
-  const userWinnersOutcomes = payouts
-    ? payouts.filter((payout, index) => balances[index].shares.gt(0) && payout.gt(0)).length
-    : 0
-  const userWinnerShares = payouts
-    ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
-    : new BigNumber(0)
-  const EPS = 0.01
-  const allPayoutsEqual = payouts
-    ? payouts.every(payout =>
-        payout
-          .sub(1 / payouts.length)
-          .abs()
-          .lte(EPS),
-      )
-    : false
-
   const buySellButtons = (
     <SellBuyWrapper>
       <Button
@@ -261,7 +257,35 @@ const Wrapper = (props: Props) => {
   const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), 18))
   const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), 18))
 
-  const currentPrediction = ((realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)).toString()
+  const finalAnswerPercentage = (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
+
+  const earnedCollateral = isScalar
+    ? scalarComputeEarnedCollateral(
+        finalAnswerPercentage,
+        balances.map(balance => balance.shares),
+      )
+    : computeEarnedCollateral(
+        payouts,
+        balances.map(balance => balance.shares),
+      )
+
+  const hasWinningOutcomes = earnedCollateral && earnedCollateral.gt(0)
+  const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
+  const userWinnersOutcomes = payouts
+    ? payouts.filter((payout, index) => balances[index].shares.gt(0) && payout.gt(0)).length
+    : 0
+  const userWinnerShares = payouts
+    ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
+    : new BigNumber(0)
+  const EPS = 0.01
+  const allPayoutsEqual = payouts
+    ? payouts.every(payout =>
+        payout
+          .sub(1 / payouts.length)
+          .abs()
+          .lte(EPS),
+      )
+    : false
 
   return (
     <>
@@ -280,7 +304,7 @@ const Wrapper = (props: Props) => {
             {isScalar ? (
               <MarketScale
                 border={true}
-                currentPrediction={currentPrediction}
+                currentPrediction={finalAnswerPercentage.toString()}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Final answer'}
                 unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
