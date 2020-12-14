@@ -19,7 +19,7 @@ import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
-import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -53,7 +53,7 @@ const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
 }
 
@@ -231,7 +231,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <OutcomeTable
         balances={balances}
         collateral={collateral}
-        disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
+        disabledColumns={[
+          OutcomeTableValue.Payout,
+          OutcomeTableValue.Outcome,
+          OutcomeTableValue.Probability,
+          OutcomeTableValue.Bonded,
+        ]}
         newShares={newShares}
         outcomeHandleChange={(value: number) => switchOutcome(value)}
         outcomeSelected={outcomeIndex}
@@ -331,7 +336,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <StyledButtonContainer borderTop={true}>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
           Cancel
         </Button>
         <Button buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>
