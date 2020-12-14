@@ -118,7 +118,7 @@ const Wrapper = (props: Props) => {
       setStatus(Status.Loading)
       setMessage('Resolving condition...')
       if (isScalar && scalarLow && scalarHigh) {
-        await realitio.encodeResolveCondition(question.id, question.title, scalarLow, scalarHigh)
+        await realitio.resolveCondition(question.id, question.raw, scalarLow, scalarHigh)
       } else {
         await oracle.resolveCondition(question, balances.length)
       }

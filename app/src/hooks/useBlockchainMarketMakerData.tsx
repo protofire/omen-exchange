@@ -144,8 +144,11 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
         : new BigNumber(0)
 
     const arbitrator = getArbitratorFromAddress(networkId, graphMarketMakerData.arbitratorAddress)
+
     const payouts = graphMarketMakerData.payouts
       ? graphMarketMakerData.payouts
+      : isScalar
+      ? null
       : realitioAnswer
       ? OracleService.getPayouts(graphMarketMakerData.question.templateId, realitioAnswer, outcomesLength)
       : null

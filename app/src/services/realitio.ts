@@ -288,6 +288,16 @@ class RealitioService {
     return announceConditionInterface.functions.announceConditionQuestionId.encode(args)
   }
 
+  resolveCondition = async (questionId: string, question: string, scalarLow: BigNumber, scalarHigh: BigNumber) => {
+    try {
+      const transactionObject = await this.scalarContract.resolve(questionId, question, scalarLow, scalarHigh)
+      return this.provider.waitForTransaction(transactionObject.hash)
+    } catch (err) {
+      logger.error(`There was an error resolving the condition with question id '${questionId}'`, err.message)
+      throw err
+    }
+  }
+
   encodeResolveCondition = async (
     questionId: string,
     question: string,
