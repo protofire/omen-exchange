@@ -2,7 +2,7 @@ import React from 'react'
 
 import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
-import { MarketPoolLiquidity } from './market_pool_liquidity'
+import { MarketBond } from './market_bond'
 
 interface Props {
   marketMakerData: MarketMakerData
@@ -10,8 +10,8 @@ interface Props {
   switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
-const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
-  return <MarketPoolLiquidity {...props} />
+const MarketBondContainer: React.FC<Props> = (props: Props) => {
+  return <MarketBond {...props} />
 }
 
-export { MarketPoolLiquidityContainer }
+export { MarketBondContainer }
