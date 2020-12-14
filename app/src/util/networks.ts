@@ -1,12 +1,13 @@
 import {
   DEFAULT_ARBITRATOR,
-  DEFAULT_TOKEN,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
   GRAPH_MAINNET_HTTP,
   GRAPH_MAINNET_WS,
   GRAPH_RINKEBY_HTTP,
   GRAPH_RINKEBY_WS,
+  GRAPH_SOKOL_HTTP,
+  GRAPH_SOKOL_WS,
   INFURA_PROJECT_ID,
   KLEROS_CURATE_GRAPH_MAINNET_HTTP,
   KLEROS_CURATE_GRAPH_MAINNET_WS,
@@ -55,6 +56,7 @@ interface Network {
     omenVerifiedMarkets: string
   }
   cpk?: CPKAddresses
+  defaultToken: string
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -90,6 +92,7 @@ const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8',
       omenVerifiedMarkets: '0xb72103eE8819F2480c25d306eEAb7c3382fBA612',
     },
+    defaultToken: 'dai',
   },
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
@@ -112,12 +115,13 @@ const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x03165DF66d9448E45c2f5137486af3E7e752a352',
       omenVerifiedMarkets: '0x3b29096b7ab49428923d902cEC3dFEaa49993234',
     },
+    defaultToken: 'dai',
   },
   [networkIds.SOKOL]: {
     label: 'Sokol',
     url: 'https://sokol.poa.network',
-    graphHttpUri: GRAPH_RINKEBY_HTTP,
-    graphWsUri: GRAPH_RINKEBY_WS,
+    graphHttpUri: GRAPH_SOKOL_HTTP,
+    graphWsUri: GRAPH_SOKOL_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
     klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
     realitioTimeout: 10,
@@ -127,7 +131,7 @@ const networks: { [K in NetworkId]: Network } = {
       realitio: '0x63975d9e7CF434dCd04bD808d8c79d03EF69100B',
       marketMakerFactory: '0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5',
       conditionalTokens: '0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f',
-      oracle: '0xF6176D7126d7C68a7753F566362C72Ad36AF1e04',
+      oracle: '0xa57EBD93faa73b3491aAe396557D6ceC24fC6984',
       klerosBadge: '0x0000000000000000000000000000000000000000',
       klerosTokenView: '0x0000000000000000000000000000000000000000',
       klerosTCR: '0x0000000000000000000000000000000000000000',
@@ -137,9 +141,10 @@ const networks: { [K in NetworkId]: Network } = {
     cpk: {
       masterCopyAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
       proxyFactoryAddress: '0xaaF0CCef0C0C355Ee764B3d36bcCF257C527269B',
-      multiSendAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
+      multiSendAddress: '0xBe95a1C930B7d4F816518Ad7742062537F928b99',
       fallbackHandlerAddress: '0x1e9C3EBAd833b26E522D2fDa180Af3D2A32459D2',
     },
+    defaultToken: 'wspoa',
   },
 }
 
@@ -180,7 +185,14 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     addresses: {
       [networkIds.MAINNET]: '0x6b175474e89094c44da98b954eedeac495271d0f',
       [networkIds.RINKEBY]: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-      [networkIds.SOKOL]: '0x3B6578D5A24e16010830bf6443bc9223D6B53480',
+    },
+    order: 1,
+  },
+  wspoa: {
+    symbol: 'WSPOA',
+    decimals: 18,
+    addresses: {
+      [networkIds.SOKOL]: '0xc655c6D80ac92d75fBF4F40e95280aEb855B1E87',
     },
     order: 1,
   },
@@ -317,7 +329,9 @@ export const getDefaultToken = (networkId: number) => {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
 
-  return getToken(networkId, DEFAULT_TOKEN)
+  const defaultToken = networks[networkId].defaultToken as KnownToken
+
+  return getToken(networkId, defaultToken)
 }
 
 export const getTokensByNetwork = (networkId: number): Token[] => {
