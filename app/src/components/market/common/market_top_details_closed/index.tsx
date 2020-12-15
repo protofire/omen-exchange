@@ -8,7 +8,7 @@ import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFr
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import theme from '../../../../theme'
 import { getContractAddress } from '../../../../util/networks'
-import { MarketMakerData, Token } from '../../../../util/types'
+import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
 import { CurrencySelector } from '../currency_selector'
@@ -118,10 +118,11 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
           creationTimestamp={creationDate}
           pendingArbitration={isPendingArbitration}
           resolutionTimestamp={question.resolution}
-          state={'closed'}
+          state={MarketState.closed}
         ></ProgressBar>
       )}
       <MarketData
+        answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
         collateralVolume={collateralVolume}
         currency={collateralToken}
         lastActiveDay={lastActiveDay}

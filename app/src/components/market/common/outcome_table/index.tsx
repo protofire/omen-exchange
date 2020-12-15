@@ -3,8 +3,9 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 import styled, { css } from 'styled-components'
 
+import { getOutcomeColor } from '../../../../theme/utils'
 import { formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
-import { BalanceItem, OutcomeTableValue, Token } from '../../../../util/types'
+import { BalanceItem, BondItem, OutcomeTableValue, Token, TokenEthereum } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
 import { BarDiagram } from '../bar_diagram_probabilities'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors, OutcomeItemText, OutcomeItemTextWrapper } from '../common_styled'
@@ -21,9 +22,13 @@ interface Props {
   payouts?: Maybe<Big[]>
   probabilities: number[]
   newShares?: Maybe<BigNumber[]>
+  newBonds?: BondItem[]
   withWinningOutcome?: boolean
   showPriceChange?: boolean
   showSharesChange?: boolean
+  showBondChange?: boolean
+  isBond?: boolean
+  bonds?: BondItem[]
 }
 
 const TableWrapper = styled.div`
@@ -76,8 +81,15 @@ const WinningBadgeStyled = styled(WinningBadge)`
   margin-right: auto;
 `
 
+const BondRadioInput = styled(RadioInput)`
+  margin-right: 16px;
+`
+
 export const OutcomeTable = (props: Props) => {
   const {
+    bonds = [],
+    isBond = false,
+    showBondChange = false,
     balances,
     collateral,
     disabledColumns = [],
@@ -90,7 +102,16 @@ export const OutcomeTable = (props: Props) => {
     withWinningOutcome = false,
     showPriceChange = false,
     showSharesChange = false,
+    newBonds,
   } = props
+
+  let winningBondIndex = -1
+  bonds.forEach((bond, bondIndex) => {
+    if ((winningBondIndex === -1 || bonds[winningBondIndex].bondedEth.lt(bond.bondedEth)) && bond.bondedEth.gt(0)) {
+      winningBondIndex = bondIndex
+    }
+  })
+  const bondRadioVisible = isBond && displayRadioSelection && !withWinningOutcome
 
   const TableHead: OutcomeTableValue[] = [
     OutcomeTableValue.OutcomeProbability,
@@ -99,9 +120,10 @@ export const OutcomeTable = (props: Props) => {
     OutcomeTableValue.CurrentPrice,
     OutcomeTableValue.Shares,
     OutcomeTableValue.Payout,
+    OutcomeTableValue.Bonded,
   ]
 
-  const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right']
+  const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
     return (
@@ -112,6 +134,7 @@ export const OutcomeTable = (props: Props) => {
               <THStyled
                 colSpan={index === 0 && displayRadioSelection ? 2 : 1}
                 key={index}
+                style={isBond && index === 1 ? { width: '53%' } : {}}
                 textAlign={TableCellsAlign[index]}
               >
                 {value} {value === OutcomeTableValue.CurrentPrice && `(${collateral.symbol})`}
@@ -130,6 +153,67 @@ export const OutcomeTable = (props: Props) => {
     [outcomeHandleChange],
   )
 
+  const renderInvalidRow = (outcomeIndex: number) => {
+    const outcomeName = 'Invalid'
+    const showBondBadge = isBond && withWinningOutcome && outcomeIndex === winningBondIndex
+    const formattedBondedEth =
+      bonds && bonds[outcomeIndex] && bonds[outcomeIndex].bondedEth
+        ? formatBigNumber(bonds[outcomeIndex].bondedEth, TokenEthereum.decimals)
+        : ''
+    const formattedNewBondedEth =
+      newBonds && newBonds[outcomeIndex].bondedEth
+        ? formatBigNumber(newBonds[outcomeIndex].bondedEth, TokenEthereum.decimals)
+        : ''
+    return (
+      <TRExtended
+        clickable={displayRadioSelection}
+        key={`${outcomeName}-${outcomeIndex}`}
+        onClick={() => selectRow(outcomeIndex)}
+      >
+        {disabledColumns.includes(OutcomeTableValue.Outcome) ? null : (
+          <TDStyled textAlign={TableCellsAlign[4]}>
+            {showBondBadge ? (
+              <WinningBadge index={outcomeIndex} outcomeName={outcomeName} payouts={null} showPayout={false} />
+            ) : (
+              <OutcomeItemTextWrapper>
+                {bondRadioVisible && (
+                  <BondRadioInput
+                    checked={outcomeSelected === outcomeIndex}
+                    data-testid={`outcome_table_radio_invalid`}
+                    name="outcome"
+                    onChange={(e: any) => selectRow(+e.target.value)}
+                    outcomeIndex={outcomeIndex}
+                    value={outcomeIndex}
+                  />
+                )}
+                {!bondRadioVisible && <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={outcomeIndex} />}
+                <OutcomeItemText>{outcomeName}</OutcomeItemText>
+              </OutcomeItemTextWrapper>
+            )}
+          </TDStyled>
+        )}
+        {disabledColumns.includes(OutcomeTableValue.Shares) ? null : (
+          <TDStyled textAlign={TableCellsAlign[3]}>
+            <TDFlexDiv textAlign={TableCellsAlign[3]}>0.00</TDFlexDiv>
+          </TDStyled>
+        )}
+        {disabledColumns.includes(OutcomeTableValue.Bonded) ? null : (
+          <TDStyled
+            style={showBondBadge ? { color: getOutcomeColor(outcomeIndex).darker } : {}}
+            textAlign={TableCellsAlign[6]}
+          >
+            <TDFlexDiv textAlign={TableCellsAlign[6]}>
+              {formattedBondedEth}{' '}
+              {showBondChange && formattedBondedEth !== formattedNewBondedEth && (
+                <NewValue outcomeIndex={outcomeIndex} value={formattedNewBondedEth} />
+              )}
+            </TDFlexDiv>
+          </TDStyled>
+        )}
+      </TRExtended>
+    )
+  }
+
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
     const { currentPrice, outcomeName, payout, shares } = balanceItem
     const currentPriceFormatted = withWinningOutcome ? payout.toFixed(2) : Number(currentPrice).toFixed(2)
@@ -139,6 +223,15 @@ export const OutcomeTable = (props: Props) => {
     const formattedShares = formatBigNumber(shares, collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] && payouts[outcomeIndex].gt(0)
     const formattedNewShares = newShares ? formatBigNumber(newShares[outcomeIndex], collateral.decimals) : null
+    const showBondBadge = isBond && withWinningOutcome && outcomeIndex === winningBondIndex
+    const formattedBondedEth =
+      bonds && bonds[outcomeIndex] && bonds[outcomeIndex].bondedEth
+        ? formatBigNumber(bonds[outcomeIndex].bondedEth, TokenEthereum.decimals)
+        : ''
+    const formattedNewBondedEth =
+      newBonds && newBonds[outcomeIndex].bondedEth
+        ? formatBigNumber(newBonds[outcomeIndex].bondedEth, TokenEthereum.decimals)
+        : ''
 
     return (
       <TRExtended
@@ -146,18 +239,19 @@ export const OutcomeTable = (props: Props) => {
         key={`${outcomeName}-${outcomeIndex}`}
         onClick={() => selectRow(outcomeIndex)}
       >
-        {!displayRadioSelection || withWinningOutcome ? null : (
-          <TDRadio textAlign={TableCellsAlign[0]}>
-            <RadioInput
-              checked={outcomeSelected === outcomeIndex}
-              data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
-              name="outcome"
-              onChange={(e: any) => selectRow(+e.target.value)}
-              outcomeIndex={outcomeIndex}
-              value={outcomeIndex}
-            />
-          </TDRadio>
-        )}
+        {!isBond &&
+          (!displayRadioSelection || withWinningOutcome ? null : (
+            <TDRadio textAlign={TableCellsAlign[0]}>
+              <RadioInput
+                checked={outcomeSelected === outcomeIndex}
+                data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
+                name="outcome"
+                onChange={(e: any) => selectRow(+e.target.value)}
+                outcomeIndex={outcomeIndex}
+                value={outcomeIndex}
+              />
+            </TDRadio>
+          ))}
         {disabledColumns.includes(OutcomeTableValue.OutcomeProbability) ? null : (
           <TDStyled textAlign={TableCellsAlign[1]}>
             <BarDiagram
@@ -175,10 +269,24 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.Outcome) ? null : (
           <TDStyled textAlign={TableCellsAlign[4]}>
-            <OutcomeItemTextWrapper>
-              {<OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={outcomeIndex} />}
-              <OutcomeItemText>{outcomeName}</OutcomeItemText>
-            </OutcomeItemTextWrapper>
+            {showBondBadge ? (
+              <WinningBadge index={outcomeIndex} outcomeName={outcomeName} payouts={null} showPayout={false} />
+            ) : (
+              <OutcomeItemTextWrapper>
+                {bondRadioVisible && (
+                  <BondRadioInput
+                    checked={outcomeSelected === outcomeIndex}
+                    data-testid={`outcome_table_radio_${balanceItem.outcomeName}`}
+                    name="outcome"
+                    onChange={(e: any) => selectRow(+e.target.value)}
+                    outcomeIndex={outcomeIndex}
+                    value={outcomeIndex}
+                  />
+                )}
+                {!bondRadioVisible && <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={outcomeIndex} />}
+                <OutcomeItemText>{outcomeName}</OutcomeItemText>
+              </OutcomeItemTextWrapper>
+            )}
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Probability) ? null : (
@@ -206,6 +314,19 @@ export const OutcomeTable = (props: Props) => {
             {withWinningOutcome && payouts ? formatNumber(formattedPayout) : '0.00'}
           </TDStyled>
         )}
+        {disabledColumns.includes(OutcomeTableValue.Bonded) ? null : (
+          <TDStyled
+            style={showBondBadge ? { color: getOutcomeColor(outcomeIndex).darker } : {}}
+            textAlign={TableCellsAlign[6]}
+          >
+            <TDFlexDiv textAlign={TableCellsAlign[6]}>
+              {formattedBondedEth}{' '}
+              {showBondChange && formattedBondedEth !== formattedNewBondedEth && (
+                <NewValue outcomeIndex={outcomeIndex} value={formattedNewBondedEth} />
+              )}
+            </TDFlexDiv>
+          </TDStyled>
+        )}
       </TRExtended>
     )
   }
@@ -214,7 +335,10 @@ export const OutcomeTable = (props: Props) => {
 
   return (
     <TableWrapper>
-      <Table head={renderTableHeader()}>{renderTable()}</Table>
+      <Table head={renderTableHeader()}>
+        {renderTable()}
+        {isBond && renderInvalidRow(balances.length)}
+      </Table>
     </TableWrapper>
   )
 }

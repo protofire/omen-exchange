@@ -18,6 +18,7 @@ const realitioAbi = [
   'event LogNewQuestion(bytes32 indexed question_id, address indexed user, uint256 template_id, string question, bytes32 indexed content_hash, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce, uint256 created)',
   'function isFinalized(bytes32 question_id) view public returns (bool)',
   'function resultFor(bytes32 question_id) external view returns (bytes32)',
+  'function submitAnswer(bytes32 question_id, bytes32 answer, uint256 max_previous)',
 ]
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
@@ -112,7 +113,7 @@ class RealitioService {
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
     const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
 
-    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+    const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
     const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
 
@@ -186,6 +187,7 @@ class RealitioService {
       isPendingArbitration: question.isPendingArbitration,
       arbitrationOccurred: question.arbitrationOccurred,
       currentAnswerTimestamp: question.currentAnswerTimestamp,
+      currentAnswerBond: question.currentAnswerBond,
     }
   }
 
@@ -215,6 +217,16 @@ class RealitioService {
     }
   }
 
+  submitAnswer = async (questionId: string, answer: string, amount: BigNumber): Promise<void> => {
+    try {
+      const result = await this.contract.submitAnswer(questionId, answer, 0, { value: amount })
+      return this.provider.waitForTransaction(result.hash)
+    } catch (error) {
+      logger.error(`There was an error submitting answer '${questionId}'`, error.message)
+      throw error
+    }
+  }
+
   static encodeAskQuestion = (
     question: string,
     outcomes: Outcome[],
@@ -226,6 +238,7 @@ class RealitioService {
     const args = getQuestionArgs(question, outcomes, category, arbitratorAddress, openingDateMoment, networkId)
 
     const askQuestionInterface = new utils.Interface(realitioAbi)
+    const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
     return askQuestionInterface.functions.askQuestion.encode(args)
   }
@@ -259,6 +272,7 @@ class RealitioService {
     const questionId = await this.constantContract.askQuestion(...args, {
       from: signerAddress,
     })
+    const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
     return questionId
   }

@@ -50,6 +50,16 @@ export interface BalanceItem {
   holdings: BigNumber
 }
 
+export interface BondItem {
+  outcomeName: string
+  bondedEth: BigNumber
+}
+
+export interface AnswerItem {
+  answer: string
+  bondAggregate: BigNumber
+}
+
 export interface KlerosSubmission {
   id: string
   status: KlerosItemStatus
@@ -91,6 +101,12 @@ export interface Question {
   isPendingArbitration: boolean
   arbitrationOccurred: boolean
   currentAnswerTimestamp: Maybe<BigNumber>
+  currentAnswerBond: Maybe<BigNumber>
+  answers?: {
+    answer: string
+    bondAggregate: BigNumber
+  }[]
+  bonds?: BondItem[]
 }
 
 export enum OutcomeTableValue {
@@ -100,6 +116,7 @@ export enum OutcomeTableValue {
   Payout = 'Payout',
   Outcome = 'Outcome',
   Probability = 'Probability',
+  Bonded = 'Bonded (ETH)',
 }
 
 export interface Token {
@@ -108,6 +125,11 @@ export interface Token {
   symbol: string
   image?: string
   volume?: string
+}
+
+export const TokenEthereum = {
+  decimals: 18,
+  symbol: 'ETH',
 }
 
 export interface QuestionLog {
@@ -379,3 +401,24 @@ export type MarketCondition = {
   scalarHigh: Maybe<BigNumber>
   scalarLow: Maybe<BigNumber>
 }
+
+export enum MarketDetailsTab {
+  swap = 'SWAP',
+  pool = 'POOL',
+  history = 'HISTORY',
+  verify = 'VERIFY',
+  buy = 'BUY',
+  sell = 'SELL',
+  finalize = 'FINALIZE',
+  setOutcome = 'SET_OUTCOME',
+}
+
+export enum MarketState {
+  open = 'open',
+  finalizing = 'finalizing',
+  arbitration = 'arbitration',
+  closed = 'closed',
+  none = '',
+}
+
+export const INVALID_ANSWER_ID = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'

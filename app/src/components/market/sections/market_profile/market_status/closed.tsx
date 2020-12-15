@@ -4,12 +4,12 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useContracts } from '../../../../../hooks'
+import { useConnectedCPKContext, useContracts } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
-import { CPKService, ERC20Service } from '../../../../../services'
+import { ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
 import { formatBigNumber, formatNumber } from '../../../../../util/tools'
-import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
@@ -94,6 +94,8 @@ const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: 
 
 const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const cpk = useConnectedCPKContext()
+
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
 
@@ -105,7 +107,6 @@ const Wrapper = (props: Props) => {
     balances,
     collateral: collateralToken,
     isConditionResolved,
-    isQuestionFinalized,
     outcomeTokenMarginalPrices,
     payouts,
     question,
@@ -172,10 +173,12 @@ const Wrapper = (props: Props) => {
         return
       }
 
+      if (!cpk) {
+        return
+      }
+
       setStatus(Status.Loading)
       setMessage('Redeeming payout...')
-
-      const cpk = await CPKService.create(provider)
 
       await cpk.redeemPositions({
         isConditionResolved,
@@ -201,7 +204,7 @@ const Wrapper = (props: Props) => {
 
   const probabilities = balances.map(balance => balance.probability)
 
-  const disabledColumns = [OutcomeTableValue.Outcome, OutcomeTableValue.Probability]
+  const disabledColumns = [OutcomeTableValue.Outcome, OutcomeTableValue.Probability, OutcomeTableValue.Bonded]
 
   if (!account) {
     disabledColumns.push(OutcomeTableValue.Shares)
@@ -213,7 +216,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
-          setCurrentTab('SELL')
+          setCurrentTab(MarketDetailsTab.sell)
         }}
       >
         Sell
@@ -222,7 +225,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
-          setCurrentTab('BUY')
+          setCurrentTab(MarketDetailsTab.buy)
         }}
       >
         Buy
@@ -230,18 +233,9 @@ const Wrapper = (props: Props) => {
     </SellBuyWrapper>
   )
 
-  const [currentTab, setCurrentTab] = useState('SWAP')
+  const [currentTab, setCurrentTab] = useState(MarketDetailsTab.swap)
 
-  const marketTabs = {
-    swap: 'SWAP',
-    pool: 'POOL',
-    history: 'HISTORY',
-    verify: 'VERIFY',
-    buy: 'BUY',
-    sell: 'SELL',
-  }
-
-  const switchMarketTab = (newTab: string) => {
+  const switchMarketTab = (newTab: MarketDetailsTab) => {
     setCurrentTab(newTab)
   }
 
@@ -291,7 +285,7 @@ const Wrapper = (props: Props) => {
           marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
-        {currentTab === marketTabs.swap && (
+        {currentTab === MarketDetailsTab.swap && (
           <>
             {isScalar ? (
               <MarketScale
@@ -338,7 +332,7 @@ const Wrapper = (props: Props) => {
                   {buySellButtons}
                 </StyledButtonContainer>
               ) : (
-                <ButtonContainerFullWidth borderTop={true}>
+                <ButtonContainerFullWidth>
                   {!isConditionResolved && (
                     <>
                       <Button
@@ -366,7 +360,7 @@ const Wrapper = (props: Props) => {
             </WhenConnected>
           </>
         )}
-        {currentTab === marketTabs.pool && (
+        {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             isScalar={isScalar}
@@ -374,8 +368,8 @@ const Wrapper = (props: Props) => {
             switchMarketTab={switchMarketTab}
           />
         )}
-        {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
-        {currentTab === marketTabs.buy && (
+        {currentTab === MarketDetailsTab.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
+        {currentTab === MarketDetailsTab.buy && (
           <MarketBuyContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             isScalar={isScalar}
@@ -383,7 +377,7 @@ const Wrapper = (props: Props) => {
             switchMarketTab={switchMarketTab}
           />
         )}
-        {currentTab === marketTabs.sell && (
+        {currentTab === MarketDetailsTab.sell && (
           <MarketSellContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             isScalar={isScalar}
