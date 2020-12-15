@@ -49,13 +49,13 @@ export const useGraphMarketsFromQuestion = (questionId: string): Result => {
 
   useEffect(() => {
     if (!questionId) setMarkets([])
-  }, [questionId])
-
-  if (data && data.question && !isObjectEqual(markets, data.question.indexedFixedProductMarketMakers)) {
-    setMarkets(data.question.indexedFixedProductMarketMakers)
-  } else if (data && data.question && !data.question.indexedFixedProductMarketMakers.length) {
-    setMarkets([])
-  }
+    if (data && data.question && !isObjectEqual(markets, data.question.indexedFixedProductMarketMakers)) {
+      setMarkets(data.question.indexedFixedProductMarketMakers)
+    } else if (data && data.question && !data.question.indexedFixedProductMarketMakers.length) {
+      setMarkets([])
+    }
+    // eslint-disable-next-line
+  }, [questionId, data])
 
   return {
     markets,

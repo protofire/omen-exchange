@@ -191,6 +191,8 @@ export const ImportMarketContent = (props: Props) => {
   useEffect(() => {
     if (question && marketIdStatus === Status.Error) {
       setLoading(false)
+    } else if (question && marketIdStatus === Status.Ready && !marketMakerData) {
+      setLoading(false)
     } else if (question && marketMakerData && marketMakerData.question.id === question.id) {
       setLoading(false)
       if (arbitrator) {
