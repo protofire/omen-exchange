@@ -371,9 +371,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         // Calculate loss amount given how close it is to upper bound, i.e. how close it is to max loss
         const loss = positionValue * (amountNumber || 0) - (feeNumber || 0)
         // Calculate total payout by adding loss to amount
-        setYourPayout((amountNumber || 0) + loss)
+        setYourPayout((amountNumber || 0) + loss < 0 ? 0 : (amountNumber || 0) + loss)
         // Return loss amount
-        setProfitLoss(loss)
+        setProfitLoss(loss < -(amountNumber || 0) ? -(amountNumber || 0) : loss)
       }
     }
   }, [scaleValuePrediction, amountNumber, long, lowerBoundNumber, newPredictionNumber, upperBoundNumber, feeNumber])
