@@ -4,8 +4,8 @@ import React, { useCallback } from 'react'
 import styled, { css } from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks'
-import { getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { getOutcomeColor } from '../../../../theme/utils'
+import { getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, BondItem, OutcomeTableValue, Token, TokenEthereum } from '../../../../util/types'
 import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
@@ -205,8 +205,7 @@ export const OutcomeTable = (props: Props) => {
         )}
         {disabledColumns.includes(OutcomeTableValue.Bonded) ? null : (
           <TDStyled
-            style={showBondBadge ? { color: 
-                                    (outcomeIndex).darker } : {}}
+            style={showBondBadge ? { color: getOutcomeColor(outcomeIndex).darker } : {}}
             textAlign={TableCellsAlign[6]}
           >
             <TDFlexDiv textAlign={TableCellsAlign[6]}>
