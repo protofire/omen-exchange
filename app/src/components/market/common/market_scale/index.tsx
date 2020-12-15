@@ -244,6 +244,7 @@ const ValueBoxSubtitle = styled.p`
 `
 
 interface Props {
+  amountShares?: Maybe<BigNumber>
   lowerBound: BigNumber
   startingPoint?: Maybe<BigNumber>
   unit: string
@@ -253,7 +254,6 @@ interface Props {
   border?: boolean
   newPrediction?: Maybe<number>
   long?: Maybe<boolean>
-  potentialProfit?: Maybe<BigNumber>
   collateral?: Maybe<Token>
   amount?: Maybe<BigNumber>
   fee?: Maybe<BigNumber>
@@ -262,6 +262,7 @@ interface Props {
 export const MarketScale: React.FC<Props> = (props: Props) => {
   const {
     amount,
+    amountShares,
     border,
     collateral,
     currentPrediction,
@@ -269,7 +270,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     long,
     lowerBound,
     newPrediction,
-    potentialProfit,
     startingPoint,
     startingPointTitle,
     unit,
@@ -285,11 +285,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const currentPredictionNumber = Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
   const newPredictionNumber = Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
 
-  const potentialProfitNumber =
-    collateral && Number(formatBigNumber(potentialProfit || new BigNumber(0), collateral.decimals))
+  const amountSharesNumber = Number(formatBigNumber(amountShares || new BigNumber(0), 18))
 
   const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
-  const feeNumber = fee && collateral && (Number(formatBigNumber(fee, collateral.decimals)) + 1) ** 2 - 1
+  const feeNumber = fee && collateral && Number(formatBigNumber(fee, collateral.decimals))
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
@@ -339,20 +338,20 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         // Determine the percentage distance from the new prediction number to the upper bound
         positionValue = (scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
         // Calculate profit amount given how close it is to the upper bound, i.e. how close it is to max profit
-        const profit = positionValue * (potentialProfitNumber || 0) - (feeNumber || 0)
+        const profit = positionValue * ((amountSharesNumber || 0) - (amountNumber || 0)) - (feeNumber || 0)
         // Calculate total payout by adding profit to amount
-        setYourPayout((amountNumber || 0) + profit)
+        setYourPayout(profit + (amountNumber || 0))
         // Return profit amount
         setProfitLoss(profit)
       } else {
         // Determine the percentage distance from the new prediction number to the lower bound as a negative value
         positionValue = -(scaleValuePrediction - newPredictionNumber) / (lowerBoundNumber - newPredictionNumber)
         // Calculate loss amount given how close it is to lower bound, i.e. how close it is to max loss
-        const loss = positionValue * (potentialLossNumber || 0) - (feeNumber || 0)
+        const loss = positionValue * (amountNumber || 0) - (feeNumber || 0)
         // Calculate total payout by adding loss to amount
-        setYourPayout((amountNumber || 0) + loss)
+        setYourPayout((amountNumber || 0) + loss < 0 ? 0 : (amountNumber || 0) + loss)
         // Return loss amount
-        setProfitLoss(loss)
+        setProfitLoss(loss < -(amountNumber || 0) ? -(amountNumber || 0) : loss)
       }
       // If taking a short position
     } else {
@@ -361,33 +360,23 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         // Determine the percentage distance from the new prediction number to the lower bound
         positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
         // Calculate profit amount given how close it is to the lower bound, i.e. how close it is to max profit
-        const profit = positionValue * (potentialProfitNumber || 0) - (feeNumber || 0)
+        const profit = positionValue * ((amountSharesNumber || 0) - (amountNumber || 0)) - (feeNumber || 0)
         // Calculate total payout by adding profit to amount
-        setYourPayout((amountNumber || 0) + profit)
+        setYourPayout(profit + (amountNumber || 0))
         // Return profit amount
         setProfitLoss(profit)
       } else {
         // Determine the percentage distance from the new prediction number to the upper bound as a negative value
         positionValue = -(scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
         // Calculate loss amount given how close it is to upper bound, i.e. how close it is to max loss
-        const loss = positionValue * (potentialLossNumber || 0) - (feeNumber || 0)
+        const loss = positionValue * (amountNumber || 0) - (feeNumber || 0)
         // Calculate total payout by adding loss to amount
         setYourPayout((amountNumber || 0) + loss)
         // Return loss amount
         setProfitLoss(loss)
       }
     }
-  }, [
-    scaleValuePrediction,
-    amountNumber,
-    long,
-    lowerBoundNumber,
-    newPredictionNumber,
-    potentialLossNumber,
-    potentialProfitNumber,
-    upperBoundNumber,
-    feeNumber,
-  ])
+  }, [scaleValuePrediction, amountNumber, long, lowerBoundNumber, newPredictionNumber, upperBoundNumber, feeNumber])
 
   const activateTooltip = () => {
     const scaleTooltip: HTMLElement | null = document.querySelector('#scale-tooltip')
