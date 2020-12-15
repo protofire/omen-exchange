@@ -162,23 +162,12 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
-  const potentialLossUncapped = reverseTradedShares.isZero()
-    ? new BigNumber(0)
-    : reverseTradedShares.sub(amount.add(feePaid))
-  const potentialLoss = reverseTradedShares.isZero()
-    ? new BigNumber(0)
-    : reverseTradedShares.sub(amount).lt(debouncedAmount)
-    ? reverseTradedShares.sub(amount)
-    : debouncedAmount
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
   const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
   const potentialProfitFormatted = `${formatNumber(
     (Number(formatBigNumber(potentialProfit, collateral.decimals)) - totalFee).toString(),
-  )} ${collateral.symbol}`
-  const potentialLossFormatted = `${formatNumber(
-    (Number(formatBigNumber(potentialLoss, collateral.decimals)) + totalFee).toString(),
   )} ${collateral.symbol}`
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
@@ -310,7 +299,12 @@ export const ScalarMarketBuy = (props: Props) => {
               value={feeFormatted}
             />
             <TransactionDetailsLine />
-            <TransactionDetailsRow title={'Max. Loss'} value={potentialLossFormatted} />
+            <TransactionDetailsRow
+              title={'Max. Loss'}
+              value={`${!amount.isZero() ? '-' : ''}${formatNumber(formatBigNumber(amount, collateral.decimals))} ${
+                collateral.symbol
+              }`}
+            />
             <TransactionDetailsRow
               emphasizeValue={potentialProfit.gt(0)}
               state={ValueStates.success}
