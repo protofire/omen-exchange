@@ -372,7 +372,7 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     addresses: {
       [networkIds.MAINNET]: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       [networkIds.RINKEBY]: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
-      [networkIds.SOKOL]: '0xFE083F7B16B26582D74Deb57Cf63d755b597eA05',
+      [networkIds.SOKOL]: '0xa0Baf56D83be19Eb6bA8aFAD2Db812Bc13D8Be1d',
     },
     isSelectionEnabled: true,
   },
