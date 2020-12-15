@@ -253,7 +253,6 @@ interface Props {
   border?: boolean
   newPrediction?: Maybe<number>
   long?: Maybe<boolean>
-  potentialLoss?: Maybe<BigNumber>
   potentialProfit?: Maybe<BigNumber>
   collateral?: Maybe<Token>
   amount?: Maybe<BigNumber>
@@ -270,7 +269,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     long,
     lowerBound,
     newPrediction,
-    potentialLoss,
     potentialProfit,
     startingPoint,
     startingPointTitle,
@@ -289,8 +287,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const potentialProfitNumber =
     collateral && Number(formatBigNumber(potentialProfit || new BigNumber(0), collateral.decimals))
-  const potentialLossNumber =
-    collateral && Number(formatBigNumber(potentialLoss || new BigNumber(0), collateral.decimals))
 
   const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
   const feeNumber = fee && collateral && (Number(formatBigNumber(fee, collateral.decimals)) + 1) ** 2 - 1
