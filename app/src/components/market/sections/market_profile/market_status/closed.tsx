@@ -89,14 +89,6 @@ const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: 
   const longEarnedCollateral = numberBalances[1] * finalAnswerPercentage
   const earnedCollateral = parseUnits((shortEarnedCollateral + longEarnedCollateral).toString(), 18)
 
-  // const bigFinalAnswerPercentage = parseUnits(finalAnswerPercentage.toString(), 18)
-  // console.log(bigFinalAnswerPercentage)
-  // const shortEarnedCollateral = balances[0].mul(parseUnits('1', 18).sub(bigFinalAnswerPercentage))
-  // const longEarnedCollateral = balances[1].mul(bigFinalAnswerPercentage)
-  // const earnedCollateral = shortEarnedCollateral.add(longEarnedCollateral)
-  // console.log(balances[0])
-
-  // return earnedCollateral
   return earnedCollateral
 }
 
