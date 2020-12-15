@@ -285,7 +285,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const currentPredictionNumber = Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
   const newPredictionNumber = Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
 
-  const amountSharesNumber = Number(formatBigNumber(amountShares || new BigNumber(0), 18))
+  const amountSharesNumber =
+    collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
 
   const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
   const feeNumber = fee && collateral && Number(formatBigNumber(fee, collateral.decimals))
@@ -339,6 +340,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         positionValue = (scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
         // Calculate profit amount given how close it is to the upper bound, i.e. how close it is to max profit
         const profit = positionValue * ((amountSharesNumber || 0) - (amountNumber || 0)) - (feeNumber || 0)
+        console.log(amountSharesNumber)
         // Calculate total payout by adding profit to amount
         setYourPayout(profit + (amountNumber || 0))
         // Return profit amount
