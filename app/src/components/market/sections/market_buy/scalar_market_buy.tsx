@@ -158,7 +158,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
-  const totalFee = (Number(formatBigNumber(fee, collateral.decimals)) + 1) ** 2 - 1
+  const totalFee = Number(formatBigNumber(fee, collateral.decimals))
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
@@ -166,9 +166,11 @@ export const ScalarMarketBuy = (props: Props) => {
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
   const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
-  const potentialProfitFormatted = `${formatNumber(
-    (Number(formatBigNumber(potentialProfit, collateral.decimals)) - totalFee).toString(),
-  )} ${collateral.symbol}`
+  const potentialProfitFormatted = potentialProfit.gt(Zero)
+    ? `${formatNumber((Number(formatBigNumber(potentialProfit, collateral.decimals)) - totalFee).toString())} ${
+        collateral.symbol
+      }`
+    : `0.00 ${collateral.symbol}`
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
 
