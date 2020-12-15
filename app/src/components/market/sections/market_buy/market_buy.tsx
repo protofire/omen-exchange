@@ -18,7 +18,7 @@ import {
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
@@ -36,7 +36,6 @@ import { SetAllowance } from '../../common/set_allowance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
-import { UpgradeProxy } from '../../common/upgrade_proxy'
 import { WarningMessage } from '../../common/warning_message'
 
 const WarningMessageStyled = styled(WarningMessage)`
@@ -364,12 +363,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       {showUpgrade && (
-        <UpgradeProxy
-          context={context}
+        <SetAllowance
+          collateral={getNativeAsset(context.networkId)}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
-          style={{ marginBottom: 20 }}
-          upgradeProxy={upgradeProxy}
+          onUnlock={upgradeProxy}
         />
       )}
       <StyledButtonContainer>

@@ -21,7 +21,7 @@ import {
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
-import { pseudoNativeAssetAddress } from '../../../../../../util/networks'
+import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
@@ -55,7 +55,6 @@ import { TradingFeeSelector } from '../../../../common/trading_fee_selector'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../../../common/transaction_details_row'
-import { UpgradeProxy } from '../../../../common/upgrade_proxy'
 import { VerifiedRow } from '../../../../common/verified_row'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome } from '../outcomes'
@@ -488,12 +487,11 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           />
         )}
         {showUpgrade && (
-          <UpgradeProxy
-            context={context}
+          <SetAllowance
+            collateral={getNativeAsset(context.networkId)}
             finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
             loading={RemoteData.is.asking(proxyIsUpToDate)}
-            style={{ marginBottom: 20 }}
-            upgradeProxy={upgradeProxy}
+            onUnlock={upgradeProxy}
           />
         )}
         <WarningMessage

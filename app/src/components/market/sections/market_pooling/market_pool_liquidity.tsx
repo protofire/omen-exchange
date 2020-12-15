@@ -16,7 +16,7 @@ import {
 } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   calcAddFundingSendAmounts,
@@ -41,7 +41,6 @@ import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
-import { UpgradeProxy } from '../../common/upgrade_proxy'
 import { WarningMessage } from '../../common/warning_message'
 
 interface Props extends RouteComponentProps<any> {
@@ -574,12 +573,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       {activeTab === Tabs.deposit && showUpgrade && (
-        <UpgradeProxy
-          context={context}
+        <SetAllowance
+          collateral={getNativeAsset(context.networkId)}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
-          style={{ marginBottom: 20 }}
-          upgradeProxy={upgradeProxy}
+          onUnlock={upgradeProxy}
         />
       )}
       <WarningMessageStyled
