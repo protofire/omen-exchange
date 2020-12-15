@@ -158,7 +158,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
-  const totalFee = Number(formatBigNumber(fee, collateral.decimals))
+  const totalFee = Number(formatBigNumber(fee, 18))
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
