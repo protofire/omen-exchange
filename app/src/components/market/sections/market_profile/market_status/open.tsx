@@ -7,7 +7,13 @@ import { useConnectedCPKContext } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useGraphMarketTradeData } from '../../../../../hooks/useGraphMarketTradeData'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
-import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
+import {
+  BalanceItem,
+  MarketDetailsTab,
+  MarketMakerData,
+  OutcomeTableValue,
+  TradeObject,
+} from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketScale } from '../../../common/market_scale'
@@ -134,7 +140,7 @@ const Wrapper = (props: Props) => {
   }, [])
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
-    return !shares.isZero()
+    return shares && !shares.isZero()
   })
 
   const probabilities = balances.map(balance => balance.probability)
@@ -263,6 +269,24 @@ const Wrapper = (props: Props) => {
     collateral.address,
     cpk?.address.toLowerCase(),
   )
+
+  const [shortTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '0'))
+  const [longTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '1'))
+  const [averageShortPrice, setAverageShortPrice] = useState<number>(0)
+  const [averageLongPrice, setAverageLongPrice] = useState<number>(0)
+
+  useEffect(() => {
+    if (shortTrades.length) {
+      const tradePrices = shortTrades.map(trade => trade.outcomeTokenMarginalPrice)
+      const tradesTotalPrice = tradePrices.reduce((a, b) => a + b)
+      setAverageShortPrice(tradesTotalPrice / shortTrades.length)
+    }
+    if (longTrades.length) {
+      const tradePrices = longTrades.map(trade => trade.outcomeTokenMarginalPrice)
+      const tradesTotalPrice = tradePrices.reduce((a, b) => a + b)
+      setAverageLongPrice(tradesTotalPrice / longTrades.length)
+    }
+  }, [shortTrades, longTrades])
 
   useEffect(() => {
     if ((isQuestionFinalized || !isFinalizing) && currentTab === MarketDetailsTab.finalize) {
