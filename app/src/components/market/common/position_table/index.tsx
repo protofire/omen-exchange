@@ -128,9 +128,9 @@ export const PositionTable = (props: Props) => {
 
   const TableCellsAlign = ['left', 'right', 'right', 'right']
 
-  // if (shortPayoutAmount?.lte(dust) && longPayoutAmount?.lte(dust)) {
-  //   return <></>
-  // }
+  if (shortShares.lte(DUST) && longShares.lte(DUST)) {
+    return <></>
+  }
 
   const renderTableHeader = () => {
     return (
