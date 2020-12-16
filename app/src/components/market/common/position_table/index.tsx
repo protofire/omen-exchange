@@ -45,6 +45,8 @@ interface Props {
   shortPayout: number
   shortProfitLoss: number
   longProfitLoss: number
+  shortProfitLossPercentage: number
+  longProfitLossPercentage: number
 }
 
 export const PositionTable = (props: Props) => {
@@ -55,8 +57,10 @@ export const PositionTable = (props: Props) => {
     fee,
     longPayout,
     longProfitLoss,
+    longProfitLossPercentage,
     shortPayout,
     shortProfitLoss,
+    shortProfitLossPercentage,
     trades,
   } = props
 
@@ -78,42 +82,36 @@ export const PositionTable = (props: Props) => {
   const [longProfitAmount, setLongProfitAmount] = useState<number>(0)
   const [virtualHoldings, setVirtualHoldings] = useState<BigNumber[]>(holdings)
 
-  useEffect(() => {
-    let totalShortCollateralAmount
-    let totalLongCollateralAmount
+  // useEffect(() => {
+  //   let totalShortCollateralAmount
+  //   let totalLongCollateralAmount
 
-    if (shortTrades.length) {
-      const shortCollateralAmounts = shortTrades.map(trade => trade.collateralAmount)
-      totalShortCollateralAmount = shortCollateralAmounts.reduce((a, b) => a.add(b))
-    }
+  //   if (shortTrades.length) {
+  //     const shortCollateralAmounts = shortTrades.map(trade => trade.collateralAmount)
+  //     totalShortCollateralAmount = shortCollateralAmounts.reduce((a, b) => a.add(b))
+  //   }
 
-    if (longTrades.length) {
-      const longCollateralAmounts = longTrades.map(trade => trade.collateralAmount)
-      totalLongCollateralAmount = longCollateralAmounts.reduce((a, b) => a.add(b))
-    }
+  //   if (longTrades.length) {
+  //     const longCollateralAmounts = longTrades.map(trade => trade.collateralAmount)
+  //     totalLongCollateralAmount = longCollateralAmounts.reduce((a, b) => a.add(b))
+  //   }
 
-    totalShortCollateralAmount && setTotalShortCollateralAmount(totalShortCollateralAmount)
-    totalLongCollateralAmount && setTotalLongCollateralAmount(totalLongCollateralAmount)
-  }, [longTrades, shortTrades])
+  //   totalShortCollateralAmount && setTotalShortCollateralAmount(totalShortCollateralAmount)
+  //   totalLongCollateralAmount && setTotalLongCollateralAmount(totalLongCollateralAmount)
+  // }, [longTrades, shortTrades])
 
   // useEffect(() => {
   //   setShortProfitPercentage(
-  //     (shortPayoutAmountNumber / Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals)) - 1) * 100,
+  //     (shortPayout / Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals)) - 1) * 100,
   //   )
   //   setLongProfitPercentage(
-  //     (longPayoutAmountNumber / Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals)) - 1) * 100,
-  //   )
-  //   setShortProfitAmount(
-  //     (shortProfitPercentage * Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals))) / 100,
-  //   )
-  //   setLongProfitAmount(
-  //     (longProfitPercentage * Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals))) / 100,
+  //     (longPayout / Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals)) - 1) * 100,
   //   )
   // }, [
-  //   shortPayoutAmountNumber,
+  //   shortPayout,
   //   totalShortCollateralAmount,
   //   collateral.decimals,
-  //   longPayoutAmountNumber,
+  //   longPayout,
   //   totalLongCollateralAmount,
   //   shortProfitPercentage,
   //   longProfitPercentage,
@@ -160,7 +158,9 @@ export const PositionTable = (props: Props) => {
         </TDStyled>
         <TDStyled textAlign={TableCellsAlign[3]}>
           {index === 0 ? formatNumber(shortProfitLoss.toString()) : formatNumber(longProfitLoss.toString())}(
-          {index === 0 ? formatNumber(shortProfitPercentage.toString()) : formatNumber(longProfitPercentage.toString())}
+          {index === 0
+            ? formatNumber(shortProfitLossPercentage.toString())
+            : formatNumber(longProfitLossPercentage.toString())}
           %)
         </TDStyled>
       </TR>

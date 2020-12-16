@@ -346,7 +346,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       ? Number(currentPrediction) * 100
       : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
   )
-  const [scaleValuePrediction, setScaleValuePrediction] = useState(newPredictionNumber)
+  const [scaleValuePrediction, setScaleValuePrediction] = useState(currentPredictionNumber || newPredictionNumber)
   const [yourPayout, setYourPayout] = useState(0)
   const [profitLoss, setProfitLoss] = useState(0)
   const [shortPayout, setShortPayout] = useState(0)
@@ -355,6 +355,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [longProfitLoss, setLongProfitLoss] = useState(0)
   const [totalShortPrice, setTotalShortPrice] = useState<number>(0)
   const [totalLongPrice, setTotalLongPrice] = useState<number>(0)
+  const [shortProfitLossPercentage, setShortProfitLossPercentage] = useState<number>(0)
+  const [longProfitLossPercentage, setLongProfitLossPercentage] = useState<number>(0)
+
+  console.log(currentPrediction)
 
   useEffect(() => {
     if (trades && trades.length) {
@@ -438,12 +442,21 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     } else {
       if (shortShares && shortShares.gt(DUST)) {
         setShortPayout((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
-        console.log(totalShortPrice)
         setShortProfitLoss((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - (totalShortPrice || 0))
+        setShortProfitLossPercentage(
+          (((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - (totalShortPrice || 0)) /
+            (totalShortPrice || 0)) *
+            100,
+        )
       }
       if (longShares && longShares.gt(DUST)) {
         setLongPayout((longSharesNumber || 0) * (Number(scaleBall?.value) / 100))
         setLongProfitLoss((longSharesNumber || 0) * (Number(scaleBall?.value) / 100) - (totalLongPrice || 0))
+        setLongProfitLossPercentage(
+          (((longSharesNumber || 0) * (Number(scaleBall?.value) / 100) - (totalLongPrice || 0)) /
+            (totalLongPrice || 0)) *
+            100,
+        )
       }
     }
   }, [
@@ -617,8 +630,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             fee={fee}
             longPayout={longPayout}
             longProfitLoss={longProfitLoss}
+            longProfitLossPercentage={longProfitLossPercentage}
             shortPayout={shortPayout}
             shortProfitLoss={shortProfitLoss}
+            shortProfitLossPercentage={shortProfitLossPercentage}
             trades={trades}
           />
         )}
