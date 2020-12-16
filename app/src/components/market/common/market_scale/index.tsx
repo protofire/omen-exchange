@@ -266,16 +266,12 @@ interface Props {
   status?: Maybe<Status>
   balances?: Maybe<BalanceItem[]>
   fee?: Maybe<BigNumber>
-  averageLongPosition?: Maybe<number>
-  averageShortPosition?: Maybe<number>
   slider?: Maybe<boolean>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
   const {
     amount,
-    averageLongPosition,
-    averageShortPosition,
     balances,
     borderBottom,
     borderTop,
@@ -314,11 +310,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
   const feeNumber = fee && collateral && (Number(formatBigNumber(fee, collateral.decimals)) + 1) ** 2 - 1
-
-  const averageShortPrice =
-    averageShortPosition && averageShortPosition * (upperBoundNumber - lowerBoundNumber) - lowerBoundNumber
-  const averageLongPrice =
-    averageLongPosition && averageLongPosition * (upperBoundNumber - lowerBoundNumber) - lowerBoundNumber
 
   const shortShares =
     balances &&
@@ -362,6 +353,21 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [shortProfitLoss, setShortProfitLoss] = useState(0)
   const [longPayout, setLongPayout] = useState(0)
   const [longProfitLoss, setLongProfitLoss] = useState(0)
+  const [shortTrades] = useState<TradeObject[]>((trades || []).filter(trade => trade.outcomeIndex === '0'))
+  const [longTrades] = useState<TradeObject[]>((trades || []).filter(trade => trade.outcomeIndex === '1'))
+  const [totalShortPrice, setTotalShortPrice] = useState<number>(0)
+  const [totalLongPrice, setTotalLongPrice] = useState<number>(0)
+
+  useEffect(() => {
+    if (shortTrades.length) {
+      const tradePrices = shortTrades.map(trade => trade.outcomeTokenMarginalPrice)
+      setTotalShortPrice(tradePrices.reduce((a, b) => a + b))
+    }
+    if (longTrades.length) {
+      const tradePrices = longTrades.map(trade => trade.outcomeTokenMarginalPrice)
+      setTotalLongPrice(tradePrices.reduce((a, b) => a + b))
+    }
+  }, [shortTrades, longTrades])
 
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
@@ -370,9 +376,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
     if (shortShares && shortShares.gt(DUST)) {
       setShortPayout((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
+      setShortProfitLoss((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - totalShortPrice)
     }
     if (longShares && longShares.gt(DUST)) {
       setLongPayout((longSharesNumber || 0) * (Number(scaleBall?.value) / 100))
+      setLongProfitLoss((longSharesNumber || 0) * (Number(scaleBall?.value) / 100) - totalLongPrice)
     }
   }
 

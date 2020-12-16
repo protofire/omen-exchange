@@ -270,24 +270,6 @@ const Wrapper = (props: Props) => {
     cpk?.address.toLowerCase(),
   )
 
-  const [shortTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '0'))
-  const [longTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '1'))
-  const [averageShortPosition, setAverageShortPosition] = useState<Maybe<number>>(null)
-  const [averageLongPosition, setAverageLongPosition] = useState<Maybe<number>>(null)
-
-  useEffect(() => {
-    if (shortTrades.length) {
-      const tradePrices = shortTrades.map(trade => trade.outcomeTokenMarginalPrice)
-      const tradesTotalPrice = tradePrices.reduce((a, b) => a + b)
-      setAverageShortPosition(tradesTotalPrice / shortTrades.length)
-    }
-    if (longTrades.length) {
-      const tradePrices = longTrades.map(trade => trade.outcomeTokenMarginalPrice)
-      const tradesTotalPrice = tradePrices.reduce((a, b) => a + b)
-      setAverageLongPosition(tradesTotalPrice / longTrades.length)
-    }
-  }, [shortTrades, longTrades])
-
   useEffect(() => {
     if ((isQuestionFinalized || !isFinalizing) && currentTab === MarketDetailsTab.finalize) {
       setCurrentTab(MarketDetailsTab.swap)
@@ -311,8 +293,6 @@ const Wrapper = (props: Props) => {
             {isScalar ? (
               <>
                 <MarketScale
-                  averageLongPosition={averageLongPosition}
-                  averageShortPosition={averageShortPosition}
                   balances={balances}
                   borderBottom={false}
                   borderTop={true}
