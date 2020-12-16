@@ -97,7 +97,7 @@ const networks: { [K in NetworkId]: Network } = {
     graphWsUri: GRAPH_RINKEBY_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
     klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
-    realitioTimeout: 10,
+    realitioTimeout: 180,
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     omenTCRListId: 1,
     contracts: {
@@ -127,6 +127,13 @@ export const supportedNetworkURLs = entries(networks).reduce<{
 )
 
 export const infuraNetworkURL = networks[1].url
+
+export const getInfuraUrl = (networkId: number): string => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].url
+}
 
 export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   cdai: {

@@ -4,9 +4,12 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
+import { getLogger } from '../util/logger'
 import { getOutcomes } from '../util/networks'
 import { isObjectEqual, waitABit } from '../util/tools'
-import { KlerosSubmission, Question, Status } from '../util/types'
+import { AnswerItem, BondItem, INVALID_ANSWER_ID, KlerosSubmission, Question, Status } from '../util/types'
+
+const logger = getLogger('useGraphMarketMakerData')
 
 const query = gql`
   query GetMarket($id: ID!) {
@@ -34,18 +37,23 @@ const query = gql`
       timeout
       resolutionTimestamp
       currentAnswer
+      currentAnswerTimestamp
+      currentAnswerBond
       answerFinalizedTimestamp
       scaledLiquidityParameter
       runningDailyVolumeByHour
       isPendingArbitration
       arbitrationOccurred
-      currentAnswerTimestamp
       runningDailyVolumeByHour
       curatedByDxDao
       curatedByDxDaoOrKleros
       question {
         id
         data
+        answers {
+          answer
+          bondAggregate
+        }
       }
       klerosTCRregistered
       curatedByDxDaoOrKleros
@@ -82,10 +90,15 @@ type GraphResponseFixedProductMarketMaker = {
   isPendingArbitration: boolean
   arbitrationOccurred: boolean
   currentAnswerTimestamp: string
+  currentAnswerBond: Maybe<BigNumber>
   runningDailyVolumeByHour: BigNumber[]
   question: {
     id: string
     data: string
+    answers: {
+      answer: string
+      bondAggregate: BigNumber
+    }[]
   }
   resolutionTimestamp: string
   templateId: string
@@ -129,6 +142,35 @@ type Result = {
   status: Status
 }
 
+const getBondedItems = (outcomes: string[], answers: AnswerItem[]): BondItem[] => {
+  const bondedItems: BondItem[] = outcomes.map((outcome: string, index: number) => {
+    const answer = answers.find(
+      answer => answer.answer !== INVALID_ANSWER_ID && new BigNumber(answer.answer).toNumber() === index,
+    )
+    if (answer) {
+      return {
+        outcomeName: outcome,
+        bondedEth: new BigNumber(answer.bondAggregate),
+      } as BondItem
+    }
+    return {
+      outcomeName: outcome,
+      bondedEth: new BigNumber(0),
+    }
+  })
+
+  const invalidAnswer = answers.find(answer => answer.answer === INVALID_ANSWER_ID)
+
+  bondedItems.push({
+    outcomeName: 'Invalid',
+    bondedEth: invalidAnswer ? new BigNumber(invalidAnswer.bondAggregate) : new BigNumber(0),
+  })
+
+  // add invalid outcome
+
+  return bondedItems
+}
+
 const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: number): GraphMarketMakerData => {
   const outcomes = data.outcomes ? data.outcomes : getOutcomes(networkId, +data.templateId)
 
@@ -158,6 +200,9 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
       isPendingArbitration: data.isPendingArbitration,
       arbitrationOccurred: data.arbitrationOccurred,
       currentAnswerTimestamp: data.currentAnswerTimestamp ? bigNumberify(data.currentAnswerTimestamp) : null,
+      currentAnswerBond: data.currentAnswerBond,
+      answers: data.question.answers,
+      bonds: getBondedItems(outcomes, data.question.answers),
     },
     curatedByDxDao: data.curatedByDxDao,
     klerosTCRregistered: data.klerosTCRregistered,
@@ -198,13 +243,17 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
   }
 
   const fetchData = async () => {
-    needRefetch = true
-    let counter = 0
-    await waitABit()
-    while (needRefetch && counter < 15) {
-      await refetch()
+    try {
+      needRefetch = true
+      let counter = 0
       await waitABit()
-      counter += 1
+      while (needRefetch && counter < 15) {
+        await refetch()
+        await waitABit()
+        counter += 1
+      }
+    } catch (error) {
+      logger.log(error.message)
     }
   }
 
