@@ -387,7 +387,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         ? Number(currentPrediction) * 100
         : (((startingPointNumber || 0) - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
     )
-    setScaleValuePrediction(Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
+    setScaleValuePrediction(
+      newPrediction
+        ? Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
+        : currentPredictionNumber,
+    )
   }, [newPrediction, currentPrediction, lowerBoundNumber, startingPointNumber, upperBoundNumber])
 
   useEffect(() => {
@@ -513,8 +517,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             </ScaleTooltip>
             <ScaleBall
               className="scale-ball"
-              data-for="scalarTooltip"
-              data-tip={`${formatNumber(scaleValuePrediction.toString())} ${unit}`}
               disabled={isSliderDisabled}
               max="100"
               min="0"
