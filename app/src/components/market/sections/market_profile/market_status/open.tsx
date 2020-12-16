@@ -295,16 +295,6 @@ const Wrapper = (props: Props) => {
     // eslint-disable-next-line
   }, [isQuestionFinalized, isFinalizing])
 
-  const shortShares = balances
-    .filter(balance => balance.outcomeName === 'short')
-    .map(shortBalance => shortBalance.shares)
-    .reduce((a, b) => a.add(b))
-
-  const longShares = balances
-    .filter(balance => balance.outcomeName === 'long')
-    .map(longBalance => longBalance.shares)
-    .reduce((a, b) => a.add(b))
-
   return (
     <>
       <TopCard>
@@ -329,10 +319,8 @@ const Wrapper = (props: Props) => {
                   collateral={collateral}
                   currentPrediction={outcomeTokenMarginalPrices[1]}
                   fee={fee}
-                  longShares={longShares}
                   lowerBound={scalarLow || new BigNumber(0)}
                   positionTable={true}
-                  shortShares={shortShares}
                   startingPointTitle={'Current prediction'}
                   status={status}
                   trades={trades}

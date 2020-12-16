@@ -269,8 +269,6 @@ interface Props {
   averageLongPosition?: Maybe<number>
   averageShortPosition?: Maybe<number>
   slider?: Maybe<boolean>
-  shortShares?: Maybe<BigNumber>
-  longShares?: Maybe<BigNumber>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -285,14 +283,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     currentPrediction,
     fee,
     long,
-    longShares,
     lowerBound,
     newPrediction,
     positionTable,
     potentialLoss,
     potentialProfit,
     short,
-    shortShares,
     slider,
     startingPoint,
     startingPointTitle,
@@ -316,9 +312,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const potentialLossNumber =
     collateral && Number(formatBigNumber(potentialLoss || new BigNumber(0), collateral.decimals))
 
-  const shortSharesNumber = collateral && Number(formatBigNumber(shortShares || new BigNumber(0), 18))
-  const longSharesNumber = collateral && Number(formatBigNumber(longShares || new BigNumber(0), 18))
-
   const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
   const feeNumber = fee && collateral && (Number(formatBigNumber(fee, collateral.decimals)) + 1) ** 2 - 1
 
@@ -326,6 +319,23 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     averageShortPosition && averageShortPosition * (upperBoundNumber - lowerBoundNumber) - lowerBoundNumber
   const averageLongPrice =
     averageLongPosition && averageLongPosition * (upperBoundNumber - lowerBoundNumber) - lowerBoundNumber
+
+  const shortShares =
+    balances &&
+    balances
+      .filter(balance => balance.outcomeName === 'short')
+      .map(shortBalance => shortBalance.shares)
+      .reduce((a, b) => a.add(b))
+
+  const longShares =
+    balances &&
+    balances
+      .filter(balance => balance.outcomeName === 'long')
+      .map(longBalance => longBalance.shares)
+      .reduce((a, b) => a.add(b))
+
+  const shortSharesNumber = collateral && Number(formatBigNumber(shortShares || new BigNumber(0), 18))
+  const longSharesNumber = collateral && Number(formatBigNumber(longShares || new BigNumber(0), 18))
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
