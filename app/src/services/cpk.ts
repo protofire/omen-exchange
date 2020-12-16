@@ -216,8 +216,8 @@ class CPKService {
     marketData,
     marketMakerFactory,
     realitio,
+    useCompoundReserve,
   }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
-
     try {
       const { arbitrator, category, collateral, loadedQuestionId, outcomes, question, resolution, spread } = marketData
       console.log(conditionalTokens)
@@ -319,7 +319,6 @@ class CPKService {
         })
       }
 
-
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
         // Step 4: Transfer funding from user
@@ -334,7 +333,7 @@ class CPKService {
       const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
         saltNonce,
         conditionalTokens.address,
-        collateral.address,
+        fundingTokenAddress,
         conditionId,
         this.cpk.address,
         spread,
@@ -346,7 +345,7 @@ class CPKService {
         data: MarketMakerFactoryService.encodeCreateMarketMaker(
           saltNonce,
           conditionalTokens.address,
-          collateral.address,
+          fundingTokenAddress,
           conditionId,
           spread,
           marketData.funding,
