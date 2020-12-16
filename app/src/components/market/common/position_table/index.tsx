@@ -43,10 +43,22 @@ interface Props {
   fee: BigNumber | null | undefined
   longPayout: number
   shortPayout: number
+  shortProfitLoss: number
+  longProfitLoss: number
 }
 
 export const PositionTable = (props: Props) => {
-  const { balances, collateral, currentPrediction, fee, longPayout, shortPayout, trades } = props
+  const {
+    balances,
+    collateral,
+    currentPrediction,
+    fee,
+    longPayout,
+    longProfitLoss,
+    shortPayout,
+    shortProfitLoss,
+    trades,
+  } = props
 
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
@@ -83,37 +95,6 @@ export const PositionTable = (props: Props) => {
     totalShortCollateralAmount && setTotalShortCollateralAmount(totalShortCollateralAmount)
     totalLongCollateralAmount && setTotalLongCollateralAmount(totalLongCollateralAmount)
   }, [longTrades, shortTrades])
-
-  // useEffect(() => {
-  //   const virtualHoldings = [
-  //     new BigNumber(parseUnits(String(20 * Number(currentPrediction)), 18)),
-  //     new BigNumber(parseUnits(String(20 * (1 - Number(currentPrediction))), 18)),
-  //   ]
-  //   setVirtualHoldings(virtualHoldings)
-  // }, [currentPrediction])
-
-  // const calcShortPayoutAmount = useMemo(
-  //   () => async (amountShares: BigNumber): Promise<Maybe<BigNumber>> => {
-  //     const payoutAmount = calcSellAmountInCollateral(amountShares, virtualHoldings[0], [virtualHoldings[1]], marketFee)
-
-  //     return payoutAmount
-  //   },
-  //   [virtualHoldings, marketFee],
-  // )
-
-  // const calcLongPayoutAmount = useMemo(
-  //   () => async (amountShares: BigNumber): Promise<Maybe<BigNumber>> => {
-  //     const payoutAmount = calcSellAmountInCollateral(amountShares, virtualHoldings[1], [virtualHoldings[0]], marketFee)
-
-  //     return payoutAmount
-  //   },
-  //   [virtualHoldings, marketFee],
-  // )
-
-  // const shortPayoutAmount = useAsyncDerivedValue(shortShares, new BigNumber(0), calcShortPayoutAmount)
-  // const longPayoutAmount = useAsyncDerivedValue(longShares, new BigNumber(0), calcLongPayoutAmount)
-  // const shortPayoutAmountNumber = Number(formatBigNumber(shortPayoutAmount || new BigNumber(0), collateral.decimals))
-  // const longPayoutAmountNumber = Number(formatBigNumber(longPayoutAmount || new BigNumber(0), collateral.decimals))
 
   // useEffect(() => {
   //   setShortProfitPercentage(
@@ -178,7 +159,7 @@ export const PositionTable = (props: Props) => {
           {index === 0 ? formatNumber(shortPayout.toString()) : formatNumber(longPayout.toString())}
         </TDStyled>
         <TDStyled textAlign={TableCellsAlign[3]}>
-          {index === 0 ? formatNumber(shortProfitAmount.toString()) : formatNumber(longProfitAmount.toString())}(
+          {index === 0 ? formatNumber(shortProfitLoss.toString()) : formatNumber(longProfitLoss.toString())}(
           {index === 0 ? formatNumber(shortProfitPercentage.toString()) : formatNumber(longProfitPercentage.toString())}
           %)
         </TDStyled>
