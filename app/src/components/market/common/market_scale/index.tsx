@@ -456,6 +456,14 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     potentialProfitNumber,
     upperBoundNumber,
     feeNumber,
+    longShares,
+    longSharesNumber,
+    scaleBall?.value,
+    short,
+    shortShares,
+    shortSharesNumber,
+    totalLongPrice,
+    totalShortPrice,
   ])
 
   const activateTooltip = () => {
