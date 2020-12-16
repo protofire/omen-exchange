@@ -1,4 +1,4 @@
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -7,13 +7,7 @@ import { useConnectedCPKContext } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useGraphMarketTradeData } from '../../../../../hooks/useGraphMarketTradeData'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
-import {
-  BalanceItem,
-  MarketDetailsTab,
-  MarketMakerData,
-  OutcomeTableValue,
-  TradeObject,
-} from '../../../../../util/types'
+import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketScale } from '../../../common/market_scale'
@@ -109,7 +103,6 @@ const Wrapper = (props: Props) => {
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
   const context = useConnectedWeb3Context()
-  const { account, library: provider } = context
   const cpk = useConnectedCPKContext()
 
   const {

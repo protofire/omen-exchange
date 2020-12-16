@@ -1,10 +1,9 @@
-import { BigNumber, parseUnits } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import { BigNumber } from 'ethers/utils'
+import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { DUST } from '../../../../common/constants'
-import { useAsyncDerivedValue } from '../../../../hooks'
-import { calcSellAmountInCollateral, formatBigNumber, formatNumber } from '../../../../util/tools'
+import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { BalanceItem, PositionTableValue, Token, TradeObject } from '../../../../util/types'
 import { TD, TH, THead, TR, Table } from '../../../common'
 
@@ -39,7 +38,6 @@ interface Props {
   trades: TradeObject[]
   balances: BalanceItem[]
   collateral: Token
-  currentPrediction: string
   fee: BigNumber | null | undefined
   longPayout: number
   shortPayout: number
@@ -53,8 +51,6 @@ export const PositionTable = (props: Props) => {
   const {
     balances,
     collateral,
-    currentPrediction,
-    fee,
     longPayout,
     longProfitLoss,
     longProfitLossPercentage,
@@ -69,53 +65,8 @@ export const PositionTable = (props: Props) => {
   const shortSharesFormatted = formatNumber(formatBigNumber(shortShares, 18))
   const longSharesFormatted = formatNumber(formatBigNumber(longShares, 18))
 
-  const holdings = balances.map(balance => balance.holdings)
-
   const [shortTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '0'))
   const [longTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '1'))
-  const [marketFee] = useState<number>(Number(formatBigNumber(fee || new BigNumber(0), 18)))
-  const [shortProfitPercentage, setShortProfitPercentage] = useState<number>(0)
-  const [longProfitPercentage, setLongProfitPercentage] = useState<number>(0)
-  const [totalShortCollateralAmount, setTotalShortCollateralAmount] = useState<BigNumber>(new BigNumber(0))
-  const [totalLongCollateralAmount, setTotalLongCollateralAmount] = useState<BigNumber>(new BigNumber(0))
-  const [shortProfitAmount, setShortProfitAmount] = useState<number>(0)
-  const [longProfitAmount, setLongProfitAmount] = useState<number>(0)
-  const [virtualHoldings, setVirtualHoldings] = useState<BigNumber[]>(holdings)
-
-  // useEffect(() => {
-  //   let totalShortCollateralAmount
-  //   let totalLongCollateralAmount
-
-  //   if (shortTrades.length) {
-  //     const shortCollateralAmounts = shortTrades.map(trade => trade.collateralAmount)
-  //     totalShortCollateralAmount = shortCollateralAmounts.reduce((a, b) => a.add(b))
-  //   }
-
-  //   if (longTrades.length) {
-  //     const longCollateralAmounts = longTrades.map(trade => trade.collateralAmount)
-  //     totalLongCollateralAmount = longCollateralAmounts.reduce((a, b) => a.add(b))
-  //   }
-
-  //   totalShortCollateralAmount && setTotalShortCollateralAmount(totalShortCollateralAmount)
-  //   totalLongCollateralAmount && setTotalLongCollateralAmount(totalLongCollateralAmount)
-  // }, [longTrades, shortTrades])
-
-  // useEffect(() => {
-  //   setShortProfitPercentage(
-  //     (shortPayout / Number(formatBigNumber(totalShortCollateralAmount, collateral.decimals)) - 1) * 100,
-  //   )
-  //   setLongProfitPercentage(
-  //     (longPayout / Number(formatBigNumber(totalLongCollateralAmount, collateral.decimals)) - 1) * 100,
-  //   )
-  // }, [
-  //   shortPayout,
-  //   totalShortCollateralAmount,
-  //   collateral.decimals,
-  //   longPayout,
-  //   totalLongCollateralAmount,
-  //   shortProfitPercentage,
-  //   longProfitPercentage,
-  // ])
 
   const TableHead: PositionTableValue[] = [
     PositionTableValue.YourPosition,

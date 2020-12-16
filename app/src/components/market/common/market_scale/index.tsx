@@ -1,6 +1,5 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
-import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { DUST } from '../../../../common/constants'
@@ -285,7 +284,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     potentialLoss,
     potentialProfit,
     short,
-    slider,
     startingPoint,
     startingPointTitle,
     status,
@@ -357,8 +355,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [totalLongPrice, setTotalLongPrice] = useState<number>(0)
   const [shortProfitLossPercentage, setShortProfitLossPercentage] = useState<number>(0)
   const [longProfitLossPercentage, setLongProfitLossPercentage] = useState<number>(0)
-
-  console.log(currentPrediction)
 
   useEffect(() => {
     if (trades && trades.length) {
@@ -622,11 +618,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           <PositionTable
             balances={balances}
             collateral={collateral}
-            currentPrediction={
-              scaleValue || scaleValue === 0
-                ? (scaleValue / 100 === 0 ? 0.0001 : scaleValue / 100).toString()
-                : currentPrediction
-            }
             fee={fee}
             longPayout={longPayout}
             longProfitLoss={longProfitLoss}
