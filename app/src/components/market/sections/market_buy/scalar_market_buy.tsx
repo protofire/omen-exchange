@@ -257,6 +257,7 @@ export const ScalarMarketBuy = (props: Props) => {
         newPrediction={formattedNewPrediction}
         potentialLoss={potentialLossUncapped}
         potentialProfit={potentialProfit}
+        short={activeTab === Tabs.short}
         startingPointTitle={'Current prediction'}
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
         upperBound={scalarHigh || new BigNumber(0)}

@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -272,19 +272,19 @@ const Wrapper = (props: Props) => {
 
   const [shortTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '0'))
   const [longTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '1'))
-  const [averageShortPrice, setAverageShortPrice] = useState<number>(0)
-  const [averageLongPrice, setAverageLongPrice] = useState<number>(0)
+  const [averageShortPosition, setAverageShortPosition] = useState<Maybe<number>>(null)
+  const [averageLongPosition, setAverageLongPosition] = useState<Maybe<number>>(null)
 
   useEffect(() => {
     if (shortTrades.length) {
       const tradePrices = shortTrades.map(trade => trade.outcomeTokenMarginalPrice)
       const tradesTotalPrice = tradePrices.reduce((a, b) => a + b)
-      setAverageShortPrice(tradesTotalPrice / shortTrades.length)
+      setAverageShortPosition(tradesTotalPrice / shortTrades.length)
     }
     if (longTrades.length) {
       const tradePrices = longTrades.map(trade => trade.outcomeTokenMarginalPrice)
       const tradesTotalPrice = tradePrices.reduce((a, b) => a + b)
-      setAverageLongPrice(tradesTotalPrice / longTrades.length)
+      setAverageLongPosition(tradesTotalPrice / longTrades.length)
     }
   }, [shortTrades, longTrades])
 
@@ -294,6 +294,16 @@ const Wrapper = (props: Props) => {
     }
     // eslint-disable-next-line
   }, [isQuestionFinalized, isFinalizing])
+
+  const shortShares = balances
+    .filter(balance => balance.outcomeName === 'short')
+    .map(shortBalance => shortBalance.shares)
+    .reduce((a, b) => a.add(b))
+
+  const longShares = balances
+    .filter(balance => balance.outcomeName === 'long')
+    .map(longBalance => longBalance.shares)
+    .reduce((a, b) => a.add(b))
 
   return (
     <>
@@ -311,14 +321,18 @@ const Wrapper = (props: Props) => {
             {isScalar ? (
               <>
                 <MarketScale
+                  averageLongPosition={averageLongPosition}
+                  averageShortPosition={averageShortPosition}
                   balances={balances}
                   borderBottom={false}
                   borderTop={true}
                   collateral={collateral}
                   currentPrediction={outcomeTokenMarginalPrices[1]}
                   fee={fee}
+                  longShares={longShares}
                   lowerBound={scalarLow || new BigNumber(0)}
                   positionTable={true}
+                  shortShares={shortShares}
                   startingPointTitle={'Current prediction'}
                   status={status}
                   trades={trades}

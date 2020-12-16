@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
+import { DUST } from '../../../../common/constants'
 import { useAsyncDerivedValue, useCollateralBalance, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -205,9 +206,8 @@ export const ScalarMarketSell = (props: Props) => {
     amountError !== null ||
     isNegativeAmountShares
 
-  const dust = parseUnits('0.00001', collateral.decimals)
-  const isShortTabDisabled = balances[0].shares.lt(dust)
-  const isLongTabDisabled = balances[1].shares.lt(dust)
+  const isShortTabDisabled = balances[0].shares.lt(DUST)
+  const isLongTabDisabled = balances[1].shares.lt(DUST)
 
   const isNewPrediction =
     formattedNewPrediction !== 0 && formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))

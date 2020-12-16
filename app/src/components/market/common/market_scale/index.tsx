@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
+import { DUST } from '../../../../common/constants'
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { BalanceItem, Status, Token, TradeObject } from '../../../../util/types'
 import { PositionTable } from '../position_table'
@@ -255,6 +256,7 @@ interface Props {
   borderTop?: boolean
   newPrediction?: Maybe<number>
   long?: Maybe<boolean>
+  short?: Maybe<boolean>
   potentialLoss?: Maybe<BigNumber>
   potentialProfit?: Maybe<BigNumber>
   collateral?: Maybe<Token>
@@ -264,11 +266,18 @@ interface Props {
   status?: Maybe<Status>
   balances?: Maybe<BalanceItem[]>
   fee?: Maybe<BigNumber>
+  averageLongPosition?: Maybe<number>
+  averageShortPosition?: Maybe<number>
+  slider?: Maybe<boolean>
+  shortShares?: Maybe<BigNumber>
+  longShares?: Maybe<BigNumber>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
   const {
     amount,
+    averageLongPosition,
+    averageShortPosition,
     balances,
     borderBottom,
     borderTop,
@@ -276,11 +285,15 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     currentPrediction,
     fee,
     long,
+    longShares,
     lowerBound,
     newPrediction,
     positionTable,
     potentialLoss,
     potentialProfit,
+    short,
+    shortShares,
+    slider,
     startingPoint,
     startingPointTitle,
     status,
@@ -303,8 +316,16 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const potentialLossNumber =
     collateral && Number(formatBigNumber(potentialLoss || new BigNumber(0), collateral.decimals))
 
+  const shortSharesNumber = collateral && Number(formatBigNumber(shortShares || new BigNumber(0), 18))
+  const longSharesNumber = collateral && Number(formatBigNumber(longShares || new BigNumber(0), 18))
+
   const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
   const feeNumber = fee && collateral && (Number(formatBigNumber(fee, collateral.decimals)) + 1) ** 2 - 1
+
+  const averageShortPrice =
+    averageShortPosition && averageShortPosition * (upperBoundNumber - lowerBoundNumber) - lowerBoundNumber
+  const averageLongPrice =
+    averageLongPosition && averageLongPosition * (upperBoundNumber - lowerBoundNumber) - lowerBoundNumber
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
@@ -327,11 +348,22 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [scaleValuePrediction, setScaleValuePrediction] = useState(newPredictionNumber)
   const [yourPayout, setYourPayout] = useState(0)
   const [profitLoss, setProfitLoss] = useState(0)
+  const [shortPayout, setShortPayout] = useState(0)
+  const [shortProfitLoss, setShortProfitLoss] = useState(0)
+  const [longPayout, setLongPayout] = useState(0)
+  const [longProfitLoss, setLongProfitLoss] = useState(0)
 
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
     setScaleValue(Number(scaleBall?.value))
     setScaleValuePrediction((Number(scaleBall?.value) / 100) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
+
+    if (shortShares && shortShares.gt(DUST)) {
+      setShortPayout((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
+    }
+    if (longShares && longShares.gt(DUST)) {
+      setLongPayout((longSharesNumber || 0) * (Number(scaleBall?.value) / 100))
+    }
   }
 
   useEffect(() => {
@@ -369,8 +401,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         // Return loss amount
         setProfitLoss(loss)
       }
-      // If taking a short position
-    } else {
+    } else if (short) {
       // If the value selected by the slider is < the new prediction number
       if (scaleValuePrediction <= newPredictionNumber) {
         // Determine the percentage distance from the new prediction number to the lower bound
@@ -418,6 +449,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const isSliderDisabled = !isAmountInputted && shortShares?.lte(DUST) && longShares?.lte(DUST)
+
   return (
     <>
       <ScaleWrapper borderBottom={borderBottom} borderTop={borderTop}>
@@ -442,7 +475,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               className="scale-ball"
               data-for="scalarTooltip"
               data-tip={`${formatNumber(scaleValuePrediction.toString())} ${unit}`}
-              disabled={!isAmountInputted}
+              disabled={isSliderDisabled}
               max="100"
               min="0"
               onChange={handleScaleBallChange}
@@ -551,6 +584,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
                 : currentPrediction
             }
             fee={fee}
+            longPayout={longPayout}
+            shortPayout={shortPayout}
             trades={trades}
           />
         )}

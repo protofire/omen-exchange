@@ -2,6 +2,7 @@ import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import styled, { css } from 'styled-components'
 
+import { DUST } from '../../../../common/constants'
 import { useAsyncDerivedValue } from '../../../../hooks'
 import { calcSellAmountInCollateral, formatBigNumber, formatNumber } from '../../../../util/tools'
 import { BalanceItem, PositionTableValue, Token, TradeObject } from '../../../../util/types'
@@ -40,10 +41,12 @@ interface Props {
   collateral: Token
   currentPrediction: string
   fee: BigNumber | null | undefined
+  longPayout: number
+  shortPayout: number
 }
 
 export const PositionTable = (props: Props) => {
-  const { balances, collateral, currentPrediction, fee, trades } = props
+  const { balances, collateral, currentPrediction, fee, longPayout, shortPayout, trades } = props
 
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
@@ -144,7 +147,6 @@ export const PositionTable = (props: Props) => {
 
   const TableCellsAlign = ['left', 'right', 'right', 'right']
 
-  // const dust = parseUnits('0.00001', collateral.decimals)
   // if (shortPayoutAmount?.lte(dust) && longPayoutAmount?.lte(dust)) {
   //   return <></>
   // }
@@ -166,16 +168,14 @@ export const PositionTable = (props: Props) => {
   }
 
   const renderTableRow = (index: number) => {
-    // if ((index === 0 && !shortTrades.length) || (index === 0 && shortPayoutAmount?.lte(dust))) return
-    // if ((index === 1 && !longTrades.length) || (index === 1 && longPayoutAmount?.lte(dust))) return
+    if ((index === 0 && !shortTrades.length) || (index === 0 && shortShares.lte(DUST))) return
+    if ((index === 1 && !longTrades.length) || (index === 1 && longShares.lte(DUST))) return
     return (
       <TR key={index}>
         <TDPosition textAlign={TableCellsAlign[0]}>{index === 0 ? 'Short' : 'Long'}</TDPosition>
         <TDStyled textAlign={TableCellsAlign[1]}>{index === 0 ? shortSharesFormatted : longSharesFormatted}</TDStyled>
         <TDStyled textAlign={TableCellsAlign[2]}>
-          {/* {index === 0
-            ? formatNumber(formatBigNumber(shortPayoutAmount || new BigNumber(0), collateral.decimals))
-            : formatNumber(formatBigNumber(longPayoutAmount || new BigNumber(0), collateral.decimals))} */}
+          {index === 0 ? formatNumber(shortPayout.toString()) : formatNumber(longPayout.toString())}
         </TDStyled>
         <TDStyled textAlign={TableCellsAlign[3]}>
           {index === 0 ? formatNumber(shortProfitAmount.toString()) : formatNumber(longProfitAmount.toString())}(
