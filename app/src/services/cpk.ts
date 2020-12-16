@@ -251,25 +251,25 @@ class CPKService {
         to: collateral.address,
         data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
       })
-      const fundingTokenAddress = collateral.address
+      let fundingTokenAddress = collateral.address
       if (useCompoundReserve && compoundService) {
-        // const encodedMintFunction = CompoundService.encodeMintTokens(
-        //   compoundTokenDetails.symbol,
-        //   marketData.funding.toString(),
-        // )
-        // const cDai = CompoundService.getABI(compoundTokenDetails.symbol)
-        // fundingTokenAddress = compoundTokenDetails.address
-        // // Approve cToken for the cpk contract
-        // transactions.push({
-        //   to: collateral.address,
-        //   data: ERC20Service.encodeApproveUnlimited(fundingTokenAddress),
-        // })
-        // // Mint ctokens from the underlying token
-        // transactions.push({
-        //   to: fundingTokenAddress,
-        //   value: '0',
-        //   data: encodedMintFunction,
-        // })
+        const encodedMintFunction = CompoundService.encodeMintTokens(
+          compoundTokenDetails.symbol,
+          marketData.funding.toString(),
+        )
+        const cDai = CompoundService.getABI(compoundTokenDetails.symbol)
+        fundingTokenAddress = compoundTokenDetails.address
+        // Approve cToken for the cpk contract
+        transactions.push({
+          to: collateral.address,
+          data: ERC20Service.encodeApproveUnlimited(fundingTokenAddress),
+        })
+        // Mint ctokens from the underlying token
+        transactions.push({
+          to: fundingTokenAddress,
+          value: '0',
+          data: encodedMintFunction,
+        })
       }
       // Step 5: Create market maker
       const saltNonce = Math.round(Math.random() * 1000000)
