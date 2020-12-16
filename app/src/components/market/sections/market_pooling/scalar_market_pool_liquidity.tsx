@@ -7,9 +7,9 @@ import styled from 'styled-components'
 import { DOCUMENT_FAQ } from '../../../../common/constants'
 import {
   useCollateralBalance,
+  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
-  useCpk,
   useCpkAllowance,
   useFundingBalance,
 } from '../../../../hooks'
@@ -24,7 +24,7 @@ import {
   formatBigNumber,
   formatNumber,
 } from '../../../../util/tools'
-import { MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
@@ -65,7 +65,7 @@ enum Tabs {
 
 interface Props {
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
   fetchGraphMarketTradeData?: () => Promise<void> | undefined
 }
@@ -89,7 +89,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const context = useConnectedWeb3Context()
   const history = useHistory()
   const { account, library: provider } = context
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
 
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)

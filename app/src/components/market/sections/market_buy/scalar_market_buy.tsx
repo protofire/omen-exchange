@@ -8,16 +8,16 @@ import styled from 'styled-components'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
+  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
-  useCpk,
   useCpkAllowance,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
-import { MarketMakerData, Status, Ternary } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, Status, Ternary } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -36,6 +36,11 @@ import { WarningMessage } from '../../common/warning_message'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
+  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
+  margin-left: -25px;
+  margin-right: -25px;
+  padding-left: 25px;
+  padding-right: 25px;
 `
 
 const logger = getLogger('Scalar Market::Buy')
@@ -44,13 +49,13 @@ interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
   fetchGraphMarketTradeData?: () => Promise<void> | undefined
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 export const ScalarMarketBuy = (props: Props) => {
   const { fetchGraphMarketMakerData, fetchGraphMarketTradeData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
   const { library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
@@ -154,6 +159,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
+  const totalFee = (Number(formatBigNumber(fee, collateral.decimals)) + 1) ** 2 - 1
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
@@ -169,12 +175,12 @@ export const ScalarMarketBuy = (props: Props) => {
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
   const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
-  const potentialProfitFormatted = `${formatNumber(formatBigNumber(potentialProfit, collateral.decimals))} ${
-    collateral.symbol
-  }`
-  const potentialLossFormatted = `${formatNumber(formatBigNumber(potentialLoss, collateral.decimals))} ${
-    collateral.symbol
-  }`
+  const potentialProfitFormatted = `${formatNumber(
+    (Number(formatBigNumber(potentialProfit, collateral.decimals)) - totalFee).toString(),
+  )} ${collateral.symbol}`
+  const potentialLossFormatted = `${formatNumber(
+    (Number(formatBigNumber(potentialLoss, collateral.decimals)) + totalFee).toString(),
+  )} ${collateral.symbol}`
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
 
@@ -245,6 +251,7 @@ export const ScalarMarketBuy = (props: Props) => {
         borderTop={true}
         collateral={collateral}
         currentPrediction={outcomeTokenMarginalPrices[1]}
+        fee={feePaid}
         long={activeTab === Tabs.long}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
@@ -290,7 +297,7 @@ export const ScalarMarketBuy = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmount(collateralBalance)
-              setAmountDisplay(walletBalance)
+              setAmountDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
             }}
             shouldDisplayMaxButton
             symbol={collateral.symbol}
@@ -335,7 +342,7 @@ export const ScalarMarketBuy = (props: Props) => {
         />
       )}
       <StyledButtonContainer>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
           Cancel
         </Button>
         <Button buttonType={ButtonType.primaryAlternative} disabled={isBuyDisabled} onClick={finish}>

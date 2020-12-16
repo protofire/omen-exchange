@@ -7,6 +7,8 @@ import { ArbitratorIcon } from '../arbitrator_icon'
 const AWrapper = styled.a`
   text-decoration: none !important;
   position: relative;
+  display: flex;
+  align-items: center;
   & > * + * {
     margin-left: 8px;
   }

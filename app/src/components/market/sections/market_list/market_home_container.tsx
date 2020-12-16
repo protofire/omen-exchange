@@ -7,10 +7,9 @@ import { useHistory } from 'react-router'
 import { useLocation } from 'react-router-dom'
 
 import { MAX_MARKET_FEE } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../../hooks'
 import { useMarkets } from '../../../../hooks/useMarkets'
 import { queryCategories } from '../../../../queries/markets_home'
-import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
@@ -47,19 +46,24 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       scaledLiquidityParameter: parseFloat(graphMarketMakerDataItem.scaledLiquidityParameter),
       runningDailyVolumeByHour: graphMarketMakerDataItem.runningDailyVolumeByHour,
       openingTimestamp: new Date(1000 * +graphMarketMakerDataItem.openingTimestamp),
+      oracle: graphMarketMakerDataItem.condition.oracle ? graphMarketMakerDataItem.condition.oracle : null,
       outcomeTokenAmounts: graphMarketMakerDataItem.outcomeTokenAmounts.map(bigNumberify),
+      outcomeTokenMarginalPrices: graphMarketMakerDataItem.outcomeTokenMarginalPrices,
       outcomes,
       templateId: +graphMarketMakerDataItem.templateId,
       title: graphMarketMakerDataItem.title,
       usdLiquidityParameter: parseFloat(graphMarketMakerDataItem.usdLiquidityParameter),
       klerosTCRregistered: graphMarketMakerDataItem.klerosTCRregistered,
       curatedByDxDaoOrKleros: graphMarketMakerDataItem.curatedByDxDaoOrKleros,
+      scalarLow: graphMarketMakerDataItem.condition.scalarLow ? graphMarketMakerDataItem.condition.scalarLow : null,
+      scalarHigh: graphMarketMakerDataItem.condition.scalarHigh ? graphMarketMakerDataItem.condition.scalarHigh : null,
     }
   })
 }
 
 const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
+  const cpk = useConnectedCPKContext()
   const history = useHistory()
 
   const location = useLocation()
@@ -204,7 +208,9 @@ const MarketHomeContainer: React.FC = () => {
   useEffect(() => {
     const getCpkAddress = async () => {
       try {
-        const cpk = await CPKService.create(provider)
+        if (!cpk) {
+          return
+        }
         setCpkAddress(cpk.address)
       } catch (e) {
         logger.error('Could not get address of CPK', e.message)
@@ -214,7 +220,7 @@ const MarketHomeContainer: React.FC = () => {
     if (account) {
       getCpkAddress()
     }
-  }, [provider, account])
+  }, [provider, account, cpk])
 
   useEffect(() => {
     if (loading) {

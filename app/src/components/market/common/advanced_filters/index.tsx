@@ -5,10 +5,8 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork } from '../../../../util/networks'
 import { CurationSource } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
+import { IconDxDao, IconKleros } from '../../../common/icons'
 import { CurrencySelector } from '../../common/currency_selector'
-
-import { DxDao } from './img/dxDao'
-import { Kleros } from './img/kleros'
 
 const Wrapper = styled.div`
   column-gap: 20px;
@@ -124,7 +122,7 @@ export const AdvancedFilters = (props: Props) => {
           content: (
             <CurationSourceWrapper>
               <LogoWrapper>
-                <Kleros id="arbitrator" />
+                <IconKleros id="arbitrator" />
               </LogoWrapper>
               {name}
             </CurationSourceWrapper>
@@ -147,7 +145,7 @@ export const AdvancedFilters = (props: Props) => {
       content: (
         <CurationSourceWrapper>
           <LogoWrapper>
-            <DxDao />
+            <IconDxDao />
           </LogoWrapper>
           {CurationSource.DXDAO}
         </CurationSourceWrapper>
@@ -158,7 +156,7 @@ export const AdvancedFilters = (props: Props) => {
       content: (
         <CurationSourceWrapper>
           <LogoWrapper>
-            <Kleros id="verify" />
+            <IconKleros id="verify" />
           </LogoWrapper>
           {CurationSource.KLEROS}
         </CurationSourceWrapper>

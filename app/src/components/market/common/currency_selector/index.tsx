@@ -82,7 +82,7 @@ export const CurrencySelector: React.FC<Props> = props => {
     .forEach(({ address, image, symbol }, index) => {
       currencyDropdownData.push({
         content: <TokenItem image={image} text={symbol} />,
-        extraContent: balance,
+        extraContent: currency && currency.toLowerCase() === address.toLowerCase() ? balance : '',
         onClick: () => {
           if (!disabled) onChange(address)
         },
@@ -100,7 +100,7 @@ export const CurrencySelector: React.FC<Props> = props => {
         dropdownPosition={DropdownPosition.center}
         items={currencyDropdownData}
         maxHeight={true}
-        placeholder={currency && currentItem === undefined ? <Spinner height={'18px'} width={'18px'} /> : placeholder}
+        placeholder={currency && currentItem === undefined ? <Spinner size="18" /> : placeholder}
         selected={false}
       />
     </Wrapper>

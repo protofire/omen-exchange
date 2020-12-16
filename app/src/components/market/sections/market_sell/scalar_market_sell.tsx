@@ -15,7 +15,7 @@ import {
   formatNumber,
   mulBN,
 } from '../../../../util/tools'
-import { BalanceItem, MarketMakerData, Status } from '../../../../util/types'
+import { BalanceItem, MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -33,15 +33,20 @@ import { WarningMessage } from '../../common/warning_message'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
+  margin-right: -24px;
+  margin-left: -24px;
+  padding-right: 24px;
+  padding-left: 24px;
+  border-top: 1px solid ${props => props.theme.colors.verticalDivider};
 `
 
-const logger = getLogger('Scalar Market::Buy')
+const logger = getLogger('Scalar Market::Sell')
 
 interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
   fetchGraphMarketTradeData?: () => Promise<void> | undefined
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 export const ScalarMarketSell = (props: Props) => {
@@ -72,13 +77,6 @@ export const ScalarMarketSell = (props: Props) => {
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
 
-  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
-    collateral,
-    context,
-  )
-  const collateralBalance = maybeCollateralBalance || Zero
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
-
   const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
   const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
 
@@ -99,18 +97,17 @@ export const ScalarMarketSell = (props: Props) => {
     // eslint-disable-next-line
   }, [collateral.address])
 
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
-
-  const holdings = balances.map(balance => balance.holdings)
-  const holdingsOfSoldOutcome = holdings[positionIndex]
-  const holdingsOfOtherOutcome = holdings.filter((item, index) => {
-    return index !== positionIndex
-  })
-
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
     ): Promise<[Maybe<BigNumber>, Maybe<number>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
+      const holdings = balances.map(balance => balance.holdings)
+      const holdingsOfSoldOutcome = holdings[positionIndex]
+      const holdingsOfOtherOutcome = holdings.filter((item, index) => {
+        return index !== positionIndex
+      })
+      const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
+
       const amountToSell = calcSellAmountInCollateral(
         // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
         amountShares,
@@ -125,14 +122,6 @@ export const ScalarMarketSell = (props: Props) => {
         )
         return [null, null, null, null]
       }
-
-      // try {
-      //   tradedShares = await marketMaker.calcSellAmount(amount, positionIndex)
-      //   reverseTradedShares = await marketMaker.calcSellAmount(amount, positionIndex === 0 ? 1 : 0)
-      // } catch {
-      //   tradedShares = new BigNumber(0)
-      //   reverseTradedShares = new BigNumber(0)
-      // }
 
       const balanceAfterTrade = computeBalanceAfterTrade(
         balances.map(b => b.holdings),
@@ -150,7 +139,7 @@ export const ScalarMarketSell = (props: Props) => {
       logger.log(`Amount to sell ${amountToSell}`)
       return [costFee, newPrediction, amountToSell, potentialValue]
     },
-    [balances, marketMaker, positionIndex, lowerBound, upperBound],
+    [balances, marketMaker, positionIndex, lowerBound, upperBound, fee],
   )
 
   const [costFee, newPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(
@@ -159,36 +148,8 @@ export const ScalarMarketSell = (props: Props) => {
     calcSellAmount,
   )
 
-  const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
-
   const formattedNewPrediction =
     newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
-
-  // const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
-  // const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
-
-  // const baseCost = debouncedAmount.sub(feePaid)
-  // const potentialValue = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
-  // const potentialLossUncapped = reverseTradedShares.isZero()
-  //   ? new BigNumber(0)
-  //   : reverseTradedShares.sub(amount.add(feePaid))
-  // const potentialLoss = reverseTradedShares.isZero()
-  //   ? new BigNumber(0)
-  //   : reverseTradedShares.sub(amount).lt(debouncedAmount)
-  //   ? reverseTradedShares.sub(amount)
-  //   : debouncedAmount
-
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
-  // const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
-  // const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
-  // const potentialValueFormatted = `${formatNumber(formatBigNumber(potentialValue, collateral.decimals))} ${
-  //   collateral.symbol
-  // }`
-  // const potentialLossFormatted = `${formatNumber(formatBigNumber(potentialLoss, collateral.decimals))} ${
-  //   collateral.symbol
-  // }`
-  // const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
-  // const total = `${sharesTotal} Shares`
 
   const finish = async () => {
     const outcomeIndex = positionIndex
@@ -212,7 +173,6 @@ export const ScalarMarketSell = (props: Props) => {
       })
 
       await fetchGraphMarketMakerData()
-      await fetchCollateralBalance()
       fetchGraphMarketTradeData && (await fetchGraphMarketTradeData())
 
       setAmountShares(null)
@@ -249,19 +209,20 @@ export const ScalarMarketSell = (props: Props) => {
   const isShortTabDisabled = balances[0].shares.lt(dust)
   const isLongTabDisabled = balances[1].shares.lt(dust)
 
+  const isNewPrediction =
+    formattedNewPrediction !== 0 && formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))
+
   return (
     <>
       <MarketScale
         amount={potentialValue}
         borderTop={true}
         collateral={collateral}
-        currentPrediction={outcomeTokenMarginalPrices[1]}
+        currentPrediction={isNewPrediction ? String(formattedNewPrediction) : outcomeTokenMarginalPrices[1]}
         long={positionIndex === 1}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
-        // potentialLoss={potentialLossUncapped}
-        // potentialProfit={potentialProfit}
-        startingPointTitle={'Current prediction'}
+        startingPointTitle={isNewPrediction ? 'New prediction' : 'Current prediction'}
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
         upperBound={scalarHigh || new BigNumber(0)}
       />
@@ -310,7 +271,7 @@ export const ScalarMarketSell = (props: Props) => {
               setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals, 5))
             }}
             shouldDisplayMaxButton
-            symbol={collateral.symbol}
+            symbol={'Shares'}
           />
           {amountError && <GenericError>{amountError}</GenericError>}
         </div>
@@ -323,7 +284,7 @@ export const ScalarMarketSell = (props: Props) => {
             <TransactionDetailsRow
               emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
               state={ValueStates.success}
-              title={'Profit'}
+              title={'Revenue'}
               value={
                 potentialValue
                   ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${collateral.symbol}`
@@ -365,7 +326,7 @@ export const ScalarMarketSell = (props: Props) => {
         />
       )}
       <StyledButtonContainer>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
           Cancel
         </Button>
         <Button buttonType={ButtonType.primaryAlternative} disabled={isSellButtonDisabled} onClick={finish}>

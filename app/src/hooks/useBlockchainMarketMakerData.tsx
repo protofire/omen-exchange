@@ -9,6 +9,7 @@ import { getArbitratorFromAddress } from '../util/networks'
 import { promiseProps } from '../util/tools'
 import { BalanceItem, MarketMakerData, Status, Token } from '../util/types'
 
+import { useConnectedCPKContext } from './connectedCpk'
 import { useConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
 import { GraphMarketMakerData } from './useGraphMarketMakerData'
@@ -80,7 +81,9 @@ const getERC20Token = async (provider: any, address: string): Promise<Token> => 
 
 export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMarketMakerData>, networkId: number) => {
   const context = useConnectedWeb3Context()
-  const { account, library: provider } = context
+  const cpk = useConnectedCPKContext()
+
+  const { library: provider } = context
   const contracts = useContracts(context)
   const [marketMakerData, setMarketMakerData] = useState<Maybe<MarketMakerData>>(null)
   const [status, setStatus] = useState<Status>(Status.Loading)
@@ -93,11 +96,6 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
     const { buildMarketMaker, conditionalTokens } = contracts
 
     const marketMaker = buildMarketMaker(graphMarketMakerData.address)
-
-    let cpk: Maybe<CPKService> = null
-    if (account) {
-      cpk = await CPKService.create(provider)
-    }
 
     const { outcomes } = graphMarketMakerData.question
 
@@ -186,6 +184,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       lastActiveDay: graphMarketMakerData.lastActiveDay,
       creationTimestamp: graphMarketMakerData.creationTimestamp,
       scaledLiquidityParameter: graphMarketMakerData.scaledLiquidityParameter,
+      submissionIDs: graphMarketMakerData.submissionIDs,
       scalarLow: graphMarketMakerData.scalarLow,
       scalarHigh: graphMarketMakerData.scalarHigh,
       outcomeTokenMarginalPrices: graphMarketMakerData.outcomeTokenMarginalPrices,
@@ -193,7 +192,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
     setMarketMakerData(newMarketMakerData)
     setStatus(Status.Ready)
-  }, [graphMarketMakerData, account, provider, contracts, networkId])
+  }, [graphMarketMakerData, provider, contracts, networkId, cpk])
 
   const fetchData = useCallback(async () => {
     try {

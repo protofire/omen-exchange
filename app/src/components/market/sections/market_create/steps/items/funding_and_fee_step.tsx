@@ -12,8 +12,8 @@ import {
 } from '../../../../../../common/constants'
 import {
   useCollateralBalance,
+  useConnectedCPKContext,
   useConnectedWeb3Context,
-  useCpk,
   useCpkAllowance,
   useTokens,
 } from '../../../../../../hooks'
@@ -191,7 +191,7 @@ interface Props {
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
   const { account, library: provider } = context
@@ -299,7 +299,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     isNegativeDepositAmount
 
   const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+    !cpk?.cpk.isSafeApp() &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -432,6 +433,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 <CurrencySelector
                   balance={formatNumber(collateralBalanceFormatted, 5)}
                   context={context}
+                  currency={collateral.address}
                   disabled={false}
                   onSelect={onCollateralChange}
                 />

@@ -406,3 +406,10 @@ export const clampBigNumber = (x: BigNumber, min: BigNumber, max: BigNumber): Bi
   if (x.gt(max)) return max
   return x
 }
+
+export const numberToByte32 = (num: number): string => {
+  const hex = new BigNumber(num).toHexString()
+  const frontZeros = '0'.repeat(66 - hex.length)
+
+  return `0x${frontZeros}${hex.split('0x')[1]}`
+}
