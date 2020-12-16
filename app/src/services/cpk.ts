@@ -10,6 +10,7 @@ import { getCPKAddresses, getContractAddress } from '../util/networks'
 import { calcDistributionHint } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
+import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
 import { MarketMakerService } from './market_maker'
@@ -34,10 +35,13 @@ interface CPKSellOutcomesParams {
 }
 
 interface CPKCreateMarketParams {
+  compoundService: CompoundService | null
+  compoundTokenDetails: Token
   marketData: MarketData
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
+  useCompoundReserve: boolean
 }
 
 interface CPKAddFundingParams {
@@ -160,14 +164,18 @@ class CPKService {
   }
 
   createMarket = async ({
+    compoundService,
+    compoundTokenDetails,
     conditionalTokens,
     marketData,
     marketMakerFactory,
     realitio,
+    useCompoundReserve,
   }: CPKCreateMarketParams): Promise<string> => {
     try {
       const { arbitrator, category, collateral, loadedQuestionId, outcomes, question, resolution, spread } = marketData
-
+      console.log(conditionalTokens)
+      console.log('&&&')
       if (!resolution) {
         throw new Error('Resolution time was not specified')
       }
@@ -238,13 +246,31 @@ class CPKService {
         to: collateral.address,
         data: ERC20Service.encodeApproveUnlimited(marketMakerFactory.address),
       })
-
       // Step 4: Transfer funding from user
       transactions.push({
         to: collateral.address,
         data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
       })
-
+      const fundingTokenAddress = collateral.address
+      if (useCompoundReserve && compoundService) {
+        // const encodedMintFunction = CompoundService.encodeMintTokens(
+        //   compoundTokenDetails.symbol,
+        //   marketData.funding.toString(),
+        // )
+        // const cDai = CompoundService.getABI(compoundTokenDetails.symbol)
+        // fundingTokenAddress = compoundTokenDetails.address
+        // // Approve cToken for the cpk contract
+        // transactions.push({
+        //   to: collateral.address,
+        //   data: ERC20Service.encodeApproveUnlimited(fundingTokenAddress),
+        // })
+        // // Mint ctokens from the underlying token
+        // transactions.push({
+        //   to: fundingTokenAddress,
+        //   value: '0',
+        //   data: encodedMintFunction,
+        // })
+      }
       // Step 5: Create market maker
       const saltNonce = Math.round(Math.random() * 1000000)
       const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(

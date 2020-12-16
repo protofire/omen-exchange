@@ -68,4 +68,9 @@ export const currenciesData = [
     text: 'USDT',
     token: 'USDT',
   },
+  {
+    icon: <Icons.CompoundIcon />,
+    text: 'COMP',
+    token: 'COMP',
+  },
 ]

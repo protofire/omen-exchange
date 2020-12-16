@@ -4,9 +4,11 @@ import { useHistory } from 'react-router'
 import { useContracts } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
+import { CompoundService } from '../../../../services/compound_service'
 import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
+import { getToken } from '../../../../util/networks'
 import { MarketData } from '../../../../util/types'
 import { ModalConnectWallet } from '../../../modal'
 
@@ -26,6 +28,7 @@ const MarketWizardCreatorContainer: FC = () => {
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
   const handleSubmit = async (marketData: MarketData) => {
+    console.log(marketData)
     try {
       if (!account) {
         setModalState(true)
@@ -41,18 +44,32 @@ const MarketWizardCreatorContainer: FC = () => {
         // Approve collateral to the proxy contract
         const collateralService = new ERC20Service(provider, account, marketData.collateral.address)
         const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, marketData.funding)
-
+        const useCompoundReserve = true
         if (!hasEnoughAlowance) {
           await collateralService.approveUnlimited(cpk.address)
         }
+        console.log(marketData)
+        console.log('***')
+        let compoundTokenDetails = marketData.collateral
+        let compoundService = null
+        if (useCompoundReserve) {
+          const cToken = `c${marketData.collateral.symbol.toLowerCase()}`
+          const compoundCollateralToken = cToken as KnownToken
+          compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
+          marketData.userInputToken = marketData.collateral
+          // marketData.collateral = compoundTokenDetails
+          compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
+        }
         const marketMakerAddress = await cpk.createMarket({
-          marketData,
+          compoundService,
+          compoundTokenDetails,
           conditionalTokens,
+          marketData,
           realitio,
           marketMakerFactory,
+          useCompoundReserve,
         })
         setMarketMakerAddress(marketMakerAddress)
-
         setMarketCreationStatus(MarketCreationStatus.done())
         history.replace(`/${marketMakerAddress}`)
       }

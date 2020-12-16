@@ -47,6 +47,7 @@ export const MarketWizardCreator = (props: Props) => {
     categoriesCustom: [],
     category: '',
     collateral: defaultCollateral,
+    userInputToken: defaultCollateral,
     funding: new BigNumber('0'),
     loadedQuestionId: getImportQuestionId(),
     outcomes: [

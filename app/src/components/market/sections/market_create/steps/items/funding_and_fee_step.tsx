@@ -27,8 +27,10 @@ import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
+import { IconTick } from '../../../../../common/icons'
 import { TitleValue } from '../../../../../common/text/title_value'
 import { FullLoading } from '../../../../../loading'
+import { AddCompoundService } from '../../../../common/add_compound_service'
 import {
   ButtonContainerFullWidth,
   CurrenciesWrapper,
@@ -202,11 +204,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     values,
   } = props
 
+  const compundEnabledTokens = ['DAI', 'WBTC', 'BAT', 'WETH', 'USDC', 'USDT']
   const { arbitrator, category, collateral, funding, loadedQuestionId, outcomes, question, resolution, spread } = values
 
   const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
 
   const [currentToken, setCurrentToken] = useState({ tokenExists: false, symbol: '', marketAddress: '' })
+  const showAddCompundService = compundEnabledTokens.includes(currentToken.symbol.toUpperCase())
+
   useEffect(() => {
     const selectedToken = markets.find(
       ({ collateralToken }) =>
@@ -217,7 +222,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       symbol: 'DAI',
       marketAddress: selectedToken ? selectedToken.id : '',
     })
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -256,8 +260,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
+  const [isServiceChecked, setServiceCheck] = useState<boolean>(true)
+  const serviceCheck = <IconTick />
   const tokensAmount = useTokens(context).length
-
+  const toggleServiceCheck = () => {
+    setServiceCheck(!isServiceChecked)
+  }
   const amountError =
     maybeCollateralBalance === null
       ? null
@@ -280,7 +288,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const showSetAllowance =
     allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
-
   const unlockCollateral = async () => {
     if (!cpk) {
       return
@@ -452,6 +459,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             href={''}
             hyperlinkDescription={''}
           />
+        )}
+        {showAddCompundService && (
+          <AddCompoundService isServiceChecked={isServiceChecked} toggleServiceCheck={toggleServiceCheck} />
         )}
         {showSetAllowance && (
           <SetAllowance
