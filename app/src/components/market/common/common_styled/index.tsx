@@ -2,6 +2,7 @@ import styled, { css } from 'styled-components'
 
 import { getOutcomeColor } from '../../../../theme/utils'
 import { ButtonContainer } from '../../../button'
+import { TD, TH } from '../../../common'
 
 interface StatefulRadioButton {
   selected?: boolean
@@ -281,4 +282,21 @@ export const TabsGrid = styled.div`
   grid-column-gap: 13px;
   grid-template-columns: 1fr 1fr;
   margin: 0 0 20px;
+`
+
+export const PaddingCSS = css`
+  padding-left: 25px;
+  padding-right: 0;
+
+  &:last-child {
+    padding-right: 25px;
+  }
+`
+
+export const THStyled = styled(TH as any)`
+  ${PaddingCSS}
+`
+
+export const TDStyled = styled(TD as any)`
+  ${PaddingCSS}
 `

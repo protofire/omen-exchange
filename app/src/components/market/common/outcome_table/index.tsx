@@ -6,9 +6,16 @@ import styled, { css } from 'styled-components'
 import { getOutcomeColor } from '../../../../theme/utils'
 import { formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, BondItem, OutcomeTableValue, Token, TokenEthereum } from '../../../../util/types'
-import { RadioInput, TD, TH, THead, TR, Table } from '../../../common'
+import { RadioInput, TD, THead, TR, Table } from '../../../common'
 import { BarDiagram } from '../bar_diagram_probabilities'
-import { OutcomeItemLittleBallOfJoyAndDifferentColors, OutcomeItemText, OutcomeItemTextWrapper } from '../common_styled'
+import {
+  OutcomeItemLittleBallOfJoyAndDifferentColors,
+  OutcomeItemText,
+  OutcomeItemTextWrapper,
+  PaddingCSS,
+  TDStyled,
+  THStyled,
+} from '../common_styled'
 import { NewValue } from '../new_value'
 import { WinningBadge } from '../winning_badge'
 
@@ -36,15 +43,6 @@ const TableWrapper = styled.div`
   margin-right: -${props => props.theme.cards.paddingHorizontal};
 `
 
-const PaddingCSS = css`
-  padding-left: 25px;
-  padding-right: 0;
-
-  &:last-child {
-    padding-right: 25px;
-  }
-`
-
 const TRExtended = styled(TR as any)<{ clickable?: boolean }>`
   cursor: ${props => (props.clickable ? 'pointer' : 'default')};
 
@@ -57,13 +55,6 @@ TRExtended.defaultProps = {
   clickable: false,
 }
 
-const THStyled = styled(TH as any)`
-  ${PaddingCSS}
-`
-
-const TDStyled = styled(TD as any)`
-  ${PaddingCSS}
-`
 const TDRadio = styled(TD as any)`
   ${PaddingCSS}
   width: 20px;

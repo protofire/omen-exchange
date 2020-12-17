@@ -10,6 +10,9 @@ import {
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
   OutcomeItemTextWrapper,
+  PaddingCSS,
+  TDStyled,
+  THStyled,
 } from '../../common/common_styled'
 
 const TableWrapper = styled.div`
@@ -17,21 +20,7 @@ const TableWrapper = styled.div`
   margin-right: -24px
 `
 
-const PaddingCSS = css`
-  padding-left: 25px;
-  padding-right: 0;
-
-  &:last-child {
-    padding-right: 25px;
-  }
-`
-
-const THStyled = styled(TH as any)`
-  ${PaddingCSS}
-`
-
-const TDStyled = styled(TD as any)<{ positive?: boolean | undefined }>`
-  ${PaddingCSS}
+const ColoredTDStyled = styled(TDStyled as any)<{ positive?: boolean | undefined }>`
   color: ${props =>
     props.positive ? props.theme.scale.positiveText : props.positive === false ? props.theme.scale.negativeText : ''};
 `
@@ -118,17 +107,22 @@ export const PositionTable = (props: Props) => {
             <OutcomeItemText>{index === 0 ? 'Short' : 'Long'}</OutcomeItemText>
           </OutcomeItemTextWrapper>
         </TDPosition>
-        <TDStyled textAlign={TableCellsAlign[1]}>{index === 0 ? shortSharesFormatted : longSharesFormatted}</TDStyled>
-        <TDStyled textAlign={TableCellsAlign[2]}>
+        <ColoredTDStyled textAlign={TableCellsAlign[1]}>
+          {index === 0 ? shortSharesFormatted : longSharesFormatted}
+        </ColoredTDStyled>
+        <ColoredTDStyled textAlign={TableCellsAlign[2]}>
           {index === 0 ? formatNumber(shortPayout.toString()) : formatNumber(longPayout.toString())}
-        </TDStyled>
-        <TDStyled positive={index === 0 ? positiveShortProfit : positiveLongProfit} textAlign={TableCellsAlign[3]}>
+        </ColoredTDStyled>
+        <ColoredTDStyled
+          positive={index === 0 ? positiveShortProfit : positiveLongProfit}
+          textAlign={TableCellsAlign[3]}
+        >
           {index === 0 ? formatNumber(shortProfitLoss.toString()) : formatNumber(longProfitLoss.toString())}(
           {index === 0
             ? formatNumber(shortProfitLossPercentage.toString())
             : formatNumber(longProfitLossPercentage.toString())}
           %)
-        </TDStyled>
+        </ColoredTDStyled>
       </TR>
     )
   }
