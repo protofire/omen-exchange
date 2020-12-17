@@ -1,6 +1,8 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
+import { Token } from '../util/types'
+
 import { cBATAbi, cDaiAbi, cETHAbi, cUSDCAbi, cUSDTAbi, cWBTCAbi } from './compound_abi'
 
 class CompoundService {
@@ -27,6 +29,10 @@ class CompoundService {
     const daysPerYear = 365
     const supplyApy = (Math.pow((supplyRate / ethMantissa) * blocksPerDay + 1, daysPerYear - 1) - 1) * 100
     return supplyApy
+  }
+
+  calculateExchangeRate = async (userInputToken: Token, userInputTokenFunding: BigNumber): Promise<BigNumber> => {
+    return new BigNumber('1')
   }
 
   static encodeMintTokens = (tokenSymbol: string, amountWei: string): string => {

@@ -48,6 +48,7 @@ export const MarketWizardCreator = (props: Props) => {
     categoriesCustom: [],
     category: '',
     collateral: defaultCollateral,
+    userInputCollateral: defaultCollateral,
     compoundInterestRate: '',
     userInputToken: defaultCollateral,
     funding: new BigNumber('0'),
@@ -212,11 +213,23 @@ export const MarketWizardCreator = (props: Props) => {
   }
 
   const handleUseCompoundReserveChange = (useCompoundReserve: boolean) => {
+    let collateral = marketData.userInputCollateral
+    if (useCompoundReserve) {
+      collateral = getCompoundCollateral(collateral)
+    }
     const newMarketData = {
       ...marketData,
+      collateral,
       useCompoundReserve: useCompoundReserve,
     }
     setMarketdata(newMarketData)
+  }
+
+  const getCompoundCollateral = (collateral: Token): Token => {
+    const collateralSymbol = `c${collateral.symbol.toLowerCase()}`
+    const compoundCollateralToken = collateralSymbol as KnownToken
+    const compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
+    return compoundTokenDetails
   }
 
   const handleCollateralChange = (collateral: Token) => {
@@ -224,6 +237,7 @@ export const MarketWizardCreator = (props: Props) => {
       ...marketData,
       funding: ethers.constants.Zero, // when the collateral changes, reset the value of funding
       collateral,
+      userInputCollateral: collateral,
     }
     setMarketdata(newMarketData)
   }

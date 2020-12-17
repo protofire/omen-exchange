@@ -177,12 +177,13 @@ interface Props {
     outcomes: Outcome[]
     loadedQuestionId: Maybe<string>
     verifyLabel?: string
+    userInputCollateral: Token
   }
   marketCreationStatus: MarketCreationStatus
   compoundInterestRate: string
-  handleCollateralChange: (collateral: Token) => void
+  handleCollateralChange: (userInputCollateral: Token) => void
   handleTradingFeeChange: (fee: string) => void
-  setCompoundInterestRate: (collateral: Token) => void
+  setCompoundInterestRate: (userInputCollateral: Token) => void
   handleUseCompoundReserveChange: (useCompoundReserve: boolean) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
@@ -211,7 +212,18 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   } = props
 
   const compundEnabledTokens = ['DAI', 'WBTC', 'BAT', 'WETH', 'USDC', 'USDT']
-  const { arbitrator, category, collateral, funding, loadedQuestionId, outcomes, question, resolution, spread } = values
+  const {
+    arbitrator,
+    category,
+    collateral,
+    funding,
+    loadedQuestionId,
+    outcomes,
+    question,
+    resolution,
+    spread,
+    userInputCollateral,
+  } = values
 
   const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
 
@@ -229,12 +241,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       marketAddress: selectedToken ? selectedToken.id : '',
     })
     if (isServiceChecked) {
-      setCompoundInterestRate(collateral)
+      setCompoundInterestRate(userInputCollateral)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
+  const { allowance, unlock } = useCpkAllowance(signer, userInputCollateral.address)
 
   const [amount, setAmount] = useState<BigNumber>(funding)
   const [amountToDispaly, setAmountToDisplay] = useState<string>('')
@@ -243,26 +255,26 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   useEffect(() => {
-    dispatch(fetchAccountBalance(account, provider, collateral))
-  }, [dispatch, account, provider, collateral])
+    dispatch(fetchAccountBalance(account, provider, userInputCollateral))
+  }, [dispatch, account, provider, userInputCollateral])
 
   const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
   const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
-    formatBigNumber(collateralBalance, collateral.decimals, 5),
+    formatBigNumber(collateralBalance, userInputCollateral.decimals, 5),
   )
-  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(collateral, context)
+  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(userInputCollateral, context)
 
   const [isNegativeDepositAmount, setIsNegativeDepositAmount] = useState<boolean>(false)
 
   useEffect(() => {
     setCollateralBalance(maybeCollateralBalance || Zero)
-    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5))
+    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, userInputCollateral.decimals, 5))
     // eslint-disable-next-line
   }, [maybeCollateralBalance])
 
   useEffect(() => {
-    setIsNegativeDepositAmount(formatBigNumber(funding, collateral.decimals).includes('-'))
-  }, [funding, collateral.decimals])
+    setIsNegativeDepositAmount(formatBigNumber(funding, userInputCollateral.decimals).includes('-'))
+  }, [funding, userInputCollateral.decimals])
 
   const resolutionDate = resolution && formatDate(resolution, false)
 
@@ -278,17 +290,17 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleUseCompoundReserveChange(!isServiceChecked)
   }
   useEffect(() => {
-    if (isServiceChecked && showAddCompundService) {
-      setCompoundInterestRate(collateral)
+    if (showAddCompundService) {
+      setCompoundInterestRate(userInputCollateral)
     }
-  }, [isServiceChecked, collateral])
+  }, [isServiceChecked, userInputCollateral])
   const amountError =
     maybeCollateralBalance === null
       ? null
       : maybeCollateralBalance.isZero() && funding.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : funding.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${collateralBalanceFormatted} ${collateral.symbol}`
+      ? `Value must be less than or equal to ${collateralBalanceFormatted} ${userInputCollateral.symbol}`
       : null
 
   const isCreateMarketbuttonDisabled =
@@ -353,7 +365,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       name: 'funding',
       value: collateralBalance,
     })
-    setAmountToDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
+    setAmountToDisplay(formatBigNumber(collateralBalance, userInputCollateral.decimals, 5))
   }
 
   return (
@@ -416,7 +428,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 <CurrencySelector
                   balance={formatNumber(collateralBalanceFormatted, 5)}
                   context={context}
-                  currency={collateral.address}
+                  currency={userInputCollateral.address}
                   disabled={false}
                   onSelect={onCollateralChange}
                 />
@@ -425,7 +437,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             <TextfieldCustomPlaceholder
               formField={
                 <BigNumberInput
-                  decimals={collateral.decimals}
+                  decimals={userInputCollateral.decimals}
                   name="funding"
                   onChange={handleAmountChange}
                   style={{ width: 0 }}
@@ -435,7 +447,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               }
               onClickMaxButton={onClickMaxButton}
               shouldDisplayMaxButton={true}
-              symbol={collateral.symbol}
+              symbol={userInputCollateral.symbol}
             />
             {customFee && (
               <CustomFeeWrapper>
@@ -455,7 +467,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 title={'Pool Tokens'}
-                value={formatNumber(formatBigNumber(funding, collateral.decimals))}
+                value={formatNumber(formatBigNumber(funding, userInputCollateral.decimals))}
               />
             </TransactionDetailsCard>
           </div>
@@ -482,14 +494,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         {showAddCompundService && (
           <AddCompoundService
             compoundInterestRate={compoundInterestRate}
-            currentToken={currentToken.symbol}
+            currentToken={userInputCollateral.symbol}
             isServiceChecked={isServiceChecked}
             toggleServiceCheck={toggleServiceCheck}
           />
         )}
         {showSetAllowance && (
           <SetAllowance
-            collateral={collateral}
+            collateral={userInputCollateral}
             finished={allowanceFinished && RemoteData.is.success(allowance)}
             loading={RemoteData.is.asking(allowance)}
             marginBottom

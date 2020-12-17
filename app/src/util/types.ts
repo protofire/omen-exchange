@@ -187,6 +187,7 @@ export enum Wallet {
 
 export interface MarketData {
   collateral: Token
+  userInputCollateral: Token
   userInputToken: Token
   arbitratorsCustom: Arbitrator[]
   categoriesCustom: string[]

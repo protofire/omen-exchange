@@ -219,7 +219,17 @@ class CPKService {
     useCompoundReserve,
   }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
-      const { arbitrator, category, collateral, loadedQuestionId, outcomes, question, resolution, spread } = marketData
+      const {
+        arbitrator,
+        category,
+        collateral,
+        loadedQuestionId,
+        outcomes,
+        question,
+        resolution,
+        spread,
+        userInputCollateral,
+      } = marketData
 
       if (!resolution) {
         throw new Error('Resolution time was not specified')
@@ -301,32 +311,27 @@ class CPKService {
       if (!this.cpk.isSafeApp()) {
         // Step 4: Transfer funding from user
         transactions.push({
-          to: collateral.address,
+          to: userInputCollateral.address,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
         })
       }
-
-      let fundingTokenAddress = collateral.address
+      let marketPoolFunding = marketData.funding
       if (useCompoundReserve && compoundService) {
-        console.log(fundingTokenAddress)
+        marketPoolFunding = await compoundService.calculateExchangeRate(userInputCollateral, marketData.funding)
         const encodedMintFunction = CompoundService.encodeMintTokens(
           compoundTokenDetails.symbol,
           marketData.funding.toString(),
         )
-        fundingTokenAddress = compoundTokenDetails.address
         // Approve cToken for the cpk contract
         transactions.push({
-          to: collateral.address,
-          data: ERC20Service.encodeApproveUnlimited(fundingTokenAddress),
+          to: userInputCollateral.address,
+          data: ERC20Service.encodeApproveUnlimited(collateral.address),
         })
         // Mint ctokens from the underlying token
-        if (!this.cpk.isSafeApp()) {
-          transactions.push({
-            to: fundingTokenAddress,
-            value: '0',
-            data: encodedMintFunction,
-          })
-        }
+        transactions.push({
+          to: collateral.address,
+          data: encodedMintFunction,
+        })
       }
 
       // Step 5: Create market maker
@@ -334,7 +339,7 @@ class CPKService {
       const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
         saltNonce,
         conditionalTokens.address,
-        fundingTokenAddress,
+        collateral.address,
         conditionId,
         this.cpk.address,
         spread,
@@ -346,10 +351,10 @@ class CPKService {
         data: MarketMakerFactoryService.encodeCreateMarketMaker(
           saltNonce,
           conditionalTokens.address,
-          fundingTokenAddress,
+          collateral.address,
           conditionId,
           spread,
-          marketData.funding,
+          marketPoolFunding,
           distributionHint,
         ),
       })

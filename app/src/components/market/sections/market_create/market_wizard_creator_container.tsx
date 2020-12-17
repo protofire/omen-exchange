@@ -54,22 +54,22 @@ const MarketWizardCreatorContainer: FC = () => {
 
         if (!cpk.cpk.isSafeApp()) {
           // Approve collateral to the proxy contract
-          const collateralService = new ERC20Service(provider, account, marketData.collateral.address)
+          const collateralService = new ERC20Service(provider, account, marketData.userInputCollateral.address)
           const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, marketData.funding)
-
           if (!hasEnoughAlowance) {
             await collateralService.approveUnlimited(cpk.address)
           }
         }
-        let compoundTokenDetails = marketData.collateral
+        let compoundTokenDetails = marketData.userInputCollateral
         let compoundService = null
         const useCompoundReserve = marketData.useCompoundReserve
         if (useCompoundReserve) {
-          const cToken = `c${marketData.collateral.symbol.toLowerCase()}`
+          const cToken = `c${marketData.userInputCollateral.symbol.toLowerCase()}`
+          console.log(cToken)
           const compoundCollateralToken = cToken as KnownToken
           compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
-          marketData.userInputToken = marketData.collateral
-          // marketData.collateral = compoundTokenDetails
+          marketData.userInputToken = marketData.userInputCollateral
+          console.log(compoundTokenDetails)
           compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
         }
         const { marketMakerAddress, transaction } = await cpk.createMarket({
