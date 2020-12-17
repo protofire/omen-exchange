@@ -510,9 +510,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const isSliderDisabled = !isAmountInputted && shortShares?.lte(DUST) && longShares?.lte(DUST)
 
-  console.log(Number(currentPrediction))
-  console.log((scaleValue || 0) / 100)
-
   return (
     <>
       <ScaleWrapper borderBottom={borderBottom} borderTop={borderTop}>
