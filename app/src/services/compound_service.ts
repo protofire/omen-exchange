@@ -26,6 +26,12 @@ class CompoundService {
     return mintInterface.functions.mint.encode([amountWei])
   }
 
+  static encodeApproveUnlimited = (tokenSymbol: string, spenderAccount: string): string => {
+    const tokenABI = CompoundService.getABI(tokenSymbol)
+    const approveInterface = new utils.Interface(tokenABI)
+    return approveInterface.functions.approve.encode([spenderAccount, ethers.constants.MaxUint256])
+  }
+
   static getABI = (symbol: string) => {
     switch (symbol) {
       case 'cDAI':

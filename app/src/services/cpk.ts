@@ -220,8 +220,7 @@ class CPKService {
   }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
       const { arbitrator, category, collateral, loadedQuestionId, outcomes, question, resolution, spread } = marketData
-      console.log(conditionalTokens)
-      console.log('&&&')
+
       if (!resolution) {
         throw new Error('Resolution time was not specified')
       }
@@ -298,27 +297,6 @@ class CPKService {
         data: ERC20Service.encodeApproveUnlimited(marketMakerFactory.address),
       })
 
-      let fundingTokenAddress = collateral.address
-      if (useCompoundReserve && compoundService) {
-        const encodedMintFunction = CompoundService.encodeMintTokens(
-          compoundTokenDetails.symbol,
-          marketData.funding.toString(),
-        )
-        const cDai = CompoundService.getABI(compoundTokenDetails.symbol)
-        fundingTokenAddress = compoundTokenDetails.address
-        // Approve cToken for the cpk contract
-        transactions.push({
-          to: collateral.address,
-          data: ERC20Service.encodeApproveUnlimited(fundingTokenAddress),
-        })
-        // Mint ctokens from the underlying token
-        transactions.push({
-          to: fundingTokenAddress,
-          value: '0',
-          data: encodedMintFunction,
-        })
-      }
-
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
         // Step 4: Transfer funding from user
@@ -326,6 +304,29 @@ class CPKService {
           to: collateral.address,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
         })
+      }
+
+      let fundingTokenAddress = collateral.address
+      if (useCompoundReserve && compoundService) {
+        console.log(fundingTokenAddress)
+        const encodedMintFunction = CompoundService.encodeMintTokens(
+          compoundTokenDetails.symbol,
+          marketData.funding.toString(),
+        )
+        fundingTokenAddress = compoundTokenDetails.address
+        // Approve cToken for the cpk contract
+        transactions.push({
+          to: collateral.address,
+          data: ERC20Service.encodeApproveUnlimited(fundingTokenAddress),
+        })
+        // Mint ctokens from the underlying token
+        if (!this.cpk.isSafeApp()) {
+          transactions.push({
+            to: fundingTokenAddress,
+            value: '0',
+            data: encodedMintFunction,
+          })
+        }
       }
 
       // Step 5: Create market maker

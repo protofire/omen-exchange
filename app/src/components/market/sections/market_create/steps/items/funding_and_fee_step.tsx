@@ -260,7 +260,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
-  const [isServiceChecked, setServiceCheck] = useState<boolean>(true)
+  const [isServiceChecked, setServiceCheck] = useState<boolean>(false)
   const serviceCheck = <IconTick />
   const tokensAmount = useTokens(context).length
   const toggleServiceCheck = () => {
