@@ -357,17 +357,17 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [longProfitLossPercentage, setLongProfitLossPercentage] = useState<number>(0)
 
   useEffect(() => {
-    if (trades && trades.length) {
+    if (trades && trades.length && collateral) {
       setTotalShortPrice(
         trades
           .filter(trade => trade.outcomeIndex === '0')
-          .map(trade => trade.outcomeTokenMarginalPrice)
+          .map(trade => Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals)))
           .reduce((a, b) => a + b),
       )
       setTotalLongPrice(
         trades
           .filter(trade => trade.outcomeIndex === '1')
-          .map(trade => trade.outcomeTokenMarginalPrice)
+          .map(trade => Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals)))
           .reduce((a, b) => a + b),
       )
     }
@@ -494,8 +494,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   }
 
   const isSliderDisabled = !isAmountInputted && shortShares?.lte(DUST) && longShares?.lte(DUST)
-
-  console.log(trades)
 
   return (
     <>
