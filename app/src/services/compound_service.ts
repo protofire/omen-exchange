@@ -20,6 +20,15 @@ class CompoundService {
     this.provider = provider
   }
 
+  calculateSupplyRateAPY = async (): Promise<number> => {
+    const supplyRate: number = await this.contract.supplyRatePerBlock()
+    const ethMantissa = 1e18
+    const blocksPerDay = 4 * 60 * 24
+    const daysPerYear = 365
+    const supplyApy = (Math.pow((supplyRate / ethMantissa) * blocksPerDay + 1, daysPerYear - 1) - 1) * 100
+    return supplyApy
+  }
+
   static encodeMintTokens = (tokenSymbol: string, amountWei: string): string => {
     const tokenABI = CompoundService.getABI(tokenSymbol)
     const mintInterface = new utils.Interface(tokenABI)
@@ -33,18 +42,19 @@ class CompoundService {
   }
 
   static getABI = (symbol: string) => {
-    switch (symbol) {
-      case 'cDAI':
+    const symbolLowerCase = symbol.toLowerCase()
+    switch (symbolLowerCase) {
+      case 'cdai':
         return cDaiAbi
-      case 'cWBTC':
+      case 'cwbtc':
         return cWBTCAbi
-      case 'cETH':
+      case 'ceth':
         return cETHAbi
-      case 'cBAT':
+      case 'cbat':
         return cBATAbi
-      case 'cUSDT':
+      case 'cusdt':
         return cUSDTAbi
-      case 'cUSDC':
+      case 'cusdc':
         return cUSDCAbi
       default:
         return []

@@ -80,11 +80,12 @@ const ServiceTokenDetails = styled.div`
 export interface AddCompoundServiceProps {
   isServiceChecked: boolean
   toggleServiceCheck?: any
+  compoundInterestRate: string
+  currentToken: string
 }
 
 export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: AddCompoundServiceProps) => {
-  const { isServiceChecked, toggleServiceCheck } = props
-  const interestPercent = '2.5'
+  const { compoundInterestRate, currentToken, isServiceChecked, toggleServiceCheck } = props
   let serviceChecked = <IconTick />
   if (!isServiceChecked) {
     serviceChecked = <span />
@@ -101,7 +102,9 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
             <ServiceTokenDetails>
               <ServiceTextWrapper>
                 <div>Compound</div>
-                <div>Convert Dai to cDai to earn {interestPercent}% interest</div>
+                <div>
+                  Convert {currentToken} to c{currentToken} to earn {compoundInterestRate}% interest
+                </div>
               </ServiceTextWrapper>
               <ServiceCheckWrapper onClick={toggleServiceCheck}>
                 <CheckService>{serviceChecked}</CheckService>

@@ -179,8 +179,11 @@ interface Props {
     verifyLabel?: string
   }
   marketCreationStatus: MarketCreationStatus
+  compoundInterestRate: string
   handleCollateralChange: (collateral: Token) => void
   handleTradingFeeChange: (fee: string) => void
+  setCompoundInterestRate: (collateral: Token) => void
+  handleUseCompoundReserveChange: (useCompoundReserve: boolean) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
 }
@@ -195,11 +198,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const {
     back,
+    compoundInterestRate,
     handleChange,
     handleCollateralChange,
     handleTradingFeeChange,
+    handleUseCompoundReserveChange,
     marketCreationStatus,
     resetTradingFee,
+    setCompoundInterestRate,
     submit,
     values,
   } = props
@@ -222,6 +228,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       symbol: 'DAI',
       marketAddress: selectedToken ? selectedToken.id : '',
     })
+    if (isServiceChecked) {
+      setCompoundInterestRate(collateral)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -260,12 +269,19 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
-  const [isServiceChecked, setServiceCheck] = useState<boolean>(false)
+  const [isServiceChecked, setServiceCheck] = useState<boolean>(true)
   const serviceCheck = <IconTick />
+
   const tokensAmount = useTokens(context).length
   const toggleServiceCheck = () => {
     setServiceCheck(!isServiceChecked)
+    handleUseCompoundReserveChange(!isServiceChecked)
   }
+  useEffect(() => {
+    if (isServiceChecked && showAddCompundService) {
+      setCompoundInterestRate(collateral)
+    }
+  }, [isServiceChecked, collateral])
   const amountError =
     maybeCollateralBalance === null
       ? null
@@ -464,7 +480,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           />
         )}
         {showAddCompundService && (
-          <AddCompoundService isServiceChecked={isServiceChecked} toggleServiceCheck={toggleServiceCheck} />
+          <AddCompoundService
+            compoundInterestRate={compoundInterestRate}
+            currentToken={currentToken.symbol}
+            isServiceChecked={isServiceChecked}
+            toggleServiceCheck={toggleServiceCheck}
+          />
         )}
         {showSetAllowance && (
           <SetAllowance

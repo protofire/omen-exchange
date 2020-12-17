@@ -190,6 +190,7 @@ export interface MarketData {
   userInputToken: Token
   arbitratorsCustom: Arbitrator[]
   categoriesCustom: string[]
+  compoundInterestRate: string
   question: string
   category: string
   resolution: Date | null
@@ -198,6 +199,7 @@ export interface MarketData {
   funding: BigNumber
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
+  useCompoundReserve: boolean
   verifiedLabel?: string
 }
 

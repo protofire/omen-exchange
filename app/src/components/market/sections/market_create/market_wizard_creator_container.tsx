@@ -29,8 +29,16 @@ const MarketWizardCreatorContainer: FC = () => {
   const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(MarketCreationStatus.ready())
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
+  const getCompoundInterestRate = async (symbol: string): Promise<number> => {
+    const cToken = `c${symbol.toLowerCase()}`
+    const compoundCollateralToken = cToken as KnownToken
+    const compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
+    const compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
+    const supplyRate = await compoundService.calculateSupplyRateAPY()
+    return supplyRate
+  }
+
   const handleSubmit = async (marketData: MarketData) => {
-    console.log(marketData)
     try {
       if (!account) {
         setModalState(true)
@@ -55,7 +63,7 @@ const MarketWizardCreatorContainer: FC = () => {
         }
         let compoundTokenDetails = marketData.collateral
         let compoundService = null
-        const useCompoundReserve = false
+        const useCompoundReserve = marketData.useCompoundReserve
         if (useCompoundReserve) {
           const cToken = `c${marketData.collateral.symbol.toLowerCase()}`
           const compoundCollateralToken = cToken as KnownToken
@@ -92,6 +100,7 @@ const MarketWizardCreatorContainer: FC = () => {
     <>
       <MarketWizardCreator
         callback={handleSubmit}
+        getCompoundInterestRate={getCompoundInterestRate}
         marketCreationStatus={marketCreationStatus}
         marketMakerAddress={marketMakerAddress}
       />

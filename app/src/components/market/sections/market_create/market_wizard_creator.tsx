@@ -19,13 +19,14 @@ interface Props {
   callback: (param: MarketData) => void
   marketCreationStatus: MarketCreationStatus
   marketMakerAddress: string | null
+  getCompoundInterestRate: (symbol: string) => Promise<number>
 }
 
 export const MarketWizardCreator = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { networkId } = context
 
-  const { callback, marketCreationStatus } = props
+  const { callback, getCompoundInterestRate, marketCreationStatus } = props
 
   const defaultCollateral = getDefaultToken(networkId)
   const defaultArbitrator = getDefaultArbitrator(networkId)
@@ -47,9 +48,11 @@ export const MarketWizardCreator = (props: Props) => {
     categoriesCustom: [],
     category: '',
     collateral: defaultCollateral,
+    compoundInterestRate: '',
     userInputToken: defaultCollateral,
     funding: new BigNumber('0'),
     loadedQuestionId: getImportQuestionId(),
+    useCompoundReserve: false,
     outcomes: [
       {
         name: '',
@@ -208,6 +211,14 @@ export const MarketWizardCreator = (props: Props) => {
     }))
   }
 
+  const handleUseCompoundReserveChange = (useCompoundReserve: boolean) => {
+    const newMarketData = {
+      ...marketData,
+      useCompoundReserve: useCompoundReserve,
+    }
+    setMarketdata(newMarketData)
+  }
+
   const handleCollateralChange = (collateral: Token) => {
     const newMarketData = {
       ...marketData,
@@ -215,6 +226,16 @@ export const MarketWizardCreator = (props: Props) => {
       collateral,
     }
     setMarketdata(newMarketData)
+  }
+
+  const setCompoundInterestRate = (collateral: Token) => {
+    getCompoundInterestRate(collateral.symbol).then(interest => {
+      const newMarketData = {
+        ...marketData,
+        compoundInterestRate: interest.toFixed(2),
+      }
+      setMarketdata(newMarketData)
+    })
   }
 
   const handleTradingFeeChange = (fee: string) => {
@@ -285,11 +306,14 @@ export const MarketWizardCreator = (props: Props) => {
         return (
           <FundingAndFeeStep
             back={() => back()}
+            compoundInterestRate={marketData.compoundInterestRate}
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
             handleTradingFeeChange={handleTradingFeeChange}
+            handleUseCompoundReserveChange={handleUseCompoundReserveChange}
             marketCreationStatus={marketCreationStatus}
             resetTradingFee={resetTradingFee}
+            setCompoundInterestRate={setCompoundInterestRate}
             submit={() => submit()}
             values={marketData}
           />
