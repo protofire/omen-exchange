@@ -495,6 +495,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const isSliderDisabled = !isAmountInputted && shortShares?.lte(DUST) && longShares?.lte(DUST)
 
+  console.log(trades)
+
   return (
     <>
       <ScaleWrapper borderBottom={borderBottom} borderTop={borderTop}>
@@ -610,26 +612,20 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           </ValueBoxes>
         )}
       </ScaleWrapper>
-      {positionTable &&
-        status === Status.Ready &&
-        trades &&
-        balances &&
-        currentPrediction &&
-        collateral &&
-        !!trades.length && (
-          <PositionTable
-            balances={balances}
-            collateral={collateral}
-            fee={fee}
-            longPayout={longPayout}
-            longProfitLoss={longProfitLoss}
-            longProfitLossPercentage={longProfitLossPercentage}
-            shortPayout={shortPayout}
-            shortProfitLoss={shortProfitLoss}
-            shortProfitLossPercentage={shortProfitLossPercentage}
-            trades={trades}
-          />
-        )}
+      {positionTable && status === Status.Ready && trades && balances && collateral && !!trades.length && (
+        <PositionTable
+          balances={balances}
+          collateral={collateral}
+          fee={fee}
+          longPayout={longPayout}
+          longProfitLoss={longProfitLoss}
+          longProfitLossPercentage={longProfitLossPercentage}
+          shortPayout={shortPayout}
+          shortProfitLoss={shortProfitLoss}
+          shortProfitLossPercentage={shortProfitLossPercentage}
+          trades={trades}
+        />
+      )}
     </>
   )
 }

@@ -6,6 +6,11 @@ import { DUST } from '../../../../common/constants'
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { BalanceItem, PositionTableValue, Token, TradeObject } from '../../../../util/types'
 import { TD, TH, THead, TR, Table } from '../../../common'
+import {
+  OutcomeItemLittleBallOfJoyAndDifferentColors,
+  OutcomeItemText,
+  OutcomeItemTextWrapper,
+} from '../../common/common_styled'
 
 const TableWrapper = styled.div`
   margin-left: -24px
@@ -102,7 +107,12 @@ export const PositionTable = (props: Props) => {
     if ((index === 1 && !longTrades.length) || (index === 1 && longShares.lte(DUST))) return
     return (
       <TR key={index}>
-        <TDPosition textAlign={TableCellsAlign[0]}>{index === 0 ? 'Short' : 'Long'}</TDPosition>
+        <TDPosition textAlign={TableCellsAlign[0]}>
+          <OutcomeItemTextWrapper>
+            <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
+            <OutcomeItemText>{index === 0 ? 'Short' : 'Long'}</OutcomeItemText>
+          </OutcomeItemTextWrapper>
+        </TDPosition>
         <TDStyled textAlign={TableCellsAlign[1]}>{index === 0 ? shortSharesFormatted : longSharesFormatted}</TDStyled>
         <TDStyled textAlign={TableCellsAlign[2]}>
           {index === 0 ? formatNumber(shortPayout.toString()) : formatNumber(longPayout.toString())}
