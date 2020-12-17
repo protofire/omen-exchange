@@ -1,18 +1,9 @@
-[![Netlify Status](https://api.netlify.com/api/v1/badges/2da38309-7dbe-43bb-bb2a-ba3186bc3556/deploy-status)](https://app.netlify.com/sites/conditional/deploys)
+# Omen compound integration.
 
-# Omen
+## This is a work in progress app which contains integrations for -
 
-## Building
-
-The app code lives in the `app` folder. Use `yarn` to install dependencies.
-
-```bash
-cd app/
-yarn
-```
-
-Create a `.env` file. See `.env.example` for environment variables which may be set.
-
-For Omen builds, use `yarn build`.
-
-The `build` directory in the `app` directory will now contain the build to be served.
+* Allow user to convert tokens to cTokens before creating pool.
+* All conversions are handled through CPK so user only has to supply the pool with base token.
+* Coming soon-
+* Fund/Withdraw pool with either token or cTokens
+*
