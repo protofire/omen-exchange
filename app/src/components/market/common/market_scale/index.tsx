@@ -93,6 +93,16 @@ const HorizontalBarRight = styled.div<{ positive: boolean | null; width: number 
   z-index: 2;
 `
 
+const HorizontalBarChange = styled.div<{ start: number; width: number }>`
+  position: absolute;
+  top: calc(50% - ${BAR_WIDTH} / 2);
+  left: ${props => props.start * 100}%;
+  width: ${props => props.width * 100}%;
+  background: ${props => props.theme.scale.neutral};
+  height: ${BAR_WIDTH};
+  z-index: 2;
+`
+
 const ScaleBallContainer = styled.div`
   width: 100%;
 `
@@ -128,11 +138,16 @@ const ScaleBall = styled.input`
   }
 `
 
-const ScaleDot = styled.div<{ xValue: number; positive: Maybe<boolean> }>`
+const ScaleDot = styled.div<{ xValue: number; positive?: Maybe<boolean> }>`
   position: absolute;
   height: ${DOT_SIZE};
   width: ${DOT_SIZE};
-  background: ${props => (props.positive ? `${props.theme.scale.positive}` : `${props.theme.scale.negative}`)};
+  background: ${props =>
+    props.positive
+      ? `${props.theme.scale.positive}`
+      : props.positive === false
+      ? `${props.theme.scale.negative}`
+      : `${props.theme.scale.neutral}`};
   border-radius: 50%;
   z-index: 3;
   left: ${props => props.xValue * 100}%;
@@ -495,6 +510,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const isSliderDisabled = !isAmountInputted && shortShares?.lte(DUST) && longShares?.lte(DUST)
 
+  console.log(Number(currentPrediction))
+  console.log((scaleValue || 0) / 100)
+
   return (
     <>
       <ScaleWrapper borderBottom={borderBottom} borderTop={borderTop}>
@@ -527,6 +545,23 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               value={scaleValue}
             />
           </ScaleBallContainer>
+          {positionTable && (
+            <>
+              <ScaleDot positive={undefined} xValue={Number(currentPrediction)} />
+              <HorizontalBarChange
+                start={
+                  Number(currentPrediction) < (scaleValue || 0) / 100
+                    ? Number(currentPrediction)
+                    : (scaleValue || 0) / 100
+                }
+                width={
+                  Number(currentPrediction) < (scaleValue || 0) / 100
+                    ? (scaleValue || 0) / 100 - Number(currentPrediction)
+                    : Number(currentPrediction) - (scaleValue || 0) / 100
+                }
+              />
+            </>
+          )}
           {isAmountInputted && (
             <>
               <ScaleDot

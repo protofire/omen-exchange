@@ -382,6 +382,7 @@ const theme = {
     border: '#E8EAF6',
     positive: '#80CBC4',
     negative: '#EF9A9A',
+    neutral: '#86909E',
     positiveText: '#4B9E98',
     negativeText: '#EF5350',
   },
