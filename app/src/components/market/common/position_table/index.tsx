@@ -30,8 +30,10 @@ const THStyled = styled(TH as any)`
   ${PaddingCSS}
 `
 
-const TDStyled = styled(TD as any)`
+const TDStyled = styled(TD as any)<{ positive?: boolean | undefined }>`
   ${PaddingCSS}
+  color: ${props =>
+    props.positive ? props.theme.scale.positiveText : props.positive === false ? props.theme.scale.negativeText : ''};
 `
 
 const TDPosition = styled(TD as any)`
@@ -72,6 +74,9 @@ export const PositionTable = (props: Props) => {
 
   const [shortTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '0'))
   const [longTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '1'))
+
+  const positiveShortProfit = shortProfitLoss > 0 ? true : shortProfitLoss < 0 ? false : undefined
+  const positiveLongProfit = longProfitLoss > 0 ? true : longProfitLoss < 0 ? false : undefined
 
   const TableHead: PositionTableValue[] = [
     PositionTableValue.YourPosition,
@@ -117,7 +122,7 @@ export const PositionTable = (props: Props) => {
         <TDStyled textAlign={TableCellsAlign[2]}>
           {index === 0 ? formatNumber(shortPayout.toString()) : formatNumber(longPayout.toString())}
         </TDStyled>
-        <TDStyled textAlign={TableCellsAlign[3]}>
+        <TDStyled positive={index === 0 ? positiveShortProfit : positiveLongProfit} textAlign={TableCellsAlign[3]}>
           {index === 0 ? formatNumber(shortProfitLoss.toString()) : formatNumber(longProfitLoss.toString())}(
           {index === 0
             ? formatNumber(shortProfitLossPercentage.toString())
