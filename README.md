@@ -2,6 +2,8 @@
 
 ## Compound protocol integration for Omen exchange.
 
+### Github pull request https://github.com/protofire/omen-exchange/pull/1466
+
 * It allows Omen pool creators to choose to have the pool reserves get automatically converted into compound tokens which means that while
 the tokens are sitting in the pool they continually accrue interest.
 
