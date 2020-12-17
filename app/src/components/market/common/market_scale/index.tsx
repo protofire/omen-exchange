@@ -508,7 +508,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const isSliderDisabled = !isAmountInputted && shortShares?.lte(DUST) && longShares?.lte(DUST)
+  const isSliderEnabled = isAmountInputted || (positionTable && (shortShares?.gt(DUST) || longShares?.gt(DUST)))
 
   return (
     <>
@@ -532,7 +532,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             </ScaleTooltip>
             <ScaleBall
               className="scale-ball"
-              disabled={isSliderDisabled}
+              disabled={!isSliderEnabled}
               max="100"
               min="0"
               onChange={handleScaleBallChange}
