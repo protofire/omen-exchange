@@ -196,7 +196,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const dispatch = useDispatch()
   const { account, library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
-
+  const [isServiceChecked, setServiceCheck] = useState<boolean>(false)
   const {
     back,
     compoundInterestRate,
@@ -281,7 +281,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
-  const [isServiceChecked, setServiceCheck] = useState<boolean>(true)
   const serviceCheck = <IconTick />
 
   const tokensAmount = useTokens(context).length
