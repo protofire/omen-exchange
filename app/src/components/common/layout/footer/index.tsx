@@ -2,7 +2,13 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { version as appVersion } from '../../../../../package.json'
-import { DISCLAIMER_TEXT, DOCUMENT_FAQ, DOCUMENT_VALIDITY_RULES, SHOW_FOOTER } from '../../../../common/constants'
+import {
+  DISCLAIMER_TEXT,
+  DOCUMENT_FAQ,
+  DOCUMENT_VALIDITY_RULES,
+  MARKET_MAKER_FACTORY_ADDRESS,
+  SHOW_FOOTER,
+} from '../../../../common/constants'
 
 const Wrapper = styled.div<{ paddingBottomSmall?: boolean }>`
   align-items: center;
@@ -44,7 +50,7 @@ export const Footer = () => {
       <Wrapper paddingBottomSmall={DISCLAIMER_TEXT ? true : false}>
         <Link href="https://github.com/protofire/gnosis-conditional-exchange">Version {appVersion}</Link>
         <Break>·</Break>
-        <Link href="https://etherscan.io/address/0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220">Omen Contract</Link>
+        <Link href={`https://etherscan.io/address/${MARKET_MAKER_FACTORY_ADDRESS}`}>Omen Contract</Link>
         <Break>·</Break>
         <Link href="https://explore.duneanalytics.com/dashboard/omen-stats" rel="noopener noreferrer" target="_blank">
           Statistics

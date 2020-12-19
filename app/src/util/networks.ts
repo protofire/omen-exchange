@@ -12,6 +12,7 @@ import {
   KLEROS_CURATE_GRAPH_MAINNET_WS,
   KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
   KLEROS_CURATE_GRAPH_RINKEBY_WS,
+  MARKET_MAKER_FACTORY_ADDRESS,
 } from '../common/constants'
 import { entries, isNotNull } from '../util/type-utils'
 
@@ -80,7 +81,7 @@ const networks: { [K in NetworkId]: Network } = {
     omenTCRListId: 3,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
-      marketMakerFactory: '0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220',
+      marketMakerFactory: MARKET_MAKER_FACTORY_ADDRESS,
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
       oracle: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
       klerosBadge: '0xcb4aae35333193232421e86cd2e9b6c91f3b125f',
