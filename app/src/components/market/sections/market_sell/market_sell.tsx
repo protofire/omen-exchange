@@ -15,7 +15,7 @@ import {
   formatNumber,
   mulBN,
 } from '../../../../util/tools'
-import { BalanceItem, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
+import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -40,7 +40,7 @@ const logger = getLogger('Market::Sell')
 interface Props extends RouteComponentProps<any> {
   fetchGraphMarketMakerData: () => Promise<void>
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
@@ -195,7 +195,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       <OutcomeTable
         balances={balances}
         collateral={collateral}
-        disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
+        disabledColumns={[
+          OutcomeTableValue.Payout,
+          OutcomeTableValue.Outcome,
+          OutcomeTableValue.Probability,
+          OutcomeTableValue.Bonded,
+        ]}
         newShares={balances.map((balance, i) =>
           i === outcomeIndex ? balance.shares.sub(amountShares || Zero) : balance.shares,
         )}
@@ -286,7 +291,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <StyledButtonContainer>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
           Cancel
         </Button>
         <Button buttonType={ButtonType.secondaryLine} disabled={isSellButtonDisabled} onClick={() => finish()}>

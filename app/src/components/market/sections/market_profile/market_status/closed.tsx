@@ -8,7 +8,7 @@ import styled from 'styled-components'
 import { useConnectedCPKContext, useContracts } from '../../../../../hooks'
 import { ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
-import { MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
@@ -93,7 +93,6 @@ const Wrapper = (props: Props) => {
     balances,
     collateral: collateralToken,
     isConditionResolved,
-    isQuestionFinalized,
     payouts,
     question,
   } = marketMakerData
@@ -188,7 +187,7 @@ const Wrapper = (props: Props) => {
 
   const probabilities = balances.map(balance => balance.probability)
 
-  const disabledColumns = [OutcomeTableValue.Outcome, OutcomeTableValue.Probability]
+  const disabledColumns = [OutcomeTableValue.Outcome, OutcomeTableValue.Probability, OutcomeTableValue.Bonded]
 
   if (!account) {
     disabledColumns.push(OutcomeTableValue.Shares)
@@ -218,7 +217,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
-          setCurrentTab('SELL')
+          setCurrentTab(MarketDetailsTab.sell)
         }}
       >
         Sell
@@ -227,7 +226,7 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={true}
         onClick={() => {
-          setCurrentTab('BUY')
+          setCurrentTab(MarketDetailsTab.buy)
         }}
       >
         Buy
@@ -235,18 +234,9 @@ const Wrapper = (props: Props) => {
     </SellBuyWrapper>
   )
 
-  const [currentTab, setCurrentTab] = useState('SWAP')
+  const [currentTab, setCurrentTab] = useState(MarketDetailsTab.swap)
 
-  const marketTabs = {
-    swap: 'SWAP',
-    pool: 'POOL',
-    history: 'HISTORY',
-    verify: 'VERIFY',
-    buy: 'BUY',
-    sell: 'SELL',
-  }
-
-  const switchMarketTab = (newTab: string) => {
+  const switchMarketTab = (newTab: MarketDetailsTab) => {
     setCurrentTab(newTab)
   }
 
@@ -259,12 +249,10 @@ const Wrapper = (props: Props) => {
         <MarketNavigation
           activeTab={currentTab}
           hasWinningOutcomes={hasWinningOutcomes}
-          isQuestionFinalized={isQuestionFinalized}
-          marketAddress={marketMakerAddress}
-          resolutionDate={question.resolution}
+          marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
-        {currentTab === marketTabs.swap && (
+        {currentTab === MarketDetailsTab.swap && (
           <>
             <OutcomeTable
               balances={balances}
@@ -330,22 +318,22 @@ const Wrapper = (props: Props) => {
             )}
           </>
         )}
-        {currentTab === marketTabs.pool && (
+        {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />
         )}
-        {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
-        {currentTab === marketTabs.buy && (
+        {currentTab === MarketDetailsTab.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
+        {currentTab === MarketDetailsTab.buy && (
           <MarketBuyContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />
         )}
-        {currentTab === marketTabs.sell && (
+        {currentTab === MarketDetailsTab.sell && (
           <MarketSellContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             marketMakerData={marketMakerData}

@@ -31,10 +31,20 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   index: number
   outcomeName?: string
   payouts: Maybe<Big[]>
+  showPayout?: boolean
 }
 
 export const WinningBadge: React.FC<Props> = props => {
-  const { index, outcomeName = 'Winning Outcome', payouts, ...restProps } = props
+  const { index, outcomeName = 'Winning Outcome', payouts, showPayout = true, ...restProps } = props
+
+  if (!showPayout) {
+    return (
+      <Wrapper outcomeIndex={index} {...restProps}>
+        <IconDragonBall />
+        <Text outcomeIndex={index}>{outcomeName}</Text>
+      </Wrapper>
+    )
+  }
 
   return (
     payouts && (

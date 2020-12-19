@@ -274,7 +274,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     isNegativeDepositAmount
 
   const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+    !cpk?.cpk.isSafeApp() &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -385,6 +386,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               <CurrenciesWrapper>
                 <CurrencySelector
                   balance={formatNumber(collateralBalanceFormatted, 5)}
+                  currency={collateral.address}
                   disabled={false}
                   onSelect={onCollateralChange}
                 />

@@ -12,6 +12,35 @@ export enum Status {
   Error = 'Error',
 }
 
+export enum KlerosItemStatus {
+  Absent = 'Absent',
+  Registered = 'Registered',
+  RegistrationRequested = 'RegistrationRequested',
+  ClearingRequested = 'ClearingRequested',
+}
+
+export enum KlerosDisputeOutcome {
+  None = 'None',
+  Accept = 'Accept',
+  Refuse = 'Refuse',
+}
+
+export interface MarketCurationState {
+  verificationState: MarketVerificationState
+  submissionTime?: number
+  itemID?: string
+}
+
+export interface KlerosCurationData {
+  listingCriteriaURL: string
+  submissionDeposit: string
+  challengePeriodDuration: string
+  submissionBaseDeposit: string
+  removalBaseDeposit: string
+  marketVerificationData: MarketCurationState
+  ovmAddress: string // ovm here stands for Omen Verified Markets, the Kleros-Omen TCR.
+}
+
 export interface BalanceItem {
   outcomeName: string
   probability: number
@@ -19,6 +48,22 @@ export interface BalanceItem {
   shares: BigNumber
   payout: Big
   holdings: BigNumber
+}
+
+export interface BondItem {
+  outcomeName: string
+  bondedEth: BigNumber
+}
+
+export interface AnswerItem {
+  answer: string
+  bondAggregate: BigNumber
+}
+
+export interface KlerosSubmission {
+  id: string
+  status: KlerosItemStatus
+  listAddress: string
 }
 
 export enum Stage {
@@ -56,6 +101,12 @@ export interface Question {
   isPendingArbitration: boolean
   arbitrationOccurred: boolean
   currentAnswerTimestamp: Maybe<BigNumber>
+  currentAnswerBond: Maybe<BigNumber>
+  answers?: {
+    answer: string
+    bondAggregate: BigNumber
+  }[]
+  bonds?: BondItem[]
 }
 
 export enum OutcomeTableValue {
@@ -65,6 +116,7 @@ export enum OutcomeTableValue {
   Payout = 'Payout',
   Outcome = 'Outcome',
   Probability = 'Probability',
+  Bonded = 'Bonded (ETH)',
 }
 
 export interface Token {
@@ -73,6 +125,11 @@ export interface Token {
   symbol: string
   image?: string
   volume?: string
+}
+
+export const TokenEthereum = {
+  decimals: 18,
+  symbol: 'ETH',
 }
 
 export interface QuestionLog {
@@ -99,6 +156,14 @@ export type MarketWithExtraData = Market & {
   fee: BigNumber
   question: Question
   status: MarketStatus
+}
+
+export enum MarketVerificationState {
+  Verified,
+  NotVerified,
+  SubmissionChallengeable,
+  RemovalChallengeable,
+  WaitingArbitration,
 }
 
 export interface Log {
@@ -219,6 +284,7 @@ export interface MarketMakerData {
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
   scaledLiquidityParameter: number
+  submissionIDs: KlerosSubmission[]
 }
 
 export enum Ternary {
@@ -312,3 +378,24 @@ export type BuildQueryType = MarketFilters & {
   whitelistedTemplateIds: boolean
   networkId: Maybe<number>
 }
+
+export enum MarketDetailsTab {
+  swap = 'SWAP',
+  pool = 'POOL',
+  history = 'HISTORY',
+  verify = 'VERIFY',
+  buy = 'BUY',
+  sell = 'SELL',
+  finalize = 'FINALIZE',
+  setOutcome = 'SET_OUTCOME',
+}
+
+export enum MarketState {
+  open = 'open',
+  finalizing = 'finalizing',
+  arbitration = 'arbitration',
+  closed = 'closed',
+  none = '',
+}
+
+export const INVALID_ANSWER_ID = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'

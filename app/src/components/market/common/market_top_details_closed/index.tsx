@@ -1,3 +1,4 @@
+import { useWeb3React } from '@web3-react/core'
 import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
 import { useHistory } from 'react-router'
@@ -6,7 +7,8 @@ import styled from 'styled-components'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import theme from '../../../../theme'
-import { MarketMakerData, Token } from '../../../../util/types'
+import { getContractAddress } from '../../../../util/networks'
+import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
 import { CurrencySelector } from '../currency_selector'
@@ -36,6 +38,9 @@ interface Props {
 }
 
 const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
+  const context = useWeb3React()
+  const chainId = context.chainId == null ? 1 : context.chainId
+
   const { marketMakerData } = props
   const history = useHistory()
 
@@ -43,17 +48,22 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const isMobile = width <= parseInt(theme.themeBreakPoints.sm)
 
   const {
+    address,
     answerFinalizedTimestamp,
     arbitrator,
     collateral: collateralToken,
     collateralVolume,
     creationTimestamp,
-    curatedByDxDaoOrKleros: isVerified,
+    curatedByDxDao,
+    curatedByDxDaoOrKleros,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
     scaledLiquidityParameter,
+    submissionIDs,
   } = marketMakerData
+  const { title } = question
+  const ovmAddress = getContractAddress(chainId, 'omenVerifiedMarkets')
 
   const [showingProgressBar, setShowingProgressBar] = useState(false)
 
@@ -109,10 +119,11 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
           creationTimestamp={creationDate}
           pendingArbitration={isPendingArbitration}
           resolutionTimestamp={question.resolution}
-          state={'closed'}
+          state={MarketState.closed}
         ></ProgressBar>
       )}
       <MarketData
+        answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
         collateralVolume={collateralVolume}
         currency={collateralToken}
         lastActiveDay={lastActiveDay}
@@ -121,11 +132,16 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         runningDailyVolumeByHour={runningDailyVolumeByHour}
       ></MarketData>
       <AdditionalMarketData
+        address={address}
         arbitrator={arbitrator}
         category={question.category}
+        curatedByDxDao={curatedByDxDao}
+        curatedByDxDaoOrKleros={curatedByDxDaoOrKleros}
         id={question.id}
-        oracle="Reality"
-        verified={isVerified}
+        oracle="Reality.eth"
+        ovmAddress={ovmAddress}
+        submissionIDs={submissionIDs}
+        title={title}
       ></AdditionalMarketData>
     </>
   )

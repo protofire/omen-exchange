@@ -1,6 +1,7 @@
 import { useWeb3React } from '@web3-react/core'
 import { useMemo } from 'react'
 
+import { IPFS_GATEWAY } from '../common/constants'
 import {
   ConditionalTokenService,
   DxTCRService,
@@ -47,10 +48,19 @@ export const useContracts = () => {
   const klerosBadgeAddress = getContractAddress(chainId, 'klerosBadge')
   const klerosTokenViewAddress = getContractAddress(chainId, 'klerosTokenView')
   const klerosTCRAddress = getContractAddress(chainId, 'klerosTCR')
+  const omenVerifiedMarketsAddress = getContractAddress(chainId, 'omenVerifiedMarkets')
   const kleros = useMemo(
     () =>
-      provider && new KlerosService(klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, provider, account),
-    [klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, provider, account],
+      new KlerosService(
+        klerosBadgeAddress,
+        klerosTokenViewAddress,
+        klerosTCRAddress,
+        omenVerifiedMarketsAddress,
+        provider,
+        account,
+        IPFS_GATEWAY,
+      ),
+    [klerosBadgeAddress, klerosTokenViewAddress, klerosTCRAddress, omenVerifiedMarketsAddress, provider, account],
   )
 
   const buildMarketMaker = useMemo(

@@ -2,7 +2,7 @@ import { useWeb3React } from '@web3-react/core'
 import React, { FC, useState } from 'react'
 import { useHistory } from 'react-router'
 
-import { useConnectedCPKContext, useContracts } from '../../../../hooks'
+import { useConnectedCPKContext, useContracts, useGraphMeta } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
@@ -18,6 +18,7 @@ const MarketWizardCreatorContainer: FC = () => {
   const cpk = useConnectedCPKContext()
   const { account, library: provider } = context
   const history = useHistory()
+  const { waitForBlockToSync } = useGraphMeta()
 
   const [isModalOpen, setModalState] = useState(false)
   const { conditionalTokens, marketMakerFactory, realitio } = useContracts()
@@ -39,20 +40,26 @@ const MarketWizardCreatorContainer: FC = () => {
 
         setMarketCreationStatus(MarketCreationStatus.creatingAMarket())
 
-        // Approve collateral to the proxy contract
-        const collateralService = new ERC20Service(provider, account, marketData.collateral.address)
-        const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, marketData.funding)
+        if (!cpk.cpk.isSafeApp()) {
+          // Approve collateral to the proxy contract
+          const collateralService = new ERC20Service(provider, account, marketData.collateral.address)
+          const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, marketData.funding)
 
-        if (!hasEnoughAlowance) {
-          await collateralService.approveUnlimited(cpk.address)
+          if (!hasEnoughAlowance) {
+            await collateralService.approveUnlimited(cpk.address)
+          }
         }
-        const marketMakerAddress = await cpk.createMarket({
+        const { marketMakerAddress, transaction } = await cpk.createMarket({
           marketData,
           conditionalTokens,
           realitio,
           marketMakerFactory,
         })
         setMarketMakerAddress(marketMakerAddress)
+
+        if (transaction.blockNumber) {
+          await waitForBlockToSync(transaction.blockNumber)
+        }
 
         setMarketCreationStatus(MarketCreationStatus.done())
         history.replace(`/${marketMakerAddress}`)

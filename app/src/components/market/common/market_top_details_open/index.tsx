@@ -1,3 +1,4 @@
+import { useWeb3React } from '@web3-react/core'
 import React, { useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
@@ -6,7 +7,8 @@ import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import theme from '../../../../theme'
-import { MarketMakerData, Token } from '../../../../util/types'
+import { getContractAddress } from '../../../../util/networks'
+import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { MoreMenu } from '../../../common/form/more_menu'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -39,6 +41,9 @@ interface Props {
 }
 
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
+  const context = useWeb3React()
+  const chainId = context.chainId == null ? 1 : context.chainId
+
   const { width } = useWindowDimensions()
   const isMobile = width <= parseInt(theme.themeBreakPoints.sm)
 
@@ -47,18 +52,22 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
   const { marketMakerData } = props
   const {
+    address,
     answerFinalizedTimestamp,
     arbitrator,
     collateral,
     collateralVolume,
     creationTimestamp,
-    curatedByDxDaoOrKleros: isVerified,
+    curatedByDxDao,
+    curatedByDxDaoOrKleros,
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
     scaledLiquidityParameter,
+    submissionIDs,
   } = marketMakerData
 
+  const ovmAddress = getContractAddress(chainId, 'omenVerifiedMarkets')
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
   const currentTimestamp = new Date().getTime()
@@ -71,15 +80,15 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
   const marketState =
     question.resolution.getTime() > currentTimestamp
-      ? 'open'
+      ? MarketState.open
       : question.resolution.getTime() < currentTimestamp &&
         (answerFinalizedTimestamp === null || answerFinalizedTimestamp.toNumber() * 1000 > currentTimestamp)
-      ? 'finalizing'
+      ? MarketState.finalizing
       : isPendingArbitration
-      ? 'arbitration'
+      ? MarketState.arbitration
       : answerFinalizedTimestamp && answerFinalizedTimestamp.toNumber() * 1000 < currentTimestamp
-      ? 'closed'
-      : ''
+      ? MarketState.closed
+      : MarketState.none
 
   const { markets: marketsRelatedQuestion } = useGraphMarketsFromQuestion(question.id)
 
@@ -149,19 +158,26 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         ></ProgressBar>
       )}
       <MarketData
+        answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
         collateralVolume={collateralVolume}
         currency={collateral}
+        isFinalize={marketState === MarketState.finalizing}
         lastActiveDay={lastActiveDay}
         liquidity={formattedLiquidity}
         resolutionTimestamp={question.resolution}
         runningDailyVolumeByHour={runningDailyVolumeByHour}
       ></MarketData>
       <AdditionalMarketData
+        address={address}
         arbitrator={arbitrator}
         category={question.category}
+        curatedByDxDao={curatedByDxDao}
+        curatedByDxDaoOrKleros={curatedByDxDaoOrKleros}
         id={question.id}
-        oracle="Reality"
-        verified={isVerified}
+        oracle="Reality.eth"
+        ovmAddress={ovmAddress}
+        submissionIDs={submissionIDs}
+        title={question.title}
       ></AdditionalMarketData>
     </>
   )

@@ -17,7 +17,7 @@ export function usePolling<T>(opts: APIPollingOptions<T>): T {
   const [data, setData] = useState(initialState)
 
   const fetchData = useCallback(() => {
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
       fetchFunc()
         .then(newData => {
           setData(newData)

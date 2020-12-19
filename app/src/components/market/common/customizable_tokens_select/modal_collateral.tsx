@@ -56,7 +56,7 @@ export const ModalCollateral = (props: Props) => {
   }
 
   const spinner = () => {
-    return isSpinnerOn && <SpinnerStyled height={'25px'} width={'25px'} />
+    return isSpinnerOn && <SpinnerStyled size="25" />
   }
 
   const tokenDetails = () => {

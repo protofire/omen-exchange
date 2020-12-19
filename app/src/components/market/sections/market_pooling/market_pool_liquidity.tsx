@@ -23,7 +23,7 @@ import {
   formatBigNumber,
   formatNumber,
 } from '../../../../util/tools'
-import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
@@ -44,7 +44,7 @@ import { WarningMessage } from '../../common/warning_message'
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
   theme?: any
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
 }
 
@@ -55,7 +55,6 @@ enum Tabs {
 
 const BottomButtonWrapper = styled(ButtonContainer)`
   justify-content: space-between;
-  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
   margin: 0 -24px;
   padding: 20px 24px 0;
 `
@@ -208,7 +207,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const probabilities = balances.map(balance => balance.probability)
   const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+    !cpk?.cpk.isSafeApp() &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
   const depositedTokensTotal = depositedTokens.add(userEarnings)
   const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress)
   const fundingBalance = maybeFundingBalance || Zero
@@ -247,11 +247,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
 
-      const collateralAddress = await marketMaker.getCollateralToken()
-      const collateralService = new ERC20Service(provider, account, collateralAddress)
+      if (!cpk.cpk.isSafeApp()) {
+        const collateralAddress = await marketMaker.getCollateralToken()
+        const collateralService = new ERC20Service(provider, account, collateralAddress)
 
-      if (hasEnoughAllowance === Ternary.False) {
-        await collateralService.approveUnlimited(cpk.address)
+        if (hasEnoughAllowance === Ternary.False) {
+          await collateralService.approveUnlimited(cpk.address)
+        }
       }
 
       await cpk.addFunding({
@@ -349,7 +351,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const disableDepositButton =
     !amountToFund ||
     amountToFund?.isZero() ||
-    hasEnoughAllowance !== Ternary.True ||
+    (!cpk?.cpk.isSafeApp() && hasEnoughAllowance !== Ternary.True) ||
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
     isNegativeAmountToFund
@@ -390,7 +392,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       <OutcomeTable
         balances={balances}
         collateral={collateral}
-        disabledColumns={[OutcomeTableValue.OutcomeProbability, OutcomeTableValue.Payout]}
+        disabledColumns={[OutcomeTableValue.OutcomeProbability, OutcomeTableValue.Payout, OutcomeTableValue.Bonded]}
         displayRadioSelection={false}
         newShares={activeTab === Tabs.deposit ? sharesAfterAddingFunding : sharesAfterRemovingFunding}
         probabilities={probabilities}
@@ -560,7 +562,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           hyperlinkDescription=""
         />
       )}
-      <BottomButtonWrapper>
+      <BottomButtonWrapper borderTop>
         <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
           Cancel
         </Button>
