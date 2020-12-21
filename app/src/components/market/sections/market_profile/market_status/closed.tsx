@@ -82,7 +82,7 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
 }
 
 const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: BigNumber[]): Maybe<BigNumber> => {
-  if (balances[0].isZero() && balances[1].isZero()) return null
+  if (!balances[0] || (balances[0].isZero() && !balances[1]) || balances[1].isZero()) return null
 
   const numberBalances = balances.map(balance => Number(formatBigNumber(balance, 18, 18)))
   const shortEarnedCollateral = numberBalances[0] * (1 - finalAnswerPercentage)
