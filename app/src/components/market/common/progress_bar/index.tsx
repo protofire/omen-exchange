@@ -178,7 +178,7 @@ export const ProgressBar: React.FC<Props> = props => {
               <ProgressBarFill
                 className="progress-bar-fill__2"
                 fill={fillFinalizing}
-                fillFraction={arbitrationFraction > 0.01 ? arbitrationFraction : 0.01}
+                fillFraction={fillArbitration ? 1 : arbitrationFraction > 0.01 ? arbitrationFraction : 0.01}
               ></ProgressBarFill>
             </ProgressBarLine>
             <ProgressBarDot className="progress-bar-dot__3" fill={fillArbitration}></ProgressBarDot>

@@ -115,6 +115,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         <ProgressBar
           answerFinalizedTimestamp={answerFinalizedTimestamp}
           arbitrationOccurred={arbitrationOccurred}
+          bondTimestamp={question.currentAnswerTimestamp}
           creationTimestamp={creationDate}
           pendingArbitration={isPendingArbitration}
           resolutionTimestamp={question.resolution}
