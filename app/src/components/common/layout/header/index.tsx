@@ -11,6 +11,7 @@ import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { ModalConnectWallet } from '../../../modal'
 import { IconAdd, IconClose } from '../../icons'
+import { IconSettings } from '../../icons/IconSettings'
 
 const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -84,6 +85,15 @@ const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
 
 const ButtonWrapper = styled.div`
   ${ButtonCSS}
+`
+
+const ButtonSettings = styled(ButtonRound)`
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-left: 12px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+  }
 `
 
 const ContentsLeft = styled.div`
@@ -198,6 +208,9 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               />
             </>
           )}
+          <ButtonSettings {...exitButtonProps} onClick={() => history.push('/settings')}>
+            <IconSettings />
+          </ButtonSettings>
         </ContentsRight>
         <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
       </HeaderInner>
