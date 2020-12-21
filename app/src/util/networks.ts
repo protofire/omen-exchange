@@ -177,6 +177,14 @@ const networks: { [K in NetworkId]: Network } = {
       multiSendAddress: '0xBe95a1C930B7d4F816518Ad7742062537F928b99',
       fallbackHandlerAddress: '0x1e9C3EBAd833b26E522D2fDa180Af3D2A32459D2',
     },
+    wrapToken: 'wspoa',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0x6b175474e89094c44da98b954eedeac495271d0f'),
+      symbol: 'SPOA',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
     defaultToken: 'wspoa',
   },
 }
