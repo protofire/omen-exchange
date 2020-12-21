@@ -494,7 +494,9 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const noMarketsAvailable =
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
   const showFilteringInlineLoading =
-    (!noMarketsAvailable && !noOwnMarkets && isFiltering) || RemoteData.is.loading(markets)
+    (!noMarketsAvailable && !noOwnMarkets && isFiltering) ||
+    RemoteData.is.loading(markets) ||
+    RemoteData.is.reloading(markets)
   const disableLoadNextButton = !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
   const disableLoadPrevButton = pageIndex === 0 || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
 
@@ -564,6 +566,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <ListWrapper>
           {!isFiltering &&
             RemoteData.hasData(markets) &&
+            RemoteData.is.success(markets) &&
             markets.data.length > 0 &&
             markets.data.slice(0, count).map(item => {
               return <ListItem currentFilter={currentFilter} key={item.address} market={item}></ListItem>
