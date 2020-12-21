@@ -233,7 +233,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     symbol: 'WSPOA',
     decimals: 18,
     addresses: {
-      [networkIds.SOKOL]: '0xc655c6D80ac92d75fBF4F40e95280aEb855B1E87',
+      [networkIds.SOKOL]: '0xc655c6d80ac92d75fbf4f40e95280aeb855b1e87',
     },
     order: 1,
   },
