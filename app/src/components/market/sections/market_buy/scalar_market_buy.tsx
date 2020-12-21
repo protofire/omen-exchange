@@ -337,6 +337,7 @@ export const ScalarMarketBuy = (props: Props) => {
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockCollateral}
+          style={{ marginBottom: 20 }}
         />
       )}
       <StyledButtonContainer>
