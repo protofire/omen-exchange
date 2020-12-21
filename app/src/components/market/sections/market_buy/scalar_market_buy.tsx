@@ -120,16 +120,14 @@ export const ScalarMarketBuy = (props: Props) => {
   }
 
   const calcBuyAmount = useMemo(
-    () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber, BigNumber]> => {
+    () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber]> => {
       let tradedShares: BigNumber
       let reverseTradedShares: BigNumber
 
       try {
         tradedShares = await marketMaker.calcBuyAmount(amount, positionIndex)
-        reverseTradedShares = await marketMaker.calcBuyAmount(amount, positionIndex === 0 ? 1 : 0)
       } catch {
         tradedShares = new BigNumber(0)
-        reverseTradedShares = new BigNumber(0)
       }
 
       const balanceAfterTrade = computeBalanceAfterTrade(
@@ -142,14 +140,14 @@ export const ScalarMarketBuy = (props: Props) => {
 
       const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
 
-      return [tradedShares, newPrediction, amount, reverseTradedShares]
+      return [tradedShares, newPrediction, amount]
     },
     [balances, marketMaker, positionIndex, lowerBound, upperBound],
   )
 
-  const [tradedShares, newPrediction, debouncedAmount, reverseTradedShares] = useAsyncDerivedValue(
+  const [tradedShares, newPrediction, debouncedAmount] = useAsyncDerivedValue(
     amount,
-    [new BigNumber(0), 0, amount, new BigNumber(0)],
+    [new BigNumber(0), 0, amount],
     calcBuyAmount,
   )
 
@@ -162,14 +160,6 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
-  const potentialLossUncapped = reverseTradedShares.isZero()
-    ? new BigNumber(0)
-    : reverseTradedShares.sub(amount.add(feePaid))
-  const potentialLoss = reverseTradedShares.isZero()
-    ? new BigNumber(0)
-    : reverseTradedShares.sub(amount).lt(debouncedAmount)
-    ? reverseTradedShares.sub(amount)
-    : debouncedAmount
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
@@ -178,7 +168,7 @@ export const ScalarMarketBuy = (props: Props) => {
     (Number(formatBigNumber(potentialProfit, collateral.decimals)) - totalFee).toString(),
   )} ${collateral.symbol}`
   const potentialLossFormatted = `${formatNumber(
-    (Number(formatBigNumber(potentialLoss, collateral.decimals)) + totalFee).toString(),
+    Number(formatBigNumber(debouncedAmount, collateral.decimals)).toString(),
   )} ${collateral.symbol}`
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
@@ -242,6 +232,8 @@ export const ScalarMarketBuy = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
+  console.log(debouncedAmount)
+
   return (
     <>
       <MarketScale
@@ -253,7 +245,7 @@ export const ScalarMarketBuy = (props: Props) => {
         long={activeTab === Tabs.long}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
-        potentialLoss={potentialLossUncapped}
+        potentialLoss={debouncedAmount}
         potentialProfit={potentialProfit}
         startingPointTitle={'Current prediction'}
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
