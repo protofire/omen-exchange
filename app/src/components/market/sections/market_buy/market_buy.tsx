@@ -44,7 +44,7 @@ const WarningMessageStyled = styled(WarningMessage)`
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
   margin: 0 -24px;
-  margin-top: 24px;
+
   padding: 20px 24px 0;
   margin-top: ${({ theme }) => theme.borders.borderLineDisabled};
 `
@@ -335,7 +335,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           onUnlock={unlockCollateral}
         />
       )}
-      <StyledButtonContainer borderTop={true}>
+      <StyledButtonContainer borderTop={true} marginTop={showSetAllowance || isNegativeAmount}>
         <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
           Cancel
         </Button>
