@@ -45,6 +45,10 @@ const WarningMessageStyled = styled(WarningMessage)`
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
+  margin: 0 -24px;
+
+  padding: 20px 24px 0;
+  margin-top: ${({ theme }) => theme.borders.borderLineDisabled};
 `
 
 const logger = getLogger('Market::Buy')
@@ -352,6 +356,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           description={`Your buy amount should not be negative.`}
           href={''}
           hyperlinkDescription={''}
+          marginBottom={!showSetAllowance}
         />
       )}
       {showSetAllowance && (
@@ -370,7 +375,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           onUnlock={upgradeProxy}
         />
       )}
-      <StyledButtonContainer>
+      <StyledButtonContainer borderTop={true} marginTop={showSetAllowance || isNegativeAmount}>
         <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
           Cancel
         </Button>
