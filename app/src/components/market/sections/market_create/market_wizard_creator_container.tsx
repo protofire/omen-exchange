@@ -51,13 +51,17 @@ const MarketWizardCreatorContainer: FC = () => {
         }
 
         if (isScalar) {
-          const marketMakerAddress = await cpk.createScalarMarket({
+          const { marketMakerAddress, transaction } = await cpk.createScalarMarket({
             marketData,
             conditionalTokens,
             realitio,
             marketMakerFactory,
           })
           setMarketMakerAddress(marketMakerAddress)
+
+          if (transaction.blockNumber) {
+            await waitForBlockToSync(transaction.blockNumber)
+          }
 
           setMarketCreationStatus(MarketCreationStatus.done())
           history.replace(`/${marketMakerAddress}`)

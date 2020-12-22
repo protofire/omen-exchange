@@ -158,28 +158,19 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
-  const totalFee = (Number(formatBigNumber(fee, collateral.decimals)) + 1) ** 2 - 1
+  const totalFee = Number(formatBigNumber(fee, 18))
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
-  const potentialLossUncapped = reverseTradedShares.isZero()
-    ? new BigNumber(0)
-    : reverseTradedShares.sub(amount.add(feePaid))
-  const potentialLoss = reverseTradedShares.isZero()
-    ? new BigNumber(0)
-    : reverseTradedShares.sub(amount).lt(debouncedAmount)
-    ? reverseTradedShares.sub(amount)
-    : debouncedAmount
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
   const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
-  const potentialProfitFormatted = `${formatNumber(
-    (Number(formatBigNumber(potentialProfit, collateral.decimals)) - totalFee).toString(),
-  )} ${collateral.symbol}`
-  const potentialLossFormatted = `${formatNumber(
-    (Number(formatBigNumber(potentialLoss, collateral.decimals)) + totalFee).toString(),
-  )} ${collateral.symbol}`
+  const potentialProfitFormatted = potentialProfit.gt(Zero)
+    ? `${formatNumber((Number(formatBigNumber(potentialProfit, collateral.decimals)) - totalFee).toString())} ${
+        collateral.symbol
+      }`
+    : `0.00 ${collateral.symbol}`
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
 
@@ -246,6 +237,7 @@ export const ScalarMarketBuy = (props: Props) => {
     <>
       <MarketScale
         amount={amount}
+        amountShares={tradedShares}
         border={true}
         collateral={collateral}
         currentPrediction={outcomeTokenMarginalPrices[1]}
@@ -253,8 +245,6 @@ export const ScalarMarketBuy = (props: Props) => {
         long={activeTab === Tabs.long}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
-        potentialLoss={potentialLossUncapped}
-        potentialProfit={potentialProfit}
         startingPointTitle={'Current prediction'}
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
         upperBound={scalarHigh || new BigNumber(0)}
@@ -285,7 +275,7 @@ export const ScalarMarketBuy = (props: Props) => {
                 decimals={collateral.decimals}
                 name="amount"
                 onChange={(e: BigNumberInputReturn) => {
-                  setAmount(e.value)
+                  setAmount(e.value.gt(Zero) ? e.value : Zero)
                   setAmountDisplay('')
                 }}
                 style={{ width: 0 }}
@@ -311,7 +301,12 @@ export const ScalarMarketBuy = (props: Props) => {
               value={feeFormatted}
             />
             <TransactionDetailsLine />
-            <TransactionDetailsRow title={'Max. Loss'} value={potentialLossFormatted} />
+            <TransactionDetailsRow
+              title={'Max. Loss'}
+              value={`${!amount.isZero() ? '-' : ''}${formatNumber(formatBigNumber(amount, collateral.decimals))} ${
+                collateral.symbol
+              }`}
+            />
             <TransactionDetailsRow
               emphasizeValue={potentialProfit.gt(0)}
               state={ValueStates.success}
@@ -337,6 +332,7 @@ export const ScalarMarketBuy = (props: Props) => {
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockCollateral}
+          style={{ marginBottom: 20 }}
         />
       )}
       <StyledButtonContainer>
