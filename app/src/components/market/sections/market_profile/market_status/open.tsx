@@ -1,11 +1,11 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
-import { BalanceItem, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
+import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketScale } from '../../../common/market_scale'
@@ -13,6 +13,7 @@ import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
 import { WarningMessage } from '../../../common/warning_message'
+import { MarketBondContainer } from '../../market_bond/market_bond_container'
 import { MarketBuyContainer } from '../../market_buy/market_buy_container'
 import { MarketHistoryContainer } from '../../market_history/market_history_container'
 import { MarketNavigation } from '../../market_navigation'
@@ -66,7 +67,16 @@ export const StyledButtonContainer = styled(ButtonContainer)`
   }
 `
 
-const SellBuyWrapper = styled.div`
+const MarketBottomNavGroupWrapper = styled.div`
+  display: flex;
+  align-items: center;
+
+  & > * + * {
+    margin-left: 12px;
+  }
+`
+
+const MarketBottomFinalizeNavGroupWrapper = styled.div`
   display: flex;
   align-items: center;
 
@@ -93,11 +103,11 @@ const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const {
-    address: marketMakerAddress,
     balances,
     collateral,
     isQuestionFinalized,
     outcomeTokenMarginalPrices,
+    payouts,
     question,
     scalarHigh,
     scalarLow,
@@ -106,16 +116,32 @@ const Wrapper = (props: Props) => {
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
+  useEffect(() => {
+    const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
+    if (timeDifference > 0) {
+      setTimeout(callAfterTimeout, timeDifference + 2000)
+    }
+    function callAfterTimeout() {
+      fetchGraphMarketMakerData()
+      setCurrentTab(MarketDetailsTab.finalize)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
-    return !shares.isZero()
+    return shares && !shares.isZero()
   })
 
   const probabilities = balances.map(balance => balance.probability)
   const hasFunding = totalPoolShares.gt(0)
 
   const renderTableData = () => {
-    const disabledColumns = [OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]
+    const disabledColumns = [
+      OutcomeTableValue.Payout,
+      OutcomeTableValue.Outcome,
+      OutcomeTableValue.Probability,
+      OutcomeTableValue.Bonded,
+    ]
 
     if (!userHasShares) {
       disabledColumns.push(OutcomeTableValue.Shares)
@@ -128,6 +154,29 @@ const Wrapper = (props: Props) => {
         disabledColumns={disabledColumns}
         displayRadioSelection={false}
         probabilities={probabilities}
+      />
+    )
+  }
+
+  const renderFinalizeTableData = () => {
+    const disabledColumns = [
+      OutcomeTableValue.OutcomeProbability,
+      OutcomeTableValue.Probability,
+      OutcomeTableValue.CurrentPrice,
+      OutcomeTableValue.Payout,
+    ]
+
+    return (
+      <OutcomeTable
+        balances={balances}
+        bonds={question.bonds}
+        collateral={collateral}
+        disabledColumns={disabledColumns}
+        displayRadioSelection={false}
+        isBond
+        payouts={payouts}
+        probabilities={probabilities}
+        withWinningOutcome
       />
     )
   }
@@ -150,13 +199,34 @@ const Wrapper = (props: Props) => {
     </Button>
   )
 
+  const finalizeButtons = (
+    <MarketBottomFinalizeNavGroupWrapper>
+      <Button
+        buttonType={ButtonType.secondaryLine}
+        onClick={() => {
+          window.open(`${realitioBaseUrl}/app/#!/question/${question.id}`)
+        }}
+      >
+        Call Arbitrator
+      </Button>
+      <Button
+        buttonType={ButtonType.primary}
+        onClick={() => {
+          setCurrentTab(MarketDetailsTab.setOutcome)
+        }}
+      >
+        Set Outcome
+      </Button>
+    </MarketBottomFinalizeNavGroupWrapper>
+  )
+
   const buySellButtons = (
-    <SellBuyWrapper>
+    <MarketBottomNavGroupWrapper>
       <Button
         buttonType={ButtonType.secondaryLine}
         disabled={!userHasShares || !hasFunding}
         onClick={() => {
-          setCurrentTab('SELL')
+          setCurrentTab(MarketDetailsTab.sell)
         }}
       >
         Sell
@@ -165,28 +235,30 @@ const Wrapper = (props: Props) => {
         buttonType={ButtonType.secondaryLine}
         disabled={!hasFunding}
         onClick={() => {
-          setCurrentTab('BUY')
+          setCurrentTab(MarketDetailsTab.buy)
         }}
       >
         Buy
       </Button>
-    </SellBuyWrapper>
+    </MarketBottomNavGroupWrapper>
   )
 
-  const [currentTab, setCurrentTab] = useState('SWAP')
+  const isFinalizing = question.resolution < new Date() && !isQuestionFinalized
 
-  const marketTabs = {
-    swap: 'SWAP',
-    pool: 'POOL',
-    history: 'HISTORY',
-    verify: 'VERIFY',
-    buy: 'BUY',
-    sell: 'SELL',
-  }
+  const [currentTab, setCurrentTab] = useState(
+    isQuestionFinalized || !isFinalizing ? MarketDetailsTab.swap : MarketDetailsTab.finalize,
+  )
 
-  const switchMarketTab = (newTab: string) => {
+  const switchMarketTab = (newTab: MarketDetailsTab) => {
     setCurrentTab(newTab)
   }
+
+  useEffect(() => {
+    if ((isQuestionFinalized || !isFinalizing) && currentTab === MarketDetailsTab.finalize) {
+      setCurrentTab(MarketDetailsTab.swap)
+    }
+    // eslint-disable-next-line
+  }, [isQuestionFinalized, isFinalizing])
 
   return (
     <>
@@ -199,7 +271,7 @@ const Wrapper = (props: Props) => {
           marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
-        {currentTab === marketTabs.swap && (
+        {currentTab === MarketDetailsTab.swap && (
           <>
             {isScalar ? (
               <MarketScale
@@ -238,7 +310,32 @@ const Wrapper = (props: Props) => {
             </WhenConnected>
           </>
         )}
-        {currentTab === marketTabs.pool && (
+        {currentTab === MarketDetailsTab.finalize && (
+          <>
+            {renderFinalizeTableData()}
+            <WhenConnected>
+              <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+                <Button
+                  buttonType={ButtonType.secondaryLine}
+                  onClick={() => {
+                    history.goBack()
+                  }}
+                >
+                  Back
+                </Button>
+                {finalizeButtons}
+              </StyledButtonContainer>
+            </WhenConnected>
+          </>
+        )}
+        {currentTab === MarketDetailsTab.setOutcome && (
+          <MarketBondContainer
+            fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            marketMakerData={marketMakerData}
+            switchMarketTab={switchMarketTab}
+          />
+        )}
+        {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             isScalar={isScalar}
@@ -246,8 +343,8 @@ const Wrapper = (props: Props) => {
             switchMarketTab={switchMarketTab}
           />
         )}
-        {currentTab === marketTabs.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
-        {currentTab === marketTabs.buy && (
+        {currentTab === MarketDetailsTab.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
+        {currentTab === MarketDetailsTab.buy && (
           <MarketBuyContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             isScalar={isScalar}
@@ -255,7 +352,7 @@ const Wrapper = (props: Props) => {
             switchMarketTab={switchMarketTab}
           />
         )}
-        {currentTab === marketTabs.sell && (
+        {currentTab === MarketDetailsTab.sell && (
           <MarketSellContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             isScalar={isScalar}
@@ -263,9 +360,10 @@ const Wrapper = (props: Props) => {
             switchMarketTab={switchMarketTab}
           />
         )}
-        {currentTab === marketTabs.verify && (
+        {currentTab === MarketDetailsTab.verify && (
           <MarketVerifyContainer
             context={context}
+            fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />
