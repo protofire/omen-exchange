@@ -285,7 +285,6 @@ const Wrapper = (props: Props) => {
             ) : (
               renderTableData()
             )}
-            {isQuestionOpen && openQuestionMessage}
             {!hasFunding && !isQuestionOpen && (
               <WarningMessageStyled
                 additionalDescription={''}
@@ -310,24 +309,51 @@ const Wrapper = (props: Props) => {
             </WhenConnected>
           </>
         )}
-        {currentTab === MarketDetailsTab.finalize && (
-          <>
-            {renderFinalizeTableData()}
-            <WhenConnected>
-              <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
-                <Button
-                  buttonType={ButtonType.secondaryLine}
-                  onClick={() => {
-                    history.goBack()
-                  }}
-                >
-                  Back
-                </Button>
-                {finalizeButtons}
-              </StyledButtonContainer>
-            </WhenConnected>
-          </>
-        )}
+        {currentTab === MarketDetailsTab.finalize ? (
+          !isScalar ? (
+            <>
+              {renderFinalizeTableData()}
+              <WhenConnected>
+                <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+                  <Button
+                    buttonType={ButtonType.secondaryLine}
+                    onClick={() => {
+                      history.goBack()
+                    }}
+                  >
+                    Back
+                  </Button>
+                  {finalizeButtons}
+                </StyledButtonContainer>
+              </WhenConnected>
+            </>
+          ) : (
+            <>
+              <MarketScale
+                border={true}
+                currentPrediction={outcomeTokenMarginalPrices[1]}
+                lowerBound={scalarLow || new BigNumber(0)}
+                startingPointTitle={'Current prediction'}
+                unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+                upperBound={scalarHigh || new BigNumber(0)}
+              />
+              {openQuestionMessage}
+              <WhenConnected>
+                <StyledButtonContainer className={!hasFunding || isQuestionOpen ? 'border' : ''}>
+                  <Button
+                    buttonType={ButtonType.secondaryLine}
+                    onClick={() => {
+                      history.goBack()
+                    }}
+                  >
+                    Back
+                  </Button>
+                  {isQuestionOpen ? openInRealitioButton : buySellButtons}
+                </StyledButtonContainer>
+              </WhenConnected>
+            </>
+          )
+        ) : null}
         {currentTab === MarketDetailsTab.setOutcome && (
           <MarketBondContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
