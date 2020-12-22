@@ -129,7 +129,7 @@ const Wrapper = (props: Props) => {
   }, [])
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
-    return !shares.isZero()
+    return shares && !shares.isZero()
   })
 
   const probabilities = balances.map(balance => balance.probability)
