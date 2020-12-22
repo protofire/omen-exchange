@@ -238,7 +238,6 @@ class RealitioService {
     const args = getQuestionArgs(question, outcomes, category, arbitratorAddress, openingDateMoment, networkId)
 
     const askQuestionInterface = new utils.Interface(realitioAbi)
-    const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
     return askQuestionInterface.functions.askQuestion.encode(args)
   }
@@ -272,7 +271,6 @@ class RealitioService {
     const questionId = await this.constantContract.askQuestion(...args, {
       from: signerAddress,
     })
-    const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
     return questionId
   }
