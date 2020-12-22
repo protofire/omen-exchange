@@ -211,7 +211,9 @@ const AskQuestionStep = (props: Props) => {
           !resolution ||
           resolution < new Date() ||
           !category ||
-          !isProperScale,
+          !isProperScale ||
+          lowerBound.gte(startingPoint) ||
+          startingPoint.gte(upperBound),
       )
     }
   }, [
