@@ -217,6 +217,14 @@ const networks: { [K in NetworkId]: Network } = {
       multiSendAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
       fallbackHandlerAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
     },
+    wrapToken: 'wxdai',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0x6b175474e89094c44da98b954eedeac495271d0f'),
+      symbol: 'xDAI',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
     defaultToken: 'wxdai',
   },
 }
@@ -273,7 +281,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     symbol: 'wxDAI',
     decimals: 18,
     addresses: {
-      [networkIds.XDAI]: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d',
+      [networkIds.XDAI]: '0xe91d153e0b41518a2ce8dd3d7944fa863463a97d',
     },
     order: 1,
   },
