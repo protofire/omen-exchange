@@ -258,7 +258,9 @@ const Wrapper = (props: Props) => {
   const hasWinningOutcomes = earnedCollateral && earnedCollateral.gt(0)
   const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
   const userWinnersOutcomes = payouts
-    ? payouts.filter((payout, index) => balances[index].shares.gt(0) && payout.gt(0)).length
+    ? payouts.filter(
+        (payout, index) => balances[index] && balances[index].shares && balances[index].shares.gt(0) && payout.gt(0),
+      ).length
     : 0
   const userWinnerShares = payouts
     ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
