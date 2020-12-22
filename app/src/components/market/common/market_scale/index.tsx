@@ -464,7 +464,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               {currentPrediction
                 ? formatNumber(currentPredictionNumber.toString())
                 : startingPoint && startingPointNumber}
-              {` ${unit}`}
+              {currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}
             </ValueBoxTitle>
             <ValueBoxSubtitle>{startingPointTitle}</ValueBoxSubtitle>
           </ValueBoxRegular>
