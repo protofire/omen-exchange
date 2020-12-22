@@ -573,7 +573,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       {activeTab === Tabs.deposit && showUpgrade && (
-        <SetAllowance
+        <SetAllowanceStyled
           collateral={getNativeAsset(context.networkId)}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}

@@ -487,6 +487,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
             loading={RemoteData.is.asking(proxyIsUpToDate)}
             onUnlock={upgradeProxy}
+            style={{ marginBottom: 20 }}
           />
         )}
         <WarningMessage
