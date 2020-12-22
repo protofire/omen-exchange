@@ -59,6 +59,9 @@ interface Network {
     omenVerifiedMarkets: string
   }
   cpk?: CPKAddresses
+  wrapToken: string
+  targetSafeImplementation: string
+  nativeAsset: Token
   defaultToken: string
 }
 
@@ -72,6 +75,8 @@ interface KnownTokenData {
   }
   order: number
 }
+
+export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
 
 const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
@@ -95,6 +100,20 @@ const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8',
       omenVerifiedMarkets: '0xb72103eE8819F2480c25d306eEAb7c3382fBA612',
     },
+    cpk: {
+      masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
+      proxyFactoryAddress: '0x0fB4340432e56c014fa96286de17222822a9281b',
+      multiSendAddress: '0xc3BD4deCF75e9937aefb7a4CE6Ec8931dB4cfAF0',
+      fallbackHandlerAddress: '0x40A930851BD2e590Bd5A5C981b436de25742E980',
+    },
+    wrapToken: 'weth',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'),
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     defaultToken: 'dai',
   },
   [networkIds.RINKEBY]: {
@@ -118,6 +137,20 @@ const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x03165DF66d9448E45c2f5137486af3E7e752a352',
       omenVerifiedMarkets: '0x3b29096b7ab49428923d902cEC3dFEaa49993234',
     },
+    cpk: {
+      masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
+      proxyFactoryAddress: '0x336c19296d3989e9e0c2561ef21c964068657c38',
+      multiSendAddress: '0x82CFd05a033e202E980Bc99eA50A4C6BB91CE0d7',
+      fallbackHandlerAddress: '0x40A930851BD2e590Bd5A5C981b436de25742E980',
+    },
+    wrapToken: 'weth',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'),
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     defaultToken: 'dai',
   },
   [networkIds.SOKOL]: {
@@ -147,6 +180,14 @@ const networks: { [K in NetworkId]: Network } = {
       multiSendAddress: '0xBe95a1C930B7d4F816518Ad7742062537F928b99',
       fallbackHandlerAddress: '0x1e9C3EBAd833b26E522D2fDa180Af3D2A32459D2',
     },
+    wrapToken: 'wspoa',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0x6b175474e89094c44da98b954eedeac495271d0f'),
+      symbol: 'SPOA',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
     defaultToken: 'wspoa',
   },
   [networkIds.XDAI]: {
@@ -224,7 +265,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     symbol: 'WSPOA',
     decimals: 18,
     addresses: {
-      [networkIds.SOKOL]: '0xc655c6D80ac92d75fBF4F40e95280aEb855B1E87',
+      [networkIds.SOKOL]: '0xc655c6d80ac92d75fbf4f40e95280aeb855b1e87',
     },
     order: 1,
   },
@@ -582,4 +623,26 @@ export const getOmenTCRListId = (networkId: number): number => {
   }
 
   return networks[networkId].omenTCRListId
+}
+
+export const getWrapToken = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  const tokenId = networks[networkId].wrapToken as KnownToken
+  return getToken(networkId, tokenId)
+}
+
+export const getNativeAsset = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].nativeAsset as Token
+}
+
+export const getTargetSafeImplementation = (networkId: number): string => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].targetSafeImplementation.toLowerCase()
 }
