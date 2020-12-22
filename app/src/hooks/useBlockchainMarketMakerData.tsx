@@ -154,7 +154,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
     let balances: BalanceItem[]
     isScalar
       ? (balances = getScalarBalances(
-          graphMarketMakerData.outcomeTokenMarginalPrices,
+          graphMarketMakerData.outcomeTokenMarginalPrices || [],
           marketMakerShares,
           userShares,
           payouts,

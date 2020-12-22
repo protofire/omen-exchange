@@ -226,7 +226,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
   const addFunding = async () => {
-    setModalTitle('Funds Deposit')
+    setModalTitle('Deposit Funds')
 
     try {
       if (!cpk) {
@@ -276,7 +276,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const removeFunding = async () => {
-    setModalTitle('Funds Withdrawal')
+    setModalTitle('Withdraw Funds')
     try {
       if (!cpk) {
         return
