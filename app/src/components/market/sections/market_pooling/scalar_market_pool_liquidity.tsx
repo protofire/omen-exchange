@@ -1,7 +1,7 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { DOCUMENT_FAQ } from '../../../../common/constants'
@@ -27,7 +27,7 @@ import {
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
@@ -144,14 +144,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
-  const sendAmountsAfterAddingFunding = calcAddFundingSendAmounts(
-    amountToFund || Zero,
-    balances.map(b => b.holdings),
-    totalPoolShares,
-  )
-  const sharesAfterAddingFunding = sendAmountsAfterAddingFunding
-    ? balances.map((balance, i) => balance.shares.add(sendAmountsAfterAddingFunding[i]))
-    : balances.map(balance => balance.shares)
+
+  const dust = parseUnits('0.00001', collateral.decimals)
+  const disableWithdrawTab = fundingBalance.lt(dust)
 
   const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
     amountToRemove || Zero,
@@ -159,9 +154,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     totalPoolShares,
   )
 
-  const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
-    amount.lt(min) ? amount : min,
-  )
+  const depositedTokens = sendAmountsAfterRemovingFunding.length
+    ? sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
+    : new BigNumber(0)
   const depositedTokensTotal = depositedTokens.add(userEarnings)
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
@@ -303,7 +298,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       <MarketScale
         borderTop={true}
         collateral={collateral}
-        currentPrediction={outcomeTokenMarginalPrices[1]}
+        currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
         lowerBound={scalarLow || new BigNumber(0)}
         startingPointTitle={'Current prediction'}
         unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
@@ -320,7 +315,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
               Deposit
             </ButtonTab>
             <ButtonTab
-              active={disableDepositTab ? true : activeTab === Tabs.withdraw}
+              active={!disableWithdrawTab && activeTab === Tabs.withdraw}
+              disabled={disableWithdrawTab}
               onClick={() => setActiveTab(Tabs.withdraw)}
             >
               Withdraw

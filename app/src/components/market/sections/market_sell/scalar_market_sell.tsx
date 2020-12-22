@@ -258,6 +258,7 @@ export const ScalarMarketSell = (props: Props) => {
                 decimals={collateral.decimals}
                 name="amount"
                 onChange={(e: BigNumberInputReturn) => {
+                  setAmountShares(e.value)
                   setAmountShares(e.value.gt(Zero) ? e.value : Zero)
                   setAmountSharesToDisplay('')
                 }}
