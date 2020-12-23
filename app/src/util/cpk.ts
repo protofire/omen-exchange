@@ -1,3 +1,4 @@
+import SafeAppsSDK from '@gnosis.pm/safe-apps-sdk'
 import CPK, { OperationType } from 'contract-proxy-kit/lib/esm'
 import multiSendAbi from 'contract-proxy-kit/lib/esm/abis/MultiSendAbi.json'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
@@ -43,13 +44,6 @@ interface TransactionResult {
   safeTxHash?: string
 }
 
-interface TxCallback {
-  confirm: (txResult: TransactionResult) => void
-  reject: (error: Error) => void
-}
-
-type RequestId = number | string
-
 const defaultTxOperation = OperationType.Call
 const defaultTxValue = '0'
 const defaultTxData = '0x'
@@ -65,58 +59,15 @@ function standardizeTransaction(tx: Transaction): StandardTransaction {
 
 // Omen CPK monkey patch
 class OCPK extends CPK {
-  txCallbacks = new Map<RequestId, TxCallback>()
-
-  constructor(opts?: any) {
-    super(opts)
-
-    window.addEventListener('message', ({ data, origin }) => {
-      if (origin === window.origin) {
-        return
-      }
-
-      const { data: messagePayload, messageId, requestId } = data
-
-      const TRANSACTION_CONFIRMED = 'TRANSACTION_CONFIRMED'
-      const TRANSACTION_REJECTED = 'TRANSACTION_REJECTED'
-
-      if (messageId === TRANSACTION_CONFIRMED) {
-        const callback = this.txCallbacks.get(requestId)
-        if (callback) {
-          this.txCallbacks.delete(requestId)
-          callback.confirm({ safeTxHash: messagePayload.safeTxHash })
-        }
-      }
-      if (messageId === TRANSACTION_REJECTED) {
-        const callback = this.txCallbacks.get(requestId)
-        if (callback) {
-          this.txCallbacks.delete(requestId)
-          callback.reject(new Error('Transaction rejected'))
-        }
-      }
-    })
-  }
-
-  sendTransactions(transactions: StandardTransaction[], options?: ExecOptions): Promise<TransactionResult> {
-    const requestId = Math.trunc(Date.now())
-    return new Promise<TransactionResult>((confirm, reject) => {
-      const SEND_TRANSACTIONS_V2 = 'SEND_TRANSACTIONS_V2'
-      const txs = transactions.map(standardizeTransaction)
-      const params = { safeTxGas: options?.gas }
-      const data = {
-        txs,
-        params,
-      }
-      const message = {
-        messageId: SEND_TRANSACTIONS_V2,
-        requestId,
-        data,
-      }
-
-      this.txCallbacks.set(requestId, { confirm, reject })
-
-      window.parent.postMessage(message, '*')
-    })
+  async sendTransactions(transactions: StandardTransaction[], options?: ExecOptions): Promise<TransactionResult> {
+    const sdk = new SafeAppsSDK()
+    const txs = transactions.map(standardizeTransaction)
+    const params = { safeTxGas: options?.gas as number }
+    const data = {
+      txs,
+      params,
+    }
+    return await sdk.txs.send(data)
   }
 
   async execTransactions(transactions: Transaction[], options?: ExecOptions): Promise<TransactionResult> {
