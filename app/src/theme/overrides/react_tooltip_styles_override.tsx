@@ -77,25 +77,4 @@ export const ReactTooltipStylesOverride = css`
     padding: 5px 8px !important;
     font-weight: 500 !important;
   }
-
-  .scalarValueTooltip {
-    &.__react_component_tooltip.type-light {
-      &.place-top:after {
-        border: 0 solid ${theme.borders.borderColor} !important;
-      }
-
-      font-size: ${theme.fonts.defaultSize};
-      font-style: normal;
-      font-weight: 500;
-      line-height: 20px;
-      letter-spacing: 0.1px;
-      text-align: left;
-      background-color: ${theme.colors.mainBodyBackground};
-      opacity: 1;
-      border-radius: ${theme.borders.commonBorderRadius};
-      box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
-      border: 1px solid ${theme.borders.tooltip};
-      padding: 5px 8px;
-    }
-  }
 `
