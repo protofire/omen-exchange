@@ -2441,6 +2441,11 @@
   dependencies:
     big.js "^5.2.2"
 
+"@gelatonetwork/core@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@gelatonetwork/core/-/core-1.6.0.tgz#be8426359768da8b16d2352cb3497c1693b39ae8"
+  integrity sha512-ORAPbcGOwl1qyLwGLdAsIySx/xTWasi3J9o+LjvtIn8vKXuLVF+LwPmFbMPrc58FPWAkeJdQERtSoo3VprlBjQ==
+
 "@gnosis.pm/safe-apps-sdk@0.4.2", "@gnosis.pm/safe-apps-sdk@^0.4.1":
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-sdk/-/safe-apps-sdk-0.4.2.tgz#ae87b2164931c006cb0efdede3d82ff210df1648"

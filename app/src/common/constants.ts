@@ -53,8 +53,8 @@ export const TRADING_FEE_OPTIONS = [
 
 export const GRAPH_MAINNET_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen'
 export const GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen'
-export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
-export const GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
+export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/hilmarx/omen-gelato'
+export const GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/hilmarx/omen-gelato'
 export const GRAPH_SOKOL_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-sokol'
 export const GRAPH_SOKOL_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-sokol'
 export const GRAPH_XDAI_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-xdai'
@@ -70,6 +70,11 @@ export const IPFS_GATEWAY = 'https://ipfs.kleros.io'
 export const Logo = OmenLogo
 
 export const DEFAULT_ARBITRATOR: KnownArbitrator = 'kleros'
+
+export const DEFAULT_GELATO_CONDITION: KnownGelatoCondition = 'time'
+
+export const GELATO_MIN_USD_THRESH = 100
+export const GELATO_ACTIVATED = true
 
 export const DEFAULT_TOKEN = 'dai'
 
