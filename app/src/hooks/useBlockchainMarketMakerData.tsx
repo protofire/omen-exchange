@@ -24,22 +24,24 @@ const getBalances = (
 ): BalanceItem[] => {
   const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
-  const balances: BalanceItem[] = outcomes.map((outcome: string, index: number) => {
-    const outcomeName = outcome
-    const probability = actualPrices[index] * 100
-    const currentPrice = actualPrices[index]
-    const shares = userShares[index]
-    const holdings = marketMakerShares[index]
+  const balances: BalanceItem[] = outcomes.length
+    ? outcomes.map((outcome: string, index: number) => {
+        const outcomeName = outcome
+        const probability = actualPrices[index] * 100
+        const currentPrice = actualPrices[index]
+        const shares = userShares[index]
+        const holdings = marketMakerShares[index]
 
-    return {
-      outcomeName,
-      probability,
-      currentPrice,
-      shares,
-      holdings,
-      payout: payouts ? payouts[index] : new Big(0),
-    }
-  })
+        return {
+          outcomeName,
+          probability,
+          currentPrice,
+          shares,
+          holdings,
+          payout: payouts ? payouts[index] : new Big(0),
+        }
+      })
+    : []
 
   return balances
 }
@@ -52,22 +54,24 @@ const getScalarBalances = (
 ): BalanceItem[] => {
   const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
-  const balances: BalanceItem[] = outcomePrices.map((price: string, index: number) => {
-    const outcomeName = index === 0 ? 'short' : 'long'
-    const probability = actualPrices[index] * 100
-    const currentPrice = actualPrices[index]
-    const shares = userShares[index]
-    const holdings = marketMakerShares[index]
+  const balances: BalanceItem[] = outcomePrices.length
+    ? outcomePrices.map((price: string, index: number) => {
+        const outcomeName = index === 0 ? 'short' : 'long'
+        const probability = actualPrices[index] * 100
+        const currentPrice = actualPrices[index]
+        const shares = userShares[index]
+        const holdings = marketMakerShares[index]
 
-    return {
-      outcomeName,
-      probability,
-      currentPrice,
-      shares,
-      holdings,
-      payout: payouts ? payouts[index] : new Big(0),
-    }
-  })
+        return {
+          outcomeName,
+          probability,
+          currentPrice,
+          shares,
+          holdings,
+          payout: payouts ? payouts[index] : new Big(0),
+        }
+      })
+    : []
 
   return balances
 }
@@ -125,7 +129,9 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       userShares:
         cpk && cpk.address
           ? marketMaker.getBalanceInformation(cpk.address, outcomesLength)
-          : outcomes.map(() => new BigNumber(0)),
+          : outcomes.length
+          ? outcomes.map(() => new BigNumber(0))
+          : [],
       collateral: getERC20Token(provider, graphMarketMakerData.collateralAddress),
       isConditionResolved: conditionalTokens.isConditionResolved(graphMarketMakerData.conditionId),
       marketMakerFunding: marketMaker.getTotalSupply(),
