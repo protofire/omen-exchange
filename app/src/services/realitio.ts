@@ -56,7 +56,7 @@ function getScalarQuestionArgs(
   const openingTimestamp = openingDateMoment.unix()
   const questionText = RealitioQuestionLib.encodeText('uint', `${question} [${unit}]`, null, category)
 
-  const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+  const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
   return [UINT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
 }
