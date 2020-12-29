@@ -206,8 +206,8 @@ export const ScalarMarketSell = (props: Props) => {
     amountError !== null ||
     isNegativeAmountShares
 
-  const isShortTabDisabled = isDust(balances[0].shares, 18)
-  const isLongTabDisabled = isDust(balances[1].shares, 18)
+  const isShortTabDisabled = isDust(balances[0].shares, collateral.decimals)
+  const isLongTabDisabled = isDust(balances[1].shares, collateral.decimals)
 
   const isNewPrediction =
     formattedNewPrediction !== 0 && formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))

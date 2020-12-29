@@ -57,8 +57,8 @@ export const PositionTable = (props: Props) => {
 
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
-  const shortSharesFormatted = formatNumber(formatBigNumber(shortShares, 18))
-  const longSharesFormatted = formatNumber(formatBigNumber(longShares, 18))
+  const shortSharesFormatted = formatNumber(formatBigNumber(shortShares, collateral.decimals))
+  const longSharesFormatted = formatNumber(formatBigNumber(longShares, collateral.decimals))
 
   const [shortTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '0'))
   const [longTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '1'))
@@ -75,7 +75,7 @@ export const PositionTable = (props: Props) => {
 
   const TableCellsAlign = ['left', 'right', 'right', 'right']
 
-  if (isDust(shortShares, 18) && isDust(longShares, 18)) {
+  if (isDust(shortShares, collateral.decimals) && isDust(longShares, collateral.decimals)) {
     return <></>
   }
 
@@ -96,8 +96,8 @@ export const PositionTable = (props: Props) => {
   }
 
   const renderTableRow = (index: number) => {
-    if ((index === 0 && !shortTrades.length) || (index === 0 && isDust(shortShares, 18))) return
-    if ((index === 1 && !longTrades.length) || (index === 1 && isDust(longShares, 18))) return
+    if ((index === 0 && !shortTrades.length) || (index === 0 && isDust(shortShares, collateral.decimals))) return
+    if ((index === 1 && !longTrades.length) || (index === 1 && isDust(longShares, collateral.decimals))) return
     return (
       <TR key={index}>
         <TDPosition textAlign={TableCellsAlign[0]}>

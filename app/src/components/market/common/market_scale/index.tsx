@@ -337,8 +337,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       .map(longBalance => longBalance.shares)
       .reduce((a, b) => a.add(b))
 
-  const shortSharesNumber = collateral && Number(formatBigNumber(shortShares || new BigNumber(0), 18))
-  const longSharesNumber = collateral && Number(formatBigNumber(longShares || new BigNumber(0), 18))
+  const shortSharesNumber = collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
+  const longSharesNumber = collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
@@ -457,7 +457,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         setProfitLoss(loss < -(amountNumber || 0) ? -(amountNumber || 0) : loss)
       }
     } else {
-      if (shortShares && !isDust(shortShares, 18)) {
+      if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
         setShortPayout((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
         setShortProfitLoss((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - (totalShortPrice || 0))
         setShortProfitLossPercentage(
@@ -466,7 +466,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             100,
         )
       }
-      if (longShares && !isDust(longShares, 18)) {
+      if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
         setLongPayout((longSharesNumber || 0) * (Number(scaleBall?.value) / 100))
         setLongProfitLoss((longSharesNumber || 0) * (Number(scaleBall?.value) / 100) - (totalLongPrice || 0))
         setLongProfitLossPercentage(
@@ -510,7 +510,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const isSliderEnabled =
     isAmountInputted ||
-    (positionTable && (!isDust(shortShares || new BigNumber(0), 18) || !isDust(longShares || new BigNumber(0), 18)))
+    (positionTable &&
+      collateral &&
+      (!isDust(shortShares || new BigNumber(0), collateral.decimals) ||
+        !isDust(longShares || new BigNumber(0), collateral.decimals)))
 
   return (
     <>
@@ -644,7 +647,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           </ValueBoxes>
         )}
       </ScaleWrapper>
-      {positionTable && status === Status.Ready && trades && balances && collateral && !!trades.length && (
+      {positionTable && status === Status.Ready && trades && balances && collateral && trades.length > 0 && (
         <PositionTable
           balances={balances}
           collateral={collateral}
