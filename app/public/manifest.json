@@ -1,6 +1,8 @@
 {
-  "short_name": "IM",
-  "name": "Prediction Markets",
+  "name": "Omen",
+  "description": "Decentralized prediction markets on Ethereum",
+  "iconPath": "omen_logo_thumbnail.png",
+  "providedBy": { "name": "DXdao", "url": "https://dxdao.eth/" },
   "orientation": "portrait",
   "start_url": ".",
   "display": "standalone",

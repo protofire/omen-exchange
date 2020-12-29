@@ -10,16 +10,16 @@ import { DOCUMENT_VALIDITY_RULES } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
+  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
-  useCpk,
   useCpkAllowance,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
-import { MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -43,19 +43,23 @@ const WarningMessageStyled = styled(WarningMessage)`
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
+  margin: 0 -24px;
+
+  padding: 20px 24px 0;
+  margin-top: ${({ theme }) => theme.borders.borderLineDisabled};
 `
 
 const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
 }
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
   const { library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
@@ -181,7 +185,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+    !cpk?.cpk.isSafeApp() &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
@@ -213,7 +218,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     !amount ||
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
-    hasEnoughAllowance !== Ternary.True ||
+    (!cpk?.cpk.isSafeApp() && hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount
 
@@ -226,7 +231,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <OutcomeTable
         balances={balances}
         collateral={collateral}
-        disabledColumns={[OutcomeTableValue.Payout, OutcomeTableValue.Outcome, OutcomeTableValue.Probability]}
+        disabledColumns={[
+          OutcomeTableValue.Payout,
+          OutcomeTableValue.Outcome,
+          OutcomeTableValue.Probability,
+          OutcomeTableValue.Bonded,
+        ]}
         newShares={newShares}
         outcomeHandleChange={(value: number) => switchOutcome(value)}
         outcomeSelected={outcomeIndex}
@@ -314,6 +324,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           description={`Your buy amount should not be negative.`}
           href={''}
           hyperlinkDescription={''}
+          marginBottom={!showSetAllowance}
         />
       )}
       {showSetAllowance && (
@@ -324,8 +335,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           onUnlock={unlockCollateral}
         />
       )}
-      <StyledButtonContainer>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab('SWAP')}>
+      <StyledButtonContainer borderTop={true} marginTop={showSetAllowance || isNegativeAmount}>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
           Cancel
         </Button>
         <Button buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>

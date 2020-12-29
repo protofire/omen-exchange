@@ -4,9 +4,9 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { ConnectedWeb3Context, useCpk } from '../../../../hooks'
+import { ConnectedWeb3Context, useConnectedCPKContext } from '../../../../hooks'
 import { useKlerosCuration } from '../../../../hooks/useKlerosCuration'
-import { MarketMakerData, Status } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { FullLoading, InlineLoading } from '../../../loading'
@@ -32,7 +32,7 @@ const MarketVerification = styled.div`
 interface Props extends RouteComponentProps<any> {
   context: ConnectedWeb3Context
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
 }
 
@@ -47,7 +47,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const history = useHistory()
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
 
   const selectSource = useCallback(
     (value: number) => {
@@ -111,6 +111,8 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
 
   if (!loading && errorMessage) return <GenericError>{errorMessage || 'Failed to fetch curation data'}</GenericError>
 
+  const verificationBtnDisabled =
+    loading || typeof selection !== 'number' || !ovmAddress || verificationState != 1 || (cpk && cpk.cpk.isSafeApp())
   return (
     <MarketVerification>
       {loading || !data ? (
@@ -127,11 +129,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
         <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
           Back
         </Button>
-        <Button
-          buttonType={ButtonType.primaryAlternative}
-          disabled={loading || typeof selection !== 'number' || !ovmAddress || verificationState != 1}
-          onClick={onSubmitMarket}
-        >
+        <Button buttonType={ButtonType.primaryAlternative} disabled={verificationBtnDisabled} onClick={onSubmitMarket}>
           Request Verification
         </Button>
       </BottomButtonWrapper>

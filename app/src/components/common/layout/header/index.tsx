@@ -6,7 +6,6 @@ import styled, { css } from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
 import { Logo } from '../../../../common/constants'
-import { ConnectedWeb3 } from '../../../../hooks'
 import { ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
@@ -248,17 +247,15 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               {disableConnectButton && <ReactTooltip id="connectButtonTooltip" />}
             </ButtonWrapper>
           )}
-          <ConnectedWeb3>
-            {account && (
-              <>
-                <HeaderDropdown
-                  dropdownPosition={DropdownPosition.center}
-                  items={headerDropdownItems}
-                  placeholder={<Network />}
-                />
-              </>
-            )}
-          </ConnectedWeb3>
+          {context.account && (
+            <>
+              <HeaderDropdown
+                dropdownPosition={DropdownPosition.center}
+                items={headerDropdownItems}
+                placeholder={<Network />}
+              />
+            </>
+          )}
         </ContentsRight>
         <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
       </HeaderInner>

@@ -10,8 +10,9 @@ export const GnoIcon = () => (
     viewBox="0 0 200 200"
     width="24"
     x="0px"
-    xmlns="http://www.w3.org/2000/svg"
     xmlSpace="preserve"
+    // eslint-disable-next-line
+    xmlns="http://www.w3.org/2000/svg"
     y="0px"
   >
     <path d="M58.8,113.86a25.91,25.91,0,0,0,15.9-5.43L38.23,72a26,26,0,0,0,20.57,41.9Z"></path>

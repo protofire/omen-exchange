@@ -1,12 +1,12 @@
 import React, { HTMLAttributes, ReactNode } from 'react'
 import styled from 'styled-components'
 
-const Wrapper = styled.div<{ borderTop?: boolean }>`
+const Wrapper = styled.div<{ borderTop?: boolean; marginTop?: boolean }>`
   align-items: center;
   border-top: ${props => (props.borderTop ? `1px solid ${props.theme.borders.borderDisabled}` : 'none')};
+  margin-top: ${props => (props.marginTop ? `24px!important` : 'auto')};
   display: flex;
   justify-content: flex-end;
-  margin-top: auto;
   padding-top: 20px;
 
   /* It would be wise not to delete this  */
@@ -25,6 +25,7 @@ Wrapper.defaultProps = {
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   borderTop?: boolean
+  marginTop?: boolean
   children: ReactNode
 }
 
