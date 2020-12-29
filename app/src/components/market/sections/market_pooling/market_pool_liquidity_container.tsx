@@ -8,7 +8,7 @@ import { ScalarMarketPoolLiquidity } from './scalar_market_pool_liquidity'
 interface Props {
   marketMakerData: MarketMakerData
   fetchGraphMarketMakerData: () => Promise<void>
-  fetchGraphMarketTradeData?: () => Promise<void> | undefined
+  fetchGraphMarketTradeData: () => Promise<void>
   switchMarketTab: (arg0: MarketDetailsTab) => void
   isScalar: boolean
 }

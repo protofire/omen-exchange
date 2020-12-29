@@ -45,7 +45,7 @@ const logger = getLogger('Scalar Market::Sell')
 
 interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
-  fetchGraphMarketTradeData?: () => Promise<void> | undefined
+  fetchGraphMarketTradeData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
 }
@@ -174,7 +174,7 @@ export const ScalarMarketSell = (props: Props) => {
       })
 
       await fetchGraphMarketMakerData()
-      fetchGraphMarketTradeData && (await fetchGraphMarketTradeData())
+      await fetchGraphMarketTradeData()
 
       setAmountShares(null)
       setAmountSharesToDisplay('')

@@ -47,7 +47,7 @@ const logger = getLogger('Scalar Market::Buy')
 
 interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
-  fetchGraphMarketTradeData?: () => Promise<void> | undefined
+  fetchGraphMarketTradeData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
 }
@@ -214,7 +214,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
       await fetchGraphMarketMakerData()
       await fetchCollateralBalance()
-      fetchGraphMarketTradeData && (await fetchGraphMarketTradeData())
+      await fetchGraphMarketTradeData()
 
       setTweet(
         stripIndents(`${question.title}

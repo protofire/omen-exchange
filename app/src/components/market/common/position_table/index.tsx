@@ -57,8 +57,8 @@ export const PositionTable = (props: Props) => {
 
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
-  const shortSharesFormatted = formatNumber(formatBigNumber(shortShares, collateral.decimals))
-  const longSharesFormatted = formatNumber(formatBigNumber(longShares, collateral.decimals))
+  const shortSharesFormatted = formatNumber(formatBigNumber(balances[0].shares, collateral.decimals))
+  const longSharesFormatted = formatNumber(formatBigNumber(balances[1].shares, collateral.decimals))
 
   const [shortTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '0'))
   const [longTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '1'))
