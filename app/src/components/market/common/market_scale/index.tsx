@@ -376,7 +376,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       setTotalShortPrice(
         shortTrades.length
           ? shortTrades
-              .map(trade => Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals)))
+              .map(trade =>
+                trade.type === 'Buy'
+                  ? Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals))
+                  : Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals)) * -1,
+              )
               .reduce((a, b) => a + b)
           : 0,
       )
@@ -384,7 +388,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       setTotalLongPrice(
         longTrades.length
           ? longTrades
-              .map(trade => Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals)))
+              .map(trade =>
+                trade.type === 'Buy'
+                  ? Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals))
+                  : Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals)) * -1,
+              )
               .reduce((a, b) => a + b)
           : 0,
       )
