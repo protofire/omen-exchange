@@ -212,9 +212,9 @@ export const ScalarMarketBuy = (props: Props) => {
         marketMaker,
       })
 
+      await fetchGraphMarketTradeData()
       await fetchGraphMarketMakerData()
       await fetchCollateralBalance()
-      await fetchGraphMarketTradeData()
 
       setTweet(
         stripIndents(`${question.title}

@@ -192,10 +192,10 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         marketMaker,
       })
 
+      await fetchGraphMarketTradeData()
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
       await fetchCollateralBalance()
-      await fetchGraphMarketTradeData()
 
       setStatus(Status.Ready)
       setAmountToFund(null)

@@ -173,8 +173,8 @@ export const ScalarMarketSell = (props: Props) => {
         outcomeIndex,
       })
 
-      await fetchGraphMarketMakerData()
       await fetchGraphMarketTradeData()
+      await fetchGraphMarketMakerData()
 
       setAmountShares(null)
       setAmountSharesToDisplay('')
