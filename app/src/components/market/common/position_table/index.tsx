@@ -2,8 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useState } from 'react'
 import styled, { css } from 'styled-components'
 
-import { DUST } from '../../../../common/constants'
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import { BalanceItem, PositionTableValue, Token, TradeObject } from '../../../../util/types'
 import { TD, TH, THead, TR, Table } from '../../../common'
 import {
@@ -76,7 +75,7 @@ export const PositionTable = (props: Props) => {
 
   const TableCellsAlign = ['left', 'right', 'right', 'right']
 
-  if (shortShares.lte(DUST) && longShares.lte(DUST)) {
+  if (isDust(shortShares, 18) && isDust(longShares, 18)) {
     return <></>
   }
 
@@ -97,8 +96,8 @@ export const PositionTable = (props: Props) => {
   }
 
   const renderTableRow = (index: number) => {
-    if ((index === 0 && !shortTrades.length) || (index === 0 && shortShares.lte(DUST))) return
-    if ((index === 1 && !longTrades.length) || (index === 1 && longShares.lte(DUST))) return
+    if ((index === 0 && !shortTrades.length) || (index === 0 && isDust(shortShares, 18))) return
+    if ((index === 1 && !longTrades.length) || (index === 1 && isDust(longShares, 18))) return
     return (
       <TR key={index}>
         <TDPosition textAlign={TableCellsAlign[0]}>

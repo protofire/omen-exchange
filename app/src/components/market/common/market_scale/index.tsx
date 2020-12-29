@@ -2,8 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import { DUST } from '../../../../common/constants'
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import { BalanceItem, Status, Token, TradeObject } from '../../../../util/types'
 import { PositionTable } from '../position_table'
 
@@ -458,7 +457,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         setProfitLoss(loss < -(amountNumber || 0) ? -(amountNumber || 0) : loss)
       }
     } else {
-      if (shortShares && shortShares.gt(DUST)) {
+      if (shortShares && !isDust(shortShares, 18)) {
         setShortPayout((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
         setShortProfitLoss((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - (totalShortPrice || 0))
         setShortProfitLossPercentage(
@@ -467,7 +466,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             100,
         )
       }
-      if (longShares && longShares.gt(DUST)) {
+      if (longShares && !isDust(longShares, 18)) {
         setLongPayout((longSharesNumber || 0) * (Number(scaleBall?.value) / 100))
         setLongProfitLoss((longSharesNumber || 0) * (Number(scaleBall?.value) / 100) - (totalLongPrice || 0))
         setLongProfitLossPercentage(
@@ -509,7 +508,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const isSliderEnabled = isAmountInputted || (positionTable && (shortShares?.gt(DUST) || longShares?.gt(DUST)))
+  const isSliderEnabled =
+    isAmountInputted ||
+    (positionTable && (!isDust(shortShares || new BigNumber(0), 18) || !isDust(longShares || new BigNumber(0), 18)))
 
   return (
     <>

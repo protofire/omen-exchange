@@ -23,6 +23,7 @@ import {
   calcRemoveFundingSendAmounts,
   formatBigNumber,
   formatNumber,
+  isDust,
 } from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
@@ -145,8 +146,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     totalPoolShares,
   )
 
-  const dust = parseUnits('0.00001', collateral.decimals)
-  const disableWithdrawTab = fundingBalance.lt(dust)
+  const disableWithdrawTab = isDust(fundingBalance, collateral.decimals)
 
   const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
     amountToRemove || Zero,
