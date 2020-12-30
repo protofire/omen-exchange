@@ -80,12 +80,11 @@ const ButtonRoundBridge = styled(ButtonRound)`
   display: flex;
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    flex-basis: calc(100vw - 20px);
+    width: calc(100% - 20px);
     order: 3;
-    margin-top: 12px;
-    //margin-right: 12px;
-    position: relative;
-    left: -84px;
+    margin-top: 100px;
+    position: absolute;
+    left: 10px;
   }
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 12px;
@@ -152,6 +151,7 @@ const CloseIconWrapper = styled.div`
 
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   const { account, library: provider, networkId } = useWeb3Context()
+  console.log(networkId)
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
@@ -174,6 +174,22 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
 
   const exitButtonProps = {
     onClick: () => history.push('/'),
+  }
+
+  const currencyReturn = (condition: boolean): JSX.Element => {
+    return (
+      <CurrencyWrapper>
+        {condition ? (
+          <>
+            <DaiIcon size="22" /> <CurrencyText>Dai</CurrencyText>
+          </>
+        ) : (
+          <>
+            <XdaiIcon /> <CurrencyText>xDai</CurrencyText>
+          </>
+        )}
+      </CurrencyWrapper>
+    )
   }
 
   return (
@@ -206,7 +222,8 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               </ButtonCreateMobile>
             </>
           )}
-          {networkId === 1 && account && (
+          {/*mainnet           sokol              xDai    */}
+          {(networkId === 1 || networkId == 77 || networkId == 99) && account && (
             <>
               <ButtonRoundBridge
                 onClick={() => {
@@ -214,15 +231,11 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
                   setIsBridgeOpen(!isBridgeOpen)
                 }}
               >
-                <CurrencyWrapper>
-                  <DaiIcon size="22" /> <CurrencyText>Dai</CurrencyText>
-                </CurrencyWrapper>
+                {currencyReturn(networkId === 1)}
                 <ArrowWrapper>
                   <IconArrowRight />
                 </ArrowWrapper>
-                <CurrencyWrapper>
-                  <XdaiIcon /> <CurrencyText>xDai</CurrencyText>
-                </CurrencyWrapper>
+                {currencyReturn(networkId !== 1)}
               </ButtonRoundBridge>
               <XdaiBridgeTransfer open={isBridgeOpen} provider={provider} />
             </>
@@ -247,7 +260,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               {disableConnectButton && <ReactTooltip id="connectButtonTooltip" />}
             </ButtonWrapper>
           )}
-          {context.account && (
+          {account && (
             <>
               <HeaderDropdown
                 dropdownPosition={DropdownPosition.center}

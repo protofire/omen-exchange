@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 
-import { useCpk, useCpkAllowance } from '../../../../hooks'
+import { useCpkAllowance } from '../../../../hooks'
 import { RemoteData } from '../../../../util/remote_data'
 import { ButtonRound } from '../../../button/button_round'
 import { ButtonStateful } from '../../../button/button_stateful'
@@ -87,22 +87,10 @@ const TransferState = styled.div<{ show: boolean }>`
 `
 
 export const XdaiBridgeTransfer: React.FC<Props> = props => {
-  const cpk = useCpk()
-  const signer = useMemo(() => props.provider.getSigner(), [props.provider])
-  // const { allowance, unlock } = useCpkAllowance(signer, 'collateral.address')
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const [amount, setAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [transferState, setTransferState] = useState<boolean>(false)
-  const unlockCollateral = async () => {
-    if (!cpk) {
-      return
-    }
-
-    // await unlock()
-
-    setAllowanceFinished(true)
-  }
 
   return (
     <>
@@ -145,6 +133,7 @@ export const XdaiBridgeTransfer: React.FC<Props> = props => {
           <TransferButton
             onClick={() => {
               console.log('here')
+              setTransferState(!transferState)
             }}
           >
             Transfer
