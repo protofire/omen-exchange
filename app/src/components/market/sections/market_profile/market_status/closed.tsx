@@ -84,10 +84,9 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
 const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: BigNumber[]): Maybe<BigNumber> => {
   if (!balances[0] || (balances[0].isZero() && !balances[1]) || balances[1].isZero()) return null
 
-  const clampedFinalAnswerPercentage =
-    finalAnswerPercentage > 1 ? 1 : finalAnswerPercentage < 0 ? 0 : finalAnswerPercentage
-  const shortEarnedCollateral = balances[0].mul(1 - clampedFinalAnswerPercentage)
-  const longEarnedCollateral = balances[0].mul(clampedFinalAnswerPercentage)
+  const clampedFinalAnswer = finalAnswerPercentage > 1 ? 1 : finalAnswerPercentage < 0 ? 0 : finalAnswerPercentage
+  const shortEarnedCollateral = balances[0].mul(1 - clampedFinalAnswer)
+  const longEarnedCollateral = balances[1].mul(clampedFinalAnswer)
   const earnedCollateral = shortEarnedCollateral.add(longEarnedCollateral)
 
   return earnedCollateral
