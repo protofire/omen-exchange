@@ -1,5 +1,5 @@
 import Big from 'big.js'
-import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -84,10 +84,11 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
 const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: BigNumber[]): Maybe<BigNumber> => {
   if (!balances[0] || (balances[0].isZero() && !balances[1]) || balances[1].isZero()) return null
 
-  const numberBalances = balances.map(balance => Number(formatBigNumber(balance, 18, 18)))
-  const shortEarnedCollateral = numberBalances[0] * (1 - finalAnswerPercentage)
-  const longEarnedCollateral = numberBalances[1] * finalAnswerPercentage
-  const earnedCollateral = parseUnits((shortEarnedCollateral + longEarnedCollateral).toString(), 18)
+  const clampedFinalAnswerPercentage =
+    finalAnswerPercentage > 1 ? 1 : finalAnswerPercentage < 0 ? 0 : finalAnswerPercentage
+  const shortEarnedCollateral = balances[0].mul(1 - clampedFinalAnswerPercentage)
+  const longEarnedCollateral = balances[0].mul(clampedFinalAnswerPercentage)
+  const earnedCollateral = shortEarnedCollateral.add(longEarnedCollateral)
 
   return earnedCollateral
 }
