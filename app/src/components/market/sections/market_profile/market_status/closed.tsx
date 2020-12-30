@@ -1,5 +1,5 @@
 import Big from 'big.js'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -8,6 +8,7 @@ import { useConnectedCPKContext, useContracts } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
+import { formatBigNumber } from '../../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
@@ -80,12 +81,23 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
   return earnedCollateral
 }
 
+const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: BigNumber[]): Maybe<BigNumber> => {
+  if (!balances[0] || (balances[0].isZero() && !balances[1]) || balances[1].isZero()) return null
+
+  const numberBalances = balances.map(balance => Number(formatBigNumber(balance, 18, 18)))
+  const shortEarnedCollateral = numberBalances[0] * (1 - finalAnswerPercentage)
+  const longEarnedCollateral = numberBalances[1] * finalAnswerPercentage
+  const earnedCollateral = parseUnits((shortEarnedCollateral + longEarnedCollateral).toString(), 18)
+
+  return earnedCollateral
+}
+
 const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
 
   const { account, library: provider } = context
-  const { buildMarketMaker, conditionalTokens, oracle } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
 
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
 
@@ -95,9 +107,9 @@ const Wrapper = (props: Props) => {
     balances,
     collateral: collateralToken,
     isConditionResolved,
-    outcomeTokenMarginalPrices,
     payouts,
     question,
+    realitioAnswer,
     scalarHigh,
     scalarLow,
   } = marketMakerData
@@ -118,7 +130,11 @@ const Wrapper = (props: Props) => {
     try {
       setStatus(Status.Loading)
       setMessage('Resolving condition...')
-      await oracle.resolveCondition(question, balances.length)
+      if (isScalar && scalarLow && scalarHigh) {
+        await realitio.resolveCondition(question.id, question.raw, scalarLow, scalarHigh)
+      } else {
+        await oracle.resolveCondition(question, balances.length)
+      }
 
       setStatus(Status.Ready)
       setMessage(`Condition successfully resolved.`)
@@ -147,11 +163,6 @@ const Wrapper = (props: Props) => {
       isSubscribed = false
     }
   }, [provider, account, marketMakerAddress, marketMaker])
-
-  const earnedCollateral = computeEarnedCollateral(
-    payouts,
-    balances.map(balance => balance.shares),
-  )
 
   const redeem = async () => {
     setModalTitle('Redeem Payout')
@@ -198,24 +209,6 @@ const Wrapper = (props: Props) => {
     disabledColumns.push(OutcomeTableValue.Shares)
   }
 
-  const hasWinningOutcomes = earnedCollateral && earnedCollateral.gt(0)
-  const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
-  const userWinnersOutcomes = payouts
-    ? payouts.filter((payout, index) => balances[index].shares.gt(0) && payout.gt(0)).length
-    : 0
-  const userWinnerShares = payouts
-    ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
-    : new BigNumber(0)
-  const EPS = 0.01
-  const allPayoutsEqual = payouts
-    ? payouts.every(payout =>
-        payout
-          .sub(1 / payouts.length)
-          .abs()
-          .lte(EPS),
-      )
-    : false
-
   const buySellButtons = (
     <SellBuyWrapper>
       <Button
@@ -245,6 +238,42 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
+  const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), 18))
+  const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), 18))
+  const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), 18))
+
+  const finalAnswerPercentage = (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
+
+  const earnedCollateral = isScalar
+    ? scalarComputeEarnedCollateral(
+        finalAnswerPercentage,
+        balances.map(balance => balance.shares),
+      )
+    : computeEarnedCollateral(
+        payouts,
+        balances.map(balance => balance.shares),
+      )
+
+  const hasWinningOutcomes = earnedCollateral && earnedCollateral.gt(0)
+  const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
+  const userWinnersOutcomes = payouts
+    ? payouts.filter(
+        (payout, index) => balances[index] && balances[index].shares && balances[index].shares.gt(0) && payout.gt(0),
+      ).length
+    : 0
+  const userWinnerShares = payouts
+    ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
+    : new BigNumber(0)
+  const EPS = 0.01
+  const allPayoutsEqual = payouts
+    ? payouts.every(payout =>
+        payout
+          .sub(1 / payouts.length)
+          .abs()
+          .lte(EPS),
+      )
+    : false
+
   return (
     <>
       <TopCard>
@@ -262,9 +291,9 @@ const Wrapper = (props: Props) => {
             {isScalar ? (
               <MarketScale
                 border={true}
-                currentPrediction={outcomeTokenMarginalPrices[1]}
+                currentPrediction={finalAnswerPercentage.toString()}
                 lowerBound={scalarLow || new BigNumber(0)}
-                startingPointTitle={'Current prediction'}
+                startingPointTitle={'Final answer'}
                 unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
                 upperBound={scalarHigh || new BigNumber(0)}
               />

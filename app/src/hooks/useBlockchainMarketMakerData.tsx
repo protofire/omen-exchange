@@ -1,9 +1,9 @@
 import Big from 'big.js'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
 import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
-import { CPKService, ERC20Service, MarketMakerService, OracleService } from '../services'
+import { ERC20Service, MarketMakerService, OracleService } from '../services'
 import { getLogger } from '../util/logger'
 import { getArbitratorFromAddress } from '../util/networks'
 import { promiseProps } from '../util/tools'
@@ -24,22 +24,24 @@ const getBalances = (
 ): BalanceItem[] => {
   const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
-  const balances: BalanceItem[] = outcomes.map((outcome: string, index: number) => {
-    const outcomeName = outcome
-    const probability = actualPrices[index] * 100
-    const currentPrice = actualPrices[index]
-    const shares = userShares[index]
-    const holdings = marketMakerShares[index]
+  const balances: BalanceItem[] = outcomes.length
+    ? outcomes.map((outcome: string, index: number) => {
+        const outcomeName = outcome
+        const probability = actualPrices[index] * 100
+        const currentPrice = actualPrices[index]
+        const shares = userShares[index]
+        const holdings = marketMakerShares[index]
 
-    return {
-      outcomeName,
-      probability,
-      currentPrice,
-      shares,
-      holdings,
-      payout: payouts ? payouts[index] : new Big(0),
-    }
-  })
+        return {
+          outcomeName,
+          probability,
+          currentPrice,
+          shares,
+          holdings,
+          payout: payouts ? payouts[index] : new Big(0),
+        }
+      })
+    : []
 
   return balances
 }
@@ -52,22 +54,24 @@ const getScalarBalances = (
 ): BalanceItem[] => {
   const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
-  const balances: BalanceItem[] = outcomePrices.map((price: string, index: number) => {
-    const outcomeName = index === 0 ? 'short' : 'long'
-    const probability = actualPrices[index] * 100
-    const currentPrice = actualPrices[index]
-    const shares = userShares[index]
-    const holdings = marketMakerShares[index]
+  const balances: BalanceItem[] = outcomePrices.length
+    ? outcomePrices.map((price: string, index: number) => {
+        const outcomeName = index === 0 ? 'short' : 'long'
+        const probability = actualPrices[index] * 100
+        const currentPrice = actualPrices[index]
+        const shares = userShares[index]
+        const holdings = marketMakerShares[index]
 
-    return {
-      outcomeName,
-      probability,
-      currentPrice,
-      shares,
-      holdings,
-      payout: payouts ? payouts[index] : new Big(0),
-    }
-  })
+        return {
+          outcomeName,
+          probability,
+          currentPrice,
+          shares,
+          holdings,
+          payout: payouts ? payouts[index] : new Big(0),
+        }
+      })
+    : []
 
   return balances
 }
@@ -125,7 +129,9 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       userShares:
         cpk && cpk.address
           ? marketMaker.getBalanceInformation(cpk.address, outcomesLength)
-          : outcomes.map(() => new BigNumber(0)),
+          : outcomes.length
+          ? outcomes.map(() => new BigNumber(0))
+          : [],
       collateral: getERC20Token(provider, graphMarketMakerData.collateralAddress),
       isConditionResolved: conditionalTokens.isConditionResolved(graphMarketMakerData.conditionId),
       marketMakerFunding: marketMaker.getTotalSupply(),
@@ -142,8 +148,11 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
         : new BigNumber(0)
 
     const arbitrator = getArbitratorFromAddress(networkId, graphMarketMakerData.arbitratorAddress)
+
     const payouts = graphMarketMakerData.payouts
       ? graphMarketMakerData.payouts
+      : isScalar
+      ? null
       : realitioAnswer
       ? OracleService.getPayouts(graphMarketMakerData.question.templateId, realitioAnswer, outcomesLength)
       : null
@@ -173,6 +182,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       payouts,
       oracle: graphMarketMakerData.oracle,
       question: graphMarketMakerData.question,
+      realitioAnswer: realitioAnswer ? bigNumberify(realitioAnswer) : null,
       totalEarnings,
       totalPoolShares,
       userEarnings,
