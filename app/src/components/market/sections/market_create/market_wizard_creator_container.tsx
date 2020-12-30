@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React, { FC, useState } from 'react'
 import { useHistory } from 'react-router'
 
@@ -69,7 +70,6 @@ const MarketWizardCreatorContainer: FC = () => {
           const compoundCollateralToken = cToken as KnownToken
           compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
           marketData.userInputToken = marketData.userInputCollateral
-          console.log(compoundTokenDetails)
           compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
         }
         const { marketMakerAddress, transaction } = await cpk.createMarket({

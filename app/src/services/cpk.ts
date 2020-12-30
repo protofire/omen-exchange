@@ -3,7 +3,7 @@ import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ethers } from 'ethers'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
@@ -317,7 +317,8 @@ class CPKService {
       }
       let marketPoolFunding = marketData.funding
       if (useCompoundReserve && compoundService) {
-        marketPoolFunding = await compoundService.calculateExchangeRate(userInputCollateral, marketData.funding)
+        marketPoolFunding = bigNumberify(100000000)
+        console.log(marketPoolFunding.toString())
         const encodedMintFunction = CompoundService.encodeMintTokens(
           compoundTokenDetails.symbol,
           marketData.funding.toString(),

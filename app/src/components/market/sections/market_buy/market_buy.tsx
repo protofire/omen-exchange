@@ -17,9 +17,18 @@ import {
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
+import { getToken } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
-import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
+import {
+  CompoundTokenType,
+  MarketDetailsTab,
+  MarketMakerData,
+  OutcomeTableValue,
+  Status,
+  Ternary,
+  Token,
+} from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -217,10 +226,20 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     (!cpk?.cpk.isSafeApp() && hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount
-
   const switchOutcome = (value: number) => {
     setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
     setOutcomeIndex(value)
+  }
+  const collateralSymbol = collateral.symbol.toLowerCase()
+  let isFilterDisabled = true
+  let filters: any = []
+  if (collateralSymbol in CompoundTokenType) {
+    const cTokenSymbol = collateralSymbol as KnownToken
+    const baseTokenSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
+    const baseToken = getToken(context.networkId, baseTokenSymbol)
+    const cToken = getToken(context.networkId, cTokenSymbol)
+    filters = [baseToken.address, cToken.address]
+    isFilterDisabled = false
   }
   return (
     <>
@@ -255,7 +274,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               balance={formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5)}
               context={context}
               currency={collateral.address}
-              disabled
+              disabled={isFilterDisabled}
+              filters={filters}
               onSelect={(token: Token | null) => {
                 if (token) {
                   setCollateral(token)

@@ -402,4 +402,9 @@ export enum MarketState {
   none = '',
 }
 
+export enum CompoundTokenType {
+  cdai = 'cdai',
+  cusdc = 'cusdc',
+}
+
 export const INVALID_ANSWER_ID = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'

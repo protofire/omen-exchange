@@ -20,6 +20,13 @@ import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
+import {
+  Dropdown,
+  DropdownDirection,
+  DropdownItemProps,
+  DropdownPosition,
+  DropdownVariant,
+} from '../../../common/form/dropdown'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError } from '../../common/common_styled'
@@ -34,6 +41,52 @@ import { WarningMessage } from '../../common/warning_message'
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
 `
+
+const CurrencyDropdown = styled(Dropdown)`
+  min-width: 80px;
+  display: inline-flex;
+  float: right;
+`
+const CustomDropdownItem = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+
+  .dropdownItems & .sortBy {
+    display: none;
+  }
+`
+const CurrencyDropdownLabelContainer = styled.div`
+  margin-top: 20px;
+`
+const CurrencyDropdownLabel = styled.div`
+  display: inline-flex;
+  padding-left: 14px;
+  padding-top: 14px;
+  color: #37474f;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+`
+
+const filters = [
+  {
+    title: 'dai',
+    onClick: () => console.log('DAI'),
+  },
+  {
+    title: 'cDai',
+    onClick: () => console.log('cDai'),
+  },
+]
+
+const filterItems: Array<DropdownItemProps> = filters.map((item, index) => {
+  return {
+    content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
+    onClick: item.onClick,
+  }
+})
 
 const logger = getLogger('Market::Sell')
 
@@ -184,7 +237,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       : amountShares?.gt(balanceItem.shares)
       ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
       : null
-
+  console.log(tradedCollateral)
+  console.log('***')
+  console.log('YYYYY')
+  console.log(collateral)
   const isSellButtonDisabled =
     !amountShares ||
     (status !== Status.Ready && status !== Status.Error) ||
@@ -240,6 +296,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             symbol={'Shares'}
           />
           {amountError && <GenericError>{amountError}</GenericError>}
+          <CurrencyDropdownLabelContainer>
+            <CurrencyDropdownLabel>Withdraw as</CurrencyDropdownLabel>
+            <CurrencyDropdown items={filterItems} />
+          </CurrencyDropdownLabelContainer>
         </div>
         <div>
           <TransactionDetailsCard>

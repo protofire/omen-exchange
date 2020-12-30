@@ -1,5 +1,5 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 
 import { Token } from '../util/types'
 
@@ -31,7 +31,26 @@ class CompoundService {
     return supplyApy
   }
 
-  calculateExchangeRate = async (userInputToken: Token, userInputTokenFunding: BigNumber): Promise<BigNumber> => {
+  calculateToCTokenExchangeRate = async (
+    userInputToken: Token,
+    userInputTokenFunding: BigNumber,
+  ): Promise<BigNumber> => {
+    const cTokenDecimals = 8 // all cTokens have 8 decimal places
+    const underlyingDecimals = userInputToken.decimals
+    const exchangeCash = await this.contract.getCash()
+    const totalBorrows = await this.contract.totalBorrows()
+    const totalReserves = await this.contract.totalReserves()
+    const totalSupply = await this.contract.totalSupply()
+    const exchangeRate = (exchangeCash + totalBorrows - totalReserves) / totalSupply
+    const mantissa = 18 + underlyingDecimals - cTokenDecimals
+    let cTokensInUnderlying = exchangeRate / (1 * Math.pow(10, mantissa))
+    cTokensInUnderlying = Math.round(cTokensInUnderlying)
+    const normalizedCTokenInUnderlying = bigNumberify(cTokensInUnderlying.toString())
+    const cTokenTotal = userInputTokenFunding.mul(normalizedCTokenInUnderlying)
+    return cTokenTotal
+  }
+
+  calculateToTokenExchange = async (userInputToken: Token, userInputTokenFunding: BigNumber): Promise<BigNumber> => {
     return new BigNumber('1')
   }
 
