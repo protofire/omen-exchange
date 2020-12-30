@@ -120,16 +120,13 @@ export const ScalarMarketBuy = (props: Props) => {
   }
 
   const calcBuyAmount = useMemo(
-    () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber, BigNumber]> => {
+    () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber]> => {
       let tradedShares: BigNumber
-      let reverseTradedShares: BigNumber
 
       try {
         tradedShares = await marketMaker.calcBuyAmount(amount, positionIndex)
-        reverseTradedShares = await marketMaker.calcBuyAmount(amount, positionIndex === 0 ? 1 : 0)
       } catch {
         tradedShares = new BigNumber(0)
-        reverseTradedShares = new BigNumber(0)
       }
 
       const balanceAfterTrade = computeBalanceAfterTrade(
@@ -142,14 +139,14 @@ export const ScalarMarketBuy = (props: Props) => {
 
       const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
 
-      return [tradedShares, newPrediction, amount, reverseTradedShares]
+      return [tradedShares, newPrediction, amount]
     },
     [balances, marketMaker, positionIndex, lowerBound, upperBound],
   )
 
-  const [tradedShares, newPrediction, debouncedAmount, reverseTradedShares] = useAsyncDerivedValue(
+  const [tradedShares, newPrediction, debouncedAmount] = useAsyncDerivedValue(
     amount,
-    [new BigNumber(0), 0, amount, new BigNumber(0)],
+    [new BigNumber(0), 0, amount],
     calcBuyAmount,
   )
 

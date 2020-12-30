@@ -375,7 +375,16 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         setProfitLoss(loss < -(amountNumber || 0) ? -(amountNumber || 0) : loss)
       }
     }
-  }, [scaleValuePrediction, amountNumber, long, lowerBoundNumber, newPredictionNumber, upperBoundNumber, feeNumber])
+  }, [
+    scaleValuePrediction,
+    amountNumber,
+    long,
+    lowerBoundNumber,
+    newPredictionNumber,
+    upperBoundNumber,
+    feeNumber,
+    amountSharesNumber,
+  ])
 
   const activateTooltip = () => {
     const scaleTooltip: HTMLElement | null = document.querySelector('#scale-tooltip')
