@@ -118,7 +118,8 @@ const Wrapper = (props: Props) => {
 
   useEffect(() => {
     const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
-    if (timeDifference > 0) {
+    const maxTimeDifference = 86400000
+    if (timeDifference > 0 && timeDifference < maxTimeDifference) {
       setTimeout(callAfterTimeout, timeDifference + 2000)
     }
     function callAfterTimeout() {
