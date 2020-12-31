@@ -132,6 +132,7 @@ const networks: { [K in NetworkId]: Network } = {
     omenTCRListId: 1,
     contracts: {
       realitio: '0x63975d9e7CF434dCd04bD808d8c79d03EF69100B',
+      realitioScalarAdapter: '0x0e8Db8caD541C0Bf5b611636e81fEc0828bc7902',
       marketMakerFactory: '0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5',
       conditionalTokens: '0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f',
       oracle: '0xa57EBD93faa73b3491aAe396557D6ceC24fC6984',
