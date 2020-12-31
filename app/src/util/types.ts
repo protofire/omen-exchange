@@ -270,6 +270,7 @@ export interface MarketMakerData {
   balances: BalanceItem[]
   creationTimestamp: string
   collateral: Token
+  userInputCollateral: Token | null
   fee: BigNumber
   isConditionResolved: boolean
   isQuestionFinalized: boolean

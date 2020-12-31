@@ -15,7 +15,14 @@ import {
   formatNumber,
   mulBN,
 } from '../../../../util/tools'
-import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status } from '../../../../util/types'
+import {
+  BalanceItem,
+  CompoundTokenType,
+  MarketDetailsTab,
+  MarketMakerData,
+  OutcomeTableValue,
+  Status,
+} from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -70,24 +77,6 @@ const CurrencyDropdownLabel = styled.div`
   line-height: 16px;
 `
 
-const filters = [
-  {
-    title: 'dai',
-    onClick: () => console.log('DAI'),
-  },
-  {
-    title: 'cDai',
-    onClick: () => console.log('cDai'),
-  },
-]
-
-const filterItems: Array<DropdownItemProps> = filters.map((item, index) => {
-  return {
-    content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
-    onClick: item.onClick,
-  }
-})
-
 const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
@@ -102,6 +91,43 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
+  const marketMakerDataDefault = marketMakerData
+  const [stateMarketMakerData, setMarketMakerdata] = useState<MarketMakerData>(marketMakerDataDefault)
+  const collateralSymbol = collateral.symbol.toLowerCase()
+  let currencySelect = <span />
+  const setUserInputCollateral = (symbol: string): void => {
+    console.log(stateMarketMakerData)
+    console.log(symbol)
+    if (symbol.toLowerCase() === collateral.symbol.toLowerCase()) {
+      // get the value of
+    } else {
+      // get the value of
+    }
+  }
+  if (collateralSymbol in CompoundTokenType) {
+    const filters = [
+      {
+        title: 'dai',
+        onClick: () => setUserInputCollateral('dai'),
+      },
+      {
+        title: 'cDai',
+        onClick: () => setUserInputCollateral('cdai'),
+      },
+    ]
+    const filterItems: Array<DropdownItemProps> = filters.map((item, index) => {
+      return {
+        content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
+        onClick: item.onClick,
+      }
+    })
+    currencySelect = (
+      <CurrencyDropdownLabelContainer>
+        <CurrencyDropdownLabel>Withdraw as</CurrencyDropdownLabel>
+        <CurrencyDropdown items={filterItems} />
+      </CurrencyDropdownLabelContainer>
+    )
+  }
 
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
@@ -128,8 +154,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])
-
   useEffect(() => {
+    console.log('11')
     setBalanceItem(balances[outcomeIndex])
     // eslint-disable-next-line
   }, [balances[outcomeIndex]])
@@ -237,10 +263,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       : amountShares?.gt(balanceItem.shares)
       ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
       : null
-  console.log(tradedCollateral)
-  console.log('***')
-  console.log('YYYYY')
-  console.log(collateral)
   const isSellButtonDisabled =
     !amountShares ||
     (status !== Status.Ready && status !== Status.Error) ||
@@ -296,10 +318,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             symbol={'Shares'}
           />
           {amountError && <GenericError>{amountError}</GenericError>}
-          <CurrencyDropdownLabelContainer>
-            <CurrencyDropdownLabel>Withdraw as</CurrencyDropdownLabel>
-            <CurrencyDropdown items={filterItems} />
-          </CurrencyDropdownLabelContainer>
+          {currencySelect}
         </div>
         <div>
           <TransactionDetailsCard>

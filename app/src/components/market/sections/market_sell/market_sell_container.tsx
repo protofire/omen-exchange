@@ -11,8 +11,9 @@ interface Props {
 }
 
 const MarketSellContainer: React.FC<Props> = (props: Props) => {
-  const setUserInputCollateral = async (symbol: string): Promise<number> =>  {
-    
+  const setUserInputCollateral = async (symbol: string): Promise<number> => {
+    console.log('HERE')
+    return 1
   }
   return <MarketSell {...props} />
 }
