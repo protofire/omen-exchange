@@ -84,10 +84,16 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
 const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: BigNumber[]): Maybe<BigNumber> => {
   if (!balances[0] || (balances[0].isZero() && !balances[1]) || balances[1].isZero()) return null
 
-  const clampedFinalAnswer = finalAnswerPercentage > 1 ? 1 : finalAnswerPercentage < 0 ? 0 : finalAnswerPercentage
-  const shortEarnedCollateral = balances[0].mul(1 - clampedFinalAnswer)
-  const longEarnedCollateral = balances[1].mul(clampedFinalAnswer)
-  const earnedCollateral = shortEarnedCollateral.add(longEarnedCollateral)
+  // use floor as rounding method
+  Big.RM = 0
+
+  const clampedFinalAnswer = new Big(
+    finalAnswerPercentage > 1 ? 1 : finalAnswerPercentage < 0 ? 0 : finalAnswerPercentage,
+  )
+  const shortEarnedCollateral = new Big(balances[0].toString()).mul(new Big(1).sub(clampedFinalAnswer))
+  const longEarnedCollateral = new Big(balances[1].toString()).mul(clampedFinalAnswer)
+  const collaterals = [shortEarnedCollateral, longEarnedCollateral]
+  const earnedCollateral = collaterals.reduce((a, b) => a.add(b.toFixed(0)), bigNumberify(0))
 
   return earnedCollateral
 }
