@@ -182,7 +182,7 @@ export interface Arbitrator {
 export interface GelatoData {
   id: KnownGelatoCondition
   shouldSubmit: boolean
-  inputs: Date | null
+  input: Date | null
 }
 
 export enum Wallet {

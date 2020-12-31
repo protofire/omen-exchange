@@ -7,11 +7,10 @@ import { GelatoData } from '../../../../util/types'
 import { ButtonCircle } from '../../../button'
 import { DateField, FormRow } from '../../../common'
 import { IconAlert } from '../../../common/icons/IconAlert'
-import { IconCheckmark } from '../../../common/icons/IconCheckmark'
-import { IconCheckmarkFilled } from '../../../common/icons/IconCheckmarkFilled'
 import { IconClock } from '../../../common/icons/IconClock'
 import { IconFilter } from '../../../common/icons/IconFilter'
 import { IconGelato } from '../../../common/icons/IconGelato'
+import { IconTick } from '../../../common/icons/IconTick'
 import { GelatoConditions } from '../gelato_conditions'
 
 const Wrapper = styled.div<{ noMarginBottom: boolean }>`
@@ -53,7 +52,8 @@ const Box = styled.div<{ boxType: string; isRow?: boolean }>`
   ${props =>
     props.boxType == 'condition'
       ? `align-items: flex-end;
-        margin-bottom: 5px;
+        margin-bottom: 12px;
+        vertical-align: bottom;
         justify-content: space-between;`
       : ''}
 `
@@ -82,18 +82,18 @@ const ButtonCircleStyled = styled(ButtonCircle)<{ disabled?: boolean; filled?: b
       props.disabled
         ? 'invert(46%) sepia(0%) saturate(1168%) hue-rotate(183deg) brightness(99%) contrast(89%)'
         : 'none'};
-    ${props => (props.filled ? 'fill: white;' : '')}
+    ${props => (props.filled ? `fill: ${props.theme.colors.mainBodyBackground};` : '')}
   }
-  ${props => (props.filled ? 'background-color: #7986cb;' : '')}
+  ${props => (props.filled ? `background-color: ${props.theme.colors.clickable};` : '')}
   margin-right: 5px;
 `
 
-const IconStyled = styled.div<{ color?: string }>`
+const IconStyled = styled.div<{ color?: string; large?: boolean }>`
   line-height: 1;
   svg {
     fill: ${props => props.color};
-    width: 0.9rem;
-    height: 0.9rem;
+    width: ${props => (props.large ? '1rem' : '0.9rem')};
+    height: ${props => (props.large ? '1rem' : '0.9rem')};
     vertical-align: inherit;
   }
 `
@@ -126,7 +126,7 @@ export type GelatoSchedulerProps = DOMAttributes<HTMLDivElement> & {
   taskStatus?: string
   etherscanLink?: string
   handleGelatoDataChange: (gelatoData: GelatoData) => any
-  handleGelatoDataInputsChange: (newDate: Date | null) => any
+  handleGelatoDataInputChange: (newDate: Date | null) => any
 }
 
 export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSchedulerProps) => {
@@ -137,7 +137,7 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
     etherscanLink,
     gelatoData,
     handleGelatoDataChange,
-    handleGelatoDataInputsChange,
+    handleGelatoDataInputChange,
     isScheduled,
     minimum,
     noMarginBottom,
@@ -149,12 +149,21 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
   const [active, setActive] = React.useState(false)
   const [customizable, setCustomizable] = React.useState(false)
 
-  // Set gelatoInputs default to resolution - 3 days
+  // Set gelatoInput default to resolution - 3 days (or fifteen minutes from now)
   const resolutionDateCopy = new Date(resolution)
-  if (!gelatoData.inputs) gelatoData.inputs = new Date(resolutionDateCopy.setDate(resolutionDateCopy.getDate() - 3))
+  const now = new Date()
+  now.setMinutes(now.getMinutes() + 30)
+  if (!gelatoData.input) {
+    const defaultGelatoDate = new Date(resolutionDateCopy.setDate(resolutionDateCopy.getDate() - 3))
+    if (now.getTime() - defaultGelatoDate.getTime() > 0) {
+      gelatoData.input = now
+    } else {
+      gelatoData.input = defaultGelatoDate
+    }
+  }
 
   const daysBeforeWithdraw = Math.round(
-    (Date.parse(resolution.toString()) - Date.parse(gelatoData.inputs.toString())) / 1000 / 60 / 60 / 24,
+    (Date.parse(resolution.toString()) - Date.parse(gelatoData.input.toString())) / 1000 / 60 / 60 / 24,
   )
 
   const toggleActive = () => {
@@ -210,8 +219,8 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
           return (
             <Box boxType={'task'} isRow={true}>
               <Description color="green" descriptionType={'task'}>{`successful`}</Description>
-              <IconStyled color={'green'}>
-                <IconCheckmarkFilled></IconCheckmarkFilled>
+              <IconStyled>
+                <IconTick fill={'green'} />
               </IconStyled>
             </Box>
           )
@@ -286,15 +295,15 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
                 onClick={toggleActive}
                 style={{ backgroundColor: 'white' }}
               >
-                <IconStyled color={'blue'}>
-                  <IconCheckmark />
+                <IconStyled large={true}>
+                  <IconTick />
                 </IconStyled>
               </ButtonCircleStyled>
             )}
             {active && (
               <ButtonCircleStyled filled={true} onClick={toggleActive}>
-                <IconStyled color={'white'}>
-                  <IconCheckmark />
+                <IconStyled large={true}>
+                  <IconTick fill={'white'} selected={true} />
                 </IconStyled>
               </ButtonCircleStyled>
             )}
@@ -310,10 +319,10 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
             </Box>
 
             <Box boxType={'subtitle'} isRow={false}>
-              {getTaskStatus(taskStatus, gelatoData.inputs, belowMinimum, minimum)}
+              {getTaskStatus(taskStatus, gelatoData.input, belowMinimum, minimum)}
 
               <Description descriptionType={'mini'} textAlignRight={true}>
-                {`${formatDate(gelatoData.inputs)}`}
+                {`${formatDate(gelatoData.input)}`}
               </Description>
             </Box>
           </div>
@@ -339,7 +348,7 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
         <Box boxType={'outer'} isRow={false}>
           <Description descriptionType={'standard'} textAlignRight={false}>
             {`Gelato will automatically withdraw your liquidity of ${collateralToWithdraw} ${collateralSymbol} on ${formatDate(
-              gelatoData.inputs,
+              gelatoData.input,
             )} (with a network fee deducted from the withdrawn ${collateralSymbol}). Cancel the auto-withdraw by manually withdrawing your liquidity.`}
           </Description>
         </Box>
@@ -348,7 +357,7 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
         <Box boxType={'outer'} isRow={false}>
           <Description descriptionType={'standard'} textAlignRight={false}>
             {`Your provided liquidity was insufficient on ${formatDate(
-              gelatoData.inputs,
+              gelatoData.input,
             )} to pay for for the withdrawal transaction.`}
           </Description>
         </Box>
@@ -357,7 +366,7 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
         <Box boxType={'outer'} isRow={false}>
           <Description descriptionType={'standard'} textAlignRight={false}>
             {`Your provided liquidity was successfully withdrawn on ${formatDate(
-              gelatoData.inputs,
+              gelatoData.input,
             )}. Check out the transaction `}
             <span>
               <a href={etherscanLink} rel="noopener noreferrer" style={{ color: '#1E88E5' }} target="_blank">
@@ -376,6 +385,7 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
               formField={
                 <GelatoConditions disabled={true} onChangeGelatoCondition={handleGelatoDataChange} value={gelatoData} />
               }
+              style={{ marginTop: '0' }}
             />
           </Box>
           <Box boxType={'condition'} isRow={true}>
@@ -384,19 +394,19 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
               formField={
                 <DateField
                   disabled={false}
-                  maxDate={resolution}
+                  maxDate={new Date(resolutionDateCopy.setHours(resolution.getHours() - 6))}
                   minDate={new Date()}
                   name="gelato-date"
-                  onChange={handleGelatoDataInputsChange}
-                  selected={gelatoData.inputs}
+                  onChange={handleGelatoDataInputChange}
+                  selected={gelatoData.input}
                 />
               }
+              style={{ marginTop: '0' }}
             />
           </Box>
           <Description descriptionType={'standard'} textAlignRight={false}>
-            {`Gelato will automatically withdraw your liquidity ${daysBeforeWithdraw} day(s) before the market will close on
-              ${formatDate(gelatoData.inputs)}
-            `}
+            Gelato will automatically withdraw your liquidity<strong>{` ${daysBeforeWithdraw} day(s) before `}</strong>
+            the market will close on<strong>{` ${formatDate(gelatoData.input)}`}</strong>
           </Description>
         </Box>
       )}

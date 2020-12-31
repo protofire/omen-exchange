@@ -272,11 +272,11 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const handleGelatoDataInputsChange = (inputs: Date | null) => {
+  const handleGelatoDataInputChange = (input: Date | null) => {
     const newMarketData = {
       ...marketData,
     }
-    newMarketData.gelatoData.inputs = inputs
+    newMarketData.gelatoData.input = input
     setMarketdata(newMarketData)
   }
 
@@ -304,7 +304,7 @@ export const MarketWizardCreator = (props: Props) => {
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
             handleGelatoDataChange={handleGelatoDataChange}
-            handleGelatoDataInputsChange={handleGelatoDataInputsChange}
+            handleGelatoDataInputChange={handleGelatoDataInputChange}
             handleTradingFeeChange={handleTradingFeeChange}
             marketCreationStatus={marketCreationStatus}
             resetTradingFee={resetTradingFee}

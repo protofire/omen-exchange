@@ -20,7 +20,7 @@ const gelatoCoreAbi = [
   'function cancelTask(tuple(uint256 id, address userProxy, tuple(address addr, address module) provider, uint256 index, tuple(tuple(address inst, bytes data)[] conditions, tuple(address addr, bytes data, uint8 operation, uint8 dataFlow, uint256 value, bool termsOkCheck)[] actions, uint256 selfProviderGasLimit, uint256 selfProviderGasPriceCeil)[] tasks, uint256 expiryDate, uint256 cycleId, uint256 submissionsLeft) _TR)',
 ]
 
-const actionWithdrawLiquidutyAbi = [
+const actionWithdrawLiquidityAbi = [
   'function action(address _conditionalTokens, address _fixedProductMarketMaker, uint256[] _positionIds, bytes32 _conditionId, bytes32 _parentCollectionId, address _collateralToken, address _receiver)',
 ]
 
@@ -75,7 +75,7 @@ interface UniToken {
 const gelatoContracts: GelatoContracts = {
   abis: {
     gelatoCore: gelatoCoreAbi,
-    actionWithdrawLiquidity: actionWithdrawLiquidutyAbi,
+    actionWithdrawLiquidity: actionWithdrawLiquidityAbi,
     gnosisSafe: gnosisSafeAbi,
   },
   addresses: {
@@ -125,14 +125,14 @@ class GelatoService {
   provider: any
   signer: any
   networkId: number
-  dai: any
+  usdc: any
   weth: any
   addresses: NetworkContracts
 
   constructor(provider: any, signerAddress: Maybe<string>, networkId: number) {
     this.provider = provider
     this.networkId = networkId
-    this.dai = getToken(this.networkId, 'dai')
+    this.usdc = getToken(this.networkId, 'usdc')
     this.weth = getToken(this.networkId, 'weth')
     if (networkId == 1) {
       this.addresses = gelatoContracts.addresses.mainnet
@@ -152,7 +152,7 @@ class GelatoService {
    * Encode Auto Withdraw Task Submission
    */
   encodeSubmitTimeBasedWithdrawalTask = async (taskData: SubmitTimeBasedWithdrawalData): Promise<string> => {
-    if (taskData.gelatoData.inputs === null) throw Error('Need Date')
+    if (taskData.gelatoData.input === null) throw Error('Need Date')
 
     const gelatoCoreInterface = new utils.Interface(gelatoCoreAbi)
 
@@ -161,14 +161,14 @@ class GelatoService {
       module: this.addresses.providerModuleGnosisSafe,
     })
 
-    const timestamp = Date.parse(taskData.gelatoData.inputs.toString()) / 1000
+    const timestamp = Date.parse(taskData.gelatoData.input.toString()) / 1000
 
     const condition = new GelatoCondition({
       inst: this.addresses.conditionTime,
       data: utils.defaultAbiCoder.encode(['uint'], [timestamp]),
     })
 
-    const actionWithdrawLiquidityInterface = new utils.Interface(actionWithdrawLiquidutyAbi)
+    const actionWithdrawLiquidityInterface = new utils.Interface(actionWithdrawLiquidityAbi)
 
     const actionWithdrawLiquidityData = actionWithdrawLiquidityInterface.functions.action.encode([
       taskData.conditionalTokensAddress,
@@ -262,7 +262,7 @@ class GelatoService {
   }
 
   /**
-   * Returns Uniswap price of collateral to DAI
+   * Returns Uniswap price of collateral to USDC
    */
   findTokenUsdPrice = async (address: string, decimals: number): Promise<number> => {
     const token: UniToken = {
@@ -270,11 +270,14 @@ class GelatoService {
       decimals: decimals,
     }
 
-    // assumes collateral token will always have uniswap pair with either DAI or ETH
+    // assumes collateral token will always have uniswap pair with either USDC or ETH
     try {
-      return await getUniswapPrice(token, this.dai, this.provider)
+      if (utils.getAddress(token.address) == utils.getAddress(this.usdc.address)) {
+        return 1
+      }
+      return await getUniswapPrice(token, this.usdc, this.provider)
     } catch {
-      const ethUsdPrice = await getUniswapPrice(this.weth, this.dai, this.provider)
+      const ethUsdPrice = await getUniswapPrice(this.weth, this.usdc, this.provider)
       const tokenEthPrice = await getUniswapPrice(token, this.weth, this.provider)
       return ethUsdPrice * tokenEthPrice
     }

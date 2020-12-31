@@ -477,11 +477,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
       : []
   useEffect(() => {
-    if (
-      withdrawDate != null &&
-      (gelatoData.inputs == null || gelatoData.inputs.toString() != withdrawDate.toString())
-    ) {
-      const gelatoDataCopy = { ...gelatoData, inputs: withdrawDate }
+    if (withdrawDate != null && (gelatoData.input == null || gelatoData.input.toString() != withdrawDate.toString())) {
+      const gelatoDataCopy = { ...gelatoData, input: withdrawDate }
       setGelatoData(gelatoDataCopy)
     }
   }, [gelatoData, withdrawDate])
@@ -702,8 +699,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           etherscanLink={etherscanLink ? etherscanLink : undefined}
           gelatoData={gelatoData}
           handleGelatoDataChange={setGelatoData}
-          handleGelatoDataInputsChange={(newDate: Date | null) => {
-            const gelatoDataCopy = { ...gelatoData, inputs: newDate }
+          handleGelatoDataInputChange={(newDate: Date | null) => {
+            const gelatoDataCopy = { ...gelatoData, input: newDate }
             setGelatoData(gelatoDataCopy)
           }}
           isScheduled={submittedTaskReceiptWrapper ? true : false}
