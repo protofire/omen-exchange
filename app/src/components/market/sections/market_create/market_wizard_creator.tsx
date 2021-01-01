@@ -7,7 +7,7 @@ import { IMPORT_QUESTION_ID_KEY, MARKET_FEE } from '../../../../common/constants
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { queryTopCategories } from '../../../../queries/markets_home'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
-import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../../../util/networks'
+import { getArbitrator, getDefaultArbitrator, getDefaultToken } from '../../../../util/networks'
 import { limitDecimalPlaces } from '../../../../util/tools'
 import { Arbitrator, GraphResponseTopCategories, MarketData, Question, Token } from '../../../../util/types'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
@@ -78,7 +78,7 @@ export const MarketWizardCreator = (props: Props) => {
     let isSubscribed = true
 
     const updateMarketData = async () => {
-      const collateral = getToken(networkId, marketData.collateral.symbol.toLowerCase() as KnownToken)
+      const collateral = getDefaultToken(networkId)
       const arbitrator = getArbitrator(networkId, marketData.arbitrator.id)
 
       const newMarketData = {

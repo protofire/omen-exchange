@@ -15,7 +15,6 @@ import {
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useCpkAllowance,
-  useTokens,
 } from '../../../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
@@ -281,6 +280,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
+<<<<<<< HEAD
   const serviceCheck = <IconTick />
 
   const tokensAmount = useTokens(context).length
@@ -293,6 +293,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       setCompoundInterestRate(userInputCollateral)
     }
   }, [isServiceChecked, userInputCollateral])
+=======
+>>>>>>> e9b5ee31992153e269dc5a8fd877bdcb00323885
   const amountError =
     maybeCollateralBalance === null
       ? null
@@ -422,17 +424,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
         <GridTransactionDetailsWrapper noMarginTop={true}>
           <div>
-            {tokensAmount > 1 && (
-              <CurrenciesWrapper>
-                <CurrencySelector
-                  balance={formatNumber(collateralBalanceFormatted, 5)}
-                  context={context}
-                  currency={userInputCollateral.address}
-                  disabled={false}
-                  onSelect={onCollateralChange}
-                />
-              </CurrenciesWrapper>
-            )}
+            <CurrenciesWrapper>
+              <CurrencySelector
+                balance={formatNumber(collateralBalanceFormatted, 5)}
+                context={context}
+                currency={userInputCollateral.address}
+                disabled={false}
+                onSelect={onCollateralChange}
+              />
+            </CurrenciesWrapper>
             <TextfieldCustomPlaceholder
               formField={
                 <BigNumberInput

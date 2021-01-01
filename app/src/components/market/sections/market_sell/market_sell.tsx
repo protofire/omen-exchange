@@ -47,6 +47,9 @@ import { WarningMessage } from '../../common/warning_message'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
+  margin: 0 -24px;
+  padding: 20px 24px 0;
+  margin-top: ${({ theme }) => theme.borders.borderLineDisabled};
 `
 
 const CurrencyDropdown = styled(Dropdown)`
@@ -368,9 +371,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           description={`Your sell amount should not be negative.`}
           href={''}
           hyperlinkDescription={''}
+          marginBottom={true}
         />
       )}
-      <StyledButtonContainer>
+      <StyledButtonContainer borderTop={true} marginTop={isNegativeAmountShares}>
         <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
           Cancel
         </Button>
