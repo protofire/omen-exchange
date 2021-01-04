@@ -2,11 +2,10 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
-import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
 import { ERC20Service, MarketMakerService, OracleService } from '../services'
 import { getLogger } from '../util/logger'
 import { getArbitratorFromAddress } from '../util/networks'
-import { promiseProps } from '../util/tools'
+import { isScalarMarket, promiseProps } from '../util/tools'
 import { BalanceItem, MarketMakerData, Status, Token } from '../util/types'
 
 import { useConnectedCPKContext } from './connectedCpk'
@@ -107,9 +106,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       ? Date.now() > 1000 * graphMarketMakerData.answerFinalizedTimestamp.toNumber()
       : false
 
-    const isScalar =
-      graphMarketMakerData.oracle === REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase() ||
-      graphMarketMakerData.oracle === REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
+    const isScalar = isScalarMarket(graphMarketMakerData.oracle || '', networkId || 0)
 
     const outcomesLength = isScalar ? 2 : outcomes.length
 

@@ -420,12 +420,12 @@ export const isDust = (amount: BigNumber, decimals: number): boolean => {
   return amount.lt(parseUnits('0.00001', decimals))
 }
 
-export const isScalar = (oracle: string, networkId: number): boolean => {
+export const isScalarMarket = (oracle: string, networkId: number): boolean => {
   let realitioScalarAdapter
   if (networkId === 1) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase()
   } else if (networkId === 4) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
   }
 
   let isScalar = false

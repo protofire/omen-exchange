@@ -19,7 +19,7 @@ import {
   getIndexSets,
   isDust,
   isObjectEqual,
-  isScalar,
+  isScalarMarket,
   limitDecimalPlaces,
   truncateStringInTheMiddle as truncate,
 } from './tools'
@@ -480,16 +480,16 @@ describe('tools', () => {
     }
   })
 
-  describe('isScalar', () => {
+  describe('isScalarMarket', () => {
     const testCases: [[string, number], boolean][] = [
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS, 1], true],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY, 4], true],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS, 4], false],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY, 1], false],
+      [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 1], true],
+      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 4], true],
+      [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 4], false],
+      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 1], false],
       [['Incorrect address', 1], false],
     ]
     for (const [[oracle, networkId], result] of testCases) {
-      const isScalarResult = isScalar(oracle, networkId)
+      const isScalarResult = isScalarMarket(oracle, networkId)
 
       expect(isScalarResult).toStrictEqual(result)
     }
