@@ -210,28 +210,34 @@ class CPKService {
 
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
+        // Step 2: Transfer the amount of collateral being spent from the user to the CPK
+        // If user chooses to spend base token then transfer base collateral
         if (useBaseToken) {
-          // get base token
-          const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, amount.toString())
-          // Approve cToken for the cpk contract
           transactions.push({
             to: userInputCollateral.address,
-            data: ERC20Service.encodeApproveUnlimited(collateral.address),
-          })
-          // Mint ctokens from the underlying token
-          transactions.push({
-            to: collateral.address,
-            data: encodedMintFunction,
+            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
           })
         } else {
-          // Step 2: Transfer the amount of collateral being spent from the user to the CPK
           transactions.push({
             to: collateralAddress,
-            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, minCollateralAmount),
+            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
           })
         }
       }
-
+      if (useBaseToken) {
+        // get base token
+        const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, amount.toString())
+        // Approve cToken for the cpk contract
+        transactions.push({
+          to: userInputCollateral.address,
+          data: ERC20Service.encodeApproveUnlimited(collateral.address),
+        })
+        // Mint ctokens from the underlying token
+        transactions.push({
+          to: collateral.address,
+          data: encodedMintFunction,
+        })
+      }
       // Step 3: Buy outcome tokens with the CPK
       transactions.push({
         to: marketMakerAddress,
@@ -544,26 +550,34 @@ class CPKService {
       }
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
+        // Step 4: Transfer funding from user
         if (useBaseToken) {
-          // get base token
-          const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, minCollateralAmount.toString())
-          // Approve cToken for the cpk contract
+          // If use base token then transfer the base token amount from the user
           transactions.push({
             to: userInputCollateral.address,
-            data: ERC20Service.encodeApproveUnlimited(collateral.address),
-          })
-          // Mint ctokens from the underlying token
-          transactions.push({
-            to: collateral.address,
-            data: encodedMintFunction,
+            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
           })
         } else {
-          // Step 4: Transfer funding from user
+          // If use collateral token then transfer the collateral token amount from the suer
           transactions.push({
             to: collateral.address,
             data: ERC20Service.encodeTransferFrom(account, this.cpk.address, minCollateralAmount),
           })
         }
+      }
+      if (useBaseToken) {
+        // get base token
+        const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, minCollateralAmount.toString())
+        // Approve cToken for the cpk contract
+        transactions.push({
+          to: userInputCollateral.address,
+          data: ERC20Service.encodeApproveUnlimited(collateral.address),
+        })
+        // Mint ctokens from the underlying token
+        transactions.push({
+          to: collateral.address,
+          data: encodedMintFunction,
+        })
       }
 
       transactions.push({
