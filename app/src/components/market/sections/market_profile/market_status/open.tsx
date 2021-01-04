@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
+import { isDust } from '../../../../../util/tools'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
@@ -130,7 +131,7 @@ const Wrapper = (props: Props) => {
   }, [])
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
-    return shares && !shares.isZero()
+    return shares && !isDust(shares, collateral.decimals)
   })
 
   const probabilities = balances.map(balance => balance.probability)

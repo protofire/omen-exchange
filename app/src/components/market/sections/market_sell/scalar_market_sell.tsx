@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -12,6 +12,7 @@ import {
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
+  isDust,
   mulBN,
 } from '../../../../util/tools'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
@@ -201,9 +202,8 @@ export const ScalarMarketSell = (props: Props) => {
     amountError !== null ||
     isNegativeAmountShares
 
-  const dust = parseUnits('0.00001', collateral.decimals)
-  const isShortTabDisabled = balances[0].shares.lt(dust)
-  const isLongTabDisabled = balances[1].shares.lt(dust)
+  const isShortTabDisabled = isDust(balances[0].shares, collateral.decimals)
+  const isLongTabDisabled = isDust(balances[1].shares, collateral.decimals)
 
   const isNewPrediction =
     formattedNewPrediction !== 0 && formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))

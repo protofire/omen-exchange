@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
@@ -17,7 +17,13 @@ import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { calcPoolTokens, calcRemoveFundingSendAmounts, formatBigNumber, formatNumber } from '../../../../util/tools'
+import {
+  calcPoolTokens,
+  calcRemoveFundingSendAmounts,
+  formatBigNumber,
+  formatNumber,
+  isDust,
+} from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -137,8 +143,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     totalPoolShares,
   )
 
-  const dust = parseUnits('0.00001', collateral.decimals)
-  const disableWithdrawTab = fundingBalance.lt(dust)
+  const disableWithdrawTab = isDust(fundingBalance, collateral.decimals)
 
   const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
     amountToRemove || Zero,
