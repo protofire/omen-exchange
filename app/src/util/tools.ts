@@ -3,6 +3,8 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
+import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
+
 import { getLogger } from './logger'
 
 const logger = getLogger('Tools')
@@ -416,4 +418,20 @@ export const numberToByte32 = (num: number): string => {
 
 export const isDust = (amount: BigNumber, decimals: number): boolean => {
   return amount.lt(parseUnits('0.00001', decimals))
+}
+
+export const isScalar = (oracle: string, networkId: number): boolean => {
+  let realitioScalarAdapter
+  if (networkId === 1) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS
+  } else if (networkId === 4) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY
+  }
+
+  let isScalar = false
+  if (oracle === realitioScalarAdapter) {
+    isScalar = true
+  }
+
+  return isScalar
 }

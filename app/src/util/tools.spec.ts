@@ -19,9 +19,11 @@ import {
   getIndexSets,
   isDust,
   isObjectEqual,
+  isScalar,
   limitDecimalPlaces,
   truncateStringInTheMiddle as truncate,
 } from './tools'
+import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
 
 describe('tools', () => {
   describe('calcPrice', () => {
@@ -475,6 +477,21 @@ describe('tools', () => {
 
         expect(isDustResult).toStrictEqual(result)
       })
+    }
+  })
+
+  describe('isScalar', () => {
+    const testCases: [[string, number], boolean][] = [
+      [[REALITIO_SCALAR_ADAPTER_ADDRESS, 1], true],
+      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY, 4], true],
+      [[REALITIO_SCALAR_ADAPTER_ADDRESS, 4], false],
+      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY, 1], false],
+      [['Incorrect address', 1], false],
+    ]
+    for (const [[oracle, networkId], result] of testCases) {
+      const isScalarResult = isScalar(oracle, networkId)
+
+      expect(isScalarResult).toStrictEqual(result)
     }
   })
 })
