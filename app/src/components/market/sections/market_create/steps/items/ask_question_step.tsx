@@ -1,3 +1,4 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { useHistory } from 'react-router'
@@ -202,6 +203,7 @@ const AskQuestionStep = (props: Props) => {
           outcomeNames.map((name, index) => outcomeNames.indexOf(name) !== index).reduce((e1, e2) => e1 || e2),
       )
     } else if (currentFormState === FormState.scalar) {
+      console.log(lowerBound)
       setIsContinueButtonDisabled(
         !question ||
           !lowerBound ||
@@ -213,7 +215,8 @@ const AskQuestionStep = (props: Props) => {
           !category ||
           !isProperScale ||
           lowerBound.gte(startingPoint) ||
-          startingPoint.gte(upperBound),
+          startingPoint.gte(upperBound) ||
+          lowerBound.lt(Zero),
       )
     }
   }, [
