@@ -332,7 +332,7 @@ const Wrapper = (props: Props) => {
             <>
               <MarketScale
                 border={true}
-                currentPrediction={outcomeTokenMarginalPrices[1]}
+                currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Current prediction'}
                 unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
