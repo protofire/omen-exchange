@@ -50,6 +50,14 @@ const StyledButtonContainer = styled(ButtonContainer)`
   }
 `
 
+const BorderedButtonContainer = styled(ButtonContainer)`
+  margin-right: -24px;
+  margin-left: -24px;
+  padding-right: 24px;
+  padding-left: 24px;
+  border-top: 1px solid ${props => props.theme.colors.verticalDivider};
+`
+
 const SellBuyWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -341,9 +349,9 @@ const Wrapper = (props: Props) => {
                   {buySellButtons}
                 </StyledButtonContainer>
               ) : (
-                <ButtonContainerFullWidth>
+                <>
                   {!isConditionResolved && (
-                    <>
+                    <ButtonContainerFullWidth>
                       <Button
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
@@ -351,10 +359,10 @@ const Wrapper = (props: Props) => {
                       >
                         Resolve Condition
                       </Button>
-                    </>
+                    </ButtonContainerFullWidth>
                   )}
                   {isConditionResolved && hasWinningOutcomes && (
-                    <>
+                    <BorderedButtonContainer>
                       <Button
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
@@ -362,9 +370,9 @@ const Wrapper = (props: Props) => {
                       >
                         Redeem
                       </Button>
-                    </>
+                    </BorderedButtonContainer>
                   )}
-                </ButtonContainerFullWidth>
+                </>
               )}
             </WhenConnected>
           </>
