@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers/utils'
 import React, { FC, useState } from 'react'
 import { useHistory } from 'react-router'
 
@@ -6,7 +5,6 @@ import { useConnectedCPKContext, useContracts, useGraphMeta } from '../../../../
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { CompoundService } from '../../../../services/compound_service'
-import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { getToken } from '../../../../util/networks'
@@ -35,7 +33,8 @@ const MarketWizardCreatorContainer: FC = () => {
     const compoundCollateralToken = cToken as KnownToken
     const compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
     const compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
-    const supplyRate = await compoundService.calculateSupplyRateAPY()
+    await compoundService.init()
+    const supplyRate = compoundService.calculateSupplyRateAPY()
     return supplyRate
   }
 
@@ -70,6 +69,7 @@ const MarketWizardCreatorContainer: FC = () => {
           compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
           marketData.userInputToken = marketData.userInputCollateral
           compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
+          await compoundService.init()
         }
         const { marketMakerAddress, transaction } = await cpk.createMarket({
           compoundService,

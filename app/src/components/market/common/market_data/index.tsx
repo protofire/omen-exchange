@@ -96,15 +96,13 @@ export const MarketData: React.FC<Props> = props => {
   const [totalVolume, setTotalVolume] = useState<string>('')
   const [dailyVolume, setDailyVolume] = useState<string>('')
   const [displayLiquidity, setDisplayLiquidity] = useState<string>('')
-  const { account, library: provider } = context
+  const { account, library: provider, networkId } = context
 
   const setDisplayCurrencyValues = async () => {
-    if (displayCurrency.symbol.toLowerCase() in CompoundTokenType) {
+    if (currency.symbol.toLowerCase() in CompoundTokenType) {
       const compoundService = new CompoundService(currency.address, currency.symbol, provider, account)
-      const totalVolumeRaw: BigNumber = await compoundService.calculateCTokenToBaseExchange(
-        displayCurrency,
-        collateralVolume,
-      )
+      await compoundService.init()
+      const totalVolumeRaw: BigNumber = compoundService.calculateCTokenToBaseExchange(displayCurrency, collateralVolume)
       const totalVolume = formatBigNumber(totalVolumeRaw, displayCurrency.decimals)
       setTotalVolume(totalVolume)
       const dailyVolume =
@@ -135,17 +133,17 @@ export const MarketData: React.FC<Props> = props => {
 
   useEffect(() => {
     const currencySymbol = currency.symbol.toLowerCase()
-    let baseToken: Token = getToken(context.networkId, currencySymbol as KnownToken)
+    let baseToken: Token = getToken(networkId, currencySymbol as KnownToken)
     if (currencySymbol in CompoundTokenType) {
       const baseTokenSymbol = currencySymbol.substring(1, currencySymbol.length) as KnownToken
-      baseToken = getToken(context.networkId, baseTokenSymbol)
+      baseToken = getToken(networkId, baseTokenSymbol)
     }
     setDisplayCurrency(baseToken)
-  }, [currency.symbol])
+  }, [currency.symbol, networkId])
 
   useEffect(() => {
     setDisplayCurrencyValues()
-  }, [displayCurrency.symbol])
+  }, [displayCurrency.symbol]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const matchingAddress = (token: Token) => token.address.toLowerCase() === currency.address.toLowerCase()

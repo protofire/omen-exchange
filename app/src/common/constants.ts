@@ -95,21 +95,3 @@ export const IMPORT_QUESTION_ID_KEY = 'importQuestionId'
 
 export const DEFAULT_TOKEN_ADDRESS_RINKEBY = '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea'
 export const DEFAULT_TOKEN_ADDRESS = '0x6b175474e89094c44da98b954eedeac495271d0f'
-
-export const COMPOUND_TOKEN_ADDRESS_RINKEBY = [
-  { symbol: 'cBAT', base: 'BAT', address: '0xebf1a11532b93a529b5bc942b4baa98647913002' },
-  { symbol: 'cDAI', base: 'DAI', address: '0x6d7f0754ffeb405d23c51ce938289d4835be3b14' },
-  { symbol: 'cETH', base: 'WETH', address: '0xd6801a1dffcd0a410336ef88def4320d6df1883e' },
-  { symbol: 'cUSDC', base: 'USDC', address: '0x5b281a6dda0b271e91ae35de655ad301c976edb1' },
-  { symbol: 'cUSDT', base: 'USDT', address: '0x2fb298bdbef468638ad6653ff8376575ea41e768' },
-  { symbol: 'cWBTC', base: 'WBTC', address: '0x0014f450b8ae7708593f4a46f8fa6e5d50620f96' },
-]
-
-export const COMPOUND_TOKEN_ADDRESS = [
-  { symbol: 'cBAT', base: 'BAT', address: '0x6c8c6b02e7b2be14d4fa6022dfd6d75921d90e4e' },
-  { symbol: 'cDAI', base: 'DAI', address: '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643' },
-  { symbol: 'cETH', base: 'WETH', address: '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5' },
-  { symbol: 'cUSDC', base: 'USDC', address: '0x39aa39c021dfbae8fac545936693ac917d5e7563' },
-  { symbol: 'cUSDT', base: 'USDT', address: '0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9' },
-  { symbol: 'cWBTC', base: 'WBTC', address: '0xc11b1268c1a384e55c48c2391d8d480264a3a7f4' },
-]

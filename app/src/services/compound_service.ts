@@ -1,5 +1,5 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { BigNumber, bigNumberify, formatUnits, parseUnits } from 'ethers/utils'
+import { BigNumber, formatUnits, parseUnits } from 'ethers/utils'
 
 import { Token } from '../util/types'
 
@@ -9,7 +9,7 @@ class CompoundService {
   contract: Contract
   signerAddress: Maybe<string>
   provider: any
-
+  exchangeRate: number
   constructor(address: string, symbol: string, provider: any, signerAddress: Maybe<string>) {
     const cTokenABI = CompoundService.getABI(symbol)
     if (signerAddress) {
@@ -18,8 +18,13 @@ class CompoundService {
     } else {
       this.contract = new ethers.Contract(address, cTokenABI, provider)
     }
+    this.exchangeRate = 0
     this.signerAddress = signerAddress
     this.provider = provider
+  }
+
+  init = async () => {
+    this.exchangeRate = await this.calculateExchangeRate()
   }
 
   calculateSupplyRateAPY = async (): Promise<number> => {
@@ -31,43 +36,47 @@ class CompoundService {
     return supplyApy
   }
 
-  calculateCTokenToBaseExchange = async (baseToken: Token, cTokenFunding: BigNumber): Promise<BigNumber> => {
+  calculateCTokenToBaseExchange = (baseToken: Token, cTokenFunding: BigNumber): BigNumber => {
     const cTokenDecimals = 8
     const userCTokenAmount = Number(formatUnits(cTokenFunding, cTokenDecimals))
-    const exchangeRate = Number(await this.contract.functions.exchangeRateStored())
-    const cTokenMantissa = 10
+    const exchangeRate = this.exchangeRate
     const baseTokenDecimals = Number(baseToken.decimals)
-    const exponent = baseTokenDecimals + 18 - cTokenDecimals
-    const divisor = Math.pow(cTokenMantissa, exponent)
-    const oneCTokenInUnderlying = exchangeRate / divisor
+    const mantissa = 18 + baseTokenDecimals - cTokenDecimals
+    const oneCTokenInUnderlying = exchangeRate / Math.pow(10, mantissa)
     const amountUnderlyingTokens = userCTokenAmount * oneCTokenInUnderlying
-    const underlyingBigNumber = parseUnits(amountUnderlyingTokens.toString(), baseTokenDecimals)
+    const amountUnderlyingTokensBoundToPrecision = amountUnderlyingTokens.toFixed(4)
+    const underlyingBigNumber = parseUnits(amountUnderlyingTokensBoundToPrecision, baseTokenDecimals)
     return underlyingBigNumber
   }
 
-  calculateBaseToCTokenExchange = async (
-    userInputToken: Token,
-    userInputTokenFunding: BigNumber,
-  ): Promise<BigNumber> => {
-    const cTokenDecimals = 8 // all cTokens have 8 decimal places
-    const underlyingDecimals = userInputToken.decimals
-    const exchangeCash = await this.contract.getCash()
-    const totalBorrows = await this.contract.totalBorrows()
-    const totalReserves = await this.contract.totalReserves()
-    const totalSupply = await this.contract.totalSupply()
-    const exchangeRate = (exchangeCash + totalBorrows - totalReserves) / totalSupply
+  calculateExchangeRate = async (): Promise<number> => {
+    const exchangeRate = Number(await this.contract.functions.exchangeRateStored())
+    return exchangeRate
+  }
+
+  calculateBaseToCTokenExchange = (userInputToken: Token, userInputTokenFunding: BigNumber): BigNumber => {
+    const cTokenDecimals = 8
+    const userInputTokenAmount = Number(formatUnits(userInputTokenFunding, userInputToken.decimals))
+    const underlyingDecimals = Number(userInputToken.decimals)
+    const exchangeRate = this.exchangeRate
     const mantissa = 18 + underlyingDecimals - cTokenDecimals
-    let cTokensInUnderlying = exchangeRate / (1 * Math.pow(10, mantissa))
-    cTokensInUnderlying = Math.round(cTokensInUnderlying)
-    const normalizedCTokenInUnderlying = bigNumberify(cTokensInUnderlying.toString())
-    const cTokenTotal = userInputTokenFunding.mul(normalizedCTokenInUnderlying)
-    return cTokenTotal
+    const oneUnderlyingInCToken = (1 * Math.pow(10, mantissa)) / exchangeRate
+    const amountCTokens = userInputTokenAmount * oneUnderlyingInCToken
+    const cTokenAmountRoundedToPrecision = amountCTokens.toFixed(4)
+    const amountCTokenBigNumber = parseUnits(cTokenAmountRoundedToPrecision, cTokenDecimals)
+    return amountCTokenBigNumber
   }
 
   static encodeMintTokens = (tokenSymbol: string, amountWei: string): string => {
     const tokenABI = CompoundService.getABI(tokenSymbol)
     const mintInterface = new utils.Interface(tokenABI)
     return mintInterface.functions.mint.encode([amountWei])
+  }
+
+  static encodeRedeemTokens = (tokenSymbol: string, amountRedeem: string): string => {
+    const tokenABI = CompoundService.getABI(tokenSymbol)
+    const mintInterface = new utils.Interface(tokenABI)
+    return mintInterface.functions.redeem.encode([amountRedeem])
   }
 
   static encodeApproveUnlimited = (tokenSymbol: string, spenderAccount: string): string => {

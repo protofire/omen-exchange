@@ -1,7 +1,7 @@
-import React, { DOMAttributes, HTMLAttributes } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
-import { IconClose, IconTick } from '../../../common/icons'
+import { IconTick } from '../../../common/icons'
 import { CompoundIcon } from '../../../common/icons/currencies/CompoundIcon'
 
 const Wrapper = styled.div`

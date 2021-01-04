@@ -1,19 +1,18 @@
-# Omen compound integration.
+[![Netlify Status](https://api.netlify.com/api/v1/badges/2da38309-7dbe-43bb-bb2a-ba3186bc3556/deploy-status)](https://app.netlify.com/sites/conditional/deploys)
 
-## Compound protocol integration for Omen exchange.
+# Omen
 
-### Github pull request https://github.com/protofire/omen-exchange/pull/1466
+## Building
 
-* It allows Omen pool creators to choose to have the pool reserves get automatically converted into compound tokens which means that while
-the tokens are sitting in the pool they continually accrue interest.
+The app code lives in the `app` folder. Use `yarn` to install dependencies.
 
-This is achieved using contract proxy kit allowing the pool creator to transfer their selected token while the proxy internall converts
-the tokens into compound tokens before depositing into the pool.
+```bash
+cd app/
+yarn
+```
 
-** This project was created in fulfillment of the Omen Gitcoin hack https://gitcoin.co/issue/dxdaohackathon/omen-exchange/1/100024191
+Create a `.env` file. See `.env.example` for environment variables which may be set.
 
-Video demo https://youtu.be/stv9OIV8A3M
+For Omen builds, use `yarn build`.
 
-* Future work-
-* Fund/Withdraw pool with either token or cTokens.
-* View pools with cTokens with refernce to their underlying tokens.
+The `build` directory in the `app` directory will now contain the build to be served.

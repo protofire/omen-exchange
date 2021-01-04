@@ -26,7 +26,6 @@ import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
-import { IconTick } from '../../../../../common/icons'
 import { TitleValue } from '../../../../../common/text/title_value'
 import { FullLoading } from '../../../../../loading'
 import { AddCompoundService } from '../../../../common/add_compound_service'
@@ -214,7 +213,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const {
     arbitrator,
     category,
-    collateral,
     funding,
     loadedQuestionId,
     outcomes,
@@ -280,8 +278,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
-  const serviceCheck = <IconTick />
-
   const toggleServiceCheck = () => {
     setServiceCheck(!isServiceChecked)
     handleUseCompoundReserveChange(!isServiceChecked)
@@ -290,7 +286,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     if (showAddCompundService) {
       setCompoundInterestRate(userInputCollateral)
     }
-  }, [isServiceChecked, userInputCollateral])
+  }, [isServiceChecked, userInputCollateral]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const amountError =
     maybeCollateralBalance === null

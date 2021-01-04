@@ -1,10 +1,21 @@
+import { parseUnits } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
-import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
+import { CompoundService } from '../../../../../services/compound_service'
+import { getToken } from '../../../../../util/networks'
+import { formatBigNumber } from '../../../../../util/tools'
+import {
+  BalanceItem,
+  CompoundTokenType,
+  MarketDetailsTab,
+  MarketMakerData,
+  OutcomeTableValue,
+  Token,
+} from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketTopDetailsOpen } from '../../../common/market_top_details_open'
@@ -98,12 +109,27 @@ const Wrapper = (props: Props) => {
   const { fetchGraphMarketMakerData, marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
-
   const { balances, collateral, isQuestionFinalized, payouts, question, totalPoolShares } = marketMakerData
-
+  const [displayBalances, setDisplayBalances] = useState<BalanceItem[]>(balances)
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
   const context = useConnectedWeb3Context()
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
+
+  const getPricesInBaseCollateral = async (baseCollateral: Token) => {
+    const { account, library: provider } = context
+    const compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
+    await compoundService.init()
+    const baseTokenBalance = balances.map(function(bal) {
+      const cTokenPriceAmount = parseUnits(bal.currentPrice.toFixed(2), 8)
+      const baseTokenPrice = compoundService.calculateCTokenToBaseExchange(baseCollateral, cTokenPriceAmount)
+      return Object.assign({}, bal, {
+        currentPrice: formatBigNumber(baseTokenPrice, baseCollateral.decimals),
+      })
+    })
+    setDisplayCollateral(baseCollateral)
+    setDisplayBalances(baseTokenBalance)
+  }
 
   useEffect(() => {
     const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
@@ -117,6 +143,22 @@ const Wrapper = (props: Props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    // if collateral is a cToken then convert the collateral and balances to underlying token
+    let baseCollateral = collateral
+    const collateralSymbol = collateral.symbol.toLowerCase()
+    if (collateralSymbol in CompoundTokenType) {
+      const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
+      const baseCollateralToken = getToken(context.networkId, baseCollateralSymbol as KnownToken)
+      baseCollateral = baseCollateralToken
+      getPricesInBaseCollateral(baseCollateral)
+    } else {
+      setDisplayCollateral(collateral)
+      setDisplayBalances(balances)
+    }
+  }, [collateral.symbol, balances]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
     return !shares.isZero()
@@ -142,6 +184,8 @@ const Wrapper = (props: Props) => {
         balances={balances}
         collateral={collateral}
         disabledColumns={disabledColumns}
+        displayBalances={displayBalances}
+        displayCollateral={displayCollateral}
         displayRadioSelection={false}
         probabilities={probabilities}
       />

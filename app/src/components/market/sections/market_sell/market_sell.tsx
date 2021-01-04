@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
@@ -7,7 +7,9 @@ import styled from 'styled-components'
 
 import { useAsyncDerivedValue, useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
+import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
+import { getToken } from '../../../../util/networks'
 import {
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
@@ -22,18 +24,13 @@ import {
   MarketMakerData,
   OutcomeTableValue,
   Status,
+  Token,
 } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import {
-  Dropdown,
-  DropdownDirection,
-  DropdownItemProps,
-  DropdownPosition,
-  DropdownVariant,
-} from '../../../common/form/dropdown'
+import { Dropdown, DropdownItemProps } from '../../../common/form/dropdown'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError } from '../../common/common_styled'
@@ -94,43 +91,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
-  const marketMakerDataDefault = marketMakerData
-  const [stateMarketMakerData, setMarketMakerdata] = useState<MarketMakerData>(marketMakerDataDefault)
   const collateralSymbol = collateral.symbol.toLowerCase()
   let currencySelect = <span />
-  const setUserInputCollateral = (symbol: string): void => {
-    console.log(stateMarketMakerData)
-    console.log(symbol)
-    if (symbol.toLowerCase() === collateral.symbol.toLowerCase()) {
-      // get the value of
-    } else {
-      // get the value of
-    }
-  }
-  if (collateralSymbol in CompoundTokenType) {
-    const filters = [
-      {
-        title: 'dai',
-        onClick: () => setUserInputCollateral('dai'),
-      },
-      {
-        title: 'cDai',
-        onClick: () => setUserInputCollateral('cdai'),
-      },
-    ]
-    const filterItems: Array<DropdownItemProps> = filters.map((item, index) => {
-      return {
-        content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
-        onClick: item.onClick,
-      }
-    })
-    currencySelect = (
-      <CurrencyDropdownLabelContainer>
-        <CurrencyDropdownLabel>Withdraw as</CurrencyDropdownLabel>
-        <CurrencyDropdown items={filterItems} />
-      </CurrencyDropdownLabelContainer>
-    )
-  }
 
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
@@ -151,14 +113,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
-
+  const [displayBalances, setDisplayBalances] = useState<BalanceItem[]>(balances)
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
 
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])
   useEffect(() => {
-    console.log('11')
     setBalanceItem(balances[outcomeIndex])
     // eslint-disable-next-line
   }, [balances[outcomeIndex]])
@@ -170,6 +132,68 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     setAmountSharesToDisplay('')
     // eslint-disable-next-line
   }, [collateral.address])
+
+  const getPricesInBaseCollateral = async (baseCollateral: Token) => {
+    const { account, library: provider } = context
+    const compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
+    await compoundService.init()
+    const baseTokenBalance = balances.map(function(bal) {
+      const cTokenPriceAmount = parseUnits(bal.currentPrice.toFixed(2), 8)
+      const baseTokenPrice = compoundService.calculateCTokenToBaseExchange(baseCollateral, cTokenPriceAmount)
+      return Object.assign({}, bal, {
+        currentPrice: formatBigNumber(baseTokenPrice, baseCollateral.decimals),
+      })
+    })
+    setDisplayCollateral(baseCollateral)
+    setDisplayBalances(baseTokenBalance)
+  }
+
+  useEffect(() => {
+    // if collateral is a cToken then convert the collateral and balances to underlying token
+    let baseCollateral = collateral
+    const collateralSymbol = collateral.symbol.toLowerCase()
+    if (collateralSymbol in CompoundTokenType) {
+      const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
+      const baseCollateralToken = getToken(context.networkId, baseCollateralSymbol as KnownToken)
+      baseCollateral = baseCollateralToken
+      getPricesInBaseCollateral(baseCollateral)
+    } else {
+      setDisplayCollateral(collateral)
+      setDisplayBalances(balances)
+    }
+  }, [collateral.symbol, balances]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const setUserInputCollateral = (symbol: string): void => {
+    if (symbol.toLowerCase() === collateral.symbol.toLowerCase()) {
+      // get the value of
+    } else {
+      // get the value of
+    }
+  }
+  if (collateralSymbol in CompoundTokenType) {
+    const filters = [
+      {
+        title: displayCollateral.symbol,
+        onClick: () => setUserInputCollateral(displayCollateral.symbol),
+      },
+      {
+        title: collateral.symbol,
+        onClick: () => setUserInputCollateral(collateral.symbol),
+      },
+    ]
+    const filterItems: Array<DropdownItemProps> = filters.map(item => {
+      return {
+        content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
+        onClick: item.onClick,
+      }
+    })
+    currencySelect = (
+      <CurrencyDropdownLabelContainer>
+        <CurrencyDropdownLabel>Withdraw as</CurrencyDropdownLabel>
+        <CurrencyDropdown items={filterItems} />
+      </CurrencyDropdownLabelContainer>
+    )
+  }
 
   const calcSellAmount = useMemo(
     () => async (
@@ -235,12 +259,21 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Selling ${sharesAmount} shares...`)
-
+      let useBaseToken = false
+      let compoundService = null
+      if (displayCollateral.address !== collateral.address) {
+        useBaseToken = true
+        const { account, library: provider } = context
+        compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
+        await compoundService.init()
+      }
       await cpk.sellOutcomes({
         amount: tradedCollateral,
+        compoundService,
         outcomeIndex,
         marketMaker,
         conditionalTokens,
+        useBaseToken,
       })
 
       await fetchGraphMarketMakerData()
@@ -283,6 +316,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           OutcomeTableValue.Probability,
           OutcomeTableValue.Bonded,
         ]}
+        displayBalances={displayBalances}
+        displayCollateral={displayCollateral}
         newShares={balances.map((balance, i) =>
           i === outcomeIndex ? balance.shares.sub(amountShares || Zero) : balance.shares,
         )}

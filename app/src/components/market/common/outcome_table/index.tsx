@@ -15,9 +15,12 @@ import { WinningBadge } from '../winning_badge'
 interface Props {
   balances: BalanceItem[]
   collateral: Token
+  displayBalances?: BalanceItem[]
+  displayCollateral?: Token
   disabledColumns?: OutcomeTableValue[]
   displayRadioSelection?: boolean
   outcomeHandleChange?: (e: number) => void
+  getPriceInBaseToken?: (e: number) => number
   outcomeSelected?: number
   payouts?: Maybe<Big[]>
   probabilities: number[]
@@ -93,6 +96,8 @@ export const OutcomeTable = (props: Props) => {
     balances,
     collateral,
     disabledColumns = [],
+    displayCollateral = collateral,
+    displayBalances = balances,
     displayRadioSelection = true,
     newShares = null,
     outcomeHandleChange,
@@ -137,7 +142,9 @@ export const OutcomeTable = (props: Props) => {
                 style={isBond && index === 1 ? { width: '53%' } : {}}
                 textAlign={TableCellsAlign[index]}
               >
-                {value} {value === OutcomeTableValue.CurrentPrice && `(${collateral.symbol})`}
+                {value}
+                {value === OutcomeTableValue.CurrentPrice &&
+                  `(${displayCollateral.symbol ? displayCollateral.symbol : collateral.symbol})`}
               </THStyled>
             ) : null
           })}
@@ -331,13 +338,13 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
-  const renderTable = () => balances.map((balanceItem: BalanceItem, index) => renderTableRow(balanceItem, index))
+  const renderTable = () => displayBalances.map((balanceItem: BalanceItem, index) => renderTableRow(balanceItem, index))
 
   return (
     <TableWrapper>
       <Table head={renderTableHeader()}>
         {renderTable()}
-        {isBond && renderInvalidRow(balances.length)}
+        {isBond && renderInvalidRow(displayBalances.length)}
       </Table>
     </TableWrapper>
   )

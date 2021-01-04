@@ -3,11 +3,11 @@ import CPK from 'contract-proxy-kit/lib/esm'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ethers } from 'ethers'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 
 import { getLogger } from '../util/logger'
-import { getCPKAddresses, getContractAddress } from '../util/networks'
+import { getCPKAddresses, getContractAddress, getToken, getTokenFromAddress } from '../util/networks'
 import { calcDistributionHint, waitABit } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
@@ -24,14 +24,18 @@ const logger = getLogger('Services::CPKService')
 
 interface CPKBuyOutcomesParams {
   amount: BigNumber
+  compoundService: CompoundService | null
   outcomeIndex: number
+  useBaseToken: boolean
   marketMaker: MarketMakerService
 }
 
 interface CPKSellOutcomesParams {
   amount: BigNumber
+  compoundService: CompoundService | null
   outcomeIndex: number
   marketMaker: MarketMakerService
+  useBaseToken: boolean
   conditionalTokens: ConditionalTokenService
 }
 
@@ -48,18 +52,22 @@ interface CPKCreateMarketParams {
 interface CPKAddFundingParams {
   amount: BigNumber
   collateral: Token
+  compoundService: CompoundService | null
   marketMaker: MarketMakerService
+  useBaseToken: boolean
 }
 
 interface CPKRemoveFundingParams {
   amountToMerge: BigNumber
   collateralAddress: string
+  compoundService: CompoundService | null
   conditionId: string
   conditionalTokens: ConditionalTokenService
   earnings: BigNumber
   marketMaker: MarketMakerService
   outcomesCount: number
   sharesToBurn: BigNumber
+  useBaseToken: boolean
 }
 
 interface CPKRedeemParams {
@@ -147,19 +155,35 @@ class CPKService {
     return ''
   }
 
-  buyOutcomes = async ({ amount, marketMaker, outcomeIndex }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
+  buyOutcomes = async ({
+    amount,
+    compoundService,
+    marketMaker,
+    outcomeIndex,
+    useBaseToken = false,
+  }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const marketMakerAddress = marketMaker.address
-
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
       const collateralService = new ERC20Service(this.provider, account, collateralAddress)
-
+      const collateral: Token = getTokenFromAddress(networkId, collateralAddress)
+      let collateralSymbol = ''
+      let userInputCollateralSymbol: KnownToken
+      let userInputCollateral: Token = collateral
       logger.log(`CPK address: ${this.cpk.address}`)
-
-      const outcomeTokensToBuy = await marketMaker.calcBuyAmount(amount, outcomeIndex)
+      let minCollateralAmount = amount
+      if (useBaseToken && compoundService != null) {
+        collateralSymbol = collateral.symbol.toLowerCase()
+        userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
+        userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+        minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, amount)
+      }
+      const outcomeTokensToBuy = await marketMaker.calcBuyAmount(minCollateralAmount, outcomeIndex)
       logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
       const transactions = []
 
@@ -173,7 +197,7 @@ class CPKService {
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
         marketMakerAddress,
-        amount,
+        minCollateralAmount,
       )
 
       if (!hasCPKEnoughAlowance) {
@@ -186,17 +210,32 @@ class CPKService {
 
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
-        // Step 2: Transfer the amount of collateral being spent from the user to the CPK
-        transactions.push({
-          to: collateralAddress,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
-        })
+        if (useBaseToken) {
+          // get base token
+          const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, amount.toString())
+          // Approve cToken for the cpk contract
+          transactions.push({
+            to: userInputCollateral.address,
+            data: ERC20Service.encodeApproveUnlimited(collateral.address),
+          })
+          // Mint ctokens from the underlying token
+          transactions.push({
+            to: collateral.address,
+            data: encodedMintFunction,
+          })
+        } else {
+          // Step 2: Transfer the amount of collateral being spent from the user to the CPK
+          transactions.push({
+            to: collateralAddress,
+            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, minCollateralAmount),
+          })
+        }
       }
 
       // Step 3: Buy outcome tokens with the CPK
       transactions.push({
         to: marketMakerAddress,
-        data: MarketMakerService.encodeBuy(amount, outcomeIndex, outcomeTokensToBuy),
+        data: MarketMakerService.encodeBuy(minCollateralAmount, outcomeIndex, outcomeTokensToBuy),
       })
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
@@ -317,8 +356,7 @@ class CPKService {
       }
       let marketPoolFunding = marketData.funding
       if (useCompoundReserve && compoundService) {
-        marketPoolFunding = bigNumberify(100000000)
-        console.log(marketPoolFunding.toString())
+        marketPoolFunding = compoundService.calculateBaseToCTokenExchange(userInputCollateral, marketPoolFunding)
         const encodedMintFunction = CompoundService.encodeMintTokens(
           compoundTokenDetails.symbol,
           marketData.funding.toString(),
@@ -377,9 +415,11 @@ class CPKService {
 
   sellOutcomes = async ({
     amount,
+    compoundService,
     conditionalTokens,
     marketMaker,
     outcomeIndex,
+    useBaseToken,
   }: CPKSellOutcomesParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -411,14 +451,40 @@ class CPKService {
         to: marketMaker.address,
         data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
       })
-
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
-        // Step 4: Transfer funding to user
-        transactions.push({
-          to: collateralAddress,
-          data: ERC20Service.encodeTransfer(account, amount),
-        })
+        if (useBaseToken && compoundService != null) {
+          const network = await this.provider.getNetwork()
+          const networkId = network.chainId
+          const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+          const collateralSymbol = collateralToken.symbol.toLowerCase()
+          const userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
+          const userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+          const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(userInputCollateral, amount)
+          // Convert cpk token to base token if user wants to redeem in base
+          const encodedRedeemFunction = CompoundService.encodeRedeemTokens(collateralSymbol, amount.toString())
+          // Approve cToken for the cpk contract
+          transactions.push({
+            to: userInputCollateral.address,
+            data: ERC20Service.encodeApproveUnlimited(collateralToken.address),
+          })
+          // Mint ctokens from the underlying token
+          transactions.push({
+            to: collateralToken.address,
+            data: encodedRedeemFunction,
+          })
+          // Transfer base token to the user
+          transactions.push({
+            to: userInputCollateral.address,
+            data: ERC20Service.encodeTransfer(account, minCollateralAmount),
+          })
+        } else {
+          // Step 4: Transfer funding to user
+          transactions.push({
+            to: collateralAddress,
+            data: ERC20Service.encodeTransfer(account, amount),
+          })
+        }
       }
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
@@ -431,16 +497,26 @@ class CPKService {
     }
   }
 
-  addFunding = async ({ amount, collateral, marketMaker }: CPKAddFundingParams): Promise<TransactionReceipt> => {
+  addFunding = async ({
+    amount,
+    collateral,
+    compoundService,
+    marketMaker,
+    useBaseToken,
+  }: CPKAddFundingParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
 
       // Check  if the allowance of the CPK to the market maker is enough.
-      const collateralService = new ERC20Service(this.provider, account, collateral.address)
-
       const transactions = []
       const txOptions: TxOptions = {}
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+      const collateralService = new ERC20Service(this.provider, account, collateral.address)
+      let collateralSymbol = ''
+      let userInputCollateralSymbol: KnownToken
+      let userInputCollateral: Token = collateral
 
       if (this.cpk.isSafeApp()) {
         txOptions.gas = 500000
@@ -459,19 +535,40 @@ class CPKService {
           data: ERC20Service.encodeApproveUnlimited(marketMaker.address),
         })
       }
-
+      let minCollateralAmount = amount
+      if (useBaseToken && compoundService != null) {
+        collateralSymbol = collateral.symbol.toLowerCase()
+        userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
+        userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+        minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, amount)
+      }
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
-        // Step 4: Transfer funding from user
-        transactions.push({
-          to: collateral.address,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
-        })
+        if (useBaseToken) {
+          // get base token
+          const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, minCollateralAmount.toString())
+          // Approve cToken for the cpk contract
+          transactions.push({
+            to: userInputCollateral.address,
+            data: ERC20Service.encodeApproveUnlimited(collateral.address),
+          })
+          // Mint ctokens from the underlying token
+          transactions.push({
+            to: collateral.address,
+            data: encodedMintFunction,
+          })
+        } else {
+          // Step 4: Transfer funding from user
+          transactions.push({
+            to: collateral.address,
+            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, minCollateralAmount),
+          })
+        }
       }
 
       transactions.push({
         to: marketMaker.address,
-        data: MarketMakerService.encodeAddFunding(amount),
+        data: MarketMakerService.encodeAddFunding(minCollateralAmount),
       })
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
@@ -487,12 +584,14 @@ class CPKService {
   removeFunding = async ({
     amountToMerge,
     collateralAddress,
+    compoundService,
     conditionId,
     conditionalTokens,
     earnings,
     marketMaker,
     outcomesCount,
     sharesToBurn,
+    useBaseToken,
   }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -523,11 +622,45 @@ class CPKService {
 
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
+        const totalAmountEarned = amountToMerge.add(earnings)
         // transfer to the user the merged collateral plus the earned fees
-        transactions.push({
-          to: collateralAddress,
-          data: ERC20Service.encodeTransfer(account, amountToMerge.add(earnings)),
-        })
+        if (useBaseToken && compoundService != null) {
+          const network = await this.provider.getNetwork()
+          const networkId = network.chainId
+          const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+          const collateralSymbol = collateralToken.symbol.toLowerCase()
+          const userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
+          const userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+          const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(
+            userInputCollateral,
+            totalAmountEarned,
+          )
+          // Convert cpk token to base token if user wants to redeem in base
+          const encodedRedeemFunction = CompoundService.encodeRedeemTokens(
+            collateralSymbol,
+            totalAmountEarned.toString(),
+          )
+          // Approve cToken for the cpk contract
+          transactions.push({
+            to: userInputCollateral.address,
+            data: ERC20Service.encodeApproveUnlimited(collateralToken.address),
+          })
+          // Mint ctokens from the underlying token
+          transactions.push({
+            to: collateralToken.address,
+            data: encodedRedeemFunction,
+          })
+          // Transfer base token to the user
+          transactions.push({
+            to: userInputCollateral.address,
+            data: ERC20Service.encodeTransfer(account, minCollateralAmount),
+          })
+        } else {
+          transactions.push({
+            to: collateralAddress,
+            data: ERC20Service.encodeTransfer(account, totalAmountEarned),
+          })
+        }
       }
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
