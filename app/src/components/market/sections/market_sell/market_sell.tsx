@@ -116,7 +116,18 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [displayBalances, setDisplayBalances] = useState<BalanceItem[]>(balances)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
-
+  const { account, library: provider } = context
+  const [compoundService, setCompoundService] = useState<CompoundService>(
+    new CompoundService(collateral.address, collateral.symbol, provider, account),
+  )
+  useMemo(() => {
+    const getResult = async () => {
+      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
+      await compoundServiceObject.init()
+      setCompoundService(compoundServiceObject)
+    }
+    getResult()
+  }, [collateral.address, collateral.symbol, provider, account])
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])
@@ -134,9 +145,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   }, [collateral.address])
 
   const getPricesInBaseCollateral = async (baseCollateral: Token) => {
-    const { account, library: provider } = context
-    const compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
-    await compoundService.init()
     const baseTokenBalance = balances.map(function(bal) {
       const cTokenPriceAmount = parseUnits(bal.currentPrice.toFixed(2), 8)
       const baseTokenPrice = compoundService.calculateCTokenToBaseExchange(baseCollateral, cTokenPriceAmount)
@@ -245,6 +253,21 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     calcSellAmount,
   )
 
+  let potentialValueNormalized = potentialValue
+  let costFeeNormalized = costFee
+  let normalizedTradedCollateral = tradedCollateral
+  if (displayCollateral.address !== collateral.address) {
+    if (potentialValue && potentialValue.gt(0)) {
+      potentialValueNormalized = compoundService.calculateCTokenToBaseExchange(displayCollateral, potentialValue)
+    }
+    if (costFee && costFee.gt(0)) {
+      costFeeNormalized = compoundService.calculateCTokenToBaseExchange(displayCollateral, costFee)
+    }
+    if (tradedCollateral && tradedCollateral.gt(0)) {
+      normalizedTradedCollateral = compoundService.calculateCTokenToBaseExchange(displayCollateral, tradedCollateral)
+    }
+  }
+
   const finish = async () => {
     try {
       if (!tradedCollateral) {
@@ -260,12 +283,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Selling ${sharesAmount} shares...`)
       let useBaseToken = false
-      let compoundService = null
       if (displayCollateral.address !== collateral.address) {
         useBaseToken = true
-        const { account, library: provider } = context
-        compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
-        await compoundService.init()
       }
       await cpk.sellOutcomes({
         amount: tradedCollateral,
@@ -365,20 +384,24 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               value={`${formatNumber(formatBigNumber(amountShares || Zero, collateral.decimals))} Shares`}
             />
             <TransactionDetailsRow
-              emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
+              emphasizeValue={potentialValueNormalized ? potentialValueNormalized.gt(0) : false}
               state={ValueStates.success}
               title={'Profit'}
               value={
-                potentialValue
-                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${collateral.symbol}`
+                potentialValueNormalized
+                  ? `${formatNumber(formatBigNumber(potentialValueNormalized, displayCollateral.decimals, 2))} ${
+                      displayCollateral.symbol
+                    }`
                   : '0.00'
               }
             />
             <TransactionDetailsRow
               title={'Trading Fee'}
-              value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'} ${
-                collateral.symbol
-              }`}
+              value={`${
+                costFeeNormalized
+                  ? formatNumber(formatBigNumber(costFeeNormalized.mul(-1), displayCollateral.decimals, 2))
+                  : '0.00'
+              } ${displayCollateral.symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
@@ -393,8 +416,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               }
               title={'Total'}
               value={`${
-                tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
-              } ${collateral.symbol}`}
+                normalizedTradedCollateral
+                  ? formatNumber(formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, 2))
+                  : '0.00'
+              } ${displayCollateral.symbol}`}
             />
           </TransactionDetailsCard>
         </div>

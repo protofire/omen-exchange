@@ -567,7 +567,7 @@ class CPKService {
       }
       if (useBaseToken) {
         // get base token
-        const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, minCollateralAmount.toString())
+        const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, amount.toString())
         // Approve cToken for the cpk contract
         transactions.push({
           to: userInputCollateral.address,
