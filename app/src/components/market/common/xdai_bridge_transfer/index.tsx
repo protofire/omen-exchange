@@ -1,14 +1,12 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { useCpkAllowance } from '../../../../hooks'
-import { RemoteData } from '../../../../util/remote_data'
 import { ButtonRound } from '../../../button/button_round'
-import { ButtonStateful } from '../../../button/button_stateful'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { XDaiStake } from '../../../common/icons/currencies/XDaiStake'
+import { SetAllowance } from '../set_allowance_bridge'
 
 interface Props {
   open: boolean
@@ -61,11 +59,7 @@ const TextFieldCustomPlace = styled(TextfieldCustomPlaceholder)`
     margin-right: 0px;
   }
 `
-const SetAllowanceButton = styled(ButtonStateful)`
-  margin-top: 20px;
-  width: 100% !important;
-  font-weight: 500;
-`
+
 const TransferButton = styled(ButtonRound)`
   margin-top: 12px;
   width: 100%;
@@ -88,8 +82,7 @@ const TransferState = styled.div<{ show: boolean }>`
 
 export const XdaiBridgeTransfer: React.FC<Props> = props => {
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
-  const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const [amount, setAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [transferState, setTransferState] = useState<boolean>(false)
 
   return (
@@ -111,7 +104,6 @@ export const XdaiBridgeTransfer: React.FC<Props> = props => {
                 decimals={18}
                 name="amount"
                 onChange={(e: BigNumberInputReturn) => {
-                  console.log('e')
                   setAmount(e.value)
                   setAmountToDisplay('')
                 }}
@@ -122,17 +114,10 @@ export const XdaiBridgeTransfer: React.FC<Props> = props => {
             }
             symbol={'DAI'}
           />
-          <SetAllowanceButton
-            onClick={() => {
-              console.log('jere')
-            }}
-            state={0}
-          >
-            Set Allowance
-          </SetAllowanceButton>
+          <SetAllowance selectedAmount={amount} />
+
           <TransferButton
             onClick={() => {
-              console.log('here')
               setTransferState(!transferState)
             }}
           >

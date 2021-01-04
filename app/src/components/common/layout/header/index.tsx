@@ -151,7 +151,6 @@ const CloseIconWrapper = styled.div`
 
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
   const { account, library: provider, networkId } = useWeb3Context()
-  console.log(networkId)
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
@@ -227,7 +226,6 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
             <>
               <ButtonRoundBridge
                 onClick={() => {
-                  console.log(isBridgeOpen)
                   setIsBridgeOpen(!isBridgeOpen)
                 }}
               >
