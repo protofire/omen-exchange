@@ -1,6 +1,6 @@
 /* eslint-env jest */
 import Big from 'big.js'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify, formatUnits } from 'ethers/utils'
 
 import {
   calcAddFundingSendAmounts,
@@ -17,6 +17,7 @@ import {
   formatNumber,
   formatToShortNumber,
   getIndexSets,
+  isDust,
   isObjectEqual,
   limitDecimalPlaces,
   truncateStringInTheMiddle as truncate,
@@ -456,6 +457,23 @@ describe('tools', () => {
         const clampedBigNumber = clampBigNumber(x, min, max)
 
         expect(clampedBigNumber).toStrictEqual(result)
+      })
+    }
+  })
+
+  describe('isDust', () => {
+    const testCases: [[BigNumber, number], boolean][] = [
+      [[new BigNumber(0), 6], true],
+      [[new BigNumber(1), 18], true],
+      [[new BigNumber(1000), 6], false],
+      [[new BigNumber(1), 6], true],
+      [[new BigNumber(100000000), 12], false],
+    ]
+    for (const [[amount, decimals], result] of testCases) {
+      it('should correctly determine whether the amount is dust', () => {
+        const isDustResult = isDust(amount, decimals)
+
+        expect(isDustResult).toStrictEqual(result)
       })
     }
   })

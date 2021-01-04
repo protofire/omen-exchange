@@ -1,6 +1,6 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import Big from 'big.js'
-import { BigNumber, bigNumberify, formatUnits, getAddress } from 'ethers/utils'
+import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import { getLogger } from './logger'
@@ -412,4 +412,8 @@ export const numberToByte32 = (num: number): string => {
   const frontZeros = '0'.repeat(66 - hex.length)
 
   return `0x${frontZeros}${hex.split('0x')[1]}`
+}
+
+export const isDust = (amount: BigNumber, decimals: number): boolean => {
+  return amount.lt(parseUnits('0.00001', decimals))
 }
