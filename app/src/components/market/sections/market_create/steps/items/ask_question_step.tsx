@@ -203,7 +203,6 @@ const AskQuestionStep = (props: Props) => {
           outcomeNames.map((name, index) => outcomeNames.indexOf(name) !== index).reduce((e1, e2) => e1 || e2),
       )
     } else if (currentFormState === FormState.scalar) {
-      console.log(lowerBound)
       setIsContinueButtonDisabled(
         !question ||
           !lowerBound ||
