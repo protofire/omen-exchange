@@ -142,6 +142,8 @@ const Wrapper = (props: Props) => {
         await oracle.resolveCondition(question, balances.length)
       }
 
+      await fetchGraphMarketMakerData()
+
       setStatus(Status.Ready)
       setMessage(`Condition successfully resolved.`)
     } catch (err) {
