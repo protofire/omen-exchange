@@ -23,7 +23,10 @@ const realitioAbi = [
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
 ]
-const realitioScalarAdapterAbi = ['function announceConditionQuestionId(bytes32 questionId, uint256 low, uint256 high)']
+const realitioScalarAdapterAbi = [
+  'function announceConditionQuestionId(bytes32 questionId, uint256 low, uint256 high)',
+  'function resolve(bytes32 questionId, string question, uint256 low, uint256 high)',
+]
 
 function getQuestionArgs(
   question: string,
@@ -37,7 +40,7 @@ function getQuestionArgs(
   const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
   const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
 
-  const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+  const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
   return [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
 }
@@ -53,7 +56,7 @@ function getScalarQuestionArgs(
   const openingTimestamp = openingDateMoment.unix()
   const questionText = RealitioQuestionLib.encodeText('uint', `${question} [${unit}]`, null, category)
 
-  const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+  const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
   return [UINT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
 }
@@ -235,7 +238,6 @@ class RealitioService {
     const args = getQuestionArgs(question, outcomes, category, arbitratorAddress, openingDateMoment, networkId)
 
     const askQuestionInterface = new utils.Interface(realitioAbi)
-    const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
     return askQuestionInterface.functions.askQuestion.encode(args)
   }
@@ -269,7 +271,6 @@ class RealitioService {
     const questionId = await this.constantContract.askQuestion(...args, {
       from: signerAddress,
     })
-    const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
     return questionId
   }
@@ -297,6 +298,28 @@ class RealitioService {
 
     const announceConditionInterface = new utils.Interface(realitioScalarAdapterAbi)
     return announceConditionInterface.functions.announceConditionQuestionId.encode(args)
+  }
+
+  resolveCondition = async (questionId: string, question: string, scalarLow: BigNumber, scalarHigh: BigNumber) => {
+    try {
+      const transactionObject = await this.scalarContract.resolve(questionId, question, scalarLow, scalarHigh)
+      return this.provider.waitForTransaction(transactionObject.hash)
+    } catch (err) {
+      logger.error(`There was an error resolving the condition with question id '${questionId}'`, err.message)
+      throw err
+    }
+  }
+
+  encodeResolveCondition = async (
+    questionId: string,
+    question: string,
+    scalarLow: BigNumber,
+    scalarHigh: BigNumber,
+  ) => {
+    const args = [questionId, question, scalarLow, scalarHigh]
+
+    const resolveConditionInterface = new utils.Interface(realitioScalarAdapterAbi)
+    return resolveConditionInterface.functions.resolve.encode(args)
   }
 }
 

@@ -285,6 +285,7 @@ export interface MarketMakerData {
   marketMakerUserFunding: BigNumber
   payouts: Maybe<Big[]>
   question: Question
+  realitioAnswer: Maybe<BigNumber>
   totalEarnings: BigNumber
   totalPoolShares: BigNumber
   userEarnings: BigNumber

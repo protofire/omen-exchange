@@ -500,6 +500,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     shortSharesNumber,
     totalLongPrice,
     totalShortPrice,
+    amountSharesNumber,
   ])
 
   const activateTooltip = () => {

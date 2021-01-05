@@ -1,3 +1,4 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { useHistory } from 'react-router'
@@ -213,7 +214,8 @@ const AskQuestionStep = (props: Props) => {
           !category ||
           !isProperScale ||
           lowerBound.gte(startingPoint) ||
-          startingPoint.gte(upperBound),
+          startingPoint.gte(upperBound) ||
+          lowerBound.lt(Zero),
       )
     }
   }, [

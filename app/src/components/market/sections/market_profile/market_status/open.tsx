@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { useConnectedCPKContext, useGraphMarketTradeData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
+import { isDust } from '../../../../../util/tools'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
@@ -121,7 +122,8 @@ const Wrapper = (props: Props) => {
 
   useEffect(() => {
     const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
-    if (timeDifference > 0) {
+    const maxTimeDifference = 86400000
+    if (timeDifference > 0 && timeDifference < maxTimeDifference) {
       setTimeout(callAfterTimeout, timeDifference + 2000)
     }
     function callAfterTimeout() {
@@ -132,7 +134,7 @@ const Wrapper = (props: Props) => {
   }, [])
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
-    return shares && !shares.isZero()
+    return shares && !isDust(shares, collateral.decimals)
   })
 
   const probabilities = balances.map(balance => balance.probability)
@@ -349,7 +351,7 @@ const Wrapper = (props: Props) => {
             <>
               <MarketScale
                 borderTop={true}
-                currentPrediction={outcomeTokenMarginalPrices[1]}
+                currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Current prediction'}
                 unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}

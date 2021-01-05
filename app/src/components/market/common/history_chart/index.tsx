@@ -4,13 +4,9 @@ import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
-import {
-  EARLIEST_MAINNET_BLOCK_TO_CHECK,
-  REALITIO_SCALAR_ADAPTER_ADDRESS,
-  REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY,
-} from '../../../../common/constants'
+import { EARLIEST_MAINNET_BLOCK_TO_CHECK } from '../../../../common/constants'
 import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
-import { keys, range } from '../../../../util/tools'
+import { isScalarMarket, keys, range } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
 
 import { HistoryChart } from './chart'
@@ -149,17 +145,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
     // eslint-disable-next-line
   }, [latestBlockNumber, library, period])
 
-  let realitioScalarAdapter
-  if (context.networkId === 1) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase()
-  } else if (context.networkId === 4) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
-  }
-
-  let isScalar = false
-  if (oracle === realitioScalarAdapter) {
-    isScalar = true
-  }
+  const isScalar = isScalarMarket(oracle || '', context.networkId || 0)
 
   return hidden ? null : (
     <HistoryChart

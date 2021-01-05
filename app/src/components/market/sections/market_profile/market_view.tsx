@@ -1,12 +1,9 @@
 import React from 'react'
 import { Helmet } from 'react-helmet'
 
-import {
-  DOCUMENT_TITLE,
-  REALITIO_SCALAR_ADAPTER_ADDRESS,
-  REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY,
-} from '../../../../common/constants'
+import { DOCUMENT_TITLE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { isScalarMarket } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 
@@ -25,20 +22,9 @@ const MarketView: React.FC<Props> = (props: Props) => {
   const { isQuestionFinalized, oracle, question } = marketMakerData
 
   const context = useConnectedWeb3Context()
-  const networkId = context.networkId
 
   const renderView = () => {
-    let realitioScalarAdapter
-    if (networkId === 1) {
-      realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase()
-    } else if (networkId === 4) {
-      realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
-    }
-
-    let isScalar = false
-    if (oracle === realitioScalarAdapter) {
-      isScalar = true
-    }
+    const isScalar = isScalarMarket(oracle || '', context.networkId || 0)
 
     if (isQuestionFinalized) {
       return <ClosedMarketDetails isScalar={isScalar} {...props} />
