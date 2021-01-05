@@ -43,6 +43,7 @@ export const useGraphMarketsFromQuestion = (questionId: string): Result => {
 
   const { data, error, loading } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-and-network',
     skip: false,
     variables: { id: questionId },
   })
