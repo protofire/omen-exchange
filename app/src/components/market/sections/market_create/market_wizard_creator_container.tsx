@@ -6,6 +6,7 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
+import { pseudoNativeAssetAddress } from '../../../../util/networks'
 import { MarketData } from '../../../../util/types'
 import { ModalConnectWallet } from '../../../modal'
 
@@ -40,7 +41,7 @@ const MarketWizardCreatorContainer: FC = () => {
 
         setMarketCreationStatus(MarketCreationStatus.creatingAMarket())
 
-        if (!cpk.cpk.isSafeApp()) {
+        if (!cpk.cpk.isSafeApp() && marketData.collateral.address !== pseudoNativeAssetAddress) {
           // Approve collateral to the proxy contract
           const collateralService = new ERC20Service(provider, account, marketData.collateral.address)
           const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, marketData.funding)
@@ -49,6 +50,7 @@ const MarketWizardCreatorContainer: FC = () => {
             await collateralService.approveUnlimited(cpk.address)
           }
         }
+
         const { marketMakerAddress, transaction } = await cpk.createMarket({
           marketData,
           conditionalTokens,
