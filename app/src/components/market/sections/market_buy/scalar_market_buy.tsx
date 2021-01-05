@@ -204,6 +204,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
       await cpk.buyOutcomes({
         amount,
+        collateral,
         outcomeIndex,
         marketMaker,
       })

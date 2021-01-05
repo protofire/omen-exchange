@@ -8,6 +8,8 @@ import {
   GRAPH_RINKEBY_WS,
   GRAPH_SOKOL_HTTP,
   GRAPH_SOKOL_WS,
+  GRAPH_XDAI_HTTP,
+  GRAPH_XDAI_WS,
   INFURA_PROJECT_ID,
   KLEROS_CURATE_GRAPH_MAINNET_HTTP,
   KLEROS_CURATE_GRAPH_MAINNET_WS,
@@ -19,12 +21,13 @@ import { entries, isNotNull } from '../util/type-utils'
 import { getImageUrl } from './token'
 import { Arbitrator, Token } from './types'
 
-export type NetworkId = 1 | 4 | 77
+export type NetworkId = 1 | 4 | 77 | 100
 
 export const networkIds = {
   MAINNET: 1,
   RINKEBY: 4,
   SOKOL: 77,
+  XDAI: 100,
 } as const
 
 type CPKAddresses = {
@@ -57,6 +60,9 @@ interface Network {
     omenVerifiedMarkets: string
   }
   cpk?: CPKAddresses
+  wrapToken: string
+  targetSafeImplementation: string
+  nativeAsset: Token
   defaultToken: string
 }
 
@@ -70,6 +76,8 @@ interface KnownTokenData {
   }
   order: number
 }
+
+export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
 
 const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
@@ -94,6 +102,20 @@ const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8',
       omenVerifiedMarkets: '0xb72103eE8819F2480c25d306eEAb7c3382fBA612',
     },
+    cpk: {
+      masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
+      proxyFactoryAddress: '0x0fB4340432e56c014fa96286de17222822a9281b',
+      multiSendAddress: '0xc3BD4deCF75e9937aefb7a4CE6Ec8931dB4cfAF0',
+      fallbackHandlerAddress: '0x40A930851BD2e590Bd5A5C981b436de25742E980',
+    },
+    wrapToken: 'weth',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'),
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     defaultToken: 'dai',
   },
   [networkIds.RINKEBY]: {
@@ -118,6 +140,20 @@ const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x03165DF66d9448E45c2f5137486af3E7e752a352',
       omenVerifiedMarkets: '0x3b29096b7ab49428923d902cEC3dFEaa49993234',
     },
+    cpk: {
+      masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
+      proxyFactoryAddress: '0x336c19296d3989e9e0c2561ef21c964068657c38',
+      multiSendAddress: '0x82CFd05a033e202E980Bc99eA50A4C6BB91CE0d7',
+      fallbackHandlerAddress: '0x40A930851BD2e590Bd5A5C981b436de25742E980',
+    },
+    wrapToken: 'weth',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'),
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     defaultToken: 'dai',
   },
   [networkIds.SOKOL]: {
@@ -148,7 +184,53 @@ const networks: { [K in NetworkId]: Network } = {
       multiSendAddress: '0xBe95a1C930B7d4F816518Ad7742062537F928b99',
       fallbackHandlerAddress: '0x1e9C3EBAd833b26E522D2fDa180Af3D2A32459D2',
     },
+    wrapToken: 'wspoa',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0x6b175474e89094c44da98b954eedeac495271d0f'),
+      symbol: 'SPOA',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
     defaultToken: 'wspoa',
+  },
+  [networkIds.XDAI]: {
+    label: 'xDai',
+    url: 'https://rpc.xdaichain.com/',
+    graphHttpUri: GRAPH_XDAI_HTTP,
+    graphWsUri: GRAPH_XDAI_WS,
+    klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
+    klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
+    realitioTimeout: 86400,
+    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+    omenTCRListId: 1,
+    contracts: {
+      realitio: '0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03',
+      realitioScalarAdapter: '0x0000000000000000000000000000000000000000',
+      marketMakerFactory: '0x9083A2B699c0a4AD06F63580BDE2635d26a3eeF0',
+      conditionalTokens: '0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce',
+      oracle: '0x2bf1BFb0eB6276a4F4B60044068Cb8CdEB89f79B',
+      klerosBadge: '0x0000000000000000000000000000000000000000',
+      klerosTokenView: '0x0000000000000000000000000000000000000000',
+      klerosTCR: '0x0000000000000000000000000000000000000000',
+      dxTCR: '0x0000000000000000000000000000000000000000',
+      omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
+    },
+    cpk: {
+      masterCopyAddress: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+      proxyFactoryAddress: '0xfC7577774887aAE7bAcdf0Fc8ce041DA0b3200f7',
+      multiSendAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
+      fallbackHandlerAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
+    },
+    wrapToken: 'wxdai',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0x6b175474e89094c44da98b954eedeac495271d0f'),
+      symbol: 'xDAI',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    defaultToken: 'wxdai',
   },
 }
 
@@ -196,7 +278,15 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     symbol: 'WSPOA',
     decimals: 18,
     addresses: {
-      [networkIds.SOKOL]: '0xc655c6D80ac92d75fBF4F40e95280aEb855B1E87',
+      [networkIds.SOKOL]: '0xc655c6d80ac92d75fbf4f40e95280aeb855b1e87',
+    },
+    order: 1,
+  },
+  wxdai: {
+    symbol: 'wxDAI',
+    decimals: 18,
+    addresses: {
+      [networkIds.XDAI]: '0xe91d153e0b41518a2ce8dd3d7944fa863463a97d',
     },
     order: 1,
   },
@@ -377,6 +467,7 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
       [networkIds.MAINNET]: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       [networkIds.RINKEBY]: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
       [networkIds.SOKOL]: '0xf3Aaf8A99f1119d02Af9bBfEafA8a71dDD4c582e',
+      [networkIds.XDAI]: '0xa0Baf56D83be19Eb6bA8aFAD2Db812Bc13D8Be1d',
     },
     isSelectionEnabled: true,
   },
@@ -548,4 +639,26 @@ export const getOmenTCRListId = (networkId: number): number => {
   }
 
   return networks[networkId].omenTCRListId
+}
+
+export const getWrapToken = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  const tokenId = networks[networkId].wrapToken as KnownToken
+  return getToken(networkId, tokenId)
+}
+
+export const getNativeAsset = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].nativeAsset as Token
+}
+
+export const getTargetSafeImplementation = (networkId: number): string => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].targetSafeImplementation.toLowerCase()
 }

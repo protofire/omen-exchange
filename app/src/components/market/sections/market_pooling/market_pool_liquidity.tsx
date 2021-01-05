@@ -11,10 +11,12 @@ import {
   useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
+  useCpkProxy,
   useFundingBalance,
 } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
+import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   calcAddFundingSendAmounts,
@@ -118,7 +120,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
   const history = useHistory()
   const context = useConnectedWeb3Context()
-  const { account, library: provider } = context
+  const { account, library: provider, networkId } = context
   const cpk = useConnectedCPKContext()
 
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
@@ -139,6 +141,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
+
+  const [upgradeFinished, setUpgradeFinished] = useState(false)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : false
 
   useEffect(() => {
     setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
@@ -204,6 +210,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const probabilities = balances.map(balance => balance.probability)
   const showSetAllowance =
+    collateral.address !== pseudoNativeAssetAddress &&
     !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
   const depositedTokensTotal = depositedTokens.add(userEarnings)
@@ -225,6 +232,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
+  const wrapToken = getWrapToken(networkId)
+  const symbol = collateral.address === pseudoNativeAssetAddress ? wrapToken.symbol : collateral.symbol
+
   const addFunding = async () => {
     setModalTitle('Deposit Funds')
 
@@ -244,7 +254,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
 
-      if (!cpk.cpk.isSafeApp()) {
+      if (!cpk.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress) {
         const collateralAddress = await marketMaker.getCollateralToken()
         const collateralService = new ERC20Service(provider, account, collateralAddress)
 
@@ -285,7 +295,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
 
-      setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
+      setMessage(`Withdrawing funds: ${fundsAmount} ${symbol}...`)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
@@ -307,7 +317,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Ready)
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
-      setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
+      setMessage(`Successfully withdrew ${fundsAmount} ${symbol}`)
       setIsModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
@@ -327,13 +337,26 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setAllowanceFinished(true)
   }
 
+  const showUpgrade =
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+
+  const upgradeProxy = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await updateProxy()
+    setUpgradeFinished(true)
+  }
+
   const collateralAmountError =
     maybeCollateralBalance === null
       ? null
       : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : amountToFund?.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
+      ? `Value must be less than or equal to ${walletBalance} ${symbol}`
       : null
 
   const sharesAmountError =
@@ -348,7 +371,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const disableDepositButton =
     !amountToFund ||
     amountToFund?.isZero() ||
-    (!cpk?.cpk.isSafeApp() && hasEnoughAllowance !== Ternary.True) ||
+    (!cpk?.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
     isNegativeAmountToFund
@@ -360,12 +383,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
+  const wrapAddress = wrapToken.address
+
+  const currencyFilters =
+    collateral.address === wrapAddress || collateral.address === pseudoNativeAssetAddress
+      ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
+      : []
+
   return (
     <>
       <UserData>
         <UserDataTitleValue
           title="Your Liquidity"
-          value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${collateral.symbol}`}
+          value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${symbol}`}
         />
         <UserDataTitleValue
           title="Total Pool Tokens"
@@ -374,16 +404,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         <UserDataTitleValue
           state={userEarnings.gt(0) ? ValueStates.success : undefined}
           title="Your Earnings"
-          value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${
-            collateral.symbol
-          }`}
+          value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
+            formatBigNumber(userEarnings, collateral.decimals),
+          )} ${symbol}`}
         />
         <UserDataTitleValue
           state={totalEarnings.gt(0) ? ValueStates.success : undefined}
           title="Total Earnings"
           value={`${totalEarnings.gt(0) ? '+' : ''}${formatNumber(
             formatBigNumber(totalEarnings, collateral.decimals),
-          )} ${collateral.symbol}`}
+          )} ${symbol}`}
         />
       </UserData>
       <OutcomeTable
@@ -416,10 +446,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             <>
               <CurrenciesWrapper>
                 <CurrencySelector
+                  addNativeAsset
                   balance={walletBalance}
                   context={context}
                   currency={collateral.address}
-                  disabled
+                  disabled={currencyFilters.length ? false : true}
+                  filters={currencyFilters}
                   onSelect={(token: Token | null) => {
                     if (token) {
                       setCollateral(token)
@@ -508,21 +540,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
                 title="Earned"
-                value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
+                value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${symbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
-                value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${collateral.symbol}`}
+                value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${symbol}`}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={depositedTokensTotal.gt(0)}
                 state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
-                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${
-                  collateral.symbol
-                }`}
+                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${symbol}`}
               />
             </TransactionDetailsCard>
           )}
@@ -534,6 +564,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockCollateral}
+        />
+      )}
+      {activeTab === Tabs.deposit && showUpgrade && (
+        <SetAllowanceStyled
+          collateral={getNativeAsset(context.networkId)}
+          finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
+          loading={RemoteData.is.asking(proxyIsUpToDate)}
+          onUnlock={upgradeProxy}
         />
       )}
       <WarningMessageStyled
