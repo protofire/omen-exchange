@@ -21,7 +21,7 @@ import { BalanceState, fetchAccountBalance } from '../../../../../../store/reduc
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
-import { Arbitrator, CompoundEnabledTokenType, Ternary, Token } from '../../../../../../util/types'
+import { Arbitrator, CompoundEnabledTokenType, CompoundTokenType, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
@@ -286,7 +286,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleUseCompoundReserveChange(!isServiceChecked)
   }
   useEffect(() => {
-    setCompoundInterestRate(userInputCollateral)
+    if (userInputCollateral.symbol.toLowerCase() in CompoundTokenType) {
+      setCompoundInterestRate(userInputCollateral)
+    }
   }, [isServiceChecked, userInputCollateral]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const amountError =
