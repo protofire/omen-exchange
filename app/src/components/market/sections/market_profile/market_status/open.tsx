@@ -291,7 +291,7 @@ const Wrapper = (props: Props) => {
                   borderBottom={false}
                   borderTop={true}
                   collateral={collateral}
-                  currentPrediction={outcomeTokenMarginalPrices[1]}
+                  currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
                   fee={fee}
                   lowerBound={scalarLow || new BigNumber(0)}
                   positionTable={true}

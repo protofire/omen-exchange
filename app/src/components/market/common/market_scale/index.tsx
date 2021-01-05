@@ -323,19 +323,17 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
   const feeNumber = fee && collateral && Number(formatBigNumber(fee, collateral.decimals))
 
+  const shortBalances = balances && balances.filter(balance => balance.outcomeName === 'short')
   const shortShares =
-    balances &&
-    balances
-      .filter(balance => balance.outcomeName === 'short')
-      .map(shortBalance => shortBalance.shares)
-      .reduce((a, b) => a.add(b))
+    shortBalances &&
+    shortBalances.length &&
+    shortBalances.map(shortBalance => shortBalance.shares).reduce((a, b) => a.add(b))
 
+  const longBalances = balances && balances.filter(balance => balance.outcomeName === 'long')
   const longShares =
-    balances &&
-    balances
-      .filter(balance => balance.outcomeName === 'long')
-      .map(longBalance => longBalance.shares)
-      .reduce((a, b) => a.add(b))
+    longBalances &&
+    longBalances.length &&
+    longBalances.map(longBalance => longBalance.shares).reduce((a, b) => a.add(b))
 
   const shortSharesNumber = collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
   const longSharesNumber = collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
@@ -524,6 +522,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       (!isDust(shortShares || new BigNumber(0), collateral.decimals) ||
         !isDust(longShares || new BigNumber(0), collateral.decimals)))
 
+  console.log(currentPrediction)
+
   return (
     <>
       <ScaleWrapper borderBottom={borderBottom} borderTop={borderTop}>
@@ -556,7 +556,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               value={scaleValue}
             />
           </ScaleBallContainer>
-          {positionTable && (
+          {positionTable && currentPrediction && (
             <>
               <ScaleDot positive={undefined} xValue={Number(currentPrediction)} />
               <HorizontalBarChange
@@ -612,7 +612,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
                 {currentPrediction
                   ? formatNumber(currentPredictionNumber.toString())
                   : startingPoint && startingPointNumber}
-                {` ${unit}`}
+                {currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}
               </ValueBoxTitle>
               <ValueBoxSubtitle>{startingPointTitle}</ValueBoxSubtitle>
             </ValueBoxRegular>
