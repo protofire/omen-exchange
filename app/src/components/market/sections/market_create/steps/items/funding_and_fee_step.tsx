@@ -21,7 +21,7 @@ import { BalanceState, fetchAccountBalance } from '../../../../../../store/reduc
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
-import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
+import { Arbitrator, CompoundEnabledTokenType, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
@@ -209,7 +209,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     values,
   } = props
 
-  const compundEnabledTokens = ['DAI', 'WBTC', 'BAT', 'WETH', 'USDC', 'USDT']
   const {
     arbitrator,
     category,
@@ -225,7 +224,11 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
 
   const [currentToken, setCurrentToken] = useState({ tokenExists: false, symbol: '', marketAddress: '' })
-  const showAddCompundService = compundEnabledTokens.includes(currentToken.symbol.toUpperCase())
+  let showAddCompundService = false
+  const currentTokenSymbol = currentToken.symbol.toLowerCase()
+  if (currentTokenSymbol in CompoundEnabledTokenType) {
+    showAddCompundService = true
+  }
 
   useEffect(() => {
     const selectedToken = markets.find(
@@ -283,9 +286,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleUseCompoundReserveChange(!isServiceChecked)
   }
   useEffect(() => {
-    if (showAddCompundService) {
-      setCompoundInterestRate(userInputCollateral)
-    }
+    setCompoundInterestRate(userInputCollateral)
   }, [isServiceChecked, userInputCollateral]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const amountError =

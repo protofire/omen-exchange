@@ -412,4 +412,13 @@ export enum CompoundTokenType {
   cbat = 'cbat',
 }
 
+export enum CompoundEnabledTokenType {
+  dai = 'dai',
+  usdc = 'usdc',
+  usdt = 'usdt',
+  uni = 'uni',
+  weth = 'weth',
+  bat = 'bat',
+}
+
 export const INVALID_ANSWER_ID = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'

@@ -31,7 +31,6 @@ const CheckService = styled.div`
   border-radius: 50%;
   text-align: center;
   border: 1px solid #3f51b5;
-  background-color: #e8eaf6;
   display: flex;
   align-items: center;
   justify-content: center;
