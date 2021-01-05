@@ -109,7 +109,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       await compoundServiceObject.init()
       setCompoundService(compoundServiceObject)
     }
-    getResult()
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      getResult()
+    }
   }, [collateral.symbol, collateral.address, account, provider])
 
   useEffect(() => {

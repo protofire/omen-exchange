@@ -126,7 +126,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       await compoundServiceObject.init()
       setCompoundService(compoundServiceObject)
     }
-    getResult()
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      getResult()
+    }
   }, [collateral.address, collateral.symbol, provider, account])
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))

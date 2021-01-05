@@ -195,7 +195,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await compoundServiceObject.init()
       setCompoundService(compoundServiceObject)
     }
-    getResult()
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      getResult()
+    }
   }, [collateral.address, account, collateral.symbol, provider])
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
