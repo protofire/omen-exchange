@@ -16,6 +16,7 @@ import {
 import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
+import { getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   calcPoolTokens,
@@ -158,6 +159,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
+  const wrapToken = getWrapToken(context.networkId)
+
   const addFunding = async () => {
     setModalTitle('Deposit Funds')
 
@@ -288,6 +291,13 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
+  const wrapAddress = wrapToken.address
+
+  const currencyFilters =
+    collateral.address === wrapAddress || collateral.address === pseudoNativeAssetAddress
+      ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
+      : []
+
   return (
     <>
       <MarketScale
@@ -321,10 +331,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
             <>
               <CurrenciesWrapper>
                 <CurrencySelector
+                  addNativeAsset
                   balance={walletBalance}
                   context={context}
                   currency={collateral.address}
-                  disabled
+                  disabled={currencyFilters.length ? false : true}
+                  filters={currencyFilters}
                   onSelect={(token: Token | null) => {
                     if (token) {
                       setCollateral(token)
