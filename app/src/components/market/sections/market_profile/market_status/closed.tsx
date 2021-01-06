@@ -258,7 +258,10 @@ const Wrapper = (props: Props) => {
   const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), 18))
   const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), 18))
 
-  const finalAnswerPercentage = (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
+  const finalAnswerPercentage =
+    realitioAnswer && realitioAnswer.eq('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+      ? 0.5
+      : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
 
   const earnedCollateral = isScalar
     ? scalarComputeEarnedCollateral(
