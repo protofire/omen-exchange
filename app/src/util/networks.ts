@@ -163,7 +163,7 @@ const networks: { [K in NetworkId]: Network } = {
     graphWsUri: GRAPH_SOKOL_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
     klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
-    realitioTimeout: 10800,
+    realitioTimeout: 180,
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     omenTCRListId: 1,
     contracts: {
