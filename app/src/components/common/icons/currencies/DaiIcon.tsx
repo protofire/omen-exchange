@@ -4,9 +4,9 @@ interface Props {
 }
 
 export const DaiIcon = (props: Props) => {
-  const { size = '24' } = props
+  const { size = '22' } = props
   return (
-    <svg fill="none" height="22" viewBox="0 0 22 22" width="22" xmlns="http://www.w3.org/2000/svg">
+    <svg fill="none" height={size} viewBox="0 0 22 22" width={size} xmlns="http://www.w3.org/2000/svg">
       <path
         d="m11 22c6.0751 0 11-4.9249 11-11 0-6.0751-4.9249-11-11-11-6.0751 0-11 4.9249-11 11 0 6.0751 4.9249 11 11 11z"
         fill="url(#a)"

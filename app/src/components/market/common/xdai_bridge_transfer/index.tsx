@@ -84,7 +84,6 @@ const TransferState = styled.div<{ show: boolean }>`
 `
 
 export const XdaiBridgeTransfer = (props: Prop) => {
-  console.log(props)
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const context = useConnectedWeb3Context()
