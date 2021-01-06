@@ -225,7 +225,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const [amount, setAmount] = useState<BigNumber>(funding)
-  const [amountToDispaly, setAmountToDisplay] = useState<string>('')
+  const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
@@ -422,7 +422,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                   onChange={handleAmountChange}
                   style={{ width: 0 }}
                   value={amount}
-                  valueToDisplay={amountToDispaly}
+                  valueToDisplay={amountToDisplay}
                 />
               }
               onClickMaxButton={onClickMaxButton}

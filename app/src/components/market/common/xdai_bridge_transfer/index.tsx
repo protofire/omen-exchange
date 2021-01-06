@@ -1,16 +1,19 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { DEFAULT_TOKEN_ADDRESS, DEFAULT_TOKEN_ADDRESS_RINKEBY } from '../../../../common/constants'
+import { useCollateralBalance, useConnectedWeb3Context } from '../../../../hooks'
+import { formatBigNumber } from '../../../../util/tools'
 import { ButtonRound } from '../../../button/button_round'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { XDaiStake } from '../../../common/icons/currencies/XDaiStake'
 import { SetAllowance } from '../set_allowance_bridge'
 
-interface Props {
+interface Prop {
   open: boolean
-  provider: any
 }
 
 const BridgeWrapper = styled(ButtonRound)<{ isOpen: boolean }>`
@@ -80,10 +83,31 @@ const TransferState = styled.div<{ show: boolean }>`
   ${props => (!props.show ? 'display:none' : 'display: flow-root')};
 `
 
-export const XdaiBridgeTransfer: React.FC<Props> = props => {
+export const XdaiBridgeTransfer = (props: Prop) => {
+  console.log(props)
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  const context = useConnectedWeb3Context()
+  const { networkId } = context
   const [transferState, setTransferState] = useState<boolean>(false)
+  const daiAddress =
+    networkId === 1
+      ? DEFAULT_TOKEN_ADDRESS
+      : networkId === 99
+      ? DEFAULT_TOKEN_ADDRESS_RINKEBY
+      : '0x2E4adeCb3330d72bC01F5acE920093a651f99E44'
+  const token = {
+    address: daiAddress,
+    decimals: 18,
+    symbol: 'DAI',
+  }
+  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(token, context)
+  const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
+
+  useEffect(() => {
+    setCollateralBalance(maybeCollateralBalance || Zero)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [networkId])
 
   return (
     <>
@@ -91,7 +115,14 @@ export const XdaiBridgeTransfer: React.FC<Props> = props => {
         <BalanceWrapper isOpen={!transferState}>
           <MainnetWrapper>
             <ChainText>Mainnet</ChainText>
-            <BalanceText>1225 DAI</BalanceText>
+            <BalanceText
+              onClick={() => {
+                setAmount(collateralBalance)
+                setAmountToDisplay(formatBigNumber(collateralBalance, 18))
+              }}
+            >
+              {formatBigNumber(collateralBalance, 18)} DAI
+            </BalanceText>
           </MainnetWrapper>
           <XDaiWrapper>
             <ChainText>xDai Chain</ChainText>
@@ -101,8 +132,8 @@ export const XdaiBridgeTransfer: React.FC<Props> = props => {
           <TextFieldCustomPlace
             formField={
               <BigNumberInput
-                decimals={18}
-                name="amount"
+                decimals={token.decimals}
+                name="amounts"
                 onChange={(e: BigNumberInputReturn) => {
                   setAmount(e.value)
                   setAmountToDisplay('')
@@ -128,7 +159,14 @@ export const XdaiBridgeTransfer: React.FC<Props> = props => {
             <StakeText>Powered by STAKE Bridge</StakeText>
           </PoweredByStakeWrapper>
         </BalanceWrapper>
-        <TransferState show={transferState}>Milan</TransferState>
+        <TransferState
+          // onClick={() => {
+          //   console.log(formatBigNumber(collateralBalance, 18))
+          // }}
+          show={transferState}
+        >
+          Milan
+        </TransferState>
       </BridgeWrapper>
     </>
   )

@@ -150,7 +150,7 @@ const CloseIconWrapper = styled.div`
 `
 
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-  const { account, library: provider, networkId } = useWeb3Context()
+  const { account, networkId } = useWeb3Context()
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
@@ -235,7 +235,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
                 </ArrowWrapper>
                 {currencyReturn(networkId !== 1)}
               </ButtonRoundBridge>
-              <XdaiBridgeTransfer open={isBridgeOpen} provider={provider} />
+              <XdaiBridgeTransfer open={isBridgeOpen} />
             </>
           )}
 

@@ -91,7 +91,6 @@ export const BigNumberInput: React.FC<Props> = props => {
   }
 
   const currentStep = step && ethers.utils.formatUnits(step, decimals)
-
   logger.log(`Value to display: "${valueToDisplay}"`, `Value used in the background: "${currentValue}"`)
 
   return (
