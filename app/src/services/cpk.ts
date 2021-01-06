@@ -399,7 +399,6 @@ class CPKService {
       const {
         arbitrator,
         category,
-        collateral,
         loadedQuestionId,
         lowerBound,
         question,
@@ -443,6 +442,31 @@ class CPKService {
       const openingDateMoment = moment(resolution)
 
       const transactions = []
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
+        txOptions.gas = 1200000
+      }
+
+      let collateral
+
+      if (marketData.collateral.address === pseudoNativeAssetAddress) {
+        // ultimately WETH will be the collateral if we fund with native ether
+        collateral = getWrapToken(networkId)
+
+        // we need to send the funding amount in native ether
+        if (!this.cpk.isSafeApp()) {
+          txOptions.value = marketData.funding
+        }
+
+        // Step 0: Wrap ether
+        transactions.push({
+          to: collateral.address,
+          value: marketData.funding,
+        })
+      } else {
+        collateral = marketData.collateral
+      }
 
       let realityEthQuestionId: string
       if (loadedQuestionId) {
@@ -509,10 +533,14 @@ class CPKService {
       })
 
       // Step 4: Transfer funding from user
-      transactions.push({
-        to: collateral.address,
-        data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
-      })
+      // If we are funding with native ether we can skip this step
+      // If we are signed in as a safe we don't need to transfer
+      if (!this.cpk.isSafeApp() && marketData.collateral.address !== pseudoNativeAssetAddress) {
+        transactions.push({
+          to: collateral.address,
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
+        })
+      }
 
       // Step 4.5: Calculate distributionHint
       const domainSize = upperBound.sub(lowerBound)
@@ -545,7 +573,7 @@ class CPKService {
         ),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
       logger.log(`Transaction hash: ${txObject.hash}`)
 
       const transaction = await this.provider.waitForTransaction(txObject.hash)
