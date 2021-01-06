@@ -15,9 +15,10 @@ import {
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
+import { getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
-import { MarketDetailsTab, MarketMakerData, Status, Ternary } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -61,7 +62,6 @@ export const ScalarMarketBuy = (props: Props) => {
   const {
     address: marketMakerAddress,
     balances,
-    collateral,
     fee,
     outcomeTokenMarginalPrices,
     question,
@@ -78,6 +78,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountDisplay, setAmountDisplay] = useState<string>('')
+  const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
   const [activeTab, setActiveTab] = useState(Tabs.short)
   const [positionIndex, setPositionIndex] = useState(0)
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -93,7 +94,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
-    collateral,
+    marketMakerData.collateral,
     context,
   )
   const collateralBalance = maybeCollateralBalance || Zero
@@ -231,6 +232,13 @@ export const ScalarMarketBuy = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
+  const wrapAddress = getWrapToken(context.networkId).address
+
+  const currencyFilters =
+    collateral.address === wrapAddress || collateral.address === pseudoNativeAssetAddress
+      ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
+      : []
+
   return (
     <>
       <MarketScale
@@ -259,11 +267,17 @@ export const ScalarMarketBuy = (props: Props) => {
           </TabsGrid>
           <CurrenciesWrapper>
             <CurrencySelector
+              addNativeAsset
               balance={walletBalance}
               context={context}
               currency={collateral.address}
-              disabled
-              onSelect={() => null}
+              disabled={currencyFilters.length ? false : true}
+              onSelect={(token: Token | null) => {
+                if (token) {
+                  setCollateral(token)
+                  setAmount(new BigNumber(0))
+                }
+              }}
             />
           </CurrenciesWrapper>
           <ReactTooltip id="walletBalanceTooltip" />
