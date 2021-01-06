@@ -522,8 +522,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       (!isDust(shortShares || new BigNumber(0), collateral.decimals) ||
         !isDust(longShares || new BigNumber(0), collateral.decimals)))
 
-  console.log(currentPrediction)
-
   return (
     <>
       <ScaleWrapper borderBottom={borderBottom} borderTop={borderTop}>

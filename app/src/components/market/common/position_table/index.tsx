@@ -76,8 +76,8 @@ export const PositionTable = (props: Props) => {
   const TableCellsAlign = ['left', 'right', 'right', 'right']
 
   if (
-    isDust(shortShares || new BigNumber(0), collateral.decimals) &&
-    isDust(longShares || new BigNumber(0), collateral.decimals)
+    (!shortTrades.length || isDust(shortShares || new BigNumber(0), collateral.decimals)) &&
+    (!longTrades.length || isDust(longShares || new BigNumber(0), collateral.decimals))
   ) {
     return <></>
   }
