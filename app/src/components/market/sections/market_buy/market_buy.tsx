@@ -136,9 +136,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[], BigNumber]> => {
-      console.log('calc buy amount')
       let tradedShares: BigNumber
-      if (displayCollateral.address !== collateral.address) {
+      console.log(displayCollateral)
+      const collateralSymbol = collateral.symbol.toLowerCase()
+      console.log(collateralSymbol)
+      if (displayCollateral.address !== collateral.address && collateralSymbol in CompoundTokenType) {
         amount = compoundService.calculateBaseToCTokenExchange(displayCollateral, amount)
       }
       try {
@@ -153,7 +155,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         tradedShares,
       )
       let pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
-      if (displayCollateral.address !== collateral.address) {
+      if (displayCollateral.address !== collateral.address && collateralSymbol in CompoundTokenType) {
         pricesAfterTrade = pricesAfterTrade.map(priceAfterTrade => {
           const cTokenDecimals = 8
           const priceAfterTradeBig = roundNumberStringToSignificantDigits(
@@ -166,7 +168,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             priceAfterTradeBN,
           )
           const priceAfterTradeBase = formatBigNumber(priceAfterTradeBaseBN, displayCollateral.decimals)
-          console.log(Number(priceAfterTradeBase))
           return Number(priceAfterTradeBase)
         })
       }
@@ -366,19 +367,24 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
   // if collateral is a cToken then convert the collateral and balances to underlying token
   useEffect(() => {
-    setDisplayCollateralAndBalance()
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      setDisplayCollateralAndBalance()
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    setDisplayCollateralAndBalance()
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      setDisplayCollateralAndBalance()
+    }
   }, [collateral.address]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const setDisplayAmountToFund = (value: BigNumber) => {
-    if (collateral.address === displayCollateral.address) {
-      setAmount(value)
-    } else {
+    const collateralSymbol = collateral.symbol.toLowerCase()
+    if (collateral.address !== displayCollateral.address && collateralSymbol in CompoundTokenType) {
       const baseAmount = compoundService.calculateBaseToCTokenExchange(displayCollateral, value)
       setAmount(baseAmount)
+    } else {
+      setAmount(value)
     }
     setDisplayFundAmount(value)
   }

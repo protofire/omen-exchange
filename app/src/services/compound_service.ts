@@ -66,6 +66,9 @@ class CompoundService {
     const exchangeRate = new Big(this.exchangeRate)
     const mantissa = 18 + underlyingDecimals - cTokenDecimals
     const divisor = bigTen.pow(mantissa)
+    console.log(divisor.toString())
+    console.log(exchangeRate.toString())
+    console.log('***')
     const oneUnderlyingInCToken = divisor.div(exchangeRate)
     const amountCTokens = userInputTokenAmount.times(oneUnderlyingInCToken)
     const amountCTokensBoundToPrecision = roundNumberStringToSignificantDigits(

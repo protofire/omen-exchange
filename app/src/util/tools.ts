@@ -4,6 +4,7 @@ import { BigNumber, bigNumberify, formatUnits, getAddress } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import { getLogger } from './logger'
+import { CompoundEnabledTokenType } from './types'
 
 const logger = getLogger('Tools')
 
@@ -233,6 +234,22 @@ export const roundNumberStringToSignificantDigits = (value: string, sd: number):
   return r.toString()
 }
 
+/**
+ * Gets the corresponding cToken for a given token symbol.
+ * Empty string if corresponding cToken doesn't exist
+ */
+export const getCTokenForToken = (token: string): string => {
+  const tokenSymbol = token.toLowerCase()
+  if (tokenSymbol in CompoundEnabledTokenType) {
+    if (tokenSymbol === 'eth' || tokenSymbol === 'weth') {
+      return 'ceth'
+    } else {
+      return `c${tokenSymbol}`
+    }
+  } else {
+    return ''
+  }
+}
 /**
  * Compute the number of outcomes that will be sent to the user by the Market Maker
  * after funding it for the first time with `addedFunds` of collateral.
