@@ -503,7 +503,7 @@ class CPKService {
       // Step 1.5: Announce the questionId and its bounds to the RealitioScalarAdapter
       transactions.push({
         to: realitioScalarAdapterAddress,
-        data: await RealitioService.encodeAnnounceConditionQuestionId(realityEthQuestionId, lowerBound, upperBound),
+        data: RealitioService.encodeAnnounceConditionQuestionId(realityEthQuestionId, lowerBound, upperBound),
       })
 
       const oracleAddress = getContractAddress(networkId, 'realitioScalarAdapter')
