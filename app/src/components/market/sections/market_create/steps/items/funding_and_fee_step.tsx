@@ -15,10 +15,12 @@ import {
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useCpkAllowance,
+  useCpkProxy,
 } from '../../../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
+import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
@@ -224,9 +226,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const [amount, setAmount] = useState<BigNumber>(funding)
   const [amountToDispaly, setAmountToDisplay] = useState<string>('')
-
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
+
+  const [upgradeFinished, setUpgradeFinished] = useState(false)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : false
 
   useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, collateral))
@@ -273,11 +278,26 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     !account ||
     amountError !== null ||
     exceedsMaxFee ||
-    isNegativeDepositAmount
+    isNegativeDepositAmount ||
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
 
   const showSetAllowance =
+    collateral.address !== pseudoNativeAssetAddress &&
     !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
+
+  const showUpgrade =
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+
+  const upgradeProxy = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await updateProxy()
+    setUpgradeFinished(true)
+  }
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -386,6 +406,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           <div>
             <CurrenciesWrapper>
               <CurrencySelector
+                addNativeAsset
                 balance={formatNumber(collateralBalanceFormatted, 5)}
                 context={context}
                 currency={collateral.address}
@@ -457,6 +478,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             loading={RemoteData.is.asking(allowance)}
             marginBottom
             onUnlock={unlockCollateral}
+            style={{ marginBottom: 20 }}
+          />
+        )}
+        {showUpgrade && (
+          <SetAllowance
+            collateral={getNativeAsset(context.networkId)}
+            finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
+            loading={RemoteData.is.asking(proxyIsUpToDate)}
+            onUnlock={upgradeProxy}
             style={{ marginBottom: 20 }}
           />
         )}

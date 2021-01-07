@@ -58,6 +58,8 @@ function standardizeTransaction(tx: Transaction): StandardTransaction {
 }
 
 // Omen CPK monkey patch
+
+// @ts-expect-error ignore
 class OCPK extends CPK {
   async sendTransactions(transactions: StandardTransaction[], options?: ExecOptions): Promise<TransactionResult> {
     const sdk = new SafeAppsSDK()
@@ -71,11 +73,28 @@ class OCPK extends CPK {
   }
 
   async execTransactions(transactions: Transaction[], options?: ExecOptions): Promise<TransactionResult> {
-    if (this.isSafeApp() && transactions.length >= 1) {
+    if (this.isSafeApp()) {
       return this.sendTransactions(transactions.map(standardizeTransaction), options)
     }
 
     return super.execTransactions(transactions, options)
+  }
+
+  private getSafeExecTxParams(transactions: Transaction[]): StandardTransaction {
+    if (transactions.length === 1) {
+      return standardizeTransaction(transactions[0])
+    }
+
+    if (!this.multiSend) {
+      throw new Error('CPK MultiSend uninitialized')
+    }
+
+    return {
+      to: this.multiSend.address,
+      value: '',
+      data: this.encodeMultiSendCallData(transactions),
+      operation: CPK.DelegateCall,
+    }
   }
 
   encodeMultiSendCallData(transactions: Transaction[]): string {
