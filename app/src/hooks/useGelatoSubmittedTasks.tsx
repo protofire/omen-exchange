@@ -69,7 +69,7 @@ export const useGelatoSubmittedTasks = (
           const date = new Date(parseInt(timestamp) * 1000)
           setWithdrawDate(date)
 
-          if (lastWrapper.status === 'execSuccess') {
+          if (lastWrapper.status === 'execSuccess' || lastWrapper.status === 'execReverted') {
             const link = `https://${getEtherscanPrefix(networkId)}etherscan.io/tx/${lastWrapper.executionHash}`
             setEtherscanLink(link)
           }

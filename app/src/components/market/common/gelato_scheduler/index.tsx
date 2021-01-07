@@ -51,7 +51,7 @@ const Box = styled.div<{ boxType: string; isRow?: boolean }>`
       : ''}
   ${props =>
     props.boxType == 'condition'
-      ? `align-items: flex-end;
+      ? `align-items: center;
         margin-bottom: 12px;
         vertical-align: bottom;
         justify-content: space-between;`
@@ -88,13 +88,14 @@ const ButtonCircleStyled = styled(ButtonCircle)<{ disabled?: boolean; filled?: b
   margin-right: 5px;
 `
 
-const IconStyled = styled.div<{ color?: string; large?: boolean }>`
+const IconStyled = styled.div<{ color?: string; large?: boolean; stroke?: string }>`
   line-height: 1;
   svg {
     fill: ${props => props.color};
     width: ${props => (props.large ? '1rem' : '0.9rem')};
     height: ${props => (props.large ? '1rem' : '0.9rem')};
     vertical-align: inherit;
+    ${props => (props.stroke ? `stroke: ${props.stroke};` : '')}
   }
 `
 const GelatoIconCircle = styled.button<{ active?: boolean }>`
@@ -228,8 +229,8 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
           return (
             <Box boxType={'task'} isRow={true}>
               <Description color="red" descriptionType={'task'}>{`failed`}</Description>
-              <IconStyled color={'red'}>
-                <IconAlert></IconAlert>
+              <IconStyled>
+                <IconAlert bg={'red'} fill={'white'}></IconAlert>
               </IconStyled>
             </Box>
           )
@@ -237,8 +238,8 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
           return (
             <Box boxType={'task'} isRow={true}>
               <Description color="red" descriptionType={'task'}>{`canceled`}</Description>
-              <IconStyled color={'red'}>
-                <IconAlert></IconAlert>
+              <IconStyled>
+                <IconAlert bg={'red'} fill={'white'}></IconAlert>
               </IconStyled>
             </Box>
           )
@@ -251,8 +252,8 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
               minimum ? `${minimum.toFixed(3)} ${collateralSymbol}` : `${GELATO_MIN_USD_THRESH} USD`
             }`}
           </Description>
-          <IconStyled color={'red'}>
-            <IconAlert></IconAlert>
+          <IconStyled>
+            <IconAlert bg={'red'} fill={'white'}></IconAlert>
           </IconStyled>
         </Box>
       )
@@ -312,9 +313,11 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
         {isScheduled && taskStatus && (
           <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', width: '100%' }}>
             <Box boxType={'title'} isRow={false}>
-              <Description descriptionType={'standard'} textAlignRight={false}>{`Auto-Withdraw ${
-                taskStatus === 'execSuccess' ? '' : `${collateralToWithdraw} ${collateralSymbol}`
-              }`}</Description>
+              <Description descriptionType={'standard'} textAlignRight={false}>
+                <strong>
+                  {`Auto-Withdraw ${taskStatus === 'execSuccess' ? '' : `${collateralToWithdraw} ${collateralSymbol}`}`}
+                </strong>
+              </Description>
               <Description descriptionType={'mini'} textAlignRight={false}>{`Powered by Gelato Network`}</Description>
             </Box>
 
@@ -358,7 +361,13 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
           <Description descriptionType={'standard'} textAlignRight={false}>
             {`Your provided liquidity was insufficient on ${formatDate(
               gelatoData.input,
-            )} to pay for for the withdrawal transaction.`}
+            )} to pay for for the withdrawal transaction `}
+            <span>
+              <a href={etherscanLink} rel="noopener noreferrer" style={{ color: '#1E88E5' }} target="_blank">
+                here
+              </a>
+            </span>
+            {'.'}
           </Description>
         </Box>
       )}

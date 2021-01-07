@@ -252,7 +252,7 @@ class CPKService {
     realitio,
   }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
-      const { arbitrator, category, loadedQuestionId, outcomes, question, resolution, spread } = marketData
+      const { arbitrator, category, gelatoData, loadedQuestionId, outcomes, question, resolution, spread } = marketData
 
       if (!resolution) {
         throw new Error('Resolution time was not specified')
@@ -760,7 +760,7 @@ class CPKService {
       throw err
     }
   }
-  
+
   addGelatoSubmitTransaction = async (
     collateralAmount: BigNumber,
     priorCollateralAmount: BigNumber,
