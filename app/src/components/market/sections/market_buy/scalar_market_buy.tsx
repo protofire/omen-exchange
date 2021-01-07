@@ -94,7 +94,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
-    marketMakerData.collateral,
+    collateral,
     context,
   )
   const collateralBalance = maybeCollateralBalance || Zero
