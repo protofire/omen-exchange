@@ -180,10 +180,9 @@ interface Props {
     userInputCollateral: Token
   }
   marketCreationStatus: MarketCreationStatus
-  compoundInterestRate: string
+  getCompoundInterestRate: (userInputCollateral: string) => Promise<number>
   handleCollateralChange: (userInputCollateral: Token) => void
   handleTradingFeeChange: (fee: string) => void
-  setCompoundInterestRate: (userInputCollateral: Token) => void
   handleUseCompoundReserveChange: (useCompoundReserve: boolean) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
@@ -197,16 +196,16 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { account, library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
   const [isServiceChecked, setServiceCheck] = useState<boolean>(false)
+  const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
   const {
     back,
-    compoundInterestRate,
+    getCompoundInterestRate,
     handleChange,
     handleCollateralChange,
     handleTradingFeeChange,
     handleUseCompoundReserveChange,
     marketCreationStatus,
     resetTradingFee,
-    setCompoundInterestRate,
     submit,
     values,
   } = props
@@ -232,7 +231,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   if (currentTokenSymbol in CompoundEnabledTokenType) {
     showAddCompundService = true
   }
-
+  useEffect(() => {
+    // By default if compund token set the compound service check to true
+    if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType) {
+      setServiceCheck(true)
+      handleUseCompoundReserveChange(true)
+    }
+  }, [userInputCollateral.symbol, handleUseCompoundReserveChange])
   useEffect(() => {
     const selectedToken = markets.find(
       ({ collateralToken }) =>
@@ -243,9 +248,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       symbol: 'DAI',
       marketAddress: selectedToken ? selectedToken.id : '',
     })
-    if (isServiceChecked) {
-      setCompoundInterestRate(userInputCollateral)
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
@@ -292,8 +294,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleUseCompoundReserveChange(!isServiceChecked)
   }
   useEffect(() => {
+    const getInterestRate = async (userInputCollateral: Token) => {
+      const interestRate = await getCompoundInterestRate(userInputCollateral.symbol.toLowerCase())
+      setCompoundInterestRate(interestRate.toFixed(2))
+    }
     if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType) {
-      setCompoundInterestRate(userInputCollateral)
+      getInterestRate(userInputCollateral)
     }
   }, [isServiceChecked, userInputCollateral]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -317,7 +323,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     exceedsMaxFee ||
     isNegativeDepositAmount ||
     (!isUpdated && collateral.address === pseudoNativeAssetAddress)
-
   const showSetAllowance =
     collateral.address !== pseudoNativeAssetAddress &&
     !cpk?.cpk.isSafeApp() &&

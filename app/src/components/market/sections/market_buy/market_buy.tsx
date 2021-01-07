@@ -1,4 +1,3 @@
-import Big from 'big.js'
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseUnits } from 'ethers/utils'
@@ -124,7 +123,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     if (collateral.symbol.toLowerCase() in CompoundTokenType) {
       getResult()
     }
-  }, [collateral.symbol])
+  }, [collateral.symbol]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setCollateral(marketMakerData.collateral)
@@ -137,9 +136,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[], BigNumber]> => {
       let tradedShares: BigNumber
-      console.log(displayCollateral)
       const collateralSymbol = collateral.symbol.toLowerCase()
-      console.log(collateralSymbol)
       if (displayCollateral.address !== collateral.address && collateralSymbol in CompoundTokenType) {
         amount = compoundService.calculateBaseToCTokenExchange(displayCollateral, amount)
       }
@@ -323,15 +320,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
     setOutcomeIndex(value)
   }
-  const collateralSymbol = collateral.symbol.toLowerCase()
-  let filters: any = []
-  if (collateralSymbol in CompoundTokenType) {
-    const cTokenSymbol = collateralSymbol as KnownToken
-    const baseTokenSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
-    const baseToken = getToken(context.networkId, baseTokenSymbol)
-    const cToken = getToken(context.networkId, cTokenSymbol)
-    filters = [baseToken.address, cToken.address]
-  }
 
   const setBuyCollateral = (token: Token) => {
     const collateralSymbol = token.symbol.toLowerCase()
@@ -387,9 +375,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setAmount(value)
     }
     setDisplayFundAmount(value)
-  }
-  if (maybeCollateralBalance != null) {
-    console.log(maybeCollateralBalance.toString())
   }
   return (
     <>

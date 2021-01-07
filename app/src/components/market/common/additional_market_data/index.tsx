@@ -138,7 +138,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
     if (collateral.symbol.toLowerCase() in CompoundTokenType) {
       getAPY()
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <AdditionalMarketDataWrapper>
       <AdditionalMarketDataLeft>

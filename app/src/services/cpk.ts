@@ -7,7 +7,6 @@ import moment from 'moment'
 import { createCPK } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
-  getCPKAddresses,
   getContractAddress,
   getTargetSafeImplementation,
   getToken,

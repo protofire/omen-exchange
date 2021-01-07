@@ -419,7 +419,6 @@ export enum CompoundEnabledTokenType {
   uni = 'uni',
   bat = 'bat',
   eth = 'eth',
-  weth = 'weth',
 }
 
 export const INVALID_ANSWER_ID = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'

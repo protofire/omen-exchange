@@ -475,7 +475,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       : amountToRemove?.gt(maybeFundingBalance)
       ? `Value must be less than or equal to ${sharesBalance} pool shares`
       : null
-
+  const setUserInputCollateral = (userInput: Token) => {
+    setDisplayCollateral(userInput)
+  }
   const disableDepositButton =
     !amountToFund ||
     amountToFund?.isZero() ||
@@ -493,25 +495,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const collateralSymbol = collateral.symbol.toLowerCase()
   let withdrawCurrencySelect = <span />
-  let isFilterDisabled = true
   let filterItems: Array<DropdownItemProps> = []
-  const setUserInputCollateral = (symbol: string) => {
-    console.log(symbol)
-  }
   if (collateralSymbol in CompoundTokenType) {
-    const cTokenSymbol = collateralSymbol as KnownToken
-    const baseTokenSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
-    const baseToken = getToken(context.networkId, baseTokenSymbol)
-    const cToken = getToken(context.networkId, cTokenSymbol)
-    isFilterDisabled = false
     const filters = [
       {
         title: displayCollateral.symbol,
-        onClick: () => setUserInputCollateral(displayCollateral.symbol),
+        onClick: () => setUserInputCollateral(displayCollateral),
       },
       {
         title: collateral.symbol,
-        onClick: () => setUserInputCollateral(collateral.symbol),
+        onClick: () => setUserInputCollateral(collateral),
       },
     ]
     filterItems = filters.map(item => {

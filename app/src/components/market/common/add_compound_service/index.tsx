@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import { getCTokenForToken } from '../../../../util/tools'
 import { IconTick } from '../../../common/icons'
 import { CompoundIcon } from '../../../common/icons/currencies/CompoundIcon'
 
@@ -28,6 +29,7 @@ const DescriptionWrapper = styled.div`
 const CheckService = styled.div`
   width: 35px;
   height: 35px;
+  margin-top: 3px;
   border-radius: 50%;
   text-align: center;
   border: 1px solid #3f51b5;
@@ -38,7 +40,7 @@ const CheckService = styled.div`
 
 const ServiceWrapper = styled.div`
   color: ${props => props.theme.colors.textColorLightish};
-  font-size: 14px;
+  font-size: ${props => props.theme.textfield.fontSize};
   letter-spacing: 0.2px;
   line-height: 1.4;
   display: flex;
@@ -77,6 +79,9 @@ const ServiceTokenDetails = styled.div`
   display: flex;
 `
 
+const TextHeading = 'div'
+const TextBody = 'div'
+
 export interface AddCompoundServiceProps {
   isServiceChecked: boolean
   toggleServiceCheck?: any
@@ -90,10 +95,8 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
   if (!isServiceChecked) {
     serviceChecked = <span />
   }
-  let cTokenSymbol = `c${currentToken}`
-  if (currentToken.toLowerCase() === 'weth') {
-    cTokenSymbol = 'cETH'
-  }
+  const cTokenSymbol = getCTokenForToken(currentToken)
+
   return (
     <Wrapper>
       <Title>Recommended Service</Title>
@@ -105,10 +108,10 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
             </ServiceIconWrapper>
             <ServiceTokenDetails>
               <ServiceTextWrapper>
-                <div>Compound</div>
-                <div>
+                <TextHeading>Compound</TextHeading>
+                <TextBody>
                   Convert {currentToken} to {cTokenSymbol} to earn {compoundInterestRate}% interest
-                </div>
+                </TextBody>
               </ServiceTextWrapper>
               <ServiceCheckWrapper onClick={toggleServiceCheck}>
                 <CheckService>{serviceChecked}</CheckService>

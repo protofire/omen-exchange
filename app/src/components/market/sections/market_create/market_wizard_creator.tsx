@@ -246,16 +246,6 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const setCompoundInterestRate = (collateral: Token) => {
-    getCompoundInterestRate(collateral.symbol).then(interest => {
-      const newMarketData = {
-        ...marketData,
-        compoundInterestRate: interest.toFixed(2),
-      }
-      setMarketdata(newMarketData)
-    })
-  }
-
   const handleTradingFeeChange = (fee: string) => {
     const newMarketData = {
       ...marketData,
@@ -324,14 +314,13 @@ export const MarketWizardCreator = (props: Props) => {
         return (
           <FundingAndFeeStep
             back={() => back()}
-            compoundInterestRate={marketData.compoundInterestRate}
+            getCompoundInterestRate={getCompoundInterestRate}
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
             handleTradingFeeChange={handleTradingFeeChange}
             handleUseCompoundReserveChange={handleUseCompoundReserveChange}
             marketCreationStatus={marketCreationStatus}
             resetTradingFee={resetTradingFee}
-            setCompoundInterestRate={setCompoundInterestRate}
             submit={() => submit()}
             values={marketData}
           />

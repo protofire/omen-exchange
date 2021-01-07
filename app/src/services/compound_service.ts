@@ -1,6 +1,6 @@
 import Big from 'big.js'
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { BigNumber, bigNumberify, formatUnits, parseUnits } from 'ethers/utils'
+import { BigNumber, formatUnits, parseUnits } from 'ethers/utils'
 
 import { roundNumberStringToSignificantDigits } from '../util/tools'
 import { Token } from '../util/types'
@@ -41,7 +41,6 @@ class CompoundService {
   calculateCTokenToBaseExchange = (baseToken: Token, cTokenFunding: BigNumber): BigNumber => {
     const cTokenDecimals = 8
     const bigTen = new Big(10)
-    const userCTokenAmountNormalized = new Big(cTokenFunding.toString())
     const userCTokenAmount = new Big(formatUnits(cTokenFunding, cTokenDecimals))
     const exchangeRate = new Big(this.exchangeRate)
     const baseTokenDecimals = Number(baseToken.decimals)
@@ -60,15 +59,11 @@ class CompoundService {
   calculateBaseToCTokenExchange = (userInputToken: Token, userInputTokenFunding: BigNumber): BigNumber => {
     const cTokenDecimals = 8
     const bigTen = new Big(10)
-    const userInputTokenFundingNormalized = new Big(userInputTokenFunding.toString())
     const userInputTokenAmount = new Big(formatUnits(userInputTokenFunding, userInputToken.decimals))
     const underlyingDecimals = Number(userInputToken.decimals)
     const exchangeRate = new Big(this.exchangeRate)
     const mantissa = 18 + underlyingDecimals - cTokenDecimals
     const divisor = bigTen.pow(mantissa)
-    console.log(divisor.toString())
-    console.log(exchangeRate.toString())
-    console.log('***')
     const oneUnderlyingInCToken = divisor.div(exchangeRate)
     const amountCTokens = userInputTokenAmount.times(oneUnderlyingInCToken)
     const amountCTokensBoundToPrecision = roundNumberStringToSignificantDigits(

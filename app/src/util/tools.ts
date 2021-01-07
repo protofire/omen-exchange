@@ -241,7 +241,7 @@ export const roundNumberStringToSignificantDigits = (value: string, sd: number):
 export const getCTokenForToken = (token: string): string => {
   const tokenSymbol = token.toLowerCase()
   if (tokenSymbol in CompoundEnabledTokenType) {
-    if (tokenSymbol === 'eth' || tokenSymbol === 'weth') {
+    if (tokenSymbol === 'eth') {
       return 'ceth'
     } else {
       return `c${tokenSymbol}`
