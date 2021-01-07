@@ -1,9 +1,12 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
+import { IconInfo } from '../../../common/tooltip/img/IconInfo'
+import { Circle } from '../../common/common_styled'
 
 const SCALE_HEIGHT = '20px'
 const BAR_WIDTH = '2px'
@@ -240,6 +243,8 @@ const ValueBoxSubtitle = styled.p`
   color: ${props => props.theme.colors.textColor};
   margin: 0;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
 `
 
 interface Props {
@@ -350,6 +355,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     upperBoundNumber,
     feeNumber,
     amountSharesNumber,
+    scaleBall?.value,
   ])
 
   const activateTooltip = () => {
@@ -469,14 +475,42 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               >
                 {`${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`}
               </ValueBoxTitle>
-              <ValueBoxSubtitle>Your Payout</ValueBoxSubtitle>
+              <ReactTooltip id="payoutTooltip" />
+              <ValueBoxSubtitle>
+                Your Payout
+                <Circle
+                  data-delay-hide={'500'}
+                  data-effect={'solid'}
+                  data-for={'payoutTooltip'}
+                  data-multiline={'true'}
+                  data-tip={`Your payout if the market resolves at ${formatNumber(
+                    scaleValuePrediction.toString(),
+                  )} ${unit}`}
+                >
+                  <IconInfo />
+                </Circle>
+              </ValueBoxSubtitle>
             </ValueBox>
             <ValueBox>
               <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>
                 {profitLoss > 0 && '+'}
                 {`${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`}
               </ValueBoxTitle>
-              <ValueBoxSubtitle>Profit/Loss</ValueBoxSubtitle>
+              <ReactTooltip id="profitTooltip" />
+              <ValueBoxSubtitle>
+                Profit/Loss
+                <Circle
+                  data-delay-hide={'500'}
+                  data-effect={'solid'}
+                  data-for={'profitTooltip'}
+                  data-multiline={'true'}
+                  data-tip={`Your profit/loss if the market resolves at ${formatNumber(
+                    scaleValuePrediction.toString(),
+                  )} ${unit}`}
+                >
+                  <IconInfo />
+                </Circle>
+              </ValueBoxSubtitle>
             </ValueBox>
           </ValueBoxPair>
         </ValueBoxes>
