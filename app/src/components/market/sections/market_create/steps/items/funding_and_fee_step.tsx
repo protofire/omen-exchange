@@ -214,6 +214,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const {
     arbitrator,
     category,
+    collateral,
     funding,
     loadedQuestionId,
     outcomes,

@@ -17,11 +17,7 @@ import {
 import { ERC20Service } from '../../../../services'
 import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
-<<<<<<< HEAD
-import { getToken } from '../../../../util/networks'
-=======
-import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
->>>>>>> 359673da5e80259581cbf41b0a4311c931275adb
+import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   calcAddFundingSendAmounts,
@@ -329,8 +325,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }, [collateral.address]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const wrapToken = getWrapToken(networkId)
-  const symbol = collateral.address === pseudoNativeAssetAddress ? wrapToken.symbol : collateral.symbol
-
+  let symbol = collateral.address === pseudoNativeAssetAddress ? wrapToken.symbol : collateral.symbol
+  if (displayCollateral && displayCollateral.symbol) {
+    symbol = displayCollateral.symbol
+  }
   const addFunding = async () => {
     setModalTitle('Funds Deposit')
 
@@ -393,9 +391,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       }
       setStatus(Status.Loading)
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
-<<<<<<< HEAD
+
       if (displayCollateral.address === collateral.address) {
-        setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
+        setMessage(`Withdrawing funds: ${fundsAmount} ${symbol}...`)
       } else {
         const baseWithdrawAmount = compoundService.calculateCTokenToBaseExchange(
           displayCollateral,
@@ -404,11 +402,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         const baseWithdraw = formatBigNumber(baseWithdrawAmount, displayCollateral.decimals)
         setMessage(`Withdrawing funds: ${baseWithdraw} ${displayCollateral.symbol}...`)
       }
-=======
-
-      setMessage(`Withdrawing funds: ${fundsAmount} ${symbol}...`)
-
->>>>>>> 359673da5e80259581cbf41b0a4311c931275adb
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
       let useBaseToken = false
@@ -498,26 +491,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
-<<<<<<< HEAD
   const collateralSymbol = collateral.symbol.toLowerCase()
   let withdrawCurrencySelect = <span />
   let isFilterDisabled = true
-  let depositFilters: any = []
   let filterItems: Array<DropdownItemProps> = []
+  const setUserInputCollateral = (symbol: string) => {
+    console.log(symbol)
+  }
   if (collateralSymbol in CompoundTokenType) {
     const cTokenSymbol = collateralSymbol as KnownToken
     const baseTokenSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
     const baseToken = getToken(context.networkId, baseTokenSymbol)
     const cToken = getToken(context.networkId, cTokenSymbol)
     isFilterDisabled = false
-    depositFilters = [baseToken.address, cToken.address]
-    const setUserInputCollateral = (symbol: string): void => {
-      if (symbol.toLowerCase() === collateral.symbol.toLowerCase()) {
-        // get the value of
-      } else {
-        // get the value of
-      }
-    }
     const filters = [
       {
         title: displayCollateral.symbol,
@@ -560,27 +546,24 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
     setDisplayAmount(value)
   }
-=======
+
   const wrapAddress = wrapToken.address
 
   const currencyFilters =
     collateral.address === wrapAddress || collateral.address === pseudoNativeAssetAddress
       ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
       : []
-
->>>>>>> 359673da5e80259581cbf41b0a4311c931275adb
+  if (displayCollateral.address !== collateral.address) {
+    currencyFilters.push(displayCollateral.address)
+  }
   return (
     <>
       <UserData>
         <UserDataTitleValue
           title="Your Liquidity"
-<<<<<<< HEAD
           value={`${formatNumber(formatBigNumber(totalUserLiquidity, displayCollateral.decimals))} ${
             displayCollateral.symbol
           }`}
-=======
-          value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${symbol}`}
->>>>>>> 359673da5e80259581cbf41b0a4311c931275adb
         />
         <UserDataTitleValue
           title="Total Pool Tokens"
@@ -589,27 +572,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         <UserDataTitleValue
           state={displayUserEarnings.gt(0) ? ValueStates.success : undefined}
           title="Your Earnings"
-<<<<<<< HEAD
           value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
             formatBigNumber(displayUserEarnings, displayCollateral.decimals),
           )} ${displayCollateral.symbol}`}
-=======
-          value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
-            formatBigNumber(userEarnings, collateral.decimals),
-          )} ${symbol}`}
->>>>>>> 359673da5e80259581cbf41b0a4311c931275adb
         />
         <UserDataTitleValue
           state={totalEarnings.gt(0) ? ValueStates.success : undefined}
           title="Total Earnings"
           value={`${totalEarnings.gt(0) ? '+' : ''}${formatNumber(
-<<<<<<< HEAD
             formatBigNumber(displayTotalEarnings, displayCollateral.decimals),
-          )} ${displayCollateral.symbol}`}
-=======
-            formatBigNumber(totalEarnings, collateral.decimals),
           )} ${symbol}`}
->>>>>>> 359673da5e80259581cbf41b0a4311c931275adb
         />
       </UserData>
       <OutcomeTable
@@ -647,15 +619,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   addNativeAsset
                   balance={walletBalance}
                   context={context}
-<<<<<<< HEAD
                   currency={displayCollateral.address}
-                  disabled={isFilterDisabled}
-                  filters={depositFilters}
-=======
-                  currency={collateral.address}
                   disabled={currencyFilters.length ? false : true}
                   filters={currencyFilters}
->>>>>>> 359673da5e80259581cbf41b0a4311c931275adb
                   onSelect={(token: Token | null) => {
                     if (token) {
                       setBuyCollateral(token)

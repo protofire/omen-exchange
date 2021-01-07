@@ -10,9 +10,9 @@ import {
   getCPKAddresses,
   getContractAddress,
   getTargetSafeImplementation,
-  getWrapToken,
   getToken,
   getTokenFromAddress,
+  getWrapToken,
   pseudoNativeAssetAddress,
 } from '../util/networks'
 import { calcDistributionHint, waitABit } from '../util/tools'
@@ -160,11 +160,11 @@ class CPKService {
 
   buyOutcomes = async ({
     amount,
-    compoundService,
-    useBaseToken = false,
     collateral,
+    compoundService,
     marketMaker,
     outcomeIndex,
+    useBaseToken = false,
   }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -176,10 +176,6 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
-        txOptions.gas = 500000
-      }
-
       let collateralAddress
       if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
@@ -189,7 +185,9 @@ class CPKService {
         if (!this.cpk.isSafeApp()) {
           txOptions.value = amount
         }
-
+        if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
+          txOptions.gas = 500000
+        }
         // Step 0: Wrap ether
         transactions.push({
           to: collateralAddress,
@@ -198,12 +196,8 @@ class CPKService {
       } else {
         collateralAddress = await marketMaker.getCollateralToken()
       }
-
       const marketMakerAddress = marketMaker.address
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
       const collateralService = new ERC20Service(this.provider, account, collateralAddress)
-      const collateral: Token = getTokenFromAddress(networkId, collateralAddress)
       let collateralSymbol = ''
       let userInputCollateralSymbol: KnownToken
       let userInputCollateral: Token = collateral
@@ -294,7 +288,6 @@ class CPKService {
       const {
         arbitrator,
         category,
-        collateral,
         loadedQuestionId,
         outcomes,
         question,
@@ -324,9 +317,7 @@ class CPKService {
       if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = 1200000
       }
-
       let collateral
-
       if (marketData.collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateral = getWrapToken(networkId)
@@ -569,8 +560,6 @@ class CPKService {
       const transactions = []
 
       const txOptions: TxOptions = {}
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
       const collateralService = new ERC20Service(this.provider, account, collateral.address)
       let collateralSymbol = ''
       let userInputCollateralSymbol: KnownToken
@@ -600,8 +589,6 @@ class CPKService {
       }
 
       // Check  if the allowance of the CPK to the market maker is enough.
-      const collateralService = new ERC20Service(this.provider, account, collateralAddress)
-
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
         marketMaker.address,

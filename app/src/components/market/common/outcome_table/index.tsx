@@ -137,7 +137,7 @@ export const OutcomeTable = (props: Props) => {
   let symbol = collateral.address === pseudoNativeAssetAddress ? wrapSymbol : collateral.symbol
   if (displayCollateral.symbol) {
     symbol = displayCollateral.symbol
-  } 
+  }
   const renderTableHeader = () => {
     return (
       <THead>
