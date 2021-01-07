@@ -765,7 +765,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       )}
       <BottomButtonWrapper borderTop>
         <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
-          Cancel
+          Back
         </Button>
         {activeTab === Tabs.deposit && (
           <Button buttonType={ButtonType.secondaryLine} disabled={disableDepositButton} onClick={() => addFunding()}>
