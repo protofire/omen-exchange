@@ -444,3 +444,9 @@ export const isScalarMarket = (oracle: string, networkId: number): boolean => {
 
   return isScalar
 }
+
+export const getUnit = (title: string): string => {
+  const splitTitle = title.split('[')
+  const unit = splitTitle[splitTitle.length - 1].split(']')[0]
+  return unit
+}

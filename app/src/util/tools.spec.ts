@@ -17,6 +17,7 @@ import {
   formatNumber,
   formatToShortNumber,
   getIndexSets,
+  getUnit,
   isDust,
   isObjectEqual,
   isScalarMarket,
@@ -492,6 +493,20 @@ describe('tools', () => {
       const isScalarResult = isScalarMarket(oracle, networkId)
 
       expect(isScalarResult).toStrictEqual(result)
+    }
+  })
+
+  describe('getUnit', () => {
+    const testCases: [string, string][] = [
+      ['What is the [unit] for ETH [USD]', 'USD'],
+      ['What is the unit [CAT]', 'CAT'],
+      ['[[unit] unit]][asdf] [ETH]', 'ETH'],
+      ['What about weird casing [CaSInG]', 'CaSInG'],
+    ]
+    for (const [title, result] of testCases) {
+      const unitResult = getUnit(title)
+
+      expect(unitResult).toStrictEqual(result)
     }
   })
 })
