@@ -1,5 +1,7 @@
 import gql from 'graphql-tag'
 
+import { networkIds } from '../util/networks'
+
 import { BuildQueryType, CurationSource, MarketStates, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
@@ -99,7 +101,9 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
     'fee_lte: $fee',
     `timeout_gte: ${MIN_TIMEOUT}`,
-    curationSource === CurationSource.DXDAO
+    networkId === networkIds.XDAI || networkId === networkIds.SOKOL
+      ? 'curatedByDxDaoOrKleros: false'
+      : curationSource === CurationSource.DXDAO
       ? `curatedByDxDao: true`
       : curationSource === CurationSource.KLEROS
       ? `klerosTCRregistered: true`
