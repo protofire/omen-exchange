@@ -1,6 +1,8 @@
+import Big from 'big.js'
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { BigNumber, formatUnits, parseUnits } from 'ethers/utils'
+import { BigNumber, bigNumberify, formatUnits, parseUnits } from 'ethers/utils'
 
+import { roundNumberStringToSignificantDigits } from '../util/tools'
 import { Token } from '../util/types'
 
 import { cBATAbi, cDaiAbi, cETHAbi, cUSDCAbi, cUSDTAbi, cWBTCAbi } from './compound_abi'
@@ -38,33 +40,45 @@ class CompoundService {
 
   calculateCTokenToBaseExchange = (baseToken: Token, cTokenFunding: BigNumber): BigNumber => {
     const cTokenDecimals = 8
-    const userCTokenAmount = Number(formatUnits(cTokenFunding, cTokenDecimals))
-    const exchangeRate = this.exchangeRate
+    const bigTen = new Big(10)
+    const userCTokenAmountNormalized = new Big(cTokenFunding.toString())
+    const userCTokenAmount = new Big(formatUnits(cTokenFunding, cTokenDecimals))
+    const exchangeRate = new Big(this.exchangeRate)
     const baseTokenDecimals = Number(baseToken.decimals)
     const mantissa = 18 + baseTokenDecimals - cTokenDecimals
-    const oneCTokenInUnderlying = exchangeRate / Math.pow(10, mantissa)
-    const amountUnderlyingTokens = userCTokenAmount * oneCTokenInUnderlying
-    const amountUnderlyingTokensBoundToPrecision = amountUnderlyingTokens.toFixed(4)
+    const exp = bigTen.pow(mantissa)
+    const oneCTokenInUnderlying = exchangeRate.div(exp)
+    const amountUnderlyingTokens = userCTokenAmount.mul(oneCTokenInUnderlying)
+    const amountUnderlyingTokensBoundToPrecision = roundNumberStringToSignificantDigits(
+      amountUnderlyingTokens.toString(),
+      baseTokenDecimals - 4,
+    )
     const underlyingBigNumber = parseUnits(amountUnderlyingTokensBoundToPrecision, baseTokenDecimals)
     return underlyingBigNumber
+  }
+
+  calculateBaseToCTokenExchange = (userInputToken: Token, userInputTokenFunding: BigNumber): BigNumber => {
+    const cTokenDecimals = 8
+    const bigTen = new Big(10)
+    const userInputTokenFundingNormalized = new Big(userInputTokenFunding.toString())
+    const userInputTokenAmount = new Big(formatUnits(userInputTokenFunding, userInputToken.decimals))
+    const underlyingDecimals = Number(userInputToken.decimals)
+    const exchangeRate = new Big(this.exchangeRate)
+    const mantissa = 18 + underlyingDecimals - cTokenDecimals
+    const divisor = bigTen.pow(mantissa)
+    const oneUnderlyingInCToken = divisor.div(exchangeRate)
+    const amountCTokens = userInputTokenAmount.times(oneUnderlyingInCToken)
+    const amountCTokensBoundToPrecision = roundNumberStringToSignificantDigits(
+      amountCTokens.toString(),
+      cTokenDecimals - 2,
+    )
+    const amountCTokenBigNumber = parseUnits(amountCTokensBoundToPrecision, cTokenDecimals)
+    return amountCTokenBigNumber
   }
 
   calculateExchangeRate = async (): Promise<number> => {
     const exchangeRate = Number(await this.contract.functions.exchangeRateStored())
     return exchangeRate
-  }
-
-  calculateBaseToCTokenExchange = (userInputToken: Token, userInputTokenFunding: BigNumber): BigNumber => {
-    const cTokenDecimals = 8
-    const userInputTokenAmount = Number(formatUnits(userInputTokenFunding, userInputToken.decimals))
-    const underlyingDecimals = Number(userInputToken.decimals)
-    const exchangeRate = this.exchangeRate
-    const mantissa = 18 + underlyingDecimals - cTokenDecimals
-    const oneUnderlyingInCToken = (1 * Math.pow(10, mantissa)) / exchangeRate
-    const amountCTokens = userInputTokenAmount * oneUnderlyingInCToken
-    const cTokenAmountRoundedToPrecision = amountCTokens.toFixed(4)
-    const amountCTokenBigNumber = parseUnits(cTokenAmountRoundedToPrecision, cTokenDecimals)
-    return amountCTokenBigNumber
   }
 
   static encodeMintTokens = (tokenSymbol: string, amountWei: string): string => {

@@ -29,7 +29,11 @@ const MarketWizardCreatorContainer: FC = () => {
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
   const getCompoundInterestRate = async (symbol: string): Promise<number> => {
-    const cToken = `c${symbol.toLowerCase()}`
+    const tokenSymbol = symbol.toLowerCase()
+    let cToken = `c${tokenSymbol}`
+    if (tokenSymbol === 'weth') {
+      cToken = 'ceth'
+    }
     const compoundCollateralToken = cToken as KnownToken
     const compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
     const compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
@@ -62,9 +66,13 @@ const MarketWizardCreatorContainer: FC = () => {
         }
         let compoundTokenDetails = marketData.userInputCollateral
         let compoundService = null
+        const userInputCollateralSymbol = marketData.userInputCollateral.symbol.toLowerCase()
         const useCompoundReserve = marketData.useCompoundReserve
         if (useCompoundReserve) {
-          const cToken = `c${marketData.userInputCollateral.symbol.toLowerCase()}`
+          let cToken = `c${userInputCollateralSymbol}`
+          if (userInputCollateralSymbol === 'eth' || userInputCollateralSymbol === 'weth') {
+            cToken = 'ceth'
+          }
           const compoundCollateralToken = cToken as KnownToken
           compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
           marketData.userInputToken = marketData.userInputCollateral

@@ -408,7 +408,6 @@ export enum CompoundTokenType {
   cusdc = 'cusdc',
   cusdt = 'cusdt',
   cuni = 'cuni',
-  cweth = 'cweth',
   cbat = 'cbat',
 }
 
@@ -417,7 +416,6 @@ export enum CompoundEnabledTokenType {
   usdc = 'usdc',
   usdt = 'usdt',
   uni = 'uni',
-  weth = 'weth',
   bat = 'bat',
 }
 

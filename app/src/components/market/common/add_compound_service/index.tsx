@@ -90,6 +90,10 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
   if (!isServiceChecked) {
     serviceChecked = <span />
   }
+  let cTokenSymbol = `c${currentToken}`
+  if (currentToken.toLowerCase() === 'weth') {
+    cTokenSymbol = 'cETH'
+  }
   return (
     <Wrapper>
       <Title>Recommended Service</Title>
@@ -103,7 +107,7 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
               <ServiceTextWrapper>
                 <div>Compound</div>
                 <div>
-                  Convert {currentToken} to c{currentToken} to earn {compoundInterestRate}% interest
+                  Convert {currentToken} to {cTokenSymbol} to earn {compoundInterestRate}% interest
                 </div>
               </ServiceTextWrapper>
               <ServiceCheckWrapper onClick={toggleServiceCheck}>

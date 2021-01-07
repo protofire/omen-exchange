@@ -1,10 +1,13 @@
-import React, { DOMAttributes } from 'react'
+import React, { DOMAttributes, useEffect, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
+import { useConnectedWeb3Context } from '../../../../hooks'
 import { useRealityLink } from '../../../../hooks/useRealityLink'
-import { Arbitrator, KlerosItemStatus, KlerosSubmission } from '../../../../util/types'
+import { CompoundService } from '../../../../services/compound_service'
+import { Arbitrator, CompoundTokenType, KlerosItemStatus, KlerosSubmission, Token } from '../../../../util/types'
 import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
+import { CompoundIconNoBorder } from '../../../common/icons/currencies/CompoundIconNoBorder'
 
 const AdditionalMarketDataWrapper = styled.div`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
@@ -40,6 +43,11 @@ const AdditionalMarketDataLeft = styled.div`
       margin-bottom: 10px !important;
     }
   }
+`
+
+const CompoundInterestWrapper = styled.div`
+  color: ${props => props.theme.colors.compound};
+  margin-left: 8px;
 `
 
 const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
@@ -88,6 +96,7 @@ const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; i
 interface Props extends DOMAttributes<HTMLDivElement> {
   category: string
   arbitrator: Arbitrator
+  collateral: Token
   oracle: string
   id: string
   curatedByDxDaoOrKleros: boolean
@@ -99,12 +108,11 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
-
+  const { address, arbitrator, category, collateral, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
   const realitioBaseUrl = useRealityLink()
-
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
-
+  const context = useConnectedWeb3Context()
+  const { account, library: provider } = context
   submissionIDs.sort((s1, s2) => {
     if (s1.status === KlerosItemStatus.Registered) return -1
     if (s2.status === KlerosItemStatus.Registered) return 1
@@ -119,6 +127,18 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   queryParams.append('col1', title)
   queryParams.append('col2', `https://omen.eth.link/#/${address}`)
 
+  const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
+
+  useEffect(() => {
+    const getAPY = async () => {
+      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
+      const supplyRate = await compoundServiceObject.calculateSupplyRateAPY()
+      setCompoundInterestRate(supplyRate.toFixed(2))
+    }
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      getAPY()
+    }
+  }, [])
   return (
     <AdditionalMarketDataWrapper>
       <AdditionalMarketDataLeft>
@@ -160,6 +180,16 @@ export const AdditionalMarketData: React.FC<Props> = props => {
             {curatedByDxDaoOrKleros ? 'Verified' : 'Not Verified'}
           </AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
+        {collateral.symbol.toLowerCase() in CompoundTokenType ? (
+          <AdditionalMarketDataSectionWrapper
+            data-tip={`This market is earning ${compoundInterestRate}% APY powered by compound.finance`}
+          >
+            <CompoundIconNoBorder />
+            <CompoundInterestWrapper>{compoundInterestRate}% APY</CompoundInterestWrapper>
+          </AdditionalMarketDataSectionWrapper>
+        ) : (
+          <span />
+        )}
       </AdditionalMarketDataLeft>
       <ReactTooltip
         className="customMarketTooltip"

@@ -135,6 +135,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         address={address}
         arbitrator={arbitrator}
         category={question.category}
+        collateral={collateralToken}
         curatedByDxDao={curatedByDxDao}
         curatedByDxDaoOrKleros={curatedByDxDaoOrKleros}
         id={question.id}

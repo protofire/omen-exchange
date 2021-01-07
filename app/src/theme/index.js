@@ -101,6 +101,7 @@ const theme = {
     textColor: '#757575',
     textColorDark: '#37474F',
     textColorDarker: '#333',
+    compound: '#00897B',
     textColorLight: '#999',
     textColorLighter: '#86909E',
     textColorLightish: '#7D8189',

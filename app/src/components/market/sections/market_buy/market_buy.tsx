@@ -1,3 +1,4 @@
+import Big from 'big.js'
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseUnits } from 'ethers/utils'
@@ -20,7 +21,13 @@ import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
 import { getToken } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
+import {
+  computeBalanceAfterTrade,
+  formatBigNumber,
+  formatNumber,
+  mulBN,
+  roundNumberStringToSignificantDigits,
+} from '../../../../util/tools'
 import {
   CompoundTokenType,
   MarketDetailsTab,
@@ -112,7 +119,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     if (collateral.symbol.toLowerCase() in CompoundTokenType) {
       getResult()
     }
-  }, [collateral.symbol, collateral.address, account, provider])
+  }, [collateral.symbol])
 
   useEffect(() => {
     setCollateral(marketMakerData.collateral)
@@ -124,6 +131,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[], BigNumber]> => {
+      console.log('calc buy amount')
       let tradedShares: BigNumber
       if (displayCollateral.address !== collateral.address) {
         amount = compoundService.calculateBaseToCTokenExchange(displayCollateral, amount)
@@ -142,12 +150,18 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       let pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
       if (displayCollateral.address !== collateral.address) {
         pricesAfterTrade = pricesAfterTrade.map(priceAfterTrade => {
-          const priceAfterTradeBN = parseUnits(priceAfterTrade.toFixed(4).toString(), 8)
+          const cTokenDecimals = 8
+          const priceAfterTradeBig = roundNumberStringToSignificantDigits(
+            priceAfterTrade.toString(),
+            cTokenDecimals - 2,
+          )
+          const priceAfterTradeBN = parseUnits(priceAfterTradeBig, cTokenDecimals)
           const priceAfterTradeBaseBN = compoundService.calculateCTokenToBaseExchange(
             displayCollateral,
             priceAfterTradeBN,
           )
           const priceAfterTradeBase = formatBigNumber(priceAfterTradeBaseBN, displayCollateral.decimals)
+          console.log(Number(priceAfterTradeBase))
           return Number(priceAfterTradeBase)
         })
       }
@@ -288,9 +302,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     const cToken = getToken(context.networkId, cTokenSymbol)
     filters = [baseToken.address, cToken.address]
   }
-  const getPricesInBaseCollateral = async (baseCollateral: Token) => {
-    setDisplayCollateral(baseCollateral)
-  }
 
   const setBuyCollateral = (token: Token) => {
     const collateralSymbol = token.symbol.toLowerCase()
@@ -298,7 +309,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setDisplayCollateral(collateral)
     } else {
       setDisplayCollateral(token)
-      getPricesInBaseCollateral(token)
     }
   }
 
@@ -309,7 +319,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
       const baseCollateralToken = getToken(context.networkId, baseCollateralSymbol as KnownToken)
       baseCollateral = baseCollateralToken
-      getPricesInBaseCollateral(baseCollateral)
+      setDisplayCollateral(baseCollateral)
     } else {
       setDisplayCollateral(collateral)
     }
@@ -343,7 +353,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     }
     setDisplayFundAmount(value)
   }
-
+  if (maybeCollateralBalance != null) {
+    console.log(maybeCollateralBalance.toString())
+  }
   return (
     <>
       <OutcomeTable

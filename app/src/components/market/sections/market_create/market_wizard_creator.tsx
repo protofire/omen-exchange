@@ -226,8 +226,12 @@ export const MarketWizardCreator = (props: Props) => {
   }
 
   const getCompoundCollateral = (collateral: Token): Token => {
-    const collateralSymbol = `c${collateral.symbol.toLowerCase()}`
-    const compoundCollateralToken = collateralSymbol as KnownToken
+    const collateralSymbol = collateral.symbol.toLowerCase()
+    let compoundCollateralSymbol = `c${collateralSymbol}`
+    if (collateralSymbol === 'eth' || collateralSymbol === 'weth') {
+      compoundCollateralSymbol = 'ceth'
+    }
+    const compoundCollateralToken = compoundCollateralSymbol as KnownToken
     const compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
     return compoundTokenDetails
   }

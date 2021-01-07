@@ -222,6 +222,18 @@ export const calcPoolTokens = (
 }
 
 /**
+ * Round a given number string to a fixed number of significant digits
+ */
+export const roundNumberStringToSignificantDigits = (value: string, sd: number): string => {
+  const r = new Big(value)
+  if (sd > 0 && r.c.length > sd) {
+    while (r.c[sd - 1] === 0 && sd > 1) --sd
+    r.c.length = sd
+  }
+  return r.toString()
+}
+
+/**
  * Compute the number of outcomes that will be sent to the user by the Market Maker
  * after funding it for the first time with `addedFunds` of collateral.
  */
