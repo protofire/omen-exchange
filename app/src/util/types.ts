@@ -422,3 +422,9 @@ export enum MarketState {
 }
 
 export const INVALID_ANSWER_ID = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+
+export enum FormState {
+  categorical = 'CATEGORICAL',
+  import = 'IMPORT',
+  scalar = 'SCALAR',
+}
