@@ -17,7 +17,7 @@ import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
+import { computeBalanceAfterTrade, formatBigNumber, formatNumber, getUnit, mulBN } from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -252,7 +252,7 @@ export const ScalarMarketBuy = (props: Props) => {
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
         startingPointTitle={'Current prediction'}
-        unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+        unit={getUnit(question.title)}
         upperBound={scalarHigh || new BigNumber(0)}
       />
       <GridTransactionDetails>

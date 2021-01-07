@@ -23,6 +23,7 @@ import {
   calcRemoveFundingSendAmounts,
   formatBigNumber,
   formatNumber,
+  getUnit,
   isDust,
 } from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
@@ -306,7 +307,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
         lowerBound={scalarLow || new BigNumber(0)}
         startingPointTitle={'Current prediction'}
-        unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+        unit={getUnit(question.title)}
         upperBound={scalarHigh || new BigNumber(0)}
       />
       <GridTransactionDetails>

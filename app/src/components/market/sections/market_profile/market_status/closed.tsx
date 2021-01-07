@@ -9,7 +9,7 @@ import { useConnectedCPKContext, useContracts } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
-import { formatBigNumber } from '../../../../../util/tools'
+import { formatBigNumber, getUnit } from '../../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
@@ -314,7 +314,7 @@ const Wrapper = (props: Props) => {
                 currentPrediction={finalAnswerPercentage.toString()}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Final answer'}
-                unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+                unit={getUnit(question.title)}
                 upperBound={scalarHigh || new BigNumber(0)}
               />
             ) : (
