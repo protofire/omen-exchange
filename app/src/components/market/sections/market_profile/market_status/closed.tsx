@@ -1,4 +1,5 @@
 import Big from 'big.js'
+import { MaxUint256 } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
@@ -259,7 +260,7 @@ const Wrapper = (props: Props) => {
   const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), 18))
 
   const finalAnswerPercentage =
-    realitioAnswer && realitioAnswer.eq('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+    realitioAnswer && realitioAnswer.eq(MaxUint256)
       ? 0.5
       : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
 
