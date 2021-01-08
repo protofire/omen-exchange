@@ -87,6 +87,10 @@ const MarketHomeContainer: React.FC = () => {
   let categoryRoute = location.pathname.split('/category/')[1]
   if (categoryRoute) categoryRoute = categoryRoute.split('/')[0]
 
+  const typeFilter = location.pathname.includes('type')
+  let typeRoute = location.pathname.split('/type/')[1]
+  if (typeRoute) typeRoute = typeRoute.split('/')[0]
+
   const stateFilter = location.search.includes('state')
   let stateRoute = location.search.split('state=')[1]
   if (stateRoute) stateRoute = stateRoute.split('&')[0]
@@ -156,6 +160,13 @@ const MarketHomeContainer: React.FC = () => {
     searchParam = ''
   }
 
+  let typeParam: string
+  if (typeFilter) {
+    typeParam = typeRoute
+  } else {
+    typeParam = 'All'
+  }
+
   const [filter, setFilter] = useState<MarketFilters>({
     state: stateParam,
     category: categoryParam,
@@ -166,6 +177,7 @@ const MarketHomeContainer: React.FC = () => {
     templateId: null,
     currency: currencyParam,
     curationSource: curationSourceParam,
+    type: typeParam,
   })
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
@@ -285,6 +297,10 @@ const MarketHomeContainer: React.FC = () => {
 
       if (filter.category && filter.category !== 'All') {
         route += `/category/${filter.category}`
+      }
+
+      if (filter.type && filter.type !== 'All') {
+        route += `/type/${filter.type}`
       }
 
       if (filter.state && filter.state !== 'OPEN') {

@@ -213,6 +213,12 @@ export enum MarketStates {
   myMarkets = 'MY_MARKETS',
 }
 
+export enum MarketTypes {
+  all = 'ALL',
+  categorical = 'CATEGORICAL',
+  scalar = 'SCALAR',
+}
+
 export type MarketsSortCriteria =
   | 'usdVolume'
   | 'creationTimestamp'
@@ -261,6 +267,7 @@ export interface MarketFilters {
   templateId: Maybe<string>
   currency: Maybe<string>
   curationSource: CurationSource
+  type: Maybe<string>
 }
 
 export interface MarketMakerData {
