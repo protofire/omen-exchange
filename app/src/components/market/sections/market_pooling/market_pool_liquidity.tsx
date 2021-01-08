@@ -1,4 +1,3 @@
-import { TaskReceiptWrapper } from '@gelatonetwork/core'
 import { useInterval } from '@react-corekit/use-interval'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
@@ -204,7 +203,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }, FETCH_DETAILS_INTERVAL)
 
   useEffect(() => {
-    refetch()
+    if (refetch) refetch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const defaultGelatoData = getDefaultGelatoData(networkId)
