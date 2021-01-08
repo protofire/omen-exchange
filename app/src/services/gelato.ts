@@ -10,7 +10,7 @@ import { Contract, Wallet, constants, ethers, utils } from 'ethers'
 
 import { GELATO_MIN_USD_THRESH } from '../common/constants'
 import { getLogger } from '../util/logger'
-import { getToken } from '../util/networks'
+import { getToken, pseudoNativeAssetAddress } from '../util/networks'
 import { GelatoData } from '../util/types'
 
 const logger = getLogger('Services::GelatoService')
@@ -274,6 +274,9 @@ class GelatoService {
     try {
       if (utils.getAddress(token.address) == utils.getAddress(this.usdc.address)) {
         return 1
+      }
+      if (utils.getAddress(address) === utils.getAddress(pseudoNativeAssetAddress)) {
+        token.address = getToken(this.networkId, 'weth').address
       }
       return await getUniswapPrice(token, this.usdc, this.provider)
     } catch {
