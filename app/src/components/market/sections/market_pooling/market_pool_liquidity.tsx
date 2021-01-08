@@ -515,7 +515,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   setAmountToRemoveDisplay(formatBigNumber(fundingBalance, collateral.decimals, 5))
                 }}
                 shouldDisplayMaxButton
-                symbol="Shares"
+                symbol=""
               />
 
               {sharesAmountError && <GenericError>{sharesAmountError}</GenericError>}
