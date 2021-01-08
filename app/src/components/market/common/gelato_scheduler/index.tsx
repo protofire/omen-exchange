@@ -386,7 +386,7 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
           </Description>
         </Box>
       )}
-      {customizable && (
+      {customizable && !taskStatus && (
         <Box boxType={'outer'} isRow={false}>
           <Box boxType={'condition'} isRow={true}>
             <Description descriptionType={'condition'}>Withdraw Condition</Description>

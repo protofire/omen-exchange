@@ -215,7 +215,7 @@ class GelatoService {
   /**
    * Decode Action Data
    */
-  decodeSubmitTimeBasedWithdrawalTask = async (hexData: string): Promise<any> => {
+  decodeSubmitTimeBasedWithdrawalTask = (hexData: string): any => {
     const data = utils.defaultAbiCoder.decode(
       ['address', 'address', 'uint256[]', 'bytes32', 'bytes32', 'address', 'address'],
       utils.hexDataSlice(hexData, 4),
@@ -226,7 +226,7 @@ class GelatoService {
   /**
    * Decode Condition Data
    */
-  decodeTimeConditionData = async (hexData: string): Promise<any> => {
+  decodeTimeConditionData = (hexData: string): utils.BigNumber => {
     const data = utils.defaultAbiCoder.decode(['uint256'], hexData)
     return data
   }

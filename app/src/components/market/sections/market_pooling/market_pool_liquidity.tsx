@@ -1,10 +1,12 @@
+import { TaskReceiptWrapper } from '@gelatonetwork/core'
+import { useInterval } from '@react-corekit/use-interval'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { DOCUMENT_FAQ, GELATO_ACTIVATED } from '../../../../common/constants'
+import { DOCUMENT_FAQ, FETCH_DETAILS_INTERVAL, GELATO_ACTIVATED } from '../../../../common/constants'
 import {
   useCollateralBalance,
   useConnectedCPKContext,
@@ -191,11 +193,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   // Gelato
-  const { etherscanLink, submittedTaskReceiptWrapper, withdrawDate } = useGelatoSubmittedTasks(
+  const { etherscanLink, refetch, submittedTaskReceiptWrapper, withdrawDate } = useGelatoSubmittedTasks(
     cpk ? cpk.address : null,
     marketMakerAddress,
     context,
   )
+
+  useInterval(() => {
+    if (refetch) refetch()
+  }, FETCH_DETAILS_INTERVAL)
+
+  useEffect(() => {
+    refetch()
+  }, [])
 
   const defaultGelatoData = getDefaultGelatoData(networkId)
   const [gelatoData, setGelatoData] = useState<GelatoData>(defaultGelatoData)
@@ -335,6 +345,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
       await fetchCollateralBalance()
+      await refetch()
 
       setStatus(Status.Ready)
       setAmountToFund(null)
@@ -385,6 +396,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
       await fetchCollateralBalance()
+      await refetch()
 
       setStatus(Status.Ready)
       setAmountToRemove(null)

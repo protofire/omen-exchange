@@ -34,56 +34,59 @@ export const useGelatoSubmittedTasks = (
   const [withdrawDate, setWithdrawDate] = useState<Date | null>(null)
   const [etherscanLink, setEtherscanLink] = useState<string | null>(null)
 
-  const { data, error } = useQuery(GelatoSubmitted, {
+  const { data, error, loading, refetch } = useQuery(GelatoSubmitted, {
     notifyOnNetworkStatusChange: true,
     variables: { user: cpkAddress != null ? cpkAddress.toLowerCase() : null },
   })
 
-  const dataLength = data ? data.length : 0
+  const dataLength = data ? data.taskReceiptWrappers.length : 0
 
-  const getLastTask = (): TaskReceiptWrapper => {
-    return submittedTaskReceiptWrappers[submittedTaskReceiptWrappers.length - 1]
+  const getLastTask = (wrappers: TaskReceiptWrapper[]): TaskReceiptWrapper => {
+    return wrappers[wrappers.length - 1]
   }
 
-  useEffect(() => {
-    const storeGelatoDataInState = async () => {
-      if (cpkAddress && data) {
-        const taskReceiptWrappers = data.taskReceiptWrappers as TaskReceiptWrapper[]
-        // For every TaskReceipt
-        const wrappers = [] as TaskReceiptWrapper[]
-        for (const wrapper of taskReceiptWrappers) {
-          const taskData: string = wrapper.taskReceipt.tasks[0].actions[0].data
-          const decodedData = await gelato.decodeSubmitTimeBasedWithdrawalTask(taskData)
-          const dedcodedMarketMakerAddress = decodedData[1]
-          if (utils.getAddress(dedcodedMarketMakerAddress) === utils.getAddress(marketMakerAddress)) {
-            wrappers.push(wrapper)
-          }
+  const storeGelatoDataInState = () => {
+    if (cpkAddress && data) {
+      const taskReceiptWrappers = data.taskReceiptWrappers as TaskReceiptWrapper[]
+      // For every TaskReceipt
+      const wrappers = [] as TaskReceiptWrapper[]
+      for (const wrapper of taskReceiptWrappers) {
+        const taskData: string = wrapper.taskReceipt.tasks[0].actions[0].data
+        const decodedData = gelato.decodeSubmitTimeBasedWithdrawalTask(taskData)
+        const dedcodedMarketMakerAddress = decodedData[1]
+        if (utils.getAddress(dedcodedMarketMakerAddress) === utils.getAddress(marketMakerAddress)) {
+          wrappers.push(wrapper)
         }
+      }
 
-        setSubmittedTaskReceiptWrappers(wrappers)
+      setSubmittedTaskReceiptWrappers(wrappers)
 
-        // Return the last task receipt
-        if (wrappers.length > 0) {
-          const lastWrapper = wrappers[wrappers.length - 1]
-          const timestamp = await gelato.decodeTimeConditionData(lastWrapper.taskReceipt.tasks[0].conditions[0].data)
-          const date = new Date(parseInt(timestamp) * 1000)
-          setWithdrawDate(date)
+      // Return the last task receipt
+      if (wrappers.length > 0) {
+        const lastWrapper = wrappers[wrappers.length - 1]
+        const timestamp = gelato.decodeTimeConditionData(lastWrapper.taskReceipt.tasks[0].conditions[0].data)
+        const date = new Date(parseInt(timestamp.toString()) * 1000)
+        setWithdrawDate(date)
 
-          if (lastWrapper.status === 'execSuccess' || lastWrapper.status === 'execReverted') {
-            const link = `https://${getEtherscanPrefix(networkId)}etherscan.io/tx/${lastWrapper.executionHash}`
-            setEtherscanLink(link)
-          }
+        if (lastWrapper.status === 'execSuccess' || lastWrapper.status === 'execReverted') {
+          const link = `https://${getEtherscanPrefix(networkId)}etherscan.io/tx/${lastWrapper.executionHash}`
+          setEtherscanLink(link)
         }
       }
     }
+  }
+
+  useEffect(() => {
     storeGelatoDataInState()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cpkAddress, submittedTaskReceiptWrappers.length, dataLength, networkId])
+  }, [loading, cpkAddress, submittedTaskReceiptWrappers.length, dataLength, networkId])
 
   return {
-    submittedTaskReceiptWrapper: submittedTaskReceiptWrappers.length > 0 ? getLastTask() : null,
+    submittedTaskReceiptWrapper:
+      submittedTaskReceiptWrappers.length > 0 ? getLastTask(submittedTaskReceiptWrappers) : null,
     etherscanLink,
     withdrawDate,
     status: error ? Status.Error : Status.Ready,
+    refetch,
   }
 }
