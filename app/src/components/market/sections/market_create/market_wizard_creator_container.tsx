@@ -27,7 +27,7 @@ const MarketWizardCreatorContainer: FC = () => {
   const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(MarketCreationStatus.ready())
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
-  const handleSubmit = async (marketData: MarketData) => {
+  const handleSubmit = async (marketData: MarketData, isScalar: boolean) => {
     try {
       if (!account) {
         setModalState(true)
@@ -51,20 +51,37 @@ const MarketWizardCreatorContainer: FC = () => {
           }
         }
 
-        const { marketMakerAddress, transaction } = await cpk.createMarket({
-          marketData,
-          conditionalTokens,
-          realitio,
-          marketMakerFactory,
-        })
-        setMarketMakerAddress(marketMakerAddress)
+        if (isScalar) {
+          const { marketMakerAddress, transaction } = await cpk.createScalarMarket({
+            marketData,
+            conditionalTokens,
+            realitio,
+            marketMakerFactory,
+          })
+          setMarketMakerAddress(marketMakerAddress)
 
-        if (transaction.blockNumber) {
-          await waitForBlockToSync(transaction.blockNumber)
+          if (transaction.blockNumber) {
+            await waitForBlockToSync(transaction.blockNumber)
+          }
+
+          setMarketCreationStatus(MarketCreationStatus.done())
+          history.replace(`/${marketMakerAddress}`)
+        } else {
+          const { marketMakerAddress, transaction } = await cpk.createMarket({
+            marketData,
+            conditionalTokens,
+            realitio,
+            marketMakerFactory,
+          })
+          setMarketMakerAddress(marketMakerAddress)
+
+          if (transaction.blockNumber) {
+            await waitForBlockToSync(transaction.blockNumber)
+          }
+
+          setMarketCreationStatus(MarketCreationStatus.done())
+          history.replace(`/${marketMakerAddress}`)
         }
-
-        setMarketCreationStatus(MarketCreationStatus.done())
-        history.replace(`/${marketMakerAddress}`)
       }
     } catch (err) {
       setMarketCreationStatus(MarketCreationStatus.error(err))
