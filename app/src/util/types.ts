@@ -214,9 +214,9 @@ export enum MarketStates {
 }
 
 export enum MarketTypes {
-  all = 'ALL',
-  categorical = 'CATEGORICAL',
-  scalar = 'SCALAR',
+  all = '',
+  categorical = '2',
+  scalar = '1',
 }
 
 export type MarketsSortCriteria =
@@ -267,7 +267,6 @@ export interface MarketFilters {
   templateId: Maybe<string>
   currency: Maybe<string>
   curationSource: CurationSource
-  type: Maybe<string>
 }
 
 export interface MarketMakerData {

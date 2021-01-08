@@ -45,7 +45,6 @@ export const useMarkets = (options: Options): any => {
     state,
     templateId,
     title,
-    type,
   } = options
 
   const [moreMarkets, setMoreMarkets] = React.useState(true)
@@ -66,7 +65,6 @@ export const useMarkets = (options: Options): any => {
     templateId,
     currency,
     curationSource,
-    type,
   }
 
   const marketQuery = buildQueryMarkets(queryOptions)

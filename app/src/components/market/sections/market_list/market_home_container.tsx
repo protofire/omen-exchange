@@ -160,11 +160,11 @@ const MarketHomeContainer: React.FC = () => {
     searchParam = ''
   }
 
-  let typeParam: string
+  let typeParam: Maybe<string>
   if (typeFilter) {
     typeParam = typeRoute
   } else {
-    typeParam = 'All'
+    typeParam = null
   }
 
   const [filter, setFilter] = useState<MarketFilters>({
@@ -174,10 +174,9 @@ const MarketHomeContainer: React.FC = () => {
     sortBy: sortParam,
     sortByDirection: sortDirection,
     arbitrator: arbitratorParam,
-    templateId: null,
+    templateId: typeParam,
     currency: currencyParam,
     curationSource: curationSourceParam,
-    type: typeParam,
   })
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
@@ -299,8 +298,8 @@ const MarketHomeContainer: React.FC = () => {
         route += `/category/${filter.category}`
       }
 
-      if (filter.type && filter.type !== 'All') {
-        route += `/type/${filter.type}`
+      if (filter.templateId && filter.templateId !== '') {
+        route += `/type/${filter.templateId}`
       }
 
       if (filter.state && filter.state !== 'OPEN') {

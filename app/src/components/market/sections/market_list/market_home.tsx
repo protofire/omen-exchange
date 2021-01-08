@@ -265,7 +265,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     total: 0,
   })
   const [state, setState] = useState<MarketStates>(currentFilter.state)
-  const [type, setType] = useState<MarketTypes>(currentFilter.type)
   const [category, setCategory] = useState(currentFilter.category)
   const [title, setTitle] = useState(currentFilter.title)
   const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(currentFilter.sortBy)
@@ -276,7 +275,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string> | null>(currentFilter.currency)
-  const [templateId, setTemplateId] = useState<Maybe<string>>(null)
+  const [templateId, setTemplateId] = useState<Maybe<string>>(currentFilter.templateId)
   const [curationSource, setCurationSource] = useState<CurationSource>(currentFilter.curationSource)
 
   const advancedFilterSelectedCount = [currency, arbitrator, curationSource !== CurationSource.ALL_SOURCES].filter(
@@ -320,20 +319,20 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     {
       type: MarketTypes.all,
       title: 'All',
-      active: type === MarketTypes.all,
-      onClick: () => setType(MarketTypes.all),
+      active: templateId === null,
+      onClick: () => setTemplateId(MarketTypes.all),
     },
     {
       type: MarketTypes.categorical,
       title: 'Categorical',
-      active: type === MarketTypes.categorical,
-      onClick: () => setType(MarketTypes.categorical),
+      active: templateId === MarketTypes.categorical,
+      onClick: () => setTemplateId(MarketTypes.categorical),
     },
     {
       type: MarketTypes.scalar,
       title: 'Scalar',
-      active: type === MarketTypes.scalar,
-      onClick: () => setType(MarketTypes.scalar),
+      active: templateId === MarketTypes.scalar,
+      onClick: () => setTemplateId(MarketTypes.scalar),
     },
   ]
 
@@ -378,7 +377,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       sortByDirection,
       state,
       title,
-      type,
     })
   }, [
     arbitrator,
@@ -390,7 +388,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     sortByDirection,
     state,
     title,
-    type,
     onFilterChange,
   ])
 
@@ -547,7 +544,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     <>
       <Actions>
         <MarketsTypeDropdown
-          currentItem={marketTypes.findIndex(i => i.type === type)}
+          currentItem={marketTypes.findIndex(i => i.type === templateId)}
           dirty={true}
           dropdownDirection={DropdownDirection.downwards}
           dropdownVariant={DropdownVariant.card}
