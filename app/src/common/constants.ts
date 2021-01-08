@@ -73,7 +73,7 @@ export const DEFAULT_ARBITRATOR: KnownArbitrator = 'kleros'
 
 export const DEFAULT_GELATO_CONDITION: KnownGelatoCondition = 'time'
 
-export const GELATO_MIN_USD_THRESH = 250
+export const GELATO_MIN_USD_THRESH = 50 //250 REVERT
 export const GELATO_ACTIVATED = true
 
 export const DEFAULT_TOKEN = 'dai'
