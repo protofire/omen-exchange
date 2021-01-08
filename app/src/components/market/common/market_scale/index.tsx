@@ -1,9 +1,12 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
+import { IconInfo } from '../../../common/tooltip/img/IconInfo'
+import { Circle } from '../../common/common_styled'
 
 const SCALE_HEIGHT = '20px'
 const BAR_WIDTH = '2px'
@@ -240,6 +243,8 @@ const ValueBoxSubtitle = styled.p`
   color: ${props => props.theme.colors.textColor};
   margin: 0;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
 `
 
 interface Props {
@@ -330,50 +335,16 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   }, [newPrediction, currentPrediction, lowerBoundNumber, startingPointNumber, upperBoundNumber])
 
   useEffect(() => {
-    // If taking a long position
     if (long) {
-      // If the value selected by the slider is > the new prediction number
-      if (scaleValuePrediction > newPredictionNumber) {
-        // Determine the percentage distance from the new prediction number to the upper bound
-        const positionValue = (scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
-        // Calculate profit amount given how close it is to the upper bound, i.e. how close it is to max profit
-        const profit = positionValue * ((amountSharesNumber || 0) - (amountNumber || 0)) - (feeNumber || 0)
-        // Calculate total payout by adding profit to amount
-        setYourPayout(profit + (amountNumber || 0))
-        // Return profit amount
-        setProfitLoss(profit)
-      } else {
-        // Determine the percentage distance from the new prediction number to the lower bound as a negative value
-        const positionValue = -(scaleValuePrediction - newPredictionNumber) / (lowerBoundNumber - newPredictionNumber)
-        // Calculate loss amount given how close it is to lower bound, i.e. how close it is to max loss
-        const loss = positionValue * (amountNumber || 0) - (feeNumber || 0)
-        // Calculate total payout by adding loss to amount
-        setYourPayout((amountNumber || 0) + loss < 0 ? 0 : (amountNumber || 0) + loss)
-        // Return loss amount
-        setProfitLoss(loss < -(amountNumber || 0) ? -(amountNumber || 0) : loss)
-      }
-      // If taking a short position
+      // Calculate total payout by mulitplying shares amount by scale position
+      setYourPayout((amountSharesNumber || 0) * (Number(scaleBall?.value) / 100))
+      // Calculate profit by subtracting amount paid from payout
+      setProfitLoss((amountSharesNumber || 0) * (Number(scaleBall?.value) / 100) - (amountNumber || 0))
     } else {
-      // If the value selected by the slider is < the new prediction number
-      if (scaleValuePrediction <= newPredictionNumber) {
-        // Determine the percentage distance from the new prediction number to the lower bound
-        const positionValue = (newPredictionNumber - scaleValuePrediction) / (newPredictionNumber - lowerBoundNumber)
-        // Calculate profit amount given how close it is to the lower bound, i.e. how close it is to max profit
-        const profit = positionValue * ((amountSharesNumber || 0) - (amountNumber || 0)) - (feeNumber || 0)
-        // Calculate total payout by adding profit to amount
-        setYourPayout(profit + (amountNumber || 0))
-        // Return profit amount
-        setProfitLoss(profit)
-      } else {
-        // Determine the percentage distance from the new prediction number to the upper bound as a negative value
-        const positionValue = -(scaleValuePrediction - newPredictionNumber) / (upperBoundNumber - newPredictionNumber)
-        // Calculate loss amount given how close it is to upper bound, i.e. how close it is to max loss
-        const loss = positionValue * (amountNumber || 0) - (feeNumber || 0)
-        // Calculate total payout by adding loss to amount
-        setYourPayout((amountNumber || 0) + loss < 0 ? 0 : (amountNumber || 0) + loss)
-        // Return loss amount
-        setProfitLoss(loss < -(amountNumber || 0) ? -(amountNumber || 0) : loss)
-      }
+      // Calculate total payout by mulitplying shares amount by scale position
+      setYourPayout((amountSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
+      // Calculate profit by subtracting amount paid from payout
+      setProfitLoss((amountSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - (amountNumber || 0))
     }
   }, [
     scaleValuePrediction,
@@ -384,6 +355,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     upperBoundNumber,
     feeNumber,
     amountSharesNumber,
+    scaleBall?.value,
   ])
 
   const activateTooltip = () => {
@@ -503,14 +475,42 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               >
                 {`${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`}
               </ValueBoxTitle>
-              <ValueBoxSubtitle>Your Payout</ValueBoxSubtitle>
+              <ReactTooltip id="payoutTooltip" />
+              <ValueBoxSubtitle>
+                Your Payout
+                <Circle
+                  data-delay-hide={'500'}
+                  data-effect={'solid'}
+                  data-for={'payoutTooltip'}
+                  data-multiline={'true'}
+                  data-tip={`Your payout if the market resolves at ${formatNumber(
+                    scaleValuePrediction.toString(),
+                  )} ${unit}`}
+                >
+                  <IconInfo />
+                </Circle>
+              </ValueBoxSubtitle>
             </ValueBox>
             <ValueBox>
               <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>
                 {profitLoss > 0 && '+'}
                 {`${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`}
               </ValueBoxTitle>
-              <ValueBoxSubtitle>Profit/Loss</ValueBoxSubtitle>
+              <ReactTooltip id="profitTooltip" />
+              <ValueBoxSubtitle>
+                Profit/Loss
+                <Circle
+                  data-delay-hide={'500'}
+                  data-effect={'solid'}
+                  data-for={'profitTooltip'}
+                  data-multiline={'true'}
+                  data-tip={`Your profit/loss if the market resolves at ${formatNumber(
+                    scaleValuePrediction.toString(),
+                  )} ${unit}`}
+                >
+                  <IconInfo />
+                </Circle>
+              </ValueBoxSubtitle>
             </ValueBox>
           </ValueBoxPair>
         </ValueBoxes>
