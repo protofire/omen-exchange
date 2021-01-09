@@ -227,11 +227,12 @@ export const calcPoolTokens = (
  */
 export const roundNumberStringToSignificantDigits = (value: string, sd: number): string => {
   const r = new Big(value)
-  if (sd > 0 && r.c.length > sd) {
-    while (r.c[sd - 1] === 0 && sd > 1) --sd
-    r.c.length = sd
+  const preciseValue = (r as any).prec(sd)
+  if (preciseValue.gt(0)) {
+    return preciseValue.toString()
+  } else {
+    return '0'
   }
-  return r.toString()
 }
 
 /**
@@ -241,7 +242,7 @@ export const roundNumberStringToSignificantDigits = (value: string, sd: number):
 export const getCTokenForToken = (token: string): string => {
   const tokenSymbol = token.toLowerCase()
   if (tokenSymbol in CompoundEnabledTokenType) {
-    if (tokenSymbol === 'eth') {
+    if (tokenSymbol === 'eth' || tokenSymbol === 'weth') {
       return 'ceth'
     } else {
       return `c${tokenSymbol}`
@@ -249,6 +250,17 @@ export const getCTokenForToken = (token: string): string => {
   } else {
     return ''
   }
+}
+
+/**
+ *
+ */
+export const getBaseTokenForCToken = (token: string): string => {
+  const tokenSymbol = token.toLowerCase()
+  if (tokenSymbol.startsWith('c')) {
+    return tokenSymbol.substring(1, tokenSymbol.length)
+  }
+  return ''
 }
 /**
  * Compute the number of outcomes that will be sent to the user by the Market Maker

@@ -318,19 +318,23 @@ class CPKService {
       }
       let collateral
       if (marketData.collateral.address === pseudoNativeAssetAddress) {
-        // ultimately WETH will be the collateral if we fund with native ether
-        collateral = getWrapToken(networkId)
+        if (!useCompoundReserve) {
+          // ultimately WETH will be the collateral if we fund with native ether
+          collateral = getWrapToken(networkId)
 
-        // we need to send the funding amount in native ether
-        if (!this.cpk.isSafeApp()) {
-          txOptions.value = marketData.funding
+          // we need to send the funding amount in native ether
+          if (!this.cpk.isSafeApp()) {
+            txOptions.value = marketData.funding
+          }
+
+          // Step 0: Wrap ether
+          transactions.push({
+            to: collateral.address,
+            value: marketData.funding,
+          })
+        } else {
+          collateral = userInputCollateral
         }
-
-        // Step 0: Wrap ether
-        transactions.push({
-          to: collateral.address,
-          value: marketData.funding,
-        })
       } else {
         collateral = marketData.collateral
       }

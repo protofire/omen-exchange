@@ -7,6 +7,8 @@ import { Token } from '../util/types'
 
 import { cBATAbi, cDaiAbi, cETHAbi, cUSDCAbi, cUSDTAbi, cWBTCAbi } from './compound_abi'
 
+const RoundingFactor = 10000
+
 class CompoundService {
   contract: Contract
   signerAddress: Maybe<string>
@@ -50,10 +52,17 @@ class CompoundService {
     const amountUnderlyingTokens = userCTokenAmount.mul(oneCTokenInUnderlying)
     const amountUnderlyingTokensBoundToPrecision = roundNumberStringToSignificantDigits(
       amountUnderlyingTokens.toString(),
-      baseTokenDecimals - 4,
+      baseTokenDecimals - 2,
     )
-    const underlyingBigNumber = parseUnits(amountUnderlyingTokensBoundToPrecision, baseTokenDecimals)
-    return underlyingBigNumber
+    try {
+      const underlyingBigNumber = parseUnits(amountUnderlyingTokensBoundToPrecision, baseTokenDecimals)
+      return underlyingBigNumber
+    } catch (e) {
+      const amountUnderlyingTokensNumber = Number(amountUnderlyingTokensBoundToPrecision) * RoundingFactor
+      let underlyingBigNumber = parseUnits(amountUnderlyingTokensNumber.toString(), baseTokenDecimals)
+      underlyingBigNumber = underlyingBigNumber.div(RoundingFactor)
+      return underlyingBigNumber
+    }
   }
 
   calculateBaseToCTokenExchange = (userInputToken: Token, userInputTokenFunding: BigNumber): BigNumber => {
@@ -70,8 +79,15 @@ class CompoundService {
       amountCTokens.toString(),
       cTokenDecimals - 2,
     )
-    const amountCTokenBigNumber = parseUnits(amountCTokensBoundToPrecision, cTokenDecimals)
-    return amountCTokenBigNumber
+    try {
+      const amountCTokenBigNumber = parseUnits(amountCTokensBoundToPrecision, cTokenDecimals)
+      return amountCTokenBigNumber
+    } catch (e) {
+      const amountCToken = Number(amountCTokensBoundToPrecision) * RoundingFactor
+      let amountCTokenBigNumber = parseUnits(amountCToken.toString(), cTokenDecimals)
+      amountCTokenBigNumber = amountCTokenBigNumber.div(RoundingFactor)
+      return amountCTokenBigNumber
+    }
   }
 
   calculateExchangeRate = async (): Promise<number> => {

@@ -237,7 +237,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       setServiceCheck(true)
       handleUseCompoundReserveChange(true)
     }
-  }, [userInputCollateral.symbol, handleUseCompoundReserveChange])
+  }, [userInputCollateral.symbol])
   useEffect(() => {
     const selectedToken = markets.find(
       ({ collateralToken }) =>

@@ -21,6 +21,7 @@ interface Props {
   displayCollateral?: Token
   disabledColumns?: OutcomeTableValue[]
   displayRadioSelection?: boolean
+  displayProbabilities?: number[]
   outcomeHandleChange?: (e: number) => void
   getPriceInBaseToken?: (e: number) => number
   outcomeSelected?: number
@@ -106,6 +107,7 @@ export const OutcomeTable = (props: Props) => {
     outcomeSelected,
     payouts = [],
     probabilities,
+    displayProbabilities = probabilities,
     withWinningOutcome = false,
     showPriceChange = false,
     showSharesChange = false,
@@ -228,11 +230,21 @@ export const OutcomeTable = (props: Props) => {
   }
 
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
+    const currentCollateral = displayCollateral ? displayCollateral : collateral
     const { currentPrice, outcomeName, payout, shares } = balanceItem
-    const currentPriceFormatted = withWinningOutcome ? payout.toFixed(2) : Number(currentPrice).toFixed(2)
+    const currentPriceValue = Number(currentPrice)
+    let currentPriceDisplay = currentPriceValue.toFixed(2)
+    if (currentPriceValue < 0.1) {
+      currentPriceDisplay = currentPriceValue.toFixed(4)
+    }
+    const currentPriceFormatted = withWinningOutcome ? payout.toFixed(2) : currentPriceDisplay
     const probability = withWinningOutcome ? Number(payout.mul(100).toString()) : probabilities[outcomeIndex]
-    const newPrice = (probabilities[outcomeIndex] / 100).toFixed(2)
-    const formattedPayout = formatBigNumber(mulBN(shares, Number(payout.toString())), collateral.decimals)
+    const newPriceValue = displayProbabilities[outcomeIndex] / 100
+    let newPrice = newPriceValue.toFixed(2)
+    if (newPriceValue < 0.1) {
+      newPrice = newPriceValue.toFixed(4)
+    }
+    const formattedPayout = formatBigNumber(mulBN(shares, Number(payout.toString())), currentCollateral.decimals)
     const formattedShares = formatBigNumber(shares, collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] && payouts[outcomeIndex].gt(0)
     const formattedNewShares = newShares ? formatBigNumber(newShares[outcomeIndex], collateral.decimals) : null

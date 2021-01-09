@@ -51,7 +51,7 @@
     "axios": "^0.19.2",
     "babel-loader": "^8.1.0",
     "babel-plugin-named-asset-import": "^0.3.6",
-    "big.js": "^5.2.2",
+    "big.js": "^6.0.3",
     "circular-dependency-plugin": "^5.2.0",
     "common-tags": "^1.8.0",
     "contract-proxy-kit": "2.2.0-alpha.1",
