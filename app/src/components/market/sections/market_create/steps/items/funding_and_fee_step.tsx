@@ -178,14 +178,11 @@ interface Props {
     outcomes: Outcome[]
     loadedQuestionId: Maybe<string>
     verifyLabel?: string
-<<<<<<< HEAD
     userInputCollateral: Token
-=======
     lowerBound?: Maybe<BigNumber>
     upperBound?: Maybe<BigNumber>
     startingPoint?: Maybe<BigNumber>
     unit?: string
->>>>>>> 979d5f9566b05c50c2ff30231f3e62ddecf70586
   }
   marketCreationStatus: MarketCreationStatus
   getCompoundInterestRate: (userInputCollateral: string) => Promise<number>
@@ -231,10 +228,10 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     question,
     resolution,
     spread,
-    userInputCollateral,
     startingPoint,
     unit,
     upperBound,
+    userInputCollateral,
   } = values
 
   const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
@@ -250,7 +247,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType) {
       setServiceCheck(true)
       handleUseCompoundReserveChange(true)
-    }
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userInputCollateral.symbol])
   useEffect(() => {
     const selectedToken = markets.find(

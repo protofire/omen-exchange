@@ -32,50 +32,50 @@ const logger = getLogger('Services::CPKService')
 interface CPKBuyOutcomesParams {
   amount: BigNumber
   collateral: Token
-  compoundService: CompoundService | null
+  compoundService?: CompoundService | null
   outcomeIndex: number
-  useBaseToken: boolean
+  useBaseToken?: boolean
   marketMaker: MarketMakerService
 }
 
 interface CPKSellOutcomesParams {
   amount: BigNumber
-  compoundService: CompoundService | null
+  compoundService?: CompoundService | null
   outcomeIndex: number
   marketMaker: MarketMakerService
-  useBaseToken: boolean
+  useBaseToken?: boolean
   conditionalTokens: ConditionalTokenService
 }
 
 interface CPKCreateMarketParams {
-  compoundService: CompoundService | null
-  compoundTokenDetails: Token
+  compoundService?: CompoundService | null
+  compoundTokenDetails?: Token
   marketData: MarketData
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
-  useCompoundReserve: boolean
+  useCompoundReserve?: boolean
 }
 
 interface CPKAddFundingParams {
   amount: BigNumber
   collateral: Token
-  compoundService: CompoundService | null
+  compoundService?: CompoundService | null
   marketMaker: MarketMakerService
-  useBaseToken: boolean
+  useBaseToken?: boolean
 }
 
 interface CPKRemoveFundingParams {
   amountToMerge: BigNumber
   collateralAddress: string
-  compoundService: CompoundService | null
+  compoundService?: CompoundService | null
   conditionId: string
   conditionalTokens: ConditionalTokenService
   earnings: BigNumber
   marketMaker: MarketMakerService
   outcomesCount: number
   sharesToBurn: BigNumber
-  useBaseToken: boolean
+  useBaseToken?: boolean
 }
 
 interface CPKRedeemParams {
@@ -404,7 +404,7 @@ class CPKService {
         })
       }
       let marketPoolFunding = marketData.funding
-      if (useCompoundReserve && compoundService) {
+      if (useCompoundReserve && compoundService && compoundTokenDetails) {
         marketPoolFunding = compoundService.calculateBaseToCTokenExchange(userInputCollateral, marketPoolFunding)
         const encodedMintFunction = CompoundService.encodeMintTokens(
           compoundTokenDetails.symbol,

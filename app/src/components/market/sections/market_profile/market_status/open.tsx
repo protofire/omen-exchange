@@ -110,11 +110,6 @@ const Wrapper = (props: Props) => {
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
-  const { balances, collateral, isQuestionFinalized, payouts, question, totalPoolShares } = marketMakerData
-  const [displayBalances, setDisplayBalances] = useState<BalanceItem[]>(balances)
-  const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
-  const context = useConnectedWeb3Context()
-
   const {
     balances,
     collateral,
@@ -126,6 +121,9 @@ const Wrapper = (props: Props) => {
     scalarLow,
     totalPoolShares,
   } = marketMakerData
+  const [displayBalances, setDisplayBalances] = useState<BalanceItem[]>(balances)
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
+  const context = useConnectedWeb3Context()
 
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
