@@ -1,7 +1,14 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import Big from 'big.js'
-import { BigNumber, bigNumberify, formatUnits, getAddress } from 'ethers/utils'
+import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
+
+import {
+  REALITIO_SCALAR_ADAPTER_ADDRESS,
+  REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY,
+  REALITIO_SCALAR_ADAPTER_ADDRESS_SOKOL,
+  REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI,
+} from '../common/constants'
 
 import { getLogger } from './logger'
 import { CompoundEnabledTokenType } from './types'
@@ -213,7 +220,7 @@ export const calcPoolTokens = (
   holdingsBN: BigNumber[],
   poolShareSupply: BigNumber,
 ): BigNumber => {
-  if (poolShareSupply.gt(0)) {
+  if (poolShareSupply.gt(0) && holdingsBN.length > 0) {
     const poolWeight = holdingsBN.reduce((max: BigNumber, h: BigNumber) => (h.gt(max) ? h : max))
 
     return addedFunds.mul(poolShareSupply).div(poolWeight)
@@ -357,6 +364,8 @@ export const getMarketTitles = (templateId: Maybe<number>) => {
     return { marketTitle: 'Nuanced Binary Market', marketSubtitle: 'What is a nuanced-binary market?' }
   } else if (templateId === 2) {
     return { marketTitle: 'Categorical Market', marketSubtitle: 'What is a categorical market?' }
+  } else if (templateId === 1) {
+    return { marketTitle: 'Scalar Market', marketSubtitle: 'What is a scalar market?' }
   } else {
     return { marketTitle: 'Binary Market', marketSubtitle: 'What is a binary market?' }
   }
@@ -440,9 +449,45 @@ export const waitABit = (milli = 1000) =>
     setTimeout(resolve, milli)
   })
 
+export const clampBigNumber = (x: BigNumber, min: BigNumber, max: BigNumber): BigNumber => {
+  if (x.lt(min)) return min
+  if (x.gt(max)) return max
+  return x
+}
+
 export const numberToByte32 = (num: number): string => {
   const hex = new BigNumber(num).toHexString()
   const frontZeros = '0'.repeat(66 - hex.length)
 
   return `0x${frontZeros}${hex.split('0x')[1]}`
+}
+
+export const isDust = (amount: BigNumber, decimals: number): boolean => {
+  return amount.lt(parseUnits('0.00001', decimals))
+}
+
+export const isScalarMarket = (oracle: string, networkId: number): boolean => {
+  let realitioScalarAdapter
+  if (networkId === 1) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase()
+  } else if (networkId === 4) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
+  } else if (networkId === 77) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_SOKOL.toLowerCase()
+  } else if (networkId === 100) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI.toLowerCase()
+  }
+
+  let isScalar = false
+  if (oracle === realitioScalarAdapter) {
+    isScalar = true
+  }
+
+  return isScalar
+}
+
+export const getUnit = (title: string): string => {
+  const splitTitle = title.split('[')
+  const unit = splitTitle[splitTitle.length - 1].split(']')[0]
+  return unit
 }

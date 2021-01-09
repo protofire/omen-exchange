@@ -202,6 +202,10 @@ export interface MarketData {
   loadedQuestionId: Maybe<string>
   useCompoundReserve: boolean
   verifiedLabel?: string
+  lowerBound: Maybe<BigNumber>
+  upperBound: Maybe<BigNumber>
+  startingPoint: Maybe<BigNumber>
+  unit: string
 }
 
 export enum MarketStates {
@@ -279,6 +283,7 @@ export interface MarketMakerData {
   marketMakerUserFunding: BigNumber
   payouts: Maybe<Big[]>
   question: Question
+  realitioAnswer: Maybe<BigNumber>
   totalEarnings: BigNumber
   totalPoolShares: BigNumber
   userEarnings: BigNumber
@@ -290,6 +295,10 @@ export interface MarketMakerData {
   lastActiveDay: number
   scaledLiquidityParameter: number
   submissionIDs: KlerosSubmission[]
+  oracle: string
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
+  outcomeTokenMarginalPrices: string[]
 }
 
 export enum Ternary {
@@ -345,6 +354,10 @@ export type GraphMarketMakerDataItem = {
   klerosTCRregistered: boolean
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
+  condition: MarketCondition
+  outcomeTokenMarginalPrices: string[]
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
 }
 
 export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
@@ -376,12 +389,22 @@ export type MarketMakerDataItem = {
   klerosTCRregistered: boolean
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
+  oracle: Maybe<string>
+  outcomeTokenMarginalPrices: string[]
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
 }
 
 export type BuildQueryType = MarketFilters & {
   whitelistedCreators: boolean
   whitelistedTemplateIds: boolean
   networkId: Maybe<number>
+}
+
+export type MarketCondition = {
+  oracle: Maybe<string>
+  scalarHigh: Maybe<BigNumber>
+  scalarLow: Maybe<BigNumber>
 }
 
 export enum MarketDetailsTab {
@@ -422,3 +445,9 @@ export enum CompoundEnabledTokenType {
 }
 
 export const INVALID_ANSWER_ID = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+
+export enum FormState {
+  categorical = 'CATEGORICAL',
+  import = 'IMPORT',
+  scalar = 'SCALAR',
+}

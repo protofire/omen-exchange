@@ -42,7 +42,7 @@ const MarketWizardCreatorContainer: FC = () => {
     return supplyRate
   }
 
-  const handleSubmit = async (marketData: MarketData) => {
+  const handleSubmit = async (marketData: MarketData, isScalar: boolean) => {
     try {
       if (!account) {
         setModalState(true)
@@ -64,38 +64,53 @@ const MarketWizardCreatorContainer: FC = () => {
             await collateralService.approveUnlimited(cpk.address)
           }
         }
-        let compoundTokenDetails = marketData.userInputCollateral
-        let compoundService = null
-        const userInputCollateralSymbol = marketData.userInputCollateral.symbol.toLowerCase()
-        const useCompoundReserve = marketData.useCompoundReserve
-        if (useCompoundReserve) {
-          let cToken = `c${userInputCollateralSymbol}`
-          if (userInputCollateralSymbol === 'eth' || userInputCollateralSymbol === 'weth') {
-            cToken = 'ceth'
+        if (isScalar) {
+          const { marketMakerAddress, transaction } = await cpk.createScalarMarket({
+            marketData,
+            conditionalTokens,
+            realitio,
+            marketMakerFactory,
+          })
+          setMarketMakerAddress(marketMakerAddress)
+          if (transaction.blockNumber) {
+            await waitForBlockToSync(transaction.blockNumber)
           }
-          const compoundCollateralToken = cToken as KnownToken
-          compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
-          marketData.userInputToken = marketData.userInputCollateral
-          compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
-          await compoundService.init()
-        }
-        const { marketMakerAddress, transaction } = await cpk.createMarket({
-          compoundService,
-          compoundTokenDetails,
-          conditionalTokens,
-          marketData,
-          realitio,
-          marketMakerFactory,
-          useCompoundReserve,
-        })
-        setMarketMakerAddress(marketMakerAddress)
+          setMarketCreationStatus(MarketCreationStatus.done())
+          history.replace(`/${marketMakerAddress}`)
+        } else {
+          let compoundTokenDetails = marketData.userInputCollateral
+          let compoundService = null
+          const userInputCollateralSymbol = marketData.userInputCollateral.symbol.toLowerCase()
+          const useCompoundReserve = marketData.useCompoundReserve
+          if (useCompoundReserve) {
+            let cToken = `c${userInputCollateralSymbol}`
+            if (userInputCollateralSymbol === 'eth' || userInputCollateralSymbol === 'weth') {
+              cToken = 'ceth'
+            }
+            const compoundCollateralToken = cToken as KnownToken
+            compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
+            marketData.userInputToken = marketData.userInputCollateral
+            compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
+            await compoundService.init()
+          }
+          const { marketMakerAddress, transaction } = await cpk.createMarket({
+            compoundService,
+            compoundTokenDetails,
+            conditionalTokens,
+            marketData,
+            realitio,
+            marketMakerFactory,
+            useCompoundReserve,
+          })
+          setMarketMakerAddress(marketMakerAddress)
 
-        if (transaction.blockNumber) {
-          await waitForBlockToSync(transaction.blockNumber)
-        }
+          if (transaction.blockNumber) {
+            await waitForBlockToSync(transaction.blockNumber)
+          }
 
-        setMarketCreationStatus(MarketCreationStatus.done())
-        history.replace(`/${marketMakerAddress}`)
+          setMarketCreationStatus(MarketCreationStatus.done())
+          history.replace(`/${marketMakerAddress}`)
+        }
       }
     } catch (err) {
       setMarketCreationStatus(MarketCreationStatus.error(err))

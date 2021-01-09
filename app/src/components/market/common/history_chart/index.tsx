@@ -6,7 +6,7 @@ import { useWeb3Context } from 'web3-react'
 
 import { EARLIEST_MAINNET_BLOCK_TO_CHECK } from '../../../../common/constants'
 import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
-import { keys, range } from '../../../../util/tools'
+import { isScalarMarket, keys, range } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
 
 import { HistoryChart } from './chart'
@@ -70,7 +70,11 @@ type Props = {
   answerFinalizedTimestamp: Maybe<BigNumber>
   marketMakerAddress: string
   hidden: boolean
+  oracle: Maybe<string>
   outcomes: string[]
+  scalarHigh: Maybe<BigNumber>
+  scalarLow: Maybe<BigNumber>
+  unit: string
 }
 
 const blocksPerAllTimePeriod = 10000
@@ -91,9 +95,14 @@ export const HistoryChartContainer: React.FC<Props> = ({
   answerFinalizedTimestamp,
   hidden,
   marketMakerAddress,
+  oracle,
   outcomes,
+  scalarHigh,
+  scalarLow,
+  unit,
 }) => {
-  const { library } = useWeb3Context()
+  const context = useWeb3Context()
+  const { library } = context
   const [latestBlockNumber, setLatestBlockNumber] = useState<Maybe<number>>(null)
   const [blocks, setBlocks] = useState<Maybe<Block[]>>(null)
   const holdingsSeries = useHoldingsHistory(marketMakerAddress, blocks)
@@ -136,12 +145,18 @@ export const HistoryChartContainer: React.FC<Props> = ({
     // eslint-disable-next-line
   }, [latestBlockNumber, library, period])
 
+  const isScalar = isScalarMarket(oracle || '', context.networkId || 0)
+
   return hidden ? null : (
     <HistoryChart
       holdingSeries={holdingsSeries}
+      isScalar={isScalar}
       onChange={setPeriod}
       options={keys(mapPeriod)}
       outcomes={outcomes}
+      scalarHigh={scalarHigh}
+      scalarLow={scalarLow}
+      unit={unit}
       value={period}
     />
   )

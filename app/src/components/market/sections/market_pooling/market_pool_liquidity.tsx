@@ -43,7 +43,7 @@ import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { Dropdown, DropdownItemProps } from '../../../common/form/dropdown'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -72,12 +72,6 @@ const BottomButtonWrapper = styled(ButtonContainer)`
   padding: 20px 24px 0;
 `
 
-const TabsGrid = styled.div`
-  display: grid;
-  grid-column-gap: 13px;
-  grid-template-columns: 1fr 1fr;
-  margin: 0 0 20px;
-`
 const WarningMessageStyled = styled(WarningMessage)`
   margin-bottom: 0;
   margin-bottom: 24px;
@@ -330,7 +324,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     symbol = displayCollateral.symbol
   }
   const addFunding = async () => {
-    setModalTitle('Funds Deposit')
+    setModalTitle('Deposit Funds')
 
     try {
       if (!cpk) {
@@ -384,7 +378,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const removeFunding = async () => {
-    setModalTitle('Funds Withdrawal')
+    setModalTitle('Withdraw Funds')
     try {
       if (!cpk) {
         return
@@ -765,7 +759,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       )}
       <BottomButtonWrapper borderTop>
         <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
-          Cancel
+          Back
         </Button>
         {activeTab === Tabs.deposit && (
           <Button buttonType={ButtonType.secondaryLine} disabled={disableDepositButton} onClick={() => addFunding()}>

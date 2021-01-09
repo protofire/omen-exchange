@@ -16,7 +16,7 @@ import { AskQuestionStep, FundingAndFeeStep, MenuStep } from './steps'
 import { Outcome } from './steps/outcomes'
 
 interface Props {
-  callback: (param: MarketData) => void
+  callback: (param: MarketData, isScalar: boolean) => void
   marketCreationStatus: MarketCreationStatus
   marketMakerAddress: string | null
   getCompoundInterestRate: (symbol: string) => Promise<number>
@@ -67,6 +67,10 @@ export const MarketWizardCreator = (props: Props) => {
     question: '',
     resolution: null,
     spread: MARKET_FEE,
+    lowerBound: null,
+    upperBound: null,
+    startingPoint: null,
+    unit: '',
   }
 
   const [currentStep, setCurrentStep] = useState(1)
@@ -125,14 +129,18 @@ export const MarketWizardCreator = (props: Props) => {
     // eslint-disable-next-line
   }, [topCategories])
 
-  const next = (): void => {
+  const [currentFormState, setCurrentFormState] = useState('')
+
+  const next = (state: string): void => {
     const actualCurrentStep = currentStep >= 3 ? 4 : currentStep + 1
     setCurrentStep(actualCurrentStep)
+    setCurrentFormState(state)
   }
 
-  const back = (): void => {
+  const back = (state: string): void => {
     const actualCurrentStep = currentStep <= 1 ? 1 : currentStep - 1
     setCurrentStep(actualCurrentStep)
+    setCurrentFormState(state)
   }
 
   const addArbitratorCustom = (arbitrator: Arbitrator): void => {
@@ -293,27 +301,16 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const submit = () => {
-    callback(marketData as MarketData)
+  const submit = (isScalar: boolean) => {
+    callback(marketData as MarketData, isScalar)
   }
 
   const currentStepFn = () => {
-    const {
-      arbitrator,
-      arbitratorsCustom,
-      categoriesCustom,
-      category,
-      loadedQuestionId,
-      outcomes,
-      question,
-      resolution,
-    } = marketData
-
     switch (currentStep) {
       case 2:
         return (
           <FundingAndFeeStep
-            back={() => back()}
+            back={back}
             getCompoundInterestRate={getCompoundInterestRate}
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
@@ -321,7 +318,8 @@ export const MarketWizardCreator = (props: Props) => {
             handleUseCompoundReserveChange={handleUseCompoundReserveChange}
             marketCreationStatus={marketCreationStatus}
             resetTradingFee={resetTradingFee}
-            submit={() => submit()}
+            state={currentFormState}
+            submit={submit}
             values={marketData}
           />
         )
@@ -339,18 +337,10 @@ export const MarketWizardCreator = (props: Props) => {
             handleOutcomesChange={handleOutcomesChange}
             handleQuestionChange={handleQuestionChange}
             loadMoreButton={loadMoreButton}
-            next={() => next()}
+            next={next}
             setFirst={setFirst}
-            values={{
-              question,
-              outcomes,
-              loadedQuestionId,
-              category,
-              categoriesCustom,
-              resolution,
-              arbitrator,
-              arbitratorsCustom,
-            }}
+            state={currentFormState}
+            values={marketData}
           />
         )
     }

@@ -1,11 +1,11 @@
-import { bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import moment from 'moment'
 import React from 'react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import styled, { css } from 'styled-components'
 
 import { getOutcomeColor } from '../../../../theme/utils'
-import { calcPrice } from '../../../../util/tools'
+import { calcPrice, formatBigNumber } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { ButtonSelectable } from '../../../button'
 import { InlineLoading } from '../../../loading'
@@ -118,9 +118,13 @@ const AnEvenSmallerLittleBall = styled(OutcomeItemLittleBallOfJoyAndDifferentCol
 
 type Props = {
   holdingSeries: Maybe<HistoricData>
+  isScalar?: Maybe<boolean>
   onChange: (s: Period) => void
   options: Period[]
   outcomes: string[]
+  scalarHigh?: Maybe<BigNumber>
+  scalarLow?: Maybe<BigNumber>
+  unit: string
   value: Period
 }
 
@@ -163,7 +167,48 @@ const renderTooltipContent = (o: any) => {
   )
 }
 
-export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options, outcomes, value }) => {
+export const HistoryChart: React.FC<Props> = ({
+  holdingSeries,
+  isScalar,
+  onChange,
+  options,
+  outcomes,
+  scalarHigh,
+  scalarLow,
+  unit,
+  value,
+}) => {
+  const scalarLowNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
+  const scalarHighNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
+
+  const toScaleValue = (decimal: number, fixed = 0) => {
+    return `${(decimal * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) + (scalarLowNumber || 0)).toFixed(
+      fixed,
+    )} ${unit}`
+  }
+
+  const renderScalarTooltipContent = (o: any) => {
+    const { label, payload } = o
+    const prediction = (
+      payload[0]?.value * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) +
+      (scalarLowNumber || 0)
+    ).toFixed(2)
+    return (
+      <ChartTooltip>
+        <TooltipTitle>{label}</TooltipTitle>
+        <Legends>
+          <Legend key={`item-0`}>
+            <AnEvenSmallerLittleBall outcomeIndex={0} />
+            <strong>{`${prediction}`}</strong>
+            {`${unit}`}
+          </Legend>
+        </Legends>
+      </ChartTooltip>
+    )
+  }
+
+  const outcomeArray: string[] = outcomes.length ? outcomes : ['Short', 'Long']
+
   const data =
     holdingSeries &&
     holdingSeries
@@ -172,8 +217,7 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
       .map(h => {
         const prices = calcPrice(h.holdings.map(bigNumberify))
         const outcomesPrices: { [outcomeName: string]: number } = {}
-        outcomes.forEach((k, i) => (outcomesPrices[k] = prices[i]))
-
+        outcomeArray.forEach((k, i) => (outcomesPrices[k] = prices[i]))
         return { ...outcomesPrices, date: timestampToDate(h.block.timestamp, value) }
       })
 
@@ -200,10 +244,10 @@ export const HistoryChart: React.FC<Props> = ({ holdingSeries, onChange, options
       <ResponsiveContainer height={300} width="100%">
         <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }} stackOffset="expand">
           <XAxis dataKey="date" />
-          <YAxis orientation="right" tickFormatter={toPercent} />
-          <Tooltip content={renderTooltipContent} />
+          <YAxis orientation="right" tickFormatter={isScalar ? toScaleValue : toPercent} width={80} />
+          <Tooltip content={isScalar ? renderScalarTooltipContent : renderTooltipContent} />
 
-          {outcomes
+          {outcomeArray
             .map((outcomeName, index) => {
               const color = getOutcomeColor(index)
               return (

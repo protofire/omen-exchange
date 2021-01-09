@@ -49,6 +49,7 @@ interface Network {
   omenTCRListId: number
   contracts: {
     realitio: string
+    realitioScalarAdapter: string
     marketMakerFactory: string
     conditionalTokens: string
     oracle: string
@@ -91,6 +92,7 @@ const networks: { [K in NetworkId]: Network } = {
     omenTCRListId: 3,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
+      realitioScalarAdapter: '0xaa548EfBb0972e0c4b9551dcCfb6B787A1B90082',
       marketMakerFactory: '0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
       oracle: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
@@ -128,6 +130,7 @@ const networks: { [K in NetworkId]: Network } = {
     omenTCRListId: 1,
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
+      realitioScalarAdapter: '0x0e8Db8caD541C0Bf5b611636e81fEc0828bc7902',
       marketMakerFactory: '0x0fB4340432e56c014fa96286de17222822a9281b',
       conditionalTokens: '0x36bede640D19981A82090519bC1626249984c908',
       oracle: '0x17174dC1b62add32a1DE477A357e75b0dcDEed6E',
@@ -160,11 +163,12 @@ const networks: { [K in NetworkId]: Network } = {
     graphWsUri: GRAPH_SOKOL_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
     klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
-    realitioTimeout: 10800,
+    realitioTimeout: 180,
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
     omenTCRListId: 1,
     contracts: {
       realitio: '0x63975d9e7CF434dCd04bD808d8c79d03EF69100B',
+      realitioScalarAdapter: '0x86459E9eA6cF4caEe9F8F4cb1203d38EaB3cbD34',
       marketMakerFactory: '0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5',
       conditionalTokens: '0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f',
       oracle: '0xa57EBD93faa73b3491aAe396557D6ceC24fC6984',
@@ -202,6 +206,7 @@ const networks: { [K in NetworkId]: Network } = {
     omenTCRListId: 1,
     contracts: {
       realitio: '0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03',
+      realitioScalarAdapter: '0xb97FCb6adf4c4aF9981932a004e6CC47173d0Bfc',
       marketMakerFactory: '0x9083A2B699c0a4AD06F63580BDE2635d26a3eeF0',
       conditionalTokens: '0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce',
       oracle: '0x2bf1BFb0eB6276a4F4B60044068Cb8CdEB89f79B',
@@ -663,8 +668,11 @@ export const getKlerosCurateGraphUris = (networkId: number): { httpUri: string; 
 export const getOutcomes = (networkId: number, templateId: number) => {
   const isBinary = templateId === 0
   const isNuancedBinary = (networkId === 1 && templateId === 6) || (networkId === 4 && templateId === 5)
+  const isScalar = templateId === 1
   if (isBinary || isNuancedBinary) {
     return ['No', 'Yes']
+  } else if (isScalar) {
+    return []
   } else {
     throw new Error(`Cannot get outcomes for network '${networkId}' and template id '${templateId}'`)
   }
