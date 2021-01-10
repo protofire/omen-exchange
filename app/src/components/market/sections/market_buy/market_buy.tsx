@@ -90,7 +90,17 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [compoundService, setCompoundService] = useState<CompoundService>(
     new CompoundService(collateral.address, collateral.symbol, provider, account),
   )
-  const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
+  const getInitialCollateral = (): Token => {
+    const collateralSymbol = collateral.symbol.toLowerCase()
+    if (collateralSymbol in CompoundTokenType) {
+      const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
+      const baseToken = getToken(networkId, baseCollateralSymbol)
+      return baseToken
+    } else {
+      return collateral
+    }
+  }
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(getInitialCollateral())
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amount, setAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
@@ -117,9 +127,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   useMemo(() => {
     const getResult = async () => {
-      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
-      await compoundServiceObject.init()
-      setCompoundService(compoundServiceObject)
+      await compoundService.init()
+      setCompoundService(compoundService)
     }
     if (collateral.symbol.toLowerCase() in CompoundTokenType) {
       getResult()
@@ -287,7 +296,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     context,
   )
   const collateralBalance = maybeCollateralBalance || Zero
-
   const currentBalance = `${formatBigNumber(collateralBalance, displayCollateral.decimals, 5)}`
   let baseCostNormalized = baseCost
   let potentialProfitNormalized = potentialProfit
@@ -333,7 +341,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const wrapAddress = getWrapToken(networkId).address
 
-  const currencyFilters =
+  let currencyFilters =
     collateral.address === wrapAddress || collateral.address === pseudoNativeAssetAddress
       ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
       : []
@@ -342,8 +350,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   if (collateralSymbol in CompoundTokenType) {
     const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
     const baseCollateral = getToken(networkId, baseCollateralSymbol)
-    currencyFilters.push(baseCollateral.address)
-    currencyFilters.push(collateral.address)
+    if (baseCollateral.symbol.toLowerCase() === 'eth') {
+      currencyFilters = [collateral.address, pseudoNativeAssetAddress.toLowerCase()]
+    } else {
+      currencyFilters = [collateral.address, baseCollateral.address]
+    }
   }
   const switchOutcome = (value: number) => {
     setNewShares(
@@ -351,35 +362,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     )
     setOutcomeIndex(value)
   }
-
-  const setBuyCollateral = (token: Token) => {
-    const collateralSymbol = token.symbol.toLowerCase()
-    if (collateralSymbol in CompoundTokenType) {
-      setDisplayCollateral(collateral)
-    } else {
-      setDisplayCollateral(token)
-    }
-  }
-
-  const setDisplayCollateralAndBalance = () => {
-    let baseCollateral = collateral
-    const collateralSymbol = collateral.symbol.toLowerCase()
-    if (collateralSymbol in CompoundTokenType) {
-      const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
-      const baseCollateralToken = getToken(context.networkId, baseCollateralSymbol as KnownToken)
-      baseCollateral = baseCollateralToken
-      setDisplayCollateral(baseCollateral)
-    } else {
-      setDisplayCollateral(collateral)
-    }
-  }
-
-  // if collateral is a cToken then convert the collateral and balances to underlying token
-  useEffect(() => {
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-      setDisplayCollateralAndBalance()
-    }
-  }, [collateral.address]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const setDisplayAmountToFund = (value: BigNumber) => {
     const collateralSymbol = collateral.symbol.toLowerCase()
@@ -391,7 +373,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     }
     setDisplayFundAmount(value)
   }
-
   return (
     <>
       <OutcomeTable
@@ -433,7 +414,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               filters={currencyFilters}
               onSelect={(token: Token | null) => {
                 if (token) {
-                  setBuyCollateral(token)
+                  setDisplayCollateral(token)
                   setAmount(new BigNumber(0))
                   setDisplayAmountToFund(new BigNumber(0))
                 }

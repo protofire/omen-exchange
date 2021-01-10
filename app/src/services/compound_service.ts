@@ -47,6 +47,9 @@ class CompoundService {
     const exchangeRate = new Big(this.exchangeRate)
     const baseTokenDecimals = Number(baseToken.decimals)
     const mantissa = 18 + baseTokenDecimals - cTokenDecimals
+    if (exchangeRate.eq(0)) {
+      return new BigNumber('0')
+    }
     const exp = bigTen.pow(mantissa)
     const oneCTokenInUnderlying = exchangeRate.div(exp)
     const amountUnderlyingTokens = userCTokenAmount.mul(oneCTokenInUnderlying)
@@ -73,6 +76,9 @@ class CompoundService {
     const exchangeRate = new Big(this.exchangeRate)
     const mantissa = 18 + underlyingDecimals - cTokenDecimals
     const divisor = bigTen.pow(mantissa)
+    if (exchangeRate.eq(0)) {
+      return new BigNumber('0')
+    }
     const oneUnderlyingInCToken = divisor.div(exchangeRate)
     const amountCTokens = userInputTokenAmount.times(oneUnderlyingInCToken)
     const amountCTokensBoundToPrecision = roundNumberStringToSignificantDigits(
@@ -96,9 +102,15 @@ class CompoundService {
   }
 
   static encodeMintTokens = (tokenSymbol: string, amountWei: string): string => {
-    const tokenABI = CompoundService.getABI(tokenSymbol)
-    const mintInterface = new utils.Interface(tokenABI)
-    return mintInterface.functions.mint.encode([amountWei])
+    if (tokenSymbol.toLowerCase() === 'ceth') {
+      const tokenABI = CompoundService.getABI(tokenSymbol)
+      const mintInterface = new utils.Interface(tokenABI)
+      return mintInterface.functions.mint.encode([])
+    } else {
+      const tokenABI = CompoundService.getABI(tokenSymbol)
+      const mintInterface = new utils.Interface(tokenABI)
+      return mintInterface.functions.mint.encode([amountWei])
+    }
   }
 
   static encodeRedeemTokens = (tokenSymbol: string, amountRedeem: string): string => {

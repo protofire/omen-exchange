@@ -395,6 +395,15 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     },
     order: 9,
   },
+  eth: {
+    symbol: 'ETH',
+    decimals: 18,
+    addresses: {
+      [networkIds.MAINNET]: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+      [networkIds.RINKEBY]: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+    },
+    order: 18,
+  },
 }
 
 const validNetworkId = (networkId: number): networkId is NetworkId => {
