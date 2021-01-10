@@ -6,7 +6,8 @@ import { roundNumberStringToSignificantDigits } from '../util/tools'
 import { Token } from '../util/types'
 
 import { cBATAbi, cDaiAbi, cETHAbi, cUSDCAbi, cUSDTAbi, cWBTCAbi } from './compound_abi'
-
+// use floor as rounding method
+Big.RM = 0
 const RoundingFactor = 10000
 
 class CompoundService {
@@ -55,7 +56,7 @@ class CompoundService {
     const amountUnderlyingTokens = userCTokenAmount.mul(oneCTokenInUnderlying)
     const amountUnderlyingTokensBoundToPrecision = roundNumberStringToSignificantDigits(
       amountUnderlyingTokens.toString(),
-      baseTokenDecimals - 2,
+      baseTokenDecimals - 4,
     )
     try {
       const underlyingBigNumber = parseUnits(amountUnderlyingTokensBoundToPrecision, baseTokenDecimals)

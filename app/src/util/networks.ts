@@ -258,7 +258,7 @@ export const getInfuraUrl = (networkId: number): string => {
 export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   cdai: {
     symbol: 'cDAI',
-    decimals: 18,
+    decimals: 8,
     addresses: {
       [networkIds.MAINNET]: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
       [networkIds.RINKEBY]: '0x6d7f0754ffeb405d23c51ce938289d4835be3b14',
@@ -267,7 +267,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
   cbat: {
     symbol: 'cBAT',
-    decimals: 18,
+    decimals: 8,
     addresses: {
       [networkIds.MAINNET]: '0x6c8c6b02e7b2be14d4fa6022dfd6d75921d90e4e',
       [networkIds.RINKEBY]: '0xebf1a11532b93a529b5bc942b4baa98647913002',
@@ -276,7 +276,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
   ceth: {
     symbol: 'cETH',
-    decimals: 18,
+    decimals: 8,
     addresses: {
       [networkIds.MAINNET]: '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5',
       [networkIds.RINKEBY]: '0xd6801a1dffcd0a410336ef88def4320d6df1883e',
@@ -285,7 +285,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
   cusdc: {
     symbol: 'cUSDC',
-    decimals: 6,
+    decimals: 8,
     addresses: {
       [networkIds.MAINNET]: '0x39aa39c021dfbae8fac545936693ac917d5e7563',
       [networkIds.RINKEBY]: '0x5b281a6dda0b271e91ae35de655ad301c976edb1',
@@ -294,7 +294,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
   cusdt: {
     symbol: 'cUSDT',
-    decimals: 6,
+    decimals: 8,
     addresses: {
       [networkIds.MAINNET]: '0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9',
       [networkIds.RINKEBY]: '0x2fb298bdbef468638ad6653ff8376575ea41e768',
@@ -309,6 +309,14 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
       [networkIds.RINKEBY]: '0x0014f450b8ae7708593f4a46f8fa6e5d50620f96',
     },
     order: 14,
+  },
+  cuni: {
+    symbol: 'cUNI',
+    decimals: 8,
+    addresses: {
+      [networkIds.MAINNET]: '0x35a18000230da775cac24873d00ff85bccded550',
+    },
+    order: 15,
   },
   dai: {
     symbol: 'DAI',

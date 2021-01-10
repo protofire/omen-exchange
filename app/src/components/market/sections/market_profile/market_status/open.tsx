@@ -1,5 +1,5 @@
-import { BigNumber, parseUnits } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import { BigNumber } from 'ethers/utils'
+import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -7,7 +7,7 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/con
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { CompoundService } from '../../../../../services/compound_service'
 import { getToken } from '../../../../../util/networks'
-import { formatBigNumber, getUnit, isDust } from '../../../../../util/tools'
+import { getBalancesInBaseToken, getUnit, isDust } from '../../../../../util/tools'
 import {
   BalanceItem,
   CompoundTokenType,
@@ -121,27 +121,41 @@ const Wrapper = (props: Props) => {
     scalarLow,
     totalPoolShares,
   } = marketMakerData
-  const [displayBalances, setDisplayBalances] = useState<BalanceItem[]>(balances)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
   const context = useConnectedWeb3Context()
-
+  const { account, library: provider, networkId } = context
+  const [compoundService, setCompoundService] = useState<CompoundService>(
+    new CompoundService(collateral.address, collateral.symbol, provider, account),
+  )
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
-  const getPricesInBaseCollateral = async (baseCollateral: Token) => {
-    const { account, library: provider } = context
-    const compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
-    await compoundService.init()
-    const baseTokenBalance = balances.map(function(bal) {
-      const cTokenPriceAmount = parseUnits(bal.currentPrice.toFixed(2), 8)
-      const baseTokenPrice = compoundService.calculateCTokenToBaseExchange(baseCollateral, cTokenPriceAmount)
-      return Object.assign({}, bal, {
-        currentPrice: formatBigNumber(baseTokenPrice, baseCollateral.decimals),
-      })
-    })
-    setDisplayCollateral(baseCollateral)
-    setDisplayBalances(baseTokenBalance)
+  useMemo(() => {
+    const getResult = async () => {
+      await compoundService.init()
+      setCompoundService(compoundService)
+    }
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      getResult()
+    }
+  }, [collateral.symbol]) // eslint-disable-line react-hooks/exhaustive-deps
+  const setCurrentDisplayCollateral = () => {
+    const getResult = async () => {
+      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
+      await compoundServiceObject.init()
+      setCompoundService(compoundServiceObject)
+      setCompoundService(compoundService)
+    }
+    // if collateral is a cToken then convert the collateral and balances to underlying token
+    const collateralSymbol = collateral.symbol.toLowerCase()
+    if (collateralSymbol in CompoundTokenType) {
+      const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
+      const baseCollateralToken = getToken(networkId, baseCollateralSymbol as KnownToken)
+      setDisplayCollateral(baseCollateralToken)
+      getResult()
+    } else {
+      setDisplayCollateral(collateral)
+    }
   }
-
   useEffect(() => {
     const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
     const maxTimeDifference = 86400000
@@ -152,24 +166,17 @@ const Wrapper = (props: Props) => {
       fetchGraphMarketMakerData()
       setCurrentTab(MarketDetailsTab.finalize)
     }
+    setCurrentDisplayCollateral()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
-    // if collateral is a cToken then convert the collateral and balances to underlying token
-    let baseCollateral = collateral
-    const collateralSymbol = collateral.symbol.toLowerCase()
-    if (collateralSymbol in CompoundTokenType) {
-      const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
-      const baseCollateralToken = getToken(context.networkId, baseCollateralSymbol as KnownToken)
-      baseCollateral = baseCollateralToken
-      getPricesInBaseCollateral(baseCollateral)
-    } else {
-      setDisplayCollateral(collateral)
-      setDisplayBalances(balances)
-    }
-  }, [collateral.symbol, balances]) // eslint-disable-line react-hooks/exhaustive-deps
-
+    setCurrentDisplayCollateral()
+  }, [collateral.symbol]) // eslint-disable-line react-hooks/exhaustive-deps
+  let displayBalances = balances
+  if (collateral.address !== displayCollateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
+    displayBalances = getBalancesInBaseToken(balances, compoundService, displayCollateral)
+  }
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
     return shares && !isDust(shares, collateral.decimals)

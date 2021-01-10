@@ -348,16 +348,16 @@ class CPKService {
           value: marketData.funding,
         })
       } else if (useCompoundReserve && compoundTokenDetails) {
+        const encodedMintFunction = CompoundService.encodeMintTokens(
+          compoundTokenDetails.symbol,
+          marketData.funding.toString(),
+        )
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
           // If user chosen collateral is ETH
           collateral = marketData.collateral
           if (!this.cpk.isSafeApp()) {
             txOptions.value = marketData.funding
           }
-          const encodedMintFunction = CompoundService.encodeMintTokens(
-            compoundTokenDetails.symbol,
-            marketData.funding.toString(),
-          )
           transactions.push({
             to: collateral.address,
             data: encodedMintFunction,
@@ -749,16 +749,24 @@ class CPKService {
             to: userInputCollateral.address,
             data: ERC20Service.encodeApproveUnlimited(collateralToken.address),
           })
-          // Mint ctokens from the underlying token
+          // Redeem underlying token from the ctoken
           transactions.push({
             to: collateralToken.address,
             data: encodedRedeemFunction,
           })
           // Transfer base token to the user
-          transactions.push({
-            to: userInputCollateral.address,
-            data: ERC20Service.encodeTransfer(account, minCollateralAmount),
-          })
+          if (userInputCollateral.address === pseudoNativeAssetAddress) {
+            // If user wants to withdraw ether then simply transfer the amount
+            transactions.push({
+              to: account,
+              value: minCollateralAmount.toString(),
+            })
+          } else {
+            transactions.push({
+              to: userInputCollateral.address,
+              data: ERC20Service.encodeTransfer(account, minCollateralAmount),
+            })
+          }
         } else {
           // Step 4: Transfer funding to user
           transactions.push({
@@ -849,12 +857,14 @@ class CPKService {
         // Step 4: Transfer funding from user
         if (useBaseToken) {
           // If use base token then transfer the base token amount from the user
-          transactions.push({
-            to: userInputCollateral.address,
-            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
-          })
+          if (collateral.address !== pseudoNativeAssetAddress) {
+            transactions.push({
+              to: userInputCollateral.address,
+              data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+            })
+          }
         } else {
-          // If use collateral token then transfer the collateral token amount from the suer
+          // If use collateral token then transfer the collateral token amount from the user
           transactions.push({
             to: collateral.address,
             data: ERC20Service.encodeTransferFrom(account, this.cpk.address, minCollateralAmount),
@@ -865,17 +875,25 @@ class CPKService {
         // get base token
         const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, amount.toString())
         // Approve cToken for the cpk contract
-        transactions.push({
-          to: userInputCollateral.address,
-          data: ERC20Service.encodeApproveUnlimited(collateral.address),
-        })
-        // Mint ctokens from the underlying token
-        transactions.push({
-          to: collateral.address,
-          data: encodedMintFunction,
-        })
+        if (userInputCollateral.address === pseudoNativeAssetAddress) {
+          txOptions.value = amount
+          transactions.push({
+            to: collateral.address,
+            data: encodedMintFunction,
+            value: amount,
+          })
+        } else {
+          transactions.push({
+            to: userInputCollateral.address,
+            data: ERC20Service.encodeApproveUnlimited(collateral.address),
+          })
+          // Mint ctokens from the underlying token
+          transactions.push({
+            to: collateral.address,
+            data: encodedMintFunction,
+          })
+        }
       }
-
       // Step 3: Add funding to market
       transactions.push({
         to: marketMaker.address,
@@ -907,7 +925,7 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
-
+      const transactions = []
       const removeFundingTx = {
         to: marketMaker.address,
         data: MarketMakerService.encodeRemoveFunding(sharesToBurn),
@@ -922,50 +940,59 @@ class CPKService {
           amountToMerge,
         ),
       }
-
-      const transactions = [removeFundingTx, mergePositionsTx]
+      transactions.push(removeFundingTx)
+      transactions.push(mergePositionsTx)
 
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp()) {
         txOptions.gas = 500000
       }
-
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+      const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+      const collateralSymbol = collateralToken.symbol.toLowerCase()
+      let userInputCollateral = collateralToken
+      const totalAmountEarned = amountToMerge.add(earnings)
+      // transfer to the user the merged collateral plus the earned fees
+      if (useBaseToken && compoundService != null) {
+        const userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
+        userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+        // Convert cpk token to base token if user wants to redeem in base
+        const encodedRedeemFunction = CompoundService.encodeRedeemTokens(collateralSymbol, totalAmountEarned.toString())
+        // Approve cToken for the cpk contract
+        transactions.push({
+          to: userInputCollateral.address,
+          data: ERC20Service.encodeApproveUnlimited(collateralToken.address),
+        })
+        // redeeem underlying token from the ctoken token
+        transactions.push({
+          to: collateralToken.address,
+          data: encodedRedeemFunction,
+        })
+      }
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
         const totalAmountEarned = amountToMerge.add(earnings)
         // transfer to the user the merged collateral plus the earned fees
         if (useBaseToken && compoundService != null) {
-          const network = await this.provider.getNetwork()
-          const networkId = network.chainId
-          const collateralToken = getTokenFromAddress(networkId, collateralAddress)
-          const collateralSymbol = collateralToken.symbol.toLowerCase()
-          const userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
-          const userInputCollateral = getToken(networkId, userInputCollateralSymbol)
           const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(
             userInputCollateral,
             totalAmountEarned,
           )
-          // Convert cpk token to base token if user wants to redeem in base
-          const encodedRedeemFunction = CompoundService.encodeRedeemTokens(
-            collateralSymbol,
-            totalAmountEarned.toString(),
-          )
-          // Approve cToken for the cpk contract
-          transactions.push({
-            to: userInputCollateral.address,
-            data: ERC20Service.encodeApproveUnlimited(collateralToken.address),
-          })
-          // Mint ctokens from the underlying token
-          transactions.push({
-            to: collateralToken.address,
-            data: encodedRedeemFunction,
-          })
-          // Transfer base token to the user
-          transactions.push({
-            to: userInputCollateral.address,
-            data: ERC20Service.encodeTransfer(account, minCollateralAmount),
-          })
+          if (userInputCollateral.address === pseudoNativeAssetAddress) {
+            // If user wants to redeem in ether simply transfer the funds back to user
+            transactions.push({
+              to: account,
+              value: minCollateralAmount.toString(),
+            })
+          } else {
+            // Transfer base token to the user
+            transactions.push({
+              to: userInputCollateral.address,
+              data: ERC20Service.encodeTransfer(account, minCollateralAmount),
+            })
+          }
         } else {
           transactions.push({
             to: collateralAddress,

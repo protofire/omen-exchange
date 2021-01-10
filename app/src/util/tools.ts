@@ -9,9 +9,10 @@ import {
   REALITIO_SCALAR_ADAPTER_ADDRESS_SOKOL,
   REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI,
 } from '../common/constants'
+import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
-import { CompoundEnabledTokenType } from './types'
+import { BalanceItem, CompoundEnabledTokenType, Token } from './types'
 
 const logger = getLogger('Tools')
 
@@ -260,7 +261,7 @@ export const getCTokenForToken = (token: string): string => {
 }
 
 /**
- *
+ * Gets base token symbol for a given ctoken
  */
 export const getBaseTokenForCToken = (token: string): string => {
   const tokenSymbol = token.toLowerCase()
@@ -269,6 +270,29 @@ export const getBaseTokenForCToken = (token: string): string => {
   }
   return ''
 }
+/**
+ * Calculates balances in base token for a given c token
+ */
+export const getBalancesInBaseToken = (
+  balances: BalanceItem[],
+  compoundService: CompoundService,
+  displayCollateral: Token,
+): BalanceItem[] => {
+  const displayBalances = balances.map(function(bal) {
+    const cTokenPrecision = 8
+    const cTokenWithPrecision = roundNumberStringToSignificantDigits(bal.currentPrice.toString(), cTokenPrecision - 2)
+    const cTokenPriceAmount = parseUnits(cTokenWithPrecision, cTokenPrecision)
+    let baseTokenPrice = compoundService.calculateCTokenToBaseExchange(displayCollateral, cTokenPriceAmount)
+    baseTokenPrice = baseTokenPrice.mul(100000)
+    const basePrice = formatBigNumber(baseTokenPrice, displayCollateral.decimals)
+    const basePriceActual = Number(basePrice) / 100000
+    return Object.assign({}, bal, {
+      currentPrice: basePriceActual,
+    })
+  })
+  return displayBalances
+}
+
 /**
  * Compute the number of outcomes that will be sent to the user by the Market Maker
  * after funding it for the first time with `addedFunds` of collateral.
