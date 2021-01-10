@@ -2,10 +2,12 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 
 import { DOCUMENT_TITLE } from '../../../../common/constants'
+import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { isScalarMarket } from '../../../../util/tools'
 import { MarketMakerData } from '../../../../util/types'
 import { SectionTitle, TextAlign } from '../../../common/text/section_title'
 
-import { ClosedMarketDetail } from './market_status/closed'
+import { ClosedMarketDetails } from './market_status/closed'
 import { OpenMarketDetails } from './market_status/open'
 
 interface Props {
@@ -17,10 +19,18 @@ interface Props {
 const MarketView: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
 
-  const { isQuestionFinalized, question } = marketMakerData
+  const { isQuestionFinalized, oracle, question } = marketMakerData
+
+  const context = useConnectedWeb3Context()
 
   const renderView = () => {
-    return isQuestionFinalized ? <ClosedMarketDetail {...props} /> : <OpenMarketDetails {...props} />
+    const isScalar = isScalarMarket(oracle || '', context.networkId || 0)
+
+    if (isQuestionFinalized) {
+      return <ClosedMarketDetails isScalar={isScalar} {...props} />
+    } else {
+      return <OpenMarketDetails isScalar={isScalar} {...props} />
+    }
   }
 
   return (

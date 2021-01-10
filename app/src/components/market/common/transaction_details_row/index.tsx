@@ -2,6 +2,7 @@ import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
 import { IconInfo } from '../../../common/tooltip/img/IconInfo'
+import { Circle } from '../../common/common_styled'
 
 export enum ValueStates {
   error,
@@ -30,28 +31,6 @@ const Title = styled.h4`
   opacity: 0.9;
   display: flex;
   align-items: center;
-`
-
-const Circle = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: 8px;
-  border-radius: 50%;
-  border: 1px solid ${props => props.theme.colors.tertiary};
-  transition: border-color 0.15s linear;
-
-  path {
-    transition: fill 0.15s linear;
-    fill: ${props => props.theme.colors.textColorLightish};
-  }
-
-  &:hover {
-    border-color: ${props => props.theme.colors.tertiaryDark};
-    path {
-      fill: ${props => props.theme.colors.textColorDark};
-    }
-  }
 `
 
 const Value = styled.p<{ state: ValueStates; emphasizeValue?: boolean }>`
