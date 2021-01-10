@@ -2,10 +2,10 @@ import Big from 'big.js'
 import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber, formatUnits, parseUnits } from 'ethers/utils'
 
+import { cBATAbi, cDaiAbi, cETHAbi, cUNIAbi, cUSDCAbi, cUSDTAbi, cWBTCAbi } from '../abi/compound_abi'
 import { roundNumberStringToSignificantDigits } from '../util/tools'
 import { Token } from '../util/types'
 
-import { cBATAbi, cDaiAbi, cETHAbi, cUSDCAbi, cUSDTAbi, cWBTCAbi } from './compound_abi'
 // use floor as rounding method
 Big.RM = 0
 const RoundingFactor = 10000
@@ -34,10 +34,10 @@ class CompoundService {
 
   calculateSupplyRateAPY = async (): Promise<number> => {
     const supplyRate: number = await this.contract.supplyRatePerBlock()
-    const ethMantissa = 1e18
+    const supplyMantissa = 1e18
     const blocksPerDay = 4 * 60 * 24
     const daysPerYear = 365
-    const supplyApy = (Math.pow((supplyRate / ethMantissa) * blocksPerDay + 1, daysPerYear - 1) - 1) * 100
+    const supplyApy = (Math.pow((supplyRate / supplyMantissa) * blocksPerDay + 1, daysPerYear - 1) - 1) * 100
     return supplyApy
   }
 
@@ -137,6 +137,8 @@ class CompoundService {
         return cETHAbi
       case 'cbat':
         return cBATAbi
+      case 'cuni':
+        return cUNIAbi
       case 'cusdt':
         return cUSDTAbi
       case 'cusdc':

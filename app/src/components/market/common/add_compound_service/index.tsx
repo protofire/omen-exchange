@@ -26,13 +26,15 @@ const DescriptionWrapper = styled.div`
   display: flex;
 `
 
-const CheckService = styled.div`
+const CheckService = styled.div<{ isServiceChecked: boolean }>`
   width: 35px;
   height: 35px;
   margin-top: 3px;
   border-radius: 50%;
   text-align: center;
   border: 1px solid ${props => props.theme.colors.primary};
+  background-color: ${props =>
+    props.isServiceChecked ? props.theme.colors.mainBodyBackground : props.theme.colors.clickable};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -67,7 +69,7 @@ const ServiceCheckWrapper = styled.div`
 
 const Description = styled.div`
   color: ${props => props.theme.colors.textColorLightish};
-  font-size: 14px;
+  font-size: ${props => props.theme.textfield.fontSize};
   letter-spacing: 0.2px;
   line-height: 1.4;
   margin: 0 32px 0 0;
@@ -92,14 +94,8 @@ export interface AddCompoundServiceProps {
 export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: AddCompoundServiceProps) => {
   const { compoundInterestRate, currentToken, isServiceChecked, toggleServiceCheck } = props
   let serviceChecked = <IconTick />
-  let checkServiceStyle = {
-    backgroundColor: '#fff',
-  }
   if (!isServiceChecked) {
     serviceChecked = <span />
-    checkServiceStyle = {
-      backgroundColor: '#7986CB',
-    }
   }
   const cTokenSymbol = getCTokenForToken(currentToken)
 
@@ -120,7 +116,7 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
                 </TextBody>
               </ServiceTextWrapper>
               <ServiceCheckWrapper onClick={toggleServiceCheck}>
-                <CheckService style={checkServiceStyle}>{serviceChecked}</CheckService>
+                <CheckService isServiceChecked={isServiceChecked}>{serviceChecked}</CheckService>
               </ServiceCheckWrapper>
             </ServiceTokenDetails>
           </ServiceWrapper>

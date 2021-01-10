@@ -74,8 +74,8 @@ const CurrencyDropdownLabel = styled.div`
   display: inline-flex;
   padding-left: 14px;
   padding-top: 14px;
-  color: #37474f;
-  font-size: 14px;
+  color: ${({ theme }) => theme.colors.textColorDark};
+  font-size: ${({ theme }) => theme.textfield.fontSize};
   font-weight: 400;
   line-height: 16px;
 `

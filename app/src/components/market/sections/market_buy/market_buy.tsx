@@ -207,7 +207,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       return [tradedShares, probabilities, displayProbabilities, amountActual]
     },
-    [balances, marketMaker, outcomeIndex], // eslint-disable-line react-hooks/exhaustive-deps
+    [balances, marketMaker, outcomeIndex, collateral.address, collateral.symbol, compoundService, displayCollateral],
   )
   const [tradedShares, probabilities, displayProbabilities, debouncedAmount] = useAsyncDerivedValue(
     displayFundAmount || Zero,

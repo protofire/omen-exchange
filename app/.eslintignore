@@ -1,3 +1,3 @@
 src/serviceWorker.ts
-src/services/compound_abi.ts
+src/abi/compound_abi.ts
 *.d.ts
