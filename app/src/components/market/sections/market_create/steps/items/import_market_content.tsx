@@ -140,7 +140,7 @@ export const ImportMarketContent = (props: Props) => {
   const realitioBaseUrl = useRealityLink()
 
   const [state, setState] = useState<{ questionURL: string; loading: boolean }>({
-    questionURL: loadedQuestionId ? `${realitioBaseUrl}/app/#!/question/${loadedQuestionId}` : '',
+    questionURL: loadedQuestionId ? `${realitioBaseUrl}/#!/question/${loadedQuestionId}` : '',
     loading: false,
   })
 
@@ -397,7 +397,7 @@ export const ImportMarketContent = (props: Props) => {
               const { value } = event.target
               setQuestionURL(value.trim())
             }}
-            placeholder={`${realitioBaseUrl}/app/#!/...`}
+            placeholder={`${realitioBaseUrl}/#!/...`}
             type="text"
             value={state.questionURL}
           />
