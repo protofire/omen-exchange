@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 
-export const useRealityLink = (): 'https://reality.eth' | 'https://reality.eth.link' => {
+export const useRealityLink = (): string => {
   const [connected, setConnected] = useState<boolean>()
+  const [chainId, setChainId] = useState<Maybe<string>>(null)
   const windowObj: any = window
 
   useEffect(() => {
     const fetchUserAccounts = async () => {
       const account = await windowObj.ethereum.request({ method: 'eth_accounts' })
-      const chainId = windowObj.ethereum.chainId
+      setChainId(windowObj.ethereum.chainId)
 
       setConnected(account.length !== 0 && chainId === '0x1')
 
@@ -21,7 +22,16 @@ export const useRealityLink = (): 'https://reality.eth' | 'https://reality.eth.l
     if (windowObj.ethereum) {
       fetchUserAccounts()
     }
-  }, [windowObj.ethereum])
+  }, [windowObj.ethereum, chainId])
 
-  return connected ? 'https://reality.eth' : 'https://reality.eth.link'
+  let realityLink
+  if (chainId === '0x64' || chainId === '0x4d') {
+    realityLink = 'https://realitio.github.io'
+  } else if (connected) {
+    realityLink = 'https://reality.eth/app'
+  } else {
+    realityLink = 'https://reality.eth.link/app'
+  }
+
+  return realityLink
 }
