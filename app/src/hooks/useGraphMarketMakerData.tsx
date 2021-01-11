@@ -20,9 +20,11 @@ const query = gql`
       fee
       collateralVolume
       outcomeTokenAmounts
+      outcomeTokenMarginalPrices
       condition {
         id
         payouts
+        oracle
       }
       templateId
       title
@@ -62,6 +64,8 @@ const query = gql`
         id
         status
       }
+      scalarLow
+      scalarHigh
     }
   }
 `
@@ -76,6 +80,7 @@ type GraphResponseFixedProductMarketMaker = {
   condition: {
     id: string
     payouts: Maybe<string[]>
+    oracle: string
   }
   creator: string
   currentAnswer: string
@@ -86,6 +91,7 @@ type GraphResponseFixedProductMarketMaker = {
   creationTimestamp: string
   openingTimestamp: string
   outcomeTokenAmounts: string[]
+  outcomeTokenMarginalPrices: string[]
   outcomes: Maybe<string[]>
   isPendingArbitration: boolean
   arbitrationOccurred: boolean
@@ -109,6 +115,8 @@ type GraphResponseFixedProductMarketMaker = {
   curatedByDxDao: boolean
   curatedByDxDaoOrKleros: boolean
   submissionIDs: KlerosSubmission[]
+  scalarLow: Maybe<string>
+  scalarHigh: Maybe<string>
 }
 
 type GraphResponse = {
@@ -134,6 +142,10 @@ export type GraphMarketMakerData = {
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
   submissionIDs: KlerosSubmission[]
+  oracle: string
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
+  outcomeTokenMarginalPrices: string[]
 }
 
 type Result = {
@@ -185,6 +197,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     dailyVolume: bigNumberify(data.runningDailyVolume),
     conditionId: data.condition.id,
     payouts: data.condition.payouts ? data.condition.payouts.map(payout => new Big(payout)) : null,
+    oracle: data.condition.oracle,
     fee: bigNumberify(data.fee),
     scaledLiquidityParameter: parseFloat(data.scaledLiquidityParameter),
     runningDailyVolumeByHour: data.runningDailyVolumeByHour,
@@ -208,6 +221,9 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     klerosTCRregistered: data.klerosTCRregistered,
     curatedByDxDaoOrKleros: data.curatedByDxDaoOrKleros,
     submissionIDs: data.submissionIDs,
+    scalarLow: data.scalarLow ? bigNumberify(data.scalarLow || 0) : null,
+    scalarHigh: data.scalarHigh ? bigNumberify(data.scalarHigh || 0) : null,
+    outcomeTokenMarginalPrices: data.outcomeTokenMarginalPrices,
   }
 }
 
