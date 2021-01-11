@@ -59,7 +59,7 @@ export const DisplayResolution: React.FC<Props> = (props: Props) => {
   const abbr = moment.tz(tzName).zoneAbbr()
   const formatting = `MMMM Do YYYY - HH:mm:ss [${abbr}]`
 
-  const realitioUrl = questionId ? `${realitioBaseUrl}/app/#!/question/${questionId}` : `${realitioBaseUrl}/`
+  const realitioUrl = questionId ? `${realitioBaseUrl}/#!/question/${questionId}` : `${realitioBaseUrl}/`
 
   return (
     <Wrapper {...restProps}>
