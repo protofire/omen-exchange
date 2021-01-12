@@ -194,7 +194,7 @@ const Wrapper = (props: Props) => {
     <Button
       buttonType={ButtonType.secondaryLine}
       onClick={() => {
-        window.open(`${realitioBaseUrl}/app/#!/question/${question.id}`)
+        window.open(`${realitioBaseUrl}/#!/question/${question.id}`)
       }}
     >
       Answer on Reality.eth
@@ -206,7 +206,7 @@ const Wrapper = (props: Props) => {
       <Button
         buttonType={ButtonType.secondaryLine}
         onClick={() => {
-          window.open(`${realitioBaseUrl}/app/#!/question/${question.id}`)
+          window.open(`${realitioBaseUrl}/#!/question/${question.id}`)
         }}
       >
         Call Arbitrator
