@@ -53,13 +53,6 @@ export const PositionTable = (props: Props) => {
 
   const TableCellsAlign = ['left', 'right', 'right']
 
-  if (
-    isDust(shortShares || new BigNumber(0), collateral.decimals) &&
-    isDust(longShares || new BigNumber(0), collateral.decimals)
-  ) {
-    return <></>
-  }
-
   const renderTableHeader = () => {
     return (
       <THead>

@@ -469,7 +469,14 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       (!isDust(shortShares || new BigNumber(0), collateral.decimals) ||
         !isDust(longShares || new BigNumber(0), collateral.decimals)))
 
-  const isPositionTableDisabled = !positionTable || status !== Status.Ready || !trades || !balances || !collateral
+  const isPositionTableDisabled =
+    !positionTable ||
+    status !== Status.Ready ||
+    !trades ||
+    !balances ||
+    !collateral ||
+    (isDust(shortShares || new BigNumber(0), collateral.decimals) &&
+      isDust(longShares || new BigNumber(0), collateral.decimals))
 
   return (
     <>
