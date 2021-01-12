@@ -307,11 +307,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     upperBound,
   } = props
 
-  const decimals = 18
-
-  const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, decimals))
-  const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, decimals))
-  const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), decimals))
+  const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, 18))
+  const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, 18))
+  const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), 18))
 
   const currentPredictionNumber = Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
   const newPredictionNumber = Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
@@ -490,7 +488,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             {` ${unit}`}
           </ScaleTitle>
           <ScaleTitle>
-            {upperBound && formatBigNumber(upperBound, decimals)} {unit}
+            {upperBound && formatBigNumber(upperBound, 18)} {unit}
           </ScaleTitle>
         </ScaleTitleWrapper>
         <Scale>
