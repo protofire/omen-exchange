@@ -250,8 +250,6 @@ export const ScalarMarketBuy = (props: Props) => {
         long={activeTab === Tabs.long}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
-        potentialLoss={debouncedAmount}
-        potentialProfit={potentialProfit}
         short={activeTab === Tabs.short}
         startingPointTitle={'Current prediction'}
         unit={getUnit(question.title)}

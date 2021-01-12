@@ -288,7 +288,6 @@ const Wrapper = (props: Props) => {
               <>
                 <MarketScale
                   balances={balances}
-                  borderBottom={false}
                   borderTop={true}
                   collateral={collateral}
                   currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}

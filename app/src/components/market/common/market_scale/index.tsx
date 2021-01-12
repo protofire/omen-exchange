@@ -271,13 +271,10 @@ interface Props {
   upperBound: BigNumber
   startingPointTitle: string
   currentPrediction?: Maybe<string>
-  borderBottom?: boolean
   borderTop?: boolean
   newPrediction?: Maybe<number>
   long?: Maybe<boolean>
   short?: Maybe<boolean>
-  potentialLoss?: Maybe<BigNumber>
-  potentialProfit?: Maybe<BigNumber>
   collateral?: Maybe<Token>
   amount?: Maybe<BigNumber>
   positionTable?: Maybe<boolean>
@@ -293,7 +290,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     amount,
     amountShares,
     balances,
-    borderBottom,
     borderTop,
     collateral,
     currentPrediction,
@@ -302,8 +298,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     lowerBound,
     newPrediction,
     positionTable,
-    potentialLoss,
-    potentialProfit,
     short,
     startingPoint,
     startingPointTitle,
@@ -490,9 +484,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       (!isDust(shortShares || new BigNumber(0), collateral.decimals) ||
         !isDust(longShares || new BigNumber(0), collateral.decimals)))
 
+  const isPositionTableDisabled = !positionTable || status !== Status.Ready || !trades || !balances || !collateral
+
   return (
     <>
-      <ScaleWrapper borderBottom={borderBottom} borderTop={borderTop}>
+      <ScaleWrapper borderBottom={isPositionTableDisabled} borderTop={borderTop}>
         <ScaleTitleWrapper>
           <ScaleTitle>
             {formatNumber(lowerBoundNumber.toString())} {unit}
@@ -650,7 +646,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           </ValueBoxes>
         )}
       </ScaleWrapper>
-      {positionTable && status === Status.Ready && trades && balances && collateral && (
+      {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable
           balances={balances}
           collateral={collateral}
