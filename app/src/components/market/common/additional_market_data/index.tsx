@@ -185,10 +185,14 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         </AdditionalMarketDataSectionWrapper>
         {collateral.symbol.toLowerCase() in CompoundTokenType ? (
           <AdditionalMarketDataSectionWrapper
+            data-arrow-color="transparent"
+            data-for="marketData"
             data-tip={`This market is earning ${compoundInterestRate}% APY powered by compound.finance`}
           >
             <CompoundIconNoBorder />
-            <CompoundInterestWrapper>{compoundInterestRate}% APY</CompoundInterestWrapper>
+            <AdditionalMarketDataSectionTitle>
+              <CompoundInterestWrapper>{compoundInterestRate}% APY</CompoundInterestWrapper>
+            </AdditionalMarketDataSectionTitle>
           </AdditionalMarketDataSectionWrapper>
         ) : (
           <span />

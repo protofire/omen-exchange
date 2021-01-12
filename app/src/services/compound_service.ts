@@ -54,16 +54,20 @@ class CompoundService {
     const exp = bigTen.pow(mantissa)
     const oneCTokenInUnderlying = exchangeRate.div(exp)
     const amountUnderlyingTokens = userCTokenAmount.mul(oneCTokenInUnderlying)
-    const amountUnderlyingTokensBoundToPrecision = roundNumberStringToSignificantDigits(
+    let amountUnderlyingTokensBoundToPrecision = roundNumberStringToSignificantDigits(
       amountUnderlyingTokens.toString(),
-      baseTokenDecimals - 4,
+      4,
     )
     try {
       const underlyingBigNumber = parseUnits(amountUnderlyingTokensBoundToPrecision, baseTokenDecimals)
       return underlyingBigNumber
     } catch (e) {
       const amountUnderlyingTokensNumber = Number(amountUnderlyingTokensBoundToPrecision) * RoundingFactor
-      let underlyingBigNumber = parseUnits(amountUnderlyingTokensNumber.toString(), baseTokenDecimals)
+      amountUnderlyingTokensBoundToPrecision = roundNumberStringToSignificantDigits(
+        amountUnderlyingTokensNumber.toString(),
+        4,
+      )
+      let underlyingBigNumber = parseUnits(amountUnderlyingTokensBoundToPrecision.toString(), baseTokenDecimals)
       underlyingBigNumber = underlyingBigNumber.div(RoundingFactor)
       return underlyingBigNumber
     }
@@ -82,10 +86,7 @@ class CompoundService {
     }
     const oneUnderlyingInCToken = divisor.div(exchangeRate)
     const amountCTokens = userInputTokenAmount.times(oneUnderlyingInCToken)
-    const amountCTokensBoundToPrecision = roundNumberStringToSignificantDigits(
-      amountCTokens.toString(),
-      cTokenDecimals - 2,
-    )
+    const amountCTokensBoundToPrecision = roundNumberStringToSignificantDigits(amountCTokens.toString(), 4)
     try {
       const amountCTokenBigNumber = parseUnits(amountCTokensBoundToPrecision, cTokenDecimals)
       return amountCTokenBigNumber

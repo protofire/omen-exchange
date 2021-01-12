@@ -370,6 +370,11 @@ class CPKService {
             compoundTokenDetails.symbol,
             marketData.funding.toString(),
           )
+          // Transfer user input collateral to cpk
+          transactions.push({
+            to: userInputCollateral.address,
+            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
+          })
           // Approve cToken for the cpk contract
           transactions.push({
             to: userInputCollateral.address,
@@ -447,7 +452,7 @@ class CPKService {
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp() && marketData.collateral.address !== pseudoNativeAssetAddress) {
         // If we are using compound reserve then we don't need to transfer
-        // since we have already minted
+        // since we have already transferred and minted
         if (!useCompoundReserve) {
           transactions.push({
             to: collateral.address,

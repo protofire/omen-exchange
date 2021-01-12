@@ -32,12 +32,17 @@ const CheckService = styled.div<{ isServiceChecked: boolean }>`
   margin-top: 3px;
   border-radius: 50%;
   text-align: center;
-  border: 1px solid ${props => props.theme.colors.primary};
+  border: 1px solid
+    ${props => (props.isServiceChecked ? props.theme.colors.primary : props.theme.textfield.transparent)};
   background-color: ${props =>
     props.isServiceChecked ? props.theme.colors.clickable : props.theme.colors.mainBodyBackground};
   display: flex;
   align-items: center;
   justify-content: center;
+  path {
+    fill: ${props =>
+      props.isServiceChecked ? props.theme.colors.mainBodyBackground : props.theme.textfield.textColorDark};
+  }
 `
 
 const ServiceWrapper = styled.div`
@@ -67,12 +72,12 @@ const ServiceCheckWrapper = styled.div`
   width: 10%;
 `
 
-const Description = styled.div`
+const CompoundServiceDescription = styled.div`
   color: ${props => props.theme.colors.textColorLightish};
   font-size: ${props => props.theme.textfield.fontSize};
   letter-spacing: 0.2px;
   line-height: 1.4;
-  margin: 0 32px 0 0;
+  margin: 0;
   width: 100%;
 `
 
@@ -81,8 +86,31 @@ const ServiceTokenDetails = styled.div`
   display: flex;
 `
 
-const TextHeading = 'div'
-const TextBody = 'div'
+const TextHeading = styled.div`
+  color: ${props => props.theme.colors.textColorDark};
+  width: 71px;
+  height: 16px;
+  left: 54px;
+  top: calc(50% - 16px / 2 - 11px);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.2px;
+  margin: 0px 6px;
+`
+
+const TextBody = styled.div`
+  line-height: 16px;
+  font-size: 14px;
+  height: 16px;
+  margin: 6px 6px 0px 6px;
+`
+
+const TextBodyMarker = styled.span`
+  color: ${props => props.theme.colors.compound};
+`
 
 export interface AddCompoundServiceProps {
   isServiceChecked: boolean
@@ -103,7 +131,7 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
     <Wrapper>
       <Title>Recommended Service</Title>
       <DescriptionWrapper>
-        <Description>
+        <CompoundServiceDescription>
           <ServiceWrapper>
             <ServiceIconWrapper>
               <CompoundIcon />
@@ -112,7 +140,8 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
               <ServiceTextWrapper>
                 <TextHeading>Compound</TextHeading>
                 <TextBody>
-                  Convert {currentToken} to {cTokenSymbol} to earn {compoundInterestRate}% interest
+                  Convert {currentToken} to {cTokenSymbol}
+                  <TextBodyMarker> and earn {compoundInterestRate}% APY</TextBodyMarker>
                 </TextBody>
               </ServiceTextWrapper>
               <ServiceCheckWrapper onClick={toggleServiceCheck}>
@@ -120,7 +149,7 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
               </ServiceCheckWrapper>
             </ServiceTokenDetails>
           </ServiceWrapper>
-        </Description>
+        </CompoundServiceDescription>
       </DescriptionWrapper>
     </Wrapper>
   )
