@@ -70,10 +70,9 @@ export const PositionTable = (props: Props) => {
     PositionTableValue.YourPosition,
     PositionTableValue.Shares,
     PositionTableValue.Payout,
-    PositionTableValue.ProfitLoss,
   ]
 
-  const TableCellsAlign = ['left', 'right', 'right', 'right']
+  const TableCellsAlign = ['left', 'right', 'right']
 
   if (
     (!shortTrades.length || isDust(shortShares || new BigNumber(0), collateral.decimals)) &&
@@ -122,16 +121,6 @@ export const PositionTable = (props: Props) => {
         </ColoredTDStyled>
         <ColoredTDStyled textAlign={TableCellsAlign[2]}>
           {index === 0 ? formatNumber(shortPayout.toString()) : formatNumber(longPayout.toString())}
-        </ColoredTDStyled>
-        <ColoredTDStyled
-          positive={index === 0 ? positiveShortProfit : positiveLongProfit}
-          textAlign={TableCellsAlign[3]}
-        >
-          {index === 0 ? formatNumber(shortProfitLoss.toString()) : formatNumber(longProfitLoss.toString())}(
-          {index === 0
-            ? formatNumber(shortProfitLossPercentage.toString())
-            : formatNumber(longProfitLossPercentage.toString())}
-          %)
         </ColoredTDStyled>
       </TR>
     )
