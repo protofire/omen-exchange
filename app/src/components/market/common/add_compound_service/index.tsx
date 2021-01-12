@@ -34,7 +34,7 @@ const CheckService = styled.div<{ isServiceChecked: boolean }>`
   text-align: center;
   border: 1px solid ${props => props.theme.colors.primary};
   background-color: ${props =>
-    props.isServiceChecked ? props.theme.colors.mainBodyBackground : props.theme.colors.clickable};
+    props.isServiceChecked ? props.theme.colors.clickable : props.theme.colors.mainBodyBackground};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,9 +93,9 @@ export interface AddCompoundServiceProps {
 
 export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: AddCompoundServiceProps) => {
   const { compoundInterestRate, currentToken, isServiceChecked, toggleServiceCheck } = props
-  let serviceChecked = <IconTick />
+  let serviceChecked = <IconTick selected={true} />
   if (!isServiceChecked) {
-    serviceChecked = <span />
+    serviceChecked = <IconTick selected={false} />
   }
   const cTokenSymbol = getCTokenForToken(currentToken)
 
