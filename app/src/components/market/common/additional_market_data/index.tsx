@@ -103,7 +103,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
 
   const realitioBaseUrl = useRealityLink()
 
-  const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
+  const realitioUrl = id ? `${realitioBaseUrl}/#!/question/${id}` : `${realitioBaseUrl}/`
 
   submissionIDs.sort((s1, s2) => {
     if (s1.status === KlerosItemStatus.Registered) return -1
