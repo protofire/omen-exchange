@@ -24,9 +24,9 @@ const ConnectionStatusText = styled.span`
 `
 
 const ConnectionStatusDot = styled.div`
-  height: 20px;
+  height: 22px;
   margin-right: 5px;
-  width: 20px;
+  width: 22px;
 `
 
 export const Network: React.FC = props => {

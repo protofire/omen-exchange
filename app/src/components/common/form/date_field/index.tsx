@@ -11,6 +11,7 @@ interface Props {
   minDate?: any
   name: string
   onChange: any
+  placeholder?: string
   selected?: any
 }
 
@@ -31,14 +32,14 @@ const DateFieldWrapper = styled.div<{ disabled?: boolean }>`
 
       input {
         background-color: #fff;
-        border-radius: 32px;
+        border-radius: 8px;
         border: 1px solid ${props => props.theme.buttonSecondaryLine.borderColor};
         box-shadow: none;
         color: ${props => props.theme.colors.textColorDark};
         cursor: pointer;
         display: block;
         font-size: 14px;
-        height: 36px;
+        height: 40px;
         letter-spacing: 0.2px;
         line-height: 16px;
         outline: none;
@@ -105,7 +106,7 @@ const CalendarPortal = (props: CalendarPortalProps) => {
 }
 
 export const DateField = (props: Props) => {
-  const { disabled, minDate, name, onChange, selected, ...restProps } = props
+  const { disabled, minDate, name, onChange, placeholder, selected, ...restProps } = props
 
   const handleChange = (date: Maybe<Date>) => {
     onChange(date ? convertLocalToUTC(date) : date)
@@ -126,7 +127,7 @@ export const DateField = (props: Props) => {
         name={name}
         onChange={handleChange}
         onChangeRaw={handleChangeRaw}
-        placeholderText="Select Date"
+        placeholderText={placeholder || 'Select Date'}
         popperContainer={CalendarPortal}
         selected={convertUTCToLocal(selected)}
         showDisabledMonthNavigation

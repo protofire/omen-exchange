@@ -1,6 +1,7 @@
 const theme = {
   fonts: {
     defaultSize: '14px',
+    defaultLineHeight: '16px',
     fontFamily: `'Roboto', 'Helvetica Neue', 'Arial', 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', '-apple-system', 'BlinkMacSystemFont', sans-serif`,
     fontFamilyCode: `source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace`,
   },
@@ -54,12 +55,13 @@ const theme = {
     buttonBackgroundColorHover: '#fff',
     buttonBorderColor: '#DCDFF2',
     buttonBorderColorHover: '#C5CAE9',
+    buttonBorderColorActive: '#9FA8DA',
     buttonColor: '#37474F',
     buttonColorHover: '#37474F',
     dropdownItems: {
       backgroundColor: '#fff',
-      borderColor: '#ECEFF1',
-      borderRadius: '16px',
+      borderColor: '#E8EAF6',
+      borderRadius: '12px',
       boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.12)',
       item: {
         backgroundColor: 'transparent',
@@ -70,11 +72,21 @@ const theme = {
     },
   },
   buttonCircle: {
-    dimensions: '34px',
+    dimensions: '40px',
   },
+  buttonRound: {
+    borderRadius: '8px',
+    fontSize: '14px',
+    height: '40px',
+    lineHeight: '16px',
+    padding: '12px 17px',
+  },
+
   colors: {
     activeListItemBackground: '#fafafa',
     alert: '#E57373',
+    alertHover: '#EF5350',
+    borderColorDark: '#9FA8DA',
     darkGray: '#acacac',
     error: '#fa0000',
     gray: '#b7b7b7',
@@ -94,6 +106,7 @@ const theme = {
     textColorLightish: '#7D8189',
     verticalDivider: '#e8eaf6',
     clickable: '#7986CB',
+    red: '#E57373',
   },
   message: {
     colors: {
@@ -108,8 +121,8 @@ const theme = {
     border: '1px solid #EEE',
     borderRadius: '8px ',
     boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)',
-    paddingHorizontal: '25px',
-    paddingVertical: '25px',
+    paddingHorizontal: '24px',
+    paddingVertical: '20px',
     textColor: '#000',
     textColorSecondary: '#333',
     titleColor: '#000',
@@ -130,8 +143,10 @@ const theme = {
     xxxl: '1366px',
   },
   borders: {
+    tooltip: '#cfd8dc',
+    borderColor: '#ECEFF1',
     borderDisabled: '#E8EAF6',
-    borderColor: '#DCDFF2',
+    borderLineDisabled: '1px solid #E8EAF6',
     commonBorderRadius: '6px',
   },
   slider: {
@@ -146,22 +161,39 @@ const theme = {
     borderColor: '#DCDFF2',
     borderColorActive: '#9FA8DA',
     borderColorOnHover: '#C5CAE9',
-    borderRadius: '32px',
+    borderRadius: '8px',
     borderStyle: 'solid',
     borderWidth: '1px',
     color: '#37474F',
     fontSize: '14px',
     fontWeight: '500',
-    height: '36px',
+    height: '40px',
     outline: 'none',
-    paddingHorizontal: '25px',
-    paddingVertical: '10px',
+    paddingHorizontal: '20px',
+    paddingVertical: '12px',
     placeholderColor: '#86909E',
     placeholderFontSize: '14px',
     placeholderFontWeight: '400',
   },
   mainContainer: {
     maxWidth: '586px',
+  },
+  moreMenu: {
+    buttonBorder: '#DCDFF2',
+    buttonBorderHover: '#C5CAE9',
+    buttonBorderActive: '#9FA8DA',
+    boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.12)',
+    items: {
+      border: '#E8EAF6',
+      backgroundColor: '#FFF',
+    },
+    item: {
+      backgroundColor: 'transparent',
+      backgroundColorActive: '#F8F9FC',
+      backgroundColorHover: '#F8F9FC',
+      color: '#757575',
+      colorHover: '#37474F',
+    },
   },
   form: {
     common: {
@@ -341,6 +373,17 @@ const theme = {
     finalizing: '#9575CD',
     arbitration: '#BA68C8',
     closed: '#BA68C8',
+  },
+  scale: {
+    bar: '#e8eaf6',
+    box: '#e8eaf6',
+    ballBorder: '#7986cb',
+    ballBackground: '#fff',
+    border: '#E8EAF6',
+    positive: '#80CBC4',
+    negative: '#EF9A9A',
+    positiveText: '#4B9E98',
+    negativeText: '#EF5350',
   },
 }
 

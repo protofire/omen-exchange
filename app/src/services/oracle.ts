@@ -4,7 +4,7 @@ import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
-import { Question } from '../util/types'
+import { INVALID_ANSWER_ID, Question } from '../util/types'
 
 const logger = getLogger('Services::Oracle')
 
@@ -56,13 +56,13 @@ export class OracleService {
 
   static getPayouts = (templateId: number, realitioAnswer: string, numOutcomes: number): Big[] => {
     let payouts: Big[]
-    if (realitioAnswer === '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff') {
+    if (realitioAnswer === INVALID_ANSWER_ID) {
       payouts = [...Array(numOutcomes)].map(() => new Big(1))
     } else {
       const answer = new BigNumber(realitioAnswer).toNumber()
 
       if (templateId === 0 || templateId === 2) {
-        payouts = [...Array(numOutcomes)].map(() => new Big(1))
+        payouts = [...Array(numOutcomes)].map(() => new Big(0))
         payouts[answer] = new Big(1)
       } else if (templateId === 5 || templateId === 6) {
         payouts = [new Big(4 - answer), new Big(answer)]

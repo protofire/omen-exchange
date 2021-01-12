@@ -4,16 +4,23 @@ import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
-import { DOCUMENT_FAQ, MAX_MARKET_FEE } from '../../../../../../common/constants'
+import {
+  DEFAULT_TOKEN_ADDRESS,
+  DEFAULT_TOKEN_ADDRESS_RINKEBY,
+  DOCUMENT_FAQ,
+  MAX_MARKET_FEE,
+} from '../../../../../../common/constants'
 import {
   useCollateralBalance,
+  useConnectedCPKContext,
   useConnectedWeb3Context,
-  useCpk,
   useCpkAllowance,
-  useTokens,
+  useCpkProxy,
 } from '../../../../../../hooks'
+import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
+import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
@@ -25,8 +32,8 @@ import { TitleValue } from '../../../../../common/text/title_value'
 import { FullLoading } from '../../../../../loading'
 import {
   ButtonContainerFullWidth,
+  CurrenciesWrapper,
   GenericError,
-  LeftButton,
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
   OutcomeItemTextWrapper,
@@ -42,6 +49,7 @@ import { CreateCard } from '../../../../common/create_card'
 import { CurrencySelector } from '../../../../common/currency_selector'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
+import { MarketScale } from '../../../../common/market_scale'
 import { SetAllowance } from '../../../../common/set_allowance'
 import { TradingFeeSelector } from '../../../../common/trading_fee_selector'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
@@ -65,15 +73,19 @@ const SubsectionTitleStyled = styled(SubsectionTitle)`
   margin-bottom: 24px;
 `
 
+const LeftButton = styled(Button as any)`
+  margin-right: auto;
+`
+
 const SubTitle = styled.h3`
-  color: ${props => props.theme.colors.textColorDarker};
+  color: ${props => props.theme.colors.textColor};
   font-size: 14px;
   font-weight: normal;
   margin: 0 0 8px;
 `
 
 const QuestionText = styled.p`
-  color: ${props => props.theme.colors.textColor};
+  color: ${props => props.theme.colors.textColorDarker};
   font-size: 14px;
   font-weight: normal;
   margin: 0 0 24px;
@@ -93,17 +105,8 @@ const TitleValueVertical = styled(TitleValue)`
   }
 `
 
-const CurrenciesWrapper = styled.div`
-  padding: 0 0 20px 0;
-  width: 100%;
-`
-
 const GridTransactionDetailsWrapper = styled(GridTransactionDetails)<{ noMarginTop: boolean }>`
   ${props => (props.noMarginTop ? 'margin-top: 0;' : '')};
-`
-
-const ButtonCreate = styled(Button)`
-  font-weight: 400;
 `
 
 const CreateCardBottomRow = styled.div`
@@ -132,10 +135,16 @@ const CustomFeeWrapper = styled.div`
 const CustomFeeLabel = styled.p`
   width: 50%;
   margin: 0;
+  color: ${props => props.theme.colors.textColorDark};
+  font-size: 14px;
+  line-height: 16px;
 `
 
 const StyledTradingFeeSelector = styled(TradingFeeSelector)`
   width: 50%;
+  .dropdownItems {
+    min-width: auto;
+  }
 `
 
 const FlexRowWrapper = styled.div`
@@ -147,9 +156,16 @@ const FlexRowWrapper = styled.div`
   }
 `
 
+const StyledButtonContainerFullWidth = styled(ButtonContainerFullWidth as any)`
+  padding: 24px;
+  padding-bottom: 0;
+  margin: 0 -24px;
+  margin-bottom: -1px;
+`
+
 interface Props {
-  back: () => void
-  submit: () => void
+  back: (state: string) => void
+  submit: (isScalar: boolean) => void
   values: {
     collateral: Token
     question: string
@@ -161,17 +177,22 @@ interface Props {
     outcomes: Outcome[]
     loadedQuestionId: Maybe<string>
     verifyLabel?: string
+    lowerBound?: Maybe<BigNumber>
+    upperBound?: Maybe<BigNumber>
+    startingPoint?: Maybe<BigNumber>
+    unit?: string
   }
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
   handleTradingFeeChange: (fee: string) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
+  state: string
 }
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const cpk = useCpk()
+  const cpk = useConnectedCPKContext()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
   const { account, library: provider } = context
@@ -184,18 +205,53 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleTradingFeeChange,
     marketCreationStatus,
     resetTradingFee,
+    state,
     submit,
     values,
   } = props
-  const { arbitrator, category, collateral, funding, loadedQuestionId, outcomes, question, resolution, spread } = values
+  const {
+    arbitrator,
+    category,
+    collateral,
+    funding,
+    loadedQuestionId,
+    lowerBound,
+    outcomes,
+    question,
+    resolution,
+    spread,
+    startingPoint,
+    unit,
+    upperBound,
+  } = values
 
+  const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
+
+  const [currentToken, setCurrentToken] = useState({ tokenExists: false, symbol: '', marketAddress: '' })
+  useEffect(() => {
+    const selectedToken = markets.find(
+      ({ collateralToken }) =>
+        collateralToken === DEFAULT_TOKEN_ADDRESS_RINKEBY || collateralToken === DEFAULT_TOKEN_ADDRESS,
+    )
+    setCurrentToken({
+      tokenExists: selectedToken ? true : false,
+      symbol: 'DAI',
+      marketAddress: selectedToken ? selectedToken.id : '',
+    })
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const [amount, setAmount] = useState<BigNumber>(funding)
-
+  const [amountToDispaly, setAmountToDisplay] = useState<string>('')
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
+
+  const [upgradeFinished, setUpgradeFinished] = useState(false)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : false
 
   useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, collateral))
@@ -203,15 +259,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
   const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
-    formatBigNumber(collateralBalance, collateral.decimals),
+    formatBigNumber(collateralBalance, collateral.decimals, 5),
   )
-  const maybeCollateralBalance = useCollateralBalance(collateral, context)
+  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(collateral, context)
 
   const [isNegativeDepositAmount, setIsNegativeDepositAmount] = useState<boolean>(false)
 
   useEffect(() => {
     setCollateralBalance(maybeCollateralBalance || Zero)
-    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals))
+    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5))
     // eslint-disable-next-line
   }, [maybeCollateralBalance])
 
@@ -224,8 +280,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
-  const tokensAmount = useTokens(context).length
-
   const amountError =
     maybeCollateralBalance === null
       ? null
@@ -236,17 +290,34 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       : null
 
   const isCreateMarketbuttonDisabled =
-    !MarketCreationStatus.is.ready(marketCreationStatus) ||
-    MarketCreationStatus.is.error(marketCreationStatus) ||
+    MarketCreationStatus.is.creatingAMarket(marketCreationStatus) ||
+    MarketCreationStatus.is.done(marketCreationStatus) ||
+    currentToken.tokenExists ||
     !balance ||
     funding.isZero() ||
     !account ||
     amountError !== null ||
     exceedsMaxFee ||
-    isNegativeDepositAmount
+    isNegativeDepositAmount ||
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
 
   const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+    collateral.address !== pseudoNativeAssetAddress &&
+    !cpk?.cpk.isSafeApp() &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
+
+  const showUpgrade =
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+
+  const upgradeProxy = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await updateProxy()
+    setUpgradeFinished(true)
+  }
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -257,7 +328,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     setAllowanceFinished(true)
   }
 
-  const onCollateralChange = (token: Token) => {
+  const onCollateralChange = (token: Token | null) => {
+    if (!token) return
+    const tokenAddressFormatted = token.address.toLowerCase()
+    const selectedToken = markets.find(({ collateralToken }) => collateralToken === tokenAddressFormatted)
+    setCurrentToken({
+      tokenExists: selectedToken ? true : false,
+      symbol: token.symbol,
+      marketAddress: selectedToken ? selectedToken.id : '',
+    })
     handleCollateralChange(token)
     setAllowanceFinished(false)
   }
@@ -277,6 +356,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const handleAmountChange = (event: BigNumberInputReturn) => {
     setAmount(event.value)
+    setAmountToDisplay('')
     handleChange(event)
   }
 
@@ -286,50 +366,72 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       name: 'funding',
       value: collateralBalance,
     })
+    setAmountToDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
   }
 
   return (
     <>
       <CreateCardTop>
-        <SubsectionTitleStyled>Your {loadedQuestionId ? 'Imported' : 'Categorical'} Market</SubsectionTitleStyled>
+        <SubsectionTitleStyled>
+          Your {state.charAt(0).toUpperCase() + state.slice(1).toLowerCase()} Market
+        </SubsectionTitleStyled>
         <SubTitle>Question</SubTitle>
         <QuestionText>{question}</QuestionText>
-        <OutcomesTableWrapper borderBottom>
-          <OutcomesTable>
-            <OutcomesTHead>
-              <OutcomesTR>
-                <OutcomesTH style={{ width: '60%' }}>Outcome</OutcomesTH>
-                <OutcomesTH>Probability</OutcomesTH>
-              </OutcomesTR>
-            </OutcomesTHead>
-            <OutcomesTBody>
-              {outcomes.map((outcome, index) => {
-                return (
-                  <OutcomesTR key={index}>
-                    <OutcomesTD>
-                      <OutcomeItemTextWrapper>
-                        <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
-                        <OutcomeItemText>{outcome.name}</OutcomeItemText>
-                      </OutcomeItemTextWrapper>
-                    </OutcomesTD>
-                    <OutcomesTD>{outcome.probability.toFixed(2)}%</OutcomesTD>
-                  </OutcomesTR>
-                )
-              })}
-            </OutcomesTBody>
-          </OutcomesTable>
-        </OutcomesTableWrapper>
+        {state === 'SCALAR' && lowerBound && upperBound && startingPoint && unit ? (
+          <MarketScale
+            lowerBound={lowerBound}
+            startingPoint={startingPoint}
+            startingPointTitle={'Starting Point'}
+            unit={unit}
+            upperBound={upperBound}
+          />
+        ) : (
+          <OutcomesTableWrapper borderBottom>
+            <OutcomesTable>
+              <OutcomesTHead>
+                <OutcomesTR>
+                  <OutcomesTH style={{ width: '60%' }}>Outcome</OutcomesTH>
+                  <OutcomesTH>Probability</OutcomesTH>
+                </OutcomesTR>
+              </OutcomesTHead>
+              <OutcomesTBody>
+                {outcomes.map((outcome, index) => {
+                  return (
+                    <OutcomesTR key={index}>
+                      <OutcomesTD>
+                        <OutcomeItemTextWrapper>
+                          <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
+                          <OutcomeItemText>{outcome.name}</OutcomeItemText>
+                        </OutcomeItemTextWrapper>
+                      </OutcomesTD>
+                      <OutcomesTD>{outcome.probability.toFixed(2)}%</OutcomesTD>
+                    </OutcomesTR>
+                  )
+                })}
+              </OutcomesTBody>
+            </OutcomesTable>
+          </OutcomesTableWrapper>
+        )}
         <FlexRowWrapper>
           <TitleValueVertical
             date={resolution instanceof Date ? resolution : undefined}
+            invertedColors={true}
             title={'Closing Date (UTC)'}
             tooltip={true}
             value={resolutionDate}
           />
-          <TitleValueVertical title={'Category'} value={category} />
-          <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
+          <TitleValueVertical invertedColors={true} title={'Category'} value={category} />
+          <TitleValueVertical
+            invertedColors={true}
+            title={'Arbitrator'}
+            value={<DisplayArbitrator arbitrator={arbitrator} />}
+          />
           {!!loadedQuestionId && (
-            <TitleValueVertical title={'Verified by'} value={<VerifiedRow label={values.verifyLabel} />} />
+            <TitleValueVertical
+              invertedColors={true}
+              title={'Verified by'}
+              value={<VerifiedRow label={values.verifyLabel} />}
+            />
           )}
         </FlexRowWrapper>
       </CreateCardTop>
@@ -343,16 +445,16 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
         <GridTransactionDetailsWrapper noMarginTop={true}>
           <div>
-            {tokensAmount > 1 && (
-              <CurrenciesWrapper>
-                <CurrencySelector
-                  balance={formatNumber(collateralBalanceFormatted)}
-                  context={context}
-                  disabled={false}
-                  onSelect={onCollateralChange}
-                />
-              </CurrenciesWrapper>
-            )}
+            <CurrenciesWrapper>
+              <CurrencySelector
+                addNativeAsset
+                balance={formatNumber(collateralBalanceFormatted, 5)}
+                context={context}
+                currency={collateral.address}
+                disabled={false}
+                onSelect={onCollateralChange}
+              />
+            </CurrenciesWrapper>
             <TextfieldCustomPlaceholder
               formField={
                 <BigNumberInput
@@ -361,6 +463,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                   onChange={handleAmountChange}
                   style={{ width: 0 }}
                   value={amount}
+                  valueToDisplay={amountToDispaly}
                 />
               }
               onClickMaxButton={onClickMaxButton}
@@ -419,34 +522,49 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             style={{ marginBottom: 20 }}
           />
         )}
+        {showUpgrade && (
+          <SetAllowance
+            collateral={getNativeAsset(context.networkId)}
+            finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
+            loading={RemoteData.is.asking(proxyIsUpToDate)}
+            onUnlock={upgradeProxy}
+            style={{ marginBottom: 20 }}
+          />
+        )}
         <WarningMessage
           additionalDescription={''}
           description={
-            'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
+            currentToken.tokenExists
+              ? `An identical market with ${currentToken.symbol} as a currency exists already. Please use a different currency or  provide liquidity for the`
+              : 'Providing liquidity is risky and could result in near total loss. It is important to withdraw liquidity before the event occurs and to be aware the market could move abruptly at any time.'
           }
-          href={DOCUMENT_FAQ}
-          hyperlinkDescription={'More Info'}
+          href={currentToken.tokenExists ? `/#/${currentToken.marketAddress}` : DOCUMENT_FAQ}
+          hyperlinkDescription={currentToken.tokenExists ? 'existing market.' : 'More Info'}
         />
-        <ButtonContainerFullWidth borderTop>
+        <StyledButtonContainerFullWidth borderTop>
           <LeftButton
             buttonType={ButtonType.secondaryLine}
             disabled={
               !MarketCreationStatus.is.ready(marketCreationStatus) &&
               !MarketCreationStatus.is.error(marketCreationStatus)
             }
-            onClick={back}
+            onClick={() => back(state)}
           >
             Back
           </LeftButton>
           {!account && (
-            <Button buttonType={ButtonType.primary} onClick={submit}>
+            <Button buttonType={ButtonType.primary} onClick={() => submit(state === 'SCALAR')}>
               Connect Wallet
             </Button>
           )}
-          <ButtonCreate buttonType={ButtonType.secondaryLine} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
+          <Button
+            buttonType={ButtonType.secondaryLine}
+            disabled={isCreateMarketbuttonDisabled}
+            onClick={() => submit(state === 'SCALAR')}
+          >
             Create Market
-          </ButtonCreate>
-        </ButtonContainerFullWidth>
+          </Button>
+        </StyledButtonContainerFullWidth>
       </CreateCardBottom>
       {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
         <FullLoading message={`${marketCreationStatus._type}...`} />

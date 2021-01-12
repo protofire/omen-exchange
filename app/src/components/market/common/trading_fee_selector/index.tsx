@@ -47,11 +47,10 @@ export const TradingFeeSelector: React.FC<Props> = props => {
       <TradingFeeDropdown
         currentItem={8}
         disabled={disabled}
-        dropdownPosition={DropdownPosition.right}
+        dropdownPosition={DropdownPosition.center}
         items={tradingFeeDropdownItems}
         maxHeight={true}
         selected={false}
-        showScrollbar={true}
       />
     </Wrapper>
   )

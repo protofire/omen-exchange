@@ -15,7 +15,7 @@ const CommentsTitle = styled.h3`
 `
 
 const ThreeBoxCustom = styled.div`
-  margin: 30px auto;
+  margin: 30px 0;
   max-width: 100%;
   width: ${props => props.theme.mainContainer.maxWidth};
 

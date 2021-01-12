@@ -1,18 +1,22 @@
 import React from 'react'
 
-import { MarketMakerData } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
 import { MarketBuy } from './market_buy'
+import { ScalarMarketBuy } from './scalar_market_buy'
 
 interface Props {
+  isScalar: boolean
   marketMakerData: MarketMakerData
-  switchMarketTab: (arg0: string) => void
+  switchMarketTab: (arg0: MarketDetailsTab) => void
+  fetchGraphMarketMakerData: () => Promise<void>
 }
 
 const MarketBuyContainer: React.FC<Props> = (props: Props) => {
-  const { marketMakerData, switchMarketTab } = props
+  const { isScalar } = props
 
-  return <MarketBuy marketMakerData={marketMakerData} switchMarketTab={switchMarketTab} />
+  if (isScalar) return <ScalarMarketBuy {...props} />
+  return <MarketBuy {...props} />
 }
 
 export { MarketBuyContainer }

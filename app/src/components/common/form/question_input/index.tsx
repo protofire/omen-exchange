@@ -30,6 +30,7 @@ export const QuestionInput = (props: Props) => {
         <FormLabel>Set Market Question</FormLabel>
       </TitleWrapper>
       <Textfield
+        autoComplete="off"
         disabled={disabled}
         name={name}
         onChange={onChange}

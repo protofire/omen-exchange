@@ -5,27 +5,17 @@
 1. Clone this repository
 2. Install dependencies:
 
-    ```
-    cd app && yarn
-    ```
+   ```
+   cd app && yarn
+   ```
 
-3. Create a `.env` file:
-
-    ```
-    cp .env.example .env
-    ```
-
-    Set `REACT_APP_INFURA_PROJECT_ID` to your [Infura](https://infura.io/) project id.
-    The rest of the environment variables should work fine with the default values, but you can change them however you
-    want.
-
-4. Start the application with `yarn start` and connect your wallet to either Rinkeby or the Mainnet.
+3. Start the application with `yarn start` and connect your wallet to either Rinkeby or the Mainnet.
 
 ## Directory structure
 
 Most of the code is located under the `app/src` directory and the entry point is `index.tsx`.
 
-The `common/constants.ts` module extracts the environment variables, parses them if necessary, and exports them.  It
+The `common/constants.ts` module extracts the environment variables, parses them if necessary, and exports them. It
 also exposes some constants that don't come from the environment.
 
 `components` has most of the react components that make up the app. `contexts` and `hooks` have custom components and hooks.

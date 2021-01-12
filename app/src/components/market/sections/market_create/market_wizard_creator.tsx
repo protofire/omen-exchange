@@ -3,11 +3,11 @@ import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useState } from 'react'
 
-import { MARKET_FEE } from '../../../../common/constants'
+import { IMPORT_QUESTION_ID_KEY, MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { queryTopCategories } from '../../../../queries/markets_home'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
-import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../../../util/networks'
+import { getArbitrator, getDefaultArbitrator, getDefaultToken } from '../../../../util/networks'
 import { limitDecimalPlaces } from '../../../../util/tools'
 import { Arbitrator, GraphResponseTopCategories, MarketData, Question, Token } from '../../../../util/types'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
@@ -16,7 +16,7 @@ import { AskQuestionStep, FundingAndFeeStep, MenuStep } from './steps'
 import { Outcome } from './steps/outcomes'
 
 interface Props {
-  callback: (param: MarketData) => void
+  callback: (param: MarketData, isScalar: boolean) => void
   marketCreationStatus: MarketCreationStatus
   marketMakerAddress: string | null
 }
@@ -30,6 +30,17 @@ export const MarketWizardCreator = (props: Props) => {
   const defaultCollateral = getDefaultToken(networkId)
   const defaultArbitrator = getDefaultArbitrator(networkId)
 
+  const getImportQuestionId = () => {
+    const reQuestionId = /(0x[0-9A-Fa-f]{64})/
+
+    const questionId = localStorage.getItem(IMPORT_QUESTION_ID_KEY)
+
+    if (!questionId) return null
+    localStorage.removeItem(IMPORT_QUESTION_ID_KEY)
+
+    return questionId.match(reQuestionId) ? questionId : null
+  }
+
   const marketDataDefault: MarketData = {
     arbitrator: defaultArbitrator,
     arbitratorsCustom: [],
@@ -37,7 +48,7 @@ export const MarketWizardCreator = (props: Props) => {
     category: '',
     collateral: defaultCollateral,
     funding: new BigNumber('0'),
-    loadedQuestionId: null,
+    loadedQuestionId: getImportQuestionId(),
     outcomes: [
       {
         name: '',
@@ -51,6 +62,10 @@ export const MarketWizardCreator = (props: Props) => {
     question: '',
     resolution: null,
     spread: MARKET_FEE,
+    lowerBound: null,
+    upperBound: null,
+    startingPoint: null,
+    unit: '',
   }
 
   const [currentStep, setCurrentStep] = useState(1)
@@ -62,7 +77,7 @@ export const MarketWizardCreator = (props: Props) => {
     let isSubscribed = true
 
     const updateMarketData = async () => {
-      const collateral = getToken(networkId, marketData.collateral.symbol.toLowerCase() as KnownToken)
+      const collateral = getDefaultToken(networkId)
       const arbitrator = getArbitrator(networkId, marketData.arbitrator.id)
 
       const newMarketData = {
@@ -109,14 +124,18 @@ export const MarketWizardCreator = (props: Props) => {
     // eslint-disable-next-line
   }, [topCategories])
 
-  const next = (): void => {
+  const [currentFormState, setCurrentFormState] = useState('')
+
+  const next = (state: string): void => {
     const actualCurrentStep = currentStep >= 3 ? 4 : currentStep + 1
     setCurrentStep(actualCurrentStep)
+    setCurrentFormState(state)
   }
 
-  const back = (): void => {
+  const back = (state: string): void => {
     const actualCurrentStep = currentStep <= 1 ? 1 : currentStep - 1
     setCurrentStep(actualCurrentStep)
+    setCurrentFormState(state)
   }
 
   const addArbitratorCustom = (arbitrator: Arbitrator): void => {
@@ -252,33 +271,23 @@ export const MarketWizardCreator = (props: Props) => {
     setMarketdata(newMarketData)
   }
 
-  const submit = () => {
-    callback(marketData as MarketData)
+  const submit = (isScalar: boolean) => {
+    callback(marketData as MarketData, isScalar)
   }
 
   const currentStepFn = () => {
-    const {
-      arbitrator,
-      arbitratorsCustom,
-      categoriesCustom,
-      category,
-      loadedQuestionId,
-      outcomes,
-      question,
-      resolution,
-    } = marketData
-
     switch (currentStep) {
       case 2:
         return (
           <FundingAndFeeStep
-            back={() => back()}
+            back={back}
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
             handleTradingFeeChange={handleTradingFeeChange}
             marketCreationStatus={marketCreationStatus}
             resetTradingFee={resetTradingFee}
-            submit={() => submit()}
+            state={currentFormState}
+            submit={submit}
             values={marketData}
           />
         )
@@ -296,18 +305,10 @@ export const MarketWizardCreator = (props: Props) => {
             handleOutcomesChange={handleOutcomesChange}
             handleQuestionChange={handleQuestionChange}
             loadMoreButton={loadMoreButton}
-            next={() => next()}
+            next={next}
             setFirst={setFirst}
-            values={{
-              question,
-              outcomes,
-              loadedQuestionId,
-              category,
-              categoriesCustom,
-              resolution,
-              arbitrator,
-              arbitratorsCustom,
-            }}
+            state={currentFormState}
+            values={marketData}
           />
         )
     }

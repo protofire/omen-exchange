@@ -1,23 +1,19 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { useTokens } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getArbitratorsByNetwork } from '../../../../util/networks'
 import { CurationSource } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
-import { TokenItem } from '../token_item'
-
-import { DxDao } from './img/dxDao'
-import { Kleros } from './img/kleros'
+import { IconDxDao, IconKleros } from '../../../common/icons'
+import { CurrencySelector } from '../../common/currency_selector'
 
 const Wrapper = styled.div`
-  border-top: 1px solid ${props => props.theme.borders.borderColor};
   column-gap: 20px;
   display: grid;
   grid-template-columns: 1fr;
-  margin: 0 25px;
-  padding: 20px 0 25px 0;
+  margin: 0 24px;
+  margin-bottom: 24px;
   row-gap: 20px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
@@ -40,12 +36,30 @@ const Column = styled.div`
   }
 `
 
+const TitleWrapper = styled.div`
+  margin: 0 0 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
+
 const Title = styled.h2`
   color: ${props => props.theme.colors.textColorDark};
-  font-size: 14px;
+  font-size: ${({ theme }) => theme.fonts.defaultSize};
   font-weight: normal;
   line-height: 1.2;
-  margin: 0 0 12px;
+  margin: 0;
+`
+
+const ClearLabel = styled.span`
+  color: ${props => props.theme.colors.clickable};
+  font-size: ${({ theme }) => theme.fonts.defaultSize};
+  font-weight: normal;
+  line-height: 1.2;
+  cursor: pointer;
+  &:hover {
+    color: ${props => props.theme.colors.primaryLight};
+  }
 `
 
 const Options = styled(Dropdown)`
@@ -56,7 +70,7 @@ interface Props {
   currency: Maybe<string>
   arbitrator: Maybe<string>
   curationSource: CurationSource
-  onChangeCurrency: (currency: Maybe<string>) => void
+  onChangeCurrency: (currency: Maybe<string> | null) => void
   onChangeArbitrator: (arbitrator: Maybe<string>) => void
   onChangeCurationSource: (curationSource: CurationSource) => void
   onChangeTemplateId: (templateId: Maybe<string>) => void
@@ -68,7 +82,6 @@ export const AdvancedFilters = (props: Props) => {
   const { networkId } = context
 
   const arbitrators = getArbitratorsByNetwork(networkId)
-  const tokens = useTokens(context)
 
   const {
     arbitrator,
@@ -80,14 +93,6 @@ export const AdvancedFilters = (props: Props) => {
     onChangeCurrency,
     onChangeTemplateId,
   } = props
-
-  const allTokensOptions = [{ address: null, symbol: 'All', image: null }, ...tokens]
-  const currencyOptions: Array<DropdownItemProps> = allTokensOptions.map(({ address, image, symbol }) => {
-    return {
-      content: <TokenItem image={image} text={symbol} />,
-      onClick: () => onChangeCurrency(address),
-    }
-  })
 
   const questionTypeOptions: Array<DropdownItemProps> = [
     {
@@ -112,6 +117,19 @@ export const AdvancedFilters = (props: Props) => {
       return item.isSelectionEnabled
     })
     .map(({ address, name }) => {
+      if (name === CurationSource.KLEROS) {
+        return {
+          content: (
+            <CurationSourceWrapper>
+              <LogoWrapper>
+                <IconKleros id="arbitrator" />
+              </LogoWrapper>
+              {name}
+            </CurationSourceWrapper>
+          ),
+          onClick: () => onChangeArbitrator(address),
+        }
+      }
       return {
         content: name,
         onClick: () => onChangeArbitrator(address),
@@ -127,7 +145,7 @@ export const AdvancedFilters = (props: Props) => {
       content: (
         <CurationSourceWrapper>
           <LogoWrapper>
-            <DxDao />
+            <IconDxDao />
           </LogoWrapper>
           {CurationSource.DXDAO}
         </CurationSourceWrapper>
@@ -138,7 +156,7 @@ export const AdvancedFilters = (props: Props) => {
       content: (
         <CurationSourceWrapper>
           <LogoWrapper>
-            <Kleros />
+            <IconKleros id="verify" />
           </LogoWrapper>
           {CurationSource.KLEROS}
         </CurationSourceWrapper>
@@ -153,29 +171,40 @@ export const AdvancedFilters = (props: Props) => {
 
   const showQuestionType = false
 
+  const activeArbitratorIndex = arbitrators.findIndex(t => t.address === arbitrator) + 1
   return (
     <Wrapper>
       <Column>
-        <Title>Currency</Title>
-        <Options
-          currentItem={allTokensOptions.findIndex(t => t.address === currency)}
-          dirty={true}
-          dropdownPosition={DropdownPosition.left}
-          items={currencyOptions}
-          maxHeight={true}
-          showScrollbar={true}
+        <TitleWrapper>
+          <Title>Currency</Title>
+          {currency && <ClearLabel onClick={() => onChangeCurrency(null)}>Clear</ClearLabel>}
+        </TitleWrapper>
+
+        <CurrencySelector
+          addAll
+          context={context}
+          currency={currency}
+          disabled={false}
+          onSelect={currency => onChangeCurrency(currency ? currency.address : null)}
+          placeholder={currency ? '' : 'All'}
         />
       </Column>
       {showQuestionType && (
         <Column>
-          <Title>Question Type</Title>
+          <TitleWrapper>
+            <Title>Question Type</Title>
+          </TitleWrapper>
+
           <Options items={questionTypeOptions} />
         </Column>
       )}
       <Column>
-        <Title>Arbitrator</Title>
+        <TitleWrapper>
+          <Title>Arbitrator</Title>
+          {arbitrator && <ClearLabel onClick={() => onChangeArbitrator(null)}>Clear</ClearLabel>}
+        </TitleWrapper>
         <Options
-          currentItem={arbitrators.findIndex(t => t.address === arbitrator)}
+          currentItem={activeArbitratorIndex}
           dirty={true}
           dropdownPosition={DropdownPosition.center}
           items={arbitratorOptions}
@@ -183,7 +212,13 @@ export const AdvancedFilters = (props: Props) => {
       </Column>
       {!disableCurationFilter && (
         <Column>
-          <Title>Curation Source</Title>
+          <TitleWrapper>
+            <Title>Verified by</Title>
+            {curationSource !== CurationSource.ALL_SOURCES && (
+              <ClearLabel onClick={() => onChangeCurationSource(CurationSource.ALL_SOURCES)}>Clear</ClearLabel>
+            )}
+          </TitleWrapper>
+
           <Options
             currentItem={[
               CurationSource.ALL_SOURCES,
@@ -192,7 +227,7 @@ export const AdvancedFilters = (props: Props) => {
               CurationSource.NO_SOURCES,
             ].findIndex(t => t === curationSource)}
             dirty={true}
-            dropdownPosition={DropdownPosition.right}
+            dropdownPosition={DropdownPosition.center}
             items={curationSourceOptions}
           />
         </Column>

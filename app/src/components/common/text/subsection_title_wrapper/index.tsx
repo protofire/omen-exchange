@@ -6,11 +6,8 @@ const Wrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-bottom: 20px;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    flex-wrap: nowrap;
-  }
+  margin-bottom: 24px;
+  flex-wrap: nowrap;
 `
 
 export const SubsectionTitleWrapper: React.FC = props => {

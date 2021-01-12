@@ -5,12 +5,6 @@ import styled from 'styled-components'
 import { ButtonCircle } from '../../../button'
 import { IconArrowBack } from '../../icons/IconArrowBack'
 
-import CheckSVG from './img/dxdao-verified.svg'
-
-const CheckMark = styled.img`
-  margin-left 6px;
-`
-
 export enum TextAlign {
   left = 'left',
   center = 'center',
@@ -18,10 +12,10 @@ export enum TextAlign {
 }
 
 const Wrapper = styled.div`
-  align-items: center;
   display: flex;
   justify-content: center;
-  margin: 0 auto 18px auto;
+  align-items: center;
+  margin-bottom: 18px;
   max-width: 100%;
   width: ${props => props.theme.mainContainer.maxWidth};
 `
@@ -43,11 +37,10 @@ interface Props extends HTMLAttributes<HTMLDivElement>, RouteComponentProps<any>
   goBack?: boolean
   textAlign?: TextAlign
   title: string
-  verified?: Maybe<boolean>
 }
 
 export const SectionTitleWrapper: React.FC<Props> = (props: Props) => {
-  const { textAlign = TextAlign.center, goBack = '', verified, title, ...restProps } = props
+  const { textAlign = TextAlign.center, goBack = '', title, ...restProps } = props
   const enableGoBack = goBack === true
 
   return (
@@ -59,7 +52,6 @@ export const SectionTitleWrapper: React.FC<Props> = (props: Props) => {
       )}
       <Text backButtonEnabled={enableGoBack} className="titleText" textAlign={textAlign}>
         {title}
-        {verified && <CheckMark alt="" src={CheckSVG} />}
       </Text>
     </Wrapper>
   )

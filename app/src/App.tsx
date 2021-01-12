@@ -9,7 +9,7 @@ import 'sanitize.css'
 
 import { Main } from './components/main'
 import { ApolloProviderWrapper } from './contexts/Apollo'
-import { ConnectedWeb3 } from './hooks'
+import { ConnectedCPK, ConnectedWeb3 } from './hooks'
 import balanceReducer from './store/reducer'
 import theme from './theme'
 import { GlobalStyle } from './theme/global_style'
@@ -22,12 +22,14 @@ const App: React.FC = () => {
     <ThemeProvider theme={theme}>
       <Web3Provider connectors={connectors} libraryName="ethers.js">
         <ConnectedWeb3>
-          <ApolloProviderWrapper>
-            <Provider store={store}>
-              <GlobalStyle />
-              <Main />
-            </Provider>
-          </ApolloProviderWrapper>
+          <ConnectedCPK>
+            <ApolloProviderWrapper>
+              <Provider store={store}>
+                <GlobalStyle />
+                <Main />
+              </Provider>
+            </ApolloProviderWrapper>
+          </ConnectedCPK>
         </ConnectedWeb3>
       </Web3Provider>
     </ThemeProvider>

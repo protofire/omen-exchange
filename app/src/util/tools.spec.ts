@@ -2,6 +2,8 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
+import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
+
 import {
   calcAddFundingSendAmounts,
   calcDepositedTokens,
@@ -11,10 +13,16 @@ import {
   calcPoolTokens,
   calcPrice,
   calcSellAmountInCollateral,
+  clampBigNumber,
   computeBalanceAfterTrade,
   divBN,
   formatNumber,
+  formatToShortNumber,
   getIndexSets,
+  getUnit,
+  isDust,
+  isObjectEqual,
+  isScalarMarket,
   limitDecimalPlaces,
   truncateStringInTheMiddle as truncate,
 } from './tools'
@@ -378,6 +386,128 @@ describe('tools', () => {
 
         expect(formattedNumber).toStrictEqual(result)
       })
+    }
+  })
+
+  describe('formatToShortNumber', () => {
+    const testCases: [[string, number], string][] = [
+      [['1234567.8910', 2], '1.23M'],
+      [['0', 8], '0'],
+      [['4269.123123222334', 0], '4K'],
+      [['20100', 2], '20.1K'],
+    ]
+    for (const [[number, decimals], result] of testCases) {
+      it('should return the correct numerical string', () => {
+        const formattedNumber = formatToShortNumber(number, decimals)
+
+        expect(formattedNumber).toStrictEqual(result)
+      })
+    }
+  })
+
+  describe('isObjectEqual', () => {
+    const testCases: [[any, any], boolean][] = [
+      [['', ''], true],
+      [['0', '0'], true],
+      [[0, 0], true],
+      [['0', 0], false],
+      [[{}, {}], true],
+      [
+        [
+          { a: 1, b: 'z' },
+          { a: 1, b: 'z' },
+        ],
+        true,
+      ],
+      [
+        [
+          ['a', 'b', 3],
+          ['a', 'b', 3],
+        ],
+        true,
+      ],
+      [
+        [
+          { a: 1, b: { c: 1, d: 1 } },
+          { a: 1, b: { c: 1, d: 1 } },
+        ],
+        true,
+      ],
+      [
+        [
+          { a: 1, b: { c: ['2', '3'], d: 1 } },
+          { a: 1, b: { c: ['2', '3'], d: 1 } },
+        ],
+        true,
+      ],
+    ]
+    for (const [[obj1, obj2], result] of testCases) {
+      it('should return if two params are the same', () => {
+        const isSame = isObjectEqual(obj1, obj2)
+
+        expect(isSame).toStrictEqual(result)
+      })
+    }
+  })
+
+  describe('clampBigNumber', () => {
+    const testCases: [[BigNumber, BigNumber, BigNumber], BigNumber][] = [
+      [[new BigNumber(0), new BigNumber(2), new BigNumber(7)], new BigNumber(2)],
+      [[new BigNumber(1232), new BigNumber(0), new BigNumber(283)], new BigNumber(283)],
+      [[new BigNumber(3), new BigNumber(1), new BigNumber(14)], new BigNumber(3)],
+    ]
+    for (const [[x, min, max], result] of testCases) {
+      it('should return a clamped big number', () => {
+        const clampedBigNumber = clampBigNumber(x, min, max)
+
+        expect(clampedBigNumber).toStrictEqual(result)
+      })
+    }
+  })
+
+  describe('isDust', () => {
+    const testCases: [[BigNumber, number], boolean][] = [
+      [[new BigNumber(0), 6], true],
+      [[new BigNumber(1), 18], true],
+      [[new BigNumber(1000), 6], false],
+      [[new BigNumber(1), 6], true],
+      [[new BigNumber(100000000), 12], false],
+    ]
+    for (const [[amount, decimals], result] of testCases) {
+      it('should correctly determine whether the amount is dust', () => {
+        const isDustResult = isDust(amount, decimals)
+
+        expect(isDustResult).toStrictEqual(result)
+      })
+    }
+  })
+
+  describe('isScalarMarket', () => {
+    const testCases: [[string, number], boolean][] = [
+      [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 1], true],
+      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 4], true],
+      [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 4], false],
+      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 1], false],
+      [['Incorrect address', 1], false],
+    ]
+    for (const [[oracle, networkId], result] of testCases) {
+      const isScalarResult = isScalarMarket(oracle, networkId)
+
+      expect(isScalarResult).toStrictEqual(result)
+    }
+  })
+
+  describe('getUnit', () => {
+    const testCases: [string, string][] = [
+      ['What is the [unit] for ETH [USD]', 'USD'],
+      ['What is the unit [CAT]', 'CAT'],
+      ['[[unit] unit]][asdf] [ETH]', 'ETH'],
+      ['What about weird casing [CaSInG]', 'CaSInG'],
+    ]
+    for (const [title, result] of testCases) {
+      const unitResult = getUnit(title)
+
+      expect(unitResult).toStrictEqual(result)
     }
   })
 })

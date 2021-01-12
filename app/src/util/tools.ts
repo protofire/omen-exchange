@@ -1,7 +1,14 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import Big from 'big.js'
-import { BigNumber, bigNumberify, formatUnits, getAddress } from 'ethers/utils'
+import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
+
+import {
+  REALITIO_SCALAR_ADAPTER_ADDRESS,
+  REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY,
+  REALITIO_SCALAR_ADAPTER_ADDRESS_SOKOL,
+  REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI,
+} from '../common/constants'
 
 import { getLogger } from './logger'
 
@@ -212,7 +219,7 @@ export const calcPoolTokens = (
   holdingsBN: BigNumber[],
   poolShareSupply: BigNumber,
 ): BigNumber => {
-  if (poolShareSupply.gt(0)) {
+  if (poolShareSupply.gt(0) && holdingsBN.length > 0) {
     const poolWeight = holdingsBN.reduce((max: BigNumber, h: BigNumber) => (h.gt(max) ? h : max))
 
     return addedFunds.mul(poolShareSupply).div(poolWeight)
@@ -316,6 +323,8 @@ export const getMarketTitles = (templateId: Maybe<number>) => {
     return { marketTitle: 'Nuanced Binary Market', marketSubtitle: 'What is a nuanced-binary market?' }
   } else if (templateId === 2) {
     return { marketTitle: 'Categorical Market', marketSubtitle: 'What is a categorical market?' }
+  } else if (templateId === 1) {
+    return { marketTitle: 'Scalar Market', marketSubtitle: 'What is a scalar market?' }
   } else {
     return { marketTitle: 'Binary Market', marketSubtitle: 'What is a binary market?' }
   }
@@ -338,9 +347,106 @@ export const formatNumber = (number: string, decimals = 2): string => {
     return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
 
-  const fixedInt = parseFloat(number).toFixed(decimals)
+  const fixedInt = parseFloat(number.split(',').join('')).toFixed(decimals)
   const splitFixedInt = fixedInt.split('.')[0]
   const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
+}
+
+export const formatToShortNumber = (number: string, decimals = 2): string => {
+  if (number.length < 1) {
+    return '0'
+  }
+
+  const units = ['', 'K', 'M', 'B', 'T']
+  let unitIndex = 0
+  let rNumber = parseFloat(number.split(',').join(''))
+
+  while (rNumber >= 1000 && unitIndex < 5) {
+    unitIndex += 1
+    rNumber = rNumber / 1000
+  }
+
+  return `${parseFloat(rNumber.toFixed(decimals))}${units[unitIndex]}`
+}
+
+export const isObjectEqual = (obj1?: any, obj2?: any): boolean => {
+  if (!obj1 && obj2) return false
+  if (!obj2 && obj1) return false
+  if (!obj1 && !obj2) return true
+  if (typeof obj1 !== typeof obj2) return false
+
+  if (typeof obj1 !== 'object' && !Array.isArray(obj1)) {
+    return obj1 === obj2
+  }
+
+  if (Array.isArray(obj1)) {
+    if (obj1.length !== obj2.length) return false
+    for (let index = 0; index < obj1.length; index += 1) {
+      if (!isObjectEqual(obj1[index], obj2[index])) return false
+    }
+    return true
+  }
+
+  const keys1 = Object.keys(obj1)
+  const keys2 = Object.keys(obj2)
+
+  if (keys1.length !== keys2.length) return false
+
+  for (let keyIndex = 0; keyIndex < keys1.length; keyIndex += 1) {
+    const key = keys1[keyIndex]
+    if (typeof obj1[key] !== typeof obj2[key]) return false
+    if (!isObjectEqual(obj1[key], obj2[key])) return false
+  }
+
+  return true
+}
+
+export const waitABit = (milli = 1000) =>
+  new Promise(resolve => {
+    setTimeout(resolve, milli)
+  })
+
+export const clampBigNumber = (x: BigNumber, min: BigNumber, max: BigNumber): BigNumber => {
+  if (x.lt(min)) return min
+  if (x.gt(max)) return max
+  return x
+}
+
+export const numberToByte32 = (num: number): string => {
+  const hex = new BigNumber(num).toHexString()
+  const frontZeros = '0'.repeat(66 - hex.length)
+
+  return `0x${frontZeros}${hex.split('0x')[1]}`
+}
+
+export const isDust = (amount: BigNumber, decimals: number): boolean => {
+  return amount.lt(parseUnits('0.00001', decimals))
+}
+
+export const isScalarMarket = (oracle: string, networkId: number): boolean => {
+  let realitioScalarAdapter
+  if (networkId === 1) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase()
+  } else if (networkId === 4) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
+  } else if (networkId === 77) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_SOKOL.toLowerCase()
+  } else if (networkId === 100) {
+    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI.toLowerCase()
+  }
+
+  let isScalar = false
+  if (oracle === realitioScalarAdapter) {
+    isScalar = true
+  }
+
+  return isScalar
+}
+
+export const getUnit = (title: string): string => {
+  const splitTitle = title.split('[')
+  const unit = splitTitle[splitTitle.length - 1].split(']')[0]
+  return unit
 }

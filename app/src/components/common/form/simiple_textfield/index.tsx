@@ -13,7 +13,7 @@ export const SimpleTextfieldCSS = css<{ hasError?: boolean; hasSuccess?: boolean
   font-size: ${props => props.theme.textfield.fontSize};
   font-weight: ${props => props.theme.textfield.fontWeight};
   line-height: 1.2;
-  height: ${props => props.theme.textfield.height};
+  height: 38px;
   padding: ${props => props.theme.textfield.paddingVertical} 0;
   width: 100%;
   outline: none;

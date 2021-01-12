@@ -27,7 +27,6 @@ const RedirectToHome = () => <Redirect to="/" />
 
 export const Main: React.FC = () => {
   const context = useWeb3Context()
-
   return (
     <Router>
       <MainWrapper>

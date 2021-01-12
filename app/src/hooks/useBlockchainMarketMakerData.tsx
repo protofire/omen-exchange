@@ -1,13 +1,14 @@
 import Big from 'big.js'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
-import { CPKService, ERC20Service, MarketMakerService, OracleService } from '../services'
+import { ERC20Service, MarketMakerService, OracleService } from '../services'
 import { getLogger } from '../util/logger'
 import { getArbitratorFromAddress } from '../util/networks'
-import { promiseProps } from '../util/tools'
+import { isScalarMarket, promiseProps } from '../util/tools'
 import { BalanceItem, MarketMakerData, Status, Token } from '../util/types'
 
+import { useConnectedCPKContext } from './connectedCpk'
 import { useConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
 import { GraphMarketMakerData } from './useGraphMarketMakerData'
@@ -22,22 +23,54 @@ const getBalances = (
 ): BalanceItem[] => {
   const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
-  const balances: BalanceItem[] = outcomes.map((outcome: string, index: number) => {
-    const outcomeName = outcome
-    const probability = actualPrices[index] * 100
-    const currentPrice = actualPrices[index]
-    const shares = userShares[index]
-    const holdings = marketMakerShares[index]
+  const balances: BalanceItem[] = outcomes.length
+    ? outcomes.map((outcome: string, index: number) => {
+        const outcomeName = outcome
+        const probability = actualPrices[index] * 100
+        const currentPrice = actualPrices[index]
+        const shares = userShares[index]
+        const holdings = marketMakerShares[index]
 
-    return {
-      outcomeName,
-      probability,
-      currentPrice,
-      shares,
-      holdings,
-      payout: payouts ? payouts[index] : new Big(0),
-    }
-  })
+        return {
+          outcomeName,
+          probability,
+          currentPrice,
+          shares,
+          holdings,
+          payout: payouts ? payouts[index] : new Big(0),
+        }
+      })
+    : []
+
+  return balances
+}
+
+const getScalarBalances = (
+  outcomePrices: string[],
+  marketMakerShares: BigNumber[],
+  userShares: BigNumber[],
+  payouts: Maybe<Big[]>,
+): BalanceItem[] => {
+  const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
+
+  const balances: BalanceItem[] = outcomePrices.length
+    ? outcomePrices.map((price: string, index: number) => {
+        const outcomeName = index === 0 ? 'short' : 'long'
+        const probability = actualPrices[index] * 100
+        const currentPrice = actualPrices[index]
+        const shares = userShares[index]
+        const holdings = marketMakerShares[index]
+
+        return {
+          outcomeName,
+          probability,
+          currentPrice,
+          shares,
+          holdings,
+          payout: payouts ? payouts[index] : new Big(0),
+        }
+      })
+    : []
 
   return balances
 }
@@ -51,7 +84,9 @@ const getERC20Token = async (provider: any, address: string): Promise<Token> => 
 
 export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMarketMakerData>, networkId: number) => {
   const context = useConnectedWeb3Context()
-  const { account, library: provider } = context
+  const cpk = useConnectedCPKContext()
+
+  const { library: provider } = context
   const contracts = useContracts(context)
   const [marketMakerData, setMarketMakerData] = useState<Maybe<MarketMakerData>>(null)
   const [status, setStatus] = useState<Status>(Status.Loading)
@@ -65,16 +100,15 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
     const marketMaker = buildMarketMaker(graphMarketMakerData.address)
 
-    let cpk: Maybe<CPKService> = null
-    if (account) {
-      cpk = await CPKService.create(provider)
-    }
-
     const { outcomes } = graphMarketMakerData.question
 
     const isQuestionFinalized = graphMarketMakerData.answerFinalizedTimestamp
       ? Date.now() > 1000 * graphMarketMakerData.answerFinalizedTimestamp.toNumber()
       : false
+
+    const isScalar = isScalarMarket(graphMarketMakerData.oracle || '', networkId || 0)
+
+    const outcomesLength = isScalar ? 2 : outcomes.length
 
     const {
       collateral,
@@ -88,11 +122,13 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       userPoolShares,
       userShares,
     } = await promiseProps({
-      marketMakerShares: marketMaker.getBalanceInformation(graphMarketMakerData.address, outcomes.length),
+      marketMakerShares: marketMaker.getBalanceInformation(graphMarketMakerData.address, outcomesLength),
       userShares:
         cpk && cpk.address
-          ? marketMaker.getBalanceInformation(cpk.address, outcomes.length)
-          : outcomes.map(() => new BigNumber(0)),
+          ? marketMaker.getBalanceInformation(cpk.address, outcomesLength)
+          : outcomes.length
+          ? outcomes.map(() => new BigNumber(0))
+          : [],
       collateral: getERC20Token(provider, graphMarketMakerData.collateralAddress),
       isConditionResolved: conditionalTokens.isConditionResolved(graphMarketMakerData.conditionId),
       marketMakerFunding: marketMaker.getTotalSupply(),
@@ -109,12 +145,24 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
         : new BigNumber(0)
 
     const arbitrator = getArbitratorFromAddress(networkId, graphMarketMakerData.arbitratorAddress)
+
     const payouts = graphMarketMakerData.payouts
       ? graphMarketMakerData.payouts
+      : isScalar
+      ? null
       : realitioAnswer
-      ? OracleService.getPayouts(graphMarketMakerData.question.templateId, realitioAnswer, outcomes.length)
+      ? OracleService.getPayouts(graphMarketMakerData.question.templateId, realitioAnswer, outcomesLength)
       : null
-    const balances = getBalances(outcomes, marketMakerShares, userShares, payouts)
+
+    let balances: BalanceItem[]
+    isScalar
+      ? (balances = getScalarBalances(
+          graphMarketMakerData.outcomeTokenMarginalPrices || [],
+          marketMakerShares,
+          userShares,
+          payouts,
+        ))
+      : (balances = getBalances(outcomes, marketMakerShares, userShares, payouts))
 
     const newMarketMakerData: MarketMakerData = {
       address: graphMarketMakerData.address,
@@ -129,7 +177,9 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       marketMakerFunding,
       marketMakerUserFunding,
       payouts,
+      oracle: graphMarketMakerData.oracle,
       question: graphMarketMakerData.question,
+      realitioAnswer: realitioAnswer ? bigNumberify(realitioAnswer) : null,
       totalEarnings,
       totalPoolShares,
       userEarnings,
@@ -139,11 +189,17 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       curatedByDxDaoOrKleros: graphMarketMakerData.curatedByDxDaoOrKleros,
       runningDailyVolumeByHour: graphMarketMakerData.runningDailyVolumeByHour,
       lastActiveDay: graphMarketMakerData.lastActiveDay,
+      creationTimestamp: graphMarketMakerData.creationTimestamp,
+      scaledLiquidityParameter: graphMarketMakerData.scaledLiquidityParameter,
+      submissionIDs: graphMarketMakerData.submissionIDs,
+      scalarLow: graphMarketMakerData.scalarLow,
+      scalarHigh: graphMarketMakerData.scalarHigh,
+      outcomeTokenMarginalPrices: graphMarketMakerData.outcomeTokenMarginalPrices,
     }
 
     setMarketMakerData(newMarketMakerData)
     setStatus(Status.Ready)
-  }, [graphMarketMakerData, account, provider, contracts, networkId])
+  }, [graphMarketMakerData, provider, contracts, networkId, cpk])
 
   const fetchData = useCallback(async () => {
     try {
@@ -157,6 +213,13 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
   useEffect(() => {
     fetchData()
   }, [fetchData])
+
+  useEffect(() => {
+    if (marketMakerData) {
+      fetchData()
+    }
+    // eslint-disable-next-line
+  }, [graphMarketMakerData])
 
   return {
     fetchData,

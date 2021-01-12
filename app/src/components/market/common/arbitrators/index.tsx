@@ -10,11 +10,11 @@ import { ArbitratorIcon } from '../arbitrator_icon'
 const Wrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 `
 
 const ArbitratorButton = styled(Button)<{ isSelected: boolean }>`
-  margin: 0 8px 10px 0;
+  margin: 0 8px 12px 0;
   &,
   &:hover {
     border-color: ${props =>

@@ -1,11 +1,11 @@
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 // eslint-disable-next-line import/named
 import { Moment } from 'moment'
 
-import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID } from '../common/constants'
+import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID, UINT_TEMPLATE_ID } from '../common/constants'
 import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck, getRealitioTimeout } from '../util/networks'
@@ -18,24 +18,65 @@ const realitioAbi = [
   'event LogNewQuestion(bytes32 indexed question_id, address indexed user, uint256 template_id, string question, bytes32 indexed content_hash, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce, uint256 created)',
   'function isFinalized(bytes32 question_id) view public returns (bool)',
   'function resultFor(bytes32 question_id) external view returns (bytes32)',
+  'function submitAnswer(bytes32 question_id, bytes32 answer, uint256 max_previous)',
 ]
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
 ]
+const realitioScalarAdapterAbi = [
+  'function announceConditionQuestionId(bytes32 questionId, uint256 low, uint256 high)',
+  'function resolve(bytes32 questionId, string question, uint256 low, uint256 high)',
+]
+
+function getQuestionArgs(
+  question: string,
+  outcomes: Outcome[],
+  category: string,
+  arbitratorAddress: string,
+  openingDateMoment: Moment,
+  networkId: number,
+) {
+  const openingTimestamp = openingDateMoment.unix()
+  const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
+  const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
+
+  const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
+
+  return [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+}
+
+function getScalarQuestionArgs(
+  question: string,
+  unit: string,
+  category: string,
+  arbitratorAddress: string,
+  openingDateMoment: Moment,
+  networkId: number,
+) {
+  const openingTimestamp = openingDateMoment.unix()
+  const questionText = RealitioQuestionLib.encodeText('uint', `${question} [${unit}]`, null, category)
+
+  const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
+
+  return [UINT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+}
 
 class RealitioService {
   contract: Contract
   constantContract: Contract
+  scalarContract: Contract
   signerAddress: Maybe<string>
   provider: any
 
-  constructor(address: string, provider: any, signerAddress: Maybe<string>) {
+  constructor(address: string, scalarAddress: string, provider: any, signerAddress: Maybe<string>) {
     if (signerAddress) {
       const signer: Wallet = provider.getSigner()
 
       this.contract = new ethers.Contract(address, realitioAbi, provider).connect(signer)
+      this.scalarContract = new ethers.Contract(scalarAddress, realitioScalarAdapterAbi, provider).connect(signer)
     } else {
       this.contract = new ethers.Contract(address, realitioAbi, provider)
+      this.scalarContract = new ethers.Contract(scalarAddress, realitioScalarAdapterAbi, provider)
     }
 
     this.constantContract = new ethers.Contract(address, realitioCallAbi, provider)
@@ -72,7 +113,7 @@ class RealitioService {
     const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
     const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
 
-    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+    const timeoutResolution = getRealitioTimeout(networkId) || REALITIO_TIMEOUT
 
     const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
 
@@ -146,6 +187,7 @@ class RealitioService {
       isPendingArbitration: question.isPendingArbitration,
       arbitrationOccurred: question.arbitrationOccurred,
       currentAnswerTimestamp: question.currentAnswerTimestamp,
+      currentAnswerBond: question.currentAnswerBond,
     }
   }
 
@@ -175,6 +217,16 @@ class RealitioService {
     }
   }
 
+  submitAnswer = async (questionId: string, answer: string, amount: BigNumber): Promise<void> => {
+    try {
+      const result = await this.contract.submitAnswer(questionId, answer, 0, { value: amount })
+      return this.provider.waitForTransaction(result.hash)
+    } catch (error) {
+      logger.error(`There was an error submitting answer '${questionId}'`, error.message)
+      throw error
+    }
+  }
+
   static encodeAskQuestion = (
     question: string,
     outcomes: Outcome[],
@@ -183,13 +235,22 @@ class RealitioService {
     openingDateMoment: Moment,
     networkId: number,
   ): string => {
-    const openingTimestamp = openingDateMoment.unix()
-    const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
-    const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
+    const args = getQuestionArgs(question, outcomes, category, arbitratorAddress, openingDateMoment, networkId)
 
-    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
+    const askQuestionInterface = new utils.Interface(realitioAbi)
 
-    const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+    return askQuestionInterface.functions.askQuestion.encode(args)
+  }
+
+  static encodeAskScalarQuestion = (
+    question: string,
+    unit: string,
+    category: string,
+    arbitratorAddress: string,
+    openingDateMoment: Moment,
+    networkId: number,
+  ): string => {
+    const args = getScalarQuestionArgs(question, unit, category, arbitratorAddress, openingDateMoment, networkId)
 
     const askQuestionInterface = new utils.Interface(realitioAbi)
 
@@ -205,19 +266,60 @@ class RealitioService {
     networkId: number,
     signerAddress: string,
   ): Promise<string> => {
-    const openingTimestamp = openingDateMoment.unix()
-    const outcomeNames = outcomes.map((outcome: Outcome) => outcome.name)
-    const questionText = RealitioQuestionLib.encodeText('single-select', question, outcomeNames, category)
-
-    const timeoutResolution = REALITIO_TIMEOUT || getRealitioTimeout(networkId)
-
-    const args = [SINGLE_SELECT_TEMPLATE_ID, questionText, arbitratorAddress, timeoutResolution, openingTimestamp, 0]
+    const args = getQuestionArgs(question, outcomes, category, arbitratorAddress, openingDateMoment, networkId)
 
     const questionId = await this.constantContract.askQuestion(...args, {
       from: signerAddress,
     })
 
     return questionId
+  }
+
+  askScalarQuestionConstant = async (
+    question: string,
+    unit: string,
+    category: string,
+    arbitratorAddress: string,
+    openingDateMoment: Moment,
+    networkId: number,
+    signerAddress: string,
+  ): Promise<string> => {
+    const args = getScalarQuestionArgs(question, unit, category, arbitratorAddress, openingDateMoment, networkId)
+
+    const questionId = await this.constantContract.askQuestion(...args, {
+      from: signerAddress,
+    })
+
+    return questionId
+  }
+
+  static encodeAnnounceConditionQuestionId = (question: string, scalarLow: BigNumber, scalarHigh: BigNumber) => {
+    const args = [question, scalarLow, scalarHigh]
+
+    const announceConditionInterface = new utils.Interface(realitioScalarAdapterAbi)
+    return announceConditionInterface.functions.announceConditionQuestionId.encode(args)
+  }
+
+  resolveCondition = async (questionId: string, question: string, scalarLow: BigNumber, scalarHigh: BigNumber) => {
+    try {
+      const transactionObject = await this.scalarContract.resolve(questionId, question, scalarLow, scalarHigh)
+      return this.provider.waitForTransaction(transactionObject.hash)
+    } catch (err) {
+      logger.error(`There was an error resolving the condition with question id '${questionId}'`, err.message)
+      throw err
+    }
+  }
+
+  encodeResolveCondition = async (
+    questionId: string,
+    question: string,
+    scalarLow: BigNumber,
+    scalarHigh: BigNumber,
+  ) => {
+    const args = [questionId, question, scalarLow, scalarHigh]
+
+    const resolveConditionInterface = new utils.Interface(realitioScalarAdapterAbi)
+    return resolveConditionInterface.functions.resolve.encode(args)
   }
 }
 

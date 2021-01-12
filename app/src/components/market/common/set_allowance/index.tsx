@@ -6,7 +6,7 @@ import { ToggleTokenLock, ToggleTokenLockProps } from '../toggle_token_lock'
 
 const Wrapper = styled.div`
   border-radius: 4px;
-  border: 1px solid ${props => props.theme.borders.borderDisabled};
+  border: ${({ theme }) => theme.borders.borderLineDisabled};
   padding: 21px 25px;
 `
 
@@ -30,6 +30,7 @@ const Description = styled.p`
   letter-spacing: 0.2px;
   line-height: 1.4;
   margin: 0 32px 0 0;
+  display: inline-block;
 `
 
 export type SetAllowanceProps = DOMAttributes<HTMLDivElement> &

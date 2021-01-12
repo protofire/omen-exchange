@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
-  border: 1px solid ${props => props.theme.borders.borderDisabled};
+  border: ${({ theme }) => theme.borders.borderLineDisabled};
   background-color: ${props => props.theme.colors.mainBodyBackground};
   padding: 21px;
   border-bottom: 0;

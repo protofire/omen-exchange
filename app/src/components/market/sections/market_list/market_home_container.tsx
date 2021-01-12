@@ -7,10 +7,9 @@ import { useHistory } from 'react-router'
 import { useLocation } from 'react-router-dom'
 
 import { MAX_MARKET_FEE } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../../hooks'
 import { useMarkets } from '../../../../hooks/useMarkets'
 import { queryCategories } from '../../../../queries/markets_home'
-import { CPKService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
@@ -38,24 +37,33 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
     return {
       address: graphMarketMakerDataItem.id,
       arbitrator: graphMarketMakerDataItem.arbitrator,
+      creationTimestamp: graphMarketMakerDataItem.creationTimestamp,
       curatedByDxDao: graphMarketMakerDataItem.curatedByDxDao,
       category: graphMarketMakerDataItem.category,
       collateralToken: graphMarketMakerDataItem.collateralToken,
       collateralVolume: bigNumberify(graphMarketMakerDataItem.collateralVolume),
+      lastActiveDay: Number(graphMarketMakerDataItem.lastActiveDay),
+      scaledLiquidityParameter: parseFloat(graphMarketMakerDataItem.scaledLiquidityParameter),
+      runningDailyVolumeByHour: graphMarketMakerDataItem.runningDailyVolumeByHour,
       openingTimestamp: new Date(1000 * +graphMarketMakerDataItem.openingTimestamp),
+      oracle: graphMarketMakerDataItem.condition.oracle ? graphMarketMakerDataItem.condition.oracle : null,
       outcomeTokenAmounts: graphMarketMakerDataItem.outcomeTokenAmounts.map(bigNumberify),
+      outcomeTokenMarginalPrices: graphMarketMakerDataItem.outcomeTokenMarginalPrices,
       outcomes,
       templateId: +graphMarketMakerDataItem.templateId,
       title: graphMarketMakerDataItem.title,
       usdLiquidityParameter: parseFloat(graphMarketMakerDataItem.usdLiquidityParameter),
       klerosTCRregistered: graphMarketMakerDataItem.klerosTCRregistered,
       curatedByDxDaoOrKleros: graphMarketMakerDataItem.curatedByDxDaoOrKleros,
+      scalarLow: graphMarketMakerDataItem.condition.scalarLow ? graphMarketMakerDataItem.condition.scalarLow : null,
+      scalarHigh: graphMarketMakerDataItem.condition.scalarHigh ? graphMarketMakerDataItem.condition.scalarHigh : null,
     }
   })
 }
 
 const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
+  const cpk = useConnectedCPKContext()
   const history = useHistory()
 
   const location = useLocation()
@@ -79,6 +87,10 @@ const MarketHomeContainer: React.FC = () => {
   let categoryRoute = location.pathname.split('/category/')[1]
   if (categoryRoute) categoryRoute = categoryRoute.split('/')[0]
 
+  const typeFilter = location.pathname.includes('type')
+  let typeRoute = location.pathname.split('/type/')[1]
+  if (typeRoute) typeRoute = typeRoute.split('/')[0]
+
   const stateFilter = location.search.includes('state')
   let stateRoute = location.search.split('state=')[1]
   if (stateRoute) stateRoute = stateRoute.split('&')[0]
@@ -96,7 +108,7 @@ const MarketHomeContainer: React.FC = () => {
     sortParam = 'creationTimestamp'
   } else if (sortRoute === 'ending') {
     sortParam = 'openingTimestamp'
-    sortDirection = 'asc'
+    sortDirection = stateRoute === 'MY_MARKETS' ? 'desc' : 'asc'
   } else if (sortRoute === 'liquidity') {
     sortParam = 'usdLiquidityParameter'
   }
@@ -143,9 +155,16 @@ const MarketHomeContainer: React.FC = () => {
 
   let searchParam: string
   if (searchFilter) {
-    searchParam = searchRoute
+    searchParam = decodeURIComponent(searchRoute)
   } else {
     searchParam = ''
+  }
+
+  let typeParam: Maybe<string>
+  if (typeFilter) {
+    typeParam = typeRoute
+  } else {
+    typeParam = null
   }
 
   const [filter, setFilter] = useState<MarketFilters>({
@@ -155,7 +174,7 @@ const MarketHomeContainer: React.FC = () => {
     sortBy: sortParam,
     sortByDirection: sortDirection,
     arbitrator: arbitratorParam,
-    templateId: null,
+    templateId: typeParam,
     currency: currencyParam,
     curationSource: curationSourceParam,
   })
@@ -200,7 +219,9 @@ const MarketHomeContainer: React.FC = () => {
   useEffect(() => {
     const getCpkAddress = async () => {
       try {
-        const cpk = await CPKService.create(provider)
+        if (!cpk) {
+          return
+        }
         setCpkAddress(cpk.address)
       } catch (e) {
         logger.error('Could not get address of CPK', e.message)
@@ -210,7 +231,7 @@ const MarketHomeContainer: React.FC = () => {
     if (account) {
       getCpkAddress()
     }
-  }, [provider, account])
+  }, [provider, account, cpk])
 
   useEffect(() => {
     if (loading) {
@@ -277,6 +298,10 @@ const MarketHomeContainer: React.FC = () => {
         route += `/category/${filter.category}`
       }
 
+      if (filter.templateId && filter.templateId !== '') {
+        route += `/type/${filter.templateId}`
+      }
+
       if (filter.state && filter.state !== 'OPEN') {
         routeQueryArray.push(`state=${filter.state}`)
       }
@@ -285,7 +310,7 @@ const MarketHomeContainer: React.FC = () => {
         routeQueryArray.push(`tag=${filter.title}`)
       }
 
-      if (filter.curationSource) {
+      if (filter.curationSource && filter.curationSource !== 'Any') {
         route += `/curation-source/${filter.curationSource}`
       }
 

@@ -14,15 +14,13 @@ import {
   OutcomesTR,
   OutcomesTable,
   OutcomesTableWrapper,
+  PercentWrapper,
   RowWrapper,
 } from '../../../../common/common_styled'
 
-const BUTTON_DIMENSIONS = '36px'
-
 const CustomButtonCircle = styled(ButtonCircle)`
   margin-left: 15px;
-  height: ${BUTTON_DIMENSIONS};
-  width: ${BUTTON_DIMENSIONS};
+  border-radius: 8px;
   &[disabled] {
     border-color: ${props => props.theme.form.common.disabled.borderColor};
   }
@@ -39,13 +37,6 @@ const Note = styled.div`
   margin-bottom: 20px;
   margin-top: -20px;
   padding: 10px 0 0 0;
-`
-
-const PercentWrapper = styled.label`
-  color: ${({ theme }) => theme.colors.primary};
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.2;
 `
 
 const CustomButtonCircleAdd = styled(CustomButtonCircle as any)`
@@ -126,17 +117,22 @@ const Outcomes = (props: Props) => {
         <RowWrapper>
           <OutcomeItemWrapper readOnly={!!uniformProbabilities}>
             <SimpleTextfield
-              onChange={e =>
+              onChange={e => {
+                const isEmpty = !e.target.value
                 props.onChange(
                   props.outcomes.map((tcome, tIndex) =>
-                    index !== tIndex ? tcome : { ...tcome, probability: Number(e.target.value) },
+                    index !== tIndex
+                      ? tcome
+                      : isEmpty
+                      ? ({ name: tcome.name } as Outcome)
+                      : { ...tcome, probability: Number(e.target.value) },
                   ),
                 )
-              }
-              placeholder="outcome..."
+              }}
+              placeholder="50"
               readOnly={!!uniformProbabilities}
               type="number"
-              value={uniformProbabilities ? outcome.probability.toFixed(2) : outcome.probability}
+              value={uniformProbabilities ? outcome.probability?.toFixed(2) : outcome.probability}
             />
             <PercentWrapper>%</PercentWrapper>
           </OutcomeItemWrapper>

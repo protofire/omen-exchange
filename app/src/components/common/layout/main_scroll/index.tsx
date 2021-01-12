@@ -6,11 +6,13 @@ const MainScrollStyled = styled.div`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  align-items: center;
   overflow: auto;
   padding-bottom: 15px;
   padding-top: 30px;
   position: relative;
   z-index: 2;
+  overflow-x: hidden;
 `
 
 const MainScrollInner = styled.div`
@@ -20,6 +22,7 @@ const MainScrollInner = styled.div`
   flex-shrink: 0;
   margin: 0 auto;
   max-width: 100%;
+  align-items: center;
   padding-left: 10px;
   padding-right: 10px;
   width: ${props => props.theme.themeBreakPoints.xxl};

@@ -91,7 +91,9 @@ export const useMarkets = (options: Options): any => {
       }
 
       setMoreMarkets(internalMarkets.length === first + 1)
-      internalMarkets.length === first + 1 && internalMarkets.pop()
+      if (internalMarkets.length === first + 1) {
+        internalMarkets = internalMarkets.slice(0, first)
+      }
 
       if (internalMarkets && internalMarkets.length === 0 && skipFromOptions === 0) {
         setMarkets({
@@ -109,7 +111,7 @@ export const useMarkets = (options: Options): any => {
     setMarkets({
       fixedProductMarketMakers: [],
     })
-  }, [arbitrator, currency, curationSource, category, state])
+  }, [arbitrator, currency, curationSource, category, state, sortBy, templateId])
 
   return { markets, error, fetchMore, loading, moreMarkets }
 }

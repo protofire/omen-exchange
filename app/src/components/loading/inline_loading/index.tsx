@@ -43,14 +43,15 @@ const Message = styled.p`
 interface Props extends HTMLAttributes<HTMLDivElement> {
   absolute?: boolean
   message?: string
+  big?: boolean | undefined
 }
 
 export const InlineLoading: React.FC<Props> = (props: Props) => {
-  const { message = 'Loading...', ...restProps } = props
+  const { big, message = 'Loading...', ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
-      <Spinner />
+      <Spinner big={big} />
       {message ? <Message>{message}</Message> : null}
     </Wrapper>
   )

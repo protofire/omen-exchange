@@ -1,15 +1,25 @@
 import React from 'react'
+import styled from 'styled-components'
 
-import { Kleros } from '../advanced_filters/img/kleros'
+import { IconKleros } from '../../../common/icons'
 
 interface Props {
   id: Maybe<string>
 }
 
+const IconWrapper = styled.div`
+  width: 24px;
+  height: 24px;
+`
+
 export const ArbitratorIcon = ({ id }: Props) => {
   switch (id) {
     case 'kleros':
-      return <Kleros />
+      return (
+        <IconWrapper>
+          <IconKleros id={id} />
+        </IconWrapper>
+      )
     default:
       return null
   }

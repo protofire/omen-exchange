@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components'
 import { ConnectedWeb3Context, useTokens } from '../../../../hooks'
 import { Token } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
+import { Spinner } from '../../../common/spinner'
 import { TokenItem } from '../token_item'
 
 const Wrapper = styled.div`
@@ -26,16 +27,32 @@ const CurrencyDropdown = styled(Dropdown)<{ selected: boolean }>`
 `
 
 interface Props {
+  currency?: Maybe<string>
   context: ConnectedWeb3Context
   disabled?: boolean
-  onSelect: (currency: Token) => void
-  balance: string
+  filters?: Array<string>
+  onSelect: (currency: Token | null) => void
+  balance?: string
+  placeholder?: Maybe<string>
+  addAll?: boolean
+  addNativeAsset?: boolean
 }
 
 export const CurrencySelector: React.FC<Props> = props => {
-  const { balance, context, disabled, onSelect, ...restProps } = props
+  const {
+    addAll = false,
+    addNativeAsset = false,
+    balance,
+    context,
+    currency,
+    disabled,
+    filters = [],
+    onSelect,
+    placeholder,
+    ...restProps
+  } = props
 
-  const tokens = useTokens(context)
+  const tokens = useTokens(context, addNativeAsset)
 
   const currencyDropdownData: Array<DropdownItemProps> = []
 
@@ -47,29 +64,45 @@ export const CurrencySelector: React.FC<Props> = props => {
     }
   }
 
-  tokens.forEach(({ address, image, symbol }) => {
+  let currentItem: number | undefined
+
+  if (addAll) {
     currencyDropdownData.push({
-      content: image ? <TokenItem image={image} text={symbol} /> : symbol,
-      extraContent: balance,
-      onClick: !disabled
-        ? () => {
-            onChange(address)
-          }
-        : () => {
-            return
-          },
+      content: 'All',
+      onClick: () => {
+        if (!disabled) {
+          onSelect(null)
+        }
+      },
     })
-  })
+    currentItem = 0
+  }
+
+  tokens
+    .filter(({ address }) => filters.length === 0 || filters.indexOf(address.toLowerCase()) >= 0)
+    .forEach(({ address, image, symbol }, index) => {
+      currencyDropdownData.push({
+        content: <TokenItem image={image} text={symbol} />,
+        extraContent: currency && currency.toLowerCase() === address.toLowerCase() ? balance : '',
+        onClick: () => {
+          if (!disabled) onChange(address)
+        },
+      })
+      if (currency && currency.toLowerCase() === address.toLowerCase()) {
+        currentItem = addAll ? index + 1 : index
+      }
+    })
 
   return (
     <Wrapper {...restProps}>
       <CurrencyDropdown
+        currentItem={currentItem}
         disabled={disabled}
-        dropdownPosition={DropdownPosition.right}
+        dropdownPosition={DropdownPosition.center}
         items={currencyDropdownData}
         maxHeight={true}
+        placeholder={currency && currentItem === undefined ? <Spinner size="18" /> : placeholder}
         selected={false}
-        showScrollbar={true}
       />
     </Wrapper>
   )

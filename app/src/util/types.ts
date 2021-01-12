@@ -12,6 +12,35 @@ export enum Status {
   Error = 'Error',
 }
 
+export enum KlerosItemStatus {
+  Absent = 'Absent',
+  Registered = 'Registered',
+  RegistrationRequested = 'RegistrationRequested',
+  ClearingRequested = 'ClearingRequested',
+}
+
+export enum KlerosDisputeOutcome {
+  None = 'None',
+  Accept = 'Accept',
+  Refuse = 'Refuse',
+}
+
+export interface MarketCurationState {
+  verificationState: MarketVerificationState
+  submissionTime?: number
+  itemID?: string
+}
+
+export interface KlerosCurationData {
+  listingCriteriaURL: string
+  submissionDeposit: string
+  challengePeriodDuration: string
+  submissionBaseDeposit: string
+  removalBaseDeposit: string
+  marketVerificationData: MarketCurationState
+  ovmAddress: string // ovm here stands for Omen Verified Markets, the Kleros-Omen TCR.
+}
+
 export interface BalanceItem {
   outcomeName: string
   probability: number
@@ -19,6 +48,22 @@ export interface BalanceItem {
   shares: BigNumber
   payout: Big
   holdings: BigNumber
+}
+
+export interface BondItem {
+  outcomeName: string
+  bondedEth: BigNumber
+}
+
+export interface AnswerItem {
+  answer: string
+  bondAggregate: BigNumber
+}
+
+export interface KlerosSubmission {
+  id: string
+  status: KlerosItemStatus
+  listAddress: string
 }
 
 export enum Stage {
@@ -56,6 +101,12 @@ export interface Question {
   isPendingArbitration: boolean
   arbitrationOccurred: boolean
   currentAnswerTimestamp: Maybe<BigNumber>
+  currentAnswerBond: Maybe<BigNumber>
+  answers?: {
+    answer: string
+    bondAggregate: BigNumber
+  }[]
+  bonds?: BondItem[]
 }
 
 export enum OutcomeTableValue {
@@ -65,6 +116,7 @@ export enum OutcomeTableValue {
   Payout = 'Payout',
   Outcome = 'Outcome',
   Probability = 'Probability',
+  Bonded = 'Bonded (ETH)',
 }
 
 export interface Token {
@@ -72,6 +124,12 @@ export interface Token {
   decimals: number
   symbol: string
   image?: string
+  volume?: string
+}
+
+export const TokenEthereum = {
+  decimals: 18,
+  symbol: 'ETH',
 }
 
 export interface QuestionLog {
@@ -98,6 +156,14 @@ export type MarketWithExtraData = Market & {
   fee: BigNumber
   question: Question
   status: MarketStatus
+}
+
+export enum MarketVerificationState {
+  Verified,
+  NotVerified,
+  SubmissionChallengeable,
+  RemovalChallengeable,
+  WaitingArbitration,
 }
 
 export interface Log {
@@ -132,6 +198,10 @@ export interface MarketData {
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
   verifiedLabel?: string
+  lowerBound: Maybe<BigNumber>
+  upperBound: Maybe<BigNumber>
+  startingPoint: Maybe<BigNumber>
+  unit: string
 }
 
 export enum MarketStates {
@@ -141,6 +211,12 @@ export enum MarketStates {
   arbitrating = 'ARBITRATING',
   closed = 'CLOSED',
   myMarkets = 'MY_MARKETS',
+}
+
+export enum MarketTypes {
+  all = '',
+  categorical = '2',
+  scalar = '1',
 }
 
 export type MarketsSortCriteria =
@@ -175,10 +251,10 @@ export type MarketsSortCriteria =
   | 'sort24HourVolume23'
 
 export enum CurationSource {
-  ALL_SOURCES = 'All Sources',
+  ALL_SOURCES = 'Any',
   DXDAO = 'Dxdao',
   KLEROS = 'Kleros',
-  NO_SOURCES = 'No Sources',
+  NO_SOURCES = 'None',
 }
 
 export interface MarketFilters {
@@ -198,6 +274,7 @@ export interface MarketMakerData {
   answerFinalizedTimestamp: Maybe<BigNumber>
   arbitrator: Arbitrator
   balances: BalanceItem[]
+  creationTimestamp: string
   collateral: Token
   fee: BigNumber
   isConditionResolved: boolean
@@ -207,6 +284,7 @@ export interface MarketMakerData {
   marketMakerUserFunding: BigNumber
   payouts: Maybe<Big[]>
   question: Question
+  realitioAnswer: Maybe<BigNumber>
   totalEarnings: BigNumber
   totalPoolShares: BigNumber
   userEarnings: BigNumber
@@ -216,6 +294,12 @@ export interface MarketMakerData {
   curatedByDxDaoOrKleros: boolean
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
+  scaledLiquidityParameter: number
+  submissionIDs: KlerosSubmission[]
+  oracle: string
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
+  outcomeTokenMarginalPrices: string[]
 }
 
 export enum Ternary {
@@ -254,7 +338,9 @@ export type GraphResponseTopCategories = {
 
 export type GraphMarketMakerDataItem = {
   id: string
+  creationTimestamp: string
   collateralVolume: string
+  lastActiveDay: number
   collateralToken: string
   outcomeTokenAmounts: string[]
   title: string
@@ -265,8 +351,14 @@ export type GraphMarketMakerDataItem = {
   templateId: string
   usdLiquidityParameter: string
   curatedByDxDao: boolean
+  scaledLiquidityParameter: string
   klerosTCRregistered: boolean
   curatedByDxDaoOrKleros: boolean
+  runningDailyVolumeByHour: BigNumber[]
+  condition: MarketCondition
+  outcomeTokenMarginalPrices: string[]
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
 }
 
 export type Participations = { fixedProductMarketMakers: GraphMarketMakerDataItem }
@@ -281,8 +373,10 @@ export type GraphResponseMarkets = GraphResponseMarketsGeneric | GraphResponseMy
 
 export type MarketMakerDataItem = {
   address: string
+  creationTimestamp: string
   collateralVolume: BigNumber
   collateralToken: string
+  lastActiveDay: number
   outcomeTokenAmounts: BigNumber[]
   title: string
   outcomes: Maybe<string[]>
@@ -292,12 +386,51 @@ export type MarketMakerDataItem = {
   templateId: number
   usdLiquidityParameter: number
   curatedByDxDao: boolean
+  scaledLiquidityParameter: number
   klerosTCRregistered: boolean
   curatedByDxDaoOrKleros: boolean
+  runningDailyVolumeByHour: BigNumber[]
+  oracle: Maybe<string>
+  outcomeTokenMarginalPrices: string[]
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
 }
 
 export type BuildQueryType = MarketFilters & {
   whitelistedCreators: boolean
   whitelistedTemplateIds: boolean
   networkId: Maybe<number>
+}
+
+export type MarketCondition = {
+  oracle: Maybe<string>
+  scalarHigh: Maybe<BigNumber>
+  scalarLow: Maybe<BigNumber>
+}
+
+export enum MarketDetailsTab {
+  swap = 'SWAP',
+  pool = 'POOL',
+  history = 'HISTORY',
+  verify = 'VERIFY',
+  buy = 'BUY',
+  sell = 'SELL',
+  finalize = 'FINALIZE',
+  setOutcome = 'SET_OUTCOME',
+}
+
+export enum MarketState {
+  open = 'open',
+  finalizing = 'finalizing',
+  arbitration = 'arbitration',
+  closed = 'closed',
+  none = '',
+}
+
+export const INVALID_ANSWER_ID = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+
+export enum FormState {
+  categorical = 'CATEGORICAL',
+  import = 'IMPORT',
+  scalar = 'SCALAR',
 }
