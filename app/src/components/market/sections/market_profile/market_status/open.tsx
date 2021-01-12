@@ -271,6 +271,10 @@ const Wrapper = (props: Props) => {
     // eslint-disable-next-line
   }, [isQuestionFinalized, isFinalizing])
 
+  useEffect(() => {
+    fetchGraphMarketTradeData()
+  }, [])
+
   return (
     <>
       <TopCard>
