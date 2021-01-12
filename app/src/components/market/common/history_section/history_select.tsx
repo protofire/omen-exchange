@@ -88,6 +88,10 @@ type Props = {
   marketMakerAddress: string
   decimals: number
   fee: BigNumber
+  scalarHigh?: Maybe<BigNumber>
+  scalarLow?: Maybe<BigNumber>
+  unit: string
+  isScalar?: Maybe<boolean>
 }
 
 const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
@@ -110,10 +114,14 @@ export const History_select: React.FC<Props> = ({
   decimals,
   fee,
   holdingSeries,
+  isScalar,
   marketMakerAddress,
   onChange,
   options,
   outcomes,
+  scalarHigh,
+  scalarLow,
+  unit,
   value,
 }) => {
   const context = useConnectedWeb3Context()
@@ -124,6 +132,7 @@ export const History_select: React.FC<Props> = ({
   const [sharesData, setSharesData] = useState<FpmmTradeDataType[]>([])
   const [sharesDataLoader, setSharesDataLoader] = useState<boolean>(true)
 
+  const outcomeArray: string[] = outcomes.length ? outcomes : ['Short', 'Long']
   const data =
     holdingSeries &&
     holdingSeries
@@ -132,7 +141,7 @@ export const History_select: React.FC<Props> = ({
       .map(h => {
         const prices = calcPrice(h.holdings.map(bigNumberify))
         const outcomesPrices: { [outcomeName: string]: number } = {}
-        outcomes.forEach((k, i) => (outcomesPrices[k] = prices[i]))
+        outcomeArray.forEach((k, i) => (outcomesPrices[k] = prices[i]))
 
         return { ...outcomesPrices, date: formatTimestampToDate(h.block.timestamp, value) }
       })
@@ -199,7 +208,7 @@ export const History_select: React.FC<Props> = ({
         )
         const newFpmmTradeArray: any[] = []
         fpmmTransactions.forEach(item => {
-          if (item.fpmmType === 'Liquidity') {
+          if (item.fpmmType === 'Liquidity' && !isScalar) {
             let sharesValue
             const findInResponse = response.find(element => element.id === item.id)
             if (findInResponse) {
@@ -216,7 +225,6 @@ export const History_select: React.FC<Props> = ({
               const holdingsOfOtherOutcomes = balances.filter((item: BigNumber, index: number) => {
                 return index !== outcomeIndex
               })
-
               const sharesCalculation = calculateSharesBought(poolShares, balances, shares, collateralTokenAmount)
 
               sharesValue = calcSellAmountInCollateral(
@@ -334,7 +342,14 @@ export const History_select: React.FC<Props> = ({
           status={status}
         />
       ) : (
-        <HistoryChart data={data} outcomes={outcomes} />
+        <HistoryChart
+          data={data}
+          isScalar={isScalar}
+          outcomes={outcomeArray}
+          scalarHigh={scalarHigh}
+          scalarLow={scalarLow}
+          unit={unit}
+        />
       )}
     </ChartWrapper>
   )

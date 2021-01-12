@@ -1,12 +1,15 @@
 import {
   DEFAULT_ARBITRATOR,
-  DEFAULT_TOKEN,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
   GRAPH_MAINNET_HTTP,
   GRAPH_MAINNET_WS,
   GRAPH_RINKEBY_HTTP,
   GRAPH_RINKEBY_WS,
+  GRAPH_SOKOL_HTTP,
+  GRAPH_SOKOL_WS,
+  GRAPH_XDAI_HTTP,
+  GRAPH_XDAI_WS,
   INFURA_PROJECT_ID,
   KLEROS_CURATE_GRAPH_MAINNET_HTTP,
   KLEROS_CURATE_GRAPH_MAINNET_WS,
@@ -18,11 +21,13 @@ import { entries, isNotNull } from '../util/type-utils'
 import { getImageUrl } from './token'
 import { Arbitrator, Token } from './types'
 
-export type NetworkId = 1 | 4
+export type NetworkId = 1 | 4 | 77 | 100
 
 export const networkIds = {
   MAINNET: 1,
   RINKEBY: 4,
+  SOKOL: 77,
+  XDAI: 100,
 } as const
 
 type CPKAddresses = {
@@ -44,6 +49,7 @@ interface Network {
   omenTCRListId: number
   contracts: {
     realitio: string
+    realitioScalarAdapter: string
     marketMakerFactory: string
     conditionalTokens: string
     oracle: string
@@ -54,6 +60,10 @@ interface Network {
     omenVerifiedMarkets: string
   }
   cpk?: CPKAddresses
+  wrapToken: string
+  targetSafeImplementation: string
+  nativeAsset: Token
+  defaultToken: string
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -66,6 +76,8 @@ interface KnownTokenData {
   }
   order: number
 }
+
+export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
 
 const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
@@ -80,6 +92,7 @@ const networks: { [K in NetworkId]: Network } = {
     omenTCRListId: 3,
     contracts: {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
+      realitioScalarAdapter: '0xaa548EfBb0972e0c4b9551dcCfb6B787A1B90082',
       marketMakerFactory: '0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
       oracle: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
@@ -89,6 +102,21 @@ const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8',
       omenVerifiedMarkets: '0xb72103eE8819F2480c25d306eEAb7c3382fBA612',
     },
+    cpk: {
+      masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
+      proxyFactoryAddress: '0x0fB4340432e56c014fa96286de17222822a9281b',
+      multiSendAddress: '0xc3BD4deCF75e9937aefb7a4CE6Ec8931dB4cfAF0',
+      fallbackHandlerAddress: '0x40A930851BD2e590Bd5A5C981b436de25742E980',
+    },
+    wrapToken: 'weth',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'),
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    defaultToken: 'dai',
   },
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
@@ -102,6 +130,7 @@ const networks: { [K in NetworkId]: Network } = {
     omenTCRListId: 1,
     contracts: {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
+      realitioScalarAdapter: '0x0e8Db8caD541C0Bf5b611636e81fEc0828bc7902',
       marketMakerFactory: '0x0fB4340432e56c014fa96286de17222822a9281b',
       conditionalTokens: '0x36bede640D19981A82090519bC1626249984c908',
       oracle: '0x17174dC1b62add32a1DE477A357e75b0dcDEed6E',
@@ -111,6 +140,97 @@ const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x03165DF66d9448E45c2f5137486af3E7e752a352',
       omenVerifiedMarkets: '0x3b29096b7ab49428923d902cEC3dFEaa49993234',
     },
+    cpk: {
+      masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
+      proxyFactoryAddress: '0x336c19296d3989e9e0c2561ef21c964068657c38',
+      multiSendAddress: '0x82CFd05a033e202E980Bc99eA50A4C6BB91CE0d7',
+      fallbackHandlerAddress: '0x40A930851BD2e590Bd5A5C981b436de25742E980',
+    },
+    wrapToken: 'weth',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'),
+      symbol: 'ETH',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    defaultToken: 'dai',
+  },
+  [networkIds.SOKOL]: {
+    label: 'Sokol',
+    url: 'https://sokol.poa.network',
+    graphHttpUri: GRAPH_SOKOL_HTTP,
+    graphWsUri: GRAPH_SOKOL_WS,
+    klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
+    klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
+    realitioTimeout: 180,
+    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+    omenTCRListId: 1,
+    contracts: {
+      realitio: '0x63975d9e7CF434dCd04bD808d8c79d03EF69100B',
+      realitioScalarAdapter: '0x86459E9eA6cF4caEe9F8F4cb1203d38EaB3cbD34',
+      marketMakerFactory: '0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5',
+      conditionalTokens: '0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f',
+      oracle: '0xa57EBD93faa73b3491aAe396557D6ceC24fC6984',
+      klerosBadge: '0x0000000000000000000000000000000000000000',
+      klerosTokenView: '0x0000000000000000000000000000000000000000',
+      klerosTCR: '0x0000000000000000000000000000000000000000',
+      dxTCR: '0x5486a9050f2aC6f535a72526e37738A060508361',
+      omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
+    },
+    cpk: {
+      masterCopyAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
+      proxyFactoryAddress: '0xaaF0CCef0C0C355Ee764B3d36bcCF257C527269B',
+      multiSendAddress: '0xBe95a1C930B7d4F816518Ad7742062537F928b99',
+      fallbackHandlerAddress: '0x1e9C3EBAd833b26E522D2fDa180Af3D2A32459D2',
+    },
+    wrapToken: 'wspoa',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0x6b175474e89094c44da98b954eedeac495271d0f'),
+      symbol: 'SPOA',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
+    defaultToken: 'wspoa',
+  },
+  [networkIds.XDAI]: {
+    label: 'xDai',
+    url: 'https://rpc.xdaichain.com/',
+    graphHttpUri: GRAPH_XDAI_HTTP,
+    graphWsUri: GRAPH_XDAI_WS,
+    klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
+    klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
+    realitioTimeout: 86400,
+    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+    omenTCRListId: 1,
+    contracts: {
+      realitio: '0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03',
+      realitioScalarAdapter: '0xb97FCb6adf4c4aF9981932a004e6CC47173d0Bfc',
+      marketMakerFactory: '0x9083A2B699c0a4AD06F63580BDE2635d26a3eeF0',
+      conditionalTokens: '0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce',
+      oracle: '0x2bf1BFb0eB6276a4F4B60044068Cb8CdEB89f79B',
+      klerosBadge: '0x0000000000000000000000000000000000000000',
+      klerosTokenView: '0x0000000000000000000000000000000000000000',
+      klerosTCR: '0x0000000000000000000000000000000000000000',
+      dxTCR: '0x0000000000000000000000000000000000000000',
+      omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
+    },
+    cpk: {
+      masterCopyAddress: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+      proxyFactoryAddress: '0xfC7577774887aAE7bAcdf0Fc8ce041DA0b3200f7',
+      multiSendAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
+      fallbackHandlerAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
+    },
+    wrapToken: 'wxdai',
+    nativeAsset: {
+      address: pseudoNativeAssetAddress,
+      image: getImageUrl('0x6b175474e89094c44da98b954eedeac495271d0f'),
+      symbol: 'xDAI',
+      decimals: 18,
+    },
+    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    defaultToken: 'wxdai',
   },
 }
 
@@ -151,6 +271,22 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     addresses: {
       [networkIds.MAINNET]: '0x6b175474e89094c44da98b954eedeac495271d0f',
       [networkIds.RINKEBY]: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
+    },
+    order: 1,
+  },
+  wspoa: {
+    symbol: 'WSPOA',
+    decimals: 18,
+    addresses: {
+      [networkIds.SOKOL]: '0xc655c6d80ac92d75fbf4f40e95280aeb855b1e87',
+    },
+    order: 1,
+  },
+  wxdai: {
+    symbol: 'wxDAI',
+    decimals: 18,
+    addresses: {
+      [networkIds.XDAI]: '0xe91d153e0b41518a2ce8dd3d7944fa863463a97d',
     },
     order: 1,
   },
@@ -287,7 +423,9 @@ export const getDefaultToken = (networkId: number) => {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
 
-  return getToken(networkId, DEFAULT_TOKEN)
+  const defaultToken = networks[networkId].defaultToken as KnownToken
+
+  return getToken(networkId, defaultToken)
 }
 
 export const getTokensByNetwork = (networkId: number): Token[] => {
@@ -328,6 +466,8 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     addresses: {
       [networkIds.MAINNET]: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       [networkIds.RINKEBY]: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
+      [networkIds.SOKOL]: '0xf3Aaf8A99f1119d02Af9bBfEafA8a71dDD4c582e',
+      [networkIds.XDAI]: '0xa0Baf56D83be19Eb6bA8aFAD2Db812Bc13D8Be1d',
     },
     isSelectionEnabled: true,
   },
@@ -483,8 +623,11 @@ export const getKlerosCurateGraphUris = (networkId: number): { httpUri: string; 
 export const getOutcomes = (networkId: number, templateId: number) => {
   const isBinary = templateId === 0
   const isNuancedBinary = (networkId === 1 && templateId === 6) || (networkId === 4 && templateId === 5)
+  const isScalar = templateId === 1
   if (isBinary || isNuancedBinary) {
     return ['No', 'Yes']
+  } else if (isScalar) {
+    return []
   } else {
     throw new Error(`Cannot get outcomes for network '${networkId}' and template id '${templateId}'`)
   }
@@ -496,4 +639,26 @@ export const getOmenTCRListId = (networkId: number): number => {
   }
 
   return networks[networkId].omenTCRListId
+}
+
+export const getWrapToken = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  const tokenId = networks[networkId].wrapToken as KnownToken
+  return getToken(networkId, tokenId)
+}
+
+export const getNativeAsset = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].nativeAsset as Token
+}
+
+export const getTargetSafeImplementation = (networkId: number): string => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].targetSafeImplementation.toLowerCase()
 }

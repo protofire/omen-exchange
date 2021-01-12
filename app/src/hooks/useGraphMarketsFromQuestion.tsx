@@ -43,19 +43,20 @@ export const useGraphMarketsFromQuestion = (questionId: string): Result => {
 
   const { data, error, loading } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-and-network',
     skip: false,
     variables: { id: questionId },
   })
 
   useEffect(() => {
     if (!questionId) setMarkets([])
-  }, [questionId])
-
-  if (data && data.question && !isObjectEqual(markets, data.question.indexedFixedProductMarketMakers)) {
-    setMarkets(data.question.indexedFixedProductMarketMakers)
-  } else if (data && data.question && !data.question.indexedFixedProductMarketMakers.length) {
-    setMarkets([])
-  }
+    if (data && data.question && !isObjectEqual(markets, data.question.indexedFixedProductMarketMakers)) {
+      setMarkets(data.question.indexedFixedProductMarketMakers)
+    } else if (data && data.question && !data.question.indexedFixedProductMarketMakers.length) {
+      setMarkets([])
+    }
+    // eslint-disable-next-line
+  }, [questionId, data])
 
   return {
     markets,

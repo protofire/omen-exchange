@@ -374,6 +374,17 @@ const theme = {
     arbitration: '#BA68C8',
     closed: '#BA68C8',
   },
+  scale: {
+    bar: '#e8eaf6',
+    box: '#e8eaf6',
+    ballBorder: '#7986cb',
+    ballBackground: '#fff',
+    border: '#E8EAF6',
+    positive: '#80CBC4',
+    negative: '#EF9A9A',
+    positiveText: '#4B9E98',
+    negativeText: '#EF5350',
+  },
 }
 
 export default theme

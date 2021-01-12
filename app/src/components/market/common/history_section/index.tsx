@@ -6,7 +6,7 @@ import { useWeb3Context } from 'web3-react'
 
 import { EARLIEST_MAINNET_BLOCK_TO_CHECK } from '../../../../common/constants'
 import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
-import { keys, range } from '../../../../util/tools'
+import { isScalarMarket, keys, range } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
 
 import { History_select } from './history_select'
@@ -68,9 +68,13 @@ type Props = {
   marketMakerAddress: string
   hidden: boolean
   outcomes: string[]
+  oracle: Maybe<string>
   currency: string
   fee: BigNumber
   decimals: number
+  scalarHigh: Maybe<BigNumber>
+  scalarLow: Maybe<BigNumber>
+  unit: string
 }
 
 const blocksPerAllTimePeriod = 10000
@@ -94,9 +98,14 @@ export const HistorySelectContainer: React.FC<Props> = ({
   fee,
   hidden,
   marketMakerAddress,
+  oracle,
   outcomes,
+  scalarHigh,
+  scalarLow,
+  unit,
 }) => {
-  const { library } = useWeb3Context()
+  const context = useWeb3Context()
+  const { library } = context
   const [latestBlockNumber, setLatestBlockNumber] = useState<Maybe<number>>(null)
 
   const [blocks, setBlocks] = useState<Maybe<Block[]>>(null)
@@ -132,7 +141,7 @@ export const HistorySelectContainer: React.FC<Props> = ({
         const blockNumbers = range(totalDataPoints).map(multiplier => latestBlockNumber - multiplier * blocksPerPeriod)
         const blocks = await Promise.all(blockNumbers.map(blockNumber => library.getBlock(blockNumber)))
 
-        setBlocks(blocks)
+        setBlocks(blocks.filter(block => block))
       }
     }
 
@@ -142,16 +151,22 @@ export const HistorySelectContainer: React.FC<Props> = ({
     // eslint-disable-next-line
   }, [latestBlockNumber, library, period])
 
+  const isScalar = isScalarMarket(oracle || '', context.networkId || 0)
+
   return hidden ? null : (
     <History_select
       currency={currency}
       decimals={decimals}
       fee={fee}
       holdingSeries={holdingsSeries}
+      isScalar={isScalar}
       marketMakerAddress={marketMakerAddress}
       onChange={setPeriod}
       options={keys(mapPeriod)}
       outcomes={outcomes}
+      scalarHigh={scalarHigh}
+      scalarLow={scalarLow}
+      unit={unit}
       value={period}
     />
   )

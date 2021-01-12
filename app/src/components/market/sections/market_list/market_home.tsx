@@ -10,6 +10,7 @@ import {
   MarketFilters,
   MarketMakerDataItem,
   MarketStates,
+  MarketTypes,
   MarketsSortCriteria,
 } from '../../../../util/types'
 import { ButtonRound } from '../../../button'
@@ -156,6 +157,10 @@ const MarketsDropdown = styled(Dropdown)`
   width: 100%;
 `
 
+const MarketsTypeDropdown = styled(Dropdown)`
+  width: 100%;
+`
+
 const MarketsFilterDropdown = styled(Dropdown)`
   width: 100%;
 `
@@ -167,10 +172,17 @@ const Actions = styled.div`
   > div:first-child {
     margin-bottom: 14px;
   }
+  > div:nth-child(2) {
+    margin-bottom: 14px;
+  }
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: flex;
     justify-content: space-evenly;
     > div:first-child {
+      margin-right: 14px;
+      margin-bottom: 0;
+    }
+    > div:nth-child(2) {
       margin-right: 14px;
       margin-bottom: 0;
     }
@@ -263,7 +275,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   )
   const [arbitrator, setArbitrator] = useState<Maybe<string>>(currentFilter.arbitrator)
   const [currency, setCurrency] = useState<Maybe<string> | null>(currentFilter.currency)
-  const [templateId, setTemplateId] = useState<Maybe<string>>(null)
+  const [templateId, setTemplateId] = useState<Maybe<string>>(currentFilter.templateId)
   const [curationSource, setCurationSource] = useState<CurationSource>(currentFilter.curationSource)
 
   const advancedFilterSelectedCount = [currency, arbitrator, curationSource !== CurationSource.ALL_SOURCES].filter(
@@ -300,6 +312,27 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       title: 'Closed',
       active: state === MarketStates.closed,
       onClick: () => setState(MarketStates.closed),
+    },
+  ]
+
+  const marketTypes = [
+    {
+      type: MarketTypes.all,
+      title: 'All',
+      active: templateId === null,
+      onClick: () => setTemplateId(MarketTypes.all),
+    },
+    {
+      type: MarketTypes.categorical,
+      title: 'Categorical',
+      active: templateId === MarketTypes.categorical,
+      onClick: () => setTemplateId(MarketTypes.categorical),
+    },
+    {
+      type: MarketTypes.scalar,
+      title: 'Scalar',
+      active: templateId === MarketTypes.scalar,
+      onClick: () => setTemplateId(MarketTypes.scalar),
     },
   ]
 
@@ -451,6 +484,13 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     }
   })
 
+  const marketTypeItems: Array<DropdownItemProps> = marketTypes.map(item => {
+    return {
+      content: <CustomDropdownItem>{item.title} Markets</CustomDropdownItem>,
+      onClick: item.onClick,
+    }
+  })
+
   const categoryItems: Array<DropdownItemProps> =
     RemoteData.hasData(categories) && categories.data.length > 0
       ? ([
@@ -494,13 +534,22 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const noMarketsAvailable =
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
   const showFilteringInlineLoading =
-    (!noMarketsAvailable && !noOwnMarkets && isFiltering) || RemoteData.is.loading(markets)
+    (!noMarketsAvailable && !noOwnMarkets && isFiltering) ||
+    RemoteData.is.loading(markets) ||
+    RemoteData.is.reloading(markets)
   const disableLoadNextButton = !moreMarkets || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
   const disableLoadPrevButton = pageIndex === 0 || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)
 
   return (
     <>
       <Actions>
+        <MarketsTypeDropdown
+          currentItem={marketTypes.findIndex(i => i.type === templateId)}
+          dirty={true}
+          dropdownDirection={DropdownDirection.downwards}
+          dropdownVariant={DropdownVariant.card}
+          items={marketTypeItems}
+        />
         <MarketsDropdown
           currentItem={
             RemoteData.hasData(categories) ? categories.data.findIndex(i => i.id === decodeURI(category)) + 1 : 0
@@ -564,6 +613,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
         <ListWrapper>
           {!isFiltering &&
             RemoteData.hasData(markets) &&
+            RemoteData.is.success(markets) &&
             markets.data.length > 0 &&
             markets.data.slice(0, count).map(item => {
               return <ListItem currentFilter={currentFilter} key={item.address} market={item}></ListItem>

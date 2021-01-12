@@ -110,7 +110,7 @@ export const useMarkets = (options: Options): any => {
     setMarkets({
       fixedProductMarketMakers: [],
     })
-  }, [arbitrator, currency, curationSource, category, state, sortBy])
+  }, [arbitrator, currency, curationSource, category, state, sortBy, templateId])
 
   return { markets, error, fetchMore, loading, moreMarkets }
 }

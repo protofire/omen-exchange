@@ -46,13 +46,17 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       scaledLiquidityParameter: parseFloat(graphMarketMakerDataItem.scaledLiquidityParameter),
       runningDailyVolumeByHour: graphMarketMakerDataItem.runningDailyVolumeByHour,
       openingTimestamp: new Date(1000 * +graphMarketMakerDataItem.openingTimestamp),
+      oracle: graphMarketMakerDataItem.condition.oracle ? graphMarketMakerDataItem.condition.oracle : null,
       outcomeTokenAmounts: graphMarketMakerDataItem.outcomeTokenAmounts.map(bigNumberify),
+      outcomeTokenMarginalPrices: graphMarketMakerDataItem.outcomeTokenMarginalPrices,
       outcomes,
       templateId: +graphMarketMakerDataItem.templateId,
       title: graphMarketMakerDataItem.title,
       usdLiquidityParameter: parseFloat(graphMarketMakerDataItem.usdLiquidityParameter),
       klerosTCRregistered: graphMarketMakerDataItem.klerosTCRregistered,
       curatedByDxDaoOrKleros: graphMarketMakerDataItem.curatedByDxDaoOrKleros,
+      scalarLow: graphMarketMakerDataItem.condition.scalarLow ? graphMarketMakerDataItem.condition.scalarLow : null,
+      scalarHigh: graphMarketMakerDataItem.condition.scalarHigh ? graphMarketMakerDataItem.condition.scalarHigh : null,
     }
   })
 }
@@ -82,6 +86,10 @@ const MarketHomeContainer: React.FC = () => {
   const categoryFilter = location.pathname.includes('category')
   let categoryRoute = location.pathname.split('/category/')[1]
   if (categoryRoute) categoryRoute = categoryRoute.split('/')[0]
+
+  const typeFilter = location.pathname.includes('type')
+  let typeRoute = location.pathname.split('/type/')[1]
+  if (typeRoute) typeRoute = typeRoute.split('/')[0]
 
   const stateFilter = location.search.includes('state')
   let stateRoute = location.search.split('state=')[1]
@@ -152,6 +160,13 @@ const MarketHomeContainer: React.FC = () => {
     searchParam = ''
   }
 
+  let typeParam: Maybe<string>
+  if (typeFilter) {
+    typeParam = typeRoute
+  } else {
+    typeParam = null
+  }
+
   const [filter, setFilter] = useState<MarketFilters>({
     state: stateParam,
     category: categoryParam,
@@ -159,7 +174,7 @@ const MarketHomeContainer: React.FC = () => {
     sortBy: sortParam,
     sortByDirection: sortDirection,
     arbitrator: arbitratorParam,
-    templateId: null,
+    templateId: typeParam,
     currency: currencyParam,
     curationSource: curationSourceParam,
   })
@@ -281,6 +296,10 @@ const MarketHomeContainer: React.FC = () => {
 
       if (filter.category && filter.category !== 'All') {
         route += `/category/${filter.category}`
+      }
+
+      if (filter.templateId && filter.templateId !== '') {
+        route += `/type/${filter.templateId}`
       }
 
       if (filter.state && filter.state !== 'OPEN') {

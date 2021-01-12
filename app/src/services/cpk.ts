@@ -1,14 +1,19 @@
 import { txs } from '@gnosis.pm/safe-apps-sdk/dist/txs'
-import CPK from 'contract-proxy-kit/lib/esm'
-import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import { ethers } from 'ethers'
+import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
+import { createCPK } from '../util/cpk'
 import { getLogger } from '../util/logger'
-import { getCPKAddresses, getContractAddress } from '../util/networks'
-import { calcDistributionHint, waitABit } from '../util/tools'
+import {
+  getContractAddress,
+  getTargetSafeImplementation,
+  getWrapToken,
+  pseudoNativeAssetAddress,
+} from '../util/networks'
+import { calcDistributionHint, clampBigNumber, waitABit } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -23,6 +28,7 @@ const logger = getLogger('Services::CPKService')
 
 interface CPKBuyOutcomesParams {
   amount: BigNumber
+  collateral: Token
   outcomeIndex: number
   marketMaker: MarketMakerService
 }
@@ -79,6 +85,13 @@ interface TxOptions {
   gas?: number
 }
 
+const proxyAbi = [
+  'function masterCopy() external view returns (address)',
+  'function changeMasterCopy(address _masterCopy) external',
+  'function swapOwner(address prevOwner, address oldOwner, address newOwner) external',
+  'function getOwners() public view returns (address[] memory)',
+]
+
 interface CPKRequestVerificationParams {
   params: string
   ovmAddress: string
@@ -93,28 +106,16 @@ interface CreateMarketResult {
 class CPKService {
   cpk: any
   provider: Web3Provider
+  proxy: any
 
   constructor(cpk: any, provider: Web3Provider) {
     this.cpk = cpk
     this.provider = provider
+    this.proxy = new ethers.Contract(cpk.address, proxyAbi, provider.getSigner())
   }
 
   static async create(provider: Web3Provider) {
-    const signer = provider.getSigner()
-    const network = await provider.getNetwork()
-    const cpkAddresses = getCPKAddresses(network.chainId)
-    const networks = cpkAddresses
-      ? {
-          [network.chainId]: cpkAddresses,
-        }
-      : {}
-    const cpk = await CPK.create({
-      ethLibAdapter: new EthersAdapter({
-        ethers,
-        signer,
-      }),
-      networks,
-    })
+    const cpk = await createCPK(provider)
     return new CPKService(cpk, provider)
   }
 
@@ -143,12 +144,45 @@ class CPKService {
     return ''
   }
 
-  buyOutcomes = async ({ amount, marketMaker, outcomeIndex }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
+  buyOutcomes = async ({
+    amount,
+    collateral,
+    marketMaker,
+    outcomeIndex,
+  }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
-      const collateralAddress = await marketMaker.getCollateralToken()
+      const transactions = []
+
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
+        txOptions.gas = 500000
+      }
+
+      let collateralAddress
+      if (collateral.address === pseudoNativeAssetAddress) {
+        // ultimately WETH will be the collateral if we fund with native ether
+        collateralAddress = getWrapToken(networkId).address
+
+        // we need to send the funding amount in native ether
+        if (!this.cpk.isSafeApp()) {
+          txOptions.value = amount
+        }
+
+        // Step 0: Wrap ether
+        transactions.push({
+          to: collateralAddress,
+          value: amount,
+        })
+      } else {
+        collateralAddress = await marketMaker.getCollateralToken()
+      }
+
       const marketMakerAddress = marketMaker.address
 
       const collateralService = new ERC20Service(this.provider, account, collateralAddress)
@@ -157,13 +191,6 @@ class CPKService {
 
       const outcomeTokensToBuy = await marketMaker.calcBuyAmount(amount, outcomeIndex)
       logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
-      const transactions = []
-
-      const txOptions: TxOptions = {}
-
-      if (this.cpk.isSafeApp()) {
-        txOptions.gas = 500000
-      }
 
       // Check  if the allowance of the CPK to the market maker is enough.
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
@@ -180,9 +207,10 @@ class CPKService {
         })
       }
 
+      // Step 2: Transfer the amount of collateral being spent from the user to the CPK
+      // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp()) {
-        // Step 2: Transfer the amount of collateral being spent from the user to the CPK
+      if (!this.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress) {
         transactions.push({
           to: collateralAddress,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
@@ -212,7 +240,7 @@ class CPKService {
     realitio,
   }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
-      const { arbitrator, category, collateral, loadedQuestionId, outcomes, question, resolution, spread } = marketData
+      const { arbitrator, category, loadedQuestionId, outcomes, question, resolution, spread } = marketData
 
       if (!resolution) {
         throw new Error('Resolution time was not specified')
@@ -232,8 +260,28 @@ class CPKService {
       const transactions = []
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp()) {
+      if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = 1200000
+      }
+
+      let collateral
+
+      if (marketData.collateral.address === pseudoNativeAssetAddress) {
+        // ultimately WETH will be the collateral if we fund with native ether
+        collateral = getWrapToken(networkId)
+
+        // we need to send the funding amount in native ether
+        if (!this.cpk.isSafeApp()) {
+          txOptions.value = marketData.funding
+        }
+
+        // Step 0: Wrap ether
+        transactions.push({
+          to: collateral.address,
+          value: marketData.funding,
+        })
+      } else {
+        collateral = marketData.collateral
       }
 
       let questionId: string
@@ -290,9 +338,10 @@ class CPKService {
         data: ERC20Service.encodeApproveUnlimited(marketMakerFactory.address),
       })
 
+      // Step 4: Transfer funding from user
+      // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp()) {
-        // Step 4: Transfer funding from user
+      if (!this.cpk.isSafeApp() && marketData.collateral.address !== pseudoNativeAssetAddress) {
         transactions.push({
           to: collateral.address,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
@@ -325,8 +374,207 @@ class CPKService {
       })
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
+
       const txHash = await this.getTransactionHash(txObject)
       logger.log(`Transaction hash: ${txHash}`)
+
+      const transaction = await this.provider.waitForTransaction(txObject.hash)
+      return {
+        transaction,
+        marketMakerAddress: predictedMarketMakerAddress,
+      }
+    } catch (err) {
+      logger.error(`There was an error creating the market maker`, err.message)
+      throw err
+    }
+  }
+
+  createScalarMarket = async ({
+    conditionalTokens,
+    marketData,
+    marketMakerFactory,
+    realitio,
+  }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
+    try {
+      const {
+        arbitrator,
+        category,
+        loadedQuestionId,
+        lowerBound,
+        question,
+        resolution,
+        spread,
+        startingPoint,
+        unit,
+        upperBound,
+      } = marketData
+
+      if (!resolution) {
+        throw new Error('Resolution time was not specified')
+      }
+
+      if (!lowerBound) {
+        throw new Error('Lower bound not specified')
+      }
+
+      if (!upperBound) {
+        throw new Error('Upper bound not specified')
+      }
+
+      if (!startingPoint) {
+        throw new Error('Starting expected value not specified')
+      }
+
+      if (lowerBound.gt(startingPoint) || startingPoint.gt(upperBound)) {
+        throw new Error('Starting expected value should be between lowerBound and upperBound')
+      }
+
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+
+      const conditionalTokensAddress = conditionalTokens.address
+      const realitioAddress = realitio.address
+      const realitioScalarAdapterAddress = realitio.scalarContract.address
+
+      const openingDateMoment = moment(resolution)
+
+      const transactions = []
+      const txOptions: TxOptions = {}
+
+      if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
+        txOptions.gas = 1500000
+      }
+
+      let collateral
+
+      if (marketData.collateral.address === pseudoNativeAssetAddress) {
+        // ultimately WETH will be the collateral if we fund with native ether
+        collateral = getWrapToken(networkId)
+
+        // we need to send the funding amount in native ether
+        if (!this.cpk.isSafeApp()) {
+          txOptions.value = marketData.funding
+        }
+
+        // Step 0: Wrap ether
+        transactions.push({
+          to: collateral.address,
+          value: marketData.funding,
+        })
+      } else {
+        collateral = marketData.collateral
+      }
+
+      let realityEthQuestionId: string
+      if (loadedQuestionId) {
+        realityEthQuestionId = loadedQuestionId
+      } else {
+        // Step 1: Create question in realitio without bounds
+        transactions.push({
+          to: realitioAddress,
+          data: RealitioService.encodeAskScalarQuestion(
+            question,
+            unit,
+            category,
+            arbitrator.address,
+            openingDateMoment,
+            networkId,
+          ),
+        })
+        realityEthQuestionId = await realitio.askScalarQuestionConstant(
+          question,
+          unit,
+          category,
+          arbitrator.address,
+          openingDateMoment,
+          networkId,
+          this.cpk.address,
+        )
+      }
+      const conditionQuestionId = keccak256(
+        defaultAbiCoder.encode(['bytes32', 'uint256', 'uint256'], [realityEthQuestionId, lowerBound, upperBound]),
+      )
+      logger.log(`Reality.eth QuestionID ${realityEthQuestionId}`)
+      logger.log(`Conditional Tokens QuestionID ${conditionQuestionId}`)
+
+      // Step 1.5: Announce the questionId and its bounds to the RealitioScalarAdapter
+      transactions.push({
+        to: realitioScalarAdapterAddress,
+        data: RealitioService.encodeAnnounceConditionQuestionId(realityEthQuestionId, lowerBound, upperBound),
+      })
+
+      const oracleAddress = getContractAddress(networkId, 'realitioScalarAdapter')
+      const conditionId = conditionalTokens.getConditionId(conditionQuestionId, oracleAddress, 2)
+
+      let conditionExists = false
+      if (loadedQuestionId) {
+        conditionExists = await conditionalTokens.doesConditionExist(conditionId)
+      }
+
+      if (!conditionExists) {
+        // Step 2: Prepare scalar condition using the conditionQuestionId
+        logger.log(`Adding prepareCondition transaction`)
+
+        transactions.push({
+          to: conditionalTokensAddress,
+          data: ConditionalTokenService.encodePrepareCondition(conditionQuestionId, oracleAddress, 2),
+        })
+      }
+
+      logger.log(`ConditionID: ${conditionId}`)
+
+      // Step 3: Approve collateral for factory
+      transactions.push({
+        to: collateral.address,
+        data: ERC20Service.encodeApproveUnlimited(marketMakerFactory.address),
+      })
+
+      // Step 4: Transfer funding from user
+      // If we are funding with native ether we can skip this step
+      // If we are signed in as a safe we don't need to transfer
+      if (!this.cpk.isSafeApp() && marketData.collateral.address !== pseudoNativeAssetAddress) {
+        transactions.push({
+          to: collateral.address,
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
+        })
+      }
+
+      // Step 4.5: Calculate distributionHint
+      const domainSize = upperBound.sub(lowerBound)
+      const a = clampBigNumber(upperBound.sub(startingPoint), Zero, domainSize)
+      const b = clampBigNumber(startingPoint.sub(lowerBound), Zero, domainSize)
+
+      const distributionHint = [b, a]
+
+      // Step 5: Create market maker
+      const saltNonce = Math.round(Math.random() * 1000000)
+      const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
+        saltNonce,
+        conditionalTokens.address,
+        collateral.address,
+        conditionId,
+        this.cpk.address,
+        spread,
+      )
+      logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
+      transactions.push({
+        to: marketMakerFactory.address,
+        data: MarketMakerFactoryService.encodeCreateMarketMaker(
+          saltNonce,
+          conditionalTokens.address,
+          collateral.address,
+          conditionId,
+          spread,
+          marketData.funding,
+          distributionHint,
+        ),
+      })
+
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      logger.log(`Transaction hash: ${txObject.hash}`)
 
       const transaction = await this.provider.waitForTransaction(txObject.hash)
       return {
@@ -400,15 +648,38 @@ class CPKService {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
 
-      // Check  if the allowance of the CPK to the market maker is enough.
-      const collateralService = new ERC20Service(this.provider, account, collateral.address)
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
       const transactions = []
+
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp()) {
+      if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = 500000
       }
+
+      let collateralAddress
+      if (collateral.address === pseudoNativeAssetAddress) {
+        // ultimately WETH will be the collateral if we fund with native ether
+        collateralAddress = getWrapToken(networkId).address
+
+        // we need to send the funding amount in native ether
+        if (!this.cpk.isSafeApp()) {
+          txOptions.value = amount
+        }
+
+        // Step 0: Wrap ether
+        transactions.push({
+          to: collateralAddress,
+          value: amount,
+        })
+      } else {
+        collateralAddress = collateral.address
+      }
+
+      // Check  if the allowance of the CPK to the market maker is enough.
+      const collateralService = new ERC20Service(this.provider, account, collateralAddress)
 
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
@@ -419,20 +690,22 @@ class CPKService {
       if (!hasCPKEnoughAlowance) {
         // Step 1:  Approve unlimited amount to be transferred to the market maker
         transactions.push({
-          to: collateral.address,
+          to: collateralAddress,
           data: ERC20Service.encodeApproveUnlimited(marketMaker.address),
         })
       }
 
+      // Step 2: Transfer funding from user
+      // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp()) {
-        // Step 4: Transfer funding from user
+      if (!this.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress) {
         transactions.push({
           to: collateral.address,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
         })
       }
 
+      // Step 3: Add funding to market
       transactions.push({
         to: marketMaker.address,
         data: MarketMakerService.encodeAddFunding(amount),
@@ -543,6 +816,7 @@ class CPKService {
       if (this.cpk.isSafeApp()) {
         txOptions.gas = 500000
       }
+
       if (!isConditionResolved) {
         transactions.push({
           to: oracle.address,
@@ -571,6 +845,39 @@ class CPKService {
       return this.provider.waitForTransaction(txHash)
     } catch (err) {
       logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
+      throw err
+    }
+  }
+
+  proxyIsUpToDate = async (): Promise<boolean> => {
+    const deployed = await this.cpk.isProxyDeployed()
+    if (deployed) {
+      const network = await this.provider.getNetwork()
+      const implementation = await this.proxy.masterCopy()
+      if (implementation.toLowerCase() === getTargetSafeImplementation(network.chainId).toLowerCase()) {
+        return true
+      }
+    }
+    return false
+  }
+
+  upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {
+    try {
+      const txOptions: TxOptions = {}
+      // add plenty of gas to avoid locked proxy https://github.com/gnosis/contract-proxy-kit/issues/132
+      txOptions.gas = 500000
+      const network = await this.provider.getNetwork()
+      const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId)
+      const transactions = [
+        {
+          to: this.cpk.address,
+          data: this.proxy.interface.functions.changeMasterCopy.encode([targetGnosisSafeImplementation]),
+        },
+      ]
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (err) {
+      logger.error(`Error trying to update proxy`, err.message)
       throw err
     }
   }

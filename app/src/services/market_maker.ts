@@ -161,6 +161,7 @@ class MarketMakerService {
         `Balance information :: Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
       )
       const positionIdForCollectionId = await this.conditionalTokens.getPositionId(collateralTokenAddress, collectionId)
+
       const balance = await this.conditionalTokens.getBalanceOfByBlock(
         ownerAddress,
         positionIdForCollectionId,

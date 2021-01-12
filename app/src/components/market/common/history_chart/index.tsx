@@ -1,9 +1,11 @@
+import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import { useHistory } from 'react-router'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import styled from 'styled-components'
 
 import { getOutcomeColor } from '../../../../theme/utils'
+import { formatBigNumber } from '../../../../util/tools'
 import { Button } from '../../../button/button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../common_styled'
@@ -89,10 +91,43 @@ const renderTooltipContent = (o: any) => {
 type Props = {
   data: { date: string }[]
   outcomes: string[]
+  scalarHigh?: Maybe<BigNumber>
+  scalarLow?: Maybe<BigNumber>
+  unit: string
+  isScalar?: Maybe<boolean>
 }
 
-export const HistoryChart: React.FC<Props> = ({ data, outcomes }) => {
+export const HistoryChart: React.FC<Props> = ({ data, isScalar, outcomes, scalarHigh, scalarLow, unit }) => {
   const history = useHistory()
+
+  const scalarLowNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
+  const scalarHighNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
+
+  const toScaleValue = (decimal: number, fixed = 0) => {
+    return `${(decimal * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) + (scalarLowNumber || 0)).toFixed(
+      fixed,
+    )} ${unit}`
+  }
+
+  const renderScalarTooltipContent = (o: any) => {
+    const { label, payload } = o
+    const prediction = (
+      payload[0]?.value * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) +
+      (scalarLowNumber || 0)
+    ).toFixed(2)
+    return (
+      <ChartTooltip>
+        <TooltipTitle>{label}</TooltipTitle>
+        <Legends>
+          <Legend key={`item-0`}>
+            <AnEvenSmallerLittleBall outcomeIndex={0} />
+            <strong>{`${prediction}`}</strong>
+            {`${unit}`}
+          </Legend>
+        </Legends>
+      </ChartTooltip>
+    )
+  }
   return (
     <>
       <ResponsiveWrapper>
@@ -103,10 +138,10 @@ export const HistoryChart: React.FC<Props> = ({ data, outcomes }) => {
               orientation="right"
               stroke="#E8EAF6"
               tick={{ fill: '#757575', fontFamily: 'Roboto' }}
-              tickFormatter={toPercent}
+              tickFormatter={isScalar ? toScaleValue : toPercent}
               tickMargin={10}
             />
-            <Tooltip content={renderTooltipContent} />
+            <Tooltip content={isScalar ? renderScalarTooltipContent : renderTooltipContent} />
 
             {outcomes
               .map((outcomeName, index) => {

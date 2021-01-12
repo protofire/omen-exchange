@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { Alert } from './img/Alert'
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ margin?: boolean }>`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -11,7 +11,7 @@ const Wrapper = styled.div`
   border: ${({ theme }) => theme.borders.borderLineDisabled};
   align-content: center;
   padding: 4px 20px;
-  margin-bottom: 20px;
+  margin-bottom: ${props => (!props.margin ? '20px' : '0')};
 `
 
 const AlertWrapper = styled.div`
@@ -48,12 +48,22 @@ interface Props {
   danger?: boolean
   grayscale?: boolean
   style?: React.CSSProperties
+  marginBottom?: boolean
 }
 
 export const WarningMessage = (props: Props) => {
-  const { additionalDescription, danger, description, grayscale, href, hyperlinkDescription, ...restProps } = props
+  const {
+    additionalDescription,
+    danger,
+    description,
+    grayscale,
+    href,
+    hyperlinkDescription,
+    marginBottom,
+    ...restProps
+  } = props
   return (
-    <Wrapper {...restProps}>
+    <Wrapper margin={marginBottom} {...restProps}>
       <AlertWrapper className={grayscale ? 'grayscale' : ''}>
         <Alert />
       </AlertWrapper>
