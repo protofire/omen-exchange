@@ -13,6 +13,7 @@ import {
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
+  getUnit,
   isDust,
   mulBN,
 } from '../../../../util/tools'
@@ -223,7 +224,7 @@ export const ScalarMarketSell = (props: Props) => {
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
         startingPointTitle={isNewPrediction ? 'New prediction' : 'Current prediction'}
-        unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+        unit={getUnit(question.title)}
         upperBound={scalarHigh || new BigNumber(0)}
       />
       <GridTransactionDetails>

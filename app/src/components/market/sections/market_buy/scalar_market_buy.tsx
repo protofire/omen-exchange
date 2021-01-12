@@ -15,9 +15,10 @@ import {
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
+import { getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import { computeBalanceAfterTrade, formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
-import { MarketDetailsTab, MarketMakerData, Status, Ternary } from '../../../../util/types'
+import { computeBalanceAfterTrade, formatBigNumber, formatNumber, getUnit, mulBN } from '../../../../util/tools'
+import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -62,7 +63,6 @@ export const ScalarMarketBuy = (props: Props) => {
   const {
     address: marketMakerAddress,
     balances,
-    collateral,
     fee,
     outcomeTokenMarginalPrices,
     question,
@@ -79,6 +79,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountDisplay, setAmountDisplay] = useState<string>('')
+  const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
   const [activeTab, setActiveTab] = useState(Tabs.short)
   const [positionIndex, setPositionIndex] = useState(0)
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -156,7 +157,6 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
-  const totalFee = Number(formatBigNumber(fee, 18))
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
@@ -165,9 +165,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
   const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
   const potentialProfitFormatted = potentialProfit.gt(Zero)
-    ? `${formatNumber((Number(formatBigNumber(potentialProfit, collateral.decimals)) - totalFee).toString())} ${
-        collateral.symbol
-      }`
+    ? `${formatNumber(Number(formatBigNumber(potentialProfit, collateral.decimals)).toString())} ${collateral.symbol}`
     : `0.00 ${collateral.symbol}`
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
@@ -205,6 +203,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
       await cpk.buyOutcomes({
         amount,
+        collateral,
         outcomeIndex,
         marketMaker,
       })
@@ -232,6 +231,13 @@ export const ScalarMarketBuy = (props: Props) => {
     setIsModalTransactionResultOpen(true)
   }
 
+  const wrapAddress = getWrapToken(context.networkId).address
+
+  const currencyFilters =
+    collateral.address === wrapAddress || collateral.address === pseudoNativeAssetAddress
+      ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
+      : []
+
   return (
     <>
       <MarketScale
@@ -248,7 +254,7 @@ export const ScalarMarketBuy = (props: Props) => {
         potentialProfit={potentialProfit}
         short={activeTab === Tabs.short}
         startingPointTitle={'Current prediction'}
-        unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+        unit={getUnit(question.title)}
         upperBound={scalarHigh || new BigNumber(0)}
       />
       <GridTransactionDetails>
@@ -263,11 +269,17 @@ export const ScalarMarketBuy = (props: Props) => {
           </TabsGrid>
           <CurrenciesWrapper>
             <CurrencySelector
+              addNativeAsset
               balance={walletBalance}
               context={context}
               currency={collateral.address}
-              disabled
-              onSelect={() => null}
+              disabled={currencyFilters.length ? false : true}
+              onSelect={(token: Token | null) => {
+                if (token) {
+                  setCollateral(token)
+                  setAmount(new BigNumber(0))
+                }
+              }}
             />
           </CurrenciesWrapper>
           <ReactTooltip id="walletBalanceTooltip" />

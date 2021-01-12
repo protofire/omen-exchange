@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { useConnectedCPKContext, useGraphMarketTradeData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
-import { isDust } from '../../../../../util/tools'
+import { getUnit, isDust } from '../../../../../util/tools'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
@@ -197,7 +197,7 @@ const Wrapper = (props: Props) => {
     <Button
       buttonType={ButtonType.secondaryLine}
       onClick={() => {
-        window.open(`${realitioBaseUrl}/app/#!/question/${question.id}`)
+        window.open(`${realitioBaseUrl}/#!/question/${question.id}`)
       }}
     >
       Answer on Reality.eth
@@ -209,7 +209,7 @@ const Wrapper = (props: Props) => {
       <Button
         buttonType={ButtonType.secondaryLine}
         onClick={() => {
-          window.open(`${realitioBaseUrl}/app/#!/question/${question.id}`)
+          window.open(`${realitioBaseUrl}/#!/question/${question.id}`)
         }}
       >
         Call Arbitrator
@@ -298,7 +298,7 @@ const Wrapper = (props: Props) => {
                   startingPointTitle={'Current prediction'}
                   status={status}
                   trades={trades}
-                  unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+                  unit={getUnit(question.title)}
                   upperBound={scalarHigh || new BigNumber(0)}
                 />
               </>
@@ -354,7 +354,7 @@ const Wrapper = (props: Props) => {
                 currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Current prediction'}
-                unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+                unit={getUnit(question.title)}
                 upperBound={scalarHigh || new BigNumber(0)}
               />
               {openQuestionMessage}

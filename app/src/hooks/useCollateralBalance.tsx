@@ -2,6 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
 import { ERC20Service } from '../services'
+import { pseudoNativeAssetAddress } from '../util/networks'
 import { Token } from '../util/types'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
@@ -20,8 +21,12 @@ export const useCollateralBalance = (
   const fetchCollateralBalance = async () => {
     let collateralBalance = new BigNumber(0)
     if (account) {
-      const collateralService = new ERC20Service(provider, account, collateral.address)
-      collateralBalance = await collateralService.getCollateral(account)
+      if (collateral.address === pseudoNativeAssetAddress) {
+        collateralBalance = await provider.getBalance(account)
+      } else {
+        const collateralService = new ERC20Service(provider, account, collateral.address)
+        collateralBalance = await collateralService.getCollateral(account)
+      }
     }
 
     setCollateralBalance(collateralBalance)

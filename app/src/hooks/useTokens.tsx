@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
-import { getOmenTCRListId, getTokensByNetwork } from '../util/networks'
+import { getNativeAsset, getOmenTCRListId, getTokensByNetwork } from '../util/networks'
 import { getImageUrl } from '../util/token'
 import { isObjectEqual } from '../util/tools'
 import { Token } from '../util/types'
@@ -38,9 +38,13 @@ type GraphResponse = {
   ]
 }
 
-export const useTokens = (context: ConnectedWeb3Context) => {
+export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolean) => {
   const defaultTokens = getTokensByNetwork(context.networkId)
+  if (addNativeAsset) {
+    defaultTokens.splice(1, 0, getNativeAsset(context.networkId))
+  }
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
+
   const omenTCRListId = getOmenTCRListId(context.networkId)
 
   const { data, error, loading, refetch } = useQuery<GraphResponse>(query, {
@@ -54,8 +58,20 @@ export const useTokens = (context: ConnectedWeb3Context) => {
       ...token,
       image: getImageUrl(token.address),
     }))
-    if (!isObjectEqual(tokens, tokensWithImage)) {
-      setTokens(tokensWithImage)
+
+    // preserve ordering of default tokens and remove duplicates from TCR
+    const combinedTokens: Token[] = Object.values(
+      [...defaultTokens, ...tokensWithImage].reduce((prev, curr) => {
+        // @ts-expect-error ignore
+        if (prev[curr.symbol.toLowerCase()]) {
+          return prev
+        }
+        return { ...prev, [curr.symbol.toLowerCase()]: curr }
+      }, {}),
+    )
+
+    if (!isObjectEqual(tokens, combinedTokens)) {
+      setTokens(combinedTokens)
     }
   }
 

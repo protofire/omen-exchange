@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES, MAX_OUTCOME_ALLOWED } from '../../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
-import { Arbitrator, Question } from '../../../../../../util/types'
+import { Arbitrator, FormState, Question } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { DateField, FormRow, FormStateButton } from '../../../../../common'
@@ -173,13 +173,9 @@ const AskQuestionStep = (props: Props) => {
 
   const history = useHistory()
 
-  const [currentFormState, setCurrentFormState] = useState(state ? state : loadedQuestionId ? 'IMPORT' : 'CATEGORICAL')
-
-  const FormState = {
-    categorical: 'CATEGORICAL',
-    import: 'IMPORT',
-    scalar: 'SCALAR',
-  }
+  const [currentFormState, setCurrentFormState] = useState(
+    state ? state : loadedQuestionId ? FormState.import : FormState.categorical,
+  )
 
   const totalProbabilities = outcomes.reduce((total, cur) => total + (cur.probability ? cur.probability : 0), 0)
   const totalProbabilitiesNotFull = Math.abs(totalProbabilities - 100) > 0.000001
@@ -219,9 +215,6 @@ const AskQuestionStep = (props: Props) => {
       )
     }
   }, [
-    FormState.categorical,
-    FormState.import,
-    FormState.scalar,
     category,
     currentFormState,
     isProperScale,
@@ -268,17 +261,20 @@ const AskQuestionStep = (props: Props) => {
       <CategoryImportWrapper>
         <FormStateButton
           active={currentFormState === FormState.categorical}
-          onClick={() => setCurrentFormState('CATEGORICAL')}
+          onClick={() => setCurrentFormState(FormState.categorical)}
         >
           Categorical Market
         </FormStateButton>
-        <FormStateButton active={currentFormState === FormState.scalar} onClick={() => setCurrentFormState('SCALAR')}>
+        <FormStateButton
+          active={currentFormState === FormState.scalar}
+          onClick={() => setCurrentFormState(FormState.scalar)}
+        >
           Scalar Market
         </FormStateButton>
         <FormStateButton
           active={currentFormState === FormState.import}
           onClick={() => {
-            setCurrentFormState('IMPORT')
+            setCurrentFormState(FormState.import)
           }}
         >
           Import Market

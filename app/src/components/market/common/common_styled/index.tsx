@@ -300,3 +300,28 @@ export const THStyled = styled(TH as any)`
 export const TDStyled = styled(TD as any)`
   ${PaddingCSS}
 `
+
+export const Circle = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 8px;
+  border-radius: 50%;
+  border: 1px solid ${props => props.theme.colors.tertiary};
+  transition: border-color 0.15s linear;
+  cursor: pointer;
+  height: 18px;
+  width: 18px;
+
+  path {
+    transition: fill 0.15s linear;
+    fill: ${props => props.theme.colors.textColorLightish};
+  }
+
+  &:hover {
+    border-color: ${props => props.theme.colors.tertiaryDark};
+    path {
+      fill: ${props => props.theme.colors.textColorDark};
+    }
+  }
+`

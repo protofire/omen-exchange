@@ -1,4 +1,5 @@
 import Big from 'big.js'
+import { MaxUint256 } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
@@ -8,7 +9,7 @@ import { useConnectedCPKContext, useContracts, useGraphMarketTradeData } from '.
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
-import { formatBigNumber } from '../../../../../util/tools'
+import { formatBigNumber, getUnit } from '../../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
@@ -264,7 +265,10 @@ const Wrapper = (props: Props) => {
   const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), 18))
   const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), 18))
 
-  const finalAnswerPercentage = (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
+  const finalAnswerPercentage =
+    realitioAnswer && realitioAnswer.eq(MaxUint256)
+      ? 0.5
+      : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
 
   const earnedCollateral = isScalar
     ? scalarComputeEarnedCollateral(
@@ -316,7 +320,7 @@ const Wrapper = (props: Props) => {
                 currentPrediction={finalAnswerPercentage.toString()}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Final answer'}
-                unit={question.title ? question.title.split('[')[1].split(']')[0] : ''}
+                unit={getUnit(question.title)}
                 upperBound={scalarHigh || new BigNumber(0)}
               />
             ) : (
