@@ -282,7 +282,6 @@ interface Props {
   status?: Maybe<Status>
   balances?: Maybe<BalanceItem[]>
   fee?: Maybe<BigNumber>
-  slider?: Maybe<boolean>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
