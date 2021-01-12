@@ -1,7 +1,7 @@
 import Big from 'big.js'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { getOutcomeColor } from '../../../../theme/utils'

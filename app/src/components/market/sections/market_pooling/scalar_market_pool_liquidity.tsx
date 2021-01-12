@@ -84,7 +84,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     question,
     scalarHigh,
     scalarLow,
-    totalEarnings,
     totalPoolShares,
     userEarnings,
   } = marketMakerData

@@ -1,5 +1,3 @@
-import { parseUnits } from 'ethers/utils'
-
 import { OmenLogo } from '../components/common/logos/omen'
 
 export const LOGGER_ID = 'gnosis-conditional-exchange'

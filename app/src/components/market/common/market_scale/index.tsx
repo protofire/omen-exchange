@@ -359,13 +359,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [yourPayout, setYourPayout] = useState(0)
   const [profitLoss, setProfitLoss] = useState(0)
   const [shortPayout, setShortPayout] = useState(0)
-  const [shortProfitLoss, setShortProfitLoss] = useState(0)
   const [longPayout, setLongPayout] = useState(0)
-  const [longProfitLoss, setLongProfitLoss] = useState(0)
   const [totalShortPrice, setTotalShortPrice] = useState<number>(0)
   const [totalLongPrice, setTotalLongPrice] = useState<number>(0)
-  const [shortProfitLossPercentage, setShortProfitLossPercentage] = useState<number>(0)
-  const [longProfitLossPercentage, setLongProfitLossPercentage] = useState<number>(0)
 
   useEffect(() => {
     if (trades && trades.length && collateral) {
@@ -394,7 +390,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           : 0,
       )
     }
-  }, [trades])
+  }, [trades, collateral])
 
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
@@ -427,21 +423,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
         setShortPayout((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
-        setShortProfitLoss((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - (totalShortPrice || 0))
-        setShortProfitLossPercentage(
-          (((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - (totalShortPrice || 0)) /
-            (totalShortPrice || 0)) *
-            100,
-        )
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
         setLongPayout((longSharesNumber || 0) * (Number(scaleBall?.value) / 100))
-        setLongProfitLoss((longSharesNumber || 0) * (Number(scaleBall?.value) / 100) - (totalLongPrice || 0))
-        setLongProfitLossPercentage(
-          (((longSharesNumber || 0) * (Number(scaleBall?.value) / 100) - (totalLongPrice || 0)) /
-            (totalLongPrice || 0)) *
-            100,
-        )
       }
     }
   }, [
@@ -461,6 +445,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     totalLongPrice,
     totalShortPrice,
     amountSharesNumber,
+    collateral,
   ])
 
   const activateTooltip = () => {
@@ -652,12 +637,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           collateral={collateral}
           fee={fee}
           longPayout={longPayout}
-          longProfitLoss={longProfitLoss}
-          longProfitLossPercentage={longProfitLossPercentage}
           shortPayout={shortPayout}
-          shortProfitLoss={shortProfitLoss}
-          shortProfitLossPercentage={shortProfitLossPercentage}
-          trades={trades}
         />
       )}
     </>

@@ -4,10 +4,9 @@ import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useAsyncDerivedValue, useCollateralBalance, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { RemoteData } from '../../../../util/remote_data'
 import {
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
@@ -55,7 +54,6 @@ export const ScalarMarketSell = (props: Props) => {
   const { fetchGraphMarketMakerData, fetchGraphMarketTradeData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const { library: provider } = context
-  const signer = useMemo(() => provider.getSigner(), [provider])
 
   const {
     address: marketMakerAddress,
@@ -141,7 +139,7 @@ export const ScalarMarketSell = (props: Props) => {
       logger.log(`Amount to sell ${amountToSell}`)
       return [costFee, newPrediction, amountToSell, potentialValue]
     },
-    [balances, marketMaker, positionIndex, lowerBound, upperBound, fee],
+    [balances, positionIndex, lowerBound, upperBound, fee],
   )
 
   const [costFee, newPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(

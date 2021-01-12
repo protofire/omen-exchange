@@ -1,10 +1,10 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
-import styled, { css } from 'styled-components'
+import React from 'react'
+import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
-import { BalanceItem, PositionTableValue, Token, TradeObject } from '../../../../util/types'
-import { TD, TH, THead, TR, Table } from '../../../common'
+import { BalanceItem, PositionTableValue, Token } from '../../../../util/types'
+import { TD, THead, TR, Table } from '../../../common'
 import {
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
@@ -30,41 +30,20 @@ const TDPosition = styled(TD as any)`
 `
 
 interface Props {
-  trades: TradeObject[]
   balances: BalanceItem[]
   collateral: Token
   fee: BigNumber | null | undefined
   longPayout: number
   shortPayout: number
-  shortProfitLoss: number
-  longProfitLoss: number
-  shortProfitLossPercentage: number
-  longProfitLossPercentage: number
 }
 
 export const PositionTable = (props: Props) => {
-  const {
-    balances,
-    collateral,
-    longPayout,
-    longProfitLoss,
-    longProfitLossPercentage,
-    shortPayout,
-    shortProfitLoss,
-    shortProfitLossPercentage,
-    trades,
-  } = props
+  const { balances, collateral, longPayout, shortPayout } = props
 
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
   const shortSharesFormatted = formatNumber(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
   const longSharesFormatted = formatNumber(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
-
-  const [shortTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '0'))
-  const [longTrades] = useState<TradeObject[]>(trades.filter(trade => trade.outcomeIndex === '1'))
-
-  const positiveShortProfit = shortProfitLoss > 0 ? true : shortProfitLoss < 0 ? false : undefined
-  const positiveLongProfit = longProfitLoss > 0 ? true : longProfitLoss < 0 ? false : undefined
 
   const TableHead: PositionTableValue[] = [
     PositionTableValue.YourPosition,
