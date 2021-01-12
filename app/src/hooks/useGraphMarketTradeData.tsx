@@ -38,7 +38,7 @@ type GraphResponse = {
 
 type Result = {
   fetchData: () => Promise<void>
-  trades: TradeObject[]
+  trades: Maybe<TradeObject[]>
   status: Status
 }
 
@@ -62,7 +62,7 @@ const wrangleResponse = (data: GraphResponseTradeObject[]) => {
 }
 
 export const useGraphMarketTradeData = (title: string, collateral: string, account: string | undefined): Result => {
-  let trades: TradeObject[] = []
+  const [trades, setTrades] = useState<Maybe<TradeObject[]>>(null)
   const [needUpdate, setNeedUpdate] = useState<boolean>(false)
 
   const { data, error, loading, refetch } = useQuery<GraphResponse>(query, {
@@ -77,17 +77,17 @@ export const useGraphMarketTradeData = (title: string, collateral: string, accou
 
   useEffect(() => {
     if (!title || !collateral || !account) {
-      trades = []
+      setTrades([])
     }
-  }, [title, collateral])
+  }, [title, collateral, account])
 
   if (data && data.fpmmTrades) {
-    trades = wrangleResponse(data.fpmmTrades)
+    const wrangledValue = wrangleResponse(data.fpmmTrades)
     if (needUpdate) {
-      trades = wrangleResponse(data.fpmmTrades)
+      setTrades(wrangledValue)
       setNeedUpdate(false)
-    } else if (!isObjectEqual(trades, data.fpmmTrades)) {
-      trades = wrangleResponse(data.fpmmTrades)
+    } else if (!isObjectEqual(trades, wrangledValue)) {
+      setTrades(wrangledValue)
       needRefetch = false
     }
   }
@@ -105,7 +105,7 @@ export const useGraphMarketTradeData = (title: string, collateral: string, accou
 
   return {
     fetchData,
-    trades,
+    trades: error ? null : trades,
     status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
   }
 }
