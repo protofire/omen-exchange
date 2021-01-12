@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 
-import { DEFAULT_TOKEN_ADDRESS, DEFAULT_TOKEN_ADDRESS_RINKEBY } from '../../../../common/constants'
+import { DEFAULT_TOKEN_ADDRESS } from '../../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context, useCpkAllowance } from '../../../../hooks'
 import { RemoteData } from '../../../../util/remote_data'
 import { Ternary } from '../../../../util/types'
@@ -34,13 +34,7 @@ export const SetAllowance: React.FC<Props> = props => {
     setAllowanceFinished(true)
   }
 
-  const daiAddress =
-    networkId === 1
-      ? DEFAULT_TOKEN_ADDRESS
-      : networkId === 99
-      ? DEFAULT_TOKEN_ADDRESS_RINKEBY
-      : '0x2E4adeCb3330d72bC01F5acE920093a651f99E44'
-  const { allowance, unlock } = useCpkAllowance(signer, daiAddress)
+  const { allowance, unlock } = useCpkAllowance(signer, DEFAULT_TOKEN_ADDRESS)
   const isFinished = allowanceFinished && RemoteData.is.success(allowance)
   const isLoading = RemoteData.is.asking(allowance)
   const state = isLoading ? ButtonStates.working : isFinished ? ButtonStates.finished : ButtonStates.idle

@@ -3,9 +3,9 @@ import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps, matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
-import { useWeb3Context } from 'web3-react/dist'
 
 import { Logo } from '../../../../common/constants'
+import { useConnectedWeb3Context } from '../../../../hooks'
 import { ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
@@ -150,7 +150,7 @@ const CloseIconWrapper = styled.div`
 `
 
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-  const { account, networkId } = useWeb3Context()
+  const { account, networkId } = useConnectedWeb3Context()
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
@@ -221,8 +221,8 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               </ButtonCreateMobile>
             </>
           )}
-          {/*mainnet           sokol              xDai    */}
-          {(networkId === 1 || networkId == 77 || networkId == 99) && account && (
+          {/*mainnet             xDai    */}
+          {(networkId === 1 || networkId == 100) && account && (
             <>
               <ButtonRoundBridge
                 onClick={() => {

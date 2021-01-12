@@ -3,8 +3,9 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { DEFAULT_TOKEN_ADDRESS, DEFAULT_TOKEN_ADDRESS_RINKEBY } from '../../../../common/constants'
-import { useCollateralBalance, useConnectedWeb3Context } from '../../../../hooks'
+import { DEFAULT_TOKEN_ADDRESS } from '../../../../common/constants'
+import { useConnectedWeb3Context } from '../../../../hooks'
+import { ERC20Service } from '../../../../services'
 import { formatBigNumber } from '../../../../util/tools'
 import { ButtonRound } from '../../../button/button_round'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -86,27 +87,31 @@ const TransferState = styled.div<{ show: boolean }>`
 export const XdaiBridgeTransfer = (props: Prop) => {
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
-  const context = useConnectedWeb3Context()
-  const { networkId } = context
+  const [ethBalance, setXdaiBalance] = useState<BigNumber>(Zero)
+  const { account, library: provider, networkId } = useConnectedWeb3Context()
+
   const [transferState, setTransferState] = useState<boolean>(false)
-  const daiAddress =
-    networkId === 1
-      ? DEFAULT_TOKEN_ADDRESS
-      : networkId === 99
-      ? DEFAULT_TOKEN_ADDRESS_RINKEBY
-      : '0x2E4adeCb3330d72bC01F5acE920093a651f99E44'
-  const token = {
-    address: daiAddress,
-    decimals: 18,
-    symbol: 'DAI',
-  }
-  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(token, context)
+
   const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
 
   useEffect(() => {
-    setCollateralBalance(maybeCollateralBalance || Zero)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [networkId])
+    const fetchBalance = async () => {
+      try {
+        if (networkId === 1) {
+          const collateralService = new ERC20Service(provider, account, DEFAULT_TOKEN_ADDRESS)
+          setCollateralBalance(await collateralService.getCollateral(account || ''))
+        } else {
+          const balance = await provider.getBalance(account || '')
+          setXdaiBalance(balance)
+        }
+      } catch (error) {
+        setXdaiBalance(Zero)
+      }
+    }
+    setCollateralBalance(Zero)
+    setXdaiBalance(Zero)
+    fetchBalance()
+  }, [account, provider, networkId])
 
   return (
     <>
@@ -125,13 +130,13 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           </MainnetWrapper>
           <XDaiWrapper>
             <ChainText>xDai Chain</ChainText>
-            <BalanceText>0 XDAI</BalanceText>
+            <BalanceText>{formatBigNumber(ethBalance, 18)} XDAI</BalanceText>
           </XDaiWrapper>
 
           <TextFieldCustomPlace
             formField={
               <BigNumberInput
-                decimals={token.decimals}
+                decimals={18}
                 name="amounts"
                 onChange={(e: BigNumberInputReturn) => {
                   setAmount(e.value)
@@ -144,7 +149,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
             }
             symbol={'DAI'}
           />
-          <SetAllowance selectedAmount={amount} />
+          {networkId === 1 && <SetAllowance selectedAmount={amount} />}
 
           <TransferButton
             onClick={() => {

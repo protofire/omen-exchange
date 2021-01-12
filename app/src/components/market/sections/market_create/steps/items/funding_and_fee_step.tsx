@@ -49,6 +49,7 @@ import { CreateCard } from '../../../../common/create_card'
 import { CurrencySelector } from '../../../../common/currency_selector'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
+import { MarketScale } from '../../../../common/market_scale'
 import { SetAllowance } from '../../../../common/set_allowance'
 import { TradingFeeSelector } from '../../../../common/trading_fee_selector'
 import { TransactionDetailsCard } from '../../../../common/transaction_details_card'
@@ -77,14 +78,14 @@ const LeftButton = styled(Button as any)`
 `
 
 const SubTitle = styled.h3`
-  color: ${props => props.theme.colors.textColorDarker};
+  color: ${props => props.theme.colors.textColor};
   font-size: 14px;
   font-weight: normal;
   margin: 0 0 8px;
 `
 
 const QuestionText = styled.p`
-  color: ${props => props.theme.colors.textColor};
+  color: ${props => props.theme.colors.textColorDarker};
   font-size: 14px;
   font-weight: normal;
   margin: 0 0 24px;
@@ -163,8 +164,8 @@ const StyledButtonContainerFullWidth = styled(ButtonContainerFullWidth as any)`
 `
 
 interface Props {
-  back: () => void
-  submit: () => void
+  back: (state: string) => void
+  submit: (isScalar: boolean) => void
   values: {
     collateral: Token
     question: string
@@ -176,12 +177,17 @@ interface Props {
     outcomes: Outcome[]
     loadedQuestionId: Maybe<string>
     verifyLabel?: string
+    lowerBound?: Maybe<BigNumber>
+    upperBound?: Maybe<BigNumber>
+    startingPoint?: Maybe<BigNumber>
+    unit?: string
   }
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
   handleTradingFeeChange: (fee: string) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
+  state: string
 }
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
@@ -199,11 +205,25 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleTradingFeeChange,
     marketCreationStatus,
     resetTradingFee,
+    state,
     submit,
     values,
   } = props
-
-  const { arbitrator, category, collateral, funding, loadedQuestionId, outcomes, question, resolution, spread } = values
+  const {
+    arbitrator,
+    category,
+    collateral,
+    funding,
+    loadedQuestionId,
+    lowerBound,
+    outcomes,
+    question,
+    resolution,
+    spread,
+    startingPoint,
+    unit,
+    upperBound,
+  } = values
 
   const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
 
@@ -352,45 +372,66 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   return (
     <>
       <CreateCardTop>
-        <SubsectionTitleStyled>Your {loadedQuestionId ? 'Imported' : 'Categorical'} Market</SubsectionTitleStyled>
+        <SubsectionTitleStyled>
+          Your {state.charAt(0).toUpperCase() + state.slice(1).toLowerCase()} Market
+        </SubsectionTitleStyled>
         <SubTitle>Question</SubTitle>
         <QuestionText>{question}</QuestionText>
-        <OutcomesTableWrapper borderBottom>
-          <OutcomesTable>
-            <OutcomesTHead>
-              <OutcomesTR>
-                <OutcomesTH style={{ width: '60%' }}>Outcome</OutcomesTH>
-                <OutcomesTH>Probability</OutcomesTH>
-              </OutcomesTR>
-            </OutcomesTHead>
-            <OutcomesTBody>
-              {outcomes.map((outcome, index) => {
-                return (
-                  <OutcomesTR key={index}>
-                    <OutcomesTD>
-                      <OutcomeItemTextWrapper>
-                        <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
-                        <OutcomeItemText>{outcome.name}</OutcomeItemText>
-                      </OutcomeItemTextWrapper>
-                    </OutcomesTD>
-                    <OutcomesTD>{outcome.probability.toFixed(2)}%</OutcomesTD>
-                  </OutcomesTR>
-                )
-              })}
-            </OutcomesTBody>
-          </OutcomesTable>
-        </OutcomesTableWrapper>
+        {state === 'SCALAR' && lowerBound && upperBound && startingPoint && unit ? (
+          <MarketScale
+            lowerBound={lowerBound}
+            startingPoint={startingPoint}
+            startingPointTitle={'Starting Point'}
+            unit={unit}
+            upperBound={upperBound}
+          />
+        ) : (
+          <OutcomesTableWrapper borderBottom>
+            <OutcomesTable>
+              <OutcomesTHead>
+                <OutcomesTR>
+                  <OutcomesTH style={{ width: '60%' }}>Outcome</OutcomesTH>
+                  <OutcomesTH>Probability</OutcomesTH>
+                </OutcomesTR>
+              </OutcomesTHead>
+              <OutcomesTBody>
+                {outcomes.map((outcome, index) => {
+                  return (
+                    <OutcomesTR key={index}>
+                      <OutcomesTD>
+                        <OutcomeItemTextWrapper>
+                          <OutcomeItemLittleBallOfJoyAndDifferentColors outcomeIndex={index} />
+                          <OutcomeItemText>{outcome.name}</OutcomeItemText>
+                        </OutcomeItemTextWrapper>
+                      </OutcomesTD>
+                      <OutcomesTD>{outcome.probability.toFixed(2)}%</OutcomesTD>
+                    </OutcomesTR>
+                  )
+                })}
+              </OutcomesTBody>
+            </OutcomesTable>
+          </OutcomesTableWrapper>
+        )}
         <FlexRowWrapper>
           <TitleValueVertical
             date={resolution instanceof Date ? resolution : undefined}
+            invertedColors={true}
             title={'Closing Date (UTC)'}
             tooltip={true}
             value={resolutionDate}
           />
-          <TitleValueVertical title={'Category'} value={category} />
-          <TitleValueVertical title={'Arbitrator'} value={<DisplayArbitrator arbitrator={arbitrator} />} />
+          <TitleValueVertical invertedColors={true} title={'Category'} value={category} />
+          <TitleValueVertical
+            invertedColors={true}
+            title={'Arbitrator'}
+            value={<DisplayArbitrator arbitrator={arbitrator} />}
+          />
           {!!loadedQuestionId && (
-            <TitleValueVertical title={'Verified by'} value={<VerifiedRow label={values.verifyLabel} />} />
+            <TitleValueVertical
+              invertedColors={true}
+              title={'Verified by'}
+              value={<VerifiedRow label={values.verifyLabel} />}
+            />
           )}
         </FlexRowWrapper>
       </CreateCardTop>
@@ -507,16 +548,20 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               !MarketCreationStatus.is.ready(marketCreationStatus) &&
               !MarketCreationStatus.is.error(marketCreationStatus)
             }
-            onClick={back}
+            onClick={() => back(state)}
           >
             Back
           </LeftButton>
           {!account && (
-            <Button buttonType={ButtonType.primary} onClick={submit}>
+            <Button buttonType={ButtonType.primary} onClick={() => submit(state === 'SCALAR')}>
               Connect Wallet
             </Button>
           )}
-          <Button buttonType={ButtonType.secondaryLine} disabled={isCreateMarketbuttonDisabled} onClick={submit}>
+          <Button
+            buttonType={ButtonType.secondaryLine}
+            disabled={isCreateMarketbuttonDisabled}
+            onClick={() => submit(state === 'SCALAR')}
+          >
             Create Market
           </Button>
         </StyledButtonContainerFullWidth>

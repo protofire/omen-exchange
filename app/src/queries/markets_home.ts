@@ -1,5 +1,7 @@
 import gql from 'graphql-tag'
 
+import { networkIds } from '../util/networks'
+
 import { BuildQueryType, CurationSource, MarketStates, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
@@ -21,6 +23,13 @@ export const MarketDataFragment = gql`
     scaledLiquidityParameter
     curatedByDxDao
     klerosTCRregistered
+    outcomeTokenMarginalPrices
+    condition {
+      id
+      oracle
+      scalarLow
+      scalarHigh
+    }
   }
 `
 
@@ -96,10 +105,12 @@ export const buildQueryMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => 
     title ? 'title_contains: $title' : '',
     currency ? 'collateralToken: $currency' : '',
     arbitrator ? 'arbitrator: $arbitrator' : 'arbitrator_in: $knownArbitrators',
-    templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "2", "6"]' : '',
+    templateId ? 'templateId: $templateId' : whitelistedTemplateIds ? 'templateId_in: ["0", "1", "2", "6"]' : '',
     'fee_lte: $fee',
     `timeout_gte: ${MIN_TIMEOUT}`,
-    curationSource === CurationSource.DXDAO
+    networkId === networkIds.XDAI || networkId === networkIds.SOKOL
+      ? 'curatedByDxDaoOrKleros: false'
+      : curationSource === CurationSource.DXDAO
       ? `curatedByDxDao: true`
       : curationSource === CurationSource.KLEROS
       ? `klerosTCRregistered: true`
