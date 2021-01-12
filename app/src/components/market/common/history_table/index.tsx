@@ -1,10 +1,9 @@
-import { formatUnits } from 'ethers/utils'
 import React from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
-import { formatHistoryDate, formatHistoryUser } from '../../../../util/tools'
+import { formatBigNumber, formatHistoryDate, formatHistoryUser } from '../../../../util/tools'
 import { Button } from '../../../button'
 import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
 
@@ -110,7 +109,6 @@ export const HistoryTable: React.FC<Props> = ({
               collateralTokenAmount,
               creationTimestamp,
               decimals,
-
               id,
               sharesOrPoolTokenAmount,
               transactionHash,
@@ -118,6 +116,7 @@ export const HistoryTable: React.FC<Props> = ({
               user,
             }) => {
               const chainID = windowObj.ethereum.chainId
+
               const mainnetOrRinkebyUrl =
                 chainID === '0x4'
                   ? 'https://rinkeby.etherscan.io/tx/'
@@ -131,9 +130,9 @@ export const HistoryTable: React.FC<Props> = ({
                     <span>{formatHistoryUser(user)}</span>
                   </HistoryRow>
                   <HistoryRow width={'18'}>{transactionType}</HistoryRow>
-                  <HistoryRow width={'20'}>{sharesOrPoolTokenAmount}</HistoryRow>
+                  <HistoryRow width={'20'}>{formatBigNumber(sharesOrPoolTokenAmount, decimals, 3)}</HistoryRow>
                   <HistoryRow width={'22'}>
-                    {parseFloat(formatUnits(collateralTokenAmount, decimals)).toFixed(3)}
+                    {formatBigNumber(collateralTokenAmount, decimals, 3)}
                     {` ${currency}`}
                   </HistoryRow>
                   <HistoryRow as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank" width={'18'}>

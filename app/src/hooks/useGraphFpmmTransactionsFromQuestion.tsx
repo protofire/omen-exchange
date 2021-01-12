@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/react-hooks'
-import { BigNumber, formatUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
@@ -65,7 +65,13 @@ export type FpmmTradeDataType = {
   creationTimestamp: string
   transactionHash: string
   fpmmType: string
-  decimals?: string
+  decimals: number
+}
+
+export enum HistoryType {
+  All,
+  Liquidity,
+  Trades,
 }
 interface FpmmTradeData {
   id: string
@@ -82,11 +88,11 @@ interface FpmmTradeData {
   creationTimestamp: string
   transactionHash: string
   fpmmType: string
-  decimals?: string
+  decimals: number
 }
 
 interface Result {
-  fpmmTrade: FpmmTradeData[] | null
+  fpmmTransactions: FpmmTradeData[] | null
   status: string
   paginationNext: boolean
   refetch: any
@@ -107,7 +113,7 @@ const wrangleResponse = (data: any, decimals: number) => {
       fpmmType: trade.fpmmType,
       decimals: decimals,
       collateralTokenAddress: trade.fpmm.collateralToken,
-      sharesOrPoolTokenAmount: parseFloat(formatUnits(trade.sharesOrPoolTokenAmount, decimals)).toFixed(3),
+      sharesOrPoolTokenAmount: trade.sharesOrPoolTokenAmount,
       creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
       collateralTokenAmount: trade.collateralTokenAmount,
       transactionHash: trade.transactionHash,
@@ -119,20 +125,20 @@ export const useGraphFpmmTransactionsFromQuestion = (
   questionID: string,
   pageSize: number,
   pageIndex: number,
-  type: number,
+  type: HistoryType,
   decimals: number,
 ): Result => {
   const [fpmmTradeData, setFpmmTradeData] = useState<Maybe<FpmmTradeData[]>>(null)
   const [morePagination, setMorePagination] = useState<boolean>(true)
 
-  const { data, error, loading, refetch } = useQuery(type === 0 ? withoutFpmmType : withFpmmType, {
+  const { data, error, loading, refetch } = useQuery(type === HistoryType.All ? withoutFpmmType : withFpmmType, {
     notifyOnNetworkStatusChange: true,
     skip: false,
     variables: {
       id: questionID,
       pageSize: pageSize + 1,
       pageIndex: pageIndex,
-      fpmmType: type === 1 ? 'Liquidity' : 'Trade',
+      fpmmType: type === HistoryType.All ? 'Liquidity' : 'Trade',
     },
     onCompleted: ({ fpmmTransactions }: any) => {
       let internalArray = fpmmTransactions
@@ -155,7 +161,7 @@ export const useGraphFpmmTransactionsFromQuestion = (
 
   return {
     paginationNext: morePagination,
-    fpmmTrade: error ? null : fpmmTradeData,
+    fpmmTransactions: error ? null : fpmmTradeData,
     status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
     refetch,
   }

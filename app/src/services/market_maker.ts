@@ -57,7 +57,7 @@ class MarketMakerService {
     return this.contract.address
   }
 
-  getBlockNumber = async (transactionHash: string): Promise<string> => {
+  getTransaction = async (transactionHash: string): Promise<string> => {
     return this.provider.getTransaction(transactionHash)
   }
 

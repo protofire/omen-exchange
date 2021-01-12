@@ -12,6 +12,7 @@ export const FETCH_EVENTS_CHUNK_SIZE = parseInt('500000', 10)
 const MAX_OUTCOMES = parseInt('8', 10)
 export const MAX_OUTCOME_ALLOWED = MAX_OUTCOMES > 256 ? 256 : MAX_OUTCOMES
 
+export const UINT_TEMPLATE_ID = 1
 export const SINGLE_SELECT_TEMPLATE_ID = 2
 
 export const MARKET_FEE = parseFloat('2.00')
@@ -51,10 +52,14 @@ export const TRADING_FEE_OPTIONS = [
   '5.00',
 ]
 
-export const GRAPH_MAINNET_HTTP = 'https://api.thegraph.com/subgraphs/name/astro514/omen'
-export const GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/name/astro514/omen'
-export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/astro514/omen-rinkeby'
-export const GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/astro514/omen-rinkeby'
+export const GRAPH_MAINNET_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen'
+export const GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen'
+export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
+export const GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
+export const GRAPH_SOKOL_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-sokol'
+export const GRAPH_SOKOL_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-sokol'
+export const GRAPH_XDAI_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-xdai'
+export const GRAPH_XDAI_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-xdai'
 
 export const KLEROS_CURATE_GRAPH_MAINNET_HTTP = 'https://api.thegraph.com/subgraphs/name/kleros/curate'
 export const KLEROS_CURATE_GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/name/kleros/curate'
@@ -93,3 +98,10 @@ export const IMPORT_QUESTION_ID_KEY = 'importQuestionId'
 
 export const DEFAULT_TOKEN_ADDRESS_RINKEBY = '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea'
 export const DEFAULT_TOKEN_ADDRESS = '0x6b175474e89094c44da98b954eedeac495271d0f'
+
+export const REALITIO_PROXY_ADDRESS = '0x0e414d014A77971f4EAA22AB58E6d84D16Ea838E'
+export const REALITIO_PROXY_ADDRESS_RINKEBY = '0x17174dC1b62add32a1DE477A357e75b0dcDEed6E'
+export const REALITIO_SCALAR_ADAPTER_ADDRESS = '0xaa548EfBb0972e0c4b9551dcCfb6B787A1B90082'
+export const REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY = '0x0e8Db8caD541C0Bf5b611636e81fEc0828bc7902'
+export const REALITIO_SCALAR_ADAPTER_ADDRESS_SOKOL = '0x86459E9eA6cF4caEe9F8F4cb1203d38EaB3cbD34'
+export const REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI = '0xb97FCb6adf4c4aF9981932a004e6CC47173d0Bfc'

@@ -345,13 +345,20 @@ export const formatNumber = (number: string, decimals = 2): string => {
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }
 
-export const formatHistoryDate = (dateData: string) => {
+export const formatHistoryDate = (dateData: string): string => {
   const date = new Date(dateData)
   const minute = date.getMinutes()
   const minuteWithZero = (minute < 10 ? '0' : '') + minute
   const hour = date.getHours()
   const hourWithZero = (hour < 10 ? '0' : '') + hour
   return `${date.getDate()}.${date.getMonth()} - ${hourWithZero}:${minuteWithZero}`
+}
+
+export const formatTimestampToDate = (timestamp: number, value: string) => {
+  const ts = moment(timestamp * 1000)
+  if (value === '1D' || value === '1H') return ts.format('HH:mm')
+
+  return ts.format('MMM D')
 }
 
 export const formatHistoryUser = (user: any) => {

@@ -1,15 +1,21 @@
 import { BigNumber, bigNumberify } from 'ethers/utils'
-import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import {
   FpmmTradeDataType,
+  HistoryType,
   useGraphFpmmTransactionsFromQuestion,
 } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
 import { CPKService } from '../../../../services'
-import { calcPrice, calcSellAmountInCollateral, calculateSharesBought, formatBigNumber } from '../../../../util/tools'
+import {
+  calcPrice,
+  calcSellAmountInCollateral,
+  calculateSharesBought,
+  formatBigNumber,
+  formatTimestampToDate,
+} from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { Button, ButtonSelectable } from '../../../button'
 import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
@@ -99,14 +105,7 @@ const ButtonSelect = styled(Button)<{ active: boolean }>`
   ${props => (props.active ? `border-color:${props.theme.colors.borderColorDark}` : '')};
 `
 
-const timestampToDate = (timestamp: number, value: string) => {
-  const ts = moment(timestamp * 1000)
-  if (value === '1D' || value === '1H') return ts.format('HH:mm')
-
-  return ts.format('MMM D')
-}
-
-export const HistorySelect: React.FC<Props> = ({
+export const History_select: React.FC<Props> = ({
   currency,
   decimals,
   fee,
@@ -135,34 +134,34 @@ export const HistorySelect: React.FC<Props> = ({
         const outcomesPrices: { [outcomeName: string]: number } = {}
         outcomes.forEach((k, i) => (outcomesPrices[k] = prices[i]))
 
-        return { ...outcomesPrices, date: timestampToDate(h.block.timestamp, value) }
+        return { ...outcomesPrices, date: formatTimestampToDate(h.block.timestamp, value) }
       })
-  const [toogleSelect, setToogleSelect] = useState(true)
-  const [type, setType] = useState(0)
+  const [toggleSelect, setToggleSelect] = useState(true)
+  const [type, setType] = useState<HistoryType>(HistoryType.All)
   const DropdownItems = [
     {
       content: 'All',
       onClick: () => {
-        setType(0)
+        setType(HistoryType.All)
       },
     },
     {
       content: 'Liquidity',
       onClick: () => {
-        setType(1)
+        setType(HistoryType.All)
       },
     },
     {
       content: 'Trades',
       onClick: () => {
-        setType(2)
+        setType(HistoryType.Trades)
       },
     },
   ]
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize] = useState(6)
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
-  const { fpmmTrade, paginationNext, refetch, status } = useGraphFpmmTransactionsFromQuestion(
+  const { fpmmTransactions, paginationNext, refetch, status } = useGraphFpmmTransactionsFromQuestion(
     marketMakerAddress,
     pageSize,
     pageIndex,
@@ -173,12 +172,12 @@ export const HistorySelect: React.FC<Props> = ({
   useEffect(() => {
     setSharesDataLoader(true)
     ;(async () => {
-      if (fpmmTrade) {
+      if (fpmmTransactions) {
         const cpk = await CPKService.create(provider)
         const response: any[] = await Promise.all(
-          fpmmTrade.map(async item => {
+          fpmmTransactions.map(async item => {
             if (item.fpmmType === 'Liquidity') {
-              const block: any = await marketMaker.getBlockNumber(item.transactionHash)
+              const block: any = await marketMaker.getTransaction(item.transactionHash)
 
               return {
                 blockNumber: block,
@@ -199,7 +198,7 @@ export const HistorySelect: React.FC<Props> = ({
           }),
         )
         const newFpmmTradeArray: any[] = []
-        fpmmTrade.forEach(item => {
+        fpmmTransactions.forEach(item => {
           if (item.fpmmType === 'Liquidity') {
             let sharesValue
             const findInResponse = response.find(element => element.id === item.id)
@@ -208,9 +207,9 @@ export const HistorySelect: React.FC<Props> = ({
               let firstItem = balances[0]
               let outcomeIndex = 0
 
-              balances.forEach((item: BigNumber, index: number) => {
-                if (item.lt(firstItem)) {
-                  firstItem = item
+              balances.forEach((balance: BigNumber, index: number) => {
+                if (balance.lt(firstItem)) {
+                  firstItem = balance
                   outcomeIndex = index
                 }
               })
@@ -229,7 +228,7 @@ export const HistorySelect: React.FC<Props> = ({
 
               if (Number(sharesCalculation) !== 0) {
                 newFpmmTradeArray.push({
-                  sharesOrPoolTokenAmount: formatBigNumber(sharesCalculation, decimals, 3),
+                  sharesOrPoolTokenAmount: sharesCalculation,
                   decimals: item.decimals,
                   collateralTokenAmount: sharesValue && sharesValue,
                   creationTimestamp: item.creationTimestamp,
@@ -263,7 +262,7 @@ export const HistorySelect: React.FC<Props> = ({
       }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fpmmTrade])
+  }, [fpmmTransactions])
 
   useEffect(() => {
     setPageIndex(0)
@@ -302,15 +301,15 @@ export const HistorySelect: React.FC<Props> = ({
     <ChartWrapper>
       <TitleWrapper>
         <SelectWrapper>
-          <ButtonSelect active={toogleSelect} onClick={() => setToogleSelect(true)}>
+          <ButtonSelect active={toggleSelect} onClick={() => setToggleSelect(true)}>
             Activities
           </ButtonSelect>
-          <ButtonSelect active={!toogleSelect} onClick={() => setToogleSelect(false)}>
+          <ButtonSelect active={!toggleSelect} onClick={() => setToggleSelect(false)}>
             Graph
           </ButtonSelect>
         </SelectWrapper>
 
-        {toogleSelect ? (
+        {toggleSelect ? (
           <DropdownMenu currentItem={type} dropdownPosition={DropdownPosition.right} items={DropdownItems} />
         ) : (
           <ButtonsWrapper>
@@ -324,7 +323,7 @@ export const HistorySelect: React.FC<Props> = ({
           </ButtonsWrapper>
         )}
       </TitleWrapper>
-      {toogleSelect ? (
+      {toggleSelect ? (
         <HistoryTable
           currency={currency}
           fpmmTrade={sharesData}

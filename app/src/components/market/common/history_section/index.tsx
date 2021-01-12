@@ -9,7 +9,7 @@ import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
 import { keys, range } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
 
-import { HistorySelect } from './historySelect'
+import { History_select } from './history_select'
 
 // This query will return an object where each entry is
 // `fixedProductMarketMaker_X: { outcomeTokenAmounts }`,
@@ -87,7 +87,7 @@ const calcOffsetByDate = (nowOrClosedTs: number) => {
   return -offsetInMinutes * blocksPerMinute
 }
 
-export const HistoryChartContainer: React.FC<Props> = ({
+export const HistorySelectContainer: React.FC<Props> = ({
   answerFinalizedTimestamp,
   currency,
   decimals,
@@ -143,7 +143,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
   }, [latestBlockNumber, library, period])
 
   return hidden ? null : (
-    <HistorySelect
+    <History_select
       currency={currency}
       decimals={decimals}
       fee={fee}

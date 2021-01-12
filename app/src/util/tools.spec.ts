@@ -11,9 +11,13 @@ import {
   calcPoolTokens,
   calcPrice,
   calcSellAmountInCollateral,
+  calculateSharesBought,
   computeBalanceAfterTrade,
   divBN,
+  formatHistoryDate,
+  formatHistoryUser,
   formatNumber,
+  formatTimestampToDate,
   formatToShortNumber,
   getIndexSets,
   isObjectEqual,
@@ -367,6 +371,11 @@ describe('tools', () => {
       })
     }
   })
+
+  // describe('formatHistoryDate', () => {})
+  // describe('formatTimestampToDate', () => {})
+  // describe('formatHistoryUser', () => {})
+  // describe('calculateSharesBought', () => {})
 
   describe('formatNumber', () => {
     const testCases: [[string, number], string][] = [
