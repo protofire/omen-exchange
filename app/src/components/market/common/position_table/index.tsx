@@ -75,8 +75,8 @@ export const PositionTable = (props: Props) => {
   const TableCellsAlign = ['left', 'right', 'right']
 
   if (
-    (!shortTrades.length || isDust(shortShares || new BigNumber(0), collateral.decimals)) &&
-    (!longTrades.length || isDust(longShares || new BigNumber(0), collateral.decimals))
+    isDust(shortShares || new BigNumber(0), collateral.decimals) &&
+    isDust(longShares || new BigNumber(0), collateral.decimals)
   ) {
     return <></>
   }
@@ -98,16 +98,8 @@ export const PositionTable = (props: Props) => {
   }
 
   const renderTableRow = (index: number) => {
-    if (
-      (index === 0 && !shortTrades.length) ||
-      (index === 0 && isDust(shortShares || new BigNumber(0), collateral.decimals))
-    )
-      return
-    if (
-      (index === 1 && !longTrades.length) ||
-      (index === 1 && isDust(longShares || new BigNumber(0), collateral.decimals))
-    )
-      return
+    if (index === 0 && isDust(shortShares || new BigNumber(0), collateral.decimals)) return
+    if (index === 1 && isDust(longShares || new BigNumber(0), collateral.decimals)) return
     return (
       <TR key={index}>
         <TDPosition textAlign={TableCellsAlign[0]}>

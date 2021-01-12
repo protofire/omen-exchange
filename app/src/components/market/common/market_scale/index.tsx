@@ -650,7 +650,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           </ValueBoxes>
         )}
       </ScaleWrapper>
-      {positionTable && status === Status.Ready && trades && balances && collateral && trades.length > 0 && (
+      {positionTable && status === Status.Ready && trades && balances && collateral && (
         <PositionTable
           balances={balances}
           collateral={collateral}
