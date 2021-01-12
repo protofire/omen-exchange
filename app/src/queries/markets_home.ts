@@ -2,7 +2,7 @@ import gql from 'graphql-tag'
 
 import { networkIds } from '../util/networks'
 
-import { BuildQueryType, CurationSource, MarketStates, MarketsSortCriteria } from './../util/types'
+import { BuildQueryType, CurationSource, MarketStates, MarketTypes, MarketsSortCriteria } from './../util/types'
 
 export const MarketDataFragment = gql`
   fragment marketData on FixedProductMarketMaker {
@@ -46,6 +46,7 @@ export const DEFAULT_OPTIONS = {
   sortBy: null as Maybe<MarketsSortCriteria>,
   sortByDirection: 'desc' as 'asc' | 'desc',
   networkId: 1 as Maybe<number>,
+  type: MarketTypes.all,
 }
 
 export const buildQueryMyMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => {

@@ -552,7 +552,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
-        txOptions.gas = 1200000
+        txOptions.gas = 1500000
       }
 
       let collateral
