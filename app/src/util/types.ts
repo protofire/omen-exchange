@@ -213,6 +213,12 @@ export enum MarketStates {
   myMarkets = 'MY_MARKETS',
 }
 
+export enum MarketTypes {
+  all = '',
+  categorical = '2',
+  scalar = '1',
+}
+
 export type MarketsSortCriteria =
   | 'usdVolume'
   | 'creationTimestamp'
