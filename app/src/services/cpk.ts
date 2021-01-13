@@ -195,7 +195,7 @@ class CPKService {
         if (!this.cpk.isSafeApp()) {
           txOptions.value = amount
         }
-        if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
+        if (this.cpk.isSafeApp()) {
           txOptions.gas = 500000
         }
         // Step 0: Wrap ether
@@ -336,7 +336,6 @@ class CPKService {
       if (marketData.collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateral = getWrapToken(networkId)
-
         // we need to send the funding amount in native ether
         if (!this.cpk.isSafeApp()) {
           txOptions.value = marketData.funding
@@ -348,20 +347,20 @@ class CPKService {
           value: marketData.funding,
         })
       } else if (useCompoundReserve && compoundTokenDetails) {
-        const encodedMintFunction = CompoundService.encodeMintTokens(
-          compoundTokenDetails.symbol,
-          marketData.funding.toString(),
-        )
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
           // If user chosen collateral is ETH
           collateral = marketData.collateral
           if (!this.cpk.isSafeApp()) {
             txOptions.value = marketData.funding
           }
+          const encodedMintFunction = CompoundService.encodeMintTokens(
+            compoundTokenDetails.symbol,
+            marketData.funding.toString(),
+          )
           transactions.push({
             to: collateral.address,
             data: encodedMintFunction,
-            value: marketData.funding.toString(),
+            value: marketData.funding,
           })
         } else {
           collateral = marketData.collateral
@@ -452,7 +451,7 @@ class CPKService {
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp() && marketData.collateral.address !== pseudoNativeAssetAddress) {
         // If we are using compound reserve then we don't need to transfer
-        // since we have already transferred and minted
+        // since we have already transferred the userinput collateral and minted cTokens
         if (!useCompoundReserve) {
           transactions.push({
             to: collateral.address,
@@ -808,7 +807,7 @@ class CPKService {
       const transactions = []
 
       const txOptions: TxOptions = {}
-      const collateralService = new ERC20Service(this.provider, account, collateral.address)
+
       let collateralSymbol = ''
       let userInputCollateralSymbol: KnownToken
       let userInputCollateral: Token = collateral
@@ -835,14 +834,13 @@ class CPKService {
       } else {
         collateralAddress = collateral.address
       }
-
+      const collateralService = new ERC20Service(this.provider, account, collateralAddress)
       // Check  if the allowance of the CPK to the market maker is enough.
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
         marketMaker.address,
         amount,
       )
-
       if (!hasCPKEnoughAlowance) {
         // Step 1:  Approve unlimited amount to be transferred to the market maker
         transactions.push({

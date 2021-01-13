@@ -235,7 +235,7 @@ export const calcPoolTokens = (
  */
 export const roundNumberStringToSignificantDigits = (value: string, sd: number): string => {
   const r = new Big(value)
-  const preciseValue = (r as any).prec(sd)
+  const preciseValue = (r as any).prec(sd, 0)
   if (preciseValue.gt(0)) {
     return preciseValue.toString()
   } else {

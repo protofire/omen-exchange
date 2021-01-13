@@ -247,7 +247,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Buying ${sharesAmount} shares ...`)
       let useBaseToken = false
-      if (displayCollateral.address !== collateral.address) {
+      if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
         useBaseToken = true
       }
       await cpk.buyOutcomes({
@@ -373,6 +373,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     }
     setDisplayFundAmount(value)
   }
+
+  const setBuyCollateral = (token: Token) => {
+    if (token.address === pseudoNativeAssetAddress && !(collateral.symbol.toLowerCase() in CompoundTokenType)) {
+      setCollateral(token)
+      setDisplayCollateral(token)
+    } else {
+      setDisplayCollateral(token)
+    }
+  }
   return (
     <>
       <OutcomeTable
@@ -414,7 +423,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               filters={currencyFilters}
               onSelect={(token: Token | null) => {
                 if (token) {
-                  setDisplayCollateral(token)
+                  setBuyCollateral(token)
                   setAmount(new BigNumber(0))
                   setDisplayAmountToFund(new BigNumber(0))
                 }

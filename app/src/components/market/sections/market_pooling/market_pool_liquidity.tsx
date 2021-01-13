@@ -335,7 +335,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         }
       }
       let useBaseToken = false
-      if (displayCollateral.address !== collateral.address) {
+      if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
         useBaseToken = true
       }
       await cpk.addFunding({
@@ -495,9 +495,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const setBuyCollateral = (token: Token) => {
     const collateralSymbol = token.symbol.toLowerCase()
     if (collateralSymbol in CompoundTokenType) {
-      setDisplayCollateral(collateral)
-    } else {
       setDisplayCollateral(token)
+    } else if (token.address === pseudoNativeAssetAddress && !(collateral.symbol.toLowerCase() in CompoundTokenType)) {
+      setCollateral(token)
+      setDisplayCollateral(token)
+    } else {
+      setDisplayCollateral(collateral)
     }
   }
 

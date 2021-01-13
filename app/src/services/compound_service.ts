@@ -76,7 +76,8 @@ class CompoundService {
   calculateBaseToCTokenExchange = (userInputToken: Token, userInputTokenFunding: BigNumber): BigNumber => {
     const cTokenDecimals = 8
     const bigTen = new Big(10)
-    const userInputTokenAmount = new Big(formatUnits(userInputTokenFunding, userInputToken.decimals))
+    const userInputAmount = formatUnits(userInputTokenFunding, userInputToken.decimals)
+    const userInputTokenAmount = new Big(userInputAmount).round(cTokenDecimals, 0)
     const underlyingDecimals = Number(userInputToken.decimals)
     const exchangeRate = new Big(this.exchangeRate)
     const mantissa = 18 + underlyingDecimals - cTokenDecimals
@@ -86,7 +87,7 @@ class CompoundService {
     }
     const oneUnderlyingInCToken = divisor.div(exchangeRate)
     const amountCTokens = userInputTokenAmount.times(oneUnderlyingInCToken)
-    const amountCTokensBoundToPrecision = roundNumberStringToSignificantDigits(amountCTokens.toString(), 4)
+    const amountCTokensBoundToPrecision = roundNumberStringToSignificantDigits(amountCTokens.toString(), 2)
     try {
       const amountCTokenBigNumber = parseUnits(amountCTokensBoundToPrecision, cTokenDecimals)
       return amountCTokenBigNumber

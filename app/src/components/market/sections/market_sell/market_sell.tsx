@@ -285,7 +285,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Selling ${sharesAmount} shares...`)
       let useBaseToken = false
-      if (displayCollateral.address !== collateral.address) {
+      if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
         useBaseToken = true
       }
       await cpk.sellOutcomes({
