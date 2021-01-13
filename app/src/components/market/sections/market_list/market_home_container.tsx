@@ -87,6 +87,10 @@ const MarketHomeContainer: React.FC = () => {
   let categoryRoute = location.pathname.split('/category/')[1]
   if (categoryRoute) categoryRoute = categoryRoute.split('/')[0]
 
+  const typeFilter = location.pathname.includes('type')
+  let typeRoute = location.pathname.split('/type/')[1]
+  if (typeRoute) typeRoute = typeRoute.split('/')[0]
+
   const stateFilter = location.search.includes('state')
   let stateRoute = location.search.split('state=')[1]
   if (stateRoute) stateRoute = stateRoute.split('&')[0]
@@ -156,6 +160,13 @@ const MarketHomeContainer: React.FC = () => {
     searchParam = ''
   }
 
+  let typeParam: Maybe<string>
+  if (typeFilter) {
+    typeParam = typeRoute
+  } else {
+    typeParam = null
+  }
+
   const [filter, setFilter] = useState<MarketFilters>({
     state: stateParam,
     category: categoryParam,
@@ -163,7 +174,7 @@ const MarketHomeContainer: React.FC = () => {
     sortBy: sortParam,
     sortByDirection: sortDirection,
     arbitrator: arbitratorParam,
-    templateId: null,
+    templateId: typeParam,
     currency: currencyParam,
     curationSource: curationSourceParam,
   })
@@ -285,6 +296,10 @@ const MarketHomeContainer: React.FC = () => {
 
       if (filter.category && filter.category !== 'All') {
         route += `/category/${filter.category}`
+      }
+
+      if (filter.templateId && filter.templateId !== '') {
+        route += `/type/${filter.templateId}`
       }
 
       if (filter.state && filter.state !== 'OPEN') {
