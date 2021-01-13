@@ -119,6 +119,13 @@ export enum OutcomeTableValue {
   Bonded = 'Bonded (ETH)',
 }
 
+export enum PositionTableValue {
+  YourPosition = 'Your Position',
+  Shares = 'Shares',
+  Payout = 'Payout',
+  ProfitLoss = 'Profit/loss',
+}
+
 export interface Token {
   address: string
   decimals: number
@@ -211,6 +218,12 @@ export enum MarketStates {
   arbitrating = 'ARBITRATING',
   closed = 'CLOSED',
   myMarkets = 'MY_MARKETS',
+}
+
+export enum MarketTypes {
+  all = '',
+  categorical = '2',
+  scalar = '1',
 }
 
 export type MarketsSortCriteria =
@@ -394,6 +407,17 @@ export type BuildQueryType = MarketFilters & {
   whitelistedCreators: boolean
   whitelistedTemplateIds: boolean
   networkId: Maybe<number>
+}
+
+export type TradeObject = {
+  title: string
+  outcomeTokensTraded: BigNumber
+  collateralAmount: BigNumber
+  feeAmount: BigNumber
+  outcomeTokenMarginalPrice: number
+  oldOutcomeTokenMarginalPrice: number
+  type: string
+  outcomeIndex: string
 }
 
 export type MarketCondition = {
