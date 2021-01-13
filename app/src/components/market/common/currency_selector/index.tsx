@@ -82,7 +82,7 @@ export const CurrencySelector: React.FC<Props> = props => {
     .filter(({ address }) => filters.length === 0 || filters.indexOf(address.toLowerCase()) >= 0)
     .forEach(({ address, image, symbol }, index) => {
       currencyDropdownData.push({
-        content: <TokenItem image={image} text={symbol} />,
+        content: <TokenItem image={image} key={symbol} text={symbol} />,
         extraContent: currency && currency.toLowerCase() === address.toLowerCase() ? balance : '',
         onClick: () => {
           if (!disabled) onChange(address)

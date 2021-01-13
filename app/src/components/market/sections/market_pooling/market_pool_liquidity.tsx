@@ -128,7 +128,15 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const signer = useMemo(() => provider.getSigner(), [provider])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
+
+  const wrapToken = getWrapToken(networkId)
+  const nativeAsset = getNativeAsset(networkId)
+  const initialCollateral =
+    marketMakerData.collateral.address.toLowerCase() === wrapToken.address.toLowerCase()
+      ? nativeAsset
+      : marketMakerData.collateral
+  const [collateral, setCollateral] = useState<Token>(initialCollateral)
+
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const [amountToFund, setAmountToFund] = useState<Maybe<BigNumber>>(new BigNumber(0))
@@ -155,7 +163,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }, [amountToRemove, collateral.decimals])
 
   useEffect(() => {
-    setCollateral(marketMakerData.collateral)
+    setCollateral(initialCollateral)
     setAmountToFund(null)
     setAmountToFundDisplay('')
     setAmountToRemove(null)
@@ -232,7 +240,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
-  const wrapToken = getWrapToken(networkId)
   const symbol = collateral.address === pseudoNativeAssetAddress ? wrapToken.symbol : collateral.symbol
 
   const addFunding = async () => {

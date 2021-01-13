@@ -70,7 +70,14 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const { address: marketMakerAddress, balances, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
-  const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
+  const wrapToken = getWrapToken(networkId)
+  const nativeAsset = getNativeAsset(networkId)
+  const initialCollateral =
+    marketMakerData.collateral.address.toLowerCase() === wrapToken.address.toLowerCase()
+      ? nativeAsset
+      : marketMakerData.collateral
+  const [collateral, setCollateral] = useState<Token>(initialCollateral)
+
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amount, setAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
@@ -96,7 +103,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }, [amount, collateral.decimals])
 
   useEffect(() => {
-    setCollateral(marketMakerData.collateral)
+    setCollateral(initialCollateral)
     setAmount(null)
     setAmountToDisplay('')
     // eslint-disable-next-line
@@ -244,11 +251,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     isNegativeAmount ||
     (!isUpdated && collateral.address === pseudoNativeAssetAddress)
 
-  const wrapAddress = getWrapToken(networkId).address
-
   const currencyFilters =
-    collateral.address === wrapAddress || collateral.address === pseudoNativeAssetAddress
-      ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
+    collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
+      ? [wrapToken.address, pseudoNativeAssetAddress.toLowerCase()]
       : []
 
   const switchOutcome = (value: number) => {
@@ -369,7 +374,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )}
       {showUpgrade && (
         <SetAllowance
-          collateral={getNativeAsset(context.networkId)}
+          collateral={nativeAsset}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}

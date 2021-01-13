@@ -41,7 +41,7 @@ type GraphResponse = {
 export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolean) => {
   const defaultTokens = getTokensByNetwork(context.networkId)
   if (addNativeAsset) {
-    defaultTokens.splice(1, 0, getNativeAsset(context.networkId))
+    defaultTokens.unshift(getNativeAsset(context.networkId))
   }
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
 
