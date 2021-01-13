@@ -390,11 +390,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
-  const wrapAddress = wrapToken.address
-
   const currencyFilters =
-    collateral.address === wrapAddress || collateral.address === pseudoNativeAssetAddress
-      ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
+    collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
+      ? [wrapToken.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
       : []
 
   return (
@@ -453,6 +451,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             <>
               <CurrenciesWrapper>
                 <CurrencySelector
+                  addBalances
                   addNativeAsset
                   balance={walletBalance}
                   context={context}

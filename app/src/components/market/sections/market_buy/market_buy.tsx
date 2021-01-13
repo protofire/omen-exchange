@@ -253,7 +253,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const currencyFilters =
     collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
-      ? [wrapToken.address, pseudoNativeAssetAddress.toLowerCase()]
+      ? [wrapToken.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
       : []
 
   const switchOutcome = (value: number) => {
@@ -291,6 +291,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <div>
           <CurrenciesWrapper>
             <CurrencySelector
+              addBalances
               addNativeAsset
               balance={formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5)}
               context={context}

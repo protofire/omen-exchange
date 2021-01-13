@@ -16,7 +16,7 @@ import {
 import { ERC20Service } from '../../../../services'
 import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
-import { getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   calcPoolTokens,
@@ -88,7 +88,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   } = marketMakerData
   const context = useConnectedWeb3Context()
   const history = useHistory()
-  const { account, library: provider } = context
+  const { account, library: provider, networkId } = context
   const cpk = useConnectedCPKContext()
 
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
@@ -99,7 +99,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const disableDepositTab = currentDate > resolutionDate
 
   const [activeTab, setActiveTab] = useState(disableDepositTab ? Tabs.withdraw : Tabs.deposit)
-  const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
+
+  const wrapToken = getWrapToken(networkId)
+  const nativeAsset = getNativeAsset(networkId)
+  const initialCollateral =
+    marketMakerData.collateral.address.toLowerCase() === wrapToken.address.toLowerCase()
+      ? nativeAsset
+      : marketMakerData.collateral
+  const [collateral, setCollateral] = useState<Token>(initialCollateral)
+
   const [amountToFund, setAmountToFund] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
   const [amountToRemove, setAmountToRemove] = useState<Maybe<BigNumber>>(new BigNumber(0))
@@ -159,8 +167,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const depositedTokensTotal = depositedTokens.add(userEarnings)
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
-
-  const wrapToken = getWrapToken(context.networkId)
 
   const addFunding = async () => {
     setModalTitle('Deposit Funds')
@@ -292,11 +298,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
-  const wrapAddress = wrapToken.address
-
   const currencyFilters =
-    collateral.address === wrapAddress || collateral.address === pseudoNativeAssetAddress
-      ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
+    collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
+      ? [wrapToken.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
       : []
 
   return (
@@ -332,6 +336,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
             <>
               <CurrenciesWrapper>
                 <CurrencySelector
+                  addBalances
                   addNativeAsset
                   balance={walletBalance}
                   context={context}

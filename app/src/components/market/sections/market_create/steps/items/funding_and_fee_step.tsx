@@ -447,6 +447,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           <div>
             <CurrenciesWrapper>
               <CurrencySelector
+                addBalances
                 addNativeAsset
                 balance={formatNumber(collateralBalanceFormatted, 5)}
                 context={context}
