@@ -127,7 +127,7 @@ export const HistoryTable: React.FC<Props> = ({
                 <HistoryColumns key={id}>
                   <HistoryRow width={'25'}>
                     <ConnectionIcon size={'22'} />
-                    <span>{formatHistoryUser(user)}</span>
+                    <span>{formatHistoryUser(user.id)}</span>
                   </HistoryRow>
                   <HistoryRow width={'18'}>{transactionType}</HistoryRow>
                   <HistoryRow width={'20'}>{formatBigNumber(sharesOrPoolTokenAmount, decimals, 3)}</HistoryRow>

@@ -142,7 +142,6 @@ export const History_select: React.FC<Props> = ({
         const prices = calcPrice(h.holdings.map(bigNumberify))
         const outcomesPrices: { [outcomeName: string]: number } = {}
         outcomeArray.forEach((k, i) => (outcomesPrices[k] = prices[i]))
-
         return { ...outcomesPrices, date: formatTimestampToDate(h.block.timestamp, value) }
       })
   const [toggleSelect, setToggleSelect] = useState(true)
@@ -226,7 +225,6 @@ export const History_select: React.FC<Props> = ({
                 return index !== outcomeIndex
               })
               const sharesCalculation = calculateSharesBought(poolShares, balances, shares, collateralTokenAmount)
-
               sharesValue = calcSellAmountInCollateral(
                 sharesCalculation,
                 firstItem,

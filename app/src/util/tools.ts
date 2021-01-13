@@ -354,13 +354,13 @@ export const formatNumber = (number: string, decimals = 2): string => {
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }
 
-export const formatHistoryDate = (dateData: string): string => {
+export const formatHistoryDate = (dateData: number | string): string => {
   const date = new Date(dateData)
   const minute = date.getMinutes()
   const minuteWithZero = (minute < 10 ? '0' : '') + minute
   const hour = date.getHours()
   const hourWithZero = (hour < 10 ? '0' : '') + hour
-  return `${date.getDate()}.${date.getMonth()} - ${hourWithZero}:${minuteWithZero}`
+  return `${date.getDate()}.${date.getMonth() + 1} - ${hourWithZero}:${minuteWithZero}`
 }
 
 export const formatTimestampToDate = (timestamp: number, value: string) => {
@@ -370,10 +370,9 @@ export const formatTimestampToDate = (timestamp: number, value: string) => {
   return ts.format('MMM D')
 }
 
-export const formatHistoryUser = (user: any) => {
-  const string = user.id
-  const firstStringPart = string ? string.substring(0, 5) + '...' : ''
-  const lastPart = string ? string.substring(string.length - 3, string.length) : ''
+export const formatHistoryUser = (user: string) => {
+  const firstStringPart = user ? user.substring(0, 5) + '...' : ''
+  const lastPart = user ? user.substring(user.length - 3, user.length) : ''
 
   return firstStringPart + lastPart
 }

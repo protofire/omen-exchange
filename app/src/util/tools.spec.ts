@@ -17,6 +17,7 @@ import {
   clampBigNumber,
   computeBalanceAfterTrade,
   divBN,
+  formatBigNumber,
   formatHistoryDate,
   formatHistoryUser,
   formatNumber,
@@ -378,10 +379,45 @@ describe('tools', () => {
     }
   })
 
-  // describe('formatHistoryDate', () => {})
-  // describe('formatTimestampToDate', () => {})
-  // describe('formatHistoryUser', () => {})
-  // describe('calculateSharesBought', () => {})
+  describe('formatHistoryDate', () => {
+    const testCases: [number, string][] = [
+      [1610546486000, '13.1 - 15:01'],
+      [1610460714000, '12.1 - 15:11'],
+      [1609374633000, '31.12 - 01:30'],
+    ]
+
+    for (const [timestamp, result] of testCases) {
+      const unitResult = formatHistoryDate(timestamp)
+
+      expect(unitResult).toMatch(result)
+    }
+  })
+  describe('formatTimestampToDate', () => {
+    const testCases: [[number, string], string][] = [
+      [[1607993079, '1M'], 'Dec 15'],
+      [[1608166400, '1D'], '01:53'],
+      [[1608513696, '1h'], 'Dec 21'],
+    ]
+    for (const [[timestamp, value], result] of testCases) {
+      const unitReuslt = formatTimestampToDate(timestamp, value)
+
+      expect(result).toMatch(unitReuslt)
+    }
+  })
+
+  describe('formatHistoryUser', () => {
+    const testCases: [string, string][] = [
+      ['0xceacf86c3d38cec12b3eb35633af089df90d28a4', '0xcea...8a4'],
+      ['0xc390fcabd6cfaee6faa1fb3afac6c456d731c3f9', '0xc39...3f9'],
+      ['0x4c35233ef1ead84c10684c0b685d2641717017cd', '0x4c3...7cd'],
+    ]
+
+    for (const [user, result] of testCases) {
+      const unitResult = formatHistoryUser(user)
+
+      expect(unitResult).toMatch(result)
+    }
+  })
 
   describe('formatNumber', () => {
     const testCases: [[string, number], string][] = [
@@ -411,6 +447,30 @@ describe('tools', () => {
 
         expect(formattedNumber).toStrictEqual(result)
       })
+    }
+  })
+
+  describe('calculateSharesBought', () => {
+    const testCases: [[number, number[], number[], number], number][] = [
+      [[205, [200, 211], [36, 67], 1], 1],
+      [[204, [193, 216], [48, 67], 1], 1],
+      [[203, [192, 215], [48, 67], 50], 6],
+    ]
+    for (const [[poolShares, [balanceOne, balanceTwo], [sharesOne, sharesTwo], collateral], result] of testCases) {
+      const poolSharesBig = new BigNumber(poolShares)
+      const balanceOneBig = new BigNumber(balanceOne)
+      const balanceTwoBig = new BigNumber(balanceTwo)
+      const sharesOneBig = new BigNumber(sharesOne)
+      const sharesTwoBig = new BigNumber(sharesTwo)
+      const collateralBig = new BigNumber(collateral)
+      const resultBig = new BigNumber(result)
+      const calculation = calculateSharesBought(
+        poolSharesBig,
+        [balanceOneBig, balanceTwoBig],
+        [sharesOneBig, sharesTwoBig],
+        collateralBig,
+      )
+      expect(calculation.toNumber()).toBeCloseTo(resultBig.toNumber())
     }
   })
 

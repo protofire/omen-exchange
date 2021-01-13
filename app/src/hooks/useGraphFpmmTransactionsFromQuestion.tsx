@@ -62,7 +62,7 @@ export type FpmmTradeDataType = {
   collateralTokenAddress: string
   sharesOrPoolTokenAmount: BigNumber
   collateralTokenAmount: BigNumber
-  creationTimestamp: string
+  creationTimestamp: number
   transactionHash: string
   fpmmType: string
   decimals: number
@@ -85,7 +85,7 @@ interface FpmmTradeData {
   collateralTokenAddress: string
   sharesOrPoolTokenAmount: BigNumber
   collateralTokenAmount: BigNumber
-  creationTimestamp: string
+  creationTimestamp: number
   transactionHash: string
   fpmmType: string
   decimals: number
@@ -114,7 +114,7 @@ const wrangleResponse = (data: any, decimals: number) => {
       decimals: decimals,
       collateralTokenAddress: trade.fpmm.collateralToken,
       sharesOrPoolTokenAmount: trade.sharesOrPoolTokenAmount,
-      creationTimestamp: 1000 * parseInt(trade.creationTimestamp),
+      creationTimestamp: 1000 * trade.creationTimestamp,
       collateralTokenAmount: trade.collateralTokenAmount,
       transactionHash: trade.transactionHash,
     }
