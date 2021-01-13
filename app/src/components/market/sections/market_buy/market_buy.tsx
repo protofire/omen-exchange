@@ -380,7 +380,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           onUnlock={upgradeProxy}
         />
       )}
-      <StyledButtonContainer borderTop={true} marginTop={showSetAllowance || isNegativeAmount}>
+      <StyledButtonContainer borderTop={true} marginTop={showSetAllowance || showUpgrade || isNegativeAmount}>
         <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
           Cancel
         </Button>
