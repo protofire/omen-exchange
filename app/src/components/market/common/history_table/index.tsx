@@ -78,6 +78,11 @@ type Props = {
   prev: boolean
 }
 
+enum EtherscanLink {
+  rinkeby = 'https://rinkeby.etherscan.io/tx/',
+  mainnet = 'https://etherscan.io/tx/',
+}
+
 export const HistoryTable: React.FC<Props> = ({
   currency,
   fpmmTrade,
@@ -117,11 +122,7 @@ export const HistoryTable: React.FC<Props> = ({
               const chainID = windowObj.ethereum.chainId
 
               const mainnetOrRinkebyUrl =
-                chainID === '0x4'
-                  ? 'https://rinkeby.etherscan.io/tx/'
-                  : chainID === '0x1'
-                  ? 'https://etherscan.io/tx/'
-                  : ''
+                chainID === '0x4' ? EtherscanLink.rinkeby : chainID === '0x1' ? EtherscanLink.mainnet : ''
               return (
                 <HistoryRow key={id}>
                   <HistoryColumns>
