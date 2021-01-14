@@ -3,10 +3,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
-import { Token } from '../../../../util/types'
+import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
+import { BalanceItem, Status, Token, TradeObject } from '../../../../util/types'
 import { IconInfo } from '../../../common/tooltip/img/IconInfo'
 import { Circle } from '../../common/common_styled'
+import { PositionTable } from '../position_table'
 
 const SCALE_HEIGHT = '20px'
 const BAR_WIDTH = '2px'
@@ -14,17 +15,17 @@ const BALL_SIZE = '20px'
 const DOT_SIZE = '8px'
 const VALUE_BOXES_MARGIN = '12px'
 
-const ScaleWrapper = styled.div<{ border: boolean | undefined }>`
+const ScaleWrapper = styled.div<{ borderBottom: boolean | undefined; borderTop: boolean | undefined }>`
   display: flex;
   flex-direction: column;
   height: 174px;
-  border-bottom: 1px solid ${props => props.theme.scale.bar};
+  border-bottom: ${props => (!props.borderBottom ? 'none' : `1px solid ${props.theme.scale.bar}`)};
   margin-left: -25px;
   margin-right: -25px;
   padding-left: 25px;
   padding-right: 25px;
   position: relative;
-  ${props => props.border && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 202px;`};
+  ${props => props.borderTop && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 202px;`};
 `
 
 const ScaleTitleWrapper = styled.div`
@@ -94,6 +95,16 @@ const HorizontalBarRight = styled.div<{ positive: boolean | null; width: number 
   z-index: 2;
 `
 
+const HorizontalBarChange = styled.div<{ start: number; width: number }>`
+  position: absolute;
+  top: calc(50% - ${BAR_WIDTH} / 2);
+  left: ${props => props.start * 100}%;
+  width: ${props => props.width * 100}%;
+  background: ${props => props.theme.scale.neutral};
+  height: ${BAR_WIDTH};
+  z-index: 2;
+`
+
 const ScaleBallContainer = styled.div`
   width: 100%;
 `
@@ -129,11 +140,16 @@ const ScaleBall = styled.input`
   }
 `
 
-const ScaleDot = styled.div<{ xValue: number; positive: Maybe<boolean> }>`
+const ScaleDot = styled.div<{ xValue: number; positive?: Maybe<boolean> }>`
   position: absolute;
   height: ${DOT_SIZE};
   width: ${DOT_SIZE};
-  background: ${props => (props.positive ? `${props.theme.scale.positive}` : `${props.theme.scale.negative}`)};
+  background: ${props =>
+    props.positive
+      ? `${props.theme.scale.positive}`
+      : props.positive === false
+      ? `${props.theme.scale.negative}`
+      : `${props.theme.scale.neutral}`};
   border-radius: 50%;
   z-index: 3;
   left: ${props => props.xValue * 100}%;
@@ -255,11 +271,16 @@ interface Props {
   upperBound: BigNumber
   startingPointTitle: string
   currentPrediction?: Maybe<string>
-  border?: boolean
+  borderTop?: boolean
   newPrediction?: Maybe<number>
   long?: Maybe<boolean>
+  short?: Maybe<boolean>
   collateral?: Maybe<Token>
   amount?: Maybe<BigNumber>
+  positionTable?: Maybe<boolean>
+  trades?: Maybe<TradeObject[]>
+  status?: Maybe<Status>
+  balances?: Maybe<BalanceItem[]>
   fee?: Maybe<BigNumber>
 }
 
@@ -267,24 +288,27 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const {
     amount,
     amountShares,
-    border,
+    balances,
+    borderTop,
     collateral,
     currentPrediction,
     fee,
     long,
     lowerBound,
     newPrediction,
+    positionTable,
+    short,
     startingPoint,
     startingPointTitle,
+    status,
+    trades,
     unit,
     upperBound,
   } = props
 
-  const decimals = 18
-
-  const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, decimals))
-  const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, decimals))
-  const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), decimals))
+  const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, 18))
+  const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, 18))
+  const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), 18))
 
   const currentPredictionNumber = Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
   const newPredictionNumber = Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
@@ -294,6 +318,21 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
   const feeNumber = fee && collateral && Number(formatBigNumber(fee, collateral.decimals))
+
+  const shortBalances = balances && balances.filter(balance => balance.outcomeName === 'short')
+  const shortShares =
+    shortBalances &&
+    shortBalances.length &&
+    shortBalances.map(shortBalance => shortBalance.shares).reduce((a, b) => a.add(b))
+
+  const longBalances = balances && balances.filter(balance => balance.outcomeName === 'long')
+  const longShares =
+    longBalances &&
+    longBalances.length &&
+    longBalances.map(longBalance => longBalance.shares).reduce((a, b) => a.add(b))
+
+  const shortSharesNumber = collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
+  const longSharesNumber = collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
@@ -313,9 +352,42 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       ? Number(currentPrediction) * 100
       : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
   )
-  const [scaleValuePrediction, setScaleValuePrediction] = useState(newPredictionNumber)
+  const [scaleValuePrediction, setScaleValuePrediction] = useState(currentPredictionNumber || newPredictionNumber)
   const [yourPayout, setYourPayout] = useState(0)
   const [profitLoss, setProfitLoss] = useState(0)
+  const [shortPayout, setShortPayout] = useState(0)
+  const [longPayout, setLongPayout] = useState(0)
+  const [totalShortPrice, setTotalShortPrice] = useState<number>(0)
+  const [totalLongPrice, setTotalLongPrice] = useState<number>(0)
+
+  useEffect(() => {
+    if (trades && trades.length && collateral) {
+      const shortTrades = trades.filter(trade => trade.outcomeIndex === '0')
+      setTotalShortPrice(
+        shortTrades.length
+          ? shortTrades
+              .map(trade =>
+                trade.type === 'Buy'
+                  ? Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals))
+                  : Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals)) * -1,
+              )
+              .reduce((a, b) => a + b)
+          : 0,
+      )
+      const longTrades = trades.filter(trade => trade.outcomeIndex === '1')
+      setTotalLongPrice(
+        longTrades.length
+          ? longTrades
+              .map(trade =>
+                trade.type === 'Buy'
+                  ? Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals))
+                  : Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals)) * -1,
+              )
+              .reduce((a, b) => a + b)
+          : 0,
+      )
+    }
+  }, [trades, collateral])
 
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
@@ -340,11 +412,18 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       setYourPayout((amountSharesNumber || 0) * (Number(scaleBall?.value) / 100))
       // Calculate profit by subtracting amount paid from payout
       setProfitLoss((amountSharesNumber || 0) * (Number(scaleBall?.value) / 100) - (amountNumber || 0))
-    } else {
+    } else if (short) {
       // Calculate total payout by mulitplying shares amount by scale position
       setYourPayout((amountSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
       // Calculate profit by subtracting amount paid from payout
       setProfitLoss((amountSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - (amountNumber || 0))
+    } else {
+      if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
+        setShortPayout((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
+      }
+      if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
+        setLongPayout((longSharesNumber || 0) * (Number(scaleBall?.value) / 100))
+      }
     }
   }, [
     scaleValuePrediction,
@@ -354,8 +433,16 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     newPredictionNumber,
     upperBoundNumber,
     feeNumber,
-    amountSharesNumber,
+    longShares,
+    longSharesNumber,
     scaleBall?.value,
+    short,
+    shortShares,
+    shortSharesNumber,
+    totalLongPrice,
+    totalShortPrice,
+    amountSharesNumber,
+    collateral,
   ])
 
   const activateTooltip = () => {
@@ -372,149 +459,191 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const isSliderEnabled =
+    isAmountInputted ||
+    (positionTable &&
+      collateral &&
+      (!isDust(shortShares || new BigNumber(0), collateral.decimals) ||
+        !isDust(longShares || new BigNumber(0), collateral.decimals)))
+
+  const isPositionTableDisabled =
+    !positionTable ||
+    status !== Status.Ready ||
+    !trades ||
+    !balances ||
+    !collateral ||
+    (isDust(shortShares || new BigNumber(0), collateral.decimals) &&
+      isDust(longShares || new BigNumber(0), collateral.decimals))
+
   return (
-    <ScaleWrapper border={border}>
-      <ScaleTitleWrapper>
-        <ScaleTitle>
-          {formatNumber(lowerBoundNumber.toString())} {unit}
-        </ScaleTitle>
-        <ScaleTitle>
-          {formatNumber(`${upperBoundNumber / 2 + lowerBoundNumber / 2}`)}
-          {` ${unit}`}
-        </ScaleTitle>
-        <ScaleTitle>
-          {upperBound && formatBigNumber(upperBound, decimals)} {unit}
-        </ScaleTitle>
-      </ScaleTitleWrapper>
-      <Scale>
-        <ScaleBallContainer>
-          <ScaleTooltip id="scale-tooltip" xValue={scaleValue || 0}>
-            <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
-          </ScaleTooltip>
-          <ScaleBall
-            className="scale-ball"
-            data-for="scalarTooltip"
-            data-tip={`${formatNumber(scaleValuePrediction.toString())} ${unit}`}
-            disabled={!isAmountInputted}
-            max="100"
-            min="0"
-            onChange={handleScaleBallChange}
-            onMouseDown={activateTooltip}
-            onMouseUp={deactivateTooltip}
-            type="range"
-            value={scaleValue}
-          />
-        </ScaleBallContainer>
-        {isAmountInputted && (
-          <>
-            <ScaleDot
-              positive={
-                (long && (newPrediction || 0) <= Number(currentPrediction)) ||
-                (!long && (newPrediction || 0) >= Number(currentPrediction))
-              }
-              xValue={Number(currentPrediction)}
+    <>
+      <ScaleWrapper borderBottom={isPositionTableDisabled} borderTop={borderTop}>
+        <ScaleTitleWrapper>
+          <ScaleTitle>
+            {formatNumber(lowerBoundNumber.toString())} {unit}
+          </ScaleTitle>
+          <ScaleTitle>
+            {formatNumber(`${upperBoundNumber / 2 + lowerBoundNumber / 2}`)}
+            {` ${unit}`}
+          </ScaleTitle>
+          <ScaleTitle>
+            {upperBound && formatBigNumber(upperBound, 18)} {unit}
+          </ScaleTitle>
+        </ScaleTitleWrapper>
+        <Scale>
+          <ScaleBallContainer>
+            <ScaleTooltip id="scale-tooltip" xValue={scaleValue || 0}>
+              <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
+            </ScaleTooltip>
+            <ScaleBall
+              className="scale-ball"
+              disabled={!isSliderEnabled}
+              max="100"
+              min="0"
+              onChange={handleScaleBallChange}
+              onMouseDown={activateTooltip}
+              onMouseUp={deactivateTooltip}
+              type="range"
+              value={scaleValue}
             />
-            <ScaleDot positive={true} xValue={newPrediction || 0} />
-          </>
-        )}
-        <VerticalBar position={0} positive={isAmountInputted ? !long : null} />
-        <VerticalBar
-          position={1}
-          positive={
-            isAmountInputted ? (long && (newPrediction || 0) <= 0.5) || (!long && (newPrediction || 0) >= 0.5) : null
-          }
-        />
-        <VerticalBar position={2} positive={isAmountInputted ? !!long : null} />
-        <HorizontalBar />
-        {isAmountInputted && (
-          <>
-            <HorizontalBarLeft positive={!long || null} width={newPrediction || 0} />
-            <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
-          </>
-        )}
-        {!isAmountInputted && (
-          <ValueBoxRegular
-            xValue={
-              currentPrediction
-                ? Number(currentPrediction)
-                : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
-            }
-          >
-            <ValueBoxTitle>
-              {currentPrediction
-                ? formatNumber(currentPredictionNumber.toString())
-                : startingPoint && startingPointNumber}
-              {currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}
-            </ValueBoxTitle>
-            <ValueBoxSubtitle>{startingPointTitle}</ValueBoxSubtitle>
-          </ValueBoxRegular>
-        )}
-      </Scale>
-      {isAmountInputted && (
-        <ValueBoxes>
-          <ValueBoxPair>
-            <ValueBox>
-              <ValueBoxTitle>
-                {formatNumber(currentPredictionNumber.toString())} {unit}
-              </ValueBoxTitle>
-              <ValueBoxSubtitle>Current Prediction</ValueBoxSubtitle>
-            </ValueBox>
-            <ValueBox>
-              <ValueBoxTitle>
-                {formatNumber(scaleValuePrediction.toString())} {unit}
-              </ValueBoxTitle>
-              <ValueBoxSubtitle>New Prediction</ValueBoxSubtitle>
-            </ValueBox>
-          </ValueBoxPair>
-          <ValueBoxPair>
-            <ValueBox>
-              <ValueBoxTitle
-                positive={
-                  yourPayout > (amountNumber || 0) ? true : yourPayout < (amountNumber || 0) ? false : undefined
+          </ScaleBallContainer>
+          {positionTable && currentPrediction && (
+            <>
+              <ScaleDot positive={undefined} xValue={Number(currentPrediction)} />
+              <HorizontalBarChange
+                start={
+                  Number(currentPrediction) < (scaleValue || 0) / 100
+                    ? Number(currentPrediction)
+                    : (scaleValue || 0) / 100
                 }
-              >
-                {`${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`}
+                width={
+                  Number(currentPrediction) < (scaleValue || 0) / 100
+                    ? (scaleValue || 0) / 100 - Number(currentPrediction)
+                    : Number(currentPrediction) - (scaleValue || 0) / 100
+                }
+              />
+            </>
+          )}
+          {isAmountInputted && (
+            <>
+              <ScaleDot
+                positive={
+                  (long && (newPrediction || 0) <= Number(currentPrediction)) ||
+                  (!long && (newPrediction || 0) >= Number(currentPrediction))
+                }
+                xValue={Number(currentPrediction)}
+              />
+              <ScaleDot positive={true} xValue={newPrediction || 0} />
+            </>
+          )}
+          <VerticalBar position={0} positive={isAmountInputted ? !long : null} />
+          <VerticalBar
+            position={1}
+            positive={
+              isAmountInputted ? (long && (newPrediction || 0) <= 0.5) || (!long && (newPrediction || 0) >= 0.5) : null
+            }
+          />
+          <VerticalBar position={2} positive={isAmountInputted ? !!long : null} />
+          <HorizontalBar />
+          {isAmountInputted && (
+            <>
+              <HorizontalBarLeft positive={!long || null} width={newPrediction || 0} />
+              <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
+            </>
+          )}
+          {!isAmountInputted && (
+            <ValueBoxRegular
+              xValue={
+                currentPrediction
+                  ? Number(currentPrediction)
+                  : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
+              }
+            >
+              <ValueBoxTitle>
+                {currentPrediction
+                  ? formatNumber(currentPredictionNumber.toString())
+                  : startingPoint && startingPointNumber}
+                {currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}
               </ValueBoxTitle>
-              <ReactTooltip id="payoutTooltip" />
-              <ValueBoxSubtitle>
-                Your Payout
-                <Circle
-                  data-delay-hide={'500'}
-                  data-effect={'solid'}
-                  data-for={'payoutTooltip'}
-                  data-multiline={'true'}
-                  data-tip={`Your payout if the market resolves at ${formatNumber(
-                    scaleValuePrediction.toString(),
-                  )} ${unit}`}
+              <ValueBoxSubtitle>{startingPointTitle}</ValueBoxSubtitle>
+            </ValueBoxRegular>
+          )}
+        </Scale>
+        {isAmountInputted && (
+          <ValueBoxes>
+            <ValueBoxPair>
+              <ValueBox>
+                <ValueBoxTitle>
+                  {formatNumber(currentPredictionNumber.toString())} {unit}
+                </ValueBoxTitle>
+                <ValueBoxSubtitle>Current Prediction</ValueBoxSubtitle>
+              </ValueBox>
+              <ValueBox>
+                <ValueBoxTitle>
+                  {formatNumber(scaleValuePrediction.toString())} {unit}
+                </ValueBoxTitle>
+                <ValueBoxSubtitle>New Prediction</ValueBoxSubtitle>
+              </ValueBox>
+            </ValueBoxPair>
+            <ValueBoxPair>
+              <ValueBox>
+                <ValueBoxTitle
+                  positive={
+                    yourPayout > (amountNumber || 0) ? true : yourPayout < (amountNumber || 0) ? false : undefined
+                  }
                 >
-                  <IconInfo />
-                </Circle>
-              </ValueBoxSubtitle>
-            </ValueBox>
-            <ValueBox>
-              <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>
-                {profitLoss > 0 && '+'}
-                {`${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`}
-              </ValueBoxTitle>
-              <ReactTooltip id="profitTooltip" />
-              <ValueBoxSubtitle>
-                Profit/Loss
-                <Circle
-                  data-delay-hide={'500'}
-                  data-effect={'solid'}
-                  data-for={'profitTooltip'}
-                  data-multiline={'true'}
-                  data-tip={`Your profit/loss if the market resolves at ${formatNumber(
-                    scaleValuePrediction.toString(),
-                  )} ${unit}`}
-                >
-                  <IconInfo />
-                </Circle>
-              </ValueBoxSubtitle>
-            </ValueBox>
-          </ValueBoxPair>
-        </ValueBoxes>
+                  {`${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`}
+                </ValueBoxTitle>
+                <ReactTooltip id="payoutTooltip" />
+                <ValueBoxSubtitle>
+                  Your Payout
+                  <Circle
+                    data-delay-hide={'500'}
+                    data-effect={'solid'}
+                    data-for={'payoutTooltip'}
+                    data-multiline={'true'}
+                    data-tip={`Your payout if the market resolves at ${formatNumber(
+                      scaleValuePrediction.toString(),
+                    )} ${unit}`}
+                  >
+                    <IconInfo />
+                  </Circle>
+                </ValueBoxSubtitle>
+              </ValueBox>
+              <ValueBox>
+                <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>
+                  {profitLoss > 0 && '+'}
+                  {`${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`}
+                </ValueBoxTitle>
+                <ReactTooltip id="profitTooltip" />
+                <ValueBoxSubtitle>
+                  Profit/Loss
+                  <Circle
+                    data-delay-hide={'500'}
+                    data-effect={'solid'}
+                    data-for={'profitTooltip'}
+                    data-multiline={'true'}
+                    data-tip={`Your profit/loss if the market resolves at ${formatNumber(
+                      scaleValuePrediction.toString(),
+                    )} ${unit}`}
+                  >
+                    <IconInfo />
+                  </Circle>
+                </ValueBoxSubtitle>
+              </ValueBox>
+            </ValueBoxPair>
+          </ValueBoxes>
+        )}
+      </ScaleWrapper>
+      {!isPositionTableDisabled && balances && collateral && trades && (
+        <PositionTable
+          balances={balances}
+          collateral={collateral}
+          fee={fee}
+          longPayout={longPayout}
+          shortPayout={shortPayout}
+        />
       )}
-    </ScaleWrapper>
+    </>
   )
 }

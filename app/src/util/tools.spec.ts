@@ -1,6 +1,8 @@
 /* eslint-env jest */
 import Big from 'big.js'
-import { BigNumber, bigNumberify, formatUnits } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
+
+import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
 
 import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
 

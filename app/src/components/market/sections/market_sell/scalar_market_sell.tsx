@@ -45,12 +45,13 @@ const logger = getLogger('Scalar Market::Sell')
 
 interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
+  fetchGraphMarketTradeData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 export const ScalarMarketSell = (props: Props) => {
-  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, fetchGraphMarketTradeData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const { library: provider } = context
 
@@ -171,6 +172,7 @@ export const ScalarMarketSell = (props: Props) => {
         outcomeIndex,
       })
 
+      await fetchGraphMarketTradeData()
       await fetchGraphMarketMakerData()
 
       setAmountShares(null)
@@ -212,11 +214,13 @@ export const ScalarMarketSell = (props: Props) => {
   return (
     <>
       <MarketScale
-        border={true}
+        amount={potentialValue}
+        borderTop={true}
         collateral={collateral}
         currentPrediction={isNewPrediction ? String(formattedNewPrediction) : outcomeTokenMarginalPrices[1]}
         long={positionIndex === 1}
         lowerBound={scalarLow || new BigNumber(0)}
+        newPrediction={formattedNewPrediction}
         startingPointTitle={isNewPrediction ? 'New prediction' : 'Current prediction'}
         unit={getUnit(question.title)}
         upperBound={scalarHigh || new BigNumber(0)}

@@ -1,4 +1,3 @@
-import { SafeInfo } from '@gnosis.pm/safe-apps-sdk'
 import SafeAppsSdkConnector from 'contract-proxy-kit/lib/esm/safeAppsSdkConnector'
 import { useEffect, useState } from 'react'
 
@@ -10,7 +9,7 @@ export const useSafeApp = () => {
   useEffect(() => {
     if (!safeInfo) {
       safeSdk.appsSdk.addListeners({
-        onSafeInfo: (safeInfo: SafeInfo) => setSafeInfo(safeInfo),
+        onSafeInfo: safeInfo => setSafeInfo(safeInfo),
       })
     }
   }, [safeInfo])
