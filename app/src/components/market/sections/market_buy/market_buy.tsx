@@ -15,6 +15,7 @@ import {
   useContracts,
   useCpkAllowance,
   useCpkProxy,
+  useGraphMeta,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -62,6 +63,7 @@ interface Props extends RouteComponentProps<any> {
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+  const { waitForBlockToSync } = useGraphMeta()
   const { library: provider, networkId } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
@@ -175,12 +177,17 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Buying ${sharesAmount} shares ...`)
 
-      await cpk.buyOutcomes({
+      const transaction = await cpk.buyOutcomes({
         amount: amount || Zero,
         collateral,
         outcomeIndex,
         marketMaker,
       })
+
+      if (transaction.blockNumber) {
+        await waitForBlockToSync(transaction.blockNumber)
+      }
+
       await fetchGraphMarketMakerData()
       await fetchCollateralBalance()
 
