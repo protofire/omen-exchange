@@ -10,8 +10,8 @@ import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
 const TableWrapper = styled.div`
   text-align: left;
 `
-const HistoryRow = styled.div<{ width: string; firstRow?: boolean }>`
-  width: ${props => props.width}%;
+const HistoryColumns = styled.div<{ firstRow?: boolean }>`
+  width: 20%;
   padding-top: 0px;
   align-self: center;
   overflow: hidden;
@@ -19,6 +19,7 @@ const HistoryRow = styled.div<{ width: string; firstRow?: boolean }>`
   white-space: nowrap;
   padding-right: 10px;
   &:first-child {
+    width: 23%;
     svg {
       margin-right: 10px;
       vertical-align: middle;
@@ -51,7 +52,7 @@ const PaginationRight = styled.div`
   display: flex;
   margin-left: auto;
 `
-const HistoryColumns = styled.div`
+const HistoryRow = styled.div`
   display: flex;
   padding: 17px 25px;
   border-bottom: 1px solid ${props => props.theme.borders.borderDisabled};
@@ -93,15 +94,13 @@ export const HistoryTable: React.FC<Props> = ({
   return (
     <React.Fragment>
       <TableWrapper>
-        <HistoryColumns>
-          <HistoryRow width={'25'}>User</HistoryRow>
-          <HistoryRow width={'18'}>Action</HistoryRow>
-          <HistoryRow width={'20'}>Shares/PT</HistoryRow>
-          <HistoryRow width={'22'}>Amount ({currency})</HistoryRow>
-          <HistoryRow firstRow={true} width={'18'}>
-            Date - UTC
-          </HistoryRow>
-        </HistoryColumns>
+        <HistoryRow>
+          <HistoryColumns>User</HistoryColumns>
+          <HistoryColumns>Action</HistoryColumns>
+          <HistoryColumns>Shares/PT</HistoryColumns>
+          <HistoryColumns>Amount ({currency})</HistoryColumns>
+          <HistoryColumns firstRow={true}>Date - UTC</HistoryColumns>
+        </HistoryRow>
         {status === 'Ready' &&
           fpmmTrade &&
           fpmmTrade.map(
@@ -124,21 +123,21 @@ export const HistoryTable: React.FC<Props> = ({
                   ? 'https://etherscan.io/tx/'
                   : ''
               return (
-                <HistoryColumns key={id}>
-                  <HistoryRow width={'25'}>
+                <HistoryRow key={id}>
+                  <HistoryColumns>
                     <ConnectionIcon size={'22'} />
                     <span>{formatHistoryUser(user.id)}</span>
-                  </HistoryRow>
-                  <HistoryRow width={'18'}>{transactionType}</HistoryRow>
-                  <HistoryRow width={'20'}>{formatBigNumber(sharesOrPoolTokenAmount, decimals, 3)}</HistoryRow>
-                  <HistoryRow width={'22'}>
+                  </HistoryColumns>
+                  <HistoryColumns>{transactionType}</HistoryColumns>
+                  <HistoryColumns>{formatBigNumber(sharesOrPoolTokenAmount, decimals, 3)}</HistoryColumns>
+                  <HistoryColumns>
                     {formatBigNumber(collateralTokenAmount, decimals, 3)}
                     {` ${currency}`}
-                  </HistoryRow>
-                  <HistoryRow as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank" width={'18'}>
+                  </HistoryColumns>
+                  <HistoryColumns as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank">
                     {formatHistoryDate(creationTimestamp)}
-                  </HistoryRow>
-                </HistoryColumns>
+                  </HistoryColumns>
+                </HistoryRow>
               )
             },
           )}

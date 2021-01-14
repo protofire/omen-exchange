@@ -4,6 +4,7 @@ import { useHistory } from 'react-router'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import styled from 'styled-components'
 
+import theme from '../../../../theme'
 import { getOutcomeColor } from '../../../../theme/utils'
 import { formatBigNumber } from '../../../../util/tools'
 import { Button } from '../../../button/button'
@@ -133,11 +134,16 @@ export const HistoryChart: React.FC<Props> = ({ data, isScalar, outcomes, scalar
       <ResponsiveWrapper>
         <ResponsiveContainer height={300} width="100%">
           <AreaChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} stackOffset="expand">
-            <XAxis dataKey="date" stroke="#E8EAF6" tick={{ fill: '#757575', fontFamily: 'Roboto' }} tickMargin={11} />
+            <XAxis
+              dataKey="date"
+              stroke={theme.colors.verticalDivider}
+              tick={{ fill: theme.colors.textColor, fontFamily: 'Roboto' }}
+              tickMargin={11}
+            />
             <YAxis
               orientation="right"
-              stroke="#E8EAF6"
-              tick={{ fill: '#757575', fontFamily: 'Roboto' }}
+              stroke={theme.colors.verticalDivider}
+              tick={{ fill: theme.colors.textColor, fontFamily: 'Roboto' }}
               tickFormatter={isScalar ? toScaleValue : toPercent}
               tickMargin={10}
             />
