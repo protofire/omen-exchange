@@ -4,7 +4,7 @@ import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
-import { EARLIEST_MAINNET_BLOCK_TO_CHECK } from '../../../../common/constants'
+import { EARLIEST_MAINNET_BLOCK_TO_CHECK, EARLIEST_RINKEBY_BLOCK_TO_CHECK } from '../../../../common/constants'
 import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
 import { isScalarMarket, keys, range } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
@@ -105,7 +105,7 @@ export const HistorySelectContainer: React.FC<Props> = ({
   unit,
 }) => {
   const context = useWeb3Context()
-  const { library } = context
+  const { library, networkId } = context
   const [latestBlockNumber, setLatestBlockNumber] = useState<Maybe<number>>(null)
 
   const [blocks, setBlocks] = useState<Maybe<Block[]>>(null)
@@ -117,7 +117,8 @@ export const HistorySelectContainer: React.FC<Props> = ({
     [answerFinalizedTimestamp],
   )
 
-  const blocksSinceInception = latestBlockNumber ? latestBlockNumber - EARLIEST_MAINNET_BLOCK_TO_CHECK : 0
+  const earliestBlock = networkId === 1 ? EARLIEST_MAINNET_BLOCK_TO_CHECK : EARLIEST_RINKEBY_BLOCK_TO_CHECK
+  const blocksSinceInception = latestBlockNumber ? latestBlockNumber - earliestBlock : 0
   const allDataPoints = Math.floor(blocksSinceInception / blocksPerAllTimePeriod)
 
   const mapPeriod: { [period in Period]: { totalDataPoints: number; blocksPerPeriod: number } } = {

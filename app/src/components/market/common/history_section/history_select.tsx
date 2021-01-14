@@ -156,7 +156,7 @@ export const History_select: React.FC<Props> = ({
     {
       content: 'Liquidity',
       onClick: () => {
-        setType(HistoryType.All)
+        setType(HistoryType.Liquidity)
       },
     },
     {

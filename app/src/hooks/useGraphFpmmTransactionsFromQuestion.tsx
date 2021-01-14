@@ -138,7 +138,7 @@ export const useGraphFpmmTransactionsFromQuestion = (
       id: questionID,
       pageSize: pageSize + 1,
       pageIndex: pageIndex,
-      fpmmType: type === HistoryType.All ? 'Liquidity' : 'Trade',
+      fpmmType: type === HistoryType.All || type === HistoryType.Liquidity ? 'Liquidity' : 'Trade',
     },
     onCompleted: ({ fpmmTransactions }: any) => {
       let internalArray = fpmmTransactions
