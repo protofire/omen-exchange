@@ -1,8 +1,9 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { useConnectedCPKContext, useGraphMarketTradeData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { CompoundService } from '../../../../../services/compound_service'
@@ -110,9 +111,13 @@ const Wrapper = (props: Props) => {
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
+  const context = useConnectedWeb3Context()
+  const cpk = useConnectedCPKContext()
+
   const {
     balances,
     collateral,
+    fee,
     isQuestionFinalized,
     outcomeTokenMarginalPrices,
     payouts,
@@ -122,14 +127,13 @@ const Wrapper = (props: Props) => {
     totalPoolShares,
   } = marketMakerData
   const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
-  const context = useConnectedWeb3Context()
   const { account, library: provider, networkId } = context
   const [compoundService, setCompoundService] = useState<CompoundService>(
     new CompoundService(collateral.address, collateral.symbol, provider, account),
   )
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
-  useMemo(() => {
+  useEffect(() => {
     const getResult = async () => {
       await compoundService.init()
       setCompoundService(compoundService)
@@ -137,21 +141,14 @@ const Wrapper = (props: Props) => {
     if (collateral.symbol.toLowerCase() in CompoundTokenType) {
       getResult()
     }
-  }, [collateral.symbol]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const setCurrentDisplayCollateral = () => {
-    const getResult = async () => {
-      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
-      await compoundServiceObject.init()
-      setCompoundService(compoundServiceObject)
-      setCompoundService(compoundService)
-    }
     // if collateral is a cToken then convert the collateral and balances to underlying token
     const collateralSymbol = collateral.symbol.toLowerCase()
     if (collateralSymbol in CompoundTokenType) {
       const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
       const baseCollateralToken = getToken(networkId, baseCollateralSymbol as KnownToken)
       setDisplayCollateral(baseCollateralToken)
-      getResult()
     } else {
       setDisplayCollateral(collateral)
     }
@@ -305,6 +302,12 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
+  const { fetchData: fetchGraphMarketTradeData, status, trades } = useGraphMarketTradeData(
+    question.title,
+    collateral.address,
+    cpk?.address.toLowerCase(),
+  )
+
   useEffect(() => {
     if ((isQuestionFinalized || !isFinalizing) && currentTab === MarketDetailsTab.finalize) {
       setCurrentTab(MarketDetailsTab.swap)
@@ -326,14 +329,22 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.swap && (
           <>
             {isScalar ? (
-              <MarketScale
-                border={true}
-                currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
-                lowerBound={scalarLow || new BigNumber(0)}
-                startingPointTitle={'Current prediction'}
-                unit={getUnit(question.title)}
-                upperBound={scalarHigh || new BigNumber(0)}
-              />
+              <>
+                <MarketScale
+                  balances={balances}
+                  borderTop={true}
+                  collateral={collateral}
+                  currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
+                  fee={fee}
+                  lowerBound={scalarLow || new BigNumber(0)}
+                  positionTable={true}
+                  startingPointTitle={'Current prediction'}
+                  status={status}
+                  trades={trades}
+                  unit={getUnit(question.title)}
+                  upperBound={scalarHigh || new BigNumber(0)}
+                />
+              </>
             ) : (
               renderTableData()
             )}
@@ -382,7 +393,7 @@ const Wrapper = (props: Props) => {
           ) : (
             <>
               <MarketScale
-                border={true}
+                borderTop={true}
                 currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Current prediction'}
@@ -416,6 +427,7 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
@@ -425,6 +437,7 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.buy && (
           <MarketBuyContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
@@ -433,6 +446,7 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.sell && (
           <MarketSellContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}

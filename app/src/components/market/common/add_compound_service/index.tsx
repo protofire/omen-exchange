@@ -27,18 +27,20 @@ const DescriptionWrapper = styled.div`
 `
 
 const CheckService = styled.div<{ isServiceChecked: boolean }>`
-  width: 35px;
-  height: 35px;
-  margin-top: 3px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   text-align: center;
-  border: 1px solid
-    ${props => (props.isServiceChecked ? props.theme.colors.primary : props.theme.textfield.transparent)};
+  border: 1px solid ${props => (props.isServiceChecked ? props.theme.colors.transparent : props.theme.colors.tertiary)};
   background-color: ${props =>
     props.isServiceChecked ? props.theme.colors.clickable : props.theme.colors.mainBodyBackground};
   display: flex;
   align-items: center;
   justify-content: center;
+  &:hover {
+    border: 1px solid ${props => props.theme.colors.tertiaryDark};
+    cursor: pointer;
+  }
   path {
     fill: ${props =>
       props.isServiceChecked ? props.theme.colors.mainBodyBackground : props.theme.textfield.textColorDark};
@@ -70,6 +72,7 @@ const ServiceTextWrapper = styled.div`
 
 const ServiceCheckWrapper = styled.div`
   width: 10%;
+  color: transparent;
 `
 
 const CompoundServiceDescription = styled.div`
@@ -98,18 +101,19 @@ const TextHeading = styled.div`
   display: flex;
   align-items: center;
   letter-spacing: 0.2px;
-  margin: 0px 6px;
+  margin: 0px 6px 0px 0px;
 `
 
 const TextBody = styled.div`
   line-height: 16px;
   font-size: 14px;
   height: 16px;
-  margin: 6px 6px 0px 6px;
+  margin: 6px 6px 0px 0px;
 `
 
 const TextBodyMarker = styled.span`
-  color: ${props => props.theme.colors.compound};
+  color: ${props => props.theme.colors.green};
+  font-weight: 500;
 `
 
 export interface AddCompoundServiceProps {
@@ -140,8 +144,8 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
               <ServiceTextWrapper>
                 <TextHeading>Compound</TextHeading>
                 <TextBody>
-                  Convert {currentToken} to {cTokenSymbol}
-                  <TextBodyMarker> and earn {compoundInterestRate}% APY</TextBodyMarker>
+                  Convert {currentToken} to {cTokenSymbol} and
+                  <TextBodyMarker> earn {compoundInterestRate}% APY</TextBodyMarker>
                 </TextBody>
               </ServiceTextWrapper>
               <ServiceCheckWrapper onClick={toggleServiceCheck}>

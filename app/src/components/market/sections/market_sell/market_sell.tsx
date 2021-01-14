@@ -132,7 +132,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [compoundService, setCompoundService] = useState<CompoundService>(
     new CompoundService(collateral.address, collateral.symbol, provider, account),
   )
-  useMemo(() => {
+  useEffect(() => {
     const getResult = async () => {
       const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
       await compoundServiceObject.init()
@@ -141,7 +141,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     if (collateral.symbol.toLowerCase() in CompoundTokenType) {
       getResult()
     }
-  }, [collateral.address, collateral.symbol, provider, account])
+    // eslint-disable-next-line
+  }, [])
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])

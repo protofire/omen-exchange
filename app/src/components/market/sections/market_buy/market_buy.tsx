@@ -125,7 +125,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
 
-  useMemo(() => {
+  useEffect(() => {
     const getResult = async () => {
       await compoundService.init()
       setCompoundService(compoundService)
@@ -133,8 +133,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     if (collateral.symbol.toLowerCase() in CompoundTokenType) {
       getResult()
     }
-  }, [collateral.symbol]) // eslint-disable-line react-hooks/exhaustive-deps
-
+    // eslint-disable-next-line
+  }, [])
   useEffect(() => {
     setCollateral(marketMakerData.collateral)
     setAmount(null)

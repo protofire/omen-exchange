@@ -239,16 +239,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [currentToken, setCurrentToken] = useState({ tokenExists: false, symbol: '', marketAddress: '' })
   let showAddCompundService = false
   const currentTokenSymbol = currentToken.symbol.toLowerCase()
-  if (currentTokenSymbol in CompoundEnabledTokenType) {
+  const isETHNetwork = () => {
+    return context.networkId === 1 || context.networkId === 4
+  }
+  if (currentTokenSymbol in CompoundEnabledTokenType && isETHNetwork()) {
     showAddCompundService = true
   }
-  useEffect(() => {
-    // By default if compund token set the compound service check to true
-    if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType) {
-      setServiceCheck(true)
-      handleUseCompoundReserveChange(true)
-    } // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userInputCollateral.symbol])
   useEffect(() => {
     const selectedToken = markets.find(
       ({ collateralToken }) =>

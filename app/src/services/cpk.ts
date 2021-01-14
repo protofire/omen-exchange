@@ -1,4 +1,4 @@
-import { txs } from '@gnosis.pm/safe-apps-sdk/dist/txs'
+import SafeAppsSDK from '@gnosis.pm/safe-apps-sdk'
 import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
@@ -104,7 +104,12 @@ const proxyAbi = [
   'function changeMasterCopy(address _masterCopy) external',
   'function swapOwner(address prevOwner, address oldOwner, address newOwner) external',
   'function getOwners() public view returns (address[] memory)',
+  'function getThreshold() public view returns (uint256)',
 ]
+
+const fallbackMultisigTransactionReceipt: TransactionReceipt = {
+  byzantium: true,
+}
 
 interface CPKRequestVerificationParams {
   params: string
@@ -137,25 +142,37 @@ class CPKService {
     return this.cpk.address
   }
 
-  getTransactionHash = async (txObject: TransactionResult): Promise<string> => {
+  waitForTransaction = async (txObject: TransactionResult): Promise<TransactionReceipt> => {
     if (txObject.hash) {
-      return txObject.hash
+      logger.log(`Transaction hash: ${txObject.hash}`)
+      return this.provider.waitForTransaction(txObject.hash)
     }
 
-    if (txObject.safeTxHash) {
-      let transactionHash
-      // poll for safe tx data
-      while (!transactionHash) {
-        const safeTransaction = await txs.getBySafeTxHash(txObject.safeTxHash)
-        if (safeTransaction.transactionHash) {
-          transactionHash = safeTransaction.transactionHash
+    const threshold = await this.proxy.getThreshold()
+
+    if (threshold.toNumber() === 1) {
+      if (txObject.safeTxHash) {
+        logger.log(`Safe transaction hash: ${txObject.safeTxHash}`)
+        const sdk = new SafeAppsSDK()
+        let transactionHash
+        // poll for safe tx data
+        while (!transactionHash) {
+          try {
+            const safeTransaction = await sdk.txs.getBySafeTxHash(txObject.safeTxHash)
+            if (safeTransaction.transactionHash) {
+              transactionHash = safeTransaction.transactionHash
+            }
+          } catch (e) {
+            logger.log(`getBySafeTxHash: ${e.message}`)
+          }
+          await waitABit()
         }
-        await waitABit()
+        logger.log(`Transaction hash: ${transactionHash}`)
+        return this.provider.waitForTransaction(transactionHash)
       }
-      return transactionHash
     }
-
-    return ''
+    // if threshold is > 1 the tx needs more sigs, return dummy tx receipt
+    return fallbackMultisigTransactionReceipt
   }
 
   buyOutcomes = async ({
@@ -279,9 +296,7 @@ class CPKService {
       })
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      const txHash = await this.getTransactionHash(txObject)
-      logger.log(`Transaction hash: ${txHash}`)
-      return this.provider.waitForTransaction(txHash)
+      return this.waitForTransaction(txObject)
     } catch (err) {
       logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
       throw err
@@ -485,11 +500,7 @@ class CPKService {
       })
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
-
-      const txHash = await this.getTransactionHash(txObject)
-      logger.log(`Transaction hash: ${txHash}`)
-
-      const transaction = await this.provider.waitForTransaction(txObject.hash)
+      const transaction = await this.waitForTransaction(txObject)
       return {
         transaction,
         marketMakerAddress: predictedMarketMakerAddress,
@@ -781,9 +792,7 @@ class CPKService {
       }
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      const txHash = await this.getTransactionHash(txObject)
-      logger.log(`Transaction hash: ${txHash}`)
-      return this.provider.waitForTransaction(txHash)
+      return this.waitForTransaction(txObject)
     } catch (err) {
       logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
       throw err
@@ -904,9 +913,7 @@ class CPKService {
       })
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      const txHash = await this.getTransactionHash(txObject)
-      logger.log(`Transaction hash: ${txHash}`)
-      return this.provider.waitForTransaction(txHash)
+      return this.waitForTransaction(txObject)
     } catch (err) {
       logger.error(`There was an error adding an amount of '${amount.toString()}' for funding`, err.message)
       throw err
@@ -1005,9 +1012,7 @@ class CPKService {
       }
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      const txHash = await this.getTransactionHash(txObject)
-      logger.log(`Transaction hash: ${txHash}`)
-      return this.provider.waitForTransaction(txHash)
+      return this.waitForTransaction(txObject)
     } catch (err) {
       logger.error(`There was an error removing amount '${sharesToBurn.toString()}' for funding`, err.message)
       throw err
@@ -1024,9 +1029,9 @@ class CPKService {
       const ovm = new OvmService()
       const contractInstance = await ovm.createOvmContractInstance(signer, ovmAddress)
 
-      const { hash } = await ovm.generateTransaction(params, contractInstance, submissionDeposit)
+      const txObject = await ovm.generateTransaction(params, contractInstance, submissionDeposit)
 
-      return this.provider.waitForTransaction(hash)
+      return this.waitForTransaction(txObject)
     } catch (err) {
       logger.error('Error while requesting market verification via Kleros!', err.message)
       throw err
@@ -1077,9 +1082,7 @@ class CPKService {
       }
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      const txHash = await this.getTransactionHash(txObject)
-      logger.log(`Transaction hash: ${txHash}`)
-      return this.provider.waitForTransaction(txHash)
+      return this.waitForTransaction(txObject)
     } catch (err) {
       logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
       throw err
