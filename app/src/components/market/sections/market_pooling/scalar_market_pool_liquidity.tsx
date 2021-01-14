@@ -11,10 +11,9 @@ import {
   useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
+  useCpkProxy,
   useFundingBalance,
 } from '../../../../hooks'
-import { ERC20Service } from '../../../../services'
-import { CPKService } from '../../../../services/cpk'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
@@ -94,6 +93,10 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+  const [upgradeFinished, setUpgradeFinished] = useState(false)
+
   const resolutionDate = question.resolution.getTime()
   const currentDate = new Date().getTime()
   const disableDepositTab = currentDate > resolutionDate
@@ -145,7 +148,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
   const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+    collateral.address !== pseudoNativeAssetAddress &&
+    !cpk?.cpk.isSafeApp() &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const poolTokens = calcPoolTokens(
     amountToFund || Zero,
@@ -168,14 +173,36 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
+  const showUpgrade =
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+
+  const upgradeProxy = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await updateProxy()
+    setUpgradeFinished(true)
+  }
+
   const addFunding = async () => {
     setModalTitle('Deposit Funds')
 
     try {
+      if (!cpk) {
+        return
+      }
+
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
-      if (hasEnoughAllowance === Ternary.Unknown) {
+
+      if (
+        !cpk?.cpk.isSafeApp() &&
+        collateral.address !== pseudoNativeAssetAddress &&
+        hasEnoughAllowance !== Ternary.True
+      ) {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown")
       }
 
@@ -183,15 +210,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
-
-      const cpk = await CPKService.create(provider)
-
-      const collateralAddress = await marketMaker.getCollateralToken()
-      const collateralService = new ERC20Service(provider, account, collateralAddress)
-
-      if (hasEnoughAllowance === Ternary.False) {
-        await collateralService.approveUnlimited(cpk.address)
-      }
 
       await cpk.addFunding({
         amount: amountToFund || Zero,
@@ -218,6 +236,10 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const removeFunding = async () => {
     setModalTitle('Withdraw Funds')
     try {
+      if (!cpk) {
+        return
+      }
+
       setStatus(Status.Loading)
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
@@ -226,7 +248,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
-      const cpk = await CPKService.create(provider)
 
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
@@ -286,7 +307,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const disableDepositButton =
     !amountToFund ||
     amountToFund?.isZero() ||
-    hasEnoughAllowance !== Ternary.True ||
+    (!cpk?.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
     isNegativeAmountToFund
@@ -457,6 +478,14 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockCollateral}
+        />
+      )}
+      {activeTab === Tabs.deposit && showUpgrade && (
+        <SetAllowanceStyled
+          collateral={getNativeAsset(context.networkId)}
+          finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
+          loading={RemoteData.is.asking(proxyIsUpToDate)}
+          onUnlock={upgradeProxy}
         />
       )}
       <WarningMessageStyled

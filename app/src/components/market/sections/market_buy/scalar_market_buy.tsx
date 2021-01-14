@@ -12,6 +12,7 @@ import {
   useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
+  useCpkProxy,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -128,6 +129,23 @@ export const ScalarMarketBuy = (props: Props) => {
     setAllowanceFinished(true)
   }
 
+  const [upgradeFinished, setUpgradeFinished] = useState(false)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+
+  const showUpgrade =
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+
+  const upgradeProxy = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await updateProxy()
+    setUpgradeFinished(true)
+  }
+
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber]> => {
       let tradedShares: BigNumber
@@ -178,7 +196,9 @@ export const ScalarMarketBuy = (props: Props) => {
   const total = `${sharesTotal} Shares`
 
   const showSetAllowance =
-    allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False
+    collateral.address !== pseudoNativeAssetAddress &&
+    !cpk?.cpk.isSafeApp() &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const amountError =
     maybeCollateralBalance === null
@@ -192,7 +212,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const isBuyDisabled =
     (status !== Status.Ready && status !== Status.Error) ||
     amount.isZero() ||
-    hasEnoughAllowance !== Ternary.True ||
+    (!cpk?.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount
 
@@ -349,6 +369,15 @@ export const ScalarMarketBuy = (props: Props) => {
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockCollateral}
+          style={{ marginBottom: 20 }}
+        />
+      )}
+      {showUpgrade && (
+        <SetAllowance
+          collateral={nativeAsset}
+          finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
+          loading={RemoteData.is.asking(proxyIsUpToDate)}
+          onUnlock={upgradeProxy}
           style={{ marginBottom: 20 }}
         />
       )}
