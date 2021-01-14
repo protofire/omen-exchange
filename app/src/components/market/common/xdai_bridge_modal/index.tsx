@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import { DEFAULT_TOKEN_ADDRESS } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
+import { useXdaiBridge } from '../../../../hooks/useXdaiBridge'
 import { ERC20Service } from '../../../../services'
 import { formatBigNumber } from '../../../../util/tools'
 import { ButtonRound } from '../../../button/button_round'
@@ -12,6 +13,8 @@ import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { XDaiStake } from '../../../common/icons/currencies/XDaiStake'
 import { SetAllowance } from '../set_allowance_bridge'
+
+import { TransactionState } from './bridge_transaction_state'
 
 interface Prop {
   open: boolean
@@ -41,7 +44,7 @@ const ChainText = styled.div`
 const BalanceText = styled.div`
   text-align: end;
   width: 50%;
-  color: #86909e;
+  color: ${({ theme }) => theme.colors.clickable};
 `
 const MainnetWrapper = styled.div`
   margin-bottom: 12px;
@@ -78,28 +81,27 @@ const StakeText = styled.div`
   margin-left: 8px;
   font-size: 11px;
   font-weight: 500;
-  color: #7986cb;
-`
-const TransferState = styled.div<{ show: boolean }>`
-  ${props => (!props.show ? 'display:none' : 'display: flow-root')};
+  color: ${({ theme }) => theme.colors.clickable};
 `
 
 export const XdaiBridgeTransfer = (props: Prop) => {
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
-  const [ethBalance, setXdaiBalance] = useState<BigNumber>(Zero)
+  const [xDaiBalance, setXdaiBalance] = useState<BigNumber>(Zero)
   const { account, library: provider, networkId } = useConnectedWeb3Context()
 
   const [transferState, setTransferState] = useState<boolean>(false)
 
-  const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
+  const [daiBalance, setDaiBalance] = useState<BigNumber>(Zero)
+
+  const { state, transferFunction } = useXdaiBridge(networkId, networkId === 1 ? daiBalance : xDaiBalance)
 
   useEffect(() => {
     const fetchBalance = async () => {
       try {
         if (networkId === 1) {
           const collateralService = new ERC20Service(provider, account, DEFAULT_TOKEN_ADDRESS)
-          setCollateralBalance(await collateralService.getCollateral(account || ''))
+          setDaiBalance(await collateralService.getCollateral(account || ''))
         } else {
           const balance = await provider.getBalance(account || '')
           setXdaiBalance(balance)
@@ -108,7 +110,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
         setXdaiBalance(Zero)
       }
     }
-    setCollateralBalance(Zero)
+    setDaiBalance(Zero)
     setXdaiBalance(Zero)
     fetchBalance()
   }, [account, provider, networkId])
@@ -121,16 +123,16 @@ export const XdaiBridgeTransfer = (props: Prop) => {
             <ChainText>Mainnet</ChainText>
             <BalanceText
               onClick={() => {
-                setAmount(collateralBalance)
-                setAmountToDisplay(formatBigNumber(collateralBalance, 18))
+                setAmount(daiBalance)
+                setAmountToDisplay(formatBigNumber(daiBalance, 18))
               }}
             >
-              {formatBigNumber(collateralBalance, 18)} DAI
+              {formatBigNumber(daiBalance, 18)} DAI
             </BalanceText>
           </MainnetWrapper>
           <XDaiWrapper>
             <ChainText>xDai Chain</ChainText>
-            <BalanceText>{formatBigNumber(ethBalance, 18)} XDAI</BalanceText>
+            <BalanceText>{formatBigNumber(xDaiBalance, 18)} XDAI</BalanceText>
           </XDaiWrapper>
 
           <TextFieldCustomPlace
@@ -163,14 +165,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
             <StakeText>Powered by STAKE Bridge</StakeText>
           </PoweredByStakeWrapper>
         </BalanceWrapper>
-        <TransferState
-          // onClick={() => {
-          //   console.log(formatBigNumber(collateralBalance, 18))
-          // }}
-          show={transferState}
-        >
-          Milan
-        </TransferState>
+        {transferState && <TransactionState changeTransferState={setTransferState} />}
       </BridgeWrapper>
     </>
   )
