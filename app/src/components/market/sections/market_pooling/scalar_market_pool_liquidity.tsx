@@ -204,7 +204,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         collateral.address !== pseudoNativeAssetAddress &&
         hasEnoughAllowance !== Ternary.True
       ) {
-        throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown")
+        throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
       }
 
       const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)

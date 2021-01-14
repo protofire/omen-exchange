@@ -252,23 +252,18 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
-      if (hasEnoughAllowance === Ternary.Unknown) {
-        throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown")
+      if (
+        !cpk?.cpk.isSafeApp() &&
+        collateral.address !== pseudoNativeAssetAddress &&
+        hasEnoughAllowance !== Ternary.True
+      ) {
+        throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
       }
 
       const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
-
-      if (!cpk.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress) {
-        const collateralAddress = await marketMaker.getCollateralToken()
-        const collateralService = new ERC20Service(provider, account, collateralAddress)
-
-        if (hasEnoughAllowance === Ternary.False) {
-          await collateralService.approveUnlimited(cpk.address)
-        }
-      }
 
       await cpk.addFunding({
         amount: amountToFund || Zero,
