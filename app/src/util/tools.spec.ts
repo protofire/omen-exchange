@@ -2,9 +2,12 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
-import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
-
-import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
+import {
+  REALITIO_SCALAR_ADAPTER_ADDRESS,
+  REALITIO_SCALAR_ADAPTER_ADDRESS,
+  REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY,
+  REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY,
+} from '../common/constants'
 
 import {
   calcAddFundingSendAmounts,
