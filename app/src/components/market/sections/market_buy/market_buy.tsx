@@ -15,6 +15,7 @@ import {
   useContracts,
   useCpkAllowance,
   useCpkProxy,
+  useGraphMeta,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { CompoundService } from '../../../../services/compound_service'
@@ -79,6 +80,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
   const { account, library: provider, networkId } = context
+  const { waitForBlockToSync } = useGraphMeta()
+  const { library: provider, networkId } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
@@ -246,11 +249,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Buying ${sharesAmount} shares ...`)
+
       let useBaseToken = false
       if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
         useBaseToken = true
       }
-      await cpk.buyOutcomes({
+
+      const transaction = await cpk.buyOutcomes({
         amount: displayFundAmount || Zero,
         collateral,
         compoundService,
@@ -258,6 +263,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         marketMaker,
         useBaseToken,
       })
+
+      if (transaction.blockNumber) {
+        await waitForBlockToSync(transaction.blockNumber)
+      }
+
       await fetchGraphMarketMakerData()
       await fetchCollateralBalance()
 
