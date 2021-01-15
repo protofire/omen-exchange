@@ -14,7 +14,6 @@ import {
   useCpkProxy,
   useFundingBalance,
 } from '../../../../hooks'
-import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'

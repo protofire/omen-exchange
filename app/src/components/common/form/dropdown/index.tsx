@@ -255,7 +255,6 @@ const Items = styled.div<{
 
 const SecondaryText = styled.div`
   color: ${props => props.theme.colors.textColor};
-  width: 33%;
   text-align: right;
 `
 
