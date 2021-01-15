@@ -81,7 +81,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const cpk = useConnectedCPKContext()
   const { account, library: provider, networkId } = context
   const { waitForBlockToSync } = useGraphMeta()
-  const { library: provider, networkId } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
