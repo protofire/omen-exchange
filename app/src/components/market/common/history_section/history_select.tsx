@@ -240,7 +240,7 @@ export const History_select: React.FC<Props> = ({
                   creationTimestamp: item.creationTimestamp,
                   id: item.id + 1,
                   transactionHash: item.transactionHash,
-                  transactionType: item.transactionType === 'Deposit' ? 'Buy' : 'Sell',
+                  transactionType: 'Buy',
                   user: item.user,
                 })
               }
