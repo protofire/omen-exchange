@@ -12,7 +12,6 @@ import {
   useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
-  useGraphMeta,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -58,7 +57,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const { fetchGraphMarketMakerData, fetchGraphMarketTradeData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
-  const { waitForBlockToSync } = useGraphMeta()
+
   const { library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
@@ -203,16 +202,12 @@ export const ScalarMarketBuy = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Buying ${sharesAmount} shares ...`)
 
-      const transaction = await cpk.buyOutcomes({
+      await cpk.buyOutcomes({
         amount,
         collateral,
         outcomeIndex,
         marketMaker,
       })
-
-      if (transaction.blockNumber) {
-        await waitForBlockToSync(transaction.blockNumber)
-      }
 
       await fetchGraphMarketTradeData()
       await fetchGraphMarketMakerData()

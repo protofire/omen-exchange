@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import {
   DEFAULT_ARBITRATOR,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
@@ -19,6 +21,7 @@ import {
 import { entries, isNotNull } from '../util/type-utils'
 
 import { getImageUrl } from './token'
+import { waitABit } from './tools'
 import { Arbitrator, Token } from './types'
 
 export type NetworkId = 1 | 4 | 77 | 100
@@ -661,4 +664,28 @@ export const getTargetSafeImplementation = (networkId: number): string => {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
   return networks[networkId].targetSafeImplementation.toLowerCase()
+}
+
+export const getGraphMeta = async (networkId: number) => {
+  const query = `
+    query {
+      _meta {
+        block {
+          hash
+          number
+        }
+      }
+    }
+  `
+  const { httpUri } = getGraphUris(networkId)
+  const result = await axios.post(httpUri, { query })
+  return result.data.data._meta.block
+}
+
+export const waitForBlockToSync = async (networkId: number, blockNum: number) => {
+  let block
+  while (!block || block.number < blockNum + 1) {
+    block = await getGraphMeta(networkId)
+    await waitABit()
+  }
 }
