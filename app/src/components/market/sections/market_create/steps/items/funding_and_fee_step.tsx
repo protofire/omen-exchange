@@ -18,12 +18,13 @@ import {
   useCpkProxy,
 } from '../../../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
+import { CompoundService } from '../../../../../../services/compound_service'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
-import { Arbitrator, CompoundEnabledTokenType, Ternary, Token } from '../../../../../../util/types'
+import { Arbitrator, CompoundEnabledTokenType, CompoundTokenType, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
@@ -261,14 +262,17 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { allowance, unlock } = useCpkAllowance(signer, userInputCollateral.address)
 
   const [amount, setAmount] = useState<BigNumber>(funding)
-  const [amountToDispaly, setAmountToDisplay] = useState<string>('')
+  const [minCollateralAmount, setMinCollateralAmount] = useState<BigNumber>(funding)
+  const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : false
-
+  const [compoundService, setCompoundService] = useState<CompoundService>(
+    new CompoundService(collateral.address, collateral.symbol, provider, account),
+  )
   useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, userInputCollateral))
   }, [dispatch, account, provider, userInputCollateral])
@@ -291,6 +295,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     setIsNegativeDepositAmount(formatBigNumber(funding, userInputCollateral.decimals).includes('-'))
   }, [funding, userInputCollateral.decimals])
 
+  useEffect(() => {
+    if (collateral.symbol.toLowerCase() in CompoundTokenType && userInputCollateral.address !== collateral.address) {
+      const minCollateralAmount = compoundService.calculateBaseToCTokenExchange(collateral, funding)
+      setMinCollateralAmount(minCollateralAmount)
+    } else {
+      setMinCollateralAmount(funding)
+    } // eslint-disable-next-line
+  }, [userInputCollateral.symbol, amount, isServiceChecked, collateral, compoundService])
+
   const resolutionDate = resolution && formatDate(resolution, false)
 
   const [customFee, setCustomFee] = useState(false)
@@ -305,10 +318,18 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       const interestRate = await getCompoundInterestRate(userInputCollateral.symbol.toLowerCase())
       setCompoundInterestRate(interestRate.toFixed(2))
     }
+    const getCompoundExchangeRate = async () => {
+      const compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
+      await compoundService.init()
+      setCompoundService(compoundService)
+    }
     if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType) {
       getInterestRate(userInputCollateral)
     }
-  }, [isServiceChecked, userInputCollateral]) // eslint-disable-line react-hooks/exhaustive-deps
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      getCompoundExchangeRate()
+    }
+  }, [isServiceChecked, userInputCollateral, collateral]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const amountError =
     maybeCollateralBalance === null
@@ -366,8 +387,10 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       symbol: token.symbol,
       marketAddress: selectedToken ? selectedToken.id : '',
     })
+    setServiceCheck(false)
     handleCollateralChange(token)
     setAllowanceFinished(false)
+    setAmount(new BigNumber('0'))
   }
 
   const toggleCustomFee = () => {
@@ -492,7 +515,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                   onChange={handleAmountChange}
                   style={{ width: 0 }}
                   value={amount}
-                  valueToDisplay={amountToDispaly}
+                  valueToDisplay={amountToDisplay}
                 />
               }
               onClickMaxButton={onClickMaxButton}
@@ -517,7 +540,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 title={'Pool Tokens'}
-                value={formatNumber(formatBigNumber(funding, userInputCollateral.decimals))}
+                value={formatNumber(formatBigNumber(minCollateralAmount, collateral.decimals))}
               />
             </TransactionDetailsCard>
           </div>

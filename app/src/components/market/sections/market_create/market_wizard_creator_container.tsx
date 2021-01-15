@@ -85,10 +85,7 @@ const MarketWizardCreatorContainer: FC = () => {
           const userInputCollateralSymbol = marketData.userInputCollateral.symbol.toLowerCase()
           const useCompoundReserve = marketData.useCompoundReserve
           if (useCompoundReserve) {
-            let cToken = `c${userInputCollateralSymbol}`
-            if (userInputCollateralSymbol === 'eth' || userInputCollateralSymbol === 'weth') {
-              cToken = 'ceth'
-            }
+            const cToken = `c${userInputCollateralSymbol}`
             const compoundCollateralToken = cToken as KnownToken
             compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
             marketData.userInputToken = marketData.userInputCollateral
