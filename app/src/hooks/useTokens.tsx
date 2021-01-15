@@ -1,8 +1,10 @@
 import { useQuery } from '@apollo/react-hooks'
+import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
-import { getNativeAsset, getOmenTCRListId, getTokensByNetwork } from '../util/networks'
+import { ERC20Service } from '../services'
+import { getNativeAsset, getOmenTCRListId, getTokensByNetwork, pseudoNativeAssetAddress } from '../util/networks'
 import { getImageUrl } from '../util/token'
 import { isObjectEqual } from '../util/tools'
 import { Token } from '../util/types'
@@ -38,10 +40,10 @@ type GraphResponse = {
   ]
 }
 
-export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolean) => {
+export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolean, addBalances?: boolean) => {
   const defaultTokens = getTokensByNetwork(context.networkId)
   if (addNativeAsset) {
-    defaultTokens.splice(1, 0, getNativeAsset(context.networkId))
+    defaultTokens.unshift(getNativeAsset(context.networkId))
   }
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
 
@@ -53,27 +55,56 @@ export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolea
     variables: { listId: omenTCRListId.toString() },
   })
 
-  if (!error && !loading && data?.tokenLists && data.tokenLists.length > 0) {
-    const tokensWithImage: Token[] = data.tokenLists[0].tokens.map(token => ({
-      ...token,
-      image: getImageUrl(token.address),
-    }))
+  useEffect(() => {
+    const fetchTokenDetails = async () => {
+      if (!error && !loading && data?.tokenLists) {
+        let tokenData = defaultTokens
 
-    // preserve ordering of default tokens and remove duplicates from TCR
-    const combinedTokens: Token[] = Object.values(
-      [...defaultTokens, ...tokensWithImage].reduce((prev, curr) => {
-        // @ts-expect-error ignore
-        if (prev[curr.symbol.toLowerCase()]) {
-          return prev
+        if (data.tokenLists.length) {
+          const tokensWithImage: Token[] = data.tokenLists[0].tokens.map(token => ({
+            ...token,
+            image: getImageUrl(token.address),
+          }))
+
+          // preserve ordering of default tokens and remove duplicates from TCR
+          tokenData = Object.values(
+            [...defaultTokens, ...tokensWithImage].reduce((prev, curr) => {
+              // @ts-expect-error ignore
+              if (prev[curr.symbol.toLowerCase()]) {
+                return prev
+              }
+              return { ...prev, [curr.symbol.toLowerCase()]: curr }
+            }, {}),
+          )
         }
-        return { ...prev, [curr.symbol.toLowerCase()]: curr }
-      }, {}),
-    )
 
-    if (!isObjectEqual(tokens, combinedTokens)) {
-      setTokens(combinedTokens)
+        if (addBalances) {
+          // fetch token balances
+          tokenData = await Promise.all(
+            tokenData.map(async token => {
+              const { account, library: provider } = context
+              let balance = new BigNumber(0)
+              if (account) {
+                if (token.address === pseudoNativeAssetAddress) {
+                  balance = await provider.getBalance(account)
+                } else {
+                  const collateralService = new ERC20Service(provider, account, token.address)
+                  balance = await collateralService.getCollateral(account)
+                }
+              }
+              return { ...token, balance: balance.toString() }
+            }),
+          )
+        }
+
+        if (!isObjectEqual(tokens, tokenData)) {
+          setTokens(tokenData)
+        }
+      }
     }
-  }
+    fetchTokenDetails()
+    // eslint-disable-next-line
+  }, [loading])
 
   useEffect(() => {
     const reload = async () => {
