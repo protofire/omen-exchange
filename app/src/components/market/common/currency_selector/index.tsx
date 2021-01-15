@@ -1,7 +1,9 @@
+import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled, { css } from 'styled-components'
 
 import { ConnectedWeb3Context, useTokens } from '../../../../hooks'
+import { formatBigNumber } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { Spinner } from '../../../common/spinner'
@@ -36,12 +38,14 @@ interface Props {
   placeholder?: Maybe<string>
   addAll?: boolean
   addNativeAsset?: boolean
+  addBalances?: boolean
 }
 
 export const CurrencySelector: React.FC<Props> = props => {
   const {
     addAll = false,
     addNativeAsset = false,
+    addBalances = false,
     balance,
     context,
     currency,
@@ -52,7 +56,7 @@ export const CurrencySelector: React.FC<Props> = props => {
     ...restProps
   } = props
 
-  const tokens = useTokens(context, addNativeAsset)
+  const tokens = useTokens(context, addNativeAsset, addBalances)
 
   const currencyDropdownData: Array<DropdownItemProps> = []
 
@@ -80,10 +84,16 @@ export const CurrencySelector: React.FC<Props> = props => {
 
   tokens
     .filter(({ address }) => filters.length === 0 || filters.indexOf(address.toLowerCase()) >= 0)
-    .forEach(({ address, image, symbol }, index) => {
+    .forEach(({ address, balance: tokenBalance, decimals, image, symbol }, index) => {
+      const selected = currency && currency.toLowerCase() === address.toLowerCase()
       currencyDropdownData.push({
-        content: <TokenItem image={image} text={symbol} />,
-        extraContent: currency && currency.toLowerCase() === address.toLowerCase() ? balance : '',
+        content: <TokenItem image={image} key={symbol} text={symbol} />,
+        extraContent: selected ? balance : '',
+        secondaryText: !tokenBalance
+          ? ''
+          : Number(tokenBalance) > 0
+          ? formatBigNumber(new BigNumber(tokenBalance), decimals, 5)
+          : '0',
         onClick: () => {
           if (!disabled) onChange(address)
         },
