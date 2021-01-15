@@ -5,6 +5,7 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
+import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
 import { createCPK } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
@@ -13,7 +14,7 @@ import {
   getWrapToken,
   pseudoNativeAssetAddress,
 } from '../util/networks'
-import { calcDistributionHint, clampBigNumber, waitABit } from '../util/tools'
+import { calcDistributionHint, clampBigNumber, formatBigNumber, waitABit } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -882,6 +883,26 @@ class CPKService {
     } catch (err) {
       logger.error(`Error trying to update proxy`, err.message)
       throw err
+    }
+  }
+
+  sendDaiToBridge = async (amount: BigNumber): Promise<TransactionReceipt> => {
+    try {
+      const txOptions: TxOptions = {}
+
+      txOptions.gas = 100000000000000
+      const transactions = [
+        {
+          to: DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
+          value: amount,
+        },
+      ]
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+
+      return this.provider.waitForTransaction(txObject.hash)
+    } catch (e) {
+      logger.error(`Error trying to send Dai to bridge address`, e.message)
+      throw e
     }
   }
 }

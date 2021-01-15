@@ -87,33 +87,12 @@ const StakeText = styled.div`
 export const XdaiBridgeTransfer = (props: Prop) => {
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
-  const [xDaiBalance, setXdaiBalance] = useState<BigNumber>(Zero)
-  const { account, library: provider, networkId } = useConnectedWeb3Context()
+
+  const { networkId } = useConnectedWeb3Context()
 
   const [transferState, setTransferState] = useState<boolean>(false)
 
-  const [daiBalance, setDaiBalance] = useState<BigNumber>(Zero)
-
-  const { state, transferFunction } = useXdaiBridge(networkId, networkId === 1 ? daiBalance : xDaiBalance)
-
-  useEffect(() => {
-    const fetchBalance = async () => {
-      try {
-        if (networkId === 1) {
-          const collateralService = new ERC20Service(provider, account, DEFAULT_TOKEN_ADDRESS)
-          setDaiBalance(await collateralService.getCollateral(account || ''))
-        } else {
-          const balance = await provider.getBalance(account || '')
-          setXdaiBalance(balance)
-        }
-      } catch (error) {
-        setXdaiBalance(Zero)
-      }
-    }
-    setDaiBalance(Zero)
-    setXdaiBalance(Zero)
-    fetchBalance()
-  }, [account, provider, networkId])
+  const { daiBalance, state, transferFunction, xDaiBalance } = useXdaiBridge(amount)
 
   return (
     <>
@@ -132,7 +111,14 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           </MainnetWrapper>
           <XDaiWrapper>
             <ChainText>xDai Chain</ChainText>
-            <BalanceText>{formatBigNumber(xDaiBalance, 18)} XDAI</BalanceText>
+            <BalanceText
+              onClick={() => {
+                setAmount(xDaiBalance)
+                setAmountToDisplay(formatBigNumber(xDaiBalance, 18))
+              }}
+            >
+              {formatBigNumber(xDaiBalance, 18)} XDAI
+            </BalanceText>
           </XDaiWrapper>
 
           <TextFieldCustomPlace
@@ -156,6 +142,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           <TransferButton
             onClick={() => {
               setTransferState(!transferState)
+              transferFunction()
             }}
           >
             Transfer
