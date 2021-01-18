@@ -40,7 +40,7 @@ import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { Dropdown, DropdownItemProps } from '../../../common/form/dropdown'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
@@ -490,7 +490,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     withdrawCurrencySelect = (
       <CurrencyDropdownLabelContainer>
         <CurrencyDropdownLabel>Withdraw as</CurrencyDropdownLabel>
-        <CurrencyDropdown items={filterItems} />
+        <CurrencyDropdown dropdownPosition={DropdownPosition.left} items={filterItems} />
       </CurrencyDropdownLabelContainer>
     )
   }

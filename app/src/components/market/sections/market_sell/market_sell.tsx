@@ -33,7 +33,7 @@ import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { Dropdown, DropdownItemProps } from '../../../common/form/dropdown'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError } from '../../common/common_styled'
@@ -62,7 +62,6 @@ const CustomDropdownItem = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
-
   .dropdownItems & .sortBy {
     display: none;
   }
@@ -168,10 +167,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     setDisplayCollateral(inputToken)
   }
   if (collateralSymbol in CompoundTokenType) {
+    const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
+    const baseCollateral = getToken(networkId, baseCollateralSymbol)
     const filters = [
       {
-        title: displayCollateral.symbol,
-        onClick: () => setUserInputCollateral(displayCollateral.symbol),
+        title: baseCollateral.symbol,
+        onClick: () => setUserInputCollateral(baseCollateral.symbol),
       },
       {
         title: collateral.symbol,
@@ -187,7 +188,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     currencySelect = (
       <CurrencyDropdownLabelContainer>
         <CurrencyDropdownLabel>Withdraw as</CurrencyDropdownLabel>
-        <CurrencyDropdown items={filterItems} />
+        <CurrencyDropdown dropdownPosition={DropdownPosition.left} items={filterItems} />
       </CurrencyDropdownLabelContainer>
     )
   }
