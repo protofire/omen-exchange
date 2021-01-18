@@ -47,12 +47,12 @@ const AdditionalMarketDataLeft = styled.div`
 
 const CompoundInterestWrapper = styled.div`
   color: ${props => props.theme.colors.compound};
-  margin-left: 8px;
+  margin-left: 2px !important;
 `
 
-const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
+const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean; noLeftMargin?: boolean }>`
   margin: 0;
-  margin-left: 8px;
+  margin-left: ${props => (props.noLeftMargin ? '0px' : '8px')};
   font-size: ${props => props.theme.textfield.fontSize};
   line-height: 16px;
   white-space: nowrap;
@@ -188,9 +188,10 @@ export const AdditionalMarketData: React.FC<Props> = props => {
             data-arrow-color="transparent"
             data-for="marketData"
             data-tip={`This market is earning ${compoundInterestRate}% APY powered by compound.finance`}
+            noColorChange={true}
           >
             <CompoundIconNoBorder />
-            <AdditionalMarketDataSectionTitle>
+            <AdditionalMarketDataSectionTitle noLeftMargin={true}>
               <CompoundInterestWrapper>{compoundInterestRate}% APY</CompoundInterestWrapper>
             </AdditionalMarketDataSectionTitle>
           </AdditionalMarketDataSectionWrapper>

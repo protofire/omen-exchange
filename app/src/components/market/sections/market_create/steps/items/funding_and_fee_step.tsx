@@ -269,10 +269,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
-  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : false
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+
   const [compoundService, setCompoundService] = useState<CompoundService>(
     new CompoundService(collateral.address, collateral.symbol, provider, account),
   )
+
   useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, userInputCollateral))
   }, [dispatch, account, provider, userInputCollateral])
@@ -296,13 +298,20 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   }, [funding, userInputCollateral.decimals])
 
   useEffect(() => {
-    if (collateral.symbol.toLowerCase() in CompoundTokenType && userInputCollateral.address !== collateral.address) {
+    if (
+      userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType &&
+      userInputCollateral.address !== collateral.address &&
+      isServiceChecked &&
+      compoundService.exchangeRate > 0
+    ) {
       const minCollateralAmount = compoundService.calculateBaseToCTokenExchange(collateral, funding)
       setMinCollateralAmount(minCollateralAmount)
+    } else if (userInputCollateral.address !== collateral.address && isServiceChecked) {
+      setMinCollateralAmount(new BigNumber(0))
     } else {
       setMinCollateralAmount(funding)
     } // eslint-disable-next-line
-  }, [userInputCollateral.symbol, amount, isServiceChecked, collateral, compoundService])
+  }, [userInputCollateral.symbol, collateral, amount, isServiceChecked, compoundService])
 
   const resolutionDate = resolution && formatDate(resolution, false)
 
@@ -310,8 +319,12 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
   const toggleServiceCheck = () => {
-    setServiceCheck(!isServiceChecked)
-    handleUseCompoundReserveChange(!isServiceChecked)
+    const newCheckValue = !isServiceChecked
+    if (newCheckValue) {
+      setMinCollateralAmount(new BigNumber(0))
+    }
+    setServiceCheck(newCheckValue)
+    handleUseCompoundReserveChange(newCheckValue)
   }
   useEffect(() => {
     const getInterestRate = async (userInputCollateral: Token) => {
@@ -499,6 +512,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           <div>
             <CurrenciesWrapper>
               <CurrencySelector
+                addBalances
                 addNativeAsset
                 balance={formatNumber(collateralBalanceFormatted, 5)}
                 context={context}

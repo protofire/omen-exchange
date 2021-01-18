@@ -38,8 +38,11 @@ const CheckService = styled.div<{ isServiceChecked: boolean }>`
   align-items: center;
   justify-content: center;
   &:hover {
-    border: 1px solid ${props => props.theme.colors.tertiaryDark};
+    border: 1px solid ${props => (props.isServiceChecked ? 'none' : props.theme.colors.tertiaryDark)};
     cursor: pointer;
+  }
+  &:active {
+    border: none;
   }
   path {
     fill: ${props =>

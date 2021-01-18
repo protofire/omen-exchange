@@ -63,7 +63,7 @@ interface Network {
   wrapToken: string
   targetSafeImplementation: string
   nativeAsset: Token
-  defaultToken: string
+  defaultToken?: string
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -192,7 +192,6 @@ const networks: { [K in NetworkId]: Network } = {
       decimals: 18,
     },
     targetSafeImplementation: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
-    defaultToken: 'wspoa',
   },
   [networkIds.XDAI]: {
     label: 'xDai',
@@ -230,7 +229,6 @@ const networks: { [K in NetworkId]: Network } = {
       decimals: 18,
     },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
-    defaultToken: 'wxdai',
   },
 }
 
@@ -486,8 +484,11 @@ export const getDefaultToken = (networkId: number) => {
   }
 
   const defaultToken = networks[networkId].defaultToken as KnownToken
+  if (defaultToken) {
+    return getToken(networkId, defaultToken)
+  }
 
-  return getToken(networkId, defaultToken)
+  return networks[networkId].nativeAsset
 }
 
 export const getTokensByNetwork = (networkId: number): Token[] => {

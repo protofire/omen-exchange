@@ -132,6 +132,7 @@ export interface Token {
   symbol: string
   image?: string
   volume?: string
+  balance?: string
 }
 
 export const TokenEthereum = {

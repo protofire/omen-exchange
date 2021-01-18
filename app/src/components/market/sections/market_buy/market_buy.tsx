@@ -88,11 +88,19 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const { address: marketMakerAddress, balances, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
-  const [collateral, setCollateral] = useState<Token>(marketMakerData.collateral)
+  const wrapToken = getWrapToken(networkId)
+  const nativeAsset = getNativeAsset(networkId)
+  const initialCollateral =
+    marketMakerData.collateral.address.toLowerCase() === wrapToken.address.toLowerCase()
+      ? nativeAsset
+      : marketMakerData.collateral
+  const [collateral, setCollateral] = useState<Token>(initialCollateral)
+
   const [compoundService, setCompoundService] = useState<CompoundService>(
     new CompoundService(collateral.address, collateral.symbol, provider, account),
   )
-  const getInitialCollateral = (): Token => {
+
+  const getInitialDisplayCollateral = (): Token => {
     const collateralSymbol = collateral.symbol.toLowerCase()
     if (collateralSymbol in CompoundTokenType) {
       const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
@@ -102,7 +110,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       return collateral
     }
   }
-  const [displayCollateral, setDisplayCollateral] = useState<Token>(getInitialCollateral())
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(getInitialDisplayCollateral())
+
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amount, setAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
@@ -121,7 +130,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
-  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : false
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals).includes('-'))
@@ -138,7 +147,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     // eslint-disable-next-line
   }, [])
   useEffect(() => {
-    setCollateral(marketMakerData.collateral)
+    setCollateral(initialCollateral)
     setAmount(null)
     setAmountToDisplay('')
     // eslint-disable-next-line
@@ -277,7 +286,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       What do you think?`),
       )
-
+      setDisplayAmountToFund(new BigNumber(0))
       setAmount(null)
       setAmountToDisplay('')
       setStatus(Status.Ready)
@@ -348,11 +357,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     isNegativeAmount ||
     (!isUpdated && collateral.address === pseudoNativeAssetAddress)
 
-  const wrapAddress = getWrapToken(networkId).address
-
   let currencyFilters =
-    collateral.address === wrapAddress || collateral.address === pseudoNativeAssetAddress
-      ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
+    collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
+      ? [wrapToken.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
       : []
 
   const collateralSymbol = collateral.symbol.toLowerCase()
@@ -424,6 +431,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         <div>
           <CurrenciesWrapper>
             <CurrencySelector
+              addBalances
               addNativeAsset
               balance={formatBigNumber(maybeCollateralBalance || Zero, displayCollateral.decimals, 5)}
               context={context}
@@ -508,13 +516,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )}
       {showUpgrade && (
         <SetAllowance
-          collateral={getNativeAsset(context.networkId)}
+          collateral={nativeAsset}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
         />
       )}
-      <StyledButtonContainer borderTop={true} marginTop={showSetAllowance || isNegativeAmount}>
+      <StyledButtonContainer borderTop={true} marginTop={showSetAllowance || showUpgrade || isNegativeAmount}>
         <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
           Cancel
         </Button>
