@@ -8,7 +8,7 @@ import { Token } from '../util/types'
 
 // use floor as rounding method
 Big.RM = 0
-const RoundingFactor = 10000
+const RoundingFactor = 100000
 
 class CompoundService {
   contract: Contract
@@ -62,7 +62,7 @@ class CompoundService {
       const underlyingBigNumber = parseUnits(amountUnderlyingTokensBoundToPrecision, baseTokenDecimals)
       return underlyingBigNumber
     } catch (e) {
-      const amountUnderlyingTokensNumber = Number(amountUnderlyingTokensBoundToPrecision) * RoundingFactor
+      const amountUnderlyingTokensNumber = new Big(amountUnderlyingTokensBoundToPrecision).mul(RoundingFactor)
       amountUnderlyingTokensBoundToPrecision = roundNumberStringToSignificantDigits(
         amountUnderlyingTokensNumber.toString(),
         4,
@@ -87,13 +87,17 @@ class CompoundService {
     }
     const oneUnderlyingInCToken = divisor.div(exchangeRate)
     const amountCTokens = userInputTokenAmount.times(oneUnderlyingInCToken)
-    const amountCTokensBoundToPrecision = roundNumberStringToSignificantDigits(amountCTokens.toString(), 2)
+    let amountCTokensBoundToPrecision = roundNumberStringToSignificantDigits(amountCTokens.toString(), 4)
     try {
       const amountCTokenBigNumber = parseUnits(amountCTokensBoundToPrecision, cTokenDecimals)
       return amountCTokenBigNumber
     } catch (e) {
-      const amountCToken = Number(amountCTokensBoundToPrecision) * RoundingFactor
-      let amountCTokenBigNumber = parseUnits(amountCToken.toString(), cTokenDecimals)
+      const amountCTokenNumber = new Big(amountCTokensBoundToPrecision).mul(RoundingFactor)
+      amountCTokensBoundToPrecision = roundNumberStringToSignificantDigits(amountCTokenNumber.toString(), 4)
+      if (amountCTokensBoundToPrecision === '0') {
+        return new BigNumber('0')
+      }
+      let amountCTokenBigNumber = parseUnits(amountCTokensBoundToPrecision.toString(), cTokenDecimals)
       amountCTokenBigNumber = amountCTokenBigNumber.div(RoundingFactor)
       return amountCTokenBigNumber
     }
