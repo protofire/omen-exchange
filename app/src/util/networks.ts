@@ -168,7 +168,7 @@ const networks: { [K in NetworkId]: Network } = {
     klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
     realitioTimeout: 180,
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
-    omenTCRListId: 1,
+    omenTCRListId: 0,
     contracts: {
       realitio: '0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03',
       realitioScalarAdapter: '0x1D369EEC97cF2E62c8DBB804b3998Bf15bcb67dB',
@@ -205,7 +205,7 @@ const networks: { [K in NetworkId]: Network } = {
     klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
     realitioTimeout: 86400,
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
-    omenTCRListId: 1,
+    omenTCRListId: 2,
     contracts: {
       realitio: '0x79e32aE03fb27B07C89c0c568F80287C01ca2E57',
       realitioScalarAdapter: '0xcA75aaC320089c9fb077E86857fF6e954Df06a6B',
@@ -215,7 +215,7 @@ const networks: { [K in NetworkId]: Network } = {
       klerosBadge: '0x0000000000000000000000000000000000000000',
       klerosTokenView: '0x0000000000000000000000000000000000000000',
       klerosTCR: '0x0000000000000000000000000000000000000000',
-      dxTCR: '0x0000000000000000000000000000000000000000',
+      dxTCR: '0x85E001DfFF16F388Bc32Cd18009ceDF8F9b62C9E',
       omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
     },
     cpk: {
