@@ -466,7 +466,7 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     addresses: {
       [networkIds.MAINNET]: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       [networkIds.RINKEBY]: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
-      [networkIds.SOKOL]: '0xf3Aaf8A99f1119d02Af9bBfEafA8a71dDD4c582e',
+      [networkIds.SOKOL]: '0xd5ce9C7905CB1e874DaA83Cb1be02eB536308419',
       [networkIds.XDAI]: '0xa0Baf56D83be19Eb6bA8aFAD2Db812Bc13D8Be1d',
     },
     isSelectionEnabled: true,
