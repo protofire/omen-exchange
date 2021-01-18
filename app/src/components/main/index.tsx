@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet'
 import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
@@ -30,10 +30,41 @@ export const Main: React.FC = () => {
 
   const [networkId, setNetworkId] = useState(context.networkId && context.networkId.toString())
 
+  // Includes Mainnet and Rinkeby
+  const mainNetworks = ['1', '0x1', '4', '0x4']
+  // Includes xDai and Sokol
+  const xDaiNetworks = ['100', '0x64', '77', '0x4d']
+
   const windowObj: any = window
   windowObj.ethereum.on('chainChanged', (chainId: string) => {
     setNetworkId(chainId)
+    // TODO: Set host to omen.eth.link
+    if (location.host === 'localhost:3000' && xDaiNetworks.includes(chainId)) {
+      // TODO: Redirect to xdai.omen.eth.link
+      console.log('switch domain to xdai domain')
+    }
+    // TODO: Set host to xdai.omen.eth.link
+    if (location.host === 'localhost:3000' && mainNetworks.includes(chainId)) {
+      // TODO: Redirect to omen.eth.link
+      console.log('switch domain to mainnet domain')
+    }
   })
+
+  useEffect(() => {
+    if (networkId) {
+      console.log(networkId)
+      // TODO: Change host to omen.eth.link
+      if (location.host === 'localhost:3000' && xDaiNetworks.includes(networkId)) {
+        // TODO: Return warning component
+        return console.log('Wrong network, switch to mainnet')
+      }
+      // TODO: Change host to xdai.omen.eth.link
+      if (location.host === 'localhost:3000' && mainNetworks.includes(networkId)) {
+        // TODO: Return warning component
+        return console.log('Wrong network, switch to xDai')
+      }
+    }
+  }, [networkId, mainNetworks, xDaiNetworks])
 
   return (
     <Router>
