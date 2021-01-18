@@ -152,7 +152,14 @@ export const XdaiBridgeTransfer = (props: Prop) => {
             <StakeText>Powered by STAKE Bridge</StakeText>
           </PoweredByStakeWrapper>
         </BalanceWrapper>
-        {transferState && <TransactionState changeTransferState={setTransferState} />}
+        {transferState && (
+          <TransactionState
+            amountToTransfer={amount}
+            network={networkId}
+            state={state}
+            transactionModalVisibility={setTransferState}
+          />
+        )}
       </BridgeWrapper>
     </>
   )

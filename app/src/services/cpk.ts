@@ -5,7 +5,7 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
+import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, DEFAULT_TOKEN_ADDRESS } from '../common/constants'
 import { createCPK } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
@@ -24,6 +24,7 @@ import { MarketMakerFactoryService } from './market_maker_factory'
 import { OracleService } from './oracle'
 import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
+import { XdaiService } from './xdai'
 
 const logger = getLogger('Services::CPKService')
 
@@ -680,6 +681,7 @@ class CPKService {
         }
 
         // Step 0: Wrap ether
+        console.log('ether amount ', formatBigNumber(amount, 18))
         transactions.push({
           to: collateralAddress,
           value: amount,
@@ -790,6 +792,7 @@ class CPKService {
   }: CPKRequestVerificationParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
+      console.log(signer)
       const ovm = new OvmService()
       const contractInstance = await ovm.createOvmContractInstance(signer, ovmAddress)
 
@@ -886,20 +889,15 @@ class CPKService {
     }
   }
 
-  sendDaiToBridge = async (amount: BigNumber): Promise<TransactionReceipt> => {
+  sendDaiToBridge = async (amount: BigNumber) => {
     try {
-      const txOptions: TxOptions = {}
+      const xDaiService = new XdaiService(this.provider)
+      const contract = await xDaiService.generateContractInstance()
+      const transaction = await xDaiService.generateSendTransaction(amount, contract)
+      console.log(transaction)
 
-      txOptions.gas = 100000000000000
-      const transactions = [
-        {
-          to: DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
-          value: amount,
-        },
-      ]
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
-
-      return this.provider.waitForTransaction(txObject.hash)
+      return transaction
+      // return this.provider.waitForTransaction(txObject.hash)
     } catch (e) {
       logger.error(`Error trying to send Dai to bridge address`, e.message)
       throw e

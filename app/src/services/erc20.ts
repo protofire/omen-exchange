@@ -37,6 +37,10 @@ class ERC20Service {
     return this.contract.address
   }
 
+  get getContract(): Contract {
+    return this.contract
+  }
+
   /**
    * @returns A boolean indicating if `spender` has enough allowance to transfer `neededAmount` tokens from `spender`.
    */

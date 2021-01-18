@@ -1,4 +1,3 @@
-import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
@@ -8,15 +7,22 @@ import {
   DEFAULT_TOKEN_ADDRESS,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
-import { CPKService, ERC20Service } from '../services'
+import { ERC20Service } from '../services'
 import { formatBigNumber } from '../util/tools'
-import { Status } from '../util/types'
 
 import { useConnectedCPKContext } from './connectedCpk'
 import { useConnectedWeb3Context } from './connectedWeb3'
 
+export enum State {
+  idle,
+  waitingConfirmation,
+  transactionSubmitted,
+  transactionConfirmed,
+  error,
+}
+
 export const useXdaiBridge = (amount: BigNumber) => {
-  const [state, setState] = useState(true)
+  const [state, setState] = useState<State>(State.idle)
   const { account, library: provider, networkId } = useConnectedWeb3Context()
   const [xDaiBalance, setXdaiBalance] = useState<BigNumber>(Zero)
   const [daiBalance, setDaiBalance] = useState<BigNumber>(Zero)
@@ -27,14 +33,15 @@ export const useXdaiBridge = (amount: BigNumber) => {
 
   const transferFunction = async () => {
     try {
-      setState(true)
-      console.log()
-      await cpk?.sendDaiToBridge(amount)
-      console.log('here')
-
-      setState(false)
+      setState(State.waitingConfirmation)
+      const transaction = await cpk?.sendDaiToBridge(amount)
+      console.log('between waiting')
+      setState(State.transactionSubmitted)
+      const waitingConfirmation = await cpk?.waitForTransaction(transaction)
+      console.log('between confirmed', waitingConfirmation)
+      setState(State.transactionConfirmed)
     } catch (err) {
-      setState(false)
+      setState(State.error)
     }
   }
 

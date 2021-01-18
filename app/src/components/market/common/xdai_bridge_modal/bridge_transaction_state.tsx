@@ -1,11 +1,17 @@
-import React from 'react'
+import { BigNumber } from 'ethers/utils'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
+import { State } from '../../../../hooks/useXdaiBridge'
+import { formatBigNumber } from '../../../../util/tools'
 import { ButtonRound } from '../../../button/button_round'
 import { InlineLoading } from '../../../loading/inline_loading'
 
 interface Prop {
-  changeTransferState: any
+  transactionModalVisibility: any
+  state: State
+  amountToTransfer: BigNumber
+  network: number
 }
 
 const MainWrapper = styled.div``
@@ -32,19 +38,32 @@ const ChainText = styled.div`
 const TransactionLink = styled.a`
   color: ${({ theme }) => theme.colors.clickable};
 `
-export const TransactionState = (props: Prop) => {
+export const TransactionState = ({ amountToTransfer, network, state, transactionModalVisibility }: Prop) => {
+  useEffect(() => {
+    if (state === State.error) {
+      transactionModalVisibility(false)
+    }
+  }, [state])
   return (
     <MainWrapper>
       <Loader message="" />
-      <BoldedText>Transfer 3225 DAI</BoldedText>
+      <BoldedText>
+        Transfer {formatBigNumber(amountToTransfer, 18)} {network === 1 ? 'DAI' : 'XDAI'}
+      </BoldedText>
       <ChainText>to xDai Chain</ChainText>
-      <TransactionLink>Transaction Submitted</TransactionLink>
+      <TransactionLink>
+        {state === State.transactionSubmitted
+          ? 'Transaction Submitted'
+          : state === State.transactionConfirmed
+          ? 'Transaction confirmed'
+          : 'Waiting for confimation'}
+      </TransactionLink>
       <CloseButton
         onClick={() => {
-          props.changeTransferState(false)
+          transactionModalVisibility(false)
         }}
       >
-        Close
+        {state === State.transactionConfirmed ? 'Transfer Again' : 'Close'}
       </CloseButton>
     </MainWrapper>
   )
