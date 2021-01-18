@@ -41,12 +41,12 @@ export const Main: React.FC = () => {
     // TODO: Set host to omen.eth.link
     if (location.host === 'localhost:3000' && xDaiNetworks.includes(chainId)) {
       // TODO: Redirect to xdai.omen.eth.link
-      console.log('switch domain to xdai domain')
+      location.assign('http://localhost:3001')
     }
     // TODO: Set host to xdai.omen.eth.link
-    if (location.host === 'localhost:3000' && mainNetworks.includes(chainId)) {
+    if (location.host === 'localhost:3001' && mainNetworks.includes(chainId)) {
       // TODO: Redirect to omen.eth.link
-      console.log('switch domain to mainnet domain')
+      location.assign('http://localhost:3000')
     }
   })
 
@@ -59,7 +59,7 @@ export const Main: React.FC = () => {
         return console.log('Wrong network, switch to mainnet')
       }
       // TODO: Change host to xdai.omen.eth.link
-      if (location.host === 'localhost:3000' && mainNetworks.includes(networkId)) {
+      if (location.host === 'localhost:3001' && mainNetworks.includes(networkId)) {
         // TODO: Return warning component
         return console.log('Wrong network, switch to xDai')
       }
