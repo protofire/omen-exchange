@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { useState } from 'react'
 import { Helmet } from 'react-helmet'
 import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
@@ -27,6 +27,14 @@ const RedirectToHome = () => <Redirect to="/" />
 
 export const Main: React.FC = () => {
   const context = useWeb3Context()
+
+  const [networkId, setNetworkId] = useState(context.networkId && context.networkId.toString())
+
+  const windowObj: any = window
+  windowObj.ethereum.on('chainChanged', (chainId: string) => {
+    setNetworkId(chainId)
+  })
+
   return (
     <Router>
       <MainWrapper>
