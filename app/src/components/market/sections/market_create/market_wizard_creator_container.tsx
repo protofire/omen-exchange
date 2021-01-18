@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react'
 import { useHistory } from 'react-router'
 
-import { useConnectedCPKContext, useContracts, useGraphMeta } from '../../../../hooks'
+import { useConnectedCPKContext, useContracts } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -19,7 +19,6 @@ const MarketWizardCreatorContainer: FC = () => {
   const cpk = useConnectedCPKContext()
   const { account, library: provider } = context
   const history = useHistory()
-  const { waitForBlockToSync } = useGraphMeta()
 
   const [isModalOpen, setModalState] = useState(false)
   const { conditionalTokens, marketMakerFactory, realitio } = useContracts(context)
@@ -52,32 +51,24 @@ const MarketWizardCreatorContainer: FC = () => {
         }
 
         if (isScalar) {
-          const { marketMakerAddress, transaction } = await cpk.createScalarMarket({
+          const { marketMakerAddress } = await cpk.createScalarMarket({
             marketData,
             conditionalTokens,
             realitio,
             marketMakerFactory,
           })
           setMarketMakerAddress(marketMakerAddress)
-
-          if (transaction.blockNumber) {
-            await waitForBlockToSync(transaction.blockNumber)
-          }
 
           setMarketCreationStatus(MarketCreationStatus.done())
           history.replace(`/${marketMakerAddress}`)
         } else {
-          const { marketMakerAddress, transaction } = await cpk.createMarket({
+          const { marketMakerAddress } = await cpk.createMarket({
             marketData,
             conditionalTokens,
             realitio,
             marketMakerFactory,
           })
           setMarketMakerAddress(marketMakerAddress)
-
-          if (transaction.blockNumber) {
-            await waitForBlockToSync(transaction.blockNumber)
-          }
 
           setMarketCreationStatus(MarketCreationStatus.done())
           history.replace(`/${marketMakerAddress}`)

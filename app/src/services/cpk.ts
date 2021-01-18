@@ -12,6 +12,7 @@ import {
   getTargetSafeImplementation,
   getWrapToken,
   pseudoNativeAssetAddress,
+  waitForBlockToSync,
 } from '../util/networks'
 import { calcDistributionHint, clampBigNumber, waitABit } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
@@ -129,15 +130,15 @@ class CPKService {
   }
 
   waitForTransaction = async (txObject: TransactionResult): Promise<TransactionReceipt> => {
+    let transactionReceipt: TransactionReceipt
     if (txObject.hash) {
+      // standard transaction
       logger.log(`Transaction hash: ${txObject.hash}`)
-      return this.provider.waitForTransaction(txObject.hash)
-    }
-
-    const threshold = await this.proxy.getThreshold()
-
-    if (threshold.toNumber() === 1) {
-      if (txObject.safeTxHash) {
+      transactionReceipt = await this.provider.waitForTransaction(txObject.hash)
+    } else {
+      // transaction through the safe app sdk
+      const threshold = await this.proxy.getThreshold()
+      if (threshold.toNumber() === 1 && txObject.safeTxHash) {
         logger.log(`Safe transaction hash: ${txObject.safeTxHash}`)
         const sdk = new SafeAppsSDK()
         let transactionHash
@@ -154,11 +155,18 @@ class CPKService {
           await waitABit()
         }
         logger.log(`Transaction hash: ${transactionHash}`)
-        return this.provider.waitForTransaction(transactionHash)
+        transactionReceipt = await this.provider.waitForTransaction(transactionHash)
+      } else {
+        // if threshold is > 1 the tx needs more sigs, return dummy tx receipt
+        return fallbackMultisigTransactionReceipt
       }
     }
-    // if threshold is > 1 the tx needs more sigs, return dummy tx receipt
-    return fallbackMultisigTransactionReceipt
+    // wait for subgraph to sync tx
+    if (transactionReceipt.blockNumber) {
+      const network = await this.provider.getNetwork()
+      await waitForBlockToSync(network.chainId, transactionReceipt.blockNumber)
+    }
+    return transactionReceipt
   }
 
   buyOutcomes = async ({

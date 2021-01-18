@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import {
   DEFAULT_ARBITRATOR,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
@@ -19,6 +21,7 @@ import {
 import { entries, isNotNull } from '../util/type-utils'
 
 import { getImageUrl } from './token'
+import { waitABit } from './tools'
 import { Arbitrator, Token } from './types'
 
 export type NetworkId = 1 | 4 | 77 | 100
@@ -165,13 +168,13 @@ const networks: { [K in NetworkId]: Network } = {
     klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
     realitioTimeout: 180,
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
-    omenTCRListId: 1,
+    omenTCRListId: 0,
     contracts: {
-      realitio: '0x63975d9e7CF434dCd04bD808d8c79d03EF69100B',
-      realitioScalarAdapter: '0x86459E9eA6cF4caEe9F8F4cb1203d38EaB3cbD34',
+      realitio: '0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03',
+      realitioScalarAdapter: '0x1D369EEC97cF2E62c8DBB804b3998Bf15bcb67dB',
       marketMakerFactory: '0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5',
       conditionalTokens: '0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f',
-      oracle: '0xa57EBD93faa73b3491aAe396557D6ceC24fC6984',
+      oracle: '0x9E6bd63aEbFb2E858B6111cea9C389f7664F7108',
       klerosBadge: '0x0000000000000000000000000000000000000000',
       klerosTokenView: '0x0000000000000000000000000000000000000000',
       klerosTCR: '0x0000000000000000000000000000000000000000',
@@ -202,17 +205,17 @@ const networks: { [K in NetworkId]: Network } = {
     klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
     realitioTimeout: 86400,
     earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
-    omenTCRListId: 1,
+    omenTCRListId: 2,
     contracts: {
-      realitio: '0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03',
-      realitioScalarAdapter: '0xb97FCb6adf4c4aF9981932a004e6CC47173d0Bfc',
+      realitio: '0x79e32aE03fb27B07C89c0c568F80287C01ca2E57',
+      realitioScalarAdapter: '0xcA75aaC320089c9fb077E86857fF6e954Df06a6B',
       marketMakerFactory: '0x9083A2B699c0a4AD06F63580BDE2635d26a3eeF0',
       conditionalTokens: '0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce',
-      oracle: '0x2bf1BFb0eB6276a4F4B60044068Cb8CdEB89f79B',
+      oracle: '0xAB16D643bA051C11962DA645f74632d3130c81E2',
       klerosBadge: '0x0000000000000000000000000000000000000000',
       klerosTokenView: '0x0000000000000000000000000000000000000000',
       klerosTCR: '0x0000000000000000000000000000000000000000',
-      dxTCR: '0x0000000000000000000000000000000000000000',
+      dxTCR: '0x85E001DfFF16F388Bc32Cd18009ceDF8F9b62C9E',
       omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
     },
     cpk: {
@@ -467,7 +470,7 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     addresses: {
       [networkIds.MAINNET]: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       [networkIds.RINKEBY]: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
-      [networkIds.SOKOL]: '0xf3Aaf8A99f1119d02Af9bBfEafA8a71dDD4c582e',
+      [networkIds.SOKOL]: '0xd5ce9C7905CB1e874DaA83Cb1be02eB536308419',
       [networkIds.XDAI]: '0xa0Baf56D83be19Eb6bA8aFAD2Db812Bc13D8Be1d',
     },
     isSelectionEnabled: true,
@@ -662,4 +665,28 @@ export const getTargetSafeImplementation = (networkId: number): string => {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
   return networks[networkId].targetSafeImplementation.toLowerCase()
+}
+
+export const getGraphMeta = async (networkId: number) => {
+  const query = `
+    query {
+      _meta {
+        block {
+          hash
+          number
+        }
+      }
+    }
+  `
+  const { httpUri } = getGraphUris(networkId)
+  const result = await axios.post(httpUri, { query })
+  return result.data.data._meta.block
+}
+
+export const waitForBlockToSync = async (networkId: number, blockNum: number) => {
+  let block
+  while (!block || block.number < blockNum + 1) {
+    block = await getGraphMeta(networkId)
+    await waitABit()
+  }
 }
