@@ -255,7 +255,6 @@ const Items = styled.div<{
 
 const SecondaryText = styled.div`
   color: ${props => props.theme.colors.textColor};
-  width: 33%;
   text-align: right;
 `
 
@@ -389,7 +388,7 @@ export const Dropdown: React.FC<Props> = props => {
   }, [isOpen])
 
   const activeItem = getItem(currentItemIndex)
-
+  const extraContent = getItemExtraContent(currentItemIndex)
   return (
     <>
       <Wrapper
@@ -406,10 +405,10 @@ export const Dropdown: React.FC<Props> = props => {
         <DropdownButton>
           <CurrentItem className="currentItem">
             {placeholder && !isDirty ? placeholder : activeItem.content}
-            {!!activeItem.secondaryText && <SecondaryText>{activeItem.secondaryText}</SecondaryText>}
+            {!!activeItem.secondaryText && !extraContent && <SecondaryText>{activeItem.secondaryText}</SecondaryText>}
           </CurrentItem>
           <DropdownButtonRight>
-            <CurrentItemExtra>{getItemExtraContent(currentItemIndex)}</CurrentItemExtra>
+            <CurrentItemExtra>{extraContent}</CurrentItemExtra>
             {!disabled && (
               <ChevronWrapper>
                 <ChevronDown />
