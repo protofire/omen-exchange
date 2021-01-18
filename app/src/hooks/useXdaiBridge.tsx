@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
 import {
@@ -26,20 +26,36 @@ export const useXdaiBridge = (amount: BigNumber) => {
   const { account, library: provider, networkId } = useConnectedWeb3Context()
   const [xDaiBalance, setXdaiBalance] = useState<BigNumber>(Zero)
   const [daiBalance, setDaiBalance] = useState<BigNumber>(Zero)
-  const bridgeAddress = networkId === 1 ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS
   const cpk = useConnectedCPKContext()
-
-  console.log(bridgeAddress, formatBigNumber(amount, 18))
 
   const transferFunction = async () => {
     try {
-      setState(State.waitingConfirmation)
-      const transaction = await cpk?.sendDaiToBridge(amount)
-      console.log('between waiting')
-      setState(State.transactionSubmitted)
-      const waitingConfirmation = await cpk?.waitForTransaction(transaction)
-      console.log('between confirmed', waitingConfirmation)
-      setState(State.transactionConfirmed)
+      if (networkId === 1) {
+        console.log()
+        setState(State.waitingConfirmation)
+        const transaction = await cpk?.sendDaiToBridge(amount)
+        console.log('between waiting')
+        setState(State.transactionSubmitted)
+        const waitingConfirmation = await cpk?.waitForTransaction(transaction)
+        console.log('between confirmed', waitingConfirmation)
+        setState(State.transactionConfirmed)
+      } else {
+        //since minimum amount to transfer to xDai is 10
+
+        // console.log(formatBigNumber(amount, 18))
+        //
+        // console.log('Evaluation', amount.lte(tenDai))
+        // // if (amount.gte(tenDai)) {
+        // //   console.log('here')
+        // //   setState(State.error)
+        // // }
+        setState(State.waitingConfirmation)
+        const transaction = await cpk?.sendXdaiToBridge(amount)
+        console.log('Transaction hash=', transaction)
+        setState(State.transactionSubmitted)
+        const waitingConfirmation = await cpk?.waitForTransaction(transaction)
+        console.log('Waiting confirmation=', waitingConfirmation)
+      }
     } catch (err) {
       setState(State.error)
     }
@@ -49,6 +65,7 @@ export const useXdaiBridge = (amount: BigNumber) => {
     const fetchBalance = async () => {
       try {
         if (networkId === 1) {
+          console.log('lets see it it fucks it up ', networkId)
           const collateralService = new ERC20Service(provider, account, DEFAULT_TOKEN_ADDRESS)
           setDaiBalance(await collateralService.getCollateral(account || ''))
           //figure out json rpc methods for fetching xDai balance
@@ -60,14 +77,14 @@ export const useXdaiBridge = (amount: BigNumber) => {
           setDaiBalance(Zero)
         }
       } catch (error) {
+        console.log('error caught', error)
         setXdaiBalance(Zero)
         setDaiBalance(Zero)
       }
     }
-    setDaiBalance(Zero)
-    setXdaiBalance(Zero)
+
     fetchBalance()
-  }, [account, provider, networkId])
+  }, [networkId])
 
   return {
     transferFunction,

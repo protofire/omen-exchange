@@ -903,6 +903,16 @@ class CPKService {
       throw e
     }
   }
+  sendXdaiToBridge = async (amount: BigNumber) => {
+    try {
+      const xDaiService = new XdaiService(this.provider)
+      const transaction = await xDaiService.sendXdaiToBridge(amount)
+      return transaction
+    } catch (e) {
+      logger.error(`Error trying to send XDai to bridge address`, e.message)
+      throw e
+    }
+  }
 }
 
 export { CPKService }

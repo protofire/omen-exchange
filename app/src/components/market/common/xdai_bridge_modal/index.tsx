@@ -137,7 +137,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
             }
             symbol={'DAI'}
           />
-          {networkId === 1 && <SetAllowance selectedAmount={amount} />}
+          {/*{networkId === 1 && <SetAllowance selectedAmount={amount} />}*/}
 
           <TransferButton
             onClick={() => {

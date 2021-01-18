@@ -19,7 +19,7 @@ interface Props {
 }
 
 export const SetAllowance: React.FC<Props> = props => {
-  const { library: provider } = useConnectedWeb3Context()
+  const { library: provider, networkId } = useConnectedWeb3Context()
   const [allowanceFinished, setAllowanceFinished] = useState(false)
 
   const cpk = useConnectedCPKContext()
