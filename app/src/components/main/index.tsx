@@ -30,11 +30,11 @@ const RedirectToHome = () => <Redirect to="/" />
 
 export const Main: React.FC = () => {
   const context = useWeb3Context()
+  const windowObj: any = window
 
-  const [networkId, setNetworkId] = useState(context.networkId && context.networkId.toString())
+  const [networkId, setNetworkId] = useState(windowObj.ethereum.chainId)
   const [wrongNetwork, setWrongNetwork] = useState(false)
 
-  const windowObj: any = window
   windowObj.ethereum.on('chainChanged', (chainId: string) => {
     setNetworkId(chainId)
     // TODO: Set host to omen.eth.link
