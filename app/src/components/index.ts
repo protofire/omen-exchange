@@ -6,3 +6,4 @@ export { MarketBuyContainer } from './market/sections/market_buy/market_buy_cont
 export { MarketSellContainer } from './market/sections/market_sell/market_sell_container'
 export { MarketHome } from './market/sections/market_list/market_home'
 export { MarketHomeContainer } from './market/sections/market_list/market_home_container'
+export { SettingsViewContainer } from './settings/settings_view'

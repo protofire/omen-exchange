@@ -15,6 +15,7 @@ import {
   TWITTER_IMAGE_ALT,
   TWITTER_SITE,
 } from '../../common/constants'
+import { SettingsPage } from '../../pages'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { Disclaimer } from '../common/disclaimer'
 import { Footer } from '../common/layout/footer'
@@ -51,6 +52,7 @@ export const Main: React.FC = () => {
               <Route exact path="/">
                 <Redirect to="/liquidity" />
               </Route>
+              <Route component={SettingsPage} exact path="/settings" />
               <Route component={MarketHomeContainer} path="/24h-volume" />
               <Route component={MarketHomeContainer} path="/volume" />
               <Route component={MarketHomeContainer} path="/newest" />
