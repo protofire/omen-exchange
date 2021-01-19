@@ -113,6 +113,16 @@ export const SwitchNetworkModal: React.FC<Props> = props => {
     }
   }, [currentNetwork, currentNetworkId])
 
+  const setLocation = (network: string) => {
+    if (network === networks.mainnet) {
+      // TODO: Set to proper domain
+      location.assign('http://localhost:3000')
+    } else if (network === networks.xdai) {
+      // TODO: Set to proper domain
+      location.assign('http://localhost:3001')
+    }
+  }
+
   return (
     <ModalBackground>
       <Modal>
@@ -135,7 +145,7 @@ export const SwitchNetworkModal: React.FC<Props> = props => {
             </ModalHelpLink>
           )}
         </ModalTextWrapper>
-        <ModalButton>Continue with {currentNetwork}</ModalButton>
+        <ModalButton onClick={() => setLocation(currentNetwork)}>Continue with {currentNetwork}</ModalButton>
       </Modal>
     </ModalBackground>
   )
