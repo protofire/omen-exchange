@@ -6,6 +6,7 @@ import { useWeb3Context } from 'web3-react'
 import {
   DOCUMENT_DESCRIPTION,
   DOCUMENT_TITLE,
+  MAIN_NETWORKS,
   OG_DESCRIPTION,
   OG_IMAGE,
   OG_SITE_NAME,
@@ -14,6 +15,7 @@ import {
   TWITTER_CARD,
   TWITTER_IMAGE_ALT,
   TWITTER_SITE,
+  XDAI_NETWORKS,
 } from '../../common/constants'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { Disclaimer } from '../common/disclaimer'
@@ -32,21 +34,16 @@ export const Main: React.FC = () => {
   const [networkId, setNetworkId] = useState(context.networkId && context.networkId.toString())
   const [wrongNetwork, setWrongNetwork] = useState(false)
 
-  // Includes Mainnet and Rinkeby
-  const mainNetworks = ['1', '0x1', '4', '0x4']
-  // Includes xDai and Sokol
-  const xDaiNetworks = ['100', '0x64', '77', '0x4d']
-
   const windowObj: any = window
   windowObj.ethereum.on('chainChanged', (chainId: string) => {
     setNetworkId(chainId)
     // TODO: Set host to omen.eth.link
-    if (location.host === 'localhost:3000' && xDaiNetworks.includes(chainId)) {
+    if (location.host === 'localhost:3000' && XDAI_NETWORKS.includes(chainId)) {
       // TODO: Redirect to xdai.omen.eth.link
       location.assign('http://localhost:3001')
     }
     // TODO: Set host to xdai.omen.eth.link
-    if (location.host === 'localhost:3001' && mainNetworks.includes(chainId)) {
+    if (location.host === 'localhost:3001' && MAIN_NETWORKS.includes(chainId)) {
       // TODO: Redirect to omen.eth.link
       location.assign('http://localhost:3000')
     }
@@ -55,15 +52,15 @@ export const Main: React.FC = () => {
   useEffect(() => {
     if (networkId) {
       setWrongNetwork(
-        (location.host === 'localhost:3000' && xDaiNetworks.includes(networkId)) ||
-          (location.host === 'localhost:3001' && mainNetworks.includes(networkId)),
+        (location.host === 'localhost:3000' && XDAI_NETWORKS.includes(networkId)) ||
+          (location.host === 'localhost:3001' && MAIN_NETWORKS.includes(networkId)),
       )
     }
-  }, [networkId, mainNetworks, xDaiNetworks])
+  }, [networkId])
 
   return (
     <>
-      {wrongNetwork && <SwitchNetworkModal currentNetwork={networkId} />}
+      {wrongNetwork && <SwitchNetworkModal currentNetworkId={networkId} />}
       <Router>
         <MainWrapper>
           <Helmet>

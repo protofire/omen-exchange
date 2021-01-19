@@ -108,3 +108,6 @@ export const REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI = '0xb97FCb6adf4c4aF9981932a00
 
 export const MAINNET_LOCATION = 'omen.eth.link'
 export const XDAI_LOCATION = 'xdai.omen.eth.link'
+
+export const MAIN_NETWORKS = ['1', '0x1', '4', '0x4']
+export const XDAI_NETWORKS = ['100', '0x64', '77', '0x4d']
