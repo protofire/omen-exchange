@@ -111,7 +111,7 @@ export const SwitchNetworkModal: React.FC<Props> = props => {
     if (newNetwork.length && newNetwork !== currentNetwork) {
       setCurrentNetwork(newNetwork)
     }
-  }, [currentNetwork, currentNetworkId])
+  }, [currentNetwork, currentNetworkId, networks.mainnet, networks.xdai])
 
   const setLocation = (network: string) => {
     if (network === networks.mainnet) {

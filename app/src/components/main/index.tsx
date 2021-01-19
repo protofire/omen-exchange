@@ -51,6 +51,7 @@ export const Main: React.FC = () => {
 
   useEffect(() => {
     if (networkId) {
+      // TODO: Use proper domain
       setWrongNetwork(
         (location.host === 'localhost:3000' && XDAI_NETWORKS.includes(networkId)) ||
           (location.host === 'localhost:3001' && MAIN_NETWORKS.includes(networkId)),
