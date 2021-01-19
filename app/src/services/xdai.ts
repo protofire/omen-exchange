@@ -1,4 +1,4 @@
-import { Contract, ethers } from 'ethers'
+import { Contract } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import {
@@ -44,6 +44,7 @@ class XdaiService {
         },
       ]
       const transaction = await this.provider.send('eth_sendTransaction', params)
+
       return transaction
     } catch (e) {
       throw new Error('Failed at generating transaction!')

@@ -88,7 +88,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
 
   const [transferState, setTransferState] = useState<boolean>(false)
 
-  const { daiBalance, state, transferFunction, xDaiBalance } = useXdaiBridge(amount)
+  const { daiBalance, state, transactionHash, transferFunction, xDaiBalance } = useXdaiBridge(amount)
 
   return (
     <>
@@ -152,6 +152,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
             amountToTransfer={amount}
             network={networkId}
             state={state}
+            transactionHash={transactionHash}
             transactionModalVisibility={setTransferState}
           />
         )}

@@ -3,12 +3,7 @@ import { Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import {
-  DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
-  DEFAULT_TOKEN_ADDRESS,
-  INFURA_PROJECT_ID,
-  XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
-} from '../common/constants'
+import { DEFAULT_TOKEN_ADDRESS, INFURA_PROJECT_ID } from '../common/constants'
 import { ERC20Service } from '../services'
 import { formatBigNumber } from '../util/tools'
 
@@ -28,36 +23,39 @@ export const useXdaiBridge = (amount: BigNumber) => {
   const { account, library: provider, networkId } = useConnectedWeb3Context()
   const [xDaiBalance, setXdaiBalance] = useState<BigNumber>(Zero)
   const [daiBalance, setDaiBalance] = useState<BigNumber>(Zero)
+  const [transactionHash, setTransactionHash] = useState<string>('')
   const cpk = useConnectedCPKContext()
 
   const transferFunction = async () => {
     try {
       if (networkId === 1) {
-        console.log()
         setState(State.waitingConfirmation)
+
         const transaction = await cpk?.sendDaiToBridge(amount)
-        console.log('between waiting')
+
+        setTransactionHash(transaction.hash)
         setState(State.transactionSubmitted)
-        const waitingConfirmation = await cpk?.waitForTransaction(transaction)
-        console.log('between confirmed', waitingConfirmation)
+
+        await cpk?.waitForTransaction(transaction)
         setState(State.transactionConfirmed)
       } else {
-        //since minimum amount to transfer to xDai is 10
+        const amountInFloat = formatBigNumber(amount, 18)
 
-        // console.log(formatBigNumber(amount, 18))
-        //
-        // console.log('Evaluation', amount.lte(tenDai))
-        // // if (amount.gte(tenDai)) {
-        // //   console.log('here')
-        // //   setState(State.error)
-        // // }
+        if (parseInt(amountInFloat) < 10) {
+          setState(State.error)
+          return
+        }
         setState(State.waitingConfirmation)
+
         const transaction = await cpk?.sendXdaiToBridge(amount)
-        console.log('Transaction hash=', transaction)
+
+        setTransactionHash(transaction)
         setState(State.transactionSubmitted)
-        const waitingConfirmation = await cpk?.waitForTransaction(transaction)
-        console.log('Waiting confirmation=', waitingConfirmation)
+
+        await cpk?.waitForTransaction({ hash: transaction })
+        setState(State.transactionConfirmed)
       }
+      fetchBalance()
     } catch (err) {
       setState(State.error)
     }
@@ -70,19 +68,26 @@ export const useXdaiBridge = (amount: BigNumber) => {
         {
           jsonrpc: '2.0',
           id: +new Date(),
-          method: 'eth_getBalance',
-          params: [userAddress, 'latest'],
+          method: networkId === 1 ? 'eth_getBalance' : 'eth_call',
+          params: [
+            networkId === 1
+              ? userAddress
+              : {
+                  data: ERC20Service.encodedBalanceOf(userAddress),
+                  to: DEFAULT_TOKEN_ADDRESS,
+                },
+            'latest',
+          ],
         },
         {
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
           },
         },
       )
       return response.data.result
     } catch (e) {
-      console.log('Error while fetching balance', e)
+      throw new Error(`Error while fetching cross chain balance ${e}`)
     }
   }
 
@@ -92,38 +97,33 @@ export const useXdaiBridge = (amount: BigNumber) => {
 
       if (networkId === 1) {
         const response = await requestCrossChainBalance(userAddress, 'https://dai.poa.network/')
-        const value = parseInt(response, 16)
-        console.log(value / 1000000000000000000)
-
         const collateralService = new ERC20Service(provider, account, DEFAULT_TOKEN_ADDRESS)
+
         setDaiBalance(await collateralService.getCollateral(account || ''))
-        //figure out json rpc methods for fetching xDai balance
-        setXdaiBalance(new BigNumber(value))
+        setXdaiBalance(bigNumberify(response))
       } else {
         const response = await requestCrossChainBalance(
           userAddress,
           `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
         )
-        const value = parseInt(response, 16)
-        console.log(value / 1000000000000000000)
         const balance = await provider.getBalance(account || '')
+
         setXdaiBalance(balance)
-        //figure out json rpc methods for fetching Dai balance
-        setDaiBalance(new BigNumber(value))
+        setDaiBalance(bigNumberify(response))
       }
     } catch (error) {
-      console.log('Error while fetching balance', error)
-      setXdaiBalance(Zero)
-      setDaiBalance(Zero)
+      throw new Error(`Error while fetching balance ${error}`)
     }
   }
 
   useEffect(() => {
     fetchBalance()
-  }, [networkId])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [networkId, account])
 
   return {
     transferFunction,
+    transactionHash,
     state,
     daiBalance,
     xDaiBalance,

@@ -142,6 +142,12 @@ class ERC20Service {
     return approveInterface.functions.approve.encode([spenderAccount, amount])
   }
 
+  static encodedBalanceOf = (account: string): string => {
+    const balanceInterface = new utils.Interface(erc20Abi)
+
+    return balanceInterface.functions.balanceOf.encode([account])
+  }
+
   static encodeApproveUnlimited = (spenderAccount: string): string => {
     const approveInterface = new utils.Interface(erc20Abi)
 

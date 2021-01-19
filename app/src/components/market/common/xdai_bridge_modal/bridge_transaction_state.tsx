@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { State } from '../../../../hooks/useXdaiBridge'
 import { formatBigNumber } from '../../../../util/tools'
 import { ButtonRound } from '../../../button/button_round'
+import { IconArrowUp } from '../../../common/icons/IconArrowUp'
 import { InlineLoading } from '../../../loading/inline_loading'
 
 interface Prop {
@@ -12,11 +13,12 @@ interface Prop {
   state: State
   amountToTransfer: BigNumber
   network: number
+  transactionHash: string
 }
 
 const MainWrapper = styled.div``
 
-const Loader = styled(InlineLoading)`
+const SvgWrapper = styled.div`
   margin-top: 38px;
   margin-bottom: 32px;
 `
@@ -35,29 +37,57 @@ const CloseButton = styled(ButtonRound)`
 const ChainText = styled.div`
   margin: 10px 0;
 `
+const TransactionText = styled.div`
+  color: ${({ theme }) => theme.colors.textColor};
+`
 const TransactionLink = styled.a`
   color: ${({ theme }) => theme.colors.clickable};
 `
-export const TransactionState = ({ amountToTransfer, network, state, transactionModalVisibility }: Prop) => {
+export const TransactionState = ({
+  amountToTransfer,
+  network,
+  state,
+  transactionHash,
+  transactionModalVisibility,
+}: Prop) => {
   useEffect(() => {
     if (state === State.error) {
       transactionModalVisibility(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state])
   return (
     <MainWrapper>
-      <Loader message="" />
+      <SvgWrapper>
+        {state === State.waitingConfirmation ? (
+          <InlineLoading message="" />
+        ) : state === State.transactionSubmitted ? (
+          <IconArrowUp />
+        ) : (
+          <IconArrowUp color={'#4B9E98'} />
+        )}
+      </SvgWrapper>
+
       <BoldedText>
         Transfer {formatBigNumber(amountToTransfer, 18)} {network === 1 ? 'DAI' : 'XDAI'}
       </BoldedText>
-      <ChainText>to xDai Chain</ChainText>
-      <TransactionLink>
-        {state === State.transactionSubmitted
-          ? 'Transaction Submitted'
-          : state === State.transactionConfirmed
-          ? 'Transaction confirmed'
-          : 'Waiting for confimation'}
-      </TransactionLink>
+      <ChainText>to {network === 1 ? 'xDai Chain' : 'Mainnet'}</ChainText>
+
+      {state === State.waitingConfirmation ? (
+        <TransactionText>Waiting confirmation</TransactionText>
+      ) : (
+        <TransactionLink
+          href={
+            network === 1
+              ? `https://etherscan.io/tx/${transactionHash}`
+              : `https://blockscout.com/poa/xdai/tx/${transactionHash}`
+          }
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          {state === State.transactionConfirmed ? 'Transaction Confirmed' : 'Transaction submitted'}
+        </TransactionLink>
+      )}
       <CloseButton
         onClick={() => {
           transactionModalVisibility(false)

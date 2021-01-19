@@ -5,7 +5,6 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, DEFAULT_TOKEN_ADDRESS } from '../common/constants'
 import { createCPK } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
@@ -15,7 +14,7 @@ import {
   pseudoNativeAssetAddress,
   waitForBlockToSync,
 } from '../util/networks'
-import { calcDistributionHint, clampBigNumber, formatBigNumber, waitABit } from '../util/tools'
+import { calcDistributionHint, clampBigNumber, waitABit } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -689,7 +688,6 @@ class CPKService {
         }
 
         // Step 0: Wrap ether
-        console.log('ether amount ', formatBigNumber(amount, 18))
         transactions.push({
           to: collateralAddress,
           value: amount,
@@ -800,7 +798,7 @@ class CPKService {
   }: CPKRequestVerificationParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
-      console.log(signer)
+
       const ovm = new OvmService()
       const contractInstance = await ovm.createOvmContractInstance(signer, ovmAddress)
 
@@ -902,7 +900,6 @@ class CPKService {
       const xDaiService = new XdaiService(this.provider)
       const contract = await xDaiService.generateContractInstance()
       const transaction = await xDaiService.generateSendTransaction(amount, contract)
-      console.log(transaction)
 
       return transaction
       // return this.provider.waitForTransaction(txObject.hash)
@@ -915,6 +912,7 @@ class CPKService {
     try {
       const xDaiService = new XdaiService(this.provider)
       const transaction = await xDaiService.sendXdaiToBridge(amount)
+
       return transaction
     } catch (e) {
       logger.error(`Error trying to send XDai to bridge address`, e.message)
