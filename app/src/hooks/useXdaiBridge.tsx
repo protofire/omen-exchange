@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useEffect, useState } from 'react'
@@ -5,6 +6,7 @@ import { useEffect, useState } from 'react'
 import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   DEFAULT_TOKEN_ADDRESS,
+  INFURA_PROJECT_ID,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
 import { ERC20Service } from '../services'
@@ -61,28 +63,62 @@ export const useXdaiBridge = (amount: BigNumber) => {
     }
   }
 
-  useEffect(() => {
-    const fetchBalance = async () => {
-      try {
-        if (networkId === 1) {
-          console.log('lets see it it fucks it up ', networkId)
-          const collateralService = new ERC20Service(provider, account, DEFAULT_TOKEN_ADDRESS)
-          setDaiBalance(await collateralService.getCollateral(account || ''))
-          //figure out json rpc methods for fetching xDai balance
-          setXdaiBalance(new BigNumber(32))
-        } else {
-          const balance = await provider.getBalance(account || '')
-          setXdaiBalance(balance)
-          //figure out json rpc methods for fetching Dai balance
-          setDaiBalance(Zero)
-        }
-      } catch (error) {
-        console.log('error caught', error)
-        setXdaiBalance(Zero)
-        setDaiBalance(Zero)
-      }
+  const requestCrossChainBalance = async (userAddress: string, url: string) => {
+    try {
+      const response = await axios.post(
+        url,
+        {
+          jsonrpc: '2.0',
+          id: +new Date(),
+          method: 'eth_getBalance',
+          params: [userAddress, 'latest'],
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        },
+      )
+      return response.data.result
+    } catch (e) {
+      console.log('Error while fetching balance', e)
     }
+  }
 
+  const fetchBalance = async () => {
+    try {
+      const userAddress = await provider.getSigner().getAddress()
+
+      if (networkId === 1) {
+        const response = await requestCrossChainBalance(userAddress, 'https://dai.poa.network/')
+        const value = parseInt(response, 16)
+        console.log(value / 1000000000000000000)
+
+        const collateralService = new ERC20Service(provider, account, DEFAULT_TOKEN_ADDRESS)
+        setDaiBalance(await collateralService.getCollateral(account || ''))
+        //figure out json rpc methods for fetching xDai balance
+        setXdaiBalance(new BigNumber(value))
+      } else {
+        const response = await requestCrossChainBalance(
+          userAddress,
+          `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+        )
+        const value = parseInt(response, 16)
+        console.log(value / 1000000000000000000)
+        const balance = await provider.getBalance(account || '')
+        setXdaiBalance(balance)
+        //figure out json rpc methods for fetching Dai balance
+        setDaiBalance(new BigNumber(value))
+      }
+    } catch (error) {
+      console.log('Error while fetching balance', error)
+      setXdaiBalance(Zero)
+      setDaiBalance(Zero)
+    }
+  }
+
+  useEffect(() => {
     fetchBalance()
   }, [networkId])
 

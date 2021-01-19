@@ -1,18 +1,14 @@
-import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { DEFAULT_TOKEN_ADDRESS } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useXdaiBridge } from '../../../../hooks/useXdaiBridge'
-import { ERC20Service } from '../../../../services'
 import { formatBigNumber } from '../../../../util/tools'
 import { ButtonRound } from '../../../button/button_round'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { XDaiStake } from '../../../common/icons/currencies/XDaiStake'
-import { SetAllowance } from '../set_allowance_bridge'
 
 import { TransactionState } from './bridge_transaction_state'
 
@@ -135,9 +131,8 @@ export const XdaiBridgeTransfer = (props: Prop) => {
                 valueToDisplay={amountToDisplay}
               />
             }
-            symbol={'DAI'}
+            symbol={networkId === 1 ? 'DAI' : 'XDAI'}
           />
-          {/*{networkId === 1 && <SetAllowance selectedAmount={amount} />}*/}
 
           <TransferButton
             onClick={() => {
