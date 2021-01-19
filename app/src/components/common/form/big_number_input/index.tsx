@@ -20,6 +20,7 @@ const Input = styled.input`
 export interface BigNumberInputReturn {
   name: string
   value: BigNumber
+  formattedValue?: string
 }
 
 type OverrideProperties<T, R> = Omit<T, keyof R> & R
@@ -78,11 +79,11 @@ export const BigNumberInput: React.FC<Props> = props => {
 
     try {
       if (!value) {
-        onChange({ name, value: new BigNumber(0) })
+        onChange({ name, value: new BigNumber(0), formattedValue: new BigNumber(0).toString() })
       } else {
         const newValue = ethers.utils.parseUnits(value, decimals)
 
-        onChange({ name, value: newValue })
+        onChange({ name, value: newValue, formattedValue: value })
       }
       setCurrentValue(value)
     } catch (e) {

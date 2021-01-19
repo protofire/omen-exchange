@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
@@ -245,6 +246,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const [amount, setAmount] = useState<BigNumber>(funding)
+  const [formattedAmount, setFormattedAmount] = useState<string>('')
   const [amountToDispaly, setAmountToDisplay] = useState<string>('')
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
@@ -339,6 +341,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     })
     handleCollateralChange(token)
     setAllowanceFinished(false)
+    const newAmount = ethers.utils.parseUnits(formattedAmount, token.decimals)
+    setAmount(newAmount)
   }
 
   const toggleCustomFee = () => {
@@ -356,6 +360,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const handleAmountChange = (event: BigNumberInputReturn) => {
     setAmount(event.value)
+    setFormattedAmount(event.formattedValue || '')
     setAmountToDisplay('')
     handleChange(event)
   }
