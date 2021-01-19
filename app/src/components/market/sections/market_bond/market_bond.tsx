@@ -6,6 +6,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
+import { getNativeAsset } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
@@ -51,8 +52,10 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   } = marketMakerData
 
   const context = useConnectedWeb3Context()
-  const { account, library: provider } = context
+  const { account, library: provider, networkId } = context
 
+  const nativeAsset = getNativeAsset(networkId)
+  const symbol = nativeAsset.symbol
   const { realitio } = useContracts(context)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -99,7 +102,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       const answer = outcomeIndex >= balances.length ? INVALID_ANSWER_ID : numberToByte32(outcomeIndex)
 
       setMessage(
-        `Bonding ${formatBigNumber(bondEthAmount, TokenEthereum.decimals)} ETH on: ${
+        `Bonding ${formatBigNumber(bondEthAmount, TokenEthereum.decimals)} ${symbol} on: ${
           outcomeIndex >= marketMakerData.question.outcomes.length
             ? 'Invalid'
             : marketMakerData.question.outcomes[outcomeIndex]
@@ -112,7 +115,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Ready)
       setMessage(
-        `Successfully bonded ${formatBigNumber(bondEthAmount, TokenEthereum.decimals)} ETH on ${
+        `Successfully bonded ${formatBigNumber(bondEthAmount, TokenEthereum.decimals)} ${symbol} on ${
           outcomeIndex < marketMakerData.question.outcomes.length
             ? marketMakerData.question.outcomes[outcomeIndex]
             : 'Invalid'
@@ -120,7 +123,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       )
     } catch (err) {
       setStatus(Status.Error)
-      setMessage(`Error trying to bond Eth.`)
+      setMessage(`Error trying to bond ${symbol}.`)
       logger.error(`${message} - ${err.message}`)
     }
     setIsModalTransactionResultOpen(true)
@@ -153,7 +156,10 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         <div>
           <>
             <CurrenciesWrapper>
-              <EthBalance value={`${formatNumber(formatBigNumber(ethBalance, TokenEthereum.decimals, 3), 3)}`} />
+              <EthBalance
+                asset={nativeAsset}
+                value={`${formatNumber(formatBigNumber(ethBalance, TokenEthereum.decimals, 3), 3)}`}
+              />
             </CurrenciesWrapper>
 
             <TextfieldCustomPlaceholder
@@ -168,7 +174,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
                   value={bondEthAmount}
                 />
               }
-              symbol={TokenEthereum.symbol}
+              symbol={symbol}
             />
           </>
         </div>
@@ -177,19 +183,19 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Bond Amount"
-              value={`${formatNumber(formatBigNumber(bondEthAmount, TokenEthereum.decimals))} ${TokenEthereum.symbol}`}
+              value={`${formatNumber(formatBigNumber(bondEthAmount, TokenEthereum.decimals))} ${symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Profit"
-              value={`${formatNumber(formatBigNumber(currentAnswerBond || new BigNumber(0), 18))} ETH`}
+              value={`${formatNumber(formatBigNumber(currentAnswerBond || new BigNumber(0), 18))} ${symbol}`}
             />
 
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Loss"
-              value={`${formatNumber(formatBigNumber(bondEthAmount, 18))} ETH`}
+              value={`${formatNumber(formatBigNumber(bondEthAmount, 18))} ${symbol}`}
             />
           </TransactionDetailsCard>
         </div>
@@ -200,7 +206,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           Back
         </Button>
         <Button buttonType={ButtonType.primary} onClick={() => bondOutcome()}>
-          Bond ETH
+          Bond {symbol}
         </Button>
       </BottomButtonWrapper>
       <ModalTransactionResult
