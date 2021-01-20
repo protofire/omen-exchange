@@ -63,7 +63,10 @@ export const BigNumberInput: React.FC<Props> = props => {
   useEffect(() => {
     if (!value) {
       setCurrentValue('')
-    } else if (value && !ethers.utils.parseUnits(currentValue || '0', decimals).eq(value)) {
+    } else if (
+      value &&
+      !ethers.utils.parseUnits((currentValue && Number(currentValue).toFixed(decimals)) || '0', decimals).eq(value)
+    ) {
       setCurrentValue(ethers.utils.formatUnits(value, decimals))
     }
   }, [value, decimals, currentValue])

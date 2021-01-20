@@ -1,5 +1,4 @@
 import { useQuery } from '@apollo/react-hooks'
-import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useState } from 'react'
 
@@ -215,10 +214,10 @@ export const MarketWizardCreator = (props: Props) => {
     }))
   }
 
-  const handleCollateralChange = (collateral: Token) => {
+  const handleCollateralChange = (collateral: Token, amount: BigNumber) => {
     const newMarketData = {
       ...marketData,
-      funding: ethers.constants.Zero, // when the collateral changes, reset the value of funding
+      funding: amount,
       collateral,
     }
     setMarketdata(newMarketData)
