@@ -435,6 +435,7 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer
+            compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
@@ -445,6 +446,7 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === MarketDetailsTab.buy && (
           <MarketBuyContainer
+            compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
@@ -454,6 +456,7 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === MarketDetailsTab.sell && (
           <MarketSellContainer
+            compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}

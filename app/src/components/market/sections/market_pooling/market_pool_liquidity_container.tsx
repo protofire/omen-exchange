@@ -1,11 +1,13 @@
 import React from 'react'
 
+import { CompoundService } from '../../../../services'
 import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
 import { MarketPoolLiquidity } from './market_pool_liquidity'
 import { ScalarMarketPoolLiquidity } from './scalar_market_pool_liquidity'
 
 interface Props {
+  compoundService: CompoundService
   marketMakerData: MarketMakerData
   fetchGraphMarketMakerData: () => Promise<void>
   fetchGraphMarketTradeData: () => Promise<void>

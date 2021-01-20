@@ -81,6 +81,7 @@ const CurrencyDropdownLabel = styled.div`
 const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
+  compoundService: CompoundService
   fetchGraphMarketMakerData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
@@ -90,7 +91,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
-  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+  const { compoundService, fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
   const collateralSymbol = collateral.symbol.toLowerCase()
   let currencySelect = <span />
@@ -114,7 +115,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
-  const { account, library: provider, networkId } = context
+  const { networkId } = context
   const getInitialCollateral = (): Token => {
     if (collateralSymbol in CompoundTokenType) {
       const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
@@ -131,20 +132,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   }
   const [displayCollateral, setDisplayCollateral] = useState<Token>(getInitialCollateral())
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
-  const [compoundService, setCompoundService] = useState<CompoundService>(
-    new CompoundService(collateral.address, collateral.symbol, provider, account),
-  )
-  useEffect(() => {
-    const getResult = async () => {
-      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
-      await compoundServiceObject.init()
-      setCompoundService(compoundServiceObject)
-    }
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-      getResult()
-    }
-    // eslint-disable-next-line
-  }, [])
+
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])

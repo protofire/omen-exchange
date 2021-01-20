@@ -69,6 +69,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
+  compoundService: CompoundService
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
@@ -78,11 +79,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
 
-  const { account, library: provider, networkId } = context
+  const { library: provider, networkId } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
-  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+  const { compoundService, fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
@@ -94,20 +95,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
   const collateralSymbol = collateral.symbol.toLowerCase()
-  const [compoundService, setCompoundService] = useState<CompoundService>(
-    new CompoundService(collateral.address, collateral.symbol, provider, account),
-  )
-
-  useEffect(() => {
-    const getResult = async () => {
-      await compoundService.init()
-      setCompoundService(compoundService)
-    }
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-      getResult()
-    }
-    // eslint-disable-next-line
-  }, [])
 
   let baseCollateral = collateral
   if (collateral.symbol.toLowerCase() in CompoundTokenType) {

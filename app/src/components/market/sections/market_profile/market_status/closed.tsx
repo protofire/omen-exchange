@@ -8,9 +8,16 @@ import styled from 'styled-components'
 import { useConnectedCPKContext, useContracts, useGraphMarketTradeData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
+import { CompoundService } from '../../../../../services/compound_service'
 import { getLogger } from '../../../../../util/logger'
 import { formatBigNumber, getUnit } from '../../../../../util/tools'
-import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
+import {
+  CompoundTokenType,
+  MarketDetailsTab,
+  MarketMakerData,
+  OutcomeTableValue,
+  Status,
+} from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
@@ -135,10 +142,38 @@ const Wrapper = (props: Props) => {
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
+  const marketCollateralToken = collateralToken
+  const [compoundService, setCompoundService] = useState<CompoundService>(
+    new CompoundService(collateralToken.address, collateralToken.symbol, provider, account),
+  )
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
+  useMemo(() => {
+    const getResult = async () => {
+      const compoundServiceObject = new CompoundService(
+        marketCollateralToken.address,
+        marketCollateralToken.symbol,
+        provider,
+        account,
+      )
+      await compoundServiceObject.init()
+      setCompoundService(compoundServiceObject)
+    }
+    if (marketCollateralToken.symbol.toLowerCase() in CompoundTokenType) {
+      getResult()
+    }
+  }, [marketCollateralToken.address, account, marketCollateralToken.symbol, provider])
 
+  useEffect(() => {
+    const getResult = async () => {
+      await compoundService.init()
+      setCompoundService(compoundService)
+    }
+    if (marketCollateralToken.symbol.toLowerCase() in CompoundTokenType) {
+      getResult()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const resolveCondition = async () => {
     setModalTitle('Resolve Condition')
 
@@ -389,6 +424,7 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer
+            compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
@@ -399,6 +435,7 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === MarketDetailsTab.buy && (
           <MarketBuyContainer
+            compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
@@ -408,6 +445,7 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === MarketDetailsTab.sell && (
           <MarketSellContainer
+            compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}

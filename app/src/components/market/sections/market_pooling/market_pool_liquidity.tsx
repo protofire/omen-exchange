@@ -55,6 +55,7 @@ import { TransactionDetailsRow, ValueStates } from '../../common/transaction_det
 import { WarningMessage } from '../../common/warning_message'
 
 interface Props extends RouteComponentProps<any> {
+  compoundService: CompoundService
   marketMakerData: MarketMakerData
   theme?: any
   switchMarketTab: (arg0: MarketDetailsTab) => void
@@ -153,7 +154,7 @@ const CurrencyDropdownLabel = styled.div`
 const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
-  const { fetchGraphMarketMakerData, marketMakerData } = props
+  const { compoundService, fetchGraphMarketMakerData, marketMakerData } = props
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
   const history = useHistory()
   const context = useConnectedWeb3Context()
@@ -195,22 +196,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
   const [amountToFundNormalized, setAmountToFundNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToRemoveNormalized, setAmountToRemoveNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
-  const [compoundService, setCompoundService] = useState<CompoundService>(
-    new CompoundService(collateral.address, collateral.symbol, provider, account),
-  )
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
-  useMemo(() => {
-    const getResult = async () => {
-      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
-      await compoundServiceObject.init()
-      setCompoundService(compoundServiceObject)
-    }
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-      getResult()
-    }
-  }, [collateral.address, account, collateral.symbol, provider])
+
   const collateralSymbol = collateral.symbol.toLowerCase()
 
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
