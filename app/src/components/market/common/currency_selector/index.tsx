@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled, { css } from 'styled-components'
 
 import { ConnectedWeb3Context, useTokens } from '../../../../hooks'
@@ -56,7 +56,12 @@ export const CurrencySelector: React.FC<Props> = props => {
     ...restProps
   } = props
 
-  const tokens = useTokens(context, addNativeAsset, addBalances)
+  const { refetch, tokens } = useTokens(context, addNativeAsset, addBalances)
+
+  useEffect(() => {
+    refetch()
+    // eslint-disable-next-line
+  }, [balance])
 
   const currencyDropdownData: Array<DropdownItemProps> = []
 
