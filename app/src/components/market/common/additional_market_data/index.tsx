@@ -2,7 +2,8 @@ import React, { DOMAttributes } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useRealityLink } from '../../../../hooks/useRealityLink'
+import { useConnectedWeb3Context, useRealityLink } from '../../../../hooks'
+import { networkIds } from '../../../../util/networks'
 import { Arbitrator, KlerosItemStatus, KlerosSubmission } from '../../../../util/types'
 import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
 
@@ -101,6 +102,8 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 export const AdditionalMarketData: React.FC<Props> = props => {
   const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
 
+  const context = useConnectedWeb3Context()
+
   const realitioBaseUrl = useRealityLink()
 
   const realitioUrl = id ? `${realitioBaseUrl}/#!/question/${id}` : `${realitioBaseUrl}/`
@@ -148,21 +151,23 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <IconArbitrator size={'24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper
-          data-arrow-color="transparent"
-          data-for="marketData"
-          data-tip={
-            curatedByDxDaoOrKleros
-              ? 'This Market is verified by DXdao or Kleros and therefore valid.'
-              : 'This Market has not been verified and may be invalid.'
-          }
-          isError={!curatedByDxDaoOrKleros}
-        >
-          {curatedByDxDaoOrKleros ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
-          <AdditionalMarketDataSectionTitle isError={!curatedByDxDaoOrKleros}>
-            {curatedByDxDaoOrKleros ? 'Verified' : 'Not Verified'}
-          </AdditionalMarketDataSectionTitle>
-        </AdditionalMarketDataSectionWrapper>
+        {context.networkId !== networkIds.XDAI && (
+          <AdditionalMarketDataSectionWrapper
+            data-arrow-color="transparent"
+            data-for="marketData"
+            data-tip={
+              curatedByDxDaoOrKleros
+                ? 'This Market is verified by DXdao or Kleros and therefore valid.'
+                : 'This Market has not been verified and may be invalid.'
+            }
+            isError={!curatedByDxDaoOrKleros}
+          >
+            {curatedByDxDaoOrKleros ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
+            <AdditionalMarketDataSectionTitle isError={!curatedByDxDaoOrKleros}>
+              {curatedByDxDaoOrKleros ? 'Verified' : 'Not Verified'}
+            </AdditionalMarketDataSectionTitle>
+          </AdditionalMarketDataSectionWrapper>
+        )}
       </AdditionalMarketDataLeft>
       <ReactTooltip
         className="customMarketTooltip"
