@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { getLogger } from '../../../../util/logger'
+import { networkIds } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   CategoryDataItem,
@@ -603,7 +604,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             arbitrator={arbitrator}
             curationSource={curationSource}
             currency={currency}
-            disableCurationFilter={fetchMyMarkets ? true : false}
+            disableCurationFilter={fetchMyMarkets || context.networkId === networkIds.XDAI ? true : false}
             onChangeArbitrator={setArbitrator}
             onChangeCurationSource={setCurationSource}
             onChangeCurrency={setCurrency}

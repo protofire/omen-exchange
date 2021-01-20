@@ -1,6 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import { useConnectedWeb3Context } from '../../../../hooks'
+import { networkIds } from '../../../../util/networks'
 import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
 const MarketTabs = styled.div`
@@ -37,6 +39,9 @@ interface Props {
 
 export const MarketNavigation = (props: Props) => {
   const { activeTab, hasWinningOutcomes, marketMakerData, switchMarketTab } = props
+
+  const context = useConnectedWeb3Context()
+
   const { isQuestionFinalized, question } = marketMakerData
   const currentTimestamp = new Date().getTime()
 
@@ -86,7 +91,7 @@ export const MarketNavigation = (props: Props) => {
       >
         History
       </MarketTab>
-      {isOpen && (
+      {isOpen && context.networkId !== networkIds.XDAI && (
         <MarketTab
           active={activeTab === MarketDetailsTab.verify}
           onClick={() => switchMarketTab(MarketDetailsTab.verify)}
