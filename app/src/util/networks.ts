@@ -15,6 +15,7 @@ import {
   KLEROS_CURATE_GRAPH_MAINNET_WS,
   KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
   KLEROS_CURATE_GRAPH_RINKEBY_WS,
+  XDAI_LOCATION,
 } from '../common/constants'
 import { entries, isNotNull } from '../util/type-utils'
 
@@ -244,8 +245,7 @@ export const supportedNetworkURLs = entries(networks).reduce<{
   {},
 )
 
-// TODO: Set proper domain
-export const infuraNetworkURL = location.host === 'localhost:3001' ? networks[100].url : networks[1].url
+export const infuraNetworkURL = location.host === XDAI_LOCATION ? networks[100].url : networks[1].url
 
 export const getInfuraUrl = (networkId: number): string => {
   if (!validNetworkId(networkId)) {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { MAIN_NETWORKS, XDAI_NETWORKS } from '../../../common/constants'
+import { MAINNET_LOCATION, MAIN_NETWORKS, XDAI_LOCATION, XDAI_NETWORKS } from '../../../common/constants'
 import { IconNetwork } from '../icons'
 
 const ModalBackground = styled.div`
@@ -115,11 +115,9 @@ export const SwitchNetworkModal: React.FC<Props> = props => {
 
   const setLocation = (network: string) => {
     if (network === networks.mainnet) {
-      // TODO: Set to proper domain
-      location.assign('http://localhost:3000')
+      location.assign(`http://${MAINNET_LOCATION}`)
     } else if (network === networks.xdai) {
-      // TODO: Set to proper domain
-      location.assign('http://localhost:3001')
+      location.assign(`http://${XDAI_LOCATION}`)
     }
   }
 

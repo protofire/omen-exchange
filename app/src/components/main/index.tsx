@@ -6,6 +6,7 @@ import { useWeb3Context } from 'web3-react'
 import {
   DOCUMENT_DESCRIPTION,
   DOCUMENT_TITLE,
+  MAINNET_LOCATION,
   MAIN_NETWORKS,
   OG_DESCRIPTION,
   OG_IMAGE,
@@ -15,6 +16,7 @@ import {
   TWITTER_CARD,
   TWITTER_IMAGE_ALT,
   TWITTER_SITE,
+  XDAI_LOCATION,
   XDAI_NETWORKS,
 } from '../../common/constants'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
@@ -37,24 +39,19 @@ export const Main: React.FC = () => {
 
   windowObj.ethereum.on('chainChanged', (chainId: string) => {
     setNetworkId(chainId)
-    // TODO: Set host to omen.eth.link
-    if (location.host === 'localhost:3000' && XDAI_NETWORKS.includes(chainId)) {
-      // TODO: Redirect to xdai.omen.eth.link
-      location.assign('http://localhost:3001')
+    if (location.host === MAINNET_LOCATION && XDAI_NETWORKS.includes(chainId)) {
+      location.assign(`http://${XDAI_LOCATION}`)
     }
-    // TODO: Set host to xdai.omen.eth.link
-    if (location.host === 'localhost:3001' && MAIN_NETWORKS.includes(chainId)) {
-      // TODO: Redirect to omen.eth.link
-      location.assign('http://localhost:3000')
+    if (location.host === XDAI_LOCATION && MAIN_NETWORKS.includes(chainId)) {
+      location.assign(`http://${MAINNET_LOCATION}`)
     }
   })
 
   useEffect(() => {
     if (networkId) {
-      // TODO: Use proper domain
       setWrongNetwork(
-        (location.host === 'localhost:3000' && XDAI_NETWORKS.includes(networkId)) ||
-          (location.host === 'localhost:3001' && MAIN_NETWORKS.includes(networkId)),
+        (location.host === MAINNET_LOCATION && XDAI_NETWORKS.includes(networkId)) ||
+          (location.host === XDAI_LOCATION && MAIN_NETWORKS.includes(networkId)),
       )
     }
   }, [networkId])
