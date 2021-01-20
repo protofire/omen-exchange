@@ -87,7 +87,7 @@ export const MarketData: React.FC<Props> = props => {
   } = props
 
   const context = useConnectedWeb3Context()
-  const tokens = useTokens(context)
+  const { tokens } = useTokens(context)
 
   const [currencyIcon, setCurrencyIcon] = useState<string | undefined>('')
   const [showUTC, setShowUTC] = useState<boolean>(true)

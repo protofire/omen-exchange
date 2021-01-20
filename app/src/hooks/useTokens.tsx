@@ -114,5 +114,5 @@ export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolea
     // eslint-disable-next-line
   }, [context.library, context.networkId])
 
-  return tokens
+  return { tokens, refetch }
 }
