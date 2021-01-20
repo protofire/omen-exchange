@@ -244,7 +244,8 @@ export const supportedNetworkURLs = entries(networks).reduce<{
   {},
 )
 
-export const infuraNetworkURL = networks[1].url
+// TODO: Set proper domain
+export const infuraNetworkURL = location.host === 'localhost:3001' ? networks[100].url : networks[1].url
 
 export const getInfuraUrl = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
