@@ -1,6 +1,6 @@
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
@@ -15,10 +15,8 @@ import {
   useContracts,
   useCpkAllowance,
   useCpkProxy,
-  useGraphMeta,
 } from '../../../../hooks'
-import { MarketMakerService } from '../../../../services'
-import { CompoundService } from '../../../../services/compound_service'
+import { CompoundService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
@@ -27,8 +25,8 @@ import {
   formatBigNumber,
   formatNumber,
   getBaseTokenForCToken,
+  getSharesInBaseToken,
   mulBN,
-  roundNumberStringToSignificantDigits,
 } from '../../../../util/tools'
 import {
   CompoundTokenType,
@@ -79,8 +77,8 @@ interface Props extends RouteComponentProps<any> {
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+
   const { account, library: provider, networkId } = context
-  const { waitForBlockToSync } = useGraphMeta()
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
@@ -95,17 +93,36 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       ? nativeAsset
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
-
+  const collateralSymbol = collateral.symbol.toLowerCase()
   const [compoundService, setCompoundService] = useState<CompoundService>(
     new CompoundService(collateral.address, collateral.symbol, provider, account),
   )
 
+  useEffect(() => {
+    const getResult = async () => {
+      await compoundService.init()
+      setCompoundService(compoundService)
+    }
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      getResult()
+    }
+    // eslint-disable-next-line
+  }, [])
+
+  let baseCollateral = collateral
+  if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+    const baseTokenSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
+    baseCollateral = getToken(networkId, baseTokenSymbol)
+  }
+
+  let displayBalances = balances
+  if (baseCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
+    displayBalances = getSharesInBaseToken(balances, compoundService, baseCollateral)
+  }
   const getInitialDisplayCollateral = (): Token => {
     const collateralSymbol = collateral.symbol.toLowerCase()
     if (collateralSymbol in CompoundTokenType) {
-      const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
-      const baseToken = getToken(networkId, baseCollateralSymbol)
-      return baseToken
+      return baseCollateral
     } else {
       return collateral
     }
@@ -137,94 +154,51 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }, [amount, collateral.decimals])
 
   useEffect(() => {
-    const getResult = async () => {
-      await compoundService.init()
-      setCompoundService(compoundService)
-    }
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-      getResult()
-    }
-    // eslint-disable-next-line
-  }, [])
-  useEffect(() => {
     setCollateral(initialCollateral)
     setAmount(null)
     setAmountToDisplay('')
     // eslint-disable-next-line
   }, [marketMakerData.collateral.address])
 
-  let displayBalances = balances
-  if (displayCollateral.address !== collateral.address) {
-    displayBalances = balances.map(function(bal) {
-      const cTokenPrecision = 8
-      const cTokenWithPrecision = roundNumberStringToSignificantDigits(bal.currentPrice.toString(), cTokenPrecision - 2)
-      const cTokenPriceAmount = parseUnits(cTokenWithPrecision, cTokenPrecision)
-      let baseTokenPrice = compoundService.calculateCTokenToBaseExchange(displayCollateral, cTokenPriceAmount)
-      baseTokenPrice = baseTokenPrice.mul(100000)
-      const basePrice = formatBigNumber(baseTokenPrice, displayCollateral.decimals)
-      const basePriceActual = Number(basePrice) / 100000
-      return Object.assign({}, bal, {
-        currentPrice: basePriceActual,
-      })
-    })
-  }
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
-    () => async (amount: BigNumber): Promise<[BigNumber, number[], number[], BigNumber]> => {
+    () => async (amount: BigNumber): Promise<[BigNumber, number[], BigNumber]> => {
       let tradedShares: BigNumber
-      const collateralSymbol = collateral.symbol.toLowerCase()
-      let amountActual = amount
-      if (displayCollateral.address !== collateral.address && collateralSymbol in CompoundTokenType) {
-        amountActual = compoundService.calculateBaseToCTokenExchange(displayCollateral, amount)
-      }
       try {
-        tradedShares = await marketMaker.calcBuyAmount(amountActual, outcomeIndex)
+        tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
       } catch {
         tradedShares = new BigNumber(0)
       }
       const balanceAfterTrade = computeBalanceAfterTrade(
         balances.map(b => b.holdings),
         outcomeIndex,
-        amountActual,
+        amount,
         tradedShares,
       )
-      let pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
+      const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
+
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
-      if (displayCollateral.address !== collateral.address && collateralSymbol in CompoundTokenType) {
-        pricesAfterTrade = pricesAfterTrade.map(priceAfterTrade => {
-          const cTokenDecimals = 8
-          const priceAfterTradeBig = roundNumberStringToSignificantDigits(
-            priceAfterTrade.toString(),
-            cTokenDecimals - 2,
-          )
-          const priceAfterTradeBN = parseUnits(priceAfterTradeBig, cTokenDecimals)
-          let priceAfterTradeBaseBN = compoundService.calculateCTokenToBaseExchange(
-            displayCollateral,
-            priceAfterTradeBN,
-          )
-          priceAfterTradeBaseBN = priceAfterTradeBaseBN.mul(1000)
-          const priceAfterTradeBase = formatBigNumber(priceAfterTradeBaseBN, displayCollateral.decimals)
-          const priceAfterTradeBaseActual = Number(priceAfterTradeBase) / 1000
-          return priceAfterTradeBaseActual
-        })
-      }
-      let displayProbabilities = probabilities
-      if (displayCollateral.address !== collateral.address && collateralSymbol in CompoundTokenType) {
-        displayProbabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
-      }
+
       setNewShares(
         balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)),
       )
 
-      return [tradedShares, probabilities, displayProbabilities, amountActual]
+      return [tradedShares, probabilities, amount]
     },
-    [balances, marketMaker, outcomeIndex, collateral.address, collateral.symbol, compoundService, displayCollateral],
+    [balances, marketMaker, outcomeIndex],
   )
-  const [tradedShares, probabilities, displayProbabilities, debouncedAmount] = useAsyncDerivedValue(
-    displayFundAmount || Zero,
-    [new BigNumber(0), balances.map(() => 0), balances.map(() => 0), amount],
+
+  const [tradedShares, probabilities, debouncedAmount] = useAsyncDerivedValue(
+    amount || Zero,
+    [new BigNumber(0), balances.map(() => 0), amount],
     calcBuyAmount,
   )
+
+  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
+    displayCollateral,
+    context,
+  )
+  const collateralBalance = maybeCollateralBalance || Zero
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -253,28 +227,23 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       if (!cpk) {
         return
       }
-      const sharesAmount = formatBigNumber(tradedShares, collateral.decimals)
+      let displayTradedShares = tradedShares
+      let displayCollateralToken = collateral
+      if (collateralSymbol in CompoundTokenType) {
+        displayTradedShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedShares)
+        displayCollateralToken = baseCollateral
+      }
+      const sharesAmount = formatBigNumber(displayTradedShares, displayCollateralToken.decimals)
 
       setStatus(Status.Loading)
       setMessage(`Buying ${sharesAmount} shares ...`)
 
-      let useBaseToken = false
-      if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
-        useBaseToken = true
-      }
-
-      const transaction = await cpk.buyOutcomes({
-        amount: displayFundAmount || Zero,
+      await cpk.buyOutcomes({
+        amount: amount || Zero,
         collateral,
-        compoundService,
         outcomeIndex,
         marketMaker,
-        useBaseToken,
       })
-
-      if (transaction.blockNumber) {
-        await waitForBlockToSync(transaction.blockNumber)
-      }
 
       await fetchGraphMarketMakerData()
       await fetchCollateralBalance()
@@ -286,9 +255,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       What do you think?`),
       )
-      setDisplayAmountToFund(new BigNumber(0))
+
       setAmount(null)
       setAmountToDisplay('')
+      setDisplayAmountToFund(new BigNumber(0))
       setStatus(Status.Ready)
       setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
@@ -306,38 +276,36 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
+
   const baseCost = debouncedAmount?.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount || Zero)
-
-  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
-    displayCollateral,
-    context,
-  )
-  const collateralBalance = maybeCollateralBalance || Zero
-  const currentBalance = `${formatBigNumber(collateralBalance, displayCollateral.decimals, 5)}`
-  let baseCostNormalized = baseCost
-  let potentialProfitNormalized = potentialProfit
-  let feePaidNormalized = feePaid
-  if (collateral.address !== displayCollateral.address) {
-    if (baseCost && baseCost.gt(0)) {
-      baseCostNormalized = compoundService.calculateCTokenToBaseExchange(displayCollateral, baseCost)
+  let displayFeePaid = feePaid
+  let displayBaseCost = baseCost
+  let displayPotentialProfit = potentialProfit
+  let displayTradedShares = tradedShares
+  if (collateralSymbol in CompoundTokenType) {
+    if (collateralSymbol !== displayCollateral.symbol.toLowerCase()) {
+      displayFeePaid = compoundService.calculateCTokenToBaseExchange(displayCollateral, feePaid)
+      if (baseCost && baseCost.gt(0)) {
+        displayBaseCost = compoundService.calculateCTokenToBaseExchange(displayCollateral, baseCost)
+      }
+      if (potentialProfit && potentialProfit.gt(0)) {
+        displayPotentialProfit = compoundService.calculateCTokenToBaseExchange(displayCollateral, potentialProfit)
+      }
     }
-    if (potentialProfit && potentialProfit.gt(0)) {
-      potentialProfitNormalized = compoundService.calculateCTokenToBaseExchange(displayCollateral, potentialProfit)
-    }
-    if (feePaid && feePaid.gt(0)) {
-      feePaidNormalized = compoundService.calculateCTokenToBaseExchange(displayCollateral, feePaid)
-    }
+    displayTradedShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedShares)
   }
-  const feeFormatted = `${formatNumber(formatBigNumber(feePaidNormalized.mul(-1), displayCollateral.decimals))}
-  ${displayCollateral.symbol}`
-  const baseCostFormatted = `${formatNumber(formatBigNumber(baseCostNormalized || Zero, displayCollateral.decimals))} ${
+  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
+  const feeFormatted = `${formatNumber(formatBigNumber(displayFeePaid.mul(-1), displayCollateral.decimals))} ${
+    displayCollateral.symbol
+  }`
+  const baseCostFormatted = `${formatNumber(formatBigNumber(displayBaseCost || Zero, displayCollateral.decimals))} ${
     displayCollateral.symbol
   }`
   const potentialProfitFormatted = `${formatNumber(
-    formatBigNumber(potentialProfitNormalized, displayCollateral.decimals),
+    formatBigNumber(displayPotentialProfit, displayCollateral.decimals),
   )} ${displayCollateral.symbol}`
-  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
+  const sharesTotal = formatNumber(formatBigNumber(displayTradedShares, baseCollateral.decimals))
   const total = `${sharesTotal} Shares`
 
   const amountError =
@@ -346,8 +314,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       : maybeCollateralBalance.isZero() && amount?.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : amount?.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${currentBalance} ${displayCollateral.symbol}`
+      ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
       : null
+
   const isBuyDisabled =
     !amount ||
     (status !== Status.Ready && status !== Status.Error) ||
@@ -362,21 +331,32 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       ? [wrapToken.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
       : []
 
-  const collateralSymbol = collateral.symbol.toLowerCase()
   if (collateralSymbol in CompoundTokenType) {
-    const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
-    const baseCollateral = getToken(networkId, baseCollateralSymbol)
     if (baseCollateral.symbol.toLowerCase() === 'eth') {
       currencyFilters = [collateral.address, pseudoNativeAssetAddress.toLowerCase()]
     } else {
       currencyFilters = [collateral.address, baseCollateral.address]
     }
   }
+
   const switchOutcome = (value: number) => {
-    setNewShares(
-      displayBalances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)),
-    )
+    setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
     setOutcomeIndex(value)
+  }
+
+  const setBuyCollateral = (token: Token) => {
+    if (token.address === pseudoNativeAssetAddress && !(collateral.symbol.toLowerCase() in CompoundTokenType)) {
+      setCollateral(token)
+      setDisplayCollateral(token)
+    } else {
+      setDisplayCollateral(token)
+    }
+  }
+  let displayNewShares = newShares
+  if (newShares && collateralSymbol in CompoundTokenType) {
+    displayNewShares = newShares.map(function(ns) {
+      return compoundService.calculateCTokenToBaseExchange(baseCollateral, ns)
+    })
   }
 
   const setDisplayAmountToFund = (value: BigNumber) => {
@@ -390,14 +370,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setDisplayFundAmount(value)
   }
 
-  const setBuyCollateral = (token: Token) => {
-    if (token.address === pseudoNativeAssetAddress && !(collateral.symbol.toLowerCase() in CompoundTokenType)) {
-      setCollateral(token)
-      setDisplayCollateral(token)
-    } else {
-      setDisplayCollateral(token)
-    }
-  }
   return (
     <>
       <OutcomeTable
@@ -410,9 +382,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           OutcomeTableValue.Bonded,
         ]}
         displayBalances={displayBalances}
-        displayCollateral={displayCollateral}
-        displayProbabilities={displayProbabilities}
-        newShares={newShares}
+        displayCollateral={baseCollateral}
+        newShares={displayNewShares}
         outcomeHandleChange={(value: number) => switchOutcome(value)}
         outcomeSelected={outcomeIndex}
         probabilities={probabilities}
@@ -464,7 +435,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               />
             }
             onClickMaxButton={() => {
-              setDisplayAmountToFund(collateralBalance)
+              setAmount(collateralBalance)
               setAmountToDisplay(formatBigNumber(collateralBalance, displayCollateral.decimals, 5))
             }}
             shouldDisplayMaxButton

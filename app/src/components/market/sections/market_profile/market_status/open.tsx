@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -8,7 +8,7 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/con
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { CompoundService } from '../../../../../services/compound_service'
 import { getToken } from '../../../../../util/networks'
-import { getBalancesInBaseToken, getUnit, isDust } from '../../../../../util/tools'
+import { getSharesInBaseToken, getUnit, isDust } from '../../../../../util/tools'
 import {
   BalanceItem,
   CompoundTokenType,
@@ -133,6 +133,17 @@ const Wrapper = (props: Props) => {
   )
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
+  useMemo(() => {
+    const getResult = async () => {
+      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
+      await compoundServiceObject.init()
+      setCompoundService(compoundServiceObject)
+    }
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      getResult()
+    }
+  }, [collateral.address, account, collateral.symbol, provider])
+
   useEffect(() => {
     const getResult = async () => {
       await compoundService.init()
@@ -172,7 +183,7 @@ const Wrapper = (props: Props) => {
   }, [collateral.symbol]) // eslint-disable-line react-hooks/exhaustive-deps
   let displayBalances = balances
   if (collateral.address !== displayCollateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
-    displayBalances = getBalancesInBaseToken(balances, compoundService, displayCollateral)
+    displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
   }
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
@@ -189,11 +200,9 @@ const Wrapper = (props: Props) => {
       OutcomeTableValue.Probability,
       OutcomeTableValue.Bonded,
     ]
-
     if (!userHasShares) {
       disabledColumns.push(OutcomeTableValue.Shares)
     }
-
     return (
       <OutcomeTable
         balances={balances}

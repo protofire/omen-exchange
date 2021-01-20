@@ -45,9 +45,12 @@ const AdditionalMarketDataLeft = styled.div`
   }
 `
 
-const CompoundInterestWrapper = styled.div`
-  color: ${props => props.theme.colors.compound};
+const CompoundInterestWrapper = styled.div<{ customColor: string }>`
+  color: ${props => props.theme.colors.green};
   margin-left: 2px !important;
+  &:hover {
+    color: ${props => props.customColor};
+  }
 `
 
 const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean; noLeftMargin?: boolean }>`
@@ -62,7 +65,12 @@ const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean; noLeftMar
   }
 `
 
-const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; isError?: boolean }>`
+const AdditionalMarketDataSectionWrapper = styled.a<{
+  noColorChange?: boolean
+  isError?: boolean
+  customColorChange?: boolean
+  customColor?: string
+}>`
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -77,7 +85,13 @@ const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; i
       }
       path {
         fill: ${props =>
-          props.noColorChange ? '' : props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight};
+          props.customColorChange
+            ? props.customColor
+            : props.noColorChange
+            ? ''
+            : props.isError
+            ? props.theme.colors.alertHover
+            : props.theme.colors.primaryLight};
       }
 
       path:nth-child(even) {
@@ -185,14 +199,15 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         </AdditionalMarketDataSectionWrapper>
         {collateral.symbol.toLowerCase() in CompoundTokenType ? (
           <AdditionalMarketDataSectionWrapper
+            customColor={'#00897B'}
+            customColorChange={true}
             data-arrow-color="transparent"
             data-for="marketData"
             data-tip={`This market is earning ${compoundInterestRate}% APY powered by compound.finance`}
-            noColorChange={true}
           >
             <CompoundIconNoBorder />
             <AdditionalMarketDataSectionTitle noLeftMargin={true}>
-              <CompoundInterestWrapper>{compoundInterestRate}% APY</CompoundInterestWrapper>
+              <CompoundInterestWrapper customColor={'#00897B'}>{compoundInterestRate}% APY</CompoundInterestWrapper>
             </AdditionalMarketDataSectionTitle>
           </AdditionalMarketDataSectionWrapper>
         ) : (

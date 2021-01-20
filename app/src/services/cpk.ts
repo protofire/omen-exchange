@@ -983,7 +983,6 @@ class CPKService {
       }
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
-        const totalAmountEarned = amountToMerge.add(earnings)
         // transfer to the user the merged collateral plus the earned fees
         if (useBaseToken && compoundService != null) {
           const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(
