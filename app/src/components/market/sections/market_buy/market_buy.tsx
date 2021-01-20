@@ -200,6 +200,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
     (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
 
+  const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
+
   const upgradeProxy = async () => {
     if (!cpk) {
       return
@@ -400,6 +402,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
                 if (token) {
                   setBuyCollateral(token)
                   setAmount(new BigNumber(0))
+                  setAmountToDisplay('')
                   setDisplayAmountToFund(new BigNumber(0))
                 }
               }}
@@ -425,7 +428,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               setAmount(collateralBalance)
               setAmountToDisplay(formatBigNumber(collateralBalance, displayCollateral.decimals, 5))
             }}
-            shouldDisplayMaxButton
+            shouldDisplayMaxButton={shouldDisplayMaxButton}
             symbol={displayCollateral.symbol}
           />
           {amountError && <GenericError>{amountError}</GenericError>}

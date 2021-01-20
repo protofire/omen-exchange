@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import {
   DEFAULT_ARBITRATOR,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
@@ -15,10 +17,12 @@ import {
   KLEROS_CURATE_GRAPH_MAINNET_WS,
   KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
   KLEROS_CURATE_GRAPH_RINKEBY_WS,
+  XDAI_LOCATION,
 } from '../common/constants'
 import { entries, isNotNull } from '../util/type-utils'
 
 import { getImageUrl } from './token'
+import { waitABit } from './tools'
 import { Arbitrator, Token } from './types'
 
 export type NetworkId = 1 | 4 | 77 | 100
@@ -244,7 +248,7 @@ export const supportedNetworkURLs = entries(networks).reduce<{
   {},
 )
 
-export const infuraNetworkURL = networks[1].url
+export const infuraNetworkURL = location.host === XDAI_LOCATION ? networks[100].url : networks[1].url
 
 export const getInfuraUrl = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
@@ -724,4 +728,28 @@ export const getTargetSafeImplementation = (networkId: number): string => {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
   return networks[networkId].targetSafeImplementation.toLowerCase()
+}
+
+export const getGraphMeta = async (networkId: number) => {
+  const query = `
+    query {
+      _meta {
+        block {
+          hash
+          number
+        }
+      }
+    }
+  `
+  const { httpUri } = getGraphUris(networkId)
+  const result = await axios.post(httpUri, { query })
+  return result.data.data._meta.block
+}
+
+export const waitForBlockToSync = async (networkId: number, blockNum: number) => {
+  let block
+  while (!block || block.number < blockNum + 1) {
+    block = await getGraphMeta(networkId)
+    await waitABit()
+  }
 }

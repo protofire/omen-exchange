@@ -120,7 +120,7 @@ const theme = {
   cards: {
     backgroundColor: '#fff',
     border: '1px solid #EEE',
-    borderRadius: '8px ',
+    borderRadius: '8px',
     boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.05)',
     paddingHorizontal: '24px',
     paddingVertical: '20px',
@@ -368,6 +368,18 @@ const theme = {
       padding: '10px',
       zIndex: '12345',
     },
+  },
+  switchNetworkModal: {
+    backgroundColor: 'rgba(0, 0, 0, 0.06)',
+    modalColor: '#fff',
+    borderColor: '#ECEFF1',
+    boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.12)',
+    primaryTextColor: '#37474F',
+    secondaryTextColor: '#757575',
+    linkTextColor: '#7986CB',
+    connectionBall: '#55AC68',
+    primaryFontSize: '16px',
+    secondaryFontSize: '14px',
   },
   progressBar: {
     open: '#7986CB',

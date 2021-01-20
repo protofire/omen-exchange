@@ -554,6 +554,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       ? [wrapAddress, pseudoNativeAssetAddress.toLowerCase()]
       : []
 
+  const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
+
   if (collateralSymbol in CompoundTokenType) {
     const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
     const baseCollateral = getToken(networkId, baseCollateralSymbol)
@@ -672,7 +674,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   setDisplayCollateralAmountToFund(collateralBalance)
                   setAmountToFundDisplay(formatBigNumber(collateralBalance, displayCollateral.decimals, 5))
                 }}
-                shouldDisplayMaxButton
+                shouldDisplayMaxButton={shouldDisplayMaxButton}
                 symbol={displayCollateral.symbol}
               />
 
