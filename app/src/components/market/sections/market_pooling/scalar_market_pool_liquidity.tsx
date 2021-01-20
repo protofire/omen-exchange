@@ -328,6 +328,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       ? [wrapToken.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
       : []
 
+  const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
+
   return (
     <>
       <MarketScale
@@ -395,7 +397,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                   setAmountToFund(collateralBalance)
                   setAmountToFundDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
                 }}
-                shouldDisplayMaxButton
+                shouldDisplayMaxButton={shouldDisplayMaxButton}
                 symbol={collateral.symbol}
               />
 

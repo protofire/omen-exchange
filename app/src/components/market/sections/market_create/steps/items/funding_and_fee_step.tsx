@@ -310,6 +310,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
     (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
 
+  const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
+
   const upgradeProxy = async () => {
     if (!cpk) {
       return
@@ -468,7 +470,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 />
               }
               onClickMaxButton={onClickMaxButton}
-              shouldDisplayMaxButton={true}
+              shouldDisplayMaxButton={shouldDisplayMaxButton}
               symbol={collateral.symbol}
             />
             {customFee && (
