@@ -3,7 +3,7 @@ import { Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import { DEFAULT_TOKEN_ADDRESS, INFURA_PROJECT_ID } from '../common/constants'
+import { DEFAULT_TOKEN_ADDRESS, INFURA_PROJECT_ID, XDAI_FOREIGN_BRIDGE, XDAI_HOME_BRIDGE } from '../common/constants'
 import { ERC20Service } from '../services'
 import { formatBigNumber } from '../util/tools'
 
@@ -116,9 +116,49 @@ export const useXdaiBridge = (amount: BigNumber) => {
       throw new Error(`Error while fetching balance ${error}`)
     }
   }
+  const fetchUnclaimedAssets = async () => {
+    // console.log(cpk)
+    // const cpks = await cpk
+    // const transaction = await cpks?.fetchUnclaimedTransactions()
+    // console.log(transaction)
+    const queryForeign = `
+      query GetTransactions($address: String!) {
+        executions(where:{sender: $address}) {
+          transactionHash
+          value
+        }
+      }
+      `
+    const signer = provider.getSigner()
+    const account = await signer.getAddress()
+    console.log(account)
+    const header = {
+      'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Headers': '*',
+    }
+
+    const query = `
+        query Requests($address: String) { 
+            requests(where:{sender: $address}) {
+                transactionHash
+                value
+            }
+        }`
+    const variables = { address: account }
+
+    console.log('inside')
+    const xDaiRequests = await axios.post(XDAI_HOME_BRIDGE, { query, variables })
+    const xDaiExecutions = await axios.post(XDAI_FOREIGN_BRIDGE, { queryForeign, variables })
+    console.log(xDaiRequests, 'jsjsjsjsjsj')
+    console.log(xDaiExecutions, 'rela deal')
+    return xDaiRequests
+  }
 
   useEffect(() => {
     fetchBalance()
+    fetchUnclaimedAssets()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkId, account])
 

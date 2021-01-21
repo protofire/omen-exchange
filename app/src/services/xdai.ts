@@ -1,11 +1,16 @@
+import axios from 'axios'
 import { Contract } from 'ethers'
 import { BigNumber } from 'ethers/utils'
+import gql from 'graphql-tag'
 
 import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   DEFAULT_TOKEN_ADDRESS,
+  XDAI_FOREIGN_BRIDGE,
+  XDAI_HOME_BRIDGE,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
+import { getKlerosCurateGraphUris } from '../util/networks'
 
 import { ERC20Service } from './erc20'
 
@@ -48,6 +53,48 @@ class XdaiService {
       return transaction
     } catch (e) {
       throw new Error('Failed at generating transaction!')
+    }
+  }
+  fetchXdaiTransactionData = async () => {
+    try {
+      const queryForeign = `
+      query GetTransactions($address: String!) {
+        executions(where:{sender: $address}) {
+          transactionHash
+          value
+        }
+      }
+      `
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+      console.log(account)
+      const header = {
+        'Access-Control-Allow-Origin': '*',
+      }
+
+      const query = `
+        query Requests($address: String) { 
+            requests(where:{sender: $address}) {
+                transactionHash
+                value
+            }
+        }`
+      const variables = { address: account }
+
+      console.log('inside')
+      const xDaiRequests = await axios.post(XDAI_HOME_BRIDGE, { query, variables }, { headers: header })
+      const xDaiExecutions = await axios.post(
+        XDAI_FOREIGN_BRIDGE,
+        { queryForeign, variables },
+        {
+          headers: header,
+        },
+      )
+      console.log(xDaiRequests, 'jsjsjsjsjsj')
+      console.log(xDaiExecutions, 'rela deal')
+      return xDaiRequests
+    } catch (e) {
+      console.log(e)
     }
   }
 }

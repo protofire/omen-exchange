@@ -66,6 +66,10 @@ export const KLEROS_CURATE_GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/
 export const KLEROS_CURATE_GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/kleros/curate-rinkeby'
 export const KLEROS_CURATE_GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/kleros/curate-rinkeby'
 
+//xDai transaction data subgraphs
+export const XDAI_HOME_BRIDGE = 'https://api.thegraph.com/subgraphs/name/maxaleks/home-bridge-xdai'
+export const XDAI_FOREIGN_BRIDGE = 'https://api.thegraph.com/subgraphs/name/maxaleks/foreign-bridge-mainnet'
+
 export const IPFS_GATEWAY = 'https://ipfs.kleros.io'
 
 export const Logo = OmenLogo

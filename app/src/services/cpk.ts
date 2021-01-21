@@ -919,6 +919,18 @@ class CPKService {
       throw e
     }
   }
+  fetchUnclaimedTransactions = async () => {
+    try {
+      console.log('WORLS')
+      const xDaiService = await new XdaiService(this.provider)
+      const data = await xDaiService.fetchXdaiTransactionData()
+
+      return data
+    } catch (e) {
+      logger.error('Error fetching xDai subgraph data', e.message)
+      throw e
+    }
+  }
 }
 
 export { CPKService }
