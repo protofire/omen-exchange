@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
@@ -16,6 +16,7 @@ import {
   formatBigNumber,
   formatNumber,
   getBaseTokenForCToken,
+  getPricesInCToken,
   getSharesInBaseToken,
   mulBN,
 } from '../../../../util/tools'
@@ -81,7 +82,7 @@ const CurrencyDropdownLabel = styled.div`
 const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
-  compoundService: CompoundService
+  compoundService: CompoundService | null
   fetchGraphMarketMakerData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
@@ -151,8 +152,16 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   }, [collateral.address])
 
   let displayBalances = balances
-  if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
+  if (
+    baseCollateral.address !== collateral.address &&
+    collateral.symbol.toLowerCase() in CompoundTokenType &&
+    compoundService
+  ) {
     displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
+    if (displayCollateral.address === collateral.address) {
+      displayBalances = getSharesInBaseToken(balances, compoundService, baseCollateral)
+      displayBalances = getPricesInCToken(displayBalances, compoundService, baseCollateral)
+    }
   }
   const setUserInputCollateral = (symbol: string): void => {
     const inputToken = getToken(networkId, symbol.toLowerCase() as KnownToken)
@@ -220,8 +229,22 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       const costFee = potentialValue.sub(amountToSell)
 
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
-      const displayProbabilities = probabilities
-
+      let displayProbabilities = probabilities
+      if (
+        collateral.symbol.toLowerCase() in CompoundTokenType &&
+        collateral.address === displayCollateral.address &&
+        compoundService
+      ) {
+        displayProbabilities = pricesAfterTrade.map(priceAfterTrade => {
+          const priceAfterTradeBN = parseUnits(priceAfterTrade.toString(), baseCollateral.decimals)
+          const priceAfterTradeInCollateralValue = compoundService.calculateBaseToCTokenExchange(
+            baseCollateral,
+            priceAfterTradeBN,
+          )
+          const priceAfterTradeInCollateral = formatBigNumber(priceAfterTradeInCollateralValue, 8, 4)
+          return Number(priceAfterTradeInCollateral) * 100
+        })
+      }
       logger.log(`Amount to sell ${amountToSell}`)
       return [probabilities, displayProbabilities, costFee, amountToSell, potentialValue]
     }, // eslint-disable-next-line
@@ -237,7 +260,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   let potentialValueNormalized = potentialValue
   let costFeeNormalized = costFee
   let normalizedTradedCollateral = tradedCollateral
-  if (displayCollateral.address !== collateral.address) {
+  if (displayCollateral.address !== collateral.address && compoundService) {
     if (potentialValue && potentialValue.gt(0)) {
       potentialValueNormalized = compoundService.calculateCTokenToBaseExchange(displayCollateral, potentialValue)
     }
@@ -260,7 +283,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
       let displaySharesAmount = sharesAmount
-      if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares) {
+      if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares && compoundService) {
         const displaySharesAmountValue = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
         displaySharesAmount = formatBigNumber(displaySharesAmountValue || Zero, baseCollateral.decimals)
       }
@@ -282,6 +305,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       await fetchGraphMarketMakerData()
       setAmountShares(null)
       setAmountSharesToDisplay('')
+      setDisplaySellShares(new BigNumber('0'))
       setStatus(Status.Ready)
       setMessage(`Successfully sold ${displaySharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
@@ -296,7 +320,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     i === outcomeIndex ? balance.shares.sub(amountShares || Zero) : balance.shares,
   )
   let displayNewShares = newShares
-  if (collateralSymbol in CompoundTokenType) {
+  if (collateralSymbol in CompoundTokenType && compoundService) {
     displayNewShares = newShares.map(function(ns) {
       return compoundService.calculateCTokenToBaseExchange(baseCollateral, ns)
     })
@@ -304,7 +328,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
   let displaySelectedOutcomeBalance = selectedOutcomeBalance
   let displaySelectedOutcomeBalanceValue = balanceItem.shares
-  if (collateralSymbol in CompoundTokenType) {
+  if (collateralSymbol in CompoundTokenType && compoundService) {
     displaySelectedOutcomeBalanceValue = compoundService.calculateCTokenToBaseExchange(
       baseCollateral,
       balanceItem.shares,
@@ -328,22 +352,21 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     amountError !== null ||
     isNegativeAmountShares
   const setAmountSharesFromInput = (shares: BigNumber) => {
-    if (collateralSymbol in CompoundTokenType) {
+    if (collateralSymbol in CompoundTokenType && compoundService) {
       const actualAmountOfShares = compoundService.calculateBaseToCTokenExchange(baseCollateral, shares)
       setAmountShares(actualAmountOfShares)
     } else {
       setAmountShares(shares)
     }
+    setDisplaySellShares(shares)
   }
-  const setDisplayAmountToSell = (val: BigNumber) => {
-    if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
-      const actualSellAmount = compoundService.calculateBaseToCTokenExchange(displayCollateral, val)
-      setAmountShares(actualSellAmount)
-    } else {
-      setAmountShares(val)
-    }
-    setDisplaySellShares(val)
+
+  let sellAmountSharesDisplay = formatBigNumber(amountShares || Zero, collateral.decimals)
+  if (collateralSymbol in CompoundTokenType && compoundService && amountShares) {
+    const sellAmountSharesDisplayAmount = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
+    sellAmountSharesDisplay = formatBigNumber(sellAmountSharesDisplayAmount || Zero, baseCollateral.decimals)
   }
+
   return (
     <>
       <OutcomeTable
@@ -375,10 +398,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
-                decimals={displayCollateral.decimals}
+                decimals={baseCollateral.decimals}
                 name="amount"
                 onChange={(e: BigNumberInputReturn) => {
-                  setDisplayAmountToSell(e.value)
+                  setAmountSharesFromInput(e.value)
                   setAmountSharesToDisplay('')
                 }}
                 style={{ width: 0 }}
@@ -398,10 +421,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         </div>
         <div>
           <TransactionDetailsCard>
-            <TransactionDetailsRow
-              title={'Sell Amount'}
-              value={`${formatNumber(formatBigNumber(amountShares || Zero, collateral.decimals))} Shares`}
-            />
+            <TransactionDetailsRow title={'Sell Amount'} value={`${formatNumber(sellAmountSharesDisplay)} Shares`} />
             <TransactionDetailsRow
               emphasizeValue={potentialValueNormalized ? potentialValueNormalized.gt(0) : false}
               state={ValueStates.success}
