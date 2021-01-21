@@ -9,7 +9,7 @@ import { useConnectedCPKContext, useContracts, useGraphMarketTradeData } from '.
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
-import { formatBigNumber, getUnit } from '../../../../../util/tools'
+import { formatBigNumber, getUnit, isDust } from '../../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
@@ -280,7 +280,7 @@ const Wrapper = (props: Props) => {
         balances.map(balance => balance.shares),
       )
 
-  const hasWinningOutcomes = earnedCollateral && earnedCollateral.gt(0)
+  const hasWinningOutcomes = earnedCollateral && !isDust(earnedCollateral, collateralToken.decimals)
   const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
   const userWinnersOutcomes = payouts
     ? payouts.filter(
