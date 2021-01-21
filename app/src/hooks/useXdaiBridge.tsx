@@ -61,16 +61,16 @@ export const useXdaiBridge = (amount: BigNumber) => {
     }
   }
 
-  const requestCrossChainBalance = async (userAddress: string, url: string) => {
+  const requestCrossChainBalance = async (userAddress: string, chain: string) => {
     try {
       const response = await axios.post(
-        url,
+        chain === 'xDai' ? 'https://dai.poa.network/' : `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
         {
           jsonrpc: '2.0',
           id: +new Date(),
-          method: networkId === 1 ? 'eth_getBalance' : 'eth_call',
+          method: chain === 'xDai' ? 'eth_getBalance' : 'eth_call',
           params: [
-            networkId === 1
+            chain === 'xDai'
               ? userAddress
               : {
                   data: ERC20Service.encodedBalanceOf(userAddress),
@@ -94,23 +94,24 @@ export const useXdaiBridge = (amount: BigNumber) => {
   const fetchBalance = async () => {
     try {
       const userAddress = await provider.getSigner().getAddress()
+      console.log(networkId)
 
-      if (networkId === 1) {
-        const response = await requestCrossChainBalance(userAddress, 'https://dai.poa.network/')
-        const collateralService = new ERC20Service(provider, account, DEFAULT_TOKEN_ADDRESS)
+      console.log('mainnet')
+      const responseXdai = await requestCrossChainBalance(userAddress, 'xDai')
+      //below are functions for fetching balance for Dai
+      // const collateralService = new ERC20Service(provider, account, DEFAULT_TOKEN_ADDRESS)
+      // setDaiBalance(await collateralService.getCollateral(account || ''))
+      setXdaiBalance(bigNumberify(responseXdai))
+      console.log(formatBigNumber(bigNumberify(responseXdai), 18))
 
-        setDaiBalance(await collateralService.getCollateral(account || ''))
-        setXdaiBalance(bigNumberify(response))
-      } else {
-        const response = await requestCrossChainBalance(
-          userAddress,
-          `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
-        )
-        const balance = await provider.getBalance(account || '')
+      console.log('xDai here')
 
-        setXdaiBalance(balance)
-        setDaiBalance(bigNumberify(response))
-      }
+      const responseDai = await requestCrossChainBalance(userAddress, 'mainnet')
+      //method for fetching balance for xDai
+      // const balance = await provider.getBalance(account || '')
+      // setXdaiBalance(balance)
+      console.log(formatBigNumber(bigNumberify(responseDai), 18))
+      setDaiBalance(bigNumberify(responseDai))
     } catch (error) {
       throw new Error(`Error while fetching balance ${error}`)
     }
