@@ -112,6 +112,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
+  const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
@@ -258,9 +259,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       }
 
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
-
+      let displaySharesAmount = sharesAmount
+      if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares) {
+        const displaySharesAmountValue = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
+        displaySharesAmount = formatBigNumber(displaySharesAmountValue || Zero, baseCollateral.decimals)
+      }
       setStatus(Status.Loading)
-      setMessage(`Selling ${sharesAmount} shares...`)
+      setMessage(`Selling ${displaySharesAmount} shares...`)
       let useBaseToken = false
       if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
         useBaseToken = true
@@ -278,7 +283,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setAmountShares(null)
       setAmountSharesToDisplay('')
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setMessage(`Successfully sold ${displaySharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' shares.`)
@@ -330,6 +335,15 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setAmountShares(shares)
     }
   }
+  const setDisplayAmountToSell = (val: BigNumber) => {
+    if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
+      const actualSellAmount = compoundService.calculateBaseToCTokenExchange(displayCollateral, val)
+      setAmountShares(actualSellAmount)
+    } else {
+      setAmountShares(val)
+    }
+    setDisplaySellShares(val)
+  }
   return (
     <>
       <OutcomeTable
@@ -361,14 +375,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
-                decimals={collateral.decimals}
+                decimals={displayCollateral.decimals}
                 name="amount"
                 onChange={(e: BigNumberInputReturn) => {
-                  setAmountShares(e.value)
+                  setDisplayAmountToSell(e.value)
                   setAmountSharesToDisplay('')
                 }}
                 style={{ width: 0 }}
-                value={amountShares}
+                value={displaySellShares}
                 valueToDisplay={amountSharesToDisplay}
               />
             }
