@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
-import { getNativeAsset } from '../../../../util/networks'
+import { getNativeAsset, networkIds } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
@@ -64,8 +64,10 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const probabilities = balances.map(balance => balance.probability)
+  const initialBondAmount =
+    networkId === networkIds.XDAI ? new BigNumber('10000000000000000000') : new BigNumber('10000000000000000')
   const [bondEthAmount, setBondEthAmount] = useState<BigNumber>(
-    currentAnswerBond ? new BigNumber(currentAnswerBond).mul(2) : new BigNumber('10000000000000000'),
+    currentAnswerBond ? new BigNumber(currentAnswerBond).mul(2) : initialBondAmount,
   )
   const [ethBalance, setEthBalance] = useState<BigNumber>(Zero)
 
