@@ -327,7 +327,7 @@ const Wrapper = (props: Props) => {
   return (
     <>
       <TopCard>
-        <MarketTopDetailsOpen marketMakerData={marketMakerData} />
+        <MarketTopDetailsOpen compoundService={compoundService} marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
         <MarketNavigation

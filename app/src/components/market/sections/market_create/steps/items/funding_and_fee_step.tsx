@@ -21,7 +21,7 @@ import {
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
-import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
+import { getNativeAsset, networkIds, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, CompoundEnabledTokenType, Ternary, Token } from '../../../../../../util/types'
@@ -241,7 +241,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   let showAddCompundService = false
   const currentTokenSymbol = currentToken.symbol.toLowerCase()
   const isETHNetwork = () => {
-    return context.networkId === 1 || context.networkId === 4
+    return context.networkId === networkIds.MAINNET || context.networkId === networkIds.RINKEBY
   }
   if (currentTokenSymbol in CompoundEnabledTokenType && isETHNetwork()) {
     showAddCompundService = true
@@ -308,7 +308,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       const interestRate = await getCompoundInterestRate(userInputCollateral.symbol.toLowerCase())
       setCompoundInterestRate(interestRate.toFixed(2))
     }
-    if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType) {
+    if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType && isETHNetwork()) {
       getInterestRate(userInputCollateral)
     }
   }, [isServiceChecked, userInputCollateral, collateral]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -335,6 +335,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     exceedsMaxFee ||
     isNegativeDepositAmount ||
     (!isUpdated && collateral.address === pseudoNativeAssetAddress)
+
   const showSetAllowance =
     collateral.address !== pseudoNativeAssetAddress &&
     !cpk?.cpk.isSafeApp() &&
@@ -385,7 +386,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleCollateralChange(token, newAmount)
     setServiceCheck(false)
     setAllowanceFinished(false)
-    setAmount(new BigNumber('0'))
   }
 
   const toggleCustomFee = () => {

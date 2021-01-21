@@ -338,7 +338,11 @@ const Wrapper = (props: Props) => {
   return (
     <>
       <TopCard>
-        <MarketTopDetailsClosed collateral={collateral} marketMakerData={marketMakerData} />
+        <MarketTopDetailsClosed
+          collateral={collateral}
+          compoundService={compoundService}
+          marketMakerData={marketMakerData}
+        />
       </TopCard>
       <BottomCard>
         <MarketNavigation

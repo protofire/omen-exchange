@@ -7,7 +7,7 @@ import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { queryTopCategories } from '../../../../queries/markets_home'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../../../util/networks'
-import { limitDecimalPlaces } from '../../../../util/tools'
+import { getCTokenForToken, limitDecimalPlaces } from '../../../../util/tools'
 import { Arbitrator, GraphResponseTopCategories, MarketData, Question, Token } from '../../../../util/types'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 
@@ -49,7 +49,6 @@ export const MarketWizardCreator = (props: Props) => {
     collateral: defaultCollateral,
     userInputCollateral: defaultCollateral,
     compoundInterestRate: '',
-    userInputToken: defaultCollateral,
     funding: new BigNumber('0'),
     loadedQuestionId: getImportQuestionId(),
     useCompoundReserve: false,
@@ -234,11 +233,7 @@ export const MarketWizardCreator = (props: Props) => {
 
   const getCompoundCollateral = (collateral: Token): Token => {
     const collateralSymbol = collateral.symbol.toLowerCase()
-    let compoundCollateralSymbol = `c${collateralSymbol}`
-    if (collateralSymbol === 'eth' || collateralSymbol === 'weth') {
-      compoundCollateralSymbol = 'ceth'
-    }
-    const compoundCollateralToken = compoundCollateralSymbol as KnownToken
+    const compoundCollateralToken = getCTokenForToken(collateralSymbol) as KnownToken
     const compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
     return compoundTokenDetails
   }

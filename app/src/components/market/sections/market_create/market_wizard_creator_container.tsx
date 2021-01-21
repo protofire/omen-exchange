@@ -85,7 +85,6 @@ const MarketWizardCreatorContainer: FC = () => {
             const cToken = `c${userInputCollateralSymbol}`
             const compoundCollateralToken = cToken as KnownToken
             compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
-            marketData.userInputToken = marketData.userInputCollateral
             compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
             await compoundService.init()
           }

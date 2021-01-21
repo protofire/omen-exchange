@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
+import { CompoundService } from '../../../../services'
 import theme from '../../../../theme'
 import { getContractAddress } from '../../../../util/networks'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
@@ -35,11 +36,12 @@ const MarketCurrencySelector = styled(CurrencySelector)`
 interface Props {
   marketMakerData: MarketMakerData
   collateral: BigNumber
+  compoundService: CompoundService | null
 }
 
 const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { marketMakerData } = props
+  const { compoundService, marketMakerData } = props
   const history = useHistory()
 
   const { width } = useWindowDimensions()
@@ -125,6 +127,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
       <MarketData
         answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
         collateralVolume={collateralVolume}
+        compoundService={compoundService}
         currency={collateralToken}
         lastActiveDay={lastActiveDay}
         liquidity={formattedLiquidity}
