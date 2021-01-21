@@ -2,10 +2,10 @@ import React, { DOMAttributes, useEffect, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../hooks'
-import { useRealityLink } from '../../../../hooks/useRealityLink'
+import { useConnectedWeb3Context, useRealityLink } from '../../../../hooks'
+import { networkIds } from '../../../../util/networks'
 import { CompoundService } from '../../../../services/compound_service'
-import { Arbitrator, CompoundTokenType, KlerosItemStatus, KlerosSubmission, Token } from '../../../../util/types'
+import { Arbitrator, KlerosItemStatus, KlerosSubmission } from '../../../../util/types'
 import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
 import { CompoundIconNoBorder } from '../../../common/icons/currencies/CompoundIconNoBorder'
 
@@ -122,7 +122,14 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
+<<<<<<< HEAD
   const { address, arbitrator, category, collateral, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
+=======
+  const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
+
+  const context = useConnectedWeb3Context()
+
+>>>>>>> cec4949f8b7165ec51d63cb64b080ea2db66bb8e
   const realitioBaseUrl = useRealityLink()
   const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
   const context = useConnectedWeb3Context()
@@ -182,6 +189,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <IconArbitrator size={'24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
+<<<<<<< HEAD
         <AdditionalMarketDataSectionWrapper
           data-arrow-color="transparent"
           data-for="marketData"
@@ -212,6 +220,24 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           </AdditionalMarketDataSectionWrapper>
         ) : (
           <span />
+=======
+        {context.networkId !== networkIds.XDAI && (
+          <AdditionalMarketDataSectionWrapper
+            data-arrow-color="transparent"
+            data-for="marketData"
+            data-tip={
+              curatedByDxDaoOrKleros
+                ? 'This Market is verified by DXdao or Kleros and therefore valid.'
+                : 'This Market has not been verified and may be invalid.'
+            }
+            isError={!curatedByDxDaoOrKleros}
+          >
+            {curatedByDxDaoOrKleros ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
+            <AdditionalMarketDataSectionTitle isError={!curatedByDxDaoOrKleros}>
+              {curatedByDxDaoOrKleros ? 'Verified' : 'Not Verified'}
+            </AdditionalMarketDataSectionTitle>
+          </AdditionalMarketDataSectionWrapper>
+>>>>>>> cec4949f8b7165ec51d63cb64b080ea2db66bb8e
         )}
       </AdditionalMarketDataLeft>
       <ReactTooltip

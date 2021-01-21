@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
@@ -186,7 +187,7 @@ interface Props {
   }
   marketCreationStatus: MarketCreationStatus
   getCompoundInterestRate: (userInputCollateral: string) => Promise<number>
-  handleCollateralChange: (userInputCollateral: Token) => void
+  handleCollateralChange: (collateral: Token, amount: BigNumber) => void
   handleTradingFeeChange: (fee: string) => void
   handleUseCompoundReserveChange: (useCompoundReserve: boolean) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
@@ -261,6 +262,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { allowance, unlock } = useCpkAllowance(signer, userInputCollateral.address)
 
   const [amount, setAmount] = useState<BigNumber>(funding)
+  const [formattedAmount, setFormattedAmount] = useState<string>(Zero.toString())
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(funding))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
@@ -314,6 +316,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const amountError =
     maybeCollateralBalance === null
       ? null
+      : !maybeCollateralBalance.eq(collateralBalance)
+      ? null
       : maybeCollateralBalance.isZero() && funding.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : funding.gt(maybeCollateralBalance)
@@ -361,7 +365,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   }
 
   const onCollateralChange = (token: Token | null) => {
-    if (!token) return
+    if (!token || !token.balance) return
     const tokenAddressFormatted = token.address.toLowerCase()
     const selectedToken = markets.find(({ collateralToken }) => collateralToken === tokenAddressFormatted)
     setCurrentToken({
@@ -369,8 +373,17 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       symbol: token.symbol,
       marketAddress: selectedToken ? selectedToken.id : '',
     })
+
+    // optimistically update collateral balance
+    const newCollateralBalance = new BigNumber(token.balance)
+    setCollateralBalance(newCollateralBalance)
+    setCollateralBalanceFormatted(formatBigNumber(newCollateralBalance, token.decimals, 5))
+
+    const newAmount = ethers.utils.parseUnits(formattedAmount, token.decimals)
+
+    setAmount(newAmount)
+    handleCollateralChange(token, newAmount)
     setServiceCheck(false)
-    handleCollateralChange(token)
     setAllowanceFinished(false)
     setAmount(new BigNumber('0'))
   }
@@ -390,6 +403,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const handleAmountChange = (event: BigNumberInputReturn) => {
     setAmount(event.value)
+    setFormattedAmount(event.formattedValue || '')
     setAmountToDisplay('')
     handleChange(event)
   }
@@ -400,7 +414,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       name: 'funding',
       value: collateralBalance,
     })
-    setAmountToDisplay(formatBigNumber(collateralBalance, userInputCollateral.decimals, 5))
+    const formatted = formatBigNumber(collateralBalance, userInputCollateral.decimals, 5)
+    setAmountToDisplay(formatted)
+    setFormattedAmount(formatted)
   }
 
   return (
