@@ -25,6 +25,7 @@ import {
   formatBigNumber,
   formatNumber,
   getBaseTokenForCToken,
+  getPricesInCToken,
   getSharesInBaseToken,
 } from '../../../../util/tools'
 import {
@@ -566,8 +567,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
   let displayBalances = balances
-  if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
+  if (collateral.symbol.toLowerCase() in CompoundTokenType) {
     displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
+    if (collateral.symbol === displayCollateral.symbol) {
+      displayBalances = getSharesInBaseToken(balances, compoundService, baseCollateral)
+      displayBalances = getPricesInCToken(displayBalances, compoundService, baseCollateral)
+    }
   }
 
   const setWithdrawAmountToRemove = (val: BigNumber) => {
@@ -577,6 +582,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
     setAmountToRemove(normalizedWithdrawAmount)
     setAmountToRemoveNormalized(val)
+  }
+  const switchTab = (tab: Tabs) => {
+    if (collateralSymbol in CompoundTokenType) {
+      setDisplayCollateral(baseCollateral)
+    }
+    setActiveTab(tab)
   }
   return (
     <>
@@ -623,13 +634,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             <ButtonTab
               active={disableDepositTab ? false : activeTab === Tabs.deposit}
               disabled={disableDepositTab}
-              onClick={() => setActiveTab(Tabs.deposit)}
+              onClick={() => switchTab(Tabs.deposit)}
             >
               Deposit
             </ButtonTab>
             <ButtonTab
               active={disableDepositTab ? true : activeTab === Tabs.withdraw}
-              onClick={() => setActiveTab(Tabs.withdraw)}
+              onClick={() => switchTab(Tabs.withdraw)}
             >
               Withdraw
             </ButtonTab>

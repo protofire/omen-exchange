@@ -343,14 +343,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
       ? `Insufficient balance`
       : amountShares?.gt(balanceItem.shares)
-      ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
+      ? `Value must be less than or equal to ${displaySelectedOutcomeBalance} shares`
       : null
-  const isSellButtonDisabled =
-    !amountShares ||
-    (status !== Status.Ready && status !== Status.Error) ||
-    amountShares?.isZero() ||
-    amountError !== null ||
-    isNegativeAmountShares
+
   const setAmountSharesFromInput = (shares: BigNumber) => {
     if (collateralSymbol in CompoundTokenType && compoundService) {
       const actualAmountOfShares = compoundService.calculateBaseToCTokenExchange(baseCollateral, shares)
@@ -363,9 +358,17 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   let sellAmountSharesDisplay = formatBigNumber(amountShares || Zero, collateral.decimals)
   if (collateralSymbol in CompoundTokenType && compoundService && amountShares) {
-    const sellAmountSharesDisplayAmount = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
-    sellAmountSharesDisplay = formatBigNumber(sellAmountSharesDisplayAmount || Zero, baseCollateral.decimals)
+    const sellAmountSharesDisplayValue = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
+    sellAmountSharesDisplay = formatBigNumber(sellAmountSharesDisplayValue || Zero, baseCollateral.decimals)
   }
+
+  const isSellButtonDisabled =
+    !amountShares ||
+    Number(sellAmountSharesDisplay) == 0 ||
+    (status !== Status.Ready && status !== Status.Error) ||
+    amountShares?.isZero() ||
+    amountError !== null ||
+    isNegativeAmountShares
 
   return (
     <>

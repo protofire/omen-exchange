@@ -194,7 +194,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )
       return [tradedShares, probabilities, displayProbabilities, amount]
     }, // eslint-disable-next-line
-    [balances, marketMaker, outcomeIndex],
+    [balances, displayCollateral.address, marketMaker, outcomeIndex],
   )
 
   const [tradedShares, probabilities, displayProbabilities, debouncedAmount] = useAsyncDerivedValue(
@@ -240,9 +240,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       }
       let displayTradedShares = tradedShares
       let displayCollateralToken = collateral
-      if (collateralSymbol in CompoundTokenType && compoundService) {
+      let useBaseToken = false
+      let inputAmount = amount || Zero
+      if (collateralSymbol in CompoundTokenType && compoundService && amount) {
         displayTradedShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedShares)
         displayCollateralToken = baseCollateral
+        useBaseToken = true
+        inputAmount = compoundService.calculateCTokenToBaseExchange(baseCollateral, amount)
       }
       const sharesAmount = formatBigNumber(displayTradedShares, displayCollateralToken.decimals)
 
@@ -250,10 +254,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setMessage(`Buying ${sharesAmount} shares ...`)
 
       await cpk.buyOutcomes({
-        amount: amount || Zero,
+        amount: inputAmount,
         collateral,
-        outcomeIndex,
+        compoundService,
         marketMaker,
+        outcomeIndex,
+        useBaseToken,
       })
 
       await fetchGraphMarketMakerData()
@@ -330,6 +336,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const isBuyDisabled =
     !amount ||
+    Number(sharesTotal) == 0 ||
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
     (!cpk?.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
