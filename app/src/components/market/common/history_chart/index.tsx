@@ -2,10 +2,9 @@ import { Block } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useWeb3Context } from 'web3-react'
 
-import { EARLIEST_MAINNET_BLOCK_TO_CHECK } from '../../../../common/constants'
-import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
+import { useConnectedWeb3Context, useMultipleQueries } from '../../../../hooks'
+import { getEarliestBlockToCheck } from '../../../../util/networks'
 import { isScalarMarket, keys, range } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
 
@@ -101,8 +100,8 @@ export const HistoryChartContainer: React.FC<Props> = ({
   scalarLow,
   unit,
 }) => {
-  const context = useWeb3Context()
-  const { library } = context
+  const context = useConnectedWeb3Context()
+  const { library, networkId } = context
   const [latestBlockNumber, setLatestBlockNumber] = useState<Maybe<number>>(null)
   const [blocks, setBlocks] = useState<Maybe<Block[]>>(null)
   const holdingsSeries = useHoldingsHistory(marketMakerAddress, blocks)
@@ -112,7 +111,7 @@ export const HistoryChartContainer: React.FC<Props> = ({
     [answerFinalizedTimestamp],
   )
 
-  const blocksSinceInception = latestBlockNumber ? latestBlockNumber - EARLIEST_MAINNET_BLOCK_TO_CHECK : 0
+  const blocksSinceInception = latestBlockNumber ? latestBlockNumber - getEarliestBlockToCheck(networkId) : 0
   const allDataPoints = Math.floor(blocksSinceInception / blocksPerAllTimePeriod)
 
   const mapPeriod: { [period in Period]: { totalDataPoints: number; blocksPerPeriod: number } } = {

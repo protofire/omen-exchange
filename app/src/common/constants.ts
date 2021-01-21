@@ -7,6 +7,8 @@ export const INFURA_PROJECT_ID = '9c6788bb15234036991db4637638429f'
 export const REALITIO_TIMEOUT = 86400
 export const EARLIEST_MAINNET_BLOCK_TO_CHECK = parseInt('9294139')
 export const EARLIEST_RINKEBY_BLOCK_TO_CHECK = parseInt('6127043')
+export const EARLIEST_SOKOL_BLOCK_TO_CHECK = parseInt('17798332')
+export const EARLIEST_XDAI_BLOCK_TO_CHECK = parseInt('11830428')
 export const FETCH_EVENTS_CHUNK_SIZE = parseInt('500000', 10)
 
 const MAX_OUTCOMES = parseInt('8', 10)

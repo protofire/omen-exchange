@@ -4,6 +4,8 @@ import {
   DEFAULT_ARBITRATOR,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+  EARLIEST_SOKOL_BLOCK_TO_CHECK,
+  EARLIEST_XDAI_BLOCK_TO_CHECK,
   GRAPH_MAINNET_HTTP,
   GRAPH_MAINNET_WS,
   GRAPH_RINKEBY_HTTP,
@@ -168,7 +170,7 @@ const networks: { [K in NetworkId]: Network } = {
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
     klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
     realitioTimeout: 180,
-    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+    earliestBlockToCheck: EARLIEST_SOKOL_BLOCK_TO_CHECK,
     omenTCRListId: 0,
     contracts: {
       realitio: '0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03',
@@ -205,7 +207,7 @@ const networks: { [K in NetworkId]: Network } = {
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
     klerosCurateGraphWsUri: KLEROS_CURATE_GRAPH_RINKEBY_WS,
     realitioTimeout: 86400,
-    earliestBlockToCheck: EARLIEST_RINKEBY_BLOCK_TO_CHECK,
+    earliestBlockToCheck: EARLIEST_XDAI_BLOCK_TO_CHECK,
     omenTCRListId: 2,
     contracts: {
       realitio: '0x79e32aE03fb27B07C89c0c568F80287C01ca2E57',
