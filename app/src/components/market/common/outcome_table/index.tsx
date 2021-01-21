@@ -235,8 +235,11 @@ export const OutcomeTable = (props: Props) => {
       const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
       baseCollateral = getToken(networkId, baseCollateralSymbol)
     }
-    const { currentPrice, outcomeName, payout, shares } = balanceItem
-    const currentPriceValue = Number(currentPrice)
+    const { currentDisplayPrice, currentPrice, outcomeName, payout, shares } = balanceItem
+    let currentPriceValue = Number(currentPrice)
+    if (currentDisplayPrice && Number(currentDisplayPrice) > 0) {
+      currentPriceValue = Number(currentDisplayPrice)
+    }
     let currentPriceDisplay = currentPriceValue.toFixed(2)
     if (currentPriceValue < 0.1) {
       currentPriceDisplay = currentPriceValue.toFixed(4)
@@ -249,7 +252,7 @@ export const OutcomeTable = (props: Props) => {
       newPrice = newPriceValue.toFixed(4)
     }
     const formattedPayout = formatBigNumber(mulBN(shares, Number(payout.toString())), currentCollateral.decimals)
-    const formattedShares = formatBigNumber(shares, displayCollateral.decimals)
+    const formattedShares = formatBigNumber(shares, baseCollateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] && payouts[outcomeIndex].gt(0)
     const formattedNewShares = newShares ? formatBigNumber(newShares[outcomeIndex], baseCollateral.decimals) : null
     const showBondBadge = isBond && withWinningOutcome && outcomeIndex === winningBondIndex

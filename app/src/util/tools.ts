@@ -286,22 +286,47 @@ export const getBalancesInBaseToken = (
       basePrice = '0'
     }
     return Object.assign({}, bal, {
-      currentPrice: basePrice,
+      currentDisplayPrice: basePrice,
     })
   })
   return displayBalances
 }
 
+export const getPricesInCToken = (
+  balances: BalanceItem[],
+  compoundService: CompoundService,
+  displayCollateral: Token,
+): BalanceItem[] => {
+  const displayBalances = balances.map(function(bal) {
+    const baseTokenDecimals = displayCollateral.decimals
+    const cTokenDecimals = 8
+    const baseTokenWithPrecision = roundNumberStringToSignificantDigits(bal.currentPrice.toString(), 4)
+    let cTokenPrice = '0'
+    try {
+      const baseTokenPriceAmount = parseUnits(baseTokenWithPrecision, baseTokenDecimals)
+      const cTokenPriceAmount = compoundService.calculateBaseToCTokenExchange(displayCollateral, baseTokenPriceAmount)
+      cTokenPrice = formatBigNumber(cTokenPriceAmount, cTokenDecimals)
+    } catch (e) {
+      cTokenPrice = '0'
+    }
+    return Object.assign({}, bal, {
+      currentDisplayPrice: cTokenPrice,
+    })
+  })
+  return displayBalances
+}
 export const getSharesInBaseToken = (
   balances: BalanceItem[],
   compoundService: CompoundService,
   displayCollateral: Token,
 ): BalanceItem[] => {
   const displayBalances = balances.map(function(bal) {
-    const baseTokenPrice = compoundService.calculateCTokenToBaseExchange(displayCollateral, bal.shares)
-    return Object.assign({}, bal, {
-      shares: baseTokenPrice,
+    const baseTokenShares = compoundService.calculateCTokenToBaseExchange(displayCollateral, bal.shares)
+    const newBalanceObject = Object.assign({}, bal, {
+      shares: baseTokenShares,
     })
+    delete newBalanceObject.currentDisplayPrice
+    return newBalanceObject
   })
   return displayBalances
 }
