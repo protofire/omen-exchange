@@ -202,6 +202,8 @@ export const ScalarMarketBuy = (props: Props) => {
     !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
+  const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
+
   const amountError =
     maybeCollateralBalance === null
       ? null
@@ -328,7 +330,7 @@ export const ScalarMarketBuy = (props: Props) => {
               setAmount(collateralBalance)
               setAmountDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
             }}
-            shouldDisplayMaxButton
+            shouldDisplayMaxButton={shouldDisplayMaxButton}
             symbol={collateral.symbol}
           />
           {amountError && <GenericError>{amountError}</GenericError>}
