@@ -359,6 +359,7 @@ class CPKService {
       if (marketData.collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateral = getWrapToken(networkId)
+
         // we need to send the funding amount in native ether
         if (!this.cpk.isSafeApp()) {
           txOptions.value = marketData.funding
