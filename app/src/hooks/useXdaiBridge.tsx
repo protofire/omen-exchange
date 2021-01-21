@@ -149,8 +149,8 @@ export const useXdaiBridge = (amount: BigNumber) => {
     const variables = { address: account }
 
     console.log('inside')
-    const xDaiRequests = await axios.post(XDAI_HOME_BRIDGE, { query, variables })
-    const xDaiExecutions = await axios.post(XDAI_FOREIGN_BRIDGE, { queryForeign, variables })
+    const xDaiRequests = await axios.post(XDAI_HOME_BRIDGE, { query, variables }, { headers: header })
+    const xDaiExecutions = await axios.post(XDAI_FOREIGN_BRIDGE, { queryForeign, variables }, { headers: header })
     console.log(xDaiRequests, 'jsjsjsjsjsj')
     console.log(xDaiExecutions, 'rela deal')
     return xDaiRequests
