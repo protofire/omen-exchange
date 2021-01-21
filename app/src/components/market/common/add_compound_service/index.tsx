@@ -74,7 +74,7 @@ const ServiceTextWrapper = styled.div`
 `
 
 const ServiceCheckWrapper = styled.div`
-  width: 10%;
+  justify-content: space-between;
   color: transparent;
 `
 
@@ -133,7 +133,9 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
     serviceChecked = <IconTick selected={false} />
   }
   const cTokenSymbol = getCTokenForToken(currentToken)
-
+  const currentTokenDisplay = currentToken.charAt(0).toUpperCase() + currentToken.slice(1).toLowerCase()
+  const cTokenDisplay =
+    cTokenSymbol.charAt(0).toLowerCase() + cTokenSymbol.charAt(1).toUpperCase() + cTokenSymbol.slice(2).toLowerCase()
   return (
     <Wrapper>
       <Title>Recommended Service</Title>
@@ -147,7 +149,7 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
               <ServiceTextWrapper>
                 <TextHeading>Compound</TextHeading>
                 <TextBody>
-                  Convert {currentToken} to {cTokenSymbol} and
+                  Convert {currentTokenDisplay} to {cTokenDisplay} and
                   <TextBodyMarker> earn {compoundInterestRate}% APY</TextBodyMarker>
                 </TextBody>
               </ServiceTextWrapper>
