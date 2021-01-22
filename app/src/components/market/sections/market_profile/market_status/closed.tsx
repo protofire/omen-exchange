@@ -10,7 +10,7 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/con
 import { ERC20Service } from '../../../../../services'
 import { CompoundService } from '../../../../../services/compound_service'
 import { getLogger } from '../../../../../util/logger'
-import { formatBigNumber, getUnit } from '../../../../../util/tools'
+import { formatBigNumber, getUnit, isDust } from '../../../../../util/tools'
 import {
   CompoundTokenType,
   MarketDetailsTab,
@@ -315,7 +315,7 @@ const Wrapper = (props: Props) => {
         balances.map(balance => balance.shares),
       )
 
-  const hasWinningOutcomes = earnedCollateral && earnedCollateral.gt(0)
+  const hasWinningOutcomes = earnedCollateral && !isDust(earnedCollateral, collateralToken.decimals)
   const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
   const userWinnersOutcomes = payouts
     ? payouts.filter(
