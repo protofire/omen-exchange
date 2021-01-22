@@ -1,8 +1,9 @@
 import { useQuery } from '@apollo/react-hooks'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
+import { formatBigNumber } from '../util/tools'
 import { Status } from '../util/types'
 
 const fragment = gql`
@@ -20,6 +21,7 @@ const fragment = gql`
     sharesOrPoolTokenAmount
     creationTimestamp
     transactionHash
+    additionalSharesCost
   }
 `
 const withFpmmType = gql`
@@ -89,6 +91,7 @@ interface FpmmTradeData {
   transactionHash: string
   fpmmType: string
   decimals: number
+  additionalSharesCost: BigNumber
 }
 
 interface Result {
@@ -99,6 +102,10 @@ interface Result {
 }
 const wrangleResponse = (data: any, decimals: number) => {
   return data.map((trade: FpmmTradeData) => {
+    console.log('Additional shares', formatBigNumber(trade.additionalSharesCost, 18))
+    console.log('CollateralAmount', formatBigNumber(trade.collateralTokenAmount, 18))
+    console.log('trHash,', trade.transactionHash, '---', trade.transactionType)
+
     return {
       id: trade.id,
       transactionType:
@@ -117,6 +124,7 @@ const wrangleResponse = (data: any, decimals: number) => {
       creationTimestamp: 1000 * trade.creationTimestamp,
       collateralTokenAmount: trade.collateralTokenAmount,
       transactionHash: trade.transactionHash,
+      additionalSharesCosts: trade.additionalSharesCost,
     }
   })
 }
