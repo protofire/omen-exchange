@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Contract } from 'ethers'
+import { Contract, ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 
@@ -14,20 +14,42 @@ import { getKlerosCurateGraphUris } from '../util/networks'
 
 import { ERC20Service } from './erc20'
 
+const abi = [
+  {
+    constant: false,
+    inputs: [
+      { name: 'message', type: 'bytes' },
+      { name: 'signatures', type: 'bytes' },
+    ],
+    name: 'executeSignatures',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
+
 class XdaiService {
   provider: any
+  abi: any
 
   constructor(provider: any) {
     this.provider = provider
+    this.abi = abi
   }
 
-  generateContractInstance = async () => {
+  generateErc20ContractInstance = async () => {
     const signer = this.provider.getSigner()
     const account = await signer.getAddress()
 
     const erc20 = new ERC20Service(this.provider, account, DEFAULT_TOKEN_ADDRESS)
 
     return erc20.getContract
+  }
+
+  generateXdaiBridgeContractInstance = async (ovmAddress: string) => {
+    const signer = this.provider.getSigner()
+    return new ethers.Contract(ovmAddress, this.abi, signer)
   }
   generateSendTransaction = async (amount: BigNumber, contract: Contract) => {
     try {

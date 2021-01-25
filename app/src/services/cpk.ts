@@ -898,7 +898,7 @@ class CPKService {
   sendDaiToBridge = async (amount: BigNumber) => {
     try {
       const xDaiService = new XdaiService(this.provider)
-      const contract = await xDaiService.generateContractInstance()
+      const contract = await xDaiService.generateErc20ContractInstance()
       const transaction = await xDaiService.generateSendTransaction(amount, contract)
 
       return transaction
