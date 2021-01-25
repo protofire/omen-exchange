@@ -7,7 +7,7 @@ import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import theme from '../../../../theme'
-import { getContractAddress } from '../../../../util/networks'
+import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { MoreMenu } from '../../../common/form/more_menu'
@@ -110,14 +110,25 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     },
   ]
 
+  const nativeAssetAddress = getNativeAsset(context.networkId).address.toLowerCase()
+  const wrapTokenAddress = getWrapToken(context.networkId).address.toLowerCase()
+
   const onChangeMarketCurrency = (currency: Token | null) => {
     if (currency) {
-      const selectedMarket = marketsRelatedQuestion.find(e => e.collateralToken === currency.address.toLowerCase())
+      const selectedMarket = marketsRelatedQuestion.find(element => {
+        const collateralToken =
+          element.collateralToken === wrapTokenAddress ? nativeAssetAddress : element.collateralToken
+        return collateralToken === currency.address.toLowerCase()
+      })
       if (selectedMarket && selectedMarket.collateralToken !== collateral.address) {
         history.replace(`/${selectedMarket.id}`)
       }
     }
   }
+
+  const filter = marketsRelatedQuestion.map(({ collateralToken }) =>
+    collateralToken === wrapTokenAddress ? nativeAssetAddress : collateralToken,
+  )
 
   return (
     <>
@@ -125,10 +136,11 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         <SubsectionTitleLeftWrapper>
           {marketsRelatedQuestion.length > 1 && (
             <MarketCurrencySelector
+              addNativeAsset
               context={context}
-              currency={collateral.address}
+              currency={collateral.address === wrapTokenAddress ? nativeAssetAddress : collateral.address}
               disabled={false}
-              filters={marketsRelatedQuestion.map(element => element.collateralToken)}
+              filters={filter}
               onSelect={onChangeMarketCurrency}
               placeholder=""
             />
