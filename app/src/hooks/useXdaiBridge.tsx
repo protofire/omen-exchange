@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 
 import { DEFAULT_TOKEN_ADDRESS, INFURA_PROJECT_ID, XDAI_FOREIGN_BRIDGE, XDAI_HOME_BRIDGE } from '../common/constants'
 import { ERC20Service } from '../services'
-import { formatBigNumber, signaturesFormated } from '../util/tools'
+import { formatBigNumber, signaturesFormatted } from '../util/tools'
 
 import { useConnectedCPKContext } from './connectedCpk'
 import { useConnectedWeb3Context } from './connectedWeb3'
@@ -24,6 +24,7 @@ interface Prop {
   daiBalance: BigNumber
   xDaiBalance: BigNumber
   state: State
+  claimLatestToken: any
 }
 
 export const useXdaiBridge = (amount: BigNumber): Prop => {
@@ -65,6 +66,14 @@ export const useXdaiBridge = (amount: BigNumber): Prop => {
       }
       fetchBalance()
     } catch (err) {
+      setState(State.error)
+    }
+  }
+  const claimLatestToken = async () => {
+    try {
+      const transaction = await cpk?.claimDaiTokens()
+      return transaction
+    } catch (e) {
       setState(State.error)
     }
   }
@@ -169,9 +178,9 @@ export const useXdaiBridge = (amount: BigNumber): Prop => {
     // )
     // console.log(results)
 
-    const transaction = await cpk?.fetchUnclaimedTransactions()
-    // console.log(transaction)
-    console.log(signaturesFormated(transaction.message.signatures))
+    const transaction = await cpk?.fetchLatestUnclaimedTransactions()
+    console.log(transaction)
+    console.log(signaturesFormatted(transaction.message.signatures))
 
     return transaction
   }
@@ -183,6 +192,7 @@ export const useXdaiBridge = (amount: BigNumber): Prop => {
   }, [networkId, account])
 
   return {
+    claimLatestToken,
     transferFunction,
     fetchUnclaimedAssets,
     transactionHash,

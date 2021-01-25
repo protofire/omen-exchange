@@ -14,7 +14,7 @@ import {
   pseudoNativeAssetAddress,
   waitForBlockToSync,
 } from '../util/networks'
-import { calcDistributionHint, clampBigNumber, waitABit } from '../util/tools'
+import { calcDistributionHint, clampBigNumber, signaturesFormatted, waitABit } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
@@ -919,16 +919,28 @@ class CPKService {
       throw e
     }
   }
-  fetchUnclaimedTransactions = async () => {
+  fetchLatestUnclaimedTransactions = async () => {
     try {
       console.log('WORLS')
       const xDaiService = new XdaiService(this.provider)
       const data = await xDaiService.fetchXdaiTransactionData()
-      console.log(data)
 
-      return data
+      return data[0]
     } catch (e) {
       logger.error('Error fetching xDai subgraph data', e.message)
+      throw e
+    }
+  }
+  claimDaiTokens = async () => {
+    try {
+      const { message } = await this.fetchLatestUnclaimedTransactions()
+      const signatures = signaturesFormatted(message.signatures)
+      const xDaiService = new XdaiService(this.provider)
+      const contract = await xDaiService.generateXdaiBridgeContractInstance()
+      console.log(await contract)
+      await xDaiService.claimDaiTokens({ message: message.content, signatures: signatures }, contract)
+    } catch (e) {
+      logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)
       throw e
     }
   }

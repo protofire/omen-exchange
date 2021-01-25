@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks'
@@ -88,9 +88,19 @@ export const XdaiBridgeTransfer = (props: Prop) => {
 
   const [transferState, setTransferState] = useState<boolean>(false)
 
-  const { daiBalance, fetchUnclaimedAssets, state, transactionHash, transferFunction, xDaiBalance } = useXdaiBridge(
-    amount,
-  )
+  const {
+    claimLatestToken,
+    daiBalance,
+    fetchUnclaimedAssets,
+    state,
+    transactionHash,
+    transferFunction,
+    xDaiBalance,
+  } = useXdaiBridge(amount)
+
+  useEffect(() => {
+    fetchUnclaimedAssets()
+  }, [])
 
   return (
     <>
@@ -146,7 +156,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           </TransferButton>
           <ButtonRound
             onClick={() => {
-              fetchUnclaimedAssets()
+              claimLatestToken()
             }}
           >
             Claim

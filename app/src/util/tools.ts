@@ -45,12 +45,8 @@ export const signatureToVRS = (rawSignature: string) => {
   return { v, r, s }
 }
 export const packSignatures = (array: any) => {
-  const lengths = array.length.toString()
-  const length = stripZeros(formatBytes32String(lengths))
-
-  console.log(formatBytes32String(lengths))
+  const length = array.length.toString()
   console.log(length)
-  console.log(parseInt(formatBytes32String(lengths), 10))
 
   console.log(length)
   const msgLength = length.length === 1 ? `0${length}` : length
@@ -65,7 +61,7 @@ export const packSignatures = (array: any) => {
   return `0x${msgLength}${v}${r}${s}`
 }
 
-export const signaturesFormated = (signatures: [string]) => {
+export const signaturesFormatted = (signatures: [string]) => {
   return packSignatures(signatures.map(s => signatureToVRS(s)))
 }
 

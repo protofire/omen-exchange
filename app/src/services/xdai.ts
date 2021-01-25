@@ -47,9 +47,9 @@ class XdaiService {
     return erc20.getContract
   }
 
-  generateXdaiBridgeContractInstance = async (ovmAddress: string) => {
+  generateXdaiBridgeContractInstance = async () => {
     const signer = this.provider.getSigner()
-    return new ethers.Contract(ovmAddress, this.abi, signer)
+    return new ethers.Contract(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, this.abi, signer)
   }
   generateSendTransaction = async (amount: BigNumber, contract: Contract) => {
     try {
@@ -74,6 +74,19 @@ class XdaiService {
 
       return transaction
     } catch (e) {
+      throw new Error('Failed at generating transaction!')
+    }
+  }
+  claimDaiTokens = async (functionData: any, contract: any) => {
+    try {
+      console.log('INSSDIEISDSD')
+
+      console.log(functionData)
+      const transaction = await contract.executeSignatures(functionData.message, functionData.signatures)
+
+      return transaction
+    } catch (e) {
+      console.log(e)
       throw new Error('Failed at generating transaction!')
     }
   }
@@ -110,15 +123,15 @@ class XdaiService {
       console.log('inside')
       const xDaiRequests = await axios.post(XDAI_HOME_BRIDGE, { query, variables })
       const xDaiExecutions = await axios.post(XDAI_FOREIGN_BRIDGE, { query: queryForeign, variables })
-      console.log(xDaiRequests)
+
       const requestsArray = xDaiRequests.data.data.requests
       const executionsArray = xDaiExecutions.data.data.executions
-      // console.log(requestsArray, 'jsjsjsjsjsj')
-      // console.log(executionsArray, 'rela deal')
+
       const results = requestsArray.filter(
         ({ transactionHash: id1 }: any) => !executionsArray.some(({ transactionHash: id2 }: any) => id2 === id1),
       )
-      return results[0]
+      // return results[0]
+      return results
     } catch (e) {
       console.log(e)
     }
