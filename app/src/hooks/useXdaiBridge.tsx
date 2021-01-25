@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 
 import { DEFAULT_TOKEN_ADDRESS, INFURA_PROJECT_ID, XDAI_FOREIGN_BRIDGE, XDAI_HOME_BRIDGE } from '../common/constants'
 import { ERC20Service } from '../services'
-import { formatBigNumber } from '../util/tools'
+import { formatBigNumber, signaturesFormated } from '../util/tools'
 
 import { useConnectedCPKContext } from './connectedCpk'
 import { useConnectedWeb3Context } from './connectedWeb3'
@@ -17,8 +17,16 @@ export enum State {
   transactionConfirmed,
   error,
 }
+interface Prop {
+  transactionHash: string
+  transferFunction: any
+  fetchUnclaimedAssets: any
+  daiBalance: BigNumber
+  xDaiBalance: BigNumber
+  state: State
+}
 
-export const useXdaiBridge = (amount: BigNumber) => {
+export const useXdaiBridge = (amount: BigNumber): Prop => {
   const [state, setState] = useState<State>(State.idle)
   const { account, library: provider, networkId } = useConnectedWeb3Context()
   const [xDaiBalance, setXdaiBalance] = useState<BigNumber>(Zero)
@@ -117,60 +125,66 @@ export const useXdaiBridge = (amount: BigNumber) => {
     }
   }
   const fetchUnclaimedAssets = async () => {
-    // console.log(cpk)
-    // const cpks = await cpk
-    // const transaction = await cpks?.fetchUnclaimedTransactions()
+    // // console.log(cpk)
+    // // const cpks = await cpk
+    // // const transaction = await cpks?.fetchUnclaimedTransactions()
+    // // console.log(transaction)
+    // const queryForeign = `
+    //   query GetTransactions($address: String!) {
+    //     executions(where:{recipient: $address}) {
+    //       transactionHash
+    //       value
+    //     }
+    //   }
+    //   `
+    // const signer = provider.getSigner()
+    // const account = await signer.getAddress()
+    // console.log(account)
+    //
+    // const query = `
+    //     query Requests($address: String) {
+    //         requests(where:{sender: $address}) {
+    //             transactionHash
+    //             recipient
+    //             value
+    //             message{
+    //               id
+    //               content
+    //               signatures
+    //             }
+    //         }
+    //     }`
+    // const variables = { address: account }
+    //
+    // console.log('inside')
+    // const xDaiRequests = await axios.post(XDAI_HOME_BRIDGE, { query, variables })
+    // const xDaiExecutions = await axios.post(XDAI_FOREIGN_BRIDGE, { query: queryForeign, variables })
+    // console.log(xDaiRequests)
+    // const requestsArray = xDaiRequests.data.data.requests
+    // const executionsArray = xDaiExecutions.data.data.executions
+    // // console.log(requestsArray, 'jsjsjsjsjsj')
+    // // console.log(executionsArray, 'rela deal')
+    // const results = requestsArray.filter(
+    //   ({ transactionHash: id1 }: any) => !executionsArray.some(({ transactionHash: id2 }: any) => id2 === id1),
+    // )
+    // console.log(results)
+
+    const transaction = await cpk?.fetchUnclaimedTransactions()
     // console.log(transaction)
-    const queryForeign = `
-      query GetTransactions($address: String!) {
-        executions(where:{recipient: $address}) {
-          transactionHash
-          value
-        }
-      }
-      `
-    const signer = provider.getSigner()
-    const account = await signer.getAddress()
-    console.log(account)
+    console.log(signaturesFormated(transaction.message.signatures))
 
-    const query = `
-        query Requests($address: String) { 
-            requests(where:{sender: $address}) {
-                transactionHash
-                recipient
-                value
-                message{
-                  id
-                  content
-                  signatures
-                }
-            }
-        }`
-    const variables = { address: account }
-
-    console.log('inside')
-    const xDaiRequests = await axios.post(XDAI_HOME_BRIDGE, { query, variables })
-    const xDaiExecutions = await axios.post(XDAI_FOREIGN_BRIDGE, { query: queryForeign, variables })
-    console.log(xDaiRequests)
-    const requestsArray = xDaiRequests.data.data.requests
-    const executionsArray = xDaiExecutions.data.data.executions
-    // console.log(requestsArray, 'jsjsjsjsjsj')
-    // console.log(executionsArray, 'rela deal')
-    const results = requestsArray.filter(
-      ({ transactionHash: id1 }: any) => !executionsArray.some(({ transactionHash: id2 }: any) => id2 === id1),
-    )
-    console.log(results)
-    return xDaiRequests
+    return transaction
   }
 
   useEffect(() => {
     fetchBalance()
-    fetchUnclaimedAssets()
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkId, account])
 
   return {
     transferFunction,
+    fetchUnclaimedAssets,
     transactionHash,
     state,
     daiBalance,

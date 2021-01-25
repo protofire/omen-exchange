@@ -1,6 +1,15 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import Big from 'big.js'
-import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
+import ethers, {
+  BigNumber,
+  bigNumberify,
+  formatBytes32String,
+  formatUnits,
+  getAddress,
+  parseBytes32String,
+  parseUnits,
+  stripZeros,
+} from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import {
@@ -23,6 +32,41 @@ export const truncateStringInTheMiddle = (str: string, strPositionStart: number,
     return `${str.substr(0, strPositionStart)}...${str.substr(str.length - strPositionEnd, str.length)}`
   }
   return str
+}
+
+export const strip0x = (input: string) => {
+  return input.replace(/^0x/, '')
+}
+export const signatureToVRS = (rawSignature: string) => {
+  const signature = strip0x(rawSignature)
+  const v = signature.substr(64 * 2)
+  const r = signature.substr(0, 32 * 2)
+  const s = signature.substr(32 * 2, 32 * 2)
+  return { v, r, s }
+}
+export const packSignatures = (array: any) => {
+  const lengths = array.length.toString()
+  const length = stripZeros(formatBytes32String(lengths))
+
+  console.log(formatBytes32String(lengths))
+  console.log(length)
+  console.log(parseInt(formatBytes32String(lengths), 10))
+
+  console.log(length)
+  const msgLength = length.length === 1 ? `0${length}` : length
+  let v = ''
+  let r = ''
+  let s = ''
+  array.forEach((e: any) => {
+    v = v.concat(e.v)
+    r = r.concat(e.r)
+    s = s.concat(e.s)
+  })
+  return `0x${msgLength}${v}${r}${s}`
+}
+
+export const signaturesFormated = (signatures: [string]) => {
+  return packSignatures(signatures.map(s => signatureToVRS(s)))
 }
 
 export const formatDate = (date: Date, utcAdd = true): string => {

@@ -922,8 +922,9 @@ class CPKService {
   fetchUnclaimedTransactions = async () => {
     try {
       console.log('WORLS')
-      const xDaiService = await new XdaiService(this.provider)
+      const xDaiService = new XdaiService(this.provider)
       const data = await xDaiService.fetchXdaiTransactionData()
+      console.log(data)
 
       return data
     } catch (e) {

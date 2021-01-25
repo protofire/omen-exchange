@@ -88,7 +88,9 @@ export const XdaiBridgeTransfer = (props: Prop) => {
 
   const [transferState, setTransferState] = useState<boolean>(false)
 
-  const { daiBalance, state, transactionHash, transferFunction, xDaiBalance } = useXdaiBridge(amount)
+  const { daiBalance, fetchUnclaimedAssets, state, transactionHash, transferFunction, xDaiBalance } = useXdaiBridge(
+    amount,
+  )
 
   return (
     <>
@@ -142,6 +144,13 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           >
             Transfer
           </TransferButton>
+          <ButtonRound
+            onClick={() => {
+              fetchUnclaimedAssets()
+            }}
+          >
+            Claim
+          </ButtonRound>
           <PoweredByStakeWrapper>
             <XDaiStake />
             <StakeText>Powered by STAKE Bridge</StakeText>
