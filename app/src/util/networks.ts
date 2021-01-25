@@ -99,7 +99,7 @@ const networks: { [K in NetworkId]: Network } = {
       realitioScalarAdapter: '0xaa548EfBb0972e0c4b9551dcCfb6B787A1B90082',
       marketMakerFactory: '0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
-      oracle: '0xaFffbEA35c395e4BD246B4834071D01498151B16',
+      oracle: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
       klerosBadge: '0xcb4aae35333193232421e86cd2e9b6c91f3b125f',
       klerosTokenView: '0xf9b9b5440340123b21bff1ddafe1ad6feb9d6e7f',
       klerosTCR: '0xebcf3bca271b26ae4b162ba560e243055af0e679',
