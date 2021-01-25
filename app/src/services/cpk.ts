@@ -16,7 +16,7 @@ import {
   pseudoNativeAssetAddress,
   waitForBlockToSync,
 } from '../util/networks'
-import { calcDistributionHint, clampBigNumber, waitABit } from '../util/tools'
+import { calcDistributionHint, clampBigNumber, getBaseTokenForCToken, waitABit } from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
 import { CompoundService } from './compound_service'
@@ -975,7 +975,7 @@ class CPKService {
       const totalAmountEarned = amountToMerge.add(earnings)
       // transfer to the user the merged collateral plus the earned fees
       if (useBaseToken && compoundService != null) {
-        const userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
+        const userInputCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
         userInputCollateral = getToken(networkId, userInputCollateralSymbol)
         // Convert cpk token to base token if user wants to redeem in base
         const encodedRedeemFunction = CompoundService.encodeRedeemTokens(collateralSymbol, totalAmountEarned.toString())

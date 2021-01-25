@@ -238,13 +238,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
 
   const [currentToken, setCurrentToken] = useState({ tokenExists: false, symbol: '', marketAddress: '' })
-  let showAddCompundService = false
+  let showAddCompoundService = false
   const currentTokenSymbol = currentToken.symbol.toLowerCase()
   const isETHNetwork = () => {
     return context.networkId === networkIds.MAINNET || context.networkId === networkIds.RINKEBY
   }
   if (currentTokenSymbol in CompoundEnabledTokenType && isETHNetwork()) {
-    showAddCompundService = true
+    showAddCompoundService = true
   }
   useEffect(() => {
     const selectedToken = markets.find(
@@ -563,7 +563,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             hyperlinkDescription={''}
           />
         )}
-        {showAddCompundService && (
+        {showAddCompoundService && (
           <AddCompoundService
             compoundInterestRate={compoundInterestRate}
             currentToken={userInputCollateral.symbol}

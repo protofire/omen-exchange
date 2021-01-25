@@ -12,7 +12,8 @@ import {
 import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
-import { BalanceItem, CompoundEnabledTokenType, Token } from './types'
+import { getToken } from './networks'
+import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token } from './types'
 
 const logger = getLogger('Tools')
 
@@ -331,6 +332,21 @@ export const getSharesInBaseToken = (
   return displayBalances
 }
 
+/**
+ *  Gets initial display collateral
+ * If collateral is cToken type then display is the base collateral
+ * Else display is the collateral
+ */
+export const getInitialCollateral = (collateral: Token, networkId: number): Token => {
+  const collateralSymbol = collateral.symbol.toLowerCase()
+  if (collateralSymbol in CompoundTokenType) {
+    const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
+    const baseToken = getToken(networkId, baseCollateralSymbol)
+    return baseToken
+  } else {
+    return collateral
+  }
+}
 /**
  * Compute the number of outcomes that will be sent to the user by the Market Maker
  * after funding it for the first time with `addedFunds` of collateral.

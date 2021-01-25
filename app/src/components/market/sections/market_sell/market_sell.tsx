@@ -15,7 +15,7 @@ import {
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
-  getBaseTokenForCToken,
+  getInitialCollateral,
   getPricesInCToken,
   getSharesInBaseToken,
   mulBN,
@@ -118,21 +118,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const { networkId } = context
-  const getInitialCollateral = (): Token => {
-    if (collateralSymbol in CompoundTokenType) {
-      const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
-      const baseToken = getToken(networkId, baseCollateralSymbol)
-      return baseToken
-    } else {
-      return collateral
-    }
-  }
-  let baseCollateral = collateral
-  if (collateralSymbol in CompoundTokenType) {
-    const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
-    baseCollateral = getToken(networkId, baseCollateralSymbol)
-  }
-  const [displayCollateral, setDisplayCollateral] = useState<Token>(getInitialCollateral())
+  const baseCollateral = getInitialCollateral(collateral, networkId)
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
 
   useEffect(() => {
