@@ -331,7 +331,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               setAmountToDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
             }}
             shouldDisplayMaxButton={shouldDisplayMaxButton}
-            symbol={symbol}
+            symbol={collateral.symbol}
           />
           {amountError && <GenericError>{amountError}</GenericError>}
         </div>
