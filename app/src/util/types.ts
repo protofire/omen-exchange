@@ -119,12 +119,20 @@ export enum OutcomeTableValue {
   Bonded = 'Bonded (ETH)',
 }
 
+export enum PositionTableValue {
+  YourPosition = 'Your Position',
+  Shares = 'Shares',
+  Payout = 'Payout',
+  ProfitLoss = 'Profit/loss',
+}
+
 export interface Token {
   address: string
   decimals: number
   symbol: string
   image?: string
   volume?: string
+  balance?: string
 }
 
 export const TokenEthereum = {
@@ -400,6 +408,17 @@ export type BuildQueryType = MarketFilters & {
   whitelistedCreators: boolean
   whitelistedTemplateIds: boolean
   networkId: Maybe<number>
+}
+
+export type TradeObject = {
+  title: string
+  outcomeTokensTraded: BigNumber
+  collateralAmount: BigNumber
+  feeAmount: BigNumber
+  outcomeTokenMarginalPrice: number
+  oldOutcomeTokenMarginalPrice: number
+  type: string
+  outcomeIndex: string
 }
 
 export type MarketCondition = {

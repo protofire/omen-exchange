@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { useConnectedCPKContext, useGraphMarketTradeData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { getUnit, isDust } from '../../../../../util/tools'
@@ -102,10 +103,12 @@ const Wrapper = (props: Props) => {
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
   const context = useConnectedWeb3Context()
+  const cpk = useConnectedCPKContext()
 
   const {
     balances,
     collateral,
+    fee,
     isQuestionFinalized,
     outcomeTokenMarginalPrices,
     payouts,
@@ -255,6 +258,12 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
+  const { fetchData: fetchGraphMarketTradeData, status, trades } = useGraphMarketTradeData(
+    question.title,
+    collateral.address,
+    cpk?.address.toLowerCase(),
+  )
+
   useEffect(() => {
     if ((isQuestionFinalized || !isFinalizing) && currentTab === MarketDetailsTab.finalize) {
       setCurrentTab(MarketDetailsTab.swap)
@@ -276,14 +285,22 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.swap && (
           <>
             {isScalar ? (
-              <MarketScale
-                border={true}
-                currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
-                lowerBound={scalarLow || new BigNumber(0)}
-                startingPointTitle={'Current prediction'}
-                unit={getUnit(question.title)}
-                upperBound={scalarHigh || new BigNumber(0)}
-              />
+              <>
+                <MarketScale
+                  balances={balances}
+                  borderTop={true}
+                  collateral={collateral}
+                  currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
+                  fee={fee}
+                  lowerBound={scalarLow || new BigNumber(0)}
+                  positionTable={true}
+                  startingPointTitle={'Current prediction'}
+                  status={status}
+                  trades={trades}
+                  unit={getUnit(question.title)}
+                  upperBound={scalarHigh || new BigNumber(0)}
+                />
+              </>
             ) : (
               renderTableData()
             )}
@@ -332,7 +349,7 @@ const Wrapper = (props: Props) => {
           ) : (
             <>
               <MarketScale
-                border={true}
+                borderTop={true}
                 currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Current prediction'}
@@ -366,6 +383,7 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
@@ -375,6 +393,7 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.buy && (
           <MarketBuyContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
@@ -383,6 +402,7 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.sell && (
           <MarketSellContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
