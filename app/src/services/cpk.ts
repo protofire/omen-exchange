@@ -11,6 +11,7 @@ import {
   getContractAddress,
   getTargetSafeImplementation,
   getWrapToken,
+  networkIds,
   pseudoNativeAssetAddress,
   waitForBlockToSync,
 } from '../util/networks'
@@ -169,6 +170,15 @@ class CPKService {
     return transactionReceipt
   }
 
+  getGas = async (gas: number): Promise<number> => {
+    const deployed = await this.cpk.isProxyDeployed()
+    if (deployed) {
+      return gas
+    }
+    const addProxyDeploymentGas = 500000
+    return gas + addProxyDeploymentGas
+  }
+
   buyOutcomes = async ({
     amount,
     collateral,
@@ -186,7 +196,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
-        txOptions.gas = 500000
+        txOptions.gas = await this.getGas(500000)
       }
 
       let collateralAddress
@@ -284,7 +294,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
-        txOptions.gas = 1200000
+        txOptions.gas = await this.getGas(1200000)
       }
 
       let collateral
@@ -464,7 +474,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
-        txOptions.gas = 1500000
+        txOptions.gas = await this.getGas(1500000)
       }
 
       let collateral
@@ -623,7 +633,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp()) {
-        txOptions.gas = 500000
+        txOptions.gas = await this.getGas(500000)
       }
 
       const isAlreadyApprovedForMarketMaker = await conditionalTokens.isApprovedForAll(
@@ -673,7 +683,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
-        txOptions.gas = 500000
+        txOptions.gas = await this.getGas(500000)
       }
 
       let collateralAddress
@@ -770,7 +780,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp()) {
-        txOptions.gas = 500000
+        txOptions.gas = await this.getGas(500000)
       }
 
       // If we are signed in as a safe we don't need to transfer
@@ -827,7 +837,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp()) {
-        txOptions.gas = 500000
+        txOptions.gas = await this.getGas(500000)
       }
 
       if (!isConditionResolved) {
@@ -861,9 +871,12 @@ class CPKService {
   }
 
   proxyIsUpToDate = async (): Promise<boolean> => {
+    const network = await this.provider.getNetwork()
+    if (network.chainId === networkIds.XDAI) {
+      return true
+    }
     const deployed = await this.cpk.isProxyDeployed()
     if (deployed) {
-      const network = await this.provider.getNetwork()
       const implementation = await this.proxy.masterCopy()
       if (implementation.toLowerCase() === getTargetSafeImplementation(network.chainId).toLowerCase()) {
         return true
