@@ -184,6 +184,7 @@ export const History_select: React.FC<Props> = ({
         const cpk = await CPKService.create(provider)
         const response: any[] = await Promise.all(
           fpmmTransactions.map(async item => {
+            console.log('inside')
             if (item.fpmmType === 'Liquidity') {
               const block: any = await marketMaker.getTransaction(item.transactionHash)
 
@@ -198,6 +199,7 @@ export const History_select: React.FC<Props> = ({
                   outcomes.length,
                   block.blockNumber,
                 ),
+                additionalShares: item.additionalSharesCost,
                 shares: await marketMaker.getBalanceInformationByBlock(cpk.address, outcomes.length, block.blockNumber),
                 collateralTokenAmount: new BigNumber(item.collateralTokenAmount),
               }

@@ -102,9 +102,13 @@ interface Result {
 }
 const wrangleResponse = (data: any, decimals: number) => {
   return data.map((trade: FpmmTradeData) => {
-    console.log('Additional shares', formatBigNumber(trade.additionalSharesCost, 18))
-    console.log('CollateralAmount', formatBigNumber(trade.collateralTokenAmount, 18))
-    console.log('trHash,', trade.transactionHash, '---', trade.transactionType)
+    if (trade.additionalSharesCost && trade.collateralTokenAmount) {
+      console.log('Additional shares', formatBigNumber(trade.additionalSharesCost, 18))
+      console.log('CollateralAmount', formatBigNumber(trade.collateralTokenAmount, 18))
+      console.log('trHash,', trade.transactionHash, '---', trade.transactionType)
+    } else {
+      console.log(trade, 'NUlls')
+    }
 
     return {
       id: trade.id,
