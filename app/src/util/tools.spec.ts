@@ -81,7 +81,6 @@ describe('tools', () => {
       ['0xb9c764114c5619a95d7f232594e3b8dddf95b9cf', 'b9c764114c5619a95d7f232594e3b8dddf95b9cf'],
     ]
     for (const [address, testCase] of testCases) {
-      console.log(address)
       it('should strip 0x', () => {
         const stripped = strip0x(address)
         expect(stripped).toBe(testCase)
