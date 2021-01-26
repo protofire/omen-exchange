@@ -1,11 +1,13 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useXdaiBridge } from '../../../../hooks/useXdaiBridge'
 import { formatBigNumber } from '../../../../util/tools'
+import { Button } from '../../../button/button'
 import { ButtonRound } from '../../../button/button_round'
+import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { XDaiStake } from '../../../common/icons/currencies/XDaiStake'
@@ -67,6 +69,11 @@ const TransferButton = styled(ButtonRound)`
   margin-top: 12px;
   width: 100%;
 `
+const ClaimButton = styled(Button)`
+  margin-top: 12px;
+  width: 100%;
+  font-weight: 500;
+`
 const PoweredByStakeWrapper = styled.div`
   display: flex;
 
@@ -90,17 +97,15 @@ export const XdaiBridgeTransfer = (props: Prop) => {
 
   const {
     claimLatestToken,
+    claimState,
     daiBalance,
-    fetchUnclaimedAssets,
-    state,
+    isClaimStateTransaction,
     transactionHash,
+    transactionStep,
     transferFunction,
+    unclaimedAmount,
     xDaiBalance,
   } = useXdaiBridge(amount)
-
-  useEffect(() => {
-    fetchUnclaimedAssets()
-  }, [])
 
   return (
     <>
@@ -154,13 +159,18 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           >
             Transfer
           </TransferButton>
-          <ButtonRound
-            onClick={() => {
-              claimLatestToken()
-            }}
-          >
-            Claim
-          </ButtonRound>
+          {claimState && networkId === 1 && (
+            <ClaimButton
+              buttonType={ButtonType.primary}
+              onClick={() => {
+                setTransferState(!transferState)
+                setAmount(unclaimedAmount)
+                claimLatestToken()
+              }}
+            >
+              Claim {formatBigNumber(unclaimedAmount, 18, 2)} DAI
+            </ClaimButton>
+          )}
           <PoweredByStakeWrapper>
             <XDaiStake />
             <StakeText>Powered by STAKE Bridge</StakeText>
@@ -169,8 +179,9 @@ export const XdaiBridgeTransfer = (props: Prop) => {
         {transferState && (
           <TransactionState
             amountToTransfer={amount}
+            isClaimTransaction={isClaimStateTransaction}
             network={networkId}
-            state={state}
+            state={transactionStep}
             transactionHash={transactionHash}
             transactionModalVisibility={setTransferState}
           />

@@ -915,7 +915,6 @@ class CPKService {
       const transaction = await xDaiService.generateSendTransaction(amount, contract)
 
       return transaction
-      // return this.provider.waitForTransaction(txObject.hash)
     } catch (e) {
       logger.error(`Error trying to send Dai to bridge address`, e.message)
       throw e
@@ -934,11 +933,10 @@ class CPKService {
   }
   fetchLatestUnclaimedTransactions = async () => {
     try {
-      console.log('WORLS')
       const xDaiService = new XdaiService(this.provider)
       const data = await xDaiService.fetchXdaiTransactionData()
 
-      return data[0]
+      return data
     } catch (e) {
       logger.error('Error fetching xDai subgraph data', e.message)
       throw e
@@ -950,8 +948,7 @@ class CPKService {
       const signatures = signaturesFormatted(message.signatures)
       const xDaiService = new XdaiService(this.provider)
       const contract = await xDaiService.generateXdaiBridgeContractInstance()
-      console.log(await contract)
-      await xDaiService.claimDaiTokens({ message: message.content, signatures: signatures }, contract)
+      return await xDaiService.claimDaiTokens({ message: message.content, signatures: signatures }, contract)
     } catch (e) {
       logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)
       throw e

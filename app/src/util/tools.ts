@@ -1,15 +1,6 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import Big from 'big.js'
-import ethers, {
-  BigNumber,
-  bigNumberify,
-  formatBytes32String,
-  formatUnits,
-  getAddress,
-  parseBytes32String,
-  parseUnits,
-  stripZeros,
-} from 'ethers/utils'
+import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
 import {
@@ -46,9 +37,7 @@ export const signatureToVRS = (rawSignature: string) => {
 }
 export const packSignatures = (array: any) => {
   const length = array.length.toString()
-  console.log(length)
 
-  console.log(length)
   const msgLength = length.length === 1 ? `0${length}` : length
   let v = ''
   let r = ''
@@ -61,7 +50,7 @@ export const packSignatures = (array: any) => {
   return `0x${msgLength}${v}${r}${s}`
 }
 
-export const signaturesFormatted = (signatures: [string]) => {
+export const signaturesFormatted = (signatures: string[]) => {
   return packSignatures(signatures.map(s => signatureToVRS(s)))
 }
 

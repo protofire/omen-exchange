@@ -14,6 +14,7 @@ interface Prop {
   amountToTransfer: BigNumber
   network: number
   transactionHash: string
+  isClaimTransaction: boolean
 }
 
 const MainWrapper = styled.div``
@@ -45,6 +46,7 @@ const TransactionLink = styled.a`
 `
 export const TransactionState = ({
   amountToTransfer,
+  isClaimTransaction,
   network,
   state,
   transactionHash,
@@ -69,9 +71,12 @@ export const TransactionState = ({
       </SvgWrapper>
 
       <BoldedText>
-        Transfer {formatBigNumber(amountToTransfer, 18)} {network === 1 ? 'DAI' : 'XDAI'}
+        {isClaimTransaction ? 'Claim' : 'Transfer'} {formatBigNumber(amountToTransfer, 18)}{' '}
+        {network === 1 ? 'DAI' : 'XDAI'}
       </BoldedText>
-      <ChainText>to {network === 1 ? 'xDai Chain' : 'Mainnet'}</ChainText>
+      <ChainText>
+        {isClaimTransaction ? 'from' : 'to'} {network === 1 ? 'xDai Chain' : 'Mainnet'}
+      </ChainText>
 
       {state === State.waitingConfirmation ? (
         <TransactionText>Waiting confirmation</TransactionText>

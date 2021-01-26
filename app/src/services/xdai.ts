@@ -1,16 +1,15 @@
 import axios from 'axios'
 import { Contract, ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
-import gql from 'graphql-tag'
 
 import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   DEFAULT_TOKEN_ADDRESS,
+  INFURA_PROJECT_ID,
   XDAI_FOREIGN_BRIDGE,
   XDAI_HOME_BRIDGE,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
-import { getKlerosCurateGraphUris } from '../util/networks'
 
 import { ERC20Service } from './erc20'
 
@@ -79,22 +78,50 @@ class XdaiService {
   }
   claimDaiTokens = async (functionData: any, contract: any) => {
     try {
-      console.log('INSSDIEISDSD')
-
-      console.log(functionData)
       const transaction = await contract.executeSignatures(functionData.message, functionData.signatures)
 
       return transaction
     } catch (e) {
-      console.log(e)
       throw new Error('Failed at generating transaction!')
+    }
+  }
+  fetchCrossChainBalance = async (chain: string) => {
+    try {
+      //backup xDai url https://dai.poa.network/
+      const userAddress = await this.provider.getSigner().getAddress()
+
+      const response = await axios.post(
+        chain === 'xDai' ? 'https://xdai-archive.blockscout.com/' : `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+        {
+          jsonrpc: '2.0',
+          id: +new Date(),
+          method: chain === 'xDai' ? 'eth_getBalance' : 'eth_call',
+          params: [
+            chain === 'xDai'
+              ? userAddress
+              : {
+                  data: ERC20Service.encodedBalanceOf(userAddress),
+                  to: DEFAULT_TOKEN_ADDRESS,
+                },
+            'latest',
+          ],
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+      return response.data.result
+    } catch (e) {
+      throw new Error(`Error while fetching cross chain balance ${e}`)
     }
   }
   fetchXdaiTransactionData = async () => {
     try {
       const queryForeign = `
         query GetTransactions($address: String!) {
-          executions(orderBy:timestamp,orderDirection:desc,where:{recipient: $address}) {
+          executions(first:100,orderBy:timestamp,orderDirection:desc,where:{recipient: $address}) {
             transactionHash
             value
           }
@@ -102,11 +129,10 @@ class XdaiService {
         `
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
-      console.log(account)
 
       const query = `
           query Requests($address: String) {
-              requests(orderBy:timestamp,orderDirection:desc,where:{sender: $address}) {
+              requests(first:100,orderBy:timestamp,orderDirection:desc,where:{sender: $address}) {
                   transactionHash
                   recipient
                   timestamp
@@ -120,7 +146,6 @@ class XdaiService {
           }`
       const variables = { address: account }
 
-      console.log('inside')
       const xDaiRequests = await axios.post(XDAI_HOME_BRIDGE, { query, variables })
       const xDaiExecutions = await axios.post(XDAI_FOREIGN_BRIDGE, { query: queryForeign, variables })
 
@@ -130,10 +155,10 @@ class XdaiService {
       const results = requestsArray.filter(
         ({ transactionHash: id1 }: any) => !executionsArray.some(({ transactionHash: id2 }: any) => id2 === id1),
       )
-      // return results[0]
-      return results
+
+      return results[0]
     } catch (e) {
-      console.log(e)
+      console.error(e)
     }
   }
 }
