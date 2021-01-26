@@ -41,7 +41,7 @@ interface Props {
   asset: Token
 }
 
-export const EthBalance: React.FC<Props> = props => {
+export const AssetBalance: React.FC<Props> = props => {
   const { asset, value = '0.00', ...restProps } = props
 
   return (
