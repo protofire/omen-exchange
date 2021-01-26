@@ -45,13 +45,13 @@ const logger = getLogger('Scalar Market::Sell')
 
 interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
-  fetchGraphMarketTradeData: () => Promise<void>
+  fetchGraphMarketUserTxData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 export const ScalarMarketSell = (props: Props) => {
-  const { fetchGraphMarketMakerData, fetchGraphMarketTradeData, marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const { library: provider } = context
 
@@ -172,7 +172,7 @@ export const ScalarMarketSell = (props: Props) => {
         outcomeIndex,
       })
 
-      await fetchGraphMarketTradeData()
+      await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
 
       setAmountShares(null)

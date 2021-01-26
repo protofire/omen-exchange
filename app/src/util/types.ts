@@ -421,6 +421,11 @@ export type TradeObject = {
   outcomeIndex: string
 }
 
+export type LiquidityObject = {
+  type: string
+  additionalSharesCost: BigNumber
+}
+
 export type MarketCondition = {
   oracle: Maybe<string>
   scalarHigh: Maybe<BigNumber>

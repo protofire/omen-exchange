@@ -68,13 +68,13 @@ interface Props {
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
-  fetchGraphMarketTradeData: () => Promise<void>
+  fetchGraphMarketUserTxData: () => Promise<void>
 }
 
 const logger = getLogger('Scalar Market::Fund')
 
 export const ScalarMarketPoolLiquidity = (props: Props) => {
-  const { fetchGraphMarketMakerData, fetchGraphMarketTradeData, marketMakerData } = props
+  const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData } = props
   const {
     address: marketMakerAddress,
     balances,
@@ -218,7 +218,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         marketMaker,
       })
 
-      await fetchGraphMarketTradeData()
+      await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
       await fetchCollateralBalance()
@@ -262,7 +262,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         sharesToBurn: amountToRemove || Zero,
       })
 
-      await fetchGraphMarketTradeData()
+      await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
       await fetchCollateralBalance()
