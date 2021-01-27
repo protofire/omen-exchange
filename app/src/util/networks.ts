@@ -438,6 +438,9 @@ export const getTokensByNetwork = (networkId: number): Token[] => {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
 
+  const wrapTokenAddress = getWrapToken(networkId).address
+  const nativeAsset = getNativeAsset(networkId)
+
   return Object.values(knownTokens)
     .sort((a, b) => (a.order > b.order ? 1 : -1))
     .map(token => {
@@ -446,7 +449,7 @@ export const getTokensByNetwork = (networkId: number): Token[] => {
         return {
           symbol: token.symbol,
           decimals: token.decimals,
-          image: getImageUrl(address),
+          image: address === wrapTokenAddress ? nativeAsset.image : getImageUrl(address),
           address,
         }
       }
