@@ -26,6 +26,7 @@ const liquidityQuery = gql`
     fpmmLiquidities(where: { fpmm: $marketAddress, funder: $cpkAddress }) {
       type
       additionalSharesCost
+      outcomeTokenAmounts
     }
   }
 `
@@ -44,6 +45,7 @@ type GraphResponseTradeObject = {
 type GraphResponseLiquidityObject = {
   type: string
   additionalSharesCost: string
+  outcomeTokenAmounts: string[]
 }
 
 type TradeGraphResponse = {
@@ -86,6 +88,7 @@ const wrangleLiquidityResponse = (data: GraphResponseLiquidityObject[]) => {
     return {
       type: datum.type,
       additionalSharesCost: bigNumberify(datum.additionalSharesCost),
+      outcomeTokenAmounts: datum.outcomeTokenAmounts.map(bigNumberify),
     }
   })
 

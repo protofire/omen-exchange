@@ -4,7 +4,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
-import { BalanceItem, Status, Token, TradeObject } from '../../../../util/types'
+import { BalanceItem, LiquidityObject, Status, Token, TradeObject } from '../../../../util/types'
 import { IconInfo } from '../../../common/tooltip/img/IconInfo'
 import { Circle } from '../../common/common_styled'
 import { PositionTable } from '../position_table'
@@ -279,6 +279,7 @@ interface Props {
   amount?: Maybe<BigNumber>
   positionTable?: Maybe<boolean>
   trades?: Maybe<TradeObject[]>
+  liquidityTxs?: Maybe<LiquidityObject[]>
   status?: Maybe<Status>
   balances?: Maybe<BalanceItem[]>
   fee?: Maybe<BigNumber>
@@ -293,6 +294,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     collateral,
     currentPrediction,
     fee,
+    liquidityTxs,
     long,
     lowerBound,
     newPrediction,
@@ -359,6 +361,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [longPayout, setLongPayout] = useState(0)
   const [totalShortPrice, setTotalShortPrice] = useState<number>(0)
   const [totalLongPrice, setTotalLongPrice] = useState<number>(0)
+
+  console.log(liquidityTxs)
 
   useEffect(() => {
     if (trades && trades.length && collateral) {

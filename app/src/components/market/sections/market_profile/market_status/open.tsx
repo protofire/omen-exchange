@@ -264,9 +264,6 @@ const Wrapper = (props: Props) => {
     cpk?.address.toLowerCase(),
   )
 
-  console.log(trades)
-  console.log(liquidityTxs)
-
   useEffect(() => {
     if ((isQuestionFinalized || !isFinalizing) && currentTab === MarketDetailsTab.finalize) {
       setCurrentTab(MarketDetailsTab.swap)
@@ -295,6 +292,7 @@ const Wrapper = (props: Props) => {
                   collateral={collateral}
                   currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
                   fee={fee}
+                  liquidityTxs={liquidityTxs}
                   lowerBound={scalarLow || new BigNumber(0)}
                   positionTable={true}
                   startingPointTitle={'Current prediction'}
