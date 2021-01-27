@@ -116,7 +116,7 @@ export enum OutcomeTableValue {
   Payout = 'Payout',
   Outcome = 'Outcome',
   Probability = 'Probability',
-  Bonded = 'Bonded (ETH)',
+  Bonded = 'Bonded',
 }
 
 export enum PositionTableValue {
