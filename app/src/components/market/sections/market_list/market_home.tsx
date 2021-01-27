@@ -28,6 +28,7 @@ import { InlineLoading } from '../../../loading'
 import { AdvancedFilters } from '../../common/advanced_filters'
 import { ListCard } from '../../common/list_card'
 import { ListItem } from '../../common/list_item'
+import { MyMarketFilters } from '../../common/my_market_filters'
 import { Search } from '../../common/search'
 
 const TopContents = styled.div`
@@ -570,33 +571,37 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       </Actions>
       <ListCard>
         <TopContents>
-          <FiltersWrapper>
-            <FiltersLeftWrapper>
-              <ButtonFilterStyled active={showAdvancedFilters} onClick={toggleFilters}>
-                {advancedFilterSelectedCount > 0 ? (
-                  <FilterBadgeLabel>{advancedFilterSelectedCount}</FilterBadgeLabel>
-                ) : (
-                  <IconFilter />
-                )}
-                <span>Filters</span>
-              </ButtonFilterStyled>
-              <ButtonSearchStyled active={showSearch} onClick={toggleSearch}>
-                <IconSearch />
-              </ButtonSearchStyled>
-            </FiltersLeftWrapper>
-            <FiltersControls>
-              <SortDropdown
-                currentItem={
-                  fetchMyMarkets
-                    ? myMarketsSortOptions.findIndex(i => i.sortBy === sortBy)
-                    : sortOptions.findIndex(i => i.sortBy === sortBy)
-                }
-                dirty={true}
-                dropdownPosition={DropdownPosition.center}
-                items={fetchMyMarkets ? myMarketsSortItems : sortItems}
-              />
-            </FiltersControls>
-          </FiltersWrapper>
+          {!fetchMyMarkets ? (
+            <FiltersWrapper>
+              <FiltersLeftWrapper>
+                <ButtonFilterStyled active={showAdvancedFilters} onClick={toggleFilters}>
+                  {advancedFilterSelectedCount > 0 ? (
+                    <FilterBadgeLabel>{advancedFilterSelectedCount}</FilterBadgeLabel>
+                  ) : (
+                    <IconFilter />
+                  )}
+                  <span>Filters</span>
+                </ButtonFilterStyled>
+                <ButtonSearchStyled active={showSearch} onClick={toggleSearch}>
+                  <IconSearch />
+                </ButtonSearchStyled>
+              </FiltersLeftWrapper>
+              <FiltersControls>
+                <SortDropdown
+                  currentItem={
+                    fetchMyMarkets
+                      ? myMarketsSortOptions.findIndex(i => i.sortBy === sortBy)
+                      : sortOptions.findIndex(i => i.sortBy === sortBy)
+                  }
+                  dirty={true}
+                  dropdownPosition={DropdownPosition.center}
+                  items={fetchMyMarkets ? myMarketsSortItems : sortItems}
+                />
+              </FiltersControls>
+            </FiltersWrapper>
+          ) : (
+            <MyMarketFilters />
+          )}
         </TopContents>
         {showSearch && <Search onChange={setTitle} value={title} />}
         {showAdvancedFilters && (
