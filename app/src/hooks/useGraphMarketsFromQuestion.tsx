@@ -60,6 +60,6 @@ export const useGraphMarketsFromQuestion = (questionId: string): Result => {
 
   return {
     markets,
-    status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
+    status: error ? Status.Error : loading ? Status.Loading : data ? Status.Ready : Status.Loading,
   }
 }

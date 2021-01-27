@@ -203,6 +203,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
   const fetchData = useCallback(async () => {
     try {
+      setStatus(Status.Loading)
       await doFetchData()
     } catch (e) {
       logger.error(e.message)
