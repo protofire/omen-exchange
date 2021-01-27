@@ -423,7 +423,7 @@ export const isScalarMarket = (oracle: string, networkId: number): boolean => {
   const realitioScalarAdapter = getContractAddress(networkId, 'realitioScalarAdapter')
 
   let isScalar = false
-  if (oracle === realitioScalarAdapter) {
+  if (oracle === realitioScalarAdapter.toLowerCase()) {
     isScalar = true
   }
 
