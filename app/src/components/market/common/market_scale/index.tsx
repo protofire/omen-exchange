@@ -1,4 +1,5 @@
-import { BigNumber } from 'ethers/utils'
+import { Zero } from 'ethers/constants'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -362,34 +363,21 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [totalShortPrice, setTotalShortPrice] = useState<number>(0)
   const [totalLongPrice, setTotalLongPrice] = useState<number>(0)
 
-  console.log(liquidityTxs)
-
   useEffect(() => {
     if (trades && trades.length && collateral) {
       const shortTrades = trades.filter(trade => trade.outcomeIndex === '0')
-      setTotalShortPrice(
-        shortTrades.length
-          ? shortTrades
-              .map(trade =>
-                trade.type === 'Buy'
-                  ? Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals))
-                  : Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals)) * -1,
-              )
-              .reduce((a, b) => a + b)
-          : 0,
-      )
+      const totalShortTradesCost = shortTrades.length
+        ? shortTrades
+            .map(trade => (trade.type === 'Buy' ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
+            .reduce((a, b) => a.add(b))
+        : 0
+
       const longTrades = trades.filter(trade => trade.outcomeIndex === '1')
-      setTotalLongPrice(
-        longTrades.length
-          ? longTrades
-              .map(trade =>
-                trade.type === 'Buy'
-                  ? Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals))
-                  : Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals)) * -1,
-              )
-              .reduce((a, b) => a + b)
-          : 0,
-      )
+      const totalLongTradesCost = longTrades.length
+        ? longTrades
+            .map(trade => (trade.type === 'Buy' ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
+            .reduce((a, b) => a.add(b))
+        : 0
     }
   }, [trades, collateral])
 
