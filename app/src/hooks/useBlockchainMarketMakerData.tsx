@@ -93,6 +93,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
   const doFetchData = useCallback(async () => {
     if (!graphMarketMakerData) {
+      setStatus(Status.Error)
       return
     }
 
