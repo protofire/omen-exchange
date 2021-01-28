@@ -13,6 +13,7 @@ import {
   useCpkAllowance,
   useCpkProxy,
   useFundingBalance,
+  useSymbol,
 } from '../../../../hooks'
 import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
@@ -182,6 +183,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }
   const [displayCollateral, setDisplayCollateral] = useState<Token>(initialDisplayCollateral)
   const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
+  const symbol = useSymbol(displayCollateral)
+
   const [amountToFund, setAmountToFund] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
   const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
@@ -332,10 +335,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       displayDepositedTokensTotal,
     )
   }
-  let symbol = collateral.address === pseudoNativeAssetAddress ? wrapToken.symbol : collateral.symbol
-  if (displayCollateral && displayCollateral.symbol) {
-    symbol = displayCollateral.symbol
-  }
+
   const addFunding = async () => {
     setModalTitle('Deposit Funds')
 
@@ -468,7 +468,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : amountToFund?.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${walletBalance} ${symbol}`
+      ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
       : null
 
   const sharesAmountError =

@@ -3,10 +3,11 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
+import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
 import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
-import { getContractAddress, getNativeAsset, getToken } from './networks'
+import { getContractAddress, getNativeAsset, getToken, getWrapToken } from './networks'
 import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token } from './types'
 
 const logger = getLogger('Tools')
@@ -557,4 +558,37 @@ export const getUnit = (title: string): string => {
   const splitTitle = title.split('[')
   const unit = splitTitle[splitTitle.length - 1].split(']')[0]
   return unit
+}
+
+export const getMarketRelatedQuestionFilter = (
+  marketsRelatedQuestion: MarketTokenPair[],
+  networkId: number,
+): string[] => {
+  const nativeAssetAddress = getNativeAsset(networkId).address.toLowerCase()
+  const wrapTokenAddress = getWrapToken(networkId).address.toLowerCase()
+  return marketsRelatedQuestion.map(({ collateralToken }) =>
+    collateralToken.toLowerCase() === wrapTokenAddress ? nativeAssetAddress : collateralToken,
+  )
+}
+
+export const onChangeMarketCurrency = (
+  marketsRelatedQuestion: MarketTokenPair[],
+  currency: Token | null,
+  collateral: Token,
+  networkId: number,
+  // @ts-expect-error ignore
+  history,
+) => {
+  if (currency) {
+    const nativeAssetAddress = getNativeAsset(networkId).address.toLowerCase()
+    const wrapTokenAddress = getWrapToken(networkId).address.toLowerCase()
+    const selectedMarket = marketsRelatedQuestion.find(element => {
+      const collateralToken =
+        element.collateralToken.toLowerCase() === wrapTokenAddress ? nativeAssetAddress : element.collateralToken
+      return collateralToken.toLowerCase() === currency.address.toLowerCase()
+    })
+    if (selectedMarket && selectedMarket.collateralToken.toLowerCase() !== collateral.address.toLowerCase()) {
+      history.replace(`/${selectedMarket.id}`)
+    }
+  }
 }

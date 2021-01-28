@@ -15,6 +15,7 @@ import {
   useContracts,
   useCpkAllowance,
   useCpkProxy,
+  useSymbol,
 } from '../../../../hooks'
 import { CompoundService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -127,6 +128,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       displayBalances = getPricesInCToken(displayBalances, compoundService, baseCollateral)
     }
   }
+
+  const symbol = useSymbol(displayCollateral)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
@@ -317,15 +320,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     displayTradedShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedShares)
   }
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
-  const feeFormatted = `${formatNumber(formatBigNumber(displayFeePaid.mul(-1), displayCollateral.decimals))} ${
-    displayCollateral.symbol
-  }`
-  const baseCostFormatted = `${formatNumber(formatBigNumber(displayBaseCost || Zero, displayCollateral.decimals))} ${
-    displayCollateral.symbol
-  }`
+  const feeFormatted = `${formatNumber(formatBigNumber(displayFeePaid.mul(-1), displayCollateral.decimals))} ${symbol}`
+  const baseCostFormatted = `${formatNumber(formatBigNumber(displayBaseCost || Zero, displayCollateral.decimals))}
+    ${symbol}`
   const potentialProfitFormatted = `${formatNumber(
     formatBigNumber(displayPotentialProfit, displayCollateral.decimals),
-  )} ${displayCollateral.symbol}`
+  )} ${symbol}`
   const sharesTotal = formatNumber(formatBigNumber(displayTradedShares, baseCollateral.decimals))
   const total = `${sharesTotal} Shares`
 
@@ -335,7 +335,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       : maybeCollateralBalance.isZero() && amount?.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : amount?.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
+      ? `Value must be less than or equal to ${currentBalance} ${symbol}`
       : null
 
   const isBuyDisabled =

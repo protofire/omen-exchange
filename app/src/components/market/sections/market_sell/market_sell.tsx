@@ -5,7 +5,13 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useAsyncDerivedValue, useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import {
+  useAsyncDerivedValue,
+  useConnectedCPKContext,
+  useConnectedWeb3Context,
+  useContracts,
+  useSymbol,
+} from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
@@ -94,9 +100,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { compoundService, fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
-  const collateralSymbol = collateral.symbol.toLowerCase()
-  let currencySelect = <span />
-
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
     const shares = parseInt(formatBigNumber(balances[i].shares, collateral.decimals))
@@ -121,7 +124,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const baseCollateral = getInitialCollateral(collateral, networkId)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
-
+  const collateralSymbol = collateral.symbol.toLowerCase()
+  let currencySelect = <span />
+  const symbol = useSymbol(displayCollateral)
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])
@@ -418,9 +423,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Profit'}
               value={
                 potentialValueNormalized
-                  ? `${formatNumber(formatBigNumber(potentialValueNormalized, displayCollateral.decimals, 2))} ${
-                      displayCollateral.symbol
-                    }`
+                  ? `${formatNumber(formatBigNumber(potentialValueNormalized, displayCollateral.decimals, 2))} 
+                  ${symbol}`
                   : '0.00'
               }
             />
@@ -430,7 +434,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 costFeeNormalized
                   ? formatNumber(formatBigNumber(costFeeNormalized.mul(-1), displayCollateral.decimals, 2))
                   : '0.00'
-              } ${displayCollateral.symbol}`}
+              } ${symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
@@ -448,7 +452,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 normalizedTradedCollateral
                   ? formatNumber(formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, 2))
                   : '0.00'
-              } ${displayCollateral.symbol}`}
+              } ${symbol}`}
             />
           </TransactionDetailsCard>
         </div>

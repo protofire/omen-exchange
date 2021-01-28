@@ -4,7 +4,7 @@ import momentTZ from 'moment-timezone'
 import React, { DOMAttributes, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
+import { useConnectedWeb3Context, useSymbol, useTokens } from '../../../../hooks'
 import { CompoundService } from '../../../../services'
 import { getNativeAsset, getToken } from '../../../../util/networks'
 import { formatBigNumber, formatDate, formatToShortNumber, getBaseTokenForCToken } from '../../../../util/tools'
@@ -92,7 +92,6 @@ export const MarketData: React.FC<Props> = props => {
 
   const context = useConnectedWeb3Context()
   const { tokens } = useTokens(context)
-
   const [currencyIcon, setCurrencyIcon] = useState<string | undefined>('')
   const [showUTC, setShowUTC] = useState<boolean>(true)
   const [show24H, setShow24H] = useState<boolean>(false)
@@ -136,12 +135,12 @@ export const MarketData: React.FC<Props> = props => {
     const baseDailyVolumeValue = compoundService.calculateCTokenToBaseExchange(baseCurrency, dailyVolumeValue)
     displayDailyVolume = formatBigNumber(baseDailyVolumeValue, baseCurrency.decimals)
   }
-
+  const symbol = useSymbol(baseCurrency)
   return (
     <MarketDataWrapper>
       <MarketDataItem>
         <MarketDataItemTop>
-          {formatToShortNumber(displayLiquidity)} {baseCurrency.symbol}
+          {formatToShortNumber(displayLiquidity)} {symbol}
         </MarketDataItemTop>
         <MarketDataItemBottom>Liquidity</MarketDataItemBottom>
       </MarketDataItem>
@@ -149,7 +148,7 @@ export const MarketData: React.FC<Props> = props => {
         <MarketDataItemTop>
           <MarketDataItemImage src={currencyIcon && currencyIcon}></MarketDataItemImage>
           {show24H ? formatToShortNumber(displayDailyVolume) : formatToShortNumber(displayTotalVolume)}
-          &nbsp;{baseCurrency.symbol}
+          &nbsp;{symbol}
         </MarketDataItemTop>
         <TextToggle
           alternativeLabel="24h Volume"

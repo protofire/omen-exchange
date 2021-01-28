@@ -3,9 +3,9 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
 import { getOutcomeColor } from '../../../../theme/utils'
-import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { getNativeAsset, getToken } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, getBaseTokenForCToken, mulBN } from '../../../../util/tools'
 import {
   BalanceItem,
@@ -111,7 +111,7 @@ export const OutcomeTable = (props: Props) => {
     showSharesChange = false,
     newBonds,
   } = props
-
+  const context = useConnectedWeb3Context()
   let winningBondIndex = -1
   bonds.forEach((bond, bondIndex) => {
     if ((winningBondIndex === -1 || bonds[winningBondIndex].bondedEth.lt(bond.bondedEth)) && bond.bondedEth.gt(0)) {
@@ -132,13 +132,8 @@ export const OutcomeTable = (props: Props) => {
 
   const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right', 'right']
 
-  const context = useConnectedWeb3Context()
-  const nativeAsset = getNativeAsset(context.networkId)
-  const wrapSymbol = getWrapToken(context.networkId).symbol
-  let symbol = collateral.address === pseudoNativeAssetAddress ? wrapSymbol : collateral.symbol
-  if (displayCollateral.symbol) {
-    symbol = displayCollateral.symbol
-  }
+  const symbol = useSymbol(displayCollateral)
+
   const renderTableHeader = () => {
     return (
       <THead>
@@ -152,7 +147,7 @@ export const OutcomeTable = (props: Props) => {
                 textAlign={TableCellsAlign[index]}
               >
                 {value} {value === OutcomeTableValue.CurrentPrice && `(${symbol})`}
-                {value === OutcomeTableValue.Bonded && `(${nativeAsset.symbol})`}
+                {value === OutcomeTableValue.Bonded && `(${symbol})`}
               </THStyled>
             ) : null
           })}
