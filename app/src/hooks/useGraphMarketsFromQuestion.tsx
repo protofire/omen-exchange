@@ -16,7 +16,7 @@ const query = gql`
   }
 `
 
-type MarketTokenPair = {
+export type MarketTokenPair = {
   id: string
   collateralToken: string
 }
