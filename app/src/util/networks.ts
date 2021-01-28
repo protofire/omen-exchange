@@ -199,7 +199,7 @@ const networks: { [K in NetworkId]: Network } = {
   },
   [networkIds.XDAI]: {
     label: 'xDai',
-    url: 'https://rpc.xdaichain.com/',
+    url: 'https://lively-empty-wind.xdai.quiknode.pro/827b90b45d544848ea8a880d30567297d3c9ef6e/',
     graphHttpUri: GRAPH_XDAI_HTTP,
     graphWsUri: GRAPH_XDAI_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,

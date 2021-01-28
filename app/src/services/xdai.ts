@@ -5,11 +5,11 @@ import { BigNumber } from 'ethers/utils'
 import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   DEFAULT_TOKEN_ADDRESS,
-  INFURA_PROJECT_ID,
   XDAI_FOREIGN_BRIDGE,
   XDAI_HOME_BRIDGE,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
+import { getInfuraUrl } from '../util/networks'
 
 import { ERC20Service } from './erc20'
 
@@ -85,19 +85,18 @@ class XdaiService {
       throw new Error('Failed at generating transaction!')
     }
   }
-  fetchCrossChainBalance = async (chain: string) => {
+  fetchCrossChainBalance = async (chain: number) => {
     try {
-      //backup xDai url https://dai.poa.network/
       const userAddress = await this.provider.getSigner().getAddress()
 
       const response = await axios.post(
-        chain === 'xDai' ? 'https://xdai-archive.blockscout.com/' : `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+        getInfuraUrl(chain),
         {
           jsonrpc: '2.0',
           id: +new Date(),
-          method: chain === 'xDai' ? 'eth_getBalance' : 'eth_call',
+          method: chain === 100 ? 'eth_getBalance' : 'eth_call',
           params: [
-            chain === 'xDai'
+            chain === 100
               ? userAddress
               : {
                   data: ERC20Service.encodedBalanceOf(userAddress),
@@ -149,11 +148,11 @@ class XdaiService {
       const xDaiRequests = await axios.post(XDAI_HOME_BRIDGE, { query, variables })
       const xDaiExecutions = await axios.post(XDAI_FOREIGN_BRIDGE, { query: queryForeign, variables })
 
-      const requestsArray = xDaiRequests.data.data.requests
-      const executionsArray = xDaiExecutions.data.data.executions
+      const { requests } = xDaiRequests.data.data
+      const { executions } = xDaiExecutions.data.data
 
-      const results = requestsArray.filter(
-        ({ transactionHash: id1 }: any) => !executionsArray.some(({ transactionHash: id2 }: any) => id2 === id1),
+      const results = requests.filter(
+        ({ transactionHash: id1 }: any) => !executions.some(({ transactionHash: id2 }: any) => id2 === id1),
       )
 
       return results[0]

@@ -96,11 +96,11 @@ export const useXdaiBridge = (amount: BigNumber): Prop => {
     try {
       const xDaiService = new XdaiService(provider)
 
-      const responseXdai = await xDaiService.fetchCrossChainBalance('xDai')
+      const responseXdai = await xDaiService.fetchCrossChainBalance(100)
 
       setXdaiBalance(bigNumberify(responseXdai))
 
-      const responseDai = await xDaiService.fetchCrossChainBalance('Mainnet')
+      const responseDai = await xDaiService.fetchCrossChainBalance(1)
 
       setDaiBalance(bigNumberify(responseDai))
     } catch (error) {
