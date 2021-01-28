@@ -221,7 +221,13 @@ export const ImportMarketContent = (props: Props) => {
   }
 
   const validContent =
-    !!state.questionURL && !!question && !errorMessage && !!marketId && !!marketMakerData && !state.loading
+    !!state.questionURL &&
+    !!question &&
+    !errorMessage &&
+    !!marketId &&
+    !!marketMakerData &&
+    !state.loading &&
+    status !== 'Loading'
 
   const questionDetails = () => {
     return (
@@ -341,7 +347,7 @@ export const ImportMarketContent = (props: Props) => {
 
     return (
       <EmptyWrapper>
-        {!state.questionURL && (
+        {!state.questionURL ? (
           <>
             <IconReality />
             <CommentLabel>
@@ -351,8 +357,9 @@ export const ImportMarketContent = (props: Props) => {
               </a>
             </CommentLabel>
           </>
-        )}
-        {(state.loading || status === 'Loading') && state.questionURL && (
+        ) : !state.loading && status === 'Ready' ? (
+          <CommentLabel>Market not found</CommentLabel>
+        ) : (
           <>
             <SpinnerStyled size="38" />
             <CommentLabel>
@@ -363,7 +370,6 @@ export const ImportMarketContent = (props: Props) => {
             </CommentLabel>
           </>
         )}
-        {!state.loading && status === 'Ready' && <CommentLabel>Market not found</CommentLabel>}
       </EmptyWrapper>
     )
   }
