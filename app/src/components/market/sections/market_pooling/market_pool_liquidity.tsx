@@ -263,7 +263,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
-
+      setAmountToFund(null)
+      setAmountToFundDisplay('')
       await cpk.addFunding({
         amount: amountToFund || Zero,
         collateral,
@@ -275,8 +276,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchCollateralBalance()
 
       setStatus(Status.Ready)
-      setAmountToFund(null)
-      setAmountToFundDisplay('')
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
     } catch (err) {
       setStatus(Status.Error)
@@ -300,7 +299,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
-
+      setAmountToRemove(null)
+      setAmountToRemoveDisplay('')
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
         collateralAddress,
@@ -316,8 +316,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchCollateralBalance()
 
       setStatus(Status.Ready)
-      setAmountToRemove(null)
-      setAmountToRemoveDisplay('')
       setMessage(`Successfully withdrew ${fundsAmount} ${symbol}`)
       setIsModalTransactionResultOpen(true)
     } catch (err) {
