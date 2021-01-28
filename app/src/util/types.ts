@@ -424,6 +424,7 @@ export type TradeObject = {
 export type LiquidityObject = {
   type: string
   additionalSharesCost: BigNumber
+  outcomeTokenAmounts: BigNumber[]
 }
 
 export type MarketCondition = {

@@ -378,8 +378,33 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             .map(trade => (trade.type === 'Buy' ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
             .reduce((a, b) => a.add(b))
         : 0
+
+      if (liquidityTxs && liquidityTxs.length) {
+        const addLiquidityTxs = liquidityTxs.filter(tx => tx.type === 'Add')
+        const removeLiquidityTxs = liquidityTxs.filter(tx => tx.type === 'Remove')
+
+        // More short shares provided so short shares are purchased
+        const addLiquidityShortPurchaseTxs = addLiquidityTxs.filter(tx =>
+          tx.outcomeTokenAmounts[0].lt(tx.outcomeTokenAmounts[1]),
+        )
+        // More long shares are removed so short shares are purchased
+        const totalShortLiquidityTxsCost = addLiquidityShortPurchaseTxs
+          .concat(removeLiquidityTxs.filter(tx => tx.outcomeTokenAmounts[0].gt(tx.outcomeTokenAmounts[1])))
+          .map(tx => tx.additionalSharesCost)
+          .reduce((a, b) => a.add(b))
+
+        // More long shares provided so long shares are purchased
+        const addLiquidityLongPurchaseTxs = addLiquidityTxs.filter(tx =>
+          tx.outcomeTokenAmounts[0].gt(tx.outcomeTokenAmounts[1]),
+        )
+        // More short shares are removed so long shares are purchased
+        const totalLongLiquidityTxsCost = addLiquidityLongPurchaseTxs
+          .concat(removeLiquidityTxs.filter(tx => tx.outcomeTokenAmounts[0].lt(tx.outcomeTokenAmounts[1])))
+          .map(tx => tx.additionalSharesCost)
+          .reduce((a, b) => a.add(b))
+      }
     }
-  }, [trades, collateral])
+  }, [trades, collateral, liquidityTxs])
 
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
