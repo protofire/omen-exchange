@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, formatUnits, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -364,6 +364,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [totalLongPrice, setTotalLongPrice] = useState<BigNumber>(new BigNumber(0))
   const [shortProfitAmount, setShortProfitAmount] = useState(0)
   const [longProfitAmount, setLongProfitAmount] = useState(0)
+  const [longProfitPercentage, setLongProfitPercentage] = useState(0)
+  const [shortProfitPercentage, setShortProfitPercentage] = useState(0)
 
   useEffect(() => {
     if (trades && trades.length && collateral) {
@@ -443,15 +445,23 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       setProfitLoss((amountSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - (amountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
-        setShortPayout((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
-        setShortProfitAmount(
-          shortPayout - Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals)),
+        const shortPayoutAmount = (shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100)
+        const shortProfit =
+          shortPayoutAmount - Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
+        setShortPayout(shortPayoutAmount)
+        setShortProfitAmount(shortProfit)
+        setShortProfitPercentage(
+          (shortProfit / shortPayoutAmount) * 100 < -100 ? -100 : (shortProfit / shortPayoutAmount) * 100,
         )
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
-        setLongPayout((longSharesNumber || 0) * (Number(scaleBall?.value) / 100))
-        setLongProfitAmount(
-          longPayout - Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals)),
+        const longPayoutAmount = (longSharesNumber || 0) * (Number(scaleBall?.value) / 100)
+        const longProfit =
+          longPayoutAmount - Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
+        setLongPayout(longPayoutAmount)
+        setLongProfitAmount(longProfit)
+        setLongProfitPercentage(
+          (longProfit / longPayoutAmount) * 100 < -100 ? -100 : (longProfit / longPayoutAmount) * 100,
         )
       }
     }
@@ -473,6 +483,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     totalShortPrice,
     amountSharesNumber,
     collateral,
+    longPayout,
+    shortPayout,
   ])
 
   const activateTooltip = () => {
@@ -671,7 +683,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           collateral={collateral}
           fee={fee}
           longPayout={longPayout}
+          longProfitLoss={longProfitAmount}
           shortPayout={shortPayout}
+          shortProfitLoss={shortProfitAmount}
         />
       )}
     </>
