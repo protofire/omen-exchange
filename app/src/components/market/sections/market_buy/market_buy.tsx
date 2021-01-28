@@ -259,7 +259,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Buying ${sharesAmount} shares ...`)
-
+      setAmount(null)
+      setAmountToDisplay('')
+      setDisplayAmountToFund(new BigNumber(0))
       await cpk.buyOutcomes({
         amount: inputAmount,
         collateral,
@@ -280,9 +282,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       What do you think?`),
       )
 
-      setAmount(null)
-      setAmountToDisplay('')
-      setDisplayAmountToFund(new BigNumber(0))
       setStatus(Status.Ready)
       setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {

@@ -357,12 +357,18 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       const displayFundsAmount = formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)
       setStatus(Status.Loading)
+<<<<<<< HEAD
       setMessage(`Depositing funds: ${displayFundsAmount} ${displayCollateral.symbol}...`)
 
       let useBaseToken = false
       if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
         useBaseToken = true
       }
+=======
+      setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
+      setAmountToFund(null)
+      setAmountToFundDisplay('')
+>>>>>>> 5dc0433c4229d1dfe9ddcd753950a539b39015bc
       await cpk.addFunding({
         amount: amountToFundNormalized || Zero,
         compoundService,
@@ -376,10 +382,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchCollateralBalance()
 
       setStatus(Status.Ready)
+<<<<<<< HEAD
       setAmountToFund(null)
       setAmountToFundDisplay('')
       setDisplayCollateralAmountToFund(new BigNumber(0))
       setMessage(`Successfully deposited ${displayFundsAmount} ${displayCollateral.symbol}`)
+=======
+      setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
+>>>>>>> 5dc0433c4229d1dfe9ddcd753950a539b39015bc
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to deposit funds.`)
@@ -411,6 +421,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         }
         amountToRemoveFromPool = compoundService.calculateBaseToCTokenExchange(baseCollateral, amountToRemoveNormalized)
       }
+      setAmountToRemove(null)
+      setAmountToRemoveDisplay('')
+      setWithdrawAmountToRemove(new BigNumber('0'))
       await cpk.removeFunding({
         amountToMerge: normalizedAmountToMerge,
         collateralAddress,
@@ -428,9 +441,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchCollateralBalance()
 
       setStatus(Status.Ready)
-      setAmountToRemove(null)
-      setAmountToRemoveDisplay('')
-      setWithdrawAmountToRemove(new BigNumber('0'))
+
       setMessage(`Successfully withdrew ${fundsAmount} ${symbol}`)
       setIsModalTransactionResultOpen(true)
     } catch (err) {

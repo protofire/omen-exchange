@@ -285,6 +285,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
         useBaseToken = true
       }
+      setMessage(`Selling ${sharesAmount} shares...`)
+      setAmountShares(null)
+      setAmountSharesToDisplay('')
+      setDisplaySellShares(new BigNumber('0'))
+
       await cpk.sellOutcomes({
         amount: tradedCollateral,
         compoundService,
@@ -295,9 +300,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       })
 
       await fetchGraphMarketMakerData()
-      setAmountShares(null)
-      setAmountSharesToDisplay('')
-      setDisplaySellShares(new BigNumber('0'))
+
       setStatus(Status.Ready)
       setMessage(`Successfully sold ${displaySharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
