@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { BigNumber, formatUnits, parseUnits } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -360,8 +360,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [profitLoss, setProfitLoss] = useState(0)
   const [shortPayout, setShortPayout] = useState(0)
   const [longPayout, setLongPayout] = useState(0)
-  const [totalShortPrice, setTotalShortPrice] = useState<number>(0)
-  const [totalLongPrice, setTotalLongPrice] = useState<number>(0)
+  const [totalShortPrice, setTotalShortPrice] = useState<BigNumber>(new BigNumber(0))
+  const [totalLongPrice, setTotalLongPrice] = useState<BigNumber>(new BigNumber(0))
+  const [shortProfitAmount, setShortProfitAmount] = useState(0)
+  const [longProfitAmount, setLongProfitAmount] = useState(0)
 
   useEffect(() => {
     if (trades && trades.length && collateral) {
@@ -370,15 +372,17 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         ? shortTrades
             .map(trade => (trade.type === 'Buy' ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
             .reduce((a, b) => a.add(b))
-        : 0
+        : new BigNumber(0)
 
       const longTrades = trades.filter(trade => trade.outcomeIndex === '1')
       const totalLongTradesCost = longTrades.length
         ? longTrades
             .map(trade => (trade.type === 'Buy' ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
             .reduce((a, b) => a.add(b))
-        : 0
+        : new BigNumber(0)
 
+      let totalShortLiquidityTxsCost = new BigNumber(0)
+      let totalLongLiquidityTxsCost = new BigNumber(0)
       if (liquidityTxs && liquidityTxs.length) {
         const addLiquidityTxs = liquidityTxs.filter(tx => tx.type === 'Add')
         const removeLiquidityTxs = liquidityTxs.filter(tx => tx.type === 'Remove')
@@ -388,7 +392,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           tx.outcomeTokenAmounts[0].lt(tx.outcomeTokenAmounts[1]),
         )
         // More long shares are removed so short shares are purchased
-        const totalShortLiquidityTxsCost = addLiquidityShortPurchaseTxs
+        totalShortLiquidityTxsCost = addLiquidityShortPurchaseTxs
           .concat(removeLiquidityTxs.filter(tx => tx.outcomeTokenAmounts[0].gt(tx.outcomeTokenAmounts[1])))
           .map(tx => tx.additionalSharesCost)
           .reduce((a, b) => a.add(b))
@@ -398,11 +402,14 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           tx.outcomeTokenAmounts[0].gt(tx.outcomeTokenAmounts[1]),
         )
         // More short shares are removed so long shares are purchased
-        const totalLongLiquidityTxsCost = addLiquidityLongPurchaseTxs
+        totalLongLiquidityTxsCost = addLiquidityLongPurchaseTxs
           .concat(removeLiquidityTxs.filter(tx => tx.outcomeTokenAmounts[0].lt(tx.outcomeTokenAmounts[1])))
           .map(tx => tx.additionalSharesCost)
           .reduce((a, b) => a.add(b))
       }
+
+      setTotalShortPrice(totalShortTradesCost.add(totalShortLiquidityTxsCost))
+      setTotalLongPrice(totalLongTradesCost.add(totalLongLiquidityTxsCost))
     }
   }, [trades, collateral, liquidityTxs])
 
@@ -437,9 +444,15 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
         setShortPayout((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
+        setShortProfitAmount(
+          shortPayout - Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals)),
+        )
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
         setLongPayout((longSharesNumber || 0) * (Number(scaleBall?.value) / 100))
+        setLongProfitAmount(
+          longPayout - Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals)),
+        )
       }
     }
   }, [
