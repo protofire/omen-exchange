@@ -35,10 +35,12 @@ interface Props {
   fee: BigNumber | null | undefined
   longPayout: number
   shortPayout: number
+  longProfitLoss: number
+  shortProfitLoss: number
 }
 
 export const PositionTable = (props: Props) => {
-  const { balances, collateral, longPayout, shortPayout } = props
+  const { balances, collateral, longPayout, longProfitLoss, shortPayout, shortProfitLoss } = props
 
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
@@ -49,9 +51,10 @@ export const PositionTable = (props: Props) => {
     PositionTableValue.YourPosition,
     PositionTableValue.Shares,
     PositionTableValue.Payout,
+    PositionTableValue.ProfitLoss,
   ]
 
-  const TableCellsAlign = ['left', 'right', 'right']
+  const TableCellsAlign = ['left', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
     return (
@@ -85,6 +88,9 @@ export const PositionTable = (props: Props) => {
         </ColoredTDStyled>
         <ColoredTDStyled textAlign={TableCellsAlign[2]}>
           {index === 0 ? formatNumber(shortPayout.toString()) : formatNumber(longPayout.toString())}
+        </ColoredTDStyled>
+        <ColoredTDStyled textAlign={TableCellsAlign[3]}>
+          {index === 0 ? formatNumber(shortProfitLoss.toString()) : formatNumber(longProfitLoss.toString())}
         </ColoredTDStyled>
       </TR>
     )
