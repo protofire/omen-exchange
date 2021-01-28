@@ -3,9 +3,8 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { useSymbol } from '../../../../hooks'
 import { getOutcomeColor } from '../../../../theme/utils'
-import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, BondItem, OutcomeTableValue, Token, TokenEthereum } from '../../../../util/types'
 import { RadioInput, TD, THead, TR, Table } from '../../../common'
@@ -118,10 +117,7 @@ export const OutcomeTable = (props: Props) => {
 
   const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right', 'right']
 
-  const context = useConnectedWeb3Context()
-  const nativeAsset = getNativeAsset(context.networkId)
-  const wrapSymbol = getWrapToken(context.networkId).symbol
-  const symbol = collateral.address === pseudoNativeAssetAddress ? wrapSymbol : collateral.symbol
+  const symbol = useSymbol(collateral)
 
   const renderTableHeader = () => {
     return (
@@ -136,7 +132,7 @@ export const OutcomeTable = (props: Props) => {
                 textAlign={TableCellsAlign[index]}
               >
                 {value} {value === OutcomeTableValue.CurrentPrice && `(${symbol})`}
-                {value === OutcomeTableValue.Bonded && `(${nativeAsset.symbol})`}
+                {value === OutcomeTableValue.Bonded && `(${symbol})`}
               </THStyled>
             ) : null
           })}

@@ -13,6 +13,7 @@ import {
   useCpkAllowance,
   useCpkProxy,
   useFundingBalance,
+  useSymbol,
 } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
@@ -135,6 +136,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       ? nativeAsset
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
+  const symbol = useSymbol(collateral)
 
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
@@ -238,8 +240,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
-
-  const symbol = collateral.address === pseudoNativeAssetAddress ? wrapToken.symbol : collateral.symbol
 
   const addFunding = async () => {
     setModalTitle('Deposit Funds')
@@ -355,7 +355,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : amountToFund?.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${walletBalance} ${symbol}`
+      ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
       : null
 
   const sharesAmountError =
