@@ -5,7 +5,13 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useAsyncDerivedValue, useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import {
+  useAsyncDerivedValue,
+  useConnectedCPKContext,
+  useConnectedWeb3Context,
+  useContracts,
+  useSymbol,
+} from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
@@ -52,6 +58,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
+  const symbol = useSymbol(collateral)
 
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
@@ -194,6 +201,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     amountShares?.isZero() ||
     amountError !== null ||
     isNegativeAmountShares
+
   return (
     <>
       <OutcomeTable
@@ -256,15 +264,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Profit'}
               value={
                 potentialValue
-                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${collateral.symbol}`
+                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${symbol}`
                   : '0.00'
               }
             />
             <TransactionDetailsRow
               title={'Trading Fee'}
-              value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'} ${
-                collateral.symbol
-              }`}
+              value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'}
+                ${symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
@@ -280,7 +287,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Total'}
               value={`${
                 tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
-              } ${collateral.symbol}`}
+              } ${symbol}`}
             />
           </TransactionDetailsCard>
         </div>
