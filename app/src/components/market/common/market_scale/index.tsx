@@ -684,8 +684,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           fee={fee}
           longPayout={longPayout}
           longProfitLoss={longProfitAmount}
+          longProfitLossPercentage={longProfitPercentage}
           shortPayout={shortPayout}
           shortProfitLoss={shortProfitAmount}
+          shortProfitLossPercentage={shortProfitPercentage}
         />
       )}
     </>
