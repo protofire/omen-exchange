@@ -7,7 +7,7 @@ import { useConnectedCPKContext, useGraphMarketTradeData } from '../../../../../
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { CompoundService } from '../../../../../services/compound_service'
-import { getToken } from '../../../../../util/networks'
+import { getNativeAsset, getToken } from '../../../../../util/networks'
 import { getSharesInBaseToken, getUnit, isDust } from '../../../../../util/tools'
 import {
   BalanceItem,
@@ -158,7 +158,12 @@ const Wrapper = (props: Props) => {
     const collateralSymbol = collateral.symbol.toLowerCase()
     if (collateralSymbol in CompoundTokenType) {
       const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
-      const baseCollateralToken = getToken(networkId, baseCollateralSymbol as KnownToken)
+      let baseCollateralToken = collateral
+      if (baseCollateralSymbol === 'eth') {
+        baseCollateralToken = getNativeAsset(networkId)
+      } else {
+        baseCollateralToken = getToken(networkId, baseCollateralSymbol as KnownToken)
+      }
       setDisplayCollateral(baseCollateralToken)
     } else {
       setDisplayCollateral(collateral)

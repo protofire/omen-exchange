@@ -171,17 +171,17 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const wrapToken = getWrapToken(networkId)
   const nativeAsset = getNativeAsset(networkId)
-  let initialCollateral =
+  const initialCollateral =
     marketMakerData.collateral.address.toLowerCase() === wrapToken.address.toLowerCase()
       ? nativeAsset
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
+  let initialDisplayCollateral = collateral
   if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-    initialCollateral = getInitialCollateral(collateral, networkId)
+    initialDisplayCollateral = getInitialCollateral(collateral, networkId)
   }
-  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
-
-  const [displayCollateral, setDisplayCollateral] = useState<Token>(initialCollateral)
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(initialDisplayCollateral)
+  const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
   const [amountToFund, setAmountToFund] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
   const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
@@ -236,9 +236,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   let displayPoolTokens = poolTokens
   let displayTotalPoolShares = totalPoolShares
   let baseCollateral = collateral
-  if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-    const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
-    baseCollateral = getToken(networkId, baseCollateralSymbol)
+  if (collateralSymbol in CompoundTokenType) {
+    if (collateralSymbol === 'ceth') {
+      baseCollateral = getNativeAsset(networkId)
+    } else {
+      const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
+      baseCollateral = getToken(networkId, baseCollateralSymbol)
+    }
     displayPoolTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, poolTokens)
     displayTotalPoolShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, displayTotalPoolShares)
   }
@@ -345,6 +349,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       if (
         !cpk?.cpk.isSafeApp() &&
         collateral.address !== pseudoNativeAssetAddress &&
+        displayCollateral.address !== pseudoNativeAssetAddress &&
         hasEnoughAllowance !== Ternary.True
       ) {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
@@ -480,7 +485,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const disableDepositButton =
     !amountToFund ||
     amountToFund?.isZero() ||
-    (!cpk?.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
+    (!cpk?.cpk.isSafeApp() &&
+      collateral.address !== pseudoNativeAssetAddress &&
+      displayCollateral.address !== pseudoNativeAssetAddress &&
+      hasEnoughAllowance !== Ternary.True) ||
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
     isNegativeAmountToFund
@@ -495,14 +503,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   let withdrawCurrencySelect = <span />
   let filterItems: Array<DropdownItemProps> = []
   if (collateralSymbol in CompoundTokenType) {
-    const baseTokenSymbol = getBaseTokenForCToken(collateralSymbol)
-    const baseToken = getToken(networkId, baseTokenSymbol as KnownToken)
     const filters = [
       {
-        title: baseToken.symbol,
+        title: baseCollateral.symbol,
         onClick: () => {
           setAmountToRemoveNormalized(new BigNumber('0'))
-          setUserInputCollateral(baseToken)
+          setUserInputCollateral(baseCollateral)
         },
       },
       {
@@ -559,8 +565,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
   if (collateralSymbol in CompoundTokenType) {
-    const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
-    const baseCollateral = getToken(networkId, baseCollateralSymbol)
     if (baseCollateral.symbol.toLowerCase() === 'eth') {
       currencyFilters = [collateral.address, pseudoNativeAssetAddress.toLowerCase()]
     } else {
@@ -771,7 +775,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       </GridTransactionDetails>
       {activeTab === Tabs.deposit && showSetAllowance && (
         <SetAllowanceStyled
-          collateral={collateral}
+          collateral={displayCollateral}
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockCollateral}

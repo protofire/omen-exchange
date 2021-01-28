@@ -98,9 +98,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const collateralSymbol = collateral.symbol.toLowerCase()
 
   let baseCollateral = collateral
-  if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-    const baseTokenSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
-    baseCollateral = getToken(networkId, baseTokenSymbol)
+  if (collateralSymbol in CompoundTokenType) {
+    if (collateralSymbol === 'ceth') {
+      baseCollateral = getNativeAsset(networkId)
+    } else {
+      const baseTokenSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
+      baseCollateral = getToken(networkId, baseTokenSymbol)
+    }
   }
   const getInitialDisplayCollateral = (): Token => {
     const collateralSymbol = collateral.symbol.toLowerCase()
@@ -135,7 +139,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [newShares, setNewShares] = useState<Maybe<BigNumber[]>>(null)
   const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
+  const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount || Zero))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
@@ -219,10 +223,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+    (!isUpdated && displayCollateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && displayCollateral.address === pseudoNativeAssetAddress)
 
-  const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
+  const shouldDisplayMaxButton = displayCollateral.address !== pseudoNativeAssetAddress
 
   const upgradeProxy = async () => {
     if (!cpk) {
@@ -339,7 +343,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     Number(sharesTotal) == 0 ||
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
-    (!cpk?.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
+    (!cpk?.cpk.isSafeApp() &&
+      collateral.address !== pseudoNativeAssetAddress &&
+      displayCollateral.address !== pseudoNativeAssetAddress &&
+      hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount ||
     (!isUpdated && collateral.address === pseudoNativeAssetAddress)
@@ -499,7 +506,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )}
       {showSetAllowance && (
         <SetAllowance
-          collateral={collateral}
+          collateral={displayCollateral}
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockCollateral}

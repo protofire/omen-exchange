@@ -9,6 +9,7 @@ import { createCPK } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
   getContractAddress,
+  getNativeAsset,
   getTargetSafeImplementation,
   getToken,
   getTokenFromAddress,
@@ -30,6 +31,8 @@ import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
 
 const logger = getLogger('Services::CPKService')
+
+const compoundServiceGasNeeded = 1500000
 
 interface CPKBuyOutcomesParams {
   amount: BigNumber
@@ -222,8 +225,12 @@ class CPKService {
       let minCollateralAmount = amount
       if (useBaseToken && compoundService != null) {
         collateralSymbol = collateral.symbol.toLowerCase()
-        userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
-        userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+        if (collateralSymbol === 'ceth') {
+          userInputCollateral = getNativeAsset(networkId)
+        } else {
+          userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
+          userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+        }
         minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, amount)
       }
       if (collateral.address === pseudoNativeAssetAddress) {
@@ -249,7 +256,7 @@ class CPKService {
             txOptions.value = amount
           }
           if (this.cpk.isSafeApp()) {
-            txOptions.gas = 500000
+            txOptions.gas = compoundServiceGasNeeded
           }
           const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, amount.toString())
           transactions.push({
@@ -370,7 +377,7 @@ class CPKService {
 
       let collateral
 
-      if (marketData.collateral.address === pseudoNativeAssetAddress) {
+      if (marketData.collateral.address === pseudoNativeAssetAddress && !useCompoundReserve) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateral = getWrapToken(networkId)
 
@@ -385,6 +392,7 @@ class CPKService {
           value: marketData.funding,
         })
       } else if (useCompoundReserve && compoundTokenDetails) {
+        txOptions.gas = await this.getGas(compoundServiceGasNeeded)
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
           // If user chosen collateral is ETH
           collateral = marketData.collateral
@@ -773,12 +781,18 @@ class CPKService {
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
         if (useBaseToken && compoundService != null) {
+          txOptions.gas = await this.getGas(compoundServiceGasNeeded)
           const network = await this.provider.getNetwork()
           const networkId = network.chainId
           const collateralToken = getTokenFromAddress(networkId, collateralAddress)
           const collateralSymbol = collateralToken.symbol.toLowerCase()
-          const userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
-          const userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+          let userInputCollateral = collateralToken
+          if (collateralSymbol === 'ceth') {
+            userInputCollateral = getNativeAsset(networkId)
+          } else {
+            const userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
+            userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+          }
           const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(userInputCollateral, amount)
           // Convert cpk token to base token if user wants to redeem in base
           const encodedRedeemFunction = CompoundService.encodeRedeemTokens(collateralSymbol, amount.toString())
@@ -883,14 +897,19 @@ class CPKService {
       let minCollateralAmount = amount
       if (useBaseToken && compoundService != null) {
         collateralSymbol = collateral.symbol.toLowerCase()
-        userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
-        userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+        if (collateralSymbol === 'ceth') {
+          userInputCollateral = getNativeAsset(networkId)
+        } else {
+          userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
+          userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+        }
         minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, amount)
       }
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress) {
         // Step 4: Transfer funding from user
         if (useBaseToken) {
+          txOptions.gas = await this.getGas(compoundServiceGasNeeded)
           // If use base token then transfer the base token amount from the user
           if (collateral.address !== pseudoNativeAssetAddress) {
             transactions.push({
@@ -989,8 +1008,12 @@ class CPKService {
       const totalAmountEarned = amountToMerge.add(earnings)
       // transfer to the user the merged collateral plus the earned fees
       if (useBaseToken && compoundService != null) {
-        const userInputCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
-        userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+        if (collateralSymbol === 'ceth') {
+          userInputCollateral = getNativeAsset(networkId)
+        } else {
+          const userInputCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
+          userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+        }
         // Convert cpk token to base token if user wants to redeem in base
         const encodedRedeemFunction = CompoundService.encodeRedeemTokens(collateralSymbol, totalAmountEarned.toString())
         // Approve cToken for the cpk contract

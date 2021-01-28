@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { getOutcomeColor } from '../../../../theme/utils'
-import { getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, getBaseTokenForCToken, mulBN } from '../../../../util/tools'
 import {
   BalanceItem,
@@ -133,6 +133,7 @@ export const OutcomeTable = (props: Props) => {
   const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right', 'right']
 
   const context = useConnectedWeb3Context()
+  const nativeAsset = getNativeAsset(context.networkId)
   const wrapSymbol = getWrapToken(context.networkId).symbol
   let symbol = collateral.address === pseudoNativeAssetAddress ? wrapSymbol : collateral.symbol
   if (displayCollateral.symbol) {
@@ -151,6 +152,7 @@ export const OutcomeTable = (props: Props) => {
                 textAlign={TableCellsAlign[index]}
               >
                 {value} {value === OutcomeTableValue.CurrentPrice && `(${symbol})`}
+                {value === OutcomeTableValue.Bonded && `(${nativeAsset.symbol})`}
               </THStyled>
             ) : null
           })}
@@ -231,9 +233,14 @@ export const OutcomeTable = (props: Props) => {
     const currentCollateral = displayCollateral ? displayCollateral : collateral
     let baseCollateral = collateral
     const { networkId } = context
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-      const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
-      baseCollateral = getToken(networkId, baseCollateralSymbol)
+    const collateralSymbol = collateral.symbol.toLowerCase()
+    if (collateralSymbol in CompoundTokenType) {
+      if (collateralSymbol === 'ceth') {
+        baseCollateral = getNativeAsset(networkId)
+      } else {
+        const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
+        baseCollateral = getToken(networkId, baseCollateralSymbol)
+      }
     }
     const { currentDisplayPrice, currentPrice, outcomeName, payout, shares } = balanceItem
     let currentPriceValue = Number(currentPrice)

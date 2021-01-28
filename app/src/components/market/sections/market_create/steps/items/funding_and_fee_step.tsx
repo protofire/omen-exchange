@@ -337,13 +337,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     (!isUpdated && collateral.address === pseudoNativeAssetAddress)
 
   const showSetAllowance =
-    collateral.address !== pseudoNativeAssetAddress &&
+    userInputCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+    (!isUpdated && userInputCollateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && userInputCollateral.address === pseudoNativeAssetAddress)
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 

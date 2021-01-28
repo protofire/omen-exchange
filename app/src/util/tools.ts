@@ -3,16 +3,10 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
-import {
-  REALITIO_SCALAR_ADAPTER_ADDRESS,
-  REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY,
-  REALITIO_SCALAR_ADAPTER_ADDRESS_SOKOL,
-  REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI,
-} from '../common/constants'
 import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
-import { getToken } from './networks'
+import { getContractAddress, getNativeAsset, getToken } from './networks'
 import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token } from './types'
 
 const logger = getLogger('Tools')
@@ -340,9 +334,13 @@ export const getSharesInBaseToken = (
 export const getInitialCollateral = (collateral: Token, networkId: number): Token => {
   const collateralSymbol = collateral.symbol.toLowerCase()
   if (collateralSymbol in CompoundTokenType) {
-    const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
-    const baseToken = getToken(networkId, baseCollateralSymbol)
-    return baseToken
+    if (collateralSymbol === 'ceth') {
+      return getNativeAsset(networkId)
+    } else {
+      const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
+      const baseToken = getToken(networkId, baseCollateralSymbol)
+      return baseToken
+    }
   } else {
     return collateral
   }
@@ -545,19 +543,10 @@ export const isDust = (amount: BigNumber, decimals: number): boolean => {
 }
 
 export const isScalarMarket = (oracle: string, networkId: number): boolean => {
-  let realitioScalarAdapter
-  if (networkId === 1) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase()
-  } else if (networkId === 4) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
-  } else if (networkId === 77) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_SOKOL.toLowerCase()
-  } else if (networkId === 100) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI.toLowerCase()
-  }
+  const realitioScalarAdapter = getContractAddress(networkId, 'realitioScalarAdapter')
 
   let isScalar = false
-  if (oracle === realitioScalarAdapter) {
+  if (oracle === realitioScalarAdapter.toLowerCase()) {
     isScalar = true
   }
 

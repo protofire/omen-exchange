@@ -28,7 +28,7 @@ const AdditionalMarketDataLeft = styled.div`
   display: flex;
   align-items: center;
   padding: 14px 20px;
-
+  flex-wrap: wrap;
   & > * + * {
     margin-left: 14px;
   }
@@ -55,7 +55,7 @@ const CompoundInterestWrapper = styled.div<{ customColor: string }>`
 
 const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean; noLeftMargin?: boolean }>`
   margin: 0;
-  margin-left: ${props => (props.noLeftMargin ? '0px' : '8px')};
+  margin-left: 8px;
   font-size: ${props => props.theme.textfield.fontSize};
   line-height: 16px;
   white-space: nowrap;
