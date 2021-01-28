@@ -3,14 +3,12 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
-import {
-  REALITIO_SCALAR_ADAPTER_ADDRESS,
-  REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY,
-  REALITIO_SCALAR_ADAPTER_ADDRESS_SOKOL,
-  REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI,
-} from '../common/constants'
+import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
+import { getNativeAsset, getWrapToken } from '../util/networks'
+import { Token } from '../util/types'
 
 import { getLogger } from './logger'
+import { getContractAddress } from './networks'
 
 const logger = getLogger('Tools')
 
@@ -455,19 +453,10 @@ export const isDust = (amount: BigNumber, decimals: number): boolean => {
 }
 
 export const isScalarMarket = (oracle: string, networkId: number): boolean => {
-  let realitioScalarAdapter
-  if (networkId === 1) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase()
-  } else if (networkId === 4) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
-  } else if (networkId === 77) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_SOKOL.toLowerCase()
-  } else if (networkId === 100) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI.toLowerCase()
-  }
+  const realitioScalarAdapter = getContractAddress(networkId, 'realitioScalarAdapter')
 
   let isScalar = false
-  if (oracle === realitioScalarAdapter) {
+  if (oracle === realitioScalarAdapter.toLowerCase()) {
     isScalar = true
   }
 
@@ -478,4 +467,37 @@ export const getUnit = (title: string): string => {
   const splitTitle = title.split('[')
   const unit = splitTitle[splitTitle.length - 1].split(']')[0]
   return unit
+}
+
+export const getMarketRelatedQuestionFilter = (
+  marketsRelatedQuestion: MarketTokenPair[],
+  networkId: number,
+): string[] => {
+  const nativeAssetAddress = getNativeAsset(networkId).address.toLowerCase()
+  const wrapTokenAddress = getWrapToken(networkId).address.toLowerCase()
+  return marketsRelatedQuestion.map(({ collateralToken }) =>
+    collateralToken.toLowerCase() === wrapTokenAddress ? nativeAssetAddress : collateralToken,
+  )
+}
+
+export const onChangeMarketCurrency = (
+  marketsRelatedQuestion: MarketTokenPair[],
+  currency: Token | null,
+  collateral: Token,
+  networkId: number,
+  // @ts-expect-error ignore
+  history,
+) => {
+  if (currency) {
+    const nativeAssetAddress = getNativeAsset(networkId).address.toLowerCase()
+    const wrapTokenAddress = getWrapToken(networkId).address.toLowerCase()
+    const selectedMarket = marketsRelatedQuestion.find(element => {
+      const collateralToken =
+        element.collateralToken.toLowerCase() === wrapTokenAddress ? nativeAssetAddress : element.collateralToken
+      return collateralToken.toLowerCase() === currency.address.toLowerCase()
+    })
+    if (selectedMarket && selectedMarket.collateralToken.toLowerCase() !== collateral.address.toLowerCase()) {
+      history.replace(`/${selectedMarket.id}`)
+    }
+  }
 }

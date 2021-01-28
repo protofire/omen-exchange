@@ -1,11 +1,12 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
+import { getNativeAsset, networkIds } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
@@ -20,8 +21,8 @@ import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
+import { AssetBalance } from '../../common/asset_balance'
 import { CurrenciesWrapper } from '../../common/common_styled'
-import { EthBalance } from '../../common/eth_balance'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
@@ -51,8 +52,10 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   } = marketMakerData
 
   const context = useConnectedWeb3Context()
-  const { account, library: provider } = context
+  const { account, library: provider, networkId } = context
 
+  const nativeAsset = getNativeAsset(networkId)
+  const symbol = nativeAsset.symbol
   const { realitio } = useContracts(context)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -61,28 +64,30 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const probabilities = balances.map(balance => balance.probability)
-  const [bondEthAmount, setBondEthAmount] = useState<BigNumber>(
-    currentAnswerBond ? new BigNumber(currentAnswerBond).mul(2) : new BigNumber('10000000000000000'),
+  const initialBondAmount =
+    networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
+  const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
+    currentAnswerBond ? new BigNumber(currentAnswerBond).mul(2) : initialBondAmount,
   )
-  const [ethBalance, setEthBalance] = useState<BigNumber>(Zero)
+  const [nativeAssetBalance, setNativeAssetBalance] = useState<BigNumber>(Zero)
 
   useEffect(() => {
-    const fetchEthBalance = async () => {
+    const fetchBalance = async () => {
       try {
         const balance = await provider.getBalance(account || '')
-        setEthBalance(balance)
+        setNativeAssetBalance(balance)
       } catch (error) {
-        setEthBalance(Zero)
+        setNativeAssetBalance(Zero)
       }
     }
     if (account) {
-      fetchEthBalance()
+      fetchBalance()
     }
   }, [account, provider])
 
   useEffect(() => {
-    if (currentAnswerBond && !new BigNumber(currentAnswerBond).mul(2).eq(bondEthAmount)) {
-      setBondEthAmount(new BigNumber(currentAnswerBond).mul(2))
+    if (currentAnswerBond && !new BigNumber(currentAnswerBond).mul(2).eq(bondNativeAssetAmount)) {
+      setBondNativeAssetAmount(new BigNumber(currentAnswerBond).mul(2))
     }
     // eslint-disable-next-line
   }, [currentAnswerBond])
@@ -99,20 +104,20 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       const answer = outcomeIndex >= balances.length ? INVALID_ANSWER_ID : numberToByte32(outcomeIndex)
 
       setMessage(
-        `Bonding ${formatBigNumber(bondEthAmount, TokenEthereum.decimals)} ETH on: ${
+        `Bonding ${formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals)} ${symbol} on: ${
           outcomeIndex >= marketMakerData.question.outcomes.length
             ? 'Invalid'
             : marketMakerData.question.outcomes[outcomeIndex]
         }`,
       )
 
-      logger.log(`Submit Answer questionId: ${marketMakerData.question.id}, answer: ${answer}`, bondEthAmount)
-      await realitio.submitAnswer(marketMakerData.question.id, answer, bondEthAmount)
+      logger.log(`Submit Answer questionId: ${marketMakerData.question.id}, answer: ${answer}`, bondNativeAssetAmount)
+      await realitio.submitAnswer(marketMakerData.question.id, answer, bondNativeAssetAmount)
       await fetchGraphMarketMakerData()
 
       setStatus(Status.Ready)
       setMessage(
-        `Successfully bonded ${formatBigNumber(bondEthAmount, TokenEthereum.decimals)} ETH on ${
+        `Successfully bonded ${formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals)} ${symbol} on ${
           outcomeIndex < marketMakerData.question.outcomes.length
             ? marketMakerData.question.outcomes[outcomeIndex]
             : 'Invalid'
@@ -120,7 +125,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       )
     } catch (err) {
       setStatus(Status.Error)
-      setMessage(`Error trying to bond Eth.`)
+      setMessage(`Error trying to bond ${symbol}.`)
       logger.error(`${message} - ${err.message}`)
     }
     setIsModalTransactionResultOpen(true)
@@ -140,7 +145,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         ]}
         isBond
         newBonds={marketMakerData.question.bonds?.map((bond, bondIndex) =>
-          bondIndex !== outcomeIndex ? bond : { ...bond, bondedEth: bond.bondedEth.add(bondEthAmount) },
+          bondIndex !== outcomeIndex ? bond : { ...bond, bondedEth: bond.bondedEth.add(bondNativeAssetAmount) },
         )}
         outcomeHandleChange={(value: number) => {
           setOutcomeIndex(value)
@@ -153,7 +158,10 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         <div>
           <>
             <CurrenciesWrapper>
-              <EthBalance value={`${formatNumber(formatBigNumber(ethBalance, TokenEthereum.decimals, 3), 3)}`} />
+              <AssetBalance
+                asset={nativeAsset}
+                value={`${formatNumber(formatBigNumber(nativeAssetBalance, TokenEthereum.decimals, 3), 3)}`}
+              />
             </CurrenciesWrapper>
 
             <TextfieldCustomPlaceholder
@@ -165,10 +173,10 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
                   // eslint-disable-next-line @typescript-eslint/no-empty-function
                   onChange={() => {}}
                   style={{ width: 0 }}
-                  value={bondEthAmount}
+                  value={bondNativeAssetAmount}
                 />
               }
-              symbol={TokenEthereum.symbol}
+              symbol={symbol}
             />
           </>
         </div>
@@ -177,19 +185,19 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Bond Amount"
-              value={`${formatNumber(formatBigNumber(bondEthAmount, TokenEthereum.decimals))} ${TokenEthereum.symbol}`}
+              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals))} ${symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Profit"
-              value={`${formatNumber(formatBigNumber(currentAnswerBond || new BigNumber(0), 18))} ETH`}
+              value={`${formatNumber(formatBigNumber(currentAnswerBond || new BigNumber(0), 18))} ${symbol}`}
             />
 
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Loss"
-              value={`${formatNumber(formatBigNumber(bondEthAmount, 18))} ETH`}
+              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, 18))} ${symbol}`}
             />
           </TransactionDetailsCard>
         </div>
@@ -200,7 +208,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           Back
         </Button>
         <Button buttonType={ButtonType.primary} onClick={() => bondOutcome()}>
-          Bond ETH
+          Bond {symbol}
         </Button>
       </BottomButtonWrapper>
       <ModalTransactionResult

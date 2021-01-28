@@ -1,8 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { TokenEthereum } from '../../../../util/types'
-import { EtherIcon } from '../../../common/icons/currencies'
+import { Token } from '../../../../util/types'
 
 const Wrapper = styled.div`
   align-items: center;
@@ -32,17 +31,23 @@ const Value = styled.p`
   text-transform: capitalize;
 `
 
+const Image = styled.img`
+  height: 24px;
+  width: 24px;
+`
+
 interface Props {
   value?: string
+  asset: Token
 }
 
-export const EthBalance: React.FC<Props> = props => {
-  const { value = '0.00', ...restProps } = props
+export const AssetBalance: React.FC<Props> = props => {
+  const { asset, value = '0.00', ...restProps } = props
 
   return (
     <Wrapper {...restProps}>
-      <EtherIcon />
-      <Title>{TokenEthereum.symbol}</Title>
+      <Image src={asset.image} />
+      <Title>{asset.symbol}</Title>
       <Value>{value}</Value>
     </Wrapper>
   )

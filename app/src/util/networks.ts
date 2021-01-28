@@ -438,6 +438,9 @@ export const getTokensByNetwork = (networkId: number): Token[] => {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
 
+  const wrapTokenAddress = getWrapToken(networkId).address
+  const nativeAsset = getNativeAsset(networkId)
+
   return Object.values(knownTokens)
     .sort((a, b) => (a.order > b.order ? 1 : -1))
     .map(token => {
@@ -446,7 +449,7 @@ export const getTokensByNetwork = (networkId: number): Token[] => {
         return {
           symbol: token.symbol,
           decimals: token.decimals,
-          image: getImageUrl(address),
+          image: address === wrapTokenAddress ? nativeAsset.image : getImageUrl(address),
           address,
         }
       }
@@ -471,8 +474,8 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     addresses: {
       [networkIds.MAINNET]: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       [networkIds.RINKEBY]: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
-      [networkIds.SOKOL]: '0xd5ce9C7905CB1e874DaA83Cb1be02eB536308419',
-      [networkIds.XDAI]: '0xa0Baf56D83be19Eb6bA8aFAD2Db812Bc13D8Be1d',
+      [networkIds.SOKOL]: '0xd50DdFdDbC069C1D1f7CDA1D8aa4AD8cFb1E9e0F',
+      [networkIds.XDAI]: '0x7761D33924bb90129EF56480FC1bD8Da79C8069B',
     },
     isSelectionEnabled: true,
   },

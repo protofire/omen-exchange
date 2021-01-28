@@ -3,7 +3,7 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
@@ -103,8 +103,9 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     logger.debug(err.message)
   }
 
-  const [{ decimals, symbol, volume }, setDetails] = useState(token || { decimals: 0, symbol: '', volume: '' })
-
+  const [details, setDetails] = useState(token || { decimals: 0, symbol: '', volume: '' })
+  const { decimals, volume } = details
+  const symbol = useSymbol(details as Token)
   const now = moment()
   const endDate = openingTimestamp
   const endsText = moment(endDate).fromNow(true)
