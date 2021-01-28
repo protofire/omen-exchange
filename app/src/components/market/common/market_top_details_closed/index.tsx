@@ -8,6 +8,7 @@ import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFr
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import theme from '../../../../theme'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
+import { getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -80,23 +81,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
 
   const nativeAssetAddress = getNativeAsset(context.networkId).address.toLowerCase()
   const wrapTokenAddress = getWrapToken(context.networkId).address.toLowerCase()
-
-  const onChangeMarketCurrency = (currency: Token | null) => {
-    if (currency) {
-      const selectedMarket = marketsRelatedQuestion.find(element => {
-        const collateralToken =
-          element.collateralToken === wrapTokenAddress ? nativeAssetAddress : element.collateralToken
-        return collateralToken === currency.address.toLowerCase()
-      })
-      if (selectedMarket && selectedMarket.collateralToken !== collateral.address) {
-        history.push(`/${selectedMarket.id}`)
-      }
-    }
-  }
-
-  const filter = marketsRelatedQuestion.map(({ collateralToken }) =>
-    collateralToken === wrapTokenAddress ? nativeAssetAddress : collateralToken,
-  )
+  const filter = getMarketRelatedQuestionFilter(marketsRelatedQuestion, context.networkId)
 
   return (
     <>
@@ -109,7 +94,9 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
               currency={collateral.address === wrapTokenAddress ? nativeAssetAddress : collateral.address}
               disabled={false}
               filters={filter}
-              onSelect={onChangeMarketCurrency}
+              onSelect={(currency: Token | null) =>
+                onChangeMarketCurrency(marketsRelatedQuestion, currency, collateral, context.networkId, history)
+              }
               placeholder=""
             />
           )}
