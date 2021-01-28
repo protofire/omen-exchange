@@ -3,17 +3,12 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
-import {
-  REALITIO_SCALAR_ADAPTER_ADDRESS,
-  REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY,
-  REALITIO_SCALAR_ADAPTER_ADDRESS_SOKOL,
-  REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI,
-} from '../common/constants'
 import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
 import { getNativeAsset, getWrapToken } from '../util/networks'
 import { Token } from '../util/types'
 
 import { getLogger } from './logger'
+import { getContractAddress } from './networks'
 
 const logger = getLogger('Tools')
 
@@ -429,19 +424,10 @@ export const isDust = (amount: BigNumber, decimals: number): boolean => {
 }
 
 export const isScalarMarket = (oracle: string, networkId: number): boolean => {
-  let realitioScalarAdapter
-  if (networkId === 1) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase()
-  } else if (networkId === 4) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase()
-  } else if (networkId === 77) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_SOKOL.toLowerCase()
-  } else if (networkId === 100) {
-    realitioScalarAdapter = REALITIO_SCALAR_ADAPTER_ADDRESS_XDAI.toLowerCase()
-  }
+  const realitioScalarAdapter = getContractAddress(networkId, 'realitioScalarAdapter')
 
   let isScalar = false
-  if (oracle === realitioScalarAdapter) {
+  if (oracle === realitioScalarAdapter.toLowerCase()) {
     isScalar = true
   }
 
