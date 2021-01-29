@@ -1,9 +1,11 @@
+import { CpkTransactionManager } from 'contract-proxy-kit/lib/esm'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
+import { useConnectedCPKContext } from '../../../../hooks'
 import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import { BalanceItem, LiquidityObject, Status, Token, TradeObject } from '../../../../util/types'
 import { IconInfo } from '../../../common/tooltip/img/IconInfo'
@@ -288,6 +290,8 @@ interface Props {
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
+  const cpk = useConnectedCPKContext()
+
   const {
     amount,
     amountShares,
@@ -518,6 +522,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     !collateral ||
     (isDust(shortShares || new BigNumber(0), collateral.decimals) &&
       isDust(longShares || new BigNumber(0), collateral.decimals))
+
+  const isMarketCreator = cpk && creator === cpk.address.toLowerCase()
+
+  console.log(isMarketCreator)
 
   return (
     <>
