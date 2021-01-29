@@ -130,6 +130,7 @@ export type GraphMarketMakerData = {
   collateralAddress: string
   creationTimestamp: string
   collateralVolume: BigNumber
+  creator: string
   lastActiveDay: number
   dailyVolume: BigNumber
   conditionId: string
@@ -193,6 +194,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     collateralAddress: data.collateralToken,
     creationTimestamp: data.creationTimestamp,
     collateralVolume: bigNumberify(data.collateralVolume),
+    creator: data.creator,
     lastActiveDay: Number(data.lastActiveDay),
     dailyVolume: bigNumberify(data.runningDailyVolume),
     conditionId: data.condition.id,

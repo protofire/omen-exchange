@@ -109,6 +109,7 @@ const Wrapper = (props: Props) => {
     address: marketMakerAddress,
     balances,
     collateral,
+    creator,
     fee,
     isQuestionFinalized,
     outcomeTokenMarginalPrices,
@@ -290,6 +291,7 @@ const Wrapper = (props: Props) => {
                   balances={balances}
                   borderTop={true}
                   collateral={collateral}
+                  creator={creator}
                   currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
                   fee={fee}
                   liquidityTxs={liquidityTxs}

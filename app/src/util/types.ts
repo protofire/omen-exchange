@@ -284,6 +284,7 @@ export interface MarketMakerData {
   balances: BalanceItem[]
   creationTimestamp: string
   collateral: Token
+  creator: string
   fee: BigNumber
   isConditionResolved: boolean
   isQuestionFinalized: boolean
