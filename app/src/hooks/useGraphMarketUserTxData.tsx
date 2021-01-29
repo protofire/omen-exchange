@@ -127,12 +127,7 @@ export const useGraphMarketUserTxData = (
   })
 
   // Run a second liquidity query with the factory address if user is market creator
-  const {
-    data: marketLiquidityData,
-    error: marketLiquidityError,
-    loading: marketLiquidityLoading,
-    refetch: marketLiquidityRefetch,
-  } = useQuery<LiquidityGraphResponse>(liquidityQuery, {
+  const { data: marketLiquidityData } = useQuery<LiquidityGraphResponse>(liquidityQuery, {
     notifyOnNetworkStatusChange: true,
     skip: false,
     variables: { marketAddress: marketAddress, cpkAddress: factoryAddress },
