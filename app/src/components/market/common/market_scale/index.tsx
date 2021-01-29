@@ -451,23 +451,27 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       setProfitLoss((amountSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - (amountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
+        const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
         const shortPayoutAmount = (shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100)
-        const shortProfit =
-          shortPayoutAmount - Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
+        const shortProfit = shortPayoutAmount - totalShortPriceNumber
         setShortPayout(shortPayoutAmount)
         setShortProfitAmount(shortProfit)
         setShortProfitPercentage(
-          (shortProfit / shortPayoutAmount) * 100 < -100 ? -100 : (shortProfit / shortPayoutAmount) * 100,
+          (shortPayoutAmount / totalShortPriceNumber - 1) * 100 < -100
+            ? -100
+            : (shortPayoutAmount / totalShortPriceNumber - 1) * 100,
         )
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
+        const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
         const longPayoutAmount = (longSharesNumber || 0) * (Number(scaleBall?.value) / 100)
-        const longProfit =
-          longPayoutAmount - Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
+        const longProfit = longPayoutAmount - totalLongPriceNumber
         setLongPayout(longPayoutAmount)
         setLongProfitAmount(longProfit)
         setLongProfitPercentage(
-          (longProfit / longPayoutAmount) * 100 < -100 ? -100 : (longProfit / longPayoutAmount) * 100,
+          (longPayoutAmount / totalLongPriceNumber - 1) * 100 < -100
+            ? -100
+            : (longPayoutAmount / totalLongPriceNumber - 1) * 100,
         )
       }
     }
