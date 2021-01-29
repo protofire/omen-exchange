@@ -1,11 +1,9 @@
-import { CpkTransactionManager } from 'contract-proxy-kit/lib/esm'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useConnectedCPKContext } from '../../../../hooks'
 import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import { BalanceItem, LiquidityObject, Status, Token, TradeObject } from '../../../../util/types'
 import { IconInfo } from '../../../common/tooltip/img/IconInfo'
@@ -286,19 +284,15 @@ interface Props {
   status?: Maybe<Status>
   balances?: Maybe<BalanceItem[]>
   fee?: Maybe<BigNumber>
-  creator?: Maybe<string>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
-  const cpk = useConnectedCPKContext()
-
   const {
     amount,
     amountShares,
     balances,
     borderTop,
     collateral,
-    creator,
     currentPrediction,
     fee,
     liquidityTxs,
@@ -374,51 +368,57 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [shortProfitPercentage, setShortProfitPercentage] = useState(0)
 
   useEffect(() => {
+    let totalShortTradesCost = new BigNumber(0)
+    let totalLongTradesCost = new BigNumber(0)
     if (trades && trades.length && collateral) {
       const shortTrades = trades.filter(trade => trade.outcomeIndex === '0')
-      const totalShortTradesCost = shortTrades.length
+      totalShortTradesCost = shortTrades.length
         ? shortTrades
             .map(trade => (trade.type === 'Buy' ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
             .reduce((a, b) => a.add(b))
         : new BigNumber(0)
 
       const longTrades = trades.filter(trade => trade.outcomeIndex === '1')
-      const totalLongTradesCost = longTrades.length
+      totalLongTradesCost = longTrades.length
         ? longTrades
             .map(trade => (trade.type === 'Buy' ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
             .reduce((a, b) => a.add(b))
         : new BigNumber(0)
+    }
 
-      let totalShortLiquidityTxsCost = new BigNumber(0)
-      let totalLongLiquidityTxsCost = new BigNumber(0)
-      if (liquidityTxs && liquidityTxs.length) {
-        const addLiquidityTxs = liquidityTxs.filter(tx => tx.type === 'Add')
-        const removeLiquidityTxs = liquidityTxs.filter(tx => tx.type === 'Remove')
+    let totalShortLiquidityTxsCost = new BigNumber(0)
+    let totalLongLiquidityTxsCost = new BigNumber(0)
+    if (liquidityTxs && liquidityTxs.length) {
+      const addLiquidityTxs = liquidityTxs.filter(tx => tx.type === 'Add')
+      const removeLiquidityTxs = liquidityTxs.filter(tx => tx.type === 'Remove')
 
-        // More short shares provided so short shares are purchased
-        const addLiquidityShortPurchaseTxs = addLiquidityTxs.filter(tx =>
-          tx.outcomeTokenAmounts[0].lt(tx.outcomeTokenAmounts[1]),
-        )
+      // More short shares provided so short shares are purchased
+      const addLiquidityShortPurchaseTxs = addLiquidityTxs.filter(tx =>
+        tx.outcomeTokenAmounts[0].lt(tx.outcomeTokenAmounts[1]),
+      )
+      if (addLiquidityShortPurchaseTxs.length) {
         // More long shares are removed so short shares are purchased
         totalShortLiquidityTxsCost = addLiquidityShortPurchaseTxs
           .concat(removeLiquidityTxs.filter(tx => tx.outcomeTokenAmounts[0].gt(tx.outcomeTokenAmounts[1])))
           .map(tx => tx.additionalSharesCost)
           .reduce((a, b) => a.add(b))
+      }
 
-        // More long shares provided so long shares are purchased
-        const addLiquidityLongPurchaseTxs = addLiquidityTxs.filter(tx =>
-          tx.outcomeTokenAmounts[0].gt(tx.outcomeTokenAmounts[1]),
-        )
+      // More long shares provided so long shares are purchased
+      const addLiquidityLongPurchaseTxs = addLiquidityTxs.filter(tx =>
+        tx.outcomeTokenAmounts[0].gt(tx.outcomeTokenAmounts[1]),
+      )
+      if (addLiquidityLongPurchaseTxs.length) {
         // More short shares are removed so long shares are purchased
         totalLongLiquidityTxsCost = addLiquidityLongPurchaseTxs
           .concat(removeLiquidityTxs.filter(tx => tx.outcomeTokenAmounts[0].lt(tx.outcomeTokenAmounts[1])))
           .map(tx => tx.additionalSharesCost)
           .reduce((a, b) => a.add(b))
       }
-
-      setTotalShortPrice(totalShortTradesCost.add(totalShortLiquidityTxsCost))
-      setTotalLongPrice(totalLongTradesCost.add(totalLongLiquidityTxsCost))
     }
+
+    setTotalShortPrice(totalShortTradesCost.add(totalShortLiquidityTxsCost))
+    setTotalLongPrice(totalLongTradesCost.add(totalLongLiquidityTxsCost))
   }, [trades, collateral, liquidityTxs])
 
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
@@ -522,10 +522,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     !collateral ||
     (isDust(shortShares || new BigNumber(0), collateral.decimals) &&
       isDust(longShares || new BigNumber(0), collateral.decimals))
-
-  const isMarketCreator = cpk && creator === cpk.address.toLowerCase()
-
-  console.log(isMarketCreator)
 
   return (
     <>
