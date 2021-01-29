@@ -349,7 +349,7 @@ export const Dropdown: React.FC<Props> = props => {
     return items[getValidItemIndex(itemIndex)].extraContent
   }
 
-  const [currentItemIndex, setCurrentItemIndex] = useState<number>(currentItem)
+  const [currentItemIndex, setCurrentItemIndex] = useState<number>(0)
   const [isDirty, setIsDirty] = useState<boolean>(dirty)
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [dropdownPaddingRight, setDropdownPaddingRight] = useState(8)
@@ -365,10 +365,6 @@ export const Dropdown: React.FC<Props> = props => {
       setDropdownPaddingRight(isScrollVisible ? 8 : 0)
     }
   }, [isOpen, dropdownItemsRef?.current?.scrollHeight, dropdownContainerRef?.current?.clientHeight])
-
-  useEffect(() => {
-    setCurrentItemIndex(currentItem)
-  }, [currentItem])
 
   const optionClick = useCallback((onClick: (() => void) | undefined, itemIndex: number) => {
     if (!onClick) return
@@ -387,8 +383,10 @@ export const Dropdown: React.FC<Props> = props => {
     }
   }, [isOpen])
 
-  const activeItem = getItem(currentItemIndex)
-  const extraContent = getItemExtraContent(currentItemIndex)
+  const itemIndex = currentItem > -1 ? currentItem : currentItemIndex
+  const activeItem = getItem(itemIndex)
+  const extraContent = getItemExtraContent(itemIndex)
+
   return (
     <>
       <Wrapper
@@ -434,7 +432,7 @@ export const Dropdown: React.FC<Props> = props => {
             {items.map((item: DropdownItemProps, index: string) => {
               return (
                 <Item
-                  active={parseInt(index) === currentItemIndex}
+                  active={parseInt(index) === itemIndex}
                   dropdownVariant={dropdownVariant}
                   key={index}
                   onClick={
