@@ -1,8 +1,9 @@
 import { useQuery } from '@apollo/react-hooks'
-import { bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
+import { getContractAddress } from '../util/networks'
 import { isObjectEqual, waitABit } from '../util/tools'
 import { LiquidityObject, Status, TradeObject } from '../util/types'
 
@@ -95,10 +96,18 @@ const wrangleLiquidityResponse = (data: GraphResponseLiquidityObject[]) => {
   return mappedData
 }
 
-export const useGraphMarketUserTxData = (marketAddress: string, cpkAddress: string | undefined): Result => {
+export const useGraphMarketUserTxData = (
+  marketAddress: string,
+  cpkAddress: string | undefined,
+  isCreator?: boolean,
+  networkId?: number,
+): Result => {
+  // If user is market creator, retrieve the factory contract address
+  const factoryAddress = isCreator && networkId && getContractAddress(networkId, 'marketMakerFactory').toLowerCase()
+
   const [trades, setTrades] = useState<Maybe<TradeObject[]>>(null)
   const [needTradeUpdate, setNeedTradeUpdate] = useState<boolean>(false)
-  const [liquidity, setLiquidity] = useState<Maybe<LiquidityObject[]>>(null)
+  const [liquidity, setLiquidity] = useState<LiquidityObject[]>([])
   const [needLiquidityUpdate, setNeedLiquidityUpdate] = useState<boolean>(false)
 
   const { data: tradeData, error: tradeError, loading: tradeLoading, refetch: tradeRefetch } = useQuery<
@@ -115,6 +124,18 @@ export const useGraphMarketUserTxData = (marketAddress: string, cpkAddress: stri
     notifyOnNetworkStatusChange: true,
     skip: false,
     variables: { marketAddress: marketAddress, cpkAddress: cpkAddress },
+  })
+
+  // Run a second liquidity query with the factory address if user is market creator
+  const {
+    data: marketLiquidityData,
+    error: marketLiquidityError,
+    loading: marketLiquidityLoading,
+    refetch: marketLiquidityRefetch,
+  } = useQuery<LiquidityGraphResponse>(liquidityQuery, {
+    notifyOnNetworkStatusChange: true,
+    skip: false,
+    variables: { marketAddress: marketAddress, cpkAddress: factoryAddress },
   })
 
   useEffect(() => {
@@ -141,7 +162,19 @@ export const useGraphMarketUserTxData = (marketAddress: string, cpkAddress: stri
   }
 
   if (liquidityData && liquidityData.fpmmLiquidities) {
-    const wrangledValue = wrangleLiquidityResponse(liquidityData.fpmmLiquidities)
+    let wrangledValue: {
+      type: string
+      additionalSharesCost: BigNumber
+      outcomeTokenAmounts: BigNumber[]
+    }[]
+    // If market liquidity data, include in liquidity array
+    if (marketLiquidityData && marketLiquidityData.fpmmLiquidities) {
+      wrangledValue = wrangleLiquidityResponse(
+        liquidityData.fpmmLiquidities.concat(marketLiquidityData.fpmmLiquidities),
+      )
+    } else {
+      wrangledValue = wrangleLiquidityResponse(liquidityData.fpmmLiquidities)
+    }
     if (needLiquidityUpdate) {
       setLiquidity(wrangledValue)
       setNeedLiquidityUpdate(false)

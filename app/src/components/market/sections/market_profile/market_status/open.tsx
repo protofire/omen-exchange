@@ -260,9 +260,13 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
+  const isMarketCreator = cpk && creator === cpk.address.toLowerCase()
+
   const { fetchData: fetchGraphMarketUserTxData, liquidityTxs, status, trades } = useGraphMarketUserTxData(
     marketMakerAddress,
     cpk?.address.toLowerCase(),
+    isMarketCreator || false,
+    context.networkId,
   )
 
   useEffect(() => {
@@ -291,7 +295,6 @@ const Wrapper = (props: Props) => {
                   balances={balances}
                   borderTop={true}
                   collateral={collateral}
-                  creator={creator}
                   currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
                   fee={fee}
                   liquidityTxs={liquidityTxs}
