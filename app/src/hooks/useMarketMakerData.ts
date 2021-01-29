@@ -8,6 +8,6 @@ export const useMarketMakerData = (marketMakerAddress: string) => {
     marketMakerAddress,
     networkId,
   )
-  const { fetchData, marketMakerData } = useBlockchainMarketMakerData(graphMarketMakerData, networkId)
-  return { fetchData, marketMakerData, fetchGraphMarketMakerData }
+  const { fetchData, marketMakerData, status } = useBlockchainMarketMakerData(graphMarketMakerData, networkId)
+  return { fetchData, marketMakerData, fetchGraphMarketMakerData, status }
 }
