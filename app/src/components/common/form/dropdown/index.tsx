@@ -383,7 +383,7 @@ export const Dropdown: React.FC<Props> = props => {
     }
   }, [isOpen])
 
-  const itemIndex = currentItem > -1 ? currentItem : currentItemIndex
+  const itemIndex = currentItem && currentItem > -1 ? currentItem : currentItemIndex
   const activeItem = getItem(itemIndex)
   const extraContent = getItemExtraContent(itemIndex)
 
