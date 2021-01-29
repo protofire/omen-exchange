@@ -2,6 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
+import { useSymbol } from '../../../../hooks'
 import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import { BalanceItem, PositionTableValue, Token } from '../../../../util/types'
 import { TD, THead, TR, Table } from '../../../common'
@@ -53,6 +54,8 @@ export const PositionTable = (props: Props) => {
     shortProfitLossPercentage,
   } = props
 
+  const symbol = useSymbol(collateral)
+
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
   const shortSharesFormatted = formatNumber(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
@@ -77,7 +80,7 @@ export const PositionTable = (props: Props) => {
           {TableHead.map((value, index) => {
             return (
               <THStyled key={index} textAlign={TableCellsAlign[index]}>
-                {value} {value === PositionTableValue.Payout && `(${collateral.symbol})`}
+                {value} {value === PositionTableValue.Payout && `(${symbol})`}
               </THStyled>
             )
           })}

@@ -16,7 +16,7 @@ const query = gql`
   }
 `
 
-type MarketTokenPair = {
+export type MarketTokenPair = {
   id: string
   collateralToken: string
 }
@@ -60,6 +60,6 @@ export const useGraphMarketsFromQuestion = (questionId: string): Result => {
 
   return {
     markets,
-    status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
+    status: error ? Status.Error : loading ? Status.Loading : data ? Status.Ready : Status.Loading,
   }
 }

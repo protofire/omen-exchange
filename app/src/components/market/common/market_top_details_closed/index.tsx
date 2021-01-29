@@ -7,7 +7,8 @@ import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import theme from '../../../../theme'
-import { getContractAddress } from '../../../../util/networks'
+import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
+import { getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -49,7 +50,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     address,
     answerFinalizedTimestamp,
     arbitrator,
-    collateral: collateralToken,
+    collateral,
     collateralVolume,
     creationTimestamp,
     curatedByDxDao,
@@ -78,14 +79,9 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     setShowingProgressBar(!showingProgressBar)
   }
 
-  const onChangeMarketCurrency = (currency: Token | null) => {
-    if (currency) {
-      const selectedMarket = marketsRelatedQuestion.find(e => e.collateralToken === currency.address.toLowerCase())
-      if (selectedMarket && selectedMarket.collateralToken !== collateralToken.address) {
-        history.push(`/${selectedMarket.id}`)
-      }
-    }
-  }
+  const nativeAssetAddress = getNativeAsset(context.networkId).address.toLowerCase()
+  const wrapTokenAddress = getWrapToken(context.networkId).address.toLowerCase()
+  const filter = getMarketRelatedQuestionFilter(marketsRelatedQuestion, context.networkId)
 
   return (
     <>
@@ -93,11 +89,14 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         <SubsectionTitleLeftWrapper>
           {marketsRelatedQuestion.length > 1 && (
             <MarketCurrencySelector
+              addNativeAsset
               context={context}
-              currency={collateralToken.address}
+              currency={collateral.address === wrapTokenAddress ? nativeAssetAddress : collateral.address}
               disabled={false}
-              filters={marketsRelatedQuestion.map(element => element.collateralToken)}
-              onSelect={onChangeMarketCurrency}
+              filters={filter}
+              onSelect={(currency: Token | null) =>
+                onChangeMarketCurrency(marketsRelatedQuestion, currency, collateral, context.networkId, history)
+              }
               placeholder=""
             />
           )}
@@ -125,7 +124,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
       <MarketData
         answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
         collateralVolume={collateralVolume}
-        currency={collateralToken}
+        currency={collateral}
         lastActiveDay={lastActiveDay}
         liquidity={formattedLiquidity}
         resolutionTimestamp={question.resolution}

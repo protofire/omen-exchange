@@ -16,7 +16,11 @@ const BALL_SIZE = '20px'
 const DOT_SIZE = '8px'
 const VALUE_BOXES_MARGIN = '12px'
 
-const ScaleWrapper = styled.div<{ borderBottom: boolean | undefined; borderTop: boolean | undefined }>`
+const ScaleWrapper = styled.div<{
+  borderBottom: boolean | undefined
+  borderTop: boolean | undefined
+  valueBoxes: boolean | undefined
+}>`
   display: flex;
   flex-direction: column;
   height: 174px;
@@ -27,6 +31,10 @@ const ScaleWrapper = styled.div<{ borderBottom: boolean | undefined; borderTop: 
   padding-right: 25px;
   position: relative;
   ${props => props.borderTop && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 202px;`};
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    ${props => props.valueBoxes && 'padding-bottom: 24px; height: 278px;'}
+  }
 `
 
 const ScaleTitleWrapper = styled.div`
@@ -189,12 +197,25 @@ const ValueBoxes = styled.div`
   justify-content: space-between;
   margin-top: ${VALUE_BOXES_MARGIN};
   width: 100%;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    flex-direction: column;
+    justify-content: center;
+  }
 `
 
 const ValueBoxPair = styled.div`
   width: calc(50% - ${VALUE_BOXES_MARGIN} / 2);
   display: flex;
   align-items: center;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    width: calc(100% - ${VALUE_BOXES_MARGIN} / 2);
+
+    &:nth-of-type(2) {
+      margin-top: 12px;
+    }
+  }
 `
 
 const ValueBox = styled.div<{ xValue?: number }>`
@@ -529,7 +550,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <ScaleWrapper borderBottom={isPositionTableDisabled} borderTop={borderTop}>
+      <ScaleWrapper borderBottom={isPositionTableDisabled} borderTop={borderTop} valueBoxes={isAmountInputted}>
         <ScaleTitleWrapper>
           <ScaleTitle>
             {formatNumber(lowerBoundNumber.toString())} {unit}

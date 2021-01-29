@@ -13,6 +13,7 @@ import {
   useCpkAllowance,
   useCpkProxy,
   useFundingBalance,
+  useSymbol,
 } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
@@ -111,7 +112,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       ? nativeAsset
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
-
+  const symbol = useSymbol(collateral)
   const [amountToFund, setAmountToFund] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
   const [amountToRemove, setAmountToRemove] = useState<Maybe<BigNumber>>(new BigNumber(0))
@@ -458,21 +459,20 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
                 title="Earned"
-                value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
+                value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${symbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
-                value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${collateral.symbol}`}
+                value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${symbol}`}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={depositedTokensTotal.gt(0)}
                 state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
-                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${
-                  collateral.symbol
-                }`}
+                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))}
+                ${symbol}`}
               />
             </TransactionDetailsCard>
           )}
