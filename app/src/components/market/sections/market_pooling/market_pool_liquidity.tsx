@@ -24,6 +24,7 @@ import {
   calcRemoveFundingSendAmounts,
   formatBigNumber,
   formatNumber,
+  getInitialCollateral,
 } from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
@@ -37,6 +38,7 @@ import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { SetAllowance } from '../../common/set_allowance'
+import { SwitchTransactionToken } from '../../common/switch_transaction_token'
 import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
@@ -136,7 +138,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       ? nativeAsset
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
-  const symbol = useSymbol(collateral)
+  let symbol = useSymbol(collateral)
 
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
@@ -149,6 +151,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(getInitialCollateral(context.networkId, collateral))
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
@@ -176,6 +179,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const currentDate = new Date().getTime()
   const disableDepositTab = currentDate > resolutionDate
   const [activeTab, setActiveTab] = useState(disableDepositTab ? Tabs.withdraw : Tabs.deposit)
+
+  if (activeTab === Tabs.withdraw && collateral.address === pseudoNativeAssetAddress) {
+    symbol = displayCollateral.symbol
+  }
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
@@ -301,6 +308,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       const conditionId = await marketMaker.getConditionId()
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
+      let useBaseToken = false
+      if (collateral.address === pseudoNativeAssetAddress && displayCollateral.address === pseudoNativeAssetAddress) {
+        useBaseToken = true
+      }
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
         collateralAddress,
@@ -310,6 +321,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         marketMaker,
         outcomesCount: balances.length,
         sharesToBurn: amountToRemove || Zero,
+        useBaseToken,
       })
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
@@ -388,6 +400,22 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       : []
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
+
+  let toggleCollatral = collateral
+  if (collateral.address === pseudoNativeAssetAddress) {
+    if (displayCollateral.address === wrapToken.address) {
+      toggleCollatral = getNativeAsset(context.networkId)
+    } else {
+      toggleCollatral = getWrapToken(context.networkId)
+    }
+  }
+  const setToggleCollateral = () => {
+    if (displayCollateral.address === wrapToken.address) {
+      setDisplayCollateral(getNativeAsset(context.networkId))
+    } else {
+      setDisplayCollateral(getWrapToken(context.networkId))
+    }
+  }
 
   return (
     <>
@@ -554,6 +582,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 title="Total"
                 value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${symbol}`}
               />
+              {collateral.address === pseudoNativeAssetAddress ? (
+                <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollatral} />
+              ) : (
+                <span />
+              )}
             </TransactionDetailsCard>
           )}
         </div>
