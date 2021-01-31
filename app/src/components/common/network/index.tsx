@@ -3,8 +3,12 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks'
 import { truncateStringInTheMiddle } from '../../../util/tools'
+import { IconNotification } from '../icons/IconNotification'
 
 import { ConnectionIcon } from './img/ConnectionIcon'
+interface Props {
+  claim: boolean
+}
 
 const Wrapper = styled.div`
   align-items: center;
@@ -17,6 +21,7 @@ const ConnectionStatusText = styled.span`
   font-size: 12px;
   font-weight: 400;
   line-height: 1.2;
+  margin-right: 8px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     font-size: 14px;
@@ -25,11 +30,13 @@ const ConnectionStatusText = styled.span`
 
 const ConnectionStatusDot = styled.div`
   height: 22px;
-  margin-right: 5px;
   width: 22px;
 `
+const Notification = styled(IconNotification)`
+  margin-right: 12px !important;
+`
 
-export const Network: React.FC = props => {
+export const Network = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account } = context
 
@@ -38,10 +45,11 @@ export const Network: React.FC = props => {
   }
   return (
     <Wrapper {...props}>
+      {props.claim && <Notification />}
+      <ConnectionStatusText>{truncateStringInTheMiddle(account, 6, 4) || 'No account connected'}</ConnectionStatusText>
       <ConnectionStatusDot>
         <ConnectionIcon />
       </ConnectionStatusDot>
-      <ConnectionStatusText>{truncateStringInTheMiddle(account, 6, 4) || 'No account connected'}</ConnectionStatusText>
     </Wrapper>
   )
 }

@@ -407,6 +407,7 @@ export const Dropdown: React.FC<Props> = props => {
             {placeholder && !isDirty ? placeholder : activeItem.content}
             {!!activeItem.secondaryText && !extraContent && <SecondaryText>{activeItem.secondaryText}</SecondaryText>}
           </CurrentItem>
+
           <DropdownButtonRight>
             <CurrentItemExtra>{extraContent}</CurrentItemExtra>
             {!disabled && (

@@ -20,6 +20,7 @@ import {
   XDAI_NETWORKS,
 } from '../../common/constants'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
+import { ClaimDaiModal } from '../common/claim_dai_modal'
 import { Disclaimer } from '../common/disclaimer'
 import { Footer } from '../common/layout/footer'
 import { Header } from '../common/layout/header'
@@ -33,6 +34,7 @@ const RedirectToHome = () => <Redirect to="/" />
 export const Main: React.FC = () => {
   const context = useWeb3Context()
   const windowObj: any = window
+  const [claimState, setClaimState] = useState(true)
 
   const [networkId, setNetworkId] = useState(windowObj.ethereum.chainId)
   const [wrongNetwork, setWrongNetwork] = useState(false)
@@ -59,6 +61,7 @@ export const Main: React.FC = () => {
   return (
     <>
       {wrongNetwork && <SwitchNetworkModal currentNetworkId={networkId} />}
+      {claimState && <ClaimDaiModal></ClaimDaiModal>}
       <Router>
         <MainWrapper>
           <Helmet>

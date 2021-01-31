@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { MAINNET_LOCATION, MAIN_NETWORKS, XDAI_LOCATION, XDAI_NETWORKS } from '../../../common/constants'
 import { IconNetwork } from '../icons'
 
-const ModalBackground = styled.div`
+export const ModalBackground = styled.div`
   height: 100vh;
   width: 100vw;
   position: absolute;

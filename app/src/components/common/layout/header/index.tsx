@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+import { Zero } from 'ethers/constants'
+import { BigNumber, bigNumberify } from 'ethers/utils'
+import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps, matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
@@ -6,6 +8,8 @@ import styled, { css } from 'styled-components'
 
 import { Logo } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
+import { XdaiService } from '../../../../services'
+import { formatBigNumber } from '../../../../util/tools'
 import { ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
@@ -148,20 +152,70 @@ const HeaderDropdown = styled(Dropdown)`
 const CloseIconWrapper = styled.div`
   margin-right: 12px;
 `
+const ClaimWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+`
+const ClaimAmount = styled.div`
+  color: black;
+`
 
 const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
-  const { account, networkId } = useConnectedWeb3Context()
+  const { account, library: provider, networkId } = useConnectedWeb3Context()
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
+  const [claimState, setClaimState] = useState<boolean>(false)
+  const [unclaimedAmout, setUnclaimedAmount] = useState<BigNumber>(Zero)
 
   const disableConnectButton = isModalOpen
 
   const headerDropdownItems: Array<DropdownItemProps> = [
     {
+      content: (
+        <ClaimWrapper
+          onClick={() => {
+            claimFunction()
+          }}
+        >
+          <div>Claim</div>
+          <ClaimAmount>{formatBigNumber(unclaimedAmout, 18, 2)}</ClaimAmount>
+        </ClaimWrapper>
+      ),
+    },
+    {
       content: <ButtonDisconnectWallet />,
     },
   ]
+  const claimFunction = () => {
+    console.log('works')
+  }
+  useEffect(() => {
+    const fetchUnclaimedAssets = async () => {
+      const xDaiService = new XdaiService(provider)
+      const transaction = await xDaiService.fetchXdaiTransactionData()
+      if (transaction) {
+        setUnclaimedAmount(transaction.value)
+
+        // headerDropdownItems.unshift({
+        //   content: (
+        //     <ClaimWrapper>
+        //       <div>Claim</div>
+        //       <ClaimAmount>{formatBigNumber(transaction.value, 18, 2)}</ClaimAmount>
+        //     </ClaimWrapper>
+        //   ),
+        // })
+        setClaimState(true)
+
+        return
+      }
+      setClaimState(false)
+    }
+    if (networkId === 1) {
+      fetchUnclaimedAssets()
+    }
+  }, [account, networkId])
 
   const isMarketCreatePage = !!matchPath(history.location.pathname, { path: '/create', exact: true })
 
@@ -263,7 +317,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               <HeaderDropdown
                 dropdownPosition={DropdownPosition.center}
                 items={headerDropdownItems}
-                placeholder={<Network />}
+                placeholder={<Network claim={claimState} />}
               />
             </>
           )}
