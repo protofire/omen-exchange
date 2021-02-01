@@ -180,6 +180,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const disableDepositTab = currentDate > resolutionDate
   const [activeTab, setActiveTab] = useState(disableDepositTab ? Tabs.withdraw : Tabs.deposit)
 
+  let displayTotalSymbol = symbol
+  if (activeTab === Tabs.withdraw && collateral.address === pseudoNativeAssetAddress) {
+    displayTotalSymbol = displayCollateral.symbol
+  }
+
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
@@ -577,7 +582,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 emphasizeValue={depositedTokensTotal.gt(0)}
                 state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
-                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${symbol}`}
+                value={`${formatNumber(
+                  formatBigNumber(depositedTokensTotal, collateral.decimals),
+                )} ${displayTotalSymbol}`}
               />
               {collateral.address === pseudoNativeAssetAddress ? (
                 <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollatral} />

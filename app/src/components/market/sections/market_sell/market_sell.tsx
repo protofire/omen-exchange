@@ -94,7 +94,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
 
   const wrapToken = getWrapToken(context.networkId)
-
+  let displayTotalSymbol = symbol
+  if (collateral.address === displayCollateral.address && collateral.address === wrapToken.address) {
+    displayTotalSymbol = displayCollateral.symbol
+  }
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])
@@ -319,7 +322,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Total'}
               value={`${
                 tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
-              } ${symbol}`}
+              } ${displayTotalSymbol}`}
             />
             {collateral.address === wrapToken.address ? (
               <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollatral} />
