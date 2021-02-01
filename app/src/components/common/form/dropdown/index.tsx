@@ -121,12 +121,12 @@ const DropdownButton = styled.div`
   }
 `
 
-const DropdownButtonRight = styled.div`
+const DropdownButtonRight = styled.div<{ omitRightButtonMargin?: boolean }>`
   display: flex;
   align-items: center;
 
   & > * + * {
-    margin-left: 10px;
+    ${props => !props.omitRightButtonMargin && 'margin-left:10px;'};
   }
 `
 
@@ -318,6 +318,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   items: any
   placeholder?: React.ReactNode | string | undefined
   maxHeight?: boolean
+  omitRightButtonMargin?: boolean
 }
 
 export const Dropdown: React.FC<Props> = props => {
@@ -329,6 +330,7 @@ export const Dropdown: React.FC<Props> = props => {
     dropdownDirection,
     dropdownPosition,
     items,
+    omitRightButtonMargin,
     placeholder,
     maxHeight = false,
     ...restProps
@@ -409,7 +411,7 @@ export const Dropdown: React.FC<Props> = props => {
             {!!activeItem.secondaryText && !extraContent && <SecondaryText>{activeItem.secondaryText}</SecondaryText>}
           </CurrentItem>
 
-          <DropdownButtonRight>
+          <DropdownButtonRight omitRightButtonMargin={omitRightButtonMargin}>
             <CurrentItemExtra>{extraContent}</CurrentItemExtra>
             {!disabled && (
               <ChevronWrapper>

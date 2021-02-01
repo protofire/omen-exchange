@@ -28,7 +28,7 @@ interface Prop {
   isClaimStateTransaction: boolean
 }
 
-export const useXdaiBridge = (amount: BigNumber): Prop => {
+export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const [transactionStep, setTransactionStep] = useState<State>(State.idle)
   const { account, library: provider, networkId } = useConnectedWeb3Context()
   const [xDaiBalance, setXdaiBalance] = useState<BigNumber>(Zero)
@@ -41,7 +41,7 @@ export const useXdaiBridge = (amount: BigNumber): Prop => {
 
   const transferFunction = async () => {
     try {
-      if (!cpk) return
+      if (!cpk || !amount) return
       if (networkId === 1) {
         setTransactionStep(State.waitingConfirmation)
 
@@ -72,6 +72,7 @@ export const useXdaiBridge = (amount: BigNumber): Prop => {
       fetchBalance()
     } catch (err) {
       setTransactionStep(State.error)
+      console.error(`Error while transferring! ${err}`)
     }
   }
   const claimLatestToken = async () => {
@@ -89,6 +90,7 @@ export const useXdaiBridge = (amount: BigNumber): Prop => {
     } catch (e) {
       setIsClaimStateTransaction(false)
       setTransactionStep(State.error)
+      console.error(`Error while claiming DAI! ${e}`)
     }
   }
 

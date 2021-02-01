@@ -22,6 +22,7 @@ const ConnectionStatusText = styled.span`
   font-weight: 400;
   line-height: 1.2;
   margin-right: 8px;
+  margin-left: 12px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     font-size: 14px;

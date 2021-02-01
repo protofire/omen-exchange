@@ -19,6 +19,7 @@ import {
   XDAI_LOCATION,
   XDAI_NETWORKS,
 } from '../../common/constants'
+import { useXdaiBridge } from '../../hooks/useXdaiBridge'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { ClaimDaiModal } from '../common/claim_dai_modal'
 import { Disclaimer } from '../common/disclaimer'
@@ -38,6 +39,8 @@ export const Main: React.FC = () => {
 
   const [networkId, setNetworkId] = useState(windowObj.ethereum.chainId)
   const [wrongNetwork, setWrongNetwork] = useState(false)
+
+  const { unclaimedAmount } = useXdaiBridge()
 
   windowObj.ethereum.on('chainChanged', (chainId: string) => {
     setNetworkId(chainId)
@@ -61,7 +64,7 @@ export const Main: React.FC = () => {
   return (
     <>
       {wrongNetwork && <SwitchNetworkModal currentNetworkId={networkId} />}
-      {claimState && <ClaimDaiModal setClaim={setClaimState}></ClaimDaiModal>}
+      {claimState && <ClaimDaiModal setClaim={setClaimState} unclaimedAmount={unclaimedAmount}></ClaimDaiModal>}
       <Router>
         <MainWrapper>
           <Helmet>

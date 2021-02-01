@@ -146,7 +146,7 @@ const ContentsRight = styled.div`
 `
 
 const HeaderDropdown = styled(Dropdown)`
-  ${ButtonCSS}
+  ${ButtonCSS};
 `
 
 const CloseIconWrapper = styled.div`
@@ -156,11 +156,24 @@ const ClaimWrapper = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
-  border-bottom: 1px solid black;
 `
 const ClaimAmount = styled.div`
-  color: black;
+  color: ${props => props.theme.colors.textColorDark};
+  font-size: ${props => props.theme.fonts.defaultSize};
 `
+const GoldDot = styled.div`
+  height: 6px;
+  width: 6px;
+  background-color: #f9a606;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+`
+const ClaimText = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 interface ExtendsHistory extends RouteComponentProps {
   setClaim: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -180,26 +193,24 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
       content: (
         <ClaimWrapper
           onClick={() => {
-            claimFunction()
+            props.setClaim(true)
           }}
         >
-          <div>Claim</div>
-          <ClaimAmount>{formatBigNumber(unclaimedAmout, 18, 2)}</ClaimAmount>
+          <ClaimText>
+            <GoldDot />
+            Claim
+          </ClaimText>
+          <ClaimAmount>{formatBigNumber(unclaimedAmout, 18, 2)} DAI</ClaimAmount>
         </ClaimWrapper>
       ),
       visibility: !claimState,
     },
-    {
-      content: <div>Settings</div>,
-    },
+
     {
       content: <ButtonDisconnectWallet />,
     },
   ]
-  const claimFunction = () => {
-    console.log('works')
-    props.setClaim(true)
-  }
+
   useEffect(() => {
     const fetchUnclaimedAssets = async () => {
       const xDaiService = new XdaiService(provider)
@@ -276,7 +287,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
               </ButtonCreateMobile>
             </>
           )}
-          {/*mainnet             xDai    */}
+
           {(networkId === 1 || networkId == 100) && account && (
             <>
               <ButtonRoundBridge
@@ -318,6 +329,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
               <HeaderDropdown
                 dropdownPosition={DropdownPosition.center}
                 items={headerDropdownItems}
+                omitRightButtonMargin={true}
                 placeholder={<Network claim={claimState} />}
               />
             </>
