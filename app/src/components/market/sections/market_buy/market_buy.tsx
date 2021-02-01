@@ -205,7 +205,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       What do you think?`),
       )
-
       setAmount(null)
       setAmountToDisplay('')
       setStatus(Status.Ready)
