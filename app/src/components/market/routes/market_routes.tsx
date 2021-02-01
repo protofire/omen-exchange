@@ -47,7 +47,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
         fetchGraphMarketMakerData={fetchGraphMarketMakerData}
         marketMakerData={marketMakerData}
       />
-      <ThreeBoxComments threadName={marketMakerAddress} />
+      <ThreeBoxComments threadName={marketMakerData.question.id} />
     </>
   )
 }
