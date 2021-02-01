@@ -5,7 +5,15 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
-import { BalanceItem, LiquidityObject, Status, Token, TradeObject } from '../../../../util/types'
+import {
+  BalanceItem,
+  LiquidityObject,
+  LiquidityType,
+  Status,
+  Token,
+  TradeObject,
+  TradeType,
+} from '../../../../util/types'
 import { IconInfo } from '../../../common/tooltip/img/IconInfo'
 import { Circle } from '../../common/common_styled'
 import { PositionTable } from '../position_table'
@@ -395,14 +403,14 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       const shortTrades = trades.filter(trade => trade.outcomeIndex === '0')
       totalShortTradesCost = shortTrades.length
         ? shortTrades
-            .map(trade => (trade.type === 'Buy' ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
+            .map(trade => (trade.type === TradeType.buy ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
             .reduce((a, b) => a.add(b))
         : new BigNumber(0)
 
       const longTrades = trades.filter(trade => trade.outcomeIndex === '1')
       totalLongTradesCost = longTrades.length
         ? longTrades
-            .map(trade => (trade.type === 'Buy' ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
+            .map(trade => (trade.type === TradeType.buy ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
             .reduce((a, b) => a.add(b))
         : new BigNumber(0)
     }
@@ -410,8 +418,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     let totalShortLiquidityTxsCost = new BigNumber(0)
     let totalLongLiquidityTxsCost = new BigNumber(0)
     if (liquidityTxs && liquidityTxs.length) {
-      const addLiquidityTxs = liquidityTxs.filter(tx => tx.type === 'Add')
-      const removeLiquidityTxs = liquidityTxs.filter(tx => tx.type === 'Remove')
+      const addLiquidityTxs = liquidityTxs.filter(tx => tx.type === LiquidityType.add)
+      const removeLiquidityTxs = liquidityTxs.filter(tx => tx.type === LiquidityType.remove)
 
       // More short shares provided so short shares are purchased
       const addLiquidityShortPurchaseTxs = addLiquidityTxs.filter(tx =>

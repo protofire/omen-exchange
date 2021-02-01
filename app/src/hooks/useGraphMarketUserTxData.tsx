@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 
 import { getContractAddress } from '../util/networks'
 import { isObjectEqual, waitABit } from '../util/tools'
-import { LiquidityObject, Status, TradeObject } from '../util/types'
+import { LiquidityObject, LiquidityType, Status, TradeObject, TradeType } from '../util/types'
 
 const tradeQuery = gql`
   query GetMarketTradeData($marketAddress: String!, $cpkAddress: String!) {
@@ -39,12 +39,12 @@ type GraphResponseTradeObject = {
   feeAmount: string
   outcomeTokenMarginalPrice: string
   oldOutcomeTokenMarginalPrice: string
-  type: string
+  type: TradeType
   outcomeIndex: string
 }
 
 type GraphResponseLiquidityObject = {
-  type: string
+  type: LiquidityType
   additionalSharesCost: string
   outcomeTokenAmounts: string[]
 }

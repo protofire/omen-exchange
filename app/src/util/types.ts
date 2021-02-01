@@ -460,3 +460,13 @@ export enum FormState {
   import = 'IMPORT',
   scalar = 'SCALAR',
 }
+
+export enum TradeType {
+  buy = 'Buy',
+  sell = 'Sell',
+}
+
+export enum LiquidityType {
+  add = 'Add',
+  remove = 'Remove',
+}
