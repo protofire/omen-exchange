@@ -34,7 +34,7 @@ const RedirectToHome = () => <Redirect to="/" />
 export const Main: React.FC = () => {
   const context = useWeb3Context()
   const windowObj: any = window
-  const [claimState, setClaimState] = useState(true)
+  const [claimState, setClaimState] = useState(false)
 
   const [networkId, setNetworkId] = useState(windowObj.ethereum.chainId)
   const [wrongNetwork, setWrongNetwork] = useState(false)
@@ -61,7 +61,7 @@ export const Main: React.FC = () => {
   return (
     <>
       {wrongNetwork && <SwitchNetworkModal currentNetworkId={networkId} />}
-      {claimState && <ClaimDaiModal></ClaimDaiModal>}
+      {claimState && <ClaimDaiModal setClaim={setClaimState}></ClaimDaiModal>}
       <Router>
         <MainWrapper>
           <Helmet>
@@ -77,7 +77,7 @@ export const Main: React.FC = () => {
             <meta content={TWITTER_SITE} name="twitter:site" />
             <link href={`${OG_IMAGE}`} rel="icon" type="image/png" />
           </Helmet>
-          <Header />
+          <Header setClaim={setClaimState} />
           <MainScroll>
             {context.error && <WrongNetworkMessage />}
             {!context.error && (

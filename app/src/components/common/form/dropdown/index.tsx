@@ -305,6 +305,7 @@ export interface DropdownItemProps {
   secondaryText?: React.ReactNode | string
   extraContent?: string
   onClick?: () => void
+  visibility?: boolean
 }
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -433,6 +434,7 @@ export const Dropdown: React.FC<Props> = props => {
             style={{ paddingRight: dropdownPaddingRight }}
           >
             {items.map((item: DropdownItemProps, index: string) => {
+              if (item.visibility) return
               return (
                 <Item
                   active={parseInt(index) === currentItemIndex}

@@ -15,7 +15,7 @@ export const ModalBackground = styled.div`
   background: ${props => props.theme.switchNetworkModal.backgroundColor};
 `
 
-const Modal = styled.div`
+export const Modal = styled.div`
   border-radius: 8px;
   background: ${props => props.theme.switchNetworkModal.modalColor};
   border: 1px solid ${props => props.theme.switchNetworkModal.borderColor};
@@ -24,10 +24,7 @@ const Modal = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding-top: 40px;
-  padding-bottom: 24px;
-  padding-right: 32px;
-  padding-left: 32px;
+  padding: 40px 32px 24px;
 `
 
 const ModalTextWrapper = styled.div`

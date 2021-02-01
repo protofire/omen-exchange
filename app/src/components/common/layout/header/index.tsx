@@ -156,12 +156,16 @@ const ClaimWrapper = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
+  border-bottom: 1px solid black;
 `
 const ClaimAmount = styled.div`
   color: black;
 `
+interface ExtendsHistory extends RouteComponentProps {
+  setClaim: React.Dispatch<React.SetStateAction<boolean>>
+}
 
-const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentProps) => {
+const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const { account, library: provider, networkId } = useConnectedWeb3Context()
 
   const { history, ...restProps } = props
@@ -183,6 +187,10 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
           <ClaimAmount>{formatBigNumber(unclaimedAmout, 18, 2)}</ClaimAmount>
         </ClaimWrapper>
       ),
+      visibility: !claimState,
+    },
+    {
+      content: <div>Settings</div>,
     },
     {
       content: <ButtonDisconnectWallet />,
@@ -190,6 +198,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
   ]
   const claimFunction = () => {
     console.log('works')
+    props.setClaim(true)
   }
   useEffect(() => {
     const fetchUnclaimedAssets = async () => {
@@ -198,14 +207,6 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
       if (transaction) {
         setUnclaimedAmount(transaction.value)
 
-        // headerDropdownItems.unshift({
-        //   content: (
-        //     <ClaimWrapper>
-        //       <div>Claim</div>
-        //       <ClaimAmount>{formatBigNumber(transaction.value, 18, 2)}</ClaimAmount>
-        //     </ClaimWrapper>
-        //   ),
-        // })
         setClaimState(true)
 
         return
