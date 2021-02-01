@@ -483,25 +483,19 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
         const shortPayoutAmount = (shortSharesNumber || 0) * (1 - scaleValue / 100)
         const shortProfit = shortPayoutAmount - totalShortPriceNumber
+        const shortProfitRatio = shortPayoutAmount / totalShortPriceNumber - 1
         setShortPayout(shortPayoutAmount)
         setShortProfitAmount(shortProfit)
-        setShortProfitPercentage(
-          (shortPayoutAmount / totalShortPriceNumber - 1) * 100 < -100
-            ? -100
-            : (shortPayoutAmount / totalShortPriceNumber - 1) * 100,
-        )
+        setShortProfitPercentage(shortProfitRatio * 100 < -100 ? -100 : shortProfitRatio * 100)
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
         const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
         const longPayoutAmount = (longSharesNumber || 0) * (scaleValue / 100)
         const longProfit = longPayoutAmount - totalLongPriceNumber
+        const longProfitRatio = longPayoutAmount / totalLongPriceNumber - 1
         setLongPayout(longPayoutAmount)
         setLongProfitAmount(longProfit)
-        setLongProfitPercentage(
-          (longPayoutAmount / totalLongPriceNumber - 1) * 100 < -100
-            ? -100
-            : (longPayoutAmount / totalLongPriceNumber - 1) * 100,
-        )
+        setLongProfitPercentage(longProfitRatio * 100 < -100 ? -100 : longProfitRatio * 100)
       }
     }
   }, [
