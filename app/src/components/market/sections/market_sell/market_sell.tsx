@@ -163,8 +163,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Selling ${sharesAmount} shares...`)
-      setAmountShares(null)
-      setAmountSharesToDisplay('')
+
       await cpk.sellOutcomes({
         amount: tradedCollateral,
         outcomeIndex,
@@ -173,6 +172,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       })
 
       await fetchGraphMarketMakerData()
+      setAmountShares(null)
+      setAmountSharesToDisplay('')
       setStatus(Status.Ready)
       setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
