@@ -68,7 +68,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
-  let symbol = useSymbol(collateral)
+  const symbol = useSymbol(collateral)
 
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
@@ -95,9 +95,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const wrapToken = getWrapToken(context.networkId)
 
-  if (collateral.address === displayCollateral.address && collateral.address === wrapToken.address) {
-    symbol = displayCollateral.symbol
-  }
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])
@@ -179,8 +176,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Selling ${sharesAmount} shares...`)
-      setAmountShares(null)
-      setAmountSharesToDisplay('')
+
       let useBaseToken = false
       if (collateral.address !== displayCollateral.address) {
         useBaseToken = true
@@ -194,6 +190,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       })
 
       await fetchGraphMarketMakerData()
+      setAmountShares(null)
+      setAmountSharesToDisplay('')
       setStatus(Status.Ready)
       setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {

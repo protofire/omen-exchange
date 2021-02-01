@@ -138,7 +138,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       ? nativeAsset
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
-  let symbol = useSymbol(collateral)
+  const symbol = useSymbol(collateral)
 
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
@@ -179,10 +179,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const currentDate = new Date().getTime()
   const disableDepositTab = currentDate > resolutionDate
   const [activeTab, setActiveTab] = useState(disableDepositTab ? Tabs.withdraw : Tabs.deposit)
-
-  if (activeTab === Tabs.withdraw && collateral.address === pseudoNativeAssetAddress) {
-    symbol = displayCollateral.symbol
-  }
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
@@ -270,8 +266,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
-      setAmountToFund(null)
-      setAmountToFundDisplay('')
+
       await cpk.addFunding({
         amount: amountToFund || Zero,
         collateral,
@@ -282,6 +277,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchFundingBalance()
       await fetchCollateralBalance()
 
+      setAmountToFund(null)
+      setAmountToFundDisplay('')
       setStatus(Status.Ready)
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
     } catch (err) {
@@ -306,8 +303,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
-      setAmountToRemove(null)
-      setAmountToRemoveDisplay('')
       let useBaseToken = false
       if (collateral.address === pseudoNativeAssetAddress && displayCollateral.address === pseudoNativeAssetAddress) {
         useBaseToken = true
@@ -327,6 +322,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchFundingBalance()
       await fetchCollateralBalance()
 
+      setAmountToRemove(null)
+      setAmountToRemoveDisplay('')
       setStatus(Status.Ready)
       setMessage(`Successfully withdrew ${fundsAmount} ${symbol}`)
       setIsModalTransactionResultOpen(true)
