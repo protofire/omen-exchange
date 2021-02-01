@@ -287,7 +287,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       }
       setMessage(`Selling ${sharesAmount} shares...`)
 
-
       await cpk.sellOutcomes({
         amount: tradedCollateral,
         compoundService,
