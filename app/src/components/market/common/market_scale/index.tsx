@@ -377,7 +377,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     setIsAmountInputted(newPrediction ? newPrediction !== Number(currentPrediction) : false)
   }, [newPrediction, currentPrediction])
 
-  const [scaleValue, setScaleValue] = useState<number | undefined>(
+  const [scaleValue, setScaleValue] = useState<number>(
     newPrediction
       ? newPrediction * 100
       : currentPrediction
@@ -470,18 +470,18 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     if (long) {
       // Calculate total payout by mulitplying shares amount by scale position
-      setYourPayout((amountSharesNumber || 0) * (Number(scaleBall?.value) / 100))
+      setYourPayout((amountSharesNumber || 0) * (scaleValue / 100))
       // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (Number(scaleBall?.value) / 100) - (amountNumber || 0))
+      setProfitLoss((amountSharesNumber || 0) * (scaleValue / 100) - (amountNumber || 0))
     } else if (short) {
       // Calculate total payout by mulitplying shares amount by scale position
-      setYourPayout((amountSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
+      setYourPayout((amountSharesNumber || 0) * (1 - scaleValue / 100))
       // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - (amountNumber || 0))
+      setProfitLoss((amountSharesNumber || 0) * (1 - scaleValue / 100) - (amountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
         const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
-        const shortPayoutAmount = (shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100)
+        const shortPayoutAmount = (shortSharesNumber || 0) * (1 - scaleValue / 100)
         const shortProfit = shortPayoutAmount - totalShortPriceNumber
         setShortPayout(shortPayoutAmount)
         setShortProfitAmount(shortProfit)
@@ -493,7 +493,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
         const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
-        const longPayoutAmount = (longSharesNumber || 0) * (Number(scaleBall?.value) / 100)
+        const longPayoutAmount = (longSharesNumber || 0) * (scaleValue / 100)
         const longProfit = longPayoutAmount - totalLongPriceNumber
         setLongPayout(longPayoutAmount)
         setLongProfitAmount(longProfit)
@@ -514,7 +514,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     feeNumber,
     longShares,
     longSharesNumber,
-    scaleBall?.value,
+    scaleValue,
     short,
     shortShares,
     shortSharesNumber,
