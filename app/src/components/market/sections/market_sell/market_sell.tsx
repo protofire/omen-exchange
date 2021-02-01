@@ -286,9 +286,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         useBaseToken = true
       }
       setMessage(`Selling ${sharesAmount} shares...`)
-      setAmountShares(null)
-      setAmountSharesToDisplay('')
-      setDisplaySellShares(new BigNumber('0'))
+
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
