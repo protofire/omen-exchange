@@ -10,7 +10,7 @@ interface Props {
   onClick?: MouseEventHandler
 }
 
-const Wrapper = styled.div<{ rotate?: boolean }>`
+const Wrapper = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -41,7 +41,7 @@ const Wrapper = styled.div<{ rotate?: boolean }>`
 export const TextToggle = (props: Props) => {
   const { alternativeLabel, isMain, mainLabel, onClick } = props
   return (
-    <Wrapper onClick={onClick} rotate={!isMain}>
+    <Wrapper onClick={onClick}>
       {isMain ? <IconMiniDown /> : <IconMiniUp />}
       <div className="text-toggle-label">{isMain ? mainLabel : alternativeLabel}</div>
     </Wrapper>
