@@ -470,3 +470,12 @@ export enum LiquidityType {
   add = 'Add',
   remove = 'Remove',
 }
+
+export type ValueBoxItem = {
+  title: string
+  subtitle: string
+  tooltip?: string
+  positive?: boolean
+  xValue?: number
+  dataValue?: number
+}

@@ -16,13 +16,14 @@ import {
 } from '../../../../util/types'
 import { IconInfo } from '../../../common/tooltip/img/IconInfo'
 import { Circle } from '../../common/common_styled'
+import { SCALE_HEIGHT, VALUE_BOXES_MARGIN } from '../common_styled'
 import { PositionTable } from '../position_table'
 
-const SCALE_HEIGHT = '20px'
+import { ValueBoxes } from './value_boxes'
+
 const BAR_WIDTH = '2px'
 const BALL_SIZE = '20px'
 const DOT_SIZE = '8px'
-const VALUE_BOXES_MARGIN = '12px'
 
 const ScaleWrapper = styled.div<{
   borderBottom: boolean | undefined
@@ -197,100 +198,6 @@ const ScaleTooltipMessage = styled.p`
   letter-spacing: 0.1px;
   text-align: left;
   margin: 0;
-`
-
-const ValueBoxes = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: ${VALUE_BOXES_MARGIN};
-  width: 100%;
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    flex-direction: column;
-    justify-content: center;
-  }
-`
-
-const ValueBoxPair = styled.div`
-  width: calc(50% - ${VALUE_BOXES_MARGIN} / 2);
-  display: flex;
-  align-items: center;
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    width: calc(100% - ${VALUE_BOXES_MARGIN} / 2);
-
-    &:nth-of-type(2) {
-      margin-top: 12px;
-    }
-  }
-`
-
-const ValueBox = styled.div<{ xValue?: number }>`
-  padding: 12px;
-  border: 1px solid ${props => props.theme.scale.box};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 50%;
-  background: white;
-
-  &:nth-of-type(odd) {
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-  }
-  &:nth-of-type(even) {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-    border-left: none;
-  }
-`
-
-const ValueBoxRegular = styled.div<{ xValue?: number }>`
-  padding: 12px;
-  border: 1px solid ${props => props.theme.scale.box};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  ${props =>
-    props.xValue
-      ? props.xValue <= 0.885
-        ? `left: ${
-            props.xValue <= 0.115
-              ? `0`
-              : props.xValue <= 0.885
-              ? `${props.xValue * 100}%; transform: translateX(-50%);`
-              : ``
-          }`
-        : `right: 0;`
-      : ''}
-  background: white;
-  position: absolute;
-  top: calc(${SCALE_HEIGHT} + ${VALUE_BOXES_MARGIN});
-  border-radius: 4px;
-`
-
-const ValueBoxTitle = styled.p<{ positive?: boolean | undefined }>`
-  font-size: 14px;
-  font-weight: 500;
-  color: ${props => props.theme.colors.textColorDarker};
-  margin-bottom: 2px;
-  margin-top: 0;
-  color: ${props =>
-    props.positive ? props.theme.scale.positiveText : props.positive === false ? props.theme.scale.negativeText : ''};
-`
-
-const ValueBoxSubtitle = styled.p`
-  font-size: 14px;
-  color: ${props => props.theme.colors.textColor};
-  margin: 0;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
 `
 
 interface Props {
@@ -550,6 +457,19 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     (isDust(shortShares || new BigNumber(0), collateral.decimals) &&
       isDust(longShares || new BigNumber(0), collateral.decimals))
 
+  const staticValueBoxData = [
+    {
+      title: `${
+        currentPrediction ? formatNumber(currentPredictionNumber.toString()) : startingPoint && startingPointNumber
+      }
+      ${currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}`,
+      subtitle: startingPointTitle,
+      xValue: currentPrediction
+        ? Number(currentPrediction)
+        : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound)),
+    },
+  ]
+
   return (
     <>
       <ScaleWrapper borderBottom={isPositionTableDisabled} borderTop={borderTop} valueBoxes={isAmountInputted}>
@@ -627,24 +547,25 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             </>
           )}
           {!isAmountInputted && (
-            <ValueBoxRegular
-              xValue={
-                currentPrediction
-                  ? Number(currentPrediction)
-                  : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
-              }
-            >
-              <ValueBoxTitle>
-                {currentPrediction
-                  ? formatNumber(currentPredictionNumber.toString())
-                  : startingPoint && startingPointNumber}
-                {currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}
-              </ValueBoxTitle>
-              <ValueBoxSubtitle>{startingPointTitle}</ValueBoxSubtitle>
-            </ValueBoxRegular>
+            <ValueBoxes valueBoxData={staticValueBoxData} />
+            // <ValueBoxRegular
+            //   xValue={
+            //     currentPrediction
+            //       ? Number(currentPrediction)
+            //       : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
+            //   }
+            // >
+            //   <ValueBoxTitle>
+            //     {currentPrediction
+            //       ? formatNumber(currentPredictionNumber.toString())
+            //       : startingPoint && startingPointNumber}
+            //     {currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}
+            //   </ValueBoxTitle>
+            //   <ValueBoxSubtitle>{startingPointTitle}</ValueBoxSubtitle>
+            // </ValueBoxRegular>
           )}
         </Scale>
-        {isAmountInputted && (
+        {/* {isAmountInputted && (
           <ValueBoxes>
             <ValueBoxPair>
               <ValueBox>
@@ -708,7 +629,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               </ValueBox>
             </ValueBoxPair>
           </ValueBoxes>
-        )}
+        )} */}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable
