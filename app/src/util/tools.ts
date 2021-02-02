@@ -332,7 +332,7 @@ export const getSharesInBaseToken = (
  * If collateral is cToken type then display is the base collateral
  * Else display is the collateral
  */
-export const getInitialCollateral = (collateral: Token, networkId: number): Token => {
+export const getInitialCollateral = (networkId: number, collateral: Token): Token => {
   const collateralSymbol = collateral.symbol.toLowerCase()
   if (collateralSymbol in CompoundTokenType) {
     if (collateralSymbol === 'ceth') {
@@ -343,7 +343,11 @@ export const getInitialCollateral = (collateral: Token, networkId: number): Toke
       return baseToken
     }
   } else {
-    return collateral
+    if (collateral.address === getWrapToken(networkId).address) {
+      return getNativeAsset(networkId)
+    } else {
+      return collateral
+    }
   }
 }
 /**

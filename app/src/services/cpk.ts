@@ -29,6 +29,7 @@ import { MarketMakerFactoryService } from './market_maker_factory'
 import { OracleService } from './oracle'
 import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
+import { UnwrapTokenService } from './unwrap_token'
 
 const logger = getLogger('Services::CPKService')
 
@@ -48,8 +49,8 @@ interface CPKSellOutcomesParams {
   compoundService?: CompoundService | null
   outcomeIndex: number
   marketMaker: MarketMakerService
-  useBaseToken?: boolean
   conditionalTokens: ConditionalTokenService
+  useBaseToken?: boolean
 }
 
 interface CPKCreateMarketParams {
@@ -758,6 +759,19 @@ class CPKService {
       const transactions = []
       const txOptions: TxOptions = {}
 
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+
+      const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+      const collateralSymbol = collateralToken.symbol.toLowerCase()
+      let userInputCollateral = collateralToken
+      if (collateralSymbol === 'ceth') {
+        userInputCollateral = getNativeAsset(networkId)
+      } else {
+        const userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
+        userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+      }
+
       if (this.cpk.isSafeApp()) {
         txOptions.gas = await this.getGas(500000)
       }
@@ -778,22 +792,20 @@ class CPKService {
         to: marketMaker.address,
         data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
       })
-      // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp()) {
-        if (useBaseToken && compoundService != null) {
-          txOptions.gas = await this.getGas(compoundServiceGasNeeded)
-          const network = await this.provider.getNetwork()
-          const networkId = network.chainId
+
+      if (useBaseToken) {
+        if (!compoundService) {
+          // Pseudonative to base token conversion flow
           const collateralToken = getTokenFromAddress(networkId, collateralAddress)
-          const collateralSymbol = collateralToken.symbol.toLowerCase()
-          let userInputCollateral = collateralToken
-          if (collateralSymbol === 'ceth') {
-            userInputCollateral = getNativeAsset(networkId)
-          } else {
-            const userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
-            userInputCollateral = getToken(networkId, userInputCollateralSymbol)
-          }
-          const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(userInputCollateral, amount)
+          const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, amount)
+          // If use prefers to get paid in the base native asset then unwrap the asset
+          transactions.push({
+            to: collateralAddress,
+            data: encodedWithdrawFunction,
+          })
+        } else {
+          // cToken to base token conversion flow
+          txOptions.gas = await this.getGas(compoundServiceGasNeeded)
           // Convert cpk token to base token if user wants to redeem in base
           const encodedRedeemFunction = CompoundService.encodeRedeemTokens(collateralSymbol, amount.toString())
           // Approve cToken for the cpk contract
@@ -806,25 +818,30 @@ class CPKService {
             to: collateralToken.address,
             data: encodedRedeemFunction,
           })
-          // Transfer base token to the user
-          if (userInputCollateral.address === pseudoNativeAssetAddress) {
-            // If user wants to withdraw ether then simply transfer the amount
-            transactions.push({
-              to: account,
-              value: minCollateralAmount.toString(),
-            })
-          } else {
-            transactions.push({
-              to: userInputCollateral.address,
-              data: ERC20Service.encodeTransfer(account, minCollateralAmount),
-            })
-          }
-        } else {
-          // Step 4: Transfer funding to user
+        }
+      }
+      // If we are signed in as a safe we don't need to transfer
+      if (!this.cpk.isSafeApp()) {
+        // Step 4: Transfer funding to user
+        if (!useBaseToken) {
           transactions.push({
-            to: collateralAddress,
+            to: userInputCollateral.address,
             data: ERC20Service.encodeTransfer(account, amount),
           })
+        } else {
+          // Transfer unwrapped asset back to user
+          if (!compoundService) {
+            transactions.push({
+              to: account,
+              value: amount,
+            })
+          } else {
+            const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(userInputCollateral, amount)
+            transactions.push({
+              to: account,
+              value: minCollateralAmount,
+            })
+          }
         }
       }
 
@@ -977,6 +994,7 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
+
       const transactions = []
       const removeFundingTx = {
         to: marketMaker.address,
@@ -1005,57 +1023,79 @@ class CPKService {
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
       let userInputCollateral = collateralToken
-      const totalAmountEarned = amountToMerge.add(earnings)
+      const totalAmountToSend = amountToMerge.add(earnings)
       // transfer to the user the merged collateral plus the earned fees
-      if (useBaseToken && compoundService != null) {
-        if (collateralSymbol === 'ceth') {
-          userInputCollateral = getNativeAsset(networkId)
+      if (useBaseToken) {
+        if (compoundService != null) {
+          // cToken to base token flow
+          if (collateralSymbol === 'ceth') {
+            userInputCollateral = getNativeAsset(networkId)
+          } else {
+            const userInputCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
+            userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+          }
+          // Convert cpk token to base token if user wants to redeem in base
+          const encodedRedeemFunction = CompoundService.encodeRedeemTokens(
+            collateralSymbol,
+            totalAmountToSend.toString(),
+          )
+          // Approve cToken for the cpk contract
+          transactions.push({
+            to: userInputCollateral.address,
+            data: ERC20Service.encodeApproveUnlimited(collateralToken.address),
+          })
+          // redeeem underlying token from the ctoken token
+          transactions.push({
+            to: collateralToken.address,
+            data: encodedRedeemFunction,
+          })
         } else {
-          const userInputCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
-          userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+          // Pseudonative asset to base asset flow
+          const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+          const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, totalAmountToSend)
+          // If use prefers to get paid in the base native asset then unwrap the asset
+          transactions.push({
+            to: collateralAddress,
+            data: encodedWithdrawFunction,
+          })
         }
-        // Convert cpk token to base token if user wants to redeem in base
-        const encodedRedeemFunction = CompoundService.encodeRedeemTokens(collateralSymbol, totalAmountEarned.toString())
-        // Approve cToken for the cpk contract
-        transactions.push({
-          to: userInputCollateral.address,
-          data: ERC20Service.encodeApproveUnlimited(collateralToken.address),
-        })
-        // redeeem underlying token from the ctoken token
-        transactions.push({
-          to: collateralToken.address,
-          data: encodedRedeemFunction,
-        })
       }
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
         // transfer to the user the merged collateral plus the earned fees
-        if (useBaseToken && compoundService != null) {
-          const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(
-            userInputCollateral,
-            totalAmountEarned,
-          )
-          if (userInputCollateral.address === pseudoNativeAssetAddress) {
-            // If user wants to redeem in ether simply transfer the funds back to user
+        if (useBaseToken) {
+          if (compoundService != null) {
+            const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(
+              userInputCollateral,
+              totalAmountToSend,
+            )
+            if (userInputCollateral.address === pseudoNativeAssetAddress) {
+              // If user wants to redeem in ether simply transfer the funds back to user
+              transactions.push({
+                to: account,
+                value: minCollateralAmount.toString(),
+              })
+            } else {
+              // Transfer base token to the user
+              transactions.push({
+                to: userInputCollateral.address,
+                data: ERC20Service.encodeTransfer(account, minCollateralAmount),
+              })
+            }
+          } else {
+            // Transfer unwrapped asset back to user
             transactions.push({
               to: account,
-              value: minCollateralAmount.toString(),
-            })
-          } else {
-            // Transfer base token to the user
-            transactions.push({
-              to: userInputCollateral.address,
-              data: ERC20Service.encodeTransfer(account, minCollateralAmount),
+              value: totalAmountToSend,
             })
           }
         } else {
           transactions.push({
             to: collateralAddress,
-            data: ERC20Service.encodeTransfer(account, totalAmountEarned),
+            data: ERC20Service.encodeTransfer(account, totalAmountToSend),
           })
         }
       }
-
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
       return this.waitForTransaction(txObject)
     } catch (err) {

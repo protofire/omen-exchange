@@ -15,7 +15,7 @@ import {
 import { MarketMakerService } from '../../../../services'
 import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
-import { getToken } from '../../../../util/networks'
+import { getNativeAsset, getToken, getWrapToken } from '../../../../util/networks'
 import {
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
@@ -45,6 +45,7 @@ import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
+import { SwitchTransactionToken } from '../../common/switch_transaction_token'
 import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
@@ -119,14 +120,21 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const { networkId } = context
-  const baseCollateral = getInitialCollateral(collateral, networkId)
+  const baseCollateral = getInitialCollateral(networkId, collateral)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
+  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
+
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
   const collateralSymbol = collateral.symbol.toLowerCase()
   let currencySelect = <span />
   const symbol = useSymbol(displayCollateral)
+
+  const wrapToken = getWrapToken(context.networkId)
+  let displayTotalSymbol = symbol
+  if (collateral.address === displayCollateral.address && collateral.address === wrapToken.address) {
+    displayTotalSymbol = displayCollateral.symbol
+  }
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])
@@ -282,7 +290,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
       setMessage(`Selling ${displaySharesAmount} shares...`)
       let useBaseToken = false
-      if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
+      if (displayCollateral.address !== collateral.address) {
         useBaseToken = true
       }
       setMessage(`Selling ${sharesAmount} shares...`)
@@ -361,7 +369,21 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     amountShares?.isZero() ||
     amountError !== null ||
     isNegativeAmountShares
-
+  let toggleCollatral = collateral
+  if (collateral.address === wrapToken.address) {
+    if (displayCollateral.address === wrapToken.address) {
+      toggleCollatral = getNativeAsset(context.networkId)
+    } else {
+      toggleCollatral = getWrapToken(context.networkId)
+    }
+  }
+  const setToggleCollateral = () => {
+    if (displayCollateral.address === wrapToken.address) {
+      setDisplayCollateral(getNativeAsset(context.networkId))
+    } else {
+      setDisplayCollateral(getWrapToken(context.networkId))
+    }
+  }
   return (
     <>
       <OutcomeTable
@@ -452,8 +474,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 normalizedTradedCollateral
                   ? formatNumber(formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, 2))
                   : '0.00'
-              } ${symbol}`}
+              } ${displayTotalSymbol}`}
             />
+            {collateral.address === wrapToken.address ? (
+              <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollatral} />
+            ) : (
+              <span />
+            )}
           </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
