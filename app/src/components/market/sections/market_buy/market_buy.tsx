@@ -101,6 +101,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals).includes('-'))
@@ -187,7 +188,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Buying ${sharesAmount} shares ...`)
-
+      setIsTransactionProcessing(true)
       await cpk.buyOutcomes({
         amount: amount || Zero,
         collateral,
@@ -209,10 +210,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setAmountToDisplay('')
       setStatus(Status.Ready)
       setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
       logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
     }
     setIsModalTransactionResultOpen(true)
   }
@@ -235,14 +238,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
 
-  const amountError =
-    maybeCollateralBalance === null
-      ? null
-      : maybeCollateralBalance.isZero() && amount?.gt(maybeCollateralBalance)
-      ? `Insufficient balance`
-      : amount?.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${currentBalance} ${symbol}`
-      : null
+  const amountError = isTransactionProcessing
+    ? null
+    : maybeCollateralBalance === null
+    ? null
+    : maybeCollateralBalance.isZero() && amount?.gt(maybeCollateralBalance)
+    ? `Insufficient balance`
+    : amount?.gt(maybeCollateralBalance)
+    ? `Value must be less than or equal to ${currentBalance} ${symbol}`
+    : null
 
   const isBuyDisabled =
     !amount ||
