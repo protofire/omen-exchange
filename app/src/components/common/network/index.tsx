@@ -22,7 +22,7 @@ const ConnectionStatusText = styled.span`
   font-weight: 400;
   line-height: 1.2;
   margin-right: 8px;
-  margin-left: 12px;
+  //margin-left: 12px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     font-size: 14px;
@@ -33,20 +33,17 @@ const ConnectionStatusDot = styled.div`
   height: 22px;
   width: 22px;
 `
-const Notification = styled(IconNotification)`
-  margin-right: 12px !important;
-`
 
 export const Network = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { account } = context
+  const { account, networkId } = context
 
   if (!account) {
     return null
   }
   return (
     <Wrapper {...props}>
-      {props.claim && <Notification />}
+      {props.claim && networkId === 1 && <IconNotification style={{ marginRight: 12 }} />}
       <ConnectionStatusText>{truncateStringInTheMiddle(account, 6, 4) || 'No account connected'}</ConnectionStatusText>
       <ConnectionStatusDot>
         <ConnectionIcon />

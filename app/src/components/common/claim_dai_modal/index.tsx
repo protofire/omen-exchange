@@ -8,7 +8,6 @@ import { ButtonRound } from '../../button/button_round'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconClose } from '../icons'
 import { IconArrowUp } from '../icons/IconArrowUp'
-import { IconChevronUp } from '../icons/IconChevronUp'
 import { DaiIcon } from '../icons/currencies'
 import { Spinner } from '../spinner'
 import { Modal, ModalBackground } from '../switch_network_modal'
@@ -16,6 +15,7 @@ import { Modal, ModalBackground } from '../switch_network_modal'
 const ClaimAmount = styled.div`
   margin-top: 32px;
   font-size: 16px;
+  line-height: 18.75px;
   color: ${props => props.theme.textfield.color};
 `
 const SecondaryText = styled.div`
@@ -26,6 +26,7 @@ const SecondaryText = styled.div`
 `
 const ClaimButton = styled(Button)`
   margin-top: 32px;
+  font-weight: 500;
 `
 const CloseStyled = styled.div`
   align-self: flex-end;
@@ -46,8 +47,8 @@ const Reversed = styled.div`
 
 export const ClaimDaiModal = (props: any) => {
   const { claimLatestToken, transactionHash, transactionStep } = useXdaiBridge()
-  //to to test state just uncomment code below here and uncomment mikana in the claim button below as well as remove transactin Step for xDai bridge
-  // let mikana = 10
+  //to test state just uncomment code below here and uncomment mikana in the claim button below as well as remove transactin Step for xDai bridge
+  // let mikana = 3
   // const transactionStep =
   //   mikana === 1
   //     ? State.transactionSubmitted
@@ -58,9 +59,10 @@ export const ClaimDaiModal = (props: any) => {
   //     : mikana === 4
   //     ? State.error
   //     : State.idle
-  // console.log(transactionStep)
+
   useEffect(() => {
     if (transactionStep === State.error) props.setClaim(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transactionStep])
 
   return (
@@ -111,14 +113,19 @@ export const ClaimDaiModal = (props: any) => {
             buttonType={ButtonType.primary}
             onClick={() => {
               claimLatestToken()
-              // mikana++
             }}
             style={{ width: '252px' }}
           >
             Claim DAI
           </ClaimButton>
         ) : (
-          <CloseButton>Close</CloseButton>
+          <CloseButton
+            onClick={() => {
+              props.setClaim(false)
+            }}
+          >
+            Close
+          </CloseButton>
         )}
       </Modal>
     </ModalBackground>

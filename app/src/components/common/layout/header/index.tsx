@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps, matchPath } from 'react-router-dom'
@@ -80,8 +80,9 @@ const CurrencyText = styled.div`
   font-family: ${props => props.theme.fonts.fontFamily};
   line-height: 22.41px;
 `
-const ButtonRoundBridge = styled(ButtonRound)`
+const Bridge = styled.div`
   display: flex;
+  flex-direction: column;
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     width: calc(100% - 20px);
@@ -227,6 +228,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
     if (networkId === 1) {
       fetchUnclaimedAssets()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, networkId])
 
   const isMarketCreatePage = !!matchPath(history.location.pathname, { path: '/create', exact: true })
@@ -290,18 +292,20 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
 
           {(networkId === 1 || networkId == 100) && account && (
             <>
-              <ButtonRoundBridge
-                onClick={() => {
-                  setIsBridgeOpen(!isBridgeOpen)
-                }}
-              >
-                {currencyReturn(networkId === 1)}
-                <ArrowWrapper>
-                  <IconArrowRight />
-                </ArrowWrapper>
-                {currencyReturn(networkId !== 1)}
-              </ButtonRoundBridge>
-              <XdaiBridgeTransfer open={isBridgeOpen} />
+              <Bridge>
+                <ButtonRound
+                  onClick={() => {
+                    setIsBridgeOpen(!isBridgeOpen)
+                  }}
+                >
+                  {currencyReturn(networkId === 1)}
+                  <ArrowWrapper>
+                    <IconArrowRight />
+                  </ArrowWrapper>
+                  {currencyReturn(networkId !== 1)}
+                </ButtonRound>
+                <XdaiBridgeTransfer open={isBridgeOpen} />
+              </Bridge>
             </>
           )}
 

@@ -5,9 +5,7 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useXdaiBridge } from '../../../../hooks/useXdaiBridge'
 import { formatBigNumber } from '../../../../util/tools'
-import { Button } from '../../../button/button'
 import { ButtonRound } from '../../../button/button_round'
-import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { XDaiStake } from '../../../common/icons/currencies/XDaiStake'
@@ -23,15 +21,13 @@ const BridgeWrapper = styled(ButtonRound)<{ isOpen: boolean }>`
   position: absolute;
   top: calc(100% + 8px);
   width: 207.27px;
-  right: 207.27px;
   z-index: 0;
   height: fit-content;
   box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
   padding: 17px 20px;
   @media only screen and (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    top: calc(100% + 54px);
-    width: calc(100% - 20px);
-    right: 10px;
+    width: calc(100%);
+    right: 1px;
   }
 `
 
@@ -44,6 +40,9 @@ const BalanceText = styled.div`
   width: 50%;
   color: ${({ theme }) => theme.colors.clickable};
 `
+// const RegularBalance = styled.div`
+//   color: ${({ theme }) => theme.colors.textColorLighter};
+// `
 const MainnetWrapper = styled.div`
   margin-bottom: 12px;
   width: 100%;
@@ -69,11 +68,7 @@ const TransferButton = styled(ButtonRound)`
   margin-top: 12px;
   width: 100%;
 `
-const ClaimButton = styled(Button)`
-  margin-top: 12px;
-  width: 100%;
-  font-weight: 500;
-`
+
 const PoweredByStakeWrapper = styled.div`
   display: flex;
 
@@ -95,17 +90,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
 
   const [transferState, setTransferState] = useState<boolean>(false)
 
-  const {
-    claimLatestToken,
-    claimState,
-    daiBalance,
-    isClaimStateTransaction,
-    transactionHash,
-    transactionStep,
-    transferFunction,
-    unclaimedAmount,
-    xDaiBalance,
-  } = useXdaiBridge(amount)
+  const { daiBalance, transactionHash, transactionStep, transferFunction, xDaiBalance } = useXdaiBridge(amount)
 
   return (
     <>
@@ -159,18 +144,6 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           >
             Transfer
           </TransferButton>
-          {claimState && networkId === 1 && (
-            <ClaimButton
-              buttonType={ButtonType.primary}
-              onClick={() => {
-                setTransferState(!transferState)
-                setAmount(unclaimedAmount)
-                claimLatestToken()
-              }}
-            >
-              Claim {formatBigNumber(unclaimedAmount, 18, 2)} DAI
-            </ClaimButton>
-          )}
           <PoweredByStakeWrapper>
             <XDaiStake />
             <StakeText>Powered by STAKE Bridge</StakeText>
@@ -179,7 +152,6 @@ export const XdaiBridgeTransfer = (props: Prop) => {
         {transferState && (
           <TransactionState
             amountToTransfer={amount}
-            isClaimTransaction={isClaimStateTransaction}
             network={networkId}
             state={transactionStep}
             transactionHash={transactionHash}
