@@ -171,6 +171,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       arbitrator,
       balances,
       collateral,
+      creator: graphMarketMakerData.creator,
       fee: graphMarketMakerData.fee,
       collateralVolume: graphMarketMakerData.collateralVolume,
       userInputCollateral: collateral,

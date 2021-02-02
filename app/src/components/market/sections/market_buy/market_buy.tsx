@@ -1,6 +1,6 @@
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
@@ -26,7 +26,6 @@ import {
   formatBigNumber,
   formatNumber,
   getBaseTokenForCToken,
-  getPricesInCToken,
   getSharesInBaseToken,
   mulBN,
 } from '../../../../util/tools'
@@ -123,10 +122,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     compoundService
   ) {
     displayBalances = getSharesInBaseToken(balances, compoundService, baseCollateral)
-    if (displayCollateral.address === collateral.address) {
-      displayBalances = getSharesInBaseToken(balances, compoundService, baseCollateral)
-      displayBalances = getPricesInCToken(displayBalances, compoundService, baseCollateral)
-    }
   }
 
   const symbol = useSymbol(displayCollateral)
@@ -150,6 +145,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals).includes('-'))
@@ -164,7 +160,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   // get the amount of shares that will be traded and the estimated prices after trade
   const calcBuyAmount = useMemo(
-    () => async (amount: BigNumber): Promise<[BigNumber, number[], number[], BigNumber]> => {
+    () => async (amount: BigNumber): Promise<[BigNumber, number[], BigNumber]> => {
       let tradedShares: BigNumber
       try {
         tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
@@ -180,33 +176,17 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
-      let displayProbabilities = probabilities
-      if (
-        collateral.symbol.toLowerCase() in CompoundTokenType &&
-        collateral.address === displayCollateral.address &&
-        compoundService
-      ) {
-        displayProbabilities = pricesAfterTrade.map(priceAfterTrade => {
-          const priceAfterTradeBN = parseUnits(priceAfterTrade.toString(), baseCollateral.decimals)
-          const priceAfterTradeInCollateralValue = compoundService.calculateBaseToCTokenExchange(
-            baseCollateral,
-            priceAfterTradeBN,
-          )
-          const priceAfterTradeInCollateral = formatBigNumber(priceAfterTradeInCollateralValue, 8, 4)
-          return Number(priceAfterTradeInCollateral) * 100
-        })
-      }
       setNewShares(
         balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)),
       )
-      return [tradedShares, probabilities, displayProbabilities, amount]
+      return [tradedShares, probabilities, amount]
     }, // eslint-disable-next-line
     [balances, displayCollateral.address, marketMaker, outcomeIndex],
   )
 
-  const [tradedShares, probabilities, displayProbabilities, debouncedAmount] = useAsyncDerivedValue(
+  const [tradedShares, probabilities, debouncedAmount] = useAsyncDerivedValue(
     amount || Zero,
-    [new BigNumber(0), balances.map(() => 0), balances.map(() => 0), amount],
+    [new BigNumber(0), balances.map(() => 0), amount],
     calcBuyAmount,
   )
 
@@ -259,7 +239,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Buying ${sharesAmount} shares ...`)
-
+      setIsTransactionProcessing(true)
       await cpk.buyOutcomes({
         amount: inputAmount,
         collateral,
@@ -279,13 +259,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       What do you think?`),
       )
-
+      setDisplayAmountToFund(new BigNumber('0'))
       setStatus(Status.Ready)
       setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
       logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
     }
     setIsModalTransactionResultOpen(true)
   }
@@ -326,14 +308,15 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const sharesTotal = formatNumber(formatBigNumber(displayTradedShares, baseCollateral.decimals))
   const total = `${sharesTotal} Shares`
 
-  const amountError =
-    maybeCollateralBalance === null
-      ? null
-      : maybeCollateralBalance.isZero() && amount?.gt(maybeCollateralBalance)
-      ? `Insufficient balance`
-      : amount?.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${currentBalance} ${symbol}`
-      : null
+  const amountError = isTransactionProcessing
+    ? null
+    : maybeCollateralBalance === null
+    ? null
+    : maybeCollateralBalance.isZero() && amount?.gt(maybeCollateralBalance)
+    ? `Insufficient balance`
+    : amount?.gt(maybeCollateralBalance)
+    ? `Value must be less than or equal to ${currentBalance} ${symbol}`
+    : null
 
   const isBuyDisabled =
     !amount ||
@@ -404,8 +387,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           OutcomeTableValue.Bonded,
         ]}
         displayBalances={displayBalances}
-        displayCollateral={displayCollateral}
-        displayProbabilities={displayProbabilities}
+        displayCollateral={baseCollateral}
         newShares={displayNewShares}
         outcomeHandleChange={(value: number) => switchOutcome(value)}
         outcomeSelected={outcomeIndex}
@@ -459,7 +441,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               />
             }
             onClickMaxButton={() => {
-              setAmount(collateralBalance)
+              setDisplayAmountToFund(collateralBalance)
               setAmountToDisplay(formatBigNumber(collateralBalance, displayCollateral.decimals, 5))
             }}
             shouldDisplayMaxButton={shouldDisplayMaxButton}

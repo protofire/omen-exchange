@@ -765,11 +765,13 @@ class CPKService {
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
       let userInputCollateral = collateralToken
-      if (collateralSymbol === 'ceth') {
-        userInputCollateral = getNativeAsset(networkId)
-      } else {
-        const userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
-        userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+      if (compoundService && useBaseToken) {
+        if (collateralSymbol === 'ceth') {
+          userInputCollateral = getNativeAsset(networkId)
+        } else {
+          const userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
+          userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+        }
       }
 
       if (this.cpk.isSafeApp()) {
@@ -830,16 +832,16 @@ class CPKService {
           })
         } else {
           // Transfer unwrapped asset back to user
-          if (!compoundService) {
+          if (compoundService && userInputCollateral.address !== pseudoNativeAssetAddress) {
+            const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(userInputCollateral, amount)
+            transactions.push({
+              to: userInputCollateral.address,
+              data: ERC20Service.encodeTransfer(account, minCollateralAmount),
+            })
+          } else {
             transactions.push({
               to: account,
               value: amount,
-            })
-          } else {
-            const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(userInputCollateral, amount)
-            transactions.push({
-              to: account,
-              value: minCollateralAmount,
             })
           }
         }

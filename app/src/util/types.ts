@@ -289,6 +289,7 @@ export interface MarketMakerData {
   creationTimestamp: string
   collateral: Token
   userInputCollateral: Token | null
+  creator: string
   fee: BigNumber
   isConditionResolved: boolean
   isQuestionFinalized: boolean
@@ -426,6 +427,12 @@ export type TradeObject = {
   outcomeIndex: string
 }
 
+export type LiquidityObject = {
+  type: string
+  additionalSharesCost: BigNumber
+  outcomeTokenAmounts: BigNumber[]
+}
+
 export type MarketCondition = {
   oracle: Maybe<string>
   scalarHigh: Maybe<BigNumber>
@@ -475,4 +482,14 @@ export enum FormState {
   categorical = 'CATEGORICAL',
   import = 'IMPORT',
   scalar = 'SCALAR',
+}
+
+export enum TradeType {
+  buy = 'Buy',
+  sell = 'Sell',
+}
+
+export enum LiquidityType {
+  add = 'Add',
+  remove = 'Remove',
 }

@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
@@ -15,14 +15,13 @@ import {
 import { MarketMakerService } from '../../../../services'
 import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
-import { getNativeAsset, getToken, getWrapToken } from '../../../../util/networks'
+import { getNativeAsset, getWrapToken } from '../../../../util/networks'
 import {
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
   getInitialCollateral,
-  getPricesInCToken,
   getSharesInBaseToken,
   mulBN,
 } from '../../../../util/tools'
@@ -39,7 +38,6 @@ import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError } from '../../common/common_styled'
@@ -57,33 +55,6 @@ const StyledButtonContainer = styled(ButtonContainer)`
   margin: 0 -24px;
   padding: 20px 24px 0;
   margin-top: ${({ theme }) => theme.borders.borderLineDisabled};
-`
-
-const CurrencyDropdown = styled(Dropdown)`
-  min-width: 80px;
-  display: inline-flex;
-  float: right;
-`
-const CustomDropdownItem = styled.div`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 100%;
-  .dropdownItems & .sortBy {
-    display: none;
-  }
-`
-const CurrencyDropdownLabelContainer = styled.div`
-  margin-top: 20px;
-`
-const CurrencyDropdownLabel = styled.div`
-  display: inline-flex;
-  padding-left: 14px;
-  padding-top: 14px;
-  color: ${({ theme }) => theme.colors.textColorDark};
-  font-size: ${({ theme }) => theme.textfield.fontSize};
-  font-weight: 400;
-  line-height: 16px;
 `
 
 const logger = getLogger('Market::Sell')
@@ -124,10 +95,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const baseCollateral = getInitialCollateral(networkId, collateral)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
-
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
   const collateralSymbol = collateral.symbol.toLowerCase()
-  let currencySelect = <span />
   const symbol = useSymbol(displayCollateral)
 
   const wrapToken = getWrapToken(context.networkId)
@@ -158,44 +128,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     compoundService
   ) {
     displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
-    if (displayCollateral.address === collateral.address) {
-      displayBalances = getSharesInBaseToken(balances, compoundService, baseCollateral)
-      displayBalances = getPricesInCToken(displayBalances, compoundService, baseCollateral)
-    }
-  }
-  const setUserInputCollateral = (symbol: string): void => {
-    const inputToken = getToken(networkId, symbol.toLowerCase() as KnownToken)
-    setDisplayCollateral(inputToken)
-  }
-  if (collateralSymbol in CompoundTokenType) {
-    const filters = [
-      {
-        title: baseCollateral.symbol,
-        onClick: () => setUserInputCollateral(baseCollateral.symbol),
-      },
-      {
-        title: collateral.symbol,
-        onClick: () => setUserInputCollateral(collateral.symbol),
-      },
-    ]
-    const filterItems: Array<DropdownItemProps> = filters.map(item => {
-      return {
-        content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
-        onClick: item.onClick,
-      }
-    })
-    currencySelect = (
-      <CurrencyDropdownLabelContainer>
-        <CurrencyDropdownLabel>Withdraw as</CurrencyDropdownLabel>
-        <CurrencyDropdown dropdownPosition={DropdownPosition.left} items={filterItems} />
-      </CurrencyDropdownLabelContainer>
-    )
   }
 
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
-    ): Promise<[number[], number[], Maybe<BigNumber>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
+    ): Promise<[number[], Maybe<BigNumber>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
       const holdings = balances.map(balance => balance.holdings)
       const holdingsOfSoldOutcome = holdings[outcomeIndex]
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
@@ -214,7 +152,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         logger.warn(
           `Could not compute amount of collateral to sell for '${amountShares.toString()}' and '${holdingsOfSoldOutcome.toString()}'`,
         )
-        return [[], [], null, null, null]
+        return [[], null, null, null]
       }
 
       const balanceAfterTrade = computeBalanceAfterTrade(
@@ -227,33 +165,16 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
       const potentialValue = mulBN(amountToSell, 1 / (1 - marketFeeWithTwoDecimals))
       const costFee = potentialValue.sub(amountToSell)
-
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
-      let displayProbabilities = probabilities
-      if (
-        collateral.symbol.toLowerCase() in CompoundTokenType &&
-        collateral.address === displayCollateral.address &&
-        compoundService
-      ) {
-        displayProbabilities = pricesAfterTrade.map(priceAfterTrade => {
-          const priceAfterTradeBN = parseUnits(priceAfterTrade.toString(), baseCollateral.decimals)
-          const priceAfterTradeInCollateralValue = compoundService.calculateBaseToCTokenExchange(
-            baseCollateral,
-            priceAfterTradeBN,
-          )
-          const priceAfterTradeInCollateral = formatBigNumber(priceAfterTradeInCollateralValue, 8, 4)
-          return Number(priceAfterTradeInCollateral) * 100
-        })
-      }
       logger.log(`Amount to sell ${amountToSell}`)
-      return [probabilities, displayProbabilities, costFee, amountToSell, potentialValue]
+      return [probabilities, costFee, amountToSell, potentialValue]
     }, // eslint-disable-next-line
     [outcomeIndex, balances, marketFeeWithTwoDecimals],
   )
 
-  const [probabilities, displayProbabilities, costFee, tradedCollateral, potentialValue] = useAsyncDerivedValue(
+  const [probabilities, costFee, tradedCollateral, potentialValue] = useAsyncDerivedValue(
     amountShares || Zero,
-    [balances.map(() => 0), balances.map(() => 0), null, null, null],
+    [balances.map(() => 0), null, null, null],
     calcSellAmount,
   )
 
@@ -263,12 +184,18 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   if (displayCollateral.address !== collateral.address && compoundService) {
     if (potentialValue && potentialValue.gt(0)) {
       potentialValueNormalized = compoundService.calculateCTokenToBaseExchange(displayCollateral, potentialValue)
+    } else {
+      potentialValueNormalized = new BigNumber('0')
     }
     if (costFee && costFee.gt(0)) {
       costFeeNormalized = compoundService.calculateCTokenToBaseExchange(displayCollateral, costFee)
+    } else {
+      costFeeNormalized = new BigNumber('0')
     }
     if (tradedCollateral && tradedCollateral.gt(0)) {
       normalizedTradedCollateral = compoundService.calculateCTokenToBaseExchange(displayCollateral, tradedCollateral)
+    } else {
+      normalizedTradedCollateral = new BigNumber('0')
     }
   }
   const finish = async () => {
@@ -280,7 +207,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       if (!cpk) {
         return
       }
-
+      setIsTransactionProcessing(true)
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
       let displaySharesAmount = sharesAmount
       if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares && compoundService) {
@@ -293,7 +220,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       if (displayCollateral.address !== collateral.address) {
         useBaseToken = true
       }
-      setMessage(`Selling ${sharesAmount} shares...`)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
@@ -305,13 +231,17 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       })
 
       await fetchGraphMarketMakerData()
-
+      setAmountSharesFromInput(new BigNumber('0'))
+      setDisplaySellShares(null)
+      setAmountShares(null)
       setStatus(Status.Ready)
       setMessage(`Successfully sold ${displaySharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' shares.`)
       logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
     }
     setIsModalTransactionResultOpen(true)
   }
@@ -337,14 +267,16 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       formatBigNumber(displaySelectedOutcomeBalanceValue, baseCollateral.decimals),
     )
   }
-  const amountError =
-    balanceItem.shares === null
-      ? null
-      : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
-      ? `Insufficient balance`
-      : amountShares?.gt(balanceItem.shares)
-      ? `Value must be less than or equal to ${displaySelectedOutcomeBalance} shares`
-      : null
+
+  const amountError = isTransactionProcessing
+    ? null
+    : balanceItem.shares === null
+    ? null
+    : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
+    ? `Insufficient balance`
+    : amountShares?.gt(balanceItem.shares)
+    ? `Value must be less than or equal to ${displaySelectedOutcomeBalance} shares`
+    : null
 
   const setAmountSharesFromInput = (shares: BigNumber) => {
     if (collateralSymbol in CompoundTokenType && compoundService) {
@@ -369,19 +301,35 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     amountShares?.isZero() ||
     amountError !== null ||
     isNegativeAmountShares
-  let toggleCollatral = collateral
-  if (collateral.address === wrapToken.address) {
-    if (displayCollateral.address === wrapToken.address) {
-      toggleCollatral = getNativeAsset(context.networkId)
+  let toggleCollateral = collateral
+  if (collateralSymbol in CompoundTokenType) {
+    if (collateral.address === displayCollateral.address) {
+      toggleCollateral = baseCollateral
     } else {
-      toggleCollatral = getWrapToken(context.networkId)
+      toggleCollateral = collateral
+    }
+  } else {
+    if (collateral.address === wrapToken.address) {
+      if (displayCollateral.address === wrapToken.address) {
+        toggleCollateral = getNativeAsset(context.networkId)
+      } else {
+        toggleCollateral = getWrapToken(context.networkId)
+      }
     }
   }
   const setToggleCollateral = () => {
-    if (displayCollateral.address === wrapToken.address) {
-      setDisplayCollateral(getNativeAsset(context.networkId))
+    if (collateralSymbol in CompoundTokenType) {
+      if (displayCollateral.address === baseCollateral.address) {
+        setDisplayCollateral(collateral)
+      } else {
+        setDisplayCollateral(baseCollateral)
+      }
     } else {
-      setDisplayCollateral(getWrapToken(context.networkId))
+      if (displayCollateral.address === wrapToken.address) {
+        setDisplayCollateral(getNativeAsset(context.networkId))
+      } else {
+        setDisplayCollateral(getWrapToken(context.networkId))
+      }
     }
   }
   return (
@@ -397,7 +345,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         ]}
         displayBalances={displayBalances}
         displayCollateral={displayCollateral}
-        displayProbabilities={displayProbabilities}
         newShares={displayNewShares}
         outcomeHandleChange={(value: number) => {
           setOutcomeIndex(value)
@@ -434,7 +381,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             symbol={'Shares'}
           />
           {amountError && <GenericError>{amountError}</GenericError>}
-          {currencySelect}
         </div>
         <div>
           <TransactionDetailsCard>
@@ -476,8 +422,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                   : '0.00'
               } ${displayTotalSymbol}`}
             />
-            {collateral.address === wrapToken.address ? (
-              <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollatral} />
+            {collateral.address === wrapToken.address || collateralSymbol in CompoundTokenType ? (
+              <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollateral} />
             ) : (
               <span />
             )}

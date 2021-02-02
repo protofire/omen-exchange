@@ -12,7 +12,7 @@ interface Props {
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
-  fetchGraphMarketTradeData: () => Promise<void>
+  fetchGraphMarketUserTxData: () => Promise<void>
 }
 
 const MarketBuyContainer: React.FC<Props> = (props: Props) => {

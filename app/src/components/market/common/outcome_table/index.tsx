@@ -35,7 +35,6 @@ interface Props {
   displayCollateral?: Token
   disabledColumns?: OutcomeTableValue[]
   displayRadioSelection?: boolean
-  displayProbabilities?: number[]
   outcomeHandleChange?: (e: number) => void
   getPriceInBaseToken?: (e: number) => number
   outcomeSelected?: number
@@ -105,7 +104,6 @@ export const OutcomeTable = (props: Props) => {
     outcomeSelected,
     payouts = [],
     probabilities,
-    displayProbabilities = probabilities,
     withWinningOutcome = false,
     showPriceChange = false,
     showSharesChange = false,
@@ -248,7 +246,7 @@ export const OutcomeTable = (props: Props) => {
     }
     const currentPriceFormatted = withWinningOutcome ? payout.toFixed(2) : currentPriceDisplay
     const probability = withWinningOutcome ? Number(payout.mul(100).toString()) : probabilities[outcomeIndex]
-    const newPriceValue = displayProbabilities[outcomeIndex] / 100
+    const newPriceValue = probabilities[outcomeIndex] / 100
     let newPrice = newPriceValue.toFixed(2)
     if (newPriceValue < 0.01) {
       newPrice = newPriceValue.toFixed(4)

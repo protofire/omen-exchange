@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedCPKContext, useGraphMarketTradeData } from '../../../../../hooks'
+import { useConnectedCPKContext, useGraphMarketUserTxData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { CompoundService } from '../../../../../services/compound_service'
@@ -115,8 +115,10 @@ const Wrapper = (props: Props) => {
   const cpk = useConnectedCPKContext()
 
   const {
+    address: marketMakerAddress,
     balances,
     collateral,
+    creator,
     fee,
     isQuestionFinalized,
     outcomeTokenMarginalPrices,
@@ -316,10 +318,13 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
-  const { fetchData: fetchGraphMarketTradeData, status, trades } = useGraphMarketTradeData(
-    question.title,
-    collateral.address,
+  const isMarketCreator = cpk && creator === cpk.address.toLowerCase()
+
+  const { fetchData: fetchGraphMarketUserTxData, liquidityTxs, status, trades } = useGraphMarketUserTxData(
+    marketMakerAddress,
     cpk?.address.toLowerCase(),
+    isMarketCreator || false,
+    context.networkId,
   )
 
   useEffect(() => {
@@ -350,6 +355,7 @@ const Wrapper = (props: Props) => {
                   collateral={collateral}
                   currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
                   fee={fee}
+                  liquidityTxs={liquidityTxs}
                   lowerBound={scalarLow || new BigNumber(0)}
                   positionTable={true}
                   startingPointTitle={'Current prediction'}
@@ -442,7 +448,7 @@ const Wrapper = (props: Props) => {
           <MarketPoolLiquidityContainer
             compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
-            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
+            fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
@@ -453,7 +459,7 @@ const Wrapper = (props: Props) => {
           <MarketBuyContainer
             compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
-            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
+            fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
@@ -463,7 +469,7 @@ const Wrapper = (props: Props) => {
           <MarketSellContainer
             compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
-            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
+            fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}

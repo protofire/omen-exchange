@@ -29,9 +29,6 @@ const AdditionalMarketDataLeft = styled.div`
   align-items: center;
   padding: 14px 20px;
   flex-wrap: wrap;
-  & > * + * {
-    margin-left: 14px;
-  }
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-wrap: wrap !important;
     width: 100%;
@@ -47,13 +44,12 @@ const AdditionalMarketDataLeft = styled.div`
 
 const CompoundInterestWrapper = styled.div<{ customColor: string }>`
   color: ${props => props.theme.colors.green};
-  margin-left: 2px !important;
   &:hover {
     color: ${props => props.customColor};
   }
 `
 
-const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean; noLeftMargin?: boolean }>`
+const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
   margin: 0;
   margin-left: 8px;
   font-size: ${props => props.theme.textfield.fontSize};
@@ -74,7 +70,7 @@ const AdditionalMarketDataSectionWrapper = styled.a<{
   display: flex;
   align-items: center;
   cursor: pointer;
-
+  margin-left: 14px;
   &:hover {
     p {
       color: ${props => (props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight)};
@@ -210,7 +206,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
             data-tip={`This market is earning ${compoundInterestRate}% APY powered by compound.finance`}
           >
             <CompoundIconNoBorder />
-            <AdditionalMarketDataSectionTitle noLeftMargin={true}>
+            <AdditionalMarketDataSectionTitle>
               <CompoundInterestWrapper customColor={'#00897B'}>{compoundInterestRate}% APY</CompoundInterestWrapper>
             </AdditionalMarketDataSectionTitle>
           </AdditionalMarketDataSectionWrapper>

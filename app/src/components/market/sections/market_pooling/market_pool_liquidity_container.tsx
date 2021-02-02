@@ -10,7 +10,7 @@ interface Props {
   compoundService: CompoundService
   marketMakerData: MarketMakerData
   fetchGraphMarketMakerData: () => Promise<void>
-  fetchGraphMarketTradeData: () => Promise<void>
+  fetchGraphMarketUserTxData: () => Promise<void>
   switchMarketTab: (arg0: MarketDetailsTab) => void
   isScalar: boolean
 }
