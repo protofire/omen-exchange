@@ -212,24 +212,25 @@ interface Props {
   long?: Maybe<boolean>
   short?: Maybe<boolean>
   collateral?: Maybe<Token>
-  amount?: Maybe<BigNumber>
+  tradeAmount?: Maybe<BigNumber>
   positionTable?: Maybe<boolean>
   trades?: Maybe<TradeObject[]>
   liquidityTxs?: Maybe<LiquidityObject[]>
   status?: Maybe<Status>
   balances?: Maybe<BalanceItem[]>
   fee?: Maybe<BigNumber>
+  liquidityAmount?: Maybe<BigNumber>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
   const {
-    amount,
     amountShares,
     balances,
     borderTop,
     collateral,
     currentPrediction,
     fee,
+    liquidityAmount,
     liquidityTxs,
     long,
     lowerBound,
@@ -239,6 +240,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     startingPoint,
     startingPointTitle,
     status,
+    tradeAmount,
     trades,
     unit,
     upperBound,
@@ -254,7 +256,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const amountSharesNumber =
     collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
 
-  const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
+  const tradeAmountNumber = collateral && Number(formatBigNumber(tradeAmount || new BigNumber(0), collateral.decimals))
   const feeNumber = fee && collateral && Number(formatBigNumber(fee, collateral.decimals))
 
   const shortBalances = balances && balances.filter(balance => balance.outcomeName === 'short')
@@ -378,12 +380,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       // Calculate total payout by mulitplying shares amount by scale position
       setYourPayout((amountSharesNumber || 0) * (scaleValue / 100))
       // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (scaleValue / 100) - (amountNumber || 0))
+      setProfitLoss((amountSharesNumber || 0) * (scaleValue / 100) - (tradeAmountNumber || 0))
     } else if (short) {
       // Calculate total payout by mulitplying shares amount by scale position
       setYourPayout((amountSharesNumber || 0) * (1 - scaleValue / 100))
       // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (1 - scaleValue / 100) - (amountNumber || 0))
+      setProfitLoss((amountSharesNumber || 0) * (1 - scaleValue / 100) - (tradeAmountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
         const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
@@ -406,7 +408,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     }
   }, [
     scaleValuePrediction,
-    amountNumber,
+    tradeAmountNumber,
     long,
     lowerBoundNumber,
     newPredictionNumber,
@@ -482,7 +484,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       title: `${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`,
       subtitle: 'Your Payout',
       tooltip: `Your payout if the market resolves at ${formatNumber(scaleValuePrediction.toString())} ${unit}`,
-      positive: yourPayout > (amountNumber || 0) ? true : yourPayout < (amountNumber || 0) ? false : undefined,
+      positive:
+        yourPayout > (tradeAmountNumber || 0) ? true : yourPayout < (tradeAmountNumber || 0) ? false : undefined,
     },
     {
       title: `${profitLoss > 0 ? '+' : ''}
@@ -572,6 +575,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           {!isAmountInputted && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
+        {liquidityAmount > 0 && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable

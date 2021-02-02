@@ -337,6 +337,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         borderTop={true}
         collateral={collateral}
         currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
+        liquidityAmount={amountToFund}
         lowerBound={scalarLow || new BigNumber(0)}
         startingPointTitle={'Current prediction'}
         unit={getUnit(question.title)}
