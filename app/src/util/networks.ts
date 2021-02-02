@@ -528,8 +528,8 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     addresses: {
       [networkIds.MAINNET]: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       [networkIds.RINKEBY]: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
-      [networkIds.SOKOL]: '0xd50DdFdDbC069C1D1f7CDA1D8aa4AD8cFb1E9e0F',
-      [networkIds.XDAI]: '0x7761D33924bb90129EF56480FC1bD8Da79C8069B',
+      [networkIds.SOKOL]: '0x37Fcdb26F12f3FC76F2424EC6B94D434a959A0f7',
+      [networkIds.XDAI]: '0xe40DD83a262da3f56976038F1554Fe541Fa75ecd',
     },
     isSelectionEnabled: true,
   },
