@@ -14,6 +14,9 @@ const SwitchComponentWrapper = styled.div`
   cursor: pointer;
   font-style: normal;
   letter-spacing: 0.20000000298023224px;
+  &:hover {
+    color: ${props => props.theme.colors.primaryLight};
+  }
 `
 
 const SwitchComponentText = styled.div`
