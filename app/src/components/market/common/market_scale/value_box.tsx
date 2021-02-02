@@ -80,11 +80,10 @@ interface Props {
   tooltip?: string
   positive?: boolean | undefined
   xValue?: number
-  dataValue?: number
 }
 
 export const ValueBox: React.FC<Props> = (props: Props) => {
-  const { dataValue, positive, subtitle, title, tooltip, xValue } = props
+  const { positive, subtitle, title, tooltip, xValue } = props
 
   if (xValue) {
     return (

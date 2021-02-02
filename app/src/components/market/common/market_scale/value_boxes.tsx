@@ -43,7 +43,6 @@ export const ValueBoxes: React.FC<Props> = (props: Props) => {
   const mappedValueBoxes = valueBoxData.map((valueBox, index) => {
     return (
       <ValueBox
-        dataValue={valueBox.dataValue}
         key={index}
         positive={valueBox.positive}
         subtitle={valueBox.subtitle}
