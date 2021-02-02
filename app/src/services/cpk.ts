@@ -131,12 +131,20 @@ class CPKService {
     return this.cpk.address
   }
 
-  waitForTransaction = async (txObject: TransactionResult): Promise<TransactionReceipt> => {
+  waitForTransaction = async (txObject: TransactionResult, xDaiBridge?: boolean): Promise<TransactionReceipt> => {
     let transactionReceipt: TransactionReceipt
+
     if (txObject.hash) {
       // standard transaction
+
       logger.log(`Transaction hash: ${txObject.hash}`)
       transactionReceipt = await this.provider.waitForTransaction(txObject.hash)
+      //xDai bridge transaction with 8 confirmations
+      if (transactionReceipt.confirmations && transactionReceipt.confirmations <= 8 && xDaiBridge) {
+        await waitABit(2000)
+
+        await this.waitForTransaction(txObject, true)
+      }
     } else {
       // transaction through the safe app sdk
       const threshold = await this.proxy.getThreshold()
@@ -260,6 +268,7 @@ class CPKService {
       })
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
+
       return this.waitForTransaction(txObject)
     } catch (err) {
       logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)

@@ -50,7 +50,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         setTransactionHash(transaction.hash)
         setTransactionStep(State.transactionSubmitted)
 
-        await cpk.waitForTransaction(transaction)
+        await cpk.waitForTransaction(transaction, true)
         setTransactionStep(State.transactionConfirmed)
       } else {
         const amountInFloat = formatBigNumber(amount, 18)
@@ -66,7 +66,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         setTransactionHash(transaction)
         setTransactionStep(State.transactionSubmitted)
 
-        await cpk.waitForTransaction({ hash: transaction })
+        await cpk.waitForTransaction({ hash: transaction }, true)
         setTransactionStep(State.transactionConfirmed)
       }
       fetchBalance()
@@ -83,7 +83,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
       const transaction = await cpk.claimDaiTokens()
       setTransactionHash(transaction.hash)
       setTransactionStep(State.transactionSubmitted)
-      await cpk.waitForTransaction(transaction)
+      await cpk.waitForTransaction(transaction, true)
       setTransactionStep(State.transactionConfirmed)
       setIsClaimStateTransaction(false)
       fetchUnclaimedAssets()
