@@ -397,6 +397,7 @@ const theme = {
     neutral: '#86909E',
     positiveText: '#4B9E98',
     negativeText: '#EF5350',
+    positionBall: '#B2DFDB',
   },
 }
 

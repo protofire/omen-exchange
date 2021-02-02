@@ -14,7 +14,7 @@ import {
   TradeType,
 } from '../../../../util/types'
 import { IconInfo } from '../../../common/tooltip/img/IconInfo'
-import { Circle } from '../../common/common_styled'
+import { Circle, OutcomeItemLittleBallOfJoyAndDifferentColors } from '../../common/common_styled'
 import { SCALE_HEIGHT, VALUE_BOXES_MARGIN } from '../common_styled'
 import { PositionTable } from '../position_table'
 
@@ -496,6 +496,22 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     },
   ]
 
+  const liquidityValueBoxData = [
+    {
+      title: `${formatNumber(currentPredictionNumber.toString())} ${unit}`,
+      subtitle: 'Current prediction',
+    },
+    {
+      // TODO: Replace hardcoding
+      title: '+ 1500 Shares',
+      // TODO: Replace hardcoding
+      subtitle: `Long position`,
+      // TODO: Replace tooltip
+      tooltip: `badadada this is the tooltip text`,
+      ball: true,
+    },
+  ]
+
   return (
     <>
       <ScaleWrapper borderBottom={isPositionTableDisabled} borderTop={borderTop} valueBoxes={isAmountInputted}>
@@ -572,10 +588,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
             </>
           )}
-          {!isAmountInputted && <ValueBoxes valueBoxData={singleValueBoxData} />}
+          {!isAmountInputted && (!liquidityAmount || !liquidityAmount?.gt(0)) && (
+            <ValueBoxes valueBoxData={singleValueBoxData} />
+          )}
         </Scale>
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
-        {liquidityAmount > 0 && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
+        {liquidityAmount && liquidityAmount.gt(0) && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable

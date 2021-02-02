@@ -74,16 +74,25 @@ const ValueBoxSubtitle = styled.p`
   align-items: center;
 `
 
+const PositionBall = styled.div`
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  background: ${props => props.theme.scale.positionBall};
+  margin-right: 8px;
+`
+
 interface Props {
   title: string
   subtitle: string
   tooltip?: string
   positive?: boolean | undefined
   xValue?: number
+  ball?: boolean | undefined
 }
 
 export const ValueBox: React.FC<Props> = (props: Props) => {
-  const { positive, subtitle, title, tooltip, xValue } = props
+  const { ball, positive, subtitle, title, tooltip, xValue } = props
 
   if (xValue) {
     return (
@@ -99,6 +108,7 @@ export const ValueBox: React.FC<Props> = (props: Props) => {
       <ValueBoxTitle positive={positive}>{title}</ValueBoxTitle>
       {tooltip && <ReactTooltip id="payoutTooltip" />}
       <ValueBoxSubtitle>
+        {ball && <PositionBall />}
         {subtitle}
         {tooltip && (
           <Circle

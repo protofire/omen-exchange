@@ -477,4 +477,5 @@ export type ValueBoxItem = {
   tooltip?: string
   positive?: boolean
   xValue?: number
+  ball?: boolean
 }

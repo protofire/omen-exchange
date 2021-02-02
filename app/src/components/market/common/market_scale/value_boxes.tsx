@@ -43,6 +43,7 @@ export const ValueBoxes: React.FC<Props> = (props: Props) => {
   const mappedValueBoxes = valueBoxData.map((valueBox, index) => {
     return (
       <ValueBox
+        ball={valueBox.ball}
         key={index}
         positive={valueBox.positive}
         subtitle={valueBox.subtitle}
@@ -55,8 +56,7 @@ export const ValueBoxes: React.FC<Props> = (props: Props) => {
 
   return (
     <ValueBoxWrapper>
-      {mappedValueBoxes.length === 1 && mappedValueBoxes}
-      {mappedValueBoxes.length === 4 && (
+      {mappedValueBoxes.length === 4 ? (
         <>
           <ValueBoxPair>
             {mappedValueBoxes[0]}
@@ -67,6 +67,8 @@ export const ValueBoxes: React.FC<Props> = (props: Props) => {
             {mappedValueBoxes[3]}
           </ValueBoxPair>
         </>
+      ) : (
+        mappedValueBoxes
       )}
     </ValueBoxWrapper>
   )
