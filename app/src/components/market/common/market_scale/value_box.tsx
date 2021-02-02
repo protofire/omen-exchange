@@ -1,7 +1,10 @@
 import React from 'react'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { ValueBoxItem } from '../../../../util/types'
+import { IconInfo } from '../../../common/tooltip/img/IconInfo'
+import { Circle } from '../../common/common_styled'
 import { SCALE_HEIGHT, VALUE_BOXES_MARGIN } from '../common_styled'
 
 const ValueBoxSegment = styled.div`
@@ -92,5 +95,24 @@ export const ValueBox: React.FC<Props> = (props: Props) => {
     )
   }
 
-  return <ValueBoxSegment></ValueBoxSegment>
+  return (
+    <ValueBoxSegment>
+      <ValueBoxTitle positive={positive}>{title}</ValueBoxTitle>
+      {tooltip && <ReactTooltip id="payoutTooltip" />}
+      <ValueBoxSubtitle>
+        {subtitle}
+        {tooltip && (
+          <Circle
+            data-delay-hide={'500'}
+            data-effect={'solid'}
+            data-for={'payoutTooltip'}
+            data-multiline={'true'}
+            data-tip={tooltip}
+          >
+            <IconInfo />
+          </Circle>
+        )}
+      </ValueBoxSubtitle>
+    </ValueBoxSegment>
+  )
 }

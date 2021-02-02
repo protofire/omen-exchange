@@ -1,7 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
-import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
@@ -457,7 +456,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     (isDust(shortShares || new BigNumber(0), collateral.decimals) &&
       isDust(longShares || new BigNumber(0), collateral.decimals))
 
-  const staticValueBoxData = [
+  const singleValueBoxData = [
     {
       title: `${
         currentPrediction ? formatNumber(currentPredictionNumber.toString()) : startingPoint && startingPointNumber
@@ -467,6 +466,30 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       xValue: currentPrediction
         ? Number(currentPrediction)
         : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound)),
+    },
+  ]
+
+  const amountValueBoxData = [
+    {
+      title: `${formatNumber(currentPredictionNumber.toString())} ${unit}`,
+      subtitle: 'Current Prediction',
+    },
+    {
+      title: `${formatNumber(scaleValuePrediction.toString())} ${unit}`,
+      subtitle: 'New Prediction',
+    },
+    {
+      title: `${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`,
+      subtitle: 'Your Payout',
+      tooltip: `Your payout if the market resolves at ${formatNumber(scaleValuePrediction.toString())} ${unit}`,
+      positive: yourPayout > (amountNumber || 0) ? true : yourPayout < (amountNumber || 0) ? false : undefined,
+    },
+    {
+      title: `${profitLoss > 0 ? '+' : ''}
+      ${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`,
+      subtitle: 'Profit/Loss',
+      tooltip: `Your profit/loss if the market resolves at ${formatNumber(scaleValuePrediction.toString())} ${unit}`,
+      positive: profitLoss > 0 ? true : profitLoss < 0 ? false : undefined,
     },
   ]
 
@@ -546,90 +569,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
             </>
           )}
-          {!isAmountInputted && (
-            <ValueBoxes valueBoxData={staticValueBoxData} />
-            // <ValueBoxRegular
-            //   xValue={
-            //     currentPrediction
-            //       ? Number(currentPrediction)
-            //       : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
-            //   }
-            // >
-            //   <ValueBoxTitle>
-            //     {currentPrediction
-            //       ? formatNumber(currentPredictionNumber.toString())
-            //       : startingPoint && startingPointNumber}
-            //     {currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}
-            //   </ValueBoxTitle>
-            //   <ValueBoxSubtitle>{startingPointTitle}</ValueBoxSubtitle>
-            // </ValueBoxRegular>
-          )}
+          {!isAmountInputted && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
-        {/* {isAmountInputted && (
-          <ValueBoxes>
-            <ValueBoxPair>
-              <ValueBox>
-                <ValueBoxTitle>
-                  {formatNumber(currentPredictionNumber.toString())} {unit}
-                </ValueBoxTitle>
-                <ValueBoxSubtitle>Current Prediction</ValueBoxSubtitle>
-              </ValueBox>
-              <ValueBox>
-                <ValueBoxTitle>
-                  {formatNumber(scaleValuePrediction.toString())} {unit}
-                </ValueBoxTitle>
-                <ValueBoxSubtitle>New Prediction</ValueBoxSubtitle>
-              </ValueBox>
-            </ValueBoxPair>
-            <ValueBoxPair>
-              <ValueBox>
-                <ValueBoxTitle
-                  positive={
-                    yourPayout > (amountNumber || 0) ? true : yourPayout < (amountNumber || 0) ? false : undefined
-                  }
-                >
-                  {`${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`}
-                </ValueBoxTitle>
-                <ReactTooltip id="payoutTooltip" />
-                <ValueBoxSubtitle>
-                  Your Payout
-                  <Circle
-                    data-delay-hide={'500'}
-                    data-effect={'solid'}
-                    data-for={'payoutTooltip'}
-                    data-multiline={'true'}
-                    data-tip={`Your payout if the market resolves at ${formatNumber(
-                      scaleValuePrediction.toString(),
-                    )} ${unit}`}
-                  >
-                    <IconInfo />
-                  </Circle>
-                </ValueBoxSubtitle>
-              </ValueBox>
-              <ValueBox>
-                <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>
-                  {profitLoss > 0 && '+'}
-                  {`${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`}
-                </ValueBoxTitle>
-                <ReactTooltip id="profitTooltip" />
-                <ValueBoxSubtitle>
-                  Profit/Loss
-                  <Circle
-                    data-delay-hide={'500'}
-                    data-effect={'solid'}
-                    data-for={'profitTooltip'}
-                    data-multiline={'true'}
-                    data-tip={`Your profit/loss if the market resolves at ${formatNumber(
-                      scaleValuePrediction.toString(),
-                    )} ${unit}`}
-                  >
-                    <IconInfo />
-                  </Circle>
-                </ValueBoxSubtitle>
-              </ValueBox>
-            </ValueBoxPair>
-          </ValueBoxes>
-        )} */}
+        {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable

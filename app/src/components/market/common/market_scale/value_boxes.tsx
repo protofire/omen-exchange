@@ -54,5 +54,21 @@ export const ValueBoxes: React.FC<Props> = (props: Props) => {
     )
   })
 
-  return <ValueBoxWrapper>{mappedValueBoxes.length === 1 && mappedValueBoxes}</ValueBoxWrapper>
+  return (
+    <ValueBoxWrapper>
+      {mappedValueBoxes.length === 1 && mappedValueBoxes}
+      {mappedValueBoxes.length === 4 && (
+        <>
+          <ValueBoxPair>
+            {mappedValueBoxes[0]}
+            {mappedValueBoxes[1]}
+          </ValueBoxPair>
+          <ValueBoxPair>
+            {mappedValueBoxes[2]}
+            {mappedValueBoxes[3]}
+          </ValueBoxPair>
+        </>
+      )}
+    </ValueBoxWrapper>
+  )
 }
