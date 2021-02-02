@@ -79,7 +79,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
-
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
 
   useEffect(() => {
@@ -158,7 +158,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       if (!cpk) {
         return
       }
-
+      setIsTransactionProcessing(true)
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
@@ -176,24 +176,27 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setAmountSharesToDisplay('')
       setStatus(Status.Ready)
       setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' shares.`)
       logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
     }
     setIsModalTransactionResultOpen(true)
   }
 
   const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
 
-  const amountError =
-    balanceItem.shares === null
-      ? null
-      : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
-      ? `Insufficient balance`
-      : amountShares?.gt(balanceItem.shares)
-      ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
-      : null
+  const amountError = isTransactionProcessing
+    ? null
+    : balanceItem.shares === null
+    ? null
+    : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
+    ? `Insufficient balance`
+    : amountShares?.gt(balanceItem.shares)
+    ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
+    : null
 
   const isSellButtonDisabled =
     !amountShares ||
