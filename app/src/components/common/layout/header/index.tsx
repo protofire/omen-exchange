@@ -188,7 +188,6 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const [unclaimedAmout, setUnclaimedAmount] = useState<BigNumber>(Zero)
 
   const disableConnectButton = isModalOpen
-
   const headerDropdownItems: Array<DropdownItemProps> = [
     {
       content: (
@@ -204,7 +203,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           <ClaimAmount>{formatBigNumber(unclaimedAmout, 18, 2)} DAI</ClaimAmount>
         </ClaimWrapper>
       ),
-      visibility: !claimState,
+      visibility: claimState && networkId != 1,
     },
 
     {

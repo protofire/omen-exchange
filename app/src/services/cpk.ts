@@ -131,7 +131,7 @@ class CPKService {
     return this.cpk.address
   }
 
-  waitForTransaction = async (txObject: TransactionResult, xDaiBridge?: boolean): Promise<TransactionReceipt> => {
+  waitForTransaction = async (txObject: TransactionResult, confirmations?: boolean): Promise<TransactionReceipt> => {
     let transactionReceipt: TransactionReceipt
 
     if (txObject.hash) {
@@ -140,7 +140,7 @@ class CPKService {
       logger.log(`Transaction hash: ${txObject.hash}`)
       transactionReceipt = await this.provider.waitForTransaction(txObject.hash)
       //xDai bridge transaction with 8 confirmations
-      if (transactionReceipt.confirmations && transactionReceipt.confirmations <= 8 && xDaiBridge) {
+      if (transactionReceipt.confirmations && transactionReceipt.confirmations <= 8 && confirmations) {
         await waitABit(2000)
 
         await this.waitForTransaction(txObject, true)

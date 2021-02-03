@@ -13,6 +13,9 @@ const MainScrollStyled = styled.div`
   position: relative;
   z-index: 2;
   overflow-x: hidden;
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    padding-top: 57px;
+  }
 `
 
 const MainScrollInner = styled.div`
