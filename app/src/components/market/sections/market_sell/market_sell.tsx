@@ -327,7 +327,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                 tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
               } ${displayTotalSymbol}`}
             />
-            {collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress ? (
+            {collateral.address === wrapToken.address ||
+            collateral.address === getNativeAsset(context.networkId).address ? (
               <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollatral} />
             ) : (
               <span />

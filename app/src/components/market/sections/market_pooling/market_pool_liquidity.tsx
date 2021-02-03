@@ -593,7 +593,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   formatBigNumber(depositedTokensTotal, collateral.decimals),
                 )} ${displayTotalSymbol}`}
               />
-              {collateral.address === pseudoNativeAssetAddress || collateral.address === wrapToken.address (
+              {collateral.address === getNativeAsset(context.networkId).address ||
+              collateral.address === wrapToken.address ? (
                 <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollatral} />
               ) : (
                 <span />
