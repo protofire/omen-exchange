@@ -144,8 +144,11 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     const upperBoundNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
     currentPrediction =
       Number(outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : '0') *
-      ((upperBoundNumber || 0) - (lowerBoundNumber || 0) + (lowerBoundNumber || 0))
+        ((upperBoundNumber || 0) - (lowerBoundNumber || 0)) +
+      (lowerBoundNumber || 0)
   }
+
+  console.log(currentPrediction)
 
   return (
     <Wrapper to={`/${address}`}>
