@@ -70,7 +70,7 @@ const DropdownVariantPillCSS = css`
 `
 
 const DropdownVariantCardCSS = css`
-  ${CardCSS}
+  ${CardCSS};
   flex: 1;
   padding: 14px 25px;
   position: relative;
@@ -370,7 +370,9 @@ export const Dropdown: React.FC<Props> = props => {
   }, [isOpen, dropdownItemsRef?.current?.scrollHeight, dropdownContainerRef?.current?.clientHeight])
 
   const optionClick = useCallback((onClick: (() => void) | undefined, itemIndex: number) => {
-    if (!onClick) return
+    if (!onClick) {
+      return
+    }
 
     setCurrentItemIndex(itemIndex)
     onClick()

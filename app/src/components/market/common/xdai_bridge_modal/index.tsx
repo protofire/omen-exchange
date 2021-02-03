@@ -1,4 +1,5 @@
-import { BigNumber } from 'ethers/utils'
+import { Zero } from 'ethers/constants'
+import { BigNumber, formatUnits } from 'ethers/utils'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
@@ -16,15 +17,26 @@ interface Prop {
   open: boolean
 }
 
-const BridgeWrapper = styled(ButtonRound)<{ isOpen: boolean }>`
+const BridgeWrapper = styled.div<{ isOpen: boolean }>`
+  align-items: center;
+  background-color: ${({ theme }) => theme.colors.mainBodyBackground};
   ${props => (!props.isOpen ? 'display:none' : 'display: flow-root')};
+  font-size: ${props => props.theme.buttonRound.fontSize};
+  line-height: ${props => props.theme.buttonRound.lineHeight};
+  color: ${({ theme }) => theme.colors.textColorDark};
+  transition: border-color 0.15s linear;
+  user-select: none;
+  justify-content: center;
+  outline: none;
   position: absolute;
+  border-radius: ${props => props.theme.dropdown.dropdownItems.borderRadius};
   top: calc(100% + 8px);
   width: 207.27px;
   z-index: 0;
   height: fit-content;
   box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
-  padding: 17px 20px;
+  padding: 20px;
+
   @media only screen and (max-width: ${props => props.theme.themeBreakPoints.md}) {
     width: calc(100%);
     right: 1px;
@@ -35,14 +47,13 @@ const ChainText = styled.div`
   text-align: start;
   width: 50%;
 `
-const BalanceText = styled.div`
+const BalanceText = styled.div<{ disabled: boolean }>`
   text-align: end;
   width: 50%;
-  color: ${({ theme }) => theme.colors.clickable};
+  color: ${({ disabled, theme }) => (disabled ? theme.colors.textColorLighter : theme.colors.clickable)};
+  cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
 `
-// const RegularBalance = styled.div`
-//   color: ${({ theme }) => theme.colors.textColorLighter};
-// `
+
 const MainnetWrapper = styled.div`
   margin-bottom: 12px;
   width: 100%;
@@ -65,14 +76,14 @@ const TextFieldCustomPlace = styled(TextfieldCustomPlaceholder)`
 `
 
 const TransferButton = styled(ButtonRound)`
-  margin-top: 12px;
+  margin-top: 20px;
   width: 100%;
 `
 
 const PoweredByStakeWrapper = styled.div`
   display: flex;
-
-  margin-top: 16px;
+  align-items: center;
+  margin-top: 20px;
   margin-left: 6px;
 `
 const StakeText = styled.div`
@@ -91,7 +102,6 @@ export const XdaiBridgeTransfer = (props: Prop) => {
   const [transferState, setTransferState] = useState<boolean>(false)
 
   const { daiBalance, transactionHash, transactionStep, transferFunction, xDaiBalance } = useXdaiBridge(amount)
-
   return (
     <>
       <BridgeWrapper isOpen={props.open}>
@@ -99,7 +109,9 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           <MainnetWrapper>
             <ChainText>Mainnet</ChainText>
             <BalanceText
+              disabled={daiBalance.eq(Zero)}
               onClick={() => {
+                if (daiBalance.eq(Zero)) return
                 setAmount(daiBalance)
                 setAmountToDisplay(formatBigNumber(daiBalance, 18))
               }}
@@ -110,7 +122,9 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           <XDaiWrapper>
             <ChainText>xDai Chain</ChainText>
             <BalanceText
+              disabled={xDaiBalance.eq(Zero)}
               onClick={() => {
+                if (xDaiBalance.eq(Zero)) return
                 setAmount(xDaiBalance)
                 setAmountToDisplay(formatBigNumber(xDaiBalance, 18))
               }}
@@ -137,6 +151,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           />
 
           <TransferButton
+            disabled={amount.eq(Zero) || (networkId === 100 && Number(formatUnits(amount, 18)) < 10)}
             onClick={() => {
               setTransferState(!transferState)
               transferFunction()

@@ -16,7 +16,9 @@ interface Prop {
   transactionHash: string
 }
 
-const MainWrapper = styled.div``
+const MainWrapper = styled.div`
+  text-align: center;
+`
 
 const SvgWrapper = styled.div`
   margin-top: 38px;
