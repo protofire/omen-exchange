@@ -148,8 +148,6 @@ export const ListItem: React.FC<Props> = (props: Props) => {
       (lowerBoundNumber || 0)
   }
 
-  console.log(currentPrediction)
-
   return (
     <Wrapper to={`/${address}`}>
       <Title>{title}</Title>
