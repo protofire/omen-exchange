@@ -8,14 +8,7 @@ import {
   HistoryType,
   useGraphFpmmTransactionsFromQuestion,
 } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
-import { CPKService } from '../../../../services'
-import {
-  calcPrice,
-  calcSellAmountInCollateral,
-  calculateSharesBought,
-  formatBigNumber,
-  formatTimestampToDate,
-} from '../../../../util/tools'
+import { calcPrice, calcSellAmountInCollateral, formatBigNumber, formatTimestampToDate } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { Button, ButtonSelectable } from '../../../button'
 import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
@@ -125,7 +118,7 @@ export const History_select: React.FC<Props> = ({
   value,
 }) => {
   const context = useConnectedWeb3Context()
-  const { library: provider } = context
+
   const contracts = useContracts(context)
   const { buildMarketMaker } = contracts
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -181,10 +174,8 @@ export const History_select: React.FC<Props> = ({
     setSharesDataLoader(true)
     ;(async () => {
       if (fpmmTransactions) {
-        const cpk = await CPKService.create(provider)
         const response: any[] = await Promise.all(
           fpmmTransactions.map(async item => {
-            console.log('inside')
             if (item.fpmmType === 'Liquidity') {
               const block: any = await marketMaker.getTransaction(item.transactionHash)
 
@@ -193,14 +184,12 @@ export const History_select: React.FC<Props> = ({
                 id: item.id,
                 amount: item.collateralTokenAmount,
                 fpmmType: item.fpmmType,
-                poolShares: await marketMaker.poolSharesTotalSupplyByBlockNumber(block.blockNumber),
                 balances: await marketMaker.getBalanceInformationByBlock(
                   marketMakerAddress,
                   outcomes.length,
                   block.blockNumber,
                 ),
                 additionalShares: item.additionalSharesCost,
-                shares: await marketMaker.getBalanceInformationByBlock(cpk.address, outcomes.length, block.blockNumber),
                 collateralTokenAmount: new BigNumber(item.collateralTokenAmount),
               }
             }
@@ -211,9 +200,10 @@ export const History_select: React.FC<Props> = ({
         fpmmTransactions.forEach(item => {
           if (item.fpmmType === 'Liquidity' && !isScalar) {
             let sharesValue
+
             const findInResponse = response.find(element => element.id === item.id)
             if (findInResponse) {
-              const { balances, collateralTokenAmount, poolShares, shares } = findInResponse
+              const { balances } = findInResponse
               let firstItem = balances[0]
               let outcomeIndex = 0
 
@@ -226,17 +216,17 @@ export const History_select: React.FC<Props> = ({
               const holdingsOfOtherOutcomes = balances.filter((item: BigNumber, index: number) => {
                 return index !== outcomeIndex
               })
-              const sharesCalculation = calculateSharesBought(poolShares, balances, shares, collateralTokenAmount)
+
               sharesValue = calcSellAmountInCollateral(
-                sharesCalculation,
+                item.additionalSharesCost,
                 firstItem,
                 holdingsOfOtherOutcomes,
                 marketFeeWithTwoDecimals,
               )
 
-              if (Number(sharesCalculation) !== 0) {
+              if (Number(item.additionalSharesCost) !== 0) {
                 newFpmmTradeArray.push({
-                  sharesOrPoolTokenAmount: sharesCalculation,
+                  sharesOrPoolTokenAmount: item.additionalSharesCost,
                   decimals: item.decimals,
                   collateralTokenAmount: sharesValue && sharesValue,
                   creationTimestamp: item.creationTimestamp,
