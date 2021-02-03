@@ -14,6 +14,11 @@ const SwitchComponentWrapper = styled.div`
   cursor: pointer;
   font-style: normal;
   letter-spacing: 0.2px;
+  svg {
+    padding-top: 1px;
+    vertical-align: unset;
+    overflow: visible;
+  }
   &:hover {
     color: ${props => props.theme.colors.primaryLight};
     svg {
