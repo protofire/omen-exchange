@@ -411,7 +411,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
   let toggleCollatral = collateral
-  if (collateral.address === pseudoNativeAssetAddress) {
+  if (collateral.address === nativeAsset.address || collateral.address === wrapToken.address) {
     if (displayCollateral.address === wrapToken.address) {
       toggleCollatral = getNativeAsset(context.networkId)
     } else {
@@ -425,7 +425,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setDisplayCollateral(getWrapToken(context.networkId))
     }
   }
-
   return (
     <>
       <UserData>
@@ -593,8 +592,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   formatBigNumber(depositedTokensTotal, collateral.decimals),
                 )} ${displayTotalSymbol}`}
               />
-              {collateral.address === getNativeAsset(context.networkId).address ||
-              collateral.address === wrapToken.address ? (
+              {collateral.address === nativeAsset.address || collateral.address === wrapToken.address ? (
                 <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollatral} />
               ) : (
                 <span />

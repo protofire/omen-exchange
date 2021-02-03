@@ -16,6 +16,11 @@ const SwitchComponentWrapper = styled.div`
   letter-spacing: 0.20000000298023224px;
   &:hover {
     color: ${props => props.theme.colors.primaryLight};
+    svg {
+      path {
+        fill: ${props => props.theme.colors.primaryLight};
+      }
+    }
   }
 `
 
