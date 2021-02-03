@@ -507,7 +507,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       // TODO: Replace hardcoding
       subtitle: `Long position`,
       // TODO: Replace tooltip
-      tooltip: `badadada this is the tooltip text`,
+      tooltip: `To keep the market stable, you receive additional shares for depositing and removing liquidity.`,
       ball: true,
     },
   ]
