@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
+import { calcPrediction, formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import {
   BalanceItem,
   LiquidityObject,
@@ -342,8 +342,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, 18))
   const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), 18))
 
-  const currentPredictionNumber = Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
-  const newPredictionNumber = Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
+  const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound, 18)
+  const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound, 18)
 
   const amountSharesNumber =
     collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
