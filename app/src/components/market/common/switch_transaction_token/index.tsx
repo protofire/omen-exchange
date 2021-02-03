@@ -31,7 +31,7 @@ const SwitchComponentWrapper = styled.div`
 
 const SwitchComponentText = styled.div`
   display: inline-block;
-  margin-right: 10px;
+  margin-right: 8px;
 `
 
 interface Props {
