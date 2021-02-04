@@ -93,6 +93,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
   const doFetchData = useCallback(async () => {
     if (!graphMarketMakerData) {
+      setStatus(Status.Error)
       return
     }
 
@@ -170,6 +171,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       arbitrator,
       balances,
       collateral,
+      creator: graphMarketMakerData.creator,
       fee: graphMarketMakerData.fee,
       collateralVolume: graphMarketMakerData.collateralVolume,
       isConditionResolved,
@@ -203,6 +205,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
   const fetchData = useCallback(async () => {
     try {
+      setStatus(Status.Loading)
       await doFetchData()
     } catch (e) {
       logger.error(e.message)

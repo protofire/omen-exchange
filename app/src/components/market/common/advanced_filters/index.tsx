@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { getArbitratorsByNetwork } from '../../../../util/networks'
+import { getArbitratorsByNetwork, getNativeAsset, getWrapToken } from '../../../../util/networks'
 import { CurationSource } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { IconDxDao, IconKleros } from '../../../common/icons'
@@ -172,6 +172,11 @@ export const AdvancedFilters = (props: Props) => {
   const showQuestionType = false
 
   const activeArbitratorIndex = arbitrators.findIndex(t => t.address === arbitrator) + 1
+
+  const nativeAssetAddress = getNativeAsset(context.networkId).address.toLowerCase()
+  const wrapTokenAddress = getWrapToken(context.networkId).address.toLowerCase()
+  const filter = [wrapTokenAddress]
+
   return (
     <Wrapper>
       <Column>
@@ -182,10 +187,21 @@ export const AdvancedFilters = (props: Props) => {
 
         <CurrencySelector
           addAll
+          addNativeAsset
           context={context}
           currency={currency}
           disabled={false}
-          onSelect={currency => onChangeCurrency(currency ? currency.address : null)}
+          filters={filter}
+          negativeFilter
+          onSelect={currency =>
+            onChangeCurrency(
+              currency
+                ? currency.address.toLowerCase() === nativeAssetAddress
+                  ? wrapTokenAddress
+                  : currency.address
+                : null,
+            )
+          }
           placeholder={currency ? '' : 'All'}
         />
       </Column>

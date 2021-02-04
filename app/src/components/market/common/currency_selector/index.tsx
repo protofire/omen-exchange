@@ -39,6 +39,7 @@ interface Props {
   addAll?: boolean
   addNativeAsset?: boolean
   addBalances?: boolean
+  negativeFilter?: boolean
 }
 
 export const CurrencySelector: React.FC<Props> = props => {
@@ -51,6 +52,7 @@ export const CurrencySelector: React.FC<Props> = props => {
     currency,
     disabled,
     filters = [],
+    negativeFilter = false,
     onSelect,
     placeholder,
     ...restProps
@@ -88,7 +90,11 @@ export const CurrencySelector: React.FC<Props> = props => {
   }
 
   tokens
-    .filter(({ address }) => filters.length === 0 || filters.indexOf(address.toLowerCase()) >= 0)
+    .filter(({ address }) =>
+      filters.length === 0 || negativeFilter
+        ? filters.indexOf(address.toLowerCase()) === -1
+        : filters.indexOf(address.toLowerCase()) >= 0,
+    )
     .forEach(({ address, balance: tokenBalance, decimals, image, symbol }, index) => {
       const selected = currency && currency.toLowerCase() === address.toLowerCase()
       currencyDropdownData.push({
