@@ -186,7 +186,7 @@ export const History_select: React.FC<Props> = ({
                 fpmmType: item.fpmmType,
                 balances: await marketMaker.getBalanceInformationByBlock(
                   marketMakerAddress,
-                  outcomes.length,
+                  outcomeArray.length,
                   block.blockNumber,
                 ),
                 additionalShares: item.additionalSharesCost,
@@ -198,7 +198,7 @@ export const History_select: React.FC<Props> = ({
         )
         const newFpmmTradeArray: any[] = []
         fpmmTransactions.forEach(item => {
-          if (item.fpmmType === 'Liquidity' && !isScalar) {
+          if (item.fpmmType === 'Liquidity') {
             let sharesValue
 
             const findInResponse = response.find(element => element.id === item.id)
