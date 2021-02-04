@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
+import { calcXValue, formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import {
   BalanceItem,
   LiquidityObject,
@@ -382,8 +382,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       ? newPrediction * 100
       : currentPrediction
       ? Number(currentPrediction) * 100
-      : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+      : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound, 18),
   )
+  console.log(scaleValue)
   const [scaleValuePrediction, setScaleValuePrediction] = useState(currentPredictionNumber || newPredictionNumber)
   const [yourPayout, setYourPayout] = useState(0)
   const [profitLoss, setProfitLoss] = useState(0)
@@ -462,10 +463,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         ? newPrediction * 100
         : currentPrediction
         ? Number(currentPrediction) * 100
-        : (((startingPointNumber || 0) - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound, 18),
     )
     setScaleValuePrediction(Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
-  }, [newPrediction, currentPrediction, lowerBoundNumber, startingPointNumber, upperBoundNumber])
+  }, [newPrediction, currentPrediction, lowerBound, startingPoint, upperBound, lowerBoundNumber, upperBoundNumber])
 
   useEffect(() => {
     if (long) {
@@ -631,7 +632,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               xValue={
                 currentPrediction
                   ? Number(currentPrediction)
-                  : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
+                  : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound, 18)
               }
             >
               <ValueBoxTitle>
