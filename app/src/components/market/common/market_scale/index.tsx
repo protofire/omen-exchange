@@ -499,12 +499,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
         const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
-        const longPayoutAmount = (longSharesNumber || 0) * (scaleValue / 100)
-        const longProfit = longPayoutAmount - totalLongPriceNumber
-        const longProfitRatio = longPayoutAmount / totalLongPriceNumber - 1
-        setLongPayout(longPayoutAmount)
-        setLongProfitAmount(longProfit)
-        setLongProfitPercentage(longProfitRatio * 100 < -100 ? -100 : longProfitRatio * 100)
+        setLongPayout(calcPayout(longSharesNumber || 0, scaleValue))
+        setLongProfitAmount(calcProfit(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
+        setLongProfitPercentage(calcProfitPercentage(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
       }
     }
   }, [
