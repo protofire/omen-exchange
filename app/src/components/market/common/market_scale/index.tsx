@@ -477,6 +477,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     return profit
   }
 
+  const calcProfitPercentage = (shares: number, percentage: number, amount: number) => {
+    const profitPercentage = ((shares * (percentage / 100)) / amount - 1) * 100
+    profitPercentage < -100 ? -100 : profitPercentage
+    return profitPercentage
+  }
+
   useEffect(() => {
     if (long) {
       setYourPayout(calcPayout(amountSharesNumber || 0, scaleValue))
@@ -487,12 +493,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
         const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
-        const shortPayoutAmount = (shortSharesNumber || 0) * (1 - scaleValue / 100)
-        const shortProfit = shortPayoutAmount - totalShortPriceNumber
-        const shortProfitRatio = shortPayoutAmount / totalShortPriceNumber - 1
-        setShortPayout(shortPayoutAmount)
-        setShortProfitAmount(shortProfit)
-        setShortProfitPercentage(shortProfitRatio * 100 < -100 ? -100 : shortProfitRatio * 100)
+        setShortPayout(calcPayout(shortSharesNumber || 0, 100 - scaleValue))
+        setShortProfitAmount(calcProfit(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
+        setShortProfitPercentage(calcProfitPercentage(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
         const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
