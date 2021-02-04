@@ -1,6 +1,6 @@
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -18,7 +18,14 @@ import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import { computeBalanceAfterTrade, formatBigNumber, formatNumber, getUnit, mulBN } from '../../../../util/tools'
+import {
+  calcXValue,
+  computeBalanceAfterTrade,
+  formatBigNumber,
+  formatNumber,
+  getUnit,
+  mulBN,
+} from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -180,7 +187,13 @@ export const ScalarMarketBuy = (props: Props) => {
   )
 
   const formattedNewPrediction =
-    newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
+    newPrediction &&
+    calcXValue(
+      parseUnits(newPrediction.toString(), 18),
+      scalarLow || new BigNumber(0),
+      scalarHigh || new BigNumber(0),
+      18,
+    ) / 100
 
   const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
