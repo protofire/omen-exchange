@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedCPKContext, useContracts, useGraphMarketTradeData } from '../../../../../hooks'
+import { useConnectedCPKContext, useContracts, useGraphMarketUserTxData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
@@ -255,9 +255,8 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
-  const { fetchData: fetchGraphMarketTradeData } = useGraphMarketTradeData(
-    question.title,
-    collateralToken.address,
+  const { fetchData: fetchGraphMarketUserTxData } = useGraphMarketUserTxData(
+    marketMakerAddress,
     cpk?.address.toLowerCase(),
   )
 
@@ -390,7 +389,7 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
-            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
+            fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
@@ -400,7 +399,7 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.buy && (
           <MarketBuyContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
-            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
+            fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
@@ -409,7 +408,7 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.sell && (
           <MarketSellContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
-            fetchGraphMarketTradeData={fetchGraphMarketTradeData}
+            fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}

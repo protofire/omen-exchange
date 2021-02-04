@@ -13,6 +13,7 @@ import {
   useCpkAllowance,
   useCpkProxy,
   useFundingBalance,
+  useSymbol,
 } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
@@ -135,6 +136,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       ? nativeAsset
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
+  const symbol = useSymbol(collateral)
 
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
@@ -148,7 +150,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
-
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
@@ -239,8 +241,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
-  const symbol = collateral.address === pseudoNativeAssetAddress ? wrapToken.symbol : collateral.symbol
-
   const addFunding = async () => {
     setModalTitle('Deposit Funds')
 
@@ -263,7 +263,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
-
+      setIsTransactionProcessing(true)
       await cpk.addFunding({
         amount: amountToFund || Zero,
         collateral,
@@ -274,14 +274,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchFundingBalance()
       await fetchCollateralBalance()
 
-      setStatus(Status.Ready)
       setAmountToFund(null)
       setAmountToFundDisplay('')
+      setStatus(Status.Ready)
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
+      setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to deposit funds.`)
       logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
     }
     setIsModalTransactionResultOpen(true)
   }
@@ -300,7 +302,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
-
+      setIsTransactionProcessing(true)
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
         collateralAddress,
@@ -315,15 +317,17 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchFundingBalance()
       await fetchCollateralBalance()
 
-      setStatus(Status.Ready)
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
+      setStatus(Status.Ready)
       setMessage(`Successfully withdrew ${fundsAmount} ${symbol}`)
       setIsModalTransactionResultOpen(true)
+      setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to withdraw funds.`)
       logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
     }
     setIsModalTransactionResultOpen(true)
   }
@@ -351,23 +355,25 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setUpgradeFinished(true)
   }
 
-  const collateralAmountError =
-    maybeCollateralBalance === null
-      ? null
-      : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
-      ? `Insufficient balance`
-      : amountToFund?.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${walletBalance} ${symbol}`
-      : null
+  const collateralAmountError = isTransactionProcessing
+    ? null
+    : maybeCollateralBalance === null
+    ? null
+    : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
+    ? `Insufficient balance`
+    : amountToFund?.gt(maybeCollateralBalance)
+    ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
+    : null
 
-  const sharesAmountError =
-    maybeFundingBalance === null
-      ? null
-      : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
-      ? `Insufficient balance`
-      : amountToRemove?.gt(maybeFundingBalance)
-      ? `Value must be less than or equal to ${sharesBalance} pool shares`
-      : null
+  const sharesAmountError = isTransactionProcessing
+    ? null
+    : maybeFundingBalance === null
+    ? null
+    : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
+    ? `Insufficient balance`
+    : amountToRemove?.gt(maybeFundingBalance)
+    ? `Value must be less than or equal to ${sharesBalance} pool shares`
+    : null
 
   const disableDepositButton =
     !amountToFund ||

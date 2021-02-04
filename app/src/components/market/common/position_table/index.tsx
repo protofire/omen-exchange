@@ -2,6 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
+import { useSymbol } from '../../../../hooks'
 import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import { BalanceItem, PositionTableValue, Token } from '../../../../util/types'
 import { TD, THead, TR, Table } from '../../../common'
@@ -35,23 +36,42 @@ interface Props {
   fee: BigNumber | null | undefined
   longPayout: number
   shortPayout: number
+  longProfitLoss: number
+  shortProfitLoss: number
+  longProfitLossPercentage: number
+  shortProfitLossPercentage: number
 }
 
 export const PositionTable = (props: Props) => {
-  const { balances, collateral, longPayout, shortPayout } = props
+  const {
+    balances,
+    collateral,
+    longPayout,
+    longProfitLoss,
+    longProfitLossPercentage,
+    shortPayout,
+    shortProfitLoss,
+    shortProfitLossPercentage,
+  } = props
+
+  const symbol = useSymbol(collateral)
 
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
   const shortSharesFormatted = formatNumber(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
   const longSharesFormatted = formatNumber(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
 
+  const isShortPositive = shortProfitLoss > 0 ? true : shortProfitLoss < 0 ? false : undefined
+  const isLongPositive = longProfitLoss > 0 ? true : longProfitLoss < 0 ? false : undefined
+
   const TableHead: PositionTableValue[] = [
     PositionTableValue.YourPosition,
     PositionTableValue.Shares,
     PositionTableValue.Payout,
+    PositionTableValue.ProfitLoss,
   ]
 
-  const TableCellsAlign = ['left', 'right', 'right']
+  const TableCellsAlign = ['left', 'right', 'right', 'right']
 
   const renderTableHeader = () => {
     return (
@@ -60,7 +80,7 @@ export const PositionTable = (props: Props) => {
           {TableHead.map((value, index) => {
             return (
               <THStyled key={index} textAlign={TableCellsAlign[index]}>
-                {value} {value === PositionTableValue.Payout && `(${collateral.symbol})`}
+                {value} {value === PositionTableValue.Payout && `(${symbol})`}
               </THStyled>
             )
           })}
@@ -83,8 +103,13 @@ export const PositionTable = (props: Props) => {
         <ColoredTDStyled textAlign={TableCellsAlign[1]}>
           {index === 0 ? shortSharesFormatted : longSharesFormatted}
         </ColoredTDStyled>
-        <ColoredTDStyled textAlign={TableCellsAlign[2]}>
+        <ColoredTDStyled positive={index === 0 ? isShortPositive : isLongPositive} textAlign={TableCellsAlign[2]}>
           {index === 0 ? formatNumber(shortPayout.toString()) : formatNumber(longPayout.toString())}
+        </ColoredTDStyled>
+        <ColoredTDStyled positive={index === 0 ? isShortPositive : isLongPositive} textAlign={TableCellsAlign[3]}>
+          {index === 0
+            ? `${formatNumber(shortProfitLoss.toString())} (${formatNumber(shortProfitLossPercentage.toString())}%)`
+            : `${formatNumber(longProfitLoss.toString())} (${formatNumber(longProfitLossPercentage.toString())}%)`}
         </ColoredTDStyled>
       </TR>
     )

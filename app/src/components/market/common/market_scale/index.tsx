@@ -1,10 +1,19 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
-import { BalanceItem, Status, Token, TradeObject } from '../../../../util/types'
+import {
+  BalanceItem,
+  LiquidityObject,
+  LiquidityType,
+  Status,
+  Token,
+  TradeObject,
+  TradeType,
+} from '../../../../util/types'
 import { IconInfo } from '../../../common/tooltip/img/IconInfo'
 import { Circle } from '../../common/common_styled'
 import { PositionTable } from '../position_table'
@@ -15,7 +24,11 @@ const BALL_SIZE = '20px'
 const DOT_SIZE = '8px'
 const VALUE_BOXES_MARGIN = '12px'
 
-const ScaleWrapper = styled.div<{ borderBottom: boolean | undefined; borderTop: boolean | undefined }>`
+const ScaleWrapper = styled.div<{
+  borderBottom: boolean | undefined
+  borderTop: boolean | undefined
+  valueBoxes: boolean | undefined
+}>`
   display: flex;
   flex-direction: column;
   height: 174px;
@@ -26,6 +39,10 @@ const ScaleWrapper = styled.div<{ borderBottom: boolean | undefined; borderTop: 
   padding-right: 25px;
   position: relative;
   ${props => props.borderTop && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 202px;`};
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    ${props => props.valueBoxes && 'padding-bottom: 24px; height: 278px;'}
+  }
 `
 
 const ScaleTitleWrapper = styled.div`
@@ -188,12 +205,25 @@ const ValueBoxes = styled.div`
   justify-content: space-between;
   margin-top: ${VALUE_BOXES_MARGIN};
   width: 100%;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    flex-direction: column;
+    justify-content: center;
+  }
 `
 
 const ValueBoxPair = styled.div`
   width: calc(50% - ${VALUE_BOXES_MARGIN} / 2);
   display: flex;
   align-items: center;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    width: calc(100% - ${VALUE_BOXES_MARGIN} / 2);
+
+    &:nth-of-type(2) {
+      margin-top: 12px;
+    }
+  }
 `
 
 const ValueBox = styled.div<{ xValue?: number }>`
@@ -279,6 +309,7 @@ interface Props {
   amount?: Maybe<BigNumber>
   positionTable?: Maybe<boolean>
   trades?: Maybe<TradeObject[]>
+  liquidityTxs?: Maybe<LiquidityObject[]>
   status?: Maybe<Status>
   balances?: Maybe<BalanceItem[]>
   fee?: Maybe<BigNumber>
@@ -293,6 +324,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     collateral,
     currentPrediction,
     fee,
+    liquidityTxs,
     long,
     lowerBound,
     newPrediction,
@@ -345,7 +377,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     setIsAmountInputted(newPrediction ? newPrediction !== Number(currentPrediction) : false)
   }, [newPrediction, currentPrediction])
 
-  const [scaleValue, setScaleValue] = useState<number | undefined>(
+  const [scaleValue, setScaleValue] = useState<number>(
     newPrediction
       ? newPrediction * 100
       : currentPrediction
@@ -357,37 +389,66 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [profitLoss, setProfitLoss] = useState(0)
   const [shortPayout, setShortPayout] = useState(0)
   const [longPayout, setLongPayout] = useState(0)
-  const [totalShortPrice, setTotalShortPrice] = useState<number>(0)
-  const [totalLongPrice, setTotalLongPrice] = useState<number>(0)
+  const [totalShortPrice, setTotalShortPrice] = useState<BigNumber>(new BigNumber(0))
+  const [totalLongPrice, setTotalLongPrice] = useState<BigNumber>(new BigNumber(0))
+  const [shortProfitAmount, setShortProfitAmount] = useState(0)
+  const [longProfitAmount, setLongProfitAmount] = useState(0)
+  const [longProfitPercentage, setLongProfitPercentage] = useState(0)
+  const [shortProfitPercentage, setShortProfitPercentage] = useState(0)
 
   useEffect(() => {
+    let totalShortTradesCost = new BigNumber(0)
+    let totalLongTradesCost = new BigNumber(0)
     if (trades && trades.length && collateral) {
       const shortTrades = trades.filter(trade => trade.outcomeIndex === '0')
-      setTotalShortPrice(
-        shortTrades.length
-          ? shortTrades
-              .map(trade =>
-                trade.type === 'Buy'
-                  ? Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals))
-                  : Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals)) * -1,
-              )
-              .reduce((a, b) => a + b)
-          : 0,
-      )
+      totalShortTradesCost = shortTrades.length
+        ? shortTrades
+            .map(trade => (trade.type === TradeType.buy ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
+            .reduce((a, b) => a.add(b))
+        : new BigNumber(0)
+
       const longTrades = trades.filter(trade => trade.outcomeIndex === '1')
-      setTotalLongPrice(
-        longTrades.length
-          ? longTrades
-              .map(trade =>
-                trade.type === 'Buy'
-                  ? Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals))
-                  : Number(formatBigNumber(trade.collateralAmount, collateral.decimals, collateral.decimals)) * -1,
-              )
-              .reduce((a, b) => a + b)
-          : 0,
-      )
+      totalLongTradesCost = longTrades.length
+        ? longTrades
+            .map(trade => (trade.type === TradeType.buy ? trade.collateralAmount : Zero.sub(trade.collateralAmount)))
+            .reduce((a, b) => a.add(b))
+        : new BigNumber(0)
     }
-  }, [trades, collateral])
+
+    let totalShortLiquidityTxsCost = new BigNumber(0)
+    let totalLongLiquidityTxsCost = new BigNumber(0)
+    if (liquidityTxs && liquidityTxs.length) {
+      const addLiquidityTxs = liquidityTxs.filter(tx => tx.type === LiquidityType.add)
+      const removeLiquidityTxs = liquidityTxs.filter(tx => tx.type === LiquidityType.remove)
+
+      // More short shares provided so short shares are purchased
+      const addLiquidityShortPurchaseTxs = addLiquidityTxs.filter(tx =>
+        tx.outcomeTokenAmounts[0].lt(tx.outcomeTokenAmounts[1]),
+      )
+      if (addLiquidityShortPurchaseTxs.length) {
+        // More long shares are removed so short shares are purchased
+        totalShortLiquidityTxsCost = addLiquidityShortPurchaseTxs
+          .concat(removeLiquidityTxs.filter(tx => tx.outcomeTokenAmounts[0].gt(tx.outcomeTokenAmounts[1])))
+          .map(tx => tx.additionalSharesCost)
+          .reduce((a, b) => a.add(b))
+      }
+
+      // More long shares provided so long shares are purchased
+      const addLiquidityLongPurchaseTxs = addLiquidityTxs.filter(tx =>
+        tx.outcomeTokenAmounts[0].gt(tx.outcomeTokenAmounts[1]),
+      )
+      if (addLiquidityLongPurchaseTxs.length) {
+        // More short shares are removed so long shares are purchased
+        totalLongLiquidityTxsCost = addLiquidityLongPurchaseTxs
+          .concat(removeLiquidityTxs.filter(tx => tx.outcomeTokenAmounts[0].lt(tx.outcomeTokenAmounts[1])))
+          .map(tx => tx.additionalSharesCost)
+          .reduce((a, b) => a.add(b))
+      }
+    }
+
+    setTotalShortPrice(totalShortTradesCost.add(totalShortLiquidityTxsCost))
+    setTotalLongPrice(totalLongTradesCost.add(totalLongLiquidityTxsCost))
+  }, [trades, collateral, liquidityTxs])
 
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
@@ -409,20 +470,32 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     if (long) {
       // Calculate total payout by mulitplying shares amount by scale position
-      setYourPayout((amountSharesNumber || 0) * (Number(scaleBall?.value) / 100))
+      setYourPayout((amountSharesNumber || 0) * (scaleValue / 100))
       // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (Number(scaleBall?.value) / 100) - (amountNumber || 0))
+      setProfitLoss((amountSharesNumber || 0) * (scaleValue / 100) - (amountNumber || 0))
     } else if (short) {
       // Calculate total payout by mulitplying shares amount by scale position
-      setYourPayout((amountSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
+      setYourPayout((amountSharesNumber || 0) * (1 - scaleValue / 100))
       // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100) - (amountNumber || 0))
+      setProfitLoss((amountSharesNumber || 0) * (1 - scaleValue / 100) - (amountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
-        setShortPayout((shortSharesNumber || 0) * (1 - Number(scaleBall?.value) / 100))
+        const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
+        const shortPayoutAmount = (shortSharesNumber || 0) * (1 - scaleValue / 100)
+        const shortProfit = shortPayoutAmount - totalShortPriceNumber
+        const shortProfitRatio = shortPayoutAmount / totalShortPriceNumber - 1
+        setShortPayout(shortPayoutAmount)
+        setShortProfitAmount(shortProfit)
+        setShortProfitPercentage(shortProfitRatio * 100 < -100 ? -100 : shortProfitRatio * 100)
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
-        setLongPayout((longSharesNumber || 0) * (Number(scaleBall?.value) / 100))
+        const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
+        const longPayoutAmount = (longSharesNumber || 0) * (scaleValue / 100)
+        const longProfit = longPayoutAmount - totalLongPriceNumber
+        const longProfitRatio = longPayoutAmount / totalLongPriceNumber - 1
+        setLongPayout(longPayoutAmount)
+        setLongProfitAmount(longProfit)
+        setLongProfitPercentage(longProfitRatio * 100 < -100 ? -100 : longProfitRatio * 100)
       }
     }
   }, [
@@ -435,7 +508,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     feeNumber,
     longShares,
     longSharesNumber,
-    scaleBall?.value,
+    scaleValue,
     short,
     shortShares,
     shortSharesNumber,
@@ -443,6 +516,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     totalShortPrice,
     amountSharesNumber,
     collateral,
+    longPayout,
+    shortPayout,
   ])
 
   const activateTooltip = () => {
@@ -477,7 +552,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <ScaleWrapper borderBottom={isPositionTableDisabled} borderTop={borderTop}>
+      <ScaleWrapper borderBottom={isPositionTableDisabled} borderTop={borderTop} valueBoxes={isAmountInputted}>
         <ScaleTitleWrapper>
           <ScaleTitle>
             {formatNumber(lowerBoundNumber.toString())} {unit}
@@ -641,7 +716,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           collateral={collateral}
           fee={fee}
           longPayout={longPayout}
+          longProfitLoss={longProfitAmount}
+          longProfitLossPercentage={longProfitPercentage}
           shortPayout={shortPayout}
+          shortProfitLoss={shortProfitAmount}
+          shortProfitLossPercentage={shortProfitPercentage}
         />
       )}
     </>
