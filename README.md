@@ -25,7 +25,7 @@ The `build` directory in the `app` directory will now contain the build to be se
 | Contract | Address |
 | -------- | -------- |
 | [ConditionalTokens](https://github.com/gnosis/conditional-tokens-contracts) | [0xC59b0e4De5F1248C1140964E0fF287B192407E0C](https://blockscout.com/poa/xdai/address/0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce/read-contract)     |
-| FPMMDeterministicFactory | [0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220](https://etherscan.io/address/0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220#code) |
+| [FPMMDeterministicFactory](https://github.com/gnosis/conditional-tokens-market-makers) | [0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220](https://etherscan.io/address/0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220#code) |
 | [Reality.eth](https://github.com/realitio/realitio-contracts) | [0x325a2e0F3CCA2ddbaeBB4DfC38Df8D19ca165b47](https://etherscan.io/address/0x325a2e0F3CCA2ddbaeBB4DfC38Df8D19ca165b47#code) |
 | Reality.eth Oracle Adapters | [0x0e414d014A77971f4EAA22AB58E6d84D16Ea838E](https://etherscan.io/address/0x0e414d014A77971f4EAA22AB58E6d84D16Ea838E#code) |
 | Reality.eth Oracle Adapters (Scalar) | [0xaa548EfBb0972e0c4b9551dcCfb6B787A1B90082](https://etherscan.io/address/0xaa548EfBb0972e0c4b9551dcCfb6B787A1B90082#code) |
@@ -43,7 +43,7 @@ The `build` directory in the `app` directory will now contain the build to be se
 | Contract | Address |
 | -------- | -------- |
 | [ConditionalTokens](https://github.com/gnosis/conditional-tokens-contracts) | [0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce](https://blockscout.com/poa/xdai/address/0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce/read-contract)     |
-| FPMMDeterministicFactory | [0x9083A2B699c0a4AD06F63580BDE2635d26a3eeF0](https://blockscout.com/poa/xdai/address/0x9083A2B699c0a4AD06F63580BDE2635d26a3eeF0/contracts) |
+| [FPMMDeterministicFactory](https://github.com/gnosis/conditional-tokens-market-makers) | [0x9083A2B699c0a4AD06F63580BDE2635d26a3eeF0](https://blockscout.com/poa/xdai/address/0x9083A2B699c0a4AD06F63580BDE2635d26a3eeF0/contracts) |
 | [Kleros bridge](https://github.com/kleros/cross-chain-realitio-proxy) | [0xe40DD83a262da3f56976038F1554Fe541Fa75ecd](https://blockscout.com/poa/xdai/address/0xe40DD83a262da3f56976038F1554Fe541Fa75ecd/contracts) |
 | [Reality.eth](https://github.com/realitio/realitio-contracts) | [0x79e32aE03fb27B07C89c0c568F80287C01ca2E57](https://blockscout.com/poa/xdai/address/0x79e32aE03fb27B07C89c0c568F80287C01ca2E57/contracts) |
 | Reality.eth Oracle Adapters | [0x2bf1BFb0eB6276a4F4B60044068Cb8CdEB89f79B](https://blockscout.com/poa/xdai/address/0x2bf1BFb0eB6276a4F4B60044068Cb8CdEB89f79B/contracts) |
@@ -58,7 +58,7 @@ The `build` directory in the `app` directory will now contain the build to be se
 | Contract | Address |
 | -------- | -------- |
 | [ConditionalTokens](https://github.com/gnosis/conditional-tokens-contracts) | [0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f](https://etherscan.io/address/0xC59b0e4De5F1248C1140964E0fF287B192407E0C#code)     |
-| FPMMDeterministicFactory | [0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5](https://blockscout.com/poa/sokol/address/0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5/contracts) |
+| [FPMMDeterministicFactory](https://github.com/gnosis/conditional-tokens-market-makers) | [0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5](https://blockscout.com/poa/sokol/address/0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5/contracts) |
 | [Kleros bridge](https://github.com/kleros/cross-chain-realitio-proxy) | [0x37Fcdb26F12f3FC76F2424EC6B94D434a959A0f7](https://blockscout.com/poa/sokol/address/0x37Fcdb26F12f3FC76F2424EC6B94D434a959A0f7/contracts) |
 | [Reality.eth](https://github.com/realitio/realitio-contracts) | [0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03](https://blockscout.com/poa/sokol/address/0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03/contracts) |
 | Reality.eth Oracle Adapters | [0xa57EBD93faa73b3491aAe396557D6ceC24fC6984](https://blockscout.com/poa/sokol/address/0xa57EBD93faa73b3491aAe396557D6ceC24fC6984/contracts) |
