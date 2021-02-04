@@ -1,6 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps, matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
@@ -179,6 +179,26 @@ interface ExtendsHistory extends RouteComponentProps {
   setClaim: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+function useOutsideAlerter(ref: any) {
+  useEffect(() => {
+    /**
+     * Alert if clicked on outside of element
+     */
+    function handleClickOutside(event: any) {
+      if (ref.current && !ref.current.contains(event.target)) {
+        alert('You clicked outside of me!')
+      }
+    }
+
+    // Bind the event listener
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [ref])
+}
+
 const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const { account, library: provider, networkId } = useConnectedWeb3Context()
 
@@ -237,7 +257,8 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
     onClick: () => history.push('/create'),
   }
   const [isBridgeOpen, setIsBridgeOpen] = useState<boolean>(false)
-
+  const ref = useRef(null)
+  useOutsideAlerter(ref)
   const exitButtonProps = {
     onClick: () => history.push('/'),
   }
@@ -291,11 +312,12 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
 
           {(networkId === 1 || networkId == 100) && account && (
             <>
-              <Bridge>
+              <Bridge ref={ref}>
                 <ButtonRound
                   onClick={() => {
                     setIsBridgeOpen(!isBridgeOpen)
                   }}
+                  ref={ref}
                 >
                   {currencyReturn(networkId === 1)}
                   <ArrowWrapper>
