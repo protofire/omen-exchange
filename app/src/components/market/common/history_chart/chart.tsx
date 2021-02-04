@@ -5,7 +5,7 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'rec
 import styled, { css } from 'styled-components'
 
 import { getOutcomeColor } from '../../../../theme/utils'
-import { calcPrice, formatBigNumber } from '../../../../util/tools'
+import { calcPrediction, calcPrice } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { ButtonSelectable } from '../../../button'
 import { InlineLoading } from '../../../loading'
@@ -178,20 +178,22 @@ export const HistoryChart: React.FC<Props> = ({
   unit,
   value,
 }) => {
-  const scalarLowNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
-  const scalarHighNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
-
   const toScaleValue = (decimal: number, fixed = 0) => {
-    return `${(decimal * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) + (scalarLowNumber || 0)).toFixed(
-      fixed,
-    )} ${unit}`
+    return `${calcPrediction(
+      decimal.toString(),
+      scalarLow || new BigNumber(0),
+      scalarHigh || new BigNumber(0),
+      18,
+    ).toFixed(fixed)} ${unit}`
   }
 
   const renderScalarTooltipContent = (o: any) => {
     const { label, payload } = o
-    const prediction = (
-      payload[0]?.value * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) +
-      (scalarLowNumber || 0)
+    const prediction = calcPrediction(
+      payload[0]?.value,
+      scalarLow || new BigNumber(0),
+      scalarHigh || new BigNumber(0),
+      18,
     ).toFixed(2)
     return (
       <ChartTooltip>
