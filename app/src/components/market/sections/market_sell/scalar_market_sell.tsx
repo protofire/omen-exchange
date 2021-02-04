@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -9,6 +9,7 @@ import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
   calcSellAmountInCollateral,
+  calcXValue,
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
@@ -151,7 +152,13 @@ export const ScalarMarketSell = (props: Props) => {
   )
 
   const formattedNewPrediction =
-    newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
+    newPrediction &&
+    calcXValue(
+      parseUnits(newPrediction.toString(), 18),
+      scalarLow || new BigNumber(0),
+      scalarHigh || new BigNumber(0),
+      18,
+    ) / 100
 
   const finish = async () => {
     const outcomeIndex = positionIndex
