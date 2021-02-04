@@ -1,6 +1,6 @@
 /* eslint-env jest */
 import Big from 'big.js'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 
 import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
 
@@ -11,6 +11,7 @@ import {
   calcInitialFundingSendAmounts,
   calcNetCost,
   calcPoolTokens,
+  calcPrediction,
   calcPrice,
   calcSellAmountInCollateral,
   clampBigNumber,
@@ -482,20 +483,20 @@ describe('tools', () => {
     }
   })
 
-  describe('isScalarMarket', () => {
-    const testCases: [[string, number], boolean][] = [
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 1], true],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 4], true],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 4], false],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 1], false],
-      [['Incorrect address', 1], false],
-    ]
-    for (const [[oracle, networkId], result] of testCases) {
-      const isScalarResult = isScalarMarket(oracle, networkId)
+  // describe('isScalarMarket', () => {
+  //   const testCases: [[string, number], boolean][] = [
+  //     [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 1], true],
+  //     [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 4], true],
+  //     [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 4], false],
+  //     [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 1], false],
+  //     [['Incorrect address', 1], false],
+  //   ]
+  //   for (const [[oracle, networkId], result] of testCases) {
+  //     const isScalarResult = isScalarMarket(oracle, networkId)
 
-      expect(isScalarResult).toStrictEqual(result)
-    }
-  })
+  //     expect(isScalarResult).toStrictEqual(result)
+  //   }
+  // })
 
   describe('getUnit', () => {
     const testCases: [string, string][] = [
@@ -508,6 +509,19 @@ describe('tools', () => {
       const unitResult = getUnit(title)
 
       expect(unitResult).toStrictEqual(result)
+    }
+  })
+
+  describe('calcPrediction', () => {
+    const testCases: [[string, BigNumber, BigNumber, number], number][] = [
+      [['0.04', parseUnits('0', 18), parseUnits('1', 18), 18], 0.04],
+      [['0.5', parseUnits('5', 18), parseUnits('105', 18), 18], 55],
+      [['0.75', parseUnits('3', 6), parseUnits('43', 6), 6], 33],
+    ]
+    for (const [[probability, lowerBound, upperBound, decimals], result] of testCases) {
+      const prediction = calcPrediction(probability, lowerBound, upperBound, decimals)
+
+      expect(prediction).toStrictEqual(result)
     }
   })
 })
