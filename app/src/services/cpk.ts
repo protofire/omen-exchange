@@ -195,7 +195,7 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
+      if (!this.cpk.isSafeApp() && collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(500000)
       }
 
@@ -293,7 +293,7 @@ class CPKService {
       const transactions = []
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
+      if (!this.cpk.isSafeApp() && marketData.collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(1200000)
       }
 
@@ -473,7 +473,7 @@ class CPKService {
       const transactions = []
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
+      if (!this.cpk.isSafeApp() && marketData.collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(1500000)
       }
 
@@ -632,10 +632,6 @@ class CPKService {
       const transactions = []
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp()) {
-        txOptions.gas = await this.getGas(500000)
-      }
-
       const isAlreadyApprovedForMarketMaker = await conditionalTokens.isApprovedForAll(
         this.cpk.address,
         marketMaker.address,
@@ -682,7 +678,7 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
+      if (!this.cpk.isSafeApp() && collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(500000)
       }
 
@@ -779,10 +775,6 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp()) {
-        txOptions.gas = await this.getGas(500000)
-      }
-
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
         // transfer to the user the merged collateral plus the earned fees
@@ -835,10 +827,6 @@ class CPKService {
 
       const transactions = []
       const txOptions: TxOptions = {}
-
-      if (this.cpk.isSafeApp()) {
-        txOptions.gas = await this.getGas(500000)
-      }
 
       if (!isConditionResolved) {
         transactions.push({

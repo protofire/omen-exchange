@@ -61,20 +61,19 @@ function standardizeTransaction(tx: Transaction): StandardTransaction {
 
 // @ts-expect-error ignore
 class OCPK extends CPK {
-  async sendTransactions(transactions: StandardTransaction[], options?: ExecOptions): Promise<TransactionResult> {
+  async sendTransactions(transactions: StandardTransaction[]): Promise<TransactionResult> {
     const sdk = new SafeAppsSDK()
     const txs = transactions.map(standardizeTransaction)
-    const params = { safeTxGas: options?.gas as number }
     const data = {
       txs,
-      params,
+      params: {},
     }
     return await sdk.txs.send(data)
   }
 
   async execTransactions(transactions: Transaction[], options?: ExecOptions): Promise<TransactionResult> {
     if (this.isSafeApp()) {
-      return this.sendTransactions(transactions.map(standardizeTransaction), options)
+      return this.sendTransactions(transactions.map(standardizeTransaction))
     }
 
     return super.execTransactions(transactions, options)
