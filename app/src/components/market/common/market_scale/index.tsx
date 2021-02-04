@@ -472,17 +472,22 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     return payout
   }
 
+  const calcProfit = (shares: number, percentage: number, amount: number) => {
+    const profit = shares * (percentage / 100) - amount
+    return profit
+  }
+
   useEffect(() => {
     if (long) {
       // Calculate total payout by mulitplying shares amount by scale position
       setYourPayout(calcPayout(amountSharesNumber || 0, scaleValue))
       // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (scaleValue / 100) - (amountNumber || 0))
+      setProfitLoss(calcProfit(amountSharesNumber || 0, scaleValue, amountNumber || 0))
     } else if (short) {
       // Calculate total payout by mulitplying shares amount by scale position
       setYourPayout(calcPayout(amountSharesNumber || 0, 100 - scaleValue))
       // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (1 - scaleValue / 100) - (amountNumber || 0))
+      setProfitLoss(calcProfit(amountSharesNumber || 0, 100 - scaleValue, amountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
         const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
