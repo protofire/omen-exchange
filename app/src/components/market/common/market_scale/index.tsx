@@ -467,20 +467,20 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     setScaleValuePrediction(Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
   }, [newPrediction, currentPrediction, lowerBoundNumber, startingPointNumber, upperBoundNumber])
 
-  const calcProfit = (shares: number, percentage: number) => {
-    const profit = shares * (percentage / 100)
-    return profit
+  const calcPayout = (shares: number, percentage: number) => {
+    const payout = shares * (percentage / 100)
+    return payout
   }
 
   useEffect(() => {
     if (long) {
       // Calculate total payout by mulitplying shares amount by scale position
-      setYourPayout(calcProfit(amountSharesNumber || 0, scaleValue))
+      setYourPayout(calcPayout(amountSharesNumber || 0, scaleValue))
       // Calculate profit by subtracting amount paid from payout
       setProfitLoss((amountSharesNumber || 0) * (scaleValue / 100) - (amountNumber || 0))
     } else if (short) {
       // Calculate total payout by mulitplying shares amount by scale position
-      setYourPayout(calcProfit(amountSharesNumber || 0, 100 - scaleValue))
+      setYourPayout(calcPayout(amountSharesNumber || 0, 100 - scaleValue))
       // Calculate profit by subtracting amount paid from payout
       setProfitLoss((amountSharesNumber || 0) * (1 - scaleValue / 100) - (amountNumber || 0))
     } else {
