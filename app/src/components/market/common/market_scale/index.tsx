@@ -425,24 +425,26 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       const addLiquidityShortPurchaseTxs = addLiquidityTxs.filter(tx =>
         tx.outcomeTokenAmounts[0].lt(tx.outcomeTokenAmounts[1]),
       )
-      if (addLiquidityShortPurchaseTxs.length) {
-        // More long shares are removed so short shares are purchased
-        totalShortLiquidityTxsCost = addLiquidityShortPurchaseTxs
-          .concat(removeLiquidityTxs.filter(tx => tx.outcomeTokenAmounts[0].gt(tx.outcomeTokenAmounts[1])))
-          .map(tx => tx.additionalSharesCost)
-          .reduce((a, b) => a.add(b))
+      // More long shares are removed so short shares are purchased
+      const shortAdditionalSharesCosts = addLiquidityShortPurchaseTxs
+        .concat(removeLiquidityTxs.filter(tx => tx.outcomeTokenAmounts[0].gt(tx.outcomeTokenAmounts[1])))
+        .map(tx => tx.additionalSharesCost)
+
+      if (shortAdditionalSharesCosts.length) {
+        totalShortLiquidityTxsCost = shortAdditionalSharesCosts.reduce((a, b) => a.add(b))
       }
 
       // More long shares provided so long shares are purchased
       const addLiquidityLongPurchaseTxs = addLiquidityTxs.filter(tx =>
         tx.outcomeTokenAmounts[0].gt(tx.outcomeTokenAmounts[1]),
       )
-      if (addLiquidityLongPurchaseTxs.length) {
-        // More short shares are removed so long shares are purchased
-        totalLongLiquidityTxsCost = addLiquidityLongPurchaseTxs
-          .concat(removeLiquidityTxs.filter(tx => tx.outcomeTokenAmounts[0].lt(tx.outcomeTokenAmounts[1])))
-          .map(tx => tx.additionalSharesCost)
-          .reduce((a, b) => a.add(b))
+      // More short shares are removed so long shares are purchased
+      const longAdditionalSharesCosts = addLiquidityLongPurchaseTxs
+        .concat(removeLiquidityTxs.filter(tx => tx.outcomeTokenAmounts[0].lt(tx.outcomeTokenAmounts[1])))
+        .map(tx => tx.additionalSharesCost)
+
+      if (longAdditionalSharesCosts.length) {
+        totalLongLiquidityTxsCost = longAdditionalSharesCosts.reduce((a, b) => a.add(b))
       }
     }
 
