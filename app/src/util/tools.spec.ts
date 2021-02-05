@@ -4,6 +4,7 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 
 import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
 
+import { getNativeAsset } from './networks'
 import {
   calcAddFundingSendAmounts,
   calcDepositedTokens,
@@ -508,6 +509,18 @@ describe('tools', () => {
       const unitResult = getUnit(title)
 
       expect(unitResult).toStrictEqual(result)
+    }
+  })
+
+  describe('getInitialCollateral', () => {
+    const testCases: [[number, Token], Token][] = [
+      [[1, getNativeAsset(1)], getNativeAsset(1)],
+      [[3, getNativeAsset(4)], getNativeAsset(4)],
+      [[77, getNativeAsset(77)], getNativeAsset(77)],
+      [[100, getNativeAsset(100)], getNativeAsset(100)],
+    ]
+    for (const [[token], result] of testCases) {
+      expect(result).toStrictEqual(token)
     }
   })
 })
