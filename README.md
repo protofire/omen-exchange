@@ -74,7 +74,7 @@ The `build` directory in the `app` directory will now contain the build to be se
 
 | Contract | Address |
 | -------- | -------- |
-| [ConditionalTokens](https://github.com/gnosis/conditional-tokens-contracts) | [0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f](https://etherscan.io/address/0xC59b0e4De5F1248C1140964E0fF287B192407E0C#code)     |
+| [ConditionalTokens](https://github.com/gnosis/conditional-tokens-contracts) | [0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f](https://blockscout.com/poa/sokol/address/0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f/contracts)     |
 | [FPMMDeterministicFactory](https://github.com/gnosis/conditional-tokens-market-makers) | [0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5](https://blockscout.com/poa/sokol/address/0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5/contracts) |
 | [Kleros bridge](https://github.com/kleros/cross-chain-realitio-proxy) | [0x37Fcdb26F12f3FC76F2424EC6B94D434a959A0f7](https://blockscout.com/poa/sokol/address/0x37Fcdb26F12f3FC76F2424EC6B94D434a959A0f7/contracts) |
 | [Reality.eth](https://github.com/realitio/realitio-contracts) | [0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03](https://blockscout.com/poa/sokol/address/0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03/contracts) |
