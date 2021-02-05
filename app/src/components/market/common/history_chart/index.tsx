@@ -9,7 +9,6 @@ import { getOutcomeColor } from '../../../../theme/utils'
 import { formatBigNumber } from '../../../../util/tools'
 import { Button } from '../../../button/button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { InlineLoading } from '../../../loading/inline_loading'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../common_styled'
 import { CustomInlineLoading } from '../history_table'
 

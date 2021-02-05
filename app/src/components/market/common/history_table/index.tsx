@@ -7,7 +7,6 @@ import { formatBigNumber, formatHistoryDate, formatHistoryUser } from '../../../
 import { Button } from '../../../button'
 import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
 import { InlineLoading } from '../../../loading/inline_loading'
-import { commonWrapperCSS } from '../history_section/history_select'
 
 const TableWrapper = styled.div`
   text-align: left;
@@ -109,7 +108,7 @@ export const HistoryTable: React.FC<Props> = ({
   if (!fpmmTrade || status === 'Loading' || sharesDataLoader) {
     return <CustomInlineLoading message="Loading Trade History" />
   }
-
+  const formattedCurrency = currency === 'WETH' ? 'ETH' : currency === 'WXDAI' ? 'XDAI' : currency
   return (
     <React.Fragment>
       <TableWrapper>
@@ -117,7 +116,7 @@ export const HistoryTable: React.FC<Props> = ({
           <HistoryColumns>User</HistoryColumns>
           <HistoryColumns>Action</HistoryColumns>
           <HistoryColumns>Shares/PT</HistoryColumns>
-          <HistoryColumns>Amount ({currency})</HistoryColumns>
+          <HistoryColumns>Amount ({formattedCurrency})</HistoryColumns>
           <HistoryColumns firstRow={true}>Date - UTC</HistoryColumns>
         </HistoryRow>
         {status === 'Ready' &&
@@ -151,7 +150,7 @@ export const HistoryTable: React.FC<Props> = ({
                   <HistoryColumns>{formatBigNumber(sharesOrPoolTokenAmount, decimals, 3)}</HistoryColumns>
                   <HistoryColumns>
                     {formatBigNumber(collateralTokenAmount, decimals, 3)}
-                    {` ${currency}`}
+                    {` ${formattedCurrency}`}
                   </HistoryColumns>
                   <HistoryColumns as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank">
                     {formatHistoryDate(creationTimestamp)}

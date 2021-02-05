@@ -13,7 +13,6 @@ import { calcPrice, calcSellAmountInCollateral, formatBigNumber, formatTimestamp
 import { HistoricData, Period } from '../../../../util/types'
 import { Button, ButtonSelectable } from '../../../button'
 import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
-import { InlineLoading } from '../../../loading'
 import { HistoryChart } from '../history_chart'
 import { HistoryTable } from '../history_table'
 
@@ -41,11 +40,6 @@ const NoData = styled.div`
   line-height: 1.3;
   padding-left: ${props => props.theme.cards.paddingHorizontal};
   padding-right: ${props => props.theme.cards.paddingHorizontal};
-`
-
-const CustomInlineLoading = styled(InlineLoading)`
-  ${commonWrapperCSS};
-  height: 340px;
 `
 
 const ChartWrapper = styled.div`
@@ -240,12 +234,6 @@ export const History_select: React.FC<Props> = ({
             }
 
             const collateralBigNumber = new BigNumber(item.collateralTokenAmount)
-            console.log(
-              formatBigNumber(collateralBigNumber, decimals, 2),
-              'and',
-              sharesValue && formatBigNumber(sharesValue, decimals, 2),
-            )
-            console.log(item.transactionHash === '0xf3bc5c384a1b412a62f9887a7748d00725b00c1c061afff9476b43dd458c74e8')
 
             newFpmmTradeArray.push({
               sharesOrPoolTokenAmount: item.sharesOrPoolTokenAmount,
@@ -261,8 +249,6 @@ export const History_select: React.FC<Props> = ({
               user: item.user,
             })
           } else {
-            console.log(item.transactionHash === '0xf3bc5c384a1b412a62f9887a7748d00725b00c1c061afff9476b43dd458c74e8')
-
             newFpmmTradeArray.push(item)
           }
         })
