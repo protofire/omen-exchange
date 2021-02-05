@@ -1,3 +1,4 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
@@ -239,18 +240,29 @@ export const History_select: React.FC<Props> = ({
             }
 
             const collateralBigNumber = new BigNumber(item.collateralTokenAmount)
+            console.log(
+              formatBigNumber(collateralBigNumber, decimals, 2),
+              'and',
+              sharesValue && formatBigNumber(sharesValue, decimals, 2),
+            )
+            console.log(item.transactionHash === '0xf3bc5c384a1b412a62f9887a7748d00725b00c1c061afff9476b43dd458c74e8')
 
             newFpmmTradeArray.push({
               sharesOrPoolTokenAmount: item.sharesOrPoolTokenAmount,
               decimals: item.decimals,
               creationTimestamp: item.creationTimestamp,
               id: item.id,
-              collateralTokenAmount: sharesValue ? collateralBigNumber.sub(sharesValue) : collateralBigNumber,
+              collateralTokenAmount:
+                sharesValue && collateralBigNumber.sub(sharesValue).gt(Zero)
+                  ? collateralBigNumber.sub(sharesValue)
+                  : collateralBigNumber,
               transactionHash: item.transactionHash,
               transactionType: item.transactionType,
               user: item.user,
             })
           } else {
+            console.log(item.transactionHash === '0xf3bc5c384a1b412a62f9887a7748d00725b00c1c061afff9476b43dd458c74e8')
+
             newFpmmTradeArray.push(item)
           }
         })
