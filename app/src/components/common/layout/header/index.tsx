@@ -179,14 +179,14 @@ interface ExtendsHistory extends RouteComponentProps {
   setClaim: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function useOutsideAlerter(ref: any) {
+function useOutsideAlerter(ref: any, setState: any) {
   useEffect(() => {
     /**
      * Alert if clicked on outside of element
      */
     function handleClickOutside(event: any) {
       if (ref.current && !ref.current.contains(event.target)) {
-        alert('You clicked outside of me!')
+        setState(false)
       }
     }
 
@@ -196,6 +196,7 @@ function useOutsideAlerter(ref: any) {
       // Unbind the event listener on clean up
       document.removeEventListener('mousedown', handleClickOutside)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref])
 }
 
@@ -258,7 +259,8 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   }
   const [isBridgeOpen, setIsBridgeOpen] = useState<boolean>(false)
   const ref = useRef(null)
-  useOutsideAlerter(ref)
+  useOutsideAlerter(ref, setIsBridgeOpen)
+
   const exitButtonProps = {
     onClick: () => history.push('/'),
   }
