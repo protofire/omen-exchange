@@ -328,29 +328,6 @@ export const getSharesInBaseToken = (
 }
 
 /**
- *  Gets initial display collateral
- * If collateral is cToken type then display is the base collateral
- * Else display is the collateral
- */
-export const getInitialCollateral = (networkId: number, collateral: Token): Token => {
-  const collateralSymbol = collateral.symbol.toLowerCase()
-  if (collateralSymbol in CompoundTokenType) {
-    if (collateralSymbol === 'ceth') {
-      return getNativeAsset(networkId)
-    } else {
-      const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
-      const baseToken = getToken(networkId, baseCollateralSymbol)
-      return baseToken
-    }
-  } else {
-    if (collateral.address === getWrapToken(networkId).address) {
-      return getNativeAsset(networkId)
-    } else {
-      return collateral
-    }
-  }
-}
-/**
  * Compute the number of outcomes that will be sent to the user by the Market Maker
  * after funding it for the first time with `addedFunds` of collateral.
  */
@@ -603,9 +580,20 @@ export const onChangeMarketCurrency = (
  * Else display is the collateral
  */
 export const getInitialCollateral = (networkId: number, collateral: Token): Token => {
-  if (collateral.address === getWrapToken(networkId).address) {
-    return getNativeAsset(networkId)
+  const collateralSymbol = collateral.symbol.toLowerCase()
+  if (collateralSymbol in CompoundTokenType) {
+    if (collateralSymbol === 'ceth') {
+      return getNativeAsset(networkId)
+    } else {
+      const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
+      const baseToken = getToken(networkId, baseCollateralSymbol)
+      return baseToken
+    }
   } else {
-    return collateral
+    if (collateral.address === getWrapToken(networkId).address) {
+      return getNativeAsset(networkId)
+    } else {
+      return collateral
+    }
   }
 }

@@ -57,7 +57,7 @@ import { TransactionDetailsRow, ValueStates } from '../../common/transaction_det
 import { WarningMessage } from '../../common/warning_message'
 
 interface Props extends RouteComponentProps<any> {
-  compoundService: CompoundService
+  compoundService: CompoundService | null
   marketMakerData: MarketMakerData
   theme?: any
   switchMarketTab: (arg0: MarketDetailsTab) => void
@@ -345,7 +345,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setStatus(Status.Loading)
 
       let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
-      if (collateralSymbol in CompoundTokenType && displayCollateral.symbol === baseCollateral.symbol) {
+      if (
+        compoundService &&
+        collateralSymbol in CompoundTokenType &&
+        displayCollateral.symbol === baseCollateral.symbol
+      ) {
         const displayDepositedTokensTotal = compoundService.calculateCTokenToBaseExchange(
           baseCollateral,
           depositedTokensTotal,
@@ -357,10 +361,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
       let useBaseToken = false
-      if (collateral.address === pseudoNativeAssetAddress && displayCollateral.address === pseudoNativeAssetAddress) {
+      if (displayCollateral.address === pseudoNativeAssetAddress) {
         useBaseToken = true
-      }
-      if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      } else if (collateral.symbol.toLowerCase() in CompoundTokenType) {
         if (displayCollateral.address !== collateral.address) {
           useBaseToken = true
         }
@@ -459,7 +462,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const setDisplayCollateralAmountToFund = (value: BigNumber) => {
     if (collateral.address === displayCollateral.address) {
       setAmountToFund(value)
-    } else {
+    } else if (compoundService) {
       const baseAmount = compoundService.calculateBaseToCTokenExchange(displayCollateral, value)
       setAmountToFund(baseAmount)
     }
@@ -468,7 +471,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const setWithdrawAmountToRemove = (val: BigNumber) => {
     let normalizedWithdrawAmount = val
-    if (collateral.symbol.toLowerCase() in CompoundTokenType && displayCollateral.address !== collateral.address) {
+    if (
+      compoundService &&
+      collateral.symbol.toLowerCase() in CompoundTokenType &&
+      displayCollateral.address !== collateral.address
+    ) {
       normalizedWithdrawAmount = compoundService.calculateBaseToCTokenExchange(baseCollateral, normalizedWithdrawAmount)
     }
     setAmountToRemove(normalizedWithdrawAmount)
@@ -489,7 +496,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }
 
   let displayBalances = balances
-  if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+  if (compoundService && collateral.symbol.toLowerCase() in CompoundTokenType) {
     displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
   }
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
@@ -507,7 +514,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   let sellNoteDepositedTokens = depositedTokens
   let sellNoteDepositedTokensTotal = depositedTokensTotal
   // Set display values if the collateral is cToken type
-  if (collateralSymbol in CompoundTokenType) {
+  if (compoundService && collateralSymbol in CompoundTokenType) {
     displayPoolTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, poolTokens)
     displayTotalPoolShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalPoolShares)
     displayTotalUserLiquidity = compoundService.calculateCTokenToBaseExchange(displayCollateral, totalUserLiquidity)

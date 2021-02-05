@@ -7,7 +7,7 @@ import { MarketPoolLiquidity } from './market_pool_liquidity'
 import { ScalarMarketPoolLiquidity } from './scalar_market_pool_liquidity'
 
 interface Props {
-  compoundService: CompoundService
+  compoundService: CompoundService | null
   marketMakerData: MarketMakerData
   fetchGraphMarketMakerData: () => Promise<void>
   fetchGraphMarketUserTxData: () => Promise<void>

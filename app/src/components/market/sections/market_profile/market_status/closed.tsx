@@ -143,9 +143,7 @@ const Wrapper = (props: Props) => {
   const [message, setMessage] = useState('')
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const marketCollateralToken = collateralToken
-  const [compoundService, setCompoundService] = useState<CompoundService>(
-    new CompoundService(collateralToken.address, collateralToken.symbol, provider, account),
-  )
+  const [compoundService, setCompoundService] = useState<Maybe<CompoundService>>(null)
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
 
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
@@ -167,8 +165,14 @@ const Wrapper = (props: Props) => {
 
   useEffect(() => {
     const getResult = async () => {
-      await compoundService.init()
-      setCompoundService(compoundService)
+      const compoundServiceObject = new CompoundService(
+        marketCollateralToken.address,
+        marketCollateralToken.symbol,
+        provider,
+        account,
+      )
+      await compoundServiceObject.init()
+      setCompoundService(compoundServiceObject)
     }
     if (marketCollateralToken.symbol.toLowerCase() in CompoundTokenType) {
       getResult()

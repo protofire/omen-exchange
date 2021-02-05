@@ -130,9 +130,7 @@ const Wrapper = (props: Props) => {
   } = marketMakerData
   const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
   const { account, library: provider, networkId } = context
-  const [compoundService, setCompoundService] = useState<CompoundService>(
-    new CompoundService(collateral.address, collateral.symbol, provider, account),
-  )
+  const [compoundService, setCompoundService] = useState<Maybe<CompoundService>>(null)
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
   useMemo(() => {
@@ -148,8 +146,9 @@ const Wrapper = (props: Props) => {
 
   useEffect(() => {
     const getResult = async () => {
-      await compoundService.init()
-      setCompoundService(compoundService)
+      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
+      await compoundServiceObject.init()
+      setCompoundService(compoundServiceObject)
     }
     if (collateral.symbol.toLowerCase() in CompoundTokenType) {
       getResult()
@@ -189,7 +188,11 @@ const Wrapper = (props: Props) => {
     setCurrentDisplayCollateral()
   }, [collateral.symbol]) // eslint-disable-line react-hooks/exhaustive-deps
   let displayBalances = balances
-  if (collateral.address !== displayCollateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
+  if (
+    compoundService &&
+    collateral.address !== displayCollateral.address &&
+    collateral.symbol.toLowerCase() in CompoundTokenType
+  ) {
     displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
   }
   const userHasShares = balances.some((balanceItem: BalanceItem) => {

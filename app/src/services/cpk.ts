@@ -1037,8 +1037,6 @@ class CPKService {
       if (this.cpk.isSafeApp()) {
         txOptions.gas = await this.getGas(500000)
       }
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
       let userInputCollateral = collateralToken
