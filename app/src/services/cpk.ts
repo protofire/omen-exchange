@@ -603,9 +603,9 @@ class CPKService {
       })
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      logger.log(`Transaction hash: ${txObject.hash}`)
 
-      const transaction = await this.provider.waitForTransaction(txObject.hash)
+      const transaction = await this.waitForTransaction(txObject)
+
       return {
         transaction,
         marketMakerAddress: predictedMarketMakerAddress,
