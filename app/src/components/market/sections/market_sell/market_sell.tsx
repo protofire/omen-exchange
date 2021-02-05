@@ -221,6 +221,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         useBaseToken = true
       }
 
+      let useBaseToken = false
+      if (collateral.address !== displayCollateral.address) {
+        useBaseToken = true
+      }
       await cpk.sellOutcomes({
         amount: tradedCollateral,
         compoundService,

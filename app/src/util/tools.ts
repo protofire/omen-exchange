@@ -596,3 +596,16 @@ export const onChangeMarketCurrency = (
     }
   }
 }
+
+/**
+ *  Gets initial display collateral
+ * If collateral is cToken type then display is the base collateral
+ * Else display is the collateral
+ */
+export const getInitialCollateral = (networkId: number, collateral: Token): Token => {
+  if (collateral.address === getWrapToken(networkId).address) {
+    return getNativeAsset(networkId)
+  } else {
+    return collateral
+  }
+}

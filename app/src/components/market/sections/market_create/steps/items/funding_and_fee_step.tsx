@@ -524,7 +524,11 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             {customFee && (
               <CustomFeeWrapper>
                 <CustomFeeLabel>Trading Fee</CustomFeeLabel>
-                <StyledTradingFeeSelector disabled={false} onSelect={handleTradingFeeChange} />
+                <StyledTradingFeeSelector
+                  disabled={false}
+                  fee={isNaN(spread) ? '0.00%' : `${spread.toFixed(2)}%`}
+                  onSelect={handleTradingFeeChange}
+                />
               </CustomFeeWrapper>
             )}
             {amountError && <GenericError>{amountError}</GenericError>}

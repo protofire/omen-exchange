@@ -538,7 +538,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       toggleCollateral = collateral
     }
   } else {
-    if (collateral.address === pseudoNativeAssetAddress) {
+    if (collateral.address === nativeAsset.address || collateral.address === wrapToken.address) {
       if (displayCollateral.address === wrapToken.address) {
         toggleCollateral = getNativeAsset(context.networkId)
       } else {
