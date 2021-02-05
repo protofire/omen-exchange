@@ -10,6 +10,7 @@ import { getLogger } from '../util/logger'
 import {
   getContractAddress,
   getTargetSafeImplementation,
+  getTokenFromAddress,
   getWrapToken,
   networkIds,
   pseudoNativeAssetAddress,
@@ -25,6 +26,7 @@ import { MarketMakerFactoryService } from './market_maker_factory'
 import { OracleService } from './oracle'
 import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
+import { UnwrapTokenService } from './unwrap_token'
 
 const logger = getLogger('Services::CPKService')
 
@@ -40,6 +42,7 @@ interface CPKSellOutcomesParams {
   outcomeIndex: number
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
+  useBaseToken?: boolean
 }
 
 interface CPKCreateMarketParams {
@@ -64,6 +67,7 @@ interface CPKRemoveFundingParams {
   marketMaker: MarketMakerService
   outcomesCount: number
   sharesToBurn: BigNumber
+  useBaseToken?: boolean
 }
 
 interface CPKRedeemParams {
@@ -621,6 +625,7 @@ class CPKService {
     conditionalTokens,
     marketMaker,
     outcomeIndex,
+    useBaseToken,
   }: CPKSellOutcomesParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -631,6 +636,9 @@ class CPKService {
 
       const transactions = []
       const txOptions: TxOptions = {}
+
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
       if (this.cpk.isSafeApp()) {
         txOptions.gas = await this.getGas(500000)
@@ -652,14 +660,30 @@ class CPKService {
         to: marketMaker.address,
         data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
       })
-
+      if (useBaseToken) {
+        const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, amount)
+        // If use prefers to get paid in the base native asset then unwrap the asset
+        transactions.push({
+          to: collateralAddress,
+          data: encodedWithdrawFunction,
+        })
+      }
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
         // Step 4: Transfer funding to user
-        transactions.push({
-          to: collateralAddress,
-          data: ERC20Service.encodeTransfer(account, amount),
-        })
+        if (!useBaseToken) {
+          transactions.push({
+            to: collateralAddress,
+            data: ERC20Service.encodeTransfer(account, amount),
+          })
+        } else {
+          // Transfer unwrapped asset back to user
+          transactions.push({
+            to: account,
+            value: amount,
+          })
+        }
       }
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
@@ -755,11 +779,14 @@ class CPKService {
     marketMaker,
     outcomesCount,
     sharesToBurn,
+    useBaseToken,
   }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
-
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+      const transactions = []
       const removeFundingTx = {
         to: marketMaker.address,
         data: MarketMakerService.encodeRemoveFunding(sharesToBurn),
@@ -774,22 +801,39 @@ class CPKService {
           amountToMerge,
         ),
       }
-
-      const transactions = [removeFundingTx, mergePositionsTx]
+      transactions.push(removeFundingTx)
+      transactions.push(mergePositionsTx)
 
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp()) {
         txOptions.gas = await this.getGas(500000)
       }
-
+      const totalAmountToSend = amountToMerge.add(earnings)
+      if (useBaseToken) {
+        const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, totalAmountToSend)
+        // If use prefers to get paid in the base native asset then unwrap the asset
+        transactions.push({
+          to: collateralAddress,
+          data: encodedWithdrawFunction,
+        })
+      }
       // If we are signed in as a safe we don't need to transfer
       if (!this.cpk.isSafeApp()) {
         // transfer to the user the merged collateral plus the earned fees
-        transactions.push({
-          to: collateralAddress,
-          data: ERC20Service.encodeTransfer(account, amountToMerge.add(earnings)),
-        })
+        if (!useBaseToken) {
+          transactions.push({
+            to: collateralAddress,
+            data: ERC20Service.encodeTransfer(account, totalAmountToSend),
+          })
+        } else {
+          // Transfer unwrapped asset back to user
+          transactions.push({
+            to: account,
+            value: totalAmountToSend,
+          })
+        }
       }
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
