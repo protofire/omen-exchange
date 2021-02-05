@@ -27,6 +27,8 @@ import {
   truncateStringInTheMiddle as truncate,
 } from './tools'
 
+import { getNativeAsset } from './networks'
+
 describe('tools', () => {
   describe('calcPrice', () => {
     const testCases = [
@@ -510,4 +512,17 @@ describe('tools', () => {
       expect(unitResult).toStrictEqual(result)
     }
   })
+  
+  describe('getInitialCollateral', () => {
+    const testCases: [[number, Token], Token][] = [
+      [[1, getNativeAsset(1)], getNativeAsset(1)],
+      [[3, getNativeAsset(4)], getNativeAsset(4)],
+      [[77, getNativeAsset(77)], getNativeAsset(77)],
+      [[100, getNativeAsset(100)], getNativeAsset(100)],
+    ]
+    for (const [[networkId, token], result] of testCases) {
+      expect(result).toStrictEqual(token)
+    }
+  })
+
 })
