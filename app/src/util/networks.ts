@@ -479,6 +479,14 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     },
     isSelectionEnabled: true,
   },
+  dxdao: {
+    name: 'DXdao',
+    url: 'https://dxdao.eth.link/',
+    addresses: {
+      [networkIds.XDAI]: '0x34a8B97bd8Ac4AfBe91C71E961C3f9c1F064717F',
+    },
+    isSelectionEnabled: true,
+  },
   unknown: {
     name: 'Unknown',
     url: '',
