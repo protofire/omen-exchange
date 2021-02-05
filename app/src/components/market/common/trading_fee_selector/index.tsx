@@ -25,11 +25,12 @@ const TradingFeeDropdown = styled(Dropdown)<{ selected: boolean }>`
 
 interface Props {
   disabled?: boolean
+  fee: string
   onSelect: (fee: string) => void
 }
 
 export const TradingFeeSelector: React.FC<Props> = props => {
-  const { disabled, onSelect, ...restProps } = props
+  const { disabled, fee, onSelect, ...restProps } = props
 
   const onChange = (fee: string) => {
     if (TRADING_FEE_OPTIONS.includes(fee)) onSelect(fee)
@@ -42,10 +43,12 @@ export const TradingFeeSelector: React.FC<Props> = props => {
     }
   })
 
+  const currentItem = tradingFeeDropdownItems.findIndex(item => item.content === fee)
+
   return (
     <Wrapper {...restProps}>
       <TradingFeeDropdown
-        currentItem={8}
+        currentItem={currentItem}
         disabled={disabled}
         dropdownPosition={DropdownPosition.center}
         items={tradingFeeDropdownItems}
