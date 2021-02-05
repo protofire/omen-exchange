@@ -1,4 +1,3 @@
-import SafeAppsSDK from '@gnosis.pm/safe-apps-sdk'
 import CPK, { OperationType } from 'contract-proxy-kit/lib/esm'
 import multiSendAbi from 'contract-proxy-kit/lib/esm/abis/MultiSendAbi.json'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
@@ -24,26 +23,6 @@ interface Transaction {
   data?: string
 }
 
-type NumberLike = number | string | bigint | Record<string, any>
-
-interface GasLimitOptions {
-  gas?: NumberLike
-  gasLimit?: NumberLike
-}
-
-interface BaseTxOptions extends GasLimitOptions {
-  gasPrice?: NumberLike
-}
-
-interface ExecOptions extends BaseTxOptions {
-  nonce?: NumberLike
-}
-
-interface TransactionResult {
-  hash?: string
-  safeTxHash?: string
-}
-
 const defaultTxOperation = OperationType.Call
 const defaultTxValue = '0'
 const defaultTxData = '0x'
@@ -61,24 +40,6 @@ function standardizeTransaction(tx: Transaction): StandardTransaction {
 
 // @ts-expect-error ignore
 class OCPK extends CPK {
-  async sendTransactions(transactions: StandardTransaction[]): Promise<TransactionResult> {
-    const sdk = new SafeAppsSDK()
-    const txs = transactions.map(standardizeTransaction)
-    const data = {
-      txs,
-      params: {},
-    }
-    return await sdk.txs.send(data)
-  }
-
-  async execTransactions(transactions: Transaction[], options?: ExecOptions): Promise<TransactionResult> {
-    if (this.isSafeApp()) {
-      return this.sendTransactions(transactions.map(standardizeTransaction))
-    }
-
-    return super.execTransactions(transactions, options)
-  }
-
   private getSafeExecTxParams(transactions: Transaction[]): StandardTransaction {
     if (transactions.length === 1) {
       return standardizeTransaction(transactions[0])
