@@ -16,7 +16,7 @@ import { InlineLoading } from '../../../loading'
 import { HistoryChart } from '../history_chart'
 import { HistoryTable } from '../history_table'
 
-const commonWrapperCSS = css`
+export const commonWrapperCSS = css`
   border-top: 1px solid ${props => props.theme.borders.borderDisabled};
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};
@@ -287,9 +287,9 @@ export const History_select: React.FC<Props> = ({
     setPageIndex(newPageIndex)
   }
 
-  if (!data || status === 'Loading' || sharesDataLoader) {
-    return <CustomInlineLoading message="Loading Trade History" />
-  }
+  // if (!data || status === 'Loading' || sharesDataLoader) {
+  //   return <CustomInlineLoading message="Loading Trade History" />
+  // }
 
   if (holdingSeries && holdingSeries.length <= 1) {
     return <NoData>There is not enough historical data for this market</NoData>
@@ -329,6 +329,7 @@ export const History_select: React.FC<Props> = ({
           onLoadNextPage={loadNextPage}
           onLoadPrevPage={loadPrevPage}
           prev={pageIndex < 1}
+          sharesDataLoader={sharesDataLoader}
           status={status}
         />
       ) : (
@@ -338,6 +339,8 @@ export const History_select: React.FC<Props> = ({
           outcomes={outcomeArray}
           scalarHigh={scalarHigh}
           scalarLow={scalarLow}
+          sharesDataLoader={sharesDataLoader}
+          status={status}
           unit={unit}
         />
       )}

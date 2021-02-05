@@ -6,6 +6,8 @@ import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTransactionsFro
 import { formatBigNumber, formatHistoryDate, formatHistoryUser } from '../../../../util/tools'
 import { Button } from '../../../button'
 import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
+import { InlineLoading } from '../../../loading/inline_loading'
+import { commonWrapperCSS } from '../history_section/history_select'
 
 const TableWrapper = styled.div`
   text-align: left;
@@ -68,6 +70,11 @@ const HistoryRow = styled.div`
   }
 `
 
+export const CustomInlineLoading = styled(InlineLoading)`
+  width: auto;
+  height: 340px;
+`
+
 type Props = {
   fpmmTrade: FpmmTradeDataType[] | null
   status: string
@@ -76,11 +83,13 @@ type Props = {
   currency: string
   next: boolean
   prev: boolean
+  sharesDataLoader: boolean
 }
 
 enum EtherscanLink {
   rinkeby = 'https://rinkeby.etherscan.io/tx/',
   mainnet = 'https://etherscan.io/tx/',
+  xDai = 'https://blockscout.com/poa/xdai/tx/',
 }
 
 export const HistoryTable: React.FC<Props> = ({
@@ -90,11 +99,16 @@ export const HistoryTable: React.FC<Props> = ({
   onLoadNextPage,
   onLoadPrevPage,
   prev,
+  sharesDataLoader,
   status,
 }) => {
   const history = useHistory()
 
   const windowObj: any = window
+
+  if (!fpmmTrade || status === 'Loading' || sharesDataLoader) {
+    return <CustomInlineLoading message="Loading Trade History" />
+  }
 
   return (
     <React.Fragment>
@@ -122,7 +136,11 @@ export const HistoryTable: React.FC<Props> = ({
               const chainID = windowObj.ethereum.chainId
 
               const mainnetOrRinkebyUrl =
-                chainID === '0x4' ? EtherscanLink.rinkeby : chainID === '0x1' ? EtherscanLink.mainnet : ''
+                chainID === '0x4'
+                  ? EtherscanLink.rinkeby
+                  : chainID === '0x1'
+                  ? EtherscanLink.mainnet
+                  : EtherscanLink.xDai
               return (
                 <HistoryRow key={id}>
                   <HistoryColumns>

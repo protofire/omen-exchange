@@ -25,7 +25,7 @@ const ConnectionStatusText = styled.span`
 
 const ConnectionStatusDot = styled.div`
   height: 22px;
-  margin-right: 5px;
+  margin-right: 52px;
   width: 22px;
 `
 

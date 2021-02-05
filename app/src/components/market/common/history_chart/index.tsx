@@ -9,7 +9,9 @@ import { getOutcomeColor } from '../../../../theme/utils'
 import { formatBigNumber } from '../../../../util/tools'
 import { Button } from '../../../button/button'
 import { ButtonType } from '../../../button/button_styling_types'
+import { InlineLoading } from '../../../loading/inline_loading'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../common_styled'
+import { CustomInlineLoading } from '../history_table'
 
 const ResponsiveWrapper = styled.div`
   margin: 21px 24.5px;
@@ -90,15 +92,26 @@ const renderTooltipContent = (o: any) => {
   )
 }
 type Props = {
-  data: { date: string }[]
+  data: { date: string }[] | null
   outcomes: string[]
   scalarHigh?: Maybe<BigNumber>
   scalarLow?: Maybe<BigNumber>
   unit: string
   isScalar?: Maybe<boolean>
+  sharesDataLoader: boolean
+  status: any
 }
 
-export const HistoryChart: React.FC<Props> = ({ data, isScalar, outcomes, scalarHigh, scalarLow, unit }) => {
+export const HistoryChart: React.FC<Props> = ({
+  data,
+  isScalar,
+  outcomes,
+  scalarHigh,
+  scalarLow,
+  sharesDataLoader,
+  status,
+  unit,
+}) => {
   const history = useHistory()
 
   const scalarLowNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
@@ -128,6 +141,10 @@ export const HistoryChart: React.FC<Props> = ({ data, isScalar, outcomes, scalar
         </Legends>
       </ChartTooltip>
     )
+  }
+
+  if (!data || status === 'Loading' || sharesDataLoader) {
+    return <CustomInlineLoading message="Loading Trade History" />
   }
   return (
     <>
