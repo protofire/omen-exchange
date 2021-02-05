@@ -19,13 +19,13 @@ import {
 } from '../../../../hooks'
 import { CompoundService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
-  getBaseTokenForCToken,
+  getInitialCollateral,
   getSharesInBaseToken,
   mulBN,
 } from '../../../../util/tools'
@@ -97,24 +97,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
   const collateralSymbol = collateral.symbol.toLowerCase()
 
-  let baseCollateral = collateral
-  if (collateralSymbol in CompoundTokenType) {
-    if (collateralSymbol === 'ceth') {
-      baseCollateral = getNativeAsset(networkId)
-    } else {
-      const baseTokenSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
-      baseCollateral = getToken(networkId, baseTokenSymbol)
-    }
-  }
-  const getInitialDisplayCollateral = (): Token => {
-    const collateralSymbol = collateral.symbol.toLowerCase()
-    if (collateralSymbol in CompoundTokenType) {
-      return baseCollateral
-    } else {
-      return collateral
-    }
-  }
-  const [displayCollateral, setDisplayCollateral] = useState<Token>(getInitialDisplayCollateral())
+  const baseCollateral = getInitialCollateral(networkId, collateral)
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
   let displayBalances = balances
   if (
     baseCollateral.address !== collateral.address &&
@@ -180,8 +164,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)),
       )
       return [tradedShares, probabilities, amount]
-    }, // eslint-disable-next-line
-    [balances, displayCollateral.address, marketMaker, outcomeIndex],
+    },
+    [balances, marketMaker, outcomeIndex],
   )
 
   const [tradedShares, probabilities, debouncedAmount] = useAsyncDerivedValue(

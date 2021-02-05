@@ -262,55 +262,7 @@ export const getBaseTokenForCToken = (token: string): string => {
   }
   return ''
 }
-/**
- * Calculates balances in base token for a given c token
- */
-export const getBalancesInBaseToken = (
-  balances: BalanceItem[],
-  compoundService: CompoundService,
-  displayCollateral: Token,
-): BalanceItem[] => {
-  const displayBalances = balances.map(function(bal) {
-    const cTokenPrecision = 8
-    const cTokenWithPrecision = roundNumberStringToSignificantDigits(bal.currentPrice.toString(), 4)
-    let basePrice = '0'
-    try {
-      const cTokenPriceAmount = parseUnits(cTokenWithPrecision, cTokenPrecision)
-      const baseTokenPrice = compoundService.calculateCTokenToBaseExchange(displayCollateral, cTokenPriceAmount)
-      basePrice = formatBigNumber(baseTokenPrice, displayCollateral.decimals)
-    } catch (e) {
-      basePrice = '0'
-    }
-    return Object.assign({}, bal, {
-      currentDisplayPrice: basePrice,
-    })
-  })
-  return displayBalances
-}
 
-export const getPricesInCToken = (
-  balances: BalanceItem[],
-  compoundService: CompoundService,
-  displayCollateral: Token,
-): BalanceItem[] => {
-  const displayBalances = balances.map(function(bal) {
-    const baseTokenDecimals = displayCollateral.decimals
-    const cTokenDecimals = 8
-    const baseTokenWithPrecision = roundNumberStringToSignificantDigits(bal.currentPrice.toString(), 4)
-    let cTokenPrice = '0'
-    try {
-      const baseTokenPriceAmount = parseUnits(baseTokenWithPrecision, baseTokenDecimals)
-      const cTokenPriceAmount = compoundService.calculateBaseToCTokenExchange(displayCollateral, baseTokenPriceAmount)
-      cTokenPrice = formatBigNumber(cTokenPriceAmount, cTokenDecimals)
-    } catch (e) {
-      cTokenPrice = '0'
-    }
-    return Object.assign({}, bal, {
-      currentDisplayPrice: cTokenPrice,
-    })
-  })
-  return displayBalances
-}
 export const getSharesInBaseToken = (
   balances: BalanceItem[],
   compoundService: CompoundService,

@@ -246,11 +246,7 @@ export const OutcomeTable = (props: Props) => {
     }
     const currentPriceFormatted = withWinningOutcome ? payout.toFixed(2) : currentPriceDisplay
     const probability = withWinningOutcome ? Number(payout.mul(100).toString()) : probabilities[outcomeIndex]
-    const newPriceValue = probabilities[outcomeIndex] / 100
-    let newPrice = newPriceValue.toFixed(2)
-    if (newPriceValue < 0.01) {
-      newPrice = newPriceValue.toFixed(4)
-    }
+    const newPrice = (probabilities[outcomeIndex] / 100).toFixed(2)
     const formattedPayout = formatBigNumber(mulBN(shares, Number(payout.toString())), currentCollateral.decimals)
     const formattedShares = formatBigNumber(shares, baseCollateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] && payouts[outcomeIndex].gt(0)

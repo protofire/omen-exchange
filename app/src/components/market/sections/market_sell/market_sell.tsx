@@ -168,7 +168,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
       logger.log(`Amount to sell ${amountToSell}`)
       return [probabilities, costFee, amountToSell, potentialValue]
-    }, // eslint-disable-next-line
+    },
     [outcomeIndex, balances, marketFeeWithTwoDecimals],
   )
 
