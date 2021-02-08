@@ -17,6 +17,7 @@ import {
   KLEROS_CURATE_GRAPH_MAINNET_WS,
   KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
   KLEROS_CURATE_GRAPH_RINKEBY_WS,
+  XDAI_LOCATION,
 } from '../common/constants'
 import { entries, isNotNull } from '../util/type-utils'
 
@@ -220,7 +221,7 @@ const networks: { [K in NetworkId]: Network } = {
     },
     cpk: {
       masterCopyAddress: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
-      proxyFactoryAddress: '0xfC7577774887aAE7bAcdf0Fc8ce041DA0b3200f7',
+      proxyFactoryAddress: '0x3049b84bbC3EB2C375547CAc0D77da032d3d1981',
       multiSendAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
       fallbackHandlerAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
     },
@@ -247,7 +248,7 @@ export const supportedNetworkURLs = entries(networks).reduce<{
   {},
 )
 
-export const infuraNetworkURL = networks[1].url
+export const infuraNetworkURL = location.host === XDAI_LOCATION ? networks[100].url : networks[1].url
 
 export const getInfuraUrl = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
@@ -437,6 +438,9 @@ export const getTokensByNetwork = (networkId: number): Token[] => {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
 
+  const wrapTokenAddress = getWrapToken(networkId).address
+  const nativeAsset = getNativeAsset(networkId)
+
   return Object.values(knownTokens)
     .sort((a, b) => (a.order > b.order ? 1 : -1))
     .map(token => {
@@ -445,7 +449,7 @@ export const getTokensByNetwork = (networkId: number): Token[] => {
         return {
           symbol: token.symbol,
           decimals: token.decimals,
-          image: getImageUrl(address),
+          image: address === wrapTokenAddress ? nativeAsset.image : getImageUrl(address),
           address,
         }
       }
@@ -470,8 +474,16 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     addresses: {
       [networkIds.MAINNET]: '0xd47f72a2d1d0E91b0Ec5e5f5d02B2dc26d00A14D',
       [networkIds.RINKEBY]: '0xcafa054b1b054581faf65adce667bf1c684b6ef0',
-      [networkIds.SOKOL]: '0xd5ce9C7905CB1e874DaA83Cb1be02eB536308419',
-      [networkIds.XDAI]: '0xa0Baf56D83be19Eb6bA8aFAD2Db812Bc13D8Be1d',
+      [networkIds.SOKOL]: '0x37Fcdb26F12f3FC76F2424EC6B94D434a959A0f7',
+      [networkIds.XDAI]: '0xe40DD83a262da3f56976038F1554Fe541Fa75ecd',
+    },
+    isSelectionEnabled: true,
+  },
+  dxdao: {
+    name: 'DXdao',
+    url: 'https://dxdao.eth.link/',
+    addresses: {
+      [networkIds.XDAI]: '0x34a8B97bd8Ac4AfBe91C71E961C3f9c1F064717F',
     },
     isSelectionEnabled: true,
   },

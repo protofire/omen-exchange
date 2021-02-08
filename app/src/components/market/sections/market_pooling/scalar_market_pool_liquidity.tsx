@@ -13,6 +13,7 @@ import {
   useCpkAllowance,
   useCpkProxy,
   useFundingBalance,
+  useSymbol,
 } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
@@ -68,13 +69,13 @@ interface Props {
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
-  fetchGraphMarketTradeData: () => Promise<void>
+  fetchGraphMarketUserTxData: () => Promise<void>
 }
 
 const logger = getLogger('Scalar Market::Fund')
 
 export const ScalarMarketPoolLiquidity = (props: Props) => {
-  const { fetchGraphMarketMakerData, fetchGraphMarketTradeData, marketMakerData } = props
+  const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData } = props
   const {
     address: marketMakerAddress,
     balances,
@@ -111,7 +112,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       ? nativeAsset
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
-
+  const symbol = useSymbol(collateral)
   const [amountToFund, setAmountToFund] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
   const [amountToRemove, setAmountToRemove] = useState<Maybe<BigNumber>>(new BigNumber(0))
@@ -218,7 +219,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         marketMaker,
       })
 
-      await fetchGraphMarketTradeData()
+      await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
       await fetchCollateralBalance()
@@ -262,7 +263,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         sharesToBurn: amountToRemove || Zero,
       })
 
-      await fetchGraphMarketTradeData()
+      await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
       await fetchCollateralBalance()
@@ -327,6 +328,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
       ? [wrapToken.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
       : []
+
+  const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
   return (
     <>
@@ -395,7 +398,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                   setAmountToFund(collateralBalance)
                   setAmountToFundDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
                 }}
-                shouldDisplayMaxButton
+                shouldDisplayMaxButton={shouldDisplayMaxButton}
                 symbol={collateral.symbol}
               />
 
@@ -456,21 +459,20 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
                 title="Earned"
-                value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${collateral.symbol}`}
+                value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${symbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
-                value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${collateral.symbol}`}
+                value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${symbol}`}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={depositedTokensTotal.gt(0)}
                 state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
-                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${
-                  collateral.symbol
-                }`}
+                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))}
+                ${symbol}`}
               />
             </TransactionDetailsCard>
           )}

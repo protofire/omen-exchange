@@ -49,13 +49,13 @@ const logger = getLogger('Scalar Market::Buy')
 
 interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
-  fetchGraphMarketTradeData: () => Promise<void>
+  fetchGraphMarketUserTxData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 export const ScalarMarketBuy = (props: Props) => {
-  const { fetchGraphMarketMakerData, fetchGraphMarketTradeData, marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
 
@@ -202,6 +202,8 @@ export const ScalarMarketBuy = (props: Props) => {
     !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
+  const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
+
   const amountError =
     maybeCollateralBalance === null
       ? null
@@ -237,7 +239,7 @@ export const ScalarMarketBuy = (props: Props) => {
         marketMaker,
       })
 
-      await fetchGraphMarketTradeData()
+      await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
       await fetchCollateralBalance()
 
@@ -328,7 +330,7 @@ export const ScalarMarketBuy = (props: Props) => {
               setAmount(collateralBalance)
               setAmountDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
             }}
-            shouldDisplayMaxButton
+            shouldDisplayMaxButton={shouldDisplayMaxButton}
             symbol={collateral.symbol}
           />
           {amountError && <GenericError>{amountError}</GenericError>}

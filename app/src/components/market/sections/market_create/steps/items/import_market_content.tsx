@@ -186,7 +186,7 @@ export const ImportMarketContent = (props: Props) => {
 
   const { markets, status: marketIdStatus } = useGraphMarketsFromQuestion(question?.id || '')
   const marketId = markets[0]?.id || ''
-  const { marketMakerData } = useMarketMakerData(marketId.toLowerCase())
+  const { marketMakerData, status } = useMarketMakerData(marketId.toLowerCase())
 
   useEffect(() => {
     if (question && marketIdStatus === Status.Error) {
@@ -194,7 +194,6 @@ export const ImportMarketContent = (props: Props) => {
     } else if (question && marketIdStatus === Status.Ready && !marketMakerData) {
       setLoading(false)
     } else if (question && marketMakerData && marketMakerData.question.id === question.id) {
-      setLoading(false)
       if (arbitrator) {
         const outcomes = marketMakerData.balances.map(
           (balance: BalanceItem) =>
@@ -211,6 +210,7 @@ export const ImportMarketContent = (props: Props) => {
         setUniform(true)
         onSave(question, arbitrator, outcomes, verifyLabel)
       }
+      setLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marketMakerData, marketIdStatus])
@@ -221,7 +221,13 @@ export const ImportMarketContent = (props: Props) => {
   }
 
   const validContent =
-    !!state.questionURL && !!question && !errorMessage && !!marketId && !!marketMakerData && !state.loading
+    !!state.questionURL &&
+    !!question &&
+    !errorMessage &&
+    !!marketId &&
+    !!marketMakerData &&
+    !state.loading &&
+    status !== 'Loading'
 
   const questionDetails = () => {
     return (
@@ -341,7 +347,19 @@ export const ImportMarketContent = (props: Props) => {
 
     return (
       <EmptyWrapper>
-        {state.loading && (
+        {!state.questionURL ? (
+          <>
+            <IconReality />
+            <CommentLabel>
+              Import Market from{' '}
+              <a href={realitioBaseUrl} target="_blink">
+                {realitioBaseUrl}
+              </a>
+            </CommentLabel>
+          </>
+        ) : !state.loading && status === 'Ready' ? (
+          <CommentLabel>Market not found</CommentLabel>
+        ) : (
           <>
             <SpinnerStyled size="38" />
             <CommentLabel>
@@ -352,20 +370,6 @@ export const ImportMarketContent = (props: Props) => {
             </CommentLabel>
           </>
         )}
-        {!state.loading &&
-          (state.questionURL ? (
-            <CommentLabel>Market not found</CommentLabel>
-          ) : (
-            <>
-              <IconReality />
-              <CommentLabel>
-                Import Market from{' '}
-                <a href={realitioBaseUrl} target="_blink">
-                  {realitioBaseUrl}
-                </a>
-              </CommentLabel>
-            </>
-          ))}
       </EmptyWrapper>
     )
   }

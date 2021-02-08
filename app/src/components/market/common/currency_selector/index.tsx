@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled, { css } from 'styled-components'
 
 import { ConnectedWeb3Context, useTokens } from '../../../../hooks'
@@ -39,6 +39,7 @@ interface Props {
   addAll?: boolean
   addNativeAsset?: boolean
   addBalances?: boolean
+  negativeFilter?: boolean
 }
 
 export const CurrencySelector: React.FC<Props> = props => {
@@ -51,12 +52,18 @@ export const CurrencySelector: React.FC<Props> = props => {
     currency,
     disabled,
     filters = [],
+    negativeFilter = false,
     onSelect,
     placeholder,
     ...restProps
   } = props
 
-  const tokens = useTokens(context, addNativeAsset, addBalances)
+  const { refetch, tokens } = useTokens(context, addNativeAsset, addBalances)
+
+  useEffect(() => {
+    refetch()
+    // eslint-disable-next-line
+  }, [balance])
 
   const currencyDropdownData: Array<DropdownItemProps> = []
 
@@ -83,7 +90,11 @@ export const CurrencySelector: React.FC<Props> = props => {
   }
 
   tokens
-    .filter(({ address }) => filters.length === 0 || filters.indexOf(address.toLowerCase()) >= 0)
+    .filter(({ address }) =>
+      filters.length === 0 || negativeFilter
+        ? filters.indexOf(address.toLowerCase()) === -1
+        : filters.indexOf(address.toLowerCase()) >= 0,
+    )
     .forEach(({ address, balance: tokenBalance, decimals, image, symbol }, index) => {
       const selected = currency && currency.toLowerCase() === address.toLowerCase()
       currencyDropdownData.push({

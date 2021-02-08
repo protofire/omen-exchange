@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts, useSymbol } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
@@ -45,13 +45,13 @@ const logger = getLogger('Scalar Market::Sell')
 
 interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
-  fetchGraphMarketTradeData: () => Promise<void>
+  fetchGraphMarketUserTxData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 export const ScalarMarketSell = (props: Props) => {
-  const { fetchGraphMarketMakerData, fetchGraphMarketTradeData, marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const { library: provider } = context
 
@@ -79,6 +79,8 @@ export const ScalarMarketSell = (props: Props) => {
 
   const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
   const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
+
+  const symbol = useSymbol(collateral)
 
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
@@ -172,7 +174,7 @@ export const ScalarMarketSell = (props: Props) => {
         outcomeIndex,
       })
 
-      await fetchGraphMarketTradeData()
+      await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
 
       setAmountShares(null)
@@ -287,15 +289,14 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Revenue'}
               value={
                 potentialValue
-                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${collateral.symbol}`
+                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${symbol}`
                   : '0.00'
               }
             />
             <TransactionDetailsRow
               title={'Fee'}
-              value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'} ${
-                collateral.symbol
-              }`}
+              value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'}
+                ${symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
@@ -311,7 +312,7 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Total'}
               value={`${
                 tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
-              } ${collateral.symbol}`}
+              } ${symbol}`}
             />
           </TransactionDetailsCard>
         </div>
