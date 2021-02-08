@@ -215,7 +215,7 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
+      if (!this.cpk.isSafeApp() && collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(500000)
       }
 
@@ -372,7 +372,7 @@ class CPKService {
       const transactions = []
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
+      if (!this.cpk.isSafeApp() && marketData.collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(1200000)
       }
 
@@ -598,7 +598,7 @@ class CPKService {
       const transactions = []
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
+      if (!this.cpk.isSafeApp() && marketData.collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(1500000)
       }
 
@@ -728,9 +728,9 @@ class CPKService {
       })
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      logger.log(`Transaction hash: ${txObject.hash}`)
 
-      const transaction = await this.provider.waitForTransaction(txObject.hash)
+      const transaction = await this.waitForTransaction(txObject)
+
       return {
         transaction,
         marketMakerAddress: predictedMarketMakerAddress,
@@ -893,7 +893,7 @@ class CPKService {
       let userInputCollateralSymbol: KnownToken
       let userInputCollateral: Token = collateral
 
-      if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
+      if (!this.cpk.isSafeApp() && collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(500000)
       }
 
@@ -1034,9 +1034,6 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp()) {
-        txOptions.gas = await this.getGas(500000)
-      }
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
       let userInputCollateral = collateralToken
@@ -1156,10 +1153,6 @@ class CPKService {
 
       const transactions = []
       const txOptions: TxOptions = {}
-
-      if (this.cpk.isSafeApp()) {
-        txOptions.gas = await this.getGas(500000)
-      }
 
       if (!isConditionResolved) {
         transactions.push({

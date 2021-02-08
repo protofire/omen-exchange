@@ -151,8 +151,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
 
-  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
-
   const [amountToFund, setAmountToFund] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
   const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
@@ -163,6 +161,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [displayCollateral, setDisplayCollateral] = useState<Token>(getInitialCollateral(context.networkId, collateral))
+  const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
   let symbol = useSymbol(collateral)
   const collateralSymbol = collateral.symbol.toLowerCase()
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
@@ -257,7 +256,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const probabilities = balances.map(balance => balance.probability)
   const showSetAllowance =
-    collateral.address !== pseudoNativeAssetAddress &&
+    displayCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
   const depositedTokensTotal = depositedTokens.add(userEarnings)
@@ -775,7 +774,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       </GridTransactionDetails>
       {activeTab === Tabs.deposit && showSetAllowance && (
         <SetAllowanceStyled
-          collateral={collateral}
+          collateral={displayCollateral}
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockCollateral}

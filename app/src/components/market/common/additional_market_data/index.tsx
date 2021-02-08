@@ -27,7 +27,7 @@ const AdditionalMarketDataWrapper = styled.div`
 const AdditionalMarketDataLeft = styled.div`
   display: flex;
   align-items: center;
-  padding: 14px 20px;
+  padding: 14px 20px 0px 20px;
   flex-wrap: wrap;
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-wrap: wrap !important;
@@ -71,6 +71,7 @@ const AdditionalMarketDataSectionWrapper = styled.a<{
   align-items: center;
   cursor: pointer;
   margin-left: 14px;
+  margin-bottom: 14px;
   &:hover {
     p {
       color: ${props => (props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight)};
