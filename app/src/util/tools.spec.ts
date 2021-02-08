@@ -2,10 +2,7 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
-import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
-import { getContractAddress } from './networks'
-
-import { getNativeAsset } from './networks'
+import { getContractAddress, getNativeAsset } from './networks'
 import {
   calcAddFundingSendAmounts,
   calcDepositedTokens,
@@ -520,7 +517,8 @@ describe('tools', () => {
       [[77, getNativeAsset(77)], getNativeAsset(77)],
       [[100, getNativeAsset(100)], getNativeAsset(100)],
     ]
-    for (const [[token], result] of testCases) {
+    // eslint-disable-next-line
+    for (const [[_, token], result] of testCases) {
       expect(result).toStrictEqual(token)
     }
   })
