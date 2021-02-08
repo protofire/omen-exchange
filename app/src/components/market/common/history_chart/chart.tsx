@@ -179,12 +179,9 @@ export const HistoryChart: React.FC<Props> = ({
   value,
 }) => {
   const toScaleValue = (decimal: number, fixed = 0) => {
-    return `${calcPrediction(
-      decimal.toString(),
-      scalarLow || new BigNumber(0),
-      scalarHigh || new BigNumber(0),
-      18,
-    ).toFixed(fixed)} ${unit}`
+    return `${calcPrediction(decimal.toString(), scalarLow || new BigNumber(0), scalarHigh || new BigNumber(0)).toFixed(
+      fixed,
+    )} ${unit}`
   }
 
   const renderScalarTooltipContent = (o: any) => {
@@ -193,7 +190,6 @@ export const HistoryChart: React.FC<Props> = ({
       payload[0]?.value,
       scalarLow || new BigNumber(0),
       scalarHigh || new BigNumber(0),
-      18,
     ).toFixed(2)
     return (
       <ChartTooltip>

@@ -141,7 +141,6 @@ export const ScalarMarketSell = (props: Props) => {
         pricesAfterTrade[1].toString(),
         scalarLow || new BigNumber(0),
         scalarHigh || new BigNumber(0),
-        18,
       )
 
       logger.log(`Amount to sell ${amountToSell}`)

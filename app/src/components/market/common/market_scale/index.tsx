@@ -342,8 +342,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, 18))
   const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), 18))
 
-  const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound, 18)
-  const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound, 18)
+  const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound)
+  const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound)
 
   const amountSharesNumber =
     collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
@@ -453,7 +453,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
     setScaleValue(Number(scaleBall?.value))
-    setScaleValuePrediction(calcPrediction((Number(scaleBall?.value) / 100).toString(), lowerBound, upperBound, 18))
+    setScaleValuePrediction(calcPrediction((Number(scaleBall?.value) / 100).toString(), lowerBound, upperBound))
   }
 
   useEffect(() => {
@@ -464,7 +464,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         ? Number(currentPrediction) * 100
         : (((startingPointNumber || 0) - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
     )
-    setScaleValuePrediction(calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound, 18))
+    setScaleValuePrediction(
+      calcPrediction(newPrediction?.toString() || currentPrediction?.toString() || '', lowerBound, upperBound),
+    )
   }, [
     newPrediction,
     currentPrediction,

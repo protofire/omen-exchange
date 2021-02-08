@@ -177,7 +177,6 @@ export const ScalarMarketBuy = (props: Props) => {
         pricesAfterTrade[1].toString(),
         scalarLow || new BigNumber(0),
         scalarHigh || new BigNumber(0),
-        18,
       )
 
       return [tradedShares, newPrediction, amount]

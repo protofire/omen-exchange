@@ -148,7 +148,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   if (isScalar) {
     unit = title.split('[')[1].split(']')[0]
     if (outcomeTokenMarginalPrices && scalarLow && scalarHigh) {
-      currentPrediction = calcPrediction(outcomeTokenMarginalPrices[1], scalarLow, scalarHigh, 18)
+      currentPrediction = calcPrediction(outcomeTokenMarginalPrices[1], scalarLow, scalarHigh)
     }
   }
 

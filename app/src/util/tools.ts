@@ -473,10 +473,10 @@ export const onChangeMarketCurrency = (
   }
 }
 
-export const calcPrediction = (probability: string, lowerBound: BigNumber, upperBound: BigNumber, decimals: number) => {
+export const calcPrediction = (probability: string, lowerBound: BigNumber, upperBound: BigNumber) => {
   const probabilityNumber = Number(probability)
-  const lowerBoundNumber = Number(formatBigNumber(lowerBound, decimals))
-  const upperBoundNumber = Number(formatBigNumber(upperBound, decimals))
+  const lowerBoundNumber = Number(formatBigNumber(lowerBound, 18, 18))
+  const upperBoundNumber = Number(formatBigNumber(upperBound, 18, 18))
   const prediction = probabilityNumber * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
   return prediction
 }
