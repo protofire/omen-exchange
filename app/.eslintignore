@@ -1,2 +1,3 @@
 src/serviceWorker.ts
+src/abi/wrapped_asset.ts
 *.d.ts
