@@ -24,9 +24,11 @@ const Title = styled.h2<{ invertedColors: boolean | undefined }>`
 
 const Value = styled.p<{ state: ValueStates; invertedColors: boolean | undefined }>`
   color: ${props =>
-    (props.state === ValueStates.success && props.theme.colors.green) ||
-    (props.state === ValueStates.error && props.theme.colors.error) ||
-    props.invertedColors
+    props.state === ValueStates.success
+      ? props.theme.colors.green
+      : props.state === ValueStates.error
+      ? props.theme.colors.error
+      : props.invertedColors
       ? props.theme.colors.textColorDarker
       : props.theme.colors.textColor};
   font-size: 14px;
@@ -38,9 +40,11 @@ const Value = styled.p<{ state: ValueStates; invertedColors: boolean | undefined
 
   a {
     color: ${props =>
-      (props.state === ValueStates.success && props.theme.colors.green) ||
-      (props.state === ValueStates.error && props.theme.colors.error) ||
-      props.invertedColors
+      props.state === ValueStates.success
+        ? props.theme.colors.green
+        : props.state === ValueStates.error
+        ? props.theme.colors.error
+        : props.invertedColors
         ? props.theme.colors.textColorDarker
         : props.theme.colors.textColor};
     text-decoration: underline;
