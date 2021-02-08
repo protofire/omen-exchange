@@ -50,9 +50,10 @@ export const DEFAULT_OPTIONS = {
 }
 
 export const buildQueryMyMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => {
-  const { arbitrator, category, currency, title } = options
+  const { arbitrator, category, currency, sortBy, title } = options
 
   const myMarketsWhereClause = [
+    sortBy === 'openingTimestamp' ? 'openingTimestamp_gt: $now' : '',
     category === 'All' ? '' : 'category: $category',
     arbitrator ? 'arbitrator: $arbitrator' : 'arbitrator_in: $knownArbitrators',
     currency ? 'collateralToken: $currency' : '',
@@ -62,7 +63,7 @@ export const buildQueryMyMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) =
     .join(',')
 
   const queryMyMarkets = gql`
-    query GetMyMarkets($account: String!, $first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $arbitrator: String, $knownArbitrators: [String!], $currency: String, $title: String) {
+    query GetMyMarkets($account: String!, $first: Int!, $skip: Int!, $sortBy: String, $sortByDirection: String, $category: String, $arbitrator: String, $knownArbitrators: [String!], $currency: String, $title: String, $now: Int) {
       account(id: $account) {
         fpmmParticipations(first: $first, skip: $skip, orderBy: $sortBy, orderDirection: $sortByDirection, where: { ${myMarketsWhereClause} }) {
           fixedProductMarketMakers: fpmm {
