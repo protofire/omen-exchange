@@ -208,7 +208,7 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
+      if (!this.cpk.isSafeApp() && collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(500000)
       }
 
@@ -306,7 +306,7 @@ class CPKService {
       const transactions = []
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
+      if (!this.cpk.isSafeApp() && marketData.collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(1200000)
       }
 
@@ -486,7 +486,7 @@ class CPKService {
       const transactions = []
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
+      if (!this.cpk.isSafeApp() && marketData.collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(1500000)
       }
 
@@ -616,9 +616,9 @@ class CPKService {
       })
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      logger.log(`Transaction hash: ${txObject.hash}`)
 
-      const transaction = await this.provider.waitForTransaction(txObject.hash)
+      const transaction = await this.waitForTransaction(txObject)
+
       return {
         transaction,
         marketMakerAddress: predictedMarketMakerAddress,
@@ -648,10 +648,6 @@ class CPKService {
 
       const network = await this.provider.getNetwork()
       const networkId = network.chainId
-
-      if (this.cpk.isSafeApp()) {
-        txOptions.gas = await this.getGas(500000)
-      }
 
       const isAlreadyApprovedForMarketMaker = await conditionalTokens.isApprovedForAll(
         this.cpk.address,
@@ -715,7 +711,7 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp() || collateral.address === pseudoNativeAssetAddress) {
+      if (!this.cpk.isSafeApp() && collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(500000)
       }
 
@@ -815,9 +811,6 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
-      if (this.cpk.isSafeApp()) {
-        txOptions.gas = await this.getGas(500000)
-      }
       const totalAmountToSend = amountToMerge.add(earnings)
       if (useBaseToken) {
         const collateralToken = getTokenFromAddress(networkId, collateralAddress)
@@ -888,10 +881,6 @@ class CPKService {
 
       const transactions = []
       const txOptions: TxOptions = {}
-
-      if (this.cpk.isSafeApp()) {
-        txOptions.gas = await this.getGas(500000)
-      }
 
       if (!isConditionResolved) {
         transactions.push({

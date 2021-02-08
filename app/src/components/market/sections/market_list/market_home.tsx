@@ -346,7 +346,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       onClick: () => {
         setState(MarketStates.myMarkets)
         setSortBy('openingTimestamp')
-        setSortByDirection('desc')
+        setSortByDirection('asc')
       },
     })
   }
@@ -452,7 +452,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     {
       title: 'Ending soon',
       sortBy: 'openingTimestamp',
-      direction: 'desc',
+      direction: 'asc',
     },
   ] as const
 
