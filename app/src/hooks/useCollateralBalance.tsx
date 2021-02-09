@@ -36,7 +36,6 @@ export const useCollateralBalance = (
     fetchCollateralBalance()
     // eslint-disable-next-line
   }, [account, provider, collateral])
-  //re-add collateral here when you solve the issue
 
   return { collateralBalance, fetchCollateralBalance }
 }

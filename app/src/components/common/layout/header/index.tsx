@@ -165,7 +165,7 @@ const ClaimAmount = styled.div`
 const GoldDot = styled.div`
   height: 6px;
   width: 6px;
-  background-color: #f9a606;
+  background-color: ${props => props.theme.colors.gold};
   border-radius: 50%;
   display: inline-block;
   margin-right: 8px;

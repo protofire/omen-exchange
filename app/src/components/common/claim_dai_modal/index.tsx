@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
 import { State, useXdaiBridge } from '../../../hooks/useXdaiBridge'
+import theme from '../../../theme'
 import { formatBigNumber } from '../../../util/tools'
 import { Button } from '../../button/button'
 import { ButtonRound } from '../../button/button_round'
@@ -73,7 +74,7 @@ export const ClaimDaiModal = (props: any) => {
             props.setClaim(false)
           }}
         >
-          <IconClose color={'#DCDFF2'} size={'24'} />
+          <IconClose color={theme.colors.tertiary} size={'24'} />
         </CloseStyled>
 
         {transactionStep === State.idle && <DaiIcon size={'64'} />}
@@ -85,7 +86,7 @@ export const ClaimDaiModal = (props: any) => {
         )}
         {transactionStep === State.transactionConfirmed && (
           <Reversed>
-            <IconArrowUp color={'#4B9E98'} size={'64'} />
+            <IconArrowUp color={theme.colors.green} size={'64'} />
           </Reversed>
         )}
 
