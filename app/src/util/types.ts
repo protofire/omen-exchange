@@ -309,6 +309,7 @@ export interface MarketMakerData {
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
   outcomeTokenMarginalPrices: string[]
+  outcomeTokenAmounts: string[]
 }
 
 export enum Ternary {

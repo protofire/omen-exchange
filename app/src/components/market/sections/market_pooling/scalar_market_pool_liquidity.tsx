@@ -1,5 +1,6 @@
+import Big from 'big.js'
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
@@ -21,10 +22,12 @@ import { RemoteData } from '../../../../util/remote_data'
 import {
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
+  divBN,
   formatBigNumber,
   formatNumber,
   getUnit,
   isDust,
+  mulBN,
 } from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
@@ -80,6 +83,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     address: marketMakerAddress,
     balances,
     fee,
+    outcomeTokenAmounts,
     outcomeTokenMarginalPrices,
     question,
     scalarHigh,
@@ -330,6 +334,38 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       : []
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
+
+  useEffect(() => {
+    const calcAdditionalShares = () => {
+      // Use floor as rounding method
+      Big.RM = 0
+
+      const x = new Big(outcomeTokenAmounts[0])
+      const y = new Big(outcomeTokenAmounts[1])
+      // x shares after including half of purchased pool tokens
+      const xPrime = x.add(new Big(poolTokens.toString()).div(new Big(2)))
+      // y shares after including half of purchased pool tokens
+      const yPrime = y.add(new Big(poolTokens.toString()).div(new Big(2)))
+
+      let additionalShares = new Big(0)
+      if (x.gt(y)) {
+        // Total x shares after purchase = yPrime / y * x
+        const xTotal = yPrime.div(y).times(x)
+        // Additional x shares = total x shares - xPrime
+        additionalShares = xTotal.sub(xPrime)
+      }
+      if (y.gt(x)) {
+        // Total y shares after purchase = xPrime / x * y
+        const yTotal = xPrime.div(x).times(y)
+        // Additional y shares = total y shares - yPrime
+        additionalShares = yTotal.sub(yPrime)
+      }
+
+      // Convert back to BigNumber
+      return bigNumberify(additionalShares.toFixed(0))
+    }
+    calcAdditionalShares()
+  }, [poolTokens, collateral.decimals, outcomeTokenAmounts])
 
   return (
     <>

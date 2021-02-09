@@ -147,6 +147,7 @@ export type GraphMarketMakerData = {
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
   outcomeTokenMarginalPrices: string[]
+  outcomeTokenAmounts: string[]
 }
 
 type Result = {
@@ -226,6 +227,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     scalarLow: data.scalarLow ? bigNumberify(data.scalarLow || 0) : null,
     scalarHigh: data.scalarHigh ? bigNumberify(data.scalarHigh || 0) : null,
     outcomeTokenMarginalPrices: data.outcomeTokenMarginalPrices,
+    outcomeTokenAmounts: data.outcomeTokenAmounts,
   }
 }
 
