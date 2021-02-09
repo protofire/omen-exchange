@@ -29,7 +29,7 @@ import {
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
@@ -44,6 +44,8 @@ import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
+
+import { UserPoolData } from './user_pool_data'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
@@ -69,50 +71,6 @@ const WarningMessageStyled = styled(WarningMessage)`
 `
 const SetAllowanceStyled = styled(SetAllowance)`
   margin-bottom: 20px;
-`
-
-const UserDataTitleValue = styled(TitleValue)`
-  flex: 0 calc(50% - 16px);
-
-  &:nth-child(odd) {
-    margin-right: 32px;
-  }
-  &:nth-child(-n + 2) {
-    margin-bottom: 12px;
-  }
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
-    flex: 0 50%;
-
-    margin-right: 0 !important;
-    margin-bottom: 0 !important;
-
-    &:not(:first-child) {
-      margin-top: 12px;
-    }
-    &:nth-child(2) {
-      order: 2;
-    }
-    &:nth-child(3) {
-      order: 1;
-    }
-    &:nth-child(4) {
-      order: 3;
-    }
-  }
-`
-
-const UserData = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin: 0 -25px;
-  padding: 20px 24px;
-  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
-  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
-    flex-wrap: nowrap;
-    flex-direction: column;
-  }
 `
 
 const logger = getLogger('Market::Fund')
@@ -422,30 +380,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }
   return (
     <>
-      <UserData>
-        <UserDataTitleValue
-          title="Your Liquidity"
-          value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${symbol}`}
-        />
-        <UserDataTitleValue
-          title="Total Pool Tokens"
-          value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals))}`}
-        />
-        <UserDataTitleValue
-          state={userEarnings.gt(0) ? ValueStates.success : undefined}
-          title="Your Earnings"
-          value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
-            formatBigNumber(userEarnings, collateral.decimals),
-          )} ${symbol}`}
-        />
-        <UserDataTitleValue
-          state={totalEarnings.gt(0) ? ValueStates.success : undefined}
-          title="Total Earnings"
-          value={`${totalEarnings.gt(0) ? '+' : ''}${formatNumber(
-            formatBigNumber(totalEarnings, collateral.decimals),
-          )} ${symbol}`}
-        />
-      </UserData>
+      <UserPoolData
+        collateral={collateral}
+        symbol={symbol}
+        totalEarnings={totalEarnings}
+        totalPoolShares={totalPoolShares}
+        totalUserLiquidity={totalUserLiquidity}
+        userEarnings={userEarnings}
+      />
       <OutcomeTable
         balances={balances}
         collateral={collateral}
