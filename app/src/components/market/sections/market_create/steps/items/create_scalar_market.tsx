@@ -247,7 +247,7 @@ export const CreateScalarMarket = (props: Props) => {
       <WarningMessage
         additionalDescription={'.'}
         description={
-          "Set the market resolution date at least 6 days after the correct outcome will be known and make sure that this market won't be "
+          "Set the market closing date at least 6 days after the correct outcome will be known and make sure that this market won't be "
         }
         href={DOCUMENT_VALIDITY_RULES}
         hyperlinkDescription={'invalid'}
