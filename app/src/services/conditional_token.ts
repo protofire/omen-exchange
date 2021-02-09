@@ -76,7 +76,7 @@ class ConditionalTokenService {
   getBalanceOf = async (ownerAddress: string, positionId: string): Promise<BigNumber> => {
     return this.contract.balanceOf(ownerAddress, positionId)
   }
-  getBalanceOfByBlock = async (ownerAddress: string, positionId: string, block: number): Promise<BigNumber> => {
+  getBalanceOfByBlock = async (ownerAddress: string, positionId: BigNumber, block: number): Promise<BigNumber> => {
     return this.contract.balanceOf(ownerAddress, positionId, { blockTag: block })
   }
 
