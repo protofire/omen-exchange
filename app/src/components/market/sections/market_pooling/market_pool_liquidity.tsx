@@ -196,7 +196,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
-
   const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
     amount.lt(min) ? amount : min,
   )
@@ -391,16 +390,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
     : null
 
-  const sharesAmountError = isTransactionProcessing
-    ? null
-    : maybeFundingBalance === null
-    ? null
-    : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
-    ? `Insufficient balance`
-    : amountToRemove?.gt(maybeFundingBalance)
-    ? `Value must be less than or equal to ${sharesBalance} pool shares`
-    : null
-
   const disableDepositButton =
     !amountToFund ||
     amountToFund?.isZero() ||
@@ -408,13 +397,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
     isNegativeAmountToFund
-
-  const disableWithdrawButton =
-    !amountToRemove ||
-    amountToRemove?.isZero() ||
-    amountToRemove?.gt(fundingBalance) ||
-    sharesAmountError !== null ||
-    isNegativeAmountToRemove
 
   const setDisplayCollateralAmountToFund = (value: BigNumber) => {
     if (collateral.address === displayCollateral.address) {
@@ -428,11 +410,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const setWithdrawAmountToRemove = (val: BigNumber) => {
     let normalizedWithdrawAmount = val
-    if (
-      compoundService &&
-      collateral.symbol.toLowerCase() in CompoundTokenType &&
-      displayCollateral.address !== collateral.address
-    ) {
+    if (compoundService && collateral.symbol.toLowerCase() in CompoundTokenType) {
       normalizedWithdrawAmount = compoundService.calculateBaseToCTokenExchange(baseCollateral, normalizedWithdrawAmount)
     }
     setAmountToRemove(normalizedWithdrawAmount)
@@ -465,7 +443,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   let displayTotalPoolShares = totalPoolShares
   let displaySharesAfterAddingFunding = sharesAfterAddingFunding
   let displaySharesAfterRemovingFunding = sharesAfterRemovingFunding
-  let displayFundingBalance = fundingBalance
+  let displayFundingBalance = fundingBalance ? fundingBalance : new BigNumber('0')
   let displaySharesBalance = sharesBalance
   let sellNoteUserEarnings = userEarnings
   let sellNoteDepositedTokens = depositedTokens
@@ -492,6 +470,23 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       sellNoteDepositedTokensTotal = compoundService.calculateCTokenToBaseExchange(baseCollateral, depositedTokensTotal)
     }
   }
+
+  const sharesAmountError = isTransactionProcessing
+    ? null
+    : maybeFundingBalance === null
+    ? null
+    : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
+    ? `Insufficient balance`
+    : amountToRemoveNormalized?.gt(displayFundingBalance)
+    ? `Value must be less than or equal to ${displaySharesBalance} pool shares`
+    : null
+
+  const disableWithdrawButton =
+    !amountToRemove ||
+    amountToRemove?.isZero() ||
+    amountToRemoveNormalized?.gt(displayFundingBalance) ||
+    sharesAmountError !== null ||
+    isNegativeAmountToRemove
 
   let toggleCollateral = collateral
 
