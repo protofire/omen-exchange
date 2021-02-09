@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
+import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { ListCard } from '../../market/common/list_card/index'
-import imgDXdao from '../assets/images/DXdao.svg'
 import imgInfura from '../assets/images/Infura.svg'
 
 const TopContent = styled.div`
@@ -111,21 +111,23 @@ const Input = styled.input`
 `
 
 const SettingsViewContainer = () => {
-  const [activeTitle, setActiveTitle] = useState('Infura')
+  const history = useHistory()
+  const [current, setCurrent] = useState(0)
+  console.log(current)
   const dropdownList = [
     {
       title: 'Infura',
       image: imgInfura,
-      onClick: () => setActiveTitle('Infura'),
+      onClick: () => {
+        setCurrent(0)
+      },
     },
-    {
-      title: 'DXdao',
-      image: imgDXdao,
-      onClick: () => setActiveTitle('DXdao'),
-    },
+
     {
       title: 'Custom',
-      onClick: () => setActiveTitle('Custom'),
+      onClick: () => {
+        setCurrent(1)
+      },
     },
   ]
 
@@ -158,17 +160,35 @@ const SettingsViewContainer = () => {
             </StatusSection>
           </Column>
           <FiltersControls>
-            <NodeDropdown currentItem={0} dirty dropdownPosition={DropdownPosition.center} items={filterItems} />
+            <NodeDropdown currentItem={current} dirty dropdownPosition={DropdownPosition.center} items={filterItems} />
           </FiltersControls>
         </Row>
-        {activeTitle === 'Custom' && <Input placeholder="Paste your RPC URL"></Input>}
+        {current === 1 && <Input placeholder="Paste your RPC URL"></Input>}
       </MainContent>
 
       <BottomContent>
-        <ButtonRound>Back</ButtonRound>
+        <ButtonRound
+          onClick={() => {
+            history.push('/')
+          }}
+        >
+          Back
+        </ButtonRound>
         <ButtonRow>
-          <ButtonRound>Set to Default</ButtonRound>
-          <ButtonRound>Save</ButtonRound>
+          <ButtonRound
+            onClick={() => {
+              setCurrent(0)
+            }}
+          >
+            Set to Default
+          </ButtonRound>
+          <ButtonRound
+            onClick={() => {
+              console.log('do magick')
+            }}
+          >
+            Save
+          </ButtonRound>
         </ButtonRow>
       </BottomContent>
     </ListCard>
