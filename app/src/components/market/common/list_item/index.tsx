@@ -137,9 +137,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const isScalar = isScalarMarket(oracle || '', context.networkId || 0)
 
   let currentPrediction
-  let unit
+
   if (isScalar) {
-    unit = title.split('[')[1].split(']')[0]
     const lowerBoundNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
     const upperBoundNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
     currentPrediction =
@@ -155,7 +154,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <IconStar></IconStar>
         <Outcome>
           {isScalar
-            ? `${currentPrediction && formatNumber(currentPrediction.toString())} ${unit}`
+            ? `${currentPrediction && formatNumber(currentPrediction.toString())}`
             : outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}
         </Outcome>
         <Separator>|</Separator>
