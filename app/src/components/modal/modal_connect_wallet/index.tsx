@@ -3,6 +3,7 @@ import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
+import { XDAI_LOCATION } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
@@ -246,15 +247,16 @@ export const ModalConnectWallet = (props: Props) => {
                   }}
                   text="Wallet Connect"
                 />
-
-                <ConnectButton
-                  disabled={disableAuthereum}
-                  icon={<IconAuthereum />}
-                  onClick={() => {
-                    onClickWallet(Wallet.Authereum)
-                  }}
-                  text="Authereum"
-                />
+                {location.host !== XDAI_LOCATION && (
+                  <ConnectButton
+                    disabled={disableAuthereum}
+                    icon={<IconAuthereum />}
+                    onClick={() => {
+                      onClickWallet(Wallet.Authereum)
+                    }}
+                    text="Authereum"
+                  />
+                )}
               </Buttons>
             </>
           )}
