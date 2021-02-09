@@ -443,7 +443,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   let displayTotalPoolShares = totalPoolShares
   let displaySharesAfterAddingFunding = sharesAfterAddingFunding
   let displaySharesAfterRemovingFunding = sharesAfterRemovingFunding
-  let displayFundingBalance = fundingBalance ? fundingBalance : new BigNumber('0')
+  let displayFundingBalance = fundingBalance
   let displaySharesBalance = sharesBalance
   let sellNoteUserEarnings = userEarnings
   let sellNoteDepositedTokens = depositedTokens
