@@ -142,7 +142,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   if (isScalar) {
     unit = title.split('[')[1].split(']')[0]
-    scalarTitle = title.split(' [')[0] + '?'
+    scalarTitle = title.split(' [')[0]
     const lowerBoundNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
     const upperBoundNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
     currentPrediction =
