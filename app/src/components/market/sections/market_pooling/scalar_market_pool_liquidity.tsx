@@ -343,7 +343,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       Big.RM = 0
 
       const poolWeight =
-        outcomeTokenAmounts[0] > outcomeTokenAmounts[1]
+        Number(outcomeTokenAmounts[0]) > Number(outcomeTokenAmounts[1])
           ? new Big(outcomeTokenAmounts[0])
           : new Big(outcomeTokenAmounts[1])
 
@@ -357,7 +357,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       const additionalShares = bigMax(sendBackAmounts).sub(bigMin(sendBackAmounts) || new Big(0))
     }
     calcAdditionalShares()
-  }, [poolTokens, collateral.decimals, outcomeTokenAmounts])
+  }, [collateral.decimals, outcomeTokenAmounts, amountToFund])
 
   return (
     <>
