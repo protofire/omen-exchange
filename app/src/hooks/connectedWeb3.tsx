@@ -2,7 +2,7 @@ import { providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
-import connectors from '../util/connectors'
+import connectors, { handleGsMultiSend } from '../util/connectors'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
 
@@ -63,6 +63,8 @@ export const ConnectedWeb3: React.FC = props => {
     } else {
       context.setConnector('Infura')
     }
+
+    handleGsMultiSend()
 
     // disabled block tracker
     const infura = connectors['Infura']

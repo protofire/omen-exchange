@@ -1,4 +1,3 @@
-import SafeAppsSDK from '@gnosis.pm/safe-apps-sdk'
 import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
@@ -8,6 +7,7 @@ import moment from 'moment'
 import { createCPK } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
+  getBySafeTx,
   getContractAddress,
   getTargetSafeImplementation,
   getTokenFromAddress,
@@ -113,7 +113,6 @@ interface CreateMarketResult {
   transaction: TransactionReceipt
   marketMakerAddress: string
 }
-
 class CPKService {
   cpk: any
   provider: Web3Provider
@@ -136,21 +135,23 @@ class CPKService {
 
   waitForTransaction = async (txObject: TransactionResult): Promise<TransactionReceipt> => {
     let transactionReceipt: TransactionReceipt
-    if (txObject.hash) {
+    if (txObject.hash && !this.cpk.isConnectedToSafe) {
       // standard transaction
       logger.log(`Transaction hash: ${txObject.hash}`)
       transactionReceipt = await this.provider.waitForTransaction(txObject.hash)
     } else {
+      const safeTxHash = txObject.hash || txObject.safeTxHash
       // transaction through the safe app sdk
       const threshold = await this.proxy.getThreshold()
-      if (threshold.toNumber() === 1 && txObject.safeTxHash) {
-        logger.log(`Safe transaction hash: ${txObject.safeTxHash}`)
-        const sdk = new SafeAppsSDK()
+      if (threshold.toNumber() === 1 && safeTxHash) {
+        logger.log(`Safe transaction hash: ${safeTxHash}`)
         let transactionHash
+        const network = await this.provider.getNetwork()
+        const networkId = network.chainId
         // poll for safe tx data
         while (!transactionHash) {
           try {
-            const safeTransaction = await sdk.txs.getBySafeTxHash(txObject.safeTxHash)
+            const safeTransaction = await getBySafeTx(networkId, safeTxHash)
             if (safeTransaction.transactionHash) {
               transactionHash = safeTransaction.transactionHash
             }
