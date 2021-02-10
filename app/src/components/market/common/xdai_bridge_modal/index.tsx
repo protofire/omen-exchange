@@ -45,11 +45,10 @@ const BridgeWrapper = styled.div<{ isOpen: boolean }>`
 
 const ChainText = styled.div`
   text-align: start;
-  width: 50%;
 `
 const BalanceText = styled.div<{ disabled: boolean }>`
   text-align: end;
-  width: 50%;
+  width: fit-content;
   color: ${({ disabled, theme }) => (disabled ? theme.colors.textColorLighter : theme.colors.clickable)};
   cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
 `
@@ -58,10 +57,12 @@ const MainnetWrapper = styled.div`
   margin-bottom: 12px;
   width: 100%;
   display: flex;
+  justify-content: space-between;
 `
 const XDaiWrapper = styled.div`
   width: 100%;
   display: flex;
+  justify-content: space-between;
 `
 const BalanceWrapper = styled.div<{ isOpen: boolean }>`
   flex-wrap: wrap;
@@ -84,13 +85,14 @@ const PoweredByStakeWrapper = styled.div`
   display: flex;
   align-items: center;
   margin-top: 20px;
-  margin-left: 6px;
+  justify-content: center;
 `
-const StakeText = styled.div`
+const StakeText = styled.a`
   margin-left: 8px;
   font-size: 11px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.clickable};
+  line-height: 12px;
 `
 
 export const XdaiBridgeTransfer = (props: Prop) => {
@@ -113,7 +115,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
               onClick={() => {
                 if (daiBalance.eq(Zero)) return
                 setAmount(daiBalance)
-                setAmountToDisplay(formatBigNumber(daiBalance, 18))
+                setAmountToDisplay(formatBigNumber(daiBalance, 18) + '00000')
               }}
             >
               {formatBigNumber(daiBalance, 18)} DAI
@@ -161,7 +163,9 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           </TransferButton>
           <PoweredByStakeWrapper>
             <XDaiStake />
-            <StakeText>Powered by STAKE Bridge</StakeText>
+            <StakeText href={'https://bridge.xdaichain.com/'} rel="noopener noreferrer" target="_blank">
+              xDai Bridge
+            </StakeText>
           </PoweredByStakeWrapper>
         </BalanceWrapper>
         {transferState && (

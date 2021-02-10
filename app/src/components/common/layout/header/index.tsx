@@ -209,6 +209,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const [unclaimedAmout, setUnclaimedAmount] = useState<BigNumber>(Zero)
 
   const disableConnectButton = isModalOpen
+
   const headerDropdownItems: Array<DropdownItemProps> = [
     {
       content: (
@@ -224,7 +225,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           <ClaimAmount>{formatBigNumber(unclaimedAmout, 18, 2)} DAI</ClaimAmount>
         </ClaimWrapper>
       ),
-      visibility: claimState && networkId != 1,
+      visibility: !claimState && networkId === 1,
     },
 
     {
@@ -316,6 +317,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             <>
               <Bridge ref={ref}>
                 <ButtonRound
+                  active={isBridgeOpen}
                   onClick={() => {
                     setIsBridgeOpen(!isBridgeOpen)
                   }}
