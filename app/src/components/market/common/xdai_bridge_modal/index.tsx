@@ -51,6 +51,9 @@ const BalanceText = styled.div<{ disabled: boolean }>`
   width: fit-content;
   color: ${({ disabled, theme }) => (disabled ? theme.colors.textColorLighter : theme.colors.clickable)};
   cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
+  &:hover {
+    ${({ disabled, theme }) => !disabled && `color:${theme.colors.primaryLight}`};
+  }
 `
 
 const MainnetWrapper = styled.div`
@@ -93,6 +96,9 @@ const StakeText = styled.a`
   font-weight: 500;
   color: ${({ theme }) => theme.colors.clickable};
   line-height: 12px;
+  &:hover {
+    ${({ theme }) => `color:${theme.colors.primaryLight}`};
+  }
 `
 
 export const XdaiBridgeTransfer = (props: Prop) => {
