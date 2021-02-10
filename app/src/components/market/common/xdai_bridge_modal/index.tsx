@@ -115,7 +115,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
               onClick={() => {
                 if (daiBalance.eq(Zero)) return
                 setAmount(daiBalance)
-                setAmountToDisplay(formatBigNumber(daiBalance, 18) + '00000')
+                setAmountToDisplay(formatBigNumber(daiBalance, 18))
               }}
             >
               {formatBigNumber(daiBalance, 18)} DAI
