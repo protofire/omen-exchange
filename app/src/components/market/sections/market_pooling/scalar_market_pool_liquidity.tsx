@@ -20,6 +20,8 @@ import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
+  bigMax,
+  bigMin,
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
   divBN,
@@ -340,29 +342,19 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       // Use floor as rounding method
       Big.RM = 0
 
-      const x = new Big(outcomeTokenAmounts[0])
-      const y = new Big(outcomeTokenAmounts[1])
-      // x shares after including half of purchased pool tokens
-      const xPrime = x.add(new Big(poolTokens.toString()).div(new Big(2)))
-      // y shares after including half of purchased pool tokens
-      const yPrime = y.add(new Big(poolTokens.toString()).div(new Big(2)))
+      const poolWeight =
+        outcomeTokenAmounts[0] > outcomeTokenAmounts[1]
+          ? new Big(outcomeTokenAmounts[0])
+          : new Big(outcomeTokenAmounts[1])
 
-      let additionalShares = new Big(0)
-      if (x.gt(y)) {
-        // Total x shares after purchase = yPrime / y * x
-        const xTotal = yPrime.div(y).times(x)
-        // Additional x shares = total x shares - xPrime
-        additionalShares = xTotal.sub(xPrime)
-      }
-      if (y.gt(x)) {
-        // Total y shares after purchase = xPrime / x * y
-        const yTotal = xPrime.div(x).times(y)
-        // Additional y shares = total y shares - yPrime
-        additionalShares = yTotal.sub(yPrime)
-      }
+      const bigAmountToFund = new Big(amountToFund?.toString() || 0)
 
-      // Convert back to BigNumber
-      return bigNumberify(additionalShares.toFixed(0))
+      const sendBackAmounts = outcomeTokenAmounts.map(amount => {
+        const outcomeTokenAmount = new Big(amount)
+        const remaining = bigAmountToFund.mul(outcomeTokenAmount).div(poolWeight)
+        return bigAmountToFund.sub(remaining)
+      })
+      const additionalShares = bigMax(sendBackAmounts).sub(bigMin(sendBackAmounts) || new Big(0))
     }
     calcAdditionalShares()
   }, [poolTokens, collateral.decimals, outcomeTokenAmounts])
