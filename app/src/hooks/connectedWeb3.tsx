@@ -41,8 +41,11 @@ export const ConnectedWeb3: React.FC = props => {
   const safeAppInfo = useSafeApp()
   const context = useWeb3Context()
   const { account, active, error, library } = context
+  const rpcAddress: string | null = localStorage.getItem('rpcAddress')
 
   useEffect(() => {
+    console.log(rpcAddress)
+    console.log(library)
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
     if (safeAppInfo) {
@@ -84,7 +87,7 @@ export const ConnectedWeb3: React.FC = props => {
     return () => {
       isSubscribed = false
     }
-  }, [context, library, active, error, networkId, safeAppInfo])
+  }, [context, library, active, error, networkId, safeAppInfo, rpcAddress])
 
   if (!networkId || !library) {
     return null

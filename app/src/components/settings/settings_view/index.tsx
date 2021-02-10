@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
+import { useConnectedWeb3Context } from '../../../hooks'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { ListCard } from '../../market/common/list_card/index'
@@ -112,6 +113,8 @@ const Input = styled.input`
 
 const SettingsViewContainer = () => {
   const history = useHistory()
+  const context = useConnectedWeb3Context()
+  console.log(context)
   const [current, setCurrent] = useState(0)
   console.log(current)
   const dropdownList = [
@@ -130,7 +133,10 @@ const SettingsViewContainer = () => {
       },
     },
   ]
-
+  async function milan() {
+    console.log(await context)
+  }
+  milan()
   const filterItems = dropdownList.map(item => {
     return {
       content: (
@@ -178,13 +184,16 @@ const SettingsViewContainer = () => {
           <ButtonRound
             onClick={() => {
               setCurrent(0)
+              localStorage.setItem('rpcAddress', '')
             }}
           >
             Set to Default
           </ButtonRound>
           <ButtonRound
             onClick={() => {
-              console.log('do magick')
+              console.log(localStorage.getItem('rpcAddress'))
+              localStorage.setItem('rpcAddress', 'https://programmingwithmosh.com/react/localstorage-react/')
+              history.push('/')
             }}
           >
             Save
