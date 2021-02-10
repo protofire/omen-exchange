@@ -42,7 +42,7 @@ const CheckService = styled.div<{ isServiceChecked: boolean }>`
     cursor: pointer;
   }
   &:active {
-    border: none;
+    border: 1px solid ${props => (props.isServiceChecked ? 'none' : props.theme.colors.tertiaryDark)};
   }
   path {
     fill: ${props =>

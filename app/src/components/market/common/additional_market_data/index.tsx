@@ -66,11 +66,14 @@ const AdditionalMarketDataSectionWrapper = styled.a<{
   isError?: boolean
   customColorChange?: boolean
   customColor?: string
+  noMarginLeft?: boolean
+  hasMarginRight?: boolean
 }>`
   display: flex;
   align-items: center;
   cursor: pointer;
-  margin-left: 14px;
+  margin-left: ${props => (props.noMarginLeft ? '0px' : '14px')};
+  margin-right: ${props => (props.hasMarginRight ? '14px' : '0px')};
   margin-bottom: 14px;
   &:hover {
     p {
@@ -155,7 +158,11 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   return (
     <AdditionalMarketDataWrapper>
       <AdditionalMarketDataLeft>
-        <AdditionalMarketDataSectionWrapper href={`/#/24h-volume/category/${encodeURI(category)}`} noColorChange={true}>
+        <AdditionalMarketDataSectionWrapper
+          href={`/#/24h-volume/category/${encodeURI(category)}`}
+          noColorChange={true}
+          noMarginLeft={true}
+        >
           <IconCategory size={'24'} />
           <AdditionalMarketDataSectionTitle>{category}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
@@ -190,6 +197,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
                 ? 'This Market is verified by DXdao or Kleros and therefore valid.'
                 : 'This Market has not been verified and may be invalid.'
             }
+            hasMarginRight={true}
             isError={!curatedByDxDaoOrKleros}
           >
             {curatedByDxDaoOrKleros ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
@@ -205,6 +213,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
             data-arrow-color="transparent"
             data-for="marketData"
             data-tip={`This market is earning ${compoundInterestRate}% APY powered by compound.finance`}
+            noMarginLeft={true}
           >
             <CompoundIconNoBorder />
             <AdditionalMarketDataSectionTitle>

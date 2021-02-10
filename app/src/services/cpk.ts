@@ -846,23 +846,6 @@ class CPKService {
           }
         }
       }
-      // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp()) {
-        // Step 4: Transfer funding to user
-        if (!useBaseToken) {
-          transactions.push({
-            to: collateralAddress,
-            data: ERC20Service.encodeTransfer(account, amount),
-          })
-        } else {
-          // Transfer unwrapped asset back to user
-          transactions.push({
-            to: account,
-            value: amount,
-          })
-        }
-      }
-
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
       return this.waitForTransaction(txObject)
     } catch (err) {
