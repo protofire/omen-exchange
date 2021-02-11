@@ -24,6 +24,7 @@ const BridgeWrapper = styled.div<{ isOpen: boolean }>`
   font-size: ${props => props.theme.buttonRound.fontSize};
   line-height: ${props => props.theme.buttonRound.lineHeight};
   color: ${({ theme }) => theme.colors.textColorDark};
+  border: ${({ theme }) => theme.borders.borderLineDisabled};
   transition: border-color 0.15s linear;
   user-select: none;
   justify-content: center;
@@ -45,6 +46,7 @@ const BridgeWrapper = styled.div<{ isOpen: boolean }>`
 
 const ChainText = styled.div`
   text-align: start;
+  user-select: text;
 `
 const BalanceText = styled.div<{ disabled: boolean }>`
   text-align: end;
@@ -92,7 +94,7 @@ const PoweredByStakeWrapper = styled.div`
 `
 const StakeText = styled.a`
   margin-left: 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: ${({ theme }) => theme.colors.clickable};
   line-height: 12px;
@@ -117,9 +119,9 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           <MainnetWrapper>
             <ChainText>Mainnet</ChainText>
             <BalanceText
-              disabled={daiBalance.eq(Zero)}
+              disabled={daiBalance.eq(Zero) || networkId != 1}
               onClick={() => {
-                if (daiBalance.eq(Zero)) return
+                if (daiBalance.eq(Zero) || networkId != 1) return
                 setAmount(daiBalance)
                 setAmountToDisplay(formatBigNumber(daiBalance, 18))
               }}
@@ -130,9 +132,9 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           <XDaiWrapper>
             <ChainText>xDai Chain</ChainText>
             <BalanceText
-              disabled={xDaiBalance.eq(Zero)}
+              disabled={xDaiBalance.eq(Zero) || networkId === 1}
               onClick={() => {
-                if (xDaiBalance.eq(Zero)) return
+                if (xDaiBalance.eq(Zero) || networkId === 1) return
                 setAmount(xDaiBalance)
                 setAmountToDisplay(formatBigNumber(xDaiBalance, 18))
               }}
@@ -150,6 +152,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
                   setAmount(e.value)
                   setAmountToDisplay('')
                 }}
+                placeholder={networkId === 1 ? '0' : '10'}
                 style={{ width: 0 }}
                 value={amount}
                 valueToDisplay={amountToDisplay}
