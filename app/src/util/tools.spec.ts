@@ -6,6 +6,7 @@ import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEB
 
 import {
   bigMax,
+  bigMin,
   calcAddFundingSendAmounts,
   calcDepositedTokens,
   calcDistributionHint,
@@ -522,6 +523,19 @@ describe('tools', () => {
       const max = bigMax(array)
 
       expect(max).toStrictEqual(result)
+    }
+  })
+
+  describe('bigMin', () => {
+    const testCases: [Big[], Big][] = [
+      [[new Big(0), new Big(1)], new Big(0)],
+      [[new Big('12345'), new Big(123)], new Big('123')],
+      [[new Big(1829378123), new Big(-12323434)], new Big(-12323434)],
+    ]
+    for (const [array, result] of testCases) {
+      const min = bigMin(array)
+
+      expect(min).toStrictEqual(result)
     }
   })
 })
