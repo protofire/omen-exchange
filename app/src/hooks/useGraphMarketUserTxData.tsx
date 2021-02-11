@@ -64,9 +64,6 @@ type Result = {
   status: Status
 }
 
-let needTradeRefetch = false
-let needLiquidityRefetch = false
-
 const wrangleTradeResponse = (data: GraphResponseTradeObject[]) => {
   const mappedData = data.map(datum => {
     return {
@@ -152,7 +149,6 @@ export const useGraphMarketUserTxData = (
       setNeedTradeUpdate(false)
     } else if (!isObjectEqual(trades, wrangledValue)) {
       setTrades(wrangledValue)
-      needTradeRefetch = false
     }
   }
 
@@ -175,21 +171,12 @@ export const useGraphMarketUserTxData = (
       setNeedLiquidityUpdate(false)
     } else if (!isObjectEqual(liquidity, wrangledValue)) {
       setLiquidity(wrangledValue)
-      needLiquidityRefetch = false
     }
   }
 
   const fetchData = async () => {
-    needTradeRefetch = true
-    needLiquidityRefetch = true
-    let counter = 0
-    await waitABit()
-    while ((needTradeRefetch || needLiquidityRefetch) && counter < 15) {
-      await tradeRefetch()
-      await liquidityRefetch()
-      await waitABit()
-      counter += 1
-    }
+    await tradeRefetch()
+    await liquidityRefetch()
   }
 
   return {
