@@ -21,16 +21,17 @@ import {
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
-import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
+import { getNativeAsset, networkIds, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
-import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
+import { Arbitrator, CompoundEnabledTokenType, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { TitleValue } from '../../../../../common/text/title_value'
 import { FullLoading } from '../../../../../loading'
+import { AddCompoundService } from '../../../../common/add_compound_service'
 import {
   ButtonContainerFullWidth,
   CurrenciesWrapper,
@@ -178,14 +179,17 @@ interface Props {
     outcomes: Outcome[]
     loadedQuestionId: Maybe<string>
     verifyLabel?: string
+    userInputCollateral: Token
     lowerBound?: Maybe<BigNumber>
     upperBound?: Maybe<BigNumber>
     startingPoint?: Maybe<BigNumber>
     unit?: string
   }
   marketCreationStatus: MarketCreationStatus
+  getCompoundInterestRate: (userInputCollateral: string) => Promise<number>
   handleCollateralChange: (collateral: Token, amount: BigNumber) => void
   handleTradingFeeChange: (fee: string) => void
+  handleUseCompoundReserveChange: (useCompoundReserve: boolean) => void
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
   state: string
@@ -198,18 +202,22 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const dispatch = useDispatch()
   const { account, library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
-
+  const [isServiceChecked, setServiceCheck] = useState<boolean>(false)
+  const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
   const {
     back,
+    getCompoundInterestRate,
     handleChange,
     handleCollateralChange,
     handleTradingFeeChange,
+    handleUseCompoundReserveChange,
     marketCreationStatus,
     resetTradingFee,
     state,
     submit,
     values,
   } = props
+
   const {
     arbitrator,
     category,
@@ -224,11 +232,20 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     startingPoint,
     unit,
     upperBound,
+    userInputCollateral,
   } = values
 
   const { markets } = useGraphMarketsFromQuestion(loadedQuestionId || '')
 
   const [currentToken, setCurrentToken] = useState({ tokenExists: false, symbol: '', marketAddress: '' })
+  let showAddCompoundService = false
+  const currentTokenSymbol = currentToken.symbol.toLowerCase()
+  const isETHNetwork = () => {
+    return context.networkId === networkIds.MAINNET || context.networkId === networkIds.RINKEBY
+  }
+  if (currentTokenSymbol in CompoundEnabledTokenType && isETHNetwork() && state !== 'SCALAR') {
+    showAddCompoundService = true
+  }
   useEffect(() => {
     const selectedToken = markets.find(
       ({ collateralToken }) =>
@@ -239,11 +256,10 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       symbol: 'DAI',
       marketAddress: selectedToken ? selectedToken.id : '',
     })
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
+  const { allowance, unlock } = useCpkAllowance(signer, userInputCollateral.address)
 
   const [amount, setAmount] = useState<BigNumber>(funding)
   const [formattedAmount, setFormattedAmount] = useState<string>(Zero.toString())
@@ -256,31 +272,46 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
   useEffect(() => {
-    dispatch(fetchAccountBalance(account, provider, collateral))
-  }, [dispatch, account, provider, collateral])
+    dispatch(fetchAccountBalance(account, provider, userInputCollateral))
+  }, [dispatch, account, provider, userInputCollateral])
 
   const [collateralBalance, setCollateralBalance] = useState<BigNumber>(Zero)
   const [collateralBalanceFormatted, setCollateralBalanceFormatted] = useState<string>(
-    formatBigNumber(collateralBalance, collateral.decimals, 5),
+    formatBigNumber(collateralBalance, userInputCollateral.decimals, 5),
   )
-  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(collateral, context)
+  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(userInputCollateral, context)
 
   const [isNegativeDepositAmount, setIsNegativeDepositAmount] = useState<boolean>(false)
 
   useEffect(() => {
     setCollateralBalance(maybeCollateralBalance || Zero)
-    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5))
+    setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, userInputCollateral.decimals, 5))
     // eslint-disable-next-line
   }, [maybeCollateralBalance])
 
   useEffect(() => {
-    setIsNegativeDepositAmount(formatBigNumber(funding, collateral.decimals).includes('-'))
-  }, [funding, collateral.decimals])
+    setIsNegativeDepositAmount(formatBigNumber(funding, userInputCollateral.decimals).includes('-'))
+  }, [funding, userInputCollateral.decimals])
 
   const resolutionDate = resolution && formatDate(resolution, false)
 
   const [customFee, setCustomFee] = useState(false)
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
+
+  const toggleServiceCheck = () => {
+    const newCheckValue = !isServiceChecked
+    setServiceCheck(newCheckValue)
+    handleUseCompoundReserveChange(newCheckValue)
+  }
+  useEffect(() => {
+    const getInterestRate = async (userInputCollateral: Token) => {
+      const interestRate = await getCompoundInterestRate(userInputCollateral.symbol.toLowerCase())
+      setCompoundInterestRate(interestRate.toFixed(2))
+    }
+    if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType && isETHNetwork() && state !== 'SCALAR') {
+      getInterestRate(userInputCollateral)
+    }
+  }, [isServiceChecked, userInputCollateral, collateral]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const amountError =
     maybeCollateralBalance === null
@@ -290,7 +321,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       : maybeCollateralBalance.isZero() && funding.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : funding.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${collateralBalanceFormatted} ${collateral.symbol}`
+      ? `Value must be less than or equal to ${collateralBalanceFormatted} ${userInputCollateral.symbol}`
       : null
 
   const isCreateMarketbuttonDisabled =
@@ -306,13 +337,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     (!isUpdated && collateral.address === pseudoNativeAssetAddress)
 
   const showSetAllowance =
-    collateral.address !== pseudoNativeAssetAddress &&
+    userInputCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+    (!isUpdated && userInputCollateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && userInputCollateral.address === pseudoNativeAssetAddress)
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
@@ -353,6 +384,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
     setAmount(newAmount)
     handleCollateralChange(token, newAmount)
+    setServiceCheck(false)
     setAllowanceFinished(false)
   }
 
@@ -382,7 +414,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       name: 'funding',
       value: collateralBalance,
     })
-    const formatted = formatBigNumber(collateralBalance, collateral.decimals, 5)
+    const formatted = formatBigNumber(collateralBalance, userInputCollateral.decimals, 5)
     setAmountToDisplay(formatted)
     setFormattedAmount(formatted)
   }
@@ -469,7 +501,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 addNativeAsset
                 balance={formatNumber(collateralBalanceFormatted, 5)}
                 context={context}
-                currency={collateral.address}
+                currency={userInputCollateral.address}
                 disabled={false}
                 onSelect={onCollateralChange}
               />
@@ -477,7 +509,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             <TextfieldCustomPlaceholder
               formField={
                 <BigNumberInput
-                  decimals={collateral.decimals}
+                  decimals={userInputCollateral.decimals}
                   name="funding"
                   onChange={handleAmountChange}
                   style={{ width: 0 }}
@@ -487,7 +519,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               }
               onClickMaxButton={onClickMaxButton}
               shouldDisplayMaxButton={shouldDisplayMaxButton}
-              symbol={collateral.symbol}
+              symbol={userInputCollateral.symbol}
             />
             {customFee && (
               <CustomFeeWrapper>
@@ -511,7 +543,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 title={'Pool Tokens'}
-                value={formatNumber(formatBigNumber(funding, collateral.decimals))}
+                value={formatNumber(formatBigNumber(funding, userInputCollateral.decimals))}
               />
             </TransactionDetailsCard>
           </div>
@@ -535,9 +567,17 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             hyperlinkDescription={''}
           />
         )}
+        {showAddCompoundService && (
+          <AddCompoundService
+            compoundInterestRate={compoundInterestRate}
+            currentToken={userInputCollateral.symbol}
+            isServiceChecked={isServiceChecked}
+            toggleServiceCheck={toggleServiceCheck}
+          />
+        )}
         {showSetAllowance && (
           <SetAllowance
-            collateral={collateral}
+            collateral={userInputCollateral}
             finished={allowanceFinished && RemoteData.is.success(allowance)}
             loading={RemoteData.is.asking(allowance)}
             marginBottom

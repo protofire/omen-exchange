@@ -31,26 +31,31 @@ import { MarketWizardCreatorContainer } from '../market/sections/market_create/m
 import { MarketHomeContainer } from '../market/sections/market_list/market_home_container'
 
 const RedirectToHome = () => <Redirect to="/" />
-
 export const Main: React.FC = () => {
   const context = useWeb3Context()
   const windowObj: any = window
   const [claimState, setClaimState] = useState(false)
 
-  const [networkId, setNetworkId] = useState(windowObj.ethereum.chainId)
+  const host = window.location.hostname
+  let defaultChainID = 1
+  if (host === XDAI_LOCATION) {
+    defaultChainID = 100
+  }
+  const [networkId, setNetworkId] = useState(windowObj.ethereum ? windowObj.ethereum.chainId : defaultChainID)
   const [wrongNetwork, setWrongNetwork] = useState(false)
-
   const { unclaimedAmount } = useXdaiBridge()
 
-  windowObj.ethereum.on('chainChanged', (chainId: string) => {
-    setNetworkId(chainId)
-    if (location.host === MAINNET_LOCATION && XDAI_NETWORKS.includes(chainId)) {
-      location.assign(`http://${XDAI_LOCATION}`)
-    }
-    if (location.host === XDAI_LOCATION && MAIN_NETWORKS.includes(chainId)) {
-      location.assign(`http://${MAINNET_LOCATION}`)
-    }
-  })
+  if (windowObj.ethereum) {
+    windowObj.ethereum.on('chainChanged', (chainId: string) => {
+      setNetworkId(chainId)
+      if (location.host === MAINNET_LOCATION && XDAI_NETWORKS.includes(chainId)) {
+        location.assign(`http://${XDAI_LOCATION}`)
+      }
+      if (location.host === XDAI_LOCATION && MAIN_NETWORKS.includes(chainId)) {
+        location.assign(`http://${MAINNET_LOCATION}`)
+      }
+    })
+  }
 
   useEffect(() => {
     if (networkId) {
