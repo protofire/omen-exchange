@@ -9,6 +9,7 @@ import { formatBigNumber } from '../../../../util/tools'
 import { ButtonRound } from '../../../button/button_round'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { IconAlertInverted } from '../../../common/icons/IconAlertInverted'
 import { XDaiStake } from '../../../common/icons/currencies/XDaiStake'
 
 import { TransactionState } from './bridge_transaction_state'
@@ -73,9 +74,19 @@ const BalanceWrapper = styled.div<{ isOpen: boolean }>`
   flex-wrap: wrap;
   ${props => (!props.isOpen ? 'display:none' : 'display: flow-root')};
 `
+const Warning = styled.div`
+  color: ${({ theme }) => theme.colors.alert};
+  opacity: 80%;
+  margin-left: 8px;
+`
+const WarningWrapper = styled.div`
+  display: flex;
+  margin-top: 8px;
+`
 
-const TextFieldCustomPlace = styled(TextfieldCustomPlaceholder)`
+const TextFieldCustomPlace = styled(TextfieldCustomPlaceholder)<{ error: boolean }>`
   margin-top: 20px;
+  ${props => (props.error ? 'border:1px solid red !important' : '')};
   span {
     margin-right: 0px;
   }
@@ -110,6 +121,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
   const { networkId } = useConnectedWeb3Context()
 
   const [transferState, setTransferState] = useState<boolean>(false)
+  const errorEval = amount.gt(Zero) && Number(formatBigNumber(amount, 18, 2)) < 10
 
   const { daiBalance, transactionHash, transactionStep, transferFunction, xDaiBalance } = useXdaiBridge(amount)
   return (
@@ -144,6 +156,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           </XDaiWrapper>
 
           <TextFieldCustomPlace
+            error={errorEval}
             formField={
               <BigNumberInput
                 decimals={18}
@@ -160,6 +173,12 @@ export const XdaiBridgeTransfer = (props: Prop) => {
             }
             symbol={networkId === 1 ? 'DAI' : 'XDAI'}
           />
+          {errorEval && (
+            <WarningWrapper>
+              <IconAlertInverted />
+              <Warning>Minimum 10 xDai</Warning>
+            </WarningWrapper>
+          )}
 
           <TransferButton
             disabled={amount.eq(Zero) || (networkId === 100 && Number(formatUnits(amount, 18)) < 10)}
