@@ -347,17 +347,21 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           ? new Big(outcomeTokenAmounts[0])
           : new Big(outcomeTokenAmounts[1])
 
-      const bigAmountToFund = new Big(amountToFund?.toString() || 0)
+      const liquidityAmount = amountToFund?.gt(0)
+        ? new Big(amountToFund.toString())
+        : amountToRemove?.gt(0)
+        ? new Big(amountToRemove?.toString())
+        : new Big(0)
 
       const sendBackAmounts = outcomeTokenAmounts.map(amount => {
         const outcomeTokenAmount = new Big(amount)
-        const remaining = bigAmountToFund.mul(outcomeTokenAmount).div(poolWeight)
-        return bigAmountToFund.sub(remaining)
+        const remaining = liquidityAmount.mul(outcomeTokenAmount).div(poolWeight)
+        return liquidityAmount.sub(remaining)
       })
       const additionalShares = bigMax(sendBackAmounts).sub(bigMin(sendBackAmounts) || new Big(0))
     }
     calcAdditionalShares()
-  }, [collateral.decimals, outcomeTokenAmounts, amountToFund])
+  }, [collateral.decimals, outcomeTokenAmounts, amountToFund, amountToRemove])
 
   return (
     <>
