@@ -31,7 +31,7 @@ import {
   isDust,
   mulBN,
 } from '../../../../util/tools'
-import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
+import { AdditionalSharesType, MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -129,6 +129,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
   const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
+  const [additionalShares, setAdditionalShares] = useState<number>(0)
+  const [additionalSharesType, setAdditionalSharesType] = useState<Maybe<AdditionalSharesType>>()
 
   useEffect(() => {
     setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
@@ -338,29 +340,37 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
   useEffect(() => {
-    const calcAdditionalShares = () => {
-      // Use floor as rounding method
-      Big.RM = 0
+    // Use floor as rounding method
+    Big.RM = 0
 
-      const poolWeight =
-        Number(outcomeTokenAmounts[0]) > Number(outcomeTokenAmounts[1])
-          ? new Big(outcomeTokenAmounts[0])
-          : new Big(outcomeTokenAmounts[1])
+    const poolWeight =
+      Number(outcomeTokenAmounts[0]) > Number(outcomeTokenAmounts[1])
+        ? new Big(outcomeTokenAmounts[0])
+        : new Big(outcomeTokenAmounts[1])
 
-      const liquidityAmount = amountToFund?.gt(0)
-        ? new Big(amountToFund.toString())
-        : amountToRemove?.gt(0)
-        ? new Big(amountToRemove?.toString())
-        : new Big(0)
+    const liquidityAmount = amountToFund?.gt(0)
+      ? new Big(amountToFund.toString())
+      : amountToRemove?.gt(0)
+      ? new Big(amountToRemove?.toString())
+      : new Big(0)
 
-      const sendBackAmounts = outcomeTokenAmounts.map(amount => {
-        const outcomeTokenAmount = new Big(amount)
-        const remaining = liquidityAmount.mul(outcomeTokenAmount).div(poolWeight)
-        return liquidityAmount.sub(remaining)
-      })
-      const additionalShares = bigMax(sendBackAmounts).sub(bigMin(sendBackAmounts) || new Big(0))
+    const sendBackAmounts = outcomeTokenAmounts.map(amount => {
+      const outcomeTokenAmount = new Big(amount)
+      const remaining = liquidityAmount.mul(outcomeTokenAmount).div(poolWeight)
+      return liquidityAmount.sub(remaining)
+    })
+    const extraShares = bigMax(sendBackAmounts).sub(bigMin(sendBackAmounts) || new Big(0))
+    setAdditionalShares(Number(extraShares.toFixed(0)) / 10 ** collateral.decimals)
+
+    if (activeTab === Tabs.deposit) {
+      Number(outcomeTokenAmounts[0]) > Number(outcomeTokenAmounts[1])
+        ? setAdditionalSharesType(AdditionalSharesType.long)
+        : setAdditionalSharesType(AdditionalSharesType.short)
+    } else {
+      Number(outcomeTokenAmounts[0]) > Number(outcomeTokenAmounts[1])
+        ? setAdditionalSharesType(AdditionalSharesType.short)
+        : setAdditionalSharesType(AdditionalSharesType.long)
     }
-    calcAdditionalShares()
   }, [collateral.decimals, outcomeTokenAmounts, amountToFund, amountToRemove])
 
   return (

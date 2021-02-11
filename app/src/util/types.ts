@@ -480,3 +480,8 @@ export type ValueBoxItem = {
   xValue?: number
   ball?: boolean
 }
+
+export enum AdditionalSharesType {
+  long = 'LONG',
+  short = 'SHORT',
+}
