@@ -6,6 +6,7 @@ import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
+import { CompoundService } from '../../../../services'
 import theme from '../../../../theme'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
 import { getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
@@ -37,6 +38,7 @@ const MarketCurrencySelector = styled(CurrencySelector)`
 `
 
 interface Props {
+  compoundService: CompoundService | null
   marketMakerData: MarketMakerData
   title?: string
 }
@@ -49,7 +51,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const [showingProgressBar, setShowingProgressBar] = useState(false)
   const history = useHistory()
 
-  const { marketMakerData } = props
+  const { compoundService, marketMakerData } = props
   const {
     address,
     answerFinalizedTimestamp,
@@ -158,6 +160,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       <MarketData
         answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
         collateralVolume={collateralVolume}
+        compoundService={compoundService}
         currency={collateral}
         isFinalize={marketState === MarketState.finalizing}
         lastActiveDay={lastActiveDay}
@@ -169,6 +172,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
         address={address}
         arbitrator={arbitrator}
         category={question.category}
+        collateral={collateral}
         curatedByDxDao={curatedByDxDao}
         curatedByDxDaoOrKleros={curatedByDxDaoOrKleros}
         id={question.id}

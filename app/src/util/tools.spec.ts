@@ -5,6 +5,7 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
 import { getContractAddress } from './networks'
 
+import { getNativeAsset } from './networks'
 import {
   calcAddFundingSendAmounts,
   calcDepositedTokens,
@@ -509,6 +510,53 @@ describe('tools', () => {
       const unitResult = getUnit(title)
 
       expect(unitResult).toStrictEqual(result)
+    }
+  })
+
+  describe('getInitialCollateral', () => {
+    const testCases: [[number, Token], Token][] = [
+      [[1, getNativeAsset(1)], getNativeAsset(1)],
+      [[3, getNativeAsset(4)], getNativeAsset(4)],
+      [[3, getToken(4, 'ceth' as KnownToken)], getNativeAsset(4)],
+      [[77, getNativeAsset(77)], getNativeAsset(77)],
+      [[100, getNativeAsset(100)], getNativeAsset(100)],
+    ]
+    for (const [[sd, token], result] of testCases) {
+      const initialCollateralValue = getInitialCollateral(sd, token)
+      expect(result).toStrictEqual(initialCollateralValue)
+    }
+  })
+
+  describe('roundNumberStringToSignificantDigits', () => {
+    const testCases: [[string, number], string][] = [
+      [['123.45', 4], '123.4'],
+      [['0', 2], '0'],
+    ]
+    for (const [[value, sd], result] of testCases) {
+      const significantDigitValue = roundNumberStringToSignificantDigits(value, sd)
+      expect(result).toStrictEqual(significantDigitValue)
+    }
+  })
+
+  describe('getCTokenForToken', () => {
+    const testCases: [[string], string][] = [
+      [['eth'], 'ceth'],
+      [['abc'], ''],
+    ]
+    for (const [[value], result] of testCases) {
+      const cTokenValue = getCTokenForToken(value)
+      expect(result).toStrictEqual(cTokenValue)
+    }
+  })
+
+  describe('getBaseTokenForCToken', () => {
+    const testCases: [[string], string][] = [
+      [['ceth'], 'eth'],
+      [['abc'], ''],
+    ]
+    for (const [[value], result] of testCases) {
+      const cTokenValue = getBaseTokenForCToken(value)
+      expect(result).toStrictEqual(cTokenValue)
     }
   })
 })
