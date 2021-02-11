@@ -593,12 +593,14 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
             </>
           )}
-          {!isAmountInputted && (!liquidityAmount || !liquidityAmount?.gt(0)) && (
+          {!isAmountInputted && !(additionalShares && additionalShares > 0.000001) && (
             <ValueBoxes valueBoxData={singleValueBoxData} />
           )}
         </Scale>
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
-        {liquidityAmount && liquidityAmount.gt(0) && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
+        {liquidityAmount && liquidityAmount.gt(0) && additionalShares && additionalShares > 0.000001 && (
+          <ValueBoxes valueBoxData={liquidityValueBoxData} />
+        )}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable
