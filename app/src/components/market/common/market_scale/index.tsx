@@ -14,9 +14,7 @@ import {
   TradeObject,
   TradeType,
 } from '../../../../util/types'
-import { IconInfo } from '../../../common/tooltip/img/IconInfo'
-import { Circle, OutcomeItemLittleBallOfJoyAndDifferentColors } from '../../common/common_styled'
-import { SCALE_HEIGHT, VALUE_BOXES_MARGIN } from '../common_styled'
+import { SCALE_HEIGHT } from '../common_styled'
 import { PositionTable } from '../position_table'
 
 import { ValueBoxes } from './value_boxes'
@@ -509,11 +507,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Current prediction',
     },
     {
-      // TODO: Replace hardcoding
       title: `+ ${additionalShares?.toFixed(2)} Shares`,
-      // TODO: Replace hardcoding
       subtitle: `${additionalSharesType} position`,
-      // TODO: Replace tooltip
       tooltip: `To keep the market stable, you receive additional shares for depositing and removing liquidity.`,
       ball: true,
     },

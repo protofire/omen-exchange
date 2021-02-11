@@ -1,6 +1,6 @@
 import Big from 'big.js'
 import { Zero } from 'ethers/constants'
-import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
@@ -24,12 +24,10 @@ import {
   bigMin,
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
-  divBN,
   formatBigNumber,
   formatNumber,
   getUnit,
   isDust,
-  mulBN,
 } from '../../../../util/tools'
 import { AdditionalSharesType, MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
@@ -386,7 +384,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         ? setAdditionalSharesType(AdditionalSharesType.short)
         : setAdditionalSharesType(AdditionalSharesType.long)
     }
-  }, [collateral.decimals, outcomeTokenAmounts, amountToFund, amountToRemove])
+  }, [collateral.decimals, outcomeTokenAmounts, amountToFund, amountToRemove, activeTab])
 
   return (
     <>

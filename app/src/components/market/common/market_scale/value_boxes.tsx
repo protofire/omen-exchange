@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { ValueBoxItem } from '../../../../util/types'
-import { SCALE_HEIGHT, VALUE_BOXES_MARGIN } from '../common_styled'
+import { VALUE_BOXES_MARGIN } from '../common_styled'
 
 import { ValueBox } from './value_box'
 
