@@ -6,6 +6,7 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
+import { CompoundService } from '../../../../services'
 import theme from '../../../../theme'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
 import { getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
@@ -36,11 +37,12 @@ const MarketCurrencySelector = styled(CurrencySelector)`
 interface Props {
   marketMakerData: MarketMakerData
   collateral: BigNumber
+  compoundService: CompoundService | null
 }
 
 const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { marketMakerData } = props
+  const { compoundService, marketMakerData } = props
   const history = useHistory()
 
   const { width } = useWindowDimensions()
@@ -124,6 +126,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
       <MarketData
         answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
         collateralVolume={collateralVolume}
+        compoundService={compoundService}
         currency={collateral}
         lastActiveDay={lastActiveDay}
         liquidity={formattedLiquidity}
@@ -134,6 +137,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
         address={address}
         arbitrator={arbitrator}
         category={question.category}
+        collateral={collateral}
         curatedByDxDao={curatedByDxDao}
         curatedByDxDaoOrKleros={curatedByDxDaoOrKleros}
         id={question.id}
