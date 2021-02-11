@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import {
+  AdditionalSharesType,
   BalanceItem,
   LiquidityObject,
   LiquidityType,
@@ -220,10 +221,14 @@ interface Props {
   balances?: Maybe<BalanceItem[]>
   fee?: Maybe<BigNumber>
   liquidityAmount?: Maybe<BigNumber>
+  additionalShares?: Maybe<number>
+  additionalSharesType?: Maybe<AdditionalSharesType>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
   const {
+    additionalShares,
+    additionalSharesType,
     amountShares,
     balances,
     borderTop,
@@ -503,9 +508,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     },
     {
       // TODO: Replace hardcoding
-      title: '+ 1500 Shares',
+      title: `+ ${additionalShares?.toFixed(2)} Shares`,
       // TODO: Replace hardcoding
-      subtitle: `Long position`,
+      subtitle: `${additionalSharesType} position`,
       // TODO: Replace tooltip
       tooltip: `To keep the market stable, you receive additional shares for depositing and removing liquidity.`,
       ball: true,

@@ -482,6 +482,6 @@ export type ValueBoxItem = {
 }
 
 export enum AdditionalSharesType {
-  long = 'LONG',
-  short = 'SHORT',
+  long = 'Long',
+  short = 'Short',
 }
