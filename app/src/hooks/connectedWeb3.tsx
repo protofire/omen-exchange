@@ -64,6 +64,14 @@ export const ConnectedWeb3: React.FC = props => {
       context.setConnector('Infura')
     }
 
+    // disabled block tracker
+    const infura = connectors['Infura']
+    // @ts-expect-error ignore
+    if (infura.engine && infura.engine._blockTracker && infura.engine._blockTracker._isRunning) {
+      // @ts-expect-error ignore
+      infura.engine.stop()
+    }
+
     const checkIfReady = async () => {
       const network = await library.ready
       if (isSubscribed) setNetworkId(network.chainId)

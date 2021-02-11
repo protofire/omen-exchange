@@ -49,6 +49,8 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
 
+import { UserPoolData } from './user_pool_data'
+
 const BottomButtonWrapper = styled(ButtonContainer)`
   justify-content: space-between;
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
@@ -90,6 +92,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     question,
     scalarHigh,
     scalarLow,
+    totalEarnings,
     totalPoolShares,
     userEarnings,
   } = marketMakerData
@@ -182,6 +185,18 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const depositedTokensTotal = depositedTokens.add(userEarnings)
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
+
+  const totalUserShareAmounts = calcRemoveFundingSendAmounts(
+    fundingBalance,
+    balances.map(b => b.holdings),
+    totalPoolShares,
+  )
+
+  const totalDepositedTokens = totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) =>
+    amount.lt(min) ? amount : min,
+  )
+
+  const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
   const showUpgrade =
     (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
@@ -375,6 +390,14 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   return (
     <>
+      <UserPoolData
+        collateral={collateral}
+        symbol={symbol}
+        totalEarnings={totalEarnings}
+        totalPoolShares={totalPoolShares}
+        totalUserLiquidity={totalUserLiquidity}
+        userEarnings={userEarnings}
+      />
       <MarketScale
         additionalShares={additionalShares}
         additionalSharesType={additionalSharesType}

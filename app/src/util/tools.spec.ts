@@ -4,6 +4,7 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 
 import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
 
+import { getNativeAsset } from './networks'
 import {
   bigMax,
   bigMin,
@@ -28,6 +29,7 @@ import {
   limitDecimalPlaces,
   truncateStringInTheMiddle as truncate,
 } from './tools'
+import { Token } from './types'
 
 describe('tools', () => {
   describe('calcPrice', () => {
@@ -536,6 +538,18 @@ describe('tools', () => {
       const min = bigMin(array)
 
       expect(min).toStrictEqual(result)
+    }
+  })
+
+  describe('getInitialCollateral', () => {
+    const testCases: [[number, Token], Token][] = [
+      [[1, getNativeAsset(1)], getNativeAsset(1)],
+      [[3, getNativeAsset(4)], getNativeAsset(4)],
+      [[77, getNativeAsset(77)], getNativeAsset(77)],
+      [[100, getNativeAsset(100)], getNativeAsset(100)],
+    ]
+    for (const [[token], result] of testCases) {
+      expect(result).toStrictEqual(token)
     }
   })
 })
