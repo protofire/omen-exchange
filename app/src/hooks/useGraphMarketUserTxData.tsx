@@ -4,7 +4,7 @@ import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
 import { getContractAddress } from '../util/networks'
-import { isObjectEqual, waitABit } from '../util/tools'
+import { isObjectEqual } from '../util/tools'
 import { LiquidityObject, LiquidityType, Status, TradeObject, TradeType } from '../util/types'
 
 const tradeQuery = gql`
