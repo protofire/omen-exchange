@@ -83,7 +83,8 @@ export const TransactionState = ({
 
       {state === State.waitingConfirmation ? (
         <TransactionText>Waiting confirmation</TransactionText>
-      ) : (
+      ) : (state === State.transactionSubmitted || state === State.transactionConfirmed) &&
+        numberOfConfirmations === 0 ? (
         <TransactionLink
           href={
             network === 1
@@ -95,6 +96,10 @@ export const TransactionState = ({
         >
           {state === State.transactionConfirmed ? 'Transaction Confirmed' : 'Transaction submitted'}
         </TransactionLink>
+      ) : state === State.transactionSubmitted && numberOfConfirmations > 0 ? (
+        <TransactionText>Number of confirmations {numberOfConfirmations}/8</TransactionText>
+      ) : (
+        ''
       )}
       <CloseButton
         onClick={() => {

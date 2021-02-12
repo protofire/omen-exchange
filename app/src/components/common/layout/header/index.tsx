@@ -209,7 +209,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const [unclaimedAmout, setUnclaimedAmount] = useState<BigNumber>(Zero)
 
   const disableConnectButton = isModalOpen
-
+  console.log(!claimState && networkId === 1)
   const headerDropdownItems: Array<DropdownItemProps> = [
     {
       content: (
@@ -225,7 +225,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           <ClaimAmount>{formatBigNumber(unclaimedAmout, 18, 2)} DAI</ClaimAmount>
         </ClaimWrapper>
       ),
-      visibility: !claimState && networkId === 1,
+      visibility: networkId !== 1 || !claimState,
     },
 
     {
@@ -248,7 +248,12 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
     }
     if (networkId === 1) {
       fetchUnclaimedAssets()
+    } else {
+      console.log('here')
+      setUnclaimedAmount(Zero)
+      setClaimState(false)
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, networkId])
 

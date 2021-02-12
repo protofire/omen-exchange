@@ -83,6 +83,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
           waitABit(2000)
           receipt = await cpk.waitForTransaction(transaction)
         }
+        setNumberOfConfirmations(0)
         setTransactionStep(State.transactionConfirmed)
       }
       fetchBalance()
