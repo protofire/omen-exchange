@@ -7,7 +7,15 @@ import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
-import { calcPrice, formatBigNumber, formatNumber, formatToShortNumber, isScalarMarket } from '../../../../util/tools'
+import {
+  calcPrice,
+  formatBigNumber,
+  formatNumber,
+  formatToShortNumber,
+  getScalarTitle,
+  getUnit,
+  isScalarMarket,
+} from '../../../../util/tools'
 import { MarketMakerDataItem, Token } from '../../../../util/types'
 import { IconStar } from '../../../common/icons/IconStar'
 
@@ -141,8 +149,10 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   let scalarTitle
 
   if (isScalar) {
-    unit = title.split('[')[1].split(']')[0]
-    scalarTitle = title.split(' [')[0]
+    unit = getUnit(title)
+
+    scalarTitle = getScalarTitle(title)
+
     const lowerBoundNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
     const upperBoundNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
     currentPrediction =
