@@ -15,6 +15,9 @@ Create a `.env` file. See `.env.example` for environment variables which may be 
 
 For Omen builds, use `yarn build`.
 
+<<<<<<< HEAD
+The `build` directory in the `app` directory will now contain the build to be served.
+=======
 The `build` directory in the `app` directory will now contain the build to be served.
 
 
@@ -92,3 +95,4 @@ The `build` directory in the `app` directory will now contain the build to be se
 | -------- | -------- | -------- | -------- |
 | Omen | [Omen-xDai](https://thegraph.com/explorer/subgraph/protofire/omen-xdai) | [Omen-Sokol](https://thegraph.com/explorer/subgraph/protofire/omen-sokol) | - |
 | Conditional Tokens Subgraph | [Conditional-Tokens-xDai](https://thegraph.com/explorer/subgraph/davidalbela/conditional-tokens-xdai) | [Conditional-Tokens-Sokol](https://thegraph.com/explorer/subgraph/davidalbela/conditional-tokens-sokol) | - |
+>>>>>>> 7d383ce1e050faf0774dd16669b631c30b21fcb9

@@ -6,8 +6,8 @@ import { IMPORT_QUESTION_ID_KEY, MARKET_FEE } from '../../../../common/constants
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { queryTopCategories } from '../../../../queries/markets_home'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
-import { getArbitrator, getDefaultArbitrator, getDefaultToken } from '../../../../util/networks'
-import { limitDecimalPlaces } from '../../../../util/tools'
+import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../../../util/networks'
+import { getCTokenForToken, limitDecimalPlaces } from '../../../../util/tools'
 import { Arbitrator, GraphResponseTopCategories, MarketData, Question, Token } from '../../../../util/types'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 
@@ -18,13 +18,14 @@ interface Props {
   callback: (param: MarketData, isScalar: boolean) => void
   marketCreationStatus: MarketCreationStatus
   marketMakerAddress: string | null
+  getCompoundInterestRate: (symbol: string) => Promise<number>
 }
 
 export const MarketWizardCreator = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { networkId } = context
 
-  const { callback, marketCreationStatus } = props
+  const { callback, getCompoundInterestRate, marketCreationStatus } = props
 
   const defaultCollateral = getDefaultToken(networkId)
   const defaultArbitrator = getDefaultArbitrator(networkId)
@@ -46,8 +47,11 @@ export const MarketWizardCreator = (props: Props) => {
     categoriesCustom: [],
     category: '',
     collateral: defaultCollateral,
+    userInputCollateral: defaultCollateral,
+    compoundInterestRate: '',
     funding: new BigNumber('0'),
     loadedQuestionId: getImportQuestionId(),
+    useCompoundReserve: false,
     outcomes: [
       {
         name: '',
@@ -214,11 +218,32 @@ export const MarketWizardCreator = (props: Props) => {
     }))
   }
 
+  const handleUseCompoundReserveChange = (useCompoundReserve: boolean) => {
+    let collateral = marketData.userInputCollateral
+    if (useCompoundReserve) {
+      collateral = getCompoundCollateral(collateral)
+    }
+    const newMarketData = {
+      ...marketData,
+      collateral,
+      useCompoundReserve: useCompoundReserve,
+    }
+    setMarketdata(newMarketData)
+  }
+
+  const getCompoundCollateral = (collateral: Token): Token => {
+    const collateralSymbol = collateral.symbol.toLowerCase()
+    const compoundCollateralToken = getCTokenForToken(collateralSymbol) as KnownToken
+    const compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
+    return compoundTokenDetails
+  }
+
   const handleCollateralChange = (collateral: Token, amount: BigNumber) => {
     const newMarketData = {
       ...marketData,
       funding: amount,
       collateral,
+      userInputCollateral: collateral,
     }
     setMarketdata(newMarketData)
   }
@@ -280,9 +305,11 @@ export const MarketWizardCreator = (props: Props) => {
         return (
           <FundingAndFeeStep
             back={back}
+            getCompoundInterestRate={getCompoundInterestRate}
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
             handleTradingFeeChange={handleTradingFeeChange}
+            handleUseCompoundReserveChange={handleUseCompoundReserveChange}
             marketCreationStatus={marketCreationStatus}
             resetTradingFee={resetTradingFee}
             state={currentFormState}

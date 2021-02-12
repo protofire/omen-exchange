@@ -1,13 +1,22 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useConnectedCPKContext, useGraphMarketUserTxData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
-import { getUnit, isDust } from '../../../../../util/tools'
-import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
+import { CompoundService } from '../../../../../services/compound_service'
+import { getNativeAsset, getToken } from '../../../../../util/networks'
+import { getSharesInBaseToken, getUnit, isDust } from '../../../../../util/tools'
+import {
+  BalanceItem,
+  CompoundTokenType,
+  MarketDetailsTab,
+  MarketMakerData,
+  OutcomeTableValue,
+  Token,
+} from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketScale } from '../../../common/market_scale'
@@ -119,9 +128,48 @@ const Wrapper = (props: Props) => {
     scalarLow,
     totalPoolShares,
   } = marketMakerData
-
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
+  const { account, library: provider, networkId } = context
+  const [compoundService, setCompoundService] = useState<Maybe<CompoundService>>(null)
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
 
+  useMemo(() => {
+    const getResult = async () => {
+      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
+      await compoundServiceObject.init()
+      setCompoundService(compoundServiceObject)
+    }
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      getResult()
+    }
+  }, [collateral.address, account, collateral.symbol, provider])
+
+  useEffect(() => {
+    const getResult = async () => {
+      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
+      await compoundServiceObject.init()
+      setCompoundService(compoundServiceObject)
+    }
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      getResult()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  const setCurrentDisplayCollateral = () => {
+    // if collateral is a cToken then convert the collateral and balances to underlying token
+    const collateralSymbol = collateral.symbol.toLowerCase()
+    if (collateralSymbol in CompoundTokenType) {
+      const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
+      let baseCollateralToken = collateral
+      if (baseCollateralSymbol === 'eth') {
+        baseCollateralToken = getNativeAsset(networkId)
+      } else {
+        baseCollateralToken = getToken(networkId, baseCollateralSymbol as KnownToken)
+      }
+      setDisplayCollateral(baseCollateralToken)
+    } else {
+      setDisplayCollateral(collateral)
+    }
+  }
   useEffect(() => {
     const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
     const maxTimeDifference = 86400000
@@ -132,8 +180,21 @@ const Wrapper = (props: Props) => {
       fetchGraphMarketMakerData()
       setCurrentTab(MarketDetailsTab.finalize)
     }
+    setCurrentDisplayCollateral()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    setCurrentDisplayCollateral()
+  }, [collateral.symbol]) // eslint-disable-line react-hooks/exhaustive-deps
+  let displayBalances = balances
+  if (
+    compoundService &&
+    collateral.address !== displayCollateral.address &&
+    collateral.symbol.toLowerCase() in CompoundTokenType
+  ) {
+    displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
+  }
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
     return shares && !isDust(shares, collateral.decimals)
@@ -149,16 +210,16 @@ const Wrapper = (props: Props) => {
       OutcomeTableValue.Probability,
       OutcomeTableValue.Bonded,
     ]
-
     if (!userHasShares) {
       disabledColumns.push(OutcomeTableValue.Shares)
     }
-
     return (
       <OutcomeTable
         balances={balances}
         collateral={collateral}
         disabledColumns={disabledColumns}
+        displayBalances={displayBalances}
+        displayCollateral={displayCollateral}
         displayRadioSelection={false}
         probabilities={probabilities}
       />
@@ -279,7 +340,7 @@ const Wrapper = (props: Props) => {
   return (
     <>
       <TopCard>
-        <MarketTopDetailsOpen marketMakerData={marketMakerData} />
+        <MarketTopDetailsOpen compoundService={compoundService} marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
         <MarketNavigation
@@ -388,6 +449,7 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer
+            compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
@@ -398,6 +460,7 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === MarketDetailsTab.buy && (
           <MarketBuyContainer
+            compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
@@ -407,6 +470,7 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === MarketDetailsTab.sell && (
           <MarketSellContainer
+            compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
