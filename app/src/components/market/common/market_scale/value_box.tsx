@@ -33,7 +33,7 @@ const ValueBoxSegment = styled.div`
 
 const ValueBoxSingle = styled.div<{ xValue?: number }>`
   padding: 12px;
-  border: 1px solid ${props => props.theme.scale.box};
+  border: ${props => props.theme.borders.borderLineDisabled}
   display: flex;
   flex-direction: column;
   align-items: center;
