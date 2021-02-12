@@ -7,6 +7,7 @@ import { Circle } from '../../common/common_styled'
 import { SCALE_HEIGHT, VALUE_BOXES_MARGIN } from '../common_styled'
 
 const ValueBoxSegment = styled.div`
+  font-size: ${props => props.theme.fonts.defaultSize};
   padding: 12px;
   border: 1px solid ${props => props.theme.scale.box};
   display: flex;
@@ -55,7 +56,6 @@ const ValueBoxSingle = styled.div<{ xValue?: number }>`
 `
 
 const ValueBoxTitle = styled.p<{ positive?: boolean | undefined }>`
-  font-size: 14px;
   font-weight: 500;
   color: ${props => props.theme.colors.textColorDarker};
   margin-bottom: 2px;
@@ -65,7 +65,6 @@ const ValueBoxTitle = styled.p<{ positive?: boolean | undefined }>`
 `
 
 const ValueBoxSubtitle = styled.p`
-  font-size: 14px;
   color: ${props => props.theme.colors.textColor};
   margin: 0;
   white-space: nowrap;
