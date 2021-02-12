@@ -307,7 +307,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const showSetAllowance =
     collateral.address !== pseudoNativeAssetAddress &&
-    !cpk?.cpk.isSafeApp() &&
+    !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const showUpgrade =

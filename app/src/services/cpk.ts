@@ -133,6 +133,13 @@ class CPKService {
     return this.cpk.address
   }
 
+  get isSafeApp(): boolean {
+    if (this.cpk.isConnectedToSafe || this.cpk.isSafeApp()) {
+      return true
+    }
+    return false
+  }
+
   waitForTransaction = async (txObject: TransactionResult): Promise<TransactionReceipt> => {
     let transactionReceipt: TransactionReceipt
     if (txObject.hash && !this.cpk.isConnectedToSafe) {
@@ -200,7 +207,7 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
-      if (!this.cpk.isSafeApp() && collateral.address === pseudoNativeAssetAddress) {
+      if (!this.isSafeApp && collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(500000)
       }
 
@@ -210,7 +217,7 @@ class CPKService {
         collateralAddress = getWrapToken(networkId).address
 
         // we need to send the funding amount in native ether
-        if (!this.cpk.isSafeApp()) {
+        if (!this.isSafeApp) {
           txOptions.value = amount
         }
 
@@ -250,7 +257,7 @@ class CPKService {
       // Step 2: Transfer the amount of collateral being spent from the user to the CPK
       // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress) {
+      if (!this.isSafeApp && collateral.address !== pseudoNativeAssetAddress) {
         transactions.push({
           to: collateralAddress,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
@@ -298,7 +305,7 @@ class CPKService {
       const transactions = []
       const txOptions: TxOptions = {}
 
-      if (!this.cpk.isSafeApp() && marketData.collateral.address === pseudoNativeAssetAddress) {
+      if (!this.isSafeApp && marketData.collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(1200000)
       }
 
@@ -309,7 +316,7 @@ class CPKService {
         collateral = getWrapToken(networkId)
 
         // we need to send the funding amount in native ether
-        if (!this.cpk.isSafeApp()) {
+        if (!this.isSafeApp) {
           txOptions.value = marketData.funding
         }
 
@@ -379,7 +386,7 @@ class CPKService {
       // Step 4: Transfer funding from user
       // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp() && marketData.collateral.address !== pseudoNativeAssetAddress) {
+      if (!this.isSafeApp && marketData.collateral.address !== pseudoNativeAssetAddress) {
         transactions.push({
           to: collateral.address,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
@@ -478,7 +485,7 @@ class CPKService {
       const transactions = []
       const txOptions: TxOptions = {}
 
-      if (!this.cpk.isSafeApp() && marketData.collateral.address === pseudoNativeAssetAddress) {
+      if (!this.isSafeApp && marketData.collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(1500000)
       }
 
@@ -489,7 +496,7 @@ class CPKService {
         collateral = getWrapToken(networkId)
 
         // we need to send the funding amount in native ether
-        if (!this.cpk.isSafeApp()) {
+        if (!this.isSafeApp) {
           txOptions.value = marketData.funding
         }
 
@@ -569,7 +576,7 @@ class CPKService {
       // Step 4: Transfer funding from user
       // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp() && marketData.collateral.address !== pseudoNativeAssetAddress) {
+      if (!this.isSafeApp && marketData.collateral.address !== pseudoNativeAssetAddress) {
         transactions.push({
           to: collateral.address,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
@@ -657,6 +664,7 @@ class CPKService {
         to: marketMaker.address,
         data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
       })
+
       if (useBaseToken) {
         const collateralToken = getTokenFromAddress(networkId, collateralAddress)
         const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, amount)
@@ -667,7 +675,7 @@ class CPKService {
         })
       }
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp()) {
+      if (!this.isSafeApp) {
         // Step 4: Transfer funding to user
         if (!useBaseToken) {
           transactions.push({
@@ -703,7 +711,7 @@ class CPKService {
 
       const txOptions: TxOptions = {}
 
-      if (!this.cpk.isSafeApp() && collateral.address === pseudoNativeAssetAddress) {
+      if (!this.isSafeApp && collateral.address === pseudoNativeAssetAddress) {
         txOptions.gas = await this.getGas(500000)
       }
 
@@ -713,7 +721,7 @@ class CPKService {
         collateralAddress = getWrapToken(networkId).address
 
         // we need to send the funding amount in native ether
-        if (!this.cpk.isSafeApp()) {
+        if (!this.isSafeApp) {
           txOptions.value = amount
         }
 
@@ -746,7 +754,7 @@ class CPKService {
       // Step 2: Transfer funding from user
       // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress) {
+      if (!this.isSafeApp && collateral.address !== pseudoNativeAssetAddress) {
         transactions.push({
           to: collateral.address,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
@@ -814,7 +822,7 @@ class CPKService {
         })
       }
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp()) {
+      if (!this.isSafeApp) {
         // transfer to the user the merged collateral plus the earned fees
         if (!useBaseToken) {
           transactions.push({
@@ -889,7 +897,7 @@ class CPKService {
       })
 
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp() && earnedCollateral) {
+      if (!this.isSafeApp && earnedCollateral) {
         transactions.push({
           to: collateralToken.address,
           data: ERC20Service.encodeTransfer(account, earnedCollateral),

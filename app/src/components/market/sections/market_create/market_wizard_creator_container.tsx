@@ -40,7 +40,7 @@ const MarketWizardCreatorContainer: FC = () => {
 
         setMarketCreationStatus(MarketCreationStatus.creatingAMarket())
 
-        if (!cpk.cpk.isSafeApp() && marketData.collateral.address !== pseudoNativeAssetAddress) {
+        if (!cpk.isSafeApp && marketData.collateral.address !== pseudoNativeAssetAddress) {
           // Approve collateral to the proxy contract
           const collateralService = new ERC20Service(provider, account, marketData.collateral.address)
           const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, marketData.funding)
