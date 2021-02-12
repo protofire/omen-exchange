@@ -150,7 +150,6 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   if (isScalar) {
     unit = getUnit(title)
-
     scalarTitle = getScalarTitle(title)
 
     const lowerBoundNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
