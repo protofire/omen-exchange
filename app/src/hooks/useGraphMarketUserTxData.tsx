@@ -3,9 +3,11 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
+import { getLogger } from '../util/logger'
 import { getContractAddress } from '../util/networks'
-import { isObjectEqual } from '../util/tools'
 import { LiquidityObject, LiquidityType, Status, TradeObject, TradeType } from '../util/types'
+
+const logger = getLogger('useGraphMarketUserTxData')
 
 const tradeQuery = gql`
   query GetMarketTradeData($marketAddress: String!, $cpkAddress: String!) {
@@ -103,9 +105,7 @@ export const useGraphMarketUserTxData = (
   const factoryAddress = isCreator && networkId && getContractAddress(networkId, 'marketMakerFactory').toLowerCase()
 
   const [trades, setTrades] = useState<Maybe<TradeObject[]>>(null)
-  const [needTradeUpdate, setNeedTradeUpdate] = useState<boolean>(false)
   const [liquidity, setLiquidity] = useState<LiquidityObject[]>([])
-  const [needLiquidityUpdate, setNeedLiquidityUpdate] = useState<boolean>(false)
 
   const { data: tradeData, error: tradeError, loading: tradeLoading, refetch: tradeRefetch } = useQuery<
     TradeGraphResponse
@@ -124,16 +124,42 @@ export const useGraphMarketUserTxData = (
   })
 
   // Run a second liquidity query with the factory address if user is market creator
-  const { data: marketLiquidityData } = useQuery<LiquidityGraphResponse>(liquidityQuery, {
-    notifyOnNetworkStatusChange: true,
-    skip: false,
-    variables: { marketAddress: marketAddress, cpkAddress: factoryAddress },
-  })
+  const { data: marketLiquidityData, loading: marketLiquidityLoading } = useQuery<LiquidityGraphResponse>(
+    liquidityQuery,
+    {
+      notifyOnNetworkStatusChange: true,
+      skip: false,
+      variables: { marketAddress: marketAddress, cpkAddress: factoryAddress },
+    },
+  )
 
   useEffect(() => {
-    setNeedTradeUpdate(true)
-    setNeedLiquidityUpdate(true)
-  }, [marketAddress, cpkAddress])
+    if (!tradeLoading && tradeData && tradeData.fpmmTrades) {
+      const wrangledValue = wrangleTradeResponse(tradeData.fpmmTrades)
+      setTrades(wrangledValue)
+    }
+    // eslint-disable-next-line
+  }, [tradeLoading])
+
+  useEffect(() => {
+    if (!liquidityLoading && !marketLiquidityLoading && liquidityData && liquidityData.fpmmLiquidities) {
+      let wrangledValue: {
+        type: string
+        additionalSharesCost: BigNumber
+        outcomeTokenAmounts: BigNumber[]
+      }[]
+      // If market liquidity data, include in liquidity array
+      if (marketLiquidityData && marketLiquidityData.fpmmLiquidities) {
+        wrangledValue = wrangleLiquidityResponse(
+          liquidityData.fpmmLiquidities.concat(marketLiquidityData.fpmmLiquidities),
+        )
+      } else {
+        wrangledValue = wrangleLiquidityResponse(liquidityData.fpmmLiquidities)
+      }
+      setLiquidity(wrangledValue)
+    }
+    // eslint-disable-next-line
+  }, [liquidityLoading, marketLiquidityLoading])
 
   useEffect(() => {
     if (!marketAddress || !cpkAddress) {
@@ -142,41 +168,13 @@ export const useGraphMarketUserTxData = (
     }
   }, [marketAddress, cpkAddress])
 
-  if (tradeData && tradeData.fpmmTrades) {
-    const wrangledValue = wrangleTradeResponse(tradeData.fpmmTrades)
-    if (needTradeUpdate) {
-      setTrades(wrangledValue)
-      setNeedTradeUpdate(false)
-    } else if (!isObjectEqual(trades, wrangledValue)) {
-      setTrades(wrangledValue)
-    }
-  }
-
-  if (liquidityData && liquidityData.fpmmLiquidities) {
-    let wrangledValue: {
-      type: string
-      additionalSharesCost: BigNumber
-      outcomeTokenAmounts: BigNumber[]
-    }[]
-    // If market liquidity data, include in liquidity array
-    if (marketLiquidityData && marketLiquidityData.fpmmLiquidities) {
-      wrangledValue = wrangleLiquidityResponse(
-        liquidityData.fpmmLiquidities.concat(marketLiquidityData.fpmmLiquidities),
-      )
-    } else {
-      wrangledValue = wrangleLiquidityResponse(liquidityData.fpmmLiquidities)
-    }
-    if (needLiquidityUpdate) {
-      setLiquidity(wrangledValue)
-      setNeedLiquidityUpdate(false)
-    } else if (!isObjectEqual(liquidity, wrangledValue)) {
-      setLiquidity(wrangledValue)
-    }
-  }
-
   const fetchData = async () => {
-    await tradeRefetch()
-    await liquidityRefetch()
+    try {
+      await tradeRefetch()
+      await liquidityRefetch()
+    } catch (error) {
+      logger.log(error.message)
+    }
   }
 
   return {
