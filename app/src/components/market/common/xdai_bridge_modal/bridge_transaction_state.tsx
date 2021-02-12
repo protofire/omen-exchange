@@ -18,11 +18,11 @@ interface Prop {
 
 const MainWrapper = styled.div`
   text-align: center;
+  user-select: text;
 `
 
 const SvgWrapper = styled.div`
-  margin-top: 38px;
-  margin-bottom: 32px;
+  margin-bottom: 25px;
 `
 const BoldedText = styled.div`
   color: ${({ theme }) => theme.colors.textColorDark};
@@ -33,11 +33,12 @@ const BoldedText = styled.div`
 `
 const CloseButton = styled(ButtonRound)`
   width: 100%;
-  margin-top: 33px;
+  margin-top: 20px;
 `
 
 const ChainText = styled.div`
-  margin: 10px 0;
+  margin-top: 8px;
+  margin-bottom: 16px;
 `
 const TransactionText = styled.div`
   color: ${({ theme }) => theme.colors.textColor};

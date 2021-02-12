@@ -38,7 +38,7 @@ const BridgeWrapper = styled.div<{ isOpen: boolean }>`
   height: fit-content;
   box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
   padding: 20px;
-
+  user-select: text;
   @media only screen and (max-width: ${props => props.theme.themeBreakPoints.md}) {
     width: calc(100%);
     right: 1px;
@@ -47,7 +47,6 @@ const BridgeWrapper = styled.div<{ isOpen: boolean }>`
 
 const ChainText = styled.div`
   text-align: start;
-  user-select: text;
 `
 const BalanceText = styled.div<{ disabled: boolean }>`
   text-align: end;
@@ -86,7 +85,7 @@ const WarningWrapper = styled.div`
 
 const TextFieldCustomPlace = styled(TextfieldCustomPlaceholder)<{ error: boolean }>`
   margin-top: 20px;
-  ${props => (props.error ? 'border:1px solid red !important' : '')};
+  ${props => (props.error ? 'border:1px solid #F2B9B9 !important' : '')};
   span {
     margin-right: 0px;
   }
@@ -121,7 +120,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
   const { networkId } = useConnectedWeb3Context()
 
   const [transferState, setTransferState] = useState<boolean>(false)
-  const errorEval = amount.gt(Zero) && Number(formatBigNumber(amount, 18, 2)) < 10
+  const errorEval = amount.gt(Zero) && Number(formatBigNumber(amount, 18, 2)) < 10 && networkId != 1
 
   const { daiBalance, transactionHash, transactionStep, transferFunction, xDaiBalance } = useXdaiBridge(amount)
   return (

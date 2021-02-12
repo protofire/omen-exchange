@@ -41,6 +41,7 @@ const CloseButton = styled(ButtonRound)`
 const TransactionLink = styled.a`
   margin-top: 16px;
   color: ${({ theme }) => theme.colors.clickable};
+  cursor: pointer;
 `
 const Reversed = styled.div`
   transform: rotate(180deg);
