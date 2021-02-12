@@ -13,7 +13,7 @@ const ValueBoxSegment = styled.div`
   flex-direction: column;
   align-items: center;
   width: 50%;
-  background: white;
+  background: ${props => props.theme.colors.mainBodyBackground};
 
   &:nth-of-type(odd) {
     border-top-right-radius: 0px;
@@ -48,7 +48,7 @@ const ValueBoxSingle = styled.div<{ xValue?: number }>`
           }`
         : `right: 0;`
       : ''}
-  background: white;
+  background: ${props => props.theme.colors.mainBodyBackground};
   position: absolute;
   top: calc(${SCALE_HEIGHT} + ${VALUE_BOXES_MARGIN});
   border-radius: 4px;
