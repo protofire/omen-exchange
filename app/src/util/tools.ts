@@ -4,11 +4,11 @@ import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'et
 import moment from 'moment-timezone'
 
 import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
-import { getNativeAsset, getWrapToken } from '../util/networks'
-import { Token } from '../util/types'
+import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
-import { getContractAddress } from './networks'
+import { getContractAddress, getNativeAsset, getToken, getWrapToken } from './networks'
+import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token } from './types'
 
 const logger = getLogger('Tools')
 
@@ -224,6 +224,59 @@ export const calcPoolTokens = (
   } else {
     return addedFunds
   }
+}
+
+/**
+ * Round a given number string to a fixed number of significant digits
+ */
+export const roundNumberStringToSignificantDigits = (value: string, sd: number): string => {
+  const r = new Big(value)
+  const preciseValue = (r as any).prec(sd, 0)
+  if (preciseValue.gt(0)) {
+    return preciseValue.toString()
+  } else {
+    return '0'
+  }
+}
+
+/**
+ * Gets the corresponding cToken for a given token symbol.
+ * Empty string if corresponding cToken doesn't exist
+ */
+export const getCTokenForToken = (token: string): string => {
+  const tokenSymbol = token.toLowerCase()
+  if (tokenSymbol in CompoundEnabledTokenType) {
+    return `c${tokenSymbol}`
+  } else {
+    return ''
+  }
+}
+
+/**
+ * Gets base token symbol for a given ctoken
+ */
+export const getBaseTokenForCToken = (token: string): string => {
+  const tokenSymbol = token.toLowerCase()
+  if (tokenSymbol.startsWith('c')) {
+    return tokenSymbol.substring(1, tokenSymbol.length)
+  }
+  return ''
+}
+
+export const getSharesInBaseToken = (
+  balances: BalanceItem[],
+  compoundService: CompoundService,
+  displayCollateral: Token,
+): BalanceItem[] => {
+  const displayBalances = balances.map(function(bal) {
+    const baseTokenShares = compoundService.calculateCTokenToBaseExchange(displayCollateral, bal.shares)
+    const newBalanceObject = Object.assign({}, bal, {
+      shares: baseTokenShares,
+    })
+    delete newBalanceObject.currentDisplayPrice
+    return newBalanceObject
+  })
+  return displayBalances
 }
 
 /**
@@ -479,9 +532,20 @@ export const onChangeMarketCurrency = (
  * Else display is the collateral
  */
 export const getInitialCollateral = (networkId: number, collateral: Token): Token => {
-  if (collateral.address === getWrapToken(networkId).address) {
-    return getNativeAsset(networkId)
+  const collateralSymbol = collateral.symbol.toLowerCase()
+  if (collateralSymbol in CompoundTokenType) {
+    if (collateralSymbol === 'ceth') {
+      return getNativeAsset(networkId)
+    } else {
+      const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
+      const baseToken = getToken(networkId, baseCollateralSymbol)
+      return baseToken
+    }
   } else {
-    return collateral
+    if (collateral.address === getWrapToken(networkId).address) {
+      return getNativeAsset(networkId)
+    } else {
+      return collateral
+    }
   }
 }
