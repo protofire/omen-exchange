@@ -14,6 +14,8 @@ interface Prop {
   amountToTransfer: BigNumber
   network: number
   transactionHash: string
+  numberOfConfirmations: any
+  fetchBalance: any
 }
 
 const MainWrapper = styled.div`
@@ -48,17 +50,20 @@ const TransactionLink = styled.a`
 `
 export const TransactionState = ({
   amountToTransfer,
+  fetchBalance,
   network,
+  numberOfConfirmations,
   state,
   transactionHash,
   transactionModalVisibility,
 }: Prop) => {
   useEffect(() => {
+    console.log(numberOfConfirmations)
     if (state === State.error) {
       transactionModalVisibility(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state])
+  }, [state, numberOfConfirmations])
   return (
     <MainWrapper>
       <SvgWrapper>
@@ -93,6 +98,7 @@ export const TransactionState = ({
       )}
       <CloseButton
         onClick={() => {
+          fetchBalance()
           transactionModalVisibility(false)
         }}
       >

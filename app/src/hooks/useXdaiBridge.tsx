@@ -3,7 +3,7 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
 import { XdaiService } from '../services'
-import { formatBigNumber } from '../util/tools'
+import { formatBigNumber, waitABit } from '../util/tools'
 
 import { useConnectedCPKContext } from './connectedCpk'
 import { useConnectedWeb3Context } from './connectedWeb3'
@@ -26,6 +26,8 @@ interface Prop {
   unclaimedAmount: BigNumber
   claimState: boolean
   isClaimStateTransaction: boolean
+  numberOfConfirmations: any
+  fetchBalance: any
 }
 
 export const useXdaiBridge = (amount?: BigNumber): Prop => {
@@ -33,6 +35,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const { account, library: provider, networkId } = useConnectedWeb3Context()
   const [xDaiBalance, setXdaiBalance] = useState<BigNumber>(Zero)
   const [daiBalance, setDaiBalance] = useState<BigNumber>(Zero)
+  const [numberOfConfirmations, setNumberOfConfirmations] = useState<any>(0)
   const [isClaimStateTransaction, setIsClaimStateTransaction] = useState<boolean>(false)
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
   const [claimState, setClaimState] = useState<boolean>(false)
@@ -50,8 +53,16 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         setTransactionHash(transaction.hash)
         setTransactionStep(State.transactionSubmitted)
 
-        await cpk.waitForTransaction(transaction, true)
+        let receipt = await cpk.waitForTransaction(transaction)
+
+        while (receipt.confirmations && receipt.confirmations <= 8) {
+          setNumberOfConfirmations(receipt.confirmations)
+          waitABit(2000)
+          receipt = await cpk.waitForTransaction(transaction)
+        }
+
         setTransactionStep(State.transactionConfirmed)
+        setNumberOfConfirmations(0)
       } else {
         const amountInFloat = formatBigNumber(amount, 18)
 
@@ -66,7 +77,12 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         setTransactionHash(transaction)
         setTransactionStep(State.transactionSubmitted)
 
-        await cpk.waitForTransaction({ hash: transaction }, true)
+        let receipt = await cpk.waitForTransaction({ hash: transaction })
+        while (receipt.confirmations && receipt.confirmations <= 8) {
+          setNumberOfConfirmations(receipt.confirmations)
+          waitABit(2000)
+          receipt = await cpk.waitForTransaction(transaction)
+        }
         setTransactionStep(State.transactionConfirmed)
       }
       fetchBalance()
@@ -83,7 +99,12 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
       const transaction = await cpk.claimDaiTokens()
       setTransactionHash(transaction.hash)
       setTransactionStep(State.transactionSubmitted)
-      await cpk.waitForTransaction(transaction, true)
+      let receipt = await cpk.waitForTransaction(transaction)
+      while (receipt.confirmations && receipt.confirmations <= 8) {
+        setNumberOfConfirmations(receipt.confirmations)
+        waitABit(2000)
+        receipt = await cpk.waitForTransaction(transaction)
+      }
       setTransactionStep(State.transactionConfirmed)
       setIsClaimStateTransaction(false)
       fetchUnclaimedAssets()
@@ -139,8 +160,10 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
     transactionHash,
     unclaimedAmount,
     claimState,
+    numberOfConfirmations,
     transactionStep,
     daiBalance,
     xDaiBalance,
+    fetchBalance,
   }
 }

@@ -122,7 +122,15 @@ export const XdaiBridgeTransfer = (props: Prop) => {
   const [transferState, setTransferState] = useState<boolean>(false)
   const errorEval = amount.gt(Zero) && Number(formatBigNumber(amount, 18, 2)) < 10 && networkId != 1
 
-  const { daiBalance, transactionHash, transactionStep, transferFunction, xDaiBalance } = useXdaiBridge(amount)
+  const {
+    daiBalance,
+    fetchBalance,
+    numberOfConfirmations,
+    transactionHash,
+    transactionStep,
+    transferFunction,
+    xDaiBalance,
+  } = useXdaiBridge(amount)
   return (
     <>
       <BridgeWrapper isOpen={props.open}>
@@ -198,7 +206,9 @@ export const XdaiBridgeTransfer = (props: Prop) => {
         {transferState && (
           <TransactionState
             amountToTransfer={amount}
+            fetchBalance={fetchBalance}
             network={networkId}
+            numberOfConfirmations={numberOfConfirmations}
             state={transactionStep}
             transactionHash={transactionHash}
             transactionModalVisibility={setTransferState}
