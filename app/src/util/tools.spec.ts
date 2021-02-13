@@ -2,9 +2,7 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
-import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
-
-import { getNativeAsset } from './networks'
+import { getContractAddress, getNativeAsset } from './networks'
 import {
   bigMax,
   bigMin,
@@ -488,10 +486,10 @@ describe('tools', () => {
 
   describe('isScalarMarket', () => {
     const testCases: [[string, number], boolean][] = [
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 1], true],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 4], true],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 4], false],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 1], false],
+      [[getContractAddress(1, 'realitioScalarAdapter').toLowerCase(), 1], true],
+      [[getContractAddress(4, 'realitioScalarAdapter').toLowerCase(), 4], true],
+      [[getContractAddress(4, 'realitio').toLowerCase(), 4], false],
+      [[getContractAddress(1, 'realitio').toLowerCase(), 1], false],
       [['Incorrect address', 1], false],
     ]
     for (const [[oracle, networkId], result] of testCases) {
