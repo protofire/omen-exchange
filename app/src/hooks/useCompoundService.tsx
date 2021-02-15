@@ -17,25 +17,27 @@ export const useCompoundService = (
   const [compoundService, setCompoundService] = useState<Maybe<CompoundService>>(null)
 
   const fetchCompoundService = async () => {
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-      if (compoundService) {
-        await compoundService.init()
-        setCompoundService(compoundService)
-      }
+    if (compoundService) {
+      await compoundService.init()
+      setCompoundService(compoundService)
     }
   }
 
   useMemo(() => {
-    const compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
-    setCompoundService(compoundService)
-    fetchCompoundService()
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      const compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
+      setCompoundService(compoundService)
+      fetchCompoundService()
+    }
     // eslint-disable-next-line
   }, [collateral.address, account, collateral.symbol, provider])
 
   useEffect(() => {
-    const compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
-    setCompoundService(compoundService)
-    fetchCompoundService()
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      const compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
+      setCompoundService(compoundService)
+      fetchCompoundService()
+    }
     // eslint-disable-next-line
   }, [])
 
