@@ -531,6 +531,28 @@ export const onChangeMarketCurrency = (
   }
 }
 
+export const bigMax = (array: Big[]) => {
+  let len = array.length
+  let maxValue = new Big(0)
+  while (len--) {
+    if (array[len].gt(maxValue)) {
+      maxValue = array[len]
+    }
+  }
+  return maxValue
+}
+
+export const bigMin = (array: Big[]) => {
+  let len = array.length
+  let minValue
+  while (len--) {
+    if (!minValue || array[len].lt(minValue)) {
+      minValue = array[len]
+    }
+  }
+  return minValue
+}
+
 /**
  *  Gets initial display collateral
  * If collateral is cToken type then display is the base collateral

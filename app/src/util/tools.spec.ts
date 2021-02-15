@@ -2,10 +2,10 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
-import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
-
-import { getNativeAsset } from './networks'
+import { getContractAddress, getNativeAsset } from './networks'
 import {
+  bigMax,
+  bigMin,
   calcAddFundingSendAmounts,
   calcDepositedTokens,
   calcDistributionHint,
@@ -28,6 +28,7 @@ import {
   limitDecimalPlaces,
   truncateStringInTheMiddle as truncate,
 } from './tools'
+import { Token } from './types'
 
 describe('tools', () => {
   describe('calcPrice', () => {
@@ -486,10 +487,10 @@ describe('tools', () => {
 
   describe('isScalarMarket', () => {
     const testCases: [[string, number], boolean][] = [
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 1], true],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 4], true],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 4], false],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 1], false],
+      [[getContractAddress(1, 'realitioScalarAdapter').toLowerCase(), 1], true],
+      [[getContractAddress(4, 'realitioScalarAdapter').toLowerCase(), 4], true],
+      [[getContractAddress(4, 'realitio').toLowerCase(), 4], false],
+      [[getContractAddress(1, 'realitio').toLowerCase(), 1], false],
       [['Incorrect address', 1], false],
     ]
     for (const [[oracle, networkId], result] of testCases) {
@@ -510,6 +511,32 @@ describe('tools', () => {
       const unitResult = getUnit(title)
 
       expect(unitResult).toStrictEqual(result)
+    }
+  })
+
+  describe('bigMax', () => {
+    const testCases: [Big[], Big][] = [
+      [[new Big(0), new Big(1)], new Big(1)],
+      [[new Big('12345'), new Big(123)], new Big(12345)],
+      [[new Big(1829378123), new Big(-12323434)], new Big(1829378123)],
+    ]
+    for (const [array, result] of testCases) {
+      const max = bigMax(array)
+
+      expect(max).toStrictEqual(result)
+    }
+  })
+
+  describe('bigMin', () => {
+    const testCases: [Big[], Big][] = [
+      [[new Big(0), new Big(1)], new Big(0)],
+      [[new Big('12345'), new Big(123)], new Big('123')],
+      [[new Big(1829378123), new Big(-12323434)], new Big(-12323434)],
+    ]
+    for (const [array, result] of testCases) {
+      const min = bigMin(array)
+
+      expect(min).toStrictEqual(result)
     }
   })
 
