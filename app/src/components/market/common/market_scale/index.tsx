@@ -1,11 +1,11 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
-import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import {
+  AdditionalSharesType,
   BalanceItem,
   LiquidityObject,
   LiquidityType,
@@ -14,15 +14,14 @@ import {
   TradeObject,
   TradeType,
 } from '../../../../util/types'
-import { IconInfo } from '../../../common/tooltip/img/IconInfo'
-import { Circle } from '../../common/common_styled'
+import { SCALE_HEIGHT } from '../common_styled'
 import { PositionTable } from '../position_table'
 
-const SCALE_HEIGHT = '20px'
+import { ValueBoxes } from './value_boxes'
+
 const BAR_WIDTH = '2px'
 const BALL_SIZE = '20px'
 const DOT_SIZE = '8px'
-const VALUE_BOXES_MARGIN = '12px'
 
 const ScaleWrapper = styled.div<{
   borderBottom: boolean | undefined
@@ -199,100 +198,6 @@ const ScaleTooltipMessage = styled.p`
   margin: 0;
 `
 
-const ValueBoxes = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: ${VALUE_BOXES_MARGIN};
-  width: 100%;
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    flex-direction: column;
-    justify-content: center;
-  }
-`
-
-const ValueBoxPair = styled.div`
-  width: calc(50% - ${VALUE_BOXES_MARGIN} / 2);
-  display: flex;
-  align-items: center;
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    width: calc(100% - ${VALUE_BOXES_MARGIN} / 2);
-
-    &:nth-of-type(2) {
-      margin-top: 12px;
-    }
-  }
-`
-
-const ValueBox = styled.div<{ xValue?: number }>`
-  padding: 12px;
-  border: 1px solid ${props => props.theme.scale.box};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 50%;
-  background: white;
-
-  &:nth-of-type(odd) {
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-  }
-  &:nth-of-type(even) {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-    border-left: none;
-  }
-`
-
-const ValueBoxRegular = styled.div<{ xValue?: number }>`
-  padding: 12px;
-  border: 1px solid ${props => props.theme.scale.box};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  ${props =>
-    props.xValue
-      ? props.xValue <= 0.885
-        ? `left: ${
-            props.xValue <= 0.115
-              ? `0`
-              : props.xValue <= 0.885
-              ? `${props.xValue * 100}%; transform: translateX(-50%);`
-              : ``
-          }`
-        : `right: 0;`
-      : ''}
-  background: white;
-  position: absolute;
-  top: calc(${SCALE_HEIGHT} + ${VALUE_BOXES_MARGIN});
-  border-radius: 4px;
-`
-
-const ValueBoxTitle = styled.p<{ positive?: boolean | undefined }>`
-  font-size: 14px;
-  font-weight: 500;
-  color: ${props => props.theme.colors.textColorDarker};
-  margin-bottom: 2px;
-  margin-top: 0;
-  color: ${props =>
-    props.positive ? props.theme.scale.positiveText : props.positive === false ? props.theme.scale.negativeText : ''};
-`
-
-const ValueBoxSubtitle = styled.p`
-  font-size: 14px;
-  color: ${props => props.theme.colors.textColor};
-  margin: 0;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-`
-
 interface Props {
   amountShares?: Maybe<BigNumber>
   lowerBound: BigNumber
@@ -306,24 +211,29 @@ interface Props {
   long?: Maybe<boolean>
   short?: Maybe<boolean>
   collateral?: Maybe<Token>
-  amount?: Maybe<BigNumber>
+  tradeAmount?: Maybe<BigNumber>
   positionTable?: Maybe<boolean>
   trades?: Maybe<TradeObject[]>
   liquidityTxs?: Maybe<LiquidityObject[]>
   status?: Maybe<Status>
   balances?: Maybe<BalanceItem[]>
   fee?: Maybe<BigNumber>
+  liquidityAmount?: Maybe<BigNumber>
+  additionalShares?: Maybe<number>
+  additionalSharesType?: Maybe<AdditionalSharesType>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
   const {
-    amount,
+    additionalShares,
+    additionalSharesType,
     amountShares,
     balances,
     borderTop,
     collateral,
     currentPrediction,
     fee,
+    liquidityAmount,
     liquidityTxs,
     long,
     lowerBound,
@@ -333,6 +243,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     startingPoint,
     startingPointTitle,
     status,
+    tradeAmount,
     trades,
     unit,
     upperBound,
@@ -348,7 +259,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const amountSharesNumber =
     collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
 
-  const amountNumber = collateral && Number(formatBigNumber(amount || new BigNumber(0), collateral.decimals))
+  const tradeAmountNumber = collateral && Number(formatBigNumber(tradeAmount || new BigNumber(0), collateral.decimals))
   const feeNumber = fee && collateral && Number(formatBigNumber(fee, collateral.decimals))
 
   const shortBalances = balances && balances.filter(balance => balance.outcomeName === 'short')
@@ -474,12 +385,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       // Calculate total payout by mulitplying shares amount by scale position
       setYourPayout((amountSharesNumber || 0) * (scaleValue / 100))
       // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (scaleValue / 100) - (amountNumber || 0))
+      setProfitLoss((amountSharesNumber || 0) * (scaleValue / 100) - (tradeAmountNumber || 0))
     } else if (short) {
       // Calculate total payout by mulitplying shares amount by scale position
       setYourPayout((amountSharesNumber || 0) * (1 - scaleValue / 100))
       // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (1 - scaleValue / 100) - (amountNumber || 0))
+      setProfitLoss((amountSharesNumber || 0) * (1 - scaleValue / 100) - (tradeAmountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
         const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
@@ -502,7 +413,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     }
   }, [
     scaleValuePrediction,
-    amountNumber,
+    tradeAmountNumber,
     long,
     lowerBoundNumber,
     newPredictionNumber,
@@ -551,6 +462,57 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     !collateral ||
     (isDust(shortShares || new BigNumber(0), collateral.decimals) &&
       isDust(longShares || new BigNumber(0), collateral.decimals))
+
+  const singleValueBoxData = [
+    {
+      title: `${
+        currentPrediction ? formatNumber(currentPredictionNumber.toString()) : startingPoint && startingPointNumber
+      }
+      ${currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}`,
+      subtitle: startingPointTitle,
+      xValue: currentPrediction
+        ? Number(currentPrediction)
+        : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound)),
+    },
+  ]
+
+  const amountValueBoxData = [
+    {
+      title: `${formatNumber(currentPredictionNumber.toString())} ${unit}`,
+      subtitle: 'Current Prediction',
+    },
+    {
+      title: `${formatNumber(scaleValuePrediction.toString())} ${unit}`,
+      subtitle: 'New Prediction',
+    },
+    {
+      title: `${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`,
+      subtitle: 'Your Payout',
+      tooltip: `Your payout if the market resolves at ${formatNumber(scaleValuePrediction.toString())} ${unit}`,
+      positive:
+        yourPayout > (tradeAmountNumber || 0) ? true : yourPayout < (tradeAmountNumber || 0) ? false : undefined,
+    },
+    {
+      title: `${profitLoss > 0 ? '+' : ''}
+      ${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`,
+      subtitle: 'Profit/Loss',
+      tooltip: `Your profit/loss if the market resolves at ${formatNumber(scaleValuePrediction.toString())} ${unit}`,
+      positive: profitLoss > 0 ? true : profitLoss < 0 ? false : undefined,
+    },
+  ]
+
+  const liquidityValueBoxData = [
+    {
+      title: `${formatNumber(currentPredictionNumber.toString())} ${unit}`,
+      subtitle: 'Current prediction',
+    },
+    {
+      title: `+ ${additionalShares?.toFixed(2)} Shares`,
+      subtitle: `${additionalSharesType} position`,
+      tooltip: `To keep the market stable, you receive additional shares for depositing and removing liquidity.`,
+      ball: true,
+    },
+  ]
 
   return (
     <>
@@ -628,88 +590,13 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
             </>
           )}
-          {!isAmountInputted && (
-            <ValueBoxRegular
-              xValue={
-                currentPrediction
-                  ? Number(currentPrediction)
-                  : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound))
-              }
-            >
-              <ValueBoxTitle>
-                {currentPrediction
-                  ? formatNumber(currentPredictionNumber.toString())
-                  : startingPoint && startingPointNumber}
-                {currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}
-              </ValueBoxTitle>
-              <ValueBoxSubtitle>{startingPointTitle}</ValueBoxSubtitle>
-            </ValueBoxRegular>
+          {!isAmountInputted && !(additionalShares && additionalShares > 0.000001) && (
+            <ValueBoxes valueBoxData={singleValueBoxData} />
           )}
         </Scale>
-        {isAmountInputted && (
-          <ValueBoxes>
-            <ValueBoxPair>
-              <ValueBox>
-                <ValueBoxTitle>
-                  {formatNumber(currentPredictionNumber.toString())} {unit}
-                </ValueBoxTitle>
-                <ValueBoxSubtitle>Current Prediction</ValueBoxSubtitle>
-              </ValueBox>
-              <ValueBox>
-                <ValueBoxTitle>
-                  {formatNumber(scaleValuePrediction.toString())} {unit}
-                </ValueBoxTitle>
-                <ValueBoxSubtitle>New Prediction</ValueBoxSubtitle>
-              </ValueBox>
-            </ValueBoxPair>
-            <ValueBoxPair>
-              <ValueBox>
-                <ValueBoxTitle
-                  positive={
-                    yourPayout > (amountNumber || 0) ? true : yourPayout < (amountNumber || 0) ? false : undefined
-                  }
-                >
-                  {`${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`}
-                </ValueBoxTitle>
-                <ReactTooltip id="payoutTooltip" />
-                <ValueBoxSubtitle>
-                  Your Payout
-                  <Circle
-                    data-delay-hide={'500'}
-                    data-effect={'solid'}
-                    data-for={'payoutTooltip'}
-                    data-multiline={'true'}
-                    data-tip={`Your payout if the market resolves at ${formatNumber(
-                      scaleValuePrediction.toString(),
-                    )} ${unit}`}
-                  >
-                    <IconInfo />
-                  </Circle>
-                </ValueBoxSubtitle>
-              </ValueBox>
-              <ValueBox>
-                <ValueBoxTitle positive={profitLoss > 0 ? true : profitLoss < 0 ? false : undefined}>
-                  {profitLoss > 0 && '+'}
-                  {`${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`}
-                </ValueBoxTitle>
-                <ReactTooltip id="profitTooltip" />
-                <ValueBoxSubtitle>
-                  Profit/Loss
-                  <Circle
-                    data-delay-hide={'500'}
-                    data-effect={'solid'}
-                    data-for={'profitTooltip'}
-                    data-multiline={'true'}
-                    data-tip={`Your profit/loss if the market resolves at ${formatNumber(
-                      scaleValuePrediction.toString(),
-                    )} ${unit}`}
-                  >
-                    <IconInfo />
-                  </Circle>
-                </ValueBoxSubtitle>
-              </ValueBox>
-            </ValueBoxPair>
-          </ValueBoxes>
+        {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
+        {liquidityAmount && liquidityAmount.gt(0) && additionalShares && additionalShares > 0.000001 && (
+          <ValueBoxes valueBoxData={liquidityValueBoxData} />
         )}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
