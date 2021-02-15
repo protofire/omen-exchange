@@ -3,10 +3,9 @@ import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { useCompoundService, useConnectedWeb3Context } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
-import { CompoundService } from '../../../../services'
 import theme from '../../../../theme'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
 import { getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
@@ -38,7 +37,6 @@ const MarketCurrencySelector = styled(CurrencySelector)`
 `
 
 interface Props {
-  compoundService: CompoundService | null
   marketMakerData: MarketMakerData
   title?: string
 }
@@ -51,7 +49,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const [showingProgressBar, setShowingProgressBar] = useState(false)
   const history = useHistory()
 
-  const { compoundService, marketMakerData } = props
+  const { marketMakerData } = props
   const {
     address,
     answerFinalizedTimestamp,
@@ -74,6 +72,9 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const currentTimestamp = new Date().getTime()
 
   const formattedLiquidity: string = scaledLiquidityParameter ? scaledLiquidityParameter.toFixed(2) : '0'
+
+  const { compoundService: CompoundService } = useCompoundService(collateral, context)
+  const compoundService = CompoundService || null
 
   // const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
   const isPendingArbitration = question.isPendingArbitration

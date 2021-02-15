@@ -1,13 +1,11 @@
 import React from 'react'
 
-import { CompoundService } from '../../../../services'
 import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
 import { MarketBuy } from './market_buy'
 import { ScalarMarketBuy } from './scalar_market_buy'
 
 interface Props {
-  compoundService: CompoundService | null
   isScalar: boolean
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
