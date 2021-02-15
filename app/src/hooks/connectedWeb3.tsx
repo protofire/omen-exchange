@@ -67,11 +67,14 @@ export const ConnectedWeb3: React.FC = props => {
     handleGsMultiSend()
 
     // disabled block tracker
-    const infura = connectors['Infura']
-    // @ts-expect-error ignore
-    if (infura.engine && infura.engine._blockTracker && infura.engine._blockTracker._isRunning) {
-      // @ts-expect-error ignore
-      infura.engine.stop()
+    if (context.connector) {
+      if (
+        context.connector.engine &&
+        context.connector.engine._blockTracker &&
+        context.connector.engine._blockTracker._isRunning
+      ) {
+        context.connector.engine.stop()
+      }
     }
 
     const checkIfReady = async () => {
