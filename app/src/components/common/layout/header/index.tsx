@@ -209,7 +209,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const [unclaimedAmout, setUnclaimedAmount] = useState<BigNumber>(Zero)
 
   const disableConnectButton = isModalOpen
-  console.log(!claimState && networkId === 1)
+
   const headerDropdownItems: Array<DropdownItemProps> = [
     {
       content: (
@@ -249,7 +249,6 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
     if (networkId === 1) {
       fetchUnclaimedAssets()
     } else {
-      console.log('here')
       setUnclaimedAmount(Zero)
       setClaimState(false)
     }
@@ -334,7 +333,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
                   </ArrowWrapper>
                   {currencyReturn(networkId !== 1)}
                 </ButtonRound>
-                <XdaiBridgeTransfer open={isBridgeOpen} />
+                <XdaiBridgeTransfer open={isBridgeOpen} setOpen={setIsBridgeOpen} />
               </Bridge>
             </>
           )}

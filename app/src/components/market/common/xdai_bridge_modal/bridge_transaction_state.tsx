@@ -16,6 +16,7 @@ interface Prop {
   transactionHash: string
   numberOfConfirmations: any
   fetchBalance: any
+  setBridgeOpen: any
 }
 
 const MainWrapper = styled.div`
@@ -53,12 +54,12 @@ export const TransactionState = ({
   fetchBalance,
   network,
   numberOfConfirmations,
+  setBridgeOpen,
   state,
   transactionHash,
   transactionModalVisibility,
 }: Prop) => {
   useEffect(() => {
-    console.log(numberOfConfirmations)
     if (state === State.error) {
       transactionModalVisibility(false)
     }
@@ -97,7 +98,7 @@ export const TransactionState = ({
           {state === State.transactionConfirmed ? 'Transaction Confirmed' : 'Transaction submitted'}
         </TransactionLink>
       ) : state === State.transactionSubmitted && numberOfConfirmations > 0 ? (
-        <TransactionText>Number of confirmations {numberOfConfirmations}/8</TransactionText>
+        <TransactionText>{numberOfConfirmations}/8 confirmations</TransactionText>
       ) : (
         ''
       )}
@@ -105,6 +106,7 @@ export const TransactionState = ({
         onClick={() => {
           fetchBalance()
           transactionModalVisibility(false)
+          if (state !== State.transactionConfirmed) setBridgeOpen(false)
         }}
       >
         {state === State.transactionConfirmed ? 'Transfer Again' : 'Close'}

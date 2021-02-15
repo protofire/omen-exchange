@@ -16,6 +16,7 @@ import { TransactionState } from './bridge_transaction_state'
 
 interface Prop {
   open: boolean
+  setOpen: any
 }
 
 const BridgeWrapper = styled.div<{ isOpen: boolean }>`
@@ -138,7 +139,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           <MainnetWrapper>
             <ChainText>Mainnet</ChainText>
             <BalanceText
-              disabled={daiBalance.eq(Zero) || networkId != 1}
+              disabled={networkId != 1}
               onClick={() => {
                 if (daiBalance.eq(Zero) || networkId != 1) return
                 setAmount(daiBalance)
@@ -151,7 +152,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           <XDaiWrapper>
             <ChainText>xDai Chain</ChainText>
             <BalanceText
-              disabled={xDaiBalance.eq(Zero) || networkId === 1}
+              disabled={networkId === 1}
               onClick={() => {
                 if (xDaiBalance.eq(Zero) || networkId === 1) return
                 setAmount(xDaiBalance)
@@ -209,6 +210,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
             fetchBalance={fetchBalance}
             network={networkId}
             numberOfConfirmations={numberOfConfirmations}
+            setBridgeOpen={props.setOpen}
             state={transactionStep}
             transactionHash={transactionHash}
             transactionModalVisibility={setTransferState}
