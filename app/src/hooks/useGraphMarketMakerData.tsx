@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react'
 
 import { getLogger } from '../util/logger'
 import { getOutcomes } from '../util/networks'
-import { isObjectEqual, waitABit } from '../util/tools'
 import { AnswerItem, BondItem, INVALID_ANSWER_ID, KlerosSubmission, Question, Status } from '../util/types'
 
 const logger = getLogger('useGraphMarketMakerData')
@@ -229,15 +228,12 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
   }
 }
 
-let needRefetch = false
-
 /**
  * Get data from the graph for the given market maker. All the information returned by this hook comes from the graph,
  * other necessary information should be fetched from the blockchain.
  */
 export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: number): Result => {
   const [marketMakerData, setMarketMakerData] = useState<Maybe<GraphMarketMakerData>>(null)
-  const [needUpdate, setNeedUpdate] = useState<boolean>(false)
 
   const { data, error, loading, refetch } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
@@ -246,30 +242,16 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
   })
 
   useEffect(() => {
-    setNeedUpdate(true)
-  }, [marketMakerAddress])
-
-  if (data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
-    const rangledValue = wrangleResponse(data.fixedProductMarketMaker, networkId)
-    if (needUpdate) {
+    if (!loading && data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
+      const rangledValue = wrangleResponse(data.fixedProductMarketMaker, networkId)
       setMarketMakerData(rangledValue)
-      setNeedUpdate(false)
-    } else if (!isObjectEqual(marketMakerData, rangledValue)) {
-      setMarketMakerData(rangledValue)
-      needRefetch = false
     }
-  }
+    // eslint-disable-next-line
+  }, [loading])
 
   const fetchData = async () => {
     try {
-      needRefetch = true
-      let counter = 0
-      await waitABit()
-      while (needRefetch && counter < 15) {
-        await refetch()
-        await waitABit()
-        counter += 1
-      }
+      await refetch()
     } catch (error) {
       logger.log(error.message)
     }
