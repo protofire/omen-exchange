@@ -213,11 +213,16 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       let displayCollateralToken = collateral
       let useBaseToken = false
       let inputAmount = amount || Zero
-      if (collateralSymbol in CompoundTokenType && compoundService && amount) {
+      if (
+        collateralSymbol in CompoundTokenType &&
+        compoundService &&
+        amount &&
+        collateral.symbol !== displayCollateral.symbol
+      ) {
         displayTradedShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedShares)
         displayCollateralToken = baseCollateral
-        useBaseToken = true
         inputAmount = compoundService.calculateCTokenToBaseExchange(baseCollateral, amount)
+        useBaseToken = true
       }
       const sharesAmount = formatBigNumber(displayTradedShares, displayCollateralToken.decimals)
 
