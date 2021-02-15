@@ -325,3 +325,6 @@ export const Circle = styled.div`
     }
   }
 `
+
+export const SCALE_HEIGHT = '20px'
+export const VALUE_BOXES_MARGIN = '12px'
