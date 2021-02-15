@@ -360,6 +360,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           {account && (
             <>
               <HeaderDropdown
+                currentItem={headerDropdownItems.length + 1}
                 dropdownPosition={DropdownPosition.center}
                 items={headerDropdownItems}
                 omitRightButtonMargin={true}
