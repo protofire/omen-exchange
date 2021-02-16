@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { IconKleros } from '../../../common/icons'
+import { IconDxDao, IconKleros } from '../../../common/icons'
 
 interface Props {
   id: Maybe<string>
@@ -18,6 +18,12 @@ export const ArbitratorIcon = ({ id }: Props) => {
       return (
         <IconWrapper>
           <IconKleros id={id} />
+        </IconWrapper>
+      )
+    case 'dxdao':
+      return (
+        <IconWrapper>
+          <IconDxDao />
         </IconWrapper>
       )
     default:

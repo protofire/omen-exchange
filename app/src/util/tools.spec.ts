@@ -2,9 +2,10 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 
-import { REALITIO_SCALAR_ADAPTER_ADDRESS, REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY } from '../common/constants'
-
+import { getContractAddress, getNativeAsset } from './networks'
 import {
+  bigMax,
+  bigMin,
   calcAddFundingSendAmounts,
   calcDepositedTokens,
   calcDistributionHint,
@@ -20,6 +21,7 @@ import {
   formatNumber,
   formatToShortNumber,
   getIndexSets,
+  getScalarTitle,
   getUnit,
   isDust,
   isObjectEqual,
@@ -27,6 +29,7 @@ import {
   limitDecimalPlaces,
   truncateStringInTheMiddle as truncate,
 } from './tools'
+import { Token } from './types'
 
 describe('tools', () => {
   describe('calcPrice', () => {
@@ -485,10 +488,10 @@ describe('tools', () => {
 
   describe('isScalarMarket', () => {
     const testCases: [[string, number], boolean][] = [
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 1], true],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 4], true],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS.toLowerCase(), 4], false],
-      [[REALITIO_SCALAR_ADAPTER_ADDRESS_RINKEBY.toLowerCase(), 1], false],
+      [[getContractAddress(1, 'realitioScalarAdapter').toLowerCase(), 1], true],
+      [[getContractAddress(4, 'realitioScalarAdapter').toLowerCase(), 4], true],
+      [[getContractAddress(4, 'realitio').toLowerCase(), 4], false],
+      [[getContractAddress(1, 'realitio').toLowerCase(), 1], false],
       [['Incorrect address', 1], false],
     ]
     for (const [[oracle, networkId], result] of testCases) {
@@ -522,6 +525,89 @@ describe('tools', () => {
       const xValue = calcXValue(currentPrediction, lowerBound, upperBound, decimals)
 
       expect(xValue).toStrictEqual(result)
+    }
+  })
+
+  describe('bigMax', () => {
+    const testCases: [Big[], Big][] = [
+      [[new Big(0), new Big(1)], new Big(1)],
+      [[new Big('12345'), new Big(123)], new Big(12345)],
+      [[new Big(1829378123), new Big(-12323434)], new Big(1829378123)],
+    ]
+    for (const [array, result] of testCases) {
+      const max = bigMax(array)
+
+      expect(max).toStrictEqual(result)
+    }
+  })
+
+  describe('bigMin', () => {
+    const testCases: [Big[], Big][] = [
+      [[new Big(0), new Big(1)], new Big(0)],
+      [[new Big('12345'), new Big(123)], new Big('123')],
+      [[new Big(1829378123), new Big(-12323434)], new Big(-12323434)],
+    ]
+    for (const [array, result] of testCases) {
+      const min = bigMin(array)
+
+      expect(min).toStrictEqual(result)
+    }
+  })
+
+  describe('getInitialCollateral', () => {
+    const testCases: [[number, Token], Token][] = [
+      [[1, getNativeAsset(1)], getNativeAsset(1)],
+      [[3, getNativeAsset(4)], getNativeAsset(4)],
+      [[3, getToken(4, 'ceth' as KnownToken)], getNativeAsset(4)],
+      [[77, getNativeAsset(77)], getNativeAsset(77)],
+      [[100, getNativeAsset(100)], getNativeAsset(100)],
+    ]
+    for (const [[sd, token], result] of testCases) {
+      const initialCollateralValue = getInitialCollateral(sd, token)
+      expect(result).toStrictEqual(initialCollateralValue)
+    }
+  })
+
+  describe('roundNumberStringToSignificantDigits', () => {
+    const testCases: [[string, number], string][] = [
+      [['123.45', 4], '123.4'],
+      [['0', 2], '0'],
+    ]
+    for (const [[value, sd], result] of testCases) {
+      const significantDigitValue = roundNumberStringToSignificantDigits(value, sd)
+      expect(result).toStrictEqual(significantDigitValue)
+    }
+  })
+
+  describe('getCTokenForToken', () => {
+    const testCases: [[string], string][] = [
+      [['eth'], 'ceth'],
+      [['abc'], ''],
+    ]
+    for (const [[value], result] of testCases) {
+      const cTokenValue = getCTokenForToken(value)
+      expect(result).toStrictEqual(cTokenValue)
+    }
+  })
+
+  describe('getBaseTokenForCToken', () => {
+    const testCases: [[string], string][] = [
+      [['ceth'], 'eth'],
+      [['abc'], ''],
+    ]
+    for (const [[value], result] of testCases) {
+      const cTokenValue = getBaseTokenForCToken(value)
+      expect(result).toStrictEqual(cTokenValue)
+    }
+  })
+  describe('getScalarTitle', () => {
+    const testCases: [[string], string][] = [
+      [['Some random sclar market? [test]'], 'Some random sclar market?'],
+      [['scalar for testing which will last an eternity [Violets]'], 'scalar for testing which will last an eternity'],
+    ]
+    for (const [[value], result] of testCases) {
+      const modifiedTitle = getScalarTitle(value)
+      expect(result).toStrictEqual(modifiedTitle)
     }
   })
 })

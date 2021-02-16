@@ -45,6 +45,7 @@ export interface BalanceItem {
   outcomeName: string
   probability: number
   currentPrice: number
+  currentDisplayPrice?: number
   shares: BigNumber
   payout: Big
   holdings: BigNumber
@@ -195,8 +196,10 @@ export enum Wallet {
 
 export interface MarketData {
   collateral: Token
+  userInputCollateral: Token
   arbitratorsCustom: Arbitrator[]
   categoriesCustom: string[]
+  compoundInterestRate: string
   question: string
   category: string
   resolution: Date | null
@@ -205,6 +208,7 @@ export interface MarketData {
   funding: BigNumber
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
+  useCompoundReserve: boolean
   verifiedLabel?: string
   lowerBound: Maybe<BigNumber>
   upperBound: Maybe<BigNumber>
@@ -284,6 +288,7 @@ export interface MarketMakerData {
   balances: BalanceItem[]
   creationTimestamp: string
   collateral: Token
+  userInputCollateral: Token | null
   creator: string
   fee: BigNumber
   isConditionResolved: boolean
@@ -309,6 +314,7 @@ export interface MarketMakerData {
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
   outcomeTokenMarginalPrices: string[]
+  outcomeTokenAmounts: string[]
 }
 
 export enum Ternary {
@@ -453,6 +459,24 @@ export enum MarketState {
   none = '',
 }
 
+export enum CompoundTokenType {
+  cdai = 'cdai',
+  cusdc = 'cusdc',
+  cusdt = 'cusdt',
+  cuni = 'cuni',
+  cbat = 'cbat',
+  ceth = 'ceth',
+}
+
+export enum CompoundEnabledTokenType {
+  dai = 'dai',
+  usdc = 'usdc',
+  usdt = 'usdt',
+  uni = 'uni',
+  bat = 'bat',
+  eth = 'eth',
+}
+
 export const INVALID_ANSWER_ID = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 export enum FormState {
@@ -469,4 +493,18 @@ export enum TradeType {
 export enum LiquidityType {
   add = 'Add',
   remove = 'Remove',
+}
+
+export type ValueBoxItem = {
+  title: string
+  subtitle: string
+  tooltip?: string
+  positive?: boolean
+  xValue?: number
+  ball?: boolean
+}
+
+export enum AdditionalSharesType {
+  long = 'Long',
+  short = 'Short',
 }
