@@ -1,3 +1,4 @@
+import Big from 'big.js'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -19,6 +20,8 @@ import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
+  bigMax,
+  bigMin,
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
   formatBigNumber,
@@ -26,7 +29,7 @@ import {
   getUnit,
   isDust,
 } from '../../../../util/tools'
-import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
+import { AdditionalSharesType, MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -82,6 +85,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     address: marketMakerAddress,
     balances,
     fee,
+    outcomeTokenAmounts,
     outcomeTokenMarginalPrices,
     question,
     scalarHigh,
@@ -126,6 +130,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
   const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
+  const [additionalShares, setAdditionalShares] = useState<number>(0)
+  const [additionalSharesType, setAdditionalSharesType] = useState<Maybe<AdditionalSharesType>>()
 
   useEffect(() => {
     setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
@@ -346,6 +352,40 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
+  useEffect(() => {
+    // Use floor as rounding method
+    Big.RM = 0
+
+    const poolWeight =
+      Number(outcomeTokenAmounts[0]) > Number(outcomeTokenAmounts[1])
+        ? new Big(outcomeTokenAmounts[0])
+        : new Big(outcomeTokenAmounts[1])
+
+    const liquidityAmount = amountToFund?.gt(0)
+      ? new Big(amountToFund.toString())
+      : amountToRemove?.gt(0)
+      ? new Big(amountToRemove?.toString())
+      : new Big(0)
+
+    const sendBackAmounts = outcomeTokenAmounts.map(amount => {
+      const outcomeTokenAmount = new Big(amount)
+      const remaining = liquidityAmount.mul(outcomeTokenAmount).div(poolWeight)
+      return liquidityAmount.sub(remaining)
+    })
+    const extraShares = bigMax(sendBackAmounts).sub(bigMin(sendBackAmounts) || new Big(0))
+    setAdditionalShares(Number(extraShares.toFixed(0)) / 10 ** collateral.decimals)
+
+    if (activeTab === Tabs.deposit) {
+      Number(outcomeTokenAmounts[0]) > Number(outcomeTokenAmounts[1])
+        ? setAdditionalSharesType(AdditionalSharesType.long)
+        : setAdditionalSharesType(AdditionalSharesType.short)
+    } else {
+      Number(outcomeTokenAmounts[0]) > Number(outcomeTokenAmounts[1])
+        ? setAdditionalSharesType(AdditionalSharesType.short)
+        : setAdditionalSharesType(AdditionalSharesType.long)
+    }
+  }, [collateral.decimals, outcomeTokenAmounts, amountToFund, amountToRemove, activeTab])
+
   return (
     <>
       <UserPoolData
@@ -357,9 +397,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         userEarnings={userEarnings}
       />
       <MarketScale
+        additionalShares={additionalShares}
+        additionalSharesType={additionalSharesType}
         borderTop={true}
         collateral={collateral}
         currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
+        liquidityAmount={amountToFund}
         lowerBound={scalarLow || new BigNumber(0)}
         startingPointTitle={'Current prediction'}
         unit={getUnit(question.title)}

@@ -314,6 +314,7 @@ export interface MarketMakerData {
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
   outcomeTokenMarginalPrices: string[]
+  outcomeTokenAmounts: string[]
 }
 
 export enum Ternary {
@@ -492,4 +493,18 @@ export enum TradeType {
 export enum LiquidityType {
   add = 'Add',
   remove = 'Remove',
+}
+
+export type ValueBoxItem = {
+  title: string
+  subtitle: string
+  tooltip?: string
+  positive?: boolean
+  xValue?: number
+  ball?: boolean
+}
+
+export enum AdditionalSharesType {
+  long = 'Long',
+  short = 'Short',
 }

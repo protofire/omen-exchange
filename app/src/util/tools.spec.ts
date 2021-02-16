@@ -4,6 +4,8 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 
 import { getContractAddress, getNativeAsset } from './networks'
 import {
+  bigMax,
+  bigMin,
   calcAddFundingSendAmounts,
   calcDepositedTokens,
   calcDistributionHint,
@@ -30,6 +32,7 @@ import {
   limitDecimalPlaces,
   truncateStringInTheMiddle as truncate,
 } from './tools'
+import { Token } from './types'
 
 describe('tools', () => {
   describe('calcPrice', () => {
@@ -576,6 +579,32 @@ describe('tools', () => {
       const unitResult = getUnit(title)
 
       expect(unitResult).toStrictEqual(result)
+    }
+  })
+
+  describe('bigMax', () => {
+    const testCases: [Big[], Big][] = [
+      [[new Big(0), new Big(1)], new Big(1)],
+      [[new Big('12345'), new Big(123)], new Big(12345)],
+      [[new Big(1829378123), new Big(-12323434)], new Big(1829378123)],
+    ]
+    for (const [array, result] of testCases) {
+      const max = bigMax(array)
+
+      expect(max).toStrictEqual(result)
+    }
+  })
+
+  describe('bigMin', () => {
+    const testCases: [Big[], Big][] = [
+      [[new Big(0), new Big(1)], new Big(0)],
+      [[new Big('12345'), new Big(123)], new Big('123')],
+      [[new Big(1829378123), new Big(-12323434)], new Big(-12323434)],
+    ]
+    for (const [array, result] of testCases) {
+      const min = bigMin(array)
+
+      expect(min).toStrictEqual(result)
     }
   })
 
