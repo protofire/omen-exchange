@@ -492,6 +492,11 @@ export const getUnit = (title: string): string => {
   const unit = splitTitle[splitTitle.length - 1].split(']')[0]
   return unit
 }
+export const getScalarTitle = (title: string): string => {
+  const unit = getUnit(title)
+  const scalarTitle = title.substring(0, title.length - (unit.length + 3))
+  return scalarTitle
+}
 
 export const getMarketRelatedQuestionFilter = (
   marketsRelatedQuestion: MarketTokenPair[],
