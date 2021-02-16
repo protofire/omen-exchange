@@ -1,11 +1,13 @@
-import React, { DOMAttributes } from 'react'
+import React, { DOMAttributes, useEffect, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useRealityLink } from '../../../../hooks'
+import { CompoundService } from '../../../../services/compound_service'
 import { networkIds } from '../../../../util/networks'
-import { Arbitrator, KlerosItemStatus, KlerosSubmission } from '../../../../util/types'
+import { Arbitrator, CompoundTokenType, KlerosItemStatus, KlerosSubmission, Token } from '../../../../util/types'
 import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
+import { CompoundIconNoBorder } from '../../../common/icons/currencies/CompoundIconNoBorder'
 
 const AdditionalMarketDataWrapper = styled.div`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
@@ -25,11 +27,8 @@ const AdditionalMarketDataWrapper = styled.div`
 const AdditionalMarketDataLeft = styled.div`
   display: flex;
   align-items: center;
-  padding: 14px 20px;
-
-  & > * + * {
-    margin-left: 14px;
-  }
+  padding: 14px 20px 0px 20px;
+  flex-wrap: wrap;
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-wrap: wrap !important;
     width: 100%;
@@ -40,6 +39,13 @@ const AdditionalMarketDataLeft = styled.div`
       margin-right: 22px !important;
       margin-bottom: 10px !important;
     }
+  }
+`
+
+const CompoundInterestWrapper = styled.div<{ customColor: string }>`
+  color: ${props => props.theme.colors.green};
+  &:hover {
+    color: ${props => props.customColor};
   }
 `
 
@@ -55,11 +61,20 @@ const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
   }
 `
 
-const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; isError?: boolean }>`
+const AdditionalMarketDataSectionWrapper = styled.a<{
+  noColorChange?: boolean
+  isError?: boolean
+  customColorChange?: boolean
+  customColor?: string
+  noMarginLeft?: boolean
+  hasMarginRight?: boolean
+}>`
   display: flex;
   align-items: center;
   cursor: pointer;
-
+  margin-left: ${props => (props.noMarginLeft ? '0px' : '14px')};
+  margin-right: ${props => (props.hasMarginRight ? '14px' : '0px')};
+  margin-bottom: 14px;
   &:hover {
     p {
       color: ${props => (props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight)};
@@ -70,7 +85,13 @@ const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; i
       }
       path {
         fill: ${props =>
-          props.noColorChange ? '' : props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight};
+          props.customColorChange
+            ? props.customColor
+            : props.noColorChange
+            ? ''
+            : props.isError
+            ? props.theme.colors.alertHover
+            : props.theme.colors.primaryLight};
       }
 
       path:nth-child(even) {
@@ -89,6 +110,7 @@ const AdditionalMarketDataSectionWrapper = styled.a<{ noColorChange?: boolean; i
 interface Props extends DOMAttributes<HTMLDivElement> {
   category: string
   arbitrator: Arbitrator
+  collateral: Token
   oracle: string
   id: string
   curatedByDxDaoOrKleros: boolean
@@ -100,14 +122,13 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
+  const { address, arbitrator, category, collateral, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
 
   const context = useConnectedWeb3Context()
 
   const realitioBaseUrl = useRealityLink()
-
-  const realitioUrl = id ? `${realitioBaseUrl}/#!/question/${id}` : `${realitioBaseUrl}/`
-
+  const realitioUrl = id ? `${realitioBaseUrl}/app/#!/question/${id}` : `${realitioBaseUrl}/`
+  const { account, library: provider } = context
   submissionIDs.sort((s1, s2) => {
     if (s1.status === KlerosItemStatus.Registered) return -1
     if (s2.status === KlerosItemStatus.Registered) return 1
@@ -122,10 +143,26 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   queryParams.append('col1', title)
   queryParams.append('col2', `https://omen.eth.link/#/${address}`)
 
+  const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
+
+  useEffect(() => {
+    const getAPY = async () => {
+      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
+      const supplyRate = await compoundServiceObject.calculateSupplyRateAPY()
+      setCompoundInterestRate(supplyRate.toFixed(2))
+    }
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      getAPY()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <AdditionalMarketDataWrapper>
       <AdditionalMarketDataLeft>
-        <AdditionalMarketDataSectionWrapper href={`/#/24h-volume/category/${encodeURI(category)}`} noColorChange={true}>
+        <AdditionalMarketDataSectionWrapper
+          href={`/#/24h-volume/category/${encodeURI(category)}`}
+          noColorChange={true}
+          noMarginLeft={true}
+        >
           <IconCategory size={'24'} />
           <AdditionalMarketDataSectionTitle>{category}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
@@ -160,6 +197,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
                 ? 'This Market is verified by DXdao or Kleros and therefore valid.'
                 : 'This Market has not been verified and may be invalid.'
             }
+            hasMarginRight={true}
             isError={!curatedByDxDaoOrKleros}
           >
             {curatedByDxDaoOrKleros ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
@@ -167,6 +205,23 @@ export const AdditionalMarketData: React.FC<Props> = props => {
               {curatedByDxDaoOrKleros ? 'Verified' : 'Not Verified'}
             </AdditionalMarketDataSectionTitle>
           </AdditionalMarketDataSectionWrapper>
+        )}
+        {collateral.symbol.toLowerCase() in CompoundTokenType ? (
+          <AdditionalMarketDataSectionWrapper
+            customColor={'#00897B'}
+            customColorChange={true}
+            data-arrow-color="transparent"
+            data-for="marketData"
+            data-tip={`This market is earning ${compoundInterestRate}% APY powered by compound.finance`}
+            noMarginLeft={true}
+          >
+            <CompoundIconNoBorder />
+            <AdditionalMarketDataSectionTitle>
+              <CompoundInterestWrapper customColor={'#00897B'}>{compoundInterestRate}% APY</CompoundInterestWrapper>
+            </AdditionalMarketDataSectionTitle>
+          </AdditionalMarketDataSectionWrapper>
+        ) : (
+          <span />
         )}
       </AdditionalMarketDataLeft>
       <ReactTooltip

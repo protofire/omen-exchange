@@ -13,6 +13,8 @@ import {
   formatBigNumber,
   formatNumber,
   formatToShortNumber,
+  getScalarTitle,
+  getUnit,
   isScalarMarket,
 } from '../../../../util/tools'
 import { MarketMakerDataItem, Token } from '../../../../util/types'
@@ -145,8 +147,12 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   let currentPrediction
   let unit
+  let scalarTitle
+
   if (isScalar) {
-    unit = title.split('[')[1].split(']')[0]
+    unit = getUnit(title)
+    scalarTitle = getScalarTitle(title)
+
     if (outcomeTokenMarginalPrices && scalarLow && scalarHigh) {
       currentPrediction = calcPrediction(outcomeTokenMarginalPrices[1], scalarLow, scalarHigh)
     }
@@ -154,7 +160,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   return (
     <Wrapper to={`/${address}`}>
-      <Title>{title}</Title>
+      <Title>{isScalar ? scalarTitle : title}</Title>
       <Info>
         <IconStar></IconStar>
         <Outcome>

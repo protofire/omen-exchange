@@ -221,7 +221,6 @@ export const ScalarMarketSell = (props: Props) => {
   return (
     <>
       <MarketScale
-        amount={potentialValue}
         borderTop={true}
         collateral={collateral}
         currentPrediction={isNewPrediction ? String(formattedNewPrediction) : outcomeTokenMarginalPrices[1]}
@@ -229,6 +228,7 @@ export const ScalarMarketSell = (props: Props) => {
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
         startingPointTitle={isNewPrediction ? 'New prediction' : 'Current prediction'}
+        tradeAmount={potentialValue}
         unit={getUnit(question.title)}
         upperBound={scalarHigh || new BigNumber(0)}
       />

@@ -281,7 +281,6 @@ export const ScalarMarketBuy = (props: Props) => {
   return (
     <>
       <MarketScale
-        amount={amount}
         amountShares={tradedShares}
         borderTop={true}
         collateral={collateral}
@@ -292,6 +291,7 @@ export const ScalarMarketBuy = (props: Props) => {
         newPrediction={formattedNewPrediction}
         short={activeTab === Tabs.short}
         startingPointTitle={'Current prediction'}
+        tradeAmount={amount}
         unit={getUnit(question.title)}
         upperBound={scalarHigh || new BigNumber(0)}
       />

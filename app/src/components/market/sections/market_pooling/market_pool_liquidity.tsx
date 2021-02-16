@@ -15,8 +15,9 @@ import {
   useFundingBalance,
   useSymbol,
 } from '../../../../hooks'
+import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
-import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   calcAddFundingSendAmounts,
@@ -24,11 +25,22 @@ import {
   calcRemoveFundingSendAmounts,
   formatBigNumber,
   formatNumber,
+  getBaseTokenForCToken,
+  getInitialCollateral,
+  getSharesInBaseToken,
 } from '../../../../util/tools'
-import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, Ternary, Token } from '../../../../util/types'
+import {
+  CompoundTokenType,
+  MarketDetailsTab,
+  MarketMakerData,
+  OutcomeTableValue,
+  Status,
+  Ternary,
+  Token,
+} from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder, TitleValue } from '../../../common'
+import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
@@ -37,13 +49,17 @@ import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { SetAllowance } from '../../common/set_allowance'
+import { SwitchTransactionToken } from '../../common/switch_transaction_token'
 import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
 
+import { UserPoolData } from './user_pool_data'
+
 interface Props extends RouteComponentProps<any> {
+  compoundService: CompoundService | null
   marketMakerData: MarketMakerData
   theme?: any
   switchMarketTab: (arg0: MarketDetailsTab) => void
@@ -69,54 +85,10 @@ const SetAllowanceStyled = styled(SetAllowance)`
   margin-bottom: 20px;
 `
 
-const UserDataTitleValue = styled(TitleValue)`
-  flex: 0 calc(50% - 16px);
-
-  &:nth-child(odd) {
-    margin-right: 32px;
-  }
-  &:nth-child(-n + 2) {
-    margin-bottom: 12px;
-  }
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
-    flex: 0 50%;
-
-    margin-right: 0 !important;
-    margin-bottom: 0 !important;
-
-    &:not(:first-child) {
-      margin-top: 12px;
-    }
-    &:nth-child(2) {
-      order: 2;
-    }
-    &:nth-child(3) {
-      order: 1;
-    }
-    &:nth-child(4) {
-      order: 3;
-    }
-  }
-`
-
-const UserData = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin: 0 -25px;
-  padding: 20px 24px;
-  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
-  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
-    flex-wrap: nowrap;
-    flex-direction: column;
-  }
-`
-
 const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
-  const { fetchGraphMarketMakerData, marketMakerData } = props
+  const { compoundService, fetchGraphMarketMakerData, marketMakerData } = props
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
   const history = useHistory()
   const context = useConnectedWeb3Context()
@@ -136,9 +108,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       ? nativeAsset
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
-  const symbol = useSymbol(collateral)
-
-  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const [amountToFund, setAmountToFund] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
@@ -149,11 +118,29 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(getInitialCollateral(context.networkId, collateral))
+  const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
+  let symbol = useSymbol(collateral)
+  const collateralSymbol = collateral.symbol.toLowerCase()
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
+  const [amountToFundNormalized, setAmountToFundNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const [amountToRemoveNormalized, setAmountToRemoveNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
+
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+
+  let baseCollateral = collateral
+  if (collateralSymbol in CompoundTokenType) {
+    if (collateralSymbol === 'ceth') {
+      baseCollateral = getNativeAsset(networkId)
+    } else {
+      const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
+      baseCollateral = getToken(networkId, baseCollateralSymbol)
+    }
+    symbol = baseCollateral.symbol
+  }
 
   useEffect(() => {
     setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
@@ -177,6 +164,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const disableDepositTab = currentDate > resolutionDate
   const [activeTab, setActiveTab] = useState(disableDepositTab ? Tabs.withdraw : Tabs.deposit)
 
+  let displayTotalSymbol = symbol
+  if (activeTab === Tabs.withdraw) {
+    if (collateral.address === pseudoNativeAssetAddress || collateralSymbol in CompoundTokenType) {
+      displayTotalSymbol = displayCollateral.symbol
+    }
+  }
+
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
@@ -187,6 +181,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
+
   const sendAmountsAfterAddingFunding = calcAddFundingSendAmounts(
     amountToFund || Zero,
     balances.map(b => b.holdings),
@@ -201,7 +196,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
-
   const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
     amount.lt(min) ? amount : min,
   )
@@ -213,20 +207,20 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const showSharesChange = activeTab === Tabs.deposit ? amountToFund?.gt(0) : amountToRemove?.gt(0)
 
   const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
-    collateral,
+    displayCollateral,
     context,
   )
   const collateralBalance = maybeCollateralBalance || Zero
   const probabilities = balances.map(balance => balance.probability)
   const showSetAllowance =
-    collateral.address !== pseudoNativeAssetAddress &&
+    displayCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.cpk.isSafeApp() &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
   const depositedTokensTotal = depositedTokens.add(userEarnings)
   const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
 
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
+  const walletBalance = formatNumber(formatBigNumber(collateralBalance, displayCollateral.decimals, 5), 5)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
 
   const totalUserShareAmounts = calcRemoveFundingSendAmounts(
@@ -254,20 +248,29 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       if (
         !cpk?.cpk.isSafeApp() &&
         collateral.address !== pseudoNativeAssetAddress &&
+        displayCollateral.address !== pseudoNativeAssetAddress &&
         hasEnoughAllowance !== Ternary.True
       ) {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
       }
-
-      const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
-
+      let useBaseToken = false
+      if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
+        useBaseToken = true
+      }
+      let fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
+      if (collateralSymbol in CompoundTokenType && displayCollateral.symbol === baseCollateral.symbol) {
+        fundsAmount = formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)
+      }
       setStatus(Status.Loading)
-      setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
+      setMessage(`Depositing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
+
       setIsTransactionProcessing(true)
       await cpk.addFunding({
-        amount: amountToFund || Zero,
+        amount: amountToFundNormalized || Zero,
+        compoundService,
         collateral,
         marketMaker,
+        useBaseToken,
       })
 
       await fetchGraphMarketMakerData()
@@ -276,8 +279,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
+      setAmountToFundNormalized(null)
       setStatus(Status.Ready)
-      setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
+      setMessage(`Successfully deposited ${fundsAmount} ${displayCollateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
@@ -296,22 +300,42 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       }
       setStatus(Status.Loading)
 
-      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
-
-      setMessage(`Withdrawing funds: ${fundsAmount} ${symbol}...`)
+      let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
+      if (
+        compoundService &&
+        collateralSymbol in CompoundTokenType &&
+        displayCollateral.symbol === baseCollateral.symbol
+      ) {
+        const displayDepositedTokensTotal = compoundService.calculateCTokenToBaseExchange(
+          baseCollateral,
+          depositedTokensTotal,
+        )
+        fundsAmount = formatBigNumber(displayDepositedTokensTotal || Zero, displayCollateral.decimals)
+      }
+      setMessage(`Withdrawing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
+      let useBaseToken = false
+      if (displayCollateral.address === pseudoNativeAssetAddress) {
+        useBaseToken = true
+      } else if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+        if (displayCollateral.address !== collateral.address) {
+          useBaseToken = true
+        }
+      }
       setIsTransactionProcessing(true)
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
         collateralAddress,
         conditionId,
         conditionalTokens,
+        compoundService,
         earnings: userEarnings,
         marketMaker,
         outcomesCount: balances.length,
         sharesToBurn: amountToRemove || Zero,
+        useBaseToken,
       })
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
@@ -319,8 +343,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
+      setAmountToRemoveNormalized(null)
       setStatus(Status.Ready)
-      setMessage(`Successfully withdrew ${fundsAmount} ${symbol}`)
+      setMessage(`Successfully withdrew ${fundsAmount} ${displayCollateral.symbol}`)
       setIsModalTransactionResultOpen(true)
       setIsTransactionProcessing(false)
     } catch (err) {
@@ -365,16 +390,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
     : null
 
-  const sharesAmountError = isTransactionProcessing
-    ? null
-    : maybeFundingBalance === null
-    ? null
-    : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
-    ? `Insufficient balance`
-    : amountToRemove?.gt(maybeFundingBalance)
-    ? `Value must be less than or equal to ${sharesBalance} pool shares`
-    : null
-
   const disableDepositButton =
     !amountToFund ||
     amountToFund?.isZero() ||
@@ -383,52 +398,167 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     currentDate > resolutionDate ||
     isNegativeAmountToFund
 
-  const disableWithdrawButton =
-    !amountToRemove ||
-    amountToRemove?.isZero() ||
-    amountToRemove?.gt(fundingBalance) ||
-    sharesAmountError !== null ||
-    isNegativeAmountToRemove
+  const setDisplayCollateralAmountToFund = (value: BigNumber) => {
+    if (collateral.address === displayCollateral.address) {
+      setAmountToFund(value)
+    } else if (compoundService) {
+      const baseAmount = compoundService.calculateBaseToCTokenExchange(displayCollateral, value)
+      setAmountToFund(baseAmount)
+    }
+    setAmountToFundNormalized(value)
+  }
 
-  const currencyFilters =
+  const setWithdrawAmountToRemove = (val: BigNumber) => {
+    let normalizedWithdrawAmount = val
+    if (compoundService && collateral.symbol.toLowerCase() in CompoundTokenType) {
+      normalizedWithdrawAmount = compoundService.calculateBaseToCTokenExchange(baseCollateral, normalizedWithdrawAmount)
+    }
+    setAmountToRemove(normalizedWithdrawAmount)
+    setAmountToRemoveNormalized(val)
+  }
+
+  let currencyFilters =
     collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
       ? [wrapToken.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
       : []
 
+  if (collateralSymbol in CompoundTokenType) {
+    if (baseCollateral.symbol.toLowerCase() === 'eth') {
+      currencyFilters = [collateral.address, pseudoNativeAssetAddress.toLowerCase()]
+    } else {
+      currencyFilters = [collateral.address, baseCollateral.address]
+    }
+  }
+
+  let displayBalances = balances
+  if (compoundService && collateral.symbol.toLowerCase() in CompoundTokenType) {
+    displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
+  }
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
+
+  let displayTotalUserLiquidity = totalUserLiquidity
+  let displayUserEarnings = userEarnings
+  let displayTotalEarnings = totalEarnings
+  let displayPoolTokens = poolTokens
+  let displayTotalPoolShares = totalPoolShares
+  let displaySharesAfterAddingFunding = sharesAfterAddingFunding
+  let displaySharesAfterRemovingFunding = sharesAfterRemovingFunding
+  let displayFundingBalance = fundingBalance
+  let displaySharesBalance = sharesBalance
+  let sellNoteUserEarnings = userEarnings
+  let sellNoteDepositedTokens = depositedTokens
+  let sellNoteDepositedTokensTotal = depositedTokensTotal
+  // Set display values if the collateral is cToken type
+  if (compoundService && collateralSymbol in CompoundTokenType) {
+    displayPoolTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, poolTokens)
+    displayTotalPoolShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalPoolShares)
+    displayTotalUserLiquidity = compoundService.calculateCTokenToBaseExchange(displayCollateral, totalUserLiquidity)
+    displayUserEarnings = compoundService.calculateCTokenToBaseExchange(displayCollateral, userEarnings)
+    displayTotalEarnings = compoundService.calculateCTokenToBaseExchange(displayCollateral, totalEarnings)
+    displayFundingBalance = compoundService.calculateCTokenToBaseExchange(baseCollateral, fundingBalance)
+    displaySharesAfterAddingFunding = sharesAfterAddingFunding.map(function(saf) {
+      return compoundService.calculateCTokenToBaseExchange(baseCollateral, saf)
+    })
+    displaySharesAfterRemovingFunding = sharesAfterRemovingFunding.map(function(srf) {
+      return compoundService.calculateCTokenToBaseExchange(baseCollateral, srf)
+    })
+    const sharesBalanceBN = compoundService.calculateCTokenToBaseExchange(baseCollateral, fundingBalance)
+    displaySharesBalance = formatBigNumber(sharesBalanceBN, baseCollateral.decimals)
+    if (displayCollateral.address === baseCollateral.address) {
+      sellNoteUserEarnings = displayUserEarnings
+      sellNoteDepositedTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, depositedTokens)
+      sellNoteDepositedTokensTotal = compoundService.calculateCTokenToBaseExchange(baseCollateral, depositedTokensTotal)
+    }
+  }
+
+  const sharesAmountError = isTransactionProcessing
+    ? null
+    : maybeFundingBalance === null
+    ? null
+    : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
+    ? `Insufficient balance`
+    : amountToRemoveNormalized?.gt(displayFundingBalance)
+    ? `Value must be less than or equal to ${displaySharesBalance} pool shares`
+    : null
+
+  const disableWithdrawButton =
+    !amountToRemove ||
+    amountToRemove?.isZero() ||
+    amountToRemoveNormalized?.gt(displayFundingBalance) ||
+    sharesAmountError !== null ||
+    isNegativeAmountToRemove
+
+  let toggleCollateral = collateral
+
+  if (collateralSymbol in CompoundTokenType) {
+    if (collateral.address === displayCollateral.address) {
+      toggleCollateral = baseCollateral
+    } else {
+      toggleCollateral = collateral
+    }
+  } else {
+    if (collateral.address === nativeAsset.address || collateral.address === wrapToken.address) {
+      if (displayCollateral.address === wrapToken.address) {
+        toggleCollateral = getNativeAsset(context.networkId)
+      } else {
+        toggleCollateral = getWrapToken(context.networkId)
+      }
+    }
+  }
+  const setToggleCollateral = () => {
+    if (collateralSymbol in CompoundTokenType) {
+      if (displayCollateral.address === baseCollateral.address) {
+        setDisplayCollateral(collateral)
+      } else {
+        setDisplayCollateral(baseCollateral)
+      }
+    } else {
+      if (displayCollateral.address === wrapToken.address) {
+        setDisplayCollateral(getNativeAsset(context.networkId))
+      } else {
+        setDisplayCollateral(getWrapToken(context.networkId))
+      }
+    }
+  }
+
+  const setBuyCollateral = (token: Token) => {
+    const userInputCollateralSymbol = token.symbol.toLowerCase()
+    if (userInputCollateralSymbol in CompoundTokenType) {
+      setDisplayCollateral(token)
+    } else if (token.address === pseudoNativeAssetAddress && !(collateral.symbol.toLowerCase() in CompoundTokenType)) {
+      setCollateral(token)
+      setDisplayCollateral(token)
+    } else {
+      setDisplayCollateral(token)
+    }
+  }
+  const switchTab = (tab: Tabs) => {
+    if (collateralSymbol in CompoundTokenType) {
+      setDisplayCollateral(baseCollateral)
+    }
+    setAmountToFund(new BigNumber('0'))
+    setWithdrawAmountToRemove(new BigNumber('0'))
+    setActiveTab(tab)
+  }
 
   return (
     <>
-      <UserData>
-        <UserDataTitleValue
-          title="Your Liquidity"
-          value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${symbol}`}
-        />
-        <UserDataTitleValue
-          title="Total Pool Tokens"
-          value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals))}`}
-        />
-        <UserDataTitleValue
-          state={userEarnings.gt(0) ? ValueStates.success : undefined}
-          title="Your Earnings"
-          value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
-            formatBigNumber(userEarnings, collateral.decimals),
-          )} ${symbol}`}
-        />
-        <UserDataTitleValue
-          state={totalEarnings.gt(0) ? ValueStates.success : undefined}
-          title="Total Earnings"
-          value={`${totalEarnings.gt(0) ? '+' : ''}${formatNumber(
-            formatBigNumber(totalEarnings, collateral.decimals),
-          )} ${symbol}`}
-        />
-      </UserData>
+      <UserPoolData
+        collateral={baseCollateral}
+        symbol={symbol}
+        totalEarnings={displayTotalEarnings}
+        totalPoolShares={displayTotalPoolShares}
+        totalUserLiquidity={displayTotalUserLiquidity}
+        userEarnings={displayUserEarnings}
+      />
       <OutcomeTable
         balances={balances}
         collateral={collateral}
         disabledColumns={[OutcomeTableValue.OutcomeProbability, OutcomeTableValue.Payout, OutcomeTableValue.Bonded]}
+        displayBalances={displayBalances}
+        displayCollateral={baseCollateral}
         displayRadioSelection={false}
-        newShares={activeTab === Tabs.deposit ? sharesAfterAddingFunding : sharesAfterRemovingFunding}
+        newShares={activeTab === Tabs.deposit ? displaySharesAfterAddingFunding : displaySharesAfterRemovingFunding}
         probabilities={probabilities}
         showSharesChange={showSharesChange}
       />
@@ -438,13 +568,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             <ButtonTab
               active={disableDepositTab ? false : activeTab === Tabs.deposit}
               disabled={disableDepositTab}
-              onClick={() => setActiveTab(Tabs.deposit)}
+              onClick={() => switchTab(Tabs.deposit)}
             >
               Deposit
             </ButtonTab>
             <ButtonTab
               active={disableDepositTab ? true : activeTab === Tabs.withdraw}
-              onClick={() => setActiveTab(Tabs.withdraw)}
+              onClick={() => switchTab(Tabs.withdraw)}
             >
               Withdraw
             </ButtonTab>
@@ -457,13 +587,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   addNativeAsset
                   balance={walletBalance}
                   context={context}
-                  currency={collateral.address}
+                  currency={displayCollateral.address}
                   disabled={currencyFilters.length ? false : true}
                   filters={currencyFilters}
                   onSelect={(token: Token | null) => {
                     if (token) {
-                      setCollateral(token)
-                      setAmountToFund(new BigNumber(0))
+                      setBuyCollateral(token)
+                      setDisplayCollateralAmountToFund(new BigNumber(0))
                     }
                   }}
                 />
@@ -472,23 +602,23 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               <TextfieldCustomPlaceholder
                 formField={
                   <BigNumberInput
-                    decimals={collateral.decimals}
+                    decimals={displayCollateral.decimals}
                     name="amountToFund"
                     onChange={(e: BigNumberInputReturn) => {
-                      setAmountToFund(e.value)
+                      setDisplayCollateralAmountToFund(e.value)
                       setAmountToFundDisplay('')
                     }}
                     style={{ width: 0 }}
-                    value={amountToFund}
+                    value={amountToFundNormalized}
                     valueToDisplay={amountToFundDisplay}
                   />
                 }
                 onClickMaxButton={() => {
                   setAmountToFund(collateralBalance)
-                  setAmountToFundDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
+                  setAmountToFundDisplay(formatBigNumber(collateralBalance, displayCollateral.decimals, 5))
                 }}
                 shouldDisplayMaxButton={shouldDisplayMaxButton}
-                symbol={collateral.symbol}
+                symbol={displayCollateral.symbol}
               />
 
               {collateralAmountError && <GenericError>{collateralAmountError}</GenericError>}
@@ -496,25 +626,25 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              <TokenBalance text="Pool Tokens" value={formatNumber(sharesBalance)} />
+              <TokenBalance text="Pool Tokens" value={formatNumber(displaySharesBalance)} />
 
               <TextfieldCustomPlaceholder
                 formField={
                   <BigNumberInput
-                    decimals={collateral.decimals}
+                    decimals={baseCollateral.decimals}
                     name="amountToRemove"
                     onChange={(e: BigNumberInputReturn) => {
-                      setAmountToRemove(e.value)
+                      setWithdrawAmountToRemove(e.value)
                       setAmountToRemoveDisplay('')
                     }}
                     style={{ width: 0 }}
-                    value={amountToRemove}
+                    value={amountToRemoveNormalized}
                     valueToDisplay={amountToRemoveDisplay}
                   />
                 }
                 onClickMaxButton={() => {
                   setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(formatBigNumber(fundingBalance, collateral.decimals, 5))
+                  setAmountToRemoveDisplay(formatBigNumber(displayFundingBalance, baseCollateral.decimals, 5))
                 }}
                 shouldDisplayMaxButton
                 symbol=""
@@ -535,10 +665,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
-                emphasizeValue={poolTokens.gt(0)}
-                state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
+                emphasizeValue={displayPoolTokens.gt(0)}
+                state={(displayPoolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Pool Tokens"
-                value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals))}`}
+                value={`${formatNumber(formatBigNumber(displayPoolTokens, baseCollateral.decimals))}`}
               />
             </TransactionDetailsCard>
           )}
@@ -548,27 +678,40 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
                 title="Earned"
-                value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${symbol}`}
+                value={`${formatNumber(
+                  formatBigNumber(sellNoteUserEarnings, displayCollateral.decimals),
+                )} ${displayTotalSymbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
-                value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${symbol}`}
+                value={`${formatNumber(
+                  formatBigNumber(sellNoteDepositedTokens, displayCollateral.decimals),
+                )} ${displayTotalSymbol}`}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
-                emphasizeValue={depositedTokensTotal.gt(0)}
-                state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
+                emphasizeValue={sellNoteDepositedTokensTotal.gt(0)}
+                state={(sellNoteDepositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
-                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))} ${symbol}`}
+                value={`${formatNumber(
+                  formatBigNumber(sellNoteDepositedTokensTotal, displayCollateral.decimals),
+                )} ${displayTotalSymbol}`}
               />
+              {collateral.address === pseudoNativeAssetAddress ? (
+                <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollateral} />
+              ) : collateralSymbol in CompoundTokenType ? (
+                <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollateral} />
+              ) : (
+                <span />
+              )}
             </TransactionDetailsCard>
           )}
         </div>
       </GridTransactionDetails>
       {activeTab === Tabs.deposit && showSetAllowance && (
         <SetAllowanceStyled
-          collateral={collateral}
+          collateral={displayCollateral}
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockCollateral}

@@ -174,6 +174,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       creator: graphMarketMakerData.creator,
       fee: graphMarketMakerData.fee,
       collateralVolume: graphMarketMakerData.collateralVolume,
+      userInputCollateral: collateral,
       isConditionResolved,
       isQuestionFinalized,
       marketMakerFunding,
@@ -197,6 +198,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       scalarLow: graphMarketMakerData.scalarLow,
       scalarHigh: graphMarketMakerData.scalarHigh,
       outcomeTokenMarginalPrices: graphMarketMakerData.outcomeTokenMarginalPrices,
+      outcomeTokenAmounts: graphMarketMakerData.outcomeTokenAmounts,
     }
 
     setMarketMakerData(newMarketMakerData)
