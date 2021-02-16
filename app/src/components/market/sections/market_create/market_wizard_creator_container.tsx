@@ -4,9 +4,10 @@ import { useHistory } from 'react-router'
 import { useConnectedCPKContext, useContracts } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
+import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
-import { pseudoNativeAssetAddress } from '../../../../util/networks'
+import { getToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { MarketData } from '../../../../util/types'
 import { ModalConnectWallet } from '../../../modal'
 
@@ -26,6 +27,20 @@ const MarketWizardCreatorContainer: FC = () => {
   const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(MarketCreationStatus.ready())
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
 
+  const getCompoundInterestRate = async (symbol: string): Promise<number> => {
+    const tokenSymbol = symbol.toLowerCase()
+    let cToken = `c${tokenSymbol}`
+    if (tokenSymbol === 'weth') {
+      cToken = 'ceth'
+    }
+    const compoundCollateralToken = cToken as KnownToken
+    const compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
+    const compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
+    await compoundService.init()
+    const supplyRate = compoundService.calculateSupplyRateAPY()
+    return supplyRate
+  }
+
   const handleSubmit = async (marketData: MarketData, isScalar: boolean) => {
     try {
       if (!account) {
@@ -37,19 +52,19 @@ const MarketWizardCreatorContainer: FC = () => {
         if (!cpk) {
           return
         }
-
         setMarketCreationStatus(MarketCreationStatus.creatingAMarket())
-
-        if (!cpk.cpk.isSafeApp() && marketData.collateral.address !== pseudoNativeAssetAddress) {
+        if (
+          !cpk.cpk.isSafeApp() &&
+          marketData.collateral.address !== pseudoNativeAssetAddress &&
+          marketData.userInputCollateral.address !== pseudoNativeAssetAddress
+        ) {
           // Approve collateral to the proxy contract
-          const collateralService = new ERC20Service(provider, account, marketData.collateral.address)
+          const collateralService = new ERC20Service(provider, account, marketData.userInputCollateral.address)
           const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, marketData.funding)
-
           if (!hasEnoughAlowance) {
             await collateralService.approveUnlimited(cpk.address)
           }
         }
-
         if (isScalar) {
           const { marketMakerAddress } = await cpk.createScalarMarket({
             marketData,
@@ -62,14 +77,27 @@ const MarketWizardCreatorContainer: FC = () => {
           setMarketCreationStatus(MarketCreationStatus.done())
           history.replace(`/${marketMakerAddress}`)
         } else {
+          let compoundTokenDetails = marketData.userInputCollateral
+          let compoundService = null
+          const userInputCollateralSymbol = marketData.userInputCollateral.symbol.toLowerCase()
+          const useCompoundReserve = marketData.useCompoundReserve
+          if (useCompoundReserve) {
+            const cToken = `c${userInputCollateralSymbol}`
+            const compoundCollateralToken = cToken as KnownToken
+            compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
+            compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
+            await compoundService.init()
+          }
           const { marketMakerAddress } = await cpk.createMarket({
+            compoundService,
+            compoundTokenDetails,
             marketData,
             conditionalTokens,
             realitio,
             marketMakerFactory,
+            useCompoundReserve,
           })
           setMarketMakerAddress(marketMakerAddress)
-
           setMarketCreationStatus(MarketCreationStatus.done())
           history.replace(`/${marketMakerAddress}`)
         }
@@ -84,6 +112,7 @@ const MarketWizardCreatorContainer: FC = () => {
     <>
       <MarketWizardCreator
         callback={handleSubmit}
+        getCompoundInterestRate={getCompoundInterestRate}
         marketCreationStatus={marketCreationStatus}
         marketMakerAddress={marketMakerAddress}
       />
