@@ -3,6 +3,7 @@ import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks'
+import { networkIds } from '../../../util/networks'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { ListCard } from '../../market/common/list_card/index'
@@ -192,8 +193,17 @@ const SettingsViewContainer = () => {
           <ButtonRound
             onClick={() => {
               console.log(localStorage.getItem('rpcAddress'))
-              localStorage.setItem('rpcAddress', 'https://programmingwithmosh.com/react/localstorage-react/')
-              history.push('/')
+              console.log(networkIds)
+
+              localStorage.setItem(
+                'rpcAddress',
+                JSON.stringify({
+                  url: 'https://cloudflare-eth.com/',
+                  network: context.networkId,
+                }),
+              )
+              history.replace('/')
+              window.location.reload()
             }}
           >
             Save

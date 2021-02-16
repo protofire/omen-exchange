@@ -236,6 +236,15 @@ const networks: { [K in NetworkId]: Network } = {
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
   },
 }
+console.log('here')
+console.log(localStorage.getItem('rpcAddress'))
+if (localStorage.getItem('rpcAddress')) {
+  const data = JSON.parse(<string>localStorage.getItem('rpcAddress'))
+  console.log(typeof networkIds.MAINNET)
+  const network: NetworkId = data.network
+  networks[network].url = data.url
+  console.log(networks[network])
+}
 
 export const supportedNetworkIds = Object.keys(networks).map(Number) as NetworkId[]
 
