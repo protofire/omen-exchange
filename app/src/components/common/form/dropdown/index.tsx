@@ -332,7 +332,7 @@ export const Dropdown: React.FC<Props> = props => {
     maxHeight = false,
     ...restProps
   } = props
-
+  console.log(currentItem)
   const getValidItemIndex = (itemIndex: number): number => {
     const outOfBounds = itemIndex && (itemIndex > items.length - 1 || itemIndex < 0)
     if (outOfBounds) {
@@ -384,6 +384,10 @@ export const Dropdown: React.FC<Props> = props => {
   }, [isOpen])
 
   const itemIndex = currentItem && currentItem > -1 ? currentItem : currentItemIndex
+  console.log(currentItem && currentItem > -1)
+  console.log(currentItem > -1)
+  console.log(currentItem, 'and', currentItemIndex)
+  console.log(itemIndex, 'itemIndexs')
   const activeItem = getItem(itemIndex)
   const extraContent = getItemExtraContent(itemIndex)
 
