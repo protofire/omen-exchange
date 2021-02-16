@@ -94,7 +94,7 @@ export const ClaimDaiModal = (props: any) => {
         <ClaimAmount>Claim {formatBigNumber(props.unclaimedAmount, 18, 2)} DAI</ClaimAmount>
         {transactionStep === State.idle && (
           <SecondaryText>
-            Withdrawals from xDai Network <br /> need to be claimed
+            Transfers from xDai Network <br /> need to be claimed
           </SecondaryText>
         )}
         {transactionStep === State.waitingConfirmation ? (
