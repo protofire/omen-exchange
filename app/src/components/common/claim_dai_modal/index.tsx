@@ -79,7 +79,7 @@ export const ClaimDaiModal = (props: any) => {
         </CloseStyled>
 
         {transactionStep === State.idle && <DaiIcon size={'64'} />}
-        {transactionStep === State.waitingConfirmation && <Spinner size={'64'} />}
+        {transactionStep === State.waitingConfirmation && <Spinner big />}
         {transactionStep === State.transactionSubmitted && (
           <Reversed>
             <IconArrowUp size={'64'} />
