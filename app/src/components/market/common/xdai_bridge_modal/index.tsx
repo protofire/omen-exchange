@@ -75,7 +75,7 @@ const BalanceWrapper = styled.div<{ isOpen: boolean }>`
   ${props => (!props.isOpen ? 'display:none' : 'display: flow-root')};
 `
 const Warning = styled.div`
-  color: ${({ theme }) => theme.colors.alert};
+  color: ${({ theme }) => theme.colors.red};
   opacity: 80%;
   margin-left: 8px;
 `
@@ -86,7 +86,7 @@ const WarningWrapper = styled.div`
 
 const TextFieldCustomPlace = styled(TextfieldCustomPlaceholder)<{ error: boolean }>`
   margin-top: 20px;
-  ${props => (props.error ? 'border:1px solid #F2B9B9 !important' : '')};
+  ${props => (props.error ? `border:1px solid ${props.theme.colors.red} !important` : '')};
   span {
     margin-right: 0px;
   }
