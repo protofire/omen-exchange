@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
 import { State } from '../../../../hooks/useXdaiBridge'
+import theme from '../../../../theme'
 import { formatBigNumber } from '../../../../util/tools'
 import { ButtonRound } from '../../../button/button_round'
 import { IconArrowUp } from '../../../common/icons/IconArrowUp'
@@ -73,7 +74,7 @@ export const TransactionState = ({
         ) : state === State.transactionSubmitted ? (
           <IconArrowUp />
         ) : (
-          <IconArrowUp color={'#4B9E98'} />
+          <IconArrowUp color={theme.colors.green} />
         )}
       </SvgWrapper>
 

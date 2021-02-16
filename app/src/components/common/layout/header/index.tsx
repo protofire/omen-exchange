@@ -8,6 +8,7 @@ import styled, { css } from 'styled-components'
 
 import { Logo } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
+import { useOutsideAlerter } from '../../../../hooks/useOutsideAlerter'
 import { XdaiService } from '../../../../services'
 import { formatBigNumber } from '../../../../util/tools'
 import { ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
@@ -179,26 +180,26 @@ interface ExtendsHistory extends RouteComponentProps {
   setClaim: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function useOutsideAlerter(ref: any, setState: any) {
-  useEffect(() => {
-    /**
-     * Alert if clicked on outside of element
-     */
-    function handleClickOutside(event: any) {
-      if (ref.current && !ref.current.contains(event.target)) {
-        setState(false)
-      }
-    }
-
-    // Bind the event listener
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      // Unbind the event listener on clean up
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref])
-}
+// function useOutsideAlerter(ref: any, setState: any) {
+//   useEffect(() => {
+//     /**
+//      * Alert if clicked on outside of element
+//      */
+//     function handleClickOutside(event: any) {
+//       if (ref.current && !ref.current.contains(event.target)) {
+//         setState(false)
+//       }
+//     }
+//
+//     // Bind the event listener
+//     document.addEventListener('mousedown', handleClickOutside)
+//     return () => {
+//       // Unbind the event listener on clean up
+//       document.removeEventListener('mousedown', handleClickOutside)
+//     }
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [ref])
+// }
 
 const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const { account, library: provider, networkId } = useConnectedWeb3Context()
@@ -263,8 +264,8 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
     onClick: () => history.push('/create'),
   }
   const [isBridgeOpen, setIsBridgeOpen] = useState<boolean>(false)
-  const ref = useRef(null)
-  useOutsideAlerter(ref, setIsBridgeOpen)
+  const ref: any = useRef(null)
+  useOutsideAlerter(setIsBridgeOpen, ref)
 
   const exitButtonProps = {
     onClick: () => history.push('/'),
