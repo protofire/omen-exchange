@@ -139,6 +139,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
   ]
 
   const isMarketCreatePage = !!matchPath(history.location.pathname, { path: '/create', exact: true })
+  const isSettingsPage = !!matchPath(history.location.pathname, { path: '/settings', exact: true })
 
   const createButtonProps = {
     disabled: disableConnectButton || isMarketCreatePage,
@@ -208,7 +209,10 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
               />
             </>
           )}
-          <ButtonSettings {...exitButtonProps} onClick={() => history.push('/settings')}>
+          <ButtonSettings
+            {...exitButtonProps}
+            onClick={() => (isSettingsPage ? history.push('/') : history.push('/settings'))}
+          >
             <IconSettings />
           </ButtonSettings>
         </ContentsRight>
