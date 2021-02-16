@@ -101,6 +101,7 @@ const theme = {
     textColor: '#757575',
     textColorDark: '#37474F',
     textColorDarker: '#333',
+    compound: '#00897B',
     textColorLight: '#999',
     textColorLighter: '#86909E',
     textColorLightish: '#7D8189',
@@ -397,6 +398,7 @@ const theme = {
     neutral: '#86909E',
     positiveText: '#4B9E98',
     negativeText: '#EF5350',
+    positionBall: '#B2DFDB',
   },
 }
 
