@@ -242,7 +242,8 @@ export const waitForConfirmations = async (
   while (receipt.confirmations && receipt.confirmations <= CONFIRMATION_COUNT) {
     setNumberOfConfirmations(receipt.confirmations)
     await waitABit(2000)
-    receipt = await cpk.waitForTransaction(transaction)
+    if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction({ hash: transaction })
+    else receipt = await cpk.waitForTransaction(transaction)
   }
   return
 }
