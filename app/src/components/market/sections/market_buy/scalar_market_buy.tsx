@@ -19,6 +19,7 @@ import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
+  calcPrediction,
   calcXValue,
   computeBalanceAfterTrade,
   formatBigNumber,
@@ -118,9 +119,6 @@ export const ScalarMarketBuy = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
 
-  const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
-  const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
-
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
@@ -173,11 +171,15 @@ export const ScalarMarketBuy = (props: Props) => {
       )
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
-      const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
+      const newPrediction = calcPrediction(
+        pricesAfterTrade[1].toString(),
+        scalarLow || new BigNumber(0),
+        scalarHigh || new BigNumber(0),
+      )
 
       return [tradedShares, newPrediction, amount]
     },
-    [balances, marketMaker, positionIndex, lowerBound, upperBound],
+    [balances, marketMaker, positionIndex, scalarLow, scalarHigh],
   )
 
   const [tradedShares, newPrediction, debouncedAmount] = useAsyncDerivedValue(

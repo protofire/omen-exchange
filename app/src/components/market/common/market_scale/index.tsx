@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import { calcXValue, formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
+import { calcPrediction, calcXValue, formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import {
   AdditionalSharesType,
   BalanceItem,
@@ -253,8 +253,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, 18))
   const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), 18))
 
-  const currentPredictionNumber = Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
-  const newPredictionNumber = Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
+  const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound)
+  const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound)
 
   const amountSharesNumber =
     collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
@@ -366,7 +366,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
     setScaleValue(Number(scaleBall?.value))
-    setScaleValuePrediction((Number(scaleBall?.value) / 100) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
+    setScaleValuePrediction(calcPrediction((Number(scaleBall?.value) / 100).toString(), lowerBound, upperBound))
   }
 
   useEffect(() => {
@@ -377,8 +377,19 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         ? Number(currentPrediction) * 100
         : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound, 18),
     )
-    setScaleValuePrediction(Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
-  }, [newPrediction, currentPrediction, lowerBound, startingPoint, upperBound, lowerBoundNumber, upperBoundNumber])
+    setScaleValuePrediction(
+      calcPrediction(newPrediction?.toString() || currentPrediction?.toString() || '', lowerBound, upperBound),
+    )
+  }, [
+    newPrediction,
+    currentPrediction,
+    lowerBoundNumber,
+    startingPoint,
+    startingPointNumber,
+    upperBoundNumber,
+    lowerBound,
+    upperBound,
+  ])
 
   useEffect(() => {
     if (long) {

@@ -8,6 +8,7 @@ import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts, useSymbol 
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
+  calcPrediction,
   calcSellAmountInCollateral,
   calcXValue,
   computeBalanceAfterTrade,
@@ -78,9 +79,6 @@ export const ScalarMarketSell = (props: Props) => {
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
 
-  const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
-  const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
-
   const symbol = useSymbol(collateral)
 
   useEffect(() => {
@@ -137,12 +135,16 @@ export const ScalarMarketSell = (props: Props) => {
       const potentialValue = mulBN(amountToSell, 1 / (1 - marketFeeWithTwoDecimals))
       const costFee = potentialValue.sub(amountToSell)
 
-      const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
+      const newPrediction = calcPrediction(
+        pricesAfterTrade[1].toString(),
+        scalarLow || new BigNumber(0),
+        scalarHigh || new BigNumber(0),
+      )
 
       logger.log(`Amount to sell ${amountToSell}`)
       return [costFee, newPrediction, amountToSell, potentialValue]
     },
-    [balances, positionIndex, lowerBound, upperBound, fee],
+    [balances, positionIndex, scalarLow, scalarHigh, fee],
   )
 
   const [costFee, newPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(

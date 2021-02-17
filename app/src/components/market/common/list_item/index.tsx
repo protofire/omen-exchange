@@ -8,6 +8,7 @@ import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
 import {
+  calcPrediction,
   calcPrice,
   formatBigNumber,
   formatNumber,
@@ -152,12 +153,9 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     unit = getUnit(title)
     scalarTitle = getScalarTitle(title)
 
-    const lowerBoundNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
-    const upperBoundNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
-    currentPrediction =
-      Number(outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : '0') *
-        ((upperBoundNumber || 0) - (lowerBoundNumber || 0)) +
-      (lowerBoundNumber || 0)
+    if (outcomeTokenMarginalPrices && scalarLow && scalarHigh) {
+      currentPrediction = calcPrediction(outcomeTokenMarginalPrices[1], scalarLow, scalarHigh)
+    }
   }
 
   return (

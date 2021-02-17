@@ -12,6 +12,7 @@ import {
   calcInitialFundingSendAmounts,
   calcNetCost,
   calcPoolTokens,
+  calcPrediction,
   calcPrice,
   calcSellAmountInCollateral,
   calcXValue,
@@ -525,6 +526,19 @@ describe('tools', () => {
       const xValue = calcXValue(currentPrediction, lowerBound, upperBound, decimals)
 
       expect(xValue).toStrictEqual(result)
+    }
+  })
+
+  describe('calcPrediction', () => {
+    const testCases: [[string, BigNumber, BigNumber, number], number][] = [
+      [['0.04', parseUnits('0', 18), parseUnits('1', 18), 18], 0.04],
+      [['0.5', parseUnits('5', 18), parseUnits('105', 18), 18], 55],
+      [['0.75', parseUnits('3', 6), parseUnits('43', 6), 6], 33],
+    ]
+    for (const [[probability, lowerBound, upperBound, decimals], result] of testCases) {
+      const prediction = calcPrediction(probability, lowerBound, upperBound, decimals)
+
+      expect(prediction).toStrictEqual(result)
     }
   })
 
