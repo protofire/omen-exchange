@@ -581,6 +581,14 @@ export const onChangeMarketCurrency = (
   }
 }
 
+export const calcPrediction = (probability: string, lowerBound: BigNumber, upperBound: BigNumber) => {
+  const probabilityNumber = Number(probability)
+  const lowerBoundNumber = Number(formatBigNumber(lowerBound, 18, 18))
+  const upperBoundNumber = Number(formatBigNumber(upperBound, 18, 18))
+  const prediction = probabilityNumber * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
+  return prediction
+}
+
 export const bigMax = (array: Big[]) => {
   let len = array.length
   let maxValue = new Big(0)
