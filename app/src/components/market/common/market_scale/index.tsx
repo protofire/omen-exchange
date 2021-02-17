@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import { calcPrediction, formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
+import { calcPrediction, calcXValue, formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import {
   AdditionalSharesType,
   BalanceItem,
@@ -293,7 +293,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       ? newPrediction * 100
       : currentPrediction
       ? Number(currentPrediction) * 100
-      : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+      : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound, 18),
   )
   const [scaleValuePrediction, setScaleValuePrediction] = useState(currentPredictionNumber || newPredictionNumber)
   const [yourPayout, setYourPayout] = useState(0)
@@ -375,7 +375,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         ? newPrediction * 100
         : currentPrediction
         ? Number(currentPrediction) * 100
-        : (((startingPointNumber || 0) - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound, 18),
     )
     setScaleValuePrediction(
       calcPrediction(newPrediction?.toString() || currentPrediction?.toString() || '', lowerBound, upperBound),
@@ -384,6 +384,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     newPrediction,
     currentPrediction,
     lowerBoundNumber,
+    startingPoint,
     startingPointNumber,
     upperBoundNumber,
     lowerBound,
@@ -488,7 +489,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: startingPointTitle,
       xValue: currentPrediction
         ? Number(currentPrediction)
-        : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound)),
+        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound, 18),
     },
   ]
 

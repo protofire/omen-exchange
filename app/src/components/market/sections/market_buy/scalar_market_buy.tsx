@@ -1,6 +1,6 @@
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -20,6 +20,7 @@ import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../..
 import { RemoteData } from '../../../../util/remote_data'
 import {
   calcPrediction,
+  calcXValue,
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
@@ -118,9 +119,6 @@ export const ScalarMarketBuy = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
 
-  const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
-  const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
-
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
@@ -191,7 +189,13 @@ export const ScalarMarketBuy = (props: Props) => {
   )
 
   const formattedNewPrediction =
-    newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
+    newPrediction &&
+    calcXValue(
+      parseUnits(newPrediction.toString(), 18),
+      scalarLow || new BigNumber(0),
+      scalarHigh || new BigNumber(0),
+      18,
+    ) / 100
 
   const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
