@@ -391,35 +391,41 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     upperBound,
   ])
 
+  const calcPayout = (shares: number, percentage: number) => {
+    const payout = shares * (percentage / 100)
+    return payout
+  }
+
+  const calcProfit = (shares: number, percentage: number, amount: number) => {
+    const profit = shares * (percentage / 100) - amount
+    return profit
+  }
+
+  const calcProfitPercentage = (shares: number, percentage: number, amount: number) => {
+    const profitPercentage = ((shares * (percentage / 100)) / amount - 1) * 100
+    profitPercentage < -100 ? -100 : profitPercentage
+    return profitPercentage
+  }
+
   useEffect(() => {
     if (long) {
-      // Calculate total payout by mulitplying shares amount by scale position
-      setYourPayout((amountSharesNumber || 0) * (scaleValue / 100))
-      // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (scaleValue / 100) - (tradeAmountNumber || 0))
+      setYourPayout(calcPayout(amountSharesNumber || 0, scaleValue))
+      setProfitLoss(calcProfit(amountSharesNumber || 0, scaleValue, tradeAmountNumber || 0))
     } else if (short) {
-      // Calculate total payout by mulitplying shares amount by scale position
-      setYourPayout((amountSharesNumber || 0) * (1 - scaleValue / 100))
-      // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (1 - scaleValue / 100) - (tradeAmountNumber || 0))
+      setYourPayout(calcPayout(amountSharesNumber || 0, 100 - scaleValue))
+      setProfitLoss(calcProfit(amountSharesNumber || 0, 100 - scaleValue, tradeAmountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
         const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
-        const shortPayoutAmount = (shortSharesNumber || 0) * (1 - scaleValue / 100)
-        const shortProfit = shortPayoutAmount - totalShortPriceNumber
-        const shortProfitRatio = shortPayoutAmount / totalShortPriceNumber - 1
-        setShortPayout(shortPayoutAmount)
-        setShortProfitAmount(shortProfit)
-        setShortProfitPercentage(shortProfitRatio * 100 < -100 ? -100 : shortProfitRatio * 100)
+        setShortPayout(calcPayout(shortSharesNumber || 0, 100 - scaleValue))
+        setShortProfitAmount(calcProfit(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
+        setShortProfitPercentage(calcProfitPercentage(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
         const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
-        const longPayoutAmount = (longSharesNumber || 0) * (scaleValue / 100)
-        const longProfit = longPayoutAmount - totalLongPriceNumber
-        const longProfitRatio = longPayoutAmount / totalLongPriceNumber - 1
-        setLongPayout(longPayoutAmount)
-        setLongProfitAmount(longProfit)
-        setLongProfitPercentage(longProfitRatio * 100 < -100 ? -100 : longProfitRatio * 100)
+        setLongPayout(calcPayout(longSharesNumber || 0, scaleValue))
+        setLongProfitAmount(calcProfit(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
+        setLongProfitPercentage(calcProfitPercentage(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
       }
     }
   }, [
