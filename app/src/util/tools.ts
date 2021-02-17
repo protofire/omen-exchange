@@ -3,11 +3,13 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
+import { CONFIRMATION_COUNT } from '../common/constants'
 import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
+import { CPKService } from '../services'
 import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
-import { getContractAddress, getNativeAsset, getToken, getWrapToken } from './networks'
+import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from './networks'
 import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token } from './types'
 
 const logger = getLogger('Tools')
@@ -224,6 +226,25 @@ export const isAddress = (address: string): boolean => {
     return false
   }
   return true
+}
+
+export const waitForConfirmations = async (
+  transaction: any,
+  cpk: CPKService,
+  setNumberOfConfirmations: any,
+  network: number,
+) => {
+  let receipt
+
+  if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction({ hash: transaction })
+  else receipt = await cpk.waitForTransaction(transaction)
+
+  while (receipt.confirmations && receipt.confirmations <= CONFIRMATION_COUNT) {
+    setNumberOfConfirmations(receipt.confirmations)
+    await waitABit(2000)
+    receipt = await cpk.waitForTransaction(transaction)
+  }
+  return
 }
 
 export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string =>

@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks'
+import { networkIds } from '../../../util/networks'
 import { truncateStringInTheMiddle } from '../../../util/tools'
 import { IconNotification } from '../icons/IconNotification'
 
@@ -42,7 +43,7 @@ export const Network = (props: Props) => {
   }
   return (
     <Wrapper {...props}>
-      {props.claim && networkId === 1 && <IconNotification style={{ marginRight: 12 }} />}
+      {props.claim && networkId === networkIds.MAINNET && <IconNotification style={{ marginRight: 12 }} />}
       <ConnectionStatusText>{truncateStringInTheMiddle(account, 6, 4) || 'No account connected'}</ConnectionStatusText>
       <ConnectionStatusDot>
         <ConnectionIcon />

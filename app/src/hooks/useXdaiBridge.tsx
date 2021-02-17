@@ -3,7 +3,8 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
 import { XdaiService } from '../services'
-import { formatBigNumber, waitABit } from '../util/tools'
+import { knownTokens, networkIds } from '../util/networks'
+import { formatBigNumber, waitForConfirmations } from '../util/tools'
 
 import { useConnectedCPKContext } from './connectedCpk'
 import { useConnectedWeb3Context } from './connectedWeb3'
@@ -41,11 +42,12 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const [claimState, setClaimState] = useState<boolean>(false)
   const [transactionHash, setTransactionHash] = useState<string>('')
   const cpk = useConnectedCPKContext()
+  const { decimals } = knownTokens['dai']
 
   const transferFunction = async () => {
     try {
       if (!cpk || !amount) return
-      if (networkId === 1) {
+      if (networkId === networkIds.MAINNET) {
         setTransactionStep(State.waitingConfirmation)
 
         const transaction = await cpk.sendDaiToBridge(amount)
@@ -53,18 +55,12 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         setTransactionHash(transaction.hash)
         setTransactionStep(State.transactionSubmitted)
 
-        let receipt = await cpk.waitForTransaction(transaction)
-
-        while (receipt.confirmations && receipt.confirmations <= 8) {
-          setNumberOfConfirmations(receipt.confirmations)
-          waitABit(2000)
-          receipt = await cpk.waitForTransaction(transaction)
-        }
+        await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
 
         setTransactionStep(State.transactionConfirmed)
         setNumberOfConfirmations(0)
       } else {
-        const amountInFloat = formatBigNumber(amount, 18)
+        const amountInFloat = formatBigNumber(amount, decimals)
 
         if (parseInt(amountInFloat) < 10) {
           setTransactionStep(State.error)
@@ -77,16 +73,11 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         setTransactionHash(transaction)
         setTransactionStep(State.transactionSubmitted)
 
-        let receipt = await cpk.waitForTransaction({ hash: transaction })
-        while (receipt.confirmations && receipt.confirmations <= 8) {
-          setNumberOfConfirmations(receipt.confirmations)
-          waitABit(2000)
-          receipt = await cpk.waitForTransaction(transaction)
-        }
+        await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
         setNumberOfConfirmations(0)
         setTransactionStep(State.transactionConfirmed)
       }
-      fetchBalance()
+      await fetchBalance()
     } catch (err) {
       setTransactionStep(State.error)
       console.error(`Error while transferring! ${err}`)
@@ -100,15 +91,10 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
       const transaction = await cpk.claimDaiTokens()
       setTransactionHash(transaction.hash)
       setTransactionStep(State.transactionSubmitted)
-      let receipt = await cpk.waitForTransaction(transaction)
-      while (receipt.confirmations && receipt.confirmations <= 8) {
-        setNumberOfConfirmations(receipt.confirmations)
-        waitABit(2000)
-        receipt = await cpk.waitForTransaction(transaction)
-      }
+      await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
       setTransactionStep(State.transactionConfirmed)
       setIsClaimStateTransaction(false)
-      fetchUnclaimedAssets()
+      await fetchUnclaimedAssets()
     } catch (e) {
       setIsClaimStateTransaction(false)
       setTransactionStep(State.error)
@@ -146,7 +132,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
 
   useEffect(() => {
     fetchBalance()
-    if (networkId === 1) {
+    if (networkId === networkIds.MAINNET) {
       fetchUnclaimedAssets()
     }
 

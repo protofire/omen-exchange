@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useXdaiBridge } from '../../../../hooks/useXdaiBridge'
+import { knownTokens, networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { ButtonRound } from '../../../button/button_round'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -119,9 +120,11 @@ export const XdaiBridgeTransfer = (props: Prop) => {
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
 
   const { networkId } = useConnectedWeb3Context()
+  const { decimals } = knownTokens['dai']
 
   const [transferState, setTransferState] = useState<boolean>(false)
-  const errorEval = amount.gt(Zero) && Number(formatBigNumber(amount, 18, 2)) < 10 && networkId != 1
+  const errorEval =
+    amount.gt(Zero) && Number(formatBigNumber(amount, decimals, 2)) < 10 && networkId != networkIds.MAINNET
 
   const {
     daiBalance,
@@ -139,27 +142,27 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           <MainnetWrapper>
             <ChainText>Mainnet</ChainText>
             <BalanceText
-              disabled={networkId != 1}
+              disabled={networkId != networkIds.MAINNET}
               onClick={() => {
-                if (daiBalance.eq(Zero) || networkId != 1) return
+                if (daiBalance.eq(Zero) || networkId != networkIds.MAINNET) return
                 setAmount(daiBalance)
-                setAmountToDisplay(formatBigNumber(daiBalance, 18))
+                setAmountToDisplay(formatBigNumber(daiBalance, decimals))
               }}
             >
-              {formatBigNumber(daiBalance, 18)} DAI
+              {formatBigNumber(daiBalance, decimals)} DAI
             </BalanceText>
           </MainnetWrapper>
           <XDaiWrapper>
             <ChainText>xDai Chain</ChainText>
             <BalanceText
-              disabled={networkId === 1}
+              disabled={networkId === networkIds.MAINNET}
               onClick={() => {
-                if (xDaiBalance.eq(Zero) || networkId === 1) return
+                if (xDaiBalance.eq(Zero) || networkId === networkIds.MAINNET) return
                 setAmount(xDaiBalance)
-                setAmountToDisplay(formatBigNumber(xDaiBalance, 18))
+                setAmountToDisplay(formatBigNumber(xDaiBalance, decimals))
               }}
             >
-              {formatBigNumber(xDaiBalance, 18)} XDAI
+              {formatBigNumber(xDaiBalance, decimals)} XDAI
             </BalanceText>
           </XDaiWrapper>
 
@@ -167,19 +170,19 @@ export const XdaiBridgeTransfer = (props: Prop) => {
             error={errorEval}
             formField={
               <BigNumberInput
-                decimals={18}
+                decimals={decimals}
                 name="amounts"
                 onChange={(e: BigNumberInputReturn) => {
                   setAmount(e.value)
                   setAmountToDisplay('')
                 }}
-                placeholder={networkId === 1 ? '0' : '10'}
+                placeholder={networkId === networkIds.MAINNET ? '0' : '10'}
                 style={{ width: 0 }}
                 value={amount}
                 valueToDisplay={amountToDisplay}
               />
             }
-            symbol={networkId === 1 ? 'DAI' : 'XDAI'}
+            symbol={networkId === networkIds.MAINNET ? 'DAI' : 'XDAI'}
           />
           {errorEval && (
             <WarningWrapper>
@@ -189,7 +192,7 @@ export const XdaiBridgeTransfer = (props: Prop) => {
           )}
 
           <TransferButton
-            disabled={amount.eq(Zero) || (networkId === 100 && Number(formatUnits(amount, 18)) < 10)}
+            disabled={amount.eq(Zero) || (networkId === networkIds.XDAI && Number(formatUnits(amount, decimals)) < 10)}
             onClick={() => {
               setTransferState(!transferState)
               transferFunction()

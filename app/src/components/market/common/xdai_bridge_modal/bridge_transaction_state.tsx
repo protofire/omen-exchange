@@ -2,8 +2,10 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
+import { CONFIRMATION_COUNT } from '../../../../common/constants'
 import { State } from '../../../../hooks/useXdaiBridge'
 import theme from '../../../../theme'
+import { networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { ButtonRound } from '../../../button/button_round'
 import { IconArrowUp } from '../../../common/icons/IconArrowUp'
@@ -79,9 +81,9 @@ export const TransactionState = ({
       </SvgWrapper>
 
       <BoldedText>
-        Transfer {formatBigNumber(amountToTransfer, 18)} {network === 1 ? 'DAI' : 'XDAI'}
+        Transfer {formatBigNumber(amountToTransfer, 18)} {network === networkIds.MAINNET ? 'DAI' : 'XDAI'}
       </BoldedText>
-      <ChainText>to {network === 1 ? 'xDai Chain' : 'Mainnet'}</ChainText>
+      <ChainText>to {network === networkIds.MAINNET ? 'xDai Chain' : 'Mainnet'}</ChainText>
 
       {state === State.waitingConfirmation ? (
         <TransactionText>Waiting confirmation</TransactionText>
@@ -89,7 +91,7 @@ export const TransactionState = ({
         numberOfConfirmations === 0 ? (
         <TransactionLink
           href={
-            network === 1
+            network === networkIds.MAINNET
               ? `https://etherscan.io/tx/${transactionHash}`
               : `https://blockscout.com/poa/xdai/tx/${transactionHash}`
           }
@@ -99,7 +101,9 @@ export const TransactionState = ({
           {state === State.transactionConfirmed ? 'Transaction Confirmed' : 'Transaction submitted'}
         </TransactionLink>
       ) : state === State.transactionSubmitted && numberOfConfirmations > 0 ? (
-        <TransactionText>{numberOfConfirmations}/8 confirmations</TransactionText>
+        <TransactionText>
+          {numberOfConfirmations}/{CONFIRMATION_COUNT} confirmations
+        </TransactionText>
       ) : (
         ''
       )}

@@ -10,16 +10,17 @@ import { Logo } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useOutsideAlerter } from '../../../../hooks/useOutsideAlerter'
 import { XdaiService } from '../../../../services'
+import { networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
-import { Network } from '../../../common'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { XdaiBridgeTransfer } from '../../../market/common/xdai_bridge_modal'
 import { ModalConnectWallet } from '../../../modal'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../form/dropdown'
 import { IconAdd, IconClose } from '../../icons'
 import { IconArrowRight } from '../../icons/IconArrowRight'
-import { DaiIcon } from '../../icons/currencies/DaiIcon'
+import { DaiIcon } from '../../icons/currencies'
 import { XdaiIcon } from '../../icons/currencies/XdaiIcon'
+import { Network } from '../../network'
 
 const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -186,7 +187,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
   const [claimState, setClaimState] = useState<boolean>(false)
-  const [unclaimedAmout, setUnclaimedAmount] = useState<BigNumber>(Zero)
+  const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
 
   const disableConnectButton = isModalOpen
 
@@ -202,7 +203,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             <GoldDot />
             Claim
           </ClaimText>
-          <ClaimAmount>{formatBigNumber(unclaimedAmout, 18, 2)} DAI</ClaimAmount>
+          <ClaimAmount>{formatBigNumber(unclaimedAmount, 18, 2)} DAI</ClaimAmount>
         </ClaimWrapper>
       ),
       visibility: networkId !== 1 || !claimState,
@@ -297,7 +298,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             </>
           )}
 
-          {(networkId === 1 || networkId == 100) && account && (
+          {(networkId === networkIds.MAINNET || networkId == networkIds.XDAI) && account && (
             <>
               <Bridge ref={ref}>
                 <ButtonRound
