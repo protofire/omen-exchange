@@ -219,7 +219,11 @@ export const History_select: React.FC<Props> = ({
                 marketFeeWithTwoDecimals,
               )
 
-              if (Number(item.additionalSharesCost) !== 0) {
+              if (
+                Number(item.additionalSharesCost) !== 0 &&
+                sharesValue &&
+                formatBigNumber(sharesValue, item.decimals, 3) !== '0.000'
+              ) {
                 newFpmmTradeArray.push({
                   sharesOrPoolTokenAmount: item.additionalSharesCost,
                   decimals: item.decimals,
