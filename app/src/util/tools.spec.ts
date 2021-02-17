@@ -25,6 +25,7 @@ import {
   formatTimestampToDate,
   formatToShortNumber,
   getIndexSets,
+  getScalarTitle,
   getUnit,
   isDust,
   isObjectEqual,
@@ -652,6 +653,16 @@ describe('tools', () => {
     for (const [[value], result] of testCases) {
       const cTokenValue = getBaseTokenForCToken(value)
       expect(result).toStrictEqual(cTokenValue)
+    }
+  })
+  describe('getScalarTitle', () => {
+    const testCases: [[string], string][] = [
+      [['Some random sclar market? [test]'], 'Some random sclar market?'],
+      [['scalar for testing which will last an eternity [Violets]'], 'scalar for testing which will last an eternity'],
+    ]
+    for (const [[value], result] of testCases) {
+      const modifiedTitle = getScalarTitle(value)
+      expect(result).toStrictEqual(modifiedTitle)
     }
   })
 })
