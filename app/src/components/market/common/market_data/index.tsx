@@ -151,7 +151,7 @@ export const MarketData: React.FC<Props> = props => {
           &nbsp;{symbol}
         </MarketDataItemTop>
         <TextToggle
-          alternativeLabel="24h Volume"
+          alternativeLabel="24hr Volume"
           isMain={!show24H}
           mainLabel="Total Volume"
           onClick={() => setShow24H(value => !value)}
