@@ -68,6 +68,7 @@ The `build` directory in the `app` directory will now contain the build to be se
 | Uniswap V2 Router | [0x1C232F01118CB8B424793ae03F870aa7D0ac7f77](https://blockscout.com/poa/xdai/address/0x1C232F01118CB8B424793ae03F870aa7D0ac7f77/contracts) |
 | Uniswap V2 Factory | [0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7](https://blockscout.com/poa/xdai/address/0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7/contracts) |
 | Wrapped1155Factory | [0xDE6943f3717738038159a406FF157d4eb3238c1B](https://blockscout.com/poa/xdai/address/0xDE6943f3717738038159a406FF157d4eb3238c1B/contracts) |
+| [DXdaoArbitrator](https://github.com/nicoelzer/omen-arbitrator) | [0xFe14059344b74043Af518d12931600C0f52dF7c5](https://blockscout.com/poa/xdai/address/0xFe14059344b74043Af518d12931600C0f52dF7c5/contracts) |
 
 
 ## Sokol Network
