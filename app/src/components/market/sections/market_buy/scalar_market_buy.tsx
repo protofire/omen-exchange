@@ -18,7 +18,14 @@ import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import { computeBalanceAfterTrade, formatBigNumber, formatNumber, getUnit, mulBN } from '../../../../util/tools'
+import {
+  calcPrediction,
+  computeBalanceAfterTrade,
+  formatBigNumber,
+  formatNumber,
+  getUnit,
+  mulBN,
+} from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -166,11 +173,15 @@ export const ScalarMarketBuy = (props: Props) => {
       )
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
-      const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
+      const newPrediction = calcPrediction(
+        pricesAfterTrade[1].toString(),
+        scalarLow || new BigNumber(0),
+        scalarHigh || new BigNumber(0),
+      )
 
       return [tradedShares, newPrediction, amount]
     },
-    [balances, marketMaker, positionIndex, lowerBound, upperBound],
+    [balances, marketMaker, positionIndex, scalarLow, scalarHigh],
   )
 
   const [tradedShares, newPrediction, debouncedAmount] = useAsyncDerivedValue(
