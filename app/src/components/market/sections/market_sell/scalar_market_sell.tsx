@@ -8,6 +8,7 @@ import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts, useSymbol 
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
+  calcPrediction,
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
   formatBigNumber,
@@ -136,12 +137,16 @@ export const ScalarMarketSell = (props: Props) => {
       const potentialValue = mulBN(amountToSell, 1 / (1 - marketFeeWithTwoDecimals))
       const costFee = potentialValue.sub(amountToSell)
 
-      const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
+      const newPrediction = calcPrediction(
+        pricesAfterTrade[1].toString(),
+        scalarLow || new BigNumber(0),
+        scalarHigh || new BigNumber(0),
+      )
 
       logger.log(`Amount to sell ${amountToSell}`)
       return [costFee, newPrediction, amountToSell, potentialValue]
     },
-    [balances, positionIndex, lowerBound, upperBound, fee],
+    [balances, positionIndex, scalarLow, scalarHigh, fee],
   )
 
   const [costFee, newPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(
