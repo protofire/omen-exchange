@@ -1,4 +1,4 @@
-import { providers } from 'ethers'
+import { ethers, providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
@@ -90,13 +90,32 @@ export const ConnectedWeb3: React.FC = props => {
     return null
   }
 
+  // TODO: make this switchable, can go back to mainnet or whatever
+  // eslint-disable-next-line
+  let provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network/')
+  const netId = 100
+
+  const signer = library.getSigner()
+  const fakeSigner = {
+    provider,
+    getAccount: signer.getAccount,
+    getAddress: () => account,
+    _ethersType: 'Signer',
+    signer: signer,
+  }
+  // @ts-expect-error ignore
+  provider.signer = fakeSigner
+  // @ts-expect-error ignore
+  provider.getSigner = () => fakeSigner
+
+  // provider = library
   const value = {
     account: account || null,
-    library,
-    networkId,
+    library: provider,
+    networkId: netId,
     rawWeb3Context: context,
   }
-
+  // @ts-expect-error ignore
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
 

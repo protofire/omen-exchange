@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js'
 import CPK, { OperationType } from 'contract-proxy-kit/lib/esm'
 import multiSendAbi from 'contract-proxy-kit/lib/esm/abis/MultiSendAbi.json'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
-import SafeRelayTransactionManager from 'contract-proxy-kit/lib/esm/transactionManagers/SafeRelayTransactionManager'
+import CpkTransactionManager from 'contract-proxy-kit/lib/esm/transactionManagers/CpkTransactionManager'
 import { getHexDataLength, joinHexData } from 'contract-proxy-kit/lib/esm/utils/hexData'
 import { ethers } from 'ethers'
 import { Web3Provider } from 'ethers/providers'
@@ -44,7 +44,7 @@ function standardizeTransaction(tx: Transaction): StandardTransaction {
 
 class OCPK extends CPK {
   constructor(opts?: CPKConfig) {
-    console.log(opts.transactionManager)
+    console.log(opts)
     super(opts)
     this.transactionManager = opts.transactionManager
   }
@@ -487,12 +487,27 @@ class RelayTransactionManager {
     }
   }
 
-  async execTransactions({ ownerAccount, safeExecTxParams, contracts, ethLibAdapter, isConnectedToSafe, sendOptions }) {
+  async execTransactions({
+    ownerAccount,
+    safeExecTxParams,
+    contracts,
+    ethLibAdapter,
+    isConnectedToSafe,
+    isDeployed,
+    sendOptions,
+  }) {
+    console.log(contracts.proxyFactory.address, ethLibAdapter)
+    console.log('proxy address: ', contracts.safeContract.address)
+    const proxyAddress = contracts.safeContract.address
+
+    console.log({ isDeployed })
+
     // TODO: get nonce
-    console.log(contracts, ethLibAdapter)
+    const nonce = isDeployed ? 2 : 0
+
     const tx = {
       to: safeExecTxParams.to,
-      value: sendOptions.value.toString(),
+      value: '0',
       data: safeExecTxParams.data,
       operation: safeExecTxParams.operation,
       safeTxGas: 0,
@@ -500,10 +515,10 @@ class RelayTransactionManager {
       gasPrice: 0,
       gasToken: zeroAddress,
       refundReceiver: zeroAddress,
-      nonce: 0,
+      nonce,
     }
 
-    const factoryAddress = '0x0831C113cA7998b7D79719A40da2aC6920d213bd'
+    const factoryAddress = '0x57cf4511Eedeab4C341d5d7E687960401a58d64c'
     const factory = new ethers.Contract(
       factoryAddress,
       pfABI,
@@ -511,7 +526,7 @@ class RelayTransactionManager {
     )
     console.log(contracts.safeContract.address)
     const txHash = await factory.getTransactionHash(
-      contracts.safeContract.address,
+      proxyAddress,
       tx.to,
       tx.value,
       tx.data,
@@ -525,78 +540,114 @@ class RelayTransactionManager {
     )
     console.log({ txHash })
 
-    const sig = await this.signTransactionHash(ethLibAdapter, ownerAccount, txHash)
+    const sig = await this.signTransactionHash(ethLibAdapter, txHash)
 
     // console.log("Before:")
     // console.log({ sig })
     const sigad = '0xaE8f96F5a7eDa6C6366bF9567B841a8c3fd7c6B1'
     const sigs = new ethers.Contract(sigad, sigABI, new ethers.providers.JsonRpcProvider('https://dai.poa.network/'))
-    const l1 = await sigs.recoverKey(txHash, sig, 0)
-    const l2 = await sigs.recoverKey2(txHash, sig, 0)
+    // const l1 = await sigs.recoverKey(txHash, sig, 0)
+    // const l2 = await sigs.recoverKey2(txHash, sig, 0)
     const owner = await sigs.recoverKey3(txHash, sig, 0)
-    console.log('After:', owner, l1, l2)
-    return
+    console.log(owner)
+
     // console.log(l1, l2, l3)
     // const b = await sigs.signatureSplit(sig, 0)
     // console.log(b)
     // return
-    // keccak256(toUtf8Bytes('Contract Proxy Kit'))
-    console.log({ sendOptions })
-    const predeterminedSaltNonce = '0xcfe33a586323e7325be6aa6ecd8b4600d232a9037e83c8ece69413b777dabe65'
-    console.log(tx)
-    const result = await factory.createProxyAndExecTransaction(
-      contracts.masterCopyAddress,
-      predeterminedSaltNonce,
-      tx.to,
-      tx.value,
-      tx.data,
-      tx.operation,
-      ownerAccount,
-      sig,
-      {
-        value: sendOptions.value,
-        gasLimit: 1000000,
-      },
-    )
-    console.log(result)
 
-    // const BICONOMY_API_KEY = 'MPEEl225y.19edc8a0-06f9-444b-b6bc-c1b7ca6bdc31'
-    // const METHOD_API_ID = '231ab7d5-b733-41f5-bf00-102a7a4774fc'
-    // const response = await fetch(`https://api.biconomy.io/api/v2/meta-tx/native`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'x-api-key': BICONOMY_API_KEY,
-    //     'Content-Type': 'application/json;charset=utf-8',
-    //   },
-    //   body: JSON.stringify({
-    //     to: '0xB39b4beA8F97896888D19a42676efa05845bB573',
-    //     apiId: METHOD_API_ID, // Can be found on dashboard under Manage API section
-    //     params: [
-    //       contracts.masterCopyAddress,
-    //       predeterminedSaltNonce,
-    //       tx.to,
-    //       tx.value,
-    //       tx.data,
-    //       tx.operation,
-    //       ownerAccount,
-    //       r,
-    //       s,
-    //       v
-    //     ],
-    //     from: ownerAccount
-    //   })
-    // })
-    // console.log(await response.json())
+    // cross chain sig works!
+
+    // keccak256(toUtf8Bytes('Contract Proxy Kit'))
+    const predeterminedSaltNonce = '0xcfe33a586323e7325be6aa6ecd8b4600d232a9037e83c8ece69413b777dabe65'
+
+    console.log(tx)
+    // const result = await factory.createProxyAndExecTransaction(
+    //   contracts.masterCopyAddress,
+    //   predeterminedSaltNonce,
+    //   tx.to,
+    //   tx.value,
+    //   tx.data,
+    //   tx.operation,
+    //   ownerAccount,
+    //   sig,
+    //   {
+    //     value: sendOptions.value,
+    //     gasLimit: 1000000
+    //   }
+    // );
+    // console.log(result)
+    const gasLimit = '3000000'
+
+    const biconomy = async body => {
+      const BICONOMY_API_KEY = 'MPEEl225y.19edc8a0-06f9-444b-b6bc-c1b7ca6bdc31'
+      const response = await fetch(`https://api.biconomy.io/api/v2/meta-tx/native`, {
+        method: 'POST',
+        headers: {
+          'x-api-key': BICONOMY_API_KEY,
+          'Content-Type': 'application/json;charset=utf-8',
+        },
+        body: JSON.stringify(body),
+      })
+      const json = await response.json()
+      return json
+    }
+
+    const createProxyAndExecTransaction = async () => {
+      const METHOD_API_ID = 'ed29e00e-f3d1-4a53-8c2c-92b6597182a5'
+      const result = await biconomy({
+        to: factoryAddress,
+        gasLimit,
+        apiId: METHOD_API_ID, // Can be found on dashboard under Manage API section
+        params: [
+          contracts.masterCopyAddress,
+          predeterminedSaltNonce,
+          tx.to,
+          tx.value,
+          tx.data,
+          tx.operation,
+          ownerAccount,
+          sig,
+        ],
+        from: ownerAccount,
+      })
+      console.log(result)
+    }
+
+    const execTransaction = async () => {
+      console.log({ gasLimit })
+      const METHOD_API_ID = '78dc94f7-4420-4275-862f-e3ab17c4d38e'
+      const result = await biconomy({
+        to: proxyAddress,
+        gasLimit,
+        apiId: METHOD_API_ID, // Can be found on dashboard under Manage API section
+        params: [
+          tx.to,
+          tx.value,
+          tx.data,
+          tx.operation,
+          tx.safeTxGas,
+          tx.dataGas,
+          tx.gasPrice,
+          tx.gasToken,
+          tx.refundReceiver,
+          sig,
+        ],
+        from: ownerAccount,
+      })
+      console.log(result)
+    }
+
+    if (isDeployed) {
+      await execTransaction()
+    } else {
+      await createProxyAndExecTransaction()
+    }
   }
 
-  private async signTransactionHash(ethLibAdapter: EthLibAdapter, ownerAccount: Address, txHash: string) {
-    let sig = await ethLibAdapter.signMessage(txHash, ownerAccount)
-    const pre =
-      '0x' +
-      sig
-        .replace('0x', '')
-        .replace(/00$/, '1f')
-        .replace(/01$/, '20')
+  private async signTransactionHash(ethLibAdapter: EthLibAdapter, txHash: string) {
+    const messageArray = ethers.utils.arrayify(txHash)
+    let sig = await ethLibAdapter.signer.signer.signMessage(messageArray)
     let sigV = parseInt(sig.slice(-2), 16)
 
     switch (sigV) {
@@ -614,12 +665,6 @@ class RelayTransactionManager {
 
     sig = sig.slice(0, -2) + sigV.toString(16)
     return sig
-
-    return {
-      r: new BigNumber('0x' + sig.slice(2, 66)).toString(10),
-      s: new BigNumber('0x' + sig.slice(66, 130)).toString(10),
-      v: new BigNumber('0x' + sig.slice(130, 132)).toString(10),
-    }
   }
 }
 
@@ -627,13 +672,15 @@ export const createCPK = async (provider: Web3Provider) => {
   const signer = provider.getSigner()
   const network = await provider.getNetwork()
   const cpkAddresses = getCPKAddresses(network.chainId)
+  console.log(network)
   const networks = cpkAddresses
     ? {
         [network.chainId]: cpkAddresses,
       }
     : {}
-  // const transactionManager = new SafeRelayTransactionManager({ url: 'https://safe-relay.xdai.gnosis.io' })
+  console.log({ networks })
   const transactionManager = new RelayTransactionManager()
+  // const transactionManager = new CpkTransactionManager()
   const cpk = new OCPK({ ethLibAdapter: new EthersAdapter({ ethers, signer }), transactionManager, networks })
   await cpk.init()
   return cpk

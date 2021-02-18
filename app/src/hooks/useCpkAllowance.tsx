@@ -18,7 +18,7 @@ import { useConnectedCPKContext } from './connectedCpk'
 export const useCpkAllowance = (signer: Signer, tokenAddress: string) => {
   const cpk = useConnectedCPKContext()
   const [allowance, setAllowance] = useState<RemoteData<BigNumber>>(RemoteData.notAsked())
-
+  console.log({ signer })
   const provider = signer.provider
 
   const updateAllowance = useCallback(async () => {

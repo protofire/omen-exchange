@@ -234,13 +234,14 @@ class CPKService {
         }
         minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, amount)
       }
+      console.log({ useBaseToken })
       if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateralAddress = getWrapToken(networkId).address
 
         // we need to send the funding amount in native ether
         if (!this.cpk.isSafeApp()) {
-          txOptions.value = amount
+          // txOptions.value = amount
         }
         if (this.cpk.isSafeApp()) {
           txOptions.gas = 500000
@@ -324,7 +325,7 @@ class CPKService {
         to: marketMakerAddress,
         data: MarketMakerService.encodeBuy(minCollateralAmount, outcomeIndex, outcomeTokensToBuy),
       })
-
+      console.log(transactions)
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
       return this.waitForTransaction(txObject)
     } catch (err) {

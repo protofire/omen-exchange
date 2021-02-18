@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { useWeb3Context } from 'web3-react'
 
 import { CPKService } from '../services'
 import { createCPK } from '../util/cpk'
+
+import { useConnectedWeb3Context } from './connectedWeb3'
 
 const ConnectedCPKContext = React.createContext<Maybe<CPKService>>(null)
 
@@ -16,7 +17,7 @@ export const useConnectedCPKContext = () => React.useContext(ConnectedCPKContext
  */
 export const ConnectedCPK: React.FC = props => {
   const [cpk, setCpk] = useState<Maybe<CPKService>>(null)
-  const { account, library } = useWeb3Context()
+  const { account, library } = useConnectedWeb3Context()
   useEffect(() => {
     if (account && library) {
       createCPK(library)

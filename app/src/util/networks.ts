@@ -222,7 +222,7 @@ const networks: { [K in NetworkId]: Network } = {
     },
     cpk: {
       masterCopyAddress: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
-      proxyFactoryAddress: '0x0831C113cA7998b7D79719A40da2aC6920d213bd',
+      proxyFactoryAddress: '0x57cf4511Eedeab4C341d5d7E687960401a58d64c',
       multiSendAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
       fallbackHandlerAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
     },
