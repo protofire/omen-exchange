@@ -1,7 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts, useSymbol } from '../../../../hooks'
@@ -28,7 +27,6 @@ import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError, TabsGrid } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
-import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
@@ -260,8 +258,6 @@ export const ScalarMarketSell = (props: Props) => {
               Long
             </ButtonTab>
           </TabsGrid>
-          <TokenBalance text="Your Shares" value={formatNumber(selectedOutcomeBalance)} />
-          <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
