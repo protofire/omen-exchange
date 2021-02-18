@@ -543,7 +543,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             {` ${unit}`}
           </ScaleTitle>
           <ScaleTitle>
-            {upperBound && formatBigNumber(upperBound, 18)} {unit}
+            {formatNumber(upperBoundNumber.toString())} {unit}
           </ScaleTitle>
         </ScaleTitleWrapper>
         <Scale>
