@@ -4,6 +4,7 @@ import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
 
 import {
+  DISCLAIMER_TEXT,
   DOCUMENT_DESCRIPTION,
   DOCUMENT_TITLE,
   MAINNET_LOCATION,
@@ -99,7 +100,7 @@ export const Main: React.FC = () => {
             )}
           </MainScroll>
           <Footer />
-          <Disclaimer />
+          {DISCLAIMER_TEXT.length > 0 && <Disclaimer />}
         </MainWrapper>
       </Router>
     </>
