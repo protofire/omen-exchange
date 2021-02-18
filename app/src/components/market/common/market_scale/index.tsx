@@ -14,6 +14,7 @@ import {
   TradeObject,
   TradeType,
 } from '../../../../util/types'
+import { IconDraggable } from '../../../common/icons'
 import { SCALE_HEIGHT } from '../common_styled'
 import { PositionTable } from '../position_table'
 
@@ -125,13 +126,24 @@ const ScaleBallContainer = styled.div`
   width: 100%;
 `
 
-const ScaleBall = styled.input`
+const ScaleBall = styled.div<{ xValue: number }>`
+  height: ${BALL_SIZE};
+  width: ${BALL_SIZE};
+  position: absolute;
+  z-index: 4;
+  left: calc(${props => props.xValue}% - ${BALL_SIZE} / 2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const ScaleSlider = styled.input`
   height: ${SCALE_HEIGHT};
   width: calc(100% + ${BALL_SIZE});
   background: none;
   outline: none;
   -webkit-appearance: none;
-  z-index: 4;
+  z-index: 5;
   position: absolute;
   left: calc(-${BALL_SIZE} / 2);
   right: calc(-${BALL_SIZE} / 2);
@@ -141,8 +153,6 @@ const ScaleBall = styled.input`
     height: ${BALL_SIZE};
     width: ${BALL_SIZE};
     border-radius: 50%;
-    border: 3px solid ${props => props.theme.scale.ballBorder};
-    background: ${props => props.theme.scale.ballBackground};
     cursor: pointer;
   }
 
@@ -150,8 +160,6 @@ const ScaleBall = styled.input`
     height: ${BALL_SIZE};
     width: ${BALL_SIZE};
     border-radius: 50%;
-    border: 3px solid ${props => props.theme.scale.ballBorder};
-    background: ${props => props.theme.scale.ballBackground};
     cursor: pointer;
   }
 `
@@ -551,7 +559,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             <ScaleTooltip id="scale-tooltip" xValue={scaleValue || 0}>
               <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
             </ScaleTooltip>
-            <ScaleBall
+            <ScaleBall xValue={scaleValue}>
+              <IconDraggable />
+            </ScaleBall>
+            <ScaleSlider
               className="scale-ball"
               disabled={!isSliderEnabled}
               max="100"

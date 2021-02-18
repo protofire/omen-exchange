@@ -390,7 +390,7 @@ const theme = {
   scale: {
     bar: '#e8eaf6',
     box: '#e8eaf6',
-    ballBorder: '#7986cb',
+    ballBorder: '#DCDFF2',
     ballBackground: '#fff',
     border: '#E8EAF6',
     positive: '#80CBC4',
