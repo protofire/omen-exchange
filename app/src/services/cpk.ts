@@ -234,7 +234,6 @@ class CPKService {
         }
         minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, amount)
       }
-      console.log({ useBaseToken })
       if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateralAddress = getWrapToken(networkId).address
@@ -325,7 +324,7 @@ class CPKService {
         to: marketMakerAddress,
         data: MarketMakerService.encodeBuy(minCollateralAmount, outcomeIndex, outcomeTokensToBuy),
       })
-      console.log(transactions)
+
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
       return this.waitForTransaction(txObject)
     } catch (err) {
@@ -824,29 +823,29 @@ class CPKService {
         }
       }
       // If we are signed in as a safe we don't need to transfer
-      if (!this.cpk.isSafeApp()) {
-        // Step 4: Transfer funding to user
-        if (!useBaseToken) {
-          transactions.push({
-            to: userInputCollateral.address,
-            data: ERC20Service.encodeTransfer(account, amount),
-          })
-        } else {
-          // Transfer unwrapped asset back to user
-          if (compoundService && userInputCollateral.address !== pseudoNativeAssetAddress) {
-            const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(userInputCollateral, amount)
-            transactions.push({
-              to: userInputCollateral.address,
-              data: ERC20Service.encodeTransfer(account, minCollateralAmount),
-            })
-          } else {
-            transactions.push({
-              to: account,
-              value: amount,
-            })
-          }
-        }
-      }
+      // if (!this.cpk.isSafeApp()) {
+      //   // Step 4: Transfer funding to user
+      //   if (!useBaseToken) {
+      //     transactions.push({
+      //       to: userInputCollateral.address,
+      //       data: ERC20Service.encodeTransfer(account, amount),
+      //     })
+      //   } else {
+      //     // Transfer unwrapped asset back to user
+      //     if (compoundService && userInputCollateral.address !== pseudoNativeAssetAddress) {
+      //       const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(userInputCollateral, amount)
+      //       transactions.push({
+      //         to: userInputCollateral.address,
+      //         data: ERC20Service.encodeTransfer(account, minCollateralAmount),
+      //       })
+      //     } else {
+      //       transactions.push({
+      //         to: account,
+      //         value: amount,
+      //       })
+      //     }
+      //   }
+      // }
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
       return this.waitForTransaction(txObject)
     } catch (err) {

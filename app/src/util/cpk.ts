@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import CPK, { OperationType } from 'contract-proxy-kit/lib/esm'
 import multiSendAbi from 'contract-proxy-kit/lib/esm/abis/MultiSendAbi.json'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
+import safeAbi from 'contract-proxy-kit/lib/esm/abis/SafeAbi.json'
 import CpkTransactionManager from 'contract-proxy-kit/lib/esm/transactionManagers/CpkTransactionManager'
 import { getHexDataLength, joinHexData } from 'contract-proxy-kit/lib/esm/utils/hexData'
 import { ethers } from 'ethers'
@@ -48,6 +49,7 @@ class OCPK extends CPK {
     super(opts)
     this.transactionManager = opts.transactionManager
   }
+
   async execTransactions(transactions: Transaction[], options?: ExecOptions): Promise<TransactionResult> {
     console.log(this.transactionManager)
     if (!this.address) {
@@ -503,7 +505,7 @@ class RelayTransactionManager {
     console.log({ isDeployed })
 
     // TODO: get nonce
-    const nonce = isDeployed ? 2 : 0
+    const nonce = isDeployed ? 4 : 0
 
     const tx = {
       to: safeExecTxParams.to,
@@ -518,7 +520,7 @@ class RelayTransactionManager {
       nonce,
     }
 
-    const factoryAddress = '0x57cf4511Eedeab4C341d5d7E687960401a58d64c'
+    const factoryAddress = contracts.proxyFactory.address
     const factory = new ethers.Contract(
       factoryAddress,
       pfABI,
