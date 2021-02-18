@@ -546,7 +546,7 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
     name: 'DXdao',
     url: 'https://dxdao.eth.link/',
     addresses: {
-      [networkIds.XDAI]: '0x34a8B97bd8Ac4AfBe91C71E961C3f9c1F064717F',
+      [networkIds.XDAI]: '0xFe14059344b74043Af518d12931600C0f52dF7c5',
     },
     isSelectionEnabled: true,
   },
