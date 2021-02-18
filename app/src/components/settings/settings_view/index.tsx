@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
+import { Textfield } from '../../../../omen-exchange/app/src/components/common/form/textfield'
 import { useConnectedWeb3Context } from '../../../hooks'
-import { networkIds } from '../../../util/networks'
+import { getChainSpecificAlternativeUrls, networkIds, supportedNetworkURLs } from '../../../util/networks'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { ListCard } from '../../market/common/list_card/index'
@@ -117,25 +118,33 @@ const SettingsViewContainer = () => {
   const context = useConnectedWeb3Context()
 
   const [current, setCurrent] = useState(0)
+  const [url, setUrl] = useState<string>('')
 
-  const dropdownList = [
-    {
-      title: 'Infura',
-      image: imgInfura,
+  const urlObject = getChainSpecificAlternativeUrls(context.networkId)
+  console.log(urlObject)
+
+  const replacment = urlObject.map((item, index) => {
+    return {
+      title: item.name,
+      image: item.name === 'Infura' ? imgInfura : undefined,
       onClick: () => {
-        setCurrent(0)
+        setCurrent(index)
+        setUrl(item.rpcUrl)
       },
-    },
+    }
+  })
 
-    {
-      title: 'Custom',
-      onClick: () => {
-        setCurrent(1)
-      },
+  console.log(replacment.length)
+  replacment.push({
+    title: 'Custom',
+    image: undefined,
+    onClick: () => {
+      setCurrent(replacment.length - 1)
     },
-  ]
-
-  const filterItems = dropdownList.map(item => {
+  })
+  console.log(current)
+  const filterItems = replacment.map((item, index) => {
+    // console.log(index)
     return {
       content: (
         <CustomDropdownItem onClick={item.onClick}>
@@ -167,7 +176,9 @@ const SettingsViewContainer = () => {
             <NodeDropdown currentItem={current} dirty dropdownPosition={DropdownPosition.center} items={filterItems} />
           </FiltersControls>
         </Row>
-        {current === 1 && <Input placeholder="Paste your RPC URL"></Input>}
+        {current === replacment.length - 1 && (
+          <Input onChange={event => setUrl(event.target.value)} placeholder="Paste your RPC URL"></Input>
+        )}
       </MainContent>
 
       <BottomContent>
@@ -182,7 +193,7 @@ const SettingsViewContainer = () => {
           <ButtonRound
             onClick={() => {
               setCurrent(0)
-              sessionStorage.setItem('rpcAddress', '')
+              setUrl(urlObject[0].rpcUrl)
             }}
           >
             Set to Default
@@ -195,7 +206,7 @@ const SettingsViewContainer = () => {
               sessionStorage.setItem(
                 'rpcAddress',
                 JSON.stringify({
-                  url: 'https://cloudflare-eth.com/',
+                  url: url,
                   network: context.networkId,
                 }),
               )

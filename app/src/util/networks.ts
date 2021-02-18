@@ -44,7 +44,7 @@ type CPKAddresses = {
 interface Network {
   label: string
   url: string
-  alternativeUrls: { [key: string]: string }
+  alternativeUrls: { [key: string]: string }[]
   graphHttpUri: string
   graphWsUri: string
   klerosCurateGraphHttpUri: string
@@ -89,9 +89,14 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     label: 'Mainnet',
     url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
-    alternativeUrls: {
-      default: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
-    },
+    alternativeUrls: [
+      {
+        rpcUrl: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+        name: 'Infura',
+      },
+      { rpcUrl: 'https://cloudflare-eth.com/', name: 'Cloudflare' },
+      { rpcUrl: 'https://blockscout.com', name: 'BlockScout' },
+    ],
     graphHttpUri: GRAPH_MAINNET_HTTP,
     graphWsUri: GRAPH_MAINNET_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_MAINNET_HTTP,
@@ -130,9 +135,12 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
     url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
-    alternativeUrls: {
-      default: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
-    },
+    alternativeUrls: [
+      {
+        rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
+        name: 'Infura',
+      },
+    ],
     graphHttpUri: GRAPH_RINKEBY_HTTP,
     graphWsUri: GRAPH_RINKEBY_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -171,9 +179,12 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.SOKOL]: {
     label: 'Sokol',
     url: 'https://sokol.poa.network',
-    alternativeUrls: {
-      default: 'https://sokol.poa.network',
-    },
+    alternativeUrls: [
+      {
+        rpcUrl: 'https://sokol.poa.network',
+        name: 'xDai',
+      },
+    ],
     graphHttpUri: GRAPH_SOKOL_HTTP,
     graphWsUri: GRAPH_SOKOL_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -211,9 +222,13 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.XDAI]: {
     label: 'xDai',
     url: 'https://rpc.xdaichain.com/',
-    alternativeUrls: {
-      default: 'https://rpc.xdaichain.com/',
-    },
+    alternativeUrls: [
+      {
+        rpcUrl: 'https://rpc.xdaichain.com/',
+        name: 'xDai',
+      },
+      { rpcUrl: 'https://xdai-archive.blockscout.com', name: 'xDai' },
+    ],
     graphHttpUri: GRAPH_XDAI_HTTP,
     graphWsUri: GRAPH_XDAI_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -250,10 +265,16 @@ const networks: { [K in NetworkId]: Network } = {
   },
 }
 
+export const getChainSpecificAlternativeUrls = (networkId: number) => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].alternativeUrls
+}
 if (sessionStorage.getItem('rpcAddress')) {
   console.log('inside gargantua')
   const data = JSON.parse(<string>sessionStorage.getItem('rpcAddress'))
-  console.log(typeof networkIds.MAINNET)
+  console.log(data.url)
   const network: NetworkId = data.network
   networks[network].url = data.url
   console.log(networks[network])

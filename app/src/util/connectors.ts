@@ -51,7 +51,6 @@ class SafeConnector extends Connectors.Connector {
   }
 
   public async getProvider(): Promise<any> {
-    console.log('INSIDE DESIRED!!!')
     const provider = new ethers.providers.JsonRpcProvider(getInfuraUrl(this.networkId), this.networkId)
     const getSigner = provider.getSigner.bind(provider)
     provider.getSigner = () => getSigner(this.address)
