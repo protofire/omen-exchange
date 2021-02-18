@@ -115,9 +115,9 @@ const Input = styled.input`
 const SettingsViewContainer = () => {
   const history = useHistory()
   const context = useConnectedWeb3Context()
-  console.log(context)
+
   const [current, setCurrent] = useState(0)
-  console.log(current)
+
   const dropdownList = [
     {
       title: 'Infura',
@@ -134,10 +134,7 @@ const SettingsViewContainer = () => {
       },
     },
   ]
-  async function milan() {
-    console.log(await context)
-  }
-  milan()
+
   const filterItems = dropdownList.map(item => {
     return {
       content: (
@@ -185,17 +182,17 @@ const SettingsViewContainer = () => {
           <ButtonRound
             onClick={() => {
               setCurrent(0)
-              localStorage.setItem('rpcAddress', '')
+              sessionStorage.setItem('rpcAddress', '')
             }}
           >
             Set to Default
           </ButtonRound>
           <ButtonRound
             onClick={() => {
-              console.log(localStorage.getItem('rpcAddress'))
+              console.log(sessionStorage.getItem('rpcAddress'))
               console.log(networkIds)
 
-              localStorage.setItem(
+              sessionStorage.setItem(
                 'rpcAddress',
                 JSON.stringify({
                   url: 'https://cloudflare-eth.com/',

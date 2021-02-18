@@ -44,6 +44,7 @@ type CPKAddresses = {
 interface Network {
   label: string
   url: string
+  alternativeUrls: { [key: string]: string }
   graphHttpUri: string
   graphWsUri: string
   klerosCurateGraphHttpUri: string
@@ -88,6 +89,9 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     label: 'Mainnet',
     url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+    alternativeUrls: {
+      default: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+    },
     graphHttpUri: GRAPH_MAINNET_HTTP,
     graphWsUri: GRAPH_MAINNET_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_MAINNET_HTTP,
@@ -126,6 +130,9 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
     url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
+    alternativeUrls: {
+      default: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
+    },
     graphHttpUri: GRAPH_RINKEBY_HTTP,
     graphWsUri: GRAPH_RINKEBY_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -164,6 +171,9 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.SOKOL]: {
     label: 'Sokol',
     url: 'https://sokol.poa.network',
+    alternativeUrls: {
+      default: 'https://sokol.poa.network',
+    },
     graphHttpUri: GRAPH_SOKOL_HTTP,
     graphWsUri: GRAPH_SOKOL_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -201,6 +211,9 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.XDAI]: {
     label: 'xDai',
     url: 'https://rpc.xdaichain.com/',
+    alternativeUrls: {
+      default: 'https://rpc.xdaichain.com/',
+    },
     graphHttpUri: GRAPH_XDAI_HTTP,
     graphWsUri: GRAPH_XDAI_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -236,10 +249,10 @@ const networks: { [K in NetworkId]: Network } = {
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
   },
 }
-console.log('here')
-console.log(localStorage.getItem('rpcAddress'))
-if (localStorage.getItem('rpcAddress')) {
-  const data = JSON.parse(<string>localStorage.getItem('rpcAddress'))
+
+if (sessionStorage.getItem('rpcAddress')) {
+  console.log('inside gargantua')
+  const data = JSON.parse(<string>sessionStorage.getItem('rpcAddress'))
   console.log(typeof networkIds.MAINNET)
   const network: NetworkId = data.network
   networks[network].url = data.url
