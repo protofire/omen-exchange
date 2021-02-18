@@ -182,7 +182,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
                     formatBigNumber(runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24], decimals),
                   )
                 : 0
-            } ${symbol} - 24hr Volume`}
+            } ${symbol} - 24h Volume`}
           {currentFilter.sortBy === 'usdLiquidityParameter' &&
             `${formatToShortNumber(formattedLiquidity)} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
