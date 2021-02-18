@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -10,6 +10,7 @@ import { getLogger } from '../../../../util/logger'
 import {
   calcPrediction,
   calcSellAmountInCollateral,
+  calcXValue,
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
@@ -77,9 +78,6 @@ export const ScalarMarketSell = (props: Props) => {
   const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
-
-  const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
-  const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
 
   const symbol = useSymbol(collateral)
 
@@ -156,7 +154,13 @@ export const ScalarMarketSell = (props: Props) => {
   )
 
   const formattedNewPrediction =
-    newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
+    newPrediction &&
+    calcXValue(
+      parseUnits(newPrediction.toString(), 18),
+      scalarLow || new BigNumber(0),
+      scalarHigh || new BigNumber(0),
+      18,
+    ) / 100
 
   const finish = async () => {
     const outcomeIndex = positionIndex
